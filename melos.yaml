@@ -1,0 +1,15 @@
+name: mangastash
+
+packages:
+  - module/**
+  - '*'
+
+ide:
+  intellij:
+    enabled: false
+
+scripts:
+  get:
+    description: Get dependencies for all packages.
+    run: |
+      melos exec -- "flutter pub get"
