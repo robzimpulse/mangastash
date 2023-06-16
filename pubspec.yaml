@@ -31,6 +31,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  provider: ^6.0.5
+  go_router: ^7.0.0
+
+  # core
+  core_auth:
+    path: module/core/core_auth
+  core_environment:
+    path: module/core/core_environment
+  core_route:
+    path: module/core/core_route
 
   # feature
   feature_collection:
