@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:core_route/core_route.dart';
+import 'package:safe_bloc/safe_bloc.dart';
 
 void main() {
 
