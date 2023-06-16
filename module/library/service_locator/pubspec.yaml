@@ -1,4 +1,4 @@
-name: safe_bloc
+name: service_locator
 description: A new Flutter package project.
 version: 0.0.1
 
@@ -9,7 +9,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_bloc: ^8.1.1
+  get_it: ^7.4.0
+  collection: ^1.15.0
+  async: ^2.8.2
+  lazy_evaluation: ^1.1.0
+
 
 dev_dependencies:
   flutter_test:

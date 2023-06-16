@@ -56,6 +56,12 @@ dependencies:
   ui_setting:
     path: module/ui/ui_setting
 
+  # library
+  safe_bloc:
+    path: module/library/safe_bloc
+  service_locator:
+    path: module/library/service_locator
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

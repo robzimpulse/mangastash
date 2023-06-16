@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:service_locator/service_locator.dart';
 import 'package:ui_home/ui_home.dart';
 
 void main() {
+  ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
+
   runApp(const MyApp());
 }
 
