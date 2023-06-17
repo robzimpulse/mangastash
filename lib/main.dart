@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:feature_home/feature_home.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -42,7 +40,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
       return Provider<ServiceLocator>(
         create: (context) => _locator,
         child: MaterialApp.router(
-          title: 'Stock Checker',
+          title: 'Manga Stash',
           debugShowCheckedModeBanner: false,
           routerConfig: _router,
           theme: ThemeData(primarySwatch: Colors.blue),
@@ -50,7 +48,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
       );
     } else {
       return MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Manga Stash',
         theme: ThemeData(primarySwatch: Colors.blue),
         debugShowCheckedModeBanner: false,
         home: const Scaffold(
@@ -76,12 +74,10 @@ class _MangaStashAppState extends State<MangaStashApp> {
     ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
     await Future.delayed(const Duration(seconds: 3));
     // TODO: register module registrar here
-    log('initiateAppLocator', name: 'robzimpulse');
     return ServiceLocator.asNewInstance();
   }
 
   GoRouter initiateRouter({String initialRoute = MainPath.main}) {
-    log('initiateRouter', name: 'robzimpulse');
     return GoRouter(
       initialLocation: initialRoute,
       errorBuilder: (context, state) => ErrorScreen(
