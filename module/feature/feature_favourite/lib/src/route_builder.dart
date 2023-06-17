@@ -1,18 +1,18 @@
 import 'package:core_route/core_route.dart';
 import 'package:flutter/material.dart';
 
-import '../feature_home.dart';
+import 'route_path.dart';
 
-class HomeRouteBuilder extends BaseRouteBuilder {
+class RouteBuilder extends BaseRouteBuilder {
   @override
   List<GoRoute> routes() {
     return [
       GoRoute(
-        name: HomePath.main,
-        path: HomePath.main,
+        name: RoutePath.main,
+        path: RoutePath.main,
         builder: (context, state) => const Scaffold(
           body: Center(
-            child: Text('Home'),
+            child: Text('Favourite'),
           ),
         ),
       ),

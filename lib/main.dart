@@ -1,12 +1,16 @@
 import 'dart:developer';
 
-import 'package:feature_home/feature_home.dart';
+import 'package:feature_home/feature_home.dart' as home;
+import 'package:feature_collection/feature_collection.dart' as collection;
+import 'package:feature_favourite/feature_favourite.dart' as favourite;
+import 'package:feature_profile/feature_profile.dart' as profile;
+import 'package:feature_setting/feature_setting.dart' as setting;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:service_locator/service_locator.dart';
-import 'package:ui_home/ui_home.dart';
 
+import 'error_screen.dart';
 import 'path.dart';
 
 void main() {
@@ -83,18 +87,18 @@ class MangaStashAppState extends State<MangaStashApp> {
     log('initiateRouter', name: 'robzimpulse');
     return GoRouter(
       initialLocation: initialRoute,
-      errorBuilder: (context, state) => const Scaffold(
-        body: Center(
-          child: Text('Error Not Found'),
-        ),
-      ),
+      errorBuilder: (context, state) => const ErrorScreen(),
       routes: [
         GoRoute(
           path: MainPath.main,
           name: MainPath.main,
-          redirect: (context, state) => HomePath.main,
+          redirect: (context, state) => home.RoutePath.main,
         ),
-        ...HomeRouteBuilder().routes()
+        ...home.RouteBuilder().routes(),
+        ...collection.RouteBuilder().routes(),
+        ...profile.RouteBuilder().routes(),
+        ...setting.RouteBuilder().routes(),
+        ...favourite.RouteBuilder().routes(),
       ],
       observers: [
 
@@ -102,6 +106,3 @@ class MangaStashAppState extends State<MangaStashApp> {
     );
   }
 }
-
-
-

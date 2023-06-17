@@ -1,6 +1,7 @@
 name: feature_profile
 description: A new Flutter package project.
 version: 0.0.1
+publish_to: none
 
 environment:
   sdk: '>=2.18.2 <3.0.0'
@@ -9,6 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  # core
+  core_route:
+    path: ../../core/core_route
 
 dev_dependencies:
   flutter_test:
