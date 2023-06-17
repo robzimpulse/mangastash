@@ -3,19 +3,11 @@ import 'package:flutter/material.dart';
 
 import 'route_path.dart';
 
-class RouteBuilder extends BaseRouteBuilder {
+class HomeRouteBuilder extends BaseRouteBuilder {
   @override
   List<GoRoute> routes() {
     return [
-      GoRoute(
-        name: RoutePath.main,
-        path: RoutePath.main,
-        builder: (context, state) => const Scaffold(
-          body: Center(
-            child: Text('Home'),
-          ),
-        ),
-      ),
+
     ];
   }
 }

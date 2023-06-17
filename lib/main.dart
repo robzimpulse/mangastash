@@ -1,17 +1,14 @@
 import 'dart:developer';
 
-import 'package:feature_home/feature_home.dart' as home;
-import 'package:feature_collection/feature_collection.dart' as collection;
-import 'package:feature_favourite/feature_favourite.dart' as favourite;
-import 'package:feature_profile/feature_profile.dart' as profile;
-import 'package:feature_setting/feature_setting.dart' as setting;
+import 'package:feature_home/feature_home.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'error_screen.dart';
-import 'path.dart';
+import 'main_path.dart';
+import 'main_route.dart';
 
 void main() {
   // ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
@@ -24,10 +21,10 @@ class MangaStashApp extends StatefulWidget {
   const MangaStashApp({super.key});
 
   @override
-  State<StatefulWidget> createState() => MangaStashAppState();
+  State<StatefulWidget> createState() => _MangaStashAppState();
 }
 
-class MangaStashAppState extends State<MangaStashApp> {
+class _MangaStashAppState extends State<MangaStashApp> {
   late final ServiceLocator _locator;
   late final GoRouter _router;
 
@@ -87,18 +84,16 @@ class MangaStashAppState extends State<MangaStashApp> {
     log('initiateRouter', name: 'robzimpulse');
     return GoRouter(
       initialLocation: initialRoute,
-      errorBuilder: (context, state) => const ErrorScreen(),
+      errorBuilder: (context, state) => ErrorScreen(
+        text: state.error.toString(),
+      ),
       routes: [
         GoRoute(
           path: MainPath.main,
           name: MainPath.main,
-          redirect: (context, state) => home.RoutePath.main,
+          redirect: (context, state) => HomeRoutePath.main,
         ),
-        ...home.RouteBuilder().routes(),
-        ...collection.RouteBuilder().routes(),
-        ...profile.RouteBuilder().routes(),
-        ...setting.RouteBuilder().routes(),
-        ...favourite.RouteBuilder().routes(),
+        ...MainRouteBuilder().routes(),
       ],
       observers: [
 
