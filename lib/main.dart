@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:service_locator/service_locator.dart';
+import 'package:storage/storage.dart';
 
 import 'error_screen.dart';
 import 'main_path.dart';
@@ -86,7 +87,8 @@ class _MangaStashAppState extends State<MangaStashApp> {
     ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
     await Future.delayed(const Duration(seconds: 3));
     // TODO: register module registrar here
-    return ServiceLocator.asNewInstance();
+    return ServiceLocator.asNewInstance()
+      ..registerRegistrar(SharedPreferencesStorageRegistrar());
   }
 
   GoRouter initiateRouter({String initialRoute = MainPath.main}) {
