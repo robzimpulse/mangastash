@@ -5,7 +5,7 @@ import 'route_path.dart';
 
 class HomeRouteBuilder extends BaseRouteBuilder {
   @override
-  List<GoRoute> routes() {
+  List<RouteBase> routes() {
     return [
 
     ];
