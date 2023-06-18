@@ -2,6 +2,7 @@ import 'package:feature_home/feature_home.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'error_screen.dart';
@@ -44,6 +45,17 @@ class _MangaStashAppState extends State<MangaStashApp> {
           debugShowCheckedModeBanner: false,
           routerConfig: _router,
           theme: ThemeData(primarySwatch: Colors.blue),
+          builder: (context, child) {
+            return ResponsiveBreakpoints.builder(
+              breakpoints: const [
+                Breakpoint(start: 0, end: 450, name: MOBILE),
+                Breakpoint(start: 451, end: 800, name: TABLET),
+                Breakpoint(start: 801, end: 1920, name: DESKTOP),
+                Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+              ],
+              child: child ?? const SizedBox.shrink(),
+            );
+          },
         ),
       );
     } else {

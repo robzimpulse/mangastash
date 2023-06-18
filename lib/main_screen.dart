@@ -5,6 +5,7 @@ import 'package:feature_home/feature_home.dart';
 import 'package:feature_profile/feature_profile.dart';
 import 'package:feature_setting/feature_setting.dart';
 import 'package:flutter/material.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class MainScreen extends StatefulWidget {
   final Widget child;
@@ -21,7 +22,6 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-
   int index = 0;
   Color get selectedItemColor => Colors.red;
   Color get unselectedItemColor => Colors.black;
@@ -35,56 +35,116 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () => Future.value(true),
+      onWillPop: () => Future.value(false),
       child: Scaffold(
         backgroundColor: Colors.white,
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: index,
-          type: BottomNavigationBarType.fixed,
-          showUnselectedLabels: true,
-          selectedItemColor: selectedItemColor,
-          unselectedItemColor: unselectedItemColor,
-          selectedFontSize: 12.0,
-          unselectedFontSize: 12.0,
-          backgroundColor: Colors.white,
-          items: const [
-            BottomNavigationBarItem(
+        bottomNavigationBar: _bottomNavigationBar(context: context),
+        body: _sideNavigationBar(context: context),
+      ),
+    );
+  }
+
+  Widget _sideNavigationBar({required BuildContext context}) {
+    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+    final isPhone = ResponsiveBreakpoints.of(context).isPhone;
+    if (isMobile || isPhone) return widget.child;
+    return Row(
+      children: [
+        NavigationRail(
+          labelType: NavigationRailLabelType.all,
+          selectedLabelTextStyle: TextStyle(
+            color: selectedItemColor,
+            fontSize: 12,
+          ),
+          unselectedLabelTextStyle: TextStyle(
+            color: unselectedItemColor,
+            fontSize: 12,
+          ),
+          selectedIconTheme: IconThemeData(color: selectedItemColor),
+          unselectedIconTheme: IconThemeData(color: unselectedItemColor),
+          elevation: 8,
+          destinations: const [
+            NavigationRailDestination(
               icon: Icon(Icons.home_outlined),
-              label: 'Home',
+              label: Text('Home'),
             ),
-            BottomNavigationBarItem(
+            NavigationRailDestination(
               icon: Icon(Icons.collections),
-              label: 'Collection'
+              label: Text('Collection'),
             ),
-            BottomNavigationBarItem(
+            NavigationRailDestination(
               icon: Icon(Icons.favorite),
-              label: 'Favourite',
+              label: Text('Favourite'),
             ),
-            BottomNavigationBarItem(
+            NavigationRailDestination(
               icon: Icon(Icons.settings),
-              label: 'Setting',
+              label: Text('Setting'),
             ),
-            BottomNavigationBarItem(
+            NavigationRailDestination(
               icon: Icon(Icons.person_outline),
-              label: 'Profile',
+              label: Text('Profile'),
             ),
           ],
-          onTap: (index) => context.go(_route(index)),
+          onDestinationSelected: (index) => context.go(_route(index)),
+          selectedIndex: index,
         ),
-        body: widget.child,
-      ),
+      ],
+    );
+  }
+
+  Widget? _bottomNavigationBar({required BuildContext context}) {
+    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+    final isPhone = ResponsiveBreakpoints.of(context).isPhone;
+    if (!(isMobile || isPhone)) return null;
+    return BottomNavigationBar(
+      currentIndex: index,
+      type: BottomNavigationBarType.fixed,
+      showUnselectedLabels: true,
+      selectedItemColor: selectedItemColor,
+      unselectedItemColor: unselectedItemColor,
+      selectedFontSize: 12.0,
+      unselectedFontSize: 12.0,
+      backgroundColor: Colors.white,
+      items: const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home_outlined),
+          label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.collections),
+          label: 'Collection',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.favorite),
+          label: 'Favourite',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.settings),
+          label: 'Setting',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person_outline),
+          label: 'Profile',
+        ),
+      ],
+      onTap: (index) => context.go(_route(index)),
     );
   }
 
   String _route(int index) {
     switch (index) {
-      case 0: return HomeRoutePath.main;
-      case 1: return CollectionRoutePath.main;
-      case 2: return FavouriteRoutePath.main;
-      case 3: return SettingRoutePath.main;
-      case 4: return ProfileRoutePath.main;
-      default: return HomeRoutePath.main;
+      case 0:
+        return HomeRoutePath.main;
+      case 1:
+        return CollectionRoutePath.main;
+      case 2:
+        return FavouriteRoutePath.main;
+      case 3:
+        return SettingRoutePath.main;
+      case 4:
+        return ProfileRoutePath.main;
+      default:
+        return HomeRoutePath.main;
     }
   }
-
 }
