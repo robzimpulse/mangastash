@@ -16,8 +16,13 @@ import 'main_screen.dart';
 
 class MainRouteBuilder extends BaseRouteBuilder {
   @override
-  List<GoRoute> routes() {
+  List<RouteBase> routes() {
     return [
+      GoRoute(
+        path: MainPath.main,
+        name: MainPath.main,
+        redirect: (context, state) => HomeRoutePath.main,
+      ),
       GoRoute(
         path: MainPath.mainScreen,
         name: MainPath.mainScreen,

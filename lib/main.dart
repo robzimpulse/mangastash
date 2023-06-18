@@ -97,14 +97,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
       errorBuilder: (context, state) => ErrorScreen(
         text: state.error.toString(),
       ),
-      routes: [
-        GoRoute(
-          path: MainPath.main,
-          name: MainPath.main,
-          redirect: (context, state) => HomeRoutePath.main,
-        ),
-        ...MainRouteBuilder().routes(),
-      ],
+      routes: MainRouteBuilder().routes(),
       observers: [
 
       ],
