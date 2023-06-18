@@ -1,4 +1,4 @@
-name: storage
+name: core_storage
 description: A new Flutter package project.
 version: 0.0.1
 publish_to: none
@@ -14,7 +14,7 @@ dependencies:
   shared_preferences_android: 2.0.17
 
   service_locator:
-    path: ../service_locator
+    path: ../../library/service_locator
 
 dev_dependencies:
   flutter_test:

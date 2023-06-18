@@ -1,18 +1,16 @@
+import 'package:core_storage/core_storage.dart';
 import 'package:feature_home/feature_home.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:service_locator/service_locator.dart';
-import 'package:storage/storage.dart';
 
 import 'error_screen.dart';
 import 'main_path.dart';
 import 'main_route.dart';
 
 void main() {
-  // ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
-  // final locator = ServiceLocator.asNewInstance();
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MangaStashApp());
 }
@@ -85,10 +83,12 @@ class _MangaStashAppState extends State<MangaStashApp> {
 
   Future<ServiceLocator> initiateAppLocator() async {
     ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
-    await Future.delayed(const Duration(seconds: 3));
+    final locator = ServiceLocator.asNewInstance();
+
     // TODO: register module registrar here
-    return ServiceLocator.asNewInstance()
-      ..registerRegistrar(SharedPreferencesStorageRegistrar());
+    await locator.registerRegistrar(CoreStorageRegistrar());
+
+    return locator;
   }
 
   GoRouter initiateRouter({String initialRoute = MainPath.main}) {

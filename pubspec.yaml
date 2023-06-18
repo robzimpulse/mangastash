@@ -43,6 +43,8 @@ dependencies:
     path: module/core/core_environment
   core_route:
     path: module/core/core_route
+  core_storage:
+    path: module/core/core_storage
 
   # feature
   feature_collection:
@@ -73,8 +75,6 @@ dependencies:
     path: module/library/safe_bloc
   service_locator:
     path: module/library/service_locator
-  storage:
-    path: module/library/storage
 
 dev_dependencies:
   flutter_test:

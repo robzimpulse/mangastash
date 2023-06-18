@@ -57,7 +57,7 @@ class MainRouteBuilder extends BaseRouteBuilder {
             }
             default: {
               return ErrorScreen(
-                text: 'Error Screen: $screen',
+                text: 'Screen not found for path `$screen`',
               );
             }
           }
