@@ -23,50 +23,30 @@ class MainRouteBuilder extends BaseRouteBuilder {
         name: MainPath.main,
         redirect: (context, state) => HomeRoutePath.main,
       ),
-      GoRoute(
-        path: MainPath.mainScreen,
-        name: MainPath.mainScreen,
-        builder: (context, state) {
-          final screen = state.pathParameters['screen'];
-
-          switch (screen) {
-            case HomeRoutePath.home: {
-              return const MainScreen(
-                index: 0,
-                child: HomeScreen(),
-              );
-            }
-            case CollectionRoutePath.home: {
-              return const MainScreen(
-                index: 1,
-                child: CollectionScreen(),
-              );
-            }
-            case FavouriteRoutePath.home: {
-              return const MainScreen(
-                index: 2,
-                child: FavouriteScreen(),
-              );
-            }
-            case SettingRoutePath.home: {
-              return const MainScreen(
-                index: 3,
-                child: SettingScreen(),
-              );
-            }
-            case ProfileRoutePath.home: {
-              return const MainScreen(
-                index: 4,
-                child: ProfileScreen(),
-              );
-            }
-            default: {
-              return ErrorScreen(
-                text: 'Screen not found for path `$screen`',
-              );
-            }
-          }
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, shell) {
+          return MainScreen(
+            index: shell.currentIndex,
+            child: shell,
+          );
         },
+        branches: [
+          StatefulShellBranch(
+            routes: HomeRouteBuilder().routes(),
+          ),
+          StatefulShellBranch(
+            routes: CollectionRouteBuilder().routes(),
+          ),
+          StatefulShellBranch(
+            routes: FavouriteRouteBuilder().routes(),
+          ),
+          StatefulShellBranch(
+            routes: SettingRouteBuilder().routes(),
+          ),
+          StatefulShellBranch(
+            routes: ProfileRouteBuilder().routes(),
+          ),
+        ],
       ),
     ];
   }

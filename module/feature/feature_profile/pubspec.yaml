@@ -15,6 +15,10 @@ dependencies:
   core_route:
     path: ../../core/core_route
 
+  # home
+  ui_profile:
+    path: ../../ui/ui_profile
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
