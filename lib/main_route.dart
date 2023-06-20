@@ -4,13 +4,7 @@ import 'package:feature_favourite/feature_favourite.dart';
 import 'package:feature_home/feature_home.dart';
 import 'package:feature_profile/feature_profile.dart';
 import 'package:feature_setting/feature_setting.dart';
-import 'package:ui_collection/ui_collection.dart';
-import 'package:ui_favourite/ui_favourite.dart';
-import 'package:ui_home/ui_home.dart';
-import 'package:ui_profile/ui_profile.dart';
-import 'package:ui_setting/ui_setting.dart';
 
-import 'error_screen.dart';
 import 'main_path.dart';
 import 'main_screen.dart';
 
