@@ -5,13 +5,16 @@ import 'route_path.dart';
 
 class FavouriteRouteBuilder extends BaseRouteBuilder {
   @override
+  GoRoute root() {
+    return GoRoute(
+      path: FavouriteRoutePath.main,
+      name: FavouriteRoutePath.main,
+      builder: (context, state) => const FavouriteScreen(),
+    );
+  }
+
+  @override
   List<RouteBase> routes() {
-    return [
-      GoRoute(
-        path: FavouriteRoutePath.main,
-        name: FavouriteRoutePath.main,
-        builder: (context, state) => const FavouriteScreen(),
-      ),
-    ];
+    return [];
   }
 }

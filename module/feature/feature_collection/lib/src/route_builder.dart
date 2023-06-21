@@ -5,13 +5,16 @@ import 'route_path.dart';
 
 class CollectionRouteBuilder extends BaseRouteBuilder {
   @override
+  GoRoute root() {
+    return GoRoute(
+      path: CollectionRoutePath.main,
+      name: CollectionRoutePath.main,
+      builder: (context, state) => const CollectionScreen(),
+    );
+  }
+
+  @override
   List<RouteBase> routes() {
-    return [
-      GoRoute(
-        path: CollectionRoutePath.main,
-        name: CollectionRoutePath.main,
-        builder: (context, state) => const CollectionScreen(),
-      ),
-    ];
+    return [];
   }
 }

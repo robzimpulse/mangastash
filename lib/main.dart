@@ -92,12 +92,16 @@ class _MangaStashAppState extends State<MangaStashApp> {
   }
 
   GoRouter initiateRouter({String initialRoute = MainPath.main}) {
+    final routes = MainRouteBuilder();
     return GoRouter(
       initialLocation: initialRoute,
       errorBuilder: (context, state) => ErrorScreen(
         text: state.error.toString(),
       ),
-      routes: MainRouteBuilder().routes(),
+      routes: [
+        routes.root(),
+        ...routes.routes()
+      ],
       observers: [
 
       ],

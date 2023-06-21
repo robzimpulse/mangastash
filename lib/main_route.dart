@@ -17,32 +17,36 @@ class MainRouteBuilder extends BaseRouteBuilder {
         name: MainPath.main,
         redirect: (context, state) => HomeRoutePath.main,
       ),
-      StatefulShellRoute.indexedStack(
-        builder: (context, state, shell) {
-          return MainScreen(
-            index: shell.currentIndex,
-            child: shell,
-          );
-        },
-        branches: [
-          StatefulShellBranch(
-            routes: HomeRouteBuilder().routes(),
-          ),
-          StatefulShellBranch(
-            routes: CollectionRouteBuilder().routes(),
-          ),
-          StatefulShellBranch(
-            routes: FavouriteRouteBuilder().routes(),
-          ),
-          StatefulShellBranch(
-            routes: SettingRouteBuilder().routes(),
-          ),
-          StatefulShellBranch(
-            routes: ProfileRouteBuilder().routes(),
-          ),
-        ],
-      ),
     ];
+  }
+
+  @override
+  RouteBase root() {
+    return StatefulShellRoute.indexedStack(
+      builder: (context, state, shell) {
+        return MainScreen(
+          index: shell.currentIndex,
+          child: shell,
+        );
+      },
+      branches: [
+        StatefulShellBranch(
+          routes: [HomeRouteBuilder().root()],
+        ),
+        StatefulShellBranch(
+          routes: [CollectionRouteBuilder().root()],
+        ),
+        StatefulShellBranch(
+          routes: [FavouriteRouteBuilder().root()],
+        ),
+        StatefulShellBranch(
+          routes: [SettingRouteBuilder().root()],
+        ),
+        StatefulShellBranch(
+          routes: [ProfileRouteBuilder().root()],
+        ),
+      ],
+    );
   }
 
 }
