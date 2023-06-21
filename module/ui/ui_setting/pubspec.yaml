@@ -12,6 +12,10 @@ dependencies:
     sdk: flutter
   getwidget: ^3.1.1
 
+  # core
+  core_environment:
+    path: ../../core/core_environment
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

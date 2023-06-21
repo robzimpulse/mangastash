@@ -10,6 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  rxdart: ^0.27.7
+
+  service_locator:
+    path: ../../library/service_locator
 
 dev_dependencies:
   flutter_test:

@@ -11,6 +11,12 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # library
+  safe_bloc:
+    path: ../../library/safe_bloc
+  service_locator:
+    path: ../../library/service_locator
+
   # core
   core_route:
     path: ../../core/core_route

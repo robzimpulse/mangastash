@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:feature_home/feature_home.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,6 @@ class MangaStashApp extends StatefulWidget {
 
 class _MangaStashAppState extends State<MangaStashApp> {
   late final ServiceLocator _locator;
-  late final GoRouter _router;
 
   bool _isInitialized = false;
 
@@ -39,21 +39,40 @@ class _MangaStashAppState extends State<MangaStashApp> {
     if (_isInitialized) {
       return Provider<ServiceLocator>(
         create: (context) => _locator,
-        child: MaterialApp.router(
-          title: 'Manga Stash',
-          debugShowCheckedModeBanner: false,
-          routerConfig: _router,
-          theme: ThemeData(primarySwatch: Colors.blue),
-          builder: (context, child) {
-            return ResponsiveBreakpoints.builder(
-              breakpoints: const [
-                Breakpoint(start: 0, end: 450, name: MOBILE),
-                Breakpoint(start: 451, end: 800, name: TABLET),
-                Breakpoint(start: 801, end: 1920, name: DESKTOP),
-                Breakpoint(start: 1921, end: double.infinity, name: '4K'),
-              ],
-              child: child ?? const SizedBox.shrink(),
-            );
+        child: StreamBuilder<ThemeData>(
+          stream: _locator.get<ListenThemeUseCase>().themeDataStream,
+          builder: (context, snapshot) {
+            final theme = snapshot.data;
+            if (theme != null) {
+              return MaterialApp.router(
+                title: 'Manga Stash',
+                debugShowCheckedModeBanner: false,
+                routerConfig: _route(locator: _locator),
+                theme: theme,
+                builder: (context, child) {
+                  return ResponsiveBreakpoints.builder(
+                    breakpoints: const [
+                      Breakpoint(start: 0, end: 450, name: MOBILE),
+                      Breakpoint(start: 451, end: 800, name: TABLET),
+                      Breakpoint(start: 801, end: 1920, name: DESKTOP),
+                      Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+                    ],
+                    child: child ?? const SizedBox.shrink(),
+                  );
+                },
+              );
+            } else {
+              return MaterialApp(
+                title: 'Manga Stash',
+                theme: ThemeData(primarySwatch: Colors.blue),
+                debugShowCheckedModeBanner: false,
+                home: const Scaffold(
+                  body: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              );
+            }
           },
         ),
       );
@@ -73,11 +92,9 @@ class _MangaStashAppState extends State<MangaStashApp> {
 
   void _initializeApp() async {
     final locator = await initiateAppLocator();
-    final router = initiateRouter();
     setState(() {
       _isInitialized = true;
       _locator = locator;
-      _router = router;
     });
   }
 
@@ -87,11 +104,14 @@ class _MangaStashAppState extends State<MangaStashApp> {
 
     // TODO: register module registrar here
     await locator.registerRegistrar(CoreStorageRegistrar());
-
+    await locator.registerRegistrar(CoreEnvironmentRegistrar());
     return locator;
   }
 
-  GoRouter initiateRouter({String initialRoute = MainPath.main}) {
+  GoRouter _route({
+    required ServiceLocator locator,
+    String initialRoute = MainPath.main
+  }) {
     final routes = MainRouteBuilder();
     return GoRouter(
       initialLocation: initialRoute,
@@ -99,8 +119,8 @@ class _MangaStashAppState extends State<MangaStashApp> {
         text: state.error.toString(),
       ),
       routes: [
-        routes.root(),
-        ...routes.routes()
+        routes.root(locator: locator),
+        ...routes.routes(locator: locator)
       ],
       observers: [
 
