@@ -23,8 +23,6 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int index = 0;
-  Color get selectedItemColor => Colors.red;
-  Color get unselectedItemColor => Colors.black;
 
   @override
   void didUpdateWidget(covariant MainScreen oldWidget) {
@@ -52,16 +50,6 @@ class _MainScreenState extends State<MainScreen> {
       children: [
         NavigationRail(
           labelType: NavigationRailLabelType.all,
-          selectedLabelTextStyle: TextStyle(
-            color: selectedItemColor,
-            fontSize: 12,
-          ),
-          unselectedLabelTextStyle: TextStyle(
-            color: unselectedItemColor,
-            fontSize: 12,
-          ),
-          selectedIconTheme: IconThemeData(color: selectedItemColor),
-          unselectedIconTheme: IconThemeData(color: unselectedItemColor),
           elevation: 8,
           destinations: const [
             NavigationRailDestination(
@@ -101,11 +89,6 @@ class _MainScreenState extends State<MainScreen> {
       currentIndex: index,
       type: BottomNavigationBarType.fixed,
       showUnselectedLabels: true,
-      selectedItemColor: selectedItemColor,
-      unselectedItemColor: unselectedItemColor,
-      selectedFontSize: 12.0,
-      unselectedFontSize: 12.0,
-      backgroundColor: Colors.white,
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home_outlined),
