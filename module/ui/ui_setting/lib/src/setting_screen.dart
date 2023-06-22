@@ -12,8 +12,6 @@ class SettingScreen extends StatelessWidget {
     required this.themeUpdateUseCase,
   });
 
-  ThemeData? get _theme => listenThemeUseCase.themeDataStream.valueOrNull;
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -24,15 +22,24 @@ class SettingScreen extends StatelessWidget {
         ),
         body: ListView(
           children: [
-            SwitchListTile(
-              title: const Text('Lights'),
-              value: _theme?.brightness == Brightness.dark,
-              onChanged: (bool value) {
-                themeUpdateUseCase.updateTheme(
-                  theme: value ? ThemeData.dark() : ThemeData.light(),
+            StreamBuilder<ThemeData>(
+              stream: listenThemeUseCase.themeDataStream,
+              builder: (context, snapshot) {
+                final theme = snapshot.data;
+                final isDarkMode = theme?.brightness == Brightness.dark;
+                return SwitchListTile(
+                  title: Text(isDarkMode ? 'Lights' : 'Dark'),
+                  value: isDarkMode,
+                  onChanged: (bool value) => themeUpdateUseCase.updateTheme(
+                    theme: value ? ThemeData.dark() : ThemeData.light(),
+                  ),
+                  secondary: Icon(
+                    isDarkMode
+                        ? Icons.lightbulb_outline
+                        : Icons.lightbulb_sharp,
+                  ),
                 );
               },
-              secondary: const Icon(Icons.lightbulb_outline),
             ),
           ],
         ),
