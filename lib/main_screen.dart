@@ -88,6 +88,7 @@ class _MainScreenState extends State<MainScreen> {
           onDestinationSelected: (index) => context.go(_route(index)),
           selectedIndex: index,
         ),
+        Expanded(child: widget.child),
       ],
     );
   }
