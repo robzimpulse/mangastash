@@ -30,3 +30,6 @@ jobs:
       - name: "Install Dependency"
         run: |
           melos get
+          
+      - name: "Build Flutter Web"
+        run: flutter build web
