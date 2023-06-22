@@ -1,27 +1,32 @@
 name: Flutter Workflow
 
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
 on: [push, workflow_dispatch]
 
 jobs:
   build:
+    timeout-minutes: 15
     runs-on: macos-latest
     steps:
-      - name: Checkout code
+      - name: "Git Checkout"
         uses: actions/checkout@v3
-
-      - name: Install Flutter
+        with:
+          fetch-depth: 0
+      
+      - name: "Install Flutter"
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '2.10.0'
-          channel: 'stable'
-
-      - name: Setup Dart
-        uses: dart-lang/setup-dart@v1
-        with:
-          sdk: 2.18.0
+          cache: true
           
-      - name: Setup Melos
-        run: ./.github/workflows/scripts/install-tools.sh
-        
-      - name: Install Project Dependencies
-        run: melos get
+      - name: "Install Tools"
+        run: |
+          flutter pub global activate melos
+      
+      - name: "Bootstrap Workspace"
+        run: melos bootstrap --verbose
+      
+      - name: "Install Dependency"
+        run: |
+          melos get
