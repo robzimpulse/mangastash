@@ -28,3 +28,7 @@ migrate_working_dir/
 .dart_tool/
 .packages
 build/
+
+# Swagger Code Gen
+!lib/output/.gitkeep
+!lib/input/.gitkeep
