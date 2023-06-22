@@ -32,3 +32,5 @@ build/
 # Swagger Code Gen
 !lib/output/.gitkeep
 !lib/input/.gitkeep
+lib/input/
+lib/output/
