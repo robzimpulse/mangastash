@@ -22,7 +22,7 @@ jobs:
           
       - name: "Install Tools"
         run: |
-          flutter pub global activate melos
+          flutter pub global activate melos 2.9.0
       
       - name: "Bootstrap Workspace"
         run: melos bootstrap --verbose
