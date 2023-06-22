@@ -37,7 +37,7 @@ jobs:
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.mangastash_access_token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
           force_orphan: true
           user_name: 'github-ci[bot]'
