@@ -1,6 +1,5 @@
 import 'package:core_route/core_route.dart';
 import 'package:feature_collection/feature_collection.dart';
-import 'package:feature_favourite/feature_favourite.dart';
 import 'package:feature_home/feature_home.dart';
 import 'package:feature_profile/feature_profile.dart';
 import 'package:feature_setting/feature_setting.dart';
