@@ -38,9 +38,6 @@ class MainRouteBuilder extends BaseRouteBuilder {
           routes: [CollectionRouteBuilder().root(locator: locator)],
         ),
         StatefulShellBranch(
-          routes: [FavouriteRouteBuilder().root(locator: locator)],
-        ),
-        StatefulShellBranch(
           routes: [SettingRouteBuilder().root(locator: locator)],
         ),
         StatefulShellBranch(

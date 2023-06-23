@@ -48,10 +48,6 @@ class MainScreen extends StatelessWidget {
               label: Text('Collection'),
             ),
             NavigationRailDestination(
-              icon: Icon(Icons.favorite),
-              label: Text('Favourite'),
-            ),
-            NavigationRailDestination(
               icon: Icon(Icons.settings),
               label: Text('Setting'),
             ),
@@ -86,10 +82,6 @@ class MainScreen extends StatelessWidget {
           label: 'Collection',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.favorite),
-          label: 'Favourite',
-        ),
-        BottomNavigationBarItem(
           icon: Icon(Icons.settings),
           label: 'Setting',
         ),
@@ -109,10 +101,8 @@ class MainScreen extends StatelessWidget {
       case 1:
         return CollectionRoutePath.main;
       case 2:
-        return FavouriteRoutePath.main;
-      case 3:
         return SettingRoutePath.main;
-      case 4:
+      case 3:
         return ProfileRoutePath.main;
       default:
         return HomeRoutePath.main;
