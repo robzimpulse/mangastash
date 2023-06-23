@@ -3,8 +3,8 @@ import 'package:core_storage/core_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:service_locator/service_locator.dart';
 
-import 'apps_screen.dart';
-import 'splash_screen.dart';
+import 'screen/apps_screen.dart';
+import 'screen/splash_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

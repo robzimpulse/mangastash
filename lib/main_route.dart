@@ -7,7 +7,7 @@ import 'package:feature_setting/feature_setting.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'main_path.dart';
-import 'main_screen.dart';
+import 'screen/main_screen.dart';
 
 class MainRouteBuilder extends BaseRouteBuilder {
   @override

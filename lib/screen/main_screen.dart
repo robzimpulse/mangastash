@@ -7,7 +7,7 @@ import 'package:feature_setting/feature_setting.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends StatelessWidget {
   final Widget child;
   final int index;
 
@@ -16,19 +16,6 @@ class MainScreen extends StatefulWidget {
     required this.child,
     required this.index,
   });
-
-  @override
-  State<StatefulWidget> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  int index = 0;
-
-  @override
-  void didUpdateWidget(covariant MainScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    index = widget.index;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +32,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget _sideNavigationBar({required BuildContext context}) {
     final isMobile = ResponsiveBreakpoints.of(context).isMobile;
     final isPhone = ResponsiveBreakpoints.of(context).isPhone;
-    if (isMobile || isPhone) return widget.child;
+    if (isMobile || isPhone) return child;
     return Row(
       children: [
         NavigationRail(
@@ -76,7 +63,7 @@ class _MainScreenState extends State<MainScreen> {
           onDestinationSelected: (index) => context.go(_route(index)),
           selectedIndex: index,
         ),
-        Expanded(child: widget.child),
+        Expanded(child: child),
       ],
     );
   }

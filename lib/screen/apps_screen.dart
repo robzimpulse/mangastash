@@ -5,9 +5,9 @@ import 'package:responsive_framework/breakpoint.dart';
 import 'package:responsive_framework/responsive_breakpoints.dart';
 import 'package:service_locator/service_locator.dart';
 
+import '../main_path.dart';
+import '../main_route.dart';
 import 'error_screen.dart';
-import 'main_path.dart';
-import 'main_route.dart';
 
 class AppsScreen extends StatelessWidget {
   final ServiceLocator locator;
