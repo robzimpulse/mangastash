@@ -48,8 +48,6 @@ dependencies:
   # feature
   feature_collection:
     path: module/feature/feature_collection
-  feature_favourite:
-    path: module/feature/feature_favourite
   feature_home:
     path: module/feature/feature_home
   feature_profile:
@@ -60,8 +58,6 @@ dependencies:
   # ui
   ui_collection:
     path: module/ui/ui_collection
-  ui_favourite:
-    path: module/ui/ui_favourite
   ui_home:
     path: module/ui/ui_home
   ui_profile:

@@ -85,13 +85,6 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
-  feature_favourite:
-    dependency: "direct main"
-    description:
-      path: "module/feature/feature_favourite"
-      relative: true
-    source: path
-    version: "0.0.1"
   feature_home:
     dependency: "direct main"
     description:
@@ -417,13 +410,6 @@ packages:
     dependency: "direct main"
     description:
       path: "module/ui/ui_collection"
-      relative: true
-    source: path
-    version: "0.0.1"
-  ui_favourite:
-    dependency: "direct main"
-    description:
-      path: "module/ui/ui_favourite"
       relative: true
     source: path
     version: "0.0.1"
