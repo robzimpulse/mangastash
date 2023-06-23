@@ -163,6 +163,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "7.1.1"
+  ios_willpop_transition_theme:
+    dependency: "direct main"
+    description:
+      name: ios_willpop_transition_theme
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.6"
   js:
     dependency: transitive
     description:

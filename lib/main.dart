@@ -53,6 +53,4 @@ class _MangaStashAppState extends State<MangaStashApp> {
     await locator.registerRegistrar(CoreEnvironmentRegistrar());
     return locator;
   }
-
-
 }

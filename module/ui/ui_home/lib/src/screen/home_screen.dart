@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:responsive_framework/responsive_breakpoints.dart';
 
 import '../widget/manga_grid_item_widget.dart';
@@ -20,6 +21,16 @@ class HomeScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Home'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: () => context.push('/search'),
+            ),
+            IconButton(
+              icon: const Icon(Icons.favorite),
+              onPressed: () => context.push('/favourite'),
+            ),
+          ],
         ),
         body: Container(
           padding: const EdgeInsets.all(10),
