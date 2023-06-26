@@ -12,7 +12,7 @@ abstract class ChapterService {
 
   @GET('/chapter')
   Future<ChapterData> chapter({
-    @Query('manga') String mangaId,
+    @Query('manga') String? mangaId,
     @Query('ids') List<String>? ids,
     @Query('title') String? title,
     @Query('groups') List<String>? groups,

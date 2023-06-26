@@ -20,7 +20,7 @@ class _ChapterService implements ChapterService {
 
   @override
   Future<ChapterData> chapter({
-    required mangaId,
+    mangaId,
     ids,
     title,
     groups,
