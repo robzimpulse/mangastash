@@ -9,7 +9,8 @@ part of 'user_followed_users.dart';
 UserFollowedUsers _$UserFollowedUsersFromJson(Map<String, dynamic> json) =>
     UserFollowedUsers(
       (json['data'] as List<dynamic>?)
-          ?.map((e) => Data.fromJson(e as Map<String, dynamic>))
+          ?.map(
+              (e) => UserFollowedUsersData.fromJson(e as Map<String, dynamic>))
           .toList(),
       json['limit'] as int?,
       json['offset'] as int?,
@@ -24,25 +25,32 @@ Map<String, dynamic> _$UserFollowedUsersToJson(UserFollowedUsers instance) =>
       'total': instance.total,
     };
 
-Data _$DataFromJson(Map<String, dynamic> json) => Data(
+UserFollowedUsersData _$UserFollowedUsersDataFromJson(
+        Map<String, dynamic> json) =>
+    UserFollowedUsersData(
       json['id'] as String?,
       json['type'] as String?,
       json['attributes'] == null
           ? null
-          : Attributes.fromJson(json['attributes'] as Map<String, dynamic>),
+          : UserFollowedUsersAttributes.fromJson(
+              json['attributes'] as Map<String, dynamic>),
       (json['relationships'] as List<dynamic>?)
           ?.map((e) => Relationship.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
-Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{
+Map<String, dynamic> _$UserFollowedUsersDataToJson(
+        UserFollowedUsersData instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'type': instance.type,
       'attributes': instance.attributes,
       'relationships': instance.relationships,
     };
 
-Attributes _$AttributesFromJson(Map<String, dynamic> json) => Attributes(
+UserFollowedUsersAttributes _$UserFollowedUsersAttributesFromJson(
+        Map<String, dynamic> json) =>
+    UserFollowedUsersAttributes(
       json['username'] as String?,
       json['roles'] == null
           ? null
@@ -50,7 +58,8 @@ Attributes _$AttributesFromJson(Map<String, dynamic> json) => Attributes(
       json['version'] as int?,
     );
 
-Map<String, dynamic> _$AttributesToJson(Attributes instance) =>
+Map<String, dynamic> _$UserFollowedUsersAttributesToJson(
+        UserFollowedUsersAttributes instance) =>
     <String, dynamic>{
       'username': instance.username,
       'roles': instance.roles,
