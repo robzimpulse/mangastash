@@ -43,9 +43,7 @@ class Attributes {
     this.updatedAt,
     this.version,
   );
-
   factory Attributes.fromJson(Map<String, dynamic> json) =>
       _$AttributesFromJson(json);
-
   Map<String, dynamic> toJson() => _$AttributesToJson(this);
 }

@@ -3,13 +3,13 @@ part 'chapter.g.dart';
 
 ///@nodoc
 @JsonSerializable()
-class Chapter {
+class MultipleChapterData {
   final String? hash;
   final List<String>? data;
   final List<String>? dataSaver;
-  Chapter(this.hash, this.data, this.dataSaver);
-  factory Chapter.fromJson(Map<String, dynamic> json) =>
-      _$ChapterFromJson(json);
+  MultipleChapterData(this.hash, this.data, this.dataSaver);
+  factory MultipleChapterData.fromJson(Map<String, dynamic> json) =>
+      _$MultipleChapterDataFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ChapterToJson(this);
+  Map<String, dynamic> toJson() => _$MultipleChapterDataToJson(this);
 }

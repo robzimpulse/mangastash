@@ -11,8 +11,14 @@ class ScanlationsResult {
   final int? limit;
   final int? offset;
   final int? total;
-  ScanlationsResult(this.result, this.response, this.data, this.limit,
-      this.offset, this.total);
+  ScanlationsResult(
+    this.result,
+    this.response,
+    this.data,
+    this.limit,
+    this.offset,
+    this.total,
+  );
   factory ScanlationsResult.fromJson(Map<String, dynamic> json) =>
       _$ScanlationsResultFromJson(json);
   Map<String, dynamic> toJson() => _$ScanlationsResultToJson(this);
@@ -52,24 +58,25 @@ class Attributes {
   final String? createdAt;
   final String? updatedAt;
   Attributes(
-      this.name,
-      this.altNames,
-      this.website,
-      this.ircServer,
-      this.ircChannel,
-      this.discord,
-      this.contactEmail,
-      this.description,
-      this.twitter,
-      this.mangaUpdates,
-      this.focussedLanguage,
-      this.locked,
-      this.official,
-      this.inactive,
-      this.publishDelay,
-      this.version,
-      this.createdAt,
-      this.updatedAt);
+    this.name,
+    this.altNames,
+    this.website,
+    this.ircServer,
+    this.ircChannel,
+    this.discord,
+    this.contactEmail,
+    this.description,
+    this.twitter,
+    this.mangaUpdates,
+    this.focussedLanguage,
+    this.locked,
+    this.official,
+    this.inactive,
+    this.publishDelay,
+    this.version,
+    this.createdAt,
+    this.updatedAt,
+  );
   factory Attributes.fromJson(Map<String, dynamic> json) =>
       _$AttributesFromJson(json);
   Map<String, dynamic> toJson() => _$AttributesToJson(this);

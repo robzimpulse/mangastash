@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import '../at-home/chapter.dart';
+import 'chapter.dart';
 part 'single_chapter_data.g.dart';
 
 ///@nodoc
@@ -7,7 +7,7 @@ part 'single_chapter_data.g.dart';
 class SingleChapterData {
   final String? result;
   final String? baseUrl;
-  final Chapter? chapter;
+  final MultipleChapterData? chapter;
   SingleChapterData(this.result, this.chapter, this.baseUrl);
   factory SingleChapterData.fromJson(Map<String, dynamic> json) =>
       _$SingleChapterDataFromJson(json);

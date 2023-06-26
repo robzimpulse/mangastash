@@ -11,7 +11,8 @@ SingleChapterData _$SingleChapterDataFromJson(Map<String, dynamic> json) =>
       json['result'] as String?,
       json['chapter'] == null
           ? null
-          : Chapter.fromJson(json['chapter'] as Map<String, dynamic>),
+          : MultipleChapterData.fromJson(
+              json['chapter'] as Map<String, dynamic>),
       json['baseUrl'] as String?,
     );
 

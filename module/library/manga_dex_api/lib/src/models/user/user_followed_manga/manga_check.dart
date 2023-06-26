@@ -10,6 +10,5 @@ class MangaCheck {
 
   factory MangaCheck.fromJson(Map<String, dynamic> json) =>
       _$MangaCheckFromJson(json);
-
   Map<String, dynamic> toJson() => _$MangaCheckToJson(this);
 }

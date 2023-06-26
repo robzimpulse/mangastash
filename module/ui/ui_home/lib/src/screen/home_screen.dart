@@ -6,6 +6,7 @@ import 'package:service_locator/service_locator.dart';
 
 import '../widget/manga_grid_item_widget.dart';
 import 'home_cubit.dart';
+import 'home_cubit_state.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,16 +17,16 @@ class HomeScreen extends StatefulWidget {
   static Widget create({required ServiceLocator locator}) {
     return BlocProvider(
       create: (context) => HomeCubit(
-        searchService: locator(),
+        chapterRepository: locator(),
+        searchRepository: locator(),
+        atHomeRepository: locator(),
       ),
       child: const HomeScreen(),
     );
   }
-
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -59,18 +60,28 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         body: Container(
           padding: const EdgeInsets.all(10),
-          child: GridView.count(
-            crossAxisCount: _crossAxisCount(context),
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: (100 / 140),
-            // TODO: fill with data from api
-            children: const [
-              MangaGridItemWidget(
-                title: 'Test Title',
-                coverUrl: '',
-              )
-            ],
+          child: BlocBuilder<HomeCubit, HomeCubitState>(
+            builder: (context, state) {
+              if (state.isLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              return GridView.count(
+                crossAxisCount: _crossAxisCount(context),
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: (100 / 140),
+                // TODO: fill with data from api
+                children: const [
+                  MangaGridItemWidget(
+                    title: 'Test Title',
+                    coverUrl: '',
+                  )
+                ],
+              );
+            },
           ),
         ),
       ),

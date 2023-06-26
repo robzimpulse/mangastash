@@ -7,12 +7,9 @@ class UserFeed {
   final String result;
   final String response;
   final List<Data> data;
-
   UserFeed(this.result, this.response, this.data);
-
   factory UserFeed.fromJson(Map<String, dynamic> json) =>
       _$UserFeedFromJson(json);
-
   Map<String, dynamic> toJson() => _$UserFeedToJson(this);
 }
 
@@ -23,11 +20,8 @@ class Data {
   final String type;
   final Attributes attributes;
   final List<Relationship> relationships;
-
   Data(this.id, this.type, this.attributes, this.relationships);
-
   factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
-
   Map<String, dynamic> toJson() => _$DataToJson(this);
 }
 
@@ -45,7 +39,6 @@ class Attributes {
   final String updatedAt;
   final int pages;
   final int version;
-
   Attributes(
     this.volume,
     this.chapter,
@@ -59,10 +52,8 @@ class Attributes {
     this.pages,
     this.version,
   );
-
   factory Attributes.fromJson(Map<String, dynamic> json) =>
       _$AttributesFromJson(json);
-
   Map<String, dynamic> toJson() => _$AttributesToJson(this);
 }
 
@@ -71,11 +62,8 @@ class Attributes {
 class Relationship {
   final String id;
   final String type;
-
   Relationship(this.id, this.type);
-
   factory Relationship.fromJson(Map<String, dynamic> json) =>
       _$RelationshipFromJson(json);
-
   Map<String, dynamic> toJson() => _$RelationshipToJson(this);
 }

@@ -1,8 +1,6 @@
 ///@nodoc
 import 'package:json_annotation/json_annotation.dart';
-
 import '../common/relationships.dart';
-
 part 'cover.g.dart';
 
 ///@nodoc
@@ -12,9 +10,7 @@ class Cover {
   final int? limit;
   final int? offset;
   final int? total;
-
   Cover(this.data, this.limit, this.offset, this.total);
-
   factory Cover.fromJson(Map<String, dynamic> json) => _$CoverFromJson(json);
 
   Map<String, dynamic> toJson() => _$CoverToJson(this);
@@ -27,9 +23,7 @@ class Data {
   final String? type;
   final List<Relationship>? relationships;
   final Attributes? attributes;
-
   Data(this.id, this.type, this.attributes, this.relationships);
-
   factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
 
   Map<String, dynamic> toJson() => _$DataToJson(this);
@@ -44,7 +38,6 @@ class Attributes {
   final int? version;
   final String? createdAt;
   final String? updatedAt;
-
   Attributes(
     this.volume,
     this.fileName,
@@ -53,7 +46,6 @@ class Attributes {
     this.createdAt,
     this.updatedAt,
   );
-
   factory Attributes.fromJson(Map<String, dynamic> json) =>
       _$AttributesFromJson(json);
 

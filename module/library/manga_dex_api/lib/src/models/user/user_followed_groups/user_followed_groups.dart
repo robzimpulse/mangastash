@@ -1,7 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-
-import '../..//common/relationships.dart';
-
+import '../../common/relationships.dart';
 part 'user_followed_groups.g.dart';
 
 ///@nodoc
@@ -11,12 +9,9 @@ class UserFollowedGroups {
   final int? limit;
   final int? offset;
   final int? total;
-
   UserFollowedGroups(this.data, this.limit, this.offset, this.total);
-
   factory UserFollowedGroups.fromJson(Map<String, dynamic> json) =>
       _$UserFollowedGroupsFromJson(json);
-
   Map<String, dynamic> toJson() => _$UserFollowedGroupsToJson(this);
 }
 
@@ -27,11 +22,8 @@ class Data {
   final String? type;
   final Attributes? attributes;
   final List<Relationship>? relationships;
-
   Data(this.id, this.type, this.attributes, this.relationships);
-
   factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
-
   Map<String, dynamic> toJson() => _$DataToJson(this);
 }
 
@@ -50,7 +42,6 @@ class Attributes {
   final int? version;
   final String? createdAt;
   final String? updatedAt;
-
   Attributes(
     this.name,
     this.website,
@@ -65,9 +56,7 @@ class Attributes {
     this.createdAt,
     this.updatedAt,
   );
-
   factory Attributes.fromJson(Map<String, dynamic> json) =>
       _$AttributesFromJson(json);
-
   Map<String, dynamic> toJson() => _$AttributesToJson(this);
 }

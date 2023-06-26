@@ -11,8 +11,14 @@ class MangaFeed {
   final int? limit;
   final int? offset;
   final int? total;
-  MangaFeed(this.result, this.response, this.data, this.limit, this.offset,
-      this.total);
+  MangaFeed(
+    this.result,
+    this.response,
+    this.data,
+    this.limit,
+    this.offset,
+    this.total,
+  );
 
   factory MangaFeed.fromJson(Map<String, dynamic> json) =>
       _$MangaFeedFromJson(json);
@@ -49,19 +55,20 @@ class Attributes {
   final String? readableAt;
   final List<Relationship>? relationships;
   Attributes(
-      this.title,
-      this.volume,
-      this.chapter,
-      this.pages,
-      this.translatedLanguage,
-      this.uploader,
-      this.externalUrl,
-      this.version,
-      this.createdAt,
-      this.updatedAt,
-      this.publishedAt,
-      this.readableAt,
-      this.relationships);
+    this.title,
+    this.volume,
+    this.chapter,
+    this.pages,
+    this.translatedLanguage,
+    this.uploader,
+    this.externalUrl,
+    this.version,
+    this.createdAt,
+    this.updatedAt,
+    this.publishedAt,
+    this.readableAt,
+    this.relationships,
+  );
 
   factory Attributes.fromJson(Map<String, dynamic> json) =>
       _$AttributesFromJson(json);

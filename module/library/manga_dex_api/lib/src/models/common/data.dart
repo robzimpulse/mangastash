@@ -13,10 +13,7 @@ class Data {
   final String? type;
   final Attributes? attributes;
   final List<Relationship>? relationships;
-
   Data(this.id, this.type, this.attributes, this.relationships);
-
   factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
-
   Map<String, dynamic> toJson() => _$DataToJson(this);
 }

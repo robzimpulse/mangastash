@@ -12,8 +12,14 @@ class Scanlation {
   final int? limit;
   final int? offset;
   final int? total;
-  Scanlation(this.result, this.response, this.data, this.limit, this.offset,
-      this.total);
+  Scanlation(
+    this.result,
+    this.response,
+    this.data,
+    this.limit,
+    this.offset,
+    this.total,
+  );
   factory Scanlation.fromJson(Map<String, dynamic> json) =>
       _$ScanlationFromJson(json);
   Map<String, dynamic> toJson() => _$ScanlationToJson(this);

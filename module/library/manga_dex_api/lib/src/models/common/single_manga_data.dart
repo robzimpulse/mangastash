@@ -10,9 +10,7 @@ class SingleMangaData {
   final String? result;
   final String? response;
   final Data? data;
-
   SingleMangaData(this.result, this.response, this.data);
-
   factory SingleMangaData.fromJson(Map<String, dynamic> json) =>
       _$SingleMangaDataFromJson(json);
 

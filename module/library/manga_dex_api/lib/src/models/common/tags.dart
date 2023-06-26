@@ -11,9 +11,7 @@ class Tags {
   final String? id;
   final String? type;
   final TagAttributes? attributes;
-
   Tags(this.id, this.type, this.attributes);
-
   factory Tags.fromJson(Map<String, dynamic> json) => _$TagsFromJson(json);
 
   Map<String, dynamic> toJson() => _$TagsToJson(this);

@@ -9,7 +9,11 @@ class AuthenticationCheck {
   final List<String>? roles;
   final List<String>? permissions;
   AuthenticationCheck(
-      this.result, this.isAuthenticated, this.roles, this.permissions);
+    this.result,
+    this.isAuthenticated,
+    this.roles,
+    this.permissions,
+  );
   factory AuthenticationCheck.fromJson(Map<String, dynamic> json) =>
       _$AuthenticationCheckFromJson(json);
   Map<String, dynamic> toJson() => _$AuthenticationCheckToJson(this);

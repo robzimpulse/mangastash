@@ -13,9 +13,7 @@ class TagAttributes {
   final Description? description;
   final String? group;
   final int? version;
-
   TagAttributes(this.name, this.description, this.group, this.version);
-
   factory TagAttributes.fromJson(Map<String, dynamic> json) =>
       _$TagAttributesFromJson(json);
 

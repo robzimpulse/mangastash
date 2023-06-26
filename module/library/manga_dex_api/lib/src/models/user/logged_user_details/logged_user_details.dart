@@ -1,8 +1,6 @@
 ///@nodoc
 import 'package:json_annotation/json_annotation.dart';
-
 import '../../common/relationships.dart';
-
 part 'logged_user_details.g.dart';
 
 ///@nodoc
@@ -13,10 +11,8 @@ class UserDetails {
   final Data? data;
 
   UserDetails(this.result, this.data, this.response);
-
   factory UserDetails.fromJson(Map<String, dynamic> json) =>
       _$UserDetailsFromJson(json);
-
   Map<String, dynamic> toJson() => _$UserDetailsToJson(this);
 }
 
@@ -27,11 +23,8 @@ class Data {
   final String? type;
   final Attributes? attributes;
   final List<Relationship>? relationships;
-
   Data(this.id, this.type, this.attributes, this.relationships);
-
   factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
-
   Map<String, dynamic> toJson() => _$DataToJson(this);
 }
 
@@ -41,11 +34,8 @@ class Attributes {
   final String? username;
   final List<String>? roles;
   final int? version;
-
   Attributes(this.username, this.roles, this.version);
-
   factory Attributes.fromJson(Map<String, dynamic> json) =>
       _$AttributesFromJson(json);
-
   Map<String, dynamic> toJson() => _$AttributesToJson(this);
 }

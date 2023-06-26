@@ -5,14 +5,14 @@ part 'chapter_data.g.dart';
 
 ///@nodoc
 @JsonSerializable()
-class ChapterData {
+class Chapter {
   final String? result;
   final String? response;
-  final List<Data>? data;
+  final List<ChapterData>? data;
   final int? limit;
   final int? offset;
   final int? total;
-  ChapterData(
+  Chapter(
     this.result,
     this.response,
     this.data,
@@ -20,26 +20,26 @@ class ChapterData {
     this.offset,
     this.total,
   );
-  factory ChapterData.fromJson(Map<String, dynamic> json) =>
-      _$ChapterDataFromJson(json);
+  factory Chapter.fromJson(Map<String, dynamic> json) =>
+      _$ChapterFromJson(json);
+  Map<String, dynamic> toJson() => _$ChapterToJson(this);
+}
+
+///@nodoc
+@JsonSerializable()
+class ChapterData {
+  final String? id;
+  final String? type;
+  ChapterAttributes? attributes;
+  List<Relationship>? relationships;
+  ChapterData(this.id, this.type, this.attributes, this.relationships);
+  factory ChapterData.fromJson(Map<String, dynamic> json) => _$ChapterDataFromJson(json);
   Map<String, dynamic> toJson() => _$ChapterDataToJson(this);
 }
 
 ///@nodoc
 @JsonSerializable()
-class Data {
-  final String? id;
-  final String? type;
-  Attributes? attributes;
-  List<Relationship>? relationships;
-  Data(this.id, this.type, this.attributes, this.relationships);
-  factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
-  Map<String, dynamic> toJson() => _$DataToJson(this);
-}
-
-///@nodoc
-@JsonSerializable()
-class Attributes {
+class ChapterAttributes {
   final String? volume;
   final String? chapter;
   final String? title;
@@ -51,7 +51,7 @@ class Attributes {
   final String? createdAt;
   final String? updatedAt;
   final int? version;
-  Attributes(
+  ChapterAttributes(
     this.volume,
     this.chapter,
     this.title,
@@ -64,7 +64,7 @@ class Attributes {
     this.updatedAt,
     this.version,
   );
-  factory Attributes.fromJson(Map<String, dynamic> json) =>
-      _$AttributesFromJson(json);
-  Map<String, dynamic> toJson() => _$AttributesToJson(this);
+  factory ChapterAttributes.fromJson(Map<String, dynamic> json) =>
+      _$ChapterAttributesFromJson(json);
+  Map<String, dynamic> toJson() => _$ChapterAttributesToJson(this);
 }

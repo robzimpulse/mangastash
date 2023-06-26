@@ -13,6 +13,7 @@ dependencies:
   responsive_framework: ^1.0.0
   go_router: ^7.0.0
   equatable: ^2.0.5
+  collection: ^1.16.0
 
   # Library
   safe_bloc:

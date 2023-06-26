@@ -8,12 +8,12 @@ import '../models/search/search.dart';
 import '../service/search_service.dart';
 
 class SearchRepository {
-  final SearchService _searchService;
+  final SearchService _service;
 
   SearchRepository({
-    required SearchService searchService,
-  }) : _searchService = searchService;
-  
+    required SearchService service,
+  }) : _service = service;
+
   Future<Search> search({
     String? title,
     int? limit,
@@ -38,7 +38,7 @@ class SearchRepository {
     String? group,
     Map<SearchOrders, OrderDirections>? orders,
   }) {
-    return _searchService.search(
+    return _service.search(
       title: title,
       limit: limit,
       offset: offset,

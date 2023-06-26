@@ -7,7 +7,7 @@ part 'author_info.g.dart';
 class AuthorInfo {
   final String? result;
   final String? response;
-  final Data? data;
+  final AuthorInfoData? data;
   final List<Relationship>? relationships;
   AuthorInfo(this.result, this.response, this.data, this.relationships);
   factory AuthorInfo.fromJson(Map<String, dynamic> json) =>
@@ -18,18 +18,18 @@ class AuthorInfo {
 
 ///@nodoc
 @JsonSerializable()
-class Data {
+class AuthorInfoData {
   final String? id;
   final String? type;
-  final Attributes? attributes;
-  Data(this.id, this.type, this.attributes);
-  factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
-  Map<String, dynamic> toJson() => _$DataToJson(this);
+  final AuthorInfoAttributes? attributes;
+  AuthorInfoData(this.id, this.type, this.attributes);
+  factory AuthorInfoData.fromJson(Map<String, dynamic> json) => _$AuthorInfoDataFromJson(json);
+  Map<String, dynamic> toJson() => _$AuthorInfoDataToJson(this);
 }
 
 ///@nodoc
 @JsonSerializable()
-class Attributes {
+class AuthorInfoAttributes {
   final String? name;
   final String? imageUrl;
   final String? twitter;
@@ -48,29 +48,30 @@ class Attributes {
   final String? createdAt;
   final String? updateAt;
   final int? version;
-  Attributes(
-      this.name,
-      this.imageUrl,
-      this.twitter,
-      this.pixiv,
-      this.melonBook,
-      this.fanBox,
-      this.booth,
-      this.nicoVideo,
-      this.skeb,
-      this.fantia,
-      this.tumblr,
-      this.youtube,
-      this.weibo,
-      this.naver,
-      this.website,
-      this.createdAt,
-      this.updateAt,
-      this.version);
+  AuthorInfoAttributes(
+    this.name,
+    this.imageUrl,
+    this.twitter,
+    this.pixiv,
+    this.melonBook,
+    this.fanBox,
+    this.booth,
+    this.nicoVideo,
+    this.skeb,
+    this.fantia,
+    this.tumblr,
+    this.youtube,
+    this.weibo,
+    this.naver,
+    this.website,
+    this.createdAt,
+    this.updateAt,
+    this.version,
+  );
 
-  factory Attributes.fromJson(Map<String, dynamic> json) =>
-      _$AttributesFromJson(json);
-  Map<String, dynamic> toJson() => _$AttributesToJson(this);
+  factory AuthorInfoAttributes.fromJson(Map<String, dynamic> json) =>
+      _$AuthorInfoAttributesFromJson(json);
+  Map<String, dynamic> toJson() => _$AuthorInfoAttributesToJson(this);
 }
 
 ///@nodoc
