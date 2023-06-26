@@ -1,11 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_framework/responsive_breakpoints.dart';
+import 'package:safe_bloc/safe_bloc.dart';
+import 'package:service_locator/service_locator.dart';
 
 import '../widget/manga_grid_item_widget.dart';
+import 'home_cubit.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+
+  static Widget create({required ServiceLocator locator}) {
+    return BlocProvider(
+      create: (context) => HomeCubit(),
+      child: const HomeScreen(),
+    );
+  }
+
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<HomeCubit>().initialize();
+  }
 
   int _crossAxisCount(BuildContext context) {
     final responsive = ResponsiveBreakpoints.of(context);

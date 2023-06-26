@@ -11,7 +11,7 @@ class HomeRouteBuilder extends BaseRouteBuilder {
     return GoRoute(
       path: HomeRoutePath.main,
       name: HomeRoutePath.main,
-      builder: (context, state) => const HomeScreen(),
+      builder: (context, state) => HomeScreen.create(locator: locator),
     );
   }
 

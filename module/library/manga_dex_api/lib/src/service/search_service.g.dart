@@ -18,6 +18,78 @@ class _SearchService implements SearchService {
 
   String? baseUrl;
 
+  @override
+  Future<Search> search({
+    title,
+    limit,
+    offset,
+    authors,
+    artists,
+    year,
+    includedTags,
+    includedTagsMode,
+    excludedTags,
+    excludedTagsMode,
+    status,
+    originalLanguage,
+    excludedOriginalLanguages,
+    availableTranslatedLanguage,
+    publicationDemographic,
+    ids,
+    contentRating,
+    createdAtSince,
+    updatedAtSince,
+    includes,
+    group,
+    orders,
+    hasAvailableChapters,
+  }) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'title': title,
+      r'limit': limit,
+      r'offset': offset,
+      r'authors': authors,
+      r'artists': artists,
+      r'year': year,
+      r'includedTags': includedTags,
+      r'includedTagsMode': includedTagsMode?.toJson(),
+      r'excludedTags': excludedTags,
+      r'excludedTagsMode': excludedTagsMode?.toJson(),
+      r'status': status,
+      r'originalLanguage': originalLanguage,
+      r'excludedOriginalLanguages': excludedOriginalLanguages,
+      r'availableTranslatedLanguage': availableTranslatedLanguage,
+      r'publicationDemographic': publicationDemographic,
+      r'ids': ids,
+      r'contentRating': contentRating,
+      r'createdAtSince': createdAtSince,
+      r'updatedAtSince': updatedAtSince,
+      r'includes': includes,
+      r'group': group,
+      r'orders': orders,
+      r'hasAvailableChapters': hasAvailableChapters,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result =
+        await _dio.fetch<Map<String, dynamic>>(_setStreamType<Search>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/manga',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = Search.fromJson(_result.data!);
+    return value;
+  }
+
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
     if (T != dynamic &&
         !(requestOptions.responseType == ResponseType.bytes ||

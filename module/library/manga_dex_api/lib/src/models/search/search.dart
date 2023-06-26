@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../common/data.dart';
@@ -6,7 +7,7 @@ part 'search.g.dart';
 
 ///@nodoc
 @JsonSerializable()
-class Search {
+class Search extends Equatable {
   final String? result;
   final String? response;
   final List<Data>? data;
@@ -14,7 +15,7 @@ class Search {
   final int? offset;
   final int? total;
 
-  Search(
+  const Search(
     this.data,
     this.limit,
     this.offset,
@@ -26,4 +27,9 @@ class Search {
   factory Search.fromJson(Map<String, dynamic> json) => _$SearchFromJson(json);
 
   Map<String, dynamic> toJson() => _$SearchToJson(this);
+
+  @override
+  List<Object?> get props {
+    return [data, limit, offset, total, result, response];
+  }
 }
