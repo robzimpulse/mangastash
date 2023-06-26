@@ -1,5 +1,6 @@
 library manga_dex_api;
 
+export 'src/client/manga_dex_dio.dart';
 export 'src/enums/content_rating.dart';
 export 'src/enums/future_updates.dart';
 export 'src/enums/language_codes.dart';
@@ -10,6 +11,7 @@ export 'src/enums/reading_status.dart';
 export 'src/enums/tag_modes.dart';
 export 'src/enums/visibility.dart';
 export 'src/exception/server_exception.dart';
+export 'src/interceptor/header_interceptor.dart';
 export 'src/manga_dex_api_registrar.dart';
 export 'src/models/aggregate/aggregate.dart';
 export 'src/models/at-home/chapter.dart';
@@ -49,8 +51,9 @@ export 'src/models/user/user_followed_groups/user_followed_groups.dart';
 export 'src/models/user/user_followed_manga/manga_check.dart';
 export 'src/models/user/user_followed_manga/user_followed_manga.dart';
 export 'src/models/user/user_followed_users/user_followed_users.dart';
-
-
 export 'src/repository/at_home_repository.dart';
 export 'src/repository/chapter_repository.dart';
 export 'src/repository/search_repository.dart';
+export 'src/service/at_home_service.dart';
+export 'src/service/chapter_service.dart';
+export 'src/service/search_service.dart';

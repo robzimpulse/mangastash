@@ -11,7 +11,7 @@ class ChapterRepository {
     required ChapterService service,
   }) : _service = service;
 
-  Future<ChapterData> chapter({
+  Future<ChapterResponse> chapter({
     required String mangaId,
     List<String>? ids,
     String? title,

@@ -19,7 +19,7 @@ class _ChapterService implements ChapterService {
   String? baseUrl;
 
   @override
-  Future<ChapterData> chapter({
+  Future<ChapterResponse> chapter({
     mangaId,
     ids,
     title,
@@ -64,7 +64,7 @@ class _ChapterService implements ChapterService {
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<ChapterData>(Options(
+        .fetch<Map<String, dynamic>>(_setStreamType<ChapterResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -76,7 +76,7 @@ class _ChapterService implements ChapterService {
               data: _data,
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = ChapterData.fromJson(_result.data!);
+    final value = ChapterResponse.fromJson(_result.data!);
     return value;
   }
 

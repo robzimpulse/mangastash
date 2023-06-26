@@ -1,10 +1,10 @@
 import 'package:alice_lightweight/alice.dart';
 import 'package:service_locator/service_locator.dart';
 
-import '../manga_dex_api.dart';
 import 'client/manga_dex_dio.dart';
 import 'interceptor/header_interceptor.dart';
 import 'repository/at_home_repository.dart';
+import 'repository/chapter_repository.dart';
 import 'repository/search_repository.dart';
 import 'service/at_home_service.dart';
 import 'service/chapter_service.dart';

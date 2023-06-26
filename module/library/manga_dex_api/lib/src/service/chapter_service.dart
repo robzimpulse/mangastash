@@ -11,7 +11,7 @@ abstract class ChapterService {
   factory ChapterService(MangaDexDio dio, {String baseUrl}) = _ChapterService;
 
   @GET('/chapter')
-  Future<ChapterData> chapter({
+  Future<ChapterResponse> chapter({
     @Query('manga') String? mangaId,
     @Query('ids') List<String>? ids,
     @Query('title') String? title,
