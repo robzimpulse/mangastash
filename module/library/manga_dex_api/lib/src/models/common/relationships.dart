@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import '../cover/cover.dart';
+import 'attributes.dart';
 part 'relationships.g.dart';
 
 ///@nodoc

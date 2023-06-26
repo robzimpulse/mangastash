@@ -13,7 +13,8 @@ AuthorInfo _$AuthorInfoFromJson(Map<String, dynamic> json) => AuthorInfo(
           ? null
           : AuthorInfoData.fromJson(json['data'] as Map<String, dynamic>),
       (json['relationships'] as List<dynamic>?)
-          ?.map((e) => Relationship.fromJson(e as Map<String, dynamic>))
+          ?.map(
+              (e) => AuthorInfoRelationship.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
@@ -88,12 +89,15 @@ Map<String, dynamic> _$AuthorInfoAttributesToJson(
       'version': instance.version,
     };
 
-Relationship _$RelationshipFromJson(Map<String, dynamic> json) => Relationship(
+AuthorInfoRelationship _$AuthorInfoRelationshipFromJson(
+        Map<String, dynamic> json) =>
+    AuthorInfoRelationship(
       json['id'] as String?,
       json['type'] as String?,
     );
 
-Map<String, dynamic> _$RelationshipToJson(Relationship instance) =>
+Map<String, dynamic> _$AuthorInfoRelationshipToJson(
+        AuthorInfoRelationship instance) =>
     <String, dynamic>{
       'id': instance.id,
       'type': instance.type,

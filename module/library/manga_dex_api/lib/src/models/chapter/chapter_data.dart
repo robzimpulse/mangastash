@@ -5,14 +5,14 @@ part 'chapter_data.g.dart';
 
 ///@nodoc
 @JsonSerializable()
-class Chapter {
+class ChapterResponse {
   final String? result;
   final String? response;
   final List<ChapterData>? data;
   final int? limit;
   final int? offset;
   final int? total;
-  Chapter(
+  ChapterResponse(
     this.result,
     this.response,
     this.data,
@@ -20,9 +20,9 @@ class Chapter {
     this.offset,
     this.total,
   );
-  factory Chapter.fromJson(Map<String, dynamic> json) =>
-      _$ChapterFromJson(json);
-  Map<String, dynamic> toJson() => _$ChapterToJson(this);
+  factory ChapterResponse.fromJson(Map<String, dynamic> json) =>
+      _$ChapterResponseFromJson(json);
+  Map<String, dynamic> toJson() => _$ChapterResponseToJson(this);
 }
 
 ///@nodoc

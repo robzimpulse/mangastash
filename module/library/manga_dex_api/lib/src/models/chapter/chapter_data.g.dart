@@ -6,7 +6,8 @@ part of 'chapter_data.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Chapter _$ChapterFromJson(Map<String, dynamic> json) => Chapter(
+ChapterResponse _$ChapterResponseFromJson(Map<String, dynamic> json) =>
+    ChapterResponse(
       json['result'] as String?,
       json['response'] as String?,
       (json['data'] as List<dynamic>?)
@@ -17,7 +18,8 @@ Chapter _$ChapterFromJson(Map<String, dynamic> json) => Chapter(
       json['total'] as int?,
     );
 
-Map<String, dynamic> _$ChapterToJson(Chapter instance) => <String, dynamic>{
+Map<String, dynamic> _$ChapterResponseToJson(ChapterResponse instance) =>
+    <String, dynamic>{
       'result': instance.result,
       'response': instance.response,
       'data': instance.data,

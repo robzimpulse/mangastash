@@ -13,7 +13,8 @@ SingleCustomListResponse _$SingleCustomListResponseFromJson(
       json['response'] as String?,
       json['data'] == null
           ? null
-          : Data.fromJson(json['data'] as Map<String, dynamic>),
+          : SingleCustomListResponseData.fromJson(
+              json['data'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$SingleCustomListResponseToJson(
@@ -24,43 +25,55 @@ Map<String, dynamic> _$SingleCustomListResponseToJson(
       'data': instance.data,
     };
 
-Data _$DataFromJson(Map<String, dynamic> json) => Data(
+SingleCustomListResponseData _$SingleCustomListResponseDataFromJson(
+        Map<String, dynamic> json) =>
+    SingleCustomListResponseData(
       json['id'] as String?,
       json['type'] as String?,
       json['attributes'] == null
           ? null
-          : Attributes.fromJson(json['attributes'] as Map<String, dynamic>),
+          : SingleCustomListResponseAttributes.fromJson(
+              json['attributes'] as Map<String, dynamic>),
       (json['relationships'] as List<dynamic>?)
-          ?.map((e) => Relationship.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => SingleCustomListResponseRelationship.fromJson(
+              e as Map<String, dynamic>))
           .toList(),
     );
 
-Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{
+Map<String, dynamic> _$SingleCustomListResponseDataToJson(
+        SingleCustomListResponseData instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'type': instance.type,
       'attributes': instance.attributes,
       'relationships': instance.relationships,
     };
 
-Attributes _$AttributesFromJson(Map<String, dynamic> json) => Attributes(
+SingleCustomListResponseAttributes _$SingleCustomListResponseAttributesFromJson(
+        Map<String, dynamic> json) =>
+    SingleCustomListResponseAttributes(
       json['name'] as String?,
       json['visibility'] as String?,
       json['version'] as int?,
     );
 
-Map<String, dynamic> _$AttributesToJson(Attributes instance) =>
+Map<String, dynamic> _$SingleCustomListResponseAttributesToJson(
+        SingleCustomListResponseAttributes instance) =>
     <String, dynamic>{
       'name': instance.name,
       'visibility': instance.visibility,
       'version': instance.version,
     };
 
-Relationship _$RelationshipFromJson(Map<String, dynamic> json) => Relationship(
-      json['id'] as String?,
-      json['type'] as String?,
-    );
+SingleCustomListResponseRelationship
+    _$SingleCustomListResponseRelationshipFromJson(Map<String, dynamic> json) =>
+        SingleCustomListResponseRelationship(
+          json['id'] as String?,
+          json['type'] as String?,
+        );
 
-Map<String, dynamic> _$RelationshipToJson(Relationship instance) =>
+Map<String, dynamic> _$SingleCustomListResponseRelationshipToJson(
+        SingleCustomListResponseRelationship instance) =>
     <String, dynamic>{
       'id': instance.id,
       'type': instance.type,

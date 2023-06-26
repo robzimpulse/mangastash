@@ -8,7 +8,7 @@ class AuthorInfo {
   final String? result;
   final String? response;
   final AuthorInfoData? data;
-  final List<Relationship>? relationships;
+  final List<AuthorInfoRelationship>? relationships;
   AuthorInfo(this.result, this.response, this.data, this.relationships);
   factory AuthorInfo.fromJson(Map<String, dynamic> json) =>
       _$AuthorInfoFromJson(json);
@@ -76,11 +76,11 @@ class AuthorInfoAttributes {
 
 ///@nodoc
 @JsonSerializable()
-class Relationship {
+class AuthorInfoRelationship {
   final String? id;
   final String? type;
-  Relationship(this.id, this.type);
-  factory Relationship.fromJson(Map<String, dynamic> json) =>
-      _$RelationshipFromJson(json);
-  Map<String, dynamic> toJson() => _$RelationshipToJson(this);
+  AuthorInfoRelationship(this.id, this.type);
+  factory AuthorInfoRelationship.fromJson(Map<String, dynamic> json) =>
+      _$AuthorInfoRelationshipFromJson(json);
+  Map<String, dynamic> toJson() => _$AuthorInfoRelationshipToJson(this);
 }

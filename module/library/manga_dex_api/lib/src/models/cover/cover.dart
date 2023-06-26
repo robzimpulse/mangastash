@@ -6,7 +6,7 @@ part 'cover.g.dart';
 ///@nodoc
 @JsonSerializable()
 class Cover {
-  final List<Data>? data;
+  final List<CoverData>? data;
   final int? limit;
   final int? offset;
   final int? total;
@@ -18,27 +18,27 @@ class Cover {
 
 ///@nodoc
 @JsonSerializable()
-class Data {
+class CoverData {
   final String? id;
   final String? type;
   final List<Relationship>? relationships;
-  final Attributes? attributes;
-  Data(this.id, this.type, this.attributes, this.relationships);
-  factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
+  final CoverAttributes? attributes;
+  CoverData(this.id, this.type, this.attributes, this.relationships);
+  factory CoverData.fromJson(Map<String, dynamic> json) => _$CoverDataFromJson(json);
 
-  Map<String, dynamic> toJson() => _$DataToJson(this);
+  Map<String, dynamic> toJson() => _$CoverDataToJson(this);
 }
 
 ///@nodoc
 @JsonSerializable()
-class Attributes {
+class CoverAttributes {
   final String? volume;
   final String? fileName;
   final String? description;
   final int? version;
   final String? createdAt;
   final String? updatedAt;
-  Attributes(
+  CoverAttributes(
     this.volume,
     this.fileName,
     this.description,
@@ -46,8 +46,8 @@ class Attributes {
     this.createdAt,
     this.updatedAt,
   );
-  factory Attributes.fromJson(Map<String, dynamic> json) =>
-      _$AttributesFromJson(json);
+  factory CoverAttributes.fromJson(Map<String, dynamic> json) =>
+      _$CoverAttributesFromJson(json);
 
-  Map<String, dynamic> toJson() => _$AttributesToJson(this);
+  Map<String, dynamic> toJson() => _$CoverAttributesToJson(this);
 }
