@@ -9,7 +9,9 @@ part of 'single_chapter_data.dart';
 SingleChapterData _$SingleChapterDataFromJson(Map<String, dynamic> json) =>
     SingleChapterData(
       json['result'] as String?,
-      json['chapter'],
+      json['chapter'] == null
+          ? null
+          : Chapter.fromJson(json['chapter'] as Map<String, dynamic>),
       json['baseUrl'] as String?,
     );
 

@@ -33,7 +33,9 @@ Data _$DataFromJson(Map<String, dynamic> json) => Data(
       json['attributes'] == null
           ? null
           : Attributes.fromJson(json['attributes'] as Map<String, dynamic>),
-      json['relationships'] as List<dynamic>?,
+      (json['relationships'] as List<dynamic>?)
+          ?.map((e) => Relationship.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{

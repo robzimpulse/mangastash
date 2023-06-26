@@ -9,7 +9,9 @@ part of 'relationships.dart';
 Relationship _$RelationshipFromJson(Map<String, dynamic> json) => Relationship(
       json['id'] as String?,
       json['type'] as String?,
-      json['attributes'],
+      json['attributes'] == null
+          ? null
+          : Attributes.fromJson(json['attributes'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$RelationshipToJson(Relationship instance) =>

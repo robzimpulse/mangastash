@@ -8,7 +8,9 @@ part of 'user_followed_manga.dart';
 
 UserFollowedManga _$UserFollowedMangaFromJson(Map<String, dynamic> json) =>
     UserFollowedManga(
-      json['data'] as List<dynamic>?,
+      (json['data'] as List<dynamic>?)
+          ?.map((e) => Data.fromJson(e as Map<String, dynamic>))
+          .toList(),
       json['limit'] as int?,
       json['offset'] as int?,
       json['total'] as int?,

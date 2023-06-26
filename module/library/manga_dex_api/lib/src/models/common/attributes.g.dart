@@ -7,9 +7,15 @@ part of 'attributes.dart';
 // **************************************************************************
 
 Attributes _$AttributesFromJson(Map<String, dynamic> json) => Attributes(
-      json['title'],
-      json['altTitles'] as List<dynamic>?,
-      json['description'],
+      json['title'] == null
+          ? null
+          : Title.fromJson(json['title'] as Map<String, dynamic>),
+      (json['altTitles'] as List<dynamic>?)
+          ?.map((e) => AltTitles.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      json['description'] == null
+          ? null
+          : Description.fromJson(json['description'] as Map<String, dynamic>),
       json['isLocked'] as bool?,
       json['originalLanguage'] as String?,
       json['lastVolume'] as String?,
@@ -18,7 +24,9 @@ Attributes _$AttributesFromJson(Map<String, dynamic> json) => Attributes(
       json['status'] as String?,
       json['year'] as int?,
       json['contentRating'] as String?,
-      json['tags'] as List<dynamic>?,
+      (json['tags'] as List<dynamic>?)
+          ?.map((e) => Tags.fromJson(e as Map<String, dynamic>))
+          .toList(),
       json['createdAt'] as String?,
       json['updatedAt'] as String?,
       json['version'] as int?,

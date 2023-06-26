@@ -7,7 +7,9 @@ part of 'search.dart';
 // **************************************************************************
 
 Search _$SearchFromJson(Map<String, dynamic> json) => Search(
-      json['data'] as List<dynamic>?,
+      (json['data'] as List<dynamic>?)
+          ?.map((e) => Data.fromJson(e as Map<String, dynamic>))
+          .toList(),
       json['limit'] as int?,
       json['offset'] as int?,
       json['total'] as int?,

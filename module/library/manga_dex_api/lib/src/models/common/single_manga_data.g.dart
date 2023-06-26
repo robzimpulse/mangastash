@@ -10,7 +10,9 @@ SingleMangaData _$SingleMangaDataFromJson(Map<String, dynamic> json) =>
     SingleMangaData(
       json['result'] as String?,
       json['response'] as String?,
-      json['data'],
+      json['data'] == null
+          ? null
+          : Data.fromJson(json['data'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$SingleMangaDataToJson(SingleMangaData instance) =>

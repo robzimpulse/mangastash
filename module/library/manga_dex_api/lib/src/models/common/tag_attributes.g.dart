@@ -8,8 +8,12 @@ part of 'tag_attributes.dart';
 
 TagAttributes _$TagAttributesFromJson(Map<String, dynamic> json) =>
     TagAttributes(
-      json['name'],
-      json['description'],
+      json['name'] == null
+          ? null
+          : Name.fromJson(json['name'] as Map<String, dynamic>),
+      json['description'] == null
+          ? null
+          : Description.fromJson(json['description'] as Map<String, dynamic>),
       json['group'] as String?,
       json['version'] as int?,
     );
