@@ -1,12 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:retrofit/http.dart';
 
 import '../client/manga_dex_dio.dart';
-import '../enums/content_rating.dart';
-import '../enums/language_codes.dart';
-import '../enums/manga_status.dart';
-import '../enums/order_enums.dart';
-import '../enums/publication_demographic.dart';
-import '../enums/tag_modes.dart';
 import '../models/search/search.dart';
 
 part 'search_service.g.dart';
@@ -24,21 +19,20 @@ abstract class SearchService {
     @Query('artists') List<String>? artists,
     @Query('year') int? year,
     @Query('includedTags') List<String>? includedTags,
-    @Query('includedTagsMode') TagsMode? includedTagsMode,
+    @Query('includedTagsMode') String? includedTagsMode,
     @Query('excludedTags') List<String>? excludedTags,
-    @Query('excludedTagsMode') TagsMode? excludedTagsMode,
-    @Query('status') List<MangaStatus>? status,
-    @Query('originalLanguage') List<LanguageCodes>? originalLanguage,
-    @Query('excludedOriginalLanguages') List<LanguageCodes>? excludedOriginalLanguages,
-    @Query('availableTranslatedLanguage') List<LanguageCodes>? availableTranslatedLanguage,
-    @Query('publicationDemographic') List<PublicDemographic>? publicationDemographic,
+    @Query('excludedTagsMode') String? excludedTagsMode,
+    @Query('status') List<String>? status,
+    @Query('originalLanguage') List<String>? originalLanguage,
+    @Query('excludedOriginalLanguages') List<String>? excludedOriginalLanguages,
+    @Query('availableTranslatedLanguage') List<String>? availableTranslatedLanguage,
+    @Query('publicationDemographic') List<String>? publicationDemographic,
     @Query('ids') List<String>? ids,
-    @Query('contentRating') List<ContentRating>? contentRating,
+    @Query('contentRating') List<String>? contentRating,
     @Query('createdAtSince') String? createdAtSince,
     @Query('updatedAtSince') String? updatedAtSince,
     @Query('includes') List<String>? includes,
     @Query('group') String? group,
-    @Query('orders') Map<SearchOrders, OrderDirections>? orders,
-    @Query('hasAvailableChapters') bool? hasAvailableChapters,
+    @Query('orders') Map<String, String>? orders,
   });
 }

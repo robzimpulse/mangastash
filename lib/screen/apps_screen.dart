@@ -1,3 +1,4 @@
+import 'package:alice_lightweight/alice.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
 import 'package:flutter/material.dart';
@@ -24,17 +25,17 @@ class AppsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final route = _route(locator: locator);
+    _setupAlice(locator: locator, route: route);
     return StreamBuilder<ThemeData>(
       stream: listenThemeUseCase.themeDataStream,
       builder: (context, snapshot) {
         final theme = snapshot.data?.copyWith(
-          pageTransitionsTheme: const PageTransitionsTheme(
-            builders: {
-              TargetPlatform.iOS: IOSWillPopTransitionsBuilder(),
-              TargetPlatform.android: IOSWillPopTransitionsBuilder(),
-            },
-          )
-        );
+            pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            TargetPlatform.iOS: IOSWillPopTransitionsBuilder(),
+            TargetPlatform.android: IOSWillPopTransitionsBuilder(),
+          },
+        ));
         return MaterialApp.router(
           title: 'Manga Stash',
           debugShowCheckedModeBanner: false,
@@ -72,5 +73,14 @@ class AppsScreen extends StatelessWidget {
       ],
       observers: [],
     );
+  }
+
+  void _setupAlice({
+    required ServiceLocator locator,
+    required GoRouter route,
+  }) {
+    final Alice alice = locator();
+    final navigatorKey = route.routerDelegate.navigatorKey;
+    alice.setNavigatorKey(navigatorKey);
   }
 }

@@ -3,15 +3,20 @@ import 'package:dio/dio.dart';
 import 'package:dio/native_imp.dart';
 import 'package:flutter/foundation.dart';
 
+import '../interceptor/header_interceptor.dart';
+
 class MangaDexDio extends DioForNative {
   late final AliceDioInterceptor _aliceDioInterceptor;
+  late final HeaderInterceptor _headerInterceptor;
 
   MangaDexDio({
     required AliceDioInterceptor aliceDioInterceptor,
+    required HeaderInterceptor headerInterceptor,
     BaseOptions? options,
   })  : super(options) {
 
     _aliceDioInterceptor = aliceDioInterceptor;
+    _headerInterceptor = headerInterceptor;
 
     _configureProxy();
     _configureOptions();
@@ -19,11 +24,13 @@ class MangaDexDio extends DioForNative {
   }
 
   void _configureOptions() {
-    options.baseUrl = 'api.mangadex.org';
+    options.baseUrl = 'https://api.mangadex.org';
   }
 
   void _configureInterceptors() {
-    interceptors.add(_aliceDioInterceptor);
+    interceptors
+      ..add(_aliceDioInterceptor)
+      ..add(_headerInterceptor);
   }
 
   void _configureProxy() {

@@ -42,7 +42,6 @@ class _SearchService implements SearchService {
     includes,
     group,
     orders,
-    hasAvailableChapters,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -53,9 +52,9 @@ class _SearchService implements SearchService {
       r'artists': artists,
       r'year': year,
       r'includedTags': includedTags,
-      r'includedTagsMode': includedTagsMode?.toJson(),
+      r'includedTagsMode': includedTagsMode,
       r'excludedTags': excludedTags,
-      r'excludedTagsMode': excludedTagsMode?.toJson(),
+      r'excludedTagsMode': excludedTagsMode,
       r'status': status,
       r'originalLanguage': originalLanguage,
       r'excludedOriginalLanguages': excludedOriginalLanguages,
@@ -68,7 +67,6 @@ class _SearchService implements SearchService {
       r'includes': includes,
       r'group': group,
       r'orders': orders,
-      r'hasAvailableChapters': hasAvailableChapters,
     };
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};

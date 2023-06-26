@@ -1,6 +1,7 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'screen/apps_screen.dart';
@@ -51,6 +52,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
     // TODO: register module registrar here
     await locator.registerRegistrar(CoreStorageRegistrar());
     await locator.registerRegistrar(CoreEnvironmentRegistrar());
+    await locator.registerRegistrar(MangaDexApiRegistrar());
     return locator;
   }
 }

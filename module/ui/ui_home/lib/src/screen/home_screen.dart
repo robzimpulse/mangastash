@@ -15,7 +15,9 @@ class HomeScreen extends StatefulWidget {
 
   static Widget create({required ServiceLocator locator}) {
     return BlocProvider(
-      create: (context) => HomeCubit(),
+      create: (context) => HomeCubit(
+        searchService: locator(),
+      ),
       child: const HomeScreen(),
     );
   }

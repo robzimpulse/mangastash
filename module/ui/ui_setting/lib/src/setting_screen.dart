@@ -1,13 +1,15 @@
+import 'package:alice_lightweight/alice.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:flutter/material.dart';
 
 class SettingScreen extends StatelessWidget {
   final ListenThemeUseCase listenThemeUseCase;
-
+  final Alice alice;
   final UpdateThemeUseCase themeUpdateUseCase;
 
   const SettingScreen({
     super.key,
+    required this.alice,
     required this.listenThemeUseCase,
     required this.themeUpdateUseCase,
   });
@@ -41,6 +43,10 @@ class SettingScreen extends StatelessWidget {
                 );
               },
             ),
+            ListTile(
+              title: const Text('Show Alice HTTP Inspector'),
+              onTap: () => alice.showInspector(),
+            )
           ],
         ),
       ),

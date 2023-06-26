@@ -12,6 +12,7 @@ class SettingRouteBuilder extends BaseRouteBuilder {
       path: SettingRoutePath.main,
       name: SettingRoutePath.main,
       builder: (context, state) => SettingScreen(
+        alice: locator.get(),
         listenThemeUseCase: locator.get(),
         themeUpdateUseCase: locator.get(),
       ),

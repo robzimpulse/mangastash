@@ -35,6 +35,7 @@ dependencies:
   go_router: ^7.0.0
   responsive_framework: ^1.0.0
   ios_willpop_transition_theme: ^0.0.6
+  alice_lightweight: 3.3.0
 
   # core
   core_auth:
@@ -71,6 +72,8 @@ dependencies:
     path: module/library/safe_bloc
   service_locator:
     path: module/library/service_locator
+  manga_dex_api:
+    path: module/library/manga_dex_api
 
 dev_dependencies:
   flutter_test:
