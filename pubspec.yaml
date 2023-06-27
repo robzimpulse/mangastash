@@ -67,13 +67,21 @@ dependencies:
   ui_setting:
     path: module/ui/ui_setting
 
+  # data
+  data_user:
+    path: module/data/data_user
+
+  # domain
+  domain_user:
+    path: module/domain/domain_user
+  domain_manga:
+    path: module/domain/domain_manga
+
   # library
   safe_bloc:
     path: module/library/safe_bloc
   service_locator:
     path: module/library/service_locator
-  manga_dex_api:
-    path: module/library/manga_dex_api
 
 dev_dependencies:
   flutter_test:
