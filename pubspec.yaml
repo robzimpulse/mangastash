@@ -70,6 +70,8 @@ dependencies:
   # data
   data_user:
     path: module/data/data_user
+  data_manga:
+    path: module/data/data_manga
 
   # domain
   domain_user:

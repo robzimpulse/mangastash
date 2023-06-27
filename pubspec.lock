@@ -92,6 +92,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.2"
+  data_manga:
+    dependency: "direct main"
+    description:
+      path: "module/data/data_manga"
+      relative: true
+    source: path
+    version: "0.0.1"
   data_user:
     dependency: "direct main"
     description:
