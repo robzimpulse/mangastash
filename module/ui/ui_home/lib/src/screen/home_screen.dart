@@ -71,7 +71,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
                 childAspectRatio: (100 / 140),
-                // TODO: fill with data from api
                 children: state.mangas
                     .map(
                       (e) => MangaGridItemWidget(

@@ -1,4 +1,6 @@
 import 'package:alice_lightweight/core/alice_dio_interceptor.dart';
+import 'package:dio/adapter.dart';
+import 'package:dio/adapter_browser.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/native_imp.dart';
 import 'package:flutter/foundation.dart';
@@ -18,6 +20,7 @@ class MangaDexDio extends DioForNative {
     _aliceDioInterceptor = aliceDioInterceptor;
     _headerInterceptor = headerInterceptor;
 
+    _configureClient();
     _configureProxy();
     _configureOptions();
     _configureInterceptors();
@@ -35,5 +38,13 @@ class MangaDexDio extends DioForNative {
 
   void _configureProxy() {
     if (!kDebugMode) return;
+  }
+
+  void _configureClient() {
+    if (kIsWeb) {
+      httpClientAdapter = BrowserHttpClientAdapter();
+    } else {
+      httpClientAdapter = DefaultHttpClientAdapter();
+    }
   }
 }
