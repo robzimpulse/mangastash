@@ -23,17 +23,31 @@ class MangaGridItemWidget extends StatelessWidget {
               border: Border.all(color: Colors.blueGrey),
             ),
             child: CachedNetworkImage(
+              fit: BoxFit.fill,
               imageUrl: coverUrl ?? '',
-              placeholder: (context, url) => const CircularProgressIndicator(),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
+              placeholder: (context, url) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
+              errorWidget: (context, url, error) {
+                return const Center(
+                  child: Icon(Icons.error),
+                );
+              },
             ),
           ),
         ),
         Visibility(
           visible: title?.isNotEmpty == true,
-          child: Padding(
+          child: Container(
+            width: double.infinity,
+            color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.7),
             padding: const EdgeInsets.all(4.0),
-            child: Text(title ?? ''),
+            child: Text(
+              title ?? '',
+              maxLines: 2,
+            ),
           ),
         ),
       ],

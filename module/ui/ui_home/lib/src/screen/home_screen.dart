@@ -72,6 +72,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
 
+              if (state.mangas.isEmpty) {
+                return const Center(
+                  child: Text('Manga Empty'),
+                );
+              }
+
               return GridView.count(
                 crossAxisCount: _crossAxisCount(context),
                 crossAxisSpacing: 10,
