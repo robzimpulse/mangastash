@@ -1,7 +1,7 @@
-name: ui_search
+name: ui_common
 description: A new Flutter package project.
 version: 0.0.1
-publish_to: none
+publish_to: home
 
 environment:
   sdk: '>=2.18.2 <3.0.0'
@@ -10,32 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  responsive_framework: ^1.0.0
-  go_router: ^7.0.0
-  equatable: ^2.0.5
   cached_network_image: ^3.2.2
-
-  # core
-  core_network:
-    path: ../../core/core_network
-
-  # data
-  data_manga:
-    path: ../../data/data_manga
-
-  # domain
-  domain_manga:
-    path: ../../domain/domain_manga
-
-  #ui
-  ui_common:
-    path: ../../ui/ui_common
-
-  # library
-  safe_bloc:
-    path: ../../library/safe_bloc
-  service_locator:
-    path: ../../library/service_locator
 
 dev_dependencies:
   flutter_test:

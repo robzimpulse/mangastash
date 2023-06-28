@@ -17,15 +17,7 @@ class HomeCubit extends Cubit<HomeCubitState> {
   Future<void> initialize() async {
     emit(state.copyWith(isLoading: true));
 
-    final result = await _searchMangaUseCase.execute(title: 'One Piece');
-
-    if (result is network.Success<List<Manga>>) {
-      emit(state.copyWith(mangas: result.data));
-    }
-
-    if (result is network.Error<List<Manga>>) {
-      emit(state.copyWith(errorMessage: () => result.error.toString()));
-    }
+    // TODO: populate most popular manga here
 
     emit(state.copyWith(isLoading: false));
   }

@@ -644,6 +644,13 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  ui_common:
+    dependency: transitive
+    description:
+      path: "module/ui/ui_common"
+      relative: true
+    source: path
+    version: "0.0.1"
   ui_home:
     dependency: transitive
     description:
