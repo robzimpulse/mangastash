@@ -1,14 +1,18 @@
-import 'package:data_manga/manga.dart';
+import 'package:collection/collection.dart';
 import 'package:core_network/core_network.dart' as network;
+import 'package:data_manga/manga.dart';
 
 import '../../domain_manga.dart';
 
 class SearchMangaUseCase {
   final SearchRepository _searchRepository;
+  final CoverRepository _coverRepository;
 
   const SearchMangaUseCase({
     required SearchRepository searchRepository,
-  }) : _searchRepository = searchRepository;
+    required CoverRepository coverRepository,
+  })  : _searchRepository = searchRepository,
+        _coverRepository = coverRepository;
 
   Future<network.Result<List<Manga>>> execute({
     String? title,
@@ -55,17 +59,25 @@ class SearchMangaUseCase {
         contentRating: contentRating,
         createdAtSince: createdAtSince,
         updatedAtSince: updatedAtSince,
-        includes: includes,
+        includes: ['cover_art', ...includes ?? []],
         group: group,
         orders: orders,
       );
 
-      return network.Success(
-        searchResult.data
-                ?.map((e) => Manga(id: e.id, title: e.attributes?.title?.en))
-                .toList() ??
-            [],
-      );
+      final mangas = searchResult.data?.map((element) {
+        final cover = element.relationships?.firstWhereOrNull(
+          (e) => e.type == 'cover_art',
+        );
+
+        final coverUrl = _coverRepository.coverUrl(
+          element.id ?? '',
+          cover?.attributes?.fileName ?? '',
+        );
+
+        return Manga.fromData(data: element).copyWith(coverUrl: coverUrl);
+      });
+
+      return network.Success(mangas?.toList() ?? []);
     } on Exception catch (e) {
       return network.Error(e);
     }

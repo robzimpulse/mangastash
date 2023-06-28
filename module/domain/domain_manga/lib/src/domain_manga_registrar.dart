@@ -9,7 +9,10 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerRegistrar(MangaDexApiRegistrar());
 
     locator.registerFactory(
-      () => SearchMangaUseCase(searchRepository: locator()),
+      () => SearchMangaUseCase(
+        searchRepository: locator(),
+        coverRepository: locator(),
+      ),
     );
   }
 }

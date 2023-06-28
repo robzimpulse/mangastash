@@ -5,6 +5,7 @@ import 'client/manga_dex_dio.dart';
 import 'interceptor/header_interceptor.dart';
 import 'repository/at_home_repository.dart';
 import 'repository/chapter_repository.dart';
+import 'repository/cover_repository.dart';
 import 'repository/search_repository.dart';
 import 'service/at_home_service.dart';
 import 'service/chapter_service.dart';
@@ -29,5 +30,7 @@ class MangaDexApiRegistrar extends Registrar {
     locator.registerFactory(() => AtHomeRepository(service: locator()));
     locator.registerFactory(() => SearchRepository(service: locator()));
     locator.registerFactory(() => ChapterRepository(service: locator()));
+
+    locator.registerFactory(() => CoverRepository());
   }
 }

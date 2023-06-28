@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class MangaGridItemWidget extends StatelessWidget {
@@ -16,11 +17,17 @@ class MangaGridItemWidget extends StatelessWidget {
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.blueGrey),
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.blueGrey),
+            ),
+            child: CachedNetworkImage(
+              imageUrl: coverUrl ?? '',
+              placeholder: (context, url) => const CircularProgressIndicator(),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+            ),
           ),
-          child: null,
         ),
         Visibility(
           visible: title?.isNotEmpty == true,

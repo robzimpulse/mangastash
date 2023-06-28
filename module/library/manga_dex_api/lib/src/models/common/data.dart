@@ -11,9 +11,7 @@ part 'data.g.dart';
 class Data {
   final String? id;
   final String? type;
-  final Attributes? attributes;
-  final List<Relationship>? relationships;
-  Data(this.id, this.type, this.attributes, this.relationships);
+  Data(this.id, this.type);
   factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
   Map<String, dynamic> toJson() => _$DataToJson(this);
 }

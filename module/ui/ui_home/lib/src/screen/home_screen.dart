@@ -66,6 +66,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
 
+              if (state.errorMessage?.isNotEmpty == true) {
+                return Center(
+                  child: Text(state.errorMessage ?? ''),
+                );
+              }
+
               return GridView.count(
                 crossAxisCount: _crossAxisCount(context),
                 crossAxisSpacing: 10,

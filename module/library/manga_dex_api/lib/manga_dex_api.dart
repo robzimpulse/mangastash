@@ -53,6 +53,7 @@ export 'src/models/user/user_followed_manga/user_followed_manga.dart';
 export 'src/models/user/user_followed_users/user_followed_users.dart';
 export 'src/repository/at_home_repository.dart';
 export 'src/repository/chapter_repository.dart';
+export 'src/repository/cover_repository.dart';
 export 'src/repository/search_repository.dart';
 export 'src/service/at_home_service.dart';
 export 'src/service/chapter_service.dart';
