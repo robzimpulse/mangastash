@@ -8,6 +8,7 @@ on: [push, workflow_dispatch]
 jobs:
   build:
     timeout-minutes: 15
+    runs-on: macos-latest
     steps:
       - name: "Git Checkout"
         uses: actions/checkout@v3
