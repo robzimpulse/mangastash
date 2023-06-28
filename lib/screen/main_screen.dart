@@ -7,13 +7,17 @@ import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 class MainScreen extends StatelessWidget {
-  final StatefulNavigationShell child;
+  final Widget child;
+
   final int index;
+
+  final void Function(int)? onTapMenu;
 
   const MainScreen({
     super.key,
     required this.child,
     required this.index,
+    required this.onTapMenu,
   });
 
   @override
@@ -55,7 +59,7 @@ class MainScreen extends StatelessWidget {
               label: Text('Profile'),
             ),
           ],
-          onDestinationSelected: (index) => child.goBranch(index),
+          onDestinationSelected: onTapMenu,
           selectedIndex: index,
         ),
         Expanded(child: child),
@@ -89,22 +93,7 @@ class MainScreen extends StatelessWidget {
           label: 'Profile',
         ),
       ],
-      onTap: (index) => context.go(_route(index)),
+      onTap: onTapMenu,
     );
-  }
-
-  String _route(int index) {
-    switch (index) {
-      case 0:
-        return HomeRoutePath.main;
-      case 1:
-        return CollectionRoutePath.main;
-      case 2:
-        return SettingRoutePath.main;
-      case 3:
-        return ProfileRoutePath.main;
-      default:
-        return HomeRoutePath.main;
-    }
   }
 }

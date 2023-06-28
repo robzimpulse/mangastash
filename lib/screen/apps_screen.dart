@@ -61,16 +61,12 @@ class AppsScreen extends StatelessWidget {
     required ServiceLocator locator,
     String initialRoute = MainPath.main,
   }) {
-    final routes = MainRouteBuilder();
     return GoRouter(
       initialLocation: initialRoute,
       errorBuilder: (context, state) => ErrorScreen(
         text: state.error.toString(),
       ),
-      routes: [
-        routes.root(locator: locator),
-        ...routes.routes(locator: locator)
-      ],
+      routes: MainRouteBuilder().allRoutes(locator: locator),
       observers: [],
     );
   }

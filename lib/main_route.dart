@@ -29,6 +29,7 @@ class MainRouteBuilder extends BaseRouteBuilder {
         return MainScreen(
           index: shell.currentIndex,
           child: shell,
+          onTapMenu: (index) => shell.goBranch(index),
         );
       },
       branches: [
