@@ -30,12 +30,13 @@ class AppsScreen extends StatelessWidget {
       stream: listenThemeUseCase.themeDataStream,
       builder: (context, snapshot) {
         final theme = snapshot.data?.copyWith(
-            pageTransitionsTheme: const PageTransitionsTheme(
-          builders: {
-            TargetPlatform.iOS: IOSWillPopTransitionsBuilder(),
-            TargetPlatform.android: IOSWillPopTransitionsBuilder(),
-          },
-        ));
+          pageTransitionsTheme: const PageTransitionsTheme(
+            builders: {
+              TargetPlatform.iOS: IOSWillPopTransitionsBuilder(),
+              TargetPlatform.android: IOSWillPopTransitionsBuilder(),
+            },
+          ),
+        );
         return MaterialApp.router(
           title: 'Manga Stash',
           debugShowCheckedModeBanner: false,
@@ -67,7 +68,7 @@ class AppsScreen extends StatelessWidget {
         text: state.error.toString(),
       ),
       routes: MainRouteBuilder().allRoutes(locator: locator),
-      observers: [],
+      observers: [BaseRouteObserver()],
     );
   }
 
