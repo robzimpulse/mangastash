@@ -58,16 +58,18 @@ dependencies:
     path: module/feature/feature_profile
   feature_setting:
     path: module/feature/feature_setting
+  feature_search:
+    path: module/feature/feature_search
 
-  # ui
-  ui_collection:
-    path: module/ui/ui_collection
-  ui_home:
-    path: module/ui/ui_home
-  ui_profile:
-    path: module/ui/ui_profile
-  ui_setting:
-    path: module/ui/ui_setting
+#  # ui
+#  ui_collection:
+#    path: module/ui/ui_collection
+#  ui_home:
+#    path: module/ui/ui_home
+#  ui_profile:
+#    path: module/ui/ui_profile
+#  ui_setting:
+#    path: module/ui/ui_setting
 
   # data
   data_user:

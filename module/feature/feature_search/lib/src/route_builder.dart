@@ -1,17 +1,17 @@
 import 'package:core_route/core_route.dart';
 import 'package:service_locator/service_locator.dart';
-import 'package:ui_home/ui_home.dart';
+import 'package:ui_search/ui_search.dart';
 
 import 'route_path.dart';
 
-class HomeRouteBuilder extends BaseRouteBuilder {
+class SearchRouteBuilder extends BaseRouteBuilder {
 
   @override
   GoRoute root({required ServiceLocator locator}) {
     return GoRoute(
-      path: HomeRoutePath.main,
-      name: HomeRoutePath.home,
-      builder: (context, state) => HomeScreen.create(locator: locator),
+      path: SearchRoutePath.main,
+      name: SearchRoutePath.home,
+      builder: (context, state) => SearchScreen.create(locator: locator),
     );
   }
 

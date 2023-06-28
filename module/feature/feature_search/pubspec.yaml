@@ -1,4 +1,4 @@
-name: feature_home
+name: feature_search
 description: A new Flutter package project.
 version: 0.0.1
 publish_to: none
@@ -22,8 +22,8 @@ dependencies:
     path: ../../core/core_route
 
   # ui
-  ui_home:
-    path: ../../ui/ui_home
+  ui_search:
+    path: ../../ui/ui_search
 
 dev_dependencies:
   flutter_test:

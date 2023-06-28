@@ -190,6 +190,13 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  feature_search:
+    dependency: "direct main"
+    description:
+      path: "module/feature/feature_search"
+      relative: true
+    source: path
+    version: "0.0.1"
   feature_setting:
     dependency: "direct main"
     description:
@@ -631,28 +638,35 @@ packages:
     source: hosted
     version: "1.3.2"
   ui_collection:
-    dependency: "direct main"
+    dependency: transitive
     description:
       path: "module/ui/ui_collection"
       relative: true
     source: path
     version: "0.0.1"
   ui_home:
-    dependency: "direct main"
+    dependency: transitive
     description:
       path: "module/ui/ui_home"
       relative: true
     source: path
     version: "0.0.1"
   ui_profile:
-    dependency: "direct main"
+    dependency: transitive
     description:
       path: "module/ui/ui_profile"
       relative: true
     source: path
     version: "0.0.1"
+  ui_search:
+    dependency: transitive
+    description:
+      path: "module/ui/ui_search"
+      relative: true
+    source: path
+    version: "0.0.1"
   ui_setting:
-    dependency: "direct main"
+    dependency: transitive
     description:
       path: "module/ui/ui_setting"
       relative: true
