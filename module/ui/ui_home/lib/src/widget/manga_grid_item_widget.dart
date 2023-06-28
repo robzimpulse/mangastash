@@ -7,9 +7,9 @@ class MangaGridItemWidget extends StatelessWidget {
     required this.coverUrl,
   });
 
-  final String title;
+  final String? title;
 
-  final String coverUrl;
+  final String? coverUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +22,12 @@ class MangaGridItemWidget extends StatelessWidget {
           ),
           child: null,
         ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Text(title),
+        Visibility(
+          visible: title?.isNotEmpty == true,
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Text(title ?? ''),
+          ),
         ),
       ],
     );

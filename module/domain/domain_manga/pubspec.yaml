@@ -11,7 +11,15 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # Library
+  # core
+  core_network:
+    path: ../../core/core_network
+
+  # data
+  data_manga:
+    path: ../../data/data_manga
+
+  # library
   service_locator:
     path: ../../library/service_locator
   manga_dex_api:

@@ -42,6 +42,8 @@ dependencies:
     path: module/core/core_auth
   core_environment:
     path: module/core/core_environment
+  core_network:
+    path: module/core/core_network
   core_route:
     path: module/core/core_route
   core_storage:

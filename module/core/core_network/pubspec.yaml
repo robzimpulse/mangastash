@@ -1,4 +1,4 @@
-name: manga_dex_api
+name: core_network
 description: A new Flutter package project.
 version: 0.0.1
 publish_to: none
@@ -10,23 +10,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  json_annotation: ^4.8.0
   dio: ^4.0.6
-  alice_lightweight: 3.3.0
-  equatable: ^2.0.5
-  retrofit: ^3.3.1
-
-  # library
-  service_locator:
-    path: ../../library/service_locator
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner: ^2.3.3
-  json_serializable: ^6.6.1
   flutter_lints: ^2.0.0
-  retrofit_generator: ^4.2.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

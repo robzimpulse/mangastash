@@ -16,7 +16,9 @@ class HomeScreen extends StatefulWidget {
 
   static Widget create({required ServiceLocator locator}) {
     return BlocProvider(
-      create: (context) => HomeCubit(),
+      create: (context) => HomeCubit(
+        searchMangaUseCase: locator(),
+      ),
       child: const HomeScreen(),
     );
   }
@@ -70,12 +72,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisSpacing: 10,
                 childAspectRatio: (100 / 140),
                 // TODO: fill with data from api
-                children: const [
-                  MangaGridItemWidget(
-                    title: 'Test Title',
-                    coverUrl: '',
-                  )
-                ],
+                children: state.mangas
+                    .map(
+                      (e) => MangaGridItemWidget(
+                        title: e.title,
+                        coverUrl: e.coverUrl,
+                      ),
+                    )
+                    .toList(),
               );
             },
           ),
