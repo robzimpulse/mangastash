@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 class MainScreen extends StatelessWidget {
-  final Widget child;
+  final StatefulNavigationShell child;
   final int index;
 
   const MainScreen({
@@ -55,7 +55,7 @@ class MainScreen extends StatelessWidget {
               label: Text('Profile'),
             ),
           ],
-          onDestinationSelected: (index) => context.go(_route(index)),
+          onDestinationSelected: (index) => child.goBranch(index),
           selectedIndex: index,
         ),
         Expanded(child: child),
