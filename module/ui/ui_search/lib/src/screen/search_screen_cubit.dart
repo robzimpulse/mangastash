@@ -14,11 +14,10 @@ class SearchScreenCubit extends Cubit<SearchScreenCubitState> {
     SearchScreenCubitState initState = const SearchScreenCubitState(),
   }): _searchMangaUseCase = searchMangaUseCase, super(initState);
 
-  Future<void> initialize() async {
+  Future<void> search(String title) async {
     emit(state.copyWith(isLoading: true));
 
-    // TODO: change with text field value
-    final result = await _searchMangaUseCase.execute(title: 'One Piece');
+    final result = await _searchMangaUseCase.execute(title: title);
 
     if (result is network.Success<List<Manga>>) {
       emit(state.copyWith(mangas: result.data));

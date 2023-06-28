@@ -24,10 +24,19 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
+  final _debounceSearch = Debounce(delay: const Duration(seconds: 1));
+
   @override
   void initState() {
     super.initState();
-    context.read<SearchScreenCubit>().initialize();
+  }
+
+  @override
+  void dispose() {
+    _debounceSearch.dispose();
+    super.dispose();
   }
 
   int _crossAxisCount(BuildContext context) {
@@ -37,12 +46,38 @@ class _SearchScreenState extends State<SearchScreen> {
     return 8;
   }
 
+  void _onSearch(String value) {
+    _debounceSearch.call(
+      () {
+        if (!mounted) return;
+        context.read<SearchScreenCubit>().search(value);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
       onWillPop: () => Future.value(true),
       appBar: AppBar(
-        title: const Text('Search'),
+        title: TextField(
+          controller: _searchController,
+          style: const TextStyle(color: Colors.white),
+          cursorColor: Colors.white,
+          decoration: const InputDecoration(
+            hintText: 'Search...',
+            hintStyle: TextStyle(color: Colors.white54),
+            border: InputBorder.none,
+          ),
+          onChanged: _onSearch,
+          onSubmitted: (value) {},
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.sort),
+            onPressed: () => {},
+          ),
+        ],
       ),
       child: Container(
         padding: const EdgeInsets.all(10),
