@@ -1,3 +1,4 @@
+import 'package:data_manga/data_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_framework/responsive_breakpoints.dart';
@@ -43,9 +44,10 @@ class _SearchScreenState extends State<SearchScreen> {
 
   int _crossAxisCount(BuildContext context) {
     final responsive = ResponsiveBreakpoints.of(context);
-    if (responsive.isPhone || responsive.isMobile) return 3;
-    if (responsive.isTablet) return 6;
-    return 8;
+    if (responsive.isMobile) return 3;
+    if (responsive.isTablet) return 5;
+    if (responsive.isDesktop) return 8;
+    return 12;
   }
 
   void _onSearch(String value) {
@@ -57,10 +59,14 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  void _onTapFilter() {
-    context.showBottomSheet(
-      builder: (context) => const SortBottomSheet(),
+  void _onTapFilter() async {
+    final data = await context.showBottomSheet(
+      builder: (context) => const SortBottomSheet(
+        tags: [Tag(name:'Test'), Tag(name:'Test'), Tag(name:'Test')],
+      ),
     );
+    if (!mounted) return;
+    context.showSnackBar(message: 'data bottom sheet: $data');
   }
 
   @override
@@ -109,19 +115,19 @@ class _SearchScreenState extends State<SearchScreen> {
               );
             }
 
+            final children = state.mangas.map(
+              (e) => MangaGridItemWidget(
+                title: e.title,
+                coverUrl: e.coverUrl,
+              ),
+            );
+
             return GridView.count(
               crossAxisCount: _crossAxisCount(context),
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
               childAspectRatio: (100 / 140),
-              children: state.mangas
-                  .map(
-                    (e) => MangaGridItemWidget(
-                      title: e.title,
-                      coverUrl: e.coverUrl,
-                    ),
-                  )
-                  .toList(),
+              children: children.toList(),
             );
           },
         ),
