@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/http.dart';
 
 import '../client/manga_dex_dio.dart';
-import '../models/chapter/chapter_data.dart';
+import '../model/chapter/chapter_response.dart';
 
 part 'chapter_service.g.dart';
 

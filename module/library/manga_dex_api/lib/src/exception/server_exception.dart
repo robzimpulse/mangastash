@@ -1,4 +1,4 @@
-import '../models/common/server_exception.dart';
+import '../model/common/server_exception.dart';
 
 class MangadexServerException implements Exception {
   final ServerException info;

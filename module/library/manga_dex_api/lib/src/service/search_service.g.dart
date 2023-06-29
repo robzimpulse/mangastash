@@ -19,7 +19,7 @@ class _SearchService implements SearchService {
   String? baseUrl;
 
   @override
-  Future<Search> search({
+  Future<SearchResponse> search({
     title,
     limit,
     offset,
@@ -71,8 +71,8 @@ class _SearchService implements SearchService {
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
-    final _result =
-        await _dio.fetch<Map<String, dynamic>>(_setStreamType<Search>(Options(
+    final _result = await _dio
+        .fetch<Map<String, dynamic>>(_setStreamType<SearchResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -84,7 +84,7 @@ class _SearchService implements SearchService {
               data: _data,
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = Search.fromJson(_result.data!);
+    final value = SearchResponse.fromJson(_result.data!);
     return value;
   }
 

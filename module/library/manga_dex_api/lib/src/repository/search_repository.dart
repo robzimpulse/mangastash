@@ -4,7 +4,7 @@ import '../enums/manga_status.dart';
 import '../enums/order_enums.dart';
 import '../enums/publication_demographic.dart';
 import '../enums/tag_modes.dart';
-import '../models/search/search.dart';
+import '../model/manga/search_response.dart';
 import '../service/search_service.dart';
 
 class SearchRepository {
@@ -14,7 +14,7 @@ class SearchRepository {
     required SearchService service,
   }) : _service = service;
 
-  Future<Search> search({
+  Future<SearchResponse> search({
     String? title,
     int? limit,
     int? offset,
@@ -50,17 +50,28 @@ class SearchRepository {
       excludedTags: excludedTags,
       excludedTagsMode: excludedTagsMode?.rawValue,
       status: status?.map((e) => e.rawValue).toList(),
-      originalLanguage: originalLanguage?.map((e) => e.rawValue).toList(),
-      excludedOriginalLanguages: excludedOriginalLanguages?.map((e) => e.rawValue).toList(),
-      availableTranslatedLanguage: availableTranslatedLanguage?.map((e) => e.rawValue).toList(),
-      publicationDemographic: publicationDemographic?.map((e) => e.rawValue).toList(),
+      originalLanguage: originalLanguage
+          ?.map((e) => e.rawValue)
+          .toList(),
+      excludedOriginalLanguages: excludedOriginalLanguages
+          ?.map((e) => e.rawValue)
+          .toList(),
+      availableTranslatedLanguage: availableTranslatedLanguage
+          ?.map((e) => e.rawValue)
+          .toList(),
+      publicationDemographic: publicationDemographic
+          ?.map((e) => e.rawValue)
+          .toList(),
       ids: ids,
-      contentRating: contentRating?.map((e) => e.rawValue).toList(),
+      contentRating: contentRating
+          ?.map((e) => e.rawValue)
+          .toList(),
       createdAtSince: createdAtSince,
       updatedAtSince: updatedAtSince,
       includes: includes,
       group: group,
-      orders: orders?.map((key, value) => MapEntry(key.rawValue, value.rawValue)),
+      orders: orders
+          ?.map((key, value) => MapEntry(key.rawValue, value.rawValue)),
     );
   }
 }

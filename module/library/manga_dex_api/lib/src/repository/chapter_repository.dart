@@ -1,7 +1,7 @@
 import '../enums/content_rating.dart';
 import '../enums/language_codes.dart';
 import '../enums/order_enums.dart';
-import '../models/chapter/chapter_data.dart';
+import '../model/chapter/chapter_response.dart';
 import '../service/chapter_service.dart';
 
 class ChapterRepository {
@@ -41,13 +41,16 @@ class ChapterRepository {
       chapter: chapter,
       translatedLanguage: translatedLanguage?.map((e) => e.rawValue).toList(),
       originalLanguage: originalLanguage?.map((e) => e.rawValue).toList(),
-      excludedOriginalLanguage: excludedOriginalLanguage?.map((e) => e.rawValue).toList(),
+      excludedOriginalLanguage: excludedOriginalLanguage
+          ?.map((e) => e.rawValue)
+          .toList(),
       contentRating: contentRating?.map((e) => e.rawValue).toList(),
       createdAtSince: createdAtSince,
       updatedAtSince: updatedAtSince,
       publishedAtSince: publishedAtSince,
       includes: includes,
-      orders: orders?.map((key, value) => MapEntry(key.rawValue, value.rawValue)),
+      orders: orders
+          ?.map((key, value) => MapEntry(key.rawValue, value.rawValue)),
       limit: limit,
       offset: offset,
     );

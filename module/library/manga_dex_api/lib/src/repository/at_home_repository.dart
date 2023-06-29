@@ -1,4 +1,4 @@
-import '../models/common/base_url.dart';
+import '../model/at_home/at_home_response.dart';
 import '../service/at_home_service.dart';
 
 class AtHomeRepository {
@@ -8,7 +8,7 @@ class AtHomeRepository {
     required AtHomeService service,
   }) : _service = service;
 
-  Future<BaseUrl> url(String id) {
+  Future<AtHomeResponse> url(String id) {
     return _service.url(id);
   }
 }

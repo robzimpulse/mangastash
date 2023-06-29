@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/http.dart';
 
 import '../client/manga_dex_dio.dart';
-import '../models/search/search.dart';
+import '../model/manga/search_response.dart';
 
 part 'search_service.g.dart';
 
@@ -11,7 +11,7 @@ abstract class SearchService {
   factory SearchService(MangaDexDio dio, {String baseUrl}) = _SearchService;
 
   @GET('/manga')
-  Future<Search> search({
+  Future<SearchResponse> search({
     @Query('title') String? title,
     @Query('limit') int? limit,
     @Query('offset') int? offset,
