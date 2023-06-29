@@ -4,46 +4,83 @@ import 'package:feature_home/feature_home.dart';
 import 'package:feature_profile/feature_profile.dart';
 import 'package:feature_search/feature_search.dart';
 import 'package:feature_setting/feature_setting.dart';
+import 'package:flutter/widgets.dart';
 import 'package:service_locator/service_locator.dart';
+import 'package:collection/collection.dart';
 
 import 'main_path.dart';
 import 'screen/main_screen.dart';
 
 class MainRouteBuilder extends BaseRouteBuilder {
+  final Map<int, String> _indexToLocation = {
+    0: HomeRoutePath.main,
+    1: CollectionRoutePath.main,
+    2: SettingRoutePath.main,
+    3: ProfileRoutePath.main,
+  };
+
   @override
-  List<RouteBase> routes({required ServiceLocator locator}) {
+  List<RouteBase> routes({
+    required ServiceLocator locator,
+    required GlobalKey<NavigatorState> rootNavigatorKey,
+    required GlobalKey<NavigatorState> shellNavigatorKey,
+  }) {
     return [
       GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
         path: MainPath.main,
         name: MainPath.main,
         redirect: (context, state) => HomeRoutePath.main,
       ),
-      ...SearchRouteBuilder().allRoutes(locator: locator),
+      ...SearchRouteBuilder().allRoutes(
+        locator: locator,
+        rootNavigatorKey: rootNavigatorKey,
+        shellNavigatorKey: shellNavigatorKey,
+      ),
     ];
   }
 
   @override
-  RouteBase root({required ServiceLocator locator}) {
-    return StatefulShellRoute.indexedStack(
-      builder: (context, state, shell) {
+  RouteBase root({
+    required ServiceLocator locator,
+    required GlobalKey<NavigatorState> rootNavigatorKey,
+    required GlobalKey<NavigatorState> shellNavigatorKey,
+  }) {
+    return ShellRoute(
+      navigatorKey: shellNavigatorKey,
+      builder: (context, state, widget) {
+        final index = _indexToLocation.map(
+          (key, value) => MapEntry(value, key),
+        );
         return MainScreen(
-          index: shell.currentIndex,
-          child: shell,
-          onTapMenu: (index) => shell.goBranch(index),
+          index: index[state.location] ?? 0,
+          onTapMenu: (index) {
+            final location = _indexToLocation[index] ?? HomeRoutePath.main;
+            context.go(location);
+          },
+          child: widget,
         );
       },
-      branches: [
-        StatefulShellBranch(
-          routes: [HomeRouteBuilder().root(locator: locator)],
+      routes: [
+        HomeRouteBuilder().root(
+          locator: locator,
+          rootNavigatorKey: rootNavigatorKey,
+          shellNavigatorKey: shellNavigatorKey,
         ),
-        StatefulShellBranch(
-          routes: [CollectionRouteBuilder().root(locator: locator)],
+        CollectionRouteBuilder().root(
+          locator: locator,
+          rootNavigatorKey: rootNavigatorKey,
+          shellNavigatorKey: shellNavigatorKey,
         ),
-        StatefulShellBranch(
-          routes: [SettingRouteBuilder().root(locator: locator)],
+        SettingRouteBuilder().root(
+          locator: locator,
+          rootNavigatorKey: rootNavigatorKey,
+          shellNavigatorKey: shellNavigatorKey,
         ),
-        StatefulShellBranch(
-          routes: [ProfileRouteBuilder().root(locator: locator)],
+        ProfileRouteBuilder().root(
+          locator: locator,
+          rootNavigatorKey: rootNavigatorKey,
+          shellNavigatorKey: shellNavigatorKey,
         ),
       ],
     );

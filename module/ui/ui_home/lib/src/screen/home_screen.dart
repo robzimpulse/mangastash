@@ -47,11 +47,11 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
-            onPressed: () => context.go('/search'),
+            onPressed: () => context.push('/search'),
           ),
           IconButton(
             icon: const Icon(Icons.favorite),
-            onPressed: () => context.go('/favourite'),
+            onPressed: () => context.push('/favourite'),
           ),
         ],
       ),
