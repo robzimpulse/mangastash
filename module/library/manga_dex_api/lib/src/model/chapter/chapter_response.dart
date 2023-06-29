@@ -1,29 +1,28 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../common/identifier.dart';
+import '../common/pagination.dart';
 
 part 'chapter_response.g.dart';
 
 ///@nodoc
 @JsonSerializable()
-class ChapterResponse {
+class ChapterResponse extends Pagination {
   final String? result;
   final String? response;
   final List<ChapterData>? data;
-  final int? limit;
-  final int? offset;
-  final int? total;
   ChapterResponse(
     this.result,
     this.response,
     this.data,
-    this.limit,
-    this.offset,
-    this.total,
+    super.limit,
+    super.offset,
+    super.total,
   );
   factory ChapterResponse.fromJson(Map<String, dynamic> json) {
     return _$ChapterResponseFromJson(json);
   }
+  @override
   Map<String, dynamic> toJson() => _$ChapterResponseToJson(this);
 }
 
