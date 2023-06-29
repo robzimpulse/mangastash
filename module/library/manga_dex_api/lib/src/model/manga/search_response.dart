@@ -1,8 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import '../common/attributes.dart';
-import '../common/data.dart';
-import '../common/relationship.dart';
+import '../common/identifier.dart';
 import '../common/title.dart';
 
 part 'search_response.g.dart';
@@ -31,7 +29,7 @@ class SearchResponse {
 }
 
 @JsonSerializable()
-class SearchData extends Data {
+class SearchData extends Identifier {
   final SearchAttributes? attributes;
   final List<SearchRelationship>? relationships;
   SearchData(super.id, super.type, this.attributes, this.relationships);
@@ -43,9 +41,9 @@ class SearchData extends Data {
 }
 
 @JsonSerializable()
-class SearchAttributes extends Attributes {
+class SearchAttributes extends Identifier {
   final Title? title;
-  SearchAttributes(this.title);
+  SearchAttributes(super.id, super.type, this.title);
   factory SearchAttributes.fromJson(Map<String, dynamic> json) {
     return _$SearchAttributesFromJson(json);
   }
@@ -54,7 +52,7 @@ class SearchAttributes extends Attributes {
 }
 
 @JsonSerializable()
-class SearchRelationship extends Relationship {
+class SearchRelationship extends Identifier {
   final SearchRelationshipAttributes? attributes;
   SearchRelationship(super.id, super.type, this.attributes);
   factory SearchRelationship.fromJson(Map<String, dynamic> json) {
@@ -85,6 +83,5 @@ class SearchRelationshipAttributes {
   factory SearchRelationshipAttributes.fromJson(Map<String, dynamic> json) {
     return _$SearchRelationshipAttributesFromJson(json);
   }
-  @override
   Map<String, dynamic> toJson() => _$SearchRelationshipAttributesToJson(this);
 }

@@ -50,6 +50,8 @@ Map<String, dynamic> _$SearchDataToJson(SearchData instance) =>
 
 SearchAttributes _$SearchAttributesFromJson(Map<String, dynamic> json) =>
     SearchAttributes(
+      json['id'] as String?,
+      json['type'] as String?,
       json['title'] == null
           ? null
           : Title.fromJson(json['title'] as Map<String, dynamic>),
@@ -57,6 +59,8 @@ SearchAttributes _$SearchAttributesFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$SearchAttributesToJson(SearchAttributes instance) =>
     <String, dynamic>{
+      'id': instance.id,
+      'type': instance.type,
       'title': instance.title,
     };
 

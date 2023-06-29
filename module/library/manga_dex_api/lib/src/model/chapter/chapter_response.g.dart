@@ -63,6 +63,8 @@ Map<String, dynamic> _$ChapterRelationshipToJson(
 
 ChapterAttributes _$ChapterAttributesFromJson(Map<String, dynamic> json) =>
     ChapterAttributes(
+      json['id'] as String?,
+      json['type'] as String?,
       json['volume'] as String?,
       json['chapter'] as String?,
       json['title'] as String?,
@@ -80,6 +82,8 @@ ChapterAttributes _$ChapterAttributesFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$ChapterAttributesToJson(ChapterAttributes instance) =>
     <String, dynamic>{
+      'id': instance.id,
+      'type': instance.type,
       'volume': instance.volume,
       'chapter': instance.chapter,
       'title': instance.title,

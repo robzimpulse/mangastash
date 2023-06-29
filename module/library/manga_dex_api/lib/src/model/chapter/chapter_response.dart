@@ -1,8 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import '../common/attributes.dart';
-import '../common/data.dart';
-import '../common/relationship.dart';
+import '../common/identifier.dart';
 
 part 'chapter_response.g.dart';
 
@@ -31,7 +29,7 @@ class ChapterResponse {
 
 ///@nodoc
 @JsonSerializable()
-class ChapterData extends Data {
+class ChapterData extends Identifier {
   ChapterAttributes? attributes;
   List<ChapterRelationship>? relationships;
   ChapterData(super.id, super.type, this.attributes, this.relationships);
@@ -44,7 +42,7 @@ class ChapterData extends Data {
 
 ///@nodoc
 @JsonSerializable()
-class ChapterRelationship extends Relationship {
+class ChapterRelationship extends Identifier {
   ChapterRelationship(super.id, super.type);
   factory ChapterRelationship.fromJson(Map<String, dynamic> json) {
     return _$ChapterRelationshipFromJson(json);
@@ -55,7 +53,7 @@ class ChapterRelationship extends Relationship {
 
 ///@nodoc
 @JsonSerializable()
-class ChapterAttributes extends Attributes {
+class ChapterAttributes extends Identifier {
   final String? volume;
   final String? chapter;
   final String? title;
@@ -68,6 +66,8 @@ class ChapterAttributes extends Attributes {
   final String? updatedAt;
   final int? version;
   ChapterAttributes(
+    super.id,
+    super.type,
     this.volume,
     this.chapter,
     this.title,

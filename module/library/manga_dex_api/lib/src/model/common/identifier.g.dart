@@ -1,17 +1,18 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'data.dart';
+part of 'identifier.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-Data _$DataFromJson(Map<String, dynamic> json) => Data(
+Identifier _$IdentifierFromJson(Map<String, dynamic> json) => Identifier(
       json['id'] as String?,
       json['type'] as String?,
     );
 
-Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{
+Map<String, dynamic> _$IdentifierToJson(Identifier instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'type': instance.type,
     };
