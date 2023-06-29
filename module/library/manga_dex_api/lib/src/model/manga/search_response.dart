@@ -1,30 +1,29 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../common/identifier.dart';
+import '../common/pagination.dart';
 import '../common/title.dart';
 
 part 'search_response.g.dart';
 
 ///@nodoc
 @JsonSerializable()
-class SearchResponse {
+class SearchResponse extends Pagination {
   final String? result;
   final String? response;
   final List<SearchData>? data;
-  final int? limit;
-  final int? offset;
-  final int? total;
   SearchResponse(
     this.data,
-    this.limit,
-    this.offset,
-    this.total,
     this.result,
     this.response,
+    super.limit,
+    super.offset,
+    super.total,
   );
   factory SearchResponse.fromJson(Map<String, dynamic> json) {
     return _$SearchResponseFromJson(json);
   }
+  @override
   Map<String, dynamic> toJson() => _$SearchResponseToJson(this);
 }
 

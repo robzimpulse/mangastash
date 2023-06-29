@@ -11,21 +11,21 @@ SearchResponse _$SearchResponseFromJson(Map<String, dynamic> json) =>
       (json['data'] as List<dynamic>?)
           ?.map((e) => SearchData.fromJson(e as Map<String, dynamic>))
           .toList(),
+      json['result'] as String?,
+      json['response'] as String?,
       json['limit'] as int?,
       json['offset'] as int?,
       json['total'] as int?,
-      json['result'] as String?,
-      json['response'] as String?,
     );
 
 Map<String, dynamic> _$SearchResponseToJson(SearchResponse instance) =>
     <String, dynamic>{
-      'result': instance.result,
-      'response': instance.response,
-      'data': instance.data,
       'limit': instance.limit,
       'offset': instance.offset,
       'total': instance.total,
+      'result': instance.result,
+      'response': instance.response,
+      'data': instance.data,
     };
 
 SearchData _$SearchDataFromJson(Map<String, dynamic> json) => SearchData(
