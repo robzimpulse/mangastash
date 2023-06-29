@@ -1,4 +1,4 @@
-import 'package:data_manga/manga.dart';
+import 'package:data_manga/data_manga.dart';
 import 'package:equatable/equatable.dart';
 
 class HomeCubitState extends Equatable {
