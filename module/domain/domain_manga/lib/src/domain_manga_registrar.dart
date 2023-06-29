@@ -1,6 +1,7 @@
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
+import 'use_case/list_tag_use_case.dart';
 import 'use_case/search_manga_use_case.dart';
 
 class DomainMangaRegistrar extends Registrar {
@@ -10,8 +11,14 @@ class DomainMangaRegistrar extends Registrar {
 
     locator.registerFactory(
       () => SearchMangaUseCase(
-        searchRepository: locator(),
+        mangaRepository: locator(),
         coverRepository: locator(),
+      ),
+    );
+
+    locator.registerFactory(
+      () => ListTagUseCase(
+        mangaRepository: locator(),
       ),
     );
   }

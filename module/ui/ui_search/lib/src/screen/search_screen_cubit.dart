@@ -1,5 +1,5 @@
 import 'package:core_network/core_network.dart' as network;
-import 'package:data_manga/manga.dart';
+import 'package:data_manga/data_manga.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 

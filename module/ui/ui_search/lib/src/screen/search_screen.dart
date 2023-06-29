@@ -5,6 +5,7 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
+import '../widget/sort_bottom_sheet.dart';
 import 'search_screen_cubit.dart';
 import 'search_screen_cubit_state.dart';
 
@@ -56,6 +57,12 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
+  void _onTapFilter() {
+    context.showBottomSheet(
+      builder: (context) => const SortBottomSheet(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
@@ -76,7 +83,7 @@ class _SearchScreenState extends State<SearchScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.sort),
-            onPressed: () => {},
+            onPressed: _onTapFilter,
           ),
         ],
       ),

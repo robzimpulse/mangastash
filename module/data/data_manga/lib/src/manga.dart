@@ -8,18 +8,10 @@ class Manga extends Equatable {
 
   final String? coverUrl;
 
-  const Manga({required this.id, this.title, this.coverUrl});
+  const Manga({this.id, this.title, this.coverUrl});
 
   @override
   List<Object?> get props => [id, title, coverUrl];
-
-  factory Manga.fromData({required SearchData data}) {
-    return Manga(
-      id: data.id,
-      title: data.attributes?.title?.en,
-      coverUrl: null,
-    );
-  }
 
   Manga copyWith({
     String? id,

@@ -5,13 +5,14 @@ import '../enums/order_enums.dart';
 import '../enums/publication_demographic.dart';
 import '../enums/tag_modes.dart';
 import '../model/manga/search_response.dart';
-import '../service/search_service.dart';
+import '../model/manga/tag_response.dart';
+import '../service/manga_service.dart';
 
-class SearchRepository {
-  final SearchService _service;
+class MangaRepository {
+  final MangaService _service;
 
-  SearchRepository({
-    required SearchService service,
+  MangaRepository({
+    required MangaService service,
   }) : _service = service;
 
   Future<SearchResponse> search({
@@ -73,5 +74,9 @@ class SearchRepository {
       orders: orders
           ?.map((key, value) => MapEntry(key.rawValue, value.rawValue)),
     );
+  }
+
+  Future<TagResponse> tags() {
+    return _service.tags();
   }
 }

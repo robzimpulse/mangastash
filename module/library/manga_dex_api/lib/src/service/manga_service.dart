@@ -3,12 +3,13 @@ import 'package:retrofit/http.dart';
 
 import '../client/manga_dex_dio.dart';
 import '../model/manga/search_response.dart';
+import '../model/manga/tag_response.dart';
 
-part 'search_service.g.dart';
+part 'manga_service.g.dart';
 
 @RestApi()
-abstract class SearchService {
-  factory SearchService(MangaDexDio dio, {String baseUrl}) = _SearchService;
+abstract class MangaService {
+  factory MangaService(MangaDexDio dio, {String baseUrl}) = _MangaService;
 
   @GET('/manga')
   Future<SearchResponse> search({
@@ -35,4 +36,7 @@ abstract class SearchService {
     @Query('group') String? group,
     @Query('orders') Map<String, String>? orders,
   });
+
+  @GET('/manga/tag')
+  Future<TagResponse> tags();
 }

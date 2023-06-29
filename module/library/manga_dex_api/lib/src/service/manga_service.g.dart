@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'search_service.dart';
+part of 'manga_service.dart';
 
 // **************************************************************************
 // RetrofitGenerator
@@ -8,8 +8,8 @@ part of 'search_service.dart';
 
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers
 
-class _SearchService implements SearchService {
-  _SearchService(
+class _MangaService implements MangaService {
+  _MangaService(
     this._dio, {
     this.baseUrl,
   });
@@ -86,6 +86,27 @@ class _SearchService implements SearchService {
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = SearchResponse.fromJson(_result.data!);
     return value;
+  }
+
+  @override
+  Future<void> tags() async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    await _dio.fetch<void>(_setStreamType<void>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+        .compose(
+          _dio.options,
+          '/manga/tag',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    return null;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

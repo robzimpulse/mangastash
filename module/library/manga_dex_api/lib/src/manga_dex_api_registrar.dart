@@ -6,10 +6,10 @@ import 'interceptor/header_interceptor.dart';
 import 'repository/at_home_repository.dart';
 import 'repository/chapter_repository.dart';
 import 'repository/cover_repository.dart';
-import 'repository/search_repository.dart';
+import 'repository/manga_repository.dart';
 import 'service/at_home_service.dart';
 import 'service/chapter_service.dart';
-import 'service/search_service.dart';
+import 'service/manga_service.dart';
 
 class MangaDexApiRegistrar extends Registrar {
   @override
@@ -23,12 +23,12 @@ class MangaDexApiRegistrar extends Registrar {
       ),
     );
 
-    locator.registerFactory(() => SearchService(locator()));
+    locator.registerFactory(() => MangaService(locator()));
     locator.registerFactory(() => ChapterService(locator()));
     locator.registerFactory(() => AtHomeService(locator()));
 
     locator.registerFactory(() => AtHomeRepository(service: locator()));
-    locator.registerFactory(() => SearchRepository(service: locator()));
+    locator.registerFactory(() => MangaRepository(service: locator()));
     locator.registerFactory(() => ChapterRepository(service: locator()));
 
     locator.registerFactory(() => CoverRepository());

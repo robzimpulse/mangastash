@@ -1,20 +1,20 @@
 import 'package:collection/collection.dart';
-import 'package:core_network/core_network.dart' as network;
-import 'package:data_manga/manga.dart';
+import 'package:core_network/core_network.dart';
+import 'package:data_manga/data_manga.dart';
 
 import '../../domain_manga.dart';
 
 class SearchMangaUseCase {
-  final SearchRepository _searchRepository;
+  final MangaRepository _mangaRepository;
   final CoverRepository _coverRepository;
 
   const SearchMangaUseCase({
-    required SearchRepository searchRepository,
+    required MangaRepository mangaRepository,
     required CoverRepository coverRepository,
-  })  : _searchRepository = searchRepository,
+  })  : _mangaRepository = mangaRepository,
         _coverRepository = coverRepository;
 
-  Future<network.Result<List<Manga>>> execute({
+  Future<Response<List<Manga>>> execute({
     String? title,
     int? limit,
     int? offset,
@@ -39,7 +39,7 @@ class SearchMangaUseCase {
     Map<SearchOrders, OrderDirections>? orders,
   }) async {
     try {
-      final searchResult = await _searchRepository.search(
+      final searchResult = await _mangaRepository.search(
         title: title,
         limit: limit,
         offset: offset,
@@ -69,17 +69,19 @@ class SearchMangaUseCase {
           (e) => e.type == 'cover_art',
         );
 
-        final coverUrl = _coverRepository.coverUrl(
-          element.id ?? '',
-          cover?.attributes?.fileName ?? '',
+        return Manga(
+          id: element.id,
+          title: element.attributes?.title?.en,
+          coverUrl: _coverRepository.coverUrl(
+            element.id ?? '',
+            cover?.attributes?.fileName ?? '',
+          ),
         );
-
-        return Manga.fromData(data: element).copyWith(coverUrl: coverUrl);
       });
 
-      return network.Success(mangas?.toList() ?? []);
+      return Success(mangas?.toList() ?? []);
     } on Exception catch (e) {
-      return network.Error(e);
+      return Error(e);
     }
   }
 }
