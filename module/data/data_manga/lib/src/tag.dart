@@ -5,18 +5,31 @@ class Tag extends Equatable {
 
   final String? name;
 
-  const Tag({this.id, this.name});
+  final bool isIncluded;
+
+  final bool isExcluded;
+
+  const Tag({
+    this.id,
+    this.name,
+    this.isIncluded = false,
+    this.isExcluded = false,
+  });
 
   @override
-  List<Object?> get props => [id, name];
+  List<Object?> get props => [id, name, isIncluded, isExcluded];
 
   Tag copyWith({
     String? id,
     String? name,
+    bool? isIncluded,
+    bool? isExcluded,
   }) {
     return Tag(
       id: id ?? this.id,
       name: name ?? this.name,
+      isIncluded: isIncluded ?? this.isIncluded,
+      isExcluded: isExcluded ?? this.isExcluded,
     );
   }
 }

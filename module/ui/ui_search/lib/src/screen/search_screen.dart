@@ -1,6 +1,5 @@
 import 'package:data_manga/data_manga.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:responsive_framework/responsive_breakpoints.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -11,7 +10,9 @@ import 'search_screen_cubit.dart';
 import 'search_screen_cubit_state.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+  const SearchScreen({super.key, required this.locator});
+
+  final ServiceLocator locator;
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -21,7 +22,7 @@ class SearchScreen extends StatefulWidget {
       create: (context) => SearchScreenCubit(
         searchMangaUseCase: locator(),
       ),
-      child: const SearchScreen(),
+      child: SearchScreen(locator: locator),
     );
   }
 }
@@ -61,8 +62,13 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void _onTapFilter() async {
     final data = await context.showBottomSheet(
-      builder: (context) => const SortBottomSheet(
-        tags: [Tag(name:'Test'), Tag(name:'Test'), Tag(name:'Test')],
+      builder: (context) => SortBottomSheet.create(
+        locator: widget.locator,
+        tags: const [
+          Tag(id: 'test1', name:'Test 1'),
+          Tag(id: 'test2', name:'Test 2'),
+          Tag(id: 'test3', name:'Test 3'),
+        ],
       ),
     );
     if (!mounted) return;
