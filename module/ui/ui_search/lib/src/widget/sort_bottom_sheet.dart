@@ -49,8 +49,8 @@ class SortBottomSheet extends StatelessWidget {
         isSelected: [tag.isExcluded, tag.isIncluded],
         borderRadius: const BorderRadius.all(Radius.circular(8)),
         selectedColor: Colors.white,
-        selectedBorderColor: Colors.green,
-        fillColor: Colors.greenAccent,
+        selectedBorderColor: Theme.of(context).primaryColorDark,
+        fillColor: Theme.of(context).primaryColorDark,
         onPressed: (index) => _onTogglePressed(
           context: context,
           index: index,
@@ -75,6 +75,7 @@ class SortBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return DefaultTabController(
       length: 3,
       child: Padding(
@@ -83,7 +84,7 @@ class SortBottomSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             TabBar(
-              labelColor: Theme.of(context).primaryColorDark,
+              labelColor: !isDarkMode ? Colors.black : null,
               tabs: const [
                 Tab(text: 'Sort'),
                 Tab(text: 'Tags'),

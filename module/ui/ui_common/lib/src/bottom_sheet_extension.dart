@@ -13,7 +13,7 @@ extension BottomSheetExtension on BuildContext {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(this).bottomSheetTheme.backgroundColor,
       constraints: BoxConstraints(maxHeight: maxHeight),
       builder: builder,
     );
