@@ -69,7 +69,7 @@ class SortBottomSheet extends StatelessWidget {
   }
 
   void _onTapApply(BuildContext context) {
-    context.read<SortBottomSheetCubit>().apply();
+    final state = context.read<SortBottomSheetCubit>().state;
     context.pop();
   }
 

@@ -24,8 +24,4 @@ class SortBottomSheetCubit extends Cubit<SortBottomSheetCubitState> {
   void reset() {
     emit(state.copyWith(tags: state.original));
   }
-
-  void apply() {
-
-  }
 }
