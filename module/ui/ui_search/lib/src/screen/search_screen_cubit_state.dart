@@ -1,29 +1,30 @@
 import 'package:data_manga/data_manga.dart';
 import 'package:equatable/equatable.dart';
 
+import 'state/manga_section_state.dart';
+import 'state/tags_section_state.dart';
+
 class SearchScreenCubitState extends Equatable {
-  final bool isLoading;
-  final String? errorMessage;
-  final List<Manga> mangas;
+
+  final MangaSectionState mangaSectionState;
+
+  final TagsSectionState tagsSectionState;
 
   const SearchScreenCubitState({
-    this.isLoading = false,
-    this.errorMessage,
-    this.mangas = const [],
+    this.mangaSectionState = const MangaSectionState(),
+    this.tagsSectionState = const TagsSectionState(),
   });
 
   @override
-  List<Object?> get props => [isLoading, errorMessage, mangas];
+  List<Object?> get props => [mangaSectionState, tagsSectionState];
 
   SearchScreenCubitState copyWith({
-    bool? isLoading,
-    String? Function()? errorMessage,
-    List<Manga>? mangas,
+    MangaSectionState? mangaSectionState,
+    TagsSectionState? tagsSectionState,
   }) {
     return SearchScreenCubitState(
-      isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage != null ? errorMessage() : this.errorMessage,
-      mangas: mangas ?? this.mangas,
+      mangaSectionState: mangaSectionState ?? this.mangaSectionState,
+      tagsSectionState: tagsSectionState ?? this.tagsSectionState,
     );
   }
 }

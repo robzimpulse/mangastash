@@ -5,7 +5,7 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import '../widget/sort_bottom_sheet.dart';
+import '../widget/sort_bottom_sheet/sort_bottom_sheet.dart';
 import 'search_screen_cubit.dart';
 import 'search_screen_cubit_state.dart';
 
@@ -21,6 +21,7 @@ class SearchScreen extends StatefulWidget {
     return BlocProvider(
       create: (context) => SearchScreenCubit(
         searchMangaUseCase: locator(),
+        listTagUseCase: locator(),
       ),
       child: SearchScreen(locator: locator),
     );
@@ -34,6 +35,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   void initState() {
+    context.read<SearchScreenCubit>().initialize();
     super.initState();
   }
 
@@ -60,15 +62,11 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  void _onTapFilter() async {
+  void _onTapFilter({required List<Tag> tags}) async {
     final data = await context.showBottomSheet(
       builder: (context) => SortBottomSheet.create(
         locator: widget.locator,
-        tags: const [
-          Tag(id: 'test1', name:'Test 1'),
-          Tag(id: 'test2', name:'Test 2'),
-          Tag(id: 'test3', name:'Test 3'),
-        ],
+        tags: tags,
       ),
     );
     if (!mounted) return;
@@ -93,35 +91,60 @@ class _SearchScreenState extends State<SearchScreen> {
           onSubmitted: (value) {},
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.sort),
-            onPressed: _onTapFilter,
+          BlocBuilder<SearchScreenCubit, SearchScreenCubitState>(
+            buildWhen: (prev, curr) {
+              return prev.tagsSectionState != curr.tagsSectionState;
+            },
+            builder: (context, state) {
+              return IconButton(
+                icon: ConditionalWidget(
+                  value: state.tagsSectionState.isLoading,
+                  otherChild: const Icon(Icons.sort),
+                  child: const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                // icon: const Icon(Icons.sort),
+                onPressed: () => state.tagsSectionState.isLoading
+                    ? null
+                    : _onTapFilter(
+                        tags: state.tagsSectionState.tags,
+                      ),
+              );
+            },
           ),
         ],
       ),
       child: Container(
         padding: const EdgeInsets.all(10),
         child: BlocBuilder<SearchScreenCubit, SearchScreenCubitState>(
+          buildWhen: (prev, curr) {
+            return prev.mangaSectionState != curr.mangaSectionState;
+          },
           builder: (context, state) {
-            if (state.isLoading) {
+            if (state.mangaSectionState.isLoading) {
               return const Center(
                 child: CircularProgressIndicator(),
               );
             }
 
-            if (state.errorMessage?.isNotEmpty == true) {
+            if (state.mangaSectionState.errorMessage?.isNotEmpty == true) {
               return Center(
-                child: Text(state.errorMessage ?? ''),
+                child: Text(state.mangaSectionState.errorMessage ?? ''),
               );
             }
 
-            if (state.mangas.isEmpty) {
+            if (state.mangaSectionState.mangas.isEmpty) {
               return const Center(
                 child: Text('Manga Empty'),
               );
             }
 
-            final children = state.mangas.map(
+            final children = state.mangaSectionState.mangas.map(
               (e) => MangaGridItemWidget(
                 title: e.title,
                 coverUrl: e.coverUrl,
