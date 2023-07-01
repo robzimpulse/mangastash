@@ -5,7 +5,7 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import '../widget/sort_bottom_sheet/sort_bottom_sheet.dart';
+import '../widget/tags_bottom_sheet/tags_bottom_sheet.dart';
 import 'search_screen_cubit.dart';
 import 'search_screen_cubit_state.dart';
 
@@ -64,7 +64,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void _onTapFilter({required List<Tag> tags}) async {
     final data = await context.showBottomSheet(
-      builder: (context) => SortBottomSheet.create(
+      builder: (context) => TagsBottomSheet.create(
         locator: widget.locator,
         tags: tags,
       ),
@@ -109,11 +109,9 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 ),
                 // icon: const Icon(Icons.sort),
-                onPressed: () => state.tagsSectionState.isLoading
-                    ? null
-                    : _onTapFilter(
-                        tags: state.tagsSectionState.tags,
-                      ),
+                onPressed: () => !state.tagsSectionState.isLoading
+                    ? _onTapFilter(tags: state.tagsSectionState.tags)
+                    : null,
               );
             },
           ),

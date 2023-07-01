@@ -1,17 +1,20 @@
 import 'package:data_manga/data_manga.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
-import 'sort_bottom_sheet_cubit_state.dart';
+import 'tags_bottom_sheet_cubit_state.dart';
 
-class SortBottomSheetCubit extends Cubit<SortBottomSheetCubitState> {
-  SortBottomSheetCubit({
-    SortBottomSheetCubitState initialState = const SortBottomSheetCubitState(
+class TagsBottomSheetCubit extends Cubit<TagsBottomSheetCubitState> {
+  TagsBottomSheetCubit({
+    TagsBottomSheetCubitState initialState = const TagsBottomSheetCubitState(
       tags: [],
-      original: [],
+      originalTags: [],
+      mode: TagsMode.and,
+      originalMode: TagsMode.and
     ),
   }) : super(initialState);
 
-  void update({required int index, Tag? tag}) {
+  void updateTag({required int index, Tag? tag}) {
     var updated = tag;
     if (updated == null) return;
 
@@ -38,7 +41,11 @@ class SortBottomSheetCubit extends Cubit<SortBottomSheetCubitState> {
     );
   }
 
+  void updateTagsMode(bool value) {
+    emit(state.copyWith(mode: value ? TagsMode.and : TagsMode.or));
+  }
+
   void reset() {
-    emit(state.copyWith(tags: state.original));
+    emit(state.copyWith(tags: state.originalTags, mode: state.originalMode));
   }
 }
