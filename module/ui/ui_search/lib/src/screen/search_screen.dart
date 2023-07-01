@@ -31,18 +31,10 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
 
-  final _debounceSearch = Debounce(delay: const Duration(seconds: 1));
-
   @override
   void initState() {
     context.read<SearchScreenCubit>().initialize();
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _debounceSearch.dispose();
-    super.dispose();
   }
 
   int _crossAxisCount(BuildContext context) {
@@ -53,24 +45,23 @@ class _SearchScreenState extends State<SearchScreen> {
     return 12;
   }
 
-  void _onSearch(String value) {
-    _debounceSearch.call(
-      () {
-        if (!mounted) return;
-        context.read<SearchScreenCubit>().search(value);
-      },
-    );
+  void onChangeTitle(String value) {
+    final cubit = context.read<SearchScreenCubit>();
+    final state = cubit.state;
+    cubit.update(parameter: state.parameter.copyWith(title: value));
   }
 
   void _onTapFilter({required List<Tag> tags}) async {
+    final cubit = context.read<SearchScreenCubit>();
     final data = await context.showBottomSheet<SearchMangaParameter>(
       builder: (context) => AdvancedSearchBottomSheet.create(
         locator: widget.locator,
         tags: tags,
+        parameter: cubit.state.parameter,
       ),
     );
-    if (!mounted) return;
-    context.showSnackBar(message: 'data bottom sheet: $data');
+    if (!mounted || data == null) return;
+    context.read<SearchScreenCubit>().update(parameter: data);
   }
 
   @override
@@ -87,8 +78,8 @@ class _SearchScreenState extends State<SearchScreen> {
             hintStyle: TextStyle(color: Colors.white54),
             border: InputBorder.none,
           ),
-          onChanged: _onSearch,
-          onSubmitted: (value) {},
+          onChanged: onChangeTitle,
+          onSubmitted: (value) => context.read<SearchScreenCubit>().search(),
         ),
         actions: [
           BlocBuilder<SearchScreenCubit, SearchScreenCubitState>(

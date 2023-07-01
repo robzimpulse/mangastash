@@ -8,44 +8,49 @@ class AdvancedSearchBottomSheetCubit extends Cubit<AdvancedSearchBottomSheetCubi
   AdvancedSearchBottomSheetCubit({
     AdvancedSearchBottomSheetCubitState initialState = const AdvancedSearchBottomSheetCubitState(
       tags: [],
-      originalTags: [],
-      mode: TagsMode.and,
-      originalMode: TagsMode.and
+      original: SearchMangaParameter(),
+      parameter: SearchMangaParameter(),
     ),
   }) : super(initialState);
 
   void updateTag({required int index, Tag? tag}) {
-    var updated = tag;
-    if (updated == null) return;
+    final id = tag?.id;
+
+    if (id == null) return;
+
+    var parameter = state.parameter;
 
     if (index == 0) {
-      updated = updated.copyWith(
-        isExcluded: !updated.isExcluded,
-        isIncluded: !updated.isExcluded == true ? false : null,
+      parameter = parameter.copyWith(
+        includedTags: List.of(parameter.includedTags)..remove(id),
+        excludedTags: List.of(parameter.excludedTags)..add(id),
       );
     }
 
     if (index == 1) {
-      updated = updated.copyWith(
-        isIncluded: !updated.isIncluded,
-        isExcluded: !updated.isIncluded == true ? false : null,
+      parameter = parameter.copyWith(
+        includedTags: List.of(parameter.includedTags)..add(id),
+        excludedTags: List.of(parameter.excludedTags)..remove(id),
       );
     }
 
-    emit(
-      state.copyWith(
-        tags: List.from(state.tags)
-          ..removeWhere((e) => e.id == updated?.id)
-          ..add(updated),
-      ),
-    );
+    emit(state.copyWith(parameter: parameter));
   }
 
-  void updateTagsMode(bool value) {
-    emit(state.copyWith(mode: value ? TagsMode.and : TagsMode.or));
+  void updateTagsMode({required bool isIncludedTag, required bool value}) {
+    var parameter = state.parameter;
+
+    final mode = value ? TagsMode.and : TagsMode.or;
+
+    parameter = parameter.copyWith(
+      includedTagsMode: isIncludedTag ? mode : null,
+      excludedTagsMode: isIncludedTag ? null : mode,
+    );
+
+    emit(state.copyWith(parameter: parameter));
   }
 
   void reset() {
-    emit(state.copyWith(tags: state.originalTags, mode: state.originalMode));
+    emit(state.copyWith(parameter: state.original));
   }
 }

@@ -14,16 +14,15 @@ class AdvancedSearchBottomSheet extends StatelessWidget {
 
   static Widget create({
     required ServiceLocator locator,
-    List<Tag> tags = const [],
-    TagsMode mode = TagsMode.and,
+    required List<Tag> tags,
+    required SearchMangaParameter parameter,
   }) {
     return BlocProvider(
       create: (context) => AdvancedSearchBottomSheetCubit(
         initialState: AdvancedSearchBottomSheetCubitState(
           tags: tags,
-          originalTags: tags,
-          mode: mode,
-          originalMode: mode,
+          original: parameter,
+          parameter: parameter,
         ),
       ),
       child: const AdvancedSearchBottomSheet(),
@@ -42,9 +41,10 @@ class AdvancedSearchBottomSheet extends StatelessWidget {
   void _onTagsModeTogglePressed({
     required BuildContext context,
     required bool value,
+    required bool isIncludedTag,
   }) {
     final cubit = context.read<AdvancedSearchBottomSheetCubit>();
-    cubit.updateTagsMode(value);
+    cubit.updateTagsMode(isIncludedTag: isIncludedTag, value: value);
   }
 
   void _onTapReset(BuildContext context) {
@@ -53,14 +53,7 @@ class AdvancedSearchBottomSheet extends StatelessWidget {
 
   void _onTapApply(BuildContext context) {
     final state = context.read<AdvancedSearchBottomSheetCubit>().state;
-    context.pop(
-      SearchMangaParameter(
-        includedTags: state.includedTagsId,
-        includedTagsMode: state.mode,
-        excludedTags: state.excludedTagsId,
-        excludedTagsMode: state.mode,
-      ),
-    );
+    context.pop(state.parameter);
   }
 
   @override
@@ -87,7 +80,7 @@ class AdvancedSearchBottomSheet extends StatelessWidget {
               ),
               child: TabBarView(
                 children: [
-                  Column(children: [_tagsList(), _tagsMode()]),
+                  _tagsTabBarView(context),
                   const Center(child: Text('Author View')),
                 ],
               ),
@@ -116,6 +109,57 @@ class AdvancedSearchBottomSheet extends StatelessWidget {
     );
   }
 
+  Widget _tagsTabBarView(BuildContext context) {
+    return BlocBuilder<AdvancedSearchBottomSheetCubit,
+        AdvancedSearchBottomSheetCubitState>(
+      buildWhen: (prev, curr) => prev.parameter != curr.parameter,
+      builder: (context, state) {
+        final includedTagsModeName =
+            state.parameter.includedTagsMode.rawValue.toUpperCase();
+        final excludedTagsModeName =
+            state.parameter.excludedTagsMode.rawValue.toUpperCase();
+
+        return Column(
+          children: [
+            Expanded(
+              child: ConditionalWidget(
+                value: state.sortedTag.isNotEmpty,
+                otherChild: const Center(
+                  child: Text('Empty Tags'),
+                ),
+                child: ListView(
+                  children: state.sortedTag
+                      .map((e) => _tags(context: context, tag: e))
+                      .toList(),
+                ),
+              ),
+            ),
+            SwitchListTile(
+              visualDensity: VisualDensity.compact,
+              title: Text('Included Tags Mode [$includedTagsModeName]'),
+              value: state.parameter.includedTagsMode == TagsMode.and,
+              onChanged: (value) => _onTagsModeTogglePressed(
+                context: context,
+                value: value,
+                isIncludedTag: true,
+              ),
+            ),
+            SwitchListTile(
+              visualDensity: VisualDensity.compact,
+              title: Text('Excluded Tags Mode [$excludedTagsModeName]'),
+              value: state.parameter.excludedTagsMode == TagsMode.and,
+              onChanged: (value) => _onTagsModeTogglePressed(
+                context: context,
+                value: value,
+                isIncludedTag: false,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _tags({
     required BuildContext context,
     required Tag tag,
@@ -140,47 +184,6 @@ class AdvancedSearchBottomSheet extends StatelessWidget {
           Icon(Icons.check_circle_outline),
         ],
       ),
-    );
-  }
-
-  Widget _tagsList() {
-    return BlocBuilder<AdvancedSearchBottomSheetCubit,
-        AdvancedSearchBottomSheetCubitState>(
-      buildWhen: (prev, curr) => prev.tags != curr.tags,
-      builder: (context, state) {
-        return Expanded(
-          child: ConditionalWidget(
-            value: state.sortedTag.isNotEmpty,
-            otherChild: const Center(
-              child: Text('Empty Tags'),
-            ),
-            child: ListView(
-              children: state.sortedTag
-                  .map((e) => _tags(context: context, tag: e))
-                  .toList(),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _tagsMode() {
-    return BlocBuilder<AdvancedSearchBottomSheetCubit,
-        AdvancedSearchBottomSheetCubitState>(
-      buildWhen: (prev, curr) => prev.mode != curr.mode,
-      builder: (context, state) {
-        final name = state.mode.rawValue.toUpperCase();
-        return SwitchListTile(
-          visualDensity: VisualDensity.compact,
-          title: Text('Tags Mode [$name]'),
-          value: state.isTagModeAnd,
-          onChanged: (value) => _onTagsModeTogglePressed(
-            context: context,
-            value: value,
-          ),
-        );
-      },
     );
   }
 }

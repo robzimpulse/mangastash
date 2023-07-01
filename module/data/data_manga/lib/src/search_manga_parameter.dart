@@ -8,10 +8,10 @@ class SearchMangaParameter extends Equatable {
   final List<String>? authors;
   final List<String>? artists;
   final int? year;
-  final List<String>? includedTags;
-  final TagsMode? includedTagsMode;
-  final List<String>? excludedTags;
-  final TagsMode? excludedTagsMode;
+  final List<String> includedTags;
+  final TagsMode includedTagsMode;
+  final List<String> excludedTags;
+  final TagsMode excludedTagsMode;
   final List<MangaStatus>? status;
   final List<LanguageCodes>? originalLanguage;
   final List<LanguageCodes>? excludedOriginalLanguages;
@@ -32,10 +32,10 @@ class SearchMangaParameter extends Equatable {
     this.authors,
     this.artists,
     this.year,
-    this.includedTags,
-    this.includedTagsMode,
-    this.excludedTags,
-    this.excludedTagsMode,
+    this.includedTags = const [],
+    this.includedTagsMode = TagsMode.or,
+    this.excludedTags = const [],
+    this.excludedTagsMode = TagsMode.or,
     this.status,
     this.originalLanguage,
     this.excludedOriginalLanguages,

@@ -10,21 +10,26 @@ class SearchScreenCubitState extends Equatable {
 
   final TagsSectionState tagsSectionState;
 
+  final SearchMangaParameter parameter;
+
   const SearchScreenCubitState({
     this.mangaSectionState = const MangaSectionState(),
     this.tagsSectionState = const TagsSectionState(),
+    this.parameter = const SearchMangaParameter(),
   });
 
   @override
-  List<Object?> get props => [mangaSectionState, tagsSectionState];
+  List<Object?> get props => [mangaSectionState, tagsSectionState, parameter];
 
   SearchScreenCubitState copyWith({
     MangaSectionState? mangaSectionState,
     TagsSectionState? tagsSectionState,
+    SearchMangaParameter? parameter,
   }) {
     return SearchScreenCubitState(
       mangaSectionState: mangaSectionState ?? this.mangaSectionState,
       tagsSectionState: tagsSectionState ?? this.tagsSectionState,
+      parameter: parameter ?? this.parameter,
     );
   }
 }
