@@ -63,7 +63,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _onTapFilter({required List<Tag> tags}) async {
-    final data = await context.showBottomSheet(
+    final data = await context.showBottomSheet<SearchMangaParameter>(
       builder: (context) => AdvancedSearchBottomSheet.create(
         locator: widget.locator,
         tags: tags,

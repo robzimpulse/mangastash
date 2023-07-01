@@ -53,11 +53,14 @@ class AdvancedSearchBottomSheet extends StatelessWidget {
 
   void _onTapApply(BuildContext context) {
     final state = context.read<AdvancedSearchBottomSheetCubit>().state;
-    context.pop({
-      'includedTags': state.includedTagsId,
-      'excludedTags': state.excludedTagsId,
-      'tagsMode': state.mode.rawValue,
-    });
+    context.pop(
+      SearchMangaParameter(
+        includedTags: state.includedTagsId,
+        includedTagsMode: state.mode,
+        excludedTags: state.excludedTagsId,
+        excludedTagsMode: state.mode,
+      ),
+    );
   }
 
   @override
