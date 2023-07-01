@@ -20,7 +20,7 @@ abstract class MangaService {
     @Query('artists[]') List<String>? artists,
     @Query('year') int? year,
     @Query('includedTags[]') List<String>? includedTags,
-    @Query('includedTagsMode[]') String? includedTagsMode,
+    @Query('includedTagsMode') String? includedTagsMode,
     @Query('excludedTags[]') List<String>? excludedTags,
     @Query('excludedTagsMode') String? excludedTagsMode,
     @Query('status[]') List<String>? status,

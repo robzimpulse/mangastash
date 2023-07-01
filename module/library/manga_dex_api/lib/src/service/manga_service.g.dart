@@ -52,7 +52,7 @@ class _MangaService implements MangaService {
       r'artists[]': artists,
       r'year': year,
       r'includedTags[]': includedTags,
-      r'includedTagsMode[]': includedTagsMode,
+      r'includedTagsMode': includedTagsMode,
       r'excludedTags[]': excludedTags,
       r'excludedTagsMode': excludedTagsMode,
       r'status[]': status,
