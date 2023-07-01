@@ -28,15 +28,8 @@ class SortBottomSheet extends StatelessWidget {
     required int index,
     required Tag? tag,
   }) {
-    var updated = tag;
-    if (updated == null) return;
     final cubit = context.read<SortBottomSheetCubit>();
-    cubit.update(
-      updated.copyWith(
-        isExcluded: index == 0 ? !updated.isExcluded : null,
-        isIncluded: index == 1 ? !updated.isIncluded : null,
-      ),
-    );
+    cubit.update(index: index, tag: tag);
   }
 
   Widget _tags({

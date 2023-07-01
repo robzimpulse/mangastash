@@ -11,12 +11,29 @@ class SortBottomSheetCubit extends Cubit<SortBottomSheetCubitState> {
     ),
   }) : super(initialState);
 
-  void update(Tag tag) {
+  void update({required int index, Tag? tag}) {
+    var updated = tag;
+    if (updated == null) return;
+
+    if (index == 0) {
+      updated = updated.copyWith(
+        isExcluded: !updated.isExcluded,
+        isIncluded: !updated.isExcluded == true ? false : null,
+      );
+    }
+
+    if (index == 1) {
+      updated = updated.copyWith(
+        isIncluded: !updated.isIncluded,
+        isExcluded: !updated.isIncluded == true ? false : null,
+      );
+    }
+
     emit(
       state.copyWith(
         tags: List.from(state.tags)
-          ..removeWhere((e) => e.id == tag.id)
-          ..add(tag),
+          ..removeWhere((e) => e.id == updated?.id)
+          ..add(updated),
       ),
     );
   }
