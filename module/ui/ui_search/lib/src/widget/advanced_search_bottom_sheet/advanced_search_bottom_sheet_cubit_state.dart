@@ -2,7 +2,7 @@ import 'package:data_manga/data_manga.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:equatable/equatable.dart';
 
-class TagsBottomSheetCubitState extends Equatable {
+class AdvancedSearchBottomSheetCubitState extends Equatable {
   final List<Tag> tags;
 
   final List<Tag> originalTags;
@@ -11,7 +11,7 @@ class TagsBottomSheetCubitState extends Equatable {
 
   final TagsMode originalMode;
 
-  const TagsBottomSheetCubitState({
+  const AdvancedSearchBottomSheetCubitState({
     required this.tags,
     required this.originalTags,
     required this.mode,
@@ -21,8 +21,11 @@ class TagsBottomSheetCubitState extends Equatable {
   @override
   List<Object?> get props => [tags, originalTags, mode, originalMode];
 
-  TagsBottomSheetCubitState copyWith({List<Tag>? tags, TagsMode? mode}) {
-    return TagsBottomSheetCubitState(
+  AdvancedSearchBottomSheetCubitState copyWith({
+    List<Tag>? tags,
+    TagsMode? mode,
+  }) {
+    return AdvancedSearchBottomSheetCubitState(
       tags: tags ?? this.tags,
       originalTags: originalTags,
       mode: mode ?? this.mode,
@@ -39,7 +42,6 @@ class TagsBottomSheetCubitState extends Equatable {
     return List.from(originalTags)
       ..sort((a, b) => a.name?.compareTo(b.name ?? '') ?? 0);
   }
-
 
   List<String> get includedTagsId {
     return tags

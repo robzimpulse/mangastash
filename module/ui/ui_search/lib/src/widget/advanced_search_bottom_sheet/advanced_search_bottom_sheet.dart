@@ -6,11 +6,11 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import 'tags_bottom_sheet_cubit.dart';
-import 'tags_bottom_sheet_cubit_state.dart';
+import 'advanced_search_bottom_sheet_cubit.dart';
+import 'advanced_search_bottom_sheet_cubit_state.dart';
 
-class TagsBottomSheet extends StatelessWidget {
-  const TagsBottomSheet({super.key});
+class AdvancedSearchBottomSheet extends StatelessWidget {
+  const AdvancedSearchBottomSheet({super.key});
 
   static Widget create({
     required ServiceLocator locator,
@@ -18,15 +18,15 @@ class TagsBottomSheet extends StatelessWidget {
     TagsMode mode = TagsMode.and,
   }) {
     return BlocProvider(
-      create: (context) => TagsBottomSheetCubit(
-        initialState: TagsBottomSheetCubitState(
+      create: (context) => AdvancedSearchBottomSheetCubit(
+        initialState: AdvancedSearchBottomSheetCubitState(
           tags: tags,
           originalTags: tags,
           mode: mode,
           originalMode: mode,
         ),
       ),
-      child: const TagsBottomSheet(),
+      child: const AdvancedSearchBottomSheet(),
     );
   }
 
@@ -35,7 +35,7 @@ class TagsBottomSheet extends StatelessWidget {
     required int index,
     required Tag? tag,
   }) {
-    final cubit = context.read<TagsBottomSheetCubit>();
+    final cubit = context.read<AdvancedSearchBottomSheetCubit>();
     cubit.updateTag(index: index, tag: tag);
   }
 
@@ -43,16 +43,16 @@ class TagsBottomSheet extends StatelessWidget {
     required BuildContext context,
     required bool value,
   }) {
-    final cubit = context.read<TagsBottomSheetCubit>();
+    final cubit = context.read<AdvancedSearchBottomSheetCubit>();
     cubit.updateTagsMode(value);
   }
 
   void _onTapReset(BuildContext context) {
-    context.read<TagsBottomSheetCubit>().reset();
+    context.read<AdvancedSearchBottomSheetCubit>().reset();
   }
 
   void _onTapApply(BuildContext context) {
-    final state = context.read<TagsBottomSheetCubit>().state;
+    final state = context.read<AdvancedSearchBottomSheetCubit>().state;
     context.pop({
       'includedTags': state.includedTagsId,
       'excludedTags': state.excludedTagsId,
@@ -84,45 +84,7 @@ class TagsBottomSheet extends StatelessWidget {
               ),
               child: TabBarView(
                 children: [
-                  Column(
-                    children: [
-                      BlocBuilder<TagsBottomSheetCubit,
-                          TagsBottomSheetCubitState>(
-                        buildWhen: (prev, curr) => prev.tags != curr.tags,
-                        builder: (context, state) {
-                          return Expanded(
-                            child: ConditionalWidget(
-                              value: state.sortedTag.isNotEmpty,
-                              otherChild: const Center(
-                                child: Text('Empty Tags'),
-                              ),
-                              child: ListView(
-                                children: state.sortedTag
-                                    .map((e) => _tags(context: context, tag: e))
-                                    .toList(),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      BlocBuilder<TagsBottomSheetCubit,
-                          TagsBottomSheetCubitState>(
-                        buildWhen: (prev, curr) => prev.mode != curr.mode,
-                        builder: (context, state) {
-                          final name = state.mode.rawValue.toUpperCase();
-                          return SwitchListTile(
-                            visualDensity: VisualDensity.compact,
-                            title: Text('Tags Mode [$name]'),
-                            value: state.isTagModeAnd,
-                            onChanged: (value) => _onTagsModeTogglePressed(
-                              context: context,
-                              value: value,
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                  Column(children: [_tagsList(), _tagsMode()]),
                   const Center(child: Text('Author View')),
                 ],
               ),
@@ -175,6 +137,47 @@ class TagsBottomSheet extends StatelessWidget {
           Icon(Icons.check_circle_outline),
         ],
       ),
+    );
+  }
+
+  Widget _tagsList() {
+    return BlocBuilder<AdvancedSearchBottomSheetCubit,
+        AdvancedSearchBottomSheetCubitState>(
+      buildWhen: (prev, curr) => prev.tags != curr.tags,
+      builder: (context, state) {
+        return Expanded(
+          child: ConditionalWidget(
+            value: state.sortedTag.isNotEmpty,
+            otherChild: const Center(
+              child: Text('Empty Tags'),
+            ),
+            child: ListView(
+              children: state.sortedTag
+                  .map((e) => _tags(context: context, tag: e))
+                  .toList(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _tagsMode() {
+    return BlocBuilder<AdvancedSearchBottomSheetCubit,
+        AdvancedSearchBottomSheetCubitState>(
+      buildWhen: (prev, curr) => prev.mode != curr.mode,
+      builder: (context, state) {
+        final name = state.mode.rawValue.toUpperCase();
+        return SwitchListTile(
+          visualDensity: VisualDensity.compact,
+          title: Text('Tags Mode [$name]'),
+          value: state.isTagModeAnd,
+          onChanged: (value) => _onTagsModeTogglePressed(
+            context: context,
+            value: value,
+          ),
+        );
+      },
     );
   }
 }

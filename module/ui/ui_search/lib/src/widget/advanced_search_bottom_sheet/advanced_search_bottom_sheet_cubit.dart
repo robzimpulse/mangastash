@@ -2,11 +2,11 @@ import 'package:data_manga/data_manga.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
-import 'tags_bottom_sheet_cubit_state.dart';
+import 'advanced_search_bottom_sheet_cubit_state.dart';
 
-class TagsBottomSheetCubit extends Cubit<TagsBottomSheetCubitState> {
-  TagsBottomSheetCubit({
-    TagsBottomSheetCubitState initialState = const TagsBottomSheetCubitState(
+class AdvancedSearchBottomSheetCubit extends Cubit<AdvancedSearchBottomSheetCubitState> {
+  AdvancedSearchBottomSheetCubit({
+    AdvancedSearchBottomSheetCubitState initialState = const AdvancedSearchBottomSheetCubitState(
       tags: [],
       originalTags: [],
       mode: TagsMode.and,
