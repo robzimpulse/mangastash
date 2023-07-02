@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:retrofit/http.dart';
 
 import '../client/manga_dex_dio.dart';

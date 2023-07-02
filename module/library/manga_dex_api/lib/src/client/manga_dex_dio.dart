@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import '../adapter/dio_adapter.dart'
     if (dart.library.io) '../adapter/dio_adapter_mobile.dart'
     if (dart.library.js) '../adapter/dio_adapter_web.dart';
-
 import '../interceptor/header_interceptor.dart';
 
 class MangaDexDio extends DioForNative {
