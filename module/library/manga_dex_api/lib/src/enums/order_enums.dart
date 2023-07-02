@@ -13,6 +13,14 @@ enum SearchOrders {
   const SearchOrders(this.rawValue);
 }
 
+enum AuthorOrders {
+  name('name');
+
+  final String rawValue;
+
+  const AuthorOrders(this.rawValue);
+}
+
 enum ChapterOrders {
   createdAt('createdAt'),
   updatedAt('updatedAt'),
