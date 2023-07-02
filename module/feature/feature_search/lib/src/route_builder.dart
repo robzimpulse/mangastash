@@ -15,7 +15,7 @@ class SearchRouteBuilder extends BaseRouteBuilder {
     return GoRoute(
       parentNavigatorKey: rootNavigatorKey,
       path: SearchRoutePath.main,
-      name: SearchRoutePath.home,
+      name: SearchRoutePath.main,
       builder: (context, state) => SearchScreen.create(locator: locator),
     );
   }
@@ -26,6 +26,13 @@ class SearchRouteBuilder extends BaseRouteBuilder {
     required GlobalKey<NavigatorState> rootNavigatorKey,
     required GlobalKey<NavigatorState> shellNavigatorKey,
   }) {
-    return [];
+    return [
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: SearchRoutePath.setting,
+        name: SearchRoutePath.setting,
+        builder: (context, state) => const SearchParameterEditorScreen(),
+      ),
+    ];
   }
 }

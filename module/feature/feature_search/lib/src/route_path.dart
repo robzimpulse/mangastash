@@ -1,5 +1,4 @@
 class SearchRoutePath {
-  static const main = '/$home';
-
-  static const home = 'search';
+  static const main = '/search';
+  static const setting = '$main/setting';
 }

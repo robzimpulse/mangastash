@@ -4,6 +4,7 @@ import 'package:responsive_framework/responsive_breakpoints.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
+import 'package:core_route/core_route.dart';
 
 import '../../widget/advanced_search_bottom_sheet/advanced_search_bottom_sheet.dart';
 import 'search_screen_cubit.dart';
@@ -60,6 +61,20 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _onTapFilter({required List<Tag> tags}) async {
+    // TODO: Replace with commented code after screen done
+    // context.pushForResult<SearchMangaParameter>(
+    //   '/search/setting',
+    //   callback: (value) {
+    //     if (value == null || !mounted) return;
+    //     final cubit = context.read<SearchScreenCubit>();
+    //     cubit.update(
+    //       parameter: value.copyWith(offset: 0),
+    //       mangaSectionState: cubit.state.mangaSectionState.copyWith(mangas: []),
+    //     );
+    //     if (value.title?.isNotEmpty == true) cubit.search();
+    //   },
+    // );
+
     final cubit = context.read<SearchScreenCubit>();
     final data = await context.showBottomSheet<SearchMangaParameter>(
       builder: (context) => AdvancedSearchBottomSheet.create(

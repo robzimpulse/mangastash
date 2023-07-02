@@ -19,6 +19,8 @@ dependencies:
   # core
   core_network:
     path: ../../core/core_network
+  core_route:
+    path: ../../core/core_route
 
   # data
   domain_manga:
