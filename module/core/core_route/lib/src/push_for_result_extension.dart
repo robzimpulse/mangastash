@@ -11,5 +11,4 @@ extension PushForResult on BuildContext {
     Object? args,
     required ResultCallback<T>? callback,
   }) => push(location, extra: BaseRouteArgs<T>(args: args, callback: callback));
-
 }
