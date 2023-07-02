@@ -12,8 +12,11 @@ dependencies:
     sdk: flutter
   go_router: ^7.0.0
 
+ # library
   service_locator:
     path: ../../library/service_locator
+  late_object:
+    path: ../../library/late_object
 
 dev_dependencies:
   flutter_test:

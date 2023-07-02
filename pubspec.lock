@@ -310,6 +310,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.8.0"
+  late_object:
+    dependency: transitive
+    description:
+      path: "module/library/late_object"
+      relative: true
+    source: path
+    version: "0.0.1"
   lazy_evaluation:
     dependency: transitive
     description:
