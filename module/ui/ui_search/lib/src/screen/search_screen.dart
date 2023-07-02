@@ -108,7 +108,7 @@ class _SearchScreenState extends State<SearchScreen> {
               return IconButton(
                 icon: ConditionalWidget(
                   value: state.tagsSectionState.isLoading,
-                  otherChild: const Icon(Icons.sort),
+                  otherChild: const Icon(Icons.settings),
                   child: const SizedBox(
                     width: 16,
                     height: 16,
