@@ -12,3 +12,9 @@ extension PushForResult on BuildContext {
     required ResultCallback<T>? callback,
   }) => push(location, extra: BaseRouteArgs<T>(args: args, callback: callback));
 }
+
+extension ArgsHelper on GoRouterState {
+  BaseRouteArgs<T>? getArgs<T>() {
+    return (extra is BaseRouteArgs<T>) ? extra as BaseRouteArgs<T> : null;
+  }
+}
