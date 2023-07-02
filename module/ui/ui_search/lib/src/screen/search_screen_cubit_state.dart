@@ -32,4 +32,8 @@ class SearchScreenCubitState extends Equatable {
       parameter: parameter ?? this.parameter,
     );
   }
+
+  bool get canFetchNextPage {
+    return !mangaSectionState.isPaging || mangaSectionState.hasNextPage;
+  }
 }

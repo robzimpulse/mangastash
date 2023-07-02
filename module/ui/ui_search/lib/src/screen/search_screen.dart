@@ -22,6 +22,7 @@ class SearchScreen extends StatefulWidget {
       create: (context) => SearchScreenCubit(
         searchMangaUseCase: locator(),
         listTagUseCase: locator(),
+        getCoverArtUseCase: locator(),
       ),
       child: SearchScreen(locator: locator),
     );
@@ -30,11 +31,21 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final PagingScrollController _scrollController = PagingScrollController(
+    onLoadNextPage: (context) => context.read<SearchScreenCubit>().next(),
+  );
 
   @override
   void initState() {
     context.read<SearchScreenCubit>().initialize();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   int _crossAxisCount(BuildContext context) {
@@ -48,7 +59,10 @@ class _SearchScreenState extends State<SearchScreen> {
   void onChangeTitle(String value) {
     final cubit = context.read<SearchScreenCubit>();
     final state = cubit.state;
-    cubit.update(parameter: state.parameter.copyWith(title: value));
+    cubit.update(
+      parameter: state.parameter.copyWith(title: value, offset: 0),
+      mangaSectionState: cubit.state.mangaSectionState.copyWith(mangas: []),
+    );
   }
 
   void _onTapFilter({required List<Tag> tags}) async {
@@ -61,7 +75,11 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
     );
     if (!mounted || data == null) return;
-    context.read<SearchScreenCubit>().update(parameter: data);
+    cubit.update(
+      parameter: data.copyWith(offset: 0),
+      mangaSectionState: cubit.state.mangaSectionState.copyWith(mangas: []),
+    );
+    cubit.search();
   }
 
   @override
@@ -140,12 +158,21 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             );
 
-            return GridView.count(
-              crossAxisCount: _crossAxisCount(context),
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: (100 / 140),
-              children: children.toList(),
+            return NotificationListener<ScrollNotification>(
+              onNotification: (scrollNotification) {
+                return _scrollController.onScrollNotification(
+                  context,
+                  scrollNotification,
+                );
+              },
+              child: GridView.count(
+                controller: _scrollController,
+                crossAxisCount: _crossAxisCount(context),
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: (100 / 140),
+                children: children.toList(),
+              ),
             );
           },
         ),

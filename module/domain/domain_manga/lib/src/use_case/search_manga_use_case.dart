@@ -5,16 +5,13 @@ import 'package:data_manga/data_manga.dart';
 import '../../domain_manga.dart';
 
 class SearchMangaUseCase {
-  final MangaRepository _mangaRepository;
-  final CoverRepository _coverRepository;
+  final MangaRepository _repository;
 
   const SearchMangaUseCase({
-    required MangaRepository mangaRepository,
-    required CoverRepository coverRepository,
-  })  : _mangaRepository = mangaRepository,
-        _coverRepository = coverRepository;
+    required MangaRepository repository,
+  }) : _repository = repository;
 
-  Future<Response<List<Manga>>> execute({
+  Future<Response<SearchResponse>> execute({
     String? title,
     int? limit,
     int? offset,
@@ -39,7 +36,7 @@ class SearchMangaUseCase {
     Map<SearchOrders, OrderDirections>? orders,
   }) async {
     try {
-      final searchResult = await _mangaRepository.search(
+      final result = await _repository.search(
         title: title,
         limit: limit,
         offset: offset,
@@ -64,22 +61,7 @@ class SearchMangaUseCase {
         orders: orders,
       );
 
-      final mangas = searchResult.data?.map((element) {
-        final cover = element.relationships?.firstWhereOrNull(
-          (e) => e.type == 'cover_art',
-        );
-
-        return Manga(
-          id: element.id,
-          title: element.attributes?.title?.en,
-          coverUrl: _coverRepository.coverUrl(
-            element.id ?? '',
-            cover?.attributes?.fileName ?? '',
-          ),
-        );
-      });
-
-      return Success(mangas?.toList() ?? []);
+      return Success(result);
     } on Exception catch (e) {
       return Error(e);
     }

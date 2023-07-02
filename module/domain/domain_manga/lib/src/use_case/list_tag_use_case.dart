@@ -3,15 +3,15 @@ import 'package:data_manga/data_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 class ListTagUseCase {
-  final MangaRepository _mangaRepository;
+  final MangaRepository _repository;
 
   const ListTagUseCase({
-    required MangaRepository mangaRepository,
-  }) : _mangaRepository = mangaRepository;
+    required MangaRepository repository,
+  }) : _repository = repository;
 
   Future<Response<List<Tag>>> execute() async {
     try {
-      final result = await _mangaRepository.tags();
+      final result = await _repository.tags();
 
       final tags = result.data?.map(
         (e) => Tag(id: e.id, name: e.attributes.name?.en),
