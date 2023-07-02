@@ -3,7 +3,7 @@ import 'package:retrofit/http.dart';
 
 import '../client/manga_dex_dio.dart';
 import '../model/manga/search_response.dart';
-import '../model/manga/tag_response.dart';
+import '../model/tag/tag_response.dart';
 
 part 'manga_service.g.dart';
 

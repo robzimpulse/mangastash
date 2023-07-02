@@ -12,13 +12,13 @@ class TagResponse extends Pagination {
   final String? response;
   final List<TagData>? data;
   TagResponse(
-      this.data,
-      this.result,
-      this.response,
-      super.limit,
-      super.offset,
-      super.total,
-      );
+    this.data,
+    this.result,
+    this.response,
+    super.limit,
+    super.offset,
+    super.total,
+  );
   factory TagResponse.fromJson(Map<String, dynamic> json) {
     return _$TagResponseFromJson(json);
   }
@@ -49,4 +49,3 @@ class TagAttributes extends Identifier {
   @override
   Map<String, dynamic> toJson() => _$TagAttributesToJson(this);
 }
-
