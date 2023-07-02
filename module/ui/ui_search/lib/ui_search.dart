@@ -1,3 +1,3 @@
 library ui_search;
 
-export 'src/screen/search_screen.dart';
+export 'src/screen/search_screen/search_screen.dart';

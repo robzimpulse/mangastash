@@ -5,7 +5,7 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import '../widget/advanced_search_bottom_sheet/advanced_search_bottom_sheet.dart';
+import '../../widget/advanced_search_bottom_sheet/advanced_search_bottom_sheet.dart';
 import 'search_screen_cubit.dart';
 import 'search_screen_cubit_state.dart';
 
