@@ -60,20 +60,25 @@ class AdvancedSearchBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return DefaultTabController(
-      length: 2,
+      length: 6,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TabBar(
+              isScrollable: true,
               labelColor: !isDarkMode ? Colors.black : null,
               tabs: const [
                 Tab(text: 'Tags'),
                 Tab(text: 'Author'),
+                Tab(text: 'Artists'),
+                Tab(text: 'Manga Status'),
+                Tab(text: 'Original Language'),
+                Tab(text: 'Available Translated Language'),
               ],
             ),
-            const SizedBox(width: 4),
+            Divider(height: 1, color: Theme.of(context).dividerColor),
             ConstrainedBox(
               constraints: const BoxConstraints(
                 maxHeight: 300,
@@ -82,6 +87,10 @@ class AdvancedSearchBottomSheet extends StatelessWidget {
                 children: [
                   _tagsTabBarView(context),
                   const Center(child: Text('Author View')),
+                  const Center(child: Text('Artists View')),
+                  const Center(child: Text('Manga Status View')),
+                  const Center(child: Text('Original Language View')),
+                  const Center(child: Text('Available Translated View')),
                 ],
               ),
             ),

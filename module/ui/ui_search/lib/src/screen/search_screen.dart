@@ -79,7 +79,7 @@ class _SearchScreenState extends State<SearchScreen> {
       parameter: data.copyWith(offset: 0),
       mangaSectionState: cubit.state.mangaSectionState.copyWith(mangas: []),
     );
-    cubit.search();
+    if (data.title?.isNotEmpty == true) cubit.search();
   }
 
   @override
