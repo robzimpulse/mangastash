@@ -21,7 +21,7 @@ class SearchScreen extends StatefulWidget {
     return BlocProvider(
       create: (context) => SearchScreenCubit(
         searchMangaUseCase: locator(),
-        listTagUseCase: locator(),
+        listenListTagUseCase: locator(),
         getCoverArtUseCase: locator(),
       ),
       child: SearchScreen(locator: locator),
@@ -34,12 +34,6 @@ class _SearchScreenState extends State<SearchScreen> {
   final PagingScrollController _scrollController = PagingScrollController(
     onLoadNextPage: (context) => context.read<SearchScreenCubit>().next(),
   );
-
-  @override
-  void initState() {
-    context.read<SearchScreenCubit>().initialize();
-    super.initState();
-  }
 
   @override
   void dispose() {

@@ -8,47 +8,26 @@ import 'search_screen_cubit_state.dart';
 import 'state/manga_section_state.dart';
 import 'state/tags_section_state.dart';
 
-class SearchScreenCubit extends Cubit<SearchScreenCubitState> {
+class SearchScreenCubit extends Cubit<SearchScreenCubitState> with AutoSubscriptionMixin {
   final SearchMangaUseCase searchMangaUseCase;
-  final ListTagUseCase listTagUseCase;
+  final ListenListTagUseCase listenListTagUseCase;
   final GetCoverArtUseCase getCoverArtUseCase;
 
   static const _limit = 15;
 
   SearchScreenCubit({
     required this.searchMangaUseCase,
-    required this.listTagUseCase,
+    required this.listenListTagUseCase,
     required this.getCoverArtUseCase,
     SearchScreenCubitState initState = const SearchScreenCubitState(),
-  }) : super(initState);
+  }) : super(initState) {
+    addSubscription(listenListTagUseCase.listTagsStream.listen(_onReceiveTag));
+  }
 
-  void initialize() async {
+  void _onReceiveTag(List<Tag> tags) {
     update(
       tagsSectionState: state.tagsSectionState.copyWith(
-        isLoading: true,
-      ),
-    );
-
-    final result = await listTagUseCase.execute();
-
-    if (result is Success<List<Tag>>) {
-      update(
-        tagsSectionState: state.tagsSectionState.copyWith(
-          tags: result.data,
-        ),
-      );
-    }
-
-    if (result is Error<List<Tag>>) {
-      update(
-        tagsSectionState: state.tagsSectionState.copyWith(
-          errorMessage: () => result.error.toString(),
-        ),
-      );
-    }
-
-    update(
-      tagsSectionState: state.tagsSectionState.copyWith(
+        tags: tags,
         isLoading: false,
       ),
     );

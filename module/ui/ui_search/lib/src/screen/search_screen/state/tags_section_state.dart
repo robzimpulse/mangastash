@@ -4,18 +4,15 @@ import 'package:equatable/equatable.dart';
 class TagsSectionState extends Equatable {
   final bool isLoading;
 
-  final String? errorMessage;
-
   final List<Tag> tags;
 
   const TagsSectionState({
-    this.isLoading = false,
-    this.errorMessage,
+    this.isLoading = true,
     this.tags = const [],
   });
 
   @override
-  List<Object?> get props => [isLoading, errorMessage, tags];
+  List<Object?> get props => [isLoading, tags];
 
   TagsSectionState copyWith({
     bool? isLoading,
@@ -24,7 +21,6 @@ class TagsSectionState extends Equatable {
   }) {
     return TagsSectionState(
       isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage != null ? errorMessage() : this.errorMessage,
       tags: tags ?? this.tags,
     );
   }
