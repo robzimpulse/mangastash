@@ -150,7 +150,10 @@ class _SearchScreenState extends State<SearchScreen> {
 
             if (state.mangaSectionState.errorMessage?.isNotEmpty == true) {
               return Center(
-                child: Text(state.mangaSectionState.errorMessage ?? ''),
+                child: Text(
+                  state.mangaSectionState.errorMessage ?? '',
+                  textAlign: TextAlign.center,
+                ),
               );
             }
 
@@ -167,21 +170,20 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             );
 
-            return NotificationListener<ScrollNotification>(
-              onNotification: (scrollNotification) {
-                return _scrollController.onScrollNotification(
-                  context,
-                  scrollNotification,
-                );
-              },
-              child: GridView.count(
-                controller: _scrollController,
-                crossAxisCount: _crossAxisCount(context),
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: (100 / 140),
-                children: children.toList(),
+            return MangaGridWidget(
+              controller: _scrollController,
+              crossAxisCount: _crossAxisCount(context),
+              childAspectRatio: (100 / 140),
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              isLoadingNextPage: state.mangaSectionState.isPaging,
+              loadingIndicator: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
               ),
+              children: children.toList(),
             );
           },
         ),

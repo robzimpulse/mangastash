@@ -37,6 +37,7 @@ class SearchScreenCubit extends Cubit<SearchScreenCubitState> with AutoSubscript
     update(
       mangaSectionState: state.mangaSectionState.copyWith(
         isLoading: true,
+        errorMessage: () => null,
       ),
     );
 
