@@ -16,7 +16,7 @@ class MainScreen extends StatelessWidget {
     required this.onTapMenu,
   });
 
-  final Map<String, IconData> menus = const {
+  final Map<String, IconData> _menus = const {
     'Library': Icons.collections_bookmark_sharp,
     'Updates': Icons.sync,
     'History': Icons.history,
@@ -37,7 +37,7 @@ class MainScreen extends StatelessWidget {
     final isMobile = ResponsiveBreakpoints.of(context).isMobile;
     final isPhone = ResponsiveBreakpoints.of(context).isPhone;
     if (isMobile || isPhone) return child;
-    final menu = menus.entries.map(
+    final menus = _menus.entries.map(
       (e) => NavigationRailDestination(
         icon: Icon(e.value),
         label: Text(e.key),
@@ -48,7 +48,7 @@ class MainScreen extends StatelessWidget {
         NavigationRail(
           labelType: NavigationRailLabelType.all,
           elevation: 8,
-          destinations: menu.toList(),
+          destinations: menus.toList(),
           onDestinationSelected: onTapMenu,
           selectedIndex: index,
         ),
@@ -61,7 +61,7 @@ class MainScreen extends StatelessWidget {
     final isMobile = ResponsiveBreakpoints.of(context).isMobile;
     final isPhone = ResponsiveBreakpoints.of(context).isPhone;
     if (!(isMobile || isPhone)) return null;
-    final menu = menus.entries.map(
+    final menus = _menus.entries.map(
       (e) => BottomNavigationBarItem(
         icon: Icon(e.value),
         label: e.key,
@@ -71,7 +71,7 @@ class MainScreen extends StatelessWidget {
       currentIndex: index,
       type: BottomNavigationBarType.fixed,
       showUnselectedLabels: true,
-      items: menu.toList(),
+      items: menus.toList(),
       onTap: onTapMenu,
     );
   }
