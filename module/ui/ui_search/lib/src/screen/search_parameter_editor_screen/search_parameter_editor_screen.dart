@@ -39,7 +39,7 @@ class SearchParameterEditorScreen extends StatelessWidget
             title: const Text('Advanced Search Screen'),
           ),
           // TODO: add form builder
-          child: Padding(
+          body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [

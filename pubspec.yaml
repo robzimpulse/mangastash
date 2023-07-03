@@ -67,6 +67,10 @@ dependencies:
   domain_manga:
     path: module/domain/domain_manga
 
+  # ui
+  ui_common:
+    path: module/ui/ui_common
+
   # library
   safe_bloc:
     path: module/library/safe_bloc

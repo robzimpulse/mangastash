@@ -22,7 +22,7 @@ class SettingScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Setting'),
       ),
-      child: ListView(
+      body: ListView(
         children: [
           StreamBuilder<ThemeData>(
             stream: listenThemeUseCase.themeDataStream,

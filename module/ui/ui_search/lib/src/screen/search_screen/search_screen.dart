@@ -134,7 +134,7 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
         ],
       ),
-      child: Container(
+      body: Container(
         padding: const EdgeInsets.all(10),
         child: BlocBuilder<SearchScreenCubit, SearchScreenCubitState>(
           buildWhen: (prev, curr) {

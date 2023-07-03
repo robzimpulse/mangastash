@@ -8,7 +8,7 @@ class CollectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScaffoldScreen(
       onWillPop: () => Future.value(true),
-      child: const Center(
+      body: const Center(
         child: Text('Collection'),
       ),
     );

@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      child: Container(
+      body: Container(
         padding: const EdgeInsets.all(10),
         child: BlocBuilder<HomeCubit, HomeCubitState>(
           builder: (context, state) {
