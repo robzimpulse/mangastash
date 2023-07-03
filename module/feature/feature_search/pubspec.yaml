@@ -21,6 +21,10 @@ dependencies:
   core_route:
     path: ../../core/core_route
 
+  # data
+  data_manga:
+    path: ../../data/data_manga
+
   # ui
   ui_search:
     path: ../../ui/ui_search

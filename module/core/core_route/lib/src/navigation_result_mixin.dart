@@ -12,12 +12,8 @@ mixin ResultProvider<T> on Widget {
   final Late<ResultCallback<T>?> callback = Late();
 
   /// initialize [ResultProvider] mixin.
-  void initOnResult(callback) {
-    if (callback is ResultCallback<T>?) {
-      this.callback.val = callback;
-    } else {
-      throw 'Invalid callback value';
-    }
+  void initOnResult(ResultCallback<T>? callback) {
+    this.callback.val = callback;
   }
 
   /// Pop a page with result callback.

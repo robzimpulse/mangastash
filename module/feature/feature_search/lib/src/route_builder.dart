@@ -1,4 +1,5 @@
 import 'package:core_route/core_route.dart';
+import 'package:data_manga/data_manga.dart';
 import 'package:flutter/widgets.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_search/ui_search.dart';
@@ -31,7 +32,13 @@ class SearchRouteBuilder extends BaseRouteBuilder {
         parentNavigatorKey: rootNavigatorKey,
         path: SearchRoutePath.setting,
         name: SearchRoutePath.setting,
-        builder: (context, state) => const SearchParameterEditorScreen(),
+        builder: (context, state) {
+          return SearchParameterEditorScreen.create(
+            locator: locator,
+            parameter: const SearchMangaParameter(),
+            callback: state.getArgs<SearchMangaParameter>()?.callback,
+          );
+        },
       ),
     ];
   }

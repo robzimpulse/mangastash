@@ -61,9 +61,9 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _onTapFilter({required List<Tag> tags}) async {
-    // TODO: Replace with commented code after screen done
     // context.pushForResult<SearchMangaParameter>(
     //   '/search/setting',
+    //   args: context.read<SearchScreenCubit>().state.parameter,
     //   callback: (value) {
     //     if (value == null || !mounted) return;
     //     final cubit = context.read<SearchScreenCubit>();
@@ -105,8 +105,6 @@ class _SearchScreenState extends State<SearchScreen> {
             hintStyle: TextStyle(color: Colors.white54),
             border: InputBorder.none,
           ),
-          onChanged: onChangeTitle,
-          onSubmitted: (value) => context.read<SearchScreenCubit>().search(),
         ),
         actions: [
           BlocBuilder<SearchScreenCubit, SearchScreenCubitState>(

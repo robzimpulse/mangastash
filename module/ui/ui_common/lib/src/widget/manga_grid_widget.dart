@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../controller/paging_scroll_controller.dart';
 import 'manga_grid_item_widget.dart';
-import 'paging_scroll_controller.dart';
 
 class MangaGridWidget extends StatelessWidget {
   final PagingScrollController controller;
