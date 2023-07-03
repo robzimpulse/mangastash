@@ -38,8 +38,6 @@ dependencies:
   alice_lightweight: 3.3.0
 
   # core
-  core_auth:
-    path: module/core/core_auth
   core_environment:
     path: module/core/core_environment
   core_network:
@@ -61,25 +59,11 @@ dependencies:
   feature_search:
     path: module/feature/feature_search
 
-#  # ui
-#  ui_collection:
-#    path: module/ui/ui_collection
-#  ui_home:
-#    path: module/ui/ui_home
-#  ui_profile:
-#    path: module/ui/ui_profile
-#  ui_setting:
-#    path: module/ui/ui_setting
-
   # data
-  data_user:
-    path: module/data/data_user
   data_manga:
     path: module/data/data_manga
 
   # domain
-  domain_user:
-    path: module/domain/domain_user
   domain_manga:
     path: module/domain/domain_manga
 

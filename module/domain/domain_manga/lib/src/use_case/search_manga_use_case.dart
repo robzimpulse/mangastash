@@ -1,6 +1,4 @@
-import 'package:collection/collection.dart';
 import 'package:core_network/core_network.dart';
-import 'package:data_manga/data_manga.dart';
 
 import '../../domain_manga.dart';
 

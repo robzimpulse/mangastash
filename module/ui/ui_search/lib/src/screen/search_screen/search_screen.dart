@@ -1,10 +1,9 @@
-import 'package:data_manga/data_manga.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_breakpoints.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
-import 'package:core_route/core_route.dart';
 
 import '../../widget/advanced_search_bottom_sheet/advanced_search_bottom_sheet.dart';
 import 'search_screen_cubit.dart';
@@ -105,6 +104,8 @@ class _SearchScreenState extends State<SearchScreen> {
             hintStyle: TextStyle(color: Colors.white54),
             border: InputBorder.none,
           ),
+          onChanged: onChangeTitle,
+          onSubmitted: (value) => context.read<SearchScreenCubit>().search(),
         ),
         actions: [
           BlocBuilder<SearchScreenCubit, SearchScreenCubitState>(

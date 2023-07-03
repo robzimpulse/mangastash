@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:core_network/core_network.dart';
-import 'package:data_manga/src/tag.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:rxdart/src/streams/value_stream.dart';
 import 'package:rxdart/subjects.dart';
 

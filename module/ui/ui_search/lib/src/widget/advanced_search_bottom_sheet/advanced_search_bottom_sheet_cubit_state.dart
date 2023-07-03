@@ -1,4 +1,4 @@
-import 'package:data_manga/data_manga.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 
 class AdvancedSearchBottomSheetCubitState extends Equatable {
@@ -31,8 +31,8 @@ class AdvancedSearchBottomSheetCubitState extends Equatable {
   List<Tag> get sortedTag {
     final updated = tags.map(
       (e) => e.copyWith(
-        isIncluded: parameter.includedTags?.contains(e.id),
-        isExcluded: parameter.excludedTags?.contains(e.id),
+        isIncluded: parameter.includedTags.contains(e.id),
+        isExcluded: parameter.excludedTags.contains(e.id),
       ),
     );
     return List.from(updated)

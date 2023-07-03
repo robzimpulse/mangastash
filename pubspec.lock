@@ -71,13 +71,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.16.0"
-  core_auth:
-    dependency: "direct main"
-    description:
-      path: "module/core/core_auth"
-      relative: true
-    source: path
-    version: "0.0.1"
   core_environment:
     dependency: "direct main"
     description:
@@ -127,13 +120,6 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
-  data_user:
-    dependency: "direct main"
-    description:
-      path: "module/data/data_user"
-      relative: true
-    source: path
-    version: "0.0.1"
   dio:
     dependency: transitive
     description:
@@ -148,10 +134,10 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
-  domain_user:
-    dependency: "direct main"
+  entity_manga:
+    dependency: transitive
     description:
-      path: "module/domain/domain_user"
+      path: "module/entity/entity_manga"
       relative: true
     source: path
     version: "0.0.1"

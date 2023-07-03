@@ -22,6 +22,10 @@ dependencies:
   data_manga:
     path: ../../data/data_manga
 
+  # entity
+  entity_manga:
+    path: ../../entity/entity_manga
+
   # domain
   domain_manga:
     path: ../../domain/domain_manga

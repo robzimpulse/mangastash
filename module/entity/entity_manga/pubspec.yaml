@@ -1,4 +1,4 @@
-name: domain_user
+name: entity_manga
 description: A new Flutter package project.
 version: 0.0.1
 publish_to: none
@@ -10,6 +10,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  equatable: ^2.0.5
+  collection: ^1.16.0
+
+  # library
+  manga_dex_api:
+    path: ../../library/manga_dex_api
 
 dev_dependencies:
   flutter_test:

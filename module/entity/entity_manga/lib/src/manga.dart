@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:manga_dex_api/manga_dex_api.dart';
 
 class Manga extends Equatable {
   final String? id;

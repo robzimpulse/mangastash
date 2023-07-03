@@ -1,5 +1,5 @@
-import 'package:data_manga/data_manga.dart';
 import 'package:domain_manga/domain_manga.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:safe_bloc/safe_bloc.dart';

@@ -1,5 +1,5 @@
-import 'package:data_manga/data_manga.dart';
 import 'package:domain_manga/domain_manga.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import 'search_parameter_editor_screen_cubit_state.dart';

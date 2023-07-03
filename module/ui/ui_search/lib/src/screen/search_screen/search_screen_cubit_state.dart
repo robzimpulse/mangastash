@@ -1,4 +1,4 @@
-import 'package:data_manga/data_manga.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 
 import 'state/manga_section_state.dart';

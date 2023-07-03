@@ -1,4 +1,4 @@
-library domain_manga_dex;
+library domain_manga;
 
 export 'package:manga_dex_api/manga_dex_api.dart';
 

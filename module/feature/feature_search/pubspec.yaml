@@ -25,6 +25,10 @@ dependencies:
   data_manga:
     path: ../../data/data_manga
 
+  # entity
+  entity_manga:
+    path: ../../entity/entity_manga
+
   # ui
   ui_search:
     path: ../../ui/ui_search
