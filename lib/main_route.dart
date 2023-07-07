@@ -1,5 +1,9 @@
 import 'package:core_route/core_route.dart';
+import 'package:feature_browse/feature_browse.dart';
+import 'package:feature_history/feature_history.dart';
 import 'package:feature_library/feature_library.dart';
+import 'package:feature_more/feature_more.dart';
+import 'package:feature_updates/feature_updates.dart';
 import 'package:flutter/widgets.dart';
 import 'package:service_locator/service_locator.dart';
 
@@ -12,9 +16,10 @@ class MainRouteBuilder extends BaseRouteBuilder {
 
   final Map<int, String> _indexToLocation = {
     0: LibraryRoutePath.library,
-    1: LibraryRoutePath.library,
-    2: LibraryRoutePath.library,
-    3: LibraryRoutePath.library,
+    1: UpdatesRoutePath.updates,
+    2: HistoryRoutePath.history,
+    3: BrowseRoutePath.browse,
+    4: MoreRoutePath.more,
   };
 
   @override
@@ -65,21 +70,26 @@ class MainRouteBuilder extends BaseRouteBuilder {
           rootNavigatorKey: rootNavigatorKey,
           shellNavigatorKey: shellNavigatorKey,
         ),
-        // CollectionRouteBuilder().root(
-        //   locator: locator,
-        //   rootNavigatorKey: rootNavigatorKey,
-        //   shellNavigatorKey: shellNavigatorKey,
-        // ),
-        // SettingRouteBuilder().root(
-        //   locator: locator,
-        //   rootNavigatorKey: rootNavigatorKey,
-        //   shellNavigatorKey: shellNavigatorKey,
-        // ),
-        // ProfileRouteBuilder().root(
-        //   locator: locator,
-        //   rootNavigatorKey: rootNavigatorKey,
-        //   shellNavigatorKey: shellNavigatorKey,
-        // ),
+        UpdatesRouteBuilder().root(
+          locator: locator,
+          rootNavigatorKey: rootNavigatorKey,
+          shellNavigatorKey: shellNavigatorKey,
+        ),
+        HistoryRouteBuilder().root(
+          locator: locator,
+          rootNavigatorKey: rootNavigatorKey,
+          shellNavigatorKey: shellNavigatorKey,
+        ),
+        BrowseRouteBuilder().root(
+          locator: locator,
+          rootNavigatorKey: rootNavigatorKey,
+          shellNavigatorKey: shellNavigatorKey,
+        ),
+        MoreRouteBuilder().root(
+          locator: locator,
+          rootNavigatorKey: rootNavigatorKey,
+          shellNavigatorKey: shellNavigatorKey,
+        ),
       ],
     );
   }

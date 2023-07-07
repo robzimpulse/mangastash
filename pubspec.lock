@@ -155,10 +155,38 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.1"
+  feature_browse:
+    dependency: "direct main"
+    description:
+      path: "module/feature/feature_browse"
+      relative: true
+    source: path
+    version: "0.0.1"
+  feature_history:
+    dependency: "direct main"
+    description:
+      path: "module/feature/feature_history"
+      relative: true
+    source: path
+    version: "0.0.1"
   feature_library:
     dependency: "direct main"
     description:
       path: "module/feature/feature_library"
+      relative: true
+    source: path
+    version: "0.0.1"
+  feature_more:
+    dependency: "direct main"
+    description:
+      path: "module/feature/feature_more"
+      relative: true
+    source: path
+    version: "0.0.1"
+  feature_updates:
+    dependency: "direct main"
+    description:
+      path: "module/feature/feature_updates"
       relative: true
     source: path
     version: "0.0.1"

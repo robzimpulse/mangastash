@@ -66,8 +66,16 @@ dependencies:
     path: module/ui/ui_common
 
   # feature
+  feature_browse:
+    path: module/feature/feature_browse
+  feature_history:
+    path: module/feature/feature_history
   feature_library:
     path: module/feature/feature_library
+  feature_more:
+    path: module/feature/feature_more
+  feature_updates:
+    path: module/feature/feature_updates
 
 dev_dependencies:
   flutter_test:

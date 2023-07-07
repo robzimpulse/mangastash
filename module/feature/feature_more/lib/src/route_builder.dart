@@ -4,7 +4,7 @@ import 'package:service_locator/service_locator.dart';
 
 import 'route_path.dart';
 
-class LibraryRouteBuilder extends BaseRouteBuilder {
+class MoreRouteBuilder extends BaseRouteBuilder {
   @override
   GoRoute root({
     required ServiceLocator locator,
@@ -12,8 +12,8 @@ class LibraryRouteBuilder extends BaseRouteBuilder {
     required GlobalKey<NavigatorState> shellNavigatorKey,
   }) {
     return GoRoute(
-      path: LibraryRoutePath.library,
-      name: LibraryRoutePath.library,
+      path: MoreRoutePath.more,
+      name: MoreRoutePath.more,
       // TODO: implement ui
       builder: (context, state) => const SizedBox.shrink(),
       pageBuilder: (context, state) => const NoTransitionPage(
