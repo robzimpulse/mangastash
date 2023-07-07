@@ -34,6 +34,26 @@ class MainRouteBuilder extends BaseRouteBuilder {
         name: MainPath.main,
         redirect: (context, state) => LibraryRoutePath.library,
       ),
+      ...LibraryRouteBuilder().routes(
+        locator: locator,
+        rootNavigatorKey: rootNavigatorKey,
+        shellNavigatorKey: shellNavigatorKey,
+      ),
+      ...UpdatesRouteBuilder().routes(
+        locator: locator,
+        rootNavigatorKey: rootNavigatorKey,
+        shellNavigatorKey: shellNavigatorKey,
+      ),
+      ...HistoryRouteBuilder().routes(
+        locator: locator,
+        rootNavigatorKey: rootNavigatorKey,
+        shellNavigatorKey: shellNavigatorKey,
+      ),
+      ...BrowseRouteBuilder().routes(
+        locator: locator,
+        rootNavigatorKey: rootNavigatorKey,
+        shellNavigatorKey: shellNavigatorKey,
+      ),
       ...MoreRouteBuilder().routes(
         locator: locator,
         rootNavigatorKey: rootNavigatorKey,

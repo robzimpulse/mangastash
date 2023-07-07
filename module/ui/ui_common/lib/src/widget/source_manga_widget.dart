@@ -7,7 +7,10 @@ class SourceMangaWidget extends StatelessWidget {
     required this.url,
     required this.name,
     this.onTap,
+    this.iconUrl = '',
   });
+
+  final String iconUrl;
 
   final String url;
 
@@ -21,7 +24,7 @@ class SourceMangaWidget extends StatelessWidget {
       leading: SizedBox(
         height: double.infinity,
         child: CachedNetworkImage(
-          imageUrl: '$url/favicon.ico',
+          imageUrl: iconUrl,
           width: 16,
           height: 16,
           errorWidget: (context, url, error) => const Icon(Icons.error),
@@ -41,6 +44,7 @@ class SourceMangaWidget extends StatelessWidget {
       title: Text(name),
       subtitle: Text(url),
       onTap: onTap,
+      minLeadingWidth: 16,
     );
   }
 }

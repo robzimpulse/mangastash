@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -16,12 +15,12 @@ class BrowseScreen extends StatelessWidget {
 
   final Function(BuildContext) onTapSearchManga;
 
-  final Function(BuildContext, String) onTapSource;
+  final Function(BuildContext, String, String) onTapSource;
 
   static Widget create({
     required ServiceLocator locator,
     required Function(BuildContext) onTapSearchManga,
-    required Function(BuildContext, String) onTapSource,
+    required Function(BuildContext, String, String) onTapSource,
   }) {
     return BlocProvider(
       create: (context) => BrowseScreenCubit(),
@@ -46,21 +45,26 @@ class BrowseScreen extends StatelessWidget {
         ],
       ),
       body: BlocBuilder<BrowseScreenCubit, BrowseScreenCubitState>(
-          builder: (context, state) {
-        return AdaptivePhysicListView.separated(
-          separatorBuilder: (context, index) {
-            return const Divider(height: 1, thickness: 1);
-          },
-          itemBuilder: (context, index) {
-            return SourceMangaWidget(
+        builder: (context, state) {
+          return AdaptivePhysicListView.separated(
+            separatorBuilder: (context, index) => const Divider(
+              height: 1,
+              thickness: 1,
+            ),
+            itemBuilder: (context, index) => SourceMangaWidget(
+              iconUrl: state.sources[index].iconUrl,
               url: state.sources[index].url,
               name: state.sources[index].name,
-              onTap: () => onTapSource.call(context, state.sources[index].url),
-            );
-          },
-          itemCount: state.sources.length,
-        );
-      }),
+              onTap: () => onTapSource.call(
+                context,
+                state.sources[index].name,
+                state.sources[index].url,
+              ),
+            ),
+            itemCount: state.sources.length,
+          );
+        },
+      ),
     );
   }
 }

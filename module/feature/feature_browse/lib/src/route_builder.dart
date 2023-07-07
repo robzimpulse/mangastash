@@ -19,16 +19,18 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         locator: locator,
         // TODO: implement redirect to search source screen
         onTapSearchManga: (context) {},
-        // TODO: implement redirect to source screen
-        onTapSource: (context, url) {},
+        onTapSource: (context, title, url) => context.push(
+          '${BrowseRoutePath.browseSource}?title=$title&url=$url',
+        ),
       ),
       pageBuilder: (context, state) => NoTransitionPage(
         child: BrowseScreen.create(
           locator: locator,
           // TODO: implement redirect to search source screen
           onTapSearchManga: (context) {},
-          // TODO: implement redirect to source screen
-          onTapSource: (context, url) {},
+          onTapSource: (context, title, url) => context.push(
+            '${BrowseRoutePath.browseSource}?title=$title&url=$url',
+          ),
         ),
       ),
     );
@@ -40,6 +42,17 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
     required GlobalKey<NavigatorState> rootNavigatorKey,
     required GlobalKey<NavigatorState> shellNavigatorKey,
   }) {
-    return [];
+    return [
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: BrowseRoutePath.browseSource,
+        name: BrowseRoutePath.browseSource,
+        builder: (context, state) => BrowseSourceMangaScreen.create(
+          locator: locator,
+          title: state.queryParameters['title'] ?? 'Undefined Source',
+          url: state.queryParameters['url'] ?? 'Undefined Source',
+        ),
+      ),
+    ];
   }
 }
