@@ -21,6 +21,10 @@ dependencies:
   core_route:
     path: ../../core/core_route
 
+  # ui
+  ui_more:
+    path: ../../ui/ui_more
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

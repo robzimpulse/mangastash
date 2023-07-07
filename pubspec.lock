@@ -637,6 +637,13 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  ui_more:
+    dependency: transitive
+    description:
+      path: "module/ui/ui_more"
+      relative: true
+    source: path
+    version: "0.0.1"
   url_launcher_linux:
     dependency: transitive
     description:

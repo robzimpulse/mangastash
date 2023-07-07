@@ -11,7 +11,6 @@ import 'main_path.dart';
 import 'screen/main_screen.dart';
 
 class MainRouteBuilder extends BaseRouteBuilder {
-
   final String _defaultLocation = LibraryRoutePath.library;
 
   final Map<int, String> _indexToLocation = {
@@ -35,11 +34,11 @@ class MainRouteBuilder extends BaseRouteBuilder {
         name: MainPath.main,
         redirect: (context, state) => LibraryRoutePath.library,
       ),
-      // ...SearchRouteBuilder().allRoutes(
-      //   locator: locator,
-      //   rootNavigatorKey: rootNavigatorKey,
-      //   shellNavigatorKey: shellNavigatorKey,
-      // ),
+      ...MoreRouteBuilder().routes(
+        locator: locator,
+        rootNavigatorKey: rootNavigatorKey,
+        shellNavigatorKey: shellNavigatorKey,
+      ),
     ];
   }
 
