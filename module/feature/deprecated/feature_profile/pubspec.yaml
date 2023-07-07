@@ -1,4 +1,4 @@
-name: feature_search
+name: feature_profile
 description: A new Flutter package project.
 version: 0.0.1
 publish_to: none
@@ -13,25 +13,17 @@ dependencies:
 
   # library
   safe_bloc:
-    path: ../../library/safe_bloc
+    path: ../../../library/safe_bloc
   service_locator:
-    path: ../../library/service_locator
+    path: ../../../library/service_locator
 
   # core
   core_route:
-    path: ../../core/core_route
+    path: ../../../core/core_route
 
-  # data
-  data_manga:
-    path: ../../data/data_manga
-
-  # entity
-  entity_manga:
-    path: ../../entity/entity_manga
-
-  # ui
-  ui_search:
-    path: ../../ui/ui_search
+  # home
+  ui_profile:
+    path: ../../../ui/ui_profile
 
 dev_dependencies:
   flutter_test:

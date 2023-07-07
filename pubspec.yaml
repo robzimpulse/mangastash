@@ -37,6 +37,12 @@ dependencies:
   ios_willpop_transition_theme: ^0.0.6
   alice_lightweight: 3.3.0
 
+  # library
+  safe_bloc:
+    path: module/library/safe_bloc
+  service_locator:
+    path: module/library/service_locator
+
   # core
   core_environment:
     path: module/core/core_environment
@@ -46,18 +52,6 @@ dependencies:
     path: module/core/core_route
   core_storage:
     path: module/core/core_storage
-
-  # feature
-  feature_collection:
-    path: module/feature/feature_collection
-  feature_home:
-    path: module/feature/feature_home
-  feature_profile:
-    path: module/feature/feature_profile
-  feature_setting:
-    path: module/feature/feature_setting
-  feature_search:
-    path: module/feature/feature_search
 
   # data
   data_manga:
@@ -71,11 +65,9 @@ dependencies:
   ui_common:
     path: module/ui/ui_common
 
-  # library
-  safe_bloc:
-    path: module/library/safe_bloc
-  service_locator:
-    path: module/library/service_locator
+  # feature
+  feature_library:
+    path: module/feature/feature_library
 
 dev_dependencies:
   flutter_test:

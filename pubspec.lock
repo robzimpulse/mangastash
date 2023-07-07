@@ -155,38 +155,10 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.1"
-  feature_collection:
+  feature_library:
     dependency: "direct main"
     description:
-      path: "module/feature/feature_collection"
-      relative: true
-    source: path
-    version: "0.0.1"
-  feature_home:
-    dependency: "direct main"
-    description:
-      path: "module/feature/feature_home"
-      relative: true
-    source: path
-    version: "0.0.1"
-  feature_profile:
-    dependency: "direct main"
-    description:
-      path: "module/feature/feature_profile"
-      relative: true
-    source: path
-    version: "0.0.1"
-  feature_search:
-    dependency: "direct main"
-    description:
-      path: "module/feature/feature_search"
-      relative: true
-    source: path
-    version: "0.0.1"
-  feature_setting:
-    dependency: "direct main"
-    description:
-      path: "module/feature/feature_setting"
+      path: "module/feature/feature_library"
       relative: true
     source: path
     version: "0.0.1"
@@ -630,45 +602,10 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.2"
-  ui_collection:
-    dependency: transitive
-    description:
-      path: "module/ui/ui_collection"
-      relative: true
-    source: path
-    version: "0.0.1"
   ui_common:
     dependency: "direct main"
     description:
       path: "module/ui/ui_common"
-      relative: true
-    source: path
-    version: "0.0.1"
-  ui_home:
-    dependency: transitive
-    description:
-      path: "module/ui/ui_home"
-      relative: true
-    source: path
-    version: "0.0.1"
-  ui_profile:
-    dependency: transitive
-    description:
-      path: "module/ui/ui_profile"
-      relative: true
-    source: path
-    version: "0.0.1"
-  ui_search:
-    dependency: transitive
-    description:
-      path: "module/ui/ui_search"
-      relative: true
-    source: path
-    version: "0.0.1"
-  ui_setting:
-    dependency: transitive
-    description:
-      path: "module/ui/ui_setting"
       relative: true
     source: path
     version: "0.0.1"

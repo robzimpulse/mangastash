@@ -1,4 +1,4 @@
-name: feature_setting
+name: feature_home
 description: A new Flutter package project.
 version: 0.0.1
 publish_to: none
@@ -13,17 +13,17 @@ dependencies:
 
   # library
   safe_bloc:
-    path: ../../library/safe_bloc
+    path: ../../../library/safe_bloc
   service_locator:
-    path: ../../library/service_locator
+    path: ../../../library/service_locator
 
   # core
   core_route:
-    path: ../../core/core_route
+    path: ../../../core/core_route
 
-  # home
-  ui_setting:
-    path: ../../ui/ui_setting
+  # ui
+  ui_home:
+    path: ../../../ui/ui_home
 
 dev_dependencies:
   flutter_test:

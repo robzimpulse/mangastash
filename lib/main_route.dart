@@ -1,22 +1,20 @@
 import 'package:core_route/core_route.dart';
-import 'package:feature_collection/feature_collection.dart';
-import 'package:feature_home/feature_home.dart';
-import 'package:feature_profile/feature_profile.dart';
-import 'package:feature_search/feature_search.dart';
-import 'package:feature_setting/feature_setting.dart';
+import 'package:feature_library/feature_library.dart';
 import 'package:flutter/widgets.dart';
 import 'package:service_locator/service_locator.dart';
-import 'package:collection/collection.dart';
 
 import 'main_path.dart';
 import 'screen/main_screen.dart';
 
 class MainRouteBuilder extends BaseRouteBuilder {
+
+  final String _defaultLocation = LibraryRoutePath.library;
+
   final Map<int, String> _indexToLocation = {
-    0: HomeRoutePath.main,
-    1: CollectionRoutePath.main,
-    2: SettingRoutePath.main,
-    3: ProfileRoutePath.main,
+    0: LibraryRoutePath.library,
+    1: LibraryRoutePath.library,
+    2: LibraryRoutePath.library,
+    3: LibraryRoutePath.library,
   };
 
   @override
@@ -30,13 +28,13 @@ class MainRouteBuilder extends BaseRouteBuilder {
         parentNavigatorKey: rootNavigatorKey,
         path: MainPath.main,
         name: MainPath.main,
-        redirect: (context, state) => HomeRoutePath.main,
+        redirect: (context, state) => LibraryRoutePath.library,
       ),
-      ...SearchRouteBuilder().allRoutes(
-        locator: locator,
-        rootNavigatorKey: rootNavigatorKey,
-        shellNavigatorKey: shellNavigatorKey,
-      ),
+      // ...SearchRouteBuilder().allRoutes(
+      //   locator: locator,
+      //   rootNavigatorKey: rootNavigatorKey,
+      //   shellNavigatorKey: shellNavigatorKey,
+      // ),
     ];
   }
 
@@ -55,33 +53,33 @@ class MainRouteBuilder extends BaseRouteBuilder {
         return MainScreen(
           index: index[state.location] ?? 0,
           onTapMenu: (index) {
-            final location = _indexToLocation[index] ?? HomeRoutePath.main;
+            final location = _indexToLocation[index] ?? _defaultLocation;
             context.go(location);
           },
           child: widget,
         );
       },
       routes: [
-        HomeRouteBuilder().root(
+        LibraryRouteBuilder().root(
           locator: locator,
           rootNavigatorKey: rootNavigatorKey,
           shellNavigatorKey: shellNavigatorKey,
         ),
-        CollectionRouteBuilder().root(
-          locator: locator,
-          rootNavigatorKey: rootNavigatorKey,
-          shellNavigatorKey: shellNavigatorKey,
-        ),
-        SettingRouteBuilder().root(
-          locator: locator,
-          rootNavigatorKey: rootNavigatorKey,
-          shellNavigatorKey: shellNavigatorKey,
-        ),
-        ProfileRouteBuilder().root(
-          locator: locator,
-          rootNavigatorKey: rootNavigatorKey,
-          shellNavigatorKey: shellNavigatorKey,
-        ),
+        // CollectionRouteBuilder().root(
+        //   locator: locator,
+        //   rootNavigatorKey: rootNavigatorKey,
+        //   shellNavigatorKey: shellNavigatorKey,
+        // ),
+        // SettingRouteBuilder().root(
+        //   locator: locator,
+        //   rootNavigatorKey: rootNavigatorKey,
+        //   shellNavigatorKey: shellNavigatorKey,
+        // ),
+        // ProfileRouteBuilder().root(
+        //   locator: locator,
+        //   rootNavigatorKey: rootNavigatorKey,
+        //   shellNavigatorKey: shellNavigatorKey,
+        // ),
       ],
     );
   }

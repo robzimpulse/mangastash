@@ -13,17 +13,17 @@ dependencies:
 
   # library
   safe_bloc:
-    path: ../../library/safe_bloc
+    path: ../../../library/safe_bloc
   service_locator:
-    path: ../../library/service_locator
+    path: ../../../library/service_locator
 
   # core
   core_route:
-    path: ../../core/core_route
+    path: ../../../core/core_route
 
   # home
   ui_collection:
-    path: ../../ui/ui_collection
+    path: ../../../ui/ui_collection
 
 dev_dependencies:
   flutter_test:
