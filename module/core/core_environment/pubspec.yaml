@@ -12,6 +12,7 @@ dependencies:
     sdk: flutter
   rxdart: ^0.27.7
 
+  # library
   service_locator:
     path: ../../library/service_locator
 
