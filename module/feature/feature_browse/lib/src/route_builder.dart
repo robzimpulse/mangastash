@@ -18,13 +18,17 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
       builder: (context, state) => BrowseScreen.create(
         locator: locator,
         // TODO: implement redirect to search source screen
-        onTapSearchSource: (context) {},
+        onTapSearchManga: (context) {},
+        // TODO: implement redirect to source screen
+        onTapSource: (context, url) {},
       ),
       pageBuilder: (context, state) => NoTransitionPage(
         child: BrowseScreen.create(
           locator: locator,
           // TODO: implement redirect to search source screen
-          onTapSearchSource: (context) {},
+          onTapSearchManga: (context) {},
+          // TODO: implement redirect to source screen
+          onTapSource: (context, url) {},
         ),
       ),
     );

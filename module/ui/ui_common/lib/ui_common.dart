@@ -9,3 +9,4 @@ export 'src/widget/adaptive_physic_list_view.dart';
 export 'src/widget/conditional_widget.dart';
 export 'src/widget/manga_grid_item_widget.dart';
 export 'src/widget/manga_grid_widget.dart';
+export 'src/widget/source_manga_widget.dart';
