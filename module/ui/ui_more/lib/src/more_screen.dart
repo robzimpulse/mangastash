@@ -38,80 +38,94 @@ class MoreScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScaffoldScreen(
       onWillPop: () => Future.value(true),
-      appBar: AppBar(
-        title: const Text('Setting'),
-      ),
-      body: ListView(
+      body: Column(
         children: [
-          SwitchListTile(
-            title: const Text('Downloaded Only'),
-            subtitle: const Text('Filters all entries in your library'),
-            value: true,
-            onChanged: (value) {},
-            secondary: const SizedBox(
-              height: double.infinity,
-              child: Icon(Icons.cloud_off),
+          const SafeArea(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'Manga Stash',
+                style: TextStyle(fontSize: 56),
+              ),
             ),
           ),
-          SwitchListTile(
-            title: const Text('Incognito Mode'),
-            subtitle: const Text('Pause reading history'),
-            value: true,
-            onChanged: (value) {},
-            secondary: const SizedBox(
-              height: double.infinity,
-              child: Icon(Icons.disabled_visible),
-            ),
-          ),
-          const Divider(height: 2),
-          ListTile(
-            title: const Text('Download Queue'),
-            subtitle: const Text('22 remaining'),
-            onTap: () => onTapDownloadQueue.call(context),
-            leading: const SizedBox(
-              height: double.infinity,
-              child: Icon(Icons.download),
-            ),
-          ),
-          ListTile(
-            title: const Text('Statistic'),
-            onTap: () => onTapStatistic.call(context),
-            leading: const SizedBox(
-              height: double.infinity,
-              child: Icon(Icons.auto_graph),
-            ),
-          ),
-          ListTile(
-            title: const Text('Backup and Restore'),
-            onTap: () => onTapBackupRestore.call(context),
-            leading: const SizedBox(
-              height: double.infinity,
-              child: Icon(Icons.settings_backup_restore),
-            ),
-          ),
-          const Divider(height: 2),
-          ListTile(
-            title: const Text('Settings'),
-            onTap: () => onTapSetting.call(context),
-            leading: const SizedBox(
-              height: double.infinity,
-              child: Icon(Icons.settings),
-            ),
-          ),
-          ListTile(
-            title: const Text('About'),
-            onTap: () {},
-            leading: const SizedBox(
-              height: double.infinity,
-              child: Icon(Icons.info_outline),
-            ),
-          ),
-          ListTile(
-            title: const Text('Help'),
-            onTap: () {},
-            leading: const SizedBox(
-              height: double.infinity,
-              child: Icon(Icons.help_outline),
+          const Divider(height: 1, thickness: 1),
+          Expanded(
+            child: AdaptivePhysicListView(
+              padding: EdgeInsets.zero,
+              children: [
+                SwitchListTile(
+                  title: const Text('Downloaded Only'),
+                  subtitle: const Text('Filters all entries in your library'),
+                  value: true,
+                  onChanged: (value) {},
+                  secondary: const SizedBox(
+                    height: double.infinity,
+                    child: Icon(Icons.cloud_off),
+                  ),
+                ),
+                SwitchListTile(
+                  title: const Text('Incognito Mode'),
+                  subtitle: const Text('Pause reading history'),
+                  value: true,
+                  onChanged: (value) {},
+                  secondary: const SizedBox(
+                    height: double.infinity,
+                    child: Icon(Icons.disabled_visible),
+                  ),
+                ),
+                const Divider(height: 1, thickness: 1),
+                ListTile(
+                  title: const Text('Download Queue'),
+                  subtitle: const Text('22 remaining'),
+                  onTap: () => onTapDownloadQueue.call(context),
+                  leading: const SizedBox(
+                    height: double.infinity,
+                    child: Icon(Icons.download),
+                  ),
+                ),
+                ListTile(
+                  title: const Text('Statistic'),
+                  onTap: () => onTapStatistic.call(context),
+                  leading: const SizedBox(
+                    height: double.infinity,
+                    child: Icon(Icons.auto_graph),
+                  ),
+                ),
+                ListTile(
+                  title: const Text('Backup and Restore'),
+                  onTap: () => onTapBackupRestore.call(context),
+                  leading: const SizedBox(
+                    height: double.infinity,
+                    child: Icon(Icons.settings_backup_restore),
+                  ),
+                ),
+                const Divider(height: 1, thickness: 1),
+                ListTile(
+                  title: const Text('Settings'),
+                  onTap: () => onTapSetting.call(context),
+                  leading: const SizedBox(
+                    height: double.infinity,
+                    child: Icon(Icons.settings),
+                  ),
+                ),
+                ListTile(
+                  title: const Text('About'),
+                  onTap: () {},
+                  leading: const SizedBox(
+                    height: double.infinity,
+                    child: Icon(Icons.info_outline),
+                  ),
+                ),
+                ListTile(
+                  title: const Text('Help'),
+                  onTap: () {},
+                  leading: const SizedBox(
+                    height: double.infinity,
+                    child: Icon(Icons.help_outline),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
