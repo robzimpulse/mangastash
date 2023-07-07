@@ -23,7 +23,7 @@ dependencies:
 
   # home
   ui_collection:
-    path: ../../../ui/ui_collection
+    path: ../../../ui/deprecated/ui_collection
 
 dev_dependencies:
   flutter_test:
