@@ -1,18 +1,14 @@
-import 'package:alice_lightweight/alice.dart';
 import 'package:core_environment/core_environment.dart';
-import 'package:core_route/core_route.dart';
 import 'package:flutter/material.dart';
 import 'package:ios_willpop_transition_theme/ios_willpop_transition_theme.dart';
 import 'package:responsive_framework/breakpoint.dart';
 import 'package:responsive_framework/responsive_breakpoints.dart';
 import 'package:service_locator/service_locator.dart';
 
-import '../main_path.dart';
-import '../main_route.dart';
-import 'error_screen.dart';
-
 class AppsScreen extends StatelessWidget {
   final ServiceLocator locator;
+
+  final RouterConfig<Object>? routerConfig;
 
   final ListenThemeUseCase listenThemeUseCase;
 
@@ -20,12 +16,11 @@ class AppsScreen extends StatelessWidget {
     super.key,
     required this.locator,
     required this.listenThemeUseCase,
+    this.routerConfig,
   });
 
   @override
   Widget build(BuildContext context) {
-    final route = _route(locator: locator);
-    _setupAlice(locator: locator, route: route);
     return StreamBuilder<ThemeData>(
       stream: listenThemeUseCase.themeDataStream,
       builder: (context, snapshot) {
@@ -40,7 +35,7 @@ class AppsScreen extends StatelessWidget {
         return MaterialApp.router(
           title: 'Manga Stash',
           debugShowCheckedModeBanner: false,
-          routerConfig: route,
+          routerConfig: routerConfig,
           theme: theme ?? ThemeData.light(),
           builder: (context, child) {
             return ResponsiveBreakpoints.builder(
@@ -56,34 +51,5 @@ class AppsScreen extends StatelessWidget {
         );
       },
     );
-  }
-
-  GoRouter _route({
-    required ServiceLocator locator,
-    String initialRoute = MainPath.main,
-  }) {
-    final rootNavigatorKey = GlobalKey<NavigatorState>();
-    return GoRouter(
-      navigatorKey: rootNavigatorKey,
-      initialLocation: initialRoute,
-      errorBuilder: (context, state) => ErrorScreen(
-        text: state.error.toString(),
-      ),
-      routes: MainRouteBuilder().allRoutes(
-        locator: locator,
-        rootNavigatorKey: rootNavigatorKey,
-        shellNavigatorKey: GlobalKey<NavigatorState>(),
-      ),
-      observers: [BaseRouteObserver()],
-    );
-  }
-
-  void _setupAlice({
-    required ServiceLocator locator,
-    required GoRouter route,
-  }) {
-    final Alice alice = locator();
-    final navigatorKey = route.routerDelegate.navigatorKey;
-    alice.setNavigatorKey(navigatorKey);
   }
 }
