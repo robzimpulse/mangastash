@@ -114,9 +114,26 @@ class _BrowseSourceMangaScreenState extends State<BrowseSourceMangaScreen> {
               );
             },
           ),
-          IconButton(
+          PopupMenuButton<int>(
             icon: const Icon(Icons.grid_view_sharp),
-            onPressed: () {},
+            itemBuilder: (context) {
+              // TODO: set menu for layout here
+              return const [
+                PopupMenuItem<int>(
+                  value: 0,
+                  child: Text("My Account"),
+                ),
+                PopupMenuItem<int>(
+                  value: 1,
+                  child: Text("Settings"),
+                ),
+                PopupMenuItem<int>(
+                  value: 2,
+                  child: Text("Logout"),
+                ),
+              ];
+            },
+            onSelected: (value) {},
           ),
           IconButton(
             icon: const Icon(Icons.open_in_browser),
