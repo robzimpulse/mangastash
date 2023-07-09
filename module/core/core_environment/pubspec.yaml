@@ -16,6 +16,10 @@ dependencies:
   service_locator:
     path: ../../library/service_locator
 
+  # core
+  core_storage:
+    path: ../../core/core_storage
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
