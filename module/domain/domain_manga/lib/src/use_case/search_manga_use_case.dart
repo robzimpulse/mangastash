@@ -1,4 +1,5 @@
 import 'package:core_network/core_network.dart';
+import 'package:entity_manga/entity_manga.dart';
 
 import '../../domain_manga.dart';
 
@@ -10,53 +11,32 @@ class SearchMangaUseCase {
   }) : _repository = repository;
 
   Future<Response<SearchResponse>> execute({
-    String? title,
-    int? limit,
-    int? offset,
-    List<String>? authors,
-    List<String>? artists,
-    int? year,
-    List<String>? includedTags,
-    TagsMode? includedTagsMode,
-    List<String>? excludedTags,
-    TagsMode? excludedTagsMode,
-    List<MangaStatus>? status,
-    List<LanguageCodes>? originalLanguage,
-    List<LanguageCodes>? excludedOriginalLanguages,
-    List<LanguageCodes>? availableTranslatedLanguage,
-    List<PublicDemographic>? publicationDemographic,
-    List<String>? ids,
-    List<ContentRating>? contentRating,
-    String? createdAtSince,
-    String? updatedAtSince,
-    List<String>? includes,
-    String? group,
-    Map<SearchOrders, OrderDirections>? orders,
+    required SearchMangaParameter parameter,
   }) async {
     try {
       final result = await _repository.search(
-        title: title,
-        limit: limit,
-        offset: offset,
-        authors: authors,
-        artists: artists,
-        year: year,
-        includedTags: includedTags,
-        includedTagsMode: includedTagsMode,
-        excludedTags: excludedTags,
-        excludedTagsMode: excludedTagsMode,
-        status: status,
-        originalLanguage: originalLanguage,
-        excludedOriginalLanguages: excludedOriginalLanguages,
-        availableTranslatedLanguage: availableTranslatedLanguage,
-        publicationDemographic: publicationDemographic,
-        ids: ids,
-        contentRating: contentRating,
-        createdAtSince: createdAtSince,
-        updatedAtSince: updatedAtSince,
-        includes: ['cover_art', ...includes ?? []],
-        group: group,
-        orders: orders,
+        title: parameter.title,
+        limit: parameter.limit,
+        offset: parameter.offset,
+        authors: parameter.authors,
+        artists: parameter.artists,
+        year: parameter.year,
+        includedTags: parameter.includedTags,
+        includedTagsMode: parameter.includedTagsMode,
+        excludedTags: parameter.excludedTags,
+        excludedTagsMode: parameter.excludedTagsMode,
+        status: parameter.status,
+        originalLanguage: parameter.originalLanguage,
+        excludedOriginalLanguages: parameter.excludedOriginalLanguages,
+        availableTranslatedLanguage: parameter.availableTranslatedLanguage,
+        publicationDemographic: parameter.publicationDemographic,
+        ids: parameter.ids,
+        contentRating: parameter.contentRating,
+        createdAtSince: parameter.createdAtSince,
+        updatedAtSince: parameter.updatedAtSince,
+        includes: parameter.includes,
+        group: parameter.group,
+        orders: parameter.orders,
       );
 
       return Success(result);

@@ -45,8 +45,8 @@ enum CoverOrders {
 }
 
 enum OrderDirections {
-  ascending('ascending'),
-  descending('descending');
+  ascending('asc'),
+  descending('desc');
 
   final String rawValue;
 

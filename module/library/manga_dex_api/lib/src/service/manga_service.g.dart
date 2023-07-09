@@ -66,7 +66,7 @@ class _MangaService implements MangaService {
       r'updatedAtSince': updatedAtSince,
       r'includes[]': includes,
       r'group': group,
-      r'orders': orders,
+      r'order': orders,
     };
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};

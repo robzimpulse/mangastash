@@ -34,7 +34,7 @@ abstract class MangaService {
     @Query('updatedAtSince') String? updatedAtSince,
     @Query('includes[]') List<String>? includes,
     @Query('group') String? group,
-    @Query('orders') Map<String, String>? orders,
+    @Query('order') Map<String, String>? orders,
   });
 
   @GET('/manga/tag')

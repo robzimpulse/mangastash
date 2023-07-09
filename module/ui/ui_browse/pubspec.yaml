@@ -12,18 +12,32 @@ dependencies:
     sdk: flutter
   equatable: ^2.0.5
   cached_network_image: ^3.2.2
+  collection: ^1.16.0
+  responsive_framework: ^1.0.0
+
+  # domain
+  domain_manga:
+    path: ../../domain/domain_manga
+
+  # entity
+  entity_manga:
+    path: ../../entity/entity_manga
 
   # library
   service_locator:
     path: ../../library/service_locator
   safe_bloc:
     path: ../../library/safe_bloc
+  manga_dex_api:
+    path: ../../library/manga_dex_api
 
   # core
   core_environment:
     path: ../../core/core_environment
   core_route:
     path: ../../core/core_route
+  core_network:
+    path: ../../core/core_network
 
   #ui
   ui_common:

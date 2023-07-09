@@ -44,13 +44,7 @@ class SearchScreenCubit extends Cubit<SearchScreenCubitState> with AutoSubscript
     final param = state.parameter;
 
     final result = await searchMangaUseCase.execute(
-      title: param.title,
-      includedTags: param.includedTags,
-      includedTagsMode: param.includedTagsMode,
-      excludedTags: param.excludedTags,
-      excludedTagsMode: param.excludedTagsMode,
-      offset: param.offset,
-      limit: _limit,
+      parameter: param,
     );
 
     if (result is Success<SearchResponse>) {
@@ -110,13 +104,7 @@ class SearchScreenCubit extends Cubit<SearchScreenCubitState> with AutoSubscript
     final param = state.parameter;
 
     final result = await searchMangaUseCase.execute(
-      title: param.title,
-      includedTags: param.includedTags,
-      includedTagsMode: param.includedTagsMode,
-      excludedTags: param.excludedTags,
-      excludedTagsMode: param.excludedTagsMode,
-      offset: param.offset,
-      limit: _limit,
+      parameter: param,
     );
 
     if (result is Success<SearchResponse>) {
