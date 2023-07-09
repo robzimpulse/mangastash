@@ -5,6 +5,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import 'browse_source_manga_screen_cubit_state.dart';
+import 'browse_source_manga_screen_layout.dart';
 
 class BrowseSourceMangaScreenCubit
     extends Cubit<BrowseSourceMangaScreenCubitState> {
@@ -123,5 +124,9 @@ class BrowseSourceMangaScreenCubit
 
   void searchMode(bool value) {
     emit(state.copyWith(isSearchActive: value));
+  }
+
+  void updateLayout(BrowseSourceMangaScreenLayout layout) {
+    emit(state.copyWith(layout: layout));
   }
 }

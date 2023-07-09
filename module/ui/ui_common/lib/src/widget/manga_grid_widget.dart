@@ -56,14 +56,17 @@ class MangaGridWidget extends StatelessWidget {
               childCount: children.length,
             ),
           ),
-          if (isLoadingNextPage)
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) => loadingIndicator,
-                childCount: 1,
-              ),
-            ),
+          if (isLoadingNextPage) _loadingIndicator(),
         ],
+      ),
+    );
+  }
+
+  Widget _loadingIndicator() {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) => loadingIndicator,
+        childCount: 1,
       ),
     );
   }

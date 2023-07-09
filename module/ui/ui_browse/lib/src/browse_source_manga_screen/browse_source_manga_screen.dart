@@ -6,6 +6,7 @@ import 'package:ui_common/ui_common.dart';
 
 import 'browse_source_manga_screen_cubit.dart';
 import 'browse_source_manga_screen_cubit_state.dart';
+import 'browse_source_manga_screen_layout.dart';
 
 class BrowseSourceMangaScreen extends StatefulWidget {
   const BrowseSourceMangaScreen({
@@ -114,26 +115,35 @@ class _BrowseSourceMangaScreenState extends State<BrowseSourceMangaScreen> {
               );
             },
           ),
-          PopupMenuButton<int>(
-            icon: const Icon(Icons.grid_view_sharp),
+          PopupMenuButton<BrowseSourceMangaScreenLayout>(
+            icon: BlocBuilder<BrowseSourceMangaScreenCubit,
+                BrowseSourceMangaScreenCubitState>(
+              buildWhen: (prev, curr) => prev.layout != curr.layout,
+              builder: (context, state) {
+                switch (state.layout) {
+                  case BrowseSourceMangaScreenLayout.comfortableGrid:
+                    return const Icon(Icons.grid_on);
+                  case BrowseSourceMangaScreenLayout.compactGrid:
+                    return const Icon(Icons.grid_view_sharp);
+                  case BrowseSourceMangaScreenLayout.list:
+                    return const Icon(Icons.list);
+                }
+              },
+            ),
             itemBuilder: (context) {
-              // TODO: set menu for layout here
-              return const [
-                PopupMenuItem<int>(
-                  value: 0,
-                  child: Text("My Account"),
+              final options = BrowseSourceMangaScreenLayout.values.map(
+                (e) => PopupMenuItem<BrowseSourceMangaScreenLayout>(
+                  value: e,
+                  child: Text(e.rawValue),
                 ),
-                PopupMenuItem<int>(
-                  value: 1,
-                  child: Text("Settings"),
-                ),
-                PopupMenuItem<int>(
-                  value: 2,
-                  child: Text("Logout"),
-                ),
-              ];
+              );
+
+              return options.toList();
             },
-            onSelected: (value) {},
+            onSelected: (value) {
+              final cubit = context.read<BrowseSourceMangaScreenCubit>();
+              cubit.updateLayout(value);
+            },
           ),
           IconButton(
             icon: const Icon(Icons.open_in_browser),
