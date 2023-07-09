@@ -7,17 +7,12 @@ import 'package:ui_common/ui_common.dart';
 import 'browse_source_manga_screen_cubit.dart';
 import 'browse_source_manga_screen_cubit_state.dart';
 
-class BrowseSourceMangaScreen extends StatelessWidget {
-
-  BrowseSourceMangaScreen({
+class BrowseSourceMangaScreen extends StatefulWidget {
+  const BrowseSourceMangaScreen({
     super.key,
     required this.title,
     required this.url,
   });
-
-  final PagingScrollController _scrollController = PagingScrollController(
-    onLoadNextPage: (context) => context.read<BrowseSourceMangaScreenCubit>().next(),
-  );
 
   final String title;
 
@@ -41,14 +36,28 @@ class BrowseSourceMangaScreen extends StatelessWidget {
     );
   }
 
-  Widget _bloc({
-    BlocBuilderCondition<BrowseSourceMangaScreenCubitState>? buildWhen,
-    required BlocWidgetBuilder<BrowseSourceMangaScreenCubitState> builder,
-  }) {
-    return BlocBuilder<BrowseSourceMangaScreenCubit, BrowseSourceMangaScreenCubitState>(
-      buildWhen: buildWhen,
-      builder: builder,
-    );
+  @override
+  State<BrowseSourceMangaScreen> createState() =>
+      _BrowseSourceMangaScreenState();
+}
+
+class _BrowseSourceMangaScreenState extends State<BrowseSourceMangaScreen> {
+  final PagingScrollController _scrollController = PagingScrollController(
+    onLoadNextPage: (context) {
+      context.read<BrowseSourceMangaScreenCubit>().next();
+    },
+  );
+
+  final TextEditingController _searchController = TextEditingController();
+
+  final FocusNode _searchFocusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _searchController.dispose();
+    _searchFocusNode.dispose();
+    super.dispose();
   }
 
   int _crossAxisCount(BuildContext context) {
@@ -64,11 +73,46 @@ class BrowseSourceMangaScreen extends StatelessWidget {
     return ScaffoldScreen(
       onWillPop: () => Future.value(true),
       appBar: AppBar(
-        title: Text(title),
+        title: BlocBuilder<BrowseSourceMangaScreenCubit,
+            BrowseSourceMangaScreenCubitState>(
+          buildWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
+          builder: (context, state) {
+            if (!state.isSearchActive) {
+              return Text(widget.title);
+            }
+
+            return TextField(
+              controller: _searchController..clear(),
+              focusNode: _searchFocusNode..requestFocus(),
+              style: const TextStyle(color: Colors.white),
+              cursorColor: Colors.white,
+              decoration: const InputDecoration(
+                hintText: 'Search...',
+                hintStyle: TextStyle(color: Colors.white54),
+                border: InputBorder.none,
+              ),
+              onSubmitted: (value) {
+                final cubit = context.read<BrowseSourceMangaScreenCubit>();
+                cubit.init(title: value);
+              },
+            );
+          },
+        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
+          BlocBuilder<BrowseSourceMangaScreenCubit,
+              BrowseSourceMangaScreenCubitState>(
+            buildWhen: (prev, curr) {
+              return prev.isSearchActive != curr.isSearchActive;
+            },
+            builder: (context, state) {
+              return IconButton(
+                icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
+                onPressed: () {
+                  final cubit = context.read<BrowseSourceMangaScreenCubit>();
+                  cubit.searchMode(!state.isSearchActive);
+                },
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.grid_view_sharp),
@@ -80,9 +124,16 @@ class BrowseSourceMangaScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: _bloc(
+      body: BlocBuilder<BrowseSourceMangaScreenCubit,
+          BrowseSourceMangaScreenCubitState>(
+        buildWhen: (prev, curr) {
+          return prev.mangas != curr.mangas ||
+              prev.isLoading != curr.isLoading ||
+              prev.errorMessage != curr.errorMessage ||
+              prev.isPagingNextPage != curr.isPagingNextPage ||
+              prev.hasNextPage != curr.hasNextPage;
+        },
         builder: (context, state) {
-
           if (state.isLoading) {
             return const Center(
               child: CircularProgressIndicator(),
@@ -105,7 +156,7 @@ class BrowseSourceMangaScreen extends StatelessWidget {
           }
 
           final children = state.mangas.map(
-                (e) => MangaGridItemWidget(
+            (e) => MangaGridItemWidget(
               title: e.title,
               coverUrl: e.coverUrl,
             ),

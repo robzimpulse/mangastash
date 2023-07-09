@@ -20,10 +20,12 @@ class BrowseSourceMangaScreenCubit
     required this.getCoverArtUseCase,
   }) : super(initialState);
 
-  void init() async {
-    emit(state.copyWith(isLoading: true));
+  void init({String? title}) async {
+    emit(state.copyWith(isLoading: true, mangas: title != null ? [] : null,));
 
     final param = state.parameter.copyWith(
+      title: title,
+      offset: 0,
       includes: ['cover_art'],
       orders: {
         SearchOrders.rating: OrderDirections.descending,
@@ -117,5 +119,9 @@ class BrowseSourceMangaScreenCubit
     }
 
     emit(state.copyWith(isPagingNextPage: false));
+  }
+
+  void searchMode(bool value) {
+    emit(state.copyWith(isSearchActive: value));
   }
 }

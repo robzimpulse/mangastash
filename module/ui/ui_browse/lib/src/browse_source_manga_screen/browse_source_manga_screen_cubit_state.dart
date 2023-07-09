@@ -14,6 +14,8 @@ class BrowseSourceMangaScreenCubitState extends Equatable {
 
   final bool isPagingNextPage;
 
+  final bool isSearchActive;
+
   const BrowseSourceMangaScreenCubitState({
     this.isLoading = false,
     this.errorMessage,
@@ -21,6 +23,7 @@ class BrowseSourceMangaScreenCubitState extends Equatable {
     this.parameter = const SearchMangaParameter(),
     this.hasNextPage = false,
     this.isPagingNextPage = false,
+    this.isSearchActive = false,
   });
 
   @override
@@ -32,6 +35,7 @@ class BrowseSourceMangaScreenCubitState extends Equatable {
       parameter,
       hasNextPage,
       isPagingNextPage,
+      isSearchActive,
     ];
   }
 
@@ -39,12 +43,14 @@ class BrowseSourceMangaScreenCubitState extends Equatable {
     bool? isLoading,
     bool? hasNextPage,
     bool? isPagingNextPage,
+    bool? isSearchActive,
     String? Function()? errorMessage,
     SearchMangaParameter? parameter,
     List<Manga>? mangas,
   }) {
     return BrowseSourceMangaScreenCubitState(
       isLoading: isLoading ?? this.isLoading,
+      isSearchActive: isSearchActive ?? this.isSearchActive,
       isPagingNextPage: isPagingNextPage ?? this.isPagingNextPage,
       hasNextPage: hasNextPage ?? this.hasNextPage,
       parameter: parameter ?? this.parameter,
