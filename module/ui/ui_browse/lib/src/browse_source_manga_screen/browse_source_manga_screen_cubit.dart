@@ -3,9 +3,9 @@ import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
+import 'package:ui_common/ui_common.dart';
 
 import 'browse_source_manga_screen_cubit_state.dart';
-import 'browse_source_manga_screen_layout.dart';
 
 class BrowseSourceMangaScreenCubit
     extends Cubit<BrowseSourceMangaScreenCubitState> {
@@ -126,7 +126,7 @@ class BrowseSourceMangaScreenCubit
     emit(state.copyWith(isSearchActive: value));
   }
 
-  void updateLayout(BrowseSourceMangaScreenLayout layout) {
+  void updateLayout(MangaShelfItemLayout layout) {
     emit(state.copyWith(layout: layout));
   }
 }

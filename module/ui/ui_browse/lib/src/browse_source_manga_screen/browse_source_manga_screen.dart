@@ -6,7 +6,6 @@ import 'package:ui_common/ui_common.dart';
 
 import 'browse_source_manga_screen_cubit.dart';
 import 'browse_source_manga_screen_cubit_state.dart';
-import 'browse_source_manga_screen_layout.dart';
 
 class BrowseSourceMangaScreen extends StatefulWidget {
   const BrowseSourceMangaScreen({
@@ -115,24 +114,24 @@ class _BrowseSourceMangaScreenState extends State<BrowseSourceMangaScreen> {
               );
             },
           ),
-          PopupMenuButton<BrowseSourceMangaScreenLayout>(
+          PopupMenuButton<MangaShelfItemLayout>(
             icon: BlocBuilder<BrowseSourceMangaScreenCubit,
                 BrowseSourceMangaScreenCubitState>(
               buildWhen: (prev, curr) => prev.layout != curr.layout,
               builder: (context, state) {
                 switch (state.layout) {
-                  case BrowseSourceMangaScreenLayout.comfortableGrid:
+                  case MangaShelfItemLayout.comfortableGrid:
                     return const Icon(Icons.grid_on);
-                  case BrowseSourceMangaScreenLayout.compactGrid:
+                  case MangaShelfItemLayout.compactGrid:
                     return const Icon(Icons.grid_view_sharp);
-                  case BrowseSourceMangaScreenLayout.list:
+                  case MangaShelfItemLayout.list:
                     return const Icon(Icons.list);
                 }
               },
             ),
             itemBuilder: (context) {
-              final options = BrowseSourceMangaScreenLayout.values.map(
-                (e) => PopupMenuItem<BrowseSourceMangaScreenLayout>(
+              final options = MangaShelfItemLayout.values.map(
+                (e) => PopupMenuItem<MangaShelfItemLayout>(
                   value: e,
                   child: Text(e.rawValue),
                 ),
@@ -158,7 +157,8 @@ class _BrowseSourceMangaScreenState extends State<BrowseSourceMangaScreen> {
               prev.isLoading != curr.isLoading ||
               prev.errorMessage != curr.errorMessage ||
               prev.isPagingNextPage != curr.isPagingNextPage ||
-              prev.hasNextPage != curr.hasNextPage;
+              prev.hasNextPage != curr.hasNextPage ||
+              prev.layout != curr.layout;
         },
         builder: (context, state) {
           if (state.isLoading) {
@@ -183,27 +183,52 @@ class _BrowseSourceMangaScreenState extends State<BrowseSourceMangaScreen> {
           }
 
           final children = state.mangas.map(
-            (e) => MangaGridItemWidget(
-              title: e.title,
-              coverUrl: e.coverUrl,
+            (e) => MangaShelfItem(
+              title: e.title ?? '',
+              coverUrl: e.coverUrl ?? '',
+              layout: state.layout,
             ),
           );
 
-          return MangaGridWidget(
-            controller: _scrollController,
-            crossAxisCount: _crossAxisCount(context),
-            childAspectRatio: (100 / 140),
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-            isLoadingNextPage: state.isPagingNextPage,
-            loadingIndicator: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
+          const indicator = Padding(
+            padding: EdgeInsets.symmetric(vertical: 10),
+            child: Center(
+              child: CircularProgressIndicator(),
             ),
-            children: children.toList(),
           );
+
+          switch (state.layout) {
+            case MangaShelfItemLayout.comfortableGrid:
+              return MangaShelfWidget.comfortableGrid(
+                controller: _scrollController,
+                isLoadingNextPage: state.isPagingNextPage,
+                loadingIndicator: indicator,
+                crossAxisCount: _crossAxisCount(context),
+                childAspectRatio: (100 / 140),
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                children: children.toList(),
+              );
+            case MangaShelfItemLayout.compactGrid:
+              return MangaShelfWidget.compactGrid(
+                controller: _scrollController,
+                isLoadingNextPage: state.isPagingNextPage,
+                loadingIndicator: indicator,
+                crossAxisCount: _crossAxisCount(context),
+                childAspectRatio: (100 / 140),
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                children: children.toList(),
+              );
+            case MangaShelfItemLayout.list:
+              return MangaShelfWidget.list(
+                controller: _scrollController,
+                isLoadingNextPage: state.isPagingNextPage,
+                loadingIndicator: indicator,
+                separator: const Divider(height: 1, thickness: 1),
+                children: children.toList(),
+              );
+          }
         },
       ),
     );

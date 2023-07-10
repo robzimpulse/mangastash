@@ -1,7 +1,6 @@
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
-
-import 'browse_source_manga_screen_layout.dart';
+import 'package:ui_common/ui_common.dart';
 
 class BrowseSourceMangaScreenCubitState extends Equatable {
   final bool isLoading;
@@ -18,7 +17,7 @@ class BrowseSourceMangaScreenCubitState extends Equatable {
 
   final bool isSearchActive;
 
-  final BrowseSourceMangaScreenLayout layout;
+  final MangaShelfItemLayout layout;
 
   const BrowseSourceMangaScreenCubitState({
     this.isLoading = false,
@@ -28,7 +27,7 @@ class BrowseSourceMangaScreenCubitState extends Equatable {
     this.hasNextPage = false,
     this.isPagingNextPage = false,
     this.isSearchActive = false,
-    this.layout = BrowseSourceMangaScreenLayout.compactGrid
+    this.layout = MangaShelfItemLayout.compactGrid
   });
 
   @override
@@ -53,7 +52,7 @@ class BrowseSourceMangaScreenCubitState extends Equatable {
     String? Function()? errorMessage,
     SearchMangaParameter? parameter,
     List<Manga>? mangas,
-    BrowseSourceMangaScreenLayout? layout,
+    MangaShelfItemLayout? layout,
   }) {
     return BrowseSourceMangaScreenCubitState(
       isLoading: isLoading ?? this.isLoading,
