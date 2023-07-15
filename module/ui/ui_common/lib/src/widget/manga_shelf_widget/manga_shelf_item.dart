@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'manga_shelf_item_layout.dart';
 
 class MangaShelfItem extends StatelessWidget {
-
   const MangaShelfItem({
     super.key,
     required this.title,
@@ -91,7 +90,11 @@ class MangaShelfItem extends StatelessWidget {
             width: double.infinity,
             color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.7),
             padding: const EdgeInsets.all(4.0),
-            child: Text(title, maxLines: 2),
+            child: Text(
+              title,
+              maxLines: 2,
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
       ],
@@ -99,28 +102,22 @@ class MangaShelfItem extends StatelessWidget {
   }
 
   Widget _comfortableGrid(BuildContext context) {
-    return Stack(
-      alignment: Alignment.bottomCenter,
+    return Column(
       children: [
-        Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.blueGrey),
-            ),
-            child: CachedNetworkImage(
-              fit: BoxFit.fill,
-              imageUrl: coverUrl,
-              placeholder: (context, url) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              },
-              errorWidget: (context, url, error) {
-                return const Center(
-                  child: Icon(Icons.error),
-                );
-              },
-            ),
+        Expanded(
+          child: CachedNetworkImage(
+            fit: BoxFit.fill,
+            imageUrl: coverUrl,
+            placeholder: (context, url) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            },
+            errorWidget: (context, url, error) {
+              return const Center(
+                child: Icon(Icons.error),
+              );
+            },
           ),
         ),
         Visibility(
@@ -129,7 +126,11 @@ class MangaShelfItem extends StatelessWidget {
             width: double.infinity,
             color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.7),
             padding: const EdgeInsets.all(4.0),
-            child: Text(title, maxLines: 2),
+            child: Text(
+              title,
+              maxLines: 2,
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
       ],
