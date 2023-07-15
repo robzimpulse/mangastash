@@ -1,3 +1,4 @@
+import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_breakpoints.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -6,33 +7,35 @@ import 'package:ui_common/ui_common.dart';
 
 import 'browse_source_manga_screen_cubit.dart';
 import 'browse_source_manga_screen_cubit_state.dart';
+import 'sources/manga_dex_cubit.dart';
 
 class BrowseSourceMangaScreen extends StatefulWidget {
   const BrowseSourceMangaScreen({
     super.key,
-    required this.title,
-    required this.url,
+    required this.source,
   });
 
-  final String title;
-
-  final String url;
+  final MangaSource source;
 
   static Widget create({
     required ServiceLocator locator,
-    required String title,
-    required String url,
+    required MangaSource source,
   }) {
-    return BlocProvider(
-      create: (context) => BrowseSourceMangaScreenCubit(
-        getCoverArtUseCase: locator(),
-        searchMangaUseCase: locator(),
-        listenListTagUseCase: locator(),
-      )..init(),
-      child: BrowseSourceMangaScreen(
-        title: title,
-        url: url,
-      ),
+    BrowseSourceMangaScreenCubit cubit;
+    switch (source) {
+      case MangaSource.mangadex:
+        cubit = MangaDexCubit(
+          getCoverArtUseCase: locator(),
+          searchMangaUseCase: locator(),
+          listenListTagUseCase: locator(),
+        )..init();
+        break;
+      default:
+        cubit = DefaultBrowseSourceMangaScreenCubit()..init();
+    }
+    return BlocProvider<BrowseSourceMangaScreenCubit>.value(
+      value: cubit,
+      child: BrowseSourceMangaScreen(source: source),
     );
   }
 
@@ -78,7 +81,7 @@ class _BrowseSourceMangaScreenState extends State<BrowseSourceMangaScreen> {
           buildWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
           builder: (context, state) {
             if (!state.isSearchActive) {
-              return Text(widget.title);
+              return Text(widget.source.name);
             }
 
             return TextField(
@@ -167,16 +170,17 @@ class _BrowseSourceMangaScreenState extends State<BrowseSourceMangaScreen> {
             );
           }
 
-          if (state.errorMessage?.isNotEmpty == true) {
-            return Center(
-              child: Text(
-                state.errorMessage ?? '',
-                textAlign: TextAlign.center,
-              ),
-            );
-          }
-
           if (state.mangas.isEmpty) {
+
+            if (state.errorMessage?.isNotEmpty == true) {
+              return Center(
+                child: Text(
+                  state.errorMessage ?? '',
+                  textAlign: TextAlign.center,
+                ),
+              );
+            }
+
             return const Center(
               child: Text('Manga Empty'),
             );

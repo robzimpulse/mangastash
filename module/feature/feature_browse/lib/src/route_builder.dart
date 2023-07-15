@@ -1,4 +1,6 @@
 import 'package:core_route/core_route.dart';
+import 'package:entity_manga/entity_manga.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_browse/ui_browse.dart';
@@ -19,8 +21,9 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         locator: locator,
         // TODO: implement redirect to search source screen
         onTapSearchManga: (context) {},
-        onTapSource: (context, title, url) => context.push(
-          '${BrowseRoutePath.browseSource}?title=$title&url=$url',
+        onTapSource: (context, source) => context.push(
+          BrowseRoutePath.browseSource,
+          extra: source,
         ),
       ),
       pageBuilder: (context, state) => NoTransitionPage(
@@ -28,8 +31,9 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
           locator: locator,
           // TODO: implement redirect to search source screen
           onTapSearchManga: (context) {},
-          onTapSource: (context, title, url) => context.push(
-            '${BrowseRoutePath.browseSource}?title=$title&url=$url',
+          onTapSource: (context, source) => context.push(
+            BrowseRoutePath.browseSource,
+            extra: source,
           ),
         ),
       ),
@@ -47,11 +51,14 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         parentNavigatorKey: rootNavigatorKey,
         path: BrowseRoutePath.browseSource,
         name: BrowseRoutePath.browseSource,
-        builder: (context, state) => BrowseSourceMangaScreen.create(
-          locator: locator,
-          title: state.queryParameters['title'] ?? 'Undefined Source',
-          url: state.queryParameters['url'] ?? 'Undefined Source',
-        ),
+        builder: (context, state) {
+          final source = state.extra as MangaSource?;
+          if (source == null) return const Scaffold(body: Text(''));
+          return BrowseSourceMangaScreen.create(
+            locator: locator,
+            source: source,
+          );
+        },
       ),
     ];
   }

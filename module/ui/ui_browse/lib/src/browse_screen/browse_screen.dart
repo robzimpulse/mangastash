@@ -1,3 +1,4 @@
+import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -15,12 +16,12 @@ class BrowseScreen extends StatelessWidget {
 
   final Function(BuildContext) onTapSearchManga;
 
-  final Function(BuildContext, String, String) onTapSource;
+  final Function(BuildContext, MangaSource) onTapSource;
 
   static Widget create({
     required ServiceLocator locator,
     required Function(BuildContext) onTapSearchManga,
-    required Function(BuildContext, String, String) onTapSource,
+    required Function(BuildContext, MangaSource) onTapSource,
   }) {
     return BlocProvider(
       create: (context) => BrowseScreenCubit(),
@@ -57,8 +58,7 @@ class BrowseScreen extends StatelessWidget {
               name: state.sources[index].name,
               onTap: () => onTapSource.call(
                 context,
-                state.sources[index].name,
-                state.sources[index].url,
+                state.sources[index],
               ),
             ),
             itemCount: state.sources.length,
