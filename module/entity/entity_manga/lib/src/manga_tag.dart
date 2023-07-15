@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class Tag extends Equatable {
+class MangaTag extends Equatable {
   final String? id;
 
   final String? name;
@@ -9,7 +9,7 @@ class Tag extends Equatable {
 
   final bool isExcluded;
 
-  const Tag({
+  const MangaTag({
     this.id,
     this.name,
     this.isIncluded = false,
@@ -19,13 +19,13 @@ class Tag extends Equatable {
   @override
   List<Object?> get props => [id, name, isIncluded, isExcluded];
 
-  Tag copyWith({
+  MangaTag copyWith({
     String? id,
     String? name,
     bool? isIncluded,
     bool? isExcluded,
   }) {
-    return Tag(
+    return MangaTag(
       id: id ?? this.id,
       name: name ?? this.name,
       isIncluded: isIncluded ?? this.isIncluded,

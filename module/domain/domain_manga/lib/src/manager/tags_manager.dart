@@ -9,7 +9,7 @@ import '../use_case/list_tag_use_case.dart';
 import '../use_case/listen_list_tag_use_case.dart';
 
 class TagsManager implements ListenListTagUseCase {
-  final _listTagsSubject = BehaviorSubject<List<Tag>>();
+  final _listTagsSubject = BehaviorSubject<List<MangaTag>>();
 
   final ListTagUseCase _listTagUseCase;
 
@@ -20,12 +20,12 @@ class TagsManager implements ListenListTagUseCase {
   }
 
   @override
-  ValueStream<List<Tag>> get listTagsStream => _listTagsSubject.stream;
+  ValueStream<List<MangaTag>> get listTagsStream => _listTagsSubject.stream;
 
   void _update(Timer t) async {
     final result = await _listTagUseCase.execute();
 
-    if (result is Success<List<Tag>>) {
+    if (result is Success<List<MangaTag>>) {
       _listTagsSubject.add(result.data);
     }
   }
