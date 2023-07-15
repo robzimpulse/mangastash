@@ -35,8 +35,8 @@ class MangaShelfItem extends StatelessWidget {
       children: [
         CachedNetworkImage(
           imageUrl: coverUrl,
-          width: 100,
-          height: 100,
+          width: 50,
+          height: 50,
           errorWidget: (context, url, error) => const Icon(Icons.error),
           progressIndicatorBuilder: (context, url, downloadProgress) {
             return Center(
@@ -51,7 +51,10 @@ class MangaShelfItem extends StatelessWidget {
           },
         ),
         Expanded(
-          child: Text(title),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Text(title),
+          ),
         ),
       ],
     );
