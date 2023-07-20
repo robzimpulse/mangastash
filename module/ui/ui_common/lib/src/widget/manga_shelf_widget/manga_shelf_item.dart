@@ -66,7 +66,7 @@ class MangaShelfItem extends StatelessWidget {
         Positioned.fill(
           child: Container(
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.blueGrey),
+              border: Border.all(color: Theme.of(context).dividerColor),
             ),
             child: CachedNetworkImage(
               fit: BoxFit.fill,

@@ -11,9 +11,11 @@ class MangaShelfWidget extends StatelessWidget {
   final bool isLoadingNextPage;
   final Widget loadingIndicator;
   final Widget contentSliverWidget;
+  final EdgeInsetsGeometry padding;
 
   const MangaShelfWidget({
     super.key,
+    this.padding = const EdgeInsets.all(0),
     required this.controller,
     required this.children,
     required this.isLoadingNextPage,
@@ -23,6 +25,7 @@ class MangaShelfWidget extends StatelessWidget {
 
   MangaShelfWidget.list({
     super.key,
+    this.padding = const EdgeInsets.all(0),
     required this.controller,
     required this.children,
     required this.isLoadingNextPage,
@@ -50,7 +53,7 @@ class MangaShelfWidget extends StatelessWidget {
     required double childAspectRatio,
     required double mainAxisSpacing,
     required double crossAxisSpacing,
-  }) : contentSliverWidget = SliverGrid(
+  })  : contentSliverWidget = SliverGrid(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             childAspectRatio: childAspectRatio,
             crossAxisCount: crossAxisCount,
@@ -61,6 +64,10 @@ class MangaShelfWidget extends StatelessWidget {
             (context, index) => children[index],
             childCount: children.length,
           ),
+        ),
+        padding = EdgeInsets.symmetric(
+          vertical: mainAxisSpacing,
+          horizontal: crossAxisSpacing,
         );
 
   MangaShelfWidget.comfortableGrid({
@@ -73,7 +80,7 @@ class MangaShelfWidget extends StatelessWidget {
     required double childAspectRatio,
     required double mainAxisSpacing,
     required double crossAxisSpacing,
-  }) : contentSliverWidget = SliverGrid(
+  })  : contentSliverWidget = SliverGrid(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             childAspectRatio: childAspectRatio,
             crossAxisCount: crossAxisCount,
@@ -84,6 +91,10 @@ class MangaShelfWidget extends StatelessWidget {
             (context, index) => children[index],
             childCount: children.length,
           ),
+        ),
+        padding = EdgeInsets.symmetric(
+          vertical: mainAxisSpacing,
+          horizontal: crossAxisSpacing,
         );
 
   @override
@@ -98,7 +109,10 @@ class MangaShelfWidget extends StatelessWidget {
       child: CustomScrollView(
         controller: controller,
         slivers: [
-          contentSliverWidget,
+          SliverPadding(
+            padding: padding,
+            sliver: contentSliverWidget,
+          ),
           if (isLoadingNextPage) _loadingIndicator(),
         ],
       ),
@@ -111,6 +125,12 @@ class MangaShelfWidget extends StatelessWidget {
         (context, index) => loadingIndicator,
         childCount: 1,
       ),
+    );
+  }
+
+  Widget _padding() {
+    return SliverPadding(
+      padding: padding,
     );
   }
 }
