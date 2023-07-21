@@ -15,21 +15,24 @@ class MangaDexCubit extends BrowseSourceMangaScreenCubit {
     required this.searchMangaUseCase,
     required this.listenListTagUseCase,
     required this.getCoverArtUseCase,
-  }) : super(initialState: const BrowseSourceMangaScreenCubitState());
+  }) : super(
+          initialState: const BrowseSourceMangaScreenCubitState(
+            parameter: SearchMangaParameter(
+              includes: ['cover_art'],
+              orders: {SearchOrders.rating: OrderDirections.descending},
+            ),
+          ),
+        );
 
   @override
   void init({String? title}) async {
     emit(
       state.copyWith(
         isLoading: true,
-        mangas: title != null ? [] : null,
+        mangas: [],
         parameter: state.parameter.copyWith(
           title: title,
           offset: 0,
-          includes: ['cover_art'],
-          orders: {
-            SearchOrders.rating: OrderDirections.descending,
-          },
         ),
       ),
     );

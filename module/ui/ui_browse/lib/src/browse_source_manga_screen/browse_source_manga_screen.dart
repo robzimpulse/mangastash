@@ -1,3 +1,4 @@
+import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_breakpoints.dart';
@@ -89,33 +90,44 @@ class _BrowseSourceMangaScreenState extends State<BrowseSourceMangaScreen> {
       ),
       body: Column(
         children: [
-          GappedToggleButton(
-            foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
-            backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-            selectedColor: Theme.of(context).appBarTheme.foregroundColor,
-            unselectedColor: Theme.of(context).appBarTheme.backgroundColor,
-            icons: const [
-              Icon(Icons.favorite),
-              Icon(Icons.update),
-              Icon(Icons.filter_list)
-            ],
-            labels: const [
-              'Favorite',
-              'Latest',
-              'Filter'
-            ],
-            isSelected: [
-              false,
-              false,
-              true
-            ],
-            onPressed: (index) {
-
-            },
-          ),
+          _sortAndFilter(),
           Expanded(child: _content()),
         ],
       ),
+    );
+  }
+
+  Widget _sortAndFilter() {
+    return _bloc(
+      buildWhen: (prev, curr) => prev.parameter != curr.parameter,
+      builder: (context, state) {
+        return GappedToggleButton(
+          foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+          selectedColor: Theme.of(context).appBarTheme.foregroundColor,
+          unselectedColor: Theme.of(context).appBarTheme.backgroundColor,
+          icons: const [
+            Icon(Icons.favorite),
+            Icon(Icons.update),
+            Icon(Icons.filter_list)
+          ],
+          labels: const [
+            'Favorite',
+            'Latest',
+            'Filter'
+          ],
+          isSelected: [
+            state.parameter.orders?[SearchOrders.rating] == OrderDirections.descending,
+            state.parameter.orders?[SearchOrders.latestUploadedChapter] == OrderDirections.descending,
+            false
+          ],
+          onPressed: (index) {
+            final cubit = context.read<BrowseSourceMangaScreenCubit>();
+            if (index == 0) cubit.onTapFavorite();
+            if (index == 1) cubit.onTapLatest();
+          },
+        );
+      },
     );
   }
 

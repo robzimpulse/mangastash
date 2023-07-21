@@ -1,3 +1,4 @@
+import 'package:domain_manga/domain_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:ui_common/ui_common.dart';
 
@@ -23,15 +24,31 @@ abstract class BrowseSourceMangaScreenCubit
   }
 
   void onTapFavorite() {
-    emit(state.copyWith(isFavorite: true, isFilter: false, isLatest: false));
+    var parameter = state.parameter;
+
+    parameter = parameter.copyWith(
+      orders: {
+        SearchOrders.rating: OrderDirections.descending
+      },
+    );
+
+    emit(state.copyWith(parameter: parameter));
+
+    init();
   }
 
   void onTapLatest() {
-    emit(state.copyWith(isFavorite: false, isFilter: false, isLatest: true));
-  }
+    var parameter = state.parameter;
 
-  void onTapFilter() {
-    emit(state.copyWith(isFavorite: false, isFilter: true, isLatest: false));
+    parameter = parameter.copyWith(
+      orders: {
+        SearchOrders.latestUploadedChapter: OrderDirections.descending
+      },
+    );
+
+    emit(state.copyWith(parameter: parameter));
+
+    init();
   }
 }
 

@@ -19,12 +19,6 @@ class BrowseSourceMangaScreenCubitState extends Equatable {
 
   final MangaShelfItemLayout layout;
 
-  final bool isFavorite;
-
-  final bool isLatest;
-
-  final bool isFilter;
-
   const BrowseSourceMangaScreenCubitState({
     this.isLoading = false,
     this.errorMessage,
@@ -34,9 +28,6 @@ class BrowseSourceMangaScreenCubitState extends Equatable {
     this.isPagingNextPage = false,
     this.isSearchActive = false,
     this.layout = MangaShelfItemLayout.comfortableGrid,
-    this.isFavorite = false,
-    this.isLatest = false,
-    this.isFilter = false,
   });
 
   @override
@@ -50,9 +41,6 @@ class BrowseSourceMangaScreenCubitState extends Equatable {
       isPagingNextPage,
       isSearchActive,
       layout,
-      isFavorite,
-      isLatest,
-      isFilter,
     ];
   }
 
@@ -65,9 +53,6 @@ class BrowseSourceMangaScreenCubitState extends Equatable {
     SearchMangaParameter? parameter,
     List<Manga>? mangas,
     MangaShelfItemLayout? layout,
-    bool? isFavorite,
-    bool? isLatest,
-    bool? isFilter,
   }) {
     return BrowseSourceMangaScreenCubitState(
       isLoading: isLoading ?? this.isLoading,
@@ -78,9 +63,6 @@ class BrowseSourceMangaScreenCubitState extends Equatable {
       mangas: mangas ?? this.mangas,
       layout: layout ?? this.layout,
       errorMessage: errorMessage != null ? errorMessage() : this.errorMessage,
-      isFavorite: isFavorite ?? this.isFavorite,
-      isLatest: isLatest ?? this.isLatest,
-      isFilter: isFilter ?? this.isFilter,
     );
   }
 }
