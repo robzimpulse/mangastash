@@ -11,6 +11,7 @@ class GappedToggleButton extends StatelessWidget {
     this.selectedColor,
     this.unselectedColor,
     this.foregroundColor,
+    this.size,
   })  : assert(icons.length == labels.length),
         assert(icons.length == isSelected.length);
 
@@ -30,11 +31,13 @@ class GappedToggleButton extends StatelessWidget {
 
   final void Function(int index)? onPressed;
 
+  final Size? size;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 52,
-      width: double.infinity,
+      height: size?.height,
+      width: size?.width,
       color: backgroundColor,
       padding: const EdgeInsets.all(8),
       child: ListView.separated(
