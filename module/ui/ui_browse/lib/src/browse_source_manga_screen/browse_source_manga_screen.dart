@@ -29,13 +29,13 @@ class BrowseSourceMangaScreen extends StatefulWidget {
           getCoverArtUseCase: locator(),
           searchMangaUseCase: locator(),
           listenListTagUseCase: locator(),
-        )..init();
+        );
         break;
       default:
-        cubit = DefaultBrowseSourceMangaScreenCubit()..init();
+        cubit = DefaultBrowseSourceMangaScreenCubit();
     }
     return BlocProvider<BrowseSourceMangaScreenCubit>.value(
-      value: cubit,
+      value: cubit..init(),
       child: BrowseSourceMangaScreen(source: source),
     );
   }
