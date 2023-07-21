@@ -6,7 +6,7 @@ import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
 import 'browse_manga_dex_cubit.dart';
-import '../sources/browse_manga_dex_state.dart';
+import 'browse_manga_dex_state.dart';
 import '../sources/manga_dex_filter_bottom_sheet.dart';
 
 class BrowseMangaDexScreen extends StatefulWidget {
