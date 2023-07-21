@@ -8,7 +8,7 @@ import 'package:ui_common/ui_common.dart';
 
 import 'browse_source_manga_screen_cubit.dart';
 import 'browse_source_manga_screen_cubit_state.dart';
-import 'sources/browse_manga_dex_screen.dart';
+import 'manga_dex/browse_manga_dex_screen.dart';
 
 class BrowseSourceMangaScreen extends StatefulWidget {
   const BrowseSourceMangaScreen({
