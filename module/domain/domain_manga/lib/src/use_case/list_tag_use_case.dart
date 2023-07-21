@@ -14,7 +14,11 @@ class ListTagUseCase {
       final result = await _repository.tags();
 
       final tags = result.data?.map(
-        (e) => MangaTag(id: e.id, name: e.attributes.name?.en),
+        (e) => MangaTag(
+          id: e.id,
+          name: e.attributes.name?.en,
+          group: e.attributes.group,
+        ),
       );
 
       return Success(tags?.toList() ?? []);
