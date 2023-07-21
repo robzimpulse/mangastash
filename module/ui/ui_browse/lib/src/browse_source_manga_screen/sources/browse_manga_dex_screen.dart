@@ -5,7 +5,7 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import 'browse_manga_dex_cubit.dart';
+import '../manga_dex/browse_manga_dex_cubit.dart';
 import 'browse_manga_dex_state.dart';
 import 'manga_dex_filter_bottom_sheet.dart';
 

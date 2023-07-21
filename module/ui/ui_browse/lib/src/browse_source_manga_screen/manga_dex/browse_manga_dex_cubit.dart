@@ -5,7 +5,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:ui_common/ui_common.dart';
 
-import 'browse_manga_dex_state.dart';
+import '../sources/browse_manga_dex_state.dart';
 
 class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
   final SearchMangaUseCase searchMangaUseCase;
