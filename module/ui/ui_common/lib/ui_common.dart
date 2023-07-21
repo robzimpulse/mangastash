@@ -2,6 +2,7 @@ library ui_common;
 
 export 'src/controller/paging_scroll_controller.dart';
 export 'src/extension/bottom_sheet_extension.dart';
+export 'src/extension/expansion_tile_extension.dart';
 export 'src/extension/snackbar_extension.dart';
 export 'src/scaffold_screen.dart';
 export 'src/util/debounce.dart';

@@ -1,21 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:ui_common/ui_common.dart';
 
 class MangaDexFilterBottomSheet extends StatelessWidget {
   const MangaDexFilterBottomSheet({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      shrinkWrap: true,
-      children: const [
-        ExpansionTile(
-          title: Text('testing'),
-          children: [
-            Text('content'),
-          ],
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListView(
+        shrinkWrap: true,
+        children: [
+          Row(
+            children: [
+              OutlinedButton(
+                onPressed: () {},
+                child: const Text('Testing'),
+              ),
+              const Spacer(),
+              OutlinedButton(
+                onPressed: () {},
+                child: const Text('Testing'),
+              ),
+            ],
+          ),
+          const Divider(height: 1),
+          const ExpansionTile(
+            title: Text('testing'),
+            children: [
+              Text('content'),
+            ],
+          ).divider(context: context, visible: false),
+        ],
+      ),
     );
   }
-
 }
