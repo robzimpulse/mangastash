@@ -1,48 +1,37 @@
 import 'package:domain_manga/domain_manga.dart';
-import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_breakpoints.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import 'browse_source_manga_screen_cubit.dart';
-import 'browse_source_manga_screen_cubit_state.dart';
-import 'sources/browse_manga_dex_screen.dart';
+import 'browse_manga_dex_cubit.dart';
+import 'browse_manga_dex_state.dart';
+import 'manga_dex_filter_bottom_sheet.dart';
 
-class BrowseSourceMangaScreen extends StatefulWidget {
-  const BrowseSourceMangaScreen({
-    super.key,
-    required this.source,
-  });
+class BrowseMangaDexScreen extends StatefulWidget {
+  const BrowseMangaDexScreen({super.key});
 
-  final MangaSource source;
+  @override
+  State<BrowseMangaDexScreen> createState() => _BrowseMangaDexScreenState();
 
   static Widget create({
     required ServiceLocator locator,
-    required MangaSource source,
   }) {
-
-    if (source == MangaSource.mangadex) {
-      return BrowseMangaDexScreen.create(locator: locator);
-    }
-
-    return BlocProvider<BrowseSourceMangaScreenCubit>.value(
-      value: DefaultBrowseSourceMangaScreenCubit()..init(),
-      child: BrowseSourceMangaScreen(source: source),
+    return BlocProvider(
+      create: (context) => BrowseMangaDexCubit(
+        searchMangaUseCase: locator(),
+        listenListTagUseCase: locator(),
+        getCoverArtUseCase: locator(),
+      )..init(),
+      child: const BrowseMangaDexScreen(),
     );
   }
-
-  @override
-  State<BrowseSourceMangaScreen> createState() =>
-      _BrowseSourceMangaScreenState();
 }
 
-class _BrowseSourceMangaScreenState extends State<BrowseSourceMangaScreen> {
+class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
   final PagingScrollController _scrollController = PagingScrollController(
-    onLoadNextPage: (context) {
-      context.read<BrowseSourceMangaScreenCubit>().next();
-    },
+    onLoadNextPage: (context) => context.read<BrowseMangaDexCubit>().next(),
   );
 
   final TextEditingController _searchController = TextEditingController();
@@ -104,20 +93,24 @@ class _BrowseSourceMangaScreenState extends State<BrowseSourceMangaScreen> {
             Icon(Icons.update),
             Icon(Icons.filter_list)
           ],
-          labels: const [
-            'Favorite',
-            'Latest',
-            'Filter'
-          ],
+          labels: const ['Favorite', 'Latest', 'Filter'],
           isSelected: [
-            state.parameter.orders?[SearchOrders.rating] == OrderDirections.descending,
-            state.parameter.orders?[SearchOrders.latestUploadedChapter] == OrderDirections.descending,
+            state.parameter.orders?[SearchOrders.rating] ==
+                OrderDirections.descending,
+            state.parameter.orders?[SearchOrders.latestUploadedChapter] ==
+                OrderDirections.descending,
             false
           ],
           onPressed: (index) {
-            final cubit = context.read<BrowseSourceMangaScreenCubit>();
+            final cubit = context.read<BrowseMangaDexCubit>();
             if (index == 0) cubit.onTapFavorite();
             if (index == 1) cubit.onTapLatest();
+
+            if (index == 2) {
+              context.showBottomSheet(
+                builder: (context) => const MangaDexFilterBottomSheet(),
+              );
+            }
           },
         );
       },
@@ -128,10 +121,7 @@ class _BrowseSourceMangaScreenState extends State<BrowseSourceMangaScreen> {
     return _bloc(
       buildWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
       builder: (context, state) {
-        if (!state.isSearchActive) {
-          return Text(widget.source.name);
-        }
-
+        if (!state.isSearchActive) return const Text('MangaDex');
         return TextField(
           controller: _searchController..clear(),
           focusNode: _searchFocusNode..requestFocus(),
@@ -143,7 +133,7 @@ class _BrowseSourceMangaScreenState extends State<BrowseSourceMangaScreen> {
             border: InputBorder.none,
           ),
           onSubmitted: (value) {
-            final cubit = context.read<BrowseSourceMangaScreenCubit>();
+            final cubit = context.read<BrowseMangaDexCubit>();
             cubit.init(title: value);
           },
         );
@@ -160,7 +150,7 @@ class _BrowseSourceMangaScreenState extends State<BrowseSourceMangaScreen> {
         return IconButton(
           icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
           onPressed: () {
-            final cubit = context.read<BrowseSourceMangaScreenCubit>();
+            final cubit = context.read<BrowseMangaDexCubit>();
             cubit.searchMode(!state.isSearchActive);
           },
         );
@@ -194,7 +184,7 @@ class _BrowseSourceMangaScreenState extends State<BrowseSourceMangaScreen> {
         return options.toList();
       },
       onSelected: (value) {
-        final cubit = context.read<BrowseSourceMangaScreenCubit>();
+        final cubit = context.read<BrowseMangaDexCubit>();
         cubit.updateLayout(value);
       },
     );
@@ -285,11 +275,10 @@ class _BrowseSourceMangaScreenState extends State<BrowseSourceMangaScreen> {
   }
 
   Widget _bloc({
-    required BlocWidgetBuilder<BrowseSourceMangaScreenCubitState> builder,
-    BlocBuilderCondition<BrowseSourceMangaScreenCubitState>? buildWhen,
+    required BlocWidgetBuilder<BrowseMangaDexState> builder,
+    BlocBuilderCondition<BrowseMangaDexState>? buildWhen,
   }) {
-    return BlocBuilder<BrowseSourceMangaScreenCubit,
-        BrowseSourceMangaScreenCubitState>(
+    return BlocBuilder<BrowseMangaDexCubit, BrowseMangaDexState>(
       buildWhen: buildWhen,
       builder: builder,
     );

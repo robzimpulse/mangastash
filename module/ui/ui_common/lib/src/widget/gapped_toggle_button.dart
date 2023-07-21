@@ -51,7 +51,7 @@ class GappedToggleButton extends StatelessWidget {
           onPressed: () => onPressed?.call(index),
         ),
         separatorBuilder: (context, index) => const SizedBox(width: 8),
-        itemCount: 3,
+        itemCount: icons.length,
       ),
     );
   }

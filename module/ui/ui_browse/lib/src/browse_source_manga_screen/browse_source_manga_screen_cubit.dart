@@ -24,41 +24,29 @@ abstract class BrowseSourceMangaScreenCubit
   }
 
   void onTapFavorite() {
-    var parameter = state.parameter;
-
-    parameter = parameter.copyWith(
-      orders: {
-        SearchOrders.rating: OrderDirections.descending
-      },
-    );
-
-    emit(state.copyWith(parameter: parameter));
-
+    final orders = {SearchOrders.rating: OrderDirections.descending};
+    emit(state.copyWith(parameter: state.parameter.copyWith(orders: orders)));
     init();
   }
 
   void onTapLatest() {
-    var parameter = state.parameter;
-
-    parameter = parameter.copyWith(
-      orders: {
-        SearchOrders.latestUploadedChapter: OrderDirections.descending
-      },
-    );
-
-    emit(state.copyWith(parameter: parameter));
-
+    final orders = {
+      SearchOrders.latestUploadedChapter: OrderDirections.descending
+    };
+    emit(state.copyWith(parameter: state.parameter.copyWith(orders: orders)));
     init();
   }
+
+  void onTapFilter();
 }
 
 class DefaultBrowseSourceMangaScreenCubit extends BrowseSourceMangaScreenCubit {
   @override
-  void init({String? title}) {
-
-  }
+  void init({String? title}) {}
 
   @override
-  void next() {
-  }
+  void next() {}
+
+  @override
+  void onTapFilter() {}
 }

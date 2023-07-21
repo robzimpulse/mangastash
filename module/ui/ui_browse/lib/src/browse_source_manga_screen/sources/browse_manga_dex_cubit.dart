@@ -2,29 +2,28 @@ import 'package:collection/collection.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:safe_bloc/safe_bloc.dart';
+import 'package:ui_common/ui_common.dart';
 
-import '../browse_source_manga_screen_cubit.dart';
-import '../browse_source_manga_screen_cubit_state.dart';
+import 'browse_manga_dex_state.dart';
 
-class MangaDexCubit extends BrowseSourceMangaScreenCubit {
+class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
   final SearchMangaUseCase searchMangaUseCase;
   final ListenListTagUseCase listenListTagUseCase;
   final GetCoverArtUseCase getCoverArtUseCase;
 
-  MangaDexCubit({
+  BrowseMangaDexCubit({
     required this.searchMangaUseCase,
     required this.listenListTagUseCase,
     required this.getCoverArtUseCase,
-  }) : super(
-          initialState: const BrowseSourceMangaScreenCubitState(
-            parameter: SearchMangaParameter(
-              includes: ['cover_art'],
-              orders: {SearchOrders.rating: OrderDirections.descending},
-            ),
-          ),
-        );
+    BrowseMangaDexState initialState = const BrowseMangaDexState(
+      parameter: SearchMangaParameter(
+        includes: ['cover_art'],
+        orders: {SearchOrders.rating: OrderDirections.descending},
+      ),
+    ),
+  }) : super(initialState);
 
-  @override
   void init({String? title}) async {
     emit(
       state.copyWith(
@@ -40,7 +39,6 @@ class MangaDexCubit extends BrowseSourceMangaScreenCubit {
     emit(state.copyWith(isLoading: false));
   }
 
-  @override
   void next() async {
     emit(state.copyWith(isPagingNextPage: true));
     await _fetch();
@@ -92,5 +90,31 @@ class MangaDexCubit extends BrowseSourceMangaScreenCubit {
         ),
       );
     }
+  }
+
+  void searchMode(bool value) {
+    emit(state.copyWith(isSearchActive: value));
+  }
+
+  void updateLayout(MangaShelfItemLayout layout) {
+    emit(state.copyWith(layout: layout));
+  }
+
+  void onTapFavorite() {
+    final orders = {SearchOrders.rating: OrderDirections.descending};
+    emit(state.copyWith(parameter: state.parameter.copyWith(orders: orders)));
+    init();
+  }
+
+  void onTapLatest() {
+    final orders = {
+      SearchOrders.latestUploadedChapter: OrderDirections.descending
+    };
+    emit(state.copyWith(parameter: state.parameter.copyWith(orders: orders)));
+    init();
+  }
+
+  void onTapFilter() {
+
   }
 }
