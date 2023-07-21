@@ -15,6 +15,12 @@ dependencies:
   collection: ^1.16.0
   responsive_framework: ^1.0.0
 
+  # github
+  expansion_tile_group:
+    git:
+      url: https://github.com/robzimpulse/Expansion-Tile-Group.git
+      ref: main
+
   # domain
   domain_manga:
     path: ../../domain/domain_manga
