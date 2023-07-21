@@ -1,8 +1,11 @@
+import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:ui_common/ui_common.dart';
 
 class MangaDexFilterBottomSheet extends StatelessWidget {
-  const MangaDexFilterBottomSheet({super.key});
+  const MangaDexFilterBottomSheet({super.key, required this.tags});
+
+  final List<MangaTag> tags;
 
   @override
   Widget build(BuildContext context) {

@@ -7,22 +7,28 @@ import 'package:ui_common/ui_common.dart';
 
 import 'browse_manga_dex_state.dart';
 
-class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
+class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState>
+    with AutoSubscriptionMixin {
   final SearchMangaUseCase searchMangaUseCase;
-  final ListenListTagUseCase listenListTagUseCase;
   final GetCoverArtUseCase getCoverArtUseCase;
 
   BrowseMangaDexCubit({
     required this.searchMangaUseCase,
-    required this.listenListTagUseCase,
     required this.getCoverArtUseCase,
+    required ListenListTagUseCase listenListTagUseCase,
     BrowseMangaDexState initialState = const BrowseMangaDexState(
       parameter: SearchMangaParameter(
         includes: ['cover_art'],
         orders: {SearchOrders.rating: OrderDirections.descending},
       ),
     ),
-  }) : super(initialState);
+  }) : super(initialState) {
+    addSubscription(listenListTagUseCase.listTagsStream.listen(_onUpdateTags));
+  }
+
+  void _onUpdateTags(List<MangaTag> tags) {
+    emit(state.copyWith(tags: tags));
+  }
 
   void init({String? title}) async {
     emit(
@@ -114,7 +120,5 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
     init();
   }
 
-  void onTapFilter() {
-
-  }
+  void onTapFilter() {}
 }

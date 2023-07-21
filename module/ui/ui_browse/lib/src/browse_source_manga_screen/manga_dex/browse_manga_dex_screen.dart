@@ -108,7 +108,9 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
 
             if (index == 2) {
               context.showBottomSheet(
-                builder: (context) => const MangaDexFilterBottomSheet(),
+                builder: (context) => MangaDexFilterBottomSheet(
+                  tags: state.tags,
+                ),
               );
             }
           },

@@ -19,6 +19,8 @@ class BrowseMangaDexState extends Equatable {
 
   final MangaShelfItemLayout layout;
 
+  final List<MangaTag> tags;
+
   const BrowseMangaDexState({
     this.isLoading = false,
     this.errorMessage,
@@ -28,6 +30,7 @@ class BrowseMangaDexState extends Equatable {
     this.isPagingNextPage = false,
     this.isSearchActive = false,
     this.layout = MangaShelfItemLayout.comfortableGrid,
+    this.tags = const [],
   });
 
   @override
@@ -41,6 +44,7 @@ class BrowseMangaDexState extends Equatable {
       isPagingNextPage,
       isSearchActive,
       layout,
+      tags,
     ];
   }
 
@@ -53,6 +57,7 @@ class BrowseMangaDexState extends Equatable {
     SearchMangaParameter? parameter,
     List<Manga>? mangas,
     MangaShelfItemLayout? layout,
+    List<MangaTag>? tags,
   }) {
     return BrowseMangaDexState(
       isLoading: isLoading ?? this.isLoading,
@@ -63,6 +68,7 @@ class BrowseMangaDexState extends Equatable {
       mangas: mangas ?? this.mangas,
       layout: layout ?? this.layout,
       errorMessage: errorMessage != null ? errorMessage() : this.errorMessage,
+      tags: tags ?? this.tags,
     );
   }
 }
