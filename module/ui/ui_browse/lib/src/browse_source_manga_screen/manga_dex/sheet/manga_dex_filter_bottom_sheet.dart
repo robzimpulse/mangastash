@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:ui_common/ui_common.dart';
@@ -14,26 +15,41 @@ class MangaDexFilterBottomSheet extends StatelessWidget {
       child: ListView(
         shrinkWrap: true,
         children: [
-          Row(
-            children: [
-              OutlinedButton(
-                onPressed: () {},
-                child: const Text('Testing'),
-              ),
-              const Spacer(),
-              OutlinedButton(
-                onPressed: () {},
-                child: const Text('Testing'),
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Row(
+              children: [
+                OutlinedButton(
+                  onPressed: () {},
+                  child: const Text('Testing'),
+                ),
+                const Spacer(),
+                OutlinedButton(
+                  onPressed: () {},
+                  child: const Text('Testing'),
+                ),
+              ],
+            ),
           ),
           const Divider(height: 1),
-          const ExpansionTile(
-            title: Text('testing'),
-            children: [
-              Text('content'),
-            ],
-          ).divider(context: context, visible: false),
+          ...tags
+              .groupListsBy((e) => e.group)
+              .entries
+              .map<Widget>(
+                (e) => ExpansionTile(
+                  title: Text(e.key ?? ''),
+                  children: e.value
+                      .map(
+                        (e) => CheckboxListTile(
+                          title: Text(e.name ?? ''),
+                          value: false,
+                          onChanged: (value) {},
+                        ),
+                      )
+                      .toList(),
+                ).divider(context: context, visible: false),
+              )
+              .toList(),
         ],
       ),
     );
