@@ -9,18 +9,50 @@ class MangaDexFilterBottomSheet extends StatelessWidget {
 
   final List<MangaTag> tags;
 
+  List<MapEntry<String?, List<MangaTag>>> get _tagsGroup {
+    return tags.groupListsBy((e) => e.group).entries.toList();
+  }
+
+  Widget _content(BuildContext context) {
+    return ExpansionTileGroup(
+      toggleType: ToggleType.expandOnlyCurrent,
+      children: _tagsGroup.map((e) => _group(context, e)).toList(),
+    );
+  }
+
+  ExpansionTileItem _group(
+    BuildContext context,
+    MapEntry<String?, List<MangaTag>> e,
+  ) {
+    return ExpansionTileItem(
+      themeData: Theme.of(context).copyWith(
+        dividerColor: Colors.transparent,
+      ),
+      title: Text(e.key?.toTitleCase() ?? ''),
+      children: e.value.map((e) => _item(context, e)).toList(),
+    );
+  }
+
+  Widget _item(BuildContext context, MangaTag e) {
+    return CheckboxListTile(
+      title: Text(e.name ?? ''),
+      value: false,
+      onChanged: (value) {},
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxHeight: 500),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Row(
+    return DraggableScrollableSheet(
+      expand: false,
+      snap: true,
+      maxChildSize: 0.8,
+      builder: (context, controller) {
+        return Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            children: [
+              Row(
                 children: [
                   OutlinedButton(
                     onPressed: () {},
@@ -33,32 +65,18 @@ class MangaDexFilterBottomSheet extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-            const Divider(height: 1),
-            ExpansionTileGroup(
-              toggleType: ToggleType.expandOnlyCurrent,
-              children: tags
-                  .groupListsBy((e) => e.group)
-                  .entries
-                  .map<ExpansionTileItem>(
-                    (e) => ExpansionTileItem(
-                      title: Text(e.key?.toTitleCase() ?? ''),
-                      children: e.value
-                          .map(
-                            (e) => CheckboxListTile(
-                              title: Text(e.name ?? ''),
-                              value: false,
-                              onChanged: (value) {},
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ],
-        ),
-      ),
+              const Divider(height: 1, thickness: 1),
+              Expanded(
+                child: ListView(
+                  controller: controller,
+                  shrinkWrap: true,
+                  children: [_content(context)],
+                ),
+              )
+            ],
+          ),
+        );
+      },
     );
   }
 }
