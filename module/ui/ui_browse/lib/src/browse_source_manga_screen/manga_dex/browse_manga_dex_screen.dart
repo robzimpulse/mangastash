@@ -1,4 +1,5 @@
 import 'package:domain_manga/domain_manga.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_breakpoints.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -10,7 +11,9 @@ import 'browse_manga_dex_state.dart';
 import 'sheet/manga_dex_filter_bottom_sheet.dart';
 
 class BrowseMangaDexScreen extends StatefulWidget {
-  const BrowseMangaDexScreen({super.key});
+  const BrowseMangaDexScreen({super.key, required this.locator});
+
+  final ServiceLocator locator;
 
   @override
   State<BrowseMangaDexScreen> createState() => _BrowseMangaDexScreenState();
@@ -21,10 +24,9 @@ class BrowseMangaDexScreen extends StatefulWidget {
     return BlocProvider(
       create: (context) => BrowseMangaDexCubit(
         searchMangaUseCase: locator(),
-        listenListTagUseCase: locator(),
         getCoverArtUseCase: locator(),
       )..init(),
-      child: const BrowseMangaDexScreen(),
+      child: BrowseMangaDexScreen(locator: locator),
     );
   }
 }
@@ -99,19 +101,24 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
                 OrderDirections.descending,
             state.parameter.orders?[SearchOrders.latestUploadedChapter] ==
                 OrderDirections.descending,
-            false
+            state.parameter.includedTags.isNotEmpty ||
+                state.parameter.excludedTags.isNotEmpty,
           ],
-          onPressed: (index) {
-            final cubit = context.read<BrowseMangaDexCubit>();
-            if (index == 0) cubit.onTapFavorite();
-            if (index == 1) cubit.onTapLatest();
+          onPressed: (index) async {
+            if (index == 0) _cubit(context).onTapFavorite();
+            if (index == 1) _cubit(context).onTapLatest();
 
             if (index == 2) {
-              context.showBottomSheet(
-                builder: (context) => MangaDexFilterBottomSheet(
-                  tags: state.tags,
+              final result = await context.showBottomSheet<List<MangaTag>>(
+                builder: (context) => MangaDexFilterBottomSheet.create(
+                  locator: widget.locator,
+                  includedTags: state.parameter.includedTags,
+                  excludedTags: state.parameter.excludedTags,
                 ),
               );
+
+              if (!mounted || result == null) return;
+              _cubit(context).setFilter(result);
             }
           },
         );
@@ -134,10 +141,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
             hintStyle: TextStyle(color: Colors.white54),
             border: InputBorder.none,
           ),
-          onSubmitted: (value) {
-            final cubit = context.read<BrowseMangaDexCubit>();
-            cubit.init(title: value);
-          },
+          onSubmitted: (value) => _cubit(context).init(title: value),
         );
       },
     );
@@ -151,10 +155,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
       builder: (context, state) {
         return IconButton(
           icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
-          onPressed: () {
-            final cubit = context.read<BrowseMangaDexCubit>();
-            cubit.searchMode(!state.isSearchActive);
-          },
+          onPressed: () => _cubit(context).searchMode(!state.isSearchActive),
         );
       },
     );
@@ -185,10 +186,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
 
         return options.toList();
       },
-      onSelected: (value) {
-        final cubit = context.read<BrowseMangaDexCubit>();
-        cubit.updateLayout(value);
-      },
+      onSelected: (value) => _cubit(context).updateLayout(value),
     );
   }
 
@@ -284,5 +282,9 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
       buildWhen: buildWhen,
       builder: builder,
     );
+  }
+
+  BrowseMangaDexCubit _cubit(BuildContext context) {
+    return context.read<BrowseMangaDexCubit>();
   }
 }

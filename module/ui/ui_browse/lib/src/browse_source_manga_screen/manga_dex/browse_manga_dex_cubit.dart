@@ -7,28 +7,20 @@ import 'package:ui_common/ui_common.dart';
 
 import 'browse_manga_dex_state.dart';
 
-class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState>
-    with AutoSubscriptionMixin {
+class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
   final SearchMangaUseCase searchMangaUseCase;
   final GetCoverArtUseCase getCoverArtUseCase;
 
   BrowseMangaDexCubit({
     required this.searchMangaUseCase,
     required this.getCoverArtUseCase,
-    required ListenListTagUseCase listenListTagUseCase,
     BrowseMangaDexState initialState = const BrowseMangaDexState(
       parameter: SearchMangaParameter(
         includes: ['cover_art'],
         orders: {SearchOrders.rating: OrderDirections.descending},
       ),
     ),
-  }) : super(initialState) {
-    addSubscription(listenListTagUseCase.listTagsStream.listen(_onUpdateTags));
-  }
-
-  void _onUpdateTags(List<MangaTag> tags) {
-    emit(state.copyWith(tags: tags));
-  }
+  }) : super(initialState);
 
   void init({String? title}) async {
     emit(
@@ -107,18 +99,51 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState>
   }
 
   void onTapFavorite() {
-    final orders = {SearchOrders.rating: OrderDirections.descending};
-    emit(state.copyWith(parameter: state.parameter.copyWith(orders: orders)));
+    emit(
+      state.copyWith(
+        parameter: state.parameter.copyWith(
+          orders: {SearchOrders.rating: OrderDirections.descending},
+          includedTags: [],
+          excludedTags: [],
+        ),
+      ),
+    );
     init();
   }
 
   void onTapLatest() {
-    final orders = {
-      SearchOrders.latestUploadedChapter: OrderDirections.descending
-    };
-    emit(state.copyWith(parameter: state.parameter.copyWith(orders: orders)));
+    emit(
+      state.copyWith(
+        parameter: state.parameter.copyWith(
+          orders: {
+            SearchOrders.latestUploadedChapter: OrderDirections.descending
+          },
+          includedTags: [],
+          excludedTags: [],
+        ),
+      ),
+    );
     init();
   }
 
-  void onTapFilter() {}
+  void setFilter(List<MangaTag> tags) {
+    emit(
+      state.copyWith(
+        parameter: state.parameter.copyWith(
+          orders: {},
+          includedTags: tags
+              .where((e) => e.isIncluded)
+              .map((e) => e.id)
+              .whereType<String>()
+              .toList(),
+          excludedTags: tags
+              .where((e) => e.isExcluded)
+              .map((e) => e.id)
+              .whereType<String>()
+              .toList(),
+        ),
+      ),
+    );
+    init();
+  }
 }
