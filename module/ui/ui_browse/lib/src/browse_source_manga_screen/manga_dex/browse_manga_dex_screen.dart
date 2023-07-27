@@ -76,7 +76,10 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
           child: _sortAndFilter(size: const Size.fromHeight(52)),
         ),
       ),
-      body: _content(),
+      body: RefreshIndicator(
+        onRefresh: () => _cubit(context).init(),
+        child: _content(),
+      ),
     );
   }
 
@@ -107,23 +110,25 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
           onPressed: (index) async {
             if (index == 0) _cubit(context).onTapFavorite();
             if (index == 1) _cubit(context).onTapLatest();
-
-            if (index == 2) {
-              final result = await context.showBottomSheet<List<MangaTag>>(
-                builder: (context) => MangaDexFilterBottomSheet.create(
-                  locator: widget.locator,
-                  includedTags: state.parameter.includedTags,
-                  excludedTags: state.parameter.excludedTags,
-                ),
-              );
-
-              if (!mounted || result == null) return;
-              _cubit(context).setFilter(result);
-            }
+            if (index == 2) _showFilterBottomSheet();
           },
         );
       },
     );
+  }
+
+  void _showFilterBottomSheet() async {
+    final state = _cubit(context).state;
+    final result = await context.showBottomSheet<List<MangaTag>>(
+      builder: (context) => MangaDexFilterBottomSheet.create(
+        locator: widget.locator,
+        includedTags: state.parameter.includedTags,
+        excludedTags: state.parameter.excludedTags,
+      ),
+    );
+
+    if (!mounted || result == null) return;
+    _cubit(context).setFilter(result);
   }
 
   Widget _title() {

@@ -22,7 +22,7 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
     ),
   }) : super(initialState);
 
-  void init({String? title}) async {
+  Future<void> init({String? title}) async {
     emit(
       state.copyWith(
         isLoading: true,

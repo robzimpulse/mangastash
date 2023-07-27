@@ -102,13 +102,12 @@ class _MangaDexFilterBottomSheetState extends State<MangaDexFilterBottomSheet> {
     return DraggableScrollableSheet(
       expand: false,
       snap: true,
-      maxChildSize: 0.8,
       builder: (context, controller) {
-        return Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            children: [
-              Row(
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
                 children: [
                   OutlinedButton(
                     onPressed: () => _cubit(context).reset(),
@@ -123,16 +122,19 @@ class _MangaDexFilterBottomSheetState extends State<MangaDexFilterBottomSheet> {
                   ),
                 ],
               ),
-              const Divider(height: 1, thickness: 1),
-              Expanded(
+            ),
+            const Divider(height: 1, thickness: 1),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: ListView(
                   controller: controller,
                   shrinkWrap: true,
                   children: [_content(context)],
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         );
       },
     );
