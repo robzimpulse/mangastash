@@ -232,6 +232,9 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
             title: e.title ?? '',
             coverUrl: e.coverUrl ?? '',
             layout: state.layout,
+            onTap: () => context.showSnackBar(
+              message: 'tapped manga ${e.title}',
+            ),
           ),
         );
 

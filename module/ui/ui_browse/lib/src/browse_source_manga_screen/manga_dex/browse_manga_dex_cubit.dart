@@ -30,6 +30,7 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
         parameter: state.parameter.copyWith(
           title: title,
           offset: 0,
+          limit: 20,
         ),
       ),
     );

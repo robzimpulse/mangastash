@@ -9,6 +9,7 @@ class MangaShelfItem extends StatelessWidget {
     required this.title,
     required this.coverUrl,
     required this.layout,
+    this.onTap,
   });
 
   final String title;
@@ -17,8 +18,17 @@ class MangaShelfItem extends StatelessWidget {
 
   final MangaShelfItemLayout layout;
 
+  final VoidCallback? onTap;
+
   @override
   Widget build(BuildContext context) {
+    return InkWell(
+      child: _content(context),
+      onTap: () => onTap?.call(),
+    );
+  }
+
+  Widget _content(BuildContext context) {
     switch (layout) {
       case MangaShelfItemLayout.comfortableGrid:
         return _comfortableGrid(context);
