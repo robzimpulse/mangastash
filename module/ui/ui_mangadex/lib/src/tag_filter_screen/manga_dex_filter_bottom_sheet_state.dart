@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 
-class MangaDexFilterBottomSheetState extends Equatable {
+class MangaDexFilterBottomSheetState extends Equatable with EquatableMixin {
   const MangaDexFilterBottomSheetState({
     this.tags = const [],
     this.includedTags = const [],

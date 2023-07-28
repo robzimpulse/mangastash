@@ -6,9 +6,9 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
+import '../tag_filter_screen/manga_dex_filter_bottom_sheet.dart';
 import 'browse_manga_dex_cubit.dart';
 import 'browse_manga_dex_state.dart';
-import 'sheet/manga_dex_filter_bottom_sheet.dart';
 
 class BrowseMangaDexScreen extends StatefulWidget {
   const BrowseMangaDexScreen({super.key, required this.locator});
@@ -137,8 +137,8 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
       builder: (context, state) {
         if (!state.isSearchActive) return const Text('MangaDex');
         return TextField(
-          controller: _searchController..clear(),
-          focusNode: _searchFocusNode..requestFocus(),
+          controller: _searchController,
+          focusNode: _searchFocusNode,
           style: const TextStyle(color: Colors.white),
           cursorColor: Colors.white,
           decoration: const InputDecoration(
@@ -154,13 +154,16 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
 
   Widget _searchIcon() {
     return _bloc(
-      buildWhen: (prev, curr) {
-        return prev.isSearchActive != curr.isSearchActive;
-      },
+      buildWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
       builder: (context, state) {
         return IconButton(
           icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
-          onPressed: () => _cubit(context).searchMode(!state.isSearchActive),
+          onPressed: () {
+            _cubit(context).searchMode(!state.isSearchActive);
+            if (!state.isSearchActive) return;
+            _searchController.clear();
+            _searchFocusNode.requestFocus();
+          },
         );
       },
     );

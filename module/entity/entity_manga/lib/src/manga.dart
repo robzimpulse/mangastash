@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class Manga extends Equatable {
+class Manga extends Equatable with EquatableMixin {
   final String? id;
 
   final String? title;

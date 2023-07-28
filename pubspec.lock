@@ -667,6 +667,13 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  ui_mangadex:
+    dependency: transitive
+    description:
+      path: "module/ui/ui_mangadex"
+      relative: true
+    source: path
+    version: "0.0.1"
   ui_more:
     dependency: transitive
     description:

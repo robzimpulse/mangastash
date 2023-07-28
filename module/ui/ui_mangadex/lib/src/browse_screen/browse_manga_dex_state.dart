@@ -2,7 +2,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ui_common/ui_common.dart';
 
-class BrowseSourceMangaScreenCubitState extends Equatable {
+class BrowseMangaDexState extends Equatable with EquatableMixin {
   final bool isLoading;
 
   final String? errorMessage;
@@ -19,7 +19,9 @@ class BrowseSourceMangaScreenCubitState extends Equatable {
 
   final MangaShelfItemLayout layout;
 
-  const BrowseSourceMangaScreenCubitState({
+  final List<MangaTag> tags;
+
+  const BrowseMangaDexState({
     this.isLoading = false,
     this.errorMessage,
     this.mangas = const [],
@@ -28,6 +30,7 @@ class BrowseSourceMangaScreenCubitState extends Equatable {
     this.isPagingNextPage = false,
     this.isSearchActive = false,
     this.layout = MangaShelfItemLayout.comfortableGrid,
+    this.tags = const [],
   });
 
   @override
@@ -41,10 +44,11 @@ class BrowseSourceMangaScreenCubitState extends Equatable {
       isPagingNextPage,
       isSearchActive,
       layout,
+      tags,
     ];
   }
 
-  BrowseSourceMangaScreenCubitState copyWith({
+  BrowseMangaDexState copyWith({
     bool? isLoading,
     bool? hasNextPage,
     bool? isPagingNextPage,
@@ -53,8 +57,9 @@ class BrowseSourceMangaScreenCubitState extends Equatable {
     SearchMangaParameter? parameter,
     List<Manga>? mangas,
     MangaShelfItemLayout? layout,
+    List<MangaTag>? tags,
   }) {
-    return BrowseSourceMangaScreenCubitState(
+    return BrowseMangaDexState(
       isLoading: isLoading ?? this.isLoading,
       isSearchActive: isSearchActive ?? this.isSearchActive,
       isPagingNextPage: isPagingNextPage ?? this.isPagingNextPage,
@@ -63,6 +68,7 @@ class BrowseSourceMangaScreenCubitState extends Equatable {
       mangas: mangas ?? this.mangas,
       layout: layout ?? this.layout,
       errorMessage: errorMessage != null ? errorMessage() : this.errorMessage,
+      tags: tags ?? this.tags,
     );
   }
 }
