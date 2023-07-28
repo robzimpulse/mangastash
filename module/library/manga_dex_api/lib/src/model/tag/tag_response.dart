@@ -1,23 +1,24 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../common/identifier.dart';
-import '../common/pagination.dart';
+import '../common/response.dart';
 import '../common/title.dart';
 
 part 'tag_response.g.dart';
 
 @JsonSerializable()
-class TagResponse extends Pagination {
-  final String? result;
-  final String? response;
+class TagResponse extends Response {
   final List<TagData>? data;
+  final int? limit;
+  final int? offset;
+  final int? total;
   TagResponse(
+    super.result,
+    super.response,
     this.data,
-    this.result,
-    this.response,
-    super.limit,
-    super.offset,
-    super.total,
+    this.limit,
+    this.offset,
+    this.total,
   );
   factory TagResponse.fromJson(Map<String, dynamic> json) {
     return _$TagResponseFromJson(json);

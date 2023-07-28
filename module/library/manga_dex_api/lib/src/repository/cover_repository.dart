@@ -1,5 +1,4 @@
 class CoverRepository {
-
   CoverRepository();
 
   String coverUrl(String mangaId, String filename) {

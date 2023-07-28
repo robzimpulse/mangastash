@@ -25,8 +25,10 @@ abstract class MangaService {
     @Query('excludedTagsMode') String? excludedTagsMode,
     @Query('status[]') List<String>? status,
     @Query('originalLanguage[]') List<String>? originalLanguage,
-    @Query('excludedOriginalLanguages[]') List<String>? excludedOriginalLanguages,
-    @Query('availableTranslatedLanguage[]') List<String>? availableTranslatedLanguage,
+    @Query('excludedOriginalLanguages[]')
+        List<String>? excludedOriginalLanguages,
+    @Query('availableTranslatedLanguage[]')
+        List<String>? availableTranslatedLanguage,
     @Query('publicationDemographic[]') List<String>? publicationDemographic,
     @Query('ids[]') List<String>? ids,
     @Query('contentRating[]') List<String>? contentRating,
@@ -39,4 +41,9 @@ abstract class MangaService {
 
   @GET('/manga/tag')
   Future<TagResponse> tags();
+
+  @GET('/manga/{id}')
+  Future<SearchData> detail({
+    @Path('id') String? id,
+  });
 }

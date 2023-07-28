@@ -21,9 +21,9 @@ class AuthorRepository {
       limit: limit,
       offset: offset,
       includes: includes,
-      orders: orders
-          ?.map((key, value) => MapEntry(key.rawValue, value.rawValue)),
+      orders: orders?.map(
+        (key, value) => MapEntry(key.rawValue, value.rawValue),
+      ),
     );
   }
-
 }

@@ -51,32 +51,30 @@ class MangaRepository {
       excludedTags: excludedTags,
       excludedTagsMode: excludedTagsMode?.rawValue,
       status: status?.map((e) => e.rawValue).toList(),
-      originalLanguage: originalLanguage
-          ?.map((e) => e.rawValue)
-          .toList(),
-      excludedOriginalLanguages: excludedOriginalLanguages
-          ?.map((e) => e.rawValue)
-          .toList(),
-      availableTranslatedLanguage: availableTranslatedLanguage
-          ?.map((e) => e.rawValue)
-          .toList(),
-      publicationDemographic: publicationDemographic
-          ?.map((e) => e.rawValue)
-          .toList(),
+      originalLanguage: originalLanguage?.map((e) => e.rawValue).toList(),
+      excludedOriginalLanguages:
+          excludedOriginalLanguages?.map((e) => e.rawValue).toList(),
+      availableTranslatedLanguage:
+          availableTranslatedLanguage?.map((e) => e.rawValue).toList(),
+      publicationDemographic:
+          publicationDemographic?.map((e) => e.rawValue).toList(),
       ids: ids,
-      contentRating: contentRating
-          ?.map((e) => e.rawValue)
-          .toList(),
+      contentRating: contentRating?.map((e) => e.rawValue).toList(),
       createdAtSince: createdAtSince,
       updatedAtSince: updatedAtSince,
       includes: includes,
       group: group,
-      orders: orders
-          ?.map((key, value) => MapEntry(key.rawValue, value.rawValue)),
+      orders: orders?.map(
+        (key, value) => MapEntry(key.rawValue, value.rawValue),
+      ),
     );
   }
 
   Future<TagResponse> tags() {
     return _service.tags();
+  }
+
+  Future<SearchData> detail(String id) {
+    return _service.detail(id: id);
   }
 }

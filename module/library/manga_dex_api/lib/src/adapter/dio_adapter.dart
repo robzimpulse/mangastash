@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
 
-HttpClientAdapter getAdapter() => throw UnsupportedError(
-    'Cannot implement adapter',
-);
+HttpClientAdapter getAdapter() {
+  return throw UnsupportedError('Cannot implement adapter');
+}

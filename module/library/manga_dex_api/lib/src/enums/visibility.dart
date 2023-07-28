@@ -1,5 +1,6 @@
 enum Visibility {
-  private('private'), public('public');
+  private('private'),
+  public('public');
 
   final String rawValue;
 

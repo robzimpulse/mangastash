@@ -1,22 +1,23 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../common/identifier.dart';
-import '../common/pagination.dart';
+import '../common/response.dart';
 
 part 'author_response.g.dart';
 
 @JsonSerializable()
-class AuthorResponse extends Pagination {
-  final String? result;
-  final String? response;
+class AuthorResponse extends Response {
   final List<AuthorData>? data;
+  final int? limit;
+  final int? offset;
+  final int? total;
   AuthorResponse(
+    super.result,
+    super.response,
     this.data,
-    this.result,
-    this.response,
-    super.limit,
-    super.offset,
-    super.total,
+    this.limit,
+    this.offset,
+    this.total,
   );
   factory AuthorResponse.fromJson(Map<String, dynamic> json) {
     return _$AuthorResponseFromJson(json);

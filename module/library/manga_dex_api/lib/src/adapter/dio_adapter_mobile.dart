@@ -4,7 +4,10 @@ import 'package:dio/dio.dart';
 HttpClientAdapter getAdapter() {
   final adapter = DefaultHttpClientAdapter();
 
-  const charlesIp = String.fromEnvironment('PROXY_IP', defaultValue: "");
+  const charlesIp = String.fromEnvironment(
+    'PROXY_IP',
+    defaultValue: "192.168.1.2",
+  );
 
   if (charlesIp.isEmpty) return adapter;
 
