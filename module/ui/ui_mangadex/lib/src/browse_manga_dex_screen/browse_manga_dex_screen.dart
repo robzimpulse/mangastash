@@ -6,6 +6,7 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
+import '../detail_manga_screen/detail_manga_screen.dart';
 import '../filter_bottom_sheet/filter_bottom_sheet.dart';
 import 'browse_manga_dex_cubit.dart';
 import 'browse_manga_dex_state.dart';
@@ -235,8 +236,13 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
             title: e.title ?? '',
             coverUrl: e.coverUrl ?? '',
             layout: state.layout,
-            onTap: () => context.showSnackBar(
-              message: 'tapped manga ${e.title}',
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => DetailMangaScreen.create(
+                  locator: widget.locator,
+                  manga: e,
+                ),
+              ),
             ),
           ),
         );
