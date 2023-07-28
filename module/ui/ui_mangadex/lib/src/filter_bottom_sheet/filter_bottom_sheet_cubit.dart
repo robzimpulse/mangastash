@@ -2,13 +2,12 @@ import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
-import 'manga_dex_filter_bottom_sheet_state.dart';
+import 'filter_bottom_sheet_state.dart';
 
-class MangaDexFilterBottomSheetCubit
-    extends Cubit<MangaDexFilterBottomSheetState> with AutoSubscriptionMixin {
-  MangaDexFilterBottomSheetCubit({
-    MangaDexFilterBottomSheetState initialState =
-        const MangaDexFilterBottomSheetState(),
+class FilterBottomSheetCubit extends Cubit<FilterBottomSheetState>
+    with AutoSubscriptionMixin {
+  FilterBottomSheetCubit({
+    FilterBottomSheetState initialState = const FilterBottomSheetState(),
     required ListenListTagUseCase listenListTagUseCase,
   }) : super(
           initialState.copyWith(

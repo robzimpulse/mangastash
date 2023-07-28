@@ -6,7 +6,7 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import '../tag_filter_screen/manga_dex_filter_bottom_sheet.dart';
+import '../filter_bottom_sheet/filter_bottom_sheet.dart';
 import 'browse_manga_dex_cubit.dart';
 import 'browse_manga_dex_state.dart';
 
@@ -120,7 +120,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
   void _showFilterBottomSheet() async {
     final state = _cubit(context).state;
     final result = await context.showBottomSheet<List<MangaTag>>(
-      builder: (context) => MangaDexFilterBottomSheet.create(
+      builder: (context) => FilterBottomSheet.create(
         locator: widget.locator,
         includedTags: state.parameter.includedTags,
         excludedTags: state.parameter.excludedTags,

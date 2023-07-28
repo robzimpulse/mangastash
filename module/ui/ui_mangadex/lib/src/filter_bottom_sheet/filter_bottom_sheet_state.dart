@@ -2,8 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 
-class MangaDexFilterBottomSheetState extends Equatable with EquatableMixin {
-  const MangaDexFilterBottomSheetState({
+class FilterBottomSheetState extends Equatable with EquatableMixin {
+  const FilterBottomSheetState({
     this.tags = const [],
     this.includedTags = const [],
     this.excludedTags = const [],
@@ -47,14 +47,14 @@ class MangaDexFilterBottomSheetState extends Equatable with EquatableMixin {
         .toList();
   }
 
-  MangaDexFilterBottomSheetState copyWith({
+  FilterBottomSheetState copyWith({
     List<MangaTag>? tags,
     List<String>? includedTags,
     List<String>? excludedTags,
     List<String>? originalIncludedTags,
     List<String>? originalExcludedTags,
   }) {
-    return MangaDexFilterBottomSheetState(
+    return FilterBottomSheetState(
       tags: tags ?? this.tags,
       originalExcludedTags: originalExcludedTags ?? this.originalExcludedTags,
       originalIncludedTags: originalIncludedTags ?? this.originalIncludedTags,

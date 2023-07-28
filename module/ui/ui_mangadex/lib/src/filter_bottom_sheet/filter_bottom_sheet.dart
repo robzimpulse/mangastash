@@ -7,11 +7,11 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import 'manga_dex_filter_bottom_sheet_cubit.dart';
-import 'manga_dex_filter_bottom_sheet_state.dart';
+import 'filter_bottom_sheet_cubit.dart';
+import 'filter_bottom_sheet_state.dart';
 
-class MangaDexFilterBottomSheet extends StatefulWidget {
-  const MangaDexFilterBottomSheet({super.key});
+class FilterBottomSheet extends StatefulWidget {
+  const FilterBottomSheet({super.key});
 
   static Widget create({
     required ServiceLocator locator,
@@ -19,8 +19,8 @@ class MangaDexFilterBottomSheet extends StatefulWidget {
     List<String> excludedTags = const [],
   }) {
     return BlocProvider(
-      create: (context) => MangaDexFilterBottomSheetCubit(
-        initialState: MangaDexFilterBottomSheetState(
+      create: (context) => FilterBottomSheetCubit(
+        initialState: FilterBottomSheetState(
           originalIncludedTags: includedTags,
           originalExcludedTags: excludedTags,
           includedTags: includedTags,
@@ -28,26 +28,24 @@ class MangaDexFilterBottomSheet extends StatefulWidget {
         ),
         listenListTagUseCase: locator(),
       ),
-      child: const MangaDexFilterBottomSheet(),
+      child: const FilterBottomSheet(),
     );
   }
 
   @override
-  State<MangaDexFilterBottomSheet> createState() =>
-      _MangaDexFilterBottomSheetState();
+  State<FilterBottomSheet> createState() => _FilterBottomSheetState();
 }
 
-class _MangaDexFilterBottomSheetState extends State<MangaDexFilterBottomSheet> {
-  MangaDexFilterBottomSheetCubit _cubit(BuildContext context) {
-    return context.read<MangaDexFilterBottomSheetCubit>();
+class _FilterBottomSheetState extends State<FilterBottomSheet> {
+  FilterBottomSheetCubit _cubit(BuildContext context) {
+    return context.read<FilterBottomSheetCubit>();
   }
 
   Widget _bloc({
-    required BlocWidgetBuilder<MangaDexFilterBottomSheetState> builder,
-    BlocBuilderCondition<MangaDexFilterBottomSheetState>? buildWhen,
+    required BlocWidgetBuilder<FilterBottomSheetState> builder,
+    BlocBuilderCondition<FilterBottomSheetState>? buildWhen,
   }) {
-    return BlocBuilder<MangaDexFilterBottomSheetCubit,
-        MangaDexFilterBottomSheetState>(
+    return BlocBuilder<FilterBottomSheetCubit, FilterBottomSheetState>(
       buildWhen: buildWhen,
       builder: builder,
     );
