@@ -20,12 +20,12 @@ ChapterResponse _$ChapterResponseFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$ChapterResponseToJson(ChapterResponse instance) =>
     <String, dynamic>{
-      'limit': instance.limit,
-      'offset': instance.offset,
-      'total': instance.total,
       'result': instance.result,
       'response': instance.response,
       'data': instance.data,
+      'limit': instance.limit,
+      'offset': instance.offset,
+      'total': instance.total,
     };
 
 ChapterData _$ChapterDataFromJson(Map<String, dynamic> json) => ChapterData(

@@ -8,11 +8,11 @@ part of 'author_response.dart';
 
 AuthorResponse _$AuthorResponseFromJson(Map<String, dynamic> json) =>
     AuthorResponse(
+      json['result'] as String?,
+      json['response'] as String?,
       (json['data'] as List<dynamic>?)
           ?.map((e) => AuthorData.fromJson(e as Map<String, dynamic>))
           .toList(),
-      json['result'] as String?,
-      json['response'] as String?,
       json['limit'] as int?,
       json['offset'] as int?,
       json['total'] as int?,
@@ -20,12 +20,12 @@ AuthorResponse _$AuthorResponseFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$AuthorResponseToJson(AuthorResponse instance) =>
     <String, dynamic>{
-      'limit': instance.limit,
-      'offset': instance.offset,
-      'total': instance.total,
       'result': instance.result,
       'response': instance.response,
       'data': instance.data,
+      'limit': instance.limit,
+      'offset': instance.offset,
+      'total': instance.total,
     };
 
 AuthorData _$AuthorDataFromJson(Map<String, dynamic> json) => AuthorData(

@@ -8,11 +8,11 @@ part of 'search_response.dart';
 
 SearchResponse _$SearchResponseFromJson(Map<String, dynamic> json) =>
     SearchResponse(
+      json['result'] as String?,
+      json['response'] as String?,
       (json['data'] as List<dynamic>?)
           ?.map((e) => SearchData.fromJson(e as Map<String, dynamic>))
           .toList(),
-      json['result'] as String?,
-      json['response'] as String?,
       json['limit'] as int?,
       json['offset'] as int?,
       json['total'] as int?,
@@ -20,12 +20,12 @@ SearchResponse _$SearchResponseFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$SearchResponseToJson(SearchResponse instance) =>
     <String, dynamic>{
-      'limit': instance.limit,
-      'offset': instance.offset,
-      'total': instance.total,
       'result': instance.result,
       'response': instance.response,
       'data': instance.data,
+      'limit': instance.limit,
+      'offset': instance.offset,
+      'total': instance.total,
     };
 
 SearchData _$SearchDataFromJson(Map<String, dynamic> json) => SearchData(
