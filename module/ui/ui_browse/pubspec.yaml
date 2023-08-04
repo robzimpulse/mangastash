@@ -11,9 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   equatable: ^2.0.5
-  cached_network_image: ^3.2.2
   collection: ^1.16.0
-  responsive_framework: ^1.0.0
 
   # github
   expansion_tile_group:

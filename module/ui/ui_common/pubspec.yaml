@@ -11,6 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
   cached_network_image: ^3.2.2
+  expandable: ^5.0.1
+  responsive_framework: ^1.0.0
 
 dev_dependencies:
   flutter_test:

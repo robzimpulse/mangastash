@@ -38,6 +38,13 @@ class DetailMangaScreen extends StatefulWidget {
 }
 
 class _DetailMangaScreenState extends State<DetailMangaScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+    _cubit(context).init();
+  }
+
   Widget _bloc({
     required BlocWidgetBuilder<DetailMangaState> builder,
     BlocBuilderCondition<DetailMangaState>? buildWhen,
@@ -76,8 +83,21 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: () => _cubit(context).init(),
-        child: Column(
-          children: const [],
+        child: _bloc(
+          builder: (context, state) => MangaDetailWidget(
+            coverUrl: widget.manga.coverUrl,
+            title: widget.manga.title,
+            author: 'Author',
+            status: 'Status',
+            description: 'Expanded Expanded Expanded Expanded Expanded '
+                'Expanded Expanded Expanded Expanded Expanded Expanded '
+                'Expanded Expanded Expanded Expanded Expanded Expanded '
+                'Expanded Expanded Expanded Expanded Expanded '
+                'Expanded Expanded Expanded Expanded Expanded Expanded '
+                'Expanded Expanded Expanded Expanded Expanded '
+                'Expanded Expanded Expanded Expanded Expanded Expanded '
+                'Expanded Expanded Expanded Expanded Expanded ',
+          ),
         ),
       ),
     );

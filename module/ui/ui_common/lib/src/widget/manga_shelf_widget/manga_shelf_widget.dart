@@ -127,10 +127,4 @@ class MangaShelfWidget extends StatelessWidget {
       ),
     );
   }
-
-  Widget _padding() {
-    return SliverPadding(
-      padding: padding,
-    );
-  }
 }
