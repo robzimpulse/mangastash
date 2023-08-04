@@ -1,5 +1,6 @@
 import 'package:alice_lightweight/alice.dart';
 import 'package:core_environment/core_environment.dart';
+import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
@@ -58,6 +59,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
     final locator = ServiceLocator.asNewInstance();
 
     // TODO: register module registrar here
+    await locator.registerRegistrar(CoreNetworkRegistrar());
     await locator.registerRegistrar(CoreStorageRegistrar());
     await locator.registerRegistrar(CoreEnvironmentRegistrar());
     await locator.registerRegistrar(DomainMangaRegistrar());

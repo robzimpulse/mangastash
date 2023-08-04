@@ -11,6 +11,11 @@ dependencies:
   flutter:
     sdk: flutter
   dio: ^4.0.6
+  system_proxy: ^0.1.0
+
+  # library
+  service_locator:
+    path: ../../library/service_locator
 
 dev_dependencies:
   flutter_test:

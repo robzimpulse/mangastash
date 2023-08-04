@@ -632,6 +632,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.1.0"
+  system_proxy:
+    dependency: transitive
+    description:
+      name: system_proxy
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.0"
   term_glyph:
     dependency: transitive
     description:

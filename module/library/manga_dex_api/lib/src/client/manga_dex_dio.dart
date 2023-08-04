@@ -21,7 +21,6 @@ class MangaDexDio extends DioForNative {
     _headerInterceptor = headerInterceptor;
 
     _configureClient();
-    _configureProxy();
     _configureOptions();
     _configureInterceptors();
   }
@@ -34,10 +33,6 @@ class MangaDexDio extends DioForNative {
     interceptors
       ..add(_aliceDioInterceptor)
       ..add(_headerInterceptor);
-  }
-
-  void _configureProxy() {
-    if (!kDebugMode) return;
   }
 
   void _configureClient() {
