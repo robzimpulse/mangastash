@@ -14,6 +14,9 @@ SearchChapterResponse _$SearchChapterResponseFromJson(
       (json['data'] as List<dynamic>?)
           ?.map((e) => ChapterData.fromJson(e as Map<String, dynamic>))
           .toList(),
+      json['limit'] as int?,
+      json['offset'] as int?,
+      json['total'] as int?,
     );
 
 Map<String, dynamic> _$SearchChapterResponseToJson(
@@ -22,4 +25,7 @@ Map<String, dynamic> _$SearchChapterResponseToJson(
       'result': instance.result,
       'response': instance.response,
       'data': instance.data,
+      'limit': instance.limit,
+      'offset': instance.offset,
+      'total': instance.total,
     };

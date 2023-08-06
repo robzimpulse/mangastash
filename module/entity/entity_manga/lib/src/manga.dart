@@ -17,6 +17,8 @@ class Manga extends Equatable with EquatableMixin {
 
   final List<MangaTag>? tags;
 
+  final List<MangaChapter>? chapters;
+
   const Manga({
     this.id,
     this.title,
@@ -25,11 +27,12 @@ class Manga extends Equatable with EquatableMixin {
     this.status,
     this.description,
     this.tags,
+    this.chapters,
   });
 
   @override
   List<Object?> get props {
-    return [id, title, coverUrl, author, status, description, tags];
+    return [id, title, coverUrl, author, status, description, tags, chapters];
   }
 
   Manga copyWith({
@@ -40,6 +43,7 @@ class Manga extends Equatable with EquatableMixin {
     String? status,
     String? description,
     List<MangaTag>? tags,
+    List<MangaChapter>? chapters,
   }) {
     return Manga(
       id: id ?? this.id,
@@ -49,6 +53,7 @@ class Manga extends Equatable with EquatableMixin {
       status: status ?? this.status,
       description: description ?? this.description,
       tags: tags ?? this.tags,
+      chapters: chapters ?? this.chapters,
     );
   }
 }

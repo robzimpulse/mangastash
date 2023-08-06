@@ -6,42 +6,61 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'detail_manga_state.dart';
 
 class DetailMangaCubit extends Cubit<DetailMangaState> {
-
-  final GetMangaUseCase getMangaUseCase;
+  final SearchChapterUseCase searchChapterUseCase;
 
   DetailMangaCubit({
     required Manga manga,
-    required this.getMangaUseCase,
+    required this.searchChapterUseCase,
     DetailMangaState initialState = const DetailMangaState(),
   }) : super(initialState.copyWith(manga: manga));
 
-  // TODO: implement this
   Future<void> init() async {
     emit(state.copyWith(isLoading: true));
 
-    // final id = state.manga?.id;
-    //
-    // if (id == null) {
-    //   emit(
-    //     state.copyWith(
-    //       isLoading: false,
-    //       errorMessage: () => 'Manga id Empty',
-    //     ),
-    //   );
-    //   return;
-    // }
-    //
-    // final result = await getMangaUseCase.execute(id);
-    //
-    // if (result is Success<MangaResponse>) {
-    //   emit(state.copyWith(data: result.data.data));
-    // }
-    //
-    // if (result is Error<MangaResponse>) {
-    //   emit(state.copyWith(errorMessage: () => result.error.toString()));
-    // }
+    final id = state.manga?.id;
+
+    if (id == null) {
+      emit(
+        state.copyWith(
+          isLoading: false,
+          errorMessage: () => 'Manga id Empty',
+        ),
+      );
+      return;
+    }
+
+    final response = await searchChapterUseCase.execute(
+      parameter: SearchChapterParameter(
+        mangaId: id,
+        limit: 100,
+        orders: const {
+          ChapterOrders.chapter: OrderDirections.descending,
+        },
+      ),
+    );
+
+    if (response is Success<SearchChapterResponse>) {
+      emit(
+        state.copyWith(
+          manga: state.manga?.copyWith(
+            chapters: response.data.data
+                ?.map(
+                  (e) => MangaChapter(
+                    id: e.id,
+                    chapter: e.attributes?.chapter,
+                    title: e.attributes?.title,
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+      );
+    }
+
+    if (response is Error<SearchChapterResponse>) {
+      emit(state.copyWith(errorMessage: () => response.error.toString()));
+    }
 
     emit(state.copyWith(isLoading: false));
   }
-
 }

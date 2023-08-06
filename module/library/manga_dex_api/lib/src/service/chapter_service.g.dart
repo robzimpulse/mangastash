@@ -56,7 +56,7 @@ class _ChapterService implements ChapterService {
       r'updatedAtSince': updatedAtSince,
       r'publishedAtSince': publishedAtSince,
       r'includes[]': includes,
-      r'orders': orders,
+      r'order': orders,
       r'limit': limit,
       r'offset': offset,
     };

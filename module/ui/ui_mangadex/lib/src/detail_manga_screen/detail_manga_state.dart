@@ -7,19 +7,16 @@ class DetailMangaState extends Equatable with EquatableMixin {
     this.isLoading = false,
     this.errorMessage,
     this.manga,
-    this.data,
   });
 
   final Manga? manga;
 
   final bool isLoading;
 
-  final MangaData? data;
-
   final String? errorMessage;
 
   @override
-  List<Object?> get props => [manga, data, isLoading, errorMessage];
+  List<Object?> get props => [manga, isLoading, errorMessage];
 
   DetailMangaState copyWith({
     Manga? manga,
@@ -29,7 +26,6 @@ class DetailMangaState extends Equatable with EquatableMixin {
   }) {
     return DetailMangaState(
       manga: manga ?? this.manga,
-      data: data ?? this.data,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage != null ? errorMessage() : this.errorMessage,
     );

@@ -14,10 +14,9 @@ class MangaDetailWidget extends StatelessWidget {
     this.description,
     this.onTapFavorite,
     this.onTapWebsite,
-    this.chapterCount,
-    this.onTapChapterIndex,
     this.tags,
     this.onTapTag,
+    required this.child,
   });
 
   final String? coverUrl;
@@ -30,17 +29,15 @@ class MangaDetailWidget extends StatelessWidget {
 
   final String? description;
 
-  final int? chapterCount;
-
   final List<String>? tags;
 
   final void Function()? onTapFavorite;
 
   final void Function()? onTapWebsite;
 
-  final void Function(int)? onTapChapterIndex;
-
   final void Function(String)? onTapTag;
+
+  final List<Widget> child;
 
   Widget _header() {
     return SliverPadding(
@@ -160,39 +157,47 @@ class MangaDetailWidget extends StatelessWidget {
     );
   }
 
-  Widget? _chapterCount() {
-    final count = chapterCount;
-    if (count == null) return null;
-    if (count < 1) return null;
-    return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      sliver: SliverToBoxAdapter(
-        child: Row(
-          children: [
-            Text('$count Chapters'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget? _chapters() {
-    final count = chapterCount;
-    if (count == null) return null;
-    if (count < 1) return null;
-    return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      sliver: SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) => ListTile(
-            title: Text('Chapter $index'),
-            onTap: () => onTapChapterIndex?.call(index),
-          ),
-          childCount: count,
-        ),
-      ),
-    );
-  }
+  // List<Widget>? _chapters() {
+  //   if (isLoading) {
+  //     return [
+  //       const SliverFillRemaining(
+  //         hasScrollBody: false,
+  //         child: Center(
+  //           child: CircularProgressIndicator(),
+  //         ),
+  //       ),
+  //     ];
+  //   }
+  //
+  //   final count = chapterCount;
+  //   if (count == null) return null;
+  //   if (count < 1) return null;
+  //
+  //   return [
+  //     SliverPadding(
+  //       padding: const EdgeInsets.symmetric(horizontal: 8),
+  //       sliver: SliverToBoxAdapter(
+  //         child: Row(
+  //           children: [
+  //             Text('$count Chapters'),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //     SliverPadding(
+  //       padding: const EdgeInsets.symmetric(horizontal: 8),
+  //       sliver: SliverList(
+  //         delegate: SliverChildBuilderDelegate(
+  //           (context, index) => ListTile(
+  //             title: Text('Chapter $index'),
+  //             onTap: () => onTapChapterIndex?.call(index),
+  //           ),
+  //           childCount: count,
+  //         ),
+  //       ),
+  //     )
+  //   ];
+  // }
 
   Widget _separator() {
     return const SliverToBoxAdapter(
@@ -208,8 +213,7 @@ class MangaDetailWidget extends StatelessWidget {
         _buttons(),
         _description(),
         _tags(),
-        _chapterCount(),
-        _chapters(),
+        ...child,
       ].whereType<Widget>().intersperseOuter(_separator()).toList(),
     );
   }

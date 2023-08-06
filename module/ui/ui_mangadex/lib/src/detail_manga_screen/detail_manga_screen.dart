@@ -23,8 +23,8 @@ class DetailMangaScreen extends StatefulWidget {
     return BlocProvider(
       create: (context) => DetailMangaCubit(
         manga: manga,
-        getMangaUseCase: locator(),
-      ),
+        searchChapterUseCase: locator(),
+      )..init(),
       child: DetailMangaScreen(
         locator: locator,
       ),
@@ -88,23 +88,7 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
   Widget _content() {
     return _bloc(
       builder: (context, state) {
-        if (state.isLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-
-        if (state.errorMessage?.isNotEmpty == true) {
-          return Center(
-            child: Text(
-              state.errorMessage ?? '',
-              textAlign: TextAlign.center,
-            ),
-          );
-        }
-
         final tags = state.manga?.tags;
-
         return MangaDetailWidget(
           coverUrl: state.manga?.coverUrl,
           title: state.manga?.title,
@@ -118,14 +102,64 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
           onTapWebsite: () => context.showSnackBar(
             message: 'on tap website',
           ),
-          onTapChapterIndex: (index) => context.showSnackBar(
-            message: 'on tap chapter $index',
-          ),
           onTapTag: (name) => context.showSnackBar(
             message: 'on tap tag $name',
           ),
+          child: _chapters(context, state),
         );
       },
     );
+  }
+
+  List<Widget> _chapters(BuildContext context, DetailMangaState state) {
+    if (state.isLoading) {
+      return [
+        const SliverFillRemaining(
+          hasScrollBody: false,
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      ];
+    }
+
+    if (state.errorMessage?.isNotEmpty == true) {
+      return [
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Center(
+            child: Text(
+              state.errorMessage ?? '',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        )
+      ];
+    }
+
+    return [
+      SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        sliver: SliverToBoxAdapter(
+          child: Row(
+            children: [
+              Text('${state.manga?.chapters?.length} Chapters'),
+            ],
+          ),
+        ),
+      ),
+      SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        sliver: SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) => ListTile(
+              title: Text('Chapter ${state.manga?.chapters?[index].name}'),
+              onTap: () {},
+            ),
+            childCount: state.manga?.chapters?.length,
+          ),
+        ),
+      )
+    ];
   }
 }

@@ -9,10 +9,16 @@ part 'search_chapter_response.g.dart';
 @JsonSerializable()
 class SearchChapterResponse extends Response {
   final List<ChapterData>? data;
+  final int? limit;
+  final int? offset;
+  final int? total;
   SearchChapterResponse(
     super.result,
     super.response,
     this.data,
+    this.limit,
+    this.offset,
+    this.total,
   );
   factory SearchChapterResponse.fromJson(Map<String, dynamic> json) {
     return _$SearchChapterResponseFromJson(json);

@@ -3,23 +3,30 @@ import 'package:equatable/equatable.dart';
 class MangaChapter extends Equatable with EquatableMixin {
   final String? id;
 
-  final String? name;
+  final String? chapter;
+
+  final String? title;
 
   const MangaChapter({
     this.id,
-    this.name,
+    this.chapter,
+    this.title,
   });
 
   @override
-  List<Object?> get props => [id, name];
+  List<Object?> get props => [id, chapter, title];
 
   MangaChapter copyWith({
     String? id,
-    String? name,
+    String? chapter,
+    String? title,
   }) {
     return MangaChapter(
       id: id ?? this.id,
-      name: name ?? this.name,
+      chapter: chapter ?? this.chapter,
+      title: title ?? this.title,
     );
   }
+
+  String get name => '$chapter - $title';
 }

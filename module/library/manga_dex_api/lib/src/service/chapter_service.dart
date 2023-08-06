@@ -28,7 +28,7 @@ abstract class ChapterService {
     @Query('updatedAtSince') String? updatedAtSince,
     @Query('publishedAtSince') String? publishedAtSince,
     @Query('includes[]') List<String>? includes,
-    @Query('orders') Map<String, String>? orders,
+    @Query('order') Map<String, String>? orders,
     @Query('limit') int? limit,
     @Query('offset') int? offset,
   });
