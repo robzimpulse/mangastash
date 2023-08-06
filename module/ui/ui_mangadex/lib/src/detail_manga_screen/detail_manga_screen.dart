@@ -26,7 +26,7 @@ class DetailMangaScreen extends StatefulWidget {
       create: (context) => DetailMangaCubit(
         manga: manga,
         getMangaUseCase: locator(),
-      )..init(),
+      ),
       child: DetailMangaScreen(
         locator: locator,
         manga: manga,
