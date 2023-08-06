@@ -38,7 +38,6 @@ class DetailMangaScreen extends StatefulWidget {
 }
 
 class _DetailMangaScreenState extends State<DetailMangaScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -84,22 +83,45 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
       body: RefreshIndicator(
         onRefresh: () => _cubit(context).init(),
         child: _bloc(
-          builder: (context, state) => MangaDetailWidget(
-            coverUrl: widget.manga.coverUrl,
-            title: widget.manga.title,
-            author: 'Author',
-            status: 'Status',
-            description: 'Expanded Expanded Expanded Expanded Expanded '
-                'Expanded Expanded Expanded Expanded Expanded Expanded '
-                'Expanded Expanded Expanded Expanded Expanded Expanded '
-                'Expanded Expanded Expanded Expanded Expanded '
-                'Expanded Expanded Expanded Expanded Expanded Expanded '
-                'Expanded Expanded Expanded Expanded Expanded '
-                'Expanded Expanded Expanded Expanded Expanded Expanded '
-                'Expanded Expanded Expanded Expanded Expanded ',
-          ),
+          builder: (context, state) => _content(),
         ),
       ),
+    );
+  }
+
+  Widget _content() {
+    return _bloc(
+      builder: (context, state) {
+        if (state.isLoading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        if (state.errorMessage?.isNotEmpty == true) {
+          return Center(
+            child: Text(
+              state.errorMessage ?? '',
+              textAlign: TextAlign.center,
+            ),
+          );
+        }
+
+        return MangaDetailWidget(
+          coverUrl: widget.manga.coverUrl,
+          title: widget.manga.title,
+          author: 'Author',
+          status: 'Status',
+          description: 'Expanded Expanded Expanded Expanded Expanded '
+              'Expanded Expanded Expanded Expanded Expanded Expanded '
+              'Expanded Expanded Expanded Expanded Expanded Expanded '
+              'Expanded Expanded Expanded Expanded Expanded '
+              'Expanded Expanded Expanded Expanded Expanded Expanded '
+              'Expanded Expanded Expanded Expanded Expanded '
+              'Expanded Expanded Expanded Expanded Expanded Expanded '
+              'Expanded Expanded Expanded Expanded Expanded ',
+        );
+      },
     );
   }
 }
