@@ -85,7 +85,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
   }
 
   Widget _sortAndFilter({Size? size}) {
-    return _bloc(
+    return _builder(
       buildWhen: (prev, curr) => prev.parameter != curr.parameter,
       builder: (context, state) {
         return GappedToggleButton(
@@ -133,7 +133,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
   }
 
   Widget _title() {
-    return _bloc(
+    return _consumer(
       buildWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
       builder: (context, state) {
         if (!state.isSearchActive) return const Text('MangaDex');
@@ -150,21 +150,21 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
           onSubmitted: (value) => _cubit(context).init(title: value),
         );
       },
+      listenWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
+      listener: (context, state) {
+        _searchController.clear();
+        _searchFocusNode.requestFocus();
+      },
     );
   }
 
   Widget _searchIcon() {
-    return _bloc(
+    return _builder(
       buildWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
       builder: (context, state) {
         return IconButton(
           icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
-          onPressed: () {
-            _cubit(context).searchMode(!state.isSearchActive);
-            if (!state.isSearchActive) return;
-            _searchController.clear();
-            _searchFocusNode.requestFocus();
-          },
+          onPressed: () => _cubit(context).searchMode(!state.isSearchActive),
         );
       },
     );
@@ -172,7 +172,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
 
   Widget _layoutIcon() {
     return PopupMenuButton<MangaShelfItemLayout>(
-      icon: _bloc(
+      icon: _builder(
         buildWhen: (prev, curr) => prev.layout != curr.layout,
         builder: (context, state) {
           switch (state.layout) {
@@ -200,7 +200,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
   }
 
   Widget _content() {
-    return _bloc(
+    return _builder(
       buildWhen: (prev, curr) {
         return prev.mangas != curr.mangas ||
             prev.isLoading != curr.isLoading ||
@@ -291,13 +291,27 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
     );
   }
 
-  Widget _bloc({
+  Widget _builder({
     required BlocWidgetBuilder<BrowseMangaDexState> builder,
     BlocBuilderCondition<BrowseMangaDexState>? buildWhen,
   }) {
     return BlocBuilder<BrowseMangaDexCubit, BrowseMangaDexState>(
       buildWhen: buildWhen,
       builder: builder,
+    );
+  }
+
+  Widget _consumer({
+    required BlocWidgetBuilder<BrowseMangaDexState> builder,
+    BlocBuilderCondition<BrowseMangaDexState>? buildWhen,
+    required BlocWidgetListener<BrowseMangaDexState> listener,
+    BlocListenerCondition<BrowseMangaDexState>? listenWhen,
+  }) {
+    return BlocConsumer<BrowseMangaDexCubit, BrowseMangaDexState>(
+      builder: builder,
+      listener: listener,
+      buildWhen: buildWhen,
+      listenWhen: listenWhen,
     );
   }
 
