@@ -9,10 +9,10 @@ class GetChapterUseCase {
   }) : _repository = repository;
 
   Future<Response<ChapterResponse>> execute({
-    required String authorId,
+    required String chapterId,
   }) async {
     try {
-      final response = await _repository.detail(authorId);
+      final response = await _repository.detail(chapterId);
       return Success(response);
     } on Exception catch (e) {
       return Error(e);

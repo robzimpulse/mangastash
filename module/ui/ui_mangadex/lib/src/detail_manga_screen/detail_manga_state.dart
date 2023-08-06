@@ -7,25 +7,29 @@ class DetailMangaState extends Equatable with EquatableMixin {
     this.isLoading = false,
     this.errorMessage,
     this.manga,
+    this.parameter = const SearchChapterParameter(),
   });
 
   final Manga? manga;
+
+  final SearchChapterParameter parameter;
 
   final bool isLoading;
 
   final String? errorMessage;
 
   @override
-  List<Object?> get props => [manga, isLoading, errorMessage];
+  List<Object?> get props => [manga, isLoading, errorMessage, parameter];
 
   DetailMangaState copyWith({
     Manga? manga,
-    MangaData? data,
+    SearchChapterParameter? parameter,
     bool? isLoading,
     String? Function()? errorMessage,
   }) {
     return DetailMangaState(
       manga: manga ?? this.manga,
+      parameter: parameter ?? this.parameter,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage != null ? errorMessage() : this.errorMessage,
     );

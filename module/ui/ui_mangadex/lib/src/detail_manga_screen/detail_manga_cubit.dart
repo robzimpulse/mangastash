@@ -12,55 +12,52 @@ class DetailMangaCubit extends Cubit<DetailMangaState> {
     required Manga manga,
     required this.searchChapterUseCase,
     DetailMangaState initialState = const DetailMangaState(),
-  }) : super(initialState.copyWith(manga: manga));
+  }) : super(
+          initialState.copyWith(
+            manga: manga,
+            parameter: SearchChapterParameter(
+              mangaId: manga.id,
+              translatedLanguage: const [LanguageCodes.english],
+              orders: const {ChapterOrders.chapter: OrderDirections.descending},
+            ),
+          ),
+        );
 
   Future<void> init() async {
     emit(state.copyWith(isLoading: true));
-
-    final id = state.manga?.id;
-
-    if (id == null) {
-      emit(
-        state.copyWith(
-          isLoading: false,
-          errorMessage: () => 'Manga id Empty',
-        ),
-      );
-      return;
-    }
-
-    final response = await searchChapterUseCase.execute(
-      parameter: SearchChapterParameter(
-        mangaId: id,
-        limit: 100,
-        orders: const {
-          ChapterOrders.chapter: OrderDirections.descending,
-        },
-      ),
-    );
-
-    if (response is Success<SearchChapterResponse>) {
-      emit(
-        state.copyWith(
-          manga: state.manga?.copyWith(
-            chapters: response.data.data
-                ?.map(
-                  (e) => MangaChapter(
-                    id: e.id,
-                    chapter: e.attributes?.chapter,
-                    title: e.attributes?.title,
-                  ),
-                )
-                .toList(),
-          ),
-        ),
-      );
-    }
-
-    if (response is Error<SearchChapterResponse>) {
-      emit(state.copyWith(errorMessage: () => response.error.toString()));
-    }
-
+    await _fetchAllChapter();
     emit(state.copyWith(isLoading: false));
+  }
+
+  Future<void> _fetchAllChapter() async {
+    var param = state.parameter.copyWith(limit: 100);
+    List<MangaChapter> chapters = [];
+    var total = 0;
+
+    do {
+      final response = await searchChapterUseCase.execute(parameter: param);
+      if (response is Error<SearchChapterResponse>) {
+        emit(state.copyWith(errorMessage: () => response.error.toString()));
+        break;
+      }
+      if (response is Success<SearchChapterResponse>) {
+        final data = response.data.data ?? [];
+        final offset = response.data.offset ?? 0;
+        final limit = response.data.limit ?? 0;
+        total = response.data.total ?? 0;
+        chapters.addAll(
+          data.map(
+            (e) => MangaChapter(
+              id: e.id,
+              chapter: e.attributes?.chapter,
+              title: e.attributes?.title,
+            ),
+          ),
+        );
+        param = param.copyWith(offset: offset + limit);
+      }
+    } while (chapters.length < total);
+
+    emit(state.copyWith(manga: state.manga?.copyWith(chapters: chapters)));
   }
 }

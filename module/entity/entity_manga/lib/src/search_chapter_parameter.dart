@@ -21,7 +21,7 @@ class SearchChapterParameter extends Equatable with EquatableMixin {
   final List<Include>? includes;
   final Map<ChapterOrders, OrderDirections>? orders;
 
-  SearchChapterParameter({
+  const SearchChapterParameter({
     this.limit,
     this.offset,
     this.mangaId,
