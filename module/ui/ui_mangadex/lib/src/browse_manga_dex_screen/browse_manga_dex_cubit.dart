@@ -10,10 +10,12 @@ import 'browse_manga_dex_state.dart';
 class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
   final SearchMangaUseCase searchMangaUseCase;
   final GetCoverArtUseCase getCoverArtUseCase;
+  final GetAuthorUseCase getAuthorUseCase;
 
   BrowseMangaDexCubit({
     required this.searchMangaUseCase,
     required this.getCoverArtUseCase,
+    required this.getAuthorUseCase,
     BrowseMangaDexState initialState = const BrowseMangaDexState(
       parameter: SearchMangaParameter(
         orders: {SearchOrders.rating: OrderDirections.descending},
@@ -43,6 +45,42 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
     emit(state.copyWith(isPagingNextPage: false));
   }
 
+  // TODO: move to another use case
+  Future<String> _coverArtUrl(MangaData data) async {
+    final cover = data.relationships?.firstWhereOrNull(
+      (e) => e?.type == Include.coverArt.rawValue,
+    );
+    final response = await getCoverArtUseCase.execute(
+      mangaId: data.id ?? '',
+      coverId: cover?.id ?? '',
+    );
+    if (response is Success<String>) {
+      return response.data;
+    }
+    return '';
+  }
+
+  // TODO: move to another use case
+  Future<List<String>> _authors(MangaData data) async {
+    final authors = data.relationships?.where(
+      (e) => e?.type == Include.author.rawValue,
+    );
+    if (authors == null) return [];
+    final promises = authors.map(
+      (e) async {
+        final response = await getAuthorUseCase.execute(
+          authorId: e?.id ?? '',
+        );
+        if (response is Success<AuthorResponse>) {
+          return response.data.data?.attributes?.name;
+        }
+        return null;
+      },
+    );
+    final result = await Future.wait(promises);
+    return result.whereNotNull().toList();
+  }
+
   Future<void> _fetch() async {
     final param = state.parameter;
 
@@ -51,34 +89,20 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
     );
 
     if (result is Success<SearchResponse>) {
-      List<Manga> mangas = [];
       final data = result.data.data?.map((element) async {
-        final cover = element.relationships?.firstWhereOrNull(
-          (e) => e?.type == 'cover_art',
-        );
-
-        String coverUrl = '';
-
-        final response = await getCoverArtUseCase.execute(
-          mangaId: element.id ?? '',
-          coverId: cover?.id ?? '',
-        );
-
-        if (response is Success<String>) {
-          coverUrl = response.data;
-        }
-
         return Manga(
           id: element.id,
-          coverUrl: coverUrl,
+          coverUrl: await _coverArtUrl(element),
           title: element.attributes?.title?.en,
           status: element.attributes?.status,
           description: element.attributes?.description?.en,
+          author: (await _authors(element)).join(' | '),
         );
       });
 
       final offset = result.data.offset ?? 0;
       final limit = result.data.limit ?? 0;
+      List<Manga> mangas = [];
       if (data != null) mangas = await Future.wait(data);
 
       emit(

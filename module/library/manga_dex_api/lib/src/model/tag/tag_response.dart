@@ -30,7 +30,7 @@ class TagResponse extends Response {
 
 @JsonSerializable()
 class TagData extends Identifier {
-  final TagAttributes attributes;
+  final TagDataAttributes attributes;
   TagData(super.id, super.type, this.attributes);
   factory TagData.fromJson(Map<String, dynamic> json) {
     return _$TagDataFromJson(json);
@@ -40,19 +40,19 @@ class TagData extends Identifier {
 }
 
 @JsonSerializable()
-class TagAttributes extends Attribute {
+class TagDataAttributes extends Attribute {
   final Title? name;
   final String? group;
-  TagAttributes(
+  TagDataAttributes(
     this.name,
     this.group,
     super.createdAt,
     super.updatedAt,
     super.version,
   );
-  factory TagAttributes.fromJson(Map<String, dynamic> json) {
-    return _$TagAttributesFromJson(json);
+  factory TagDataAttributes.fromJson(Map<String, dynamic> json) {
+    return _$TagDataAttributesFromJson(json);
   }
   @override
-  Map<String, dynamic> toJson() => _$TagAttributesToJson(this);
+  Map<String, dynamic> toJson() => _$TagDataAttributesToJson(this);
 }

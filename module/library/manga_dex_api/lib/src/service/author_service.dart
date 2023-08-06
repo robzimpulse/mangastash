@@ -10,13 +10,9 @@ part 'author_service.g.dart';
 abstract class AuthorService {
   factory AuthorService(MangaDexDio dio, {String baseUrl}) = _AuthorService;
 
-  @GET('/author')
-  Future<AuthorResponse> search({
-    @Query('limit') int? limit,
-    @Query('offset') int? offset,
-    @Query('ids[]') List<String>? ids,
-    @Query('name') String? name,
+  @GET('/author/{id}')
+  Future<AuthorResponse> detail({
+    @Path('id') String? id,
     @Query('includes[]') List<String>? includes,
-    @Query('orders') Map<String, String>? orders,
   });
 }

@@ -1,4 +1,4 @@
-import '../enums/order_enums.dart';
+import '../enums/includes.dart';
 import '../model/author/author_response.dart';
 import '../service/author_service.dart';
 
@@ -9,21 +9,10 @@ class AuthorRepository {
     required AuthorService service,
   }) : _service = service;
 
-  Future<AuthorResponse> search({
-    String? name,
-    int? limit,
-    int? offset,
-    List<String>? includes,
-    Map<AuthorOrders, OrderDirections>? orders,
-  }) async {
-    return _service.search(
-      name: name,
-      limit: limit,
-      offset: offset,
-      includes: includes,
-      orders: orders?.map(
-        (key, value) => MapEntry(key.rawValue, value.rawValue),
-      ),
+  Future<AuthorResponse> detail(String id, {List<Include>? includes}) async {
+    return _service.detail(
+      id: id,
+      includes: includes?.map((e) => e.rawValue).toList(),
     );
   }
 }

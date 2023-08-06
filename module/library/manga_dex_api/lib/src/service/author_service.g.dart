@@ -19,23 +19,12 @@ class _AuthorService implements AuthorService {
   String? baseUrl;
 
   @override
-  Future<AuthorResponse> search({
-    limit,
-    offset,
-    ids,
-    name,
+  Future<AuthorResponse> detail({
+    id,
     includes,
-    orders,
   }) async {
     const _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'limit': limit,
-      r'offset': offset,
-      r'ids[]': ids,
-      r'name': name,
-      r'includes[]': includes,
-      r'orders': orders,
-    };
+    final queryParameters = <String, dynamic>{r'includes[]': includes};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
@@ -47,7 +36,7 @@ class _AuthorService implements AuthorService {
     )
             .compose(
               _dio.options,
-              '/author',
+              '/author/${id}',
               queryParameters: queryParameters,
               data: _data,
             )

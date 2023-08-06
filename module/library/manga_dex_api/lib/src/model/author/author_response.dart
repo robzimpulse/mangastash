@@ -9,17 +9,11 @@ part 'author_response.g.dart';
 
 @JsonSerializable()
 class AuthorResponse extends Response {
-  final List<AuthorData>? data;
-  final int? limit;
-  final int? offset;
-  final int? total;
+  final AuthorData? data;
   AuthorResponse(
     super.result,
     super.response,
     this.data,
-    this.limit,
-    this.offset,
-    this.total,
   );
   factory AuthorResponse.fromJson(Map<String, dynamic> json) {
     return _$AuthorResponseFromJson(json);
@@ -30,6 +24,20 @@ class AuthorResponse extends Response {
 
 @JsonSerializable()
 class AuthorData extends Identifier {
+  final AuthorDataAttributes? attributes;
+  final List<Relationship?>? relationships;
+  AuthorData(super.id, super.type, this.attributes, this.relationships);
+  factory AuthorData.fromJson(Map<String, dynamic> json) {
+    return _$AuthorDataFromJson(json);
+  }
+  @override
+  Map<String, dynamic> toJson() => _$AuthorDataToJson(this);
+}
+
+@JsonSerializable()
+class AuthorDataAttributes extends Attribute {
+  final String? name;
+  final String? imageUrl;
   final String? twitter;
   final String? pixiv;
   final String? melonBook;
@@ -43,14 +51,13 @@ class AuthorData extends Identifier {
   final String? weibo;
   final String? naver;
   final String? website;
-  final int? version;
-  final String? createdAt;
-  final String? updatedAt;
-  final AuthorDataAttributes? attributes;
-  final List<Relationship> relationships;
-  AuthorData(
-    super.id,
-    super.type,
+
+  AuthorDataAttributes(
+    super.createdAt,
+    super.updatedAt,
+    super.version,
+    this.name,
+    this.imageUrl,
     this.twitter,
     this.pixiv,
     this.melonBook,
@@ -64,31 +71,6 @@ class AuthorData extends Identifier {
     this.weibo,
     this.naver,
     this.website,
-    this.version,
-    this.createdAt,
-    this.updatedAt,
-    this.attributes,
-    this.relationships,
-  );
-  factory AuthorData.fromJson(Map<String, dynamic> json) {
-    return _$AuthorDataFromJson(json);
-  }
-  @override
-  Map<String, dynamic> toJson() => _$AuthorDataToJson(this);
-}
-
-@JsonSerializable()
-class AuthorDataAttributes extends Attribute {
-  final String? name;
-  final String? imageUrl;
-  // TODO: map author biography
-  // final AuthorDataAttributesBiography biography;
-  AuthorDataAttributes(
-    this.name,
-    this.imageUrl,
-    super.createdAt,
-    super.updatedAt,
-    super.version,
   );
   factory AuthorDataAttributes.fromJson(Map<String, dynamic> json) {
     return _$AuthorDataAttributesFromJson(json);
@@ -96,3 +78,4 @@ class AuthorDataAttributes extends Attribute {
   @override
   Map<String, dynamic> toJson() => _$AuthorDataAttributesToJson(this);
 }
+

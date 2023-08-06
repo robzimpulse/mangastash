@@ -1,7 +1,6 @@
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
-import 'package:responsive_framework/responsive_breakpoints.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -26,6 +25,7 @@ class BrowseMangaDexScreen extends StatefulWidget {
       create: (context) => BrowseMangaDexCubit(
         searchMangaUseCase: locator(),
         getCoverArtUseCase: locator(),
+        getAuthorUseCase: locator(),
       )..init(),
       child: BrowseMangaDexScreen(locator: locator),
     );

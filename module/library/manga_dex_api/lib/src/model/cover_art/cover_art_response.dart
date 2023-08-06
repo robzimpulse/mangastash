@@ -23,7 +23,7 @@ class CoverArtResponse extends Response {
 
 @JsonSerializable()
 class CoverArtData extends Identifier {
-  final CoverArtAttributes? attributes;
+  final CoverArtDataAttributes? attributes;
   final List<Relationship?>? relationships;
   CoverArtData(super.id, super.type, this.attributes, this.relationships);
   factory CoverArtData.fromJson(Map<String, dynamic> json) {
@@ -34,12 +34,12 @@ class CoverArtData extends Identifier {
 }
 
 @JsonSerializable()
-class CoverArtAttributes extends Attribute {
+class CoverArtDataAttributes extends Attribute {
   final String? description;
   final String? volume;
   final String? fileName;
   final String? locale;
-  CoverArtAttributes(
+  CoverArtDataAttributes(
     this.description,
     this.volume,
     this.fileName,
@@ -48,8 +48,9 @@ class CoverArtAttributes extends Attribute {
     super.updatedAt,
     super.version,
   );
-  factory CoverArtAttributes.fromJson(Map<String, dynamic> json) {
-    return _$CoverArtAttributesFromJson(json);
+  factory CoverArtDataAttributes.fromJson(Map<String, dynamic> json) {
+    return _$CoverArtDataAttributesFromJson(json);
   }
-  Map<String, dynamic> toJson() => _$CoverArtAttributesToJson(this);
+  @override
+  Map<String, dynamic> toJson() => _$CoverArtDataAttributesToJson(this);
 }

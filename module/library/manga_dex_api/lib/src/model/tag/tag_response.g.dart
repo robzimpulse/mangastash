@@ -30,7 +30,7 @@ Map<String, dynamic> _$TagResponseToJson(TagResponse instance) =>
 TagData _$TagDataFromJson(Map<String, dynamic> json) => TagData(
       json['id'] as String?,
       json['type'] as String?,
-      TagAttributes.fromJson(json['attributes'] as Map<String, dynamic>),
+      TagDataAttributes.fromJson(json['attributes'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$TagDataToJson(TagData instance) => <String, dynamic>{
@@ -39,8 +39,8 @@ Map<String, dynamic> _$TagDataToJson(TagData instance) => <String, dynamic>{
       'attributes': instance.attributes,
     };
 
-TagAttributes _$TagAttributesFromJson(Map<String, dynamic> json) =>
-    TagAttributes(
+TagDataAttributes _$TagDataAttributesFromJson(Map<String, dynamic> json) =>
+    TagDataAttributes(
       json['name'] == null
           ? null
           : Title.fromJson(json['name'] as Map<String, dynamic>),
@@ -50,7 +50,7 @@ TagAttributes _$TagAttributesFromJson(Map<String, dynamic> json) =>
       json['version'] as num?,
     );
 
-Map<String, dynamic> _$TagAttributesToJson(TagAttributes instance) =>
+Map<String, dynamic> _$TagDataAttributesToJson(TagDataAttributes instance) =>
     <String, dynamic>{
       'createdAt': instance.createdAt,
       'updatedAt': instance.updatedAt,

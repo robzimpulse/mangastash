@@ -27,7 +27,7 @@ CoverArtData _$CoverArtDataFromJson(Map<String, dynamic> json) => CoverArtData(
       json['type'] as String?,
       json['attributes'] == null
           ? null
-          : CoverArtAttributes.fromJson(
+          : CoverArtDataAttributes.fromJson(
               json['attributes'] as Map<String, dynamic>),
       (json['relationships'] as List<dynamic>?)
           ?.map((e) => e == null
@@ -44,8 +44,9 @@ Map<String, dynamic> _$CoverArtDataToJson(CoverArtData instance) =>
       'relationships': instance.relationships,
     };
 
-CoverArtAttributes _$CoverArtAttributesFromJson(Map<String, dynamic> json) =>
-    CoverArtAttributes(
+CoverArtDataAttributes _$CoverArtDataAttributesFromJson(
+        Map<String, dynamic> json) =>
+    CoverArtDataAttributes(
       json['description'] as String?,
       json['volume'] as String?,
       json['fileName'] as String?,
@@ -55,7 +56,8 @@ CoverArtAttributes _$CoverArtAttributesFromJson(Map<String, dynamic> json) =>
       json['version'] as num?,
     );
 
-Map<String, dynamic> _$CoverArtAttributesToJson(CoverArtAttributes instance) =>
+Map<String, dynamic> _$CoverArtDataAttributesToJson(
+        CoverArtDataAttributes instance) =>
     <String, dynamic>{
       'createdAt': instance.createdAt,
       'updatedAt': instance.updatedAt,
