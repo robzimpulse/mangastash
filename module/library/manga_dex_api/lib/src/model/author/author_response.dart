@@ -1,6 +1,8 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import '../common/attribute.dart';
 import '../common/identifier.dart';
+import '../common/relationship.dart';
 import '../common/response.dart';
 
 part 'author_response.g.dart';
@@ -45,7 +47,7 @@ class AuthorData extends Identifier {
   final String? createdAt;
   final String? updatedAt;
   final AuthorDataAttributes? attributes;
-  final List<AuthorDataRelationship> relationships;
+  final List<Relationship> relationships;
   AuthorData(
     super.id,
     super.type,
@@ -76,25 +78,21 @@ class AuthorData extends Identifier {
 }
 
 @JsonSerializable()
-class AuthorDataAttributes {
+class AuthorDataAttributes extends Attribute {
   final String? name;
   final String? imageUrl;
   // TODO: map author biography
   // final AuthorDataAttributesBiography biography;
-  AuthorDataAttributes({this.name, this.imageUrl});
+  AuthorDataAttributes(
+    this.name,
+    this.imageUrl,
+    super.createdAt,
+    super.updatedAt,
+    super.version,
+  );
   factory AuthorDataAttributes.fromJson(Map<String, dynamic> json) {
     return _$AuthorDataAttributesFromJson(json);
   }
-  Map<String, dynamic> toJson() => _$AuthorDataAttributesToJson(this);
-}
-
-@JsonSerializable()
-class AuthorDataRelationship extends Identifier {
-  final String? related;
-  AuthorDataRelationship(super.id, super.type, this.related);
-  factory AuthorDataRelationship.fromJson(Map<String, dynamic> json) {
-    return _$AuthorDataRelationshipFromJson(json);
-  }
   @override
-  Map<String, dynamic> toJson() => _$AuthorDataRelationshipToJson(this);
+  Map<String, dynamic> toJson() => _$AuthorDataAttributesToJson(this);
 }

@@ -30,7 +30,9 @@ MangaData _$MangaDataFromJson(Map<String, dynamic> json) => MangaData(
           : MangaDataAttributes.fromJson(
               json['attributes'] as Map<String, dynamic>),
       (json['relationships'] as List<dynamic>?)
-          ?.map((e) => Relationship.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => e == null
+              ? null
+              : Relationship.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
@@ -79,6 +81,9 @@ MangaDataAttributes _$MangaDataAttributesFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$MangaDataAttributesToJson(
         MangaDataAttributes instance) =>
     <String, dynamic>{
+      'createdAt': instance.createdAt,
+      'updatedAt': instance.updatedAt,
+      'version': instance.version,
       'title': instance.title,
       'altTitle': instance.altTitle,
       'description': instance.description,
@@ -92,9 +97,6 @@ Map<String, dynamic> _$MangaDataAttributesToJson(
       'contentRating': instance.contentRating,
       'state': instance.state,
       'chapterNumbersResetOnNewVolume': instance.chapterNumbersResetOnNewVolume,
-      'createdAt': instance.createdAt,
-      'updatedAt': instance.updatedAt,
-      'version': instance.version,
       'latestUploadedChapter': instance.latestUploadedChapter,
       'availableTranslatedLanguages': instance.availableTranslatedLanguages,
       'tags': instance.tags,

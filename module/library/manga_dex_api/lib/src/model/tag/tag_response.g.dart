@@ -41,20 +41,20 @@ Map<String, dynamic> _$TagDataToJson(TagData instance) => <String, dynamic>{
 
 TagAttributes _$TagAttributesFromJson(Map<String, dynamic> json) =>
     TagAttributes(
-      json['id'] as String?,
-      json['type'] as String?,
       json['name'] == null
           ? null
           : Title.fromJson(json['name'] as Map<String, dynamic>),
       json['group'] as String?,
-      json['version'] as int?,
+      json['createdAt'] as String?,
+      json['updatedAt'] as String?,
+      json['version'] as num?,
     );
 
 Map<String, dynamic> _$TagAttributesToJson(TagAttributes instance) =>
     <String, dynamic>{
-      'id': instance.id,
-      'type': instance.type,
+      'createdAt': instance.createdAt,
+      'updatedAt': instance.updatedAt,
+      'version': instance.version,
       'name': instance.name,
       'group': instance.group,
-      'version': instance.version,
     };

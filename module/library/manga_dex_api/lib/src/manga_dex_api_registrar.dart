@@ -11,6 +11,7 @@ import 'repository/manga_repository.dart';
 import 'service/at_home_service.dart';
 import 'service/author_service.dart';
 import 'service/chapter_service.dart';
+import 'service/cover_art_service.dart';
 import 'service/manga_service.dart';
 
 class MangaDexApiRegistrar extends Registrar {
@@ -29,12 +30,12 @@ class MangaDexApiRegistrar extends Registrar {
     locator.registerFactory(() => ChapterService(locator()));
     locator.registerFactory(() => AtHomeService(locator()));
     locator.registerFactory(() => AuthorService(locator()));
+    locator.registerFactory(() => CoverArtService(locator()));
 
     locator.registerFactory(() => AtHomeRepository(service: locator()));
     locator.registerFactory(() => MangaRepository(service: locator()));
     locator.registerFactory(() => ChapterRepository(service: locator()));
     locator.registerFactory(() => AuthorRepository(service: locator()));
-
-    locator.registerFactory(() => CoverRepository());
+    locator.registerFactory(() => CoverRepository(service: locator()));
   }
 }

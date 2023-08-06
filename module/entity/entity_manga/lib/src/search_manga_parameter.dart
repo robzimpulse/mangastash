@@ -21,7 +21,7 @@ class SearchMangaParameter extends Equatable with EquatableMixin {
   final List<ContentRating>? contentRating;
   final String? createdAtSince;
   final String? updatedAtSince;
-  final List<String>? includes;
+  final List<Include>? includes;
   final String? group;
   final Map<SearchOrders, OrderDirections>? orders;
 
@@ -98,7 +98,7 @@ class SearchMangaParameter extends Equatable with EquatableMixin {
     List<ContentRating>? contentRating,
     String? createdAtSince,
     String? updatedAtSince,
-    List<String>? includes,
+    List<Include>? includes,
     String? group,
     Map<SearchOrders, OrderDirections>? orders,
   }) {

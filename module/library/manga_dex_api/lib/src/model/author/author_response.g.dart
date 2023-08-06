@@ -52,8 +52,7 @@ AuthorData _$AuthorDataFromJson(Map<String, dynamic> json) => AuthorData(
           : AuthorDataAttributes.fromJson(
               json['attributes'] as Map<String, dynamic>),
       (json['relationships'] as List<dynamic>)
-          .map(
-              (e) => AuthorDataRelationship.fromJson(e as Map<String, dynamic>))
+          .map((e) => Relationship.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
@@ -84,29 +83,19 @@ Map<String, dynamic> _$AuthorDataToJson(AuthorData instance) =>
 AuthorDataAttributes _$AuthorDataAttributesFromJson(
         Map<String, dynamic> json) =>
     AuthorDataAttributes(
-      name: json['name'] as String?,
-      imageUrl: json['imageUrl'] as String?,
+      json['name'] as String?,
+      json['imageUrl'] as String?,
+      json['createdAt'] as String?,
+      json['updatedAt'] as String?,
+      json['version'] as num?,
     );
 
 Map<String, dynamic> _$AuthorDataAttributesToJson(
         AuthorDataAttributes instance) =>
     <String, dynamic>{
+      'createdAt': instance.createdAt,
+      'updatedAt': instance.updatedAt,
+      'version': instance.version,
       'name': instance.name,
       'imageUrl': instance.imageUrl,
-    };
-
-AuthorDataRelationship _$AuthorDataRelationshipFromJson(
-        Map<String, dynamic> json) =>
-    AuthorDataRelationship(
-      json['id'] as String?,
-      json['type'] as String?,
-      json['related'] as String?,
-    );
-
-Map<String, dynamic> _$AuthorDataRelationshipToJson(
-        AuthorDataRelationship instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'type': instance.type,
-      'related': instance.related,
     };

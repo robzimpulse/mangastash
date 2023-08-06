@@ -63,12 +63,10 @@ Map<String, dynamic> _$ChapterRelationshipToJson(
 
 ChapterAttributes _$ChapterAttributesFromJson(Map<String, dynamic> json) =>
     ChapterAttributes(
-      json['id'] as String?,
-      json['type'] as String?,
       json['volume'] as String?,
       json['chapter'] as String?,
       json['title'] as String?,
-      json['transdLanguage'] as String?,
+      json['transLanguage'] as String?,
       json['hash'] as String?,
       (json['chapterData'] as List<dynamic>?)?.map((e) => e as String).toList(),
       (json['chapterDataSaver'] as List<dynamic>?)
@@ -77,22 +75,20 @@ ChapterAttributes _$ChapterAttributesFromJson(Map<String, dynamic> json) =>
       json['publishAt'] as String?,
       json['createdAt'] as String?,
       json['updatedAt'] as String?,
-      json['version'] as int?,
+      json['version'] as num?,
     );
 
 Map<String, dynamic> _$ChapterAttributesToJson(ChapterAttributes instance) =>
     <String, dynamic>{
-      'id': instance.id,
-      'type': instance.type,
+      'createdAt': instance.createdAt,
+      'updatedAt': instance.updatedAt,
+      'version': instance.version,
       'volume': instance.volume,
       'chapter': instance.chapter,
       'title': instance.title,
-      'transdLanguage': instance.transdLanguage,
+      'transLanguage': instance.transLanguage,
       'hash': instance.hash,
       'chapterData': instance.chapterData,
       'chapterDataSaver': instance.chapterDataSaver,
       'publishAt': instance.publishAt,
-      'createdAt': instance.createdAt,
-      'updatedAt': instance.updatedAt,
-      'version': instance.version,
     };

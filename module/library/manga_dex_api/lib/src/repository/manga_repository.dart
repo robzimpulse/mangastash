@@ -1,4 +1,5 @@
 import '../enums/content_rating.dart';
+import '../enums/includes.dart';
 import '../enums/language_codes.dart';
 import '../enums/manga_status.dart';
 import '../enums/order_enums.dart';
@@ -36,7 +37,7 @@ class MangaRepository {
     List<ContentRating>? contentRating,
     String? createdAtSince,
     String? updatedAtSince,
-    List<String>? includes,
+    List<Include>? includes,
     String? group,
     Map<SearchOrders, OrderDirections>? orders,
   }) {
@@ -63,7 +64,7 @@ class MangaRepository {
       contentRating: contentRating?.map((e) => e.rawValue).toList(),
       createdAtSince: createdAtSince,
       updatedAtSince: updatedAtSince,
-      includes: includes,
+      includes: includes?.map((e) => e.rawValue).toList(),
       group: group,
       orders: orders?.map(
         (key, value) => MapEntry(key.rawValue, value.rawValue),

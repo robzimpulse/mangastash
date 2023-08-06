@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import '../common/attribute.dart';
 import '../common/identifier.dart';
 import '../common/relationship.dart';
 import '../common/response.dart';
@@ -27,7 +28,7 @@ class MangaResponse extends Response {
 @JsonSerializable()
 class MangaData extends Identifier {
   final MangaDataAttributes? attributes;
-  final List<Relationship>? relationships;
+  final List<Relationship?>? relationships;
   MangaData(super.id, super.type, this.attributes, this.relationships);
   factory MangaData.fromJson(Map<String, dynamic> json) {
     return _$MangaDataFromJson(json);
@@ -37,7 +38,7 @@ class MangaData extends Identifier {
 }
 
 @JsonSerializable()
-class MangaDataAttributes {
+class MangaDataAttributes extends Attribute {
   final Title? title;
   final List<Title?>? altTitle;
   final Title? description;
@@ -51,9 +52,6 @@ class MangaDataAttributes {
   final String? contentRating;
   final String? state;
   final bool chapterNumbersResetOnNewVolume;
-  final String? createdAt;
-  final String? updatedAt;
-  final num? version;
   final String? latestUploadedChapter;
   final List<String?>? availableTranslatedLanguages;
   final List<TagData?> tags;
@@ -70,9 +68,9 @@ class MangaDataAttributes {
     this.contentRating,
     this.state,
     this.chapterNumbersResetOnNewVolume,
-    this.createdAt,
-    this.updatedAt,
-    this.version,
+    super.createdAt,
+    super.updatedAt,
+    super.version,
     this.latestUploadedChapter,
     this.availableTranslatedLanguages,
     this.tags,

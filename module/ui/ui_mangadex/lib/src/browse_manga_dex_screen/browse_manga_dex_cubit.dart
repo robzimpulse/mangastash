@@ -16,7 +16,6 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
     required this.getCoverArtUseCase,
     BrowseMangaDexState initialState = const BrowseMangaDexState(
       parameter: SearchMangaParameter(
-        includes: ['cover_art'],
         orders: {SearchOrders.rating: OrderDirections.descending},
       ),
     ),
@@ -52,27 +51,39 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
     );
 
     if (result is Success<SearchResponse>) {
-      final mangas = result.data.data?.map((element) {
+      List<Manga> mangas = [];
+      final data = result.data.data?.map((element) async {
         final cover = element.relationships?.firstWhereOrNull(
-          (e) => e.type == 'cover_art',
+          (e) => e?.type == 'cover_art',
         );
+
+        String coverUrl = '';
+
+        final response = await getCoverArtUseCase.execute(
+          mangaId: element.id ?? '',
+          coverId: cover?.id ?? '',
+        );
+
+        if (response is Success<String>) {
+          coverUrl = response.data;
+        }
 
         return Manga(
           id: element.id,
+          coverUrl: coverUrl,
           title: element.attributes?.title?.en,
-          coverUrl: getCoverArtUseCase.execute(
-            mangaId: element.id ?? '',
-            filename: cover?.attributes?.fileName ?? '',
-          ),
+          status: element.attributes?.status,
+          description: element.attributes?.description?.en,
         );
       });
 
       final offset = result.data.offset ?? 0;
       final limit = result.data.limit ?? 0;
+      if (data != null) mangas = await Future.wait(data);
 
       emit(
         state.copyWith(
-          mangas: [...state.mangas, ...mangas?.toList() ?? []],
+          mangas: [...state.mangas, ...mangas],
           parameter: param.copyWith(
             limit: limit,
             offset: offset + limit,

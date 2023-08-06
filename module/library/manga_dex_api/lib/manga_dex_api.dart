@@ -3,6 +3,7 @@ library manga_dex_api;
 export 'src/client/manga_dex_dio.dart';
 export 'src/enums/content_rating.dart';
 export 'src/enums/future_updates.dart';
+export 'src/enums/includes.dart';
 export 'src/enums/language_codes.dart';
 export 'src/enums/manga_status.dart';
 export 'src/enums/order_enums.dart';

@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import '../common/attribute.dart';
 import '../common/identifier.dart';
 import '../common/response.dart';
 import '../common/title.dart';
@@ -39,11 +40,16 @@ class TagData extends Identifier {
 }
 
 @JsonSerializable()
-class TagAttributes extends Identifier {
+class TagAttributes extends Attribute {
   final Title? name;
   final String? group;
-  final int? version;
-  TagAttributes(super.id, super.type, this.name, this.group, this.version);
+  TagAttributes(
+    this.name,
+    this.group,
+    super.createdAt,
+    super.updatedAt,
+    super.version,
+  );
   factory TagAttributes.fromJson(Map<String, dynamic> json) {
     return _$TagAttributesFromJson(json);
   }

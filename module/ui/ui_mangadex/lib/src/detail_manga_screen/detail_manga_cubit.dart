@@ -19,27 +19,27 @@ class DetailMangaCubit extends Cubit<DetailMangaState> {
   Future<void> init() async {
     emit(state.copyWith(isLoading: true));
 
-    final id = state.manga?.id;
-
-    if (id == null) {
-      emit(
-        state.copyWith(
-          isLoading: false,
-          errorMessage: () => 'Manga id Empty',
-        ),
-      );
-      return;
-    }
-
-    final result = await getMangaUseCase.execute(id);
-
-    if (result is Success<MangaResponse>) {
-      emit(state.copyWith(data: result.data.data));
-    }
-
-    if (result is Error<MangaResponse>) {
-      emit(state.copyWith(errorMessage: () => result.error.toString()));
-    }
+    // final id = state.manga?.id;
+    //
+    // if (id == null) {
+    //   emit(
+    //     state.copyWith(
+    //       isLoading: false,
+    //       errorMessage: () => 'Manga id Empty',
+    //     ),
+    //   );
+    //   return;
+    // }
+    //
+    // final result = await getMangaUseCase.execute(id);
+    //
+    // if (result is Success<MangaResponse>) {
+    //   emit(state.copyWith(data: result.data.data));
+    // }
+    //
+    // if (result is Error<MangaResponse>) {
+    //   emit(state.copyWith(errorMessage: () => result.error.toString()));
+    // }
 
     emit(state.copyWith(isLoading: false));
   }

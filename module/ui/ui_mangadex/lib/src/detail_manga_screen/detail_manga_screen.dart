@@ -105,16 +105,9 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
         return MangaDetailWidget(
           coverUrl: widget.manga.coverUrl,
           title: widget.manga.title,
-          author: 'Author',
-          status: 'Status',
-          description: 'Expanded Expanded Expanded Expanded Expanded '
-              'Expanded Expanded Expanded Expanded Expanded Expanded '
-              'Expanded Expanded Expanded Expanded Expanded Expanded '
-              'Expanded Expanded Expanded Expanded Expanded '
-              'Expanded Expanded Expanded Expanded Expanded Expanded '
-              'Expanded Expanded Expanded Expanded Expanded '
-              'Expanded Expanded Expanded Expanded Expanded Expanded '
-              'Expanded Expanded Expanded Expanded Expanded ',
+          author: widget.manga.author,
+          status: widget.manga.status,
+          description: widget.manga.description,
         );
       },
     );
