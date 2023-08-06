@@ -3,16 +3,16 @@ import 'package:json_annotation/json_annotation.dart';
 import '../common/response.dart';
 import 'manga_response.dart';
 
-part 'search_response.g.dart';
+part 'search_manga_response.g.dart';
 
 ///@nodoc
 @JsonSerializable()
-class SearchResponse extends Response {
+class SearchMangaResponse extends Response {
   final List<MangaData>? data;
   final int? limit;
   final int? offset;
   final int? total;
-  SearchResponse(
+  SearchMangaResponse(
     super.result,
     super.response,
     this.data,
@@ -20,9 +20,9 @@ class SearchResponse extends Response {
     this.offset,
     this.total,
   );
-  factory SearchResponse.fromJson(Map<String, dynamic> json) {
-    return _$SearchResponseFromJson(json);
+  factory SearchMangaResponse.fromJson(Map<String, dynamic> json) {
+    return _$SearchMangaResponseFromJson(json);
   }
   @override
-  Map<String, dynamic> toJson() => _$SearchResponseToJson(this);
+  Map<String, dynamic> toJson() => _$SearchMangaResponseToJson(this);
 }

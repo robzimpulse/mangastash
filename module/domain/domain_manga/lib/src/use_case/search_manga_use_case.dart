@@ -10,7 +10,7 @@ class SearchMangaUseCase {
     required MangaRepository repository,
   }) : _repository = repository;
 
-  Future<Response<SearchResponse>> execute({
+  Future<Response<SearchMangaResponse>> execute({
     required SearchMangaParameter parameter,
   }) async {
     try {

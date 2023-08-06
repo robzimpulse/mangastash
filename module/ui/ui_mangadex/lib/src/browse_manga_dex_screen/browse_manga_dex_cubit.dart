@@ -88,7 +88,7 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
       parameter: param,
     );
 
-    if (result is Success<SearchResponse>) {
+    if (result is Success<SearchMangaResponse>) {
       final data = result.data.data?.map((element) async {
         final tags = element.attributes?.tags.map(
           (e) => MangaTag(
@@ -126,7 +126,7 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
       );
     }
 
-    if (result is Error<SearchResponse>) {
+    if (result is Error<SearchMangaResponse>) {
       emit(
         state.copyWith(
           errorMessage: () => result.error.toString(),

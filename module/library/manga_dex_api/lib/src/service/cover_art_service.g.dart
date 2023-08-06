@@ -19,9 +19,12 @@ class _CoverArtService implements CoverArtService {
   String? baseUrl;
 
   @override
-  Future<CoverArtResponse> detail({id}) async {
+  Future<CoverArtResponse> detail({
+    id,
+    includes,
+  }) async {
     const _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'includes[]': includes};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};

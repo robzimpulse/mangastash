@@ -10,12 +10,9 @@ ChapterResponse _$ChapterResponseFromJson(Map<String, dynamic> json) =>
     ChapterResponse(
       json['result'] as String?,
       json['response'] as String?,
-      (json['data'] as List<dynamic>?)
-          ?.map((e) => ChapterData.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      json['limit'] as int?,
-      json['offset'] as int?,
-      json['total'] as int?,
+      json['data'] == null
+          ? null
+          : ChapterData.fromJson(json['data'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$ChapterResponseToJson(ChapterResponse instance) =>
@@ -23,9 +20,6 @@ Map<String, dynamic> _$ChapterResponseToJson(ChapterResponse instance) =>
       'result': instance.result,
       'response': instance.response,
       'data': instance.data,
-      'limit': instance.limit,
-      'offset': instance.offset,
-      'total': instance.total,
     };
 
 ChapterData _$ChapterDataFromJson(Map<String, dynamic> json) => ChapterData(
@@ -33,10 +27,10 @@ ChapterData _$ChapterDataFromJson(Map<String, dynamic> json) => ChapterData(
       json['type'] as String?,
       json['attributes'] == null
           ? null
-          : ChapterAttributes.fromJson(
+          : ChapterDataAttributes.fromJson(
               json['attributes'] as Map<String, dynamic>),
       (json['relationships'] as List<dynamic>?)
-          ?.map((e) => ChapterRelationship.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => Relationship.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
@@ -48,37 +42,23 @@ Map<String, dynamic> _$ChapterDataToJson(ChapterData instance) =>
       'relationships': instance.relationships,
     };
 
-ChapterRelationship _$ChapterRelationshipFromJson(Map<String, dynamic> json) =>
-    ChapterRelationship(
-      json['id'] as String?,
-      json['type'] as String?,
-    );
-
-Map<String, dynamic> _$ChapterRelationshipToJson(
-        ChapterRelationship instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'type': instance.type,
-    };
-
-ChapterAttributes _$ChapterAttributesFromJson(Map<String, dynamic> json) =>
-    ChapterAttributes(
+ChapterDataAttributes _$ChapterDataAttributesFromJson(
+        Map<String, dynamic> json) =>
+    ChapterDataAttributes(
       json['volume'] as String?,
       json['chapter'] as String?,
       json['title'] as String?,
-      json['transLanguage'] as String?,
-      json['hash'] as String?,
-      (json['chapterData'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      (json['chapterDataSaver'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
+      json['translatedLanguage'] as String?,
+      json['externalUrl'] as String?,
       json['publishAt'] as String?,
+      json['readableAt'] as String?,
       json['createdAt'] as String?,
       json['updatedAt'] as String?,
       json['version'] as num?,
     );
 
-Map<String, dynamic> _$ChapterAttributesToJson(ChapterAttributes instance) =>
+Map<String, dynamic> _$ChapterDataAttributesToJson(
+        ChapterDataAttributes instance) =>
     <String, dynamic>{
       'createdAt': instance.createdAt,
       'updatedAt': instance.updatedAt,
@@ -86,9 +66,8 @@ Map<String, dynamic> _$ChapterAttributesToJson(ChapterAttributes instance) =>
       'volume': instance.volume,
       'chapter': instance.chapter,
       'title': instance.title,
-      'transLanguage': instance.transLanguage,
-      'hash': instance.hash,
-      'chapterData': instance.chapterData,
-      'chapterDataSaver': instance.chapterDataSaver,
+      'translatedLanguage': instance.translatedLanguage,
+      'externalUrl': instance.externalUrl,
       'publishAt': instance.publishAt,
+      'readableAt': instance.readableAt,
     };

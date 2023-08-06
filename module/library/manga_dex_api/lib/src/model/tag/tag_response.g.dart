@@ -30,7 +30,10 @@ Map<String, dynamic> _$TagResponseToJson(TagResponse instance) =>
 TagData _$TagDataFromJson(Map<String, dynamic> json) => TagData(
       json['id'] as String?,
       json['type'] as String?,
-      TagDataAttributes.fromJson(json['attributes'] as Map<String, dynamic>),
+      json['attributes'] == null
+          ? null
+          : TagDataAttributes.fromJson(
+              json['attributes'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$TagDataToJson(TagData instance) => <String, dynamic>{

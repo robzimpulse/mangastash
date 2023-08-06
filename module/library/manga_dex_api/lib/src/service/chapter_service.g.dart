@@ -19,7 +19,7 @@ class _ChapterService implements ChapterService {
   String? baseUrl;
 
   @override
-  Future<ChapterResponse> chapter({
+  Future<SearchChapterResponse> search({
     mangaId,
     ids,
     title,
@@ -42,24 +42,51 @@ class _ChapterService implements ChapterService {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'manga': mangaId,
-      r'ids': ids,
+      r'ids[]': ids,
       r'title': title,
-      r'groups': groups,
+      r'groups[]': groups,
       r'uploader': uploader,
       r'volume': volume,
       r'chapter': chapter,
-      r'translatedLanguage': translatedLanguage,
-      r'originalLanguage': originalLanguage,
-      r'excludedOriginalLanguage': excludedOriginalLanguage,
-      r'contentRating': contentRating,
+      r'translatedLanguage[]': translatedLanguage,
+      r'originalLanguage[]': originalLanguage,
+      r'excludedOriginalLanguage[]': excludedOriginalLanguage,
+      r'contentRating[]': contentRating,
       r'createdAtSince': createdAtSince,
       r'updatedAtSince': updatedAtSince,
       r'publishedAtSince': publishedAtSince,
-      r'includes': includes,
+      r'includes[]': includes,
       r'orders': orders,
       r'limit': limit,
       r'offset': offset,
     };
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<SearchChapterResponse>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/chapter',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = SearchChapterResponse.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<ChapterResponse> detail({
+    id,
+    includes,
+  }) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'includes[]': includes};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
@@ -71,7 +98,7 @@ class _ChapterService implements ChapterService {
     )
             .compose(
               _dio.options,
-              '/chapter',
+              '/chapter/${id}',
               queryParameters: queryParameters,
               data: _data,
             )

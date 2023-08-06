@@ -13,5 +13,6 @@ abstract class CoverArtService {
   @GET('/cover/{id}')
   Future<CoverArtResponse> detail({
     @Path('id') String? id,
+    @Query('includes[]') List<String>? includes,
   });
 }

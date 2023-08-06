@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'search_response.dart';
+part of 'search_manga_response.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-SearchResponse _$SearchResponseFromJson(Map<String, dynamic> json) =>
-    SearchResponse(
+SearchMangaResponse _$SearchMangaResponseFromJson(Map<String, dynamic> json) =>
+    SearchMangaResponse(
       json['result'] as String?,
       json['response'] as String?,
       (json['data'] as List<dynamic>?)
@@ -18,7 +18,8 @@ SearchResponse _$SearchResponseFromJson(Map<String, dynamic> json) =>
       json['total'] as int?,
     );
 
-Map<String, dynamic> _$SearchResponseToJson(SearchResponse instance) =>
+Map<String, dynamic> _$SearchMangaResponseToJson(
+        SearchMangaResponse instance) =>
     <String, dynamic>{
       'result': instance.result,
       'response': instance.response,

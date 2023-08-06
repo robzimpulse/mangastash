@@ -6,7 +6,7 @@ import '../enums/order_enums.dart';
 import '../enums/publication_demographic.dart';
 import '../enums/tag_modes.dart';
 import '../model/manga/manga_response.dart';
-import '../model/manga/search_response.dart';
+import '../model/manga/search_manga_response.dart';
 import '../model/tag/tag_response.dart';
 import '../service/manga_service.dart';
 
@@ -17,7 +17,7 @@ class MangaRepository {
     required MangaService service,
   }) : _service = service;
 
-  Future<SearchResponse> search({
+  Future<SearchMangaResponse> search({
     String? title,
     int? limit,
     int? offset,

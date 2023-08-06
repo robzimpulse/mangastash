@@ -19,7 +19,7 @@ class _MangaService implements MangaService {
   String? baseUrl;
 
   @override
-  Future<SearchResponse> search({
+  Future<SearchMangaResponse> search({
     title,
     limit,
     offset,
@@ -71,8 +71,8 @@ class _MangaService implements MangaService {
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
-    final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<SearchResponse>(Options(
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<SearchMangaResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -84,7 +84,7 @@ class _MangaService implements MangaService {
               data: _data,
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = SearchResponse.fromJson(_result.data!);
+    final value = SearchMangaResponse.fromJson(_result.data!);
     return value;
   }
 

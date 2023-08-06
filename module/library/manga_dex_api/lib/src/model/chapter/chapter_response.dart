@@ -2,6 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 import '../common/attribute.dart';
 import '../common/identifier.dart';
+import '../common/relationship.dart';
 import '../common/response.dart';
 
 part 'chapter_response.g.dart';
@@ -9,17 +10,11 @@ part 'chapter_response.g.dart';
 ///@nodoc
 @JsonSerializable()
 class ChapterResponse extends Response {
-  final List<ChapterData>? data;
-  final int? limit;
-  final int? offset;
-  final int? total;
+  final ChapterData? data;
   ChapterResponse(
     super.result,
     super.response,
     this.data,
-    this.limit,
-    this.offset,
-    this.total,
   );
   factory ChapterResponse.fromJson(Map<String, dynamic> json) {
     return _$ChapterResponseFromJson(json);
@@ -28,11 +23,10 @@ class ChapterResponse extends Response {
   Map<String, dynamic> toJson() => _$ChapterResponseToJson(this);
 }
 
-///@nodoc
 @JsonSerializable()
 class ChapterData extends Identifier {
-  ChapterAttributes? attributes;
-  List<ChapterRelationship>? relationships;
+  ChapterDataAttributes? attributes;
+  List<Relationship>? relationships;
   ChapterData(super.id, super.type, this.attributes, this.relationships);
   factory ChapterData.fromJson(Map<String, dynamic> json) {
     return _$ChapterDataFromJson(json);
@@ -41,44 +35,30 @@ class ChapterData extends Identifier {
   Map<String, dynamic> toJson() => _$ChapterDataToJson(this);
 }
 
-///@nodoc
 @JsonSerializable()
-class ChapterRelationship extends Identifier {
-  ChapterRelationship(super.id, super.type);
-  factory ChapterRelationship.fromJson(Map<String, dynamic> json) {
-    return _$ChapterRelationshipFromJson(json);
-  }
-  @override
-  Map<String, dynamic> toJson() => _$ChapterRelationshipToJson(this);
-}
-
-///@nodoc
-@JsonSerializable()
-class ChapterAttributes extends Attribute {
+class ChapterDataAttributes extends Attribute {
   final String? volume;
   final String? chapter;
   final String? title;
-  final String? transLanguage;
-  final String? hash;
-  final List<String>? chapterData;
-  final List<String>? chapterDataSaver;
+  final String? translatedLanguage;
+  final String? externalUrl;
   final String? publishAt;
-  ChapterAttributes(
+  final String? readableAt;
+  ChapterDataAttributes(
     this.volume,
     this.chapter,
     this.title,
-    this.transLanguage,
-    this.hash,
-    this.chapterData,
-    this.chapterDataSaver,
+    this.translatedLanguage,
+    this.externalUrl,
     this.publishAt,
+    this.readableAt,
     super.createdAt,
     super.updatedAt,
     super.version,
   );
-  factory ChapterAttributes.fromJson(Map<String, dynamic> json) {
-    return _$ChapterAttributesFromJson(json);
+  factory ChapterDataAttributes.fromJson(Map<String, dynamic> json) {
+    return _$ChapterDataAttributesFromJson(json);
   }
   @override
-  Map<String, dynamic> toJson() => _$ChapterAttributesToJson(this);
+  Map<String, dynamic> toJson() => _$ChapterDataAttributesToJson(this);
 }
