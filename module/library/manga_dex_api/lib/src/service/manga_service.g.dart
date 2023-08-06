@@ -112,14 +112,14 @@ class _MangaService implements MangaService {
   }
 
   @override
-  Future<SearchData> detail({id}) async {
+  Future<MangaResponse> detail({id}) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<SearchData>(Options(
+        .fetch<Map<String, dynamic>>(_setStreamType<MangaResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -131,7 +131,7 @@ class _MangaService implements MangaService {
               data: _data,
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = SearchData.fromJson(_result.data!);
+    final value = MangaResponse.fromJson(_result.data!);
     return value;
   }
 

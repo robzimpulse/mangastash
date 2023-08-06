@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/http.dart';
 
 import '../client/manga_dex_dio.dart';
+import '../model/manga/manga_response.dart';
 import '../model/manga/search_response.dart';
 import '../model/tag/tag_response.dart';
 
@@ -43,7 +44,7 @@ abstract class MangaService {
   Future<TagResponse> tags();
 
   @GET('/manga/{id}')
-  Future<SearchData> detail({
+  Future<MangaResponse> detail({
     @Path('id') String? id,
   });
 }

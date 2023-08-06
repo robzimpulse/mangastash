@@ -16,6 +16,7 @@ export 'src/manga_dex_api_registrar.dart';
 export 'src/model/at_home/at_home_response.dart';
 export 'src/model/author/author_response.dart';
 export 'src/model/chapter/chapter_response.dart';
+export 'src/model/manga/manga_response.dart';
 export 'src/model/manga/search_response.dart';
 export 'src/repository/at_home_repository.dart';
 export 'src/repository/author_repository.dart';

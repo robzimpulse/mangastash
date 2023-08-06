@@ -4,6 +4,7 @@ import '../enums/manga_status.dart';
 import '../enums/order_enums.dart';
 import '../enums/publication_demographic.dart';
 import '../enums/tag_modes.dart';
+import '../model/manga/manga_response.dart';
 import '../model/manga/search_response.dart';
 import '../model/tag/tag_response.dart';
 import '../service/manga_service.dart';
@@ -74,7 +75,7 @@ class MangaRepository {
     return _service.tags();
   }
 
-  Future<SearchData> detail(String id) {
+  Future<MangaResponse> detail(String id) {
     return _service.detail(id: id);
   }
 }

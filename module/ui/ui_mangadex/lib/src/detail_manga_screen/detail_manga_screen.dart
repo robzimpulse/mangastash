@@ -25,6 +25,7 @@ class DetailMangaScreen extends StatefulWidget {
     return BlocProvider(
       create: (context) => DetailMangaCubit(
         manga: manga,
+        getMangaUseCase: locator(),
       )..init(),
       child: DetailMangaScreen(
         locator: locator,
@@ -38,12 +39,6 @@ class DetailMangaScreen extends StatefulWidget {
 }
 
 class _DetailMangaScreenState extends State<DetailMangaScreen> {
-  @override
-  void initState() {
-    super.initState();
-    _cubit(context).init();
-  }
-
   Widget _bloc({
     required BlocWidgetBuilder<DetailMangaState> builder,
     BlocBuilderCondition<DetailMangaState>? buildWhen,

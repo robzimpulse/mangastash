@@ -8,7 +8,7 @@ class GetMangaUseCase {
     required MangaRepository repository,
   }) : _repository = repository;
 
-  Future<Response<SearchData>> execute(
+  Future<Response<MangaResponse>> execute(
     String id, {
     List<String>? includes,
   }) async {
