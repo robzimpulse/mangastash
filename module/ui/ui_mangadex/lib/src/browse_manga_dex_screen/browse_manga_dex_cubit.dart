@@ -90,6 +90,14 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
 
     if (result is Success<SearchResponse>) {
       final data = result.data.data?.map((element) async {
+        final tags = element.attributes?.tags.map(
+          (e) => MangaTag(
+            id: e?.id,
+            name: e?.attributes?.name?.en,
+            group: e?.attributes?.group,
+          ),
+        );
+
         return Manga(
           id: element.id,
           coverUrl: await _coverArtUrl(element),
@@ -97,6 +105,7 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
           status: element.attributes?.status,
           description: element.attributes?.description?.en,
           author: (await _authors(element)).join(' | '),
+          tags: tags?.toList(),
         );
       });
 

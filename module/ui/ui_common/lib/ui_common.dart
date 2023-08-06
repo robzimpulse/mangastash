@@ -2,6 +2,7 @@ library ui_common;
 
 export 'package:cached_network_image/cached_network_image.dart';
 export 'package:expandable/expandable.dart';
+export 'package:intersperse/intersperse.dart';
 export 'package:responsive_framework/responsive_framework.dart';
 
 export 'src/controller/paging_scroll_controller.dart';

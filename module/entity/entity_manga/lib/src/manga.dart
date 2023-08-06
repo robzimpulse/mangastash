@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../entity_manga.dart';
+
 class Manga extends Equatable with EquatableMixin {
   final String? id;
 
@@ -13,6 +15,8 @@ class Manga extends Equatable with EquatableMixin {
 
   final String? description;
 
+  final List<MangaTag>? tags;
+
   const Manga({
     this.id,
     this.title,
@@ -20,10 +24,13 @@ class Manga extends Equatable with EquatableMixin {
     this.author,
     this.status,
     this.description,
+    this.tags,
   });
 
   @override
-  List<Object?> get props => [id, title, coverUrl, author, status, description];
+  List<Object?> get props {
+    return [id, title, coverUrl, author, status, description, tags];
+  }
 
   Manga copyWith({
     String? id,
@@ -32,6 +39,7 @@ class Manga extends Equatable with EquatableMixin {
     String? author,
     String? status,
     String? description,
+    List<MangaTag>? tags,
   }) {
     return Manga(
       id: id ?? this.id,
@@ -40,6 +48,7 @@ class Manga extends Equatable with EquatableMixin {
       author: author ?? this.author,
       status: status ?? this.status,
       description: description ?? this.description,
+      tags: tags ?? this.tags,
     );
   }
 }

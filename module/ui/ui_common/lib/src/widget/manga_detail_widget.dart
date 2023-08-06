@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 
+import '../../ui_common.dart';
+
 class MangaDetailWidget extends StatelessWidget {
   const MangaDetailWidget({
     super.key,
@@ -10,6 +12,12 @@ class MangaDetailWidget extends StatelessWidget {
     this.author,
     this.status,
     this.description,
+    this.onTapFavorite,
+    this.onTapWebsite,
+    this.chapterCount,
+    this.onTapChapterIndex,
+    this.tags,
+    this.onTapTag,
   });
 
   final String? coverUrl;
@@ -21,6 +29,18 @@ class MangaDetailWidget extends StatelessWidget {
   final String? status;
 
   final String? description;
+
+  final int? chapterCount;
+
+  final List<String>? tags;
+
+  final void Function()? onTapFavorite;
+
+  final void Function()? onTapWebsite;
+
+  final void Function(int)? onTapChapterIndex;
+
+  final void Function(String)? onTapTag;
 
   Widget _header() {
     return SliverPadding(
@@ -45,12 +65,16 @@ class MangaDetailWidget extends StatelessWidget {
                 );
               },
             ),
-            Column(
-              children: [
-                if (title != null) Text(title ?? ''),
-                if (author != null) Text(author ?? ''),
-                if (status != null) Text(status ?? ''),
-              ],
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  if (title != null) Text(title ?? ''),
+                  if (author != null) Text(author ?? ''),
+                  if (status != null) Text(status ?? ''),
+                ].intersperse(const SizedBox(height: 4)).toList(),
+              ),
             ),
           ],
         ),
@@ -67,12 +91,12 @@ class MangaDetailWidget extends StatelessWidget {
           children: [
             IconButton(
               icon: const Icon(Icons.favorite_outline),
-              onPressed: () {},
+              onPressed: onTapFavorite,
             ),
             const SizedBox.shrink(),
             IconButton(
               icon: const Icon(Icons.web),
-              onPressed: () {},
+              onPressed: onTapWebsite,
             ),
           ],
         ),
@@ -80,7 +104,9 @@ class MangaDetailWidget extends StatelessWidget {
     );
   }
 
-  Widget _description() {
+  Widget? _description() {
+    final text = description;
+    if (text == null) return null;
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       sliver: SliverToBoxAdapter(
@@ -92,13 +118,13 @@ class MangaDetailWidget extends StatelessWidget {
             ),
             collapsed: Column(
               children: [
-                Text(description ?? '', maxLines: 3),
+                Text(text, maxLines: 3),
                 const Icon(Icons.keyboard_arrow_down)
               ],
             ),
             expanded: Column(
               children: [
-                Text(description ?? ''),
+                Text(text),
                 const Icon(Icons.keyboard_arrow_up),
               ],
             ),
@@ -108,7 +134,10 @@ class MangaDetailWidget extends StatelessWidget {
     );
   }
 
-  Widget _tags() {
+  Widget? _tags() {
+    final data = tags;
+    if (data == null) return null;
+    if (data.isEmpty) return null;
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       sliver: SliverToBoxAdapter(
@@ -119,11 +148,11 @@ class MangaDetailWidget extends StatelessWidget {
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) => OutlinedButton(
-                child: Text('Index $index'),
-                onPressed: () {},
+                child: Text(data[index]),
+                onPressed: () => onTapTag?.call(data[index]),
               ),
               separatorBuilder: (context, index) => const SizedBox(width: 8),
-              itemCount: 100,
+              itemCount: data.length,
             ),
           ),
         ),
@@ -131,28 +160,43 @@ class MangaDetailWidget extends StatelessWidget {
     );
   }
 
-  Widget _chapterCount() {
+  Widget? _chapterCount() {
+    final count = chapterCount;
+    if (count == null) return null;
+    if (count < 1) return null;
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       sliver: SliverToBoxAdapter(
         child: Row(
-          children: const [
-            Text('319 Chapters'),
+          children: [
+            Text('$count Chapters'),
           ],
         ),
       ),
     );
   }
 
-  Widget _chapters() {
+  Widget? _chapters() {
+    final count = chapterCount;
+    if (count == null) return null;
+    if (count < 1) return null;
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
-          (context, index) => Text('Chapter $index'),
-          childCount: 319,
+          (context, index) => ListTile(
+            title: Text('Chapter $index'),
+            onTap: () => onTapChapterIndex?.call(index),
+          ),
+          childCount: count,
         ),
       ),
+    );
+  }
+
+  Widget _separator() {
+    return const SliverToBoxAdapter(
+      child: SizedBox(height: 8),
     );
   }
 
@@ -162,11 +206,11 @@ class MangaDetailWidget extends StatelessWidget {
       slivers: [
         _header(),
         _buttons(),
-        if (description != null) _description(),
+        _description(),
         _tags(),
         _chapterCount(),
         _chapters(),
-      ],
+      ].whereType<Widget>().intersperseOuter(_separator()).toList(),
     );
   }
 }

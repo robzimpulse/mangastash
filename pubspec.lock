@@ -305,6 +305,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.2"
+  intersperse:
+    dependency: transitive
+    description:
+      name: intersperse
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   ios_willpop_transition_theme:
     dependency: "direct main"
     description:

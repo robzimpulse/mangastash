@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -102,12 +103,27 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
           );
         }
 
+        final tags = state.manga?.tags;
+
         return MangaDetailWidget(
           coverUrl: state.manga?.coverUrl,
           title: state.manga?.title,
           author: state.manga?.author,
           status: state.manga?.status,
           description: state.manga?.description,
+          tags: tags?.map((e) => e.name).whereNotNull().toList(),
+          onTapFavorite: () => context.showSnackBar(
+            message: 'on tap favorite',
+          ),
+          onTapWebsite: () => context.showSnackBar(
+            message: 'on tap website',
+          ),
+          onTapChapterIndex: (index) => context.showSnackBar(
+            message: 'on tap chapter $index',
+          ),
+          onTapTag: (name) => context.showSnackBar(
+            message: 'on tap tag $name',
+          ),
         );
       },
     );

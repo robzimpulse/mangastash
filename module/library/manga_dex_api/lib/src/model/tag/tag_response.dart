@@ -30,7 +30,7 @@ class TagResponse extends Response {
 
 @JsonSerializable()
 class TagData extends Identifier {
-  final TagDataAttributes attributes;
+  final TagDataAttributes? attributes;
   TagData(super.id, super.type, this.attributes);
   factory TagData.fromJson(Map<String, dynamic> json) {
     return _$TagDataFromJson(json);

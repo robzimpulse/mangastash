@@ -16,8 +16,8 @@ class ListTagUseCase {
       final tags = result.data?.map(
         (e) => MangaTag(
           id: e.id,
-          name: e.attributes.name?.en,
-          group: e.attributes.group,
+          name: e.attributes?.name?.en,
+          group: e.attributes?.group,
         ),
       );
 
