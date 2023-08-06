@@ -10,11 +10,8 @@ import 'detail_manga_state.dart';
 class DetailMangaScreen extends StatefulWidget {
   const DetailMangaScreen({
     super.key,
-    required this.manga,
     required this.locator,
   });
-
-  final Manga manga;
 
   final ServiceLocator locator;
 
@@ -29,7 +26,6 @@ class DetailMangaScreen extends StatefulWidget {
       ),
       child: DetailMangaScreen(
         locator: locator,
-        manga: manga,
       ),
     );
   }
@@ -58,7 +54,7 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
     return ScaffoldScreen(
       onWillPop: () => Future.value(true),
       appBar: AppBar(
-        title: Text(widget.manga.title ?? ''),
+        title: _title(),
         elevation: 0,
         actions: [
           IconButton(
@@ -77,10 +73,14 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: () => _cubit(context).init(),
-        child: _bloc(
-          builder: (context, state) => _content(),
-        ),
+        child: _content(),
       ),
+    );
+  }
+
+  Widget _title() {
+    return _bloc(
+      builder: (context, state) => Text(state.manga?.title ?? ''),
     );
   }
 
@@ -103,11 +103,11 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
         }
 
         return MangaDetailWidget(
-          coverUrl: widget.manga.coverUrl,
-          title: widget.manga.title,
-          author: widget.manga.author,
-          status: widget.manga.status,
-          description: widget.manga.description,
+          coverUrl: state.manga?.coverUrl,
+          title: state.manga?.title,
+          author: state.manga?.author,
+          status: state.manga?.status,
+          description: state.manga?.description,
         );
       },
     );
