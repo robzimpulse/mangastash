@@ -27,6 +27,4 @@ class MangaChapter extends Equatable with EquatableMixin {
       title: title ?? this.title,
     );
   }
-
-  String get name => '$chapter - $title';
 }

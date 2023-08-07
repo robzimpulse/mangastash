@@ -96,6 +96,7 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
           status: state.manga?.status,
           description: state.manga?.description,
           tags: tags?.map((e) => e.name).whereNotNull().toList(),
+          horizontalPadding: 12,
           onTapFavorite: () => context.showSnackBar(
             message: 'on tap favorite',
           ),
@@ -137,29 +138,38 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
       ];
     }
 
-    return [
-      SliverPadding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        sliver: SliverToBoxAdapter(
-          child: Row(
-            children: [
-              Text('${state.manga?.chapters?.length} Chapters'),
-            ],
+    if (state.manga?.chapters?.isEmpty == true) {
+      return [
+        const SliverFillRemaining(
+          hasScrollBody: false,
+          child: Center(
+            child: Text(
+              'No Chapter Found',
+              textAlign: TextAlign.center,
+            ),
           ),
+        )
+      ];
+    }
+
+    return [
+      SliverToBoxAdapter(
+        child: ListTile(
+          title: Text('${state.manga?.chapters?.length} Chapters'),
         ),
       ),
-      SliverPadding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        sliver: SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) => ListTile(
-              title: Text('Chapter ${state.manga?.chapters?[index].name}'),
-              onTap: () {},
+      SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => ListTile(
+            title: Text('Chapter ${state.manga?.chapters?[index].chapter}'),
+            subtitle: Text('${state.manga?.chapters?[index].title}'),
+            onTap: () => context.showSnackBar(
+              message: 'on tap chapter id ${state.manga?.chapters?[index].id}',
             ),
-            childCount: state.manga?.chapters?.length,
           ),
+          childCount: state.manga?.chapters?.length,
         ),
-      )
+      ),
     ];
   }
 }

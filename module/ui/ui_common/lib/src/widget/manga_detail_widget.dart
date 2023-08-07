@@ -16,6 +16,8 @@ class MangaDetailWidget extends StatelessWidget {
     this.onTapWebsite,
     this.tags,
     this.onTapTag,
+    this.horizontalPadding = 8,
+    this.separator = const SizedBox(height: 8),
     required this.child,
   });
 
@@ -39,9 +41,13 @@ class MangaDetailWidget extends StatelessWidget {
 
   final List<Widget> child;
 
+  final double horizontalPadding;
+
+  final Widget separator;
+
   Widget _header() {
     return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       sliver: SliverToBoxAdapter(
         child: Row(
           children: [
@@ -81,7 +87,7 @@ class MangaDetailWidget extends StatelessWidget {
 
   Widget _buttons() {
     return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       sliver: SliverToBoxAdapter(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -105,7 +111,7 @@ class MangaDetailWidget extends StatelessWidget {
     final text = description;
     if (text == null) return null;
     return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       sliver: SliverToBoxAdapter(
         child: ExpandableNotifier(
           child: ExpandablePanel(
@@ -113,16 +119,28 @@ class MangaDetailWidget extends StatelessWidget {
               tapBodyToExpand: true,
               tapBodyToCollapse: true,
             ),
-            collapsed: Column(
+            collapsed: Row(
               children: [
-                Text(text, maxLines: 3),
-                const Icon(Icons.keyboard_arrow_down)
+                Expanded(
+                  child: Column(
+                    children: [
+                      Text(text, maxLines: 3),
+                      const Icon(Icons.keyboard_arrow_down)
+                    ],
+                  ),
+                ),
               ],
             ),
-            expanded: Column(
+            expanded: Row(
               children: [
-                Text(text),
-                const Icon(Icons.keyboard_arrow_up),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Text(text),
+                      const Icon(Icons.keyboard_arrow_up),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -136,7 +154,7 @@ class MangaDetailWidget extends StatelessWidget {
     if (data == null) return null;
     if (data.isEmpty) return null;
     return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       sliver: SliverToBoxAdapter(
         child: SizedBox(
           height: 32,
@@ -157,64 +175,17 @@ class MangaDetailWidget extends StatelessWidget {
     );
   }
 
-  // List<Widget>? _chapters() {
-  //   if (isLoading) {
-  //     return [
-  //       const SliverFillRemaining(
-  //         hasScrollBody: false,
-  //         child: Center(
-  //           child: CircularProgressIndicator(),
-  //         ),
-  //       ),
-  //     ];
-  //   }
-  //
-  //   final count = chapterCount;
-  //   if (count == null) return null;
-  //   if (count < 1) return null;
-  //
-  //   return [
-  //     SliverPadding(
-  //       padding: const EdgeInsets.symmetric(horizontal: 8),
-  //       sliver: SliverToBoxAdapter(
-  //         child: Row(
-  //           children: [
-  //             Text('$count Chapters'),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //     SliverPadding(
-  //       padding: const EdgeInsets.symmetric(horizontal: 8),
-  //       sliver: SliverList(
-  //         delegate: SliverChildBuilderDelegate(
-  //           (context, index) => ListTile(
-  //             title: Text('Chapter $index'),
-  //             onTap: () => onTapChapterIndex?.call(index),
-  //           ),
-  //           childCount: count,
-  //         ),
-  //       ),
-  //     )
-  //   ];
-  // }
-
-  Widget _separator() {
-    return const SliverToBoxAdapter(
-      child: SizedBox(height: 8),
-    );
-  }
+  Widget _separator() => SliverToBoxAdapter(child: separator);
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        _header(),
-        _buttons(),
-        _description(),
-        _tags(),
-        ...child,
-      ].whereType<Widget>().intersperseOuter(_separator()).toList(),
-    );
+    final widgets = [
+      _header(),
+      _buttons(),
+      _description(),
+      _tags(),
+    ].whereType<Widget>().intersperse(_separator());
+
+    return CustomScrollView(slivers: [_separator(), ...widgets, ...child]);
   }
 }
