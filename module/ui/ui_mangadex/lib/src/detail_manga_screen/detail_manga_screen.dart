@@ -36,7 +36,7 @@ class DetailMangaScreen extends StatefulWidget {
 }
 
 class _DetailMangaScreenState extends State<DetailMangaScreen> {
-  Widget _bloc({
+  Widget _builder({
     required BlocWidgetBuilder<DetailMangaState> builder,
     BlocBuilderCondition<DetailMangaState>? buildWhen,
   }) {
@@ -80,13 +80,13 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
   }
 
   Widget _title() {
-    return _bloc(
+    return _builder(
       builder: (context, state) => Text(state.manga?.title ?? ''),
     );
   }
 
   Widget _content() {
-    return _bloc(
+    return _builder(
       builder: (context, state) {
         final tags = state.manga?.tags;
         return MangaDetailWidget(
