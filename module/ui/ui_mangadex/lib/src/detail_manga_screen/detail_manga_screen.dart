@@ -161,7 +161,7 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
       SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) => ListTile(
-            title: Text('Chapter ${state.manga?.chapters?[index].chapter}'),
+            title: Text('${state.manga?.chapters?[index].name}'),
             subtitle: Text('${state.manga?.chapters?[index].title}'),
             onTap: () => context.showSnackBar(
               message: 'on tap chapter id ${state.manga?.chapters?[index].id}',

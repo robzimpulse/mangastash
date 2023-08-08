@@ -51,6 +51,7 @@ class DetailMangaCubit extends Cubit<DetailMangaState> {
               id: e.id,
               chapter: e.attributes?.chapter,
               title: e.attributes?.title,
+              volume: e.attributes?.volume,
             ),
           ),
         );
