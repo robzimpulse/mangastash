@@ -1,7 +1,6 @@
 import 'package:alice_lightweight/core/alice_dio_interceptor.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/native_imp.dart';
-import 'package:flutter/foundation.dart';
 
 import '../adapter/dio_adapter.dart'
     if (dart.library.io) '../adapter/dio_adapter_mobile.dart'

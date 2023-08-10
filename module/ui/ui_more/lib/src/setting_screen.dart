@@ -5,15 +5,19 @@ import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
 class SettingScreen extends StatelessWidget {
-  final ListenThemeUseCase listenThemeUseCase;
   final Alice alice;
+  final ListenThemeUseCase listenThemeUseCase;
   final UpdateThemeUseCase themeUpdateUseCase;
+  final ListenLocaleUseCase listenLocaleUseCase;
+  final UpdateLocaleUseCase updateLocaleUseCase;
 
   const SettingScreen({
     super.key,
     required this.alice,
     required this.listenThemeUseCase,
     required this.themeUpdateUseCase,
+    required this.listenLocaleUseCase,
+    required this.updateLocaleUseCase,
   });
 
   static Widget create({
@@ -23,6 +27,8 @@ class SettingScreen extends StatelessWidget {
       alice: locator(),
       listenThemeUseCase: locator(),
       themeUpdateUseCase: locator(),
+      listenLocaleUseCase: locator(),
+      updateLocaleUseCase: locator(),
     );
   }
 
@@ -41,9 +47,8 @@ class SettingScreen extends StatelessWidget {
               final theme = snapshot.data;
               final isDarkMode = theme?.brightness == Brightness.dark;
               final title = isDarkMode ? 'Lights' : 'Dark';
-              final icon = isDarkMode
-                  ? Icons.lightbulb_outline
-                  : Icons.lightbulb_sharp;
+              final icon =
+                  isDarkMode ? Icons.lightbulb_outline : Icons.lightbulb_sharp;
 
               return SwitchListTile(
                 title: Text('$title Mode'),
@@ -58,12 +63,26 @@ class SettingScreen extends StatelessWidget {
               );
             },
           ),
+          StreamBuilder<String>(
+            stream: listenLocaleUseCase.localeDataStream,
+            builder: (context, snapshot) {
+              final locale = snapshot.data;
+              return ListTile(
+                title: const Text('Language'),
+                trailing: Text('$locale'),
+                leading: const SizedBox(
+                  height: double.infinity,
+                  child: Icon(Icons.translate),
+                ),
+              );
+            },
+          ),
           ListTile(
             title: const Text('HTTP Inspector'),
             onTap: () => alice.showInspector(),
             leading: const SizedBox(
               height: double.infinity,
-              child: Icon(Icons.compare_arrows),
+              child: Icon(Icons.http),
             ),
           ),
         ],

@@ -23,7 +23,7 @@ class DetailMangaScreen extends StatefulWidget {
     return BlocProvider(
       create: (context) => DetailMangaCubit(
         manga: manga,
-        searchChapterUseCase: locator(),
+        getAllChapterUseCase: locator(),
       )..init(),
       child: DetailMangaScreen(
         locator: locator,
@@ -161,8 +161,8 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
       SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) => ListTile(
-            title: Text('${state.manga?.chapters?[index].name}'),
-            subtitle: Text('${state.manga?.chapters?[index].title}'),
+            title: Text('${state.manga?.chapters?[index].top}'),
+            subtitle: Text('${state.manga?.chapters?[index].bottom}'),
             onTap: () => context.showSnackBar(
               message: 'on tap chapter id ${state.manga?.chapters?[index].id}',
             ),
