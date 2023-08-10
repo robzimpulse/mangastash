@@ -5,7 +5,6 @@ extension ParseableDateStringExtension on String {
     try {
       return DateFormat('yyyy-MM-DDThh:mm:ssZ').parse(this);
     } on Exception catch(e) {
-      print(e.toString());
       return null;
     }
   }
