@@ -89,7 +89,82 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
     return _builder(
       builder: (context, state) {
         final tags = state.manga?.tags;
-        return MangaDetailWidget(
+        final errorMessage = state.errorMessage;
+        final chapters = state.manga?.chapters;
+
+        if (state.isLoading) {
+          return MangaDetailWidget.loading(
+            coverUrl: state.manga?.coverUrl,
+            title: state.manga?.title,
+            author: state.manga?.author,
+            status: state.manga?.status,
+            description: state.manga?.description,
+            tags: tags?.map((e) => e.name).whereNotNull().toList(),
+            horizontalPadding: 12,
+            onTapFavorite: () => context.showSnackBar(
+              message: 'on tap favorite',
+            ),
+            onTapWebsite: () => context.showSnackBar(
+              message: 'on tap website',
+            ),
+            onTapTag: (name) => context.showSnackBar(
+              message: 'on tap tag $name',
+            ),
+          );
+        }
+
+        if (errorMessage != null) {
+          return MangaDetailWidget.message(
+            coverUrl: state.manga?.coverUrl,
+            title: state.manga?.title,
+            author: state.manga?.author,
+            status: state.manga?.status,
+            description: state.manga?.description,
+            tags: tags?.map((e) => e.name).whereNotNull().toList(),
+            horizontalPadding: 12,
+            onTapFavorite: () => context.showSnackBar(
+              message: 'on tap favorite',
+            ),
+            onTapWebsite: () => context.showSnackBar(
+              message: 'on tap website',
+            ),
+            onTapTag: (name) => context.showSnackBar(
+              message: 'on tap tag $name',
+            ),
+            message: errorMessage,
+          );
+        }
+
+        if (chapters != null) {
+          return MangaDetailWidget.content(
+            coverUrl: state.manga?.coverUrl,
+            title: state.manga?.title,
+            author: state.manga?.author,
+            status: state.manga?.status,
+            description: state.manga?.description,
+            tags: tags?.map((e) => e.name).whereNotNull().toList(),
+            horizontalPadding: 12,
+            onTapFavorite: () => context.showSnackBar(
+              message: 'on tap favorite',
+            ),
+            onTapWebsite: () => context.showSnackBar(
+              message: 'on tap website',
+            ),
+            onTapTag: (name) => context.showSnackBar(
+              message: 'on tap tag $name',
+            ),
+            chapterCount: chapters.length,
+            chapterForIndex: (context, index) => ListTile(
+              title: Text(chapters[index].top),
+              subtitle: Text(chapters[index].bottom),
+              onTap: () => context.showSnackBar(
+                message: 'on tap chapter id ${chapters[index].id}',
+              ),
+            ),
+          );
+        }
+
+        return MangaDetailWidget.message(
           coverUrl: state.manga?.coverUrl,
           title: state.manga?.title,
           author: state.manga?.author,
@@ -106,73 +181,9 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
           onTapTag: (name) => context.showSnackBar(
             message: 'on tap tag $name',
           ),
-          child: _chapters(context, state),
+          message: 'No Chapter Found',
         );
       },
     );
-  }
-
-  List<Widget> _chapters(BuildContext context, DetailMangaState state) {
-    if (state.isLoading) {
-      return [
-        const SliverFillRemaining(
-          hasScrollBody: false,
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
-      ];
-    }
-
-    if (state.errorMessage?.isNotEmpty == true) {
-      return [
-        SliverFillRemaining(
-          hasScrollBody: false,
-          child: Center(
-            child: Text(
-              state.errorMessage ?? '',
-              textAlign: TextAlign.center,
-            ),
-          ),
-        )
-      ];
-    }
-
-    if (state.manga?.chapters?.isEmpty == true) {
-      return [
-        const SliverFillRemaining(
-          hasScrollBody: false,
-          child: Padding(
-            padding: EdgeInsets.all(24),
-            child: Center(
-              child: Text(
-                'No Chapter Found',
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-        )
-      ];
-    }
-
-    return [
-      SliverToBoxAdapter(
-        child: ListTile(
-          title: Text('${state.manga?.chapters?.length} Chapters'),
-        ),
-      ),
-      SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) => ListTile(
-            title: Text('${state.manga?.chapters?[index].top}'),
-            subtitle: Text('${state.manga?.chapters?[index].bottom}'),
-            onTap: () => context.showSnackBar(
-              message: 'on tap chapter id ${state.manga?.chapters?[index].id}',
-            ),
-          ),
-          childCount: state.manga?.chapters?.length,
-        ),
-      ),
-    ];
   }
 }

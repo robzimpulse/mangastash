@@ -21,6 +21,86 @@ class MangaDetailWidget extends StatelessWidget {
     required this.child,
   });
 
+  MangaDetailWidget.loading({
+    super.key,
+    this.coverUrl,
+    this.title,
+    this.author,
+    this.status,
+    this.description,
+    this.onTapFavorite,
+    this.onTapWebsite,
+    this.tags,
+    this.onTapTag,
+    this.horizontalPadding = 8,
+    this.separator = const SizedBox(height: 8),
+  }) : child = [
+          const SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+        ];
+
+  MangaDetailWidget.message({
+    super.key,
+    this.coverUrl,
+    this.title,
+    this.author,
+    this.status,
+    this.description,
+    this.onTapFavorite,
+    this.onTapWebsite,
+    this.tags,
+    this.onTapTag,
+    this.horizontalPadding = 8,
+    this.separator = const SizedBox(height: 8),
+    required String message,
+  }) : child = [
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Center(
+                child: Text(
+                  message,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
+        ];
+
+  MangaDetailWidget.content({
+    super.key,
+    this.coverUrl,
+    this.title,
+    this.author,
+    this.status,
+    this.description,
+    this.onTapFavorite,
+    this.onTapWebsite,
+    this.tags,
+    this.onTapTag,
+    this.horizontalPadding = 8,
+    this.separator = const SizedBox(height: 8),
+    required int chapterCount,
+    required NullableIndexedWidgetBuilder chapterForIndex,
+  }) : child = [
+          SliverToBoxAdapter(
+            child: ListTile(
+              title: Text('$chapterCount Chapters'),
+            ),
+          ),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              chapterForIndex,
+              childCount: chapterCount,
+            ),
+          ),
+        ];
+
   final String? coverUrl;
 
   final String? title;
