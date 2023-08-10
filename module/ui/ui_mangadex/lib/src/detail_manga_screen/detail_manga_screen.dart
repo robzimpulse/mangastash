@@ -142,10 +142,13 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
       return [
         const SliverFillRemaining(
           hasScrollBody: false,
-          child: Center(
-            child: Text(
-              'No Chapter Found',
-              textAlign: TextAlign.center,
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Center(
+              child: Text(
+                'No Chapter Found',
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
         )
