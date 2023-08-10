@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:equatable/equatable.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
@@ -48,7 +49,7 @@ class MangaChapter extends Equatable with EquatableMixin {
 
   String get bottom {
     List<String> texts = [];
-    if (readableAt != null) texts.add('$readableAt');
+    if (readableAt != null) texts.add('${readableAt?.asDateTime?.ddLLLLyy}');
     if (title != null) texts.add('$title');
     return texts.join(' - ');
   }
