@@ -6,9 +6,7 @@ import '../../domain_manga.dart';
 
 class SearchMangaUseCase {
   final MangaRepository _mangaRepository;
-  // TODO: use this repository
   final AuthorRepository _authorRepository;
-  // TODO: use this repository
   final CoverRepository _coverRepository;
 
   const SearchMangaUseCase({
@@ -50,7 +48,7 @@ class SearchMangaUseCase {
 
       final offset = result.offset ?? 0;
       final limit = result.limit ?? 0;
-      final promises = result.data?.map((e) => _mapManga(e)).toList() ?? [];
+      final promises = result.data?.map(_mapManga).toList() ?? [];
       final mangas = await Future.wait(promises);
 
       return Success(
