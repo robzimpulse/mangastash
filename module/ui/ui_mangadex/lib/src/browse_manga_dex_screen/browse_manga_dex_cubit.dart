@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -41,42 +40,6 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
     emit(state.copyWith(isPagingNextPage: false));
   }
 
-  // TODO: move to another use case
-  Future<String> _coverArtUrl(MangaData data) async {
-    final cover = data.relationships?.firstWhereOrNull(
-      (e) => e.type == Include.coverArt.rawValue,
-    );
-    final response = await getCoverArtUseCase.execute(
-      mangaId: data.id ?? '',
-      coverId: cover?.id ?? '',
-    );
-    if (response is Success<String>) {
-      return response.data;
-    }
-    return '';
-  }
-
-  // TODO: move to another use case
-  Future<List<String>> _authors(MangaData data) async {
-    final authors = data.relationships?.where(
-      (e) => e.type == Include.author.rawValue,
-    );
-    if (authors == null) return [];
-    final promises = authors.map(
-      (e) async {
-        final response = await getAuthorUseCase.execute(
-          authorId: e.id ?? '',
-        );
-        if (response is Success<AuthorResponse>) {
-          return response.data.data?.attributes?.name;
-        }
-        return null;
-      },
-    );
-    final result = await Future.wait(promises);
-    return result.whereNotNull().toList();
-  }
-
   Future<void> _fetch() async {
     final param = state.parameter;
 
@@ -84,19 +47,10 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
       parameter: param,
     );
 
-    if (result is Success<SearchMangaResponse>) {
-      final data = result.data.data?.map((element) async {
-        return Manga.from(
-          element,
-          coverUrl: await _coverArtUrl(element),
-          author: await _authors(element),
-        );
-      });
-
+    if (result is Success<PaginationManga>) {
       final offset = result.data.offset ?? 0;
       final limit = result.data.limit ?? 0;
-      List<Manga> mangas = [];
-      if (data != null) mangas = await Future.wait(data);
+      final mangas = result.data.mangas ?? [];
 
       emit(
         state.copyWith(
@@ -105,12 +59,12 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
             limit: limit,
             offset: offset + limit,
           ),
-          hasNextPage: (result.data.data?.length ?? 0) < limit,
+          hasNextPage: mangas.length < limit,
         ),
       );
     }
 
-    if (result is Error<SearchMangaResponse>) {
+    if (result is Error<PaginationManga>) {
       emit(
         state.copyWith(
           errorMessage: () => result.error.toString(),
