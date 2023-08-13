@@ -13,16 +13,22 @@ class MangaChapter extends Equatable with EquatableMixin {
 
   final String? readableAt;
 
+  final List<String>? images;
+
+  final List<String>? imagesDataSaver;
+
   const MangaChapter({
     this.id,
     this.chapter,
     this.title,
     this.volume,
     this.readableAt,
+    this.images,
+    this.imagesDataSaver,
   });
 
   @override
-  List<Object?> get props => [id, chapter, title, volume, readableAt];
+  List<Object?> get props => [id, chapter, title, volume, readableAt, images, imagesDataSaver,];
 
   MangaChapter copyWith({
     String? id,
@@ -30,6 +36,8 @@ class MangaChapter extends Equatable with EquatableMixin {
     String? title,
     String? volume,
     String? readableAt,
+    List<String>? images,
+    List<String>? imagesDataSaver,
   }) {
     return MangaChapter(
       id: id ?? this.id,
@@ -37,6 +45,8 @@ class MangaChapter extends Equatable with EquatableMixin {
       title: title ?? this.title,
       volume: volume ?? this.volume,
       readableAt: readableAt ?? this.readableAt,
+      images: images ?? this.images,
+      imagesDataSaver: imagesDataSaver ?? this.imagesDataSaver,
     );
   }
 

@@ -1,10 +1,12 @@
 import 'package:collection/collection.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
+import '../reader_manga_screen/reader_manga_screen.dart';
 import 'detail_manga_cubit.dart';
 import 'detail_manga_state.dart';
 
@@ -22,8 +24,15 @@ class DetailMangaScreen extends StatefulWidget {
   }) {
     return BlocProvider(
       create: (context) => DetailMangaCubit(
-        manga: manga,
         getAllChapterUseCase: locator(),
+        initialState: DetailMangaState(
+          manga: manga,
+          parameter: SearchChapterParameter(
+            mangaId: manga.id,
+            translatedLanguage: const [LanguageCodes.english],
+            orders: const {ChapterOrders.chapter: OrderDirections.descending},
+          ),
+        ),
       )..init(),
       child: DetailMangaScreen(
         locator: locator,
@@ -157,8 +166,10 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
             chapterForIndex: (context, index) => ListTile(
               title: Text(chapters[index].top),
               subtitle: Text(chapters[index].bottom),
-              onTap: () => context.showSnackBar(
-                message: 'on tap chapter id ${chapters[index].id}',
+              onTap: () => _onTapChapter(
+                context,
+                state.manga,
+                chapters[index].id,
               ),
             ),
           );
@@ -184,6 +195,22 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
           message: 'No Chapter Found',
         );
       },
+    );
+  }
+
+  void _onTapChapter(
+    BuildContext context,
+    Manga? manga,
+    String? initialChapterId,
+  ) {
+    if (manga == null) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ReaderMangaScreen(
+          manga: manga,
+          initialChapterId: initialChapterId,
+        ),
+      ),
     );
   }
 }

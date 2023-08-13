@@ -16,11 +16,7 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
     required this.searchMangaUseCase,
     required this.getCoverArtUseCase,
     required this.getAuthorUseCase,
-    BrowseMangaDexState initialState = const BrowseMangaDexState(
-      parameter: SearchMangaParameter(
-        orders: {SearchOrders.rating: OrderDirections.descending},
-      ),
-    ),
+    BrowseMangaDexState initialState = const BrowseMangaDexState(),
   }) : super(initialState);
 
   Future<void> init({String? title}) async {

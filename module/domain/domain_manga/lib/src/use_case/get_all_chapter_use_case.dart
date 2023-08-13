@@ -40,8 +40,6 @@ class GetAllChapterUseCase {
         );
 
         final data = result.data ?? [];
-        final offset = result.offset ?? 0;
-        final limit = result.limit ?? 0;
         total = result.total ?? 0;
         chapters.addAll(data);
 

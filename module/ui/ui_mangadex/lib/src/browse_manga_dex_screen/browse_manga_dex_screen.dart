@@ -26,6 +26,11 @@ class BrowseMangaDexScreen extends StatefulWidget {
         searchMangaUseCase: locator(),
         getCoverArtUseCase: locator(),
         getAuthorUseCase: locator(),
+        initialState: const BrowseMangaDexState(
+          parameter: SearchMangaParameter(
+            orders: {SearchOrders.rating: OrderDirections.descending},
+          ),
+        ),
       )..init(),
       child: BrowseMangaDexScreen(locator: locator),
     );

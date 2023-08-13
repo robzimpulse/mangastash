@@ -9,19 +9,9 @@ class DetailMangaCubit extends Cubit<DetailMangaState> {
   final GetAllChapterUseCase getAllChapterUseCase;
 
   DetailMangaCubit({
-    required Manga manga,
     required this.getAllChapterUseCase,
     DetailMangaState initialState = const DetailMangaState(),
-  }) : super(
-          initialState.copyWith(
-            manga: manga,
-            parameter: SearchChapterParameter(
-              mangaId: manga.id,
-              translatedLanguage: const [LanguageCodes.english],
-              orders: const {ChapterOrders.chapter: OrderDirections.descending},
-            ),
-          ),
-        );
+  }) : super(initialState);
 
   Future<void> init() async {
     emit(state.copyWith(isLoading: true));
