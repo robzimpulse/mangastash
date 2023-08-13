@@ -28,7 +28,7 @@ class MangaResponse extends Response {
 @JsonSerializable()
 class MangaData extends Identifier {
   final MangaDataAttributes? attributes;
-  final List<Relationship?>? relationships;
+  final List<Relationship>? relationships;
   MangaData(super.id, super.type, this.attributes, this.relationships);
   factory MangaData.fromJson(Map<String, dynamic> json) {
     return _$MangaDataFromJson(json);
@@ -40,7 +40,7 @@ class MangaData extends Identifier {
 @JsonSerializable()
 class MangaDataAttributes extends Attribute {
   final Title? title;
-  final List<Title?>? altTitle;
+  final List<Title>? altTitle;
   final Title? description;
   final bool? isLocked;
   final String? originalLanguage;
@@ -53,8 +53,9 @@ class MangaDataAttributes extends Attribute {
   final String? state;
   final bool chapterNumbersResetOnNewVolume;
   final String? latestUploadedChapter;
+  /// cast to [String?] since server return list of string with null element
   final List<String?>? availableTranslatedLanguages;
-  final List<TagData?> tags;
+  final List<TagData>? tags;
   MangaDataAttributes(
     this.title,
     this.description,
@@ -79,5 +80,6 @@ class MangaDataAttributes extends Attribute {
   factory MangaDataAttributes.fromJson(Map<String, dynamic> json) {
     return _$MangaDataAttributesFromJson(json);
   }
+  @override
   Map<String, dynamic> toJson() => _$MangaDataAttributesToJson(this);
 }

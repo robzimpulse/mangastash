@@ -30,9 +30,7 @@ CoverArtData _$CoverArtDataFromJson(Map<String, dynamic> json) => CoverArtData(
           : CoverArtDataAttributes.fromJson(
               json['attributes'] as Map<String, dynamic>),
       (json['relationships'] as List<dynamic>?)
-          ?.map((e) => e == null
-              ? null
-              : Relationship.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => Relationship.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 

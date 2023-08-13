@@ -30,9 +30,7 @@ MangaData _$MangaDataFromJson(Map<String, dynamic> json) => MangaData(
           : MangaDataAttributes.fromJson(
               json['attributes'] as Map<String, dynamic>),
       (json['relationships'] as List<dynamic>?)
-          ?.map((e) => e == null
-              ? null
-              : Relationship.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => Relationship.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
@@ -68,13 +66,11 @@ MangaDataAttributes _$MangaDataAttributesFromJson(Map<String, dynamic> json) =>
       (json['availableTranslatedLanguages'] as List<dynamic>?)
           ?.map((e) => e as String?)
           .toList(),
-      (json['tags'] as List<dynamic>)
-          .map((e) =>
-              e == null ? null : TagData.fromJson(e as Map<String, dynamic>))
+      (json['tags'] as List<dynamic>?)
+          ?.map((e) => TagData.fromJson(e as Map<String, dynamic>))
           .toList(),
       (json['altTitle'] as List<dynamic>?)
-          ?.map((e) =>
-              e == null ? null : Title.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => Title.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 

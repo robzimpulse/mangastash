@@ -12,7 +12,6 @@ import 'use_case/listen_list_tag_use_case.dart';
 import 'use_case/search_chapter_use_case.dart';
 import 'use_case/search_manga_use_case.dart';
 
-
 class DomainMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
@@ -25,7 +24,13 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(() => GetMangaUseCase(repository: locator()));
     locator.registerFactory(() => ListTagUseCase(repository: locator()));
     locator.registerFactory(() => SearchChapterUseCase(repository: locator()));
-    locator.registerFactory(() => SearchMangaUseCase(repository: locator()));
+    locator.registerFactory(
+      () => SearchMangaUseCase(
+        mangaRepository: locator(),
+        authorRepository: locator(),
+        coverRepository: locator(),
+      ),
+    );
 
     locator.registerSingleton(TagsManager(listTagUseCase: locator()));
     locator.alias<ListenListTagUseCase, TagsManager>();

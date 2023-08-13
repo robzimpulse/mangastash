@@ -20,6 +20,7 @@ export 'src/model/chapter/chapter_response.dart';
 export 'src/model/chapter/search_chapter_response.dart';
 export 'src/model/manga/manga_response.dart';
 export 'src/model/manga/search_manga_response.dart';
+export 'src/model/tag/tag_response.dart';
 export 'src/repository/at_home_repository.dart';
 export 'src/repository/author_repository.dart';
 export 'src/repository/chapter_repository.dart';

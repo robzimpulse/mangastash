@@ -24,7 +24,7 @@ class CoverArtResponse extends Response {
 @JsonSerializable()
 class CoverArtData extends Identifier {
   final CoverArtDataAttributes? attributes;
-  final List<Relationship?>? relationships;
+  final List<Relationship>? relationships;
   CoverArtData(super.id, super.type, this.attributes, this.relationships);
   factory CoverArtData.fromJson(Map<String, dynamic> json) {
     return _$CoverArtDataFromJson(json);

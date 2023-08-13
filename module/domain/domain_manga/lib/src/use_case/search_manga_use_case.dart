@@ -4,17 +4,25 @@ import 'package:entity_manga/entity_manga.dart';
 import '../../domain_manga.dart';
 
 class SearchMangaUseCase {
-  final MangaRepository _repository;
+  final MangaRepository _mangaRepository;
+  // TODO: use this repository
+  final AuthorRepository _authorRepository;
+  // TODO: use this repository
+  final CoverRepository _coverRepository;
 
   const SearchMangaUseCase({
-    required MangaRepository repository,
-  }) : _repository = repository;
+    required MangaRepository mangaRepository,
+    required AuthorRepository authorRepository,
+    required CoverRepository coverRepository,
+  })  : _mangaRepository = mangaRepository,
+        _authorRepository = authorRepository,
+        _coverRepository = coverRepository;
 
   Future<Response<SearchMangaResponse>> execute({
     required SearchMangaParameter parameter,
   }) async {
     try {
-      final result = await _repository.search(
+      final result = await _mangaRepository.search(
         title: parameter.title,
         limit: parameter.limit,
         offset: parameter.offset,

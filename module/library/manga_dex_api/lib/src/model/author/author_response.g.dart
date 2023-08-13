@@ -30,9 +30,7 @@ AuthorData _$AuthorDataFromJson(Map<String, dynamic> json) => AuthorData(
           : AuthorDataAttributes.fromJson(
               json['attributes'] as Map<String, dynamic>),
       (json['relationships'] as List<dynamic>?)
-          ?.map((e) => e == null
-              ? null
-              : Relationship.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => Relationship.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 

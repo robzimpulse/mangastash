@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:manga_dex_api/manga_dex_api.dart';
 
 class MangaTag extends Equatable with EquatableMixin {
   final String? id;
@@ -35,6 +36,14 @@ class MangaTag extends Equatable with EquatableMixin {
       group: group ?? this.group,
       isIncluded: isIncluded ?? this.isIncluded,
       isExcluded: isExcluded ?? this.isExcluded,
+    );
+  }
+
+  factory MangaTag.from(TagData data) {
+    return MangaTag(
+      id: data.id,
+      name: data.attributes?.name?.en,
+      group: data.attributes?.group,
     );
   }
 }

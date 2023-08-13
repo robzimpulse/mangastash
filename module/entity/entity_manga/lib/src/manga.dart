@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../entity_manga.dart';
 
@@ -54,6 +55,18 @@ class Manga extends Equatable with EquatableMixin {
       description: description ?? this.description,
       tags: tags ?? this.tags,
       chapters: chapters ?? this.chapters,
+    );
+  }
+
+  factory Manga.from(MangaData data, {String? coverUrl, List<String>? author}) {
+    return Manga(
+      id: data.id,
+      coverUrl: coverUrl,
+      title: data.attributes?.title?.en,
+      status: data.attributes?.status,
+      description: data.attributes?.description?.en,
+      author: author?.join(' | '),
+      tags: data.attributes?.tags?.map((e) => MangaTag.from(e)).toList(),
     );
   }
 }

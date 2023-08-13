@@ -25,7 +25,7 @@ class AuthorResponse extends Response {
 @JsonSerializable()
 class AuthorData extends Identifier {
   final AuthorDataAttributes? attributes;
-  final List<Relationship?>? relationships;
+  final List<Relationship>? relationships;
   AuthorData(super.id, super.type, this.attributes, this.relationships);
   factory AuthorData.fromJson(Map<String, dynamic> json) {
     return _$AuthorDataFromJson(json);

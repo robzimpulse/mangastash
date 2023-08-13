@@ -44,7 +44,7 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
   // TODO: move to another use case
   Future<String> _coverArtUrl(MangaData data) async {
     final cover = data.relationships?.firstWhereOrNull(
-      (e) => e?.type == Include.coverArt.rawValue,
+      (e) => e.type == Include.coverArt.rawValue,
     );
     final response = await getCoverArtUseCase.execute(
       mangaId: data.id ?? '',
@@ -59,13 +59,13 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
   // TODO: move to another use case
   Future<List<String>> _authors(MangaData data) async {
     final authors = data.relationships?.where(
-      (e) => e?.type == Include.author.rawValue,
+      (e) => e.type == Include.author.rawValue,
     );
     if (authors == null) return [];
     final promises = authors.map(
       (e) async {
         final response = await getAuthorUseCase.execute(
-          authorId: e?.id ?? '',
+          authorId: e.id ?? '',
         );
         if (response is Success<AuthorResponse>) {
           return response.data.data?.attributes?.name;
@@ -86,22 +86,10 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
 
     if (result is Success<SearchMangaResponse>) {
       final data = result.data.data?.map((element) async {
-        final tags = element.attributes?.tags.map(
-          (e) => MangaTag(
-            id: e?.id,
-            name: e?.attributes?.name?.en,
-            group: e?.attributes?.group,
-          ),
-        );
-
-        return Manga(
-          id: element.id,
+        return Manga.from(
+          element,
           coverUrl: await _coverArtUrl(element),
-          title: element.attributes?.title?.en,
-          status: element.attributes?.status,
-          description: element.attributes?.description?.en,
-          author: (await _authors(element)).join(' | '),
-          tags: tags?.toList(),
+          author: await _authors(element),
         );
       });
 
