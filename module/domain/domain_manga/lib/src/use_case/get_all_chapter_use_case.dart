@@ -3,22 +3,22 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 class GetAllChapterUseCase {
-  final ChapterRepository _repository;
+  final ChapterRepository _chapterRepository;
 
   const GetAllChapterUseCase({
-    required ChapterRepository repository,
-  }) : _repository = repository;
+    required ChapterRepository chapterRepository,
+  })  : _chapterRepository = chapterRepository;
 
-  Future<Response<List<ChapterData>>> execute({
+  Future<Response<List<MangaChapter>>> execute({
     required SearchChapterParameter parameter,
   }) async {
     try {
       var total = 0;
       var param = parameter.copyWith(limit: 100);
-      List<ChapterData> chapters = [];
+      List<MangaChapter> chapters = [];
 
       do {
-        final result = await _repository.search(
+        final result = await _chapterRepository.search(
           mangaId: param.mangaId ?? '',
           ids: param.ids,
           title: param.title,
@@ -39,15 +39,24 @@ class GetAllChapterUseCase {
           offset: param.offset,
         );
 
-        final data = result.data ?? [];
+        final promises = result.data?.map(_mapChapter) ?? [];
+        final data = await Future.wait(promises);
+
         total = result.total ?? 0;
         chapters.addAll(data);
-
       } while (chapters.length < total);
 
       return Success(chapters);
     } on Exception catch (e) {
       return Error(e);
     }
+  }
+
+  Future<MangaChapter> _mapChapter(ChapterData data) async {
+    return MangaChapter.from(
+      data,
+      images: const [],
+      imagesDataSaver: const [],
+    );
   }
 }

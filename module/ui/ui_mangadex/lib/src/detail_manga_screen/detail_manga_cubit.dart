@@ -20,12 +20,12 @@ class DetailMangaCubit extends Cubit<DetailMangaState> {
       parameter: state.parameter,
     );
 
-    if (response is Success<List<ChapterData>>) {
-      final chapters = response.data.map((e) => MangaChapter.from(e)).toList();
+    if (response is Success<List<MangaChapter>>) {
+      final chapters = response.data;
       emit(state.copyWith(manga: state.manga?.copyWith(chapters: chapters)));
     }
 
-    if (response is Error<List<ChapterData>>) {
+    if (response is Error<List<MangaChapter>>) {
       emit(state.copyWith(errorMessage: () => response.error.toString()));
     }
 

@@ -28,7 +28,15 @@ class MangaChapter extends Equatable with EquatableMixin {
   });
 
   @override
-  List<Object?> get props => [id, chapter, title, volume, readableAt, images, imagesDataSaver,];
+  List<Object?> get props => [
+        id,
+        chapter,
+        title,
+        volume,
+        readableAt,
+        images,
+        imagesDataSaver,
+      ];
 
   MangaChapter copyWith({
     String? id,
@@ -64,13 +72,19 @@ class MangaChapter extends Equatable with EquatableMixin {
     return texts.join(' - ');
   }
 
-  factory MangaChapter.from(ChapterData data) {
+  factory MangaChapter.from(
+    ChapterData data, {
+    List<String>? images,
+    List<String>? imagesDataSaver,
+  }) {
     return MangaChapter(
       id: data.id,
       chapter: data.attributes?.chapter,
       title: data.attributes?.title,
       volume: data.attributes?.volume,
       readableAt: data.attributes?.readableAt,
+      images: images,
+      imagesDataSaver: imagesDataSaver,
     );
   }
 }

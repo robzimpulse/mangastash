@@ -17,18 +17,24 @@ class DomainMangaRegistrar extends Registrar {
   Future<void> register(ServiceLocator locator) async {
     await locator.registerRegistrar(MangaDexApiRegistrar());
 
-    locator.registerFactory(() => GetAllChapterUseCase(repository: locator()));
     locator.registerFactory(() => GetAuthorUseCase(repository: locator()));
     locator.registerFactory(() => GetChapterUseCase(repository: locator()));
     locator.registerFactory(() => GetCoverArtUseCase(repository: locator()));
     locator.registerFactory(() => GetMangaUseCase(repository: locator()));
     locator.registerFactory(() => ListTagUseCase(repository: locator()));
     locator.registerFactory(() => SearchChapterUseCase(repository: locator()));
+
     locator.registerFactory(
       () => SearchMangaUseCase(
         mangaRepository: locator(),
         authorRepository: locator(),
         coverRepository: locator(),
+      ),
+    );
+
+    locator.registerFactory(
+      () => GetAllChapterUseCase(
+        chapterRepository: locator(),
       ),
     );
 
