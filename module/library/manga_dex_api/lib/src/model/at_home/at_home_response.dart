@@ -15,10 +15,12 @@ class AtHomeResponse {
   }
   Map<String, dynamic> toJson() => _$AtHomeResponseToJson(this);
 
-  List<String>? get images => chapter?.data?.map((e) => '$baseUrl/$e').toList();
+  List<String>? get images =>
+      chapter?.data?.map((e) => '$baseUrl/data/${chapter?.hash}/$e').toList();
 
-  List<String>? get imagesDataSaver =>
-      chapter?.dataSaver?.map((e) => '$baseUrl/$e').toList();
+  List<String>? get imagesDataSaver => chapter?.dataSaver
+      ?.map((e) => '$baseUrl/data-saver/${chapter?.hash}/$e')
+      .toList();
 }
 
 ///@nodoc

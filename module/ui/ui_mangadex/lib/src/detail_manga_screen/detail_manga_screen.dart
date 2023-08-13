@@ -166,10 +166,13 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
             chapterForIndex: (context, index) => ListTile(
               title: Text(chapters[index].top),
               subtitle: Text(chapters[index].bottom),
-              onTap: () => _onTapChapter(
-                context,
-                state.manga,
-                chapters[index].id,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ReaderMangaScreen.create(
+                    locator: widget.locator,
+                    chapter: chapters[index],
+                  ),
+                ),
               ),
             ),
           );
@@ -198,19 +201,4 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
     );
   }
 
-  void _onTapChapter(
-    BuildContext context,
-    Manga? manga,
-    String? initialChapterId,
-  ) {
-    if (manga == null) return;
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ReaderMangaScreen(
-          manga: manga,
-          initialChapterId: initialChapterId,
-        ),
-      ),
-    );
-  }
 }

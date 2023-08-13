@@ -1,54 +1,83 @@
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
+import 'package:safe_bloc/safe_bloc.dart';
+import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-class ReaderMangaScreen extends StatelessWidget {
-  const ReaderMangaScreen({
-    super.key,
-    required this.manga,
-    this.initialChapterId,
-  });
+import 'reader_manga_cubit.dart';
+import 'reader_manga_state.dart';
 
-  final Manga manga;
+class ReaderMangaScreen extends StatefulWidget {
+  const ReaderMangaScreen({super.key});
 
-  final String? initialChapterId;
+  static Widget create({
+    required ServiceLocator locator,
+    required MangaChapter chapter,
+  }) {
+    return BlocProvider(
+      create: (context) => ReaderMangaCubit(
+        initialState: ReaderMangaState(
+          chapter: chapter,
+        ),
+        getChapterImageUseCase: locator(),
+      )..init(),
+      child: const ReaderMangaScreen(),
+    );
+  }
+
+  @override
+  State<ReaderMangaScreen> createState() => _ReaderMangaScreenState();
+}
+
+class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
+  Widget _builder({
+    required BlocWidgetBuilder<ReaderMangaState> builder,
+    BlocBuilderCondition<ReaderMangaState>? buildWhen,
+  }) {
+    return BlocBuilder<ReaderMangaCubit, ReaderMangaState>(
+      buildWhen: buildWhen,
+      builder: builder,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final data = manga.chapters?.map((e) => e.images ?? []) ?? [];
-    final images = data.expand((e) => e);
-
     return ScaffoldScreen(
       onWillPop: () => Future.value(true),
-      body: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          const Positioned(
-            bottom: double.minPositive,
-            child: Text(
-              'Page Indicator',
-              style: TextStyle(fontSize: 10),
+      body: _content(),
+    );
+  }
+
+  Widget _content() {
+    return _builder(
+      builder: (context, state) {
+        if (state.isLoading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        final images = state.chapter?.imagesDataSaver ?? [];
+
+        return Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            const Positioned(
+              bottom: double.minPositive,
+              child: Text(
+                'Page Indicator',
+                style: TextStyle(fontSize: 10),
+              ),
             ),
-          ),
-          ListView(
-            children: [
-              const SizedBox(
-                height: 200,
-                child: Center(
-                  child: Text('There\'s no previous chapter'),
-                ),
+            ListView.builder(
+              itemBuilder: (context, index) => CachedNetworkImage(
+                imageUrl: images[index],
               ),
-              ...images.map((e) => CachedNetworkImage(imageUrl: e)).toList(),
-              const SizedBox(
-                height: 200,
-                child: Center(
-                  child: Text('There\'s no next chapter'),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+              itemCount: images.length,
+            ),
+          ],
+        );
+      },
     );
   }
 }

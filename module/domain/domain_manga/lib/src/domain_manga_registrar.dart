@@ -4,6 +4,7 @@ import 'package:service_locator/service_locator.dart';
 import 'manager/tags_manager.dart';
 import 'use_case/get_all_chapter_use_case.dart';
 import 'use_case/get_author_use_case.dart';
+import 'use_case/get_chapter_image_use_case.dart';
 import 'use_case/get_chapter_use_case.dart';
 import 'use_case/get_cover_art_use_case.dart';
 import 'use_case/get_manga_use_case.dart';
@@ -23,6 +24,12 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(() => GetMangaUseCase(repository: locator()));
     locator.registerFactory(() => ListTagUseCase(repository: locator()));
     locator.registerFactory(() => SearchChapterUseCase(repository: locator()));
+
+    locator.registerFactory(
+      () => GetChapterImageUseCase(
+        repository: locator(),
+      ),
+    );
 
     locator.registerFactory(
       () => SearchMangaUseCase(
