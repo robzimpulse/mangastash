@@ -1,5 +1,5 @@
 import 'package:core_route/core_route.dart';
-import 'package:flutter/material.dart';
+import 'package:ui_common/ui_common.dart';
 
 class ErrorScreen extends StatelessWidget {
   const ErrorScreen({super.key, required this.text});

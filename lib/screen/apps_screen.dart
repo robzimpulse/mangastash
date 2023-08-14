@@ -1,10 +1,8 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/material.dart';
 import 'package:ios_willpop_transition_theme/ios_willpop_transition_theme.dart';
-import 'package:responsive_framework/breakpoint.dart';
-import 'package:responsive_framework/responsive_breakpoints.dart';
 import 'package:service_locator/service_locator.dart';
+import 'package:ui_common/ui_common.dart';
 
 class AppsScreen extends StatelessWidget {
   final ServiceLocator locator;

@@ -1,8 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
-
-import '../../ui_common.dart';
+import 'package:intersperse/intersperse.dart';
 
 class MangaDetailWidget extends StatelessWidget {
   const MangaDetailWidget({

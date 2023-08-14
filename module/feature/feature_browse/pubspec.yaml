@@ -26,6 +26,8 @@ dependencies:
     path: ../../core/core_route
 
   # ui
+  ui_common:
+    path: ../../ui/ui_common
   ui_browse:
     path: ../../ui/ui_browse
   ui_mangadex:

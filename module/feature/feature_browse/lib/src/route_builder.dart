@@ -1,8 +1,8 @@
 import 'package:core_route/core_route.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:flutter/material.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_browse/ui_browse.dart';
+import 'package:ui_common/ui_common.dart';
 import 'package:ui_mangadex/ui_mangadex.dart';
 
 import 'route_path.dart';

@@ -4,8 +4,8 @@ import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
-import 'package:flutter/material.dart';
 import 'package:service_locator/service_locator.dart';
+import 'package:ui_common/ui_common.dart';
 
 import 'main_path.dart';
 import 'main_route.dart';

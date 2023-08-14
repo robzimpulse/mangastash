@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:responsive_framework/responsive_framework.dart';
 import 'package:ui_common/ui_common.dart';
 
 class MainScreen extends StatelessWidget {
