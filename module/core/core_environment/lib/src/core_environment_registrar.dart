@@ -18,5 +18,4 @@ class CoreEnvironmentRegistrar extends Registrar {
     locator.alias<UpdateLocaleUseCase, LocaleManager>();
     locator.alias<ListenLocaleUseCase, LocaleManager>();
   }
-
 }

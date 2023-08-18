@@ -15,7 +15,7 @@ class TagsManager implements ListenListTagUseCase {
 
   TagsManager({
     required ListTagUseCase listTagUseCase,
-  })  : _listTagUseCase = listTagUseCase {
+  }) : _listTagUseCase = listTagUseCase {
     _update(Timer.periodic(const Duration(minutes: 5), _update));
   }
 

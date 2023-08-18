@@ -1,5 +1,4 @@
 abstract class Storage {
-
   Set<String> getKeys();
 
   Object? get(String key);

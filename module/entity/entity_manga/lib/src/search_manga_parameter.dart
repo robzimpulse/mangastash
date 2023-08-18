@@ -116,11 +116,11 @@ class SearchMangaParameter extends Equatable with EquatableMixin {
       status: status ?? this.status,
       originalLanguage: originalLanguage ?? this.originalLanguage,
       excludedOriginalLanguages:
-      excludedOriginalLanguages ?? this.excludedOriginalLanguages,
+          excludedOriginalLanguages ?? this.excludedOriginalLanguages,
       availableTranslatedLanguage:
-      availableTranslatedLanguage ?? this.availableTranslatedLanguage,
+          availableTranslatedLanguage ?? this.availableTranslatedLanguage,
       publicationDemographic:
-      publicationDemographic ?? this.publicationDemographic,
+          publicationDemographic ?? this.publicationDemographic,
       ids: ids ?? this.ids,
       contentRating: contentRating ?? this.contentRating,
       createdAtSince: createdAtSince ?? this.createdAtSince,

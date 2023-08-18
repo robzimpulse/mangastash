@@ -39,7 +39,11 @@ class _MangaStashAppState extends State<MangaStashApp> {
   @override
   Widget build(BuildContext context) {
     return _isInitialized
-        ? AppsScreen(locator: _locator, listenThemeUseCase: _locator.get(), routerConfig: _router,)
+        ? AppsScreen(
+            locator: _locator,
+            listenThemeUseCase: _locator.get(),
+            routerConfig: _router,
+          )
         : const SplashScreen();
   }
 
@@ -55,7 +59,8 @@ class _MangaStashAppState extends State<MangaStashApp> {
   }
 
   Future<ServiceLocator> initiateAppLocator() async {
-    ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
+    ServiceLocatorInitiator.setServiceLocatorFactory(
+        () => GetItServiceLocator());
     final locator = ServiceLocator.asNewInstance();
 
     // TODO: register module registrar here

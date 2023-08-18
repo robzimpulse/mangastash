@@ -3,7 +3,6 @@ import 'package:equatable/equatable.dart';
 import 'manga.dart';
 
 class PaginationManga extends Equatable with EquatableMixin {
-
   final int? offset;
 
   final int? limit;

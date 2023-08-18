@@ -78,4 +78,3 @@ class AuthorDataAttributes extends Attribute {
   @override
   Map<String, dynamic> toJson() => _$AuthorDataAttributesToJson(this);
 }
-

@@ -20,9 +20,7 @@ class DownloadQueueScreen extends StatelessWidget {
         title: const Text('Download Queue'),
       ),
       body: ListView(
-        children: [
-
-        ],
+        children: [],
       ),
     );
   }

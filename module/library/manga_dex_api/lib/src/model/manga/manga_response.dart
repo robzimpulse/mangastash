@@ -53,6 +53,7 @@ class MangaDataAttributes extends Attribute {
   final String? state;
   final bool chapterNumbersResetOnNewVolume;
   final String? latestUploadedChapter;
+
   /// cast to [String?] since server return list of string with null element
   final List<String?>? availableTranslatedLanguages;
   final List<TagData>? tags;

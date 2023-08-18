@@ -20,9 +20,7 @@ class BackupRestoreScreen extends StatelessWidget {
         title: const Text('Backup and Restore'),
       ),
       body: ListView(
-        children: [
-
-        ],
+        children: [],
       ),
     );
   }

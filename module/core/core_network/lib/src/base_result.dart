@@ -8,7 +8,9 @@ class Error<T> extends Response<T> {
   Exception get error => _error;
 
   Error(Object error) {
-    if (error is DioError && error.error is! DioError && error.error is Exception) {
+    if (error is DioError &&
+        error.error is! DioError &&
+        error.error is Exception) {
       // there is a chance that DioError.error is instance of DioError
       // which will cause stack overflow error
       _error = error.error as Exception;
@@ -24,7 +26,6 @@ class Error<T> extends Response<T> {
 }
 
 class Success<T> extends Response<T> {
-
   late final T _data;
 
   T get data => _data;

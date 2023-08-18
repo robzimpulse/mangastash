@@ -10,7 +10,8 @@ extension PushForResult on BuildContext {
     String location, {
     Object? args,
     required ResultCallback<T>? callback,
-  }) => push(location, extra: BaseRouteArgs<T>(args: args, callback: callback));
+  }) =>
+      push(location, extra: BaseRouteArgs<T>(args: args, callback: callback));
 }
 
 extension ArgsHelper on GoRouterState {

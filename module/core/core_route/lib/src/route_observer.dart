@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:flutter/widgets.dart';
 
 class BaseRouteObserver extends NavigatorObserver {
-
   BaseRouteObserver();
 
   @override

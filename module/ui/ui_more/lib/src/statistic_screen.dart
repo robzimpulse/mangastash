@@ -20,9 +20,7 @@ class StatisticScreen extends StatelessWidget {
         title: const Text('Statistic'),
       ),
       body: ListView(
-        children: [
-
-        ],
+        children: [],
       ),
     );
   }

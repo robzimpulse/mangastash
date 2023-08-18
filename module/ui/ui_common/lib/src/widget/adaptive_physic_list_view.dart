@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class AdaptivePhysicListView extends ListView {
-
   AdaptivePhysicListView({
     super.key,
     super.scrollDirection,
@@ -49,10 +48,10 @@ class AdaptivePhysicListView extends ListView {
     super.restorationId,
     super.clipBehavior,
   }) : super.builder(
-    itemBuilder: itemBuilder,
-    findChildIndexCallback: findChildIndexCallback,
-    itemCount: itemCount,
-  );
+          itemBuilder: itemBuilder,
+          findChildIndexCallback: findChildIndexCallback,
+          itemCount: itemCount,
+        );
 
   AdaptivePhysicListView.separated({
     super.key,
@@ -76,11 +75,11 @@ class AdaptivePhysicListView extends ListView {
     super.restorationId,
     super.clipBehavior,
   }) : super.separated(
-    itemBuilder: itemBuilder,
-    separatorBuilder: separatorBuilder,
-    itemCount: itemCount,
-    findChildIndexCallback: findChildIndexCallback,
-  );
+          itemBuilder: itemBuilder,
+          separatorBuilder: separatorBuilder,
+          itemCount: itemCount,
+          findChildIndexCallback: findChildIndexCallback,
+        );
 
   const AdaptivePhysicListView.custom({
     super.key,

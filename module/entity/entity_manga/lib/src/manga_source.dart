@@ -7,7 +7,8 @@ enum MangaSource {
     url: 'https://www.mangadex.org',
   ),
   asurascan(
-    iconUrl: 'https://www.asurascans.com/wp-content/uploads/2021/03/cropped-Group_1-1-32x32.png',
+    iconUrl:
+        'https://www.asurascans.com/wp-content/uploads/2021/03/cropped-Group_1-1-32x32.png',
     name: 'Asura Scans',
     url: 'https://www.asurascans.com',
   );

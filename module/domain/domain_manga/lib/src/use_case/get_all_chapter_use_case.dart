@@ -7,7 +7,7 @@ class GetAllChapterUseCase {
 
   const GetAllChapterUseCase({
     required ChapterRepository chapterRepository,
-  })  : _chapterRepository = chapterRepository;
+  }) : _chapterRepository = chapterRepository;
 
   Future<Response<List<MangaChapter>>> execute({
     required SearchChapterParameter parameter,

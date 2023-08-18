@@ -32,9 +32,9 @@ class AppsScreen extends StatelessWidget {
     return theme.copyWith(
       pageTransitionsTheme: _transition(),
       splashColor: theme.primaryColor,
-        colorScheme: theme.colorScheme.copyWith(
-          secondary: theme.primaryColor,
-        ),
+      colorScheme: theme.colorScheme.copyWith(
+        secondary: theme.primaryColor,
+      ),
     );
   }
 

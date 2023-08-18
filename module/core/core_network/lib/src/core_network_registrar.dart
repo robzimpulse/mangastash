@@ -9,5 +9,4 @@ class CoreNetworkRegistrar extends Registrar {
     locator.registerSingleton(await SystemProxyManager.init());
     locator.alias<GetSystemProxyUseCase, SystemProxyManager>();
   }
-
 }
