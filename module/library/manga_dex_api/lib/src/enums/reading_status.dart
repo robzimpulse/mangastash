@@ -9,4 +9,11 @@ enum ReadingStatus {
   final String rawValue;
 
   const ReadingStatus(this.rawValue);
+
+  factory ReadingStatus.fromRawValue(String rawValue) {
+    return ReadingStatus.values.firstWhere(
+      (e) => e.rawValue == rawValue,
+      orElse: () => ReadingStatus.reading,
+    );
+  }
 }

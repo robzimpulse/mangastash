@@ -12,4 +12,11 @@ enum LanguageCodes {
   final String rawValue;
 
   const LanguageCodes(this.rawValue);
+
+  factory LanguageCodes.fromRawValue(String rawValue) {
+    return LanguageCodes.values.firstWhere(
+      (e) => e.rawValue == rawValue,
+      orElse: () => LanguageCodes.english,
+    );
+  }
 }

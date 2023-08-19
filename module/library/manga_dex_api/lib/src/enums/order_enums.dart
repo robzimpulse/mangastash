@@ -11,6 +11,13 @@ enum SearchOrders {
   final String rawValue;
 
   const SearchOrders(this.rawValue);
+
+  factory SearchOrders.fromRawValue(String rawValue) {
+    return SearchOrders.values.firstWhere(
+      (e) => e.rawValue == rawValue,
+      orElse: () => SearchOrders.rating,
+    );
+  }
 }
 
 enum AuthorOrders {
@@ -19,6 +26,13 @@ enum AuthorOrders {
   final String rawValue;
 
   const AuthorOrders(this.rawValue);
+
+  factory AuthorOrders.fromRawValue(String rawValue) {
+    return AuthorOrders.values.firstWhere(
+      (e) => e.rawValue == rawValue,
+      orElse: () => AuthorOrders.name,
+    );
+  }
 }
 
 enum ChapterOrders {
@@ -32,6 +46,13 @@ enum ChapterOrders {
   final String rawValue;
 
   const ChapterOrders(this.rawValue);
+
+  factory ChapterOrders.fromRawValue(String rawValue) {
+    return ChapterOrders.values.firstWhere(
+      (e) => e.rawValue == rawValue,
+      orElse: () => ChapterOrders.chapter,
+    );
+  }
 }
 
 enum CoverOrders {
@@ -42,6 +63,13 @@ enum CoverOrders {
   final String rawValue;
 
   const CoverOrders(this.rawValue);
+
+  factory CoverOrders.fromRawValue(String rawValue) {
+    return CoverOrders.values.firstWhere(
+      (e) => e.rawValue == rawValue,
+      orElse: () => CoverOrders.volume,
+    );
+  }
 }
 
 enum OrderDirections {
@@ -51,6 +79,13 @@ enum OrderDirections {
   final String rawValue;
 
   const OrderDirections(this.rawValue);
+
+  factory OrderDirections.fromRawValue(String rawValue) {
+    return OrderDirections.values.firstWhere(
+      (e) => e.rawValue == rawValue,
+      orElse: () => OrderDirections.descending,
+    );
+  }
 }
 
 enum ScanlationOrders {
@@ -63,4 +98,11 @@ enum ScanlationOrders {
   final String rawValue;
 
   const ScanlationOrders(this.rawValue);
+
+  factory ScanlationOrders.fromRawValue(String rawValue) {
+    return ScanlationOrders.values.firstWhere(
+      (e) => e.rawValue == rawValue,
+      orElse: () => ScanlationOrders.relevance,
+    );
+  }
 }

@@ -8,4 +8,11 @@ enum PublicDemographic {
   final String rawValue;
 
   const PublicDemographic(this.rawValue);
+
+  factory PublicDemographic.fromRawValue(String rawValue) {
+    return PublicDemographic.values.firstWhere(
+      (e) => e.rawValue == rawValue,
+      orElse: () => PublicDemographic.none,
+    );
+  }
 }
