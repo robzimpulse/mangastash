@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:system_proxy/system_proxy.dart';
 
-import '../system_proxy_http_overrides.dart';
 import '../use_case/get_proxy_use_case.dart';
 
 class SystemProxyManager implements GetSystemProxyUseCase {
@@ -32,5 +31,28 @@ class SystemProxyManager implements GetSystemProxyUseCase {
     }
 
     return SystemProxyManager(host: host, port: port);
+  }
+}
+
+class SystemProxyHttpOverrides extends HttpOverrides {
+  String port;
+  String host;
+  bool? bypassSslValidation;
+
+  SystemProxyHttpOverrides({
+    required this.port,
+    required this.host,
+    this.bypassSslValidation,
+  });
+
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    final httpClient = super.createHttpClient(context);
+    final value = host.isNotEmpty ? "PROXY $host:$port;" : 'DIRECT';
+    httpClient.findProxy = (uri) => value;
+    if (bypassSslValidation == true) {
+      httpClient.badCertificateCallback = (_, __, ___) => true;
+    }
+    return httpClient;
   }
 }
