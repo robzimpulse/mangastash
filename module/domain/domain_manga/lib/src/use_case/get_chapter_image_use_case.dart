@@ -8,7 +8,7 @@ class GetChapterImageUseCase {
     required AtHomeRepository repository,
   }) : _repository = repository;
 
-  Future<Response<AtHomeResponse>> execute({
+  Future<Result<AtHomeResponse>> execute({
     required String chapterId,
   }) async {
     try {

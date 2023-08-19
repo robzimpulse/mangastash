@@ -17,7 +17,7 @@ class SearchMangaUseCase {
         _authorRepository = authorRepository,
         _coverRepository = coverRepository;
 
-  Future<Response<PaginationManga>> execute({
+  Future<Result<PaginationManga>> execute({
     required SearchMangaParameter parameter,
   }) async {
     try {

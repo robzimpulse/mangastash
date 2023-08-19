@@ -8,7 +8,7 @@ class GetAuthorUseCase {
     required AuthorRepository repository,
   }) : _repository = repository;
 
-  Future<Response<AuthorResponse>> execute({
+  Future<Result<AuthorResponse>> execute({
     required String authorId,
   }) async {
     try {

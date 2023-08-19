@@ -8,7 +8,7 @@ class GetCoverArtUseCase {
     required CoverRepository repository,
   }) : _repository = repository;
 
-  Future<Response<String>> execute({
+  Future<Result<String>> execute({
     required String mangaId,
     required String coverId,
   }) async {

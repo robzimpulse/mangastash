@@ -9,7 +9,7 @@ class GetChapterUseCase {
     required ChapterRepository repository,
   }) : _repository = repository;
 
-  Future<Response<MangaChapter>> execute({
+  Future<Result<MangaChapter>> execute({
     required String chapterId,
   }) async {
     try {

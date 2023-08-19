@@ -9,7 +9,7 @@ class GetAllChapterUseCase {
     required ChapterRepository chapterRepository,
   }) : _chapterRepository = chapterRepository;
 
-  Future<Response<List<MangaChapter>>> execute({
+  Future<Result<List<MangaChapter>>> execute({
     required SearchChapterParameter parameter,
   }) async {
     try {

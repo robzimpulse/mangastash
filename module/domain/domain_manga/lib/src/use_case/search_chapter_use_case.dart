@@ -9,7 +9,7 @@ class SearchChapterUseCase {
     required ChapterRepository repository,
   }) : _repository = repository;
 
-  Future<Response<SearchChapterResponse>> execute({
+  Future<Result<SearchChapterResponse>> execute({
     required SearchChapterParameter parameter,
   }) async {
     try {

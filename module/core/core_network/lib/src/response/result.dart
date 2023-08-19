@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 
-abstract class Response<T> {}
+abstract class Result<T> {}
 
-class Error<T> extends Response<T> {
+class Error<T> extends Result<T> {
   late final Exception _error;
 
   Exception get error => _error;
@@ -25,7 +25,7 @@ class Error<T> extends Response<T> {
   }
 }
 
-class Success<T> extends Response<T> {
+class Success<T> extends Result<T> {
   late final T _data;
 
   T get data => _data;

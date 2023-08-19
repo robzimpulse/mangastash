@@ -9,7 +9,7 @@ class ListTagUseCase {
     required MangaRepository repository,
   }) : _repository = repository;
 
-  Future<Response<List<MangaTag>>> execute() async {
+  Future<Result<List<MangaTag>>> execute() async {
     try {
       final result = await _repository.tags();
 
