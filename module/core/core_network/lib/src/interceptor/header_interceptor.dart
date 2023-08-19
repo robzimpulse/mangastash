@@ -5,9 +5,9 @@ class HeaderInterceptor extends Interceptor {
 
   @override
   void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
+      RequestOptions options,
+      RequestInterceptorHandler handler,
+      ) async {
     try {
       options.headers['Content-Type'] = 'application/json';
       options.headers['Accept'] = 'application/json';

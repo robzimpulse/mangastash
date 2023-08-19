@@ -16,7 +16,17 @@ import 'use_case/search_manga_use_case.dart';
 class DomainMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    await locator.registerRegistrar(MangaDexApiRegistrar());
+    locator.registerFactory(() => MangaService(locator()));
+    locator.registerFactory(() => ChapterService(locator()));
+    locator.registerFactory(() => AtHomeService(locator()));
+    locator.registerFactory(() => AuthorService(locator()));
+    locator.registerFactory(() => CoverArtService(locator()));
+    //
+    locator.registerFactory(() => AtHomeRepository(service: locator()));
+    locator.registerFactory(() => MangaRepository(service: locator()));
+    locator.registerFactory(() => ChapterRepository(service: locator()));
+    locator.registerFactory(() => AuthorRepository(service: locator()));
+    locator.registerFactory(() => CoverRepository(service: locator()));
 
     locator.registerFactory(() => GetAuthorUseCase(repository: locator()));
     locator.registerFactory(() => GetChapterUseCase(repository: locator()));

@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/http.dart';
 
-import '../client/manga_dex_dio.dart';
 import '../model/chapter/chapter_response.dart';
 import '../model/chapter/search_chapter_response.dart';
 
@@ -9,7 +8,7 @@ part 'chapter_service.g.dart';
 
 @RestApi()
 abstract class ChapterService {
-  factory ChapterService(MangaDexDio dio, {String baseUrl}) = _ChapterService;
+  factory ChapterService(Dio dio, {String baseUrl}) = _ChapterService;
 
   @GET('/chapter')
   Future<SearchChapterResponse> search({

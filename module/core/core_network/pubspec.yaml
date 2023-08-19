@@ -11,6 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   dio: ^4.0.6
+  alice_lightweight: 3.3.0
   system_proxy: ^0.1.0
 
   # library
