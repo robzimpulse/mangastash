@@ -8,7 +8,7 @@ class CoreStorageRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final local = await SharedPreferences.getInstance();
-    locator.registerSingleton(SharedPreferencesStorage(local));
+    locator.registerLazySingleton(() => SharedPreferencesStorage(local));
     locator.alias<Storage, SharedPreferencesStorage>();
   }
 }

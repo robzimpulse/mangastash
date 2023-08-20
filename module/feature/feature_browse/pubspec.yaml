@@ -24,6 +24,8 @@ dependencies:
   # core
   core_route:
     path: ../../core/core_route
+  core_network:
+    path: ../../core/core_network
 
   # ui
   ui_common:

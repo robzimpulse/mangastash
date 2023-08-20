@@ -10,15 +10,22 @@ import 'browse_manga_dex_cubit.dart';
 import 'browse_manga_dex_state.dart';
 
 class BrowseMangaDexScreen extends StatefulWidget {
-  const BrowseMangaDexScreen({super.key, required this.locator});
+  const BrowseMangaDexScreen({
+    super.key,
+    required this.locator,
+    required this.onTapSource,
+  });
 
   final ServiceLocator locator;
+
+  final Function(BuildContext) onTapSource;
 
   @override
   State<BrowseMangaDexScreen> createState() => _BrowseMangaDexScreenState();
 
   static Widget create({
     required ServiceLocator locator,
+    required Function(BuildContext) onTapSource,
   }) {
     return BlocProvider(
       create: (context) => BrowseMangaDexCubit(
@@ -31,7 +38,10 @@ class BrowseMangaDexScreen extends StatefulWidget {
           ),
         ),
       )..init(),
-      child: BrowseMangaDexScreen(locator: locator),
+      child: BrowseMangaDexScreen(
+        locator: locator,
+        onTapSource: onTapSource,
+      ),
     );
   }
 }
@@ -73,9 +83,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
           _layoutIcon(),
           IconButton(
             icon: const Icon(Icons.open_in_browser),
-            onPressed: () => context.showSnackBar(
-              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-            ),
+            onPressed: () => widget.onTapSource.call(context),
           ),
         ],
         bottom: PreferredSize(
