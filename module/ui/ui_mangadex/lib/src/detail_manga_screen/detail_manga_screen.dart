@@ -58,6 +58,21 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
     return context.read<DetailMangaCubit>();
   }
 
+  void _onTapFavorite(BuildContext context) {
+    // TODO: implement this
+    return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+  }
+
+  void _onTapWebsite(BuildContext context) {
+    // TODO: implement this
+    return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+  }
+
+  void _onTapTag(BuildContext context, {MangaTag? tag}) {
+    // TODO: implement this
+    return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
@@ -68,15 +83,24 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.download),
-            onPressed: () {},
+            // TODO: implement this
+            onPressed: () => context.showSnackBar(
+              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.sort),
-            onPressed: () {},
+            // TODO: implement this
+            onPressed: () => context.showSnackBar(
+              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.more_vert),
-            onPressed: () {},
+            // TODO: implement this
+            onPressed: () => context.showSnackBar(
+              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+            ),
           ),
         ],
       ),
@@ -109,14 +133,11 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
             description: state.manga?.description,
             tags: tags?.map((e) => e.name).whereNotNull().toList(),
             horizontalPadding: 12,
-            onTapFavorite: () => context.showSnackBar(
-              message: 'on tap favorite',
-            ),
-            onTapWebsite: () => context.showSnackBar(
-              message: 'on tap website',
-            ),
-            onTapTag: (name) => context.showSnackBar(
-              message: 'on tap tag $name',
+            onTapFavorite: () => _onTapFavorite(context),
+            onTapWebsite: () => _onTapWebsite(context),
+            onTapTag: (name) => _onTapTag(
+              context,
+              tag: tags?.firstWhere((e) => e.name == name),
             ),
           );
         }
@@ -130,14 +151,11 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
             description: state.manga?.description,
             tags: tags?.map((e) => e.name).whereNotNull().toList(),
             horizontalPadding: 12,
-            onTapFavorite: () => context.showSnackBar(
-              message: 'on tap favorite',
-            ),
-            onTapWebsite: () => context.showSnackBar(
-              message: 'on tap website',
-            ),
-            onTapTag: (name) => context.showSnackBar(
-              message: 'on tap tag $name',
+            onTapFavorite: () => _onTapFavorite(context),
+            onTapWebsite: () => _onTapWebsite(context),
+            onTapTag: (name) => _onTapTag(
+              context,
+              tag: tags?.firstWhere((e) => e.name == name),
             ),
             message: errorMessage,
           );
@@ -152,14 +170,11 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
             description: state.manga?.description,
             tags: tags?.map((e) => e.name).whereNotNull().toList(),
             horizontalPadding: 12,
-            onTapFavorite: () => context.showSnackBar(
-              message: 'on tap favorite',
-            ),
-            onTapWebsite: () => context.showSnackBar(
-              message: 'on tap website',
-            ),
-            onTapTag: (name) => context.showSnackBar(
-              message: 'on tap tag $name',
+            onTapFavorite: () => _onTapFavorite(context),
+            onTapWebsite: () => _onTapWebsite(context),
+            onTapTag: (name) => _onTapTag(
+              context,
+              tag: tags?.firstWhere((e) => e.name == name),
             ),
             chapterCount: chapters.length,
             chapterForIndex: (context, index) => ListTile(
@@ -185,14 +200,11 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
           description: state.manga?.description,
           tags: tags?.map((e) => e.name).whereNotNull().toList(),
           horizontalPadding: 12,
-          onTapFavorite: () => context.showSnackBar(
-            message: 'on tap favorite',
-          ),
-          onTapWebsite: () => context.showSnackBar(
-            message: 'on tap website',
-          ),
-          onTapTag: (name) => context.showSnackBar(
-            message: 'on tap tag $name',
+          onTapFavorite: () => _onTapFavorite(context),
+          onTapWebsite: () => _onTapWebsite(context),
+          onTapTag: (name) => _onTapTag(
+            context,
+            tag: tags?.firstWhere((e) => e.name == name),
           ),
           message: 'No Chapter Found',
         );

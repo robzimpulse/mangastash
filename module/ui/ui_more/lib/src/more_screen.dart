@@ -57,7 +57,10 @@ class MoreScreen extends StatelessWidget {
                   title: const Text('Downloaded Only'),
                   subtitle: const Text('Filters all entries in your library'),
                   value: true,
-                  onChanged: (value) {},
+                  // TODO: implement this
+                  onChanged: (value) => context.showSnackBar(
+                    message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+                  ),
                   secondary: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.cloud_off),
@@ -67,7 +70,10 @@ class MoreScreen extends StatelessWidget {
                   title: const Text('Incognito Mode'),
                   subtitle: const Text('Pause reading history'),
                   value: true,
-                  onChanged: (value) {},
+                  // TODO: implement this
+                  onChanged: (value) => context.showSnackBar(
+                    message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+                  ),
                   secondary: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.disabled_visible),
@@ -110,7 +116,10 @@ class MoreScreen extends StatelessWidget {
                 ),
                 ListTile(
                   title: const Text('About'),
-                  onTap: () {},
+                  // TODO: implement this
+                  onTap: () => context.showSnackBar(
+                    message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+                  ),
                   leading: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.info_outline),
@@ -118,7 +127,10 @@ class MoreScreen extends StatelessWidget {
                 ),
                 ListTile(
                   title: const Text('Help'),
-                  onTap: () {},
+                  // TODO: implement this
+                  onTap: () => context.showSnackBar(
+                    message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+                  ),
                   leading: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.help_outline),

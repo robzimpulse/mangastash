@@ -237,17 +237,15 @@ class MangaDetailWidget extends StatelessWidget {
       sliver: SliverToBoxAdapter(
         child: SizedBox(
           height: 32,
-          child: Center(
-            child: ListView.separated(
-              shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) => OutlinedButton(
-                child: Text(data[index]),
-                onPressed: () => onTapTag?.call(data[index]),
-              ),
-              separatorBuilder: (context, index) => const SizedBox(width: 8),
-              itemCount: data.length,
+          child: ListView.separated(
+            shrinkWrap: true,
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, index) => OutlinedButton(
+              child: Text(data[index]),
+              onPressed: () => onTapTag?.call(data[index]),
             ),
+            separatorBuilder: (context, index) => const SizedBox(width: 8),
+            itemCount: data.length,
           ),
         ),
       ),
