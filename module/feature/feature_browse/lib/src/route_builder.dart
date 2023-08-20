@@ -60,21 +60,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
           final source = state.extra as MangaSource?;
           switch (source) {
             case MangaSource.mangadex:
-              return BrowseMangaDexScreen.create(
-                locator: locator,
-                onTapSource: (context) {
-                  final url = MangaSource.mangadex.url;
-                  final LaunchUrlUseCase launcher = locator();
-                  launcher.launch(
-                    url: url,
-                    mode: LaunchMode.externalApplication,
-                    onSuccess: (success) {
-                      if (success) return;
-                      context.showSnackBar(message: 'Could not launch $url');
-                    },
-                  );
-                },
-              );
+              return BrowseMangaDexScreen.create(locator: locator);
             default:
               return const Scaffold(body: Text(''));
           }

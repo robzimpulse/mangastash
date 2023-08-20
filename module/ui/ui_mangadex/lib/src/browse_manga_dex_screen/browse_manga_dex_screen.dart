@@ -1,3 +1,4 @@
+import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -10,23 +11,14 @@ import 'browse_manga_dex_cubit.dart';
 import 'browse_manga_dex_state.dart';
 
 class BrowseMangaDexScreen extends StatefulWidget {
-  const BrowseMangaDexScreen({
-    super.key,
-    required this.locator,
-    required this.onTapSource,
-  });
+  const BrowseMangaDexScreen({super.key, required this.locator});
 
   final ServiceLocator locator;
-
-  final Function(BuildContext) onTapSource;
 
   @override
   State<BrowseMangaDexScreen> createState() => _BrowseMangaDexScreenState();
 
-  static Widget create({
-    required ServiceLocator locator,
-    required Function(BuildContext) onTapSource,
-  }) {
+  static Widget create({required ServiceLocator locator}) {
     return BlocProvider(
       create: (context) => BrowseMangaDexCubit(
         searchMangaUseCase: locator(),
@@ -38,10 +30,7 @@ class BrowseMangaDexScreen extends StatefulWidget {
           ),
         ),
       )..init(),
-      child: BrowseMangaDexScreen(
-        locator: locator,
-        onTapSource: onTapSource,
-      ),
+      child: BrowseMangaDexScreen(locator: locator),
     );
   }
 }
@@ -64,10 +53,9 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
   }
 
   int _crossAxisCount(BuildContext context) {
-    final responsive = ResponsiveBreakpoints.of(context);
-    if (responsive.isMobile) return 3;
-    if (responsive.isTablet) return 5;
-    if (responsive.isDesktop) return 8;
+    if (_breakpoints(context).isMobile) return 3;
+    if (_breakpoints(context).isTablet) return 5;
+    if (_breakpoints(context).isDesktop) return 8;
     return 12;
   }
 
@@ -83,7 +71,14 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
           _layoutIcon(),
           IconButton(
             icon: const Icon(Icons.open_in_browser),
-            onPressed: () => widget.onTapSource.call(context),
+            onPressed: () => launcher.launch(
+              url: source.url,
+              mode: LaunchMode.externalApplication,
+              onSuccess: (success) {
+                if (success) return;
+                context.showSnackBar(message: 'Could not launch ${source.url}');
+              },
+            ),
           ),
         ],
         bottom: PreferredSize(
@@ -332,4 +327,12 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
   BrowseMangaDexCubit _cubit(BuildContext context) {
     return context.read<BrowseMangaDexCubit>();
   }
+
+  ResponsiveBreakpointsData _breakpoints(BuildContext context) {
+    return ResponsiveBreakpoints.of(context);
+  }
+
+  LaunchUrlUseCase get launcher => widget.locator();
+
+  MangaSource get source => MangaSource.mangadex;
 }
