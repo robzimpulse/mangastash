@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:collection/collection.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:rxdart/rxdart.dart';
@@ -8,7 +11,7 @@ import '../use_case/update_locale_use_case.dart';
 class LocaleManager implements ListenLocaleUseCase, UpdateLocaleUseCase {
   final Storage _storage;
 
-  final _localeDataStream = BehaviorSubject<String>.seeded('');
+  final _localeDataStream = BehaviorSubject<Locale>();
 
   static const _key = 'locale';
 
@@ -17,16 +20,23 @@ class LocaleManager implements ListenLocaleUseCase, UpdateLocaleUseCase {
   }
 
   void _init() async {
-    var value = _storage.getString(_key) ?? await findSystemLocale();
-    updateLocale(locale: value);
+    final value = _storage.getString(_key) ?? await findSystemLocale();
+    final language = value.split('_').firstOrNull;
+    final country = value.split('_').lastOrNull;
+    if (language == null) return;
+    updateLocale(locale: Locale(language, country));
   }
 
   @override
-  ValueStream<String> get localeDataStream => _localeDataStream.stream;
+  ValueStream<Locale> get localeDataStream => _localeDataStream.stream;
 
   @override
-  void updateLocale({required String locale}) {
-    _storage.setString(_key, locale);
+  void updateLocale({required Locale locale}) {
+    final values = [
+      locale.languageCode,
+      locale.countryCode,
+    ].whereNotNull().join('_');
+    _storage.setString(_key, values);
     _localeDataStream.add(locale);
   }
 }

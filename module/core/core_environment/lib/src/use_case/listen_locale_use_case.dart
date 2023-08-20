@@ -1,5 +1,7 @@
+import 'dart:ui';
+
 import 'package:rxdart/rxdart.dart';
 
 abstract class ListenLocaleUseCase {
-  ValueStream<String> get localeDataStream;
+  ValueStream<Locale> get localeDataStream;
 }

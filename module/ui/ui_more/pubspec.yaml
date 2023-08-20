@@ -10,7 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  alice_lightweight: 3.3.0
 
   # library
   service_locator:
@@ -21,6 +20,8 @@ dependencies:
     path: ../../core/core_environment
   core_route:
     path: ../../core/core_route
+  core_network:
+    path: ../../core/core_network
 
   #ui
   ui_common:

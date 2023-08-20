@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 abstract class UpdateLocaleUseCase {
-  void updateLocale({required String locale});
+  void updateLocale({required Locale locale});
 }

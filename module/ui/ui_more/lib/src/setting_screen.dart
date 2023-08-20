@@ -1,5 +1,5 @@
-import 'package:alice_lightweight/alice.dart';
 import 'package:core_environment/core_environment.dart';
+import 'package:core_network/core_network.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
@@ -62,13 +62,13 @@ class SettingScreen extends StatelessWidget {
               );
             },
           ),
-          StreamBuilder<String>(
+          StreamBuilder<Locale>(
             stream: listenLocaleUseCase.localeDataStream,
             builder: (context, snapshot) {
               final locale = snapshot.data;
               return ListTile(
                 title: const Text('Language'),
-                trailing: Text('$locale'),
+                trailing: Text('${locale?.flagEmoji}'),
                 leading: const SizedBox(
                   height: double.infinity,
                   child: Icon(Icons.translate),
