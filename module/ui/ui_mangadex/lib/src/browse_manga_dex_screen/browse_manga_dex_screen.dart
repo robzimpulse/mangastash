@@ -73,7 +73,9 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
           _layoutIcon(),
           IconButton(
             icon: const Icon(Icons.open_in_browser),
-            onPressed: () {},
+            onPressed: () => context.showSnackBar(
+              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+            ),
           ),
         ],
         bottom: PreferredSize(
