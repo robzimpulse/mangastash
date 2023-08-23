@@ -1,7 +1,9 @@
 import 'package:entity_manga/entity_manga.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 import 'reader_manga_cubit.dart';
 import 'reader_manga_state.dart';
@@ -29,6 +31,9 @@ class ReaderMangaScreen extends StatefulWidget {
 }
 
 class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
+
+  final _pageDataStream = BehaviorSubject<int>.seeded(0);
+
   Widget _builder({
     required BlocWidgetBuilder<ReaderMangaState> builder,
     BlocBuilderCondition<ReaderMangaState>? buildWhen,
@@ -37,6 +42,12 @@ class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
       buildWhen: buildWhen,
       builder: builder,
     );
+  }
+
+  @override
+  void dispose() {
+    _pageDataStream.close();
+    super.dispose();
   }
 
   @override
@@ -62,25 +73,37 @@ class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
           alignment: Alignment.bottomCenter,
           children: [
             ListView.builder(
-              itemBuilder: (context, index) => CachedNetworkImage(
-                imageUrl: images[index],
+              itemBuilder: (context, index) => VisibilityDetector(
+                onVisibilityChanged: (info) {
+                  final value = (info.key as ValueKey<int>?)?.value;
+                  if (value == null) return;
+                  _pageDataStream.add(value);
+                },
+                key: ValueKey<int>(index),
+                child: CachedNetworkImage(
+                  imageUrl: images[index],
+                ),
               ),
               itemCount: images.length,
             ),
-            Positioned(
-              bottom: double.minPositive,
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.5),
-                  borderRadius: const BorderRadius.all(Radius.circular(4)),
-                ),
-                child: Text(
-                  // TODO: implement page indicator
-                  'Page x of ${images.length}',
-                  style: const TextStyle(fontSize: 10),
-                ),
-              ),
+            StreamBuilder<int>(
+              stream: _pageDataStream.stream,
+              builder: (context, snapshot) {
+                return Positioned(
+                  bottom: double.minPositive,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.5),
+                      borderRadius: const BorderRadius.all(Radius.circular(4)),
+                    ),
+                    child: Text(
+                      'Page ${snapshot.data ?? 0} of ${images.length}',
+                      style: const TextStyle(fontSize: 10),
+                    ),
+                  ),
+                );
+              }
             ),
           ],
         );

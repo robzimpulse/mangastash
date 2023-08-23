@@ -13,6 +13,8 @@ dependencies:
 
   equatable: ^2.0.5
   collection: ^1.16.0
+  visibility_detector: ^0.4.0+2
+  rxdart: ^0.27.7
 
   # github
   expansion_tile_group:
