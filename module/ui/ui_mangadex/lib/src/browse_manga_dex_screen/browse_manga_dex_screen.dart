@@ -97,7 +97,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
     return _builder(
       buildWhen: (prev, curr) => prev.parameter != curr.parameter,
       builder: (context, state) {
-        return GappedToggleButton(
+        return GappedToggleButtonWidget(
           size: size,
           foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor,

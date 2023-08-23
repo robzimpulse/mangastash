@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class GappedToggleButton extends StatelessWidget {
-  const GappedToggleButton({
+class GappedToggleButtonWidget extends StatelessWidget {
+  const GappedToggleButtonWidget({
     super.key,
     this.backgroundColor,
     required this.icons,
