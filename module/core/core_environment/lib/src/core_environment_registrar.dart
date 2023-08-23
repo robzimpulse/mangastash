@@ -2,6 +2,8 @@ import 'package:service_locator/service_locator.dart';
 
 import 'manager/locale_manager.dart';
 import 'manager/theme_manager.dart';
+import 'use_case/get_country_list_use_case.dart';
+import 'use_case/get_language_list_use_case.dart';
 import 'use_case/listen_locale_use_case.dart';
 import 'use_case/listen_theme_use_case.dart';
 import 'use_case/update_locale_use_case.dart';
@@ -17,5 +19,7 @@ class CoreEnvironmentRegistrar extends Registrar {
     locator.registerLazySingleton(() => LocaleManager(storage: locator()));
     locator.alias<UpdateLocaleUseCase, LocaleManager>();
     locator.alias<ListenLocaleUseCase, LocaleManager>();
+    locator.alias<GetCountryListUseCase, LocaleManager>();
+    locator.alias<GetLanguageListUseCase, LocaleManager>();
   }
 }

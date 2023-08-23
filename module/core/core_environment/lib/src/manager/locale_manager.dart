@@ -7,10 +7,17 @@ import 'package:rxdart/rxdart.dart';
 
 import '../entity/country.dart';
 import '../entity/language.dart';
+import '../use_case/get_country_list_use_case.dart';
+import '../use_case/get_language_list_use_case.dart';
 import '../use_case/listen_locale_use_case.dart';
 import '../use_case/update_locale_use_case.dart';
 
-class LocaleManager implements ListenLocaleUseCase, UpdateLocaleUseCase {
+class LocaleManager
+    implements
+        ListenLocaleUseCase,
+        UpdateLocaleUseCase,
+        GetCountryListUseCase,
+        GetLanguageListUseCase {
   final Storage _storage;
 
   final _localeDataStream = BehaviorSubject<Locale>();
@@ -43,6 +50,7 @@ class LocaleManager implements ListenLocaleUseCase, UpdateLocaleUseCase {
   }
 
   // data from https://github.com/miguelpruivo/country_codes/blob/master/lib/src/codes.dart
+  @override
   List<Country> get countries {
     final data = {
       "AF": {
@@ -1303,6 +1311,7 @@ class LocaleManager implements ListenLocaleUseCase, UpdateLocaleUseCase {
   }
 
   // data from https://github.com/gomgom/flutter_language_pickers/blob/master/lib/languages.dart
+  @override
   List<Language> get languages {
     final data = [
       {"isoCode": "ab", "name": "Abkhazian"},
