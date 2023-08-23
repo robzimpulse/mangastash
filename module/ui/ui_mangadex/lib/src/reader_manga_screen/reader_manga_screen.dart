@@ -61,18 +61,26 @@ class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
         return Stack(
           alignment: Alignment.bottomCenter,
           children: [
-            const Positioned(
-              bottom: double.minPositive,
-              child: Text(
-                'Page Indicator',
-                style: TextStyle(fontSize: 10),
-              ),
-            ),
             ListView.builder(
               itemBuilder: (context, index) => CachedNetworkImage(
                 imageUrl: images[index],
               ),
               itemCount: images.length,
+            ),
+            Positioned(
+              bottom: double.minPositive,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.5),
+                  borderRadius: const BorderRadius.all(Radius.circular(4)),
+                ),
+                child: Text(
+                  // TODO: implement page indicator
+                  'Page x of ${images.length}',
+                  style: const TextStyle(fontSize: 10),
+                ),
+              ),
             ),
           ],
         );
