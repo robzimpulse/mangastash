@@ -14,6 +14,7 @@ dependencies:
   intl: ^0.18.1
   collection: ^1.16.0
   locale_emoji: ^0.2.1
+  equatable: ^2.0.5
 
   # library
   service_locator:
