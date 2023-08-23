@@ -3,8 +3,6 @@ import 'package:core_network/core_network.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import 'locale_picker_bottom_sheet/locale_picker_bottom_sheet_screen.dart';
-
 class SettingScreen extends StatefulWidget {
   final Alice alice;
   final ListenThemeUseCase listenThemeUseCase;
@@ -65,9 +63,7 @@ class _SettingScreenState extends State<SettingScreen> {
               return SwitchListTile(
                 title: Text('$title Mode'),
                 value: isDarkMode,
-                onChanged: (bool value) => widget.themeUpdateUseCase.updateTheme(
-                  theme: value ? ThemeData.dark() : ThemeData.light(),
-                ),
+                onChanged: _onChangeTheme,
                 secondary: SizedBox(
                   height: double.infinity,
                   child: Icon(icon),
@@ -79,14 +75,35 @@ class _SettingScreenState extends State<SettingScreen> {
             stream: widget.listenLocaleUseCase.localeDataStream,
             builder: (context, snapshot) {
               final locale = snapshot.data;
+              final language = locale?.language(
+                widget.getLanguageListUseCase.languages,
+              );
               return ListTile(
                 title: const Text('Language'),
-                trailing: Text('${locale?.flagEmoji}'),
+                trailing: Text('${language?.name}'),
                 leading: const SizedBox(
                   height: double.infinity,
                   child: Icon(Icons.translate),
                 ),
-                onTap: _showLanguagePicker,
+                onTap: () => _showLanguagePicker(context),
+              );
+            },
+          ),
+          StreamBuilder<Locale>(
+            stream: widget.listenLocaleUseCase.localeDataStream,
+            builder: (context, snapshot) {
+              final locale = snapshot.data;
+              final country = locale?.country(
+                widget.getCountryListUseCase.countries,
+              );
+              return ListTile(
+                title: const Text('Country'),
+                trailing: Text('${country?.name}'),
+                leading: const SizedBox(
+                  height: double.infinity,
+                  child: Icon(Icons.language),
+                ),
+                onTap: () => _showCountryPicker(context),
               );
             },
           ),
@@ -103,15 +120,23 @@ class _SettingScreenState extends State<SettingScreen> {
     );
   }
 
-  void _showLanguagePicker() async {
-    final result = await context.showBottomSheet<Locale>(
-      builder: (context) => LocalePickerBottomSheetScreen.create(
-        countries: widget.getCountryListUseCase.countries,
-        languages: widget.getLanguageListUseCase.languages,
-        locale: widget.listenLocaleUseCase.localeDataStream.valueOrNull,
-      ),
+  void _onChangeTheme(bool value) {
+    widget.themeUpdateUseCase.updateTheme(
+      theme: value ? ThemeData.dark() : ThemeData.light(),
     );
-    if (result == null) return;
-    widget.updateLocaleUseCase.updateLocale(locale: result);
+  }
+
+  void _showLanguagePicker(BuildContext context) async {
+    // TODO: implement this
+    context.showSnackBar(
+      message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+    );
+  }
+
+  void _showCountryPicker(BuildContext context) async {
+    // TODO: implement this
+    context.showSnackBar(
+      message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+    );
   }
 }
