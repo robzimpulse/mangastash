@@ -1,4 +1,3 @@
-import 'package:alice_lightweight/alice.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
@@ -39,11 +38,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
   @override
   Widget build(BuildContext context) {
     return _isInitialized
-        ? AppsScreen(
-            locator: _locator,
-            listenThemeUseCase: _locator.get(),
-            routerConfig: _router,
-          )
+        ? AppsScreen(listenThemeUseCase: _locator.get(), routerConfig: _router)
         : const SplashScreen();
   }
 
@@ -60,7 +55,8 @@ class _MangaStashAppState extends State<MangaStashApp> {
 
   Future<ServiceLocator> initiateAppLocator() async {
     ServiceLocatorInitiator.setServiceLocatorFactory(
-        () => GetItServiceLocator());
+      () => GetItServiceLocator(),
+    );
     final locator = ServiceLocator.asNewInstance();
 
     // TODO: register module registrar here

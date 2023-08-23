@@ -5,15 +5,12 @@ import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
 class AppsScreen extends StatelessWidget {
-  final ServiceLocator locator;
-
   final RouterConfig<Object>? routerConfig;
 
   final ListenThemeUseCase listenThemeUseCase;
 
   const AppsScreen({
     super.key,
-    required this.locator,
     required this.listenThemeUseCase,
     this.routerConfig,
   });
@@ -40,7 +37,6 @@ class AppsScreen extends StatelessWidget {
 
   ThemeData _themeDark() {
     final theme = FlexThemeData.dark(scheme: FlexScheme.outerSpace);
-
     return theme.copyWith(
       pageTransitionsTheme: _transition(),
       splashColor: theme.primaryColor,

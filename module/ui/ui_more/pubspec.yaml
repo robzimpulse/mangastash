@@ -10,10 +10,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  equatable: ^2.0.5
 
   # library
   service_locator:
     path: ../../library/service_locator
+  safe_bloc:
+    path: ../../library/safe_bloc
 
   # core
   core_environment:
