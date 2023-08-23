@@ -6,6 +6,7 @@ export 'package:flutter/material.dart';
 export 'package:intersperse/intersperse.dart';
 export 'package:responsive_framework/responsive_framework.dart';
 
+export 'src/bottom_sheet/picker_bottom_sheet.dart';
 export 'src/controller/paging_scroll_controller.dart';
 export 'src/extension/bottom_sheet_extension.dart';
 export 'src/extension/expansion_tile_extension.dart';

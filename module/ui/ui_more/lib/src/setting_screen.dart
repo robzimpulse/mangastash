@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:service_locator/service_locator.dart';
@@ -85,7 +86,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   height: double.infinity,
                   child: Icon(Icons.translate),
                 ),
-                onTap: () => _showLanguagePicker(context),
+                onTap: _showLanguagePicker,
               );
             },
           ),
@@ -126,17 +127,34 @@ class _SettingScreenState extends State<SettingScreen> {
     );
   }
 
-  void _showLanguagePicker(BuildContext context) async {
-    // TODO: implement this
-    context.showSnackBar(
-      message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+  void _showLanguagePicker() async {
+    final languages = widget.getLanguageListUseCase.languages;
+    final result = await context.showBottomSheet<String>(
+      builder: (context) => PickerBottomSheet(
+        names: languages.map((e) => e.name).whereNotNull().toList(),
+      ),
+    );
+    final code = languages.firstWhereOrNull((e) => e.name == result)?.isoCode;
+    final locale = widget.listenLocaleUseCase.localeDataStream.valueOrNull;
+    if (code == null || locale == null) return;
+    widget.updateLocaleUseCase.updateLocale(
+      locale: Locale(code, locale.countryCode),
     );
   }
 
   void _showCountryPicker(BuildContext context) async {
-    // TODO: implement this
-    context.showSnackBar(
-      message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+    final countries = widget.getCountryListUseCase.countries;
+    final result = await context.showBottomSheet<String>(
+      builder: (context) => PickerBottomSheet(
+        names: countries.map((e) => e.name).whereNotNull().toList(),
+      ),
+    );
+    final code =
+        countries.firstWhereOrNull((e) => e.name == result)?.alpha2Code;
+    final locale = widget.listenLocaleUseCase.localeDataStream.valueOrNull;
+    if (code == null || locale == null) return;
+    widget.updateLocaleUseCase.updateLocale(
+      locale: Locale(locale.languageCode, code),
     );
   }
 }
