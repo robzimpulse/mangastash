@@ -58,22 +58,19 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         name: BrowseRoutePath.browseSource,
         redirect: (context, state) {
           final source = state.extra as MangaSource?;
-          switch (source) {
-            case MangaSource.mangadex:
-              return BrowseRoutePath.mangadex;
-            default:
-              return 'Not Found';
-          }
+          if (source == null) return 'undefined';
+          return '${BrowseRoutePath.browse}/${source.route}';
         },
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: BrowseRoutePath.mangadex,
-        name: BrowseRoutePath.mangadex,
+        path: '${BrowseRoutePath.browse}/${MangaSource.mangadex.route}',
+        name: '${BrowseRoutePath.browse}/${MangaSource.mangadex.route}',
         builder: (context, state) => BrowseMangaDexScreen.create(
           locator: locator,
         ),
       ),
+      // TODO: add more route for specific source browse screen here
     ];
   }
 }

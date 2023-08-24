@@ -6,7 +6,7 @@ import 'browse_screen_cubit_state.dart';
 class BrowseScreenCubit extends Cubit<BrowseScreenCubitState> {
   BrowseScreenCubit({
     BrowseScreenCubitState initialState = const BrowseScreenCubitState(
-      sources: [MangaSource.mangadex, MangaSource.asurascan],
+      sources: [MangaSource.mangadex, MangaSource.asurascans],
     ),
   }) : super(initialState);
 }
