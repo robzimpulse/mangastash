@@ -6,4 +6,11 @@ enum MangaShelfItemLayout {
   final String rawValue;
 
   const MangaShelfItemLayout(this.rawValue);
+
+  factory MangaShelfItemLayout.fromRawValue(String rawValue) {
+    return MangaShelfItemLayout.values.firstWhere(
+      (e) => e.rawValue == rawValue,
+      orElse: () => MangaShelfItemLayout.compactGrid,
+    );
+  }
 }

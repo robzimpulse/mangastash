@@ -59,13 +59,13 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         redirect: (context, state) {
           final source = state.extra as MangaSource?;
           if (source == null) return 'undefined';
-          return '${BrowseRoutePath.browse}/${source.route}';
+          return '${BrowseRoutePath.browse}/${source.id}';
         },
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: '${BrowseRoutePath.browse}/${MangaSource.mangadex.route}',
-        name: '${BrowseRoutePath.browse}/${MangaSource.mangadex.route}',
+        path: '${BrowseRoutePath.browse}/${MangaSource.mangadex.id}',
+        name: '${BrowseRoutePath.browse}/${MangaSource.mangadex.id}',
         builder: (context, state) => BrowseMangaDexScreen.create(
           locator: locator,
         ),
