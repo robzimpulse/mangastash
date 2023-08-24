@@ -3,11 +3,11 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import 'browse_screen_cubit.dart';
-import 'browse_screen_cubit_state.dart';
+import 'browse_source_screen_cubit.dart';
+import 'browse_source_screen_cubit_state.dart';
 
-class BrowseScreen extends StatelessWidget {
-  const BrowseScreen({
+class BrowseSourceScreen extends StatelessWidget {
+  const BrowseSourceScreen({
     super.key,
     required this.onTapSearchManga,
     required this.onTapSource,
@@ -23,8 +23,8 @@ class BrowseScreen extends StatelessWidget {
     required Function(BuildContext, MangaSource) onTapSource,
   }) {
     return BlocProvider(
-      create: (context) => BrowseScreenCubit(),
-      child: BrowseScreen(
+      create: (context) => BrowseSourceScreenCubit(),
+      child: BrowseSourceScreen(
         onTapSearchManga: onTapSearchManga,
         onTapSource: onTapSource,
       ),
@@ -44,7 +44,7 @@ class BrowseScreen extends StatelessWidget {
           )
         ],
       ),
-      body: BlocBuilder<BrowseScreenCubit, BrowseScreenCubitState>(
+      body: BlocBuilder<BrowseSourceScreenCubit, BrowseSourceScreenCubitState>(
         builder: (context, state) {
           return AdaptivePhysicListView.separated(
             separatorBuilder: (context, index) => const Divider(

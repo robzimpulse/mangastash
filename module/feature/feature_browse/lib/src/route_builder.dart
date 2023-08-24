@@ -18,7 +18,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
     return GoRoute(
       path: BrowseRoutePath.browse,
       name: BrowseRoutePath.browse,
-      builder: (context, state) => BrowseScreen.create(
+      builder: (context, state) => BrowseSourceScreen.create(
         locator: locator,
         // TODO: implement redirect to search source screen
         onTapSearchManga: (context) => context.showSnackBar(
@@ -30,7 +30,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         ),
       ),
       pageBuilder: (context, state) => NoTransitionPage(
-        child: BrowseScreen.create(
+        child: BrowseSourceScreen.create(
           locator: locator,
           // TODO: implement redirect to search source screen
           onTapSearchManga: (context) => context.showSnackBar(
