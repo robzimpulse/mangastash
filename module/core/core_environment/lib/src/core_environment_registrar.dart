@@ -12,11 +12,11 @@ import 'use_case/update_theme_use_case.dart';
 class CoreEnvironmentRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    locator.registerLazySingleton(() => ThemeManager(storage: locator()));
+    locator.registerSingleton(ThemeManager(storage: locator()));
     locator.alias<UpdateThemeUseCase, ThemeManager>();
     locator.alias<ListenThemeUseCase, ThemeManager>();
 
-    locator.registerLazySingleton(() => LocaleManager(storage: locator()));
+    locator.registerSingleton(LocaleManager(storage: locator()));
     locator.alias<UpdateLocaleUseCase, LocaleManager>();
     locator.alias<ListenLocaleUseCase, LocaleManager>();
     locator.alias<GetCountryListUseCase, LocaleManager>();

@@ -11,15 +11,15 @@ import 'use_case/launch_url_use_case.dart';
 class CoreNetworkRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    locator.registerLazySingleton(() => Alice());
+    locator.registerSingleton(Alice());
 
     locator.registerFactory(() => MangaDexDio(alice: locator()));
     locator.alias<Dio, MangaDexDio>();
 
-    locator.registerLazySingletonAsync(() => SystemProxyManager.init());
+    locator.registerSingleton(await SystemProxyManager.init());
     locator.alias<GetSystemProxyUseCase, SystemProxyManager>();
 
-    locator.registerLazySingleton(() => UrlLauncherManager());
+    locator.registerSingleton(UrlLauncherManager());
     locator.alias<LaunchUrlUseCase, UrlLauncherManager>();
   }
 }

@@ -57,7 +57,7 @@ class DomainMangaRegistrar extends Registrar {
       ),
     );
 
-    locator.registerLazySingleton(() => TagsManager(listTagUseCase: locator()));
+    locator.registerSingleton(TagsManager(listTagUseCase: locator()));
     locator.alias<ListenListTagUseCase, TagsManager>();
   }
 }
