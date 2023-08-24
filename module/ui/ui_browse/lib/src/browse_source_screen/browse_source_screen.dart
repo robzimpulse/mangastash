@@ -4,7 +4,7 @@ import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
 import 'browse_source_screen_cubit.dart';
-import 'browse_source_screen_cubit_state.dart';
+import 'browse_source_screen_state.dart';
 
 class BrowseSourceScreen extends StatelessWidget {
   const BrowseSourceScreen({
@@ -44,7 +44,7 @@ class BrowseSourceScreen extends StatelessWidget {
           )
         ],
       ),
-      body: BlocBuilder<BrowseSourceScreenCubit, BrowseSourceScreenCubitState>(
+      body: BlocBuilder<BrowseSourceScreenCubit, BrowseSourceScreenState>(
         builder: (context, state) {
           return AdaptivePhysicListView.separated(
             separatorBuilder: (context, index) => const Divider(
