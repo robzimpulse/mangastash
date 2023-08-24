@@ -45,5 +45,6 @@ abstract class MangaService {
   @GET('/manga/{id}')
   Future<MangaResponse> detail({
     @Path('id') String? id,
+    @Query('includes[]') List<String>? includes,
   });
 }

@@ -31,7 +31,8 @@ class BaseRouteObserver extends NavigatorObserver {
 
   void _update(Route? route) {
     final location = route?.settings.name;
-    if (location == null) return;
+    final arguments = route?.settings.arguments;
     log('location: $location', name: 'robzimpulse');
+    log('arguments: $arguments', name: 'robzimpulse');
   }
 }

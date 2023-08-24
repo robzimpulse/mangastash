@@ -76,7 +76,10 @@ class MangaRepository {
     return _service.tags();
   }
 
-  Future<MangaResponse> detail(String id) {
-    return _service.detail(id: id);
+  Future<MangaResponse> detail({required String id, List<Include>? includes}) {
+    return _service.detail(
+      id: id,
+      includes: includes?.map((e) => e.rawValue).toList(),
+    );
   }
 }

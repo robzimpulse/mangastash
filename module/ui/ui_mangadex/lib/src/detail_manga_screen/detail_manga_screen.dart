@@ -10,32 +10,25 @@ import 'detail_manga_cubit.dart';
 import 'detail_manga_state.dart';
 
 class DetailMangaScreen extends StatefulWidget {
-  const DetailMangaScreen({
-    super.key,
-    required this.locator,
-  });
-
-  final ServiceLocator locator;
+  const DetailMangaScreen({super.key});
 
   static Widget create({
     required ServiceLocator locator,
-    required Manga manga,
+    required String mangaId,
   }) {
     return BlocProvider(
       create: (context) => DetailMangaCubit(
         getAllChapterUseCase: locator(),
         initialState: DetailMangaState(
-          manga: manga,
           parameter: SearchChapterParameter(
-            mangaId: manga.id,
+            mangaId: mangaId,
+            includes: const [Include.coverArt, Include.author],
             translatedLanguage: const [LanguageCodes.english],
             orders: const {ChapterOrders.chapter: OrderDirections.descending},
           ),
-        ),
+        ), getMangaUseCase: locator(),
       )..init(),
-      child: DetailMangaScreen(
-        locator: locator,
-      ),
+      child: const DetailMangaScreen(),
     );
   }
 
@@ -180,14 +173,15 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
             chapterForIndex: (context, index) => ListTile(
               title: Text(chapters[index].top),
               subtitle: Text(chapters[index].bottom),
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => ReaderMangaScreen.create(
-                    locator: widget.locator,
-                    chapter: chapters[index],
-                  ),
-                ),
-              ),
+              // TODO: implement this
+              // onTap: () => Navigator.of(context).push(
+              //   MaterialPageRoute(
+              //     builder: (context) => ReaderMangaScreen.create(
+              //       locator: widget.locator,
+              //       chapter: chapters[index],
+              //     ),
+              //   ),
+              // ),
             ),
           );
         }

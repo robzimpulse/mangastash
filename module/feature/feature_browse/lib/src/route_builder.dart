@@ -68,6 +68,18 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         name: '${BrowseRoutePath.browse}/${MangaSource.mangadex.id}',
         builder: (context, state) => BrowseMangaDexScreen.create(
           locator: locator,
+          onTapManga: (context, manga) => context.push(
+            '${BrowseRoutePath.browse}/${MangaSource.mangadex.id}/${manga.id}',
+          ),
+        ),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '${BrowseRoutePath.browse}/${MangaSource.mangadex.id}/:mangaId',
+        name: '${BrowseRoutePath.browse}/${MangaSource.mangadex.id}/:mangaId',
+        builder: (context, state) => DetailMangaScreen.create(
+          locator: locator,
+          mangaId: state.pathParameters['mangaId'] ?? '',
         ),
       ),
       // TODO: add more route for specific source browse screen here

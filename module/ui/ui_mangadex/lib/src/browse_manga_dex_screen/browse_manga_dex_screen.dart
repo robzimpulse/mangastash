@@ -11,14 +11,26 @@ import 'browse_manga_dex_cubit.dart';
 import 'browse_manga_dex_state.dart';
 
 class BrowseMangaDexScreen extends StatefulWidget {
-  const BrowseMangaDexScreen({super.key, required this.locator});
+  const BrowseMangaDexScreen({
+    super.key,
+    required this.launchUrlUseCase,
+    required this.listenListTagUseCase,
+    required this.onTapManga,
+  });
 
-  final ServiceLocator locator;
+  final LaunchUrlUseCase launchUrlUseCase;
+
+  final ListenListTagUseCase listenListTagUseCase;
+
+  final Function(BuildContext, Manga) onTapManga;
 
   @override
   State<BrowseMangaDexScreen> createState() => _BrowseMangaDexScreenState();
 
-  static Widget create({required ServiceLocator locator}) {
+  static Widget create({
+    required ServiceLocator locator,
+    required Function(BuildContext, Manga) onTapManga,
+  }) {
     return BlocProvider(
       create: (context) => BrowseMangaDexCubit(
         searchMangaUseCase: locator(),
@@ -30,7 +42,11 @@ class BrowseMangaDexScreen extends StatefulWidget {
           ),
         ),
       )..init(),
-      child: BrowseMangaDexScreen(locator: locator),
+      child: BrowseMangaDexScreen(
+        launchUrlUseCase: locator(),
+        listenListTagUseCase: locator(),
+        onTapManga: onTapManga,
+      ),
     );
   }
 }
@@ -71,7 +87,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
           _layoutIcon(),
           IconButton(
             icon: const Icon(Icons.open_in_browser),
-            onPressed: () => launcher.launch(
+            onPressed: () => widget.launchUrlUseCase.launch(
               url: source.url,
               mode: LaunchMode.externalApplication,
               onSuccess: (success) {
@@ -131,7 +147,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
     final state = _cubit(context).state;
     final result = await context.showBottomSheet<List<MangaTag>>(
       builder: (context) => FilterBottomSheet.create(
-        locator: widget.locator,
+        listenListTagUseCase: widget.listenListTagUseCase,
         includedTags: state.parameter.includedTags,
         excludedTags: state.parameter.excludedTags,
       ),
@@ -245,14 +261,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
             title: e.title ?? '',
             coverUrl: e.coverUrl ?? '',
             layout: state.layout,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => DetailMangaScreen.create(
-                  locator: widget.locator,
-                  manga: e,
-                ),
-              ),
-            ),
+            onTap: () => widget.onTapManga.call(context, e),
           ),
         );
 
@@ -331,8 +340,6 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
   ResponsiveBreakpointsData _breakpoints(BuildContext context) {
     return ResponsiveBreakpoints.of(context);
   }
-
-  LaunchUrlUseCase get launcher => widget.locator();
 
   MangaSource get source => MangaSource.mangadex;
 }

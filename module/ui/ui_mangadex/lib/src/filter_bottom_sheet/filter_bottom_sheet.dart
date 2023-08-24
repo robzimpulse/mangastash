@@ -1,9 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:core_route/core_route.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:expansion_tile_group/expansion_tile_group.dart';
 import 'package:safe_bloc/safe_bloc.dart';
-import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
 import 'filter_bottom_sheet_cubit.dart';
@@ -13,7 +13,7 @@ class FilterBottomSheet extends StatefulWidget {
   const FilterBottomSheet({super.key});
 
   static Widget create({
-    required ServiceLocator locator,
+  required ListenListTagUseCase listenListTagUseCase,
     List<String> includedTags = const [],
     List<String> excludedTags = const [],
   }) {
@@ -25,7 +25,7 @@ class FilterBottomSheet extends StatefulWidget {
           includedTags: includedTags,
           excludedTags: excludedTags,
         ),
-        listenListTagUseCase: locator(),
+        listenListTagUseCase: listenListTagUseCase,
       ),
       child: const FilterBottomSheet(),
     );

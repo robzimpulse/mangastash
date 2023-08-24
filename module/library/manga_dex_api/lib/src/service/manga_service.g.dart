@@ -112,9 +112,12 @@ class _MangaService implements MangaService {
   }
 
   @override
-  Future<MangaResponse> detail({id}) async {
+  Future<MangaResponse> detail({
+    id,
+    includes,
+  }) async {
     const _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'includes[]': includes};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
