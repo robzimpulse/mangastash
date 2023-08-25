@@ -31,7 +31,6 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(() => CoverRepository(service: locator()));
 
     locator.registerFactory(() => GetAuthorUseCase(repository: locator()));
-    locator.registerFactory(() => GetChapterUseCase(repository: locator()));
     locator.registerFactory(() => GetCoverArtUseCase(repository: locator()));
     locator.registerFactory(() => ListTagUseCase(repository: locator()));
     locator.registerFactory(() => SearchChapterUseCase(repository: locator()));
@@ -61,6 +60,13 @@ class DomainMangaRegistrar extends Registrar {
         mangaRepository: locator(),
         authorRepository: locator(),
         coverRepository: locator(),
+        chapterRepository: locator(),
+      ),
+    );
+
+    locator.registerFactory(
+      () => GetChapterUseCase(
+        atHomeRepository: locator(),
         chapterRepository: locator(),
       ),
     );

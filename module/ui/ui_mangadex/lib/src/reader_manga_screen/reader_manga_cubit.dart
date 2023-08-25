@@ -6,12 +6,10 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'reader_manga_state.dart';
 
 class ReaderMangaCubit extends Cubit<ReaderMangaState> {
-  final GetChapterImageUseCase getChapterImageUseCase;
   final GetChapterUseCase getChapterUseCase;
 
   ReaderMangaCubit({
     required this.getChapterUseCase,
-    required this.getChapterImageUseCase,
     ReaderMangaState initialState = const ReaderMangaState(),
   }) : super(initialState);
 
@@ -23,24 +21,7 @@ class ReaderMangaCubit extends Cubit<ReaderMangaState> {
     );
 
     if (response is Success<MangaChapter>) {
-      final result = await getChapterImageUseCase.execute(
-        chapterId: state.chapterId ?? '',
-      );
-
-      if (result is Success<AtHomeResponse>) {
-        emit(
-          state.copyWith(
-            chapter: response.data.copyWith(
-              images: result.data.images,
-              imagesDataSaver: result.data.imagesDataSaver,
-            ),
-          ),
-        );
-      }
-
-      if (result is Error<AtHomeResponse>) {
-        emit(state.copyWith(errorMessage: () => result.error.toString()));
-      }
+      emit(state.copyWith(chapter: response.data));
     }
 
     if (response is Error<MangaChapter>) {

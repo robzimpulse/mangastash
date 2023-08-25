@@ -1,4 +1,3 @@
-import 'package:entity_manga/entity_manga.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -22,7 +21,6 @@ class ReaderMangaScreen extends StatefulWidget {
           mangaId: mangaId,
           chapterId: chapterId,
         ),
-        getChapterImageUseCase: locator(),
         getChapterUseCase: locator(),
       )..init(),
       child: const ReaderMangaScreen(),
@@ -75,6 +73,7 @@ class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
           alignment: Alignment.bottomCenter,
           children: [
             ListView.builder(
+              padding: EdgeInsets.zero,
               itemBuilder: (context, index) => VisibilityDetector(
                 onVisibilityChanged: (info) {
                   final value = (info.key as ValueKey<int>?)?.value;
@@ -89,24 +88,29 @@ class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
               itemCount: images.length,
             ),
             StreamBuilder<int>(
-                stream: _pageDataStream.stream,
-                builder: (context, snapshot) {
-                  return Positioned(
-                    bottom: double.minPositive,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.5),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(4)),
-                      ),
-                      child: Text(
-                        'Page ${snapshot.data ?? 0} of ${images.length}',
-                        style: const TextStyle(fontSize: 10),
+              stream: _pageDataStream.stream,
+              builder: (context, snapshot) {
+                return Positioned(
+                  bottom: double.minPositive,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.5),
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(4),
                       ),
                     ),
-                  );
-                }),
+                    child: Text(
+                      'Page ${snapshot.data ?? 0} of ${images.length}',
+                      style: const TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
           ],
         );
       },
