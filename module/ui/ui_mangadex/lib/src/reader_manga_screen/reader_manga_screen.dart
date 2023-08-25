@@ -13,14 +13,17 @@ class ReaderMangaScreen extends StatefulWidget {
 
   static Widget create({
     required ServiceLocator locator,
-    required MangaChapter chapter,
+    required String? mangaId,
+    required String? chapterId,
   }) {
     return BlocProvider(
       create: (context) => ReaderMangaCubit(
         initialState: ReaderMangaState(
-          chapter: chapter,
+          mangaId: mangaId,
+          chapterId: chapterId,
         ),
         getChapterImageUseCase: locator(),
+        getChapterUseCase: locator(),
       )..init(),
       child: const ReaderMangaScreen(),
     );
@@ -31,7 +34,6 @@ class ReaderMangaScreen extends StatefulWidget {
 }
 
 class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
-
   final _pageDataStream = BehaviorSubject<int>.seeded(0);
 
   Widget _builder({
@@ -87,24 +89,24 @@ class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
               itemCount: images.length,
             ),
             StreamBuilder<int>(
-              stream: _pageDataStream.stream,
-              builder: (context, snapshot) {
-                return Positioned(
-                  bottom: double.minPositive,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.5),
-                      borderRadius: const BorderRadius.all(Radius.circular(4)),
+                stream: _pageDataStream.stream,
+                builder: (context, snapshot) {
+                  return Positioned(
+                    bottom: double.minPositive,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.5),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(4)),
+                      ),
+                      child: Text(
+                        'Page ${snapshot.data ?? 0} of ${images.length}',
+                        style: const TextStyle(fontSize: 10),
+                      ),
                     ),
-                    child: Text(
-                      'Page ${snapshot.data ?? 0} of ${images.length}',
-                      style: const TextStyle(fontSize: 10),
-                    ),
-                  ),
-                );
-              }
-            ),
+                  );
+                }),
           ],
         );
       },

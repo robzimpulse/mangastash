@@ -5,16 +5,18 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import '../reader_manga_screen/reader_manga_screen.dart';
 import 'detail_manga_cubit.dart';
 import 'detail_manga_state.dart';
 
 class DetailMangaScreen extends StatefulWidget {
-  const DetailMangaScreen({super.key});
+  const DetailMangaScreen({super.key, required this.onTapChapter});
+
+  final Function(BuildContext, String?) onTapChapter;
 
   static Widget create({
     required ServiceLocator locator,
     required String mangaId,
+    required Function(BuildContext, String?) onTapChapter,
   }) {
     return BlocProvider(
       create: (context) => DetailMangaCubit(
@@ -26,9 +28,12 @@ class DetailMangaScreen extends StatefulWidget {
             translatedLanguage: const [LanguageCodes.english],
             orders: const {ChapterOrders.chapter: OrderDirections.descending},
           ),
-        ), getMangaUseCase: locator(),
+        ),
+        getMangaUseCase: locator(),
       )..init(),
-      child: const DetailMangaScreen(),
+      child: DetailMangaScreen(
+        onTapChapter: onTapChapter,
+      ),
     );
   }
 
@@ -113,47 +118,17 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
   Widget _content() {
     return _builder(
       builder: (context, state) {
-        final tags = state.manga?.tags;
-        final errorMessage = state.errorMessage;
-        final chapters = state.manga?.chapters;
-
         if (state.isLoading) {
-          return MangaDetailWidget.loading(
-            coverUrl: state.manga?.coverUrl,
-            title: state.manga?.title,
-            author: state.manga?.author,
-            status: state.manga?.status,
-            description: state.manga?.description,
-            tags: tags?.map((e) => e.name).whereNotNull().toList(),
-            horizontalPadding: 12,
-            onTapFavorite: () => _onTapFavorite(context),
-            onTapWebsite: () => _onTapWebsite(context),
-            onTapTag: (name) => _onTapTag(
-              context,
-              tag: tags?.firstWhere((e) => e.name == name),
-            ),
-          );
+          return const Center(child: CircularProgressIndicator());
         }
 
+        final errorMessage = state.errorMessage;
         if (errorMessage != null) {
-          return MangaDetailWidget.message(
-            coverUrl: state.manga?.coverUrl,
-            title: state.manga?.title,
-            author: state.manga?.author,
-            status: state.manga?.status,
-            description: state.manga?.description,
-            tags: tags?.map((e) => e.name).whereNotNull().toList(),
-            horizontalPadding: 12,
-            onTapFavorite: () => _onTapFavorite(context),
-            onTapWebsite: () => _onTapWebsite(context),
-            onTapTag: (name) => _onTapTag(
-              context,
-              tag: tags?.firstWhere((e) => e.name == name),
-            ),
-            message: errorMessage,
-          );
+          return Center(child: Text(errorMessage));
         }
 
+        final tags = state.manga?.tags;
+        final chapters = state.manga?.chapters;
         if (chapters != null) {
           return MangaDetailWidget.content(
             coverUrl: state.manga?.coverUrl,
@@ -173,15 +148,10 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
             chapterForIndex: (context, index) => ListTile(
               title: Text(chapters[index].top),
               subtitle: Text(chapters[index].bottom),
-              // TODO: implement this
-              // onTap: () => Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (context) => ReaderMangaScreen.create(
-              //       locator: widget.locator,
-              //       chapter: chapters[index],
-              //     ),
-              //   ),
-              // ),
+              onTap: () => widget.onTapChapter.call(
+                context,
+                chapters[index].id,
+              ),
             ),
           );
         }

@@ -13,7 +13,7 @@ class FilterBottomSheet extends StatefulWidget {
   const FilterBottomSheet({super.key});
 
   static Widget create({
-  required ListenListTagUseCase listenListTagUseCase,
+    required ListenListTagUseCase listenListTagUseCase,
     List<String> includedTags = const [],
     List<String> excludedTags = const [],
   }) {

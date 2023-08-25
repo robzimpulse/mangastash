@@ -6,6 +6,8 @@ class ReaderMangaState extends Equatable with EquatableMixin {
     this.isLoading = false,
     this.chapter,
     this.errorMessage,
+    this.mangaId,
+    this.chapterId,
   });
 
   final bool isLoading;
@@ -14,15 +16,25 @@ class ReaderMangaState extends Equatable with EquatableMixin {
 
   final MangaChapter? chapter;
 
+  final String? mangaId;
+
+  final String? chapterId;
+
   @override
-  List<Object?> get props => [isLoading, chapter, errorMessage];
+  List<Object?> get props {
+    return [mangaId, chapterId, isLoading, chapter, errorMessage];
+  }
 
   ReaderMangaState copyWith({
+    String? mangaId,
+    String? chapterId,
     bool? isLoading,
     MangaChapter? chapter,
     String? Function()? errorMessage,
   }) {
     return ReaderMangaState(
+      mangaId: mangaId ?? this.mangaId,
+      chapterId: chapterId ?? this.chapterId,
       isLoading: isLoading ?? this.isLoading,
       chapter: chapter ?? this.chapter,
       errorMessage: errorMessage != null ? errorMessage() : this.errorMessage,
