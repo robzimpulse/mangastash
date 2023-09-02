@@ -1,7 +1,7 @@
 name: ui_common
 description: A new Flutter package project.
 version: 0.0.1
-publish_to: home
+publish_to: none
 
 environment:
   sdk: '>=2.18.2 <3.0.0'
@@ -14,6 +14,10 @@ dependencies:
   expandable: ^5.0.1
   responsive_framework: ^1.0.0
   intersperse: ^2.0.0
+
+  # core
+  core_route:
+    path: ../../core/core_route
 
 dev_dependencies:
   flutter_test:

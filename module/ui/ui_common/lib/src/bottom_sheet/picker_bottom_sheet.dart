@@ -1,6 +1,5 @@
+import 'package:core_route/core_route.dart';
 import 'package:flutter/material.dart';
-
-import '../../src/extension/bottom_sheet_extension.dart';
 
 class PickerBottomSheet extends StatefulWidget {
   const PickerBottomSheet({super.key, required this.names});
@@ -21,7 +20,7 @@ class _PickerBottomSheetState extends State<PickerBottomSheet> {
         controller: controller,
         itemBuilder: (context, index) => ListTile(
           title: Text(widget.names[index]),
-          onTap: () => context.dismissSheet(result: widget.names[index]),
+          onTap: () => context.pop(widget.names[index]),
         ),
         separatorBuilder: (context, index) => const Divider(
           height: 1,

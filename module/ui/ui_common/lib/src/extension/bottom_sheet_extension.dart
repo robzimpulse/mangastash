@@ -15,11 +15,7 @@ extension BottomSheetExtension on BuildContext {
       ),
       backgroundColor: Theme.of(this).bottomSheetTheme.backgroundColor,
       constraints: BoxConstraints(maxHeight: maxHeight),
-      builder: builder,
+      builder: (context) => SafeArea(child: builder.call(context)),
     );
-  }
-
-  void dismissSheet<T>({T? result}) {
-    Navigator.of(this).pop(result);
   }
 }
