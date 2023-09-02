@@ -11,7 +11,6 @@ class SettingScreen extends StatefulWidget {
   final ListenLocaleUseCase listenLocaleUseCase;
   final UpdateLocaleUseCase updateLocaleUseCase;
   final GetLanguageListUseCase getLanguageListUseCase;
-  final GetCountryListUseCase getCountryListUseCase;
 
   const SettingScreen({
     super.key,
@@ -21,7 +20,6 @@ class SettingScreen extends StatefulWidget {
     required this.listenLocaleUseCase,
     required this.updateLocaleUseCase,
     required this.getLanguageListUseCase,
-    required this.getCountryListUseCase,
   });
 
   static Widget create({
@@ -33,7 +31,6 @@ class SettingScreen extends StatefulWidget {
       themeUpdateUseCase: locator(),
       listenLocaleUseCase: locator(),
       updateLocaleUseCase: locator(),
-      getCountryListUseCase: locator(),
       getLanguageListUseCase: locator(),
     );
   }
@@ -94,9 +91,7 @@ class _SettingScreenState extends State<SettingScreen> {
             stream: widget.listenLocaleUseCase.localeDataStream,
             builder: (context, snapshot) {
               final locale = snapshot.data;
-              final country = locale?.country(
-                widget.getCountryListUseCase.countries,
-              );
+              final country = locale?.country;
               return ListTile(
                 title: const Text('Country'),
                 trailing: Text('${country?.name}'),
@@ -104,7 +99,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   height: double.infinity,
                   child: Icon(Icons.language),
                 ),
-                onTap: () => _showCountryPicker(context),
+                onTap: _showCountryPicker,
               );
             },
           ),
@@ -142,19 +137,18 @@ class _SettingScreenState extends State<SettingScreen> {
     );
   }
 
-  void _showCountryPicker(BuildContext context) async {
-    final countries = widget.getCountryListUseCase.countries;
+  void _showCountryPicker() async {
+    final locale = widget.listenLocaleUseCase.localeDataStream.valueOrNull;
     final result = await context.showBottomSheet<String>(
       builder: (context) => PickerBottomSheet(
-        names: countries.map((e) => e.name).whereNotNull().toList(),
+        names: Country.sorted.map((e) => e.name).toList(),
+        selectedName: locale?.country?.name,
       ),
     );
-    final code =
-        countries.firstWhereOrNull((e) => e.name == result)?.alpha2Code;
-    final locale = widget.listenLocaleUseCase.localeDataStream.valueOrNull;
-    if (code == null || locale == null) return;
+
+    if (locale == null || result == null) return;
     widget.updateLocaleUseCase.updateLocale(
-      locale: Locale(locale.languageCode, code),
+      locale: Locale(locale.languageCode, Country.fromName(result).code),
     );
   }
 }

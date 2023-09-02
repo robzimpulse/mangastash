@@ -16,19 +16,3 @@ extension FlagEmojiLocaleExt on Locale {
     );
   }
 }
-
-extension LanguageExt on Locale {
-  Language? language(List<Language> languages) {
-    return languages.firstWhereOrNull(
-      (element) => element.isoCode == languageCode,
-    );
-  }
-}
-
-extension CountryExt on Locale {
-  Country? country(List<Country> countries) {
-    return countries.firstWhereOrNull(
-      (element) => element.alpha2Code == countryCode,
-    );
-  }
-}

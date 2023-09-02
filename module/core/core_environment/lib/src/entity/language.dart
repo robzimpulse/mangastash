@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+// TODO: convert this to enum
 class Language extends Equatable with EquatableMixin {
   final String? isoCode;
 

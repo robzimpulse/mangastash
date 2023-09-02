@@ -1,16 +1,13 @@
 import 'package:core_route/core_route.dart';
 import 'package:flutter/material.dart';
 
-class PickerBottomSheet extends StatefulWidget {
-  const PickerBottomSheet({super.key, required this.names});
+class PickerBottomSheet extends StatelessWidget {
+  const PickerBottomSheet({super.key, required this.names, this.selectedName});
 
   final List<String> names;
 
-  @override
-  State<PickerBottomSheet> createState() => _PickerBottomSheetState();
-}
+  final String? selectedName;
 
-class _PickerBottomSheetState extends State<PickerBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
@@ -19,14 +16,18 @@ class _PickerBottomSheetState extends State<PickerBottomSheet> {
       builder: (context, controller) => ListView.separated(
         controller: controller,
         itemBuilder: (context, index) => ListTile(
-          title: Text(widget.names[index]),
-          onTap: () => context.pop(widget.names[index]),
+          title: Text(names[index]),
+          trailing: Visibility(
+            visible: names[index] == selectedName,
+            child: const Icon(Icons.check),
+          ),
+          onTap: () => context.pop(names[index]),
         ),
         separatorBuilder: (context, index) => const Divider(
           height: 1,
           thickness: 1,
         ),
-        itemCount: widget.names.length,
+        itemCount: names.length,
       ),
     );
   }
