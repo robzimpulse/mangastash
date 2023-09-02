@@ -54,6 +54,7 @@ class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
   Widget build(BuildContext context) {
     return ScaffoldScreen(
       onWillPop: () => Future.value(true),
+      bottomSafeArea: false,
       body: _content(),
     );
   }
@@ -92,19 +93,22 @@ class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
               builder: (context, snapshot) {
                 return Positioned(
                   bottom: double.minPositive,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.5),
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(4),
+                  child: SafeArea(
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(4),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      'Page ${snapshot.data ?? 0} of ${images.length}',
-                      style: const TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
+                      child: Text(
+                        'Page ${snapshot.data ?? 0} of ${images.length}',
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
