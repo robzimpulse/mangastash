@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -45,8 +46,21 @@ class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: [],
+    );
+  }
+
+  @override
   void dispose() {
     _pageDataStream.close();
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
+    );
     super.dispose();
   }
 
