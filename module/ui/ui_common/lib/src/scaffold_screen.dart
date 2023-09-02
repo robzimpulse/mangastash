@@ -11,12 +11,15 @@ class ScaffoldScreen extends StatelessWidget {
 
   final Color? backgroundColor;
 
+  final bool bottomSafeArea;
+
   const ScaffoldScreen({
     super.key,
     this.onWillPop,
     this.appBar,
     this.bottomNavigationBar,
     this.backgroundColor,
+    this.bottomSafeArea = true,
     required this.body,
   });
 
@@ -28,7 +31,11 @@ class ScaffoldScreen extends StatelessWidget {
         backgroundColor: backgroundColor,
         appBar: appBar,
         bottomNavigationBar: bottomNavigationBar,
-        body: body,
+        body: SafeArea(
+          top: false,
+          bottom: bottomSafeArea,
+          child: body,
+        ),
       ),
     );
   }
