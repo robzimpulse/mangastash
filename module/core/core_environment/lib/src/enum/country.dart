@@ -339,16 +339,14 @@ enum Country {
   factory Country.fromCode(String code) {
     return Country.values.firstWhere(
       (e) => e.code == code,
-      // TODO: change to indonesia
-      orElse: () => Country.unitedStates,
+      orElse: () => Country.indonesia,
     );
   }
 
   factory Country.fromName(String name) {
     return Country.values.firstWhere(
       (e) => e.name == name,
-      // TODO: change to indonesia
-      orElse: () => Country.unitedStates,
+      orElse: () => Country.indonesia,
     );
   }
 

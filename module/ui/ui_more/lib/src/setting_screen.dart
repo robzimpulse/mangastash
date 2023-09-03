@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:service_locator/service_locator.dart';
@@ -10,7 +9,6 @@ class SettingScreen extends StatefulWidget {
   final UpdateThemeUseCase themeUpdateUseCase;
   final ListenLocaleUseCase listenLocaleUseCase;
   final UpdateLocaleUseCase updateLocaleUseCase;
-  final GetLanguageListUseCase getLanguageListUseCase;
 
   const SettingScreen({
     super.key,
@@ -19,7 +17,6 @@ class SettingScreen extends StatefulWidget {
     required this.themeUpdateUseCase,
     required this.listenLocaleUseCase,
     required this.updateLocaleUseCase,
-    required this.getLanguageListUseCase,
   });
 
   static Widget create({
@@ -31,7 +28,6 @@ class SettingScreen extends StatefulWidget {
       themeUpdateUseCase: locator(),
       listenLocaleUseCase: locator(),
       updateLocaleUseCase: locator(),
-      getLanguageListUseCase: locator(),
     );
   }
 
@@ -73,12 +69,9 @@ class _SettingScreenState extends State<SettingScreen> {
             stream: widget.listenLocaleUseCase.localeDataStream,
             builder: (context, snapshot) {
               final locale = snapshot.data;
-              final language = locale?.language(
-                widget.getLanguageListUseCase.languages,
-              );
               return ListTile(
                 title: const Text('Language'),
-                trailing: Text('${language?.name}'),
+                trailing: Text('${locale?.language.name}'),
                 leading: const SizedBox(
                   height: double.infinity,
                   child: Icon(Icons.translate),
@@ -123,17 +116,15 @@ class _SettingScreenState extends State<SettingScreen> {
   }
 
   void _showLanguagePicker() async {
-    final languages = widget.getLanguageListUseCase.languages;
+    final locale = widget.listenLocaleUseCase.localeDataStream.valueOrNull;
     final result = await context.showBottomSheet<String>(
       builder: (context) => PickerBottomSheet(
-        names: languages.map((e) => e.name).whereNotNull().toList(),
+        names: Language.sorted.map((e) => e.name).toList(),
       ),
     );
-    final code = languages.firstWhereOrNull((e) => e.name == result)?.isoCode;
-    final locale = widget.listenLocaleUseCase.localeDataStream.valueOrNull;
-    if (code == null || locale == null) return;
+    if (result == null || locale == null) return;
     widget.updateLocaleUseCase.updateLocale(
-      locale: Locale(code, locale.countryCode),
+      locale: Locale(Language.fromName(result).code, locale.countryCode),
     );
   }
 
