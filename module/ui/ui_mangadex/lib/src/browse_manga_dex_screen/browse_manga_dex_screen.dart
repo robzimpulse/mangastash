@@ -75,6 +75,16 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
     return 12;
   }
 
+  void _onTapOpenInBrowser(BuildContext context) async {
+    final result = await widget.launchUrlUseCase.launch(
+      url: source.url,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (result || !mounted) return;
+    context.showSnackBar(message: 'Could not launch ${source.url}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
@@ -87,14 +97,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
           _layoutIcon(),
           IconButton(
             icon: const Icon(Icons.open_in_browser),
-            onPressed: () => widget.launchUrlUseCase.launch(
-              url: source.url,
-              mode: LaunchMode.externalApplication,
-              onSuccess: (success) {
-                if (success) return;
-                context.showSnackBar(message: 'Could not launch ${source.url}');
-              },
-            ),
+            onPressed: () => _onTapOpenInBrowser(context),
           ),
         ],
         bottom: PreferredSize(
