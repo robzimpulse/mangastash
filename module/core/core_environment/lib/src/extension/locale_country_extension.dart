@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import '../entity/country.dart';
+import '../enum/country.dart';
 
 extension CountryExt on Locale {
   Country? get country {

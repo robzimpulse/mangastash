@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:collection/collection.dart';
 import 'package:locale_emoji/locale_emoji.dart';
 
-import '../entity/country.dart';
+import '../enum/country.dart';
 import '../entity/language.dart';
 
 extension FlagEmojiLocaleExt on Locale {
