@@ -35,6 +35,7 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
   }
 
   void next() async {
+    if (!state.hasNextPage) return;
     emit(state.copyWith(isPagingNextPage: true));
     await _fetch();
     emit(state.copyWith(isPagingNextPage: false));
@@ -50,6 +51,7 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
     if (result is Success<PaginationManga>) {
       final offset = result.data.offset ?? 0;
       final limit = result.data.limit ?? 0;
+      final total = result.data.total ?? 0;
       final mangas = result.data.mangas ?? [];
 
       emit(
@@ -59,7 +61,7 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
             limit: limit,
             offset: offset + limit,
           ),
-          hasNextPage: mangas.length < limit,
+          hasNextPage: mangas.length < total,
         ),
       );
     }

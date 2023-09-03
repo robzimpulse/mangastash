@@ -8,7 +8,7 @@ import 'manga_shelf_item.dart';
 class MangaShelfWidget extends StatelessWidget {
   final PagingScrollController controller;
   final List<MangaShelfItem> children;
-  final bool isLoadingNextPage;
+  final bool hasNextPage;
   final Widget loadingIndicator;
   final Widget contentSliverWidget;
   final EdgeInsetsGeometry padding;
@@ -18,7 +18,7 @@ class MangaShelfWidget extends StatelessWidget {
     this.padding = const EdgeInsets.all(0),
     required this.controller,
     required this.children,
-    required this.isLoadingNextPage,
+    required this.hasNextPage,
     required this.loadingIndicator,
     required this.contentSliverWidget,
   });
@@ -28,7 +28,7 @@ class MangaShelfWidget extends StatelessWidget {
     this.padding = const EdgeInsets.all(0),
     required this.controller,
     required this.children,
-    required this.isLoadingNextPage,
+    required this.hasNextPage,
     required this.loadingIndicator,
     Widget? separator,
   }) : contentSliverWidget = SliverList(
@@ -47,7 +47,7 @@ class MangaShelfWidget extends StatelessWidget {
     super.key,
     required this.controller,
     required this.children,
-    required this.isLoadingNextPage,
+    required this.hasNextPage,
     required this.loadingIndicator,
     required int crossAxisCount,
     required double childAspectRatio,
@@ -74,7 +74,7 @@ class MangaShelfWidget extends StatelessWidget {
     super.key,
     required this.controller,
     required this.children,
-    required this.isLoadingNextPage,
+    required this.hasNextPage,
     required this.loadingIndicator,
     required int crossAxisCount,
     required double childAspectRatio,
@@ -113,7 +113,7 @@ class MangaShelfWidget extends StatelessWidget {
             padding: padding,
             sliver: contentSliverWidget,
           ),
-          if (isLoadingNextPage) _loadingIndicator(),
+          if (hasNextPage) _loadingIndicator(),
         ],
       ),
     );

@@ -279,7 +279,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
           case MangaShelfItemLayout.comfortableGrid:
             return MangaShelfWidget.comfortableGrid(
               controller: _scrollController,
-              isLoadingNextPage: state.isPagingNextPage,
+              hasNextPage: state.hasNextPage,
               loadingIndicator: indicator,
               crossAxisCount: _crossAxisCount(context),
               childAspectRatio: (100 / 140),
@@ -290,7 +290,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
           case MangaShelfItemLayout.compactGrid:
             return MangaShelfWidget.compactGrid(
               controller: _scrollController,
-              isLoadingNextPage: state.isPagingNextPage,
+              hasNextPage: state.hasNextPage,
               loadingIndicator: indicator,
               crossAxisCount: _crossAxisCount(context),
               childAspectRatio: (100 / 140),
@@ -302,7 +302,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
             return MangaShelfWidget.list(
               padding: const EdgeInsets.symmetric(vertical: 8),
               controller: _scrollController,
-              isLoadingNextPage: state.isPagingNextPage,
+              hasNextPage: state.hasNextPage,
               loadingIndicator: indicator,
               separator: const Divider(height: 1, thickness: 1),
               children: children.toList(),

@@ -46,15 +46,14 @@ class SearchMangaUseCase {
         orders: parameter.orders,
       );
 
-      final offset = result.offset ?? 0;
-      final limit = result.limit ?? 0;
       final promises = result.data?.map(_mapManga).toList() ?? [];
       final mangas = await Future.wait(promises);
 
       return Success(
         PaginationManga(
-          offset: offset,
-          limit: limit,
+          offset: result.offset ?? 0,
+          limit: result.limit ?? 0,
+          total: result.total ?? 0,
           mangas: mangas,
         ),
       );
