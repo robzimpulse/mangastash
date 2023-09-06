@@ -22,10 +22,22 @@ class MainScreen extends StatelessWidget {
     'More': Icons.more_horiz,
   };
 
+  Future<bool> _onWillPop(BuildContext context) async {
+    const defaultValue = false;
+    final result = await context.showBottomSheet<bool>(
+      builder: (context) => const ConfirmationBottomSheet(
+        content: 'Are you sure want to quit?',
+        positiveButtonText: 'Yes',
+        negativeButtonText: 'No',
+      ),
+    );
+    return result ?? defaultValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      onWillPop: () => Future.value(false),
+      onWillPop: () => _onWillPop(context),
       bottomNavigationBar: _bottomNavigationBar(context: context),
       body: _sideNavigationBar(context: context),
     );
