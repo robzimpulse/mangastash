@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 
 extension SnackbarExtension on BuildContext {
-  void showSnackBar({required String message}) {
+  void showSnackBar({required String message, List<Widget>? actions}) {
     ScaffoldMessenger.of(this).showSnackBar(
       SnackBar(
-        content: Text(message, style: Theme.of(this).textTheme.bodyText1),
+        content: Row(
+          children: [
+            Expanded(
+              child: Text(
+                message,
+                style: Theme.of(this).textTheme.bodyText1,
+              ),
+            ),
+            ...?actions,
+          ],
+        ),
         backgroundColor: Theme.of(this).backgroundColor,
       ),
     );
