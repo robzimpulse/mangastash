@@ -13,6 +13,7 @@ export 'src/extension/bottom_sheet_extension.dart';
 export 'src/extension/expansion_tile_extension.dart';
 export 'src/extension/snackbar_extension.dart';
 export 'src/extension/string_casing_extension.dart';
+export 'src/extension/widget_extension.dart';
 export 'src/scaffold_screen.dart';
 export 'src/util/debounce.dart';
 export 'src/widget/adaptive_physic_list_view.dart';
