@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/services.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -35,6 +38,22 @@ class ReaderMangaScreen extends StatefulWidget {
 class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
   final _pageDataStream = BehaviorSubject<int>.seeded(0);
 
+  Map<int, BehaviorSubject<double>> _pageSizeStreams = {};
+
+  StreamSubscription? _subscription;
+
+  Widget _listener({
+    required BlocWidgetListener<ReaderMangaState> listen,
+    BlocListenerCondition<ReaderMangaState>? listenWhen,
+    Widget? child,
+  }) {
+    return BlocListener<ReaderMangaCubit, ReaderMangaState>(
+      listener: listen,
+      listenWhen: listenWhen,
+      child: child,
+    );
+  }
+
   Widget _builder({
     required BlocWidgetBuilder<ReaderMangaState> builder,
     BlocBuilderCondition<ReaderMangaState>? buildWhen,
@@ -57,6 +76,10 @@ class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
   @override
   void dispose() {
     _pageDataStream.close();
+    _subscription?.cancel();
+    for (var e in _pageSizeStreams.values) {
+      e.close();
+    }
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
       overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
@@ -74,64 +97,77 @@ class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
   }
 
   Widget _content() {
-    return _builder(
-      builder: (context, state) {
-        if (state.isLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
+    return _listener(
+      listen: (context, state) {
+        final images = (state.chapter?.imagesDataSaver ?? []).asMap();
+        _pageSizeStreams = images.map(
+          (key, value) => MapEntry(
+            key,
+            BehaviorSubject<double>.seeded(0),
+          ),
+        );
+        _subscription = Rx
+            .combineLatestList(_pageSizeStreams.values.map((e) => e.stream))
+            .map((event) => event.indexOf(event.reduce(max)))
+            .listen((event) => _pageDataStream.add(event + 1));
+      },
+      child: _builder(
+        builder: (context, state) {
+          if (state.isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
 
-        final images = state.chapter?.imagesDataSaver ?? [];
+          final images = state.chapter?.imagesDataSaver ?? [];
 
-        return Stack(
-          alignment: Alignment.bottomCenter,
-          children: [
-            ListView.builder(
-              padding: EdgeInsets.zero,
-              itemBuilder: (context, index) => VisibilityDetector(
-                onVisibilityChanged: (info) {
-                  final value = (info.key as ValueKey<int>?)?.value;
-                  if (value == null) return;
-                  _pageDataStream.add(value);
-                },
-                key: ValueKey<int>(index),
-                child: CachedNetworkImage(
-                  imageUrl: images[index],
+          return Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              ListView.builder(
+                padding: EdgeInsets.zero,
+                itemBuilder: (context, index) => VisibilityDetector(
+                  onVisibilityChanged: (info) {
+                    _pageSizeStreams[index]?.add(info.visibleFraction);
+                  },
+                  key: ValueKey<int>(index),
+                  child: CachedNetworkImage(
+                    imageUrl: images[index],
+                  ),
                 ),
+                itemCount: images.length,
               ),
-              itemCount: images.length,
-            ),
-            StreamBuilder<int>(
-              stream: _pageDataStream.stream,
-              builder: (context, snapshot) {
-                return Positioned(
-                  bottom: double.minPositive,
-                  child: SafeArea(
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(4),
+              StreamBuilder<int>(
+                stream: _pageDataStream.stream,
+                builder: (context, snapshot) {
+                  return Positioned(
+                    bottom: double.minPositive,
+                    child: SafeArea(
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.5),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(4),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        'Page ${snapshot.data ?? 0} of ${images.length}',
-                        style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                        child: Text(
+                          'Page ${snapshot.data ?? 0} of ${images.length}',
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              },
-            ),
-          ],
-        );
-      },
+                  );
+                },
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }
