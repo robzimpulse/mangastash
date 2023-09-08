@@ -9,6 +9,7 @@ class SettingScreen extends StatefulWidget {
   final UpdateThemeUseCase themeUpdateUseCase;
   final ListenLocaleUseCase listenLocaleUseCase;
   final UpdateLocaleUseCase updateLocaleUseCase;
+  final ListenCurrentTimezoneUseCase listenCurrentTimezoneUseCase;
 
   const SettingScreen({
     super.key,
@@ -17,6 +18,7 @@ class SettingScreen extends StatefulWidget {
     required this.themeUpdateUseCase,
     required this.listenLocaleUseCase,
     required this.updateLocaleUseCase,
+    required this.listenCurrentTimezoneUseCase,
   });
 
   static Widget create({
@@ -28,6 +30,7 @@ class SettingScreen extends StatefulWidget {
       themeUpdateUseCase: locator(),
       listenLocaleUseCase: locator(),
       updateLocaleUseCase: locator(),
+      listenCurrentTimezoneUseCase: locator(),
     );
   }
 
@@ -67,34 +70,38 @@ class _SettingScreenState extends State<SettingScreen> {
           ),
           StreamBuilder<Locale>(
             stream: widget.listenLocaleUseCase.localeDataStream,
-            builder: (context, snapshot) {
-              final locale = snapshot.data;
-              return ListTile(
-                title: const Text('Language'),
-                trailing: Text('${locale?.language.name}'),
-                leading: const SizedBox(
-                  height: double.infinity,
-                  child: Icon(Icons.translate),
-                ),
-                onTap: _showLanguagePicker,
-              );
-            },
+            builder: (context, snapshot) => ListTile(
+              title: const Text('Language'),
+              trailing: Text('${snapshot.data?.language.name}'),
+              leading: const SizedBox(
+                height: double.infinity,
+                child: Icon(Icons.translate),
+              ),
+              onTap: _showLanguagePicker,
+            ),
           ),
           StreamBuilder<Locale>(
             stream: widget.listenLocaleUseCase.localeDataStream,
-            builder: (context, snapshot) {
-              final locale = snapshot.data;
-              final country = locale?.country;
-              return ListTile(
-                title: const Text('Country'),
-                trailing: Text('${country?.name}'),
-                leading: const SizedBox(
-                  height: double.infinity,
-                  child: Icon(Icons.language),
-                ),
-                onTap: _showCountryPicker,
-              );
-            },
+            builder: (context, snapshot) => ListTile(
+              title: const Text('Country'),
+              trailing: Text('${snapshot.data?.country?.name}'),
+              leading: const SizedBox(
+                height: double.infinity,
+                child: Icon(Icons.language),
+              ),
+              onTap: _showCountryPicker,
+            ),
+          ),
+          StreamBuilder<String>(
+            stream: widget.listenCurrentTimezoneUseCase.timezoneDataStream,
+            builder: (context, snapshot) => ListTile(
+              title: const Text('Timezone'),
+              trailing: Text('${snapshot.data}'),
+              leading: const SizedBox(
+                height: double.infinity,
+                child: Icon(Icons.access_time_rounded),
+              ),
+            ),
           ),
           ListTile(
             title: const Text('HTTP Inspector'),
