@@ -100,9 +100,9 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
             onPressed: () => _onTapOpenInBrowser(context),
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(52),
-          child: _sortAndFilter(size: const Size.fromHeight(52)),
+        bottom: _sortAndFilter().preferredSize(
+          context: context,
+          size: const Size.fromHeight(52),
         ),
       ),
       body: RefreshIndicator(
@@ -112,12 +112,11 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
     );
   }
 
-  Widget _sortAndFilter({Size? size}) {
+  Widget _sortAndFilter() {
     return _builder(
       buildWhen: (prev, curr) => prev.parameter != curr.parameter,
       builder: (context, state) {
         return GappedToggleButtonWidget(
-          size: size,
           foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
           selectedColor: Theme.of(context).appBarTheme.foregroundColor,
