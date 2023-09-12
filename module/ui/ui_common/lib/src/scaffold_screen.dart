@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'widget/shimmer_area_widget.dart';
+
 class ScaffoldScreen extends StatelessWidget {
   final Widget body;
 
@@ -27,14 +29,16 @@ class ScaffoldScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: onWillPop,
-      child: Scaffold(
-        backgroundColor: backgroundColor,
-        appBar: appBar,
-        bottomNavigationBar: bottomNavigationBar,
-        body: SafeArea(
-          top: false,
-          bottom: bottomSafeArea,
-          child: body,
+      child: ShimmerAreaWidget(
+        child: Scaffold(
+          backgroundColor: backgroundColor,
+          appBar: appBar,
+          bottomNavigationBar: bottomNavigationBar,
+          body: SafeArea(
+            top: false,
+            bottom: bottomSafeArea,
+            child: body,
+          ),
         ),
       ),
     );

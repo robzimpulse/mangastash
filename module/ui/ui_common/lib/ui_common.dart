@@ -22,4 +22,5 @@ export 'src/widget/manga_detail_widget.dart';
 export 'src/widget/manga_shelf_widget/manga_shelf_item.dart';
 export 'src/widget/manga_shelf_widget/manga_shelf_item_layout.dart';
 export 'src/widget/manga_shelf_widget/manga_shelf_widget.dart';
+export 'src/widget/shimmer_loading_widget.dart';
 export 'src/widget/source_manga_widget.dart';
