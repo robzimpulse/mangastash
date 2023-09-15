@@ -23,14 +23,16 @@ class ShimmerLoading extends StatefulWidget {
   }) : this(
           key: key,
           isLoading: isLoading,
-          child: Container(
-            width: width,
-            height: height,
-            decoration: BoxDecoration(
-              color: const Color(0xFFEBEBF4),
-              borderRadius: BorderRadius.circular(radius),
-            ),
-          ),
+          child: !isLoading
+              ? child
+              : Container(
+                  width: width,
+                  height: height,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEBEBF4),
+                    borderRadius: BorderRadius.circular(radius),
+                  ),
+                ),
         );
 
   ShimmerLoading.circular({
@@ -41,14 +43,16 @@ class ShimmerLoading extends StatefulWidget {
   }) : this(
           key: key,
           isLoading: isLoading,
-          child: Container(
-            width: size,
-            height: size,
-            decoration: const BoxDecoration(
-              color: Colors.black,
-              shape: BoxShape.circle,
-            ),
-          ),
+          child: !isLoading
+              ? child
+              : Container(
+                  width: size,
+                  height: size,
+                  decoration: const BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                  ),
+                ),
         );
 
   ShimmerLoading.multiline({
@@ -62,20 +66,22 @@ class ShimmerLoading extends StatefulWidget {
   }) : this(
           key: key,
           isLoading: isLoading,
-          child: Column(
-            children: List.generate(
-              lines,
-              (index) => Container(
-                margin: index != 0 ? EdgeInsets.only(top: spacing) : null,
-                width: width,
-                height: height,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(16),
+          child: !isLoading
+              ? child
+              : Column(
+                  children: List.generate(
+                    lines,
+                    (index) => Container(
+                      margin: index != 0 ? EdgeInsets.only(top: spacing) : null,
+                      width: width,
+                      height: height,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
         );
 
   ShimmerLoading.dots({
@@ -165,16 +171,14 @@ class _ShimmerLoadingState extends State<ShimmerLoading> {
 
     return ShaderMask(
       blendMode: BlendMode.srcATop,
-      shaderCallback: (bounds) {
-        return gradient.createShader(
-          Rect.fromLTWH(
-            -offsetWithinShimmer.dx,
-            -offsetWithinShimmer.dy,
-            shimmerSize.width,
-            shimmerSize.height,
-          ),
-        );
-      },
+      shaderCallback: (bounds) => gradient.createShader(
+        Rect.fromLTWH(
+          -offsetWithinShimmer.dx,
+          -offsetWithinShimmer.dy,
+          shimmerSize.width,
+          shimmerSize.height,
+        ),
+      ),
       child: widget.child,
     );
   }
