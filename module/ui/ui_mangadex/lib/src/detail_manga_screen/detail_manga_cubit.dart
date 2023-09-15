@@ -17,6 +17,7 @@ class DetailMangaCubit extends Cubit<DetailMangaState> {
 
   Future<void> init() async {
     final mangaId = state.parameter.mangaId;
+
     if (mangaId == null) {
       emit(state.copyWith(errorMessage: () => 'No Manga ID'));
       return;
