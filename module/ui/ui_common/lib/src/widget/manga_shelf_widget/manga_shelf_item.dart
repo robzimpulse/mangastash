@@ -81,16 +81,12 @@ class MangaShelfItem extends StatelessWidget {
             child: CachedNetworkImage(
               fit: BoxFit.fill,
               imageUrl: coverUrl,
-              placeholder: (context, url) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              },
-              errorWidget: (context, url, error) {
-                return const Center(
-                  child: Icon(Icons.error),
-                );
-              },
+              placeholder: (context, url) => const Center(
+                child: CircularProgressIndicator(),
+              ),
+              errorWidget: (context, url, error) => const Center(
+                child: Icon(Icons.error),
+              ),
             ),
           ),
         ),
