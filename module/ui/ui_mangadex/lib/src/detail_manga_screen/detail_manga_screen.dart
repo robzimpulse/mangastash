@@ -111,7 +111,13 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
 
   Widget _title() {
     return _builder(
-      builder: (context, state) => Text(state.manga?.title ?? ''),
+      builder: (context, state) => ShimmerLoading.multiline(
+        isLoading: state.isLoading,
+        width: 100,
+        height: 20,
+        lines: 1,
+        child: Text(state.manga?.title ?? ''),
+      ),
     );
   }
 
