@@ -121,64 +121,149 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
     );
   }
 
-  Widget _content() {
-    return _builder(
-      builder: (context, state) {
-        if (state.isLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final errorMessage = state.errorMessage;
-        if (errorMessage != null) {
-          return Center(child: Text(errorMessage));
-        }
-
-        final tags = state.manga?.tags;
-        final chapters = state.manga?.chapters;
-        if (chapters != null) {
-          return MangaDetailWidget.content(
-            coverUrl: state.manga?.coverUrl,
-            title: state.manga?.title,
-            author: state.manga?.author,
-            status: state.manga?.status,
-            description: state.manga?.description,
-            tags: tags?.map((e) => e.name).whereNotNull().toList(),
-            horizontalPadding: 12,
-            onTapFavorite: () => _onTapFavorite(context),
-            onTapWebsite: () => _onTapWebsite(context),
-            onTapTag: (name) => _onTapTag(
-              context,
-              tag: tags?.firstWhere((e) => e.name == name),
-            ),
-            chapterCount: chapters.length,
-            chapterForIndex: (context, index) => ListTile(
-              title: Text(chapters[index].top),
-              subtitle: Text(chapters[index].bottom),
-              onTap: () => widget.onTapChapter.call(
-                context,
-                chapters[index].id,
+  List<Widget> _chapters(BuildContext context, DetailMangaState state) {
+    if (state.errorMessage?.isNotEmpty == true) {
+      return [
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Center(
+              child: Text(
+                state.errorMessage ?? '',
+                textAlign: TextAlign.center,
               ),
             ),
-          );
-        }
-
-        return MangaDetailWidget.message(
-          coverUrl: state.manga?.coverUrl,
-          title: state.manga?.title,
-          author: state.manga?.author,
-          status: state.manga?.status,
-          description: state.manga?.description,
-          tags: tags?.map((e) => e.name).whereNotNull().toList(),
-          horizontalPadding: 12,
-          onTapFavorite: () => _onTapFavorite(context),
-          onTapWebsite: () => _onTapWebsite(context),
-          onTapTag: (name) => _onTapTag(
-            context,
-            tag: tags?.firstWhere((e) => e.name == name),
           ),
-          message: 'No Chapter Found',
-        );
-      },
+        ),
+      ];
+    }
+
+    if (state.isLoading) {
+      return [
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          sliver: SliverToBoxAdapter(
+            child: Row(
+              children: [
+                ShimmerLoading.multiline(
+                  isLoading: state.isLoading,
+                  width: 50,
+                  height: 15,
+                  lines: 1,
+                ),
+              ],
+            ),
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          sliver: SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => ShimmerLoading.multiline(
+                isLoading: state.isLoading,
+                width: double.infinity,
+                height: 15,
+                lines: 3,
+              ),
+              childCount: 50,
+            ),
+          ),
+        ),
+      ];
+    }
+
+    final chapters = state.manga?.chapters;
+    if (chapters == null || chapters.isEmpty == true) {
+      return [
+        const SliverFillRemaining(
+          hasScrollBody: false,
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Center(
+              child: Text(
+                'No Chapter',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ];
+    }
+
+    return [
+      SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        sliver: SliverToBoxAdapter(
+          child: Row(
+            children: [
+              Text('${chapters.length} Chapters'),
+            ],
+          ),
+        ),
+      ),
+      SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        sliver: SliverList(
+          delegate: SliverChildBuilderDelegate(
+            childCount: chapters.length,
+            semanticIndexCallback: (Widget _, int index) {
+              return index.isEven ? index ~/ 2 : null;
+            },
+            (context, index) {
+              final int itemIndex = index ~/ 2;
+              return index.isOdd
+                  ? _separator()
+                  : InkWell(
+                      onTap: () => widget.onTapChapter.call(
+                        context,
+                        chapters[itemIndex].id,
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Text(chapters[itemIndex].top),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(chapters[itemIndex].bottom),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+            },
+          ),
+        ),
+      ),
+    ];
+  }
+
+  Widget _content() {
+    return _builder(
+      builder: (context, state) => MangaDetailWidget(
+        coverUrl: state.manga?.coverUrl,
+        title: state.manga?.title,
+        author: state.manga?.author,
+        status: state.manga?.status,
+        description: state.manga?.description,
+        tags: state.manga?.tags?.map((e) => e.name).whereNotNull().toList(),
+        horizontalPadding: 12,
+        onTapFavorite: () => _onTapFavorite(context),
+        onTapWebsite: () => _onTapWebsite(context),
+        onTapTag: (name) => _onTapTag(
+          context,
+          tag: state.manga?.tags?.firstWhere((e) => e.name == name),
+        ),
+        isLoading: state.isLoading,
+        child: _chapters(context, state),
+      ),
     );
   }
+
+  Widget _separator() => const SizedBox(height: 8);
 }
