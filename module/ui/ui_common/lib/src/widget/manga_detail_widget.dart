@@ -20,27 +20,6 @@ class MangaDetailWidget extends StatelessWidget {
     required this.child,
   });
 
-  MangaDetailWidget.loading({
-    super.key,
-    this.coverUrl,
-    this.title,
-    this.author,
-    this.status,
-    this.description,
-    this.onTapFavorite,
-    this.onTapWebsite,
-    this.tags,
-    this.onTapTag,
-    this.horizontalPadding = 8,
-    this.separator = const SizedBox(height: 8),
-  }) : child = [
-          const SliverFillRemaining(
-            hasScrollBody: false,
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          ),
-        ];
 
   MangaDetailWidget.message({
     super.key,
