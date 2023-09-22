@@ -59,17 +59,15 @@ class AppsScreen extends StatelessWidget {
           theme: _themeLight(),
           darkTheme: _themeDark(),
           themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-          builder: (context, child) {
-            return ResponsiveBreakpoints.builder(
-              breakpoints: const [
-                Breakpoint(start: 0, end: 450, name: MOBILE),
-                Breakpoint(start: 451, end: 800, name: TABLET),
-                Breakpoint(start: 801, end: 1920, name: DESKTOP),
-                Breakpoint(start: 1921, end: double.infinity, name: '4K'),
-              ],
-              child: child ?? const SizedBox.shrink(),
-            );
-          },
+          builder: (context, child) => ResponsiveBreakpoints.builder(
+            breakpoints: const [
+              Breakpoint(start: 0, end: 450, name: MOBILE),
+              Breakpoint(start: 451, end: 800, name: TABLET),
+              Breakpoint(start: 801, end: 1920, name: DESKTOP),
+              Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+            ],
+            child: child ?? const SizedBox.shrink(),
+          ),
         );
       },
     );
