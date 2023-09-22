@@ -23,7 +23,6 @@ class MainScreen extends StatelessWidget {
   };
 
   Future<bool> _onWillPop(BuildContext context) async {
-    const defaultValue = false;
     final result = await context.showBottomSheet<bool>(
       builder: (context) => const ConfirmationBottomSheet(
         content: 'Are you sure want to quit?',
@@ -31,7 +30,7 @@ class MainScreen extends StatelessWidget {
         negativeButtonText: 'No',
       ),
     );
-    return result ?? defaultValue;
+    return result ?? false;
   }
 
   @override
@@ -56,6 +55,7 @@ class MainScreen extends StatelessWidget {
     return Row(
       children: [
         NavigationRail(
+          key: const Key('left-navigation-rail'),
           labelType: NavigationRailLabelType.all,
           elevation: 8,
           destinations: menus.toList(),
@@ -78,6 +78,7 @@ class MainScreen extends StatelessWidget {
       ),
     );
     return BottomNavigationBar(
+      key: const Key('bottom-navigation-bar'),
       currentIndex: index,
       type: BottomNavigationBarType.fixed,
       showUnselectedLabels: true,

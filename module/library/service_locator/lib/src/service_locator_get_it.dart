@@ -17,6 +17,10 @@ class GetItServiceLocator implements ServiceLocator {
     }
   }
 
+  void setAllowReassignment(bool allowReassignment) {
+    _getIt.allowReassignment = allowReassignment;
+  }
+
   /// Get the optional call-back that will get call whenever a change in the current scope happens
   @override
   Function(bool pushed)? get onScopeChanged {

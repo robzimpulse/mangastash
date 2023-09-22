@@ -14,57 +14,58 @@ import 'screen/splash_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MangaStashApp());
+  // Service locator/dependency injector code here
+  ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
+  final locator = ServiceLocator.asNewInstance();
+  runApp(MangaStashApp(locator: locator));
 }
 
 class MangaStashApp extends StatefulWidget {
-  const MangaStashApp({super.key});
+  const MangaStashApp({super.key, required this.locator, this.testing = false});
+
+  final bool testing;
+
+  final ServiceLocator locator;
 
   @override
   State<StatefulWidget> createState() => _MangaStashAppState();
 }
 
 class _MangaStashAppState extends State<MangaStashApp> {
-  late final ServiceLocator _locator;
-  late final GoRouter _router;
-  bool _isInitialized = false;
-
-  @override
-  void initState() {
-    _initializeApp();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
-    return _isInitialized
-        ? AppsScreen(listenThemeUseCase: _locator.get(), routerConfig: _router)
-        : const SplashScreen();
-  }
-
-  void _initializeApp() async {
-    final locator = await initiateAppLocator();
-    final route = _route(locator: locator);
-    _setupAlice(locator: locator, route: route);
-    setState(() {
-      _isInitialized = true;
-      _locator = locator;
-      _router = route;
-    });
-  }
-
-  Future<ServiceLocator> initiateAppLocator() async {
-    ServiceLocatorInitiator.setServiceLocatorFactory(
-      () => GetItServiceLocator(),
+    return FutureBuilder<GoRouter>(
+      future: _initializeApp(),
+      builder: (context, snapshot) {
+        final router = snapshot.data;
+        if (router == null) return const SplashScreen();
+        return AppsScreen(
+          listenThemeUseCase: widget.locator.get(),
+          routerConfig: router,
+        );
+      },
     );
-    final locator = ServiceLocator.asNewInstance();
+  }
+
+  Future<GoRouter> _initializeApp() async {
+    await initiateAppLocator();
+    final route = _route(locator: widget.locator);
+    widget.locator<Alice>().setNavigatorKey(route.routerDelegate.navigatorKey);
+    return route;
+  }
+
+  Future<void> initiateAppLocator() async {
+    if (widget.testing) return;
 
     // TODO: register module registrar here
-    await locator.registerRegistrar(CoreNetworkRegistrar());
-    await locator.registerRegistrar(CoreStorageRegistrar());
-    await locator.registerRegistrar(CoreEnvironmentRegistrar());
-    await locator.registerRegistrar(DomainMangaRegistrar());
-    return locator;
+    await widget.locator.registerRegistrar(CoreNetworkRegistrar());
+    await widget.locator.registerRegistrar(CoreStorageRegistrar());
+    await widget.locator.registerRegistrar(CoreEnvironmentRegistrar());
+    await widget.locator.registerRegistrar(DomainMangaRegistrar());
+
+    // TODO: Remove this delay
+    await Future.delayed(const Duration(seconds: 2));
   }
 
   GoRouter _route({
@@ -85,14 +86,5 @@ class _MangaStashAppState extends State<MangaStashApp> {
       ),
       observers: [BaseRouteObserver()],
     );
-  }
-
-  void _setupAlice({
-    required ServiceLocator locator,
-    required GoRouter route,
-  }) {
-    final Alice alice = locator();
-    final navigatorKey = route.routerDelegate.navigatorKey;
-    alice.setNavigatorKey(navigatorKey);
   }
 }
