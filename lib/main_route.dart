@@ -21,6 +21,12 @@ class MainRouteBuilder extends BaseRouteBuilder {
     4: MoreRoutePath.more,
   };
 
+  Map<String, int> get _locationToIndex {
+    return _indexToLocation.map(
+      (key, value) => MapEntry(value, key),
+    );
+  }
+
   @override
   List<RouteBase> routes({
     required ServiceLocator locator,
@@ -70,19 +76,13 @@ class MainRouteBuilder extends BaseRouteBuilder {
   }) {
     return ShellRoute(
       navigatorKey: shellNavigatorKey,
-      builder: (context, state, widget) {
-        final index = _indexToLocation.map(
-          (key, value) => MapEntry(value, key),
-        );
-        return MainScreen(
-          index: index[state.location] ?? 0,
-          onTapMenu: (index) {
-            final location = _indexToLocation[index] ?? _defaultLocation;
-            context.go(location);
-          },
-          child: widget,
-        );
-      },
+      builder: (context, state, widget) => MainScreen(
+        index: _locationToIndex[state.location] ?? 0,
+        onTapMenu: (index) => context.go(
+          _indexToLocation[index] ?? _defaultLocation,
+        ),
+        child: widget,
+      ),
       routes: [
         LibraryRouteBuilder().root(
           locator: locator,
