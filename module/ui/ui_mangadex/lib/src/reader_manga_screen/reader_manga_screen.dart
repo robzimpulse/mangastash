@@ -128,6 +128,7 @@ class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
                 padding: EdgeInsets.zero,
                 itemBuilder: (context, index) => VisibilityDetector(
                   onVisibilityChanged: (info) {
+                    if (!mounted) return;
                     _pageSizeStreams[index]?.add(info.visibleFraction);
                   },
                   key: ValueKey<int>(index),
