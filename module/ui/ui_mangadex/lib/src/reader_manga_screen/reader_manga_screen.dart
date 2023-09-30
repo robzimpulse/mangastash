@@ -106,10 +106,10 @@ class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
             BehaviorSubject<double>.seeded(0),
           ),
         );
-        _subscription = Rx
-            .combineLatestList(_pageSizeStreams.values.map((e) => e.stream))
-            .map((event) => event.indexOf(event.reduce(max)))
-            .listen((event) => _pageDataStream.add(event + 1));
+        _subscription =
+            Rx.combineLatestList(_pageSizeStreams.values.map((e) => e.stream))
+                .map((event) => event.indexOf(event.reduce(max)))
+                .listen((event) => _pageDataStream.add(event + 1));
       },
       child: _builder(
         builder: (context, state) {
@@ -134,6 +134,20 @@ class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
                   key: ValueKey<int>(index),
                   child: CachedNetworkImage(
                     imageUrl: images[index],
+                    errorWidget: (context, url, error) => const Icon(
+                      Icons.error,
+                    ),
+                    progressIndicatorBuilder: (context, url, downloadProgress) {
+                      return Center(
+                        child: SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            value: downloadProgress.progress,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 itemCount: images.length,
