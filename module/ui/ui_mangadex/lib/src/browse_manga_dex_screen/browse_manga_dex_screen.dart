@@ -343,5 +343,10 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
     return ResponsiveBreakpoints.of(context);
   }
 
-  MangaSource get source => MangaSource.mangadex;
+  MangaSource get source => const MangaSource(
+    iconUrl: 'https://www.mangadex.org/favicon.ico',
+    name: 'Manga Dex',
+    url: 'https://www.mangadex.org',
+    id: 'manga_dex',
+  );
 }

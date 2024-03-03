@@ -62,62 +62,62 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
           return '${BrowseRoutePath.browse}/${source.id}';
         },
       ),
-      GoRoute(
-        parentNavigatorKey: rootNavigatorKey,
-        path: '${BrowseRoutePath.browse}/${MangaSource.mangadex.id}',
-        name: '${BrowseRoutePath.browse}/${MangaSource.mangadex.id}',
-        builder: (context, state) => BrowseMangaDexScreen.create(
-          locator: locator,
-          onTapManga: (context, manga) => context.push(
-            '${BrowseRoutePath.browse}/${MangaSource.mangadex.id}/${manga.id}',
-          ),
-        ),
-      ),
-      GoRoute(
-        parentNavigatorKey: rootNavigatorKey,
-        path: [
-          BrowseRoutePath.browse,
-          MangaSource.mangadex.id,
-          ':mangaId',
-        ].join('/'),
-        name: [
-          BrowseRoutePath.browse,
-          MangaSource.mangadex.id,
-          ':mangaId',
-        ].join('/'),
-        builder: (context, state) => DetailMangaScreen.create(
-          locator: locator,
-          mangaId: state.pathParameters['mangaId'] ?? '',
-          onTapChapter: (context, chapterId) => context.push(
-            [
-              BrowseRoutePath.browse,
-              MangaSource.mangadex.id,
-              state.pathParameters['mangaId'] ?? '',
-              chapterId ?? '',
-            ].join('/'),
-          ),
-        ),
-      ),
-      GoRoute(
-        parentNavigatorKey: rootNavigatorKey,
-        path: [
-          BrowseRoutePath.browse,
-          MangaSource.mangadex.id,
-          ':mangaId',
-          ':chapterId'
-        ].join('/'),
-        name: [
-          BrowseRoutePath.browse,
-          MangaSource.mangadex.id,
-          ':mangaId',
-          ':chapterId'
-        ].join('/'),
-        builder: (context, state) => ReaderMangaScreen.create(
-          locator: locator,
-          mangaId: state.pathParameters['mangaId'] ?? '',
-          chapterId: state.pathParameters['chapterId'] ?? '',
-        ),
-      ),
+      // GoRoute(
+      //   parentNavigatorKey: rootNavigatorKey,
+      //   path: '${BrowseRoutePath.browse}/${MangaSource.mangadex.id}',
+      //   name: '${BrowseRoutePath.browse}/${MangaSource.mangadex.id}',
+      //   builder: (context, state) => BrowseMangaDexScreen.create(
+      //     locator: locator,
+      //     onTapManga: (context, manga) => context.push(
+      //       '${BrowseRoutePath.browse}/${MangaSource.mangadex.id}/${manga.id}',
+      //     ),
+      //   ),
+      // ),
+      // GoRoute(
+      //   parentNavigatorKey: rootNavigatorKey,
+      //   path: [
+      //     BrowseRoutePath.browse,
+      //     MangaSource.mangadex.id,
+      //     ':mangaId',
+      //   ].join('/'),
+      //   name: [
+      //     BrowseRoutePath.browse,
+      //     MangaSource.mangadex.id,
+      //     ':mangaId',
+      //   ].join('/'),
+      //   builder: (context, state) => DetailMangaScreen.create(
+      //     locator: locator,
+      //     mangaId: state.pathParameters['mangaId'] ?? '',
+      //     onTapChapter: (context, chapterId) => context.push(
+      //       [
+      //         BrowseRoutePath.browse,
+      //         MangaSource.mangadex.id,
+      //         state.pathParameters['mangaId'] ?? '',
+      //         chapterId ?? '',
+      //       ].join('/'),
+      //     ),
+      //   ),
+      // ),
+      // GoRoute(
+      //   parentNavigatorKey: rootNavigatorKey,
+      //   path: [
+      //     BrowseRoutePath.browse,
+      //     MangaSource.mangadex.id,
+      //     ':mangaId',
+      //     ':chapterId'
+      //   ].join('/'),
+      //   name: [
+      //     BrowseRoutePath.browse,
+      //     MangaSource.mangadex.id,
+      //     ':mangaId',
+      //     ':chapterId'
+      //   ].join('/'),
+      //   builder: (context, state) => ReaderMangaScreen.create(
+      //     locator: locator,
+      //     mangaId: state.pathParameters['mangaId'] ?? '',
+      //     chapterId: state.pathParameters['chapterId'] ?? '',
+      //   ),
+      // ),
       // TODO: add more route for specific source browse screen here
     ];
   }
