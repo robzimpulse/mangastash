@@ -3,6 +3,7 @@ import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
+import 'package:feature_auth/feature_auth.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
@@ -70,7 +71,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
 
   GoRouter _route({
     required ServiceLocator locator,
-    String initialRoute = MainPath.main,
+    String initialRoute = AuthRoutePath.login,
   }) {
     final rootNavigatorKey = GlobalKey<NavigatorState>();
     return GoRouter(

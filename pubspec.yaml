@@ -46,6 +46,8 @@ dependencies:
     path: module/library/service_locator
 
   # core
+  core_auth:
+    path: module/core/core_auth
   core_environment:
     path: module/core/core_environment
   core_network:
@@ -78,6 +80,8 @@ dependencies:
     path: module/feature/feature_more
   feature_updates:
     path: module/feature/feature_updates
+  feature_auth:
+    path: module/feature/feature_auth
 
 dev_dependencies:
   flutter_test:
