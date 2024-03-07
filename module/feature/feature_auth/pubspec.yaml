@@ -11,6 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
 
+  go_router: ^7.0.0
+
   # library
   safe_bloc:
     path: ../../library/safe_bloc
@@ -22,6 +24,8 @@ dependencies:
     path: ../../core/core_route
   core_network:
     path: ../../core/core_network
+  core_auth:
+    path: ../../core/core_auth
 
   # ui
   ui_common:
