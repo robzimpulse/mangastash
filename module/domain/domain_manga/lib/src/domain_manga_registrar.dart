@@ -2,6 +2,7 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager/tags_manager.dart';
+import 'use_case/get_all_manga_sources_use_case.dart';
 import 'use_case_deprecated/get_all_chapter_use_case.dart';
 import 'use_case_deprecated/get_author_use_case.dart';
 import 'use_case_deprecated/get_chapter_image_use_case.dart';
@@ -16,6 +17,12 @@ import 'use_case_deprecated/search_manga_use_case.dart';
 class DomainMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
+    locator.registerFactory(
+      () => GetAllMangaSourcesUseCase(
+        service: locator(),
+      ),
+    );
+
     // manga dex services
     locator.registerFactory(() => MangaService(locator()));
     locator.registerFactory(() => ChapterService(locator()));

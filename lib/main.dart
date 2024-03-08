@@ -1,9 +1,8 @@
-import 'dart:developer';
-
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:data_manga/data_manga.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:service_locator/service_locator.dart';
@@ -36,7 +35,6 @@ class MangaStashApp extends StatefulWidget {
 }
 
 class _MangaStashAppState extends State<MangaStashApp> {
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<GoRouter>(
@@ -62,14 +60,17 @@ class _MangaStashAppState extends State<MangaStashApp> {
   Future<void> initiateAppLocator() async {
     if (widget.testing) return;
 
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
+    widget.locator.registerSingleton(
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      ),
     );
 
     // TODO: register module registrar here
     await widget.locator.registerRegistrar(CoreNetworkRegistrar());
     await widget.locator.registerRegistrar(CoreStorageRegistrar());
     await widget.locator.registerRegistrar(CoreEnvironmentRegistrar());
+    await widget.locator.registerRegistrar(DataMangaRegistrar());
     await widget.locator.registerRegistrar(DomainMangaRegistrar());
   }
 

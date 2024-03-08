@@ -12,11 +12,14 @@ dependencies:
     sdk: flutter
   collection: ^1.16.0
   rxdart: ^0.27.7
-  cloud_firestore: ^4.14.0
 
   # core
   core_network:
     path: ../../core/core_network
+
+  # data
+  data_manga:
+    path: ../../data/data_manga
 
   # entity
   entity_manga:
