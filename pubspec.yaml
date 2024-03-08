@@ -38,6 +38,7 @@ dependencies:
   alice_lightweight: 3.3.0
   flex_color_scheme: ^6.1.2
   rxdart: ^0.27.7
+  firebase_core: ^2.24.2
 
   # library
   safe_bloc:
@@ -82,7 +83,6 @@ dependencies:
     path: module/feature/feature_updates
   feature_auth:
     path: module/feature/feature_auth
-  firebase_core: ^2.24.2
 
 dev_dependencies:
   flutter_test:
