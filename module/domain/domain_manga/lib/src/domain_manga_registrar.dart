@@ -2,16 +2,16 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager/tags_manager.dart';
-import 'use_case/get_all_chapter_use_case.dart';
-import 'use_case/get_author_use_case.dart';
-import 'use_case/get_chapter_image_use_case.dart';
-import 'use_case/get_chapter_use_case.dart';
-import 'use_case/get_cover_art_use_case.dart';
-import 'use_case/get_manga_use_case.dart';
-import 'use_case/list_tag_use_case.dart';
-import 'use_case/listen_list_tag_use_case.dart';
-import 'use_case/search_chapter_use_case.dart';
-import 'use_case/search_manga_use_case.dart';
+import 'use_case_deprecated/get_all_chapter_use_case.dart';
+import 'use_case_deprecated/get_author_use_case.dart';
+import 'use_case_deprecated/get_chapter_image_use_case.dart';
+import 'use_case_deprecated/get_chapter_use_case.dart';
+import 'use_case_deprecated/get_cover_art_use_case.dart';
+import 'use_case_deprecated/get_manga_use_case.dart';
+import 'use_case_deprecated/list_tag_use_case.dart';
+import 'use_case_deprecated/listen_list_tag_use_case.dart';
+import 'use_case_deprecated/search_chapter_use_case.dart';
+import 'use_case_deprecated/search_manga_use_case.dart';
 
 class DomainMangaRegistrar extends Registrar {
   @override

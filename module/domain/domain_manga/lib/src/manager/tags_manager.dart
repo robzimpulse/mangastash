@@ -5,8 +5,8 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:rxdart/src/streams/value_stream.dart';
 import 'package:rxdart/subjects.dart';
 
-import '../use_case/list_tag_use_case.dart';
-import '../use_case/listen_list_tag_use_case.dart';
+import '../use_case_deprecated/list_tag_use_case.dart';
+import '../use_case_deprecated/listen_list_tag_use_case.dart';
 
 class TagsManager implements ListenListTagUseCase {
   final _listTagsSubject = BehaviorSubject<List<MangaTag>>();
