@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "333417519386",
+    "project_id": "mangastash-4bf38",
+    "storage_bucket": "mangastash-4bf38.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:333417519386:android:9217a7a207bde7a22474a3",
+        "android_client_info": {
+          "package_name": "com.robzimpulse.mangastash.mangastash"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaI12EqaLbpdpS3HfzodBTe5EGG9BwQFg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

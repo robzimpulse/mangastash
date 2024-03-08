@@ -82,6 +82,7 @@ dependencies:
     path: module/feature/feature_updates
   feature_auth:
     path: module/feature/feature_auth
+  firebase_core: ^2.24.2
 
 dev_dependencies:
   flutter_test:

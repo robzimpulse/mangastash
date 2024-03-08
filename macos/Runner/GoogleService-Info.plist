@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyDONMNBT5s2XmXWFufjxvrtaZ9MHbOYz3Q</string>
+	<key>GCM_SENDER_ID</key>
+	<string>333417519386</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.robzimpulse.mangastash.mangastash</string>
+	<key>PROJECT_ID</key>
+	<string>mangastash-4bf38</string>
+	<key>STORAGE_BUCKET</key>
+	<string>mangastash-4bf38.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:333417519386:ios:3325359d515cc8872474a3</string>
+</dict>
+</plist>

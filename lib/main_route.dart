@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'main_path.dart';
+import 'screen/error_screen.dart';
 import 'screen/main_screen.dart';
 
 class MainRouteBuilder extends BaseRouteBuilder {
@@ -40,6 +41,14 @@ class MainRouteBuilder extends BaseRouteBuilder {
         path: MainPath.main,
         name: MainPath.main,
         redirect: (context, state) => LibraryRoutePath.library,
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MainPath.notFound,
+        name: MainPath.notFound,
+        builder: (context, state) => ErrorScreen(
+          text: state.error.toString(),
+        ),
       ),
       ...LibraryRouteBuilder().routes(
         locator: locator,
