@@ -15,8 +15,6 @@ dependencies:
  # library
   service_locator:
     path: ../../library/service_locator
-  late_object:
-    path: ../../library/late_object
 
 dev_dependencies:
   flutter_test:
