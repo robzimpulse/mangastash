@@ -19,9 +19,8 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         onTapSearchManga: (context) => context.showSnackBar(
           message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
         ),
-        onTapSource: (context, source) => context.push(
-          BrowseRoutePath.browseSource,
-          extra: source,
+        onTapSource: (context, source) => context.showSnackBar(
+          message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
         ),
       ),
       pageBuilder: (context, state) => NoTransitionPage(
