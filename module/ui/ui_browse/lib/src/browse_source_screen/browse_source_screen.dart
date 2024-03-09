@@ -55,9 +55,9 @@ class BrowseSourceScreen extends StatelessWidget {
           itemBuilder: (context, index) => state.isLoading
               ? const SourceMangaWidget.shimmer()
               : SourceMangaWidget(
-                  iconUrl: state.sources[index].iconUrl,
-                  url: state.sources[index].url,
-                  name: state.sources[index].name,
+                  iconUrl: state.sources[index].iconUrl ?? '',
+                  url: state.sources[index].url ?? '',
+                  name: state.sources[index].name ?? '',
                   onTap: () => onTapSource.call(
                     context,
                     state.sources[index],

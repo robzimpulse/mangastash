@@ -8,7 +8,7 @@ class FilterBottomSheetCubit extends Cubit<FilterBottomSheetState>
     with AutoSubscriptionMixin {
   FilterBottomSheetCubit({
     FilterBottomSheetState initialState = const FilterBottomSheetState(),
-    required ListenListTagUseCase listenListTagUseCase,
+    required ListenListTagUseCaseDeprecated listenListTagUseCase,
   }) : super(
           initialState.copyWith(
             tags: listenListTagUseCase.listTagsStream.valueOrNull ?? [],

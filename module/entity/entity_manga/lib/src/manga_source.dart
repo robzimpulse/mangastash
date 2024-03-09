@@ -6,19 +6,19 @@ part 'manga_source.g.dart';
 @JsonSerializable(fieldRename: FieldRename.snake)
 class MangaSource extends Equatable {
 
-  final String iconUrl;
+  final String? iconUrl;
 
-  final String name;
+  final String? name;
 
-  final String url;
+  final String? url;
 
-  final String id;
+  final String? id;
 
   const MangaSource({
-    this.iconUrl = '',
-    required this.name,
-    required this.url,
-    required this.id,
+    this.iconUrl,
+    this.name,
+    this.url,
+    this.id,
   });
 
   @override

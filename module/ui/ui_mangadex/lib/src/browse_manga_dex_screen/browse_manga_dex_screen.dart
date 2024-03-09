@@ -20,7 +20,7 @@ class BrowseMangaDexScreen extends StatefulWidget {
 
   final LaunchUrlUseCase launchUrlUseCase;
 
-  final ListenListTagUseCase listenListTagUseCase;
+  final ListenListTagUseCaseDeprecated listenListTagUseCase;
 
   final Function(BuildContext, Manga) onTapManga;
 
@@ -77,7 +77,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
 
   void _onTapOpenInBrowser(BuildContext context) async {
     final result = await widget.launchUrlUseCase.launch(
-      url: source.url,
+      url: source.url ?? '',
       mode: LaunchMode.externalApplication,
     );
 

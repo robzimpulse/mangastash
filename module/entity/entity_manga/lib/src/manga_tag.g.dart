@@ -1,22 +1,17 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'manga_source.dart';
+part of 'manga_tag.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-MangaSource _$MangaSourceFromJson(Map<String, dynamic> json) => MangaSource(
-      iconUrl: json['icon_url'] as String?,
+MangaTag _$MangaTagFromJson(Map<String, dynamic> json) => MangaTag(
       name: json['name'] as String?,
-      url: json['url'] as String?,
       id: json['id'] as String?,
     );
 
-Map<String, dynamic> _$MangaSourceToJson(MangaSource instance) =>
-    <String, dynamic>{
-      'icon_url': instance.iconUrl,
+Map<String, dynamic> _$MangaTagToJson(MangaTag instance) => <String, dynamic>{
       'name': instance.name,
-      'url': instance.url,
       'id': instance.id,
     };

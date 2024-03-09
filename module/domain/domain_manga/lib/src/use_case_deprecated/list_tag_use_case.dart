@@ -2,10 +2,10 @@ import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-class ListTagUseCase {
+class ListTagUseCaseDeprecated {
   final MangaRepository _repository;
 
-  const ListTagUseCase({
+  const ListTagUseCaseDeprecated({
     required MangaRepository repository,
   }) : _repository = repository;
 

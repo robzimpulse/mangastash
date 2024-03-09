@@ -8,13 +8,13 @@ import 'package:rxdart/subjects.dart';
 import '../use_case_deprecated/list_tag_use_case.dart';
 import '../use_case_deprecated/listen_list_tag_use_case.dart';
 
-class TagsManager implements ListenListTagUseCase {
+class TagsManagerDeprecated implements ListenListTagUseCaseDeprecated {
   final _listTagsSubject = BehaviorSubject<List<MangaTagDeprecated>>();
 
-  final ListTagUseCase _listTagUseCase;
+  final ListTagUseCaseDeprecated _listTagUseCase;
 
-  TagsManager({
-    required ListTagUseCase listTagUseCase,
+  TagsManagerDeprecated({
+    required ListTagUseCaseDeprecated listTagUseCase,
   }) : _listTagUseCase = listTagUseCase {
     _update(Timer.periodic(const Duration(minutes: 5), _update));
   }
