@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-class MangaTag extends Equatable with EquatableMixin {
+class MangaTagDeprecated extends Equatable with EquatableMixin {
   final String? id;
 
   final String? name;
@@ -12,7 +12,7 @@ class MangaTag extends Equatable with EquatableMixin {
 
   final bool isExcluded;
 
-  const MangaTag({
+  const MangaTagDeprecated({
     this.id,
     this.name,
     this.group,
@@ -23,14 +23,14 @@ class MangaTag extends Equatable with EquatableMixin {
   @override
   List<Object?> get props => [id, name, group, isIncluded, isExcluded];
 
-  MangaTag copyWith({
+  MangaTagDeprecated copyWith({
     String? id,
     String? name,
     String? group,
     bool? isIncluded,
     bool? isExcluded,
   }) {
-    return MangaTag(
+    return MangaTagDeprecated(
       id: id ?? this.id,
       name: name ?? this.name,
       group: group ?? this.group,
@@ -39,8 +39,8 @@ class MangaTag extends Equatable with EquatableMixin {
     );
   }
 
-  factory MangaTag.from(TagData data) {
-    return MangaTag(
+  factory MangaTagDeprecated.from(TagData data) {
+    return MangaTagDeprecated(
       id: data.id,
       name: data.attributes?.name?.en,
       group: data.attributes?.group,

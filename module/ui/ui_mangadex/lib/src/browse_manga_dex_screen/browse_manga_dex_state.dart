@@ -19,7 +19,7 @@ class BrowseMangaDexState extends Equatable with EquatableMixin {
 
   final MangaShelfItemLayout layout;
 
-  final List<MangaTag> tags;
+  final List<MangaTagDeprecated> tags;
 
   const BrowseMangaDexState({
     this.isLoading = false,
@@ -57,7 +57,7 @@ class BrowseMangaDexState extends Equatable with EquatableMixin {
     SearchMangaParameter? parameter,
     List<Manga>? mangas,
     MangaShelfItemLayout? layout,
-    List<MangaTag>? tags,
+    List<MangaTagDeprecated>? tags,
   }) {
     return BrowseMangaDexState(
       isLoading: isLoading ?? this.isLoading,

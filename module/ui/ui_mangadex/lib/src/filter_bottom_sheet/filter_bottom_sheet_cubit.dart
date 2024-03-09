@@ -17,7 +17,7 @@ class FilterBottomSheetCubit extends Cubit<FilterBottomSheetState>
     addSubscription(listenListTagUseCase.listTagsStream.listen(_onUpdateTags));
   }
 
-  void _onUpdateTags(List<MangaTag> tags) {
+  void _onUpdateTags(List<MangaTagDeprecated> tags) {
     emit(state.copyWith(tags: tags));
   }
 

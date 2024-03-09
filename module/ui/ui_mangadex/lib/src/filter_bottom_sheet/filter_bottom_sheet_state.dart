@@ -11,7 +11,7 @@ class FilterBottomSheetState extends Equatable with EquatableMixin {
     this.originalExcludedTags = const [],
   });
 
-  final List<MangaTag> tags;
+  final List<MangaTagDeprecated> tags;
 
   final List<String> includedTags;
 
@@ -32,11 +32,11 @@ class FilterBottomSheetState extends Equatable with EquatableMixin {
     ];
   }
 
-  List<MapEntry<String?, List<MangaTag>>> get groups {
+  List<MapEntry<String?, List<MangaTagDeprecated>>> get groups {
     return finalTag.groupListsBy((e) => e.group).entries.toList();
   }
 
-  List<MangaTag> get finalTag {
+  List<MangaTagDeprecated> get finalTag {
     return tags
         .map(
           (e) => e.copyWith(
@@ -48,7 +48,7 @@ class FilterBottomSheetState extends Equatable with EquatableMixin {
   }
 
   FilterBottomSheetState copyWith({
-    List<MangaTag>? tags,
+    List<MangaTagDeprecated>? tags,
     List<String>? includedTags,
     List<String>? excludedTags,
     List<String>? originalIncludedTags,

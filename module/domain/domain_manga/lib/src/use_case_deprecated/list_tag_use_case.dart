@@ -9,12 +9,12 @@ class ListTagUseCase {
     required MangaRepository repository,
   }) : _repository = repository;
 
-  Future<Result<List<MangaTag>>> execute() async {
+  Future<Result<List<MangaTagDeprecated>>> execute() async {
     try {
       final result = await _repository.tags();
 
       final tags = result.data?.map(
-        (e) => MangaTag(
+        (e) => MangaTagDeprecated(
           id: e.id,
           name: e.attributes?.name?.en,
           group: e.attributes?.group,

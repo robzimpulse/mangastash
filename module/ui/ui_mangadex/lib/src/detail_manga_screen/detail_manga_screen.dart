@@ -66,7 +66,7 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
     return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
 
-  void _onTapTag(BuildContext context, {MangaTag? tag}) {
+  void _onTapTag(BuildContext context, {MangaTagDeprecated? tag}) {
     // TODO: implement this
     return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }

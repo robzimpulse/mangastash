@@ -64,7 +64,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   ExpansionTileItem _group(
     BuildContext context,
-    MapEntry<String?, List<MangaTag>> e,
+    MapEntry<String?, List<MangaTagDeprecated>> e,
   ) {
     return ExpansionTileItem(
       themeData: Theme.of(context).copyWith(
@@ -78,7 +78,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     );
   }
 
-  Widget _item(BuildContext context, MangaTag e) {
+  Widget _item(BuildContext context, MangaTagDeprecated e) {
     return CheckboxListTile(
       title: Text(e.name ?? ''),
       value: e.isIncluded == true

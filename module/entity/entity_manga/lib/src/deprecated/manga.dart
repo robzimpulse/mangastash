@@ -16,7 +16,7 @@ class Manga extends Equatable with EquatableMixin {
 
   final String? description;
 
-  final List<MangaTag>? tags;
+  final List<MangaTagDeprecated>? tags;
 
   final List<MangaChapter>? chapters;
 
@@ -43,7 +43,7 @@ class Manga extends Equatable with EquatableMixin {
     String? author,
     String? status,
     String? description,
-    List<MangaTag>? tags,
+    List<MangaTagDeprecated>? tags,
     List<MangaChapter>? chapters,
   }) {
     return Manga(
@@ -66,7 +66,7 @@ class Manga extends Equatable with EquatableMixin {
       status: data.attributes?.status,
       description: data.attributes?.description?.en,
       author: author?.join(' | '),
-      tags: data.attributes?.tags?.map((e) => MangaTag.from(e)).toList(),
+      tags: data.attributes?.tags?.map((e) => MangaTagDeprecated.from(e)).toList(),
     );
   }
 }

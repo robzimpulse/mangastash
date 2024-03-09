@@ -111,7 +111,7 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
     init();
   }
 
-  void setFilter(List<MangaTag> tags) {
+  void setFilter(List<MangaTagDeprecated> tags) {
     emit(
       state.copyWith(
         parameter: state.parameter.copyWith(

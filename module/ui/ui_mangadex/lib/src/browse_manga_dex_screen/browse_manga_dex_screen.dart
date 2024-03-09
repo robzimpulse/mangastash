@@ -147,7 +147,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
 
   void _showFilterBottomSheet() async {
     final state = _cubit(context).state;
-    final result = await context.showBottomSheet<List<MangaTag>>(
+    final result = await context.showBottomSheet<List<MangaTagDeprecated>>(
       builder: (context) => FilterBottomSheet.create(
         listenListTagUseCase: widget.listenListTagUseCase,
         includedTags: state.parameter.includedTags,
