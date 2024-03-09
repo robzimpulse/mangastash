@@ -33,6 +33,10 @@ class BrowseSourceScreen extends StatelessWidget {
     );
   }
 
+  BrowseSourceCubit _cubit(BuildContext context) {
+    return context.read();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
@@ -47,23 +51,26 @@ class BrowseSourceScreen extends StatelessWidget {
         ],
       ),
       body: BlocBuilder<BrowseSourceCubit, BrowseSourceState>(
-        builder: (context, state) => AdaptivePhysicListView.separated(
-          separatorBuilder: (context, index) => const Divider(
-            height: 1,
-            thickness: 1,
-          ),
-          itemBuilder: (context, index) => state.isLoading
-              ? const SourceMangaWidget.shimmer()
-              : SourceMangaWidget(
-                  iconUrl: state.sources[index].iconUrl ?? '',
-                  url: state.sources[index].url ?? '',
-                  name: state.sources[index].name ?? '',
-                  onTap: () => onTapSource.call(
-                    context,
-                    state.sources[index],
+        builder: (context, state) => RefreshIndicator(
+          onRefresh: () => _cubit(context).init(),
+          child: AdaptivePhysicListView.separated(
+            separatorBuilder: (context, index) => const Divider(
+              height: 1,
+              thickness: 1,
+            ),
+            itemBuilder: (context, index) => state.isLoading
+                ? const SourceMangaWidget.shimmer()
+                : SourceMangaWidget(
+                    iconUrl: state.sources[index].iconUrl ?? '',
+                    url: state.sources[index].url ?? '',
+                    name: state.sources[index].name ?? '',
+                    onTap: () => onTapSource.call(
+                      context,
+                      state.sources[index],
+                    ),
                   ),
-                ),
-          itemCount: state.isLoading ? 100 : state.sources.length,
+            itemCount: state.isLoading ? 100 : state.sources.length,
+          ),
         ),
       ),
     );

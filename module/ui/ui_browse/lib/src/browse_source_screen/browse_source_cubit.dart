@@ -10,17 +10,18 @@ class BrowseSourceCubit extends Cubit<BrowseSourceState> {
 
   BrowseSourceCubit({
     BrowseSourceState initialState = const BrowseSourceState(
-      isLoading: true,
+      isLoading: false,
       sources: [],
     ),
     required GetAllMangaSourcesUseCase getAllMangaSourcesUseCase,
   })  : _getAllMangaSourcesUseCase = getAllMangaSourcesUseCase,
         super(initialState);
 
-  void init() async {
+  Future<void> init() async {
+    if (state.isLoading) return;
+
     emit(state.copyWith(isLoading: true));
     final result = await _getAllMangaSourcesUseCase.execute();
-    await Future.delayed(const Duration(seconds: 5));
     emit(state.copyWith(isLoading: false));
 
     if (result is Success<List<MangaSource>>) {
