@@ -47,24 +47,24 @@ class BrowseSourceScreen extends StatelessWidget {
         ],
       ),
       body: BlocBuilder<BrowseSourceCubit, BrowseSourceState>(
-        builder: (context, state) {
-          return AdaptivePhysicListView.separated(
-            separatorBuilder: (context, index) => const Divider(
-              height: 1,
-              thickness: 1,
-            ),
-            itemBuilder: (context, index) => SourceMangaWidget(
-              iconUrl: state.sources[index].iconUrl,
-              url: state.sources[index].url,
-              name: state.sources[index].name,
-              onTap: () => onTapSource.call(
-                context,
-                state.sources[index],
-              ),
-            ),
-            itemCount: state.sources.length,
-          );
-        },
+        builder: (context, state) => AdaptivePhysicListView.separated(
+          separatorBuilder: (context, index) => const Divider(
+            height: 1,
+            thickness: 1,
+          ),
+          itemBuilder: (context, index) => state.isLoading
+              ? const SourceMangaWidget.shimmer()
+              : SourceMangaWidget(
+                  iconUrl: state.sources[index].iconUrl,
+                  url: state.sources[index].url,
+                  name: state.sources[index].name,
+                  onTap: () => onTapSource.call(
+                    context,
+                    state.sources[index],
+                  ),
+                ),
+          itemCount: state.isLoading ? 100 : state.sources.length,
+        ),
       ),
     );
   }

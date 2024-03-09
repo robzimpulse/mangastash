@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:alice_lightweight/alice.dart';
 import 'package:dio/dio.dart';
 import 'package:service_locator/service_locator.dart';
@@ -11,6 +13,7 @@ import 'use_case/launch_url_use_case.dart';
 class CoreNetworkRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
+    log('start register', name: 'core_network');
     locator.registerSingleton(Alice());
 
     locator.registerFactory(() => MangaDexDio(alice: locator()));
@@ -21,5 +24,6 @@ class CoreNetworkRegistrar extends Registrar {
 
     locator.registerSingleton(UrlLauncherManager());
     locator.alias<LaunchUrlUseCase, UrlLauncherManager>();
+    log('finish register', name: 'core_network');
   }
 }

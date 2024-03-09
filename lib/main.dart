@@ -35,10 +35,13 @@ class MangaStashApp extends StatefulWidget {
 }
 
 class _MangaStashAppState extends State<MangaStashApp> {
+
+  late final Future<GoRouter> _router = _initializeApp();
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<GoRouter>(
-      future: _initializeApp(),
+      future: _router,
       builder: (context, snapshot) {
         final router = snapshot.data;
         if (router == null) return const SplashScreen();

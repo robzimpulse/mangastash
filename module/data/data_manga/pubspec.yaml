@@ -23,6 +23,10 @@ dependencies:
   entity_manga:
     path: ../../entity/entity_manga
 
+  # core
+  core_network:
+    path: ../../core/core_network
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

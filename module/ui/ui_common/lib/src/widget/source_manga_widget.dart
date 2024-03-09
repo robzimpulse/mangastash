@@ -4,11 +4,20 @@ import 'package:flutter/material.dart';
 class SourceMangaWidget extends StatelessWidget {
   const SourceMangaWidget({
     super.key,
-    required this.url,
-    required this.name,
+    this.url = '',
+    this.name = '',
     this.onTap,
     this.iconUrl = '',
+    this.isLoading = false,
   });
+
+  const SourceMangaWidget.shimmer({
+    super.key,
+  })  : isLoading = true,
+        url = '',
+        iconUrl = '',
+        name = '',
+        onTap = null;
 
   final String iconUrl;
 
@@ -17,6 +26,8 @@ class SourceMangaWidget extends StatelessWidget {
   final String name;
 
   final GestureTapCallback? onTap;
+
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
