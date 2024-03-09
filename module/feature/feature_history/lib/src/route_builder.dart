@@ -12,10 +12,8 @@ class HistoryRouteBuilder extends BaseRouteBuilder {
     return GoRoute(
       path: HistoryRoutePath.history,
       name: HistoryRoutePath.history,
-      // TODO: implement ui
-      builder: (context, state) => const SizedBox.shrink(),
-      pageBuilder: (context, state) => const NoTransitionPage(
-        child: SizedBox.shrink(),
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: Container(),
       ),
     );
   }

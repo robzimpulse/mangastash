@@ -13,17 +13,6 @@ class MoreRouteBuilder extends BaseRouteBuilder {
     return GoRoute(
       path: MoreRoutePath.more,
       name: MoreRoutePath.more,
-      builder: (context, state) => MoreScreen.create(
-        locator: locator,
-        onTapSetting: (context) => context.push(MoreRoutePath.setting),
-        onTapStatistic: (context) => context.push(MoreRoutePath.statistic),
-        onTapBackupRestore: (context) => context.push(
-          MoreRoutePath.backupRestore,
-        ),
-        onTapDownloadQueue: (context) => context.push(
-          MoreRoutePath.downloadQueue,
-        ),
-      ),
       pageBuilder: (context, state) => NoTransitionPage(
         child: MoreScreen.create(
           locator: locator,

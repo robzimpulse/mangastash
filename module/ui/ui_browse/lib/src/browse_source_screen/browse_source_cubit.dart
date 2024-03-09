@@ -29,7 +29,7 @@ class BrowseSourceCubit extends Cubit<BrowseSourceState> {
     }
 
     if (result is Error<List<MangaSource>>) {
-      emit(state.copyWith(error: result.error));
+      emit(state.copyWith(error: () => result.error));
     }
   }
 }

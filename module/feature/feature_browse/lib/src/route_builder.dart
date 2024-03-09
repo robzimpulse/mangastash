@@ -1,7 +1,9 @@
 import 'package:core_route/core_route.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_browse/ui_browse.dart';
 import 'package:ui_common/ui_common.dart';
+import 'package:core_environment/core_environment.dart';
 
 import 'route_path.dart';
 
@@ -13,16 +15,6 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
     return GoRoute(
       path: BrowseRoutePath.browse,
       name: BrowseRoutePath.browse,
-      builder: (context, state) => BrowseSourceScreen.create(
-        locator: locator,
-        // TODO: implement redirect to search source screen
-        onTapSearchManga: (context) => context.showSnackBar(
-          message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-        ),
-        onTapSource: (context, source) => context.showSnackBar(
-          message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-        ),
-      ),
       pageBuilder: (context, state) => NoTransitionPage(
         child: BrowseSourceScreen.create(
           locator: locator,
@@ -30,8 +22,9 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
           onTapSearchManga: (context) => context.showSnackBar(
             message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
           ),
-          onTapSource: (context, source) => context.showSnackBar(
-            message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+          onTapSource: (context, source) => context.push(
+            BrowseRoutePath.browseManga,
+            extra: source,
           ),
         ),
       ),
@@ -44,6 +37,15 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
     required GlobalKey<NavigatorState> rootNavigatorKey,
   }) {
     return [
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: BrowseRoutePath.browseManga,
+        name: BrowseRoutePath.browseManga,
+        builder: (context, state) => BrowseMangaScreen.create(
+          locator: locator,
+          source: state.extra.asOrNull<MangaSource>(),
+        ),
+      ),
       // GoRoute(
       //   parentNavigatorKey: rootNavigatorKey,
       //   path: BrowseRoutePath.browseSource,

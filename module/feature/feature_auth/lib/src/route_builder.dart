@@ -11,8 +11,8 @@ class AuthRouteBuilder extends BaseRouteBuilder {
     required ServiceLocator locator,
   }) {
     return GoRoute(
-      path: AuthRoutePath.login,
-      name: AuthRoutePath.login,
+      path: AuthRoutePath.auth,
+      name: AuthRoutePath.auth,
       redirect: (context, state) => AuthRoutePath.login,
     );
   }
