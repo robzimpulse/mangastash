@@ -2,25 +2,25 @@ import 'package:equatable/equatable.dart';
 
 import 'manga.dart';
 
-class PaginationManga extends Equatable with EquatableMixin {
+class PaginationMangaDeprecated extends Equatable with EquatableMixin {
   final int? offset;
   final int? total;
   final int? limit;
 
   final List<Manga>? mangas;
 
-  const PaginationManga({this.offset, this.limit, this.total, this.mangas});
+  const PaginationMangaDeprecated({this.offset, this.limit, this.total, this.mangas});
 
   @override
   List<Object?> get props => [mangas, offset, limit, total];
 
-  PaginationManga copyWith({
+  PaginationMangaDeprecated copyWith({
     int? offset,
     int? limit,
     int? total,
     List<Manga>? mangas,
   }) {
-    return PaginationManga(
+    return PaginationMangaDeprecated(
       offset: offset ?? this.offset,
       limit: limit ?? this.limit,
       total: total ?? this.total,

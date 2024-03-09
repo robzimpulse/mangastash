@@ -35,7 +35,7 @@ class DetailMangaCubit extends Cubit<DetailMangaState> {
         parameter: state.parameter,
       );
 
-      if (result is Success<List<MangaChapter>>) {
+      if (result is Success<List<MangaChapterDeprecated>>) {
         emit(
           state.copyWith(
             manga: response.data.copyWith(
@@ -45,7 +45,7 @@ class DetailMangaCubit extends Cubit<DetailMangaState> {
         );
       }
 
-      if (result is Error<List<MangaChapter>>) {
+      if (result is Error<List<MangaChapterDeprecated>>) {
         emit(state.copyWith(errorMessage: () => result.error.toString()));
       }
     }

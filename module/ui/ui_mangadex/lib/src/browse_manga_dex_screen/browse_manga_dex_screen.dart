@@ -37,7 +37,7 @@ class BrowseMangaDexScreen extends StatefulWidget {
         getCoverArtUseCase: locator(),
         getAuthorUseCase: locator(),
         initialState: const BrowseMangaDexState(
-          parameter: SearchMangaParameter(
+          parameter: SearchMangaParameterDeprecated(
             orders: {SearchOrders.rating: OrderDirections.descending},
           ),
         ),

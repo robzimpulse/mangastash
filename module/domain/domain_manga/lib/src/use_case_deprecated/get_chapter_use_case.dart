@@ -12,7 +12,7 @@ class GetChapterUseCase {
   })  : _chapterRepository = chapterRepository,
         _atHomeRepository = atHomeRepository;
 
-  Future<Result<MangaChapter>> execute({
+  Future<Result<MangaChapterDeprecated>> execute({
     required String chapterId,
   }) async {
     try {
@@ -21,7 +21,7 @@ class GetChapterUseCase {
       final data = response.data;
       if (data == null) throw Exception('Chapter not found');
       return Success(
-        MangaChapter.from(
+        MangaChapterDeprecated.from(
           data,
           images: result.images,
           imagesDataSaver: result.imagesDataSaver,

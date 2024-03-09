@@ -14,7 +14,7 @@ class ReaderMangaState extends Equatable with EquatableMixin {
 
   final String? errorMessage;
 
-  final MangaChapter? chapter;
+  final MangaChapterDeprecated? chapter;
 
   final String? mangaId;
 
@@ -29,7 +29,7 @@ class ReaderMangaState extends Equatable with EquatableMixin {
     String? mangaId,
     String? chapterId,
     bool? isLoading,
-    MangaChapter? chapter,
+    MangaChapterDeprecated? chapter,
     String? Function()? errorMessage,
   }) {
     return ReaderMangaState(

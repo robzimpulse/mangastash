@@ -2,7 +2,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:equatable/equatable.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-class MangaChapter extends Equatable with EquatableMixin {
+class MangaChapterDeprecated extends Equatable with EquatableMixin {
   final String? id;
 
   final String? chapter;
@@ -17,7 +17,7 @@ class MangaChapter extends Equatable with EquatableMixin {
 
   final List<String>? imagesDataSaver;
 
-  const MangaChapter({
+  const MangaChapterDeprecated({
     this.id,
     this.chapter,
     this.title,
@@ -38,7 +38,7 @@ class MangaChapter extends Equatable with EquatableMixin {
         imagesDataSaver,
       ];
 
-  MangaChapter copyWith({
+  MangaChapterDeprecated copyWith({
     String? id,
     String? chapter,
     String? title,
@@ -47,7 +47,7 @@ class MangaChapter extends Equatable with EquatableMixin {
     List<String>? images,
     List<String>? imagesDataSaver,
   }) {
-    return MangaChapter(
+    return MangaChapterDeprecated(
       id: id ?? this.id,
       chapter: chapter ?? this.chapter,
       title: title ?? this.title,
@@ -72,12 +72,12 @@ class MangaChapter extends Equatable with EquatableMixin {
     return texts.join(' - ');
   }
 
-  factory MangaChapter.from(
+  factory MangaChapterDeprecated.from(
     ChapterData data, {
     List<String>? images,
     List<String>? imagesDataSaver,
   }) {
-    return MangaChapter(
+    return MangaChapterDeprecated(
       id: data.id,
       chapter: data.attributes?.chapter,
       title: data.attributes?.title,

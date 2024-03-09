@@ -48,7 +48,7 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
       parameter: param,
     );
 
-    if (result is Success<PaginationManga>) {
+    if (result is Success<PaginationMangaDeprecated>) {
       final offset = result.data.offset ?? 0;
       final limit = result.data.limit ?? 0;
       final total = result.data.total ?? 0;
@@ -66,7 +66,7 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
       );
     }
 
-    if (result is Error<PaginationManga>) {
+    if (result is Error<PaginationMangaDeprecated>) {
       emit(
         state.copyWith(
           errorMessage: () => result.error.toString(),

@@ -20,11 +20,11 @@ class ReaderMangaCubit extends Cubit<ReaderMangaState> {
       chapterId: state.chapterId ?? '',
     );
 
-    if (response is Success<MangaChapter>) {
+    if (response is Success<MangaChapterDeprecated>) {
       emit(state.copyWith(chapter: response.data));
     }
 
-    if (response is Error<MangaChapter>) {
+    if (response is Error<MangaChapterDeprecated>) {
       emit(state.copyWith(errorMessage: () => response.error.toString()));
     }
 

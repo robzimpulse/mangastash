@@ -9,13 +9,13 @@ class GetAllChapterUseCase {
     required ChapterRepository chapterRepository,
   }) : _chapterRepository = chapterRepository;
 
-  Future<Result<List<MangaChapter>>> execute({
-    required SearchChapterParameter parameter,
+  Future<Result<List<MangaChapterDeprecated>>> execute({
+    required SearchChapterParameterDeprecated parameter,
   }) async {
     try {
       var total = 0;
       var param = parameter.copyWith(limit: 100);
-      List<MangaChapter> chapters = [];
+      List<MangaChapterDeprecated> chapters = [];
 
       do {
         final result = await _chapterRepository.search(
@@ -52,8 +52,8 @@ class GetAllChapterUseCase {
     }
   }
 
-  Future<MangaChapter> _mapChapter(ChapterData data) async {
-    return MangaChapter.from(
+  Future<MangaChapterDeprecated> _mapChapter(ChapterData data) async {
+    return MangaChapterDeprecated.from(
       data,
       images: const [],
       imagesDataSaver: const [],

@@ -18,7 +18,7 @@ class Manga extends Equatable with EquatableMixin {
 
   final List<MangaTagDeprecated>? tags;
 
-  final List<MangaChapter>? chapters;
+  final List<MangaChapterDeprecated>? chapters;
 
   const Manga({
     this.id,
@@ -44,7 +44,7 @@ class Manga extends Equatable with EquatableMixin {
     String? status,
     String? description,
     List<MangaTagDeprecated>? tags,
-    List<MangaChapter>? chapters,
+    List<MangaChapterDeprecated>? chapters,
   }) {
     return Manga(
       id: id ?? this.id,

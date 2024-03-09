@@ -10,7 +10,7 @@ class SearchChapterUseCase {
   }) : _repository = repository;
 
   Future<Result<SearchChapterResponse>> execute({
-    required SearchChapterParameter parameter,
+    required SearchChapterParameterDeprecated parameter,
   }) async {
     try {
       final result = await _repository.search(

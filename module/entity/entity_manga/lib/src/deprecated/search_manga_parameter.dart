@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-class SearchMangaParameter extends Equatable with EquatableMixin {
+class SearchMangaParameterDeprecated extends Equatable with EquatableMixin {
   final String? title;
   final int? limit;
   final int? offset;
@@ -25,7 +25,7 @@ class SearchMangaParameter extends Equatable with EquatableMixin {
   final String? group;
   final Map<SearchOrders, OrderDirections>? orders;
 
-  const SearchMangaParameter({
+  const SearchMangaParameterDeprecated({
     this.title,
     this.limit,
     this.offset,
@@ -78,7 +78,7 @@ class SearchMangaParameter extends Equatable with EquatableMixin {
     ];
   }
 
-  SearchMangaParameter copyWith({
+  SearchMangaParameterDeprecated copyWith({
     String? title,
     int? limit,
     int? offset,
@@ -102,7 +102,7 @@ class SearchMangaParameter extends Equatable with EquatableMixin {
     String? group,
     Map<SearchOrders, OrderDirections>? orders,
   }) {
-    return SearchMangaParameter(
+    return SearchMangaParameterDeprecated(
       title: title ?? this.title,
       limit: limit ?? this.limit,
       offset: offset ?? this.offset,

@@ -22,7 +22,7 @@ class DetailMangaScreen extends StatefulWidget {
       create: (context) => DetailMangaCubit(
         getAllChapterUseCase: locator(),
         initialState: DetailMangaState(
-          parameter: SearchChapterParameter(
+          parameter: SearchChapterParameterDeprecated(
             mangaId: mangaId,
             includes: const [Include.coverArt, Include.author],
             translatedLanguage: const [LanguageCodes.english],

@@ -17,8 +17,8 @@ class SearchMangaUseCase {
         _authorRepository = authorRepository,
         _coverRepository = coverRepository;
 
-  Future<Result<PaginationManga>> execute({
-    required SearchMangaParameter parameter,
+  Future<Result<PaginationMangaDeprecated>> execute({
+    required SearchMangaParameterDeprecated parameter,
   }) async {
     try {
       final result = await _mangaRepository.search(
@@ -50,7 +50,7 @@ class SearchMangaUseCase {
       final mangas = await Future.wait(promises);
 
       return Success(
-        PaginationManga(
+        PaginationMangaDeprecated(
           offset: result.offset ?? 0,
           limit: result.limit ?? 0,
           total: result.total ?? 0,

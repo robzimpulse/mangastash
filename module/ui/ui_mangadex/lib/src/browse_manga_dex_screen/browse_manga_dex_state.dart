@@ -7,7 +7,7 @@ class BrowseMangaDexState extends Equatable with EquatableMixin {
 
   final String? errorMessage;
 
-  final SearchMangaParameter parameter;
+  final SearchMangaParameterDeprecated parameter;
 
   final List<Manga> mangas;
 
@@ -25,7 +25,7 @@ class BrowseMangaDexState extends Equatable with EquatableMixin {
     this.isLoading = false,
     this.errorMessage,
     this.mangas = const [],
-    this.parameter = const SearchMangaParameter(),
+    this.parameter = const SearchMangaParameterDeprecated(),
     this.hasNextPage = false,
     this.isPagingNextPage = false,
     this.isSearchActive = false,
@@ -54,7 +54,7 @@ class BrowseMangaDexState extends Equatable with EquatableMixin {
     bool? isPagingNextPage,
     bool? isSearchActive,
     String? Function()? errorMessage,
-    SearchMangaParameter? parameter,
+    SearchMangaParameterDeprecated? parameter,
     List<Manga>? mangas,
     MangaShelfItemLayout? layout,
     List<MangaTagDeprecated>? tags,
