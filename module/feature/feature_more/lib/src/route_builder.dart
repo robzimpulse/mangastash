@@ -9,8 +9,6 @@ class MoreRouteBuilder extends BaseRouteBuilder {
   @override
   GoRoute root({
     required ServiceLocator locator,
-    required GlobalKey<NavigatorState> rootNavigatorKey,
-    required GlobalKey<NavigatorState> shellNavigatorKey,
   }) {
     return GoRoute(
       path: MoreRoutePath.more,
@@ -46,7 +44,6 @@ class MoreRouteBuilder extends BaseRouteBuilder {
   List<RouteBase> routes({
     required ServiceLocator locator,
     required GlobalKey<NavigatorState> rootNavigatorKey,
-    required GlobalKey<NavigatorState> shellNavigatorKey,
   }) {
     return [
       GoRoute(

@@ -13,27 +13,11 @@ import 'screen/error_screen.dart';
 import 'screen/main_screen.dart';
 
 class MainRouteBuilder extends BaseRouteBuilder {
-  final String _defaultLocation = LibraryRoutePath.library;
-
-  final Map<int, String> _indexToLocation = {
-    0: LibraryRoutePath.library,
-    1: UpdatesRoutePath.updates,
-    2: HistoryRoutePath.history,
-    3: BrowseRoutePath.browse,
-    4: MoreRoutePath.more,
-  };
-
-  Map<String, int> get _locationToIndex {
-    return _indexToLocation.map(
-      (key, value) => MapEntry(value, key),
-    );
-  }
 
   @override
   List<RouteBase> routes({
     required ServiceLocator locator,
     required GlobalKey<NavigatorState> rootNavigatorKey,
-    required GlobalKey<NavigatorState> shellNavigatorKey,
   }) {
     return [
       GoRoute(
@@ -53,32 +37,26 @@ class MainRouteBuilder extends BaseRouteBuilder {
       ...LibraryRouteBuilder().routes(
         locator: locator,
         rootNavigatorKey: rootNavigatorKey,
-        shellNavigatorKey: shellNavigatorKey,
       ),
       ...UpdatesRouteBuilder().routes(
         locator: locator,
         rootNavigatorKey: rootNavigatorKey,
-        shellNavigatorKey: shellNavigatorKey,
       ),
       ...HistoryRouteBuilder().routes(
         locator: locator,
         rootNavigatorKey: rootNavigatorKey,
-        shellNavigatorKey: shellNavigatorKey,
       ),
       ...BrowseRouteBuilder().routes(
         locator: locator,
         rootNavigatorKey: rootNavigatorKey,
-        shellNavigatorKey: shellNavigatorKey,
       ),
       ...MoreRouteBuilder().routes(
         locator: locator,
         rootNavigatorKey: rootNavigatorKey,
-        shellNavigatorKey: shellNavigatorKey,
       ),
       ...AuthRouteBuilder().routes(
         locator: locator,
         rootNavigatorKey: rootNavigatorKey,
-        shellNavigatorKey: shellNavigatorKey,
       ),
     ];
   }
@@ -86,43 +64,41 @@ class MainRouteBuilder extends BaseRouteBuilder {
   @override
   RouteBase root({
     required ServiceLocator locator,
-    required GlobalKey<NavigatorState> rootNavigatorKey,
-    required GlobalKey<NavigatorState> shellNavigatorKey,
   }) {
-    return ShellRoute(
-      navigatorKey: shellNavigatorKey,
-      builder: (context, state, widget) => MainScreen(
-        index: _locationToIndex[state.location] ?? 0,
-        onTapMenu: (index) => context.go(
-          _indexToLocation[index] ?? _defaultLocation,
+    return StatefulShellRoute.indexedStack(
+      builder: (context, state, shell) => MainScreen(
+        index: shell.currentIndex,
+        onTapMenu: (index) => shell.goBranch(
+          index,
+          initialLocation: index == shell.currentIndex,
         ),
-        child: widget,
+        child: shell,
       ),
-      routes: [
-        LibraryRouteBuilder().root(
-          locator: locator,
-          rootNavigatorKey: rootNavigatorKey,
-          shellNavigatorKey: shellNavigatorKey,
+      branches: [
+        StatefulShellBranch(
+          routes: [
+            LibraryRouteBuilder().root(locator: locator),
+          ],
         ),
-        UpdatesRouteBuilder().root(
-          locator: locator,
-          rootNavigatorKey: rootNavigatorKey,
-          shellNavigatorKey: shellNavigatorKey,
+        StatefulShellBranch(
+          routes: [
+            UpdatesRouteBuilder().root(locator: locator),
+          ],
         ),
-        HistoryRouteBuilder().root(
-          locator: locator,
-          rootNavigatorKey: rootNavigatorKey,
-          shellNavigatorKey: shellNavigatorKey,
+        StatefulShellBranch(
+          routes: [
+            HistoryRouteBuilder().root(locator: locator),
+          ],
         ),
-        BrowseRouteBuilder().root(
-          locator: locator,
-          rootNavigatorKey: rootNavigatorKey,
-          shellNavigatorKey: shellNavigatorKey,
+        StatefulShellBranch(
+          routes: [
+            BrowseRouteBuilder().root(locator: locator),
+          ],
         ),
-        MoreRouteBuilder().root(
-          locator: locator,
-          rootNavigatorKey: rootNavigatorKey,
-          shellNavigatorKey: shellNavigatorKey,
+        StatefulShellBranch(
+          routes: [
+            MoreRouteBuilder().root(locator: locator),
+          ],
         ),
       ],
     );

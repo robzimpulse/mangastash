@@ -9,8 +9,6 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
   @override
   GoRoute root({
     required ServiceLocator locator,
-    required GlobalKey<NavigatorState> rootNavigatorKey,
-    required GlobalKey<NavigatorState> shellNavigatorKey,
   }) {
     return GoRoute(
       path: BrowseRoutePath.browse,
@@ -45,7 +43,6 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
   List<RouteBase> routes({
     required ServiceLocator locator,
     required GlobalKey<NavigatorState> rootNavigatorKey,
-    required GlobalKey<NavigatorState> shellNavigatorKey,
   }) {
     return [
       // GoRoute(
