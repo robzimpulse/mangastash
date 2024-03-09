@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
-import 'manager_deprecated//tags_manager.dart';
+import 'manager_deprecated/tags_manager.dart';
 import 'use_case/get_all_manga_sources_use_case.dart';
 import 'use_case/get_all_tags_use_case.dart';
 import 'use_case_deprecated/get_all_chapter_use_case.dart';
