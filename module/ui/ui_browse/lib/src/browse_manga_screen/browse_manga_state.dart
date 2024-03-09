@@ -1,6 +1,6 @@
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
+import 'package:ui_common/ui_common.dart';
 
 class BrowseMangaState extends Equatable with EquatableMixin {
   final bool isLoading;
@@ -9,9 +9,12 @@ class BrowseMangaState extends Equatable with EquatableMixin {
 
   final List<Manga> mangas;
 
+  final MangaShelfItemLayout layout;
+
   const BrowseMangaState({
     this.isLoading = false,
     this.error,
+    required this.layout,
     this.mangas = const [],
   });
 
@@ -20,6 +23,7 @@ class BrowseMangaState extends Equatable with EquatableMixin {
     return [
       error,
       isLoading,
+      layout,
       mangas,
     ];
   }
@@ -28,11 +32,13 @@ class BrowseMangaState extends Equatable with EquatableMixin {
     bool? isLoading,
     ValueGetter<Exception>? error,
     List<Manga>? mangas,
+    MangaShelfItemLayout? layout,
   }) {
     return BrowseMangaState(
       isLoading: isLoading ?? this.isLoading,
       mangas: mangas ?? this.mangas,
       error: error != null ? error() : this.error,
+      layout: layout ?? this.layout
     );
   }
 }
