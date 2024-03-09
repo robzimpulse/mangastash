@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-import '../entity_manga.dart';
+import '../../entity_manga.dart';
 
 class Manga extends Equatable with EquatableMixin {
   final String? id;
