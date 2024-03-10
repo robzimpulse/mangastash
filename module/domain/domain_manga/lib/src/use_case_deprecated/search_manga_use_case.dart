@@ -4,12 +4,12 @@ import 'package:entity_manga/entity_manga.dart';
 
 import '../../domain_manga.dart';
 
-class SearchMangaUseCase {
+class SearchMangaUseCaseDeprecated {
   final MangaRepository _mangaRepository;
   final AuthorRepository _authorRepository;
   final CoverRepository _coverRepository;
 
-  const SearchMangaUseCase({
+  const SearchMangaUseCaseDeprecated({
     required MangaRepository mangaRepository,
     required AuthorRepository authorRepository,
     required CoverRepository coverRepository,

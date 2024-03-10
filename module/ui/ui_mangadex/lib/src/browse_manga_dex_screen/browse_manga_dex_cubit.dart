@@ -7,7 +7,7 @@ import 'package:ui_common/ui_common.dart';
 import 'browse_manga_dex_state.dart';
 
 class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
-  final SearchMangaUseCase searchMangaUseCase;
+  final SearchMangaUseCaseDeprecated searchMangaUseCase;
   final GetCoverArtUseCase getCoverArtUseCase;
   final GetAuthorUseCase getAuthorUseCase;
 

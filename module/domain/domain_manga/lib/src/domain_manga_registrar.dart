@@ -59,7 +59,7 @@ class DomainMangaRegistrar extends Registrar {
     );
 
     locator.registerFactory(
-      () => SearchMangaUseCase(
+      () => SearchMangaUseCaseDeprecated(
         mangaRepository: locator(),
         authorRepository: locator(),
         coverRepository: locator(),
