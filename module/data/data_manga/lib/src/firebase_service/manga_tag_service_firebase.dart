@@ -18,6 +18,18 @@ class MangaTagServiceFirebase implements MangaTagService {
   MangaTagServiceFirebase({required FirebaseApp app}) : _app = app;
 
   @override
+  Future<void> add(MangaTag value) async {
+    final id = value.id;
+    if (id == null) return;
+    await _ref.doc(id).update(value.toJson());
+  }
+
+  @override
+  Future<void> update(MangaTag value) async {
+    await add(value);
+  }
+
+  @override
   Future<Result<List<MangaTag>>> list() async {
     final value = await _ref.get();
     final data = value.docs.map((e) => MangaTag.fromJson(e.data())).toList();

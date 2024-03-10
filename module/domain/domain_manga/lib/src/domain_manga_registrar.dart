@@ -4,10 +4,10 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager_deprecated/tags_manager.dart';
-import 'use_case/get_all_manga_sources_use_case.dart';
-import 'use_case/get_all_tags_use_case.dart';
-import 'use_case/get_manga_source_use_case.dart';
-import 'use_case/search_manga_source_use_case.dart';
+import 'use_case/manga_source/get_all_manga_sources_use_case.dart';
+import 'use_case/manga_tags/get_all_tags_use_case.dart';
+import 'use_case/manga_source/get_manga_source_use_case.dart';
+import 'use_case/manga_source/search_manga_source_use_case.dart';
 import 'use_case_deprecated/get_all_chapter_use_case.dart';
 import 'use_case_deprecated/get_author_use_case.dart';
 import 'use_case_deprecated/get_chapter_image_use_case.dart';

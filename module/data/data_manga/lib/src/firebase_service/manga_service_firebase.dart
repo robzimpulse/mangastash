@@ -18,6 +18,18 @@ class MangaServiceFirebase implements MangaService {
   MangaServiceFirebase({required FirebaseApp app}) : _app = app;
 
   @override
+  Future<void> add(Manga value) async {
+    final id = value.id;
+    if (id == null) return;
+    await _ref.doc(id).update(value.toJson());
+  }
+
+  @override
+  Future<void> update(Manga value) async {
+    await add(value);
+  }
+
+  @override
   Future<Result<List<Manga>>> list() async {
     final value = await _ref.get();
     final data = value.docs.map((e) => Manga.fromJson(e.data())).toList();

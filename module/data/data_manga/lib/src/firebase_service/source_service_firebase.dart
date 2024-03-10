@@ -18,6 +18,18 @@ class SourceServiceFirebase implements SourceService {
   SourceServiceFirebase({required FirebaseApp app}) : _app = app;
 
   @override
+  Future<void> add(MangaSource value) async {
+    final id = value.id;
+    if (id == null) return;
+    await _ref.doc(id).update(value.toJson());
+  }
+
+  @override
+  Future<void> update(MangaSource value) async {
+    await add(value);
+  }
+
+  @override
   Future<Result<List<MangaSource>>> list() async {
     final path = await _ref.get();
     final docs = path.docs;
