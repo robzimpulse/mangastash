@@ -22,7 +22,7 @@ class SourceServiceFirebase implements SourceService {
     final docs = path.docs;
     return Success(
       docs
-          .map((e) => MangaSource.fromJson(e.data()).copyWith.id(e.id))
+          .map((e) => MangaSource.fromJson(e.data()).copyWith(id: e.id))
           .toList(),
     );
   }
@@ -35,6 +35,6 @@ class SourceServiceFirebase implements SourceService {
       return Error(Exception('data not found'));
     }
 
-    return Success(MangaSource.fromJson(data).copyWith.id(id));
+    return Success(MangaSource.fromJson(data).copyWith(id: id));
   }
 }
