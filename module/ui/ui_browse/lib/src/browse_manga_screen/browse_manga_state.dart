@@ -7,7 +7,7 @@ class BrowseMangaState extends Equatable {
 
   final Exception? error;
 
-  final List<MangaDeprecated> mangas;
+  final List<Manga> mangas;
 
   final MangaShelfItemLayout layout;
 
@@ -38,7 +38,7 @@ class BrowseMangaState extends Equatable {
   BrowseMangaState copyWith({
     bool? isLoading,
     ValueGetter<Exception>? error,
-    List<MangaDeprecated>? mangas,
+    List<Manga>? mangas,
     MangaShelfItemLayout? layout,
     String? sourceId,
     MangaSource? source,

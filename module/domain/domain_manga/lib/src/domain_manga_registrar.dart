@@ -4,6 +4,7 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager_deprecated/tags_manager.dart';
+import 'use_case/manga/search_manga_use_case.dart';
 import 'use_case/manga_source/add_manga_source_use_case.dart';
 import 'use_case/manga_source/get_list_manga_sources_use_case.dart';
 import 'use_case/manga_source/get_manga_source_use_case.dart';
@@ -25,14 +26,39 @@ class DomainMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     log('start register', name: 'domain_manga');
-    locator.registerFactory(() => AddMangaSourcesUseCase(service: locator()));
-    locator.registerFactory(() => UpdateMangaSourcesUseCase(service: locator()));
-    locator.registerFactory(() => GetListMangaSourcesUseCase(service: locator()));
+
+    await _deprecated(locator);
+
+    locator.registerFactory(
+      () => AddMangaSourcesUseCase(service: locator()),
+    );
+    locator.registerFactory(
+      () => UpdateMangaSourcesUseCase(service: locator()),
+    );
+    locator.registerFactory(
+      () => GetListMangaSourcesUseCase(service: locator()),
+    );
     locator.registerFactory(() => GetMangaSourceUseCase(service: locator()));
-    locator.registerFactory(() => SearchMangaSourcesUseCase(service: locator()));
+    locator.registerFactory(
+      () => SearchMangaSourcesUseCase(service: locator()),
+    );
 
-    locator.registerFactory(() => GetListTagsUseCase(service: locator()));
+    locator.registerFactory(
+      () => GetListTagsUseCase(service: locator()),
+    );
 
+    locator.registerFactory(
+      () => SearchMangaUseCase(
+        mangaService: locator(),
+        authorService: locator(),
+        coverArtService: locator(),
+      ),
+    );
+
+    log('finish register', name: 'domain_manga');
+  }
+
+  Future<void> _deprecated(ServiceLocator locator) async {
     // manga dex services
     locator.registerFactory(() => MangaService(locator()));
     locator.registerFactory(() => ChapterService(locator()));
@@ -49,7 +75,9 @@ class DomainMangaRegistrar extends Registrar {
 
     locator.registerFactory(() => GetAuthorUseCase(repository: locator()));
     locator.registerFactory(() => GetCoverArtUseCase(repository: locator()));
-    locator.registerFactory(() => ListTagUseCaseDeprecated(repository: locator()));
+    locator.registerFactory(
+      () => ListTagUseCaseDeprecated(repository: locator()),
+    );
     locator.registerFactory(() => SearchChapterUseCase(repository: locator()));
 
     locator.registerFactory(
@@ -90,6 +118,5 @@ class DomainMangaRegistrar extends Registrar {
 
     locator.registerSingleton(TagsManagerDeprecated(listTagUseCase: locator()));
     locator.alias<ListenListTagUseCaseDeprecated, TagsManagerDeprecated>();
-    log('finish register', name: 'domain_manga');
   }
 }
