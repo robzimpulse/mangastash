@@ -19,14 +19,14 @@ class SourceServiceFirebase implements SourceService {
 
   @override
   Future<void> add(MangaSource value) async {
-    final id = value.id;
-    if (id == null) return;
-    await _ref.doc(id).update(value.toJson());
+    await _ref.add(value.toJson());
   }
 
   @override
   Future<void> update(MangaSource value) async {
-    await add(value);
+    final id = value.id;
+    if (id == null) return;
+    await _ref.doc(id).update(value.toJson());
   }
 
   @override

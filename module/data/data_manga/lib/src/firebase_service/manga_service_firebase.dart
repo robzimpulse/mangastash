@@ -19,14 +19,14 @@ class MangaServiceFirebase implements MangaService {
 
   @override
   Future<void> add(Manga value) async {
-    final id = value.id;
-    if (id == null) return;
-    await _ref.doc(id).update(value.toJson());
+    await _ref.add(value.toJson());
   }
 
   @override
   Future<void> update(Manga value) async {
-    await add(value);
+    final id = value.id;
+    if (id == null) return;
+    await _ref.doc(id).update(value.toJson());
   }
 
   @override
