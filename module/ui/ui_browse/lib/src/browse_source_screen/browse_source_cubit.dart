@@ -6,14 +6,14 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'browse_source_state.dart';
 
 class BrowseSourceCubit extends Cubit<BrowseSourceState> {
-  final GetAllMangaSourcesUseCase _getAllMangaSourcesUseCase;
+  final GetListMangaSourcesUseCase _getAllMangaSourcesUseCase;
 
   BrowseSourceCubit({
     BrowseSourceState initialState = const BrowseSourceState(
       isLoading: false,
       sources: [],
     ),
-    required GetAllMangaSourcesUseCase getAllMangaSourcesUseCase,
+    required GetListMangaSourcesUseCase getAllMangaSourcesUseCase,
   })  : _getAllMangaSourcesUseCase = getAllMangaSourcesUseCase,
         super(initialState);
 

@@ -23,7 +23,7 @@ class DomainMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     log('start register', name: 'domain_manga');
-    locator.registerFactory(() => GetAllMangaSourcesUseCase(service: locator()));
+    locator.registerFactory(() => GetListMangaSourcesUseCase(service: locator()));
     locator.registerFactory(() => GetMangaSourceUseCase(service: locator()));
     locator.registerFactory(() => SearchMangaSourcesUseCase(service: locator()));
     locator.registerFactory(() => GetAllTagsUseCase(service: locator()));
