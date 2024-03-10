@@ -7,6 +7,7 @@ import 'manager_deprecated/tags_manager.dart';
 import 'use_case/get_all_manga_sources_use_case.dart';
 import 'use_case/get_all_tags_use_case.dart';
 import 'use_case/get_manga_source_use_case.dart';
+import 'use_case/search_manga_source_use_case.dart';
 import 'use_case_deprecated/get_all_chapter_use_case.dart';
 import 'use_case_deprecated/get_author_use_case.dart';
 import 'use_case_deprecated/get_chapter_image_use_case.dart';
@@ -24,6 +25,7 @@ class DomainMangaRegistrar extends Registrar {
     log('start register', name: 'domain_manga');
     locator.registerFactory(() => GetAllMangaSourcesUseCase(service: locator()));
     locator.registerFactory(() => GetMangaSourceUseCase(service: locator()));
+    locator.registerFactory(() => SearchMangaSourcesUseCase(service: locator()));
     locator.registerFactory(() => GetAllTagsUseCase(service: locator()));
 
     // manga dex services

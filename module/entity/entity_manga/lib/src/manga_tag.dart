@@ -5,7 +5,6 @@ part 'manga_tag.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class MangaTag extends Equatable {
-
   final String? name;
 
   final String? id;
@@ -22,4 +21,8 @@ class MangaTag extends Equatable {
     return _$MangaTagFromJson(json);
   }
   Map<String, dynamic> toJson() => _$MangaTagToJson(this);
+
+  MangaTag copyWith({String? name, String? id}) {
+    return MangaTag(name: name ?? this.name, id: id ?? this.id);
+  }
 }

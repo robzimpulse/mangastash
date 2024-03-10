@@ -4,4 +4,10 @@ import 'package:entity_manga/entity_manga.dart';
 abstract class SourceService {
   Future<Result<List<MangaSource>>> list();
   Future<Result<MangaSource>> get(String id);
+  Future<Result<Pagination<MangaSource>>> search({
+    String? name,
+    String? url,
+    int limit,
+    int? offset,
+  });
 }
