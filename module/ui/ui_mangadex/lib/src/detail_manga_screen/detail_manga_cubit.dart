@@ -30,7 +30,7 @@ class DetailMangaCubit extends Cubit<DetailMangaState> {
       includes: state.parameter.includes,
     );
 
-    if (response is Success<Manga>) {
+    if (response is Success<MangaDeprecated>) {
       final result = await getAllChapterUseCase.execute(
         parameter: state.parameter,
       );
@@ -50,7 +50,7 @@ class DetailMangaCubit extends Cubit<DetailMangaState> {
       }
     }
 
-    if (response is Error<Manga>) {
+    if (response is Error<MangaDeprecated>) {
       emit(state.copyWith(errorMessage: () => response.error.toString()));
     }
 

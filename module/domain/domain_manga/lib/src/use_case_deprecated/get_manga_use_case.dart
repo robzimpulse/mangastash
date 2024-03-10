@@ -19,7 +19,7 @@ class GetMangaUseCase {
         _coverRepository = coverRepository,
         _chapterRepository = chapterRepository;
 
-  Future<Result<Manga>> execute(
+  Future<Result<MangaDeprecated>> execute(
     String id, {
     List<Include>? includes,
   }) async {
@@ -28,7 +28,7 @@ class GetMangaUseCase {
       final data = result.data;
       if (data == null) throw Exception('Manga not found');
       return Success(
-        Manga.from(
+        MangaDeprecated.from(
           data,
           coverUrl: await _coverArtUrl(data),
           author: await _authors(data),

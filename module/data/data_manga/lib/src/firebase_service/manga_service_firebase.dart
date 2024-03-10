@@ -17,7 +17,7 @@ class MangaServiceFirebase implements MangaService {
   MangaServiceFirebase({required FirebaseApp app}): _app = app;
 
   @override
-  Future<Result<List<Manga>>> list() async {
+  Future<Result<List<MangaDeprecated>>> list() async {
     return Error(Exception('not implemented'));
   }
 }

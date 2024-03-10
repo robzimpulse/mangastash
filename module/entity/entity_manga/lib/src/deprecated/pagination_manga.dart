@@ -7,7 +7,7 @@ class PaginationMangaDeprecated extends Equatable with EquatableMixin {
   final int? total;
   final int? limit;
 
-  final List<Manga>? mangas;
+  final List<MangaDeprecated>? mangas;
 
   const PaginationMangaDeprecated({this.offset, this.limit, this.total, this.mangas});
 
@@ -18,7 +18,7 @@ class PaginationMangaDeprecated extends Equatable with EquatableMixin {
     int? offset,
     int? limit,
     int? total,
-    List<Manga>? mangas,
+    List<MangaDeprecated>? mangas,
   }) {
     return PaginationMangaDeprecated(
       offset: offset ?? this.offset,

@@ -62,10 +62,10 @@ class SearchMangaUseCase {
     }
   }
 
-  Future<Manga> _mapManga(MangaData data) async {
+  Future<MangaDeprecated> _mapManga(MangaData data) async {
     final cover = await _coverArtUrl(data);
     final authors = await _authors(data);
-    return Manga.from(data, coverUrl: cover, author: authors);
+    return MangaDeprecated.from(data, coverUrl: cover, author: authors);
   }
 
   Future<String> _coverArtUrl(MangaData data) async {

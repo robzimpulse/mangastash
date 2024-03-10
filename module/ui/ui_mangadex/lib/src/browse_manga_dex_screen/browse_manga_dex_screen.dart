@@ -22,14 +22,14 @@ class BrowseMangaDexScreen extends StatefulWidget {
 
   final ListenListTagUseCaseDeprecated listenListTagUseCase;
 
-  final Function(BuildContext, Manga) onTapManga;
+  final Function(BuildContext, MangaDeprecated) onTapManga;
 
   @override
   State<BrowseMangaDexScreen> createState() => _BrowseMangaDexScreenState();
 
   static Widget create({
     required ServiceLocator locator,
-    required Function(BuildContext, Manga) onTapManga,
+    required Function(BuildContext, MangaDeprecated) onTapManga,
   }) {
     return BlocProvider(
       create: (context) => BrowseMangaDexCubit(

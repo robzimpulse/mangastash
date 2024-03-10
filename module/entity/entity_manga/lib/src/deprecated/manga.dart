@@ -3,7 +3,7 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../entity_manga.dart';
 
-class Manga extends Equatable with EquatableMixin {
+class MangaDeprecated extends Equatable with EquatableMixin {
   final String? id;
 
   final String? title;
@@ -20,7 +20,7 @@ class Manga extends Equatable with EquatableMixin {
 
   final List<MangaChapterDeprecated>? chapters;
 
-  const Manga({
+  const MangaDeprecated({
     this.id,
     this.title,
     this.coverUrl,
@@ -36,7 +36,7 @@ class Manga extends Equatable with EquatableMixin {
     return [id, title, coverUrl, author, status, description, tags, chapters];
   }
 
-  Manga copyWith({
+  MangaDeprecated copyWith({
     String? id,
     String? title,
     String? coverUrl,
@@ -46,7 +46,7 @@ class Manga extends Equatable with EquatableMixin {
     List<MangaTagDeprecated>? tags,
     List<MangaChapterDeprecated>? chapters,
   }) {
-    return Manga(
+    return MangaDeprecated(
       id: id ?? this.id,
       title: title ?? this.title,
       coverUrl: coverUrl ?? this.coverUrl,
@@ -58,8 +58,8 @@ class Manga extends Equatable with EquatableMixin {
     );
   }
 
-  factory Manga.from(MangaData data, {String? coverUrl, List<String>? author}) {
-    return Manga(
+  factory MangaDeprecated.from(MangaData data, {String? coverUrl, List<String>? author}) {
+    return MangaDeprecated(
       id: data.id,
       coverUrl: coverUrl,
       title: data.attributes?.title?.en,

@@ -10,7 +10,7 @@ class DetailMangaState extends Equatable with EquatableMixin {
     this.parameter = const SearchChapterParameterDeprecated(),
   });
 
-  final Manga? manga;
+  final MangaDeprecated? manga;
 
   final SearchChapterParameterDeprecated parameter;
 
@@ -22,7 +22,7 @@ class DetailMangaState extends Equatable with EquatableMixin {
   List<Object?> get props => [manga, isLoading, errorMessage, parameter];
 
   DetailMangaState copyWith({
-    Manga? manga,
+    MangaDeprecated? manga,
     SearchChapterParameterDeprecated? parameter,
     bool? isLoading,
     String? Function()? errorMessage,

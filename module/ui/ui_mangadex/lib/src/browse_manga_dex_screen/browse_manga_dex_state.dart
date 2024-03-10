@@ -9,7 +9,7 @@ class BrowseMangaDexState extends Equatable with EquatableMixin {
 
   final SearchMangaParameterDeprecated parameter;
 
-  final List<Manga> mangas;
+  final List<MangaDeprecated> mangas;
 
   final bool hasNextPage;
 
@@ -55,7 +55,7 @@ class BrowseMangaDexState extends Equatable with EquatableMixin {
     bool? isSearchActive,
     String? Function()? errorMessage,
     SearchMangaParameterDeprecated? parameter,
-    List<Manga>? mangas,
+    List<MangaDeprecated>? mangas,
     MangaShelfItemLayout? layout,
     List<MangaTagDeprecated>? tags,
   }) {
