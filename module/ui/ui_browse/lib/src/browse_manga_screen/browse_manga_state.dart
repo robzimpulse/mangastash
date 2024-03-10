@@ -2,7 +2,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ui_common/ui_common.dart';
 
-class BrowseMangaState extends Equatable with EquatableMixin {
+class BrowseMangaState extends Equatable {
   final bool isLoading;
 
   final Exception? error;

@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-class SearchChapterParameterDeprecated extends Equatable with EquatableMixin {
+class SearchChapterParameterDeprecated extends Equatable {
   final int? limit;
   final int? offset;
   final String? mangaId;

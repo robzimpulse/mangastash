@@ -2,7 +2,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:equatable/equatable.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-class MangaChapterDeprecated extends Equatable with EquatableMixin {
+class MangaChapterDeprecated extends Equatable {
   final String? id;
 
   final String? chapter;

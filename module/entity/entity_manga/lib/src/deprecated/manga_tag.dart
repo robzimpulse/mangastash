@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-class MangaTagDeprecated extends Equatable with EquatableMixin {
+class MangaTagDeprecated extends Equatable {
   final String? id;
 
   final String? name;

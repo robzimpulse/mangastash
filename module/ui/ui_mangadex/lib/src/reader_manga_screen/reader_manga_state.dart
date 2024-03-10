@@ -1,7 +1,7 @@
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 
-class ReaderMangaState extends Equatable with EquatableMixin {
+class ReaderMangaState extends Equatable {
   const ReaderMangaState({
     this.isLoading = false,
     this.chapter,

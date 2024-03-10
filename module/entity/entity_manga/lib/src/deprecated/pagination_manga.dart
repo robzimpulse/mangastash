@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 
 import 'manga.dart';
 
-class PaginationMangaDeprecated extends Equatable with EquatableMixin {
+class PaginationMangaDeprecated extends Equatable {
   final int? offset;
   final int? total;
   final int? limit;

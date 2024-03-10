@@ -2,7 +2,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-class DetailMangaState extends Equatable with EquatableMixin {
+class DetailMangaState extends Equatable {
   const DetailMangaState({
     this.isLoading = false,
     this.errorMessage,

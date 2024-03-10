@@ -6,7 +6,7 @@ import 'manga_tag.dart';
 part 'manga.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class Manga extends Equatable with EquatableMixin {
+class Manga extends Equatable {
   final String? id;
 
   final String? title;

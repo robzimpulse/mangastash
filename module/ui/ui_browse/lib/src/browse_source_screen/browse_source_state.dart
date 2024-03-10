@@ -2,7 +2,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 
-class BrowseSourceState extends Equatable with EquatableMixin {
+class BrowseSourceState extends Equatable {
   final List<MangaSource> sources;
   final bool isLoading;
   final Exception? error;
