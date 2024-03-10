@@ -23,8 +23,10 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
             message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
           ),
           onTapSource: (context, source) => context.push(
-            BrowseRoutePath.browseManga,
-            extra: source,
+            BrowseRoutePath.browseSourceManga.replaceAll(
+              ':id',
+              source.id ?? '',
+            ),
           ),
         ),
       ),
@@ -39,11 +41,11 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
     return [
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: BrowseRoutePath.browseManga,
-        name: BrowseRoutePath.browseManga,
+        path: BrowseRoutePath.browseSourceManga,
+        name: BrowseRoutePath.browseSourceManga,
         builder: (context, state) => BrowseMangaScreen.create(
           locator: locator,
-          source: state.extra.asOrNull<MangaSource>(),
+          id: state.pathParameters['id'].asOrNull<String>(),
         ),
       ),
       // GoRoute(

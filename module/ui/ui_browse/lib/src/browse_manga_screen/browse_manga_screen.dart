@@ -10,21 +10,24 @@ import 'browse_manga_state.dart';
 class BrowseMangaScreen extends StatefulWidget {
   const BrowseMangaScreen({
     super.key,
-    this.source,
     required this.launchUrlUseCase,
   });
 
-  final MangaSource? source;
   final LaunchUrlUseCase launchUrlUseCase;
 
   static Widget create({
     required ServiceLocator locator,
-    MangaSource? source,
+    String? id,
   }) {
     return BlocProvider(
-      create: (context) => BrowseMangaCubit()..init(),
+      create: (context) => BrowseMangaCubit(
+        initialState: BrowseMangaState(
+          sourceId: id,
+          layout: MangaShelfItemLayout.comfortableGrid,
+        ),
+        getMangaSourceUseCase: locator(),
+      )..init(),
       child: BrowseMangaScreen(
-        source: source,
         launchUrlUseCase: locator(),
       ),
     );
@@ -70,8 +73,11 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     );
   }
 
-  void _onTapOpenInBrowser(BuildContext context) async {
-    final url = widget.source?.url;
+  void _onTapOpenInBrowser({
+    required BuildContext context,
+    MangaSource? source,
+  }) async {
+    final url = source?.url;
 
     if (url == null || url.isEmpty) {
       context.showSnackBar(message: 'Could not launch source url');
@@ -87,7 +93,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     context.showSnackBar(message: 'Could not launch $url');
   }
 
-  Widget _layoutIcon(BuildContext context) {
+  Widget _layoutIcon({required BuildContext context}) {
     return PopupMenuButton<MangaShelfItemLayout>(
       icon: _builder(
         buildWhen: (prev, curr) => prev.layout != curr.layout,
@@ -116,18 +122,28 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     );
   }
 
+  Widget _layoutSource({required BuildContext context}) {
+    return _builder(
+      buildWhen: (prev, curr) => prev.source != curr.source,
+      builder: (context, state) => IconButton(
+        icon: const Icon(Icons.open_in_browser),
+        onPressed: () => _onTapOpenInBrowser(
+          context: context,
+          source: state.source,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
       onWillPop: () => Future.value(true),
       appBar: AppBar(
-        title: Text(widget.source?.name ?? ''),
+        title: _title(context),
         actions: [
-          _layoutIcon(context),
-          IconButton(
-            icon: const Icon(Icons.open_in_browser),
-            onPressed: () => _onTapOpenInBrowser(context),
-          ),
+          _layoutIcon(context: context),
+          _layoutSource(context: context),
         ],
       ),
       body: BlocBuilder<BrowseMangaCubit, BrowseMangaState>(
@@ -135,6 +151,20 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
           onRefresh: () => _cubit(context).init(),
           child: _content(context),
         ),
+      ),
+    );
+  }
+
+  Widget _title(BuildContext context) {
+    return _builder(
+      buildWhen: (prev, curr) =>
+          prev.source != curr.source || prev.isLoading != curr.isLoading,
+      builder: (context, state) => ShimmerLoading.multiline(
+        isLoading: state.isLoading,
+        width: 200,
+        height: 15,
+        lines: 1,
+        child: Text(state.source?.name ?? ''),
       ),
     );
   }

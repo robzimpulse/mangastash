@@ -14,12 +14,27 @@ class SourceServiceFirebase implements SourceService {
     'sources',
   );
 
-  SourceServiceFirebase({required FirebaseApp app}): _app = app;
+  SourceServiceFirebase({required FirebaseApp app}) : _app = app;
 
   @override
   Future<Result<List<MangaSource>>> list() async {
-    final value = await _ref.get();
-    final data = value.docs.map((e) => MangaSource.fromJson(e.data())).toList();
-    return Success(data);
+    final path = await _ref.get();
+    final docs = path.docs;
+    return Success(
+      docs
+          .map((e) => MangaSource.fromJson(e.data()).copyWith.id(e.id))
+          .toList(),
+    );
+  }
+
+  @override
+  Future<Result<MangaSource>> get(String id) async {
+    final path = await _ref.doc(id).get();
+    final data = path.data();
+    if (data == null) {
+      return Error(Exception('data not found'));
+    }
+
+    return Success(MangaSource.fromJson(data).copyWith.id(id));
   }
 }

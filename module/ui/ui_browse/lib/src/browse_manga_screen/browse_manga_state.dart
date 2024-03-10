@@ -11,10 +11,16 @@ class BrowseMangaState extends Equatable with EquatableMixin {
 
   final MangaShelfItemLayout layout;
 
+  final String? sourceId;
+
+  final MangaSource? source;
+
   const BrowseMangaState({
     this.isLoading = false,
     this.error,
     required this.layout,
+    this.sourceId,
+    this.source,
     this.mangas = const [],
   });
 
@@ -25,6 +31,7 @@ class BrowseMangaState extends Equatable with EquatableMixin {
       isLoading,
       layout,
       mangas,
+      source
     ];
   }
 
@@ -33,12 +40,16 @@ class BrowseMangaState extends Equatable with EquatableMixin {
     ValueGetter<Exception>? error,
     List<Manga>? mangas,
     MangaShelfItemLayout? layout,
+    String? sourceId,
+    MangaSource? source,
   }) {
     return BrowseMangaState(
       isLoading: isLoading ?? this.isLoading,
       mangas: mangas ?? this.mangas,
       error: error != null ? error() : this.error,
-      layout: layout ?? this.layout
+      layout: layout ?? this.layout,
+      sourceId: sourceId ?? this.sourceId,
+      source: source ?? this.source,
     );
   }
 }
