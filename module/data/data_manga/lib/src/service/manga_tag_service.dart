@@ -4,6 +4,7 @@ import 'package:entity_manga/entity_manga.dart';
 abstract class MangaTagService {
   Future<void> add(MangaTag value);
   Future<void> update(MangaTag value);
+  Future<bool> exists(String id);
   Future<Result<List<MangaTag>>> list();
   Future<Result<Pagination<MangaTag>>> search({
     String? name,

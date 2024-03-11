@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'manga_tag.g.dart';
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class MangaTag extends Equatable {
   final String? name;
 

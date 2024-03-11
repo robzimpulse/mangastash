@@ -25,5 +25,5 @@ Map<String, dynamic> _$MangaToJson(Manga instance) => <String, dynamic>{
       'author': instance.author,
       'status': instance.status,
       'description': instance.description,
-      'tags': instance.tags,
+      'tags': instance.tags?.map((e) => e.toJson()).toList(),
     };

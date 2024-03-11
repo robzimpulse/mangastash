@@ -4,6 +4,7 @@ import 'package:entity_manga/entity_manga.dart';
 abstract class SourceService {
   Future<void> add(MangaSource value);
   Future<void> update(MangaSource value);
+  Future<bool> exists(String id);
   Future<Result<List<MangaSource>>> list();
   Future<Result<MangaSource>> get(String id);
   Future<Result<Pagination<MangaSource>>> search({

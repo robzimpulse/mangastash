@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'manga_source.g.dart';
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class MangaSource extends Equatable {
   final String? iconUrl;
 

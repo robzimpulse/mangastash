@@ -5,7 +5,7 @@ import 'manga_tag.dart';
 
 part 'manga.g.dart';
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class Manga extends Equatable {
   final String? id;
 
