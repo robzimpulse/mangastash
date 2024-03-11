@@ -2,25 +2,36 @@ import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 
 class AddOrUpdateMangaUseCase {
-  final MangaService _service;
+  final MangaService _mangaService;
+  final MangaTagService _mangaTagService;
 
-  AddOrUpdateMangaUseCase({required MangaService service})
-      : _service = service;
+  AddOrUpdateMangaUseCase({
+    required MangaService mangaService,
+    required MangaTagService mangaTagService,
+  })  : _mangaService = mangaService,
+        _mangaTagService = mangaTagService;
 
   Future<void> execute({required List<Manga> data}) async {
-    await Future.wait(data.map((e) => _process(e)));
-  }
+    for (final manga in data) {
+      for (final tag in manga.tags ?? []) {
+        final id = tag.id;
+        if (id == null) continue;
+        final isExists = await _mangaTagService.exists(id);
+        if (isExists) {
+          await _mangaTagService.update(tag);
+        } else {
+          await _mangaTagService.add(tag);
+        }
+      }
 
-  Future<void> _process(Manga data) async {
-    final id = data.id;
-    if (id == null) return;
-    final isExists = await _service.exists(id);
-
-    if (isExists) {
-      await _service.update(data);
-    } else {
-      await _service.add(data);
+      final id = manga.id;
+      if (id == null) return;
+      final isExists = await _mangaService.exists(id);
+      if (isExists) {
+        await _mangaService.update(manga);
+      } else {
+        await _mangaService.add(manga);
+      }
     }
   }
-
 }

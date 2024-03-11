@@ -23,7 +23,8 @@ class BrowseMangaCubit extends Cubit<BrowseMangaState> {
 
   Future<void> init() async {
     emit(state.copyWith(isLoading: true));
-    await Future.wait([_fetchSource(), _fetchManga()]);
+    await _fetchSource();
+    await _fetchManga();
     emit(state.copyWith(isLoading: false));
   }
 
@@ -46,8 +47,11 @@ class BrowseMangaCubit extends Cubit<BrowseMangaState> {
     final result = await _searchMangaUseCase.execute();
 
     if (result is Success<Pagination<Manga>>) {
-      emit(state.copyWith(mangas: result.data.data));
-      await _addOrUpdateMangaUseCase.execute(data: result.data.data ?? []);
+      final mangas = result.data.data
+          ?.map((e) => e.copyWith(source: state.source))
+          .toList();
+      emit(state.copyWith(mangas: mangas));
+      await _addOrUpdateMangaUseCase.execute(data: mangas ?? []);
     }
 
     if (result is Error<Pagination<Manga>>) {

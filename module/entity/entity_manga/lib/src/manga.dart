@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../entity_manga.dart';
 import 'manga_tag.dart';
 
 part 'manga.g.dart';
@@ -21,6 +22,8 @@ class Manga extends Equatable {
 
   final List<MangaTag>? tags;
 
+  final MangaSource? source;
+
   const Manga({
     this.id,
     this.title,
@@ -29,11 +32,12 @@ class Manga extends Equatable {
     this.status,
     this.description,
     this.tags,
+    this.source,
   });
 
   @override
   List<Object?> get props {
-    return [id, title, coverUrl, author, status, description, tags];
+    return [id, title, coverUrl, author, status, description, tags, source];
   }
 
   factory Manga.fromJson(Map<String, dynamic> json) {
@@ -49,6 +53,7 @@ class Manga extends Equatable {
     String? status,
     String? description,
     List<MangaTag>? tags,
+    MangaSource? source,
   }) {
     return Manga(
       id: id ?? this.id,
@@ -58,6 +63,7 @@ class Manga extends Equatable {
       status: status ?? this.status,
       description: description ?? this.description,
       tags: tags ?? this.tags,
+      source: source ?? this.source,
     );
   }
 }
