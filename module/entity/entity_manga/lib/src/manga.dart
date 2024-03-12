@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../entity_manga.dart';
-import 'manga_tag.dart';
 
 part 'manga.g.dart';
 
