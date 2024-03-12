@@ -3,9 +3,9 @@ import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 
 class SearchMangaSourcesUseCase {
-  final SourceService _service;
+  final MangaSourceServiceFirebase _service;
 
-  SearchMangaSourcesUseCase({required SourceService service})
+  SearchMangaSourcesUseCase({required MangaSourceServiceFirebase service})
       : _service = service;
 
   Future<Result<Pagination<MangaSource>>> execute({

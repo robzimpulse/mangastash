@@ -49,12 +49,6 @@ class DomainMangaRegistrar extends Registrar {
     );
 
     locator.registerFactory(
-      () => AddOrUpdateMangaUseCase(
-        mangaService: locator(),
-        mangaTagService: locator(),
-      ),
-    );
-    locator.registerFactory(
       () => SearchMangaUseCase(
         mangaService: locator(),
         authorService: locator(),

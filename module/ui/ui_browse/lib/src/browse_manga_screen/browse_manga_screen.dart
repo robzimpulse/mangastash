@@ -27,7 +27,6 @@ class BrowseMangaScreen extends StatefulWidget {
         ),
         getMangaSourceUseCase: locator(),
         searchMangaUseCase: locator(),
-        addOrUpdateMangaUseCase: locator(),
       )..init(),
       child: BrowseMangaScreen(
         launchUrlUseCase: locator(),

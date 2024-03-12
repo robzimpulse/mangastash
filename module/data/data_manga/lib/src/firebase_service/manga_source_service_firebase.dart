@@ -4,9 +4,7 @@ import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-import '../../data_manga.dart';
-
-class SourceServiceFirebase implements SourceService {
+class MangaSourceServiceFirebase {
   final FirebaseApp _app;
 
   late final FirebaseFirestore _db = FirebaseFirestore.instanceFor(app: _app);
@@ -15,28 +13,24 @@ class SourceServiceFirebase implements SourceService {
     'sources',
   );
 
-  SourceServiceFirebase({required FirebaseApp app}) : _app = app;
+  MangaSourceServiceFirebase({required FirebaseApp app}) : _app = app;
 
-  @override
   Future<void> add(MangaSource value) async {
     final id = value.id;
     if (id == null) return;
     await _ref.doc(id).set(value.toJson());
   }
 
-  @override
   Future<void> update(MangaSource value) async {
     final id = value.id;
     if (id == null) return;
     await _ref.doc(id).update(value.toJson());
   }
 
-  @override
   Future<bool> exists(String id) async {
     return (await _ref.doc(id).get()).exists;
   }
 
-  @override
   Future<Result<List<MangaSource>>> list() async {
     final path = await _ref.get();
     final docs = path.docs;
@@ -47,7 +41,6 @@ class SourceServiceFirebase implements SourceService {
     );
   }
 
-  @override
   Future<Result<MangaSource>> get(String id) async {
     final path = await _ref.doc(id).get();
     final data = path.data();
@@ -58,7 +51,6 @@ class SourceServiceFirebase implements SourceService {
     return Success(MangaSource.fromJson(data).copyWith(id: id));
   }
 
-  @override
   Future<Result<Pagination<MangaSource>>> search({
     String? name,
     String? url,

@@ -3,9 +3,9 @@ import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 
 class GetListTagsUseCase {
-  final MangaTagService _service;
+  final MangaTagServiceFirebase _service;
 
-  GetListTagsUseCase({required MangaTagService service})
+  GetListTagsUseCase({required MangaTagServiceFirebase service})
       : _service = service;
 
   Future<Result<List<MangaTag>>> execute() async {

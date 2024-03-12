@@ -2,9 +2,9 @@ import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 
 class UpdateMangaSourcesUseCase {
-  final SourceService _service;
+  final MangaSourceServiceFirebase _service;
 
-  UpdateMangaSourcesUseCase({required SourceService service})
+  UpdateMangaSourcesUseCase({required MangaSourceServiceFirebase service})
       : _service = service;
 
   Future<void> execute({required List<MangaSource> data}) async {

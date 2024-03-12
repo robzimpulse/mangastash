@@ -9,16 +9,13 @@ import 'browse_manga_state.dart';
 class BrowseMangaCubit extends Cubit<BrowseMangaState> {
   final GetMangaSourceUseCase _getMangaSourceUseCase;
   final SearchMangaUseCase _searchMangaUseCase;
-  final AddOrUpdateMangaUseCase _addOrUpdateMangaUseCase;
 
   BrowseMangaCubit({
     required BrowseMangaState initialState,
     required GetMangaSourceUseCase getMangaSourceUseCase,
     required SearchMangaUseCase searchMangaUseCase,
-    required AddOrUpdateMangaUseCase addOrUpdateMangaUseCase,
   })  : _getMangaSourceUseCase = getMangaSourceUseCase,
         _searchMangaUseCase = searchMangaUseCase,
-        _addOrUpdateMangaUseCase = addOrUpdateMangaUseCase,
         super(initialState);
 
   Future<void> init() async {
@@ -44,14 +41,13 @@ class BrowseMangaCubit extends Cubit<BrowseMangaState> {
   }
 
   Future<void> _fetchManga() async {
-    final result = await _searchMangaUseCase.execute();
+    final id = state.sourceId;
+    if (id == null || id.isEmpty) return;
+
+    final result = await _searchMangaUseCase.execute(sourceId: id);
 
     if (result is Success<Pagination<Manga>>) {
-      final mangas = result.data.data
-          ?.map((e) => e.copyWith(source: state.source))
-          .toList();
-      emit(state.copyWith(mangas: mangas));
-      await _addOrUpdateMangaUseCase.execute(data: mangas ?? []);
+      emit(state.copyWith(mangas: result.data.data));
     }
 
     if (result is Error<Pagination<Manga>>) {

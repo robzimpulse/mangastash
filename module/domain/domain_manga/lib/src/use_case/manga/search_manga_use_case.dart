@@ -17,6 +17,7 @@ class SearchMangaUseCase {
         _coverArtService = coverArtService;
 
   Future<Result<Pagination<Manga>>> execute({
+    required String sourceId,
     String? title,
     int? limit,
     int? offset,
