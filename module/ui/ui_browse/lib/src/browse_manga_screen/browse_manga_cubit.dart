@@ -8,12 +8,12 @@ import 'browse_manga_state.dart';
 
 class BrowseMangaCubit extends Cubit<BrowseMangaState> {
   final GetMangaSourceUseCase _getMangaSourceUseCase;
-  final SearchMangaUseCase _searchMangaUseCase;
+  final SearchMangaOnMangaDexUseCase _searchMangaUseCase;
 
   BrowseMangaCubit({
     required BrowseMangaState initialState,
     required GetMangaSourceUseCase getMangaSourceUseCase,
-    required SearchMangaUseCase searchMangaUseCase,
+    required SearchMangaOnMangaDexUseCase searchMangaUseCase,
   })  : _getMangaSourceUseCase = getMangaSourceUseCase,
         _searchMangaUseCase = searchMangaUseCase,
         super(initialState);
@@ -44,7 +44,7 @@ class BrowseMangaCubit extends Cubit<BrowseMangaState> {
     final id = state.sourceId;
     if (id == null || id.isEmpty) return;
 
-    final result = await _searchMangaUseCase.execute(sourceId: id);
+    final result = await _searchMangaUseCase.execute();
 
     if (result is Success<Pagination<Manga>>) {
       emit(state.copyWith(mangas: result.data.data));

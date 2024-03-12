@@ -4,8 +4,7 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager_deprecated/tags_manager.dart';
-import 'use_case/manga/add_or_update_manga_use_case.dart';
-import 'use_case/manga/search_manga_use_case.dart';
+import 'use_case/manga/search_manga_on_mangadex_use_case.dart';
 import 'use_case/manga_source/add_manga_source_use_case.dart';
 import 'use_case/manga_source/get_list_manga_sources_use_case.dart';
 import 'use_case/manga_source/get_manga_source_use_case.dart';
@@ -49,7 +48,7 @@ class DomainMangaRegistrar extends Registrar {
     );
 
     locator.registerFactory(
-      () => SearchMangaUseCase(
+      () => SearchMangaOnMangaDexUseCase(
         mangaService: locator(),
         authorService: locator(),
         coverArtService: locator(),

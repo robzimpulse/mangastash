@@ -3,12 +3,12 @@ import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-class SearchMangaUseCase {
+class SearchMangaOnMangaDexUseCase {
   final MangaService _mangaService;
   final AuthorService _authorService;
   final CoverArtService _coverArtService;
 
-  const SearchMangaUseCase({
+  const SearchMangaOnMangaDexUseCase({
     required MangaService mangaService,
     required AuthorService authorService,
     required CoverArtService coverArtService,
@@ -17,7 +17,6 @@ class SearchMangaUseCase {
         _coverArtService = coverArtService;
 
   Future<Result<Pagination<Manga>>> execute({
-    required String sourceId,
     String? title,
     int? limit,
     int? offset,
