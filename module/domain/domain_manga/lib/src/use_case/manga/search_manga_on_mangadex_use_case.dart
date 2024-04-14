@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:collection/collection.dart';
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -17,15 +19,16 @@ class SearchMangaOnMangaDexUseCase {
         _coverArtService = coverArtService;
 
   Future<Result<Pagination<Manga>>> execute({
-    String? title,
-    int? limit,
-    int? offset,
+    required SearchMangaParameter parameter,
   }) async {
     try {
+      log('${parameter.toJson()}', name: '$SearchMangaOnMangaDexUseCase');
+      final offset = int.tryParse(parameter.offset ?? '') ?? 0;
+
       final result = await _mangaService.search(
-        title: title,
-        limit: limit,
-        offset: offset,
+        title: parameter.title,
+        limit: parameter.limit,
+        offset: offset + (parameter.limit ?? 0),
       );
 
       final promises = result.data?.map(_mapManga).toList() ?? [];

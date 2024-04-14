@@ -15,41 +15,60 @@ class BrowseMangaState extends Equatable {
 
   final MangaSource? source;
 
+  final bool hasNextPage;
+
+  final bool isPagingNextPage;
+
+  final SearchMangaParameter parameter;
+
   const BrowseMangaState({
     this.isLoading = false,
+    this.hasNextPage = false,
+    this.isPagingNextPage = false,
     this.error,
     required this.layout,
     this.sourceId,
     this.source,
     this.mangas = const [],
+    this.parameter = const SearchMangaParameter(),
   });
 
   @override
   List<Object?> get props {
     return [
-      error,
       isLoading,
+      hasNextPage,
+      isPagingNextPage,
+      error,
       layout,
+      sourceId,
+      source,
       mangas,
-      source
+      parameter,
     ];
   }
 
   BrowseMangaState copyWith({
     bool? isLoading,
+    bool? hasNextPage,
+    bool? isPagingNextPage,
     ValueGetter<Exception>? error,
-    List<Manga>? mangas,
     MangaShelfItemLayout? layout,
     String? sourceId,
     MangaSource? source,
+    List<Manga>? mangas,
+    SearchMangaParameter? parameter,
   }) {
     return BrowseMangaState(
       isLoading: isLoading ?? this.isLoading,
+      hasNextPage: hasNextPage ?? this.hasNextPage,
+      isPagingNextPage : isPagingNextPage ?? this.isPagingNextPage,
       mangas: mangas ?? this.mangas,
       error: error != null ? error() : this.error,
       layout: layout ?? this.layout,
       sourceId: sourceId ?? this.sourceId,
       source: source ?? this.source,
+      parameter: parameter ?? this.parameter,
     );
   }
 }

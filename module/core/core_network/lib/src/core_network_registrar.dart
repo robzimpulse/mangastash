@@ -13,7 +13,7 @@ import 'use_case/launch_url_use_case.dart';
 class CoreNetworkRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    log('start register', name: 'core_network');
+    log('start register', name: runtimeType.toString());
     locator.registerSingleton(Alice());
 
     locator.registerFactory(() => MangaDexDio(alice: locator()));
@@ -24,6 +24,6 @@ class CoreNetworkRegistrar extends Registrar {
 
     locator.registerSingleton(UrlLauncherManager());
     locator.alias<LaunchUrlUseCase, UrlLauncherManager>();
-    log('finish register', name: 'core_network');
+    log('finish register', name: runtimeType.toString());
   }
 }

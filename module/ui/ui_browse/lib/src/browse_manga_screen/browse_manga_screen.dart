@@ -26,6 +26,7 @@ class BrowseMangaScreen extends StatefulWidget {
           layout: MangaShelfItemLayout.comfortableGrid,
         ),
         getMangaSourceUseCase: locator(),
+        addOrUpdateMangaUseCase: locator(),
         searchMangaUseCase: locator(),
       )..init(),
       child: BrowseMangaScreen(
@@ -213,7 +214,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
           case MangaShelfItemLayout.comfortableGrid:
             return MangaShelfWidget.comfortableGrid(
               controller: _scrollController,
-              hasNextPage: false,
+              hasNextPage: state.hasNextPage,
               loadingIndicator: indicator,
               crossAxisCount: _crossAxisCount(context),
               childAspectRatio: (100 / 140),
@@ -224,7 +225,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
           case MangaShelfItemLayout.compactGrid:
             return MangaShelfWidget.compactGrid(
               controller: _scrollController,
-              hasNextPage: false,
+              hasNextPage: state.hasNextPage,
               loadingIndicator: indicator,
               crossAxisCount: _crossAxisCount(context),
               childAspectRatio: (100 / 140),
@@ -236,7 +237,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             return MangaShelfWidget.list(
               padding: const EdgeInsets.symmetric(vertical: 8),
               controller: _scrollController,
-              hasNextPage: false,
+              hasNextPage: state.hasNextPage,
               loadingIndicator: indicator,
               separator: const Divider(height: 1, thickness: 1),
               children: children.toList(),

@@ -13,3 +13,7 @@ extension AsSubtypeExtension<X> on X {
 extension AsNotNullExtension<X> on X? {
   X asNotNull() => this as X;
 }
+
+extension DistinctList<X> on List<X> {
+  List<X> distinct() => <X>{...this}.toList();
+}
