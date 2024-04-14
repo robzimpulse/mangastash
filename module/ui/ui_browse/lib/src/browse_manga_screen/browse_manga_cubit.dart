@@ -45,8 +45,8 @@ class BrowseMangaCubit extends Cubit<BrowseMangaState> {
   }
 
   Future<void> _fetchManga() async {
-    final id = state.sourceId;
-    if (id == null || id.isEmpty) return;
+
+    // TODO: limit search manga use case based on source manga
 
     final result = await _searchMangaUseCase.execute(
       parameter: state.parameter,
@@ -70,8 +70,13 @@ class BrowseMangaCubit extends Cubit<BrowseMangaState> {
             offset: offset,
             limit: limit,
           ),
+          error: () => null,
         ),
       );
+    }
+
+    if (result is Error<Pagination<Manga>> && state.mangas.isEmpty) {
+      emit(state.copyWith(error: () => result.error));
     }
   }
 

@@ -52,7 +52,7 @@ class BrowseMangaState extends Equatable {
     bool? isLoading,
     bool? hasNextPage,
     bool? isPagingNextPage,
-    ValueGetter<Exception>? error,
+    ValueGetter<Exception?>? error,
     MangaShelfItemLayout? layout,
     String? sourceId,
     MangaSource? source,
