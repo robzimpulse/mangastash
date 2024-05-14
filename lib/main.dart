@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
@@ -5,6 +7,7 @@ import 'package:core_storage/core_storage.dart';
 import 'package:data_manga/data_manga.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
@@ -75,6 +78,26 @@ class _MangaStashAppState extends State<MangaStashApp> {
     await widget.locator.registerRegistrar(CoreEnvironmentRegistrar());
     await widget.locator.registerRegistrar(DataMangaRegistrar());
     await widget.locator.registerRegistrar(DomainMangaRegistrar());
+
+    FlutterError.onError = (details) {
+      // TODO: register error handler logger
+      if (!kDebugMode) return;
+      print(details);
+    };
+
+    PlatformDispatcher.instance.onError = (error, stack) {
+      // TODO: register error handler logger
+      print(error);
+      print(stack);
+      return true;
+    };
+
+    Isolate.current.addErrorListener(
+      // TODO: register error handler logger
+      RawReceivePort((pair) {
+        print(pair);
+      }).sendPort,
+    );
   }
 
   GoRouter _route({
