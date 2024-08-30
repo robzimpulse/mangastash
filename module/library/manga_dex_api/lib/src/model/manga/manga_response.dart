@@ -13,14 +13,17 @@ part 'manga_response.g.dart';
 @JsonSerializable()
 class MangaResponse extends Response {
   final MangaData? data;
+
   MangaResponse(
     super.result,
     super.response,
     this.data,
   );
+
   factory MangaResponse.fromJson(Map<String, dynamic> json) {
     return _$MangaResponseFromJson(json);
   }
+
   @override
   Map<String, dynamic> toJson() => _$MangaResponseToJson(this);
 }
@@ -29,10 +32,13 @@ class MangaResponse extends Response {
 class MangaData extends Identifier {
   final MangaDataAttributes? attributes;
   final List<Relationship>? relationships;
+
   MangaData(super.id, super.type, this.attributes, this.relationships);
+
   factory MangaData.fromJson(Map<String, dynamic> json) {
     return _$MangaDataFromJson(json);
   }
+
   @override
   Map<String, dynamic> toJson() => _$MangaDataToJson(this);
 }
@@ -57,6 +63,7 @@ class MangaDataAttributes extends Attribute {
   /// cast to [String?] since server return list of string with null element
   final List<String?>? availableTranslatedLanguages;
   final List<TagData>? tags;
+
   MangaDataAttributes(
     this.title,
     this.description,
@@ -78,9 +85,11 @@ class MangaDataAttributes extends Attribute {
     this.tags,
     this.altTitle,
   );
+
   factory MangaDataAttributes.fromJson(Map<String, dynamic> json) {
     return _$MangaDataAttributesFromJson(json);
   }
+
   @override
   Map<String, dynamic> toJson() => _$MangaDataAttributesToJson(this);
 }

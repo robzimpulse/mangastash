@@ -12,6 +12,7 @@ class SearchMangaResponse extends Response {
   final int? limit;
   final int? offset;
   final int? total;
+
   SearchMangaResponse(
     super.result,
     super.response,
@@ -20,9 +21,11 @@ class SearchMangaResponse extends Response {
     this.offset,
     this.total,
   );
+
   factory SearchMangaResponse.fromJson(Map<String, dynamic> json) {
     return _$SearchMangaResponseFromJson(json);
   }
+
   @override
   Map<String, dynamic> toJson() => _$SearchMangaResponseToJson(this);
 }

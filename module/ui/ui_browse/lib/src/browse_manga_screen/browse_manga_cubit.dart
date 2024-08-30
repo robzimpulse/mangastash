@@ -45,7 +45,6 @@ class BrowseMangaCubit extends Cubit<BrowseMangaState> {
   }
 
   Future<void> _fetchManga() async {
-
     // TODO: limit search manga use case based on source manga
 
     final result = await _searchMangaUseCase.execute(

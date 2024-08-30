@@ -13,6 +13,7 @@ class TagResponse extends Response {
   final int? limit;
   final int? offset;
   final int? total;
+
   TagResponse(
     super.result,
     super.response,
@@ -21,9 +22,11 @@ class TagResponse extends Response {
     this.offset,
     this.total,
   );
+
   factory TagResponse.fromJson(Map<String, dynamic> json) {
     return _$TagResponseFromJson(json);
   }
+
   @override
   Map<String, dynamic> toJson() => _$TagResponseToJson(this);
 }
@@ -31,10 +34,13 @@ class TagResponse extends Response {
 @JsonSerializable()
 class TagData extends Identifier {
   final TagDataAttributes? attributes;
+
   TagData(super.id, super.type, this.attributes);
+
   factory TagData.fromJson(Map<String, dynamic> json) {
     return _$TagDataFromJson(json);
   }
+
   @override
   Map<String, dynamic> toJson() => _$TagDataToJson(this);
 }
@@ -43,6 +49,7 @@ class TagData extends Identifier {
 class TagDataAttributes extends Attribute {
   final Title? name;
   final String? group;
+
   TagDataAttributes(
     this.name,
     this.group,
@@ -50,9 +57,11 @@ class TagDataAttributes extends Attribute {
     super.updatedAt,
     super.version,
   );
+
   factory TagDataAttributes.fromJson(Map<String, dynamic> json) {
     return _$TagDataAttributesFromJson(json);
   }
+
   @override
   Map<String, dynamic> toJson() => _$TagDataAttributesToJson(this);
 }

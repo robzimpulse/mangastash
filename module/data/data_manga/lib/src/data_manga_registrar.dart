@@ -17,5 +17,4 @@ class DataMangaRegistrar extends Registrar {
 
     log('finish register', name: runtimeType.toString());
   }
-
 }

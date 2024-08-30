@@ -58,7 +58,8 @@ class MangaDeprecated extends Equatable {
     );
   }
 
-  factory MangaDeprecated.from(MangaData data, {String? coverUrl, List<String>? author}) {
+  factory MangaDeprecated.from(MangaData data,
+      {String? coverUrl, List<String>? author}) {
     return MangaDeprecated(
       id: data.id,
       coverUrl: coverUrl,
@@ -66,7 +67,9 @@ class MangaDeprecated extends Equatable {
       status: data.attributes?.status,
       description: data.attributes?.description?.en,
       author: author?.join(' | '),
-      tags: data.attributes?.tags?.map((e) => MangaTagDeprecated.from(e)).toList(),
+      tags: data.attributes?.tags
+          ?.map((e) => MangaTagDeprecated.from(e))
+          .toList(),
     );
   }
 }

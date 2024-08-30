@@ -11,14 +11,17 @@ part 'chapter_response.g.dart';
 @JsonSerializable()
 class ChapterResponse extends Response {
   final ChapterData? data;
+
   ChapterResponse(
     super.result,
     super.response,
     this.data,
   );
+
   factory ChapterResponse.fromJson(Map<String, dynamic> json) {
     return _$ChapterResponseFromJson(json);
   }
+
   @override
   Map<String, dynamic> toJson() => _$ChapterResponseToJson(this);
 }
@@ -27,10 +30,13 @@ class ChapterResponse extends Response {
 class ChapterData extends Identifier {
   ChapterDataAttributes? attributes;
   List<Relationship>? relationships;
+
   ChapterData(super.id, super.type, this.attributes, this.relationships);
+
   factory ChapterData.fromJson(Map<String, dynamic> json) {
     return _$ChapterDataFromJson(json);
   }
+
   @override
   Map<String, dynamic> toJson() => _$ChapterDataToJson(this);
 }
@@ -44,6 +50,7 @@ class ChapterDataAttributes extends Attribute {
   final String? externalUrl;
   final String? publishAt;
   final String? readableAt;
+
   ChapterDataAttributes(
     this.volume,
     this.chapter,
@@ -56,9 +63,11 @@ class ChapterDataAttributes extends Attribute {
     super.updatedAt,
     super.version,
   );
+
   factory ChapterDataAttributes.fromJson(Map<String, dynamic> json) {
     return _$ChapterDataAttributesFromJson(json);
   }
+
   @override
   Map<String, dynamic> toJson() => _$ChapterDataAttributesToJson(this);
 }

@@ -10,14 +10,17 @@ part 'author_response.g.dart';
 @JsonSerializable()
 class AuthorResponse extends Response {
   final AuthorData? data;
+
   AuthorResponse(
     super.result,
     super.response,
     this.data,
   );
+
   factory AuthorResponse.fromJson(Map<String, dynamic> json) {
     return _$AuthorResponseFromJson(json);
   }
+
   @override
   Map<String, dynamic> toJson() => _$AuthorResponseToJson(this);
 }
@@ -26,10 +29,13 @@ class AuthorResponse extends Response {
 class AuthorData extends Identifier {
   final AuthorDataAttributes? attributes;
   final List<Relationship>? relationships;
+
   AuthorData(super.id, super.type, this.attributes, this.relationships);
+
   factory AuthorData.fromJson(Map<String, dynamic> json) {
     return _$AuthorDataFromJson(json);
   }
+
   @override
   Map<String, dynamic> toJson() => _$AuthorDataToJson(this);
 }
@@ -72,9 +78,11 @@ class AuthorDataAttributes extends Attribute {
     this.naver,
     this.website,
   );
+
   factory AuthorDataAttributes.fromJson(Map<String, dynamic> json) {
     return _$AuthorDataAttributesFromJson(json);
   }
+
   @override
   Map<String, dynamic> toJson() => _$AuthorDataAttributesToJson(this);
 }

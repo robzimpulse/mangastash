@@ -12,6 +12,7 @@ class SearchChapterResponse extends Response {
   final int? limit;
   final int? offset;
   final int? total;
+
   SearchChapterResponse(
     super.result,
     super.response,
@@ -20,9 +21,11 @@ class SearchChapterResponse extends Response {
     this.offset,
     this.total,
   );
+
   factory SearchChapterResponse.fromJson(Map<String, dynamic> json) {
     return _$SearchChapterResponseFromJson(json);
   }
+
   @override
   Map<String, dynamic> toJson() => _$SearchChapterResponseToJson(this);
 }

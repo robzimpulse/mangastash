@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 
 class Pagination<T> extends Equatable {
-
   final List<T>? data;
   final int? limit;
   final String? offset;
@@ -11,5 +10,4 @@ class Pagination<T> extends Equatable {
 
   @override
   List<Object?> get props => [limit, offset, total, data];
-
 }

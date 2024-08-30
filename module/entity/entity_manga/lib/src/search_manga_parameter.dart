@@ -27,6 +27,7 @@ class SearchMangaParameter extends Equatable {
   factory SearchMangaParameter.fromJson(Map<String, dynamic> json) {
     return _$SearchMangaParameterFromJson(json);
   }
+
   Map<String, dynamic> toJson() => _$SearchMangaParameterToJson(this);
 
   SearchMangaParameter copyWith({

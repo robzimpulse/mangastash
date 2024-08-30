@@ -17,6 +17,7 @@ class CoverArtResponse extends Response {
   factory CoverArtResponse.fromJson(Map<String, dynamic> json) {
     return _$CoverArtResponseFromJson(json);
   }
+
   @override
   Map<String, dynamic> toJson() => _$CoverArtResponseToJson(this);
 }
@@ -25,10 +26,13 @@ class CoverArtResponse extends Response {
 class CoverArtData extends Identifier {
   final CoverArtDataAttributes? attributes;
   final List<Relationship>? relationships;
+
   CoverArtData(super.id, super.type, this.attributes, this.relationships);
+
   factory CoverArtData.fromJson(Map<String, dynamic> json) {
     return _$CoverArtDataFromJson(json);
   }
+
   @override
   Map<String, dynamic> toJson() => _$CoverArtDataToJson(this);
 }
@@ -39,6 +43,7 @@ class CoverArtDataAttributes extends Attribute {
   final String? volume;
   final String? fileName;
   final String? locale;
+
   CoverArtDataAttributes(
     this.description,
     this.volume,
@@ -48,9 +53,11 @@ class CoverArtDataAttributes extends Attribute {
     super.updatedAt,
     super.version,
   );
+
   factory CoverArtDataAttributes.fromJson(Map<String, dynamic> json) {
     return _$CoverArtDataAttributesFromJson(json);
   }
+
   @override
   Map<String, dynamic> toJson() => _$CoverArtDataAttributesToJson(this);
 }

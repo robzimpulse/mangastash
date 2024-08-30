@@ -9,7 +9,8 @@ class PaginationMangaDeprecated extends Equatable {
 
   final List<MangaDeprecated>? mangas;
 
-  const PaginationMangaDeprecated({this.offset, this.limit, this.total, this.mangas});
+  const PaginationMangaDeprecated(
+      {this.offset, this.limit, this.total, this.mangas});
 
   @override
   List<Object?> get props => [mangas, offset, limit, total];

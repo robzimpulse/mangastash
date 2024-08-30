@@ -62,7 +62,7 @@ class BrowseMangaState extends Equatable {
     return BrowseMangaState(
       isLoading: isLoading ?? this.isLoading,
       hasNextPage: hasNextPage ?? this.hasNextPage,
-      isPagingNextPage : isPagingNextPage ?? this.isPagingNextPage,
+      isPagingNextPage: isPagingNextPage ?? this.isPagingNextPage,
       mangas: mangas ?? this.mangas,
       error: error != null ? error() : this.error,
       layout: layout ?? this.layout,

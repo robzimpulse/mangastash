@@ -20,6 +20,7 @@ class MangaTag extends Equatable {
   factory MangaTag.fromJson(Map<String, dynamic> json) {
     return _$MangaTagFromJson(json);
   }
+
   Map<String, dynamic> toJson() => _$MangaTagToJson(this);
 
   MangaTag copyWith({String? name, String? id}) {

@@ -20,7 +20,8 @@ class TagsManagerDeprecated implements ListenListTagUseCaseDeprecated {
   }
 
   @override
-  ValueStream<List<MangaTagDeprecated>> get listTagsStream => _listTagsSubject.stream;
+  ValueStream<List<MangaTagDeprecated>> get listTagsStream =>
+      _listTagsSubject.stream;
 
   void _update(Timer t) async {
     final result = await _listTagUseCase.execute();

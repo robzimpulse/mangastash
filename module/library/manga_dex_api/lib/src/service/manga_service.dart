@@ -26,9 +26,9 @@ abstract class MangaService {
     @Query('status[]') List<String>? status,
     @Query('originalLanguage[]') List<String>? originalLanguage,
     @Query('excludedOriginalLanguages[]')
-        List<String>? excludedOriginalLanguages,
+    List<String>? excludedOriginalLanguages,
     @Query('availableTranslatedLanguage[]')
-        List<String>? availableTranslatedLanguage,
+    List<String>? availableTranslatedLanguage,
     @Query('publicationDemographic[]') List<String>? publicationDemographic,
     @Query('ids[]') List<String>? ids,
     @Query('contentRating[]') List<String>? contentRating,

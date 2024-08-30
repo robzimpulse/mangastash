@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 extension WidgetExtension on Widget {
-  PreferredSize preferredSize({required BuildContext context, required Size size}) {
+  PreferredSize preferredSize({
+    required BuildContext context,
+    required Size size,
+  }) {
     return PreferredSize(
       preferredSize: size,
       child: Container(
