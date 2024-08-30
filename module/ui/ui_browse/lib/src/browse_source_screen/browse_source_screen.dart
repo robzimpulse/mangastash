@@ -40,14 +40,13 @@ class BrowseSourceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      onWillPop: () => Future.value(true),
       appBar: AppBar(
         title: const Text('Browse Sources'),
         actions: [
           IconButton(
             icon: const Icon(Icons.screen_search_desktop_outlined),
             onPressed: () => onTapSearchManga.call(context),
-          )
+          ),
         ],
       ),
       body: BlocBuilder<BrowseSourceCubit, BrowseSourceState>(

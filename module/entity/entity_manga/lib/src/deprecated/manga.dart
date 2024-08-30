@@ -58,8 +58,11 @@ class MangaDeprecated extends Equatable {
     );
   }
 
-  factory MangaDeprecated.from(MangaData data,
-      {String? coverUrl, List<String>? author}) {
+  factory MangaDeprecated.from(
+    MangaData data, {
+    String? coverUrl,
+    List<String>? author,
+  }) {
     return MangaDeprecated(
       id: data.id,
       coverUrl: coverUrl,

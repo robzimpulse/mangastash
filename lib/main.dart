@@ -81,21 +81,26 @@ class _MangaStashAppState extends State<MangaStashApp> {
 
     FlutterError.onError = (details) {
       // TODO: register error handler logger
-      if (!kDebugMode) return;
-      print(details);
+      if (kDebugMode) {
+        print(details);
+      }
     };
 
     PlatformDispatcher.instance.onError = (error, stack) {
       // TODO: register error handler logger
-      print(error);
-      print(stack);
+      if (kDebugMode) {
+        print(error);
+        print(stack);
+      }
       return true;
     };
 
     Isolate.current.addErrorListener(
       // TODO: register error handler logger
       RawReceivePort((pair) {
-        print(pair);
+        if (kDebugMode) {
+          print(pair);
+        }
       }).sendPort,
     );
   }

@@ -7,7 +7,9 @@ class ScaffoldScreen extends StatelessWidget {
 
   final Widget? bottomNavigationBar;
 
-  final WillPopCallback? onWillPop;
+  final bool canPop;
+
+  final PopInvokedCallback? onPopInvoked;
 
   final PreferredSizeWidget? appBar;
 
@@ -17,7 +19,8 @@ class ScaffoldScreen extends StatelessWidget {
 
   const ScaffoldScreen({
     super.key,
-    this.onWillPop,
+    this.canPop = true,
+    this.onPopInvoked,
     this.appBar,
     this.bottomNavigationBar,
     this.backgroundColor,
@@ -27,8 +30,9 @@ class ScaffoldScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: onWillPop,
+    return PopScope(
+      canPop: canPop,
+      onPopInvoked: onPopInvoked,
       child: ShimmerAreaWidget(
         child: Scaffold(
           backgroundColor: backgroundColor,

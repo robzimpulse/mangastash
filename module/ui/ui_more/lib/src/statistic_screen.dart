@@ -15,12 +15,11 @@ class StatisticScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      onWillPop: () => Future.value(true),
       appBar: AppBar(
         title: const Text('Statistic'),
       ),
       body: ListView(
-        children: [],
+        children: const [],
       ),
     );
   }

@@ -42,7 +42,6 @@ class _SettingScreenState extends State<SettingScreen> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      onWillPop: () => Future.value(true),
       appBar: AppBar(
         title: const Text('Setting'),
       ),

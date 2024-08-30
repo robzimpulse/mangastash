@@ -51,7 +51,7 @@ class ConfirmationBottomSheet extends StatelessWidget {
                 ),
             ].intersperse(const SizedBox(width: 16)).toList(),
           ),
-        )
+        ),
       ].intersperse(const Divider(height: 1, thickness: 1)).toList(),
     );
   }

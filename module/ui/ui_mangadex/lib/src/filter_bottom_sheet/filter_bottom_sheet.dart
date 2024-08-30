@@ -130,7 +130,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   children: [_content(context)],
                 ),
               ),
-            )
+            ),
           ],
         );
       },

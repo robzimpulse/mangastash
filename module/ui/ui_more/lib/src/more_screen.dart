@@ -36,7 +36,6 @@ class MoreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      onWillPop: () => Future.value(true),
       body: Column(
         children: [
           const SafeArea(

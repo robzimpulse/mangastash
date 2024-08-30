@@ -101,7 +101,7 @@ class BrowseMangaDexCubit extends Cubit<BrowseMangaDexState> {
       state.copyWith(
         parameter: state.parameter.copyWith(
           orders: {
-            SearchOrders.latestUploadedChapter: OrderDirections.descending
+            SearchOrders.latestUploadedChapter: OrderDirections.descending,
           },
           includedTags: [],
           excludedTags: [],

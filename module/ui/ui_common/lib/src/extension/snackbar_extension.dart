@@ -9,13 +9,13 @@ extension SnackbarExtension on BuildContext {
             Expanded(
               child: Text(
                 message,
-                style: Theme.of(this).textTheme.bodyText1,
+                style: Theme.of(this).textTheme.bodyLarge,
               ),
             ),
             ...?actions,
           ],
         ),
-        backgroundColor: Theme.of(this).backgroundColor,
+        backgroundColor: Theme.of(this).colorScheme.background,
       ),
     );
   }

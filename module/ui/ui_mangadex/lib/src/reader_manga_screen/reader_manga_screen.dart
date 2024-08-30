@@ -90,7 +90,6 @@ class _ReaderMangaScreenState extends State<ReaderMangaScreen> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      onWillPop: () => Future.value(true),
       bottomSafeArea: false,
       body: _content(),
     );

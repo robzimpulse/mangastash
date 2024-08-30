@@ -1,7 +1,6 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:ios_willpop_transition_theme/ios_willpop_transition_theme.dart';
-import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
 class AppsScreen extends StatelessWidget {

@@ -1,3 +1,4 @@
+import 'package:core_route/core_route.dart';
 import 'package:ui_common/ui_common.dart';
 
 class MainScreen extends StatelessWidget {
@@ -22,7 +23,8 @@ class MainScreen extends StatelessWidget {
     'More': Icons.more_horiz,
   };
 
-  Future<bool> _onWillPop(BuildContext context) async {
+  void _onPopInvoked(BuildContext context, bool didPop) async {
+    if (didPop) return;
     final result = await context.showBottomSheet<bool>(
       builder: (context) => const ConfirmationBottomSheet(
         content: 'Are you sure want to quit?',
@@ -30,13 +32,15 @@ class MainScreen extends StatelessWidget {
         negativeButtonText: 'No',
       ),
     );
-    return result ?? false;
+
+    if (context.mounted && result == true) context.pop();
   }
 
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      onWillPop: () => _onWillPop(context),
+      canPop: false,
+      onPopInvoked: (didPop) => _onPopInvoked(context, didPop),
       bottomNavigationBar: _bottomNavigationBar(context: context),
       body: _sideNavigationBar(context: context),
     );

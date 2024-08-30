@@ -15,12 +15,11 @@ class DownloadQueueScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      onWillPop: () => Future.value(true),
       appBar: AppBar(
         title: const Text('Download Queue'),
       ),
       body: ListView(
-        children: [],
+        children: const [],
       ),
     );
   }

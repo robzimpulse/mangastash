@@ -5,7 +5,6 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import '../detail_manga_screen/detail_manga_screen.dart';
 import '../filter_bottom_sheet/filter_bottom_sheet.dart';
 import 'browse_manga_dex_cubit.dart';
 import 'browse_manga_dex_state.dart';
@@ -88,7 +87,6 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      onWillPop: () => Future.value(true),
       appBar: AppBar(
         title: _title(),
         elevation: 0,
@@ -124,7 +122,7 @@ class _BrowseMangaDexScreenState extends State<BrowseMangaDexScreen> {
           icons: const [
             Icon(Icons.favorite),
             Icon(Icons.update),
-            Icon(Icons.filter_list)
+            Icon(Icons.filter_list),
           ],
           labels: const ['Favorite', 'Latest', 'Filter'],
           isSelected: [

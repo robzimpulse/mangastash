@@ -140,7 +140,6 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      onWillPop: () => Future.value(true),
       appBar: AppBar(
         title: _title(context),
         actions: [

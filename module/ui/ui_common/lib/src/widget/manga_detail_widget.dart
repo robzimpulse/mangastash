@@ -155,7 +155,7 @@ class MangaDetailWidget extends StatelessWidget {
                     child: Column(
                       children: [
                         Text(text, maxLines: 3),
-                        const Icon(Icons.keyboard_arrow_down)
+                        const Icon(Icons.keyboard_arrow_down),
                       ],
                     ),
                   ),
@@ -197,7 +197,7 @@ class MangaDetailWidget extends StatelessWidget {
           separatorBuilder: (context, index) => const SizedBox(width: 8),
           itemCount: 20,
         ),
-      )),
+      ),),
     );
   }
 

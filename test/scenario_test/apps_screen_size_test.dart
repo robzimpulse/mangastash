@@ -26,13 +26,10 @@ void main() {
   });
 
   void setScreenSize(WidgetTester tester, int width, int height) {
-    tester.binding.window.devicePixelRatioTestValue = (2.625);
-    tester.binding.window.platformDispatcher.textScaleFactorTestValue = (1.1);
-    final dpi = tester.binding.window.devicePixelRatio;
-    tester.binding.window.physicalSizeTestValue = Size(
-      width * dpi,
-      height * dpi,
-    );
+    const dpi = 2.625;
+    tester.view.devicePixelRatio = dpi;
+    tester.view.physicalSize = Size(width * dpi, height * dpi);
+    tester.platformDispatcher.textScaleFactorTestValue = 1.1;
   }
 
   group('test screen size', () {

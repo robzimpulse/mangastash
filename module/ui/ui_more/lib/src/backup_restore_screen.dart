@@ -15,12 +15,11 @@ class BackupRestoreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      onWillPop: () => Future.value(true),
       appBar: AppBar(
         title: const Text('Backup and Restore'),
       ),
       body: ListView(
-        children: [],
+        children: const [],
       ),
     );
   }

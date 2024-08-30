@@ -74,7 +74,6 @@ class _DetailMangaScreenState extends State<DetailMangaScreen> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      onWillPop: () => Future.value(true),
       appBar: AppBar(
         title: _title(),
         elevation: 0,
