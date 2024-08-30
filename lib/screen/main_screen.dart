@@ -1,4 +1,5 @@
-import 'package:core_route/core_route.dart';
+import 'dart:io';
+
 import 'package:ui_common/ui_common.dart';
 
 class MainScreen extends StatelessWidget {
@@ -33,7 +34,7 @@ class MainScreen extends StatelessWidget {
       ),
     );
 
-    if (context.mounted && result == true) context.pop();
+    if (context.mounted && result == true) exit(0);
   }
 
   @override
