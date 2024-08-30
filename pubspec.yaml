@@ -20,7 +20,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.18.2 <3.0.0'
+  sdk: ">=2.19.6 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -36,7 +36,7 @@ dependencies:
   responsive_framework: ^1.0.0
   ios_willpop_transition_theme: ^0.0.6
   alice_lightweight: 3.3.0
-  flex_color_scheme: ^6.1.2
+  flex_color_scheme: ^7.3.1
   rxdart: ^0.27.7
   firebase_core: ^2.24.2
 
