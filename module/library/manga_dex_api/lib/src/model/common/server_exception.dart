@@ -21,7 +21,7 @@ class ServerException {
 @JsonSerializable()
 class Error {
   final String? id;
-  final int? status;
+  final num? status;
   final String? title;
   final String? detail;
 

@@ -42,7 +42,7 @@ class GetAllChapterUseCase {
         final promises = result.data?.map(_mapChapter) ?? [];
         final data = await Future.wait(promises);
 
-        total = result.total ?? 0;
+        total = (result.total ?? 0).toInt();
         chapters.addAll(data);
       } while (chapters.length < total);
 

@@ -13,9 +13,9 @@ SearchMangaResponse _$SearchMangaResponseFromJson(Map<String, dynamic> json) =>
       (json['data'] as List<dynamic>?)
           ?.map((e) => MangaData.fromJson(e as Map<String, dynamic>))
           .toList(),
-      json['limit'] as int?,
-      json['offset'] as int?,
-      json['total'] as int?,
+      json['limit'] as num?,
+      json['offset'] as num?,
+      json['total'] as num?,
     );
 
 Map<String, dynamic> _$SearchMangaResponseToJson(

@@ -9,9 +9,9 @@ part 'search_manga_response.g.dart';
 @JsonSerializable()
 class SearchMangaResponse extends Response {
   final List<MangaData>? data;
-  final int? limit;
-  final int? offset;
-  final int? total;
+  final num? limit;
+  final num? offset;
+  final num? total;
 
   SearchMangaResponse(
     super.result,

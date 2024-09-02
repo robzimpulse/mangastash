@@ -6,7 +6,7 @@ part 'search_manga_parameter.g.dart';
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class SearchMangaParameter extends Equatable {
   final String? title;
-  final int? limit;
+  final num? limit;
   final String? offset;
 
   const SearchMangaParameter({
@@ -32,7 +32,7 @@ class SearchMangaParameter extends Equatable {
 
   SearchMangaParameter copyWith({
     String? title,
-    int? limit,
+    num? limit,
     String? offset,
   }) {
     return SearchMangaParameter(

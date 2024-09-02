@@ -11,8 +11,10 @@ ide:
 scripts:
   get:
     description: Get dependencies for all packages.
-    run: |
-      melos exec -- "flutter pub get"
+    run: melos exec -- "flutter pub get"
   generate:
-      run: melos exec --depends-on=build_runner -- "flutter pub run build_runner build --delete-conflicting-outputs;"
-      description: Generate files for all packages.
+    description: Generate files for all packages.
+    run: melos exec --depends-on=build_runner -- "flutter pub run build_runner build --delete-conflicting-outputs;"
+  upgrade:
+    description: Upgrade dependencies for all packages.
+    run: melos exec -- "flutter pub upgrade"

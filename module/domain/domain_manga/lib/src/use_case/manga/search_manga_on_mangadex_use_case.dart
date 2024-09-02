@@ -27,8 +27,8 @@ class SearchMangaOnMangaDexUseCase {
 
       final result = await _mangaService.search(
         title: parameter.title,
-        limit: parameter.limit,
-        offset: offset + (parameter.limit ?? 0),
+        limit: parameter.limit?.toInt(),
+        offset: (offset + (parameter.limit ?? 0)).toInt(),
       );
 
       final promises = result.data?.map(_mapManga).toList() ?? [];
@@ -38,8 +38,8 @@ class SearchMangaOnMangaDexUseCase {
         Pagination<Manga>(
           data: mangas,
           offset: (result.offset ?? 0).toString(),
-          limit: result.limit ?? 0,
-          total: result.total ?? 0,
+          limit: result.limit?.toInt() ?? 0,
+          total: result.total?.toInt() ?? 0,
         ),
       );
     } on Exception catch (e) {

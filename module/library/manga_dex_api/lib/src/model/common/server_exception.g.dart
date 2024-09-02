@@ -22,7 +22,7 @@ Map<String, dynamic> _$ServerExceptionToJson(ServerException instance) =>
 
 Error _$ErrorFromJson(Map<String, dynamic> json) => Error(
       json['id'] as String?,
-      json['status'] as int?,
+      json['status'] as num?,
       json['title'] as String?,
       json['detail'] as String?,
     );

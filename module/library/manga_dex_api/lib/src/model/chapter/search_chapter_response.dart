@@ -9,9 +9,9 @@ part 'search_chapter_response.g.dart';
 @JsonSerializable()
 class SearchChapterResponse extends Response {
   final List<ChapterData>? data;
-  final int? limit;
-  final int? offset;
-  final int? total;
+  final num? limit;
+  final num? offset;
+  final num? total;
 
   SearchChapterResponse(
     super.result,

@@ -51,9 +51,9 @@ class SearchMangaUseCaseDeprecated {
 
       return Success(
         PaginationMangaDeprecated(
-          offset: result.offset ?? 0,
-          limit: result.limit ?? 0,
-          total: result.total ?? 0,
+          offset: result.offset?.toInt() ?? 0,
+          limit: result.limit?.toInt() ?? 0,
+          total: result.total?.toInt() ?? 0,
           mangas: mangas,
         ),
       );

@@ -1,5 +1,6 @@
 library manga_dex_api;
 
+export 'src/dio/mangadex_dio.dart';
 export 'src/enums/content_rating.dart';
 export 'src/enums/future_updates.dart';
 export 'src/enums/includes.dart';

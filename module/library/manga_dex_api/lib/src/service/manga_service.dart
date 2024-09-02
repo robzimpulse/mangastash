@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/http.dart';
 
+import '../dio/mangadex_dio.dart';
 import '../model/manga/manga_response.dart';
 import '../model/manga/search_manga_response.dart';
 import '../model/tag/tag_response.dart';
@@ -9,7 +10,7 @@ part 'manga_service.g.dart';
 
 @RestApi()
 abstract class MangaService {
-  factory MangaService(Dio dio, {String baseUrl}) = _MangaService;
+  factory MangaService(MangaDexDio dio, {String baseUrl}) = _MangaService;
 
   @GET('/manga')
   Future<SearchMangaResponse> search({

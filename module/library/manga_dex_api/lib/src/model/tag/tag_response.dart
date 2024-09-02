@@ -10,9 +10,9 @@ part 'tag_response.g.dart';
 @JsonSerializable()
 class TagResponse extends Response {
   final List<TagData>? data;
-  final int? limit;
-  final int? offset;
-  final int? total;
+  final num? limit;
+  final num? offset;
+  final num? total;
 
   TagResponse(
     super.result,
