@@ -67,7 +67,7 @@ class _SettingScreenState extends State<SettingScreen> {
               );
             },
           ),
-          StreamBuilder<Locale>(
+          StreamBuilder<Locale?>(
             stream: widget.listenLocaleUseCase.localeDataStream,
             builder: (context, snapshot) => ListTile(
               title: const Text('Language'),
@@ -79,7 +79,7 @@ class _SettingScreenState extends State<SettingScreen> {
               onTap: _showLanguagePicker,
             ),
           ),
-          StreamBuilder<Locale>(
+          StreamBuilder<Locale?>(
             stream: widget.listenLocaleUseCase.localeDataStream,
             builder: (context, snapshot) => ListTile(
               title: const Text('Country'),

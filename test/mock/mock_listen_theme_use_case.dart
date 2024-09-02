@@ -7,7 +7,6 @@ class MockListenThemeUseCase implements ListenThemeUseCase {
   final data = BehaviorSubject<ThemeData>.seeded(ThemeData.light());
 
   @override
-  // TODO: implement themeDataStream
   ValueStream<ThemeData> get themeDataStream => data.stream;
 
 }

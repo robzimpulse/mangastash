@@ -9,13 +9,15 @@ import '../use_case/listen_locale_use_case.dart';
 import '../use_case/update_locale_use_case.dart';
 
 class LocaleManager implements ListenLocaleUseCase, UpdateLocaleUseCase {
-  final Storage _storage;
+  final SharedPreferencesStorage _storage;
 
-  final _localeDataStream = BehaviorSubject<Locale>();
+  final _localeDataStream = BehaviorSubject<Locale?>.seeded(null);
 
   static const _key = 'locale';
 
-  LocaleManager({required Storage storage}) : _storage = storage {
+  LocaleManager({
+    required SharedPreferencesStorage storage,
+  }) : _storage = storage {
     _init();
   }
 
@@ -28,7 +30,7 @@ class LocaleManager implements ListenLocaleUseCase, UpdateLocaleUseCase {
   }
 
   @override
-  ValueStream<Locale> get localeDataStream => _localeDataStream.stream;
+  ValueStream<Locale?> get localeDataStream => _localeDataStream.stream;
 
   @override
   void updateLocale({required Locale locale}) {

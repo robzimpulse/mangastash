@@ -18,11 +18,9 @@ void main() {
   final locator = ServiceLocator.asNewInstance();
 
   setUp(() {
-    locator.registerSingleton<Storage>(MockStorage());
+    locator.registerSingleton<SharedPreferencesStorage>(MockStorage());
     locator.registerSingleton<Alice>(Alice());
-    locator.registerSingleton<ListenThemeUseCase>(
-      MockListenThemeUseCase(),
-    );
+    locator.registerSingleton<ListenThemeUseCase>(MockListenThemeUseCase());
   });
 
   void setScreenSize(WidgetTester tester, int width, int height) {
