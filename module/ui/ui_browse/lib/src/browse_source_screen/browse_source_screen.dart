@@ -62,7 +62,7 @@ class BrowseSourceScreen extends StatelessWidget {
                 : SourceMangaWidget(
                     iconUrl: state.sources[index].iconUrl ?? '',
                     url: state.sources[index].url ?? '',
-                    name: state.sources[index].name ?? '',
+                    name: state.sources[index].name?.value ?? '',
                     onTap: () => onTapSource.call(
                       context,
                       state.sources[index],

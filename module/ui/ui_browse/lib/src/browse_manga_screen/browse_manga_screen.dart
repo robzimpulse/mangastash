@@ -165,7 +165,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         width: 200,
         height: 15,
         lines: 1,
-        child: Text(state.source?.name ?? ''),
+        child: Text(state.source?.name?.value ?? ''),
       ),
     );
   }

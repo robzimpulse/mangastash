@@ -7,7 +7,7 @@ part 'manga_source.g.dart';
 class MangaSource extends Equatable {
   final String? iconUrl;
 
-  final String? name;
+  final MangaSourceEnum? name;
 
   final String? url;
 
@@ -31,7 +31,7 @@ class MangaSource extends Equatable {
 
   MangaSource copyWith({
     String? iconUrl,
-    String? name,
+    MangaSourceEnum? name,
     String? url,
     String? id,
   }) {
@@ -42,4 +42,13 @@ class MangaSource extends Equatable {
       id: id ?? this.id,
     );
   }
+}
+
+enum MangaSourceEnum {
+  @JsonValue("Manga Dex") mangadex('Manga Dex'),
+  @JsonValue("Asura Scans") asurascan('Asura Scans');
+
+  final String value;
+
+  const MangaSourceEnum(this.value);
 }
