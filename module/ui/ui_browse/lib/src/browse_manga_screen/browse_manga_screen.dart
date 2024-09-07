@@ -26,7 +26,6 @@ class BrowseMangaScreen extends StatefulWidget {
           layout: MangaShelfItemLayout.comfortableGrid,
         ),
         getMangaSourceUseCase: locator(),
-        addOrUpdateMangaUseCase: locator(),
         searchMangaUseCase: locator(),
       )..init(),
       child: BrowseMangaScreen(

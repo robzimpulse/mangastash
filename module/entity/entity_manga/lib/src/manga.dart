@@ -21,7 +21,7 @@ class Manga extends Equatable {
 
   final List<MangaTag>? tags;
 
-  final MangaSource? source;
+  final MangaSourceEnum? source;
 
   const Manga({
     this.id,
@@ -53,7 +53,7 @@ class Manga extends Equatable {
     String? status,
     String? description,
     List<MangaTag>? tags,
-    MangaSource? source,
+    MangaSourceEnum? source,
   }) {
     return Manga(
       id: id ?? this.id,

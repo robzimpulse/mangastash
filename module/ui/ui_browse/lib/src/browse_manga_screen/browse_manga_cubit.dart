@@ -9,17 +9,14 @@ import 'browse_manga_state.dart';
 
 class BrowseMangaCubit extends Cubit<BrowseMangaState> {
   final GetMangaSourceUseCase _getMangaSourceUseCase;
-  final SearchMangaOnMangaDexUseCase _searchMangaUseCase;
-  final AddOrUpdateMangaUseCase _addOrUpdateMangaUseCase;
+  final SearchMangaUseCase _searchMangaUseCase;
 
   BrowseMangaCubit({
     required BrowseMangaState initialState,
     required GetMangaSourceUseCase getMangaSourceUseCase,
-    required SearchMangaOnMangaDexUseCase searchMangaUseCase,
-    required AddOrUpdateMangaUseCase addOrUpdateMangaUseCase,
+    required SearchMangaUseCase searchMangaUseCase,
   })  : _getMangaSourceUseCase = getMangaSourceUseCase,
         _searchMangaUseCase = searchMangaUseCase,
-        _addOrUpdateMangaUseCase = addOrUpdateMangaUseCase,
         super(initialState);
 
   Future<void> init() async {
@@ -48,6 +45,7 @@ class BrowseMangaCubit extends Cubit<BrowseMangaState> {
     // TODO: limit search manga use case based on source manga
 
     final result = await _searchMangaUseCase.execute(
+      source: state.source?.name,
       parameter: state.parameter,
     );
 
@@ -56,10 +54,6 @@ class BrowseMangaCubit extends Cubit<BrowseMangaState> {
       final limit = result.data.limit ?? 0;
       final total = result.data.total ?? 0;
       final mangas = result.data.data ?? [];
-
-      _addOrUpdateMangaUseCase.execute(
-        data: mangas.map((e) => e.copyWith(source: state.source)).toList(),
-      );
 
       emit(
         state.copyWith(
