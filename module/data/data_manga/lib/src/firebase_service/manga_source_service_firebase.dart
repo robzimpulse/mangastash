@@ -52,20 +52,26 @@ class MangaSourceServiceFirebase {
   }
 
   Future<Result<Pagination<MangaSource>>> search({
-    String? name,
+    MangaSourceEnum? name,
     String? url,
+    String? iconUrl,
     int limit = 30,
     int? offset,
   }) async {
     Query<Map<String, dynamic>> queries = _ref;
 
     if (name != null) {
-      queries = queries.where('name', isEqualTo: name);
+      queries = queries.where('name', isEqualTo: name.value);
     }
 
     if (url != null) {
       queries = queries.where('url', isEqualTo: url);
     }
+
+    if (iconUrl != null) {
+      queries = queries.where('iconUrl', isEqualTo: iconUrl);
+    }
+
     if (offset != null) {
       queries = queries.startAfter([offset]);
     }

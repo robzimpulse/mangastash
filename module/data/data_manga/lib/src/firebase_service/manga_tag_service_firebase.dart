@@ -10,7 +10,7 @@ class MangaTagServiceFirebase {
   late final FirebaseFirestore _db = FirebaseFirestore.instanceFor(app: _app);
 
   late final CollectionReference<Map<String, dynamic>> _ref = _db.collection(
-    'tag',
+    'tags',
   );
 
   MangaTagServiceFirebase({required FirebaseApp app}) : _app = app;

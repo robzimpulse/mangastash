@@ -30,7 +30,5 @@ class Success<T> extends Result<T> {
 
   T get data => _data;
 
-  Success(T data) {
-    _data = data;
-  }
+  Success(T data): _data = data;
 }

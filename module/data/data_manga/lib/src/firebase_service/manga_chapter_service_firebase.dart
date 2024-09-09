@@ -4,18 +4,18 @@ import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-class MangaServiceFirebase {
+class MangaChapterServiceFirebase {
   final FirebaseApp _app;
 
   late final FirebaseFirestore _db = FirebaseFirestore.instanceFor(app: _app);
 
   late final CollectionReference<Map<String, dynamic>> _ref = _db.collection(
-    'mangas',
+    'chapters',
   );
 
-  MangaServiceFirebase({required FirebaseApp app}) : _app = app;
+  MangaChapterServiceFirebase({required FirebaseApp app}) : _app = app;
 
-  Future<void> update(Manga value) async {
+  Future<void> update(MangaChapter value) async {
     await _ref.doc(value.id).set(value.toJson());
   }
 
@@ -23,25 +23,24 @@ class MangaServiceFirebase {
     return (await _ref.doc(id).get()).exists;
   }
 
-  Future<Manga> get(String id) async {
+  Future<MangaChapter> get(String id) async {
     final value = (await _ref.doc(id).get()).data();
     if (value == null) throw Exception('Data not Found');
-    return Manga.fromJson(value);
+    return MangaChapter.fromJson(value);
   }
 
-  Future<Result<List<Manga>>> list() async {
+  Future<Result<List<MangaChapter>>> list() async {
     final value = await _ref.get();
-    final data = value.docs.map((e) => Manga.fromJson(e.data())).toList();
+    final data = value.docs.map((e) => MangaChapter.fromJson(e.data())).toList();
     return Success(data);
   }
 
-  Future<Result<Pagination<Manga>>> search({
+  Future<Result<Pagination<MangaChapter>>> search({
+    String? mangaId,
     String? title,
-    String? coverUrl,
-    String? author,
-    String? status,
-    String? description,
-    MangaSourceEnum? source,
+    String? volume,
+    String? chapter,
+    String? readableAt,
     int limit = 30,
     int? offset,
   }) async {
@@ -51,24 +50,20 @@ class MangaServiceFirebase {
       queries = queries.where('title', isEqualTo: title);
     }
 
-    if (coverUrl != null) {
-      queries = queries.where('coverUrl', isEqualTo: coverUrl);
+    if (mangaId != null) {
+      queries = queries.where('mangaId', isEqualTo: mangaId);
     }
 
-    if (author != null) {
-      queries = queries.where('author', isEqualTo: author);
+    if (volume != null) {
+      queries = queries.where('volume', isEqualTo: volume);
     }
 
-    if (status != null) {
-      queries = queries.where('status', isEqualTo: status);
+    if (readableAt != null) {
+      queries = queries.where('readableAt', isEqualTo: readableAt);
     }
 
-    if (description != null) {
-      queries = queries.where('description', isEqualTo: description);
-    }
-
-    if (source != null) {
-      queries = queries.where('source', isEqualTo: source.value);
+    if (chapter != null) {
+      queries = queries.where('chapter', isEqualTo: chapter);
     }
 
     if (offset != null) {
@@ -79,9 +74,9 @@ class MangaServiceFirebase {
     final data = await queries.limit(limit).get();
 
     return Success(
-      Pagination<Manga>(
+      Pagination<MangaChapter>(
         data: data.docs
-            .map((e) => Manga.fromJson(e.data()).copyWith(id: e.id))
+            .map((e) => MangaChapter.fromJson(e.data()).copyWith(id: e.id))
             .toList(),
         limit: limit,
         offset: data.docs.lastOrNull?.id,

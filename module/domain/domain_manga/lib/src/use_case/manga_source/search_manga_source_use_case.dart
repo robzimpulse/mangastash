@@ -9,7 +9,7 @@ class SearchMangaSourcesUseCase {
       : _service = service;
 
   Future<Result<Pagination<MangaSource>>> execute({
-    String? name,
+    MangaSourceEnum? name,
     String? url,
     int? offset,
   }) async {

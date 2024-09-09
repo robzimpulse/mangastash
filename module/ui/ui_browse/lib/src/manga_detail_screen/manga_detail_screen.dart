@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -265,7 +266,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               Expanded(
                 child: Text(
                   [
-                    // if (chapter.readableAt != null) '${readableAt?.asDateTime?.ddLLLLyy}',
+                    if (chapter.readableAt != null)
+                      '${chapter.readableAt?.asDateTime?.ddLLLLyy}',
                     if (chapter.title != null) '${chapter.title}',
                   ].join(' - '),
                 ),

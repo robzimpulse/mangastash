@@ -28,9 +28,11 @@ class GetListChapterOnMangaDexUseCase {
           data.map(
             (e) => MangaChapter(
               id: e.id,
+              mangaId: mangaId,
               title: e.attributes?.title,
               chapter: e.attributes?.chapter,
               volume: e.attributes?.volume,
+              readableAt: e.attributes?.readableAt,
             ),
           ),
         );

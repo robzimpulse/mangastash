@@ -80,6 +80,7 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => GetListChapterUseCase(
         getListChapterOnMangaDexUseCase: locator(),
+        mangaChapterServiceFirebase: locator(),
       ),
     );
     locator.registerFactory(

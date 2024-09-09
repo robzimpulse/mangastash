@@ -38,15 +38,13 @@ class SearchMangaUseCase {
 
     if (result is Success<Pagination<Manga>>) {
       final mangas = result.data.data ?? [];
-      await _syncManga(
-        data: mangas.map((e) => e.copyWith(source: source)).toList(),
-      );
+      _sync(data: mangas.map((e) => e.copyWith(source: source)).toList());
     }
 
     return result;
   }
 
-  Future<void> _syncManga({required List<Manga> data}) async {
+  Future<void> _sync({required List<Manga> data}) async {
     await Future.wait(data.map((e) => _updateManga(manga: e)));
   }
 
