@@ -22,8 +22,8 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
             message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
           ),
           onTapSource: (context, source) => context.push(
-            BrowseRoutePath.browseSourceManga.replaceAll(
-              ':id',
+            BrowseRoutePath.browseManga.replaceAll(
+              ':sourceId',
               source.id ?? '',
             ),
           ),
@@ -40,80 +40,37 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
     return [
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: BrowseRoutePath.browseSourceManga,
-        name: BrowseRoutePath.browseSourceManga,
+        path: BrowseRoutePath.browseManga,
+        name: BrowseRoutePath.browseManga,
         builder: (context, state) => BrowseMangaScreen.create(
           locator: locator,
-          id: state.pathParameters['id'].asOrNull<String>(),
+          sourceId: state.pathParameters['sourceId'].asOrNull<String>(),
+          onTapManga: (context, mangaId) => context.push(
+            BrowseRoutePath.browseManga
+                .replaceAll(
+                  ':mangaId',
+                  mangaId ?? '',
+                )
+                .replaceAll(
+                  ':sourceId',
+                  state.pathParameters['sourceId'].asOrNull<String>() ?? '',
+                ),
+          ),
         ),
       ),
-      // GoRoute(
-      //   parentNavigatorKey: rootNavigatorKey,
-      //   path: BrowseRoutePath.browseSource,
-      //   name: BrowseRoutePath.browseSource,
-      //   redirect: (context, state) {
-      //     final source = state.extra as MangaSource?;
-      //     if (source == null) return 'undefined';
-      //     return '${BrowseRoutePath.browse}/${source.id}';
-      //   },
-      // ),
-      // GoRoute(
-      //   parentNavigatorKey: rootNavigatorKey,
-      //   path: '${BrowseRoutePath.browse}/${MangaSource.mangadex.id}',
-      //   name: '${BrowseRoutePath.browse}/${MangaSource.mangadex.id}',
-      //   builder: (context, state) => BrowseMangaDexScreen.create(
-      //     locator: locator,
-      //     onTapManga: (context, manga) => context.push(
-      //       '${BrowseRoutePath.browse}/${MangaSource.mangadex.id}/${manga.id}',
-      //     ),
-      //   ),
-      // ),
-      // GoRoute(
-      //   parentNavigatorKey: rootNavigatorKey,
-      //   path: [
-      //     BrowseRoutePath.browse,
-      //     MangaSource.mangadex.id,
-      //     ':mangaId',
-      //   ].join('/'),
-      //   name: [
-      //     BrowseRoutePath.browse,
-      //     MangaSource.mangadex.id,
-      //     ':mangaId',
-      //   ].join('/'),
-      //   builder: (context, state) => DetailMangaScreen.create(
-      //     locator: locator,
-      //     mangaId: state.pathParameters['mangaId'] ?? '',
-      //     onTapChapter: (context, chapterId) => context.push(
-      //       [
-      //         BrowseRoutePath.browse,
-      //         MangaSource.mangadex.id,
-      //         state.pathParameters['mangaId'] ?? '',
-      //         chapterId ?? '',
-      //       ].join('/'),
-      //     ),
-      //   ),
-      // ),
-      // GoRoute(
-      //   parentNavigatorKey: rootNavigatorKey,
-      //   path: [
-      //     BrowseRoutePath.browse,
-      //     MangaSource.mangadex.id,
-      //     ':mangaId',
-      //     ':chapterId'
-      //   ].join('/'),
-      //   name: [
-      //     BrowseRoutePath.browse,
-      //     MangaSource.mangadex.id,
-      //     ':mangaId',
-      //     ':chapterId'
-      //   ].join('/'),
-      //   builder: (context, state) => ReaderMangaScreen.create(
-      //     locator: locator,
-      //     mangaId: state.pathParameters['mangaId'] ?? '',
-      //     chapterId: state.pathParameters['chapterId'] ?? '',
-      //   ),
-      // ),
-      // TODO: add more route for specific source browse screen here
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: BrowseRoutePath.mangaDetail,
+        name: BrowseRoutePath.mangaDetail,
+        builder: (context, state) => MangaDetailScreen.create(
+          locator: locator,
+          sourceId: state.pathParameters['sourceId'].asOrNull<String>(),
+          mangaId: state.pathParameters['mangaId'].asOrNull<String>(),
+          onTapChapter: (context, chapterId) => context.showSnackBar(
+            message: '🚧🚧🚧 Under Construction for chapter $chapterId 🚧🚧🚧',
+          ),
+        ),
+      ),
     ];
   }
 }

@@ -5,14 +5,14 @@ import 'add_or_update_manga_use_case.dart';
 import 'search_manga_on_mangadex_use_case.dart';
 
 class SearchMangaUseCase {
-  final SearchMangaOnMangaDexUseCase searchMangaOnMangaDexUseCase;
-
-  final AddOrUpdateMangaUseCase addOrUpdateMangaUseCase;
+  final SearchMangaOnMangaDexUseCase _searchMangaOnMangaDexUseCase;
+  final AddOrUpdateMangaUseCase _addOrUpdateMangaUseCase;
 
   const SearchMangaUseCase({
-    required this.searchMangaOnMangaDexUseCase,
-    required this.addOrUpdateMangaUseCase,
-  });
+    required SearchMangaOnMangaDexUseCase searchMangaOnMangaDexUseCase,
+    required AddOrUpdateMangaUseCase addOrUpdateMangaUseCase,
+  })  : _searchMangaOnMangaDexUseCase = searchMangaOnMangaDexUseCase,
+        _addOrUpdateMangaUseCase = addOrUpdateMangaUseCase;
 
   Future<Result<Pagination<Manga>>> execute({
     required MangaSourceEnum? source,
@@ -24,7 +24,9 @@ class SearchMangaUseCase {
 
     switch (source) {
       case MangaSourceEnum.mangadex:
-        result = await searchMangaOnMangaDexUseCase.execute(parameter: parameter,);
+        result = await _searchMangaOnMangaDexUseCase.execute(
+          parameter: parameter,
+        );
         break;
       case MangaSourceEnum.asurascan:
         result = Error(Exception('Unimplemented for ${source.name}'));
@@ -33,7 +35,7 @@ class SearchMangaUseCase {
 
     if (result is Success<Pagination<Manga>>) {
       final mangas = result.data.data ?? [];
-      await addOrUpdateMangaUseCase.execute(
+      await _addOrUpdateMangaUseCase.execute(
         data: mangas.map((e) => e.copyWith(source: source)).toList(),
       );
     }
