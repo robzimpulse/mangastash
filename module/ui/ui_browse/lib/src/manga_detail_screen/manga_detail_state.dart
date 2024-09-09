@@ -1,20 +1,17 @@
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
+import 'package:ui_common/ui_common.dart';
 
 class MangaDetailState extends Equatable {
   final bool isLoading;
-  final String? errorMessage;
-  final String? sourceId;
-  final MangaSource? source;
+  final Exception? error;
   final String? mangaId;
   final Manga? manga;
   final List<MangaChapter>? chapters;
 
   const MangaDetailState({
     this.isLoading = false,
-    this.errorMessage,
-    this.source,
-    this.sourceId,
+    this.error,
     this.mangaId,
     this.manga,
     this.chapters,
@@ -23,11 +20,25 @@ class MangaDetailState extends Equatable {
   @override
   List<Object?> get props => [
         isLoading,
-        errorMessage,
-        source,
-        sourceId,
+        error,
         mangaId,
         manga,
         chapters,
       ];
+
+  MangaDetailState copyWith({
+    bool? isLoading,
+    ValueGetter<Exception?>? error,
+    String? mangaId,
+    Manga? manga,
+    List<MangaChapter>? chapters,
+  }) {
+    return MangaDetailState(
+      isLoading: isLoading ?? this.isLoading,
+      error: error != null ? error() : this.error,
+      mangaId: mangaId ?? this.mangaId,
+      manga: manga ?? this.manga,
+      chapters: chapters ?? this.chapters,
+    );
+  }
 }

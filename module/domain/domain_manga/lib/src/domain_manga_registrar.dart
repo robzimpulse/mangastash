@@ -7,6 +7,7 @@ import 'package:service_locator/service_locator.dart';
 import 'use_case/chapter/get_list_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/get_list_chapter_use_case.dart';
 import 'use_case/manga/add_or_update_manga_use_case.dart';
+import 'use_case/manga/get_manga_use_case.dart';
 import 'use_case/manga/search_manga_on_mangadex_use_case.dart';
 import 'use_case/manga/search_manga_use_case.dart';
 import 'use_case/manga_source/add_manga_source_use_case.dart';
@@ -85,6 +86,11 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => GetListChapterUseCase(
         getListChapterOnMangaDexUseCase: locator(),
+      ),
+    );
+    locator.registerFactory(
+      () => GetMangaUseCase(
+        mangaServiceFirebase: locator(),
       ),
     );
     log('finish register', name: runtimeType.toString(), time: DateTime.now());

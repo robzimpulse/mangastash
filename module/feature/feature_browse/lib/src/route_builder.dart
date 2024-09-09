@@ -46,15 +46,10 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
           locator: locator,
           sourceId: state.pathParameters['sourceId'].asOrNull<String>(),
           onTapManga: (context, mangaId) => context.push(
-            BrowseRoutePath.browseManga
-                .replaceAll(
-                  ':mangaId',
-                  mangaId ?? '',
-                )
-                .replaceAll(
-                  ':sourceId',
-                  state.pathParameters['sourceId'].asOrNull<String>() ?? '',
-                ),
+            BrowseRoutePath.mangaDetail.replaceAll(
+              ':mangaId',
+              mangaId ?? '',
+            ),
           ),
         ),
       ),
@@ -64,7 +59,6 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         name: BrowseRoutePath.mangaDetail,
         builder: (context, state) => MangaDetailScreen.create(
           locator: locator,
-          sourceId: state.pathParameters['sourceId'].asOrNull<String>(),
           mangaId: state.pathParameters['mangaId'].asOrNull<String>(),
           onTapChapter: (context, chapterId) => context.showSnackBar(
             message: '🚧🚧🚧 Under Construction for chapter $chapterId 🚧🚧🚧',

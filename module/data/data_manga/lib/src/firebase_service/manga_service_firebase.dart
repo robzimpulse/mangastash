@@ -15,20 +15,18 @@ class MangaServiceFirebase {
 
   MangaServiceFirebase({required FirebaseApp app}) : _app = app;
 
-  Future<void> add(Manga value) async {
-    final id = value.id;
-    if (id == null) return;
-    await _ref.doc(id).set(value.toJson());
-  }
-
   Future<void> update(Manga value) async {
-    final id = value.id;
-    if (id == null) return;
-    await _ref.doc(id).update(value.toJson());
+    await _ref.doc(value.id).set(value.toJson());
   }
 
   Future<bool> exists(String id) async {
     return (await _ref.doc(id).get()).exists;
+  }
+
+  Future<Manga> get(String id) async {
+    final value = (await _ref.doc(id).get()).data();
+    if (value == null) throw Exception('Data not Found');
+    return Manga.fromJson(value);
   }
 
   Future<Result<List<Manga>>> list() async {

@@ -14,16 +14,15 @@ class MangaDetailScreen extends StatefulWidget {
 
   static Widget create({
     required ServiceLocator locator,
-    required String? sourceId,
     required String? mangaId,
     required Function(BuildContext, String?) onTapChapter,
   }) {
     return BlocProvider(
       create: (context) => MangaDetailCubit(
         initialState: MangaDetailState(
-          sourceId: sourceId,
           mangaId: mangaId,
         ),
+        getMangaUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         onTapChapter: onTapChapter,
@@ -115,7 +114,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   List<Widget> _chapters(BuildContext context, MangaDetailState state) {
-    if (state.errorMessage?.isNotEmpty == true) {
+    final error = state.error;
+    if (error != null) {
       return [
         SliverFillRemaining(
           hasScrollBody: false,
@@ -123,7 +123,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             padding: const EdgeInsets.all(24),
             child: Center(
               child: Text(
-                state.errorMessage ?? '',
+                error.toString(),
                 textAlign: TextAlign.center,
               ),
             ),

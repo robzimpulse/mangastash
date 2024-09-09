@@ -15,16 +15,8 @@ class MangaTagServiceFirebase {
 
   MangaTagServiceFirebase({required FirebaseApp app}) : _app = app;
 
-  Future<void> add(MangaTag value) async {
-    final id = value.id;
-    if (id == null) return;
-    await _ref.doc(id).set(value.toJson());
-  }
-
   Future<void> update(MangaTag value) async {
-    final id = value.id;
-    if (id == null) return;
-    await _ref.doc(id).update(value.toJson());
+    await _ref.doc(value.id).set(value.toJson());
   }
 
   Future<bool> exists(String id) async {

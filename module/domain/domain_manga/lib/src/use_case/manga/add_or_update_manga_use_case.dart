@@ -17,26 +17,12 @@ class AddOrUpdateMangaUseCase {
 
   Future<void> _updateTag({required MangaTag? tag}) async {
     if (tag == null) return;
-    final id = tag.id;
-    if (id == null) return;
-    final isExists = await _mangaTagServiceFirebase.exists(id);
-    if (isExists) {
-      await _mangaTagServiceFirebase.update(tag);
-    } else {
-      await _mangaTagServiceFirebase.add(tag);
-    }
+    await _mangaTagServiceFirebase.update(tag);
   }
 
   Future<void> _updateManga({required Manga? manga}) async {
     if (manga == null) return;
-    final id = manga.id;
-    if (id == null) return;
-    final isExists = await _mangaServiceFirebase.exists(id);
-    if (isExists) {
-      await _mangaServiceFirebase.update(manga);
-    } else {
-      await _mangaServiceFirebase.add(manga);
-    }
-    await Future.wait(manga.tags?.map((e) => _updateTag(tag: e)) ?? []);
+    final promises = manga.tags?.map((e) => _updateTag(tag: e)) ?? [];
+    await Future.wait([...promises, _mangaServiceFirebase.update(manga)]);
   }
 }
