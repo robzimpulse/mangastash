@@ -1,18 +1,21 @@
 import 'package:core_network/core_network.dart';
+import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 
-import 'add_or_update_manga_use_case.dart';
 import 'search_manga_on_mangadex_use_case.dart';
 
 class SearchMangaUseCase {
   final SearchMangaOnMangaDexUseCase _searchMangaOnMangaDexUseCase;
-  final AddOrUpdateMangaUseCase _addOrUpdateMangaUseCase;
+  final MangaServiceFirebase _mangaServiceFirebase;
+  final MangaTagServiceFirebase _mangaTagServiceFirebase;
 
   const SearchMangaUseCase({
     required SearchMangaOnMangaDexUseCase searchMangaOnMangaDexUseCase,
-    required AddOrUpdateMangaUseCase addOrUpdateMangaUseCase,
+    required MangaServiceFirebase mangaServiceFirebase,
+    required MangaTagServiceFirebase mangaTagServiceFirebase,
   })  : _searchMangaOnMangaDexUseCase = searchMangaOnMangaDexUseCase,
-        _addOrUpdateMangaUseCase = addOrUpdateMangaUseCase;
+        _mangaServiceFirebase = mangaServiceFirebase,
+        _mangaTagServiceFirebase = mangaTagServiceFirebase;
 
   Future<Result<Pagination<Manga>>> execute({
     required MangaSourceEnum? source,
@@ -35,11 +38,27 @@ class SearchMangaUseCase {
 
     if (result is Success<Pagination<Manga>>) {
       final mangas = result.data.data ?? [];
-      await _addOrUpdateMangaUseCase.execute(
+      await _syncManga(
         data: mangas.map((e) => e.copyWith(source: source)).toList(),
       );
     }
 
     return result;
   }
+
+  Future<void> _syncManga({required List<Manga> data}) async {
+    await Future.wait(data.map((e) => _updateManga(manga: e)));
+  }
+
+  Future<void> _updateTag({required MangaTag? tag}) async {
+    if (tag == null) return;
+    await _mangaTagServiceFirebase.update(tag);
+  }
+
+  Future<void> _updateManga({required Manga? manga}) async {
+    if (manga == null) return;
+    final promises = manga.tags?.map((e) => _updateTag(tag: e)) ?? [];
+    await Future.wait([...promises, _mangaServiceFirebase.update(manga)]);
+  }
+
 }

@@ -23,6 +23,7 @@ class MangaDetailScreen extends StatefulWidget {
           mangaId: mangaId,
         ),
         getMangaUseCase: locator(),
+        getListChapterUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         onTapChapter: onTapChapter,
