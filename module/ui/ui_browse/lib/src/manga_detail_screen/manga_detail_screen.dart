@@ -208,28 +208,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               final int itemIndex = index ~/ 2;
               return index.isOdd
                   ? _separator()
-                  : InkWell(
-                      onTap: () => widget.onTapChapter.call(
-                        context,
-                        chapters[itemIndex].id,
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Text(chapters[itemIndex].top),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(chapters[itemIndex].bottom),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    );
+                  : _chapter(context: context, chapter: chapters[itemIndex]);
             },
           ),
         ),
@@ -260,4 +239,41 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   Widget _separator() => const SizedBox(height: 8);
+
+  Widget _chapter({
+    required BuildContext context,
+    required MangaChapter? chapter,
+  }) {
+    if (chapter == null) return const SizedBox.shrink();
+
+    return InkWell(
+      onTap: () => widget.onTapChapter.call(context, chapter.id),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Text(
+                [
+                  if (chapter.volume != null) 'Vol ${chapter.volume}',
+                  if (chapter.chapter != null) 'Ch ${chapter.chapter}',
+                ].join(' '),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  [
+                    // if (chapter.readableAt != null) '${readableAt?.asDateTime?.ddLLLLyy}',
+                    if (chapter.title != null) '${chapter.title}',
+                  ].join(' - '),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }

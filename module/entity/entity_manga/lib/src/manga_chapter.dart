@@ -24,19 +24,4 @@ class MangaChapter extends Equatable {
   }
 
   Map<String, dynamic> toJson() => _$MangaChapterToJson(this);
-
-  String get top {
-    List<String> texts = [];
-    if (volume != null) texts.add('Vol $volume');
-    if (chapter != null) texts.add('Ch $chapter');
-    return texts.join(' ');
-  }
-
-  String get bottom {
-    List<String> texts = [];
-    // if (readableAt != null) texts.add('${readableAt?.asDateTime?.ddLLLLyy}');
-    if (title != null) texts.add('$title');
-    return texts.join(' - ');
-  }
-
 }
