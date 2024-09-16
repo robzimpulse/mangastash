@@ -2,14 +2,14 @@ import 'package:core_network/core_network.dart';
 import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 
-import 'get_list_chapter_on_manga_dex_use_case.dart';
+import 'search_chapter_on_manga_dex_use_case.dart';
 
-class GetListChapterUseCase {
-  final GetListChapterOnMangaDexUseCase _getListChapterOnMangaDexUseCase;
+class SearchChapterUseCase {
+  final SearchChapterOnMangaDexUseCase _getListChapterOnMangaDexUseCase;
   final MangaChapterServiceFirebase _mangaChapterServiceFirebase;
 
-  const GetListChapterUseCase({
-    required GetListChapterOnMangaDexUseCase getListChapterOnMangaDexUseCase,
+  const SearchChapterUseCase({
+    required SearchChapterOnMangaDexUseCase getListChapterOnMangaDexUseCase,
     required MangaChapterServiceFirebase mangaChapterServiceFirebase,
   })  : _getListChapterOnMangaDexUseCase = getListChapterOnMangaDexUseCase,
         _mangaChapterServiceFirebase = mangaChapterServiceFirebase;

@@ -2,10 +2,10 @@ import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-class GetListChapterOnMangaDexUseCase {
+class SearchChapterOnMangaDexUseCase {
   final ChapterRepository _chapterRepository;
 
-  const GetListChapterOnMangaDexUseCase({
+  const SearchChapterOnMangaDexUseCase({
     required ChapterRepository chapterRepository,
   }) : _chapterRepository = chapterRepository;
 

@@ -17,6 +17,8 @@ class MangaChapter extends Equatable {
 
   final String? readableAt;
 
+  final List<String>? images;
+
   const MangaChapter({
     this.id,
     this.mangaId,
@@ -24,10 +26,19 @@ class MangaChapter extends Equatable {
     this.volume,
     this.chapter,
     this.readableAt,
+    this.images,
   });
 
   @override
-  List<Object?> get props => [id, mangaId, title, volume, chapter, readableAt];
+  List<Object?> get props => [
+        id,
+        mangaId,
+        title,
+        volume,
+        chapter,
+        readableAt,
+        images,
+      ];
 
   factory MangaChapter.fromJson(Map<String, dynamic> json) {
     return _$MangaChapterFromJson(json);
@@ -42,6 +53,7 @@ class MangaChapter extends Equatable {
     String? volume,
     String? chapter,
     String? readableAt,
+    List<String>? images,
   }) {
     return MangaChapter(
       id: id ?? this.id,
@@ -50,6 +62,7 @@ class MangaChapter extends Equatable {
       volume: volume ?? this.volume,
       chapter: chapter ?? this.chapter,
       readableAt: readableAt ?? this.readableAt,
+      images: images ?? this.images,
     );
   }
 }

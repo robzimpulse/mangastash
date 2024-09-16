@@ -7,12 +7,12 @@ import 'manga_detail_state.dart';
 
 class MangaDetailCubit extends Cubit<MangaDetailState> {
   final GetMangaUseCase _getMangaUseCase;
-  final GetListChapterUseCase _getListChapterUseCase;
+  final SearchChapterUseCase _getListChapterUseCase;
 
   MangaDetailCubit({
     MangaDetailState initialState = const MangaDetailState(),
     required GetMangaUseCase getMangaUseCase,
-    required GetListChapterUseCase getListChapterUseCase,
+    required SearchChapterUseCase getListChapterUseCase,
   })  : _getMangaUseCase = getMangaUseCase,
         _getListChapterUseCase = getListChapterUseCase,
         super(initialState);

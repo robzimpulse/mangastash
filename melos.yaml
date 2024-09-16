@@ -9,7 +9,7 @@ ide:
     enabled: false
 
 scripts:
-  clean:
+  flutter_clean:
     description: Clean all packages.
     run: melos exec -c 1 -- "flutter clean"
   get:

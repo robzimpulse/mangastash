@@ -13,6 +13,8 @@ MangaChapter _$MangaChapterFromJson(Map<String, dynamic> json) => MangaChapter(
       volume: json['volume'] as String?,
       chapter: json['chapter'] as String?,
       readableAt: json['readable_at'] as String?,
+      images:
+          (json['images'] as List<dynamic>?)?.map((e) => e as String).toList(),
     );
 
 Map<String, dynamic> _$MangaChapterToJson(MangaChapter instance) =>
@@ -23,4 +25,5 @@ Map<String, dynamic> _$MangaChapterToJson(MangaChapter instance) =>
       'volume': instance.volume,
       'chapter': instance.chapter,
       'readable_at': instance.readableAt,
+      'images': instance.images,
     };

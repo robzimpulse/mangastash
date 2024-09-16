@@ -4,8 +4,10 @@ import 'package:core_network/core_network.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
-import 'use_case/chapter/get_list_chapter_on_manga_dex_use_case.dart';
-import 'use_case/chapter/get_list_chapter_use_case.dart';
+import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
+import 'use_case/chapter/get_chapter_use_case.dart';
+import 'use_case/chapter/search_chapter_on_manga_dex_use_case.dart';
+import 'use_case/chapter/search_chapter_use_case.dart';
 import 'use_case/manga/get_manga_use_case.dart';
 import 'use_case/manga/search_manga_on_mangadex_use_case.dart';
 import 'use_case/manga/search_manga_use_case.dart';
@@ -66,8 +68,14 @@ class DomainMangaRegistrar extends Registrar {
       ),
     );
     locator.registerFactory(
-      () => GetListChapterOnMangaDexUseCase(
+      () => SearchChapterOnMangaDexUseCase(
         chapterRepository: locator(),
+      ),
+    );
+    locator.registerFactory(
+      () => GetChapterOnMangaDexUseCase(
+        chapterRepository: locator(),
+        atHomeRepository: locator(),
       ),
     );
     locator.registerFactory(
@@ -78,7 +86,7 @@ class DomainMangaRegistrar extends Registrar {
       ),
     );
     locator.registerFactory(
-      () => GetListChapterUseCase(
+      () => SearchChapterUseCase(
         getListChapterOnMangaDexUseCase: locator(),
         mangaChapterServiceFirebase: locator(),
       ),
@@ -86,6 +94,12 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => GetMangaUseCase(
         mangaServiceFirebase: locator(),
+      ),
+    );
+    locator.registerFactory(
+      () => GetChapterUseCase(
+        getChapterOnMangaDexUseCase: locator(),
+        mangaChapterServiceFirebase: locator(),
       ),
     );
     log('finish register', name: runtimeType.toString(), time: DateTime.now());

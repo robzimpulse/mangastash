@@ -46,10 +46,12 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
           locator: locator,
           sourceId: state.pathParameters['sourceId'].asOrNull<String>(),
           onTapManga: (context, mangaId) => context.push(
-            BrowseRoutePath.mangaDetail.replaceAll(
-              ':mangaId',
-              mangaId ?? '',
-            ),
+            BrowseRoutePath.mangaDetail
+                .replaceAll(
+                  ':sourceId',
+                  state.pathParameters['sourceId'].asOrNull<String>() ?? '',
+                )
+                .replaceAll(':mangaId', mangaId ?? ''),
           ),
         ),
       ),
@@ -60,9 +62,29 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         builder: (context, state) => MangaDetailScreen.create(
           locator: locator,
           mangaId: state.pathParameters['mangaId'].asOrNull<String>(),
-          onTapChapter: (context, chapterId) => context.showSnackBar(
-            message: '🚧🚧🚧 Under Construction for chapter $chapterId 🚧🚧🚧',
+          onTapChapter: (context, chapterId) => context.push(
+            BrowseRoutePath.chapterDetail
+                .replaceAll(
+                  ':sourceId',
+                  state.pathParameters['sourceId'].asOrNull<String>() ?? '',
+                )
+                .replaceAll(
+                  ':mangaId',
+                  state.pathParameters['mangaId'].asOrNull<String>() ?? '',
+                )
+                .replaceAll(':chapterId', chapterId ?? ''),
           ),
+        ),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: BrowseRoutePath.chapterDetail,
+        name: BrowseRoutePath.chapterDetail,
+        builder: (context, state) => MangaReaderScreen.create(
+          locator: locator,
+          sourceId: state.pathParameters['sourceId'].asOrNull<String>(),
+          mangaId: state.pathParameters['mangaId'].asOrNull<String>(),
+          chapterId: state.pathParameters['chapterId'].asOrNull<String>(),
         ),
       ),
     ];

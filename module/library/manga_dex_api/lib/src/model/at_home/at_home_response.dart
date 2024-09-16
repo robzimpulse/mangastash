@@ -10,6 +10,13 @@ class AtHomeResponse {
   final String? baseUrl;
   final AtHomeChapter? chapter;
 
+  late final List<String>? images =
+      chapter?.data?.map((e) => '$baseUrl/data/${chapter?.hash}/$e').toList();
+
+  late final List<String>? imagesDataSaver = chapter?.dataSaver
+      ?.map((e) => '$baseUrl/data-saver/${chapter?.hash}/$e')
+      .toList();
+
   AtHomeResponse(this.result, this.baseUrl, this.chapter);
 
   factory AtHomeResponse.fromJson(Map<String, dynamic> json) {
@@ -17,13 +24,6 @@ class AtHomeResponse {
   }
 
   Map<String, dynamic> toJson() => _$AtHomeResponseToJson(this);
-
-  List<String>? get images =>
-      chapter?.data?.map((e) => '$baseUrl/data/${chapter?.hash}/$e').toList();
-
-  List<String>? get imagesDataSaver => chapter?.dataSaver
-      ?.map((e) => '$baseUrl/data-saver/${chapter?.hash}/$e')
-      .toList();
 }
 
 ///@nodoc
