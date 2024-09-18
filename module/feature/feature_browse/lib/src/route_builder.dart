@@ -61,6 +61,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         name: BrowseRoutePath.mangaDetail,
         builder: (context, state) => MangaDetailScreen.create(
           locator: locator,
+          sourceId: state.pathParameters['sourceId'].asOrNull<String>(),
           mangaId: state.pathParameters['mangaId'].asOrNull<String>(),
           onTapChapter: (context, chapterId) => context.push(
             BrowseRoutePath.chapterDetail

@@ -8,6 +8,8 @@ class MangaDetailState extends Equatable {
   final String? mangaId;
   final Manga? manga;
   final List<MangaChapter>? chapters;
+  final String? sourceId;
+  final MangaSource? source;
 
   const MangaDetailState({
     this.isLoading = false,
@@ -15,6 +17,8 @@ class MangaDetailState extends Equatable {
     this.mangaId,
     this.manga,
     this.chapters,
+    this.source,
+    this.sourceId,
   });
 
   @override
@@ -24,6 +28,8 @@ class MangaDetailState extends Equatable {
         mangaId,
         manga,
         chapters,
+        sourceId,
+        source,
       ];
 
   MangaDetailState copyWith({
@@ -32,6 +38,8 @@ class MangaDetailState extends Equatable {
     String? mangaId,
     Manga? manga,
     List<MangaChapter>? chapters,
+    String? sourceId,
+    MangaSource? source,
   }) {
     return MangaDetailState(
       isLoading: isLoading ?? this.isLoading,
@@ -39,6 +47,8 @@ class MangaDetailState extends Equatable {
       mangaId: mangaId ?? this.mangaId,
       manga: manga ?? this.manga,
       chapters: chapters ?? this.chapters,
+      sourceId: sourceId ?? this.sourceId,
+      source: source ?? this.source,
     );
   }
 }

@@ -1,18 +1,14 @@
 import 'package:core_network/core_network.dart';
-import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 
 import 'get_chapter_on_manga_dex_use_case.dart';
 
 class GetChapterUseCase {
   final GetChapterOnMangaDexUseCase _getChapterOnMangaDexUseCase;
-  final MangaChapterServiceFirebase _mangaChapterServiceFirebase;
 
   GetChapterUseCase({
     required GetChapterOnMangaDexUseCase getChapterOnMangaDexUseCase,
-    required MangaChapterServiceFirebase mangaChapterServiceFirebase,
-  })  : _getChapterOnMangaDexUseCase = getChapterOnMangaDexUseCase,
-        _mangaChapterServiceFirebase = mangaChapterServiceFirebase;
+  })  : _getChapterOnMangaDexUseCase = getChapterOnMangaDexUseCase;
 
   Future<Result<MangaChapter>> execute({
     required MangaSourceEnum? source,
@@ -37,14 +33,6 @@ class GetChapterUseCase {
         break;
     }
 
-    if (result is Success<MangaChapter>) {
-      _sync(data: result.data);
-    }
-
     return result;
-  }
-
-  Future<void> _sync({required MangaChapter data}) async {
-    await _mangaChapterServiceFirebase.update(data);
   }
 }

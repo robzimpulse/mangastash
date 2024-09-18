@@ -8,29 +8,50 @@ import 'manga_detail_state.dart';
 class MangaDetailCubit extends Cubit<MangaDetailState> {
   final GetMangaUseCase _getMangaUseCase;
   final SearchChapterUseCase _getListChapterUseCase;
+  final GetMangaSourceUseCase _getMangaSourceUseCase;
 
   MangaDetailCubit({
     MangaDetailState initialState = const MangaDetailState(),
     required GetMangaUseCase getMangaUseCase,
     required SearchChapterUseCase getListChapterUseCase,
+    required GetMangaSourceUseCase getMangaSourceUseCase,
   })  : _getMangaUseCase = getMangaUseCase,
         _getListChapterUseCase = getListChapterUseCase,
+        _getMangaSourceUseCase = getMangaSourceUseCase,
         super(initialState);
 
   Future<void> init() async {
     emit(state.copyWith(isLoading: true));
 
-    await _fetchManga();
-    await _fetchChapter();
+    await _fetchSource();
+    await Future.wait([_fetchManga(), _fetchChapter()]);
 
     emit(state.copyWith(isLoading: false));
+  }
+
+  Future<void> _fetchSource() async {
+    final id = state.sourceId;
+    if (id == null || id.isEmpty) return;
+
+    final result = await _getMangaSourceUseCase.execute(id);
+
+    if (result is Success<MangaSource>) {
+      emit(state.copyWith(source: result.data));
+    }
+
+    if (result is Error<MangaSource>) {
+      emit(state.copyWith(error: () => result.error));
+    }
   }
 
   Future<void> _fetchManga() async {
     final id = state.mangaId;
     if (id == null || id.isEmpty) return;
 
-    final result = await _getMangaUseCase.execute(mangaId: id);
+    final result = await _getMangaUseCase.execute(
+      mangaId: id,
+      source: state.source?.name,
+    );
 
     if (result is Success<Manga>) {
       emit(state.copyWith(manga: result.data));
@@ -47,7 +68,7 @@ class MangaDetailCubit extends Cubit<MangaDetailState> {
 
     final result = await _getListChapterUseCase.execute(
       mangaId: id,
-      source: state.manga?.source,
+      source: state.source?.name,
     );
 
     if (result is Success<List<MangaChapter>>) {

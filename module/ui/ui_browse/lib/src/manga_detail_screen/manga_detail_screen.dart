@@ -15,6 +15,7 @@ class MangaDetailScreen extends StatefulWidget {
 
   static Widget create({
     required ServiceLocator locator,
+    required String? sourceId,
     required String? mangaId,
     required Function(BuildContext, String?) onTapChapter,
   }) {
@@ -22,9 +23,10 @@ class MangaDetailScreen extends StatefulWidget {
       create: (context) => MangaDetailCubit(
         initialState: MangaDetailState(
           mangaId: mangaId,
+          sourceId: sourceId
         ),
         getMangaUseCase: locator(),
-        getListChapterUseCase: locator(),
+        getListChapterUseCase: locator(), getMangaSourceUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         onTapChapter: onTapChapter,

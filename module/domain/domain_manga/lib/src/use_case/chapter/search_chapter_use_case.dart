@@ -1,18 +1,14 @@
 import 'package:core_network/core_network.dart';
-import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 
 import 'search_chapter_on_manga_dex_use_case.dart';
 
 class SearchChapterUseCase {
-  final SearchChapterOnMangaDexUseCase _getListChapterOnMangaDexUseCase;
-  final MangaChapterServiceFirebase _mangaChapterServiceFirebase;
+  final SearchChapterOnMangaDexUseCase _searchChapterOnMangaDexUseCase;
 
   const SearchChapterUseCase({
-    required SearchChapterOnMangaDexUseCase getListChapterOnMangaDexUseCase,
-    required MangaChapterServiceFirebase mangaChapterServiceFirebase,
-  })  : _getListChapterOnMangaDexUseCase = getListChapterOnMangaDexUseCase,
-        _mangaChapterServiceFirebase = mangaChapterServiceFirebase;
+    required SearchChapterOnMangaDexUseCase searchChapterOnMangaDexUseCase,
+  })  : _searchChapterOnMangaDexUseCase = searchChapterOnMangaDexUseCase;
 
   Future<Result<List<MangaChapter>>> execute({
     required MangaSourceEnum? source,
@@ -24,7 +20,7 @@ class SearchChapterUseCase {
 
     switch (source) {
       case MangaSourceEnum.mangadex:
-        result = await _getListChapterOnMangaDexUseCase.execute(
+        result = await _searchChapterOnMangaDexUseCase.execute(
           mangaId: mangaId,
         );
         break;
@@ -33,14 +29,6 @@ class SearchChapterUseCase {
         break;
     }
 
-    if (result is Success<List<MangaChapter>>) {
-      _sync(data: result.data);
-    }
-
     return result;
-  }
-
-  Future<void> _sync({required List<MangaChapter> data}) async {
-    await Future.wait(data.map((e) => _mangaChapterServiceFirebase.update(e)));
   }
 }
