@@ -32,6 +32,7 @@ class GetMangaOnMangaDexUseCase {
               ?.map((e) => MangaTag(name: e.attributes?.name?.en, id: e.id))
               .toList(),
           author: (await _authors(manga)).join(' | '),
+          webUrl: 'https://mangadex.org/title/${manga.id}',
         ),
       );
     } on Exception catch (e) {

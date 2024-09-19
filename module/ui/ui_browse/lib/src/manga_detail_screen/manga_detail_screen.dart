@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
+import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -9,9 +10,15 @@ import 'manga_detail_cubit.dart';
 import 'manga_detail_state.dart';
 
 class MangaDetailScreen extends StatefulWidget {
-  const MangaDetailScreen({super.key, required this.onTapChapter});
+  const MangaDetailScreen({
+    super.key,
+    required this.onTapChapter,
+    required this.launchUrlUseCase,
+  });
 
   final Function(BuildContext, String?) onTapChapter;
+
+  final LaunchUrlUseCase launchUrlUseCase;
 
   static Widget create({
     required ServiceLocator locator,
@@ -23,13 +30,15 @@ class MangaDetailScreen extends StatefulWidget {
       create: (context) => MangaDetailCubit(
         initialState: MangaDetailState(
           mangaId: mangaId,
-          sourceId: sourceId
+          sourceId: sourceId,
         ),
         getMangaUseCase: locator(),
-        getListChapterUseCase: locator(), getMangaSourceUseCase: locator(),
+        getListChapterUseCase: locator(),
+        getMangaSourceUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         onTapChapter: onTapChapter,
+        launchUrlUseCase: locator(),
       ),
     );
   }
@@ -58,9 +67,21 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
 
-  void _onTapWebsite(BuildContext context) {
-    // TODO: implement this
-    return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+  void _onTapWebsite(BuildContext context, MangaDetailState state) async {
+    final url = state.manga?.webUrl;
+
+    if (url == null || url.isEmpty) {
+      context.showSnackBar(message: 'Could not launch source url');
+      return;
+    }
+
+    final result = await widget.launchUrlUseCase.launch(
+      url: url,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (result || !mounted) return;
+    context.showSnackBar(message: 'Could not launch $url');
   }
 
   void _onTapTag(BuildContext context, {MangaTag? tag}) {
@@ -230,7 +251,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         tags: state.manga?.tags?.map((e) => e.name).whereNotNull().toList(),
         horizontalPadding: 12,
         onTapFavorite: () => _onTapFavorite(context),
-        onTapWebsite: () => _onTapWebsite(context),
+        onTapWebsite: () => _onTapWebsite(context, state),
         onTapTag: (name) => _onTapTag(
           context,
           tag: state.manga?.tags?.firstWhere((e) => e.name == name),

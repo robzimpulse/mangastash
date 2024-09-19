@@ -21,7 +21,7 @@ class Manga extends Equatable {
 
   final List<MangaTag>? tags;
 
-  final MangaSourceEnum? source;
+  final String? webUrl;
 
   const Manga({
     this.id,
@@ -31,12 +31,21 @@ class Manga extends Equatable {
     this.status,
     this.description,
     this.tags,
-    this.source,
+    this.webUrl,
   });
 
   @override
   List<Object?> get props {
-    return [id, title, coverUrl, author, status, description, tags, source];
+    return [
+      id,
+      title,
+      coverUrl,
+      author,
+      status,
+      description,
+      tags,
+      webUrl,
+    ];
   }
 
   factory Manga.fromJson(Map<String, dynamic> json) {
@@ -53,7 +62,7 @@ class Manga extends Equatable {
     String? status,
     String? description,
     List<MangaTag>? tags,
-    MangaSourceEnum? source,
+    String? webUrl,
   }) {
     return Manga(
       id: id ?? this.id,
@@ -63,7 +72,7 @@ class Manga extends Equatable {
       status: status ?? this.status,
       description: description ?? this.description,
       tags: tags ?? this.tags,
-      source: source ?? this.source,
+      webUrl: webUrl ?? this.webUrl,
     );
   }
 }
