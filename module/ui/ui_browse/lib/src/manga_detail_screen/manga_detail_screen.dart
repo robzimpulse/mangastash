@@ -6,6 +6,7 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
+import '../manga_misc_bottom_sheet/manga_misc_bottom_sheet.dart';
 import 'manga_detail_cubit.dart';
 import 'manga_detail_state.dart';
 
@@ -13,10 +14,13 @@ class MangaDetailScreen extends StatefulWidget {
   const MangaDetailScreen({
     super.key,
     required this.onTapChapter,
+    required this.onTapSort,
     required this.launchUrlUseCase,
   });
 
   final Function(BuildContext, String?) onTapChapter;
+
+  final Function(BuildContext) onTapSort;
 
   final LaunchUrlUseCase launchUrlUseCase;
 
@@ -25,6 +29,7 @@ class MangaDetailScreen extends StatefulWidget {
     required String? sourceId,
     required String? mangaId,
     required Function(BuildContext, String?) onTapChapter,
+    required Function(BuildContext) onTapSort,
   }) {
     return BlocProvider(
       create: (context) => MangaDetailCubit(
@@ -38,6 +43,7 @@ class MangaDetailScreen extends StatefulWidget {
       )..init(),
       child: MangaDetailScreen(
         onTapChapter: onTapChapter,
+        onTapSort: onTapSort,
         launchUrlUseCase: locator(),
       ),
     );
@@ -105,10 +111,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.sort),
-            // TODO: implement this
-            onPressed: () => context.showSnackBar(
-              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-            ),
+            onPressed: () => widget.onTapSort(context),
           ),
           IconButton(
             icon: const Icon(Icons.more_vert),

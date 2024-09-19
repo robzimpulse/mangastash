@@ -75,6 +75,9 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
                 )
                 .replaceAll(':chapterId', chapterId ?? ''),
           ),
+          onTapSort: (context) => context.showBottomSheet(
+            builder: (context) => MangaMiscBottomSheet.create(locator: locator),
+          ),
         ),
       ),
       GoRoute(
