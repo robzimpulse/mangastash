@@ -40,22 +40,29 @@ class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      expand: false,
-      snap: true,
-      builder: (context, controller) => CustomScrollView(
-        controller: controller,
-        slivers: const [
-          SliverToBoxAdapter(
-            child: Row(
+    return DefaultTabController(
+      length: 3,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const TabBar(
+            indicatorSize: TabBarIndicatorSize.tab,
+            tabs: [
+              Tab(text: 'Filter'),
+              Tab(text: 'Sort'),
+              Tab(text: 'Display'),
+            ],
+          ),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 200),
+            child: const TabBarView(
               children: [
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('🚧🚧🚧 Under Construction 🚧🚧🚧'),
-                ),
+                Icon(Icons.directions_car),
+                Icon(Icons.directions_transit),
+                Icon(Icons.directions_bike),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

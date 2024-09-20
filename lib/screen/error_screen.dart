@@ -14,11 +14,14 @@ class ErrorScreen extends StatelessWidget {
         title: const Text('Error Screen'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/'),
+          onPressed: () => context.pop(),
         ),
       ),
       body: Center(
-        child: Text(text),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+        ),
       ),
     );
   }

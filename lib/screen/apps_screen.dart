@@ -23,26 +23,48 @@ class AppsScreen extends StatelessWidget {
     );
   }
 
+  // taken from https://rydmike.com/flexcolorscheme/themesplayground-latest/
   ThemeData _themeLight() {
-    final theme = FlexThemeData.light(scheme: FlexScheme.outerSpace);
-    return theme.copyWith(
-      pageTransitionsTheme: _transition(),
-      splashColor: theme.primaryColor,
-      colorScheme: theme.colorScheme.copyWith(
-        secondary: theme.primaryColor,
+    return FlexThemeData.light(
+      scheme: FlexScheme.outerSpace,
+      surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+      blendLevel: 7,
+      tabBarStyle: FlexTabBarStyle.forAppBar,
+      subThemesData: const FlexSubThemesData(
+        blendOnLevel: 10,
+        blendOnColors: false,
+        useTextTheme: true,
+        useM2StyleDividerInM3: true,
+        alignedDropdown: true,
+        useInputDecoratorThemeInDialogs: true,
+        appBarBackgroundSchemeColor: SchemeColor.primary,
+        outlinedButtonSchemeColor: SchemeColor.onPrimary,
       ),
-    );
+      visualDensity: FlexColorScheme.comfortablePlatformDensity,
+      useMaterial3: true,
+      swapLegacyOnMaterial3: true,
+    ).copyWith(pageTransitionsTheme: _transition());
   }
 
+  // taken from https://rydmike.com/flexcolorscheme/themesplayground-latest/
   ThemeData _themeDark() {
-    final theme = FlexThemeData.dark(scheme: FlexScheme.outerSpace);
-    return theme.copyWith(
-      pageTransitionsTheme: _transition(),
-      splashColor: theme.primaryColor,
-      colorScheme: theme.colorScheme.copyWith(
-        secondary: theme.primaryColor,
+    return FlexThemeData.dark(
+      scheme: FlexScheme.outerSpace,
+      surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+      blendLevel: 13,
+      tabBarStyle: FlexTabBarStyle.forAppBar,
+      subThemesData: const FlexSubThemesData(
+        blendOnLevel: 20,
+        useTextTheme: true,
+        useM2StyleDividerInM3: true,
+        alignedDropdown: true,
+        useInputDecoratorThemeInDialogs: true,
+        outlinedButtonSchemeColor: SchemeColor.onPrimary,
       ),
-    );
+      visualDensity: FlexColorScheme.comfortablePlatformDensity,
+      useMaterial3: true,
+      swapLegacyOnMaterial3: true,
+    ).copyWith(pageTransitionsTheme: _transition());
   }
 
   @override

@@ -31,7 +31,7 @@ class MainRouteBuilder extends BaseRouteBuilder {
         path: MainPath.notFound,
         name: MainPath.notFound,
         builder: (context, state) => ErrorScreen(
-          text: state.error.toString(),
+          text: state.extra as String? ?? '',
         ),
       ),
       ...LibraryRouteBuilder().routes(

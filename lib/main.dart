@@ -15,7 +15,6 @@ import 'firebase_options.dart';
 import 'main_path.dart';
 import 'main_route.dart';
 import 'screen/apps_screen.dart';
-import 'screen/error_screen.dart';
 import 'screen/splash_screen.dart';
 
 void main() {
@@ -38,7 +37,6 @@ class MangaStashApp extends StatefulWidget {
 }
 
 class _MangaStashAppState extends State<MangaStashApp> {
-
   late final Future<GoRouter> _router = _initializeApp();
 
   @override
@@ -49,7 +47,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
         final router = snapshot.data;
         if (router == null) return const SplashScreen();
         return AppsScreen(
-          listenThemeUseCase: widget.locator.get(),
+          listenThemeUseCase: widget.locator(),
           routerConfig: router,
         );
       },
@@ -113,9 +111,9 @@ class _MangaStashAppState extends State<MangaStashApp> {
     return GoRouter(
       navigatorKey: rootNavigatorKey,
       initialLocation: initialRoute,
-      // TODO: replace [errorBuilder] with [onError] based on https://github.com/flutter/flutter/issues/108144
-      errorBuilder: (context, state) => ErrorScreen(
-        text: state.error.toString(),
+      onException: (context, state, router) => router.push(
+        MainPath.notFound,
+        extra: 'Path Not Found (${state.uri.toString()})',
       ),
       routes: MainRouteBuilder().allRoutes(
         locator: locator,
