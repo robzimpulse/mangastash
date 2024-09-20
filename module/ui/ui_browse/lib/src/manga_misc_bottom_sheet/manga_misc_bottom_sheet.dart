@@ -13,7 +13,11 @@ class MangaMiscBottomSheet extends StatefulWidget {
   }) {
     return BlocProvider(
       create: (context) => MangaMiscCubit(
-        initialState: const MangaMiscState(),
+        initialState: const MangaMiscState(
+          downloaded: false,
+          unread: false,
+          bookmarked: false,
+        ),
       ),
       child: const MangaMiscBottomSheet(),
     );
@@ -38,6 +42,110 @@ class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
     );
   }
 
+  Widget _filter(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _bloc(
+          buildWhen: (prev, curr) {
+            return prev.downloaded != curr.downloaded;
+          },
+          builder: (context, state) => CheckboxListTile(
+            tristate: true,
+            value: state.downloaded,
+            onChanged: (value) => _cubit(context).update(
+              downloaded: () => value,
+            ),
+            title: const Text('Downloaded'),
+          ),
+        ),
+        _bloc(
+          buildWhen: (prev, curr) {
+            return prev.unread != curr.unread;
+          },
+          builder: (context, state) => CheckboxListTile(
+            tristate: true,
+            value: state.unread,
+            onChanged: (value) => _cubit(context).update(
+              unread: () => value,
+            ),
+            title: const Text('Unread'),
+          ),
+        ),
+        _bloc(
+          buildWhen: (prev, curr) {
+            return prev.bookmarked != curr.bookmarked;
+          },
+          builder: (context, state) => CheckboxListTile(
+            tristate: true,
+            value: state.bookmarked,
+            onChanged: (value) => _cubit(context).update(
+              bookmarked: () => value,
+            ),
+            title: const Text('Bookmarked'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _sort(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (final options in MangaMiscSortOptionEnum.values)
+          _bloc(
+            buildWhen: (prev, curr) {
+              final isSortOptionChanged = prev.sortOption != curr.sortOption;
+              final isSortOrderChanged = prev.sortOrder != curr.sortOrder;
+              return isSortOptionChanged || isSortOrderChanged;
+            },
+            builder: (context, state) => ListTile(
+              leading: (state.sortOption == options)
+                  ? (state.sortOrder == MangaMiscSortOrderEnum.desc)
+                      ? const Icon(Icons.arrow_downward)
+                      : const Icon(Icons.arrow_upward)
+                  : SizedBox.fromSize(
+                      size: Size(
+                        IconTheme.of(context).size ?? 0,
+                        IconTheme.of(context).size ?? 0,
+                      ),
+                    ),
+              title: Text(options.value),
+              onTap: () => _cubit(context).update(
+                sortOption: options,
+                sortOrder: (state.sortOption == options)
+                    ? (state.sortOrder == MangaMiscSortOrderEnum.asc)
+                        ? MangaMiscSortOrderEnum.desc
+                        : MangaMiscSortOrderEnum.asc
+                    : null,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _display(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (final display in MangaMiscDisplayEnum.values)
+          _bloc(
+            buildWhen: (prev, curr) => prev.display != curr.display,
+            builder: (context, state) => RadioListTile<MangaMiscDisplayEnum>(
+              title: Text(display.value),
+              value: display,
+              groupValue: state.display,
+              onChanged: (value) => _cubit(context).update(
+                display: value,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -55,11 +163,11 @@ class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
           ),
           ConstrainedBox(
             constraints: const BoxConstraints(maxHeight: 200),
-            child: const TabBarView(
+            child: TabBarView(
               children: [
-                Icon(Icons.directions_car),
-                Icon(Icons.directions_transit),
-                Icon(Icons.directions_bike),
+                _filter(context),
+                _sort(context),
+                _display(context),
               ],
             ),
           ),
