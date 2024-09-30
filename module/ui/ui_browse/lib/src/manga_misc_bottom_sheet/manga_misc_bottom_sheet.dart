@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -28,6 +30,8 @@ class MangaMiscBottomSheet extends StatefulWidget {
 }
 
 class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
+  final ValueNotifier<Size> _currentSize = ValueNotifier(Size.zero);
+
   MangaMiscCubit _cubit(BuildContext context) {
     return context.read<MangaMiscCubit>();
   }
@@ -161,13 +165,60 @@ class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
               Tab(text: 'Display'),
             ],
           ),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 200),
+          ValueListenableBuilder(
+            valueListenable: _currentSize,
+            builder: (context, size, child) => AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              constraints: BoxConstraints(maxHeight: size.height),
+              child: child,
+            ),
             child: TabBarView(
               children: [
-                _filter(context),
-                _sort(context),
-                _display(context),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ChildSizeNotifierWidget(
+                      builder: (context, size, _) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (!context.mounted) return;
+                          _currentSize.value = size ?? Size.zero;
+                        });
+                        return _filter(context);
+                      },
+                    ),
+                    const Spacer(),
+                  ],
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ChildSizeNotifierWidget(
+                      builder: (context, size, _) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (!context.mounted) return;
+                          _currentSize.value = size ?? Size.zero;
+                        });
+                        return _sort(context);
+                      },
+                    ),
+                    const Spacer(),
+                  ],
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ChildSizeNotifierWidget(
+                      builder: (context, size, _) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (!context.mounted) return;
+                          _currentSize.value = size ?? Size.zero;
+                        });
+                        return _display(context);
+                      },
+                    ),
+                    const Spacer(),
+                  ],
+                ),
               ],
             ),
           ),
