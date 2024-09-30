@@ -153,6 +153,7 @@ class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
+      animationDuration: const Duration(milliseconds: 100),
       length: 3,
       child: Column(
         mainAxisSize: MainAxisSize.min,
