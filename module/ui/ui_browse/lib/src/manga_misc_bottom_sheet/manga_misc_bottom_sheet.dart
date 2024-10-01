@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -181,8 +179,10 @@ class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
                     ChildSizeNotifierWidget(
                       builder: (context, size, _) {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (!context.mounted) return;
-                          _currentSize.value = size ?? Size.zero;
+                          final value = size ?? Size.zero;
+                          if (!context.mounted || value.isEmpty) return;
+                          if (_currentSize.value.height > value.height) return;
+                          _currentSize.value = value;
                         });
                         return _filter(context);
                       },
@@ -196,8 +196,10 @@ class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
                     ChildSizeNotifierWidget(
                       builder: (context, size, _) {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (!context.mounted) return;
-                          _currentSize.value = size ?? Size.zero;
+                          final value = size ?? Size.zero;
+                          if (!context.mounted || value.isEmpty) return;
+                          if (_currentSize.value.height > value.height) return;
+                          _currentSize.value = value;
                         });
                         return _sort(context);
                       },
@@ -211,8 +213,10 @@ class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
                     ChildSizeNotifierWidget(
                       builder: (context, size, _) {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (!context.mounted) return;
-                          _currentSize.value = size ?? Size.zero;
+                          final value = size ?? Size.zero;
+                          if (!context.mounted || value.isEmpty) return;
+                          if (_currentSize.value.height > value.height) return;
+                          _currentSize.value = value;
                         });
                         return _display(context);
                       },

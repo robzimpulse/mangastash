@@ -133,12 +133,15 @@ class _MangaReaderScreenState extends State<MangaReaderScreen> {
                     Icons.error,
                   ),
                   progressIndicatorBuilder: (context, url, downloadProgress) {
-                    return Center(
-                      child: SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          value: downloadProgress.progress,
+                    return ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 300),
+                      child: Center(
+                        child: SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            value: downloadProgress.progress,
+                          ),
                         ),
                       ),
                     );
