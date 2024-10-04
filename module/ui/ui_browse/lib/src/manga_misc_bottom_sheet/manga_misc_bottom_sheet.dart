@@ -1,3 +1,4 @@
+import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -13,11 +14,8 @@ class MangaMiscBottomSheet extends StatefulWidget {
   }) {
     return BlocProvider(
       create: (context) => MangaMiscCubit(
-        initialState: const MangaMiscState(
-          downloaded: false,
-          unread: false,
-          bookmarked: false,
-        ),
+        listenMangaChapterConfig: locator(),
+        updateMangaChapterConfig: locator(),
       ),
       child: const MangaMiscBottomSheet(),
     );
@@ -50,11 +48,11 @@ class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
       children: [
         _bloc(
           buildWhen: (prev, curr) {
-            return prev.downloaded != curr.downloaded;
+            return prev.config?.downloaded != curr.config?.downloaded;
           },
           builder: (context, state) => CheckboxListTile(
             tristate: true,
-            value: state.downloaded,
+            value: state.config?.downloaded,
             onChanged: (value) => _cubit(context).update(
               downloaded: () => value,
             ),
@@ -63,11 +61,11 @@ class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
         ),
         _bloc(
           buildWhen: (prev, curr) {
-            return prev.unread != curr.unread;
+            return prev.config?.unread != curr.config?.unread;
           },
           builder: (context, state) => CheckboxListTile(
             tristate: true,
-            value: state.unread,
+            value: state.config?.unread,
             onChanged: (value) => _cubit(context).update(
               unread: () => value,
             ),
@@ -76,11 +74,11 @@ class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
         ),
         _bloc(
           buildWhen: (prev, curr) {
-            return prev.bookmarked != curr.bookmarked;
+            return prev.config?.bookmarked != curr.config?.bookmarked;
           },
           builder: (context, state) => CheckboxListTile(
             tristate: true,
-            value: state.bookmarked,
+            value: state.config?.bookmarked,
             onChanged: (value) => _cubit(context).update(
               bookmarked: () => value,
             ),
@@ -95,16 +93,18 @@ class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        for (final options in MangaMiscSortOptionEnum.values)
+        for (final options in MangaChapterSortOptionEnum.values)
           _bloc(
             buildWhen: (prev, curr) {
-              final isSortOptionChanged = prev.sortOption != curr.sortOption;
-              final isSortOrderChanged = prev.sortOrder != curr.sortOrder;
+              final isSortOptionChanged =
+                  prev.config?.sortOption != curr.config?.sortOption;
+              final isSortOrderChanged =
+                  prev.config?.sortOrder != curr.config?.sortOrder;
               return isSortOptionChanged || isSortOrderChanged;
             },
             builder: (context, state) => ListTile(
-              leading: (state.sortOption == options)
-                  ? (state.sortOrder == MangaMiscSortOrderEnum.desc)
+              leading: (state.config?.sortOption == options)
+                  ? (state.config?.sortOrder == MangaChapterSortOrderEnum.desc)
                       ? const Icon(Icons.arrow_downward)
                       : const Icon(Icons.arrow_upward)
                   : SizedBox.fromSize(
@@ -116,10 +116,10 @@ class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
               title: Text(options.value),
               onTap: () => _cubit(context).update(
                 sortOption: options,
-                sortOrder: (state.sortOption == options)
-                    ? (state.sortOrder == MangaMiscSortOrderEnum.asc)
-                        ? MangaMiscSortOrderEnum.desc
-                        : MangaMiscSortOrderEnum.asc
+                sortOrder: (state.config?.sortOption == options)
+                    ? (state.config?.sortOrder == MangaChapterSortOrderEnum.asc)
+                        ? MangaChapterSortOrderEnum.desc
+                        : MangaChapterSortOrderEnum.asc
                     : null,
               ),
             ),
@@ -132,13 +132,14 @@ class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        for (final display in MangaMiscDisplayEnum.values)
+        for (final display in MangaChapterDisplayEnum.values)
           _bloc(
-            buildWhen: (prev, curr) => prev.display != curr.display,
-            builder: (context, state) => RadioListTile<MangaMiscDisplayEnum>(
+            buildWhen: (prev, curr) =>
+                prev.config?.display != curr.config?.display,
+            builder: (context, state) => RadioListTile<MangaChapterDisplayEnum>(
               title: Text(display.value),
               value: display,
-              groupValue: state.display,
+              groupValue: state.config?.display,
               onChanged: (value) => _cubit(context).update(
                 display: value,
               ),

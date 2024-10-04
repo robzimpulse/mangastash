@@ -27,6 +27,14 @@ dependencies:
   core_network:
     path: ../../core/core_network
 
+  # entity
+  entity_manga:
+    path: ../../entity/entity_manga
+
+  # domain
+  domain_manga:
+    path: ../../domain/domain_manga
+
   #ui
   ui_common:
     path: ../../ui/ui_common
