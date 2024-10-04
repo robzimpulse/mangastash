@@ -49,7 +49,7 @@ class MangaDetailWidget extends StatelessWidget {
 
   final bool isLoading;
 
-  Widget _header() {
+  Widget _header(BuildContext context) {
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       sliver: SliverToBoxAdapter(
@@ -87,9 +87,21 @@ class MangaDetailWidget extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    if (title != null) Text(title ?? ''),
-                    if (author != null) Text(author ?? ''),
-                    if (status != null) Text(status ?? ''),
+                    if (title != null)
+                      Text(
+                        title ?? '',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    if (author != null)
+                      Text(
+                        author ?? '',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    if (status != null)
+                      Text(
+                        status ?? '',
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
                   ].intersperse(const SizedBox(height: 4)).toList(),
                 ),
               ),
@@ -100,30 +112,56 @@ class MangaDetailWidget extends StatelessWidget {
     );
   }
 
-  Widget _buttons() {
+  Widget _buttons(BuildContext context) {
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       sliver: SliverToBoxAdapter(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            ShimmerLoading.box(
-              isLoading: isLoading,
-              width: 50,
-              height: 50,
-              child: IconButton(
-                icon: const Icon(Icons.favorite_outline),
-                onPressed: onTapFavorite,
+            InkWell(
+              onTap: onTapFavorite,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ShimmerLoading.box(
+                    isLoading: isLoading,
+                    width: 50,
+                    height: 50,
+                    child: const Icon(Icons.favorite_outline),
+                  ),
+                  const SizedBox(height: 2),
+                  ShimmerLoading.multiline(
+                    isLoading: isLoading,
+                    lines: 1,
+                    width: 50,
+                    height: 15,
+                    child: const Text('Favorite'),
+                  ),
+                ],
               ),
             ),
             const SizedBox.shrink(),
-            ShimmerLoading.box(
-              isLoading: isLoading,
-              width: 50,
-              height: 50,
-              child: IconButton(
-                icon: const Icon(Icons.web),
-                onPressed: onTapWebsite,
+            InkWell(
+              onTap: onTapWebsite,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ShimmerLoading.box(
+                    isLoading: isLoading,
+                    width: 50,
+                    height: 50,
+                    child: const Icon(Icons.web),
+                  ),
+                  const SizedBox(height: 2),
+                  ShimmerLoading.multiline(
+                    isLoading: isLoading,
+                    lines: 1,
+                    width: 50,
+                    height: 15,
+                    child: const Text('Website'),
+                  )
+                ],
               ),
             ),
           ],
@@ -132,7 +170,7 @@ class MangaDetailWidget extends StatelessWidget {
     );
   }
 
-  Widget? _description() {
+  Widget? _description(BuildContext context) {
     final text = description;
     if (text == null) return null;
     return SliverPadding(
@@ -180,7 +218,7 @@ class MangaDetailWidget extends StatelessWidget {
     );
   }
 
-  Widget _loadingTags() {
+  Widget _loadingTags(BuildContext context) {
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       sliver: SliverToBoxAdapter(
@@ -202,7 +240,7 @@ class MangaDetailWidget extends StatelessWidget {
     );
   }
 
-  Widget? _loadedTags() {
+  Widget? _loadedTags(BuildContext context) {
     final data = tags;
     if (data == null) return null;
     if (data.isEmpty) return null;
@@ -227,18 +265,22 @@ class MangaDetailWidget extends StatelessWidget {
     );
   }
 
-  Widget _separator() => SliverToBoxAdapter(child: separator);
+  Widget _separator(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: separator,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final widgets = [
-      _header(),
-      _buttons(),
-      _description(),
-      isLoading ? _loadingTags() : _loadedTags(),
+      _header(context),
+      _buttons(context),
+      _description(context),
+      isLoading ? _loadingTags(context) : _loadedTags(context),
       ...child,
-    ].whereType<Widget>().intersperse(_separator());
+    ].whereType<Widget>().intersperse(_separator(context));
 
-    return CustomScrollView(slivers: [_separator(), ...widgets]);
+    return CustomScrollView(slivers: [_separator(context), ...widgets]);
   }
 }

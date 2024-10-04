@@ -220,7 +220,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             children: [
               Text(
                 '${chapters.length} Chapters',
-                style: Theme.of(context).textTheme.headlineSmall,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             ],
           ),
