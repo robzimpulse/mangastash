@@ -184,20 +184,21 @@ class MangaDetailWidget extends StatelessWidget {
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       sliver: SliverToBoxAdapter(
-          child: SizedBox(
-        height: 32,
-        child: ListView.separated(
-          shrinkWrap: true,
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (context, index) => ShimmerLoading.box(
-            isLoading: isLoading,
-            width: 80,
-            height: 44,
+        child: SizedBox(
+          height: 32,
+          child: ListView.separated(
+            shrinkWrap: true,
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, index) => ShimmerLoading.box(
+              isLoading: isLoading,
+              width: 80,
+              height: 44,
+            ),
+            separatorBuilder: (context, index) => const SizedBox(width: 8),
+            itemCount: 20,
           ),
-          separatorBuilder: (context, index) => const SizedBox(width: 8),
-          itemCount: 20,
         ),
-      ),),
+      ),
     );
   }
 
