@@ -39,6 +39,7 @@ class MangaDetailScreen extends StatefulWidget {
         getMangaUseCase: locator(),
         getListChapterUseCase: locator(),
         getMangaSourceUseCase: locator(),
+        listenMangaChapterConfig: locator(),
       )..init(),
       child: MangaDetailScreen(
         onTapChapter: onTapChapter,
@@ -251,7 +252,11 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               final int itemIndex = index ~/ 2;
               return index.isOdd
                   ? _separator()
-                  : _chapter(context: context, chapter: chapters[itemIndex]);
+                  : _chapter(
+                      context: context,
+                      chapter: chapters[itemIndex],
+                      config: state.config,
+                    );
             },
           ),
         ),
@@ -286,8 +291,25 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   Widget _chapter({
     required BuildContext context,
     required MangaChapter? chapter,
+    required MangaChapterConfig? config,
   }) {
     if (chapter == null) return const SizedBox.shrink();
+
+    final display = config?.display;
+
+    String? title = chapter.title;
+    String? chapterName = chapter.chapter;
+
+    if (display != null) {
+      switch (display) {
+        case MangaChapterDisplayEnum.title:
+          chapterName = null;
+          break;
+        case MangaChapterDisplayEnum.chapter:
+          title = null;
+          break;
+      }
+    }
 
     return InkWell(
       onTap: () => widget.onTapChapter.call(context, chapter.id),
@@ -301,7 +323,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 Text(
                   [
                     if (chapter.volume != null) 'Vol ${chapter.volume}',
-                    if (chapter.chapter != null) 'Ch ${chapter.chapter}',
+                    if (chapterName != null) 'Ch $chapterName',
                   ].join(' '),
                 ),
               ],
@@ -314,7 +336,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                     [
                       if (chapter.readableAt != null)
                         '${chapter.readableAt?.asDateTime?.ddLLLLyy}',
-                      if (chapter.title != null) '${chapter.title}',
+                      if (title != null) title,
                     ].join(' - '),
                   ),
                 ),

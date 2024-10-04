@@ -5,7 +5,8 @@ import 'package:safe_bloc/safe_bloc.dart';
 
 import 'manga_detail_state.dart';
 
-class MangaDetailCubit extends Cubit<MangaDetailState> {
+class MangaDetailCubit extends Cubit<MangaDetailState>
+    with AutoSubscriptionMixin {
   final GetMangaUseCase _getMangaUseCase;
   final SearchChapterUseCase _getListChapterUseCase;
   final GetMangaSourceUseCase _getMangaSourceUseCase;
@@ -15,10 +16,20 @@ class MangaDetailCubit extends Cubit<MangaDetailState> {
     required GetMangaUseCase getMangaUseCase,
     required SearchChapterUseCase getListChapterUseCase,
     required GetMangaSourceUseCase getMangaSourceUseCase,
+    required ListenMangaChapterConfig listenMangaChapterConfig,
   })  : _getMangaUseCase = getMangaUseCase,
         _getListChapterUseCase = getListChapterUseCase,
         _getMangaSourceUseCase = getMangaSourceUseCase,
-        super(initialState);
+        super(initialState) {
+    addSubscription(
+      listenMangaChapterConfig.mangaChapterConfigStream
+          .listen(_updateMangaConfig),
+    );
+  }
+
+  void _updateMangaConfig(MangaChapterConfig config) {
+    emit(state.copyWith(config: config));
+  }
 
   Future<void> init() async {
     emit(state.copyWith(isLoading: true));
