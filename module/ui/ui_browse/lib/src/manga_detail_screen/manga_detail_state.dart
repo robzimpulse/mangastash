@@ -2,6 +2,19 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ui_common/ui_common.dart';
 
+enum DownloadOption {
+  next('Next Chapter'),
+  next5('Next 5 Chapter'),
+  next10('Next 10 Chapter'),
+  custom('Custom'),
+  unread('Unread'),
+  all('All');
+
+  final String value;
+
+  const DownloadOption(this.value);
+}
+
 class MangaDetailState extends Equatable {
   final bool isLoading;
   final Exception? error;

@@ -64,9 +64,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
-  MangaDetailCubit _cubit(BuildContext context) {
-    return context.read<MangaDetailCubit>();
-  }
+  MangaDetailCubit _cubit(BuildContext context) => context.read();
 
   void _onTapFavorite(BuildContext context) {
     // TODO: implement this
@@ -95,6 +93,12 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
 
+  void _onTapDownload(BuildContext context, DownloadOption option) {
+    context.showSnackBar(
+      message: '🚧🚧🚧 Under Construction $option 🚧🚧🚧',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
@@ -102,12 +106,17 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         title: _title(),
         elevation: 0,
         actions: [
-          IconButton(
+          PopupMenuButton<DownloadOption>(
             icon: const Icon(Icons.download),
-            // TODO: implement this
-            onPressed: () => context.showSnackBar(
-              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-            ),
+            onSelected: (value) => _onTapDownload(context, value),
+            itemBuilder: (context) => [
+              ...DownloadOption.values.map(
+                (e) => PopupMenuItem<DownloadOption>(
+                  value: e,
+                  child: Text(e.value),
+                ),
+              ),
+            ],
           ),
           IconButton(
             icon: const Icon(Icons.sort),
