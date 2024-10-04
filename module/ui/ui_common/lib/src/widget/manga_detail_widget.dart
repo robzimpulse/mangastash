@@ -184,19 +184,19 @@ class MangaDetailWidget extends StatelessWidget {
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       sliver: SliverToBoxAdapter(
-        child: SizedBox(
-          height: 32,
-          child: ListView.separated(
-            shrinkWrap: true,
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index) => ShimmerLoading.box(
-              isLoading: isLoading,
-              width: 80,
-              height: 44,
+        child: Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            ...List.generate(
+              10,
+              (index) => ShimmerLoading.box(
+                isLoading: isLoading,
+                width: 80,
+                height: 30,
+              ),
             ),
-            separatorBuilder: (context, index) => const SizedBox(width: 8),
-            itemCount: 20,
-          ),
+          ],
         ),
       ),
     );
@@ -209,18 +209,19 @@ class MangaDetailWidget extends StatelessWidget {
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       sliver: SliverToBoxAdapter(
-        child: SizedBox(
-          height: 32,
-          child: ListView.separated(
-            shrinkWrap: true,
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index) => OutlinedButton(
-              child: Text(data[index]),
-              onPressed: () => onTapTag?.call(data[index]),
-            ),
-            separatorBuilder: (context, index) => const SizedBox(width: 8),
-            itemCount: data.length,
-          ),
+        child: Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final item in data)
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 30),
+                child: OutlinedButton(
+                  child: Text(item),
+                  onPressed: () => onTapTag?.call(item),
+                ),
+              ),
+          ],
         ),
       ),
     );
