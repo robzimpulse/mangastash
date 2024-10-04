@@ -29,7 +29,6 @@ class AppsScreen extends StatelessWidget {
       scheme: FlexScheme.outerSpace,
       surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
       blendLevel: 7,
-      tabBarStyle: FlexTabBarStyle.forAppBar,
       subThemesData: const FlexSubThemesData(
         blendOnLevel: 10,
         blendOnColors: false,
