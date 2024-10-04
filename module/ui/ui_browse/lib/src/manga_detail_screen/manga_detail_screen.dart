@@ -99,6 +99,13 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
+  void _onTapShare(BuildContext context) {
+    // TODO: implement this
+    context.showSnackBar(
+      message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
@@ -123,11 +130,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             onPressed: () => widget.onTapSort(context),
           ),
           IconButton(
-            icon: const Icon(Icons.more_vert),
-            // TODO: implement this
-            onPressed: () => context.showSnackBar(
-              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-            ),
+            icon: const Icon(Icons.share),
+            onPressed: () => _onTapShare(context),
           ),
         ],
       ),
