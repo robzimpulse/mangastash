@@ -38,12 +38,11 @@ class AppsScreen extends StatelessWidget {
         alignedDropdown: true,
         useInputDecoratorThemeInDialogs: true,
         appBarBackgroundSchemeColor: SchemeColor.primary,
-        outlinedButtonSchemeColor: SchemeColor.onPrimary,
       ),
       visualDensity: FlexColorScheme.comfortablePlatformDensity,
       useMaterial3: true,
       swapLegacyOnMaterial3: true,
-    ).copyWith(pageTransitionsTheme: _transition());
+    );
   }
 
   // taken from https://rydmike.com/flexcolorscheme/themesplayground-latest/
@@ -64,7 +63,7 @@ class AppsScreen extends StatelessWidget {
       visualDensity: FlexColorScheme.comfortablePlatformDensity,
       useMaterial3: true,
       swapLegacyOnMaterial3: true,
-    ).copyWith(pageTransitionsTheme: _transition());
+    );
   }
 
   @override
@@ -77,8 +76,8 @@ class AppsScreen extends StatelessWidget {
           title: 'Manga Stash',
           debugShowCheckedModeBanner: false,
           routerConfig: routerConfig,
-          theme: _themeLight(),
-          darkTheme: _themeDark(),
+          theme: _themeLight().copyWith(pageTransitionsTheme: _transition()),
+          darkTheme: _themeDark().copyWith(pageTransitionsTheme: _transition()),
           themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
           builder: (context, child) => ResponsiveBreakpoints.builder(
             breakpoints: const [
