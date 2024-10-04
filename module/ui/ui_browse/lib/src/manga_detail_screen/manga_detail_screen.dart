@@ -214,11 +214,14 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
     return [
       SliverPadding(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12).copyWith(top: 12),
         sliver: SliverToBoxAdapter(
           child: Row(
             children: [
-              Text('${chapters.length} Chapters'),
+              Text(
+                '${chapters.length} Chapters',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
             ],
           ),
         ),
@@ -227,7 +230,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         sliver: SliverList(
           delegate: SliverChildBuilderDelegate(
-            childCount: chapters.length,
+            childCount: (chapters.length * 2) - 1,
             semanticIndexCallback: (Widget _, int index) {
               return index.isEven ? index ~/ 2 : null;
             },
@@ -265,7 +268,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
-  Widget _separator() => const SizedBox(height: 8);
+  Widget _separator() => const Divider(height: 1);
 
   Widget _chapter({
     required BuildContext context,
@@ -275,32 +278,37 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
     return InkWell(
       onTap: () => widget.onTapChapter.call(context, chapter.id),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Text(
-                [
-                  if (chapter.volume != null) 'Vol ${chapter.volume}',
-                  if (chapter.chapter != null) 'Ch ${chapter.chapter}',
-                ].join(' '),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Text(
                   [
-                    if (chapter.readableAt != null)
-                      '${chapter.readableAt?.asDateTime?.ddLLLLyy}',
-                    if (chapter.title != null) '${chapter.title}',
-                  ].join(' - '),
+                    if (chapter.volume != null) 'Vol ${chapter.volume}',
+                    if (chapter.chapter != null) 'Ch ${chapter.chapter}',
+                  ].join(' '),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    [
+                      if (chapter.readableAt != null)
+                        '${chapter.readableAt?.asDateTime?.ddLLLLyy}',
+                      if (chapter.title != null) '${chapter.title}',
+                    ].join(' - '),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
