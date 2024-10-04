@@ -6,7 +6,6 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import '../manga_misc_bottom_sheet/manga_misc_bottom_sheet.dart';
 import 'manga_detail_cubit.dart';
 import 'manga_detail_state.dart';
 
@@ -94,6 +93,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   void _onTapDownload(BuildContext context, DownloadOption option) {
+    // TODO: implement this
     context.showSnackBar(
       message: '🚧🚧🚧 Under Construction $option 🚧🚧🚧',
     );
