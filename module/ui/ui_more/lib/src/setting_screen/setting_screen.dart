@@ -155,7 +155,6 @@ class _SettingScreenState extends State<SettingScreen> {
           prev.mangaChapterConfig != curr.mangaChapterConfig,
       builder: (context, state) => ListTile(
         title: const Text('Manga Chapter Sort'),
-        onTap: () {},
         trailing: Text(
           [
             state.mangaChapterConfig?.sortOption.value ?? '',
@@ -176,7 +175,6 @@ class _SettingScreenState extends State<SettingScreen> {
           prev.mangaChapterConfig != curr.mangaChapterConfig,
       builder: (context, state) => ListTile(
         title: const Text('Manga Chapter Filter'),
-        onTap: () {},
         trailing: Text(
           [
             state.mangaChapterConfig?.unread ?? 'null',
@@ -198,7 +196,6 @@ class _SettingScreenState extends State<SettingScreen> {
           prev.mangaChapterConfig != curr.mangaChapterConfig,
       builder: (context, state) => ListTile(
         title: const Text('Manga Chapter Display'),
-        onTap: () {},
         trailing: Text(
           state.mangaChapterConfig?.display.value ?? '',
         ),
@@ -210,22 +207,86 @@ class _SettingScreenState extends State<SettingScreen> {
     );
   }
 
+  Widget _buildAppsSettingGroup(BuildContext context) {
+    return MultiSliver(
+      children: [
+        SliverPinnedHeader(
+          child: ListTile(
+            title: Text(
+              'Apps Setting',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: _buildDarkModeMenu(context),
+        ),
+        SliverToBoxAdapter(
+          child: _buildLanguageMenu(context),
+        ),
+        SliverToBoxAdapter(
+          child: _buildCountryMenu(context),
+        ),
+        SliverToBoxAdapter(
+          child: _buildTimeZoneMenu(context),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMangaChapterSettingGroup(BuildContext context) {
+    return MultiSliver(
+      children: [
+        SliverPinnedHeader(
+          child: ListTile(
+            title: Text(
+              'Manga Chapter Config',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: _buildMangaSortMenu(context),
+        ),
+        SliverToBoxAdapter(
+          child: _buildMangaChapterFilterMenu(context),
+        ),
+        SliverToBoxAdapter(
+          child: _buildMangaChapterDisplayMenu(context),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDebugSettingGroup(BuildContext context) {
+    return MultiSliver(
+      children: [
+        SliverPinnedHeader(
+          child: ListTile(
+            title: Text(
+              'Debug Setting',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: _buildHttpInspectorMenu(context),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
       appBar: AppBar(
         title: const Text('Setting'),
       ),
-      body: ListView(
-        children: [
-          _buildDarkModeMenu(context),
-          _buildLanguageMenu(context),
-          _buildCountryMenu(context),
-          _buildTimeZoneMenu(context),
-          _buildMangaSortMenu(context),
-          _buildMangaChapterFilterMenu(context),
-          _buildMangaChapterDisplayMenu(context),
-          _buildHttpInspectorMenu(context),
+      body: CustomScrollView(
+        slivers: [
+          _buildAppsSettingGroup(context),
+          _buildMangaChapterSettingGroup(context),
+          _buildDebugSettingGroup(context),
         ],
       ),
     );

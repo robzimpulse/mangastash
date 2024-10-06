@@ -14,6 +14,7 @@ dependencies:
   expandable: ^5.0.1
   responsive_framework: ^1.0.0
   intersperse: ^2.0.0
+  sliver_tools: ^0.2.12
 
   # core
   core_route:

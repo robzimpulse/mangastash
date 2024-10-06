@@ -5,6 +5,7 @@ export 'package:expandable/expandable.dart';
 export 'package:flutter/material.dart';
 export 'package:intersperse/intersperse.dart';
 export 'package:responsive_framework/responsive_framework.dart';
+export 'package:sliver_tools/sliver_tools.dart';
 
 export 'src/bottom_sheet/confirmation_bottom_sheet.dart';
 export 'src/bottom_sheet/picker_bottom_sheet.dart';
