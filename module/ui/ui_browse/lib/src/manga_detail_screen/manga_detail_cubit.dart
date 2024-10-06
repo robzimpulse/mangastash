@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -29,6 +31,7 @@ class MangaDetailCubit extends Cubit<MangaDetailState>
 
   void _updateMangaConfig(MangaChapterConfig config) {
     emit(state.copyWith(config: config));
+    _processChapter();
   }
 
   Future<void> init() async {
@@ -38,6 +41,68 @@ class MangaDetailCubit extends Cubit<MangaDetailState>
     await Future.wait([_fetchManga(), _fetchChapter()]);
 
     emit(state.copyWith(isLoading: false));
+  }
+
+  void _processChapter() {
+    final sortOrder = state.config?.sortOrder;
+    final sortOption = state.config?.sortOption;
+    List<MangaChapter>? sortedChapter = state.chapters;
+
+    if (sortOrder != null && sortOption != null) {
+      switch (sortOption) {
+        case MangaChapterSortOptionEnum.chapterNumber:
+          switch (sortOrder) {
+            case MangaChapterSortOrderEnum.asc:
+              sortedChapter = state.chapters?.sorted(
+                (a, b) {
+                  final aChapter = int.tryParse(a.chapter ?? '');
+                  final bChapter = int.tryParse(b.chapter ?? '');
+                  if (aChapter == null || bChapter == null) return 0;
+                  return -aChapter.compareTo(bChapter);
+                },
+              );
+              break;
+            case MangaChapterSortOrderEnum.desc:
+              sortedChapter = state.chapters?.sorted(
+                (a, b) {
+                  final aChapter = int.tryParse(a.chapter ?? '');
+                  final bChapter = int.tryParse(b.chapter ?? '');
+                  if (aChapter == null || bChapter == null) return 0;
+                  return aChapter.compareTo(bChapter);
+                },
+              );
+              break;
+          }
+
+          break;
+        case MangaChapterSortOptionEnum.uploadDate:
+          switch (sortOrder) {
+            case MangaChapterSortOrderEnum.asc:
+              sortedChapter = state.chapters?.sorted(
+                (a, b) {
+                  final aDate = a.readableAt?.asDateTime;
+                  final bDate = b.readableAt?.asDateTime;
+                  if (aDate == null || bDate == null) return 0;
+                  return aDate.compareTo(bDate);
+                },
+              );
+              break;
+            case MangaChapterSortOrderEnum.desc:
+              sortedChapter = state.chapters?.sorted(
+                (a, b) {
+                  final aDate = a.readableAt?.asDateTime;
+                  final bDate = b.readableAt?.asDateTime;
+                  if (aDate == null || bDate == null) return 0;
+                  return -aDate.compareTo(bDate);
+                },
+              );
+              break;
+          }
+          break;
+      }
+    }
+
+    emit(state.copyWith(processedChapters: sortedChapter));
   }
 
   Future<void> _fetchSource() async {
@@ -89,5 +154,7 @@ class MangaDetailCubit extends Cubit<MangaDetailState>
     if (result is Error<List<MangaChapter>>) {
       emit(state.copyWith(error: () => result.error));
     }
+
+    _processChapter();
   }
 }

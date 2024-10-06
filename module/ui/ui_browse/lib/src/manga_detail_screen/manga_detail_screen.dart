@@ -208,7 +208,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       ];
     }
 
-    final chapters = state.chapters;
+    final chapters = state.processedChapters;
     if (chapters == null || chapters.isEmpty == true) {
       return [
         const SliverFillRemaining(
@@ -226,64 +226,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       ];
     }
 
-    final sortOrder = state.config?.sortOrder;
-    final sortOption = state.config?.sortOption;
-    List<MangaChapter> sortedChapter = chapters;
-
-    if (sortOrder != null && sortOption != null) {
-      switch (sortOption) {
-        case MangaChapterSortOptionEnum.chapterNumber:
-          switch (sortOrder) {
-            case MangaChapterSortOrderEnum.asc:
-              sortedChapter = chapters.sorted(
-                (a, b) {
-                  final aChapter = int.tryParse(a.chapter ?? '');
-                  final bChapter = int.tryParse(b.chapter ?? '');
-                  if (aChapter == null || bChapter == null) return 0;
-                  return -aChapter.compareTo(bChapter);
-                },
-              );
-              break;
-            case MangaChapterSortOrderEnum.desc:
-              sortedChapter = chapters.sorted(
-                (a, b) {
-                  final aChapter = int.tryParse(a.chapter ?? '');
-                  final bChapter = int.tryParse(b.chapter ?? '');
-                  if (aChapter == null || bChapter == null) return 0;
-                  return aChapter.compareTo(bChapter);
-                },
-              );
-              break;
-          }
-
-          break;
-        case MangaChapterSortOptionEnum.uploadDate:
-          switch (sortOrder) {
-            case MangaChapterSortOrderEnum.asc:
-              sortedChapter = chapters.sorted(
-                (a, b) {
-                  final aDate = a.readableAt?.asDateTime;
-                  final bDate = b.readableAt?.asDateTime;
-                  if (aDate == null || bDate == null) return 0;
-                  return aDate.compareTo(bDate);
-                },
-              );
-              break;
-            case MangaChapterSortOrderEnum.desc:
-              sortedChapter = chapters.sorted(
-                (a, b) {
-                  final aDate = a.readableAt?.asDateTime;
-                  final bDate = b.readableAt?.asDateTime;
-                  if (aDate == null || bDate == null) return 0;
-                  return -aDate.compareTo(bDate);
-                },
-              );
-              break;
-          }
-          break;
-      }
-    }
-
     return [
       SliverPadding(
         padding: const EdgeInsets.symmetric(horizontal: 12).copyWith(top: 12),
@@ -291,7 +233,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           child: Row(
             children: [
               Text(
-                '${sortedChapter.length} Chapters',
+                '${chapters.length} Chapters',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ],
@@ -302,7 +244,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         sliver: SliverList(
           delegate: SliverChildBuilderDelegate(
-            childCount: (sortedChapter.length * 2) - 1,
+            childCount: (chapters.length * 2) - 1,
             semanticIndexCallback: (Widget _, int index) {
               return index.isEven ? index ~/ 2 : null;
             },
@@ -312,7 +254,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   ? _separator()
                   : _chapter(
                       context: context,
-                      chapter: sortedChapter[itemIndex],
+                      chapter: chapters[itemIndex],
                       config: state.config,
                     );
             },
