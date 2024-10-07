@@ -169,18 +169,48 @@ class _SettingScreenState extends State<SettingScreen> {
     );
   }
 
-  Widget _buildMangaChapterFilterMenu(BuildContext context) {
+  Widget _buildMangaChapterFilterUnreadMenu(BuildContext context) {
     return _builder(
       buildWhen: (prev, curr) =>
           prev.mangaChapterConfig != curr.mangaChapterConfig,
       builder: (context, state) => ListTile(
-        title: const Text('Manga Chapter Filter'),
+        title: const Text('Filter Unread Chapter'),
         trailing: Text(
-          [
-            state.mangaChapterConfig?.unread ?? 'null',
-            state.mangaChapterConfig?.bookmarked ?? 'null',
-            state.mangaChapterConfig?.downloaded ?? 'null',
-          ].join(' | '),
+          state.mangaChapterConfig?.unread.toString() ?? 'Null',
+        ),
+        leading: const SizedBox(
+          height: double.infinity,
+          child: Icon(Icons.filter_alt),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMangaChapterFilterBookmarkedMenu(BuildContext context) {
+    return _builder(
+      buildWhen: (prev, curr) =>
+          prev.mangaChapterConfig != curr.mangaChapterConfig,
+      builder: (context, state) => ListTile(
+        title: const Text('Filter Bookmarked Chapter'),
+        trailing: Text(
+          state.mangaChapterConfig?.bookmarked.toString() ?? 'Null',
+        ),
+        leading: const SizedBox(
+          height: double.infinity,
+          child: Icon(Icons.filter_alt),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMangaChapterFilterDownloadedMenu(BuildContext context) {
+    return _builder(
+      buildWhen: (prev, curr) =>
+          prev.mangaChapterConfig != curr.mangaChapterConfig,
+      builder: (context, state) => ListTile(
+        title: const Text('Filter Downloaded Chapter'),
+        trailing: Text(
+          state.mangaChapterConfig?.downloaded.toString() ?? 'Null',
         ),
         leading: const SizedBox(
           height: double.infinity,
@@ -210,14 +240,7 @@ class _SettingScreenState extends State<SettingScreen> {
   Widget _buildAppsSettingGroup(BuildContext context) {
     return MultiSliver(
       children: [
-        SliverPinnedHeader(
-          child: ListTile(
-            title: Text(
-              'Apps Setting',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-          ),
-        ),
+        _buildHeaderGroup(context, 'Apps Setting'),
         SliverToBoxAdapter(
           child: _buildDarkModeMenu(context),
         ),
@@ -237,19 +260,18 @@ class _SettingScreenState extends State<SettingScreen> {
   Widget _buildMangaChapterSettingGroup(BuildContext context) {
     return MultiSliver(
       children: [
-        SliverPinnedHeader(
-          child: ListTile(
-            title: Text(
-              'Manga Chapter Config',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-          ),
-        ),
+        _buildHeaderGroup(context, 'Manga Chapter Config'),
         SliverToBoxAdapter(
           child: _buildMangaSortMenu(context),
         ),
         SliverToBoxAdapter(
-          child: _buildMangaChapterFilterMenu(context),
+          child: _buildMangaChapterFilterBookmarkedMenu(context),
+        ),
+        SliverToBoxAdapter(
+          child: _buildMangaChapterFilterDownloadedMenu(context),
+        ),
+        SliverToBoxAdapter(
+          child: _buildMangaChapterFilterUnreadMenu(context),
         ),
         SliverToBoxAdapter(
           child: _buildMangaChapterDisplayMenu(context),
@@ -261,18 +283,27 @@ class _SettingScreenState extends State<SettingScreen> {
   Widget _buildDebugSettingGroup(BuildContext context) {
     return MultiSliver(
       children: [
-        SliverPinnedHeader(
-          child: ListTile(
-            title: Text(
-              'Debug Setting',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-          ),
-        ),
+        _buildHeaderGroup(context, 'Debug Setting'),
         SliverToBoxAdapter(
           child: _buildHttpInspectorMenu(context),
         ),
       ],
+    );
+  }
+
+  Widget _buildHeaderGroup(BuildContext context, String title) {
+    return SliverPinnedHeader(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.background,
+        ),
+        child: ListTile(
+          title: Text(
+            title,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ),
+      ),
     );
   }
 
