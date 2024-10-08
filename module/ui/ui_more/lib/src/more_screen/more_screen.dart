@@ -2,34 +2,36 @@ import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
 class MoreScreen extends StatelessWidget {
-  final Function(BuildContext) onTapSetting;
+  final VoidCallback? onTapSetting;
+  final VoidCallback? onTapStatistic;
+  final VoidCallback? onTapBackupRestore;
+  final VoidCallback? onTapDownloadQueue;
+  final VoidCallback? onTapAbout;
 
-  final Function(BuildContext) onTapStatistic;
-
-  final Function(BuildContext) onTapBackupRestore;
-
-  final Function(BuildContext) onTapDownloadQueue;
 
   const MoreScreen({
     super.key,
-    required this.onTapSetting,
-    required this.onTapStatistic,
-    required this.onTapBackupRestore,
-    required this.onTapDownloadQueue,
+    this.onTapSetting,
+    this.onTapStatistic,
+    this.onTapBackupRestore,
+    this.onTapDownloadQueue,
+    this.onTapAbout,
   });
 
   static Widget create({
     required ServiceLocator locator,
-    required Function(BuildContext) onTapSetting,
-    required Function(BuildContext) onTapStatistic,
-    required Function(BuildContext) onTapBackupRestore,
-    required Function(BuildContext) onTapDownloadQueue,
+    VoidCallback? onTapSetting,
+    VoidCallback? onTapStatistic,
+    VoidCallback? onTapBackupRestore,
+    VoidCallback? onTapDownloadQueue,
+    VoidCallback? onTapAbout,
   }) {
     return MoreScreen(
       onTapSetting: onTapSetting,
       onTapStatistic: onTapStatistic,
       onTapBackupRestore: onTapBackupRestore,
       onTapDownloadQueue: onTapDownloadQueue,
+      onTapAbout: onTapAbout,
     );
   }
 
@@ -82,7 +84,7 @@ class MoreScreen extends StatelessWidget {
                 ListTile(
                   title: const Text('Download Queue'),
                   subtitle: const Text('22 remaining'),
-                  onTap: () => onTapDownloadQueue.call(context),
+                  onTap: () => onTapDownloadQueue?.call(),
                   leading: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.download),
@@ -90,7 +92,7 @@ class MoreScreen extends StatelessWidget {
                 ),
                 ListTile(
                   title: const Text('Statistic'),
-                  onTap: () => onTapStatistic.call(context),
+                  onTap: () => onTapStatistic?.call(),
                   leading: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.auto_graph),
@@ -98,7 +100,7 @@ class MoreScreen extends StatelessWidget {
                 ),
                 ListTile(
                   title: const Text('Backup and Restore'),
-                  onTap: () => onTapBackupRestore.call(context),
+                  onTap: () => onTapBackupRestore?.call(),
                   leading: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.settings_backup_restore),
@@ -107,7 +109,7 @@ class MoreScreen extends StatelessWidget {
                 const Divider(height: 1, thickness: 1),
                 ListTile(
                   title: const Text('Settings'),
-                  onTap: () => onTapSetting.call(context),
+                  onTap: () => onTapSetting?.call(),
                   leading: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.settings),
@@ -116,9 +118,7 @@ class MoreScreen extends StatelessWidget {
                 ListTile(
                   title: const Text('About'),
                   // TODO: implement this
-                  onTap: () => context.showSnackBar(
-                    message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-                  ),
+                  onTap: () => onTapAbout?.call(),
                   leading: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.info_outline),

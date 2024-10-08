@@ -16,14 +16,11 @@ class MoreRouteBuilder extends BaseRouteBuilder {
       pageBuilder: (context, state) => NoTransitionPage(
         child: MoreScreen.create(
           locator: locator,
-          onTapSetting: (context) => context.push(MoreRoutePath.setting),
-          onTapStatistic: (context) => context.push(MoreRoutePath.statistic),
-          onTapBackupRestore: (context) => context.push(
-            MoreRoutePath.backupRestore,
-          ),
-          onTapDownloadQueue: (context) => context.push(
-            MoreRoutePath.downloadQueue,
-          ),
+          onTapSetting: () => context.push(MoreRoutePath.setting),
+          onTapStatistic: () => context.push(MoreRoutePath.statistic),
+          onTapBackupRestore: () => context.push(MoreRoutePath.backupRestore),
+          onTapDownloadQueue: () => context.push(MoreRoutePath.downloadQueue),
+          onTapAbout: () => context.push(MoreRoutePath.aboutUs),
         ),
       ),
     );
@@ -146,6 +143,18 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         builder: (context, state) => SettingScreen.create(
           locator: locator,
           onTapAdvancedMenu: () => context.push(MoreRoutePath.advanced),
+          onTapAppearanceMenu: () => context.push(MoreRoutePath.appearance),
+          onTapGeneralMenu: () => context.push(MoreRoutePath.general),
+          onTapAboutMenu: () => context.push(MoreRoutePath.aboutUs),
+          onTapSecurityMenu: () => context.push(MoreRoutePath.security),
+          onTapTrackingMenu: () => context.push(MoreRoutePath.tracking),
+          onTapBrowseMenu: () => context.push(MoreRoutePath.browse),
+          onTapDownloadMenu: () => context.push(MoreRoutePath.download),
+          onTapLibraryMenu: () => context.push(MoreRoutePath.library),
+          onTapManualBackupRestoreMenu: () => context.push(
+            MoreRoutePath.backupRestore,
+          ),
+          onTapReaderMenu: () => context.push(MoreRoutePath.reader),
         ),
       ),
     ];

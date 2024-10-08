@@ -6,17 +6,47 @@ import 'setting_screen_cubit.dart';
 import 'setting_screen_state.dart';
 
 class SettingScreen extends StatelessWidget {
-
   final VoidCallback? onTapAdvancedMenu;
+  final VoidCallback? onTapAppearanceMenu;
+
+  final VoidCallback? onTapGeneralMenu;
+  final VoidCallback? onTapLibraryMenu;
+  final VoidCallback? onTapReaderMenu;
+  final VoidCallback? onTapDownloadMenu;
+  final VoidCallback? onTapTrackingMenu;
+  final VoidCallback? onTapBrowseMenu;
+  final VoidCallback? onTapManualBackupRestoreMenu;
+  final VoidCallback? onTapSecurityMenu;
+  final VoidCallback? onTapAboutMenu;
 
   const SettingScreen({
     super.key,
     this.onTapAdvancedMenu,
+    this.onTapAppearanceMenu,
+    this.onTapGeneralMenu,
+    this.onTapLibraryMenu,
+    this.onTapReaderMenu,
+    this.onTapDownloadMenu,
+    this.onTapTrackingMenu,
+    this.onTapBrowseMenu,
+    this.onTapManualBackupRestoreMenu,
+    this.onTapSecurityMenu,
+    this.onTapAboutMenu,
   });
 
   static Widget create({
     required ServiceLocator locator,
     VoidCallback? onTapAdvancedMenu,
+    VoidCallback? onTapAppearanceMenu,
+    VoidCallback? onTapGeneralMenu,
+    VoidCallback? onTapLibraryMenu,
+    VoidCallback? onTapReaderMenu,
+    VoidCallback? onTapDownloadMenu,
+    VoidCallback? onTapTrackingMenu,
+    VoidCallback? onTapBrowseMenu,
+    VoidCallback? onTapManualBackupRestoreMenu,
+    VoidCallback? onTapSecurityMenu,
+    VoidCallback? onTapAboutMenu,
   }) {
     return BlocProvider(
       create: (context) => SettingScreenCubit(
@@ -24,6 +54,16 @@ class SettingScreen extends StatelessWidget {
       ),
       child: SettingScreen(
         onTapAdvancedMenu: onTapAdvancedMenu,
+        onTapAppearanceMenu: onTapAppearanceMenu,
+        onTapGeneralMenu: onTapGeneralMenu,
+        onTapLibraryMenu: onTapLibraryMenu,
+        onTapReaderMenu: onTapReaderMenu,
+        onTapDownloadMenu: onTapDownloadMenu,
+        onTapTrackingMenu: onTapTrackingMenu,
+        onTapBrowseMenu: onTapBrowseMenu,
+        onTapManualBackupRestoreMenu: onTapManualBackupRestoreMenu,
+        onTapSecurityMenu: onTapSecurityMenu,
+        onTapAboutMenu: onTapAboutMenu,
       ),
     );
   }
@@ -37,54 +77,70 @@ class SettingScreen extends StatelessWidget {
       body: ListView(
         children: [
           ListTile(
+            leading: const Icon(Icons.tune_outlined),
             title: const Text('General'),
             subtitle: const Text('App Language, Notifications'),
-            onTap: () {},
+            onTap: () => onTapGeneralMenu?.call(),
           ),
           ListTile(
+            leading: const Icon(Icons.palette_outlined),
             title: const Text('Appearance'),
             subtitle: const Text('Theme, Date & Time Format'),
-            onTap: () {},
+            onTap: () => onTapAppearanceMenu?.call(),
           ),
           ListTile(
+            leading: const Icon(Icons.collections_bookmark_outlined),
             title: const Text('Library'),
             subtitle: const Text('Categories, Global Update'),
-            onTap: () {},
+            onTap: () => onTapLibraryMenu?.call(),
           ),
           ListTile(
+            leading: const Icon(Icons.chrome_reader_mode_outlined),
+            title: const Text('Reader'),
+            subtitle: const Text('Reading Mode, Display, Navigation'),
+            onTap: () => onTapReaderMenu?.call(),
+          ),
+          ListTile(
+            leading: const Icon(Icons.download_outlined),
             title: const Text('Downloads'),
             subtitle: const Text('Automatic Download, Download Ahead'),
-            onTap: () {},
+            onTap: () => onTapDownloadMenu?.call(),
           ),
           ListTile(
+            leading: const Icon(Icons.autorenew_outlined),
             title: const Text('Tracking'),
             subtitle: const Text('One-Way Progress Sync, Enhanced Sync'),
-            onTap: () {},
+            onTap: () => onTapTrackingMenu?.call(),
           ),
           ListTile(
+            leading: const Icon(Icons.explore_outlined),
             title: const Text('Browse'),
             subtitle: const Text('Sources, Extensions, Global Search'),
-            onTap: () {},
+            onTap: () => onTapBrowseMenu?.call(),
           ),
           ListTile(
+            leading: const Icon(Icons.settings_backup_restore_outlined),
             title: const Text('Backup & Restore'),
             subtitle: const Text('Manual & Automatic Backup'),
-            onTap: () {},
+            onTap: () => onTapManualBackupRestoreMenu?.call(),
           ),
           ListTile(
+            leading: const Icon(Icons.security_outlined),
             title: const Text('Security'),
             subtitle: const Text('App Lock, Secure Screen'),
-            onTap: () {},
+            onTap: () => onTapSecurityMenu?.call(),
           ),
           ListTile(
+            leading: const Icon(Icons.code_outlined),
             title: const Text('Advanced'),
             subtitle: const Text('Dump Crash Logs, Battery Optimizations'),
             onTap: () => onTapAdvancedMenu?.call(),
           ),
           ListTile(
+            leading: const Icon(Icons.info_outline),
             title: const Text('About'),
             subtitle: const Text('Mangastash Version'),
-            onTap: () {},
+            onTap: () => onTapAboutMenu?.call(),
           ),
         ],
       ),
