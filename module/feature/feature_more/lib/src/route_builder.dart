@@ -143,7 +143,10 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         parentNavigatorKey: rootNavigatorKey,
         path: MoreRoutePath.setting,
         name: MoreRoutePath.setting,
-        builder: (context, state) => SettingScreen.create(locator: locator),
+        builder: (context, state) => SettingScreen.create(
+          locator: locator,
+          onTapAdvancedMenu: () => context.push(MoreRoutePath.advanced),
+        ),
       ),
     ];
   }
