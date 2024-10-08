@@ -37,15 +37,89 @@ class MoreRouteBuilder extends BaseRouteBuilder {
     return [
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: MoreRoutePath.setting,
-        name: MoreRoutePath.setting,
-        builder: (context, state) => SettingScreen.create(locator: locator),
+        path: MoreRoutePath.aboutUs,
+        name: MoreRoutePath.aboutUs,
+        builder: (context, state) => AboutScreen.create(
+          locator: locator,
+        ),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MoreRoutePath.advanced,
+        name: MoreRoutePath.advanced,
+        builder: (context, state) => AdvancedScreen.create(
+          locator: locator,
+        ),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MoreRoutePath.appearance,
+        name: MoreRoutePath.appearance,
+        builder: (context, state) => AppearanceScreen.create(
+          locator: locator,
+        ),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: MoreRoutePath.backupRestore,
         name: MoreRoutePath.backupRestore,
         builder: (context, state) => BackupRestoreScreen.create(
+          locator: locator,
+        ),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MoreRoutePath.browse,
+        name: MoreRoutePath.browse,
+        builder: (context, state) => BrowseScreen.create(
+          locator: locator,
+        ),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MoreRoutePath.downloadQueue,
+        name: MoreRoutePath.downloadQueue,
+        builder: (context, state) => DownloadQueueScreen.create(
+          locator: locator,
+        ),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MoreRoutePath.download,
+        name: MoreRoutePath.download,
+        builder: (context, state) => DownloadScreen.create(
+          locator: locator,
+        ),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MoreRoutePath.general,
+        name: MoreRoutePath.general,
+        builder: (context, state) => GeneralScreen.create(
+          locator: locator,
+        ),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MoreRoutePath.library,
+        name: MoreRoutePath.library,
+        builder: (context, state) => LibraryScreen.create(
+          locator: locator,
+        ),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MoreRoutePath.reader,
+        name: MoreRoutePath.reader,
+        builder: (context, state) => ReaderScreen.create(
+          locator: locator,
+        ),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MoreRoutePath.security,
+        name: MoreRoutePath.security,
+        builder: (context, state) => SecurityScreen.create(
           locator: locator,
         ),
       ),
@@ -59,11 +133,17 @@ class MoreRouteBuilder extends BaseRouteBuilder {
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: MoreRoutePath.downloadQueue,
-        name: MoreRoutePath.downloadQueue,
-        builder: (context, state) => DownloadQueueScreen.create(
+        path: MoreRoutePath.tracking,
+        name: MoreRoutePath.tracking,
+        builder: (context, state) => TrackingScreen.create(
           locator: locator,
         ),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MoreRoutePath.setting,
+        name: MoreRoutePath.setting,
+        builder: (context, state) => SettingScreen.create(locator: locator),
       ),
     ];
   }
