@@ -9,18 +9,18 @@ import 'browse_source_state.dart';
 class BrowseSourceScreen extends StatelessWidget {
   const BrowseSourceScreen({
     super.key,
-    required this.onTapSearchManga,
-    required this.onTapSource,
+    this.onTapSearchManga,
+    this.onTapSource,
   });
 
-  final Function(BuildContext) onTapSearchManga;
+  final Function()? onTapSearchManga;
 
-  final Function(BuildContext, MangaSource) onTapSource;
+  final Function(MangaSource)? onTapSource;
 
   static Widget create({
     required ServiceLocator locator,
-    required Function(BuildContext) onTapSearchManga,
-    required Function(BuildContext, MangaSource) onTapSource,
+    Function()? onTapSearchManga,
+    Function(MangaSource)? onTapSource,
   }) {
     return BlocProvider(
       create: (context) => BrowseSourceCubit(
@@ -45,7 +45,7 @@ class BrowseSourceScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.screen_search_desktop_outlined),
-            onPressed: () => onTapSearchManga.call(context),
+            onPressed: () => onTapSearchManga?.call(),
           ),
         ],
       ),
@@ -63,10 +63,7 @@ class BrowseSourceScreen extends StatelessWidget {
                     iconUrl: state.sources[index].iconUrl ?? '',
                     url: state.sources[index].url ?? '',
                     name: state.sources[index].name?.value ?? '',
-                    onTap: () => onTapSource.call(
-                      context,
-                      state.sources[index],
-                    ),
+                    onTap: () => onTapSource?.call(state.sources[index]),
                   ),
             itemCount: state.isLoading ? 100 : state.sources.length,
           ),

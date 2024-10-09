@@ -18,10 +18,10 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         child: BrowseSourceScreen.create(
           locator: locator,
           // TODO: implement redirect to search source screen
-          onTapSearchManga: (context) => context.showSnackBar(
+          onTapSearchManga: () => context.showSnackBar(
             message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
           ),
-          onTapSource: (context, source) => context.push(
+          onTapSource: (source) => context.push(
             BrowseRoutePath.browseManga.replaceAll(
               ':sourceId',
               source.id ?? '',
@@ -45,7 +45,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         builder: (context, state) => BrowseMangaScreen.create(
           locator: locator,
           sourceId: state.pathParameters['sourceId'].asOrNull<String>(),
-          onTapManga: (context, mangaId) => context.push(
+          onTapManga: (mangaId) => context.push(
             BrowseRoutePath.mangaDetail
                 .replaceAll(
                   ':sourceId',
@@ -63,7 +63,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
           locator: locator,
           sourceId: state.pathParameters['sourceId'].asOrNull<String>(),
           mangaId: state.pathParameters['mangaId'].asOrNull<String>(),
-          onTapChapter: (context, chapterId) => context.push(
+          onTapChapter: (chapterId) => context.push(
             BrowseRoutePath.chapterDetail
                 .replaceAll(
                   ':sourceId',
@@ -75,7 +75,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
                 )
                 .replaceAll(':chapterId', chapterId ?? ''),
           ),
-          onTapSort: (context) => context.showBottomSheet(
+          onTapSort: () => context.showBottomSheet(
             builder: (context) => MangaMiscBottomSheet.create(locator: locator),
           ),
         ),

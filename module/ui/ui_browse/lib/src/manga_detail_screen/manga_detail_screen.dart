@@ -17,9 +17,9 @@ class MangaDetailScreen extends StatefulWidget {
     required this.launchUrlUseCase,
   });
 
-  final Function(BuildContext, String?) onTapChapter;
+  final Function(String?)? onTapChapter;
 
-  final Function(BuildContext) onTapSort;
+  final Function()? onTapSort;
 
   final LaunchUrlUseCase launchUrlUseCase;
 
@@ -27,8 +27,8 @@ class MangaDetailScreen extends StatefulWidget {
     required ServiceLocator locator,
     required String? sourceId,
     required String? mangaId,
-    required Function(BuildContext, String?) onTapChapter,
-    required Function(BuildContext) onTapSort,
+    required Function(String?)? onTapChapter,
+    required Function()? onTapSort,
   }) {
     return BlocProvider(
       create: (context) => MangaDetailCubit(
@@ -128,7 +128,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.sort),
-            onPressed: () => widget.onTapSort(context),
+            onPressed: () => widget.onTapSort?.call(),
           ),
           IconButton(
             icon: const Icon(Icons.share),
@@ -312,7 +312,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     }
 
     return InkWell(
-      onTap: () => widget.onTapChapter.call(context, chapter.id),
+      onTap: () => widget.onTapChapter?.call(chapter.id),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(

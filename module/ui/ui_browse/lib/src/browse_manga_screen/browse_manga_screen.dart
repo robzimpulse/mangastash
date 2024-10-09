@@ -11,16 +11,16 @@ class BrowseMangaScreen extends StatefulWidget {
   const BrowseMangaScreen({
     super.key,
     required this.launchUrlUseCase,
-    required this.onTapManga,
+    this.onTapManga,
   });
 
   final LaunchUrlUseCase launchUrlUseCase;
 
-  final Function(BuildContext, String?) onTapManga;
+  final Function(String?)? onTapManga;
 
   static Widget create({
     required ServiceLocator locator,
-    required Function(BuildContext, String?) onTapManga,
+    Function(String?)? onTapManga,
     String? sourceId,
   }) {
     return BlocProvider(
@@ -203,7 +203,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             title: e.title ?? '',
             coverUrl: e.coverUrl ?? '',
             layout: state.layout,
-            onTap: () => widget.onTapManga(context, e.id),
+            onTap: () => widget.onTapManga?.call(e.id),
           ),
         );
 
