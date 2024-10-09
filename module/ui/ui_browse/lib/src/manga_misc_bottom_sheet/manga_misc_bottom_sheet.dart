@@ -1,3 +1,4 @@
+import 'package:core_route/core_route.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -5,6 +6,19 @@ import 'package:ui_common/ui_common.dart';
 
 import 'manga_misc_cubit.dart';
 import 'manga_misc_state.dart';
+
+class MangaMiscBottomSheetRoute extends BottomSheetRoute {
+  MangaMiscBottomSheetRoute({
+    super.key,
+    super.name,
+    required ServiceLocator locator,
+  }) : super(
+          child: MangaMiscBottomSheet.create(locator: locator),
+          draggable: true,
+          elevation: 16,
+          expanded: false,
+        );
+}
 
 class MangaMiscBottomSheet extends StatefulWidget {
   const MangaMiscBottomSheet({super.key});

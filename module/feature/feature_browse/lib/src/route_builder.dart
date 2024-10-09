@@ -89,14 +89,14 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
           chapterId: state.pathParameters['chapterId'].asOrNull<String>(),
         ),
       ),
-      // GoRoute(
-      //   parentNavigatorKey: rootNavigatorKey,
-      //   path: BrowseRoutePath.chapterConfig,
-      //   name: BrowseRoutePath.chapterConfig,
-      //   pageBuilder: (context, state) => NoTransitionPage(
-      //
-      //   ),
-      // ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: BrowseRoutePath.chapterConfig,
+        name: BrowseRoutePath.chapterConfig,
+        pageBuilder: (context, state) => MangaMiscBottomSheetRoute(
+          locator: locator,
+        ),
+      ),
     ];
   }
 }
