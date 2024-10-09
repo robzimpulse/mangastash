@@ -7,8 +7,8 @@ import 'general_screen_cubit.dart';
 import 'general_screen_state.dart';
 
 class GeneralScreen extends StatelessWidget {
-  final Future<String?> Function()? onTapLanguageMenu;
-  final Future<String?> Function()? onTapCountryMenu;
+  final ValueGetter<Future<String?>>? onTapLanguageMenu;
+  final ValueGetter<Future<String?>>? onTapCountryMenu;
 
   const GeneralScreen({
     super.key,
@@ -18,8 +18,8 @@ class GeneralScreen extends StatelessWidget {
 
   static Widget create({
     required ServiceLocator locator,
-    Future<String?> Function()? onTapLanguageMenu,
-    Future<String?> Function()? onTapCountryMenu,
+    ValueGetter<Future<String?>>? onTapLanguageMenu,
+    ValueGetter<Future<String?>>? onTapCountryMenu,
   }) {
     return BlocProvider(
       create: (_) => GeneralScreenCubit(

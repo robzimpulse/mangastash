@@ -17,9 +17,9 @@ class MangaDetailScreen extends StatefulWidget {
     required this.launchUrlUseCase,
   });
 
-  final Function(String?)? onTapChapter;
+  final ValueSetter<String?>? onTapChapter;
 
-  final Function()? onTapSort;
+  final VoidCallback? onTapSort;
 
   final LaunchUrlUseCase launchUrlUseCase;
 
@@ -27,8 +27,8 @@ class MangaDetailScreen extends StatefulWidget {
     required ServiceLocator locator,
     required String? sourceId,
     required String? mangaId,
-    required Function(String?)? onTapChapter,
-    required Function()? onTapSort,
+    required ValueSetter<String?>? onTapChapter,
+    required VoidCallback? onTapSort,
   }) {
     return BlocProvider(
       create: (context) => MangaDetailCubit(

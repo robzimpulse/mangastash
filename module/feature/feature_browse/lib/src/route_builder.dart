@@ -75,9 +75,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
                 )
                 .replaceAll(':chapterId', chapterId ?? ''),
           ),
-          onTapSort: () => context.showBottomSheet(
-            builder: (context) => MangaMiscBottomSheet.create(locator: locator),
-          ),
+          onTapSort: () => context.push(BrowseRoutePath.chapterConfig),
         ),
       ),
       GoRoute(
@@ -91,6 +89,14 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
           chapterId: state.pathParameters['chapterId'].asOrNull<String>(),
         ),
       ),
+      // GoRoute(
+      //   parentNavigatorKey: rootNavigatorKey,
+      //   path: BrowseRoutePath.chapterConfig,
+      //   name: BrowseRoutePath.chapterConfig,
+      //   pageBuilder: (context, state) => NoTransitionPage(
+      //
+      //   ),
+      // ),
     ];
   }
 }

@@ -7,7 +7,7 @@ class MainScreen extends StatelessWidget {
 
   final int index;
 
-  final void Function(int)? onTapMenu;
+  final ValueSetter<int>? onTapMenu;
 
   const MainScreen({
     super.key,

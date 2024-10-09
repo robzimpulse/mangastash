@@ -16,11 +16,11 @@ class BrowseMangaScreen extends StatefulWidget {
 
   final LaunchUrlUseCase launchUrlUseCase;
 
-  final Function(String?)? onTapManga;
+  final ValueSetter<String?>? onTapManga;
 
   static Widget create({
     required ServiceLocator locator,
-    Function(String?)? onTapManga,
+    ValueSetter<String?>? onTapManga,
     String? sourceId,
   }) {
     return BlocProvider(

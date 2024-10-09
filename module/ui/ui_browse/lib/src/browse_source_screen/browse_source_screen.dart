@@ -13,9 +13,9 @@ class BrowseSourceScreen extends StatelessWidget {
     this.onTapSource,
   });
 
-  final Function()? onTapSearchManga;
+  final VoidCallback? onTapSearchManga;
 
-  final Function(MangaSource)? onTapSource;
+  final ValueSetter<MangaSource>? onTapSource;
 
   static Widget create({
     required ServiceLocator locator,
