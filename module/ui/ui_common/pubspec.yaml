@@ -19,6 +19,8 @@ dependencies:
   # core
   core_route:
     path: ../../core/core_route
+  core_environment:
+    path: ../../core/core_environment
 
 dev_dependencies:
   flutter_test:

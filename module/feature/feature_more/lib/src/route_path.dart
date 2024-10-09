@@ -15,5 +15,5 @@ class MoreRoutePath {
   static const tracking = '$setting/tracking';
   static const more = '/more';
   static const setting = '/setting';
-
+  static const languagePicker = '$setting/language';
 }

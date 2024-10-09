@@ -9,4 +9,12 @@ class GeneralScreenState extends Equatable {
 
   @override
   List<Object?> get props => [locale];
+
+  GeneralScreenState copyWith({
+    Locale? locale,
+  }) {
+    return GeneralScreenState(
+      locale: locale ?? this.locale,
+    );
+  }
 }

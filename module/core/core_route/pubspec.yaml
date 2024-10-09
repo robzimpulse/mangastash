@@ -11,6 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   go_router: ^14.0.0
+  modal_bottom_sheet: ^3.0.0
 
   # library
   service_locator:

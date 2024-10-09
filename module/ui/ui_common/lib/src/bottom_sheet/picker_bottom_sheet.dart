@@ -10,25 +10,21 @@ class PickerBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      expand: false,
-      snap: true,
-      builder: (context, controller) => ListView.separated(
-        controller: controller,
-        itemBuilder: (context, index) => ListTile(
-          title: Text(names[index]),
-          trailing: Visibility(
-            visible: names[index] == selectedName,
-            child: const Icon(Icons.check),
-          ),
-          onTap: () => context.pop(names[index]),
+    return ListView.separated(
+      shrinkWrap: true,
+      itemBuilder: (context, index) => ListTile(
+        title: Text(names[index]),
+        trailing: Visibility(
+          visible: names[index] == selectedName,
+          child: const Icon(Icons.check),
         ),
-        separatorBuilder: (context, index) => const Divider(
-          height: 1,
-          thickness: 1,
-        ),
-        itemCount: names.length,
+        onTap: () => context.pop(names[index]),
       ),
+      separatorBuilder: (context, index) => const Divider(
+        height: 1,
+        thickness: 1,
+      ),
+      itemCount: names.length,
     );
   }
 }

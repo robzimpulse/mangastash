@@ -24,6 +24,8 @@ dependencies:
   # ui
   ui_more:
     path: ../../ui/ui_more
+  ui_common:
+    path: ../../ui/ui_common
 
 dev_dependencies:
   flutter_test:

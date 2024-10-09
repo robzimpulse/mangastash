@@ -7,18 +7,26 @@ import 'general_screen_cubit.dart';
 import 'general_screen_state.dart';
 
 class GeneralScreen extends StatelessWidget {
+  final Future<String?> Function()? onTapLanguageMenu;
+
   const GeneralScreen({
     super.key,
+    this.onTapLanguageMenu,
   });
 
   static Widget create({
     required ServiceLocator locator,
+    Future<String?> Function()? onTapLanguageMenu,
   }) {
     return BlocProvider(
       create: (_) => GeneralScreenCubit(
         initialState: const GeneralScreenState(),
+        updateLocaleUseCase: locator(),
+        listenLocaleUseCase: locator(),
       ),
-      child: const GeneralScreen(),
+      child: GeneralScreen(
+        onTapLanguageMenu: onTapLanguageMenu,
+      ),
     );
   }
 
@@ -40,52 +48,28 @@ class GeneralScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('General Screen'),
       ),
-      body: const CustomScrollView(
+      body: CustomScrollView(
         slivers: [
-          // SliverToBoxAdapter(
-          //   child: _builder(
-          //     buildWhen: (prev, curr) => prev.locale != curr.locale,
-          //     builder: (_, state) => ListTile(
-          //       title: const Text('Language'),
-          //       trailing: Text('${state.locale?.language.name}'),
-          //       leading: const SizedBox(
-          //         height: double.infinity,
-          //         child: Icon(Icons.translate),
-          //       ),
-          //       // onTap: () => _showLanguagePicker(context, state),
-          //     ),
-          //   ),
-          // ),
+          SliverToBoxAdapter(
+            child: _builder(
+              buildWhen: (prev, curr) => prev.locale != curr.locale,
+              builder: (_, state) => ListTile(
+                title: const Text('Language'),
+                trailing: Text('${state.locale?.language.name}'),
+                leading: const SizedBox(
+                  height: double.infinity,
+                  child: Icon(Icons.translate),
+                ),
+                onTap: () async {
+                  final result = await onTapLanguageMenu?.call();
+                  if (result == null || !context.mounted) return;
+                  _cubit(context).changeLanguage(result);
+                },
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
-
-  // Widget _buildLanguageMenu(BuildContext context) {
-  //   return _builder(
-  //     buildWhen: (prev, curr) => prev.locale != curr.locale,
-  //     builder: (_, state) => ListTile(
-  //       title: const Text('Language'),
-  //       trailing: Text('${state.locale?.language.name}'),
-  //       leading: const SizedBox(
-  //         height: double.infinity,
-  //         child: Icon(Icons.translate),
-  //       ),
-  //       onTap: () => _showLanguagePicker(context, state),
-  //     ),
-  //   );
-  // }
-  //
-  // void _showLanguagePicker(
-  //     BuildContext context,
-  //     SettingScreenState state,
-  //     ) async {
-  //   final result = await context.showBottomSheet<String>(
-  //     builder: (context) => PickerBottomSheet(
-  //       names: Language.sorted.map((e) => e.name).toList(),
-  //     ),
-  //   );
-  //   if (result == null || !context.mounted) return;
-  //   _cubit(context).changeLanguage(result);
-  // }
 }
