@@ -33,4 +33,15 @@ class GeneralScreenCubit extends Cubit<GeneralScreenState> with AutoSubscription
       ),
     );
   }
+
+  void changeCountry(String country) {
+    final locale = state.locale;
+    if (locale == null) return;
+    _updateLocaleUseCase.updateLocale(
+      locale: Locale(
+        locale.languageCode,
+        Country.fromName(country).code,
+      ),
+    );
+  }
 }

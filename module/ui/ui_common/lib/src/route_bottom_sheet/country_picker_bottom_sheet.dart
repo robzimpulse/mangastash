@@ -4,16 +4,16 @@ import 'package:service_locator/service_locator.dart';
 
 import '../../ui_common.dart';
 
-class LanguagePickerBottomSheet extends BottomSheetRoute {
-  LanguagePickerBottomSheet({
+class CountryPickerBottomSheet extends BottomSheetRoute {
+  CountryPickerBottomSheet({
     super.key,
     super.name,
     required ServiceLocator locator,
-    Language? selected,
+    Country? selected,
   }) : super(
           child: PickerBottomSheet.create(
             locator: locator,
-            options: Language.values.map((e) => e.name).toList(),
+            options: Country.values.map((e) => e.name).toList(),
             selected: selected?.name,
           ),
           draggable: true,

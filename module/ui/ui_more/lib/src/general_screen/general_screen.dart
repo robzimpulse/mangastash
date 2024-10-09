@@ -8,15 +8,18 @@ import 'general_screen_state.dart';
 
 class GeneralScreen extends StatelessWidget {
   final Future<String?> Function()? onTapLanguageMenu;
+  final Future<String?> Function()? onTapCountryMenu;
 
   const GeneralScreen({
     super.key,
     this.onTapLanguageMenu,
+    this.onTapCountryMenu,
   });
 
   static Widget create({
     required ServiceLocator locator,
     Future<String?> Function()? onTapLanguageMenu,
+    Future<String?> Function()? onTapCountryMenu,
   }) {
     return BlocProvider(
       create: (_) => GeneralScreenCubit(
@@ -26,6 +29,7 @@ class GeneralScreen extends StatelessWidget {
       ),
       child: GeneralScreen(
         onTapLanguageMenu: onTapLanguageMenu,
+          onTapCountryMenu: onTapCountryMenu,
       ),
     );
   }
@@ -64,6 +68,24 @@ class GeneralScreen extends StatelessWidget {
                   final result = await onTapLanguageMenu?.call();
                   if (result == null || !context.mounted) return;
                   _cubit(context).changeLanguage(result);
+                },
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: _builder(
+              buildWhen: (prev, curr) => prev.locale != curr.locale,
+              builder: (_, state) => ListTile(
+                title: const Text('Country'),
+                trailing: Text('${state.locale?.country?.name}'),
+                leading: const SizedBox(
+                  height: double.infinity,
+                  child: Icon(Icons.translate),
+                ),
+                onTap: () async {
+                  final result = await onTapCountryMenu?.call();
+                  if (result == null || !context.mounted) return;
+                  _cubit(context).changeCountry(result);
                 },
               ),
             ),

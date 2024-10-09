@@ -16,4 +16,5 @@ class MoreRoutePath {
   static const more = '/more';
   static const setting = '/setting';
   static const languagePicker = '$setting/language';
+  static const countryPicker = '$setting/country';
 }

@@ -95,6 +95,7 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         builder: (context, state) => GeneralScreen.create(
           locator: locator,
           onTapLanguageMenu: () => context.push(MoreRoutePath.languagePicker),
+          onTapCountryMenu: () => context.push(MoreRoutePath.countryPicker),
         ),
       ),
       GoRoute(
@@ -166,6 +167,15 @@ class MoreRouteBuilder extends BaseRouteBuilder {
           locator: locator,
         ),
       ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MoreRoutePath.countryPicker,
+        name: MoreRoutePath.countryPicker,
+        pageBuilder: (context, state) => CountryPickerBottomSheet(
+          locator: locator,
+        ),
+      ),
+
     ];
   }
 }
