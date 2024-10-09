@@ -12,7 +12,7 @@ class AdvancedScreen extends StatelessWidget {
 
   const AdvancedScreen({
     super.key,
-    required this.alice
+    required this.alice,
   });
 
   static Widget create({
@@ -43,7 +43,7 @@ class AdvancedScreen extends StatelessWidget {
               height: double.infinity,
               child: Icon(Icons.http),
             ),
-          )
+          ),
         ],
       ),
     );

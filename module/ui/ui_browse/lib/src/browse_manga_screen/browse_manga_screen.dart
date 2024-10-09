@@ -95,7 +95,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
       mode: LaunchMode.externalApplication,
     );
 
-    if (result || !mounted) return;
+    if (result || !context.mounted) return;
     context.showSnackBar(message: 'Could not launch $url');
   }
 

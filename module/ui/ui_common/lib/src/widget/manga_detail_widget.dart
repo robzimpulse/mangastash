@@ -160,7 +160,7 @@ class MangaDetailWidget extends StatelessWidget {
                     width: 50,
                     height: 15,
                     child: const Text('Website'),
-                  )
+                  ),
                 ],
               ),
             ),

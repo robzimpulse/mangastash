@@ -84,7 +84,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       mode: LaunchMode.externalApplication,
     );
 
-    if (result || !mounted) return;
+    if (result || !context.mounted) return;
     context.showSnackBar(message: 'Could not launch $url');
   }
 

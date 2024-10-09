@@ -12,7 +12,7 @@ class MangaChapterConfig extends Equatable {
     this.bookmarked,
     this.display = MangaChapterDisplayEnum.title,
     this.sortOption = MangaChapterSortOptionEnum.chapterNumber,
-    this.sortOrder = MangaChapterSortOrderEnum.asc
+    this.sortOrder = MangaChapterSortOrderEnum.asc,
   });
 
   final bool? downloaded;

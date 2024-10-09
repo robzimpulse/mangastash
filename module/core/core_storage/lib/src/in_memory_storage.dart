@@ -2,7 +2,7 @@ import 'storage.dart';
 
 class InMemoryStorage extends Storage {
 
-  Map<String, Object> _impl;
+  final Map<String, Object> _impl;
 
   InMemoryStorage(this._impl);
 
