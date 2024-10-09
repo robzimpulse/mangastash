@@ -12,8 +12,12 @@ class MangaMiscBottomSheetRoute extends BottomSheetRoute {
     super.key,
     super.name,
     required ServiceLocator locator,
+    MangaChapterConfig? config,
   }) : super(
-          child: MangaMiscBottomSheet.create(locator: locator),
+          child: MangaMiscBottomSheet.create(
+            locator: locator,
+            config: config,
+          ),
           draggable: true,
           elevation: 16,
           expanded: false,
@@ -25,11 +29,13 @@ class MangaMiscBottomSheet extends StatefulWidget {
 
   static Widget create({
     required ServiceLocator locator,
+    MangaChapterConfig? config,
   }) {
     return BlocProvider(
       create: (context) => MangaMiscCubit(
-        listenMangaChapterConfig: locator(),
-        updateMangaChapterConfig: locator(),
+        initialState: MangaMiscState(
+          config: config ?? const MangaChapterConfig(),
+        ),
       ),
       child: const MangaMiscBottomSheet(),
     );
@@ -148,8 +154,9 @@ class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
       children: [
         for (final display in MangaChapterDisplayEnum.values)
           _bloc(
-            buildWhen: (prev, curr) =>
-                prev.config?.display != curr.config?.display,
+            buildWhen: (prev, curr) {
+              return prev.config?.display != curr.config?.display;
+            },
             builder: (context, state) => RadioListTile<MangaChapterDisplayEnum>(
               title: Text(display.value),
               value: display,
@@ -170,6 +177,7 @@ class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
       length: 3,
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const TabBar(
             indicatorSize: TabBarIndicatorSize.tab,
@@ -240,6 +248,25 @@ class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
                   ],
                 ),
               ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _bloc(
+              builder: (context, state) => ElevatedButton(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                onPressed: () => context.pop(state.config),
+                child: Text(
+                  'Apply',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
             ),
           ),
         ],

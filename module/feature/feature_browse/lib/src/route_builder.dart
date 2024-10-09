@@ -1,5 +1,6 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_browse/ui_browse.dart';
 import 'package:ui_common/ui_common.dart';
@@ -75,7 +76,10 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
                 )
                 .replaceAll(':chapterId', chapterId ?? ''),
           ),
-          onTapSort: () => context.push(BrowseRoutePath.chapterConfig),
+          onTapSort: (config) => context.push<MangaChapterConfig>(
+            BrowseRoutePath.chapterConfig,
+            extra: config,
+          ),
         ),
       ),
       GoRoute(
@@ -95,6 +99,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         name: BrowseRoutePath.chapterConfig,
         pageBuilder: (context, state) => MangaMiscBottomSheetRoute(
           locator: locator,
+          config: state.extra.asOrNull<MangaChapterConfig>(),
         ),
       ),
     ];

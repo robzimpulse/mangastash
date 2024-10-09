@@ -18,18 +18,12 @@ class MangaDetailCubit extends Cubit<MangaDetailState>
     required GetMangaUseCase getMangaUseCase,
     required SearchChapterUseCase getListChapterUseCase,
     required GetMangaSourceUseCase getMangaSourceUseCase,
-    required ListenMangaChapterConfig listenMangaChapterConfig,
   })  : _getMangaUseCase = getMangaUseCase,
         _getListChapterUseCase = getListChapterUseCase,
         _getMangaSourceUseCase = getMangaSourceUseCase,
-        super(initialState) {
-    addSubscription(
-      listenMangaChapterConfig.mangaChapterConfigStream
-          .listen(_updateMangaConfig),
-    );
-  }
+        super(initialState);
 
-  void _updateMangaConfig(MangaChapterConfig config) {
+  void updateMangaConfig(MangaChapterConfig config) {
     emit(state.copyWith(config: config));
     _processChapter();
   }

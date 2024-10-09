@@ -1,4 +1,5 @@
 import 'package:core_environment/core_environment.dart';
+import 'package:flutter/foundation.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -7,8 +8,8 @@ import 'general_screen_cubit.dart';
 import 'general_screen_state.dart';
 
 class GeneralScreen extends StatelessWidget {
-  final ValueGetter<Future<String?>>? onTapLanguageMenu;
-  final ValueGetter<Future<String?>>? onTapCountryMenu;
+  final AsyncValueGetter<String?>? onTapLanguageMenu;
+  final AsyncValueGetter<String?>? onTapCountryMenu;
 
   const GeneralScreen({
     super.key,
@@ -18,8 +19,8 @@ class GeneralScreen extends StatelessWidget {
 
   static Widget create({
     required ServiceLocator locator,
-    ValueGetter<Future<String?>>? onTapLanguageMenu,
-    ValueGetter<Future<String?>>? onTapCountryMenu,
+    AsyncValueGetter<String?>? onTapLanguageMenu,
+    AsyncValueGetter<String?>? onTapCountryMenu,
   }) {
     return BlocProvider(
       create: (_) => GeneralScreenCubit(

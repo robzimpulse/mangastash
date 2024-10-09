@@ -44,7 +44,6 @@ class BottomSheetRoute<T> extends Page<T> {
       settings: this,
       duration: duration,
       builder: (context) => SafeArea(
-        bottom: false,
         child: Material(
           elevation: elevation,
           color: backgroundColor,

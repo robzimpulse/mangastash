@@ -19,7 +19,7 @@ class MangaDetailScreen extends StatefulWidget {
 
   final ValueSetter<String?>? onTapChapter;
 
-  final VoidCallback? onTapSort;
+  final Future<MangaChapterConfig?> Function(MangaChapterConfig?)? onTapSort;
 
   final LaunchUrlUseCase launchUrlUseCase;
 
@@ -27,8 +27,8 @@ class MangaDetailScreen extends StatefulWidget {
     required ServiceLocator locator,
     required String? sourceId,
     required String? mangaId,
-    required ValueSetter<String?>? onTapChapter,
-    required VoidCallback? onTapSort,
+    ValueSetter<String?>? onTapChapter,
+    Future<MangaChapterConfig?> Function(MangaChapterConfig?)? onTapSort,
   }) {
     return BlocProvider(
       create: (context) => MangaDetailCubit(
@@ -39,7 +39,6 @@ class MangaDetailScreen extends StatefulWidget {
         getMangaUseCase: locator(),
         getListChapterUseCase: locator(),
         getMangaSourceUseCase: locator(),
-        listenMangaChapterConfig: locator(),
       )..init(),
       child: MangaDetailScreen(
         onTapChapter: onTapChapter,
@@ -126,9 +125,15 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               ),
             ],
           ),
-          IconButton(
-            icon: const Icon(Icons.sort),
-            onPressed: () => widget.onTapSort?.call(),
+          _builder(
+            builder: (context, state) => IconButton(
+              icon: const Icon(Icons.sort),
+              onPressed: () async {
+                final result = await widget.onTapSort?.call(state.config);
+                if (!context.mounted || result == null) return;
+                _cubit(context).updateMangaConfig(result);
+              },
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.share),

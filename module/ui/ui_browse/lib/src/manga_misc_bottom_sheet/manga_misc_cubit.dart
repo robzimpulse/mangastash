@@ -6,22 +6,9 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'manga_misc_state.dart';
 
 class MangaMiscCubit extends Cubit<MangaMiscState> with AutoSubscriptionMixin {
-  final UpdateMangaChapterConfig _updateMangaChapterConfig;
-
   MangaMiscCubit({
     MangaMiscState initialState = const MangaMiscState(),
-    required ListenMangaChapterConfig listenMangaChapterConfig,
-    required UpdateMangaChapterConfig updateMangaChapterConfig,
-  })  : _updateMangaChapterConfig = updateMangaChapterConfig,
-        super(initialState) {
-    addSubscription(
-      listenMangaChapterConfig.mangaChapterConfigStream.listen(_updateConfig),
-    );
-  }
-
-  void _updateConfig(MangaChapterConfig config) {
-    emit(state.copyWith(config: config));
-  }
+  }) : super(initialState);
 
   void update({
     ValueGetter<bool?>? downloaded,
@@ -31,16 +18,16 @@ class MangaMiscCubit extends Cubit<MangaMiscState> with AutoSubscriptionMixin {
     MangaChapterSortOptionEnum? sortOption,
     MangaChapterSortOrderEnum? sortOrder,
   }) {
-    final config = state.config;
-    if (config == null) return;
-    _updateMangaChapterConfig.updateMangaChapterConfig(
-      config: config.copyWith(
-        downloaded: downloaded,
-        unread: unread,
-        bookmarked: bookmarked,
-        display: display,
-        sortOption: sortOption,
-        sortOrder: sortOrder,
+    emit(
+      state.copyWith(
+        config: state.config?.copyWith(
+          downloaded: downloaded,
+          unread: unread,
+          bookmarked: bookmarked,
+          display: display,
+          sortOption: sortOption,
+          sortOrder: sortOrder,
+        ),
       ),
     );
   }
