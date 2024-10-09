@@ -15,12 +15,19 @@ dependencies:
   responsive_framework: ^1.0.0
   intersperse: ^2.0.0
   sliver_tools: ^0.2.12
+  equatable: ^2.0.5
 
   # core
   core_route:
     path: ../../core/core_route
   core_environment:
     path: ../../core/core_environment
+
+  # library
+  safe_bloc:
+    path: ../../library/safe_bloc
+  service_locator:
+    path: ../../library/service_locator
 
 dev_dependencies:
   flutter_test:

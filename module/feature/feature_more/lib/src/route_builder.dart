@@ -1,5 +1,4 @@
 import 'package:core_route/core_route.dart';
-import 'package:flutter/widgets.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 import 'package:ui_more/ui_more.dart';
@@ -163,7 +162,9 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         parentNavigatorKey: rootNavigatorKey,
         path: MoreRoutePath.languagePicker,
         name: MoreRoutePath.languagePicker,
-        pageBuilder: (context, state) => LanguagePickerBottomSheet(),
+        pageBuilder: (context, state) => LanguagePickerBottomSheet(
+          locator: locator,
+        ),
       ),
     ];
   }
