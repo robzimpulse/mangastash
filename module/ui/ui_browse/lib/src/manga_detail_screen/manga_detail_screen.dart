@@ -94,16 +94,12 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   void _onTapDownload(BuildContext context, DownloadOption option) {
     // TODO: implement this
-    context.showSnackBar(
-      message: '🚧🚧🚧 Under Construction $option 🚧🚧🚧',
-    );
+    context.showSnackBar(message: '🚧🚧🚧 Under Construction $option 🚧🚧🚧');
   }
 
   void _onTapShare(BuildContext context) {
     // TODO: implement this
-    context.showSnackBar(
-      message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-    );
+    context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
 
   @override
