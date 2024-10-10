@@ -106,9 +106,9 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         builder: (context, state) {
           switch (state.layout) {
             case MangaShelfItemLayout.comfortableGrid:
-              return const Icon(Icons.grid_on);
-            case MangaShelfItemLayout.compactGrid:
               return const Icon(Icons.grid_view_sharp);
+            case MangaShelfItemLayout.compactGrid:
+              return const Icon(Icons.grid_on);
             case MangaShelfItemLayout.list:
               return const Icon(Icons.list);
           }
