@@ -80,7 +80,7 @@ class BrowseMangaCubit extends Cubit<BrowseMangaState> {
     emit(state.copyWith(isPagingNextPage: false));
   }
 
-  void update({MangaShelfItemLayout? layout}) {
-    emit(state.copyWith(layout: layout));
+  void update({MangaShelfItemLayout? layout, bool? isSearchActive,}) {
+    emit(state.copyWith(layout: layout, isSearchActive: isSearchActive));
   }
 }

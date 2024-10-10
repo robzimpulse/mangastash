@@ -48,15 +48,19 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     onLoadNextPage: (context) => _cubit(context).next(),
   );
 
+  final TextEditingController _searchController = TextEditingController();
+
+  final FocusNode _searchFocusNode = FocusNode();
+
   @override
   void dispose() {
+    _searchController.dispose();
+    _searchFocusNode.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
-  BrowseMangaCubit _cubit(BuildContext context) {
-    return context.read();
-  }
+  BrowseMangaCubit _cubit(BuildContext context) => context.read();
 
   int _crossAxisCount(BuildContext context) {
     if (_breakpoints(context).isMobile) return 3;
@@ -141,18 +145,44 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     );
   }
 
+  Widget _layoutSearch({required BuildContext context}) {
+    return _builder(
+      buildWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
+      builder: (context, state) {
+        return IconButton(
+          icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
+          onPressed: () => _cubit(context).update(
+            isSearchActive: !state.isSearchActive,
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
       appBar: AppBar(
         title: _title(context),
         actions: [
+          _layoutSearch(context: context),
           _layoutIcon(context: context),
           _layoutSource(context: context),
         ],
       ),
-      body: BlocBuilder<BrowseMangaCubit, BrowseMangaState>(
-        builder: (context, state) => RefreshIndicator(
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<BrowseMangaCubit, BrowseMangaState>(
+            listenWhen: (prev, curr) {
+              return prev.isSearchActive != curr.isSearchActive;
+            },
+            listener: (context, state) {
+              _searchController.clear();
+              _searchFocusNode.requestFocus();
+            },
+          ),
+        ],
+        child: RefreshIndicator(
           onRefresh: () => _cubit(context).init(),
           child: _content(context),
         ),
@@ -162,15 +192,32 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
 
   Widget _title(BuildContext context) {
     return _builder(
-      buildWhen: (prev, curr) =>
-          prev.source != curr.source || prev.isLoading != curr.isLoading,
-      builder: (context, state) => ShimmerLoading.multiline(
-        isLoading: state.isLoading,
-        width: 200,
-        height: 15,
-        lines: 1,
-        child: Text(state.source?.name?.value ?? ''),
-      ),
+      buildWhen: (prev, curr) {
+        final isSourceChanged = prev.source != curr.source;
+        final isLoadingChanged = prev.isLoading != curr.isLoading;
+        final isSearchChanged = prev.isSearchActive != curr.isSearchActive;
+        return isSourceChanged || isLoadingChanged || isSearchChanged;
+      },
+      builder: (context, state) => !state.isSearchActive
+          ? ShimmerLoading.multiline(
+              isLoading: state.isLoading,
+              width: 200,
+              height: 15,
+              lines: 1,
+              child: Text(state.source?.name?.value ?? ''),
+            )
+          : TextField(
+              controller: _searchController,
+              focusNode: _searchFocusNode,
+              decoration: const InputDecoration(
+                hintText: 'Search...',
+                border: InputBorder.none,
+              ),
+              // TODO: implement this
+              onSubmitted: (value) => context.showSnackBar(
+                message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+              ),
+            ),
     );
   }
 
