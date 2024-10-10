@@ -4,9 +4,6 @@ import 'package:core_network/core_network.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
-import 'manager/manga_chapter_config_manager/listen_manga_chapter_config.dart';
-import 'manager/manga_chapter_config_manager/manga_chapter_config_manager.dart';
-import 'manager/manga_chapter_config_manager/update_manga_chapter_config.dart';
 import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
 import 'use_case/chapter/search_chapter_on_manga_dex_use_case.dart';
@@ -110,9 +107,6 @@ class DomainMangaRegistrar extends Registrar {
       ),
     );
 
-    locator.registerSingleton(MangaChapterConfigManager());
-    locator.alias<ListenMangaChapterConfig, MangaChapterConfigManager>();
-    locator.alias<UpdateMangaChapterConfig, MangaChapterConfigManager>();
     log('finish register', name: runtimeType.toString(), time: DateTime.now());
   }
 }
