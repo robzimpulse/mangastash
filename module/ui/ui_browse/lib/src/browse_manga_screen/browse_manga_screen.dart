@@ -204,15 +204,24 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               width: 200,
               height: 15,
               lines: 1,
-              child: Text(state.source?.name?.value ?? ''),
+              child: Text(
+                state.source?.name?.value ?? '',
+              ),
             )
           : TextField(
               controller: _searchController,
               focusNode: _searchFocusNode,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: 'Search...',
+                filled: false,
                 border: InputBorder.none,
+                // TODO: fix style - should be same as app bar title style
+                hintStyle: Theme.of(context).appBarTheme.titleTextStyle ??
+                    Theme.of(context).appBarTheme.toolbarTextStyle,
               ),
+              // TODO: fix style - should be same as app bar title style
+              style: Theme.of(context).appBarTheme.titleTextStyle ??
+                  Theme.of(context).appBarTheme.toolbarTextStyle,
               // TODO: implement this
               onSubmitted: (value) => context.showSnackBar(
                 message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
