@@ -37,7 +37,7 @@ jobs:
         run: melos get --verbose
           
       - name: "Build Flutter Web"
-        run: flutter build web --base-href "/mangastash/" --dart-define=FLUTTER_WEB_USE_SKIA=true
+        run: flutter build web --base-href "/mangastash/"
 
       - name: "Build APK"
         run: flutter build apk
