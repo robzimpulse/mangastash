@@ -33,6 +33,12 @@ jobs:
       - name: "Build Flutter Web"
         run: flutter build web --base-href "/mangastash/"
 
+      - name: 'Save Artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-web
+          path: build/web
+
       - name: "Deploy to Github Page"
         uses: peaceiris/actions-gh-pages@v3
         with:
