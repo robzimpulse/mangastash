@@ -45,6 +45,6 @@ jobs:
           github_token: ${{ secrets.PERSONAL_TOKEN_GH_PAGES }}
           publish_dir: ./build/web
           force_orphan: true
-          user_name: 'github-ci[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
+          user_name: 'robzimpulse'
+          user_email: 'kugelfang.killaruna@gmail.com'
           commit_message: 'Publish to gh-pages'
