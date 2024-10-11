@@ -42,9 +42,17 @@ jobs:
       - name: "Deploy to Github Page"
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.PERSONAL_TOKEN_GH_PAGES }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
           force_orphan: true
           user_name: 'robzimpulse'
           user_email: 'kugelfang.killaruna@gmail.com'
           commit_message: 'Publish to gh-pages'
+
+      - name: 'Deploy to Firebase'
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MANGASTASH_4BF38 }}
+          channelId: live
+          projectId: mangastash-4bf38
