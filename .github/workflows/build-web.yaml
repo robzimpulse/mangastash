@@ -1,4 +1,4 @@
-name: Flutter Workflow
+name: Build Web
 
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
