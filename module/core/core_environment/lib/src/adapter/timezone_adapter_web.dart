@@ -1,7 +1,3 @@
-import 'package:timezone/browser.dart' as tz;
+import 'package:timezone/data/latest_all.dart' as tz;
 
-Future<void> initializeTimeZone() async {
-  await tz.initializeTimeZone(
-    'assets/packages/timezone/data/latest.tzf',
-  );
-}
+Future<void> initializeTimeZone() async => tz.initializeTimeZones();
