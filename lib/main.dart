@@ -65,11 +65,6 @@ class _MangaStashAppState extends State<MangaStashApp> {
   Future<void> initiateAppLocator() async {
     if (widget.testing) return;
 
-    log(
-      'start initiateAppLocator',
-      name: runtimeType.toString(),
-      time: DateTime.now(),
-    );
     widget.locator.registerSingleton(
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
@@ -98,22 +93,6 @@ class _MangaStashAppState extends State<MangaStashApp> {
       }
       return true;
     };
-
-
-    // Isolate.current.addErrorListener(
-    //   // TODO: register error handler logger
-    //   RawReceivePort((pair) {
-    //     if (kDebugMode) {
-    //       print(pair);
-    //     }
-    //   }).sendPort,
-    // );
-
-    log(
-      'finish initiateAppLocator',
-      name: runtimeType.toString(),
-      time: DateTime.now(),
-    );
   }
 
   GoRouter _route({
