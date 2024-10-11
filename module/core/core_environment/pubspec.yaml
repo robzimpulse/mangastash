@@ -21,6 +21,8 @@ dependencies:
   # library
   service_locator:
     path: ../../library/service_locator
+  background_worker:
+    path: ../../library/background_worker
 
   # core
   core_storage:
