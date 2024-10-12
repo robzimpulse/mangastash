@@ -1,3 +1,8 @@
 {
-  "hosting": {"public": "build/web"}
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json"
+    ]
+  }
 }

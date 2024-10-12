@@ -70,6 +70,9 @@ jobs:
       - name: "Build Flutter Web"
         run: flutter build web
 
+      - name: "Copy Firebase Configuration"
+        run: cp firebase.json build/web/firebase.json
+
       - name: 'Save Artifact'
         uses: actions/upload-artifact@v4
         with:
