@@ -1,4 +1,3 @@
-import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/foundation.dart';
 import 'package:safe_bloc/safe_bloc.dart';
