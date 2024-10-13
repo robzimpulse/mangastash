@@ -19,8 +19,17 @@ class BrowseMangaCubit extends Cubit<BrowseMangaState> {
         _searchMangaUseCase = searchMangaUseCase,
         super(initialState);
 
-  Future<void> init() async {
-    emit(state.copyWith(isLoading: true));
+  Future<void> init({String? title}) async {
+    emit(
+      state.copyWith(
+        isLoading: true,
+        mangas: [],
+        parameter: state.parameter.copyWith(
+          title: title,
+          offset: '0',
+        ),
+      ),
+    );
     await _fetchSource();
     await _fetchManga();
     emit(state.copyWith(isLoading: false));
@@ -42,8 +51,6 @@ class BrowseMangaCubit extends Cubit<BrowseMangaState> {
   }
 
   Future<void> _fetchManga() async {
-    // TODO: limit search manga use case based on source manga
-
     final result = await _searchMangaUseCase.execute(
       source: state.source?.name,
       parameter: state.parameter,
@@ -90,18 +97,5 @@ class BrowseMangaCubit extends Cubit<BrowseMangaState> {
         isSearchActive: isSearchActive,
       ),
     );
-  }
-
-  void search(String title) async{
-    emit(
-      state.copyWith(
-        mangas: [],
-        parameter: state.parameter.copyWith(
-          title: title,
-        ),
-      ),
-    );
-
-    await _fetchManga();
   }
 }

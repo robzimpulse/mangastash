@@ -177,7 +177,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               return prev.isSearchActive != curr.isSearchActive;
             },
             listener: (context, state) {
-              _searchController.clear();
+              // _searchController.clear();
               _searchFocusNode.requestFocus();
             },
           ),
@@ -221,7 +221,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
                 ),
                 cursorColor: DefaultTextStyle.of(context).style.color,
                 style: DefaultTextStyle.of(context).style,
-                onSubmitted: (value) => _cubit(context).search(value),
+                onSubmitted: (value) => _cubit(context).init(title: value),
               ),
             ),
     );
