@@ -1,8 +1,6 @@
 import 'package:collection/collection.dart';
-import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
-import 'package:core_route/core_route.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -41,6 +39,8 @@ class MangaDetailScreen extends StatefulWidget {
         getMangaUseCase: locator(),
         getListChapterUseCase: locator(),
         getMangaSourceUseCase: locator(),
+        addToLibraryUseCase: locator(),
+        listenAuth: locator(),
       )..init(),
       child: MangaDetailScreen(
         onTapChapter: onTapChapter,
@@ -66,10 +66,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   MangaDetailCubit _cubit(BuildContext context) => context.read();
-
-  void _onTapAddToLibrary(BuildContext context) {
-    context.pushNamed(AuthRoutePath.login);
-  }
 
   void _onTapWebsite(BuildContext context, MangaDetailState state) async {
     final url = state.manga?.webUrl;
@@ -276,7 +272,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         description: state.manga?.description,
         tags: state.manga?.tags?.map((e) => e.name).whereNotNull().toList(),
         horizontalPadding: 12,
-        onTapAddToLibrary: () => _onTapAddToLibrary(context),
+        onTapAddToLibrary: () => _cubit(context).addToLibrary(),
         onTapWebsite: () => _onTapWebsite(context, state),
         onTapTag: (name) => _onTapTag(
           context,

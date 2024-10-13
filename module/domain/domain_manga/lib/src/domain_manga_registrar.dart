@@ -8,6 +8,7 @@ import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
 import 'use_case/chapter/search_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
+import 'use_case/library/add_to_library_use_case.dart';
 import 'use_case/manga/get_manga_on_mangadex_use_case.dart';
 import 'use_case/manga/get_manga_use_case.dart';
 import 'use_case/manga/search_manga_on_mangadex_use_case.dart';
@@ -105,6 +106,11 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => GetChapterUseCase(
         getChapterOnMangaDexUseCase: locator(),
+      ),
+    );
+    locator.registerFactory(
+      () => AddToLibraryUseCase(
+        mangaLibraryServiceFirebase: locator(),
       ),
     );
 

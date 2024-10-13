@@ -20,19 +20,19 @@ class LoginScreenCubit extends Cubit<LoginScreenState>
     emit(state.copyWith(isLoading: true, error: () => null));
     final result = await _loginAnonymously.loginAnonymously();
 
-    if (result is Success<UserCredential>) {
+    if (result is Success<User>) {
       emit(
         state.copyWith(
           isLoading: false,
           authState: AuthState(
             status: AuthStatus.loggedIn,
-            user: result.data.user,
+            user: result.data,
           ),
         ),
       );
     }
 
-    if (result is Error<UserCredential>) {
+    if (result is Error<User>) {
       emit(state.copyWith(isLoading: false, error: () => result.error));
     }
   }

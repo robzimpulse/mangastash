@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
@@ -12,16 +13,26 @@ class MangaDetailCubit extends Cubit<MangaDetailState>
   final GetMangaUseCase _getMangaUseCase;
   final SearchChapterUseCase _getListChapterUseCase;
   final GetMangaSourceUseCase _getMangaSourceUseCase;
+  final AddToLibraryUseCase _addToLibraryUseCase;
 
   MangaDetailCubit({
     MangaDetailState initialState = const MangaDetailState(),
     required GetMangaUseCase getMangaUseCase,
     required SearchChapterUseCase getListChapterUseCase,
     required GetMangaSourceUseCase getMangaSourceUseCase,
+    required AddToLibraryUseCase addToLibraryUseCase,
+    required ListenAuth listenAuth,
   })  : _getMangaUseCase = getMangaUseCase,
         _getListChapterUseCase = getListChapterUseCase,
         _getMangaSourceUseCase = getMangaSourceUseCase,
-        super(initialState);
+        _addToLibraryUseCase = addToLibraryUseCase,
+        super(initialState) {
+    addSubscription(listenAuth.authStateStream.listen(_updateAuthState));
+  }
+
+  void _updateAuthState(AuthState? authState) {
+    emit(state.copyWith(authState: authState));
+  }
 
   void updateMangaConfig(MangaChapterConfig config) {
     emit(state.copyWith(config: config));
@@ -151,4 +162,18 @@ class MangaDetailCubit extends Cubit<MangaDetailState>
 
     _processChapter();
   }
+
+  Future<void> addToLibrary() async {
+    final manga = state.manga;
+    if (manga == null) return;
+
+    final userId = state.authState?.user?.uid;
+    if (userId == null) {
+
+    }
+
+    // TODO: perform anonymous login
+    // await _addToLibraryUseCase.execute(manga: manga);
+  }
+
 }

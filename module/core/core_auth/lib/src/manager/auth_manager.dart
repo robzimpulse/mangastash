@@ -35,9 +35,10 @@ class AuthManager implements ListenAuth, UpdateAuth, GetAuth, LoginAnonymously {
   void updateAuth(AuthState state) => _authStateSubject.add(state);
 
   @override
-  Future<Result<UserCredential>> loginAnonymously() async {
+  Future<Result<User?>> loginAnonymously() async {
     try {
-      return Success(await _firebaseAuth.signInAnonymously());
+      final result = await _firebaseAuth.signInAnonymously();
+      return Success(result.user);
     } catch (e) {
       return Error(e);
     }
