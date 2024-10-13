@@ -81,8 +81,6 @@ dependencies:
     path: module/feature/feature_more
   feature_updates:
     path: module/feature/feature_updates
-  feature_auth:
-    path: module/feature/feature_auth
 
 dev_dependencies:
   flutter_test:

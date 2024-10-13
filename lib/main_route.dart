@@ -1,5 +1,5 @@
+import 'package:core_auth/core_auth.dart';
 import 'package:core_route/core_route.dart';
-import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_browse/feature_browse.dart';
 import 'package:feature_history/feature_history.dart';
 import 'package:feature_library/feature_library.dart';

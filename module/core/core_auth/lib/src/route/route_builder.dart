@@ -1,9 +1,10 @@
 import 'package:core_route/core_route.dart';
+import 'package:flutter/widgets.dart';
 import 'package:service_locator/service_locator.dart';
-import 'package:ui_auth/ui_auth.dart';
-import 'package:ui_common/ui_common.dart';
 
-import '../feature_auth.dart';
+import '../screen/login_screen/login_screen.dart';
+import '../screen/register_screen/register_screen.dart';
+import 'route_path.dart';
 
 class AuthRouteBuilder extends BaseRouteBuilder {
   @override

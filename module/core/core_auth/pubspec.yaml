@@ -16,10 +16,14 @@ dependencies:
   # library
   service_locator:
     path: ../../library/service_locator
+  safe_bloc:
+    path: ../../library/safe_bloc
 
   # core
   core_storage:
     path: ../../core/core_storage
+  core_route:
+    path: ../../core/core_route
 
 dev_dependencies:
   flutter_test:

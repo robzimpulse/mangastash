@@ -1,7 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
+import 'package:core_route/core_route.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:flutter/foundation.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -12,8 +14,8 @@ import 'manga_detail_state.dart';
 class MangaDetailScreen extends StatefulWidget {
   const MangaDetailScreen({
     super.key,
-    required this.onTapChapter,
-    required this.onTapSort,
+    this.onTapChapter,
+    this.onTapSort,
     required this.launchUrlUseCase,
   });
 
@@ -65,7 +67,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   MangaDetailCubit _cubit(BuildContext context) => context.read();
 
-  void _onTapFavorite(BuildContext context) {
+  void _onTapAddToLibrary(BuildContext context) {
     // TODO: implement this
     return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
@@ -275,7 +277,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         description: state.manga?.description,
         tags: state.manga?.tags?.map((e) => e.name).whereNotNull().toList(),
         horizontalPadding: 12,
-        onTapFavorite: () => _onTapFavorite(context),
+        onTapAddToLibrary: () => _onTapAddToLibrary(context),
         onTapWebsite: () => _onTapWebsite(context, state),
         onTapTag: (name) => _onTapTag(
           context,

@@ -13,7 +13,7 @@ class MangaDetailWidget extends StatelessWidget {
     this.author,
     this.status,
     this.description,
-    this.onTapFavorite,
+    this.onTapAddToLibrary,
     this.onTapWebsite,
     this.tags,
     this.onTapTag,
@@ -35,7 +35,7 @@ class MangaDetailWidget extends StatelessWidget {
 
   final List<String>? tags;
 
-  final void Function()? onTapFavorite;
+  final void Function()? onTapAddToLibrary;
 
   final void Function()? onTapWebsite;
 
@@ -120,7 +120,7 @@ class MangaDetailWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             InkWell(
-              onTap: onTapFavorite,
+              onTap: onTapAddToLibrary,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -136,7 +136,7 @@ class MangaDetailWidget extends StatelessWidget {
                     lines: 1,
                     width: 50,
                     height: 15,
-                    child: const Text('Favorite'),
+                    child: const Text('Add to Library'),
                   ),
                 ],
               ),

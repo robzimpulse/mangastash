@@ -20,6 +20,8 @@ dependencies:
   # core
   core_route:
     path: ../../core/core_route
+  core_auth:
+    path: ../../core/core_auth
 
   # ui
   ui_more:
