@@ -2,6 +2,7 @@ import 'package:core_route/core_route.dart';
 import 'package:flutter/widgets.dart';
 import 'package:service_locator/service_locator.dart';
 
+import '../../core_auth.dart';
 import '../screen/login_screen/login_screen.dart';
 import '../screen/register_screen/register_screen.dart';
 import 'route_path.dart';
@@ -28,6 +29,13 @@ class AuthRouteBuilder extends BaseRouteBuilder {
         parentNavigatorKey: rootNavigatorKey,
         path: AuthRoutePath.login,
         name: AuthRoutePath.login,
+        redirect: (context, state) {
+          final queryParams = state.uri.queryParameters;
+          final destination = queryParams[AuthRoutePath.onFinishPath];
+          final status = locator<GetAuth>().authState?.status;
+          final isLoggedIn = status == AuthStatus.loggedIn;
+          return isLoggedIn ? destination : null;
+        },
         builder: (context, state) => LoginScreen.create(
           locator: locator,
           onFinishPath: state.uri.queryParameters[AuthRoutePath.onFinishPath],

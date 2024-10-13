@@ -5,6 +5,7 @@ import 'package:rxdart/subjects.dart';
 
 import '../enum/auth_status.dart';
 import '../model/auth_state.dart';
+import '../model/result.dart';
 import '../use_case/get_auth.dart';
 import '../use_case/listen_auth.dart';
 import '../use_case/login_anonymously.dart';
@@ -34,12 +35,11 @@ class AuthManager implements ListenAuth, UpdateAuth, GetAuth, LoginAnonymously {
   void updateAuth(AuthState state) => _authStateSubject.add(state);
 
   @override
-  Future<bool> loginAnonymously() async {
+  Future<Result<UserCredential>> loginAnonymously() async {
     try {
-      await _firebaseAuth.signInAnonymously();
-      return true;
+      return Success(await _firebaseAuth.signInAnonymously());
     } catch (e) {
-      return false;
+      return Error(e);
     }
   }
 
