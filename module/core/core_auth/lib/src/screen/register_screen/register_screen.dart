@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 
-import 'register_cubit.dart';
+import 'register_screen_cubit.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -11,7 +11,7 @@ class RegisterScreen extends StatelessWidget {
     required ServiceLocator locator,
   }) {
     return BlocProvider(
-      create: (context) => RegisterCubit(),
+      create: (context) => RegisterScreenCubit(),
       child: const RegisterScreen(),
     );
   }

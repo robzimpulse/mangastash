@@ -28,7 +28,10 @@ class AuthRouteBuilder extends BaseRouteBuilder {
         parentNavigatorKey: rootNavigatorKey,
         path: AuthRoutePath.login,
         name: AuthRoutePath.login,
-        builder: (context, state) => LoginScreen.create(locator: locator),
+        builder: (context, state) => LoginScreen.create(
+          locator: locator,
+          onFinishPath: state.uri.queryParameters[AuthRoutePath.onFinishPath],
+        ),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,

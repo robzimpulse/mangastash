@@ -1,3 +1,4 @@
+import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
@@ -69,6 +70,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
     );
 
     // TODO: register module registrar here
+    await widget.locator.registerRegistrar(CoreAuthRegistrar());
     await widget.locator.registerRegistrar(CoreNetworkRegistrar());
     await widget.locator.registerRegistrar(CoreStorageRegistrar());
     await widget.locator.registerRegistrar(CoreEnvironmentRegistrar());

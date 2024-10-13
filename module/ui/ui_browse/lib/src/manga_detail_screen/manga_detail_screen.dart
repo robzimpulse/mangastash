@@ -1,9 +1,9 @@
 import 'package:collection/collection.dart';
+import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:flutter/foundation.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -68,8 +68,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   MangaDetailCubit _cubit(BuildContext context) => context.read();
 
   void _onTapAddToLibrary(BuildContext context) {
-    // TODO: implement this
-    return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+    context.pushNamed(AuthRoutePath.login);
   }
 
   void _onTapWebsite(BuildContext context, MangaDetailState state) async {
