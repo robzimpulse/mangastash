@@ -94,6 +94,7 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => SearchChapterUseCase(
         searchChapterOnMangaDexUseCase: locator(),
+        listenLocaleUseCase: locator(),
       ),
     );
     locator.registerFactory(

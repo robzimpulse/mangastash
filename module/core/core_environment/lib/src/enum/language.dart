@@ -45,7 +45,7 @@ enum Language {
   dhivehi(code: 'dv', name: 'Dhivehi'),
   dutch(code: 'nl', name: 'Dutch'),
   dzongkha(code: 'dz', name: 'Dzongkha'),
-  alpha2(code: 'alpha2', name: 'English'),
+  alpha2(code: 'alpha2', name: 'English (Alpha 2)'),
   english(code: 'en', name: 'English'),
   esperanto(code: 'eo', name: 'Esperanto'),
   estonian(code: 'et', name: 'Estonian'),
@@ -193,17 +193,17 @@ enum Language {
 
   const Language({required this.code, required this.name});
 
-  factory Language.fromCode(String code) {
+  factory Language.fromCode(String? code) {
     return Language.values.firstWhere(
       (e) => e.code == code,
-      orElse: () => Language.indonesia,
+      orElse: () => Language.english,
     );
   }
 
-  factory Language.fromName(String name) {
+  factory Language.fromName(String? name) {
     return Language.values.firstWhere(
       (e) => e.name == name,
-      orElse: () => Language.indonesia,
+      orElse: () => Language.english,
     );
   }
 

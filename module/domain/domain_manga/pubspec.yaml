@@ -16,6 +16,8 @@ dependencies:
   # core
   core_network:
     path: ../../core/core_network
+  core_environment:
+    path: ../../core/core_environment
 
   # data
   data_manga:

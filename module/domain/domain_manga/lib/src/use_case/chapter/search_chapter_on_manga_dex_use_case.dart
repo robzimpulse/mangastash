@@ -1,6 +1,10 @@
+import 'package:collection/collection.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
+
+import '../../helper/language_code_converter.dart';
 
 class SearchChapterOnMangaDexUseCase {
   final ChapterRepository _chapterRepository;
@@ -11,6 +15,7 @@ class SearchChapterOnMangaDexUseCase {
 
   Future<Result<List<MangaChapter>>> execute({
     required String? mangaId,
+    Language? language,
   }) async {
     try {
       var total = 0;
@@ -20,6 +25,7 @@ class SearchChapterOnMangaDexUseCase {
         final result = await _chapterRepository.search(
           mangaId: mangaId ?? '',
           limit: 20,
+          translatedLanguage: language?.languageCodes,
         );
 
         final data = result.data ?? [];
