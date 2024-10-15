@@ -10,7 +10,7 @@ enum AuthStatus {
   factory AuthStatus.fromCode(String status) {
     return AuthStatus.values.firstWhere(
       (e) => e.status == status,
-      orElse: () => AuthStatus.loggedOut,
+      orElse: () => AuthStatus.uninitialized,
     );
   }
 }

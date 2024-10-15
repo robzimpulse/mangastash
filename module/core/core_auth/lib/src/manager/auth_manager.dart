@@ -1,28 +1,37 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:rxdart/src/streams/value_stream.dart';
 import 'package:rxdart/subjects.dart';
 
 import '../enum/auth_status.dart';
 import '../model/auth_state.dart';
-import '../model/result.dart';
+import '../service/auth_service.dart';
 import '../use_case/get_auth.dart';
 import '../use_case/listen_auth.dart';
-import '../use_case/login_anonymously.dart';
-import '../use_case/update_auth.dart';
 
-class AuthManager implements ListenAuth, UpdateAuth, GetAuth, LoginAnonymously {
-
-  final FirebaseApp _app;
+class AuthManager implements ListenAuth, GetAuth {
+  static final Finalizer<StreamSubscription<User?>> _userFinalizer = Finalizer(
+    (event) => event.cancel(),
+  );
 
   final _authStateSubject = BehaviorSubject<AuthState>.seeded(
     const AuthState(status: AuthStatus.uninitialized, user: null),
   );
 
-  late final _firebaseAuth = FirebaseAuth.instanceFor(app: _app);
-
-  AuthManager({required FirebaseApp app}): _app = app {
-    _firebaseAuth.authStateChanges().listen(_updateUser);
+  AuthManager({required AuthService service}) {
+    final user = service.currentUser();
+    _authStateSubject.add(
+      AuthState(
+        status: user == null ? AuthStatus.loggedOut : AuthStatus.loggedIn,
+        user: user,
+      ),
+    );
+    _userFinalizer.attach(
+      this,
+      service.userChanges().listen(_updateUser),
+      detach: this,
+    );
   }
 
   @override
@@ -31,24 +40,12 @@ class AuthManager implements ListenAuth, UpdateAuth, GetAuth, LoginAnonymously {
   @override
   AuthState? get authState => _authStateSubject.valueOrNull;
 
-  @override
-  void updateAuth(AuthState state) => _authStateSubject.add(state);
-
-  @override
-  Future<Result<User?>> loginAnonymously() async {
-    try {
-      final result = await _firebaseAuth.signInAnonymously();
-      return Success(result.user);
-    } catch (e) {
-      return Error(e);
-    }
-  }
-
   void _updateUser(User? user) {
-    if (user == null) {
-      updateAuth(const AuthState(status: AuthStatus.loggedOut, user: null));
-    } else {
-      updateAuth(AuthState(status: AuthStatus.loggedIn, user: user));
-    }
+    _authStateSubject.add(
+      AuthState(
+        status: user == null ? AuthStatus.loggedOut : AuthStatus.loggedIn,
+        user: user,
+      ),
+    );
   }
 }
