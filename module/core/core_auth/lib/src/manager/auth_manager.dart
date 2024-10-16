@@ -7,10 +7,10 @@ import 'package:rxdart/subjects.dart';
 import '../enum/auth_status.dart';
 import '../model/auth_state.dart';
 import '../service/auth_service.dart';
-import '../use_case/get_auth.dart';
-import '../use_case/listen_auth.dart';
+import '../use_case/get_auth_use_case.dart';
+import '../use_case/listen_auth_use_case.dart';
 
-class AuthManager implements ListenAuth, GetAuth {
+class AuthManager implements ListenAuthUseCase, GetAuthUseCase {
   static final Finalizer<StreamSubscription<User?>> _userFinalizer = Finalizer(
     (event) => event.cancel(),
   );

@@ -21,7 +21,7 @@ class MangaDetailCubit extends Cubit<MangaDetailState>
     required SearchChapterUseCase getListChapterUseCase,
     required GetMangaSourceUseCase getMangaSourceUseCase,
     required AddToLibraryUseCase addToLibraryUseCase,
-    required ListenAuth listenAuth,
+    required ListenAuthUseCase listenAuth,
   })  : _getMangaUseCase = getMangaUseCase,
         _getListChapterUseCase = getListChapterUseCase,
         _getMangaSourceUseCase = getMangaSourceUseCase,
@@ -40,7 +40,7 @@ class MangaDetailCubit extends Cubit<MangaDetailState>
   }
 
   Future<void> init() async {
-    emit(state.copyWith(isLoading: true));
+    emit(state.copyWith(isLoading: true, error: () => null,));
 
     await _fetchSource();
     await Future.wait([_fetchManga(), _fetchChapter()]);
@@ -163,17 +163,26 @@ class MangaDetailCubit extends Cubit<MangaDetailState>
     _processChapter();
   }
 
-  Future<void> addToLibrary() async {
+  Future<void> addToLibrary({User? user}) async {
     final manga = state.manga;
-    if (manga == null) return;
+    final userId = user?.uid ?? state.authState?.user?.uid;
+    if (manga == null || userId == null) return;
 
-    final userId = state.authState?.user?.uid;
-    if (userId == null) {
+    final result = await _addToLibraryUseCase.execute(
+      manga: manga,
+      userId: userId,
+    );
 
+    if (result is Success<bool>) {
+      emit(
+        state.copyWith(
+          error: () => null,
+          manga: state.manga?.copyWith(
+            isOnLibrary: result.data,
+          ),
+        ),
+      );
+      return;
     }
-
-    // TODO: perform anonymous login
-    // await _addToLibraryUseCase.execute(manga: manga);
   }
-
 }

@@ -1,6 +1,8 @@
 import 'package:collection/collection.dart';
+import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
+import 'package:core_route/core_route.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -97,6 +99,18 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   void _onTapShare(BuildContext context) {
     // TODO: implement this
     context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+  }
+
+  void _onTapAddToLibrary(BuildContext context, MangaDetailState state) async {
+    final status = state.authState?.status;
+    if (status != AuthStatus.loggedIn) {
+      final result = await context.push<AuthState>(AuthRoutePath.login);
+      if (result == null || !context.mounted) return;
+      _cubit(context).addToLibrary(user: result.user);
+      return;
+    }
+
+    _cubit(context).addToLibrary(user: state.authState?.user);
   }
 
   @override
@@ -272,7 +286,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         description: state.manga?.description,
         tags: state.manga?.tags?.map((e) => e.name).whereNotNull().toList(),
         horizontalPadding: 12,
-        onTapAddToLibrary: () => _cubit(context).addToLibrary(),
+        onTapAddToLibrary: () => _onTapAddToLibrary(context, state),
         onTapWebsite: () => _onTapWebsite(context, state),
         onTapTag: (name) => _onTapTag(
           context,

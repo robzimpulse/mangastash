@@ -1,5 +1,5 @@
 import '../model/auth_state.dart';
 
-abstract class GetAuth {
+abstract class GetAuthUseCase {
   AuthState? get authState;
 }

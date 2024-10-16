@@ -2,9 +2,10 @@ import 'package:core_route/core_route.dart';
 import 'package:flutter/widgets.dart';
 import 'package:service_locator/service_locator.dart';
 
-import '../../core_auth.dart';
+import '../enum/auth_status.dart';
 import '../screen/login_screen/login_screen.dart';
 import '../screen/register_screen/register_screen.dart';
+import '../use_case/get_auth_use_case.dart';
 import 'route_path.dart';
 
 class AuthRouteBuilder extends BaseRouteBuilder {
@@ -32,7 +33,7 @@ class AuthRouteBuilder extends BaseRouteBuilder {
         redirect: (context, state) {
           final queryParams = state.uri.queryParameters;
           final destination = queryParams[AuthRoutePath.onFinishPath];
-          final status = locator<GetAuth>().authState?.status;
+          final status = locator<GetAuthUseCase>().authState?.status;
           final isLoggedIn = status == AuthStatus.loggedIn;
           return isLoggedIn ? destination : null;
         },

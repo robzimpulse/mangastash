@@ -20,6 +20,7 @@ class MangaDetailWidget extends StatelessWidget {
     this.horizontalPadding = 8,
     this.separator = const SizedBox(height: 8),
     this.isLoading = false,
+    this.isOnLibrary = false,
     required this.child,
   });
 
@@ -48,6 +49,8 @@ class MangaDetailWidget extends StatelessWidget {
   final Widget separator;
 
   final bool isLoading;
+
+  final bool isOnLibrary;
 
   Widget _header(BuildContext context) {
     return SliverPadding(
@@ -128,7 +131,9 @@ class MangaDetailWidget extends StatelessWidget {
                     isLoading: isLoading,
                     width: 50,
                     height: 50,
-                    child: const Icon(Icons.favorite_outline),
+                    child: Icon(
+                      isOnLibrary ? Icons.favorite : Icons.favorite_outline,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   ShimmerLoading.multiline(

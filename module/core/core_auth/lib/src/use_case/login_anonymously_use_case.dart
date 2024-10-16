@@ -3,10 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../model/result.dart';
 import '../service/auth_service.dart';
 
-class LoginAnonymously {
+class LoginAnonymouslyUseCase {
   final AuthService _authService;
 
-  LoginAnonymously({
+  LoginAnonymouslyUseCase({
     required AuthService authService,
   }) : _authService = authService;
 

@@ -1,3 +1,4 @@
+import 'package:core_route/core_route.dart';
 import 'package:flutter/material.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -15,6 +16,8 @@ class LoginScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => LoginScreenCubit(
         loginAnonymously: locator(),
+        listenAuthUseCase: locator(),
+        logoutUseCase: locator(),
       ),
       child: const LoginScreen(),
     );
@@ -63,6 +66,28 @@ class LoginScreen extends StatelessWidget {
                   child: state.isLoading
                       ? const CircularProgressIndicator()
                       : const Text('Login Anonymously'),
+                ),
+                ElevatedButton(
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  onPressed: () => _cubit(context).logout(),
+                  child: const Text('Logout'),
+                ),
+                ElevatedButton(
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  onPressed: () => context.pop(state.authState),
+                  child: const Text('Back'),
                 ),
               ],
             ),
