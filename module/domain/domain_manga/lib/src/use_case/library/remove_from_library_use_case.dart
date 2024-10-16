@@ -2,10 +2,10 @@ import 'package:core_network/core_network.dart';
 import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 
-class AddToLibraryUseCase {
+class RemoveFromLibraryUseCase {
   final MangaLibraryServiceFirebase _mangaLibraryServiceFirebase;
 
-  AddToLibraryUseCase({
+  RemoveFromLibraryUseCase({
     required MangaLibraryServiceFirebase mangaLibraryServiceFirebase,
   }) : _mangaLibraryServiceFirebase = mangaLibraryServiceFirebase;
 
@@ -14,9 +14,10 @@ class AddToLibraryUseCase {
     required String userId,
   }) async {
     try {
-      return Success(await _mangaLibraryServiceFirebase.add(manga, userId));
+      return Success(await _mangaLibraryServiceFirebase.remove(manga, userId));
     } catch (e) {
       return Error(e);
     }
   }
+
 }

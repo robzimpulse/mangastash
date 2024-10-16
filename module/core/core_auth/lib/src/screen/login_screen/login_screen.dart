@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 
+import '../../../core_auth.dart';
 import 'login_screen_cubit.dart';
 import 'login_screen_state.dart';
 
@@ -25,19 +26,29 @@ class LoginScreen extends StatelessWidget {
 
   LoginScreenCubit _cubit(BuildContext context) => context.read();
 
-  Widget _builder({
+  Widget _consumer({
     required BlocWidgetBuilder<LoginScreenState> builder,
     BlocBuilderCondition<LoginScreenState>? buildWhen,
+    required BlocWidgetListener<LoginScreenState> listener,
+    BlocListenerCondition<LoginScreenState>? listenWhen,
   }) {
-    return BlocBuilder<LoginScreenCubit, LoginScreenState>(
+    return BlocConsumer<LoginScreenCubit, LoginScreenState>(
       buildWhen: buildWhen,
       builder: builder,
+      listenWhen: listenWhen,
+      listener: listener,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return _builder(
+    return _consumer(
+      listenWhen: (prev, curr) {
+        final isChanged = prev.authState != curr.authState;
+        final isLoggedIn = curr.authState?.status == AuthStatus.loggedIn;
+        return isChanged && isLoggedIn;
+      },
+      listener: (context, state) => context.pop(state.authState),
       builder: (context, state) => PopScope(
         canPop: !state.isLoading,
         child: Scaffold(

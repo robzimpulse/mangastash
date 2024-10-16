@@ -4,11 +4,14 @@ import 'package:core_network/core_network.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
+import '../domain_manga.dart';
 import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
 import 'use_case/chapter/search_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
 import 'use_case/library/add_to_library_use_case.dart';
+import 'use_case/library/get_manga_from_library_use_case.dart';
+import 'use_case/library/remove_from_library_use_case.dart';
 import 'use_case/manga/get_manga_on_mangadex_use_case.dart';
 import 'use_case/manga/get_manga_use_case.dart';
 import 'use_case/manga/search_manga_on_mangadex_use_case.dart';
@@ -101,6 +104,7 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => GetMangaUseCase(
         getMangaOnMangaDexUseCase: locator(),
+        checkMangaExistsOnLibraryUseCase: locator(),
       ),
     );
     locator.registerFactory(
@@ -110,6 +114,21 @@ class DomainMangaRegistrar extends Registrar {
     );
     locator.registerFactory(
       () => AddToLibraryUseCase(
+        mangaLibraryServiceFirebase: locator(),
+      ),
+    );
+    locator.registerFactory(
+      () => RemoveFromLibraryUseCase(
+        mangaLibraryServiceFirebase: locator(),
+      ),
+    );
+    locator.registerFactory(
+      () => GetMangaFromLibraryUseCase(
+        mangaLibraryServiceFirebase: locator(),
+      ),
+    );
+    locator.registerFactory(
+      () => CheckMangaExistsOnLibraryUseCase(
         mangaLibraryServiceFirebase: locator(),
       ),
     );

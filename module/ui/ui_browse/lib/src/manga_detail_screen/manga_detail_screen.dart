@@ -43,6 +43,7 @@ class MangaDetailScreen extends StatefulWidget {
         getMangaSourceUseCase: locator(),
         addToLibraryUseCase: locator(),
         listenAuth: locator(),
+        removeFromLibraryUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         onTapChapter: onTapChapter,
@@ -286,6 +287,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         description: state.manga?.description,
         tags: state.manga?.tags?.map((e) => e.name).whereNotNull().toList(),
         horizontalPadding: 12,
+        isOnLibrary: state.manga?.isOnLibrary == true,
         onTapAddToLibrary: () => _onTapAddToLibrary(context, state),
         onTapWebsite: () => _onTapWebsite(context, state),
         onTapTag: (name) => _onTapTag(
