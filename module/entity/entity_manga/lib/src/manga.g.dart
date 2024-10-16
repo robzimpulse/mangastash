@@ -17,6 +17,10 @@ Manga _$MangaFromJson(Map<String, dynamic> json) => Manga(
           ?.map((e) => MangaTag.fromJson(e as Map<String, dynamic>))
           .toList(),
       webUrl: json['web_url'] as String?,
+      isOnLibrary: json['is_on_library'] as bool? ?? false,
+      source: json['source'] == null
+          ? null
+          : MangaSource.fromJson(json['source'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$MangaToJson(Manga instance) => <String, dynamic>{
@@ -28,4 +32,6 @@ Map<String, dynamic> _$MangaToJson(Manga instance) => <String, dynamic>{
       'description': instance.description,
       'tags': instance.tags?.map((e) => e.toJson()).toList(),
       'web_url': instance.webUrl,
+      'is_on_library': instance.isOnLibrary,
+      'source': instance.source?.toJson(),
     };

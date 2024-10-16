@@ -141,7 +141,13 @@ class MangaDetailCubit extends Cubit<MangaDetailState>
     );
 
     if (result is Success<Manga>) {
-      emit(state.copyWith(manga: result.data));
+      emit(
+        state.copyWith(
+          manga: result.data.copyWith(
+            source: state.source,
+          ),
+        ),
+      );
     }
 
     if (result is Error<Manga>) {
