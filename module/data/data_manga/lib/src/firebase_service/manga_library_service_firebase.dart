@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
-import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -56,5 +55,14 @@ class MangaLibraryServiceFirebase {
     return [
       for (final value in values.entries) Manga.fromJson(value.value),
     ];
+  }
+
+  Stream<List<Manga>> listen(String userId) {
+    final stream = _ref.doc(userId).snapshots();
+    return stream.map((event) {
+      final values = event.data();
+      if (values == null) return [];
+      return [for (final value in values.entries) Manga.fromJson(value.value)];
+    });
   }
 }

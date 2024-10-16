@@ -17,13 +17,14 @@ class MangaDetailCubit extends Cubit<MangaDetailState>
   final AddToLibraryUseCase _addToLibraryUseCase;
 
   MangaDetailCubit({
-    MangaDetailState initialState = const MangaDetailState(),
+    required MangaDetailState initialState,
     required GetMangaUseCase getMangaUseCase,
     required SearchChapterUseCase getListChapterUseCase,
     required GetMangaSourceUseCase getMangaSourceUseCase,
     required AddToLibraryUseCase addToLibraryUseCase,
     required RemoveFromLibraryUseCase removeFromLibraryUseCase,
     required ListenAuthUseCase listenAuth,
+    required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
   })  : _getMangaUseCase = getMangaUseCase,
         _getListChapterUseCase = getListChapterUseCase,
         _getMangaSourceUseCase = getMangaSourceUseCase,
@@ -31,10 +32,18 @@ class MangaDetailCubit extends Cubit<MangaDetailState>
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         super(initialState) {
     addSubscription(listenAuth.authStateStream.listen(_updateAuthState));
+    addSubscription(
+      listenMangaFromLibraryUseCase.libraryStateStream
+          .listen(_updateMangaLibrary),
+    );
   }
 
   void _updateAuthState(AuthState? authState) {
     emit(state.copyWith(authState: authState));
+  }
+
+  void _updateMangaLibrary(List<Manga> library) {
+    emit(state.copyWith(libraries: library));
   }
 
   void updateMangaConfig(MangaChapterConfig config) {
@@ -180,37 +189,10 @@ class MangaDetailCubit extends Cubit<MangaDetailState>
     final userId = user?.uid ?? state.authState?.user?.uid;
     if (manga == null || userId == null) return;
 
-    if (state.manga?.isOnLibrary != true) {
-      final result = await _addToLibraryUseCase.execute(
-        manga: manga,
-        userId: userId,
-      );
-
-      if (result is Success<bool>) {
-        emit(
-          state.copyWith(
-            error: () => null,
-            manga: state.manga?.copyWith(
-              isOnLibrary: result.data,
-            ),
-          ),
-        );
-      }
+    if (!state.isOnLibrary) {
+      await _addToLibraryUseCase.execute(manga: manga, userId: userId);
     } else {
-      final result = await _removeFromLibraryUseCase.execute(
-        manga: manga,
-        userId: userId,
-      );
-      if (result is Success<bool>) {
-        emit(
-          state.copyWith(
-            error: () => null,
-            manga: state.manga?.copyWith(
-              isOnLibrary: false,
-            ),
-          ),
-        );
-      }
+      await _removeFromLibraryUseCase.execute(manga: manga, userId: userId);
     }
   }
 }

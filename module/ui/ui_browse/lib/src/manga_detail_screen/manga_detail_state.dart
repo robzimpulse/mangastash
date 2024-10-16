@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:core_auth/core_auth.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
@@ -27,8 +28,12 @@ class MangaDetailState extends Equatable {
   final MangaChapterConfig? config;
   final List<MangaChapter>? processedChapters;
   final AuthState? authState;
+  final List<Manga> libraries;
 
-  const MangaDetailState({
+  late final bool isOnLibrary =
+      libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
+
+  MangaDetailState({
     this.isLoading = false,
     this.error,
     this.mangaId,
@@ -39,6 +44,7 @@ class MangaDetailState extends Equatable {
     this.config,
     this.processedChapters,
     this.authState,
+    this.libraries = const [],
   });
 
   @override
@@ -53,6 +59,7 @@ class MangaDetailState extends Equatable {
         config,
         processedChapters,
         authState,
+        libraries,
       ];
 
   MangaDetailState copyWith({
@@ -66,6 +73,7 @@ class MangaDetailState extends Equatable {
     MangaSource? source,
     MangaChapterConfig? config,
     AuthState? authState,
+    List<Manga>? libraries,
   }) {
     return MangaDetailState(
       config: config ?? this.config,
@@ -78,6 +86,7 @@ class MangaDetailState extends Equatable {
       sourceId: sourceId ?? this.sourceId,
       source: source ?? this.source,
       authState: authState ?? this.authState,
+      libraries: libraries ?? this.libraries,
     );
   }
 }

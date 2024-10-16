@@ -11,8 +11,12 @@ import '../use_case/get_auth_use_case.dart';
 import '../use_case/listen_auth_use_case.dart';
 
 class AuthManager implements ListenAuthUseCase, GetAuthUseCase {
-  static final Finalizer<StreamSubscription<User?>> _userFinalizer = Finalizer(
-    (event) => event.cancel(),
+  static final _finalizer = Finalizer<List<StreamSubscription>>(
+    (events) {
+      for (final event in events) {
+        event.cancel();
+      }
+    },
   );
 
   final _authStateSubject = BehaviorSubject<AuthState>.seeded(
@@ -27,9 +31,9 @@ class AuthManager implements ListenAuthUseCase, GetAuthUseCase {
         user: user,
       ),
     );
-    _userFinalizer.attach(
+    _finalizer.attach(
       this,
-      service.userChanges().listen(_updateUser),
+      [service.userChanges().listen(_updateUser)],
       detach: this,
     );
   }

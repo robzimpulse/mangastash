@@ -22,16 +22,14 @@ class LibraryMangaScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => LibraryMangaCubit(
         initialState: const LibraryMangaState(),
-        getMangaFromLibraryUseCase: locator(),
+        listenMangaFromLibraryUseCase: locator(),
         listenAuthUseCase: locator(),
-      )..init(),
+      ),
       child: LibraryMangaScreen(
         onTapManga: onTapManga,
       ),
     );
   }
-
-  LibraryMangaCubit _cubit(BuildContext context) => context.read();
 
   Widget _builder({
     required BlocWidgetBuilder<LibraryMangaState> builder,
@@ -104,18 +102,15 @@ class LibraryMangaScreen extends StatelessWidget {
           ),
         );
 
-        return RefreshIndicator(
-          onRefresh: () => _cubit(context).init(),
-          child: MangaShelfWidget.comfortableGrid(
-            controller: PagingScrollController(onLoadNextPage: (context) {}),
-            loadingIndicator: indicator,
-            crossAxisCount: _crossAxisCount(context),
-            childAspectRatio: (100 / 140),
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-            hasNextPage: false,
-            children: children.toList(),
-          ),
+        return MangaShelfWidget.comfortableGrid(
+          controller: PagingScrollController(onLoadNextPage: (context) {}),
+          loadingIndicator: indicator,
+          crossAxisCount: _crossAxisCount(context),
+          childAspectRatio: (100 / 140),
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          hasNextPage: false,
+          children: children.toList(),
         );
       },
     );
