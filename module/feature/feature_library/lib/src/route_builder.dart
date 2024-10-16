@@ -17,8 +17,9 @@ class LibraryRouteBuilder extends BaseRouteBuilder {
       pageBuilder: (context, state) => NoTransitionPage(
         child: LibraryMangaScreen.create(
           locator: locator,
-          onTapManga: (manga) => context.showSnackBar(
-            message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+          onTapManga: (manga) => context.push(
+            // TODO: how to cross access route on another module
+            '/browse_manga/${manga?.source?.id}/${manga?.id}',
           ),
         ),
       ),

@@ -52,10 +52,12 @@ class MangaDetailCubit extends Cubit<MangaDetailState>
   }
 
   Future<void> init() async {
-    emit(state.copyWith(
-      isLoading: true,
-      error: () => null,
-    ));
+    emit(
+      state.copyWith(
+        isLoading: true,
+        error: () => null,
+      ),
+    );
 
     await _fetchSource();
     await Future.wait([_fetchManga(), _fetchChapter()]);
