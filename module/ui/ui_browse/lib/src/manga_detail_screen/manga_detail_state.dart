@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:core_auth/core_auth.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ui_common/ui_common.dart';
@@ -26,12 +27,11 @@ class MangaDetailState extends Equatable {
   final String? sourceId;
   final MangaSource? source;
   final MangaChapterConfig? config;
-  final List<MangaChapter>? processedChapters;
   final AuthState? authState;
   final List<Manga> libraries;
 
-  late final bool isOnLibrary =
-      libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
+  late final bool isOnLibrary;
+  late final List<MangaChapter>? processedChapters;
 
   MangaDetailState({
     this.isLoading = false,
@@ -42,10 +42,71 @@ class MangaDetailState extends Equatable {
     this.source,
     this.sourceId,
     this.config,
-    this.processedChapters,
     this.authState,
     this.libraries = const [],
-  });
+  }) {
+    isOnLibrary = libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
+
+    final sortOrder = config?.sortOrder;
+    final sortOption = config?.sortOption;
+    List<MangaChapter>? processedChapters = chapters;
+
+    if (sortOrder != null && sortOption != null) {
+      switch (sortOption) {
+        case MangaChapterSortOptionEnum.chapterNumber:
+          switch (sortOrder) {
+            case MangaChapterSortOrderEnum.asc:
+              processedChapters = chapters?.sorted(
+                (a, b) {
+                  final aChapter = int.tryParse(a.chapter ?? '');
+                  final bChapter = int.tryParse(b.chapter ?? '');
+                  if (aChapter == null || bChapter == null) return 0;
+                  return -aChapter.compareTo(bChapter);
+                },
+              );
+              break;
+            case MangaChapterSortOrderEnum.desc:
+              processedChapters = chapters?.sorted(
+                (a, b) {
+                  final aChapter = int.tryParse(a.chapter ?? '');
+                  final bChapter = int.tryParse(b.chapter ?? '');
+                  if (aChapter == null || bChapter == null) return 0;
+                  return aChapter.compareTo(bChapter);
+                },
+              );
+              break;
+          }
+
+          break;
+        case MangaChapterSortOptionEnum.uploadDate:
+          switch (sortOrder) {
+            case MangaChapterSortOrderEnum.asc:
+              processedChapters = chapters?.sorted(
+                (a, b) {
+                  final aDate = a.readableAt?.asDateTime;
+                  final bDate = b.readableAt?.asDateTime;
+                  if (aDate == null || bDate == null) return 0;
+                  return aDate.compareTo(bDate);
+                },
+              );
+              break;
+            case MangaChapterSortOrderEnum.desc:
+              processedChapters = chapters?.sorted(
+                (a, b) {
+                  final aDate = a.readableAt?.asDateTime;
+                  final bDate = b.readableAt?.asDateTime;
+                  if (aDate == null || bDate == null) return 0;
+                  return -aDate.compareTo(bDate);
+                },
+              );
+              break;
+          }
+          break;
+      }
+    }
+
+    this.processedChapters = processedChapters;
+  }
 
   @override
   List<Object?> get props => [
@@ -57,7 +118,6 @@ class MangaDetailState extends Equatable {
         sourceId,
         source,
         config,
-        processedChapters,
         authState,
         libraries,
       ];
@@ -68,7 +128,6 @@ class MangaDetailState extends Equatable {
     String? mangaId,
     Manga? manga,
     List<MangaChapter>? chapters,
-    List<MangaChapter>? processedChapters,
     String? sourceId,
     MangaSource? source,
     MangaChapterConfig? config,
@@ -82,7 +141,6 @@ class MangaDetailState extends Equatable {
       mangaId: mangaId ?? this.mangaId,
       manga: manga ?? this.manga,
       chapters: chapters ?? this.chapters,
-      processedChapters: processedChapters ?? this.processedChapters,
       sourceId: sourceId ?? this.sourceId,
       source: source ?? this.source,
       authState: authState ?? this.authState,
