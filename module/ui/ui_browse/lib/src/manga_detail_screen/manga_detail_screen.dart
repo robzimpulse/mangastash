@@ -4,6 +4,8 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -241,9 +243,9 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     }
 
     return [
-      SliverPadding(
-        padding: const EdgeInsets.symmetric(horizontal: 12).copyWith(top: 12),
-        sliver: SliverToBoxAdapter(
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12).copyWith(top: 12),
           child: Row(
             children: [
               Text(
@@ -254,27 +256,70 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           ),
         ),
       ),
-      SliverPadding(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        sliver: SliverList(
-          delegate: SliverChildBuilderDelegate(
-            childCount: (chapters.length * 2) - 1,
-            semanticIndexCallback: (Widget _, int index) {
-              return index.isEven ? index ~/ 2 : null;
-            },
-            (context, index) {
-              final int itemIndex = index ~/ 2;
-              return index.isOdd
-                  ? _separator()
-                  : _chapter(
-                      context: context,
-                      chapter: chapters[itemIndex],
-                      config: state.config,
-                    );
-            },
+      for (final group in chapters.entries)
+        SliverPadding(
+          padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
+          sliver: MultiSliver(
+            pushPinnedChildren: true,
+            children: [
+              SliverPinnedHeader(
+                child: Container(
+                  color: Theme.of(context).cardColor,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Volume ${group.key}',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              for (final chapter in group.value.entries)
+                SliverPadding(
+                  padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
+                  sliver: MultiSliver(
+                    pushPinnedChildren: true,
+                    children: [
+                      SliverPinnedHeader(
+                        child: Container(
+                          color: Theme.of(context).cardColor,
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Chapter ${chapter.key}',
+                                style: Theme.of(context).textTheme.titleSmall,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          childCount: (chapter.value.length * 2) - 1,
+                          semanticIndexCallback: (Widget _, int index) {
+                            return index.isEven ? index ~/ 2 : null;
+                          },
+                          (context, index) {
+                            final int itemIndex = index ~/ 2;
+                            return index.isOdd
+                                ? _separator()
+                                : _chapter(
+                                    context: context,
+                                    chapter: chapter.value[itemIndex],
+                                    config: state.config,
+                                  );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
           ),
         ),
-      ),
     ];
   }
 

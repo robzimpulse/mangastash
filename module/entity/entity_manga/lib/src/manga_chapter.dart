@@ -19,7 +19,11 @@ class MangaChapter extends Equatable {
 
   final List<String>? images;
 
-  const MangaChapter({
+  late final num? numVolume = num.tryParse(volume ?? '');
+
+  late final num? numChapter = num.tryParse(chapter ?? '');
+
+  MangaChapter({
     this.id,
     this.mangaId,
     this.title,

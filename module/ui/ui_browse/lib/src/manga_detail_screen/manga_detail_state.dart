@@ -31,7 +31,7 @@ class MangaDetailState extends Equatable {
   final List<Manga> libraries;
 
   late final bool isOnLibrary;
-  late final List<MangaChapter>? processedChapters;
+  late final Map<num?, Map<num?, List<MangaChapter>>>? processedChapters;
 
   MangaDetailState({
     this.isLoading = false,
@@ -47,65 +47,79 @@ class MangaDetailState extends Equatable {
   }) {
     isOnLibrary = libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
 
-    final sortOrder = config?.sortOrder;
-    final sortOption = config?.sortOption;
-    List<MangaChapter>? processedChapters = chapters;
+    final groupByVolume = chapters
+        ?.sortedBy((e) => e.numVolume ?? 0)
+        .groupListsBy((e) => e.numVolume);
 
-    if (sortOrder != null && sortOption != null) {
-      switch (sortOption) {
-        case MangaChapterSortOptionEnum.chapterNumber:
-          switch (sortOrder) {
-            case MangaChapterSortOrderEnum.asc:
-              processedChapters = chapters?.sorted(
-                (a, b) {
-                  final aChapter = int.tryParse(a.chapter ?? '');
-                  final bChapter = int.tryParse(b.chapter ?? '');
-                  if (aChapter == null || bChapter == null) return 0;
-                  return -aChapter.compareTo(bChapter);
-                },
-              );
-              break;
-            case MangaChapterSortOrderEnum.desc:
-              processedChapters = chapters?.sorted(
-                (a, b) {
-                  final aChapter = int.tryParse(a.chapter ?? '');
-                  final bChapter = int.tryParse(b.chapter ?? '');
-                  if (aChapter == null || bChapter == null) return 0;
-                  return aChapter.compareTo(bChapter);
-                },
-              );
-              break;
-          }
+    final groupByVolumeAndChapter = groupByVolume?.map(
+      (key, value) => MapEntry(
+        key,
+        value
+            .sortedBy((e) => e.numChapter ?? 0)
+            .groupListsBy((e) => e.numChapter),
+      ),
+    );
+    processedChapters = groupByVolumeAndChapter;
 
-          break;
-        case MangaChapterSortOptionEnum.uploadDate:
-          switch (sortOrder) {
-            case MangaChapterSortOrderEnum.asc:
-              processedChapters = chapters?.sorted(
-                (a, b) {
-                  final aDate = a.readableAt?.asDateTime;
-                  final bDate = b.readableAt?.asDateTime;
-                  if (aDate == null || bDate == null) return 0;
-                  return aDate.compareTo(bDate);
-                },
-              );
-              break;
-            case MangaChapterSortOrderEnum.desc:
-              processedChapters = chapters?.sorted(
-                (a, b) {
-                  final aDate = a.readableAt?.asDateTime;
-                  final bDate = b.readableAt?.asDateTime;
-                  if (aDate == null || bDate == null) return 0;
-                  return -aDate.compareTo(bDate);
-                },
-              );
-              break;
-          }
-          break;
-      }
-    }
+    // TODO: perform sorting
 
-    this.processedChapters = processedChapters;
+    // final sortOrder = config?.sortOrder;
+    // final sortOption = config?.sortOption;
+    // List<MangaChapter>? processedChapters;
+
+    // if (sortOrder != null && sortOption != null) {
+    //   switch (sortOption) {
+    //     case MangaChapterSortOptionEnum.chapterNumber:
+    //       switch (sortOrder) {
+    //         case MangaChapterSortOrderEnum.asc:
+    //           processedChapters = chapters?.sorted(
+    //             (a, b) {
+    //               final aChapter = int.tryParse(a.chapter ?? '');
+    //               final bChapter = int.tryParse(b.chapter ?? '');
+    //               if (aChapter == null || bChapter == null) return 0;
+    //               return -aChapter.compareTo(bChapter);
+    //             },
+    //           );
+    //           break;
+    //         case MangaChapterSortOrderEnum.desc:
+    //           processedChapters = chapters?.sorted(
+    //             (a, b) {
+    //               final aChapter = int.tryParse(a.chapter ?? '');
+    //               final bChapter = int.tryParse(b.chapter ?? '');
+    //               if (aChapter == null || bChapter == null) return 0;
+    //               return aChapter.compareTo(bChapter);
+    //             },
+    //           );
+    //           break;
+    //       }
+    //
+    //       break;
+    //     case MangaChapterSortOptionEnum.uploadDate:
+    //       switch (sortOrder) {
+    //         case MangaChapterSortOrderEnum.asc:
+    //           processedChapters = chapters?.sorted(
+    //             (a, b) {
+    //               final aDate = a.readableAt?.asDateTime;
+    //               final bDate = b.readableAt?.asDateTime;
+    //               if (aDate == null || bDate == null) return 0;
+    //               return aDate.compareTo(bDate);
+    //             },
+    //           );
+    //           break;
+    //         case MangaChapterSortOrderEnum.desc:
+    //           processedChapters = chapters?.sorted(
+    //             (a, b) {
+    //               final aDate = a.readableAt?.asDateTime;
+    //               final bDate = b.readableAt?.asDateTime;
+    //               if (aDate == null || bDate == null) return 0;
+    //               return -aDate.compareTo(bDate);
+    //             },
+    //           );
+    //           break;
+    //       }
+    //       break;
+    //   }
+    // }
   }
 
   @override
