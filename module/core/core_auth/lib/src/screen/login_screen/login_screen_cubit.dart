@@ -1,38 +1,38 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import '../../../core_auth.dart';
-import '../../enum/auth_status.dart';
-import '../../model/auth_state.dart';
 import '../../model/result.dart';
-import '../../use_case/login_anonymously_use_case.dart';
-import '../../use_case/logout_use_case.dart';
+import '../../use_case/login_use_case.dart';
 import 'login_screen_state.dart';
 
 class LoginScreenCubit extends Cubit<LoginScreenState>
     with AutoSubscriptionMixin {
-  final LoginAnonymouslyUseCase _loginAnonymously;
-  final LogoutUseCase _logoutUseCase;
+  final LoginUseCase _loginUseCase;
 
   LoginScreenCubit({
     LoginScreenState initialState = const LoginScreenState(),
     required ListenAuthUseCase listenAuthUseCase,
-    required LoginAnonymouslyUseCase loginAnonymously,
-    required LogoutUseCase logoutUseCase,
-  })  : _loginAnonymously = loginAnonymously,
-        _logoutUseCase = logoutUseCase,
+    required LoginUseCase loginUseCase,
+  })  : _loginUseCase = loginUseCase,
         super(initialState) {
     addSubscription(listenAuthUseCase.authStateStream.listen(_updateAuthState));
+  }
+
+  void update({String? email, String? password}) {
+    emit(state.copyWith(email: email, password: password));
   }
 
   void _updateAuthState(AuthState? authState) {
     emit(state.copyWith(authState: authState));
   }
 
-  void loginAnonymously() async {
+  void login() async {
     emit(state.copyWith(isLoading: true, error: () => null));
 
-    final result = await _loginAnonymously.execute();
+    final result = await _loginUseCase.execute(
+      email: state.email,
+      password: state.password,
+    );
 
     if (result is Success<User>) {
       emit(state.copyWith(isLoading: false, error: () => null));
@@ -41,9 +41,5 @@ class LoginScreenCubit extends Cubit<LoginScreenState>
     if (result is Error<User>) {
       emit(state.copyWith(isLoading: false, error: () => result.error));
     }
-  }
-
-  void logout() async {
-    await _logoutUseCase.execute();
   }
 }

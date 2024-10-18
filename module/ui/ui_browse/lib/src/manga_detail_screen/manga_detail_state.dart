@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:core_auth/core_auth.dart';
-import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ui_common/ui_common.dart';
@@ -49,6 +48,7 @@ class MangaDetailState extends Equatable {
 
     final groupByVolume = chapters
         ?.sortedBy((e) => e.numVolume ?? 0)
+        .reversed
         .groupListsBy((e) => e.numVolume);
 
     final groupByVolumeAndChapter = groupByVolume?.map(
@@ -56,6 +56,7 @@ class MangaDetailState extends Equatable {
         key,
         value
             .sortedBy((e) => e.numChapter ?? 0)
+            .reversed
             .groupListsBy((e) => e.numChapter),
       ),
     );

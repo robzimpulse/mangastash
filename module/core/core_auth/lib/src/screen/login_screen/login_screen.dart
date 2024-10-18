@@ -16,9 +16,8 @@ class LoginScreen extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (context) => LoginScreenCubit(
-        loginAnonymously: locator(),
+        loginUseCase: locator(),
         listenAuthUseCase: locator(),
-        logoutUseCase: locator(),
       ),
       child: const LoginScreen(),
     );
@@ -26,81 +25,102 @@ class LoginScreen extends StatelessWidget {
 
   LoginScreenCubit _cubit(BuildContext context) => context.read();
 
-  Widget _consumer({
+  Widget _builder({
     required BlocWidgetBuilder<LoginScreenState> builder,
     BlocBuilderCondition<LoginScreenState>? buildWhen,
-    required BlocWidgetListener<LoginScreenState> listener,
-    BlocListenerCondition<LoginScreenState>? listenWhen,
   }) {
-    return BlocConsumer<LoginScreenCubit, LoginScreenState>(
+    return BlocBuilder<LoginScreenCubit, LoginScreenState>(
       buildWhen: buildWhen,
       builder: builder,
-      listenWhen: listenWhen,
-      listener: listener,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return _consumer(
-      listenWhen: (prev, curr) {
-        final isChanged = prev.authState != curr.authState;
-        final isLoggedIn = curr.authState?.status == AuthStatus.loggedIn;
-        return isChanged && isLoggedIn;
-      },
-      listener: (context, state) => context.pop(state.authState),
-      builder: (context, state) => PopScope(
-        canPop: !state.isLoading,
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Login Screen'),
-          ),
-          body: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: Center(
-                    child: Text(state.toString()),
-                  ),
-                ),
-                ElevatedButton(
-                  style: ButtonStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<LoginScreenCubit, LoginScreenState>(
+          listenWhen: (prev, curr) {
+            final isChanged = prev.authState != curr.authState;
+            final isLoggedIn = curr.authState?.status == AuthStatus.loggedIn;
+            return isChanged && isLoggedIn;
+          },
+          listener: (context, state) => context.pop(state.authState),
+        ),
+      ],
+      child: _builder(
+        buildWhen: (prev, curr) => prev.isLoading != curr.isLoading,
+        builder: (context, state) => PopScope(
+          canPop: !state.isLoading,
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Text('Login Screen'),
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextField(
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.email),
+                    ),
+                    onChanged: (value) => _cubit(context).update(
+                      email: value,
+                    ),
+                    onSubmitted: (value) => _cubit(context).update(
+                      email: value,
                     ),
                   ),
-                  onPressed: () => _cubit(context).loginAnonymously(),
-                  child: state.isLoading
-                      ? const CircularProgressIndicator()
-                      : const Text('Login Anonymously'),
-                ),
-                ElevatedButton(
-                  style: ButtonStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Password',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.password),
+                    ),
+                    onChanged: (value) => _cubit(context).update(
+                      password: value,
+                    ),
+                    onSubmitted: (value) => _cubit(context).update(
+                      password: value,
                     ),
                   ),
-                  onPressed: () => _cubit(context).logout(),
-                  child: const Text('Logout'),
-                ),
-                ElevatedButton(
-                  style: ButtonStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  const SizedBox(height: 8),
+                  _builder(
+                    buildWhen: (prev, curr) => prev.error != curr.error,
+                    builder: (context, state) {
+                      final error = state.error;
+                      return error != null
+                          ? Text(
+                              error.toString(),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelSmall
+                                  ?.copyWith(color: Colors.red),
+                            )
+                          : const SizedBox.shrink();
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
+                    onPressed: () => _cubit(context).login(),
+                    child: state.isLoading
+                        ? const CircularProgressIndicator()
+                        : const Text('Login'),
                   ),
-                  onPressed: () => context.pop(state.authState),
-                  child: const Text('Back'),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

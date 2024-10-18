@@ -5,12 +5,18 @@ import '../../../core_auth.dart';
 
 class LoginScreenState extends Equatable {
   const LoginScreenState({
+    this.email = '',
+    this.password = '',
     this.isLoading = false,
     this.authState,
     this.error,
   });
 
   final bool isLoading;
+
+  final String email;
+
+  final String password;
 
   final AuthState? authState;
 
@@ -21,6 +27,8 @@ class LoginScreenState extends Equatable {
 
   LoginScreenState copyWith({
     bool? isLoading,
+    String? email,
+    String? password,
     AuthState? authState,
     ValueGetter<Exception?>? error,
   }) {
