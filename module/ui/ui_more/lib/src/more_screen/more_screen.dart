@@ -1,5 +1,10 @@
+import 'package:core_auth/core_auth.dart';
+import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
+
+import 'more_screen_cubit.dart';
+import 'more_screen_state.dart';
 
 class MoreScreen extends StatelessWidget {
   final VoidCallback? onTapSetting;
@@ -7,6 +12,8 @@ class MoreScreen extends StatelessWidget {
   final VoidCallback? onTapBackupRestore;
   final VoidCallback? onTapDownloadQueue;
   final VoidCallback? onTapAbout;
+  final VoidCallback? onTapHelp;
+  final VoidCallback? onTapLogin;
 
   const MoreScreen({
     super.key,
@@ -15,6 +22,8 @@ class MoreScreen extends StatelessWidget {
     this.onTapBackupRestore,
     this.onTapDownloadQueue,
     this.onTapAbout,
+    this.onTapHelp,
+    this.onTapLogin,
   });
 
   static Widget create({
@@ -24,13 +33,34 @@ class MoreScreen extends StatelessWidget {
     VoidCallback? onTapBackupRestore,
     VoidCallback? onTapDownloadQueue,
     VoidCallback? onTapAbout,
+    VoidCallback? onTapHelp,
+    VoidCallback? onTapLogin,
   }) {
-    return MoreScreen(
-      onTapSetting: onTapSetting,
-      onTapStatistic: onTapStatistic,
-      onTapBackupRestore: onTapBackupRestore,
-      onTapDownloadQueue: onTapDownloadQueue,
-      onTapAbout: onTapAbout,
+    return BlocProvider(
+      create: (context) => MoreScreenCubit(
+        listenAuthUseCase: locator(),
+        logoutUseCase: locator(),
+      ),
+      child: MoreScreen(
+        onTapSetting: onTapSetting,
+        onTapStatistic: onTapStatistic,
+        onTapBackupRestore: onTapBackupRestore,
+        onTapDownloadQueue: onTapDownloadQueue,
+        onTapAbout: onTapAbout,
+        onTapLogin: onTapLogin,
+      ),
+    );
+  }
+
+  MoreScreenCubit _cubit(BuildContext context) => context.read();
+
+  Widget _builder({
+    required BlocWidgetBuilder<MoreScreenState> builder,
+    BlocBuilderCondition<MoreScreenState>? buildWhen,
+  }) {
+    return BlocBuilder<MoreScreenCubit, MoreScreenState>(
+      buildWhen: buildWhen,
+      builder: builder,
     );
   }
 
@@ -83,7 +113,7 @@ class MoreScreen extends StatelessWidget {
                 ListTile(
                   title: const Text('Download Queue'),
                   subtitle: const Text('22 remaining'),
-                  onTap: () => onTapDownloadQueue?.call(),
+                  onTap: onTapDownloadQueue,
                   leading: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.download),
@@ -91,7 +121,7 @@ class MoreScreen extends StatelessWidget {
                 ),
                 ListTile(
                   title: const Text('Statistic'),
-                  onTap: () => onTapStatistic?.call(),
+                  onTap: onTapStatistic,
                   leading: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.auto_graph),
@@ -99,7 +129,7 @@ class MoreScreen extends StatelessWidget {
                 ),
                 ListTile(
                   title: const Text('Backup and Restore'),
-                  onTap: () => onTapBackupRestore?.call(),
+                  onTap: onTapBackupRestore,
                   leading: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.settings_backup_restore),
@@ -108,7 +138,7 @@ class MoreScreen extends StatelessWidget {
                 const Divider(height: 1, thickness: 1),
                 ListTile(
                   title: const Text('Settings'),
-                  onTap: () => onTapSetting?.call(),
+                  onTap: onTapSetting,
                   leading: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.settings),
@@ -116,8 +146,7 @@ class MoreScreen extends StatelessWidget {
                 ),
                 ListTile(
                   title: const Text('About'),
-                  // TODO: implement this
-                  onTap: () => onTapAbout?.call(),
+                  onTap: onTapAbout,
                   leading: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.info_outline),
@@ -125,13 +154,32 @@ class MoreScreen extends StatelessWidget {
                 ),
                 ListTile(
                   title: const Text('Help'),
-                  // TODO: implement this
-                  onTap: () => context.showSnackBar(
-                    message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-                  ),
+                  onTap: onTapHelp,
                   leading: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.help_outline),
+                  ),
+                ),
+                _builder(
+                  builder: (context, state) => Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      onPressed: state.authState?.status == AuthStatus.loggedOut
+                          ? onTapLogin
+                          : () => _cubit(context).logout(),
+                      child: Text(
+                        state.authState?.status == AuthStatus.loggedOut
+                            ? 'Login'
+                            : 'Logout',
+                      ),
+                    ),
                   ),
                 ),
               ],

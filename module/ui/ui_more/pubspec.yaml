@@ -26,6 +26,8 @@ dependencies:
     path: ../../core/core_route
   core_network:
     path: ../../core/core_network
+  core_auth:
+    path: ../../core/core_auth
 
   # entity
   entity_manga:

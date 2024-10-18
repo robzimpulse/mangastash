@@ -9,3 +9,4 @@ export 'src/route/route_builder.dart';
 export 'src/route/route_path.dart';
 export 'src/use_case/get_auth_use_case.dart';
 export 'src/use_case/listen_auth_use_case.dart';
+export 'src/use_case/logout_use_case.dart';
