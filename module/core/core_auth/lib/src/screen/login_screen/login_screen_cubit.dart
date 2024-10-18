@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
-import '../../../core_auth.dart';
+import '../../model/auth_state.dart';
 import '../../model/result.dart';
+import '../../use_case/listen_auth_use_case.dart';
 import '../../use_case/login_anonymously_use_case.dart';
 import '../../use_case/login_use_case.dart';
 import 'login_screen_state.dart';
@@ -22,8 +24,14 @@ class LoginScreenCubit extends Cubit<LoginScreenState>
     addSubscription(listenAuthUseCase.authStateStream.listen(_updateAuthState));
   }
 
-  void update({String? email, String? password}) {
-    emit(state.copyWith(email: email, password: password));
+  void update({String? email, String? password, bool? isVisible}) {
+    emit(
+      state.copyWith(
+        email: email,
+        password: password,
+        isVisible: isVisible,
+      ),
+    );
   }
 
   void _updateAuthState(AuthState? authState) {

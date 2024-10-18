@@ -1,5 +1,6 @@
 import 'package:core_route/core_route.dart';
 import 'package:flutter/material.dart';
+import 'package:focus_detector_v2/focus_detector_v2.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 
@@ -8,10 +9,13 @@ import 'login_screen_cubit.dart';
 import 'login_screen_state.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key, this.onTapRegister});
+
+  final VoidCallback? onTapRegister;
 
   static Widget create({
     required ServiceLocator locator,
+    VoidCallback? onTapRegister,
     String? onFinishPath,
   }) {
     return BlocProvider(
@@ -20,7 +24,9 @@ class LoginScreen extends StatelessWidget {
         listenAuthUseCase: locator(),
         loginAnonymouslyUseCase: locator(),
       ),
-      child: const LoginScreen(),
+      child: LoginScreen(
+        onTapRegister: onTapRegister,
+      ),
     );
   }
 
@@ -103,7 +109,7 @@ class LoginScreen extends StatelessWidget {
       ),
       const SizedBox(height: 16),
       Wrap(
-        runAlignment: WrapAlignment.center,
+        alignment: WrapAlignment.center,
         children: [
           TextButton.icon(
             onPressed: null,
@@ -137,6 +143,14 @@ class LoginScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.labelSmall,
             ),
           ),
+          TextButton.icon(
+            onPressed: onTapRegister,
+            icon: const Icon(Icons.email),
+            label: Text(
+              'Email',
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+          ),
         ],
       ),
     ];
@@ -148,26 +162,33 @@ class LoginScreen extends StatelessWidget {
       listeners: [
         BlocListener<LoginScreenCubit, LoginScreenState>(
           listenWhen: (prev, curr) {
-            final isChanged = prev.authState != curr.authState;
-            final isLoggedIn = curr.authState?.status == AuthStatus.loggedIn;
-            return isChanged && isLoggedIn;
+            final isAuthStateChanged = prev.authState != curr.authState;
+            final isVisibleChanged = prev.isVisible != curr.isVisible;
+            return isAuthStateChanged || isVisibleChanged;
           },
-          listener: (context, state) => context.pop(state.authState),
+          listener: (context, state) {
+            final isLoggedIn = state.authState?.status == AuthStatus.loggedIn;
+            if (state.isVisible && isLoggedIn) context.pop(state.authState);
+          },
         ),
       ],
       child: _builder(
         buildWhen: (prev, curr) => prev.isLoading != curr.isLoading,
         builder: (context, state) => PopScope(
           canPop: !state.isLoading,
-          child: Scaffold(
-            appBar: AppBar(
-              title: const Text('Login Screen'),
-            ),
-            body: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: _content(context, state.isLoading),
+          child: FocusDetector(
+            onVisibilityGained: () => _cubit(context).update(isVisible: true),
+            onVisibilityLost: () => _cubit(context).update(isVisible: false),
+            child: Scaffold(
+              appBar: AppBar(
+                title: const Text('Login Screen'),
+              ),
+              body: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: _content(context, state.isLoading),
+                ),
               ),
             ),
           ),

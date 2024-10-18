@@ -3,17 +3,14 @@ import 'package:flutter/cupertino.dart';
 
 import '../../../core_auth.dart';
 
-class LoginScreenState extends Equatable {
-  const LoginScreenState({
+class RegisterScreenState extends Equatable {
+  const RegisterScreenState({
     this.email = '',
     this.password = '',
     this.isLoading = false,
-    this.isVisible = true,
     this.authState,
     this.error,
   });
-
-  final bool isVisible;
 
   final bool isLoading;
 
@@ -26,25 +23,16 @@ class LoginScreenState extends Equatable {
   final Exception? error;
 
   @override
-  List<Object?> get props => [
-        isLoading,
-        authState,
-        error,
-        email,
-        password,
-        isVisible,
-      ];
+  List<Object?> get props => [isLoading, authState, error, email, password];
 
-  LoginScreenState copyWith({
+  RegisterScreenState copyWith({
     bool? isLoading,
-    bool? isVisible,
     String? email,
     String? password,
     AuthState? authState,
     ValueGetter<Exception?>? error,
   }) {
-    return LoginScreenState(
-      isVisible: isVisible ?? this.isVisible,
+    return RegisterScreenState(
       isLoading: isLoading ?? this.isLoading,
       authState: authState ?? this.authState,
       error: error != null ? error() : this.error,
