@@ -3,8 +3,8 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import 'library_manga_cubit.dart';
-import 'library_manga_state.dart';
+import 'library_manga_screen_cubit.dart';
+import 'library_manga_screen_state.dart';
 
 class LibraryMangaScreen extends StatelessWidget {
   const LibraryMangaScreen({
@@ -20,8 +20,8 @@ class LibraryMangaScreen extends StatelessWidget {
     String? sourceId,
   }) {
     return BlocProvider(
-      create: (context) => LibraryMangaCubit(
-        initialState: const LibraryMangaState(),
+      create: (context) => LibraryMangaScreenCubit(
+        initialState: const LibraryMangaScreenState(),
         listenMangaFromLibraryUseCase: locator(),
         listenAuthUseCase: locator(),
       ),
@@ -32,10 +32,10 @@ class LibraryMangaScreen extends StatelessWidget {
   }
 
   Widget _builder({
-    required BlocWidgetBuilder<LibraryMangaState> builder,
-    BlocBuilderCondition<LibraryMangaState>? buildWhen,
+    required BlocWidgetBuilder<LibraryMangaScreenState> builder,
+    BlocBuilderCondition<LibraryMangaScreenState>? buildWhen,
   }) {
-    return BlocBuilder<LibraryMangaCubit, LibraryMangaState>(
+    return BlocBuilder<LibraryMangaScreenCubit, LibraryMangaScreenState>(
       buildWhen: buildWhen,
       builder: builder,
     );

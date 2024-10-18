@@ -3,7 +3,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
-class LibraryMangaState extends Equatable {
+class LibraryMangaScreenState extends Equatable {
   final bool isLoading;
 
   final Exception? error;
@@ -12,7 +12,7 @@ class LibraryMangaState extends Equatable {
 
   final AuthState? authState;
 
-  const LibraryMangaState({
+  const LibraryMangaScreenState({
     this.isLoading = false,
     this.error,
     this.mangas = const [],
@@ -29,13 +29,13 @@ class LibraryMangaState extends Equatable {
     ];
   }
 
-  LibraryMangaState copyWith({
+  LibraryMangaScreenState copyWith({
     bool? isLoading,
     ValueGetter<Exception?>? error,
     List<Manga>? mangas,
     AuthState? authState,
   }) {
-    return LibraryMangaState(
+    return LibraryMangaScreenState(
       isLoading: isLoading ?? this.isLoading,
       mangas: mangas ?? this.mangas,
       error: error != null ? error() : this.error,

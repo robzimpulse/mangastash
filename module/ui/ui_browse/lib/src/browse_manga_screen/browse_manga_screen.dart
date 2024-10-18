@@ -4,8 +4,8 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import 'browse_manga_cubit.dart';
-import 'browse_manga_state.dart';
+import 'browse_manga_screen_cubit.dart';
+import 'browse_manga_screen_state.dart';
 
 class BrowseMangaScreen extends StatefulWidget {
   const BrowseMangaScreen({
@@ -24,8 +24,8 @@ class BrowseMangaScreen extends StatefulWidget {
     String? sourceId,
   }) {
     return BlocProvider(
-      create: (context) => BrowseMangaCubit(
-        initialState: BrowseMangaState(
+      create: (context) => BrowseMangaScreenCubit(
+        initialState: BrowseMangaScreenState(
           sourceId: sourceId,
           layout: MangaShelfItemLayout.comfortableGrid,
         ),
@@ -60,7 +60,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     super.dispose();
   }
 
-  BrowseMangaCubit _cubit(BuildContext context) => context.read();
+  BrowseMangaScreenCubit _cubit(BuildContext context) => context.read();
 
   int _crossAxisCount(BuildContext context) {
     if (_breakpoints(context).isMobile) return 3;
@@ -74,10 +74,10 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
   }
 
   Widget _builder({
-    required BlocWidgetBuilder<BrowseMangaState> builder,
-    BlocBuilderCondition<BrowseMangaState>? buildWhen,
+    required BlocWidgetBuilder<BrowseMangaScreenState> builder,
+    BlocBuilderCondition<BrowseMangaScreenState>? buildWhen,
   }) {
-    return BlocBuilder<BrowseMangaCubit, BrowseMangaState>(
+    return BlocBuilder<BrowseMangaScreenCubit, BrowseMangaScreenState>(
       buildWhen: buildWhen,
       builder: builder,
     );
@@ -172,7 +172,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
       ),
       body: MultiBlocListener(
         listeners: [
-          BlocListener<BrowseMangaCubit, BrowseMangaState>(
+          BlocListener<BrowseMangaScreenCubit, BrowseMangaScreenState>(
             listenWhen: (prev, curr) {
               return prev.isSearchActive != curr.isSearchActive;
             },

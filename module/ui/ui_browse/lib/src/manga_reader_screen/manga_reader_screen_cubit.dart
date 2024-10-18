@@ -3,16 +3,16 @@ import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
-import 'manga_reader_state.dart';
+import 'manga_reader_screen_state.dart';
 
-class MangaReaderCubit extends Cubit<MangaReaderState> {
+class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState> {
   final GetChapterUseCase _getChapterUseCase;
   final GetMangaSourceUseCase _getMangaSourceUseCase;
 
-  MangaReaderCubit({
+  MangaReaderScreenCubit({
     required GetChapterUseCase getChapterUseCase,
     required GetMangaSourceUseCase getMangaSourceUseCase,
-    MangaReaderState initialState = const MangaReaderState(),
+    MangaReaderScreenState initialState = const MangaReaderScreenState(),
   })  : _getMangaSourceUseCase = getMangaSourceUseCase,
         _getChapterUseCase = getChapterUseCase,
         super(initialState);

@@ -4,14 +4,12 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import 'manga_detail_cubit.dart';
-import 'manga_detail_state.dart';
+import 'manga_detail_screen_cubit.dart';
+import 'manga_detail_screen_state.dart';
 
 class MangaDetailScreen extends StatefulWidget {
   const MangaDetailScreen({
@@ -35,8 +33,8 @@ class MangaDetailScreen extends StatefulWidget {
     Future<MangaChapterConfig?> Function(MangaChapterConfig?)? onTapSort,
   }) {
     return BlocProvider(
-      create: (context) => MangaDetailCubit(
-        initialState: MangaDetailState(
+      create: (context) => MangaDetailScreenCubit(
+        initialState: MangaDetailScreenState(
           mangaId: mangaId,
           sourceId: sourceId,
         ),
@@ -62,18 +60,18 @@ class MangaDetailScreen extends StatefulWidget {
 
 class _MangaDetailScreenState extends State<MangaDetailScreen> {
   Widget _builder({
-    required BlocWidgetBuilder<MangaDetailState> builder,
-    BlocBuilderCondition<MangaDetailState>? buildWhen,
+    required BlocWidgetBuilder<MangaDetailScreenState> builder,
+    BlocBuilderCondition<MangaDetailScreenState>? buildWhen,
   }) {
-    return BlocBuilder<MangaDetailCubit, MangaDetailState>(
+    return BlocBuilder<MangaDetailScreenCubit, MangaDetailScreenState>(
       buildWhen: buildWhen,
       builder: builder,
     );
   }
 
-  MangaDetailCubit _cubit(BuildContext context) => context.read();
+  MangaDetailScreenCubit _cubit(BuildContext context) => context.read();
 
-  void _onTapWebsite(BuildContext context, MangaDetailState state) async {
+  void _onTapWebsite(BuildContext context, MangaDetailScreenState state) async {
     final url = state.manga?.webUrl;
 
     if (url == null || url.isEmpty) {
@@ -105,7 +103,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
 
-  void _onTapAddToLibrary(BuildContext context, MangaDetailState state) async {
+  void _onTapAddToLibrary(BuildContext context, MangaDetailScreenState state) async {
     final status = state.authState?.status;
     if (status != AuthStatus.loggedIn) {
       final result = await context.push<AuthState>(AuthRoutePath.login);
@@ -171,7 +169,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
-  List<Widget> _chapters(BuildContext context, MangaDetailState state) {
+  List<Widget> _chapters(BuildContext context, MangaDetailScreenState state) {
     final error = state.error;
     if (error != null) {
       return [

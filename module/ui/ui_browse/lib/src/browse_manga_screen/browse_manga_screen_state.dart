@@ -2,7 +2,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ui_common/ui_common.dart';
 
-class BrowseMangaState extends Equatable {
+class BrowseMangaScreenState extends Equatable {
   final bool isLoading;
 
   final Exception? error;
@@ -23,7 +23,7 @@ class BrowseMangaState extends Equatable {
 
   final SearchMangaParameter parameter;
 
-  const BrowseMangaState({
+  const BrowseMangaScreenState({
     this.isLoading = false,
     this.hasNextPage = false,
     this.isPagingNextPage = false,
@@ -52,7 +52,7 @@ class BrowseMangaState extends Equatable {
     ];
   }
 
-  BrowseMangaState copyWith({
+  BrowseMangaScreenState copyWith({
     bool? isLoading,
     bool? hasNextPage,
     bool? isPagingNextPage,
@@ -64,7 +64,7 @@ class BrowseMangaState extends Equatable {
     List<Manga>? mangas,
     SearchMangaParameter? parameter,
   }) {
-    return BrowseMangaState(
+    return BrowseMangaScreenState(
       isLoading: isLoading ?? this.isLoading,
       hasNextPage: hasNextPage ?? this.hasNextPage,
       isPagingNextPage: isPagingNextPage ?? this.isPagingNextPage,

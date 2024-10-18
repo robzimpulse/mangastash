@@ -4,9 +4,9 @@ import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
-import 'manga_detail_state.dart';
+import 'manga_detail_screen_state.dart';
 
-class MangaDetailCubit extends Cubit<MangaDetailState>
+class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     with AutoSubscriptionMixin {
   final GetMangaUseCase _getMangaUseCase;
   final SearchChapterUseCase _getListChapterUseCase;
@@ -14,8 +14,8 @@ class MangaDetailCubit extends Cubit<MangaDetailState>
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
   final AddToLibraryUseCase _addToLibraryUseCase;
 
-  MangaDetailCubit({
-    required MangaDetailState initialState,
+  MangaDetailScreenCubit({
+    required MangaDetailScreenState initialState,
     required GetMangaUseCase getMangaUseCase,
     required SearchChapterUseCase getListChapterUseCase,
     required GetMangaSourceUseCase getMangaSourceUseCase,

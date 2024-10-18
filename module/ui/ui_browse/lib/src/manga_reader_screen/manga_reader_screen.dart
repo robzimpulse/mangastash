@@ -8,8 +8,8 @@ import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-import 'manga_reader_cubit.dart';
-import 'manga_reader_state.dart';
+import 'manga_reader_screen_cubit.dart';
+import 'manga_reader_screen_state.dart';
 
 class MangaReaderScreen extends StatefulWidget {
   const MangaReaderScreen({super.key});
@@ -21,8 +21,8 @@ class MangaReaderScreen extends StatefulWidget {
     required String? chapterId,
   }) {
     return BlocProvider(
-      create: (context) => MangaReaderCubit(
-        initialState: MangaReaderState(
+      create: (context) => MangaReaderScreenCubit(
+        initialState: MangaReaderScreenState(
           mangaId: mangaId,
           chapterId: chapterId,
           sourceId: sourceId,
@@ -46,12 +46,12 @@ class _MangaReaderScreenState extends State<MangaReaderScreen> {
   StreamSubscription? _subscription;
 
   Widget _builder({
-    required BlocWidgetBuilder<MangaReaderState> builder,
-    BlocBuilderCondition<MangaReaderState>? buildWhen,
-    required BlocWidgetListener<MangaReaderState> listener,
-    BlocListenerCondition<MangaReaderState>? listenWhen,
+    required BlocWidgetBuilder<MangaReaderScreenState> builder,
+    BlocBuilderCondition<MangaReaderScreenState>? buildWhen,
+    required BlocWidgetListener<MangaReaderScreenState> listener,
+    BlocListenerCondition<MangaReaderScreenState>? listenWhen,
   }) {
-    return BlocConsumer<MangaReaderCubit, MangaReaderState>(
+    return BlocConsumer<MangaReaderScreenCubit, MangaReaderScreenState>(
       listenWhen: listenWhen,
       listener: listener,
       buildWhen: buildWhen,

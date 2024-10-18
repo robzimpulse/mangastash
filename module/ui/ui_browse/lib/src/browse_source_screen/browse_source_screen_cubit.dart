@@ -3,13 +3,13 @@ import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
-import 'browse_source_state.dart';
+import 'browse_source_screen_state.dart';
 
-class BrowseSourceCubit extends Cubit<BrowseSourceState> {
+class BrowseSourceScreenCubit extends Cubit<BrowseSourceScreenState> {
   final GetListMangaSourcesUseCase _getAllMangaSourcesUseCase;
 
-  BrowseSourceCubit({
-    BrowseSourceState initialState = const BrowseSourceState(
+  BrowseSourceScreenCubit({
+    BrowseSourceScreenState initialState = const BrowseSourceScreenState(
       isLoading: false,
       sources: [],
     ),

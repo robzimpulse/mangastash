@@ -5,14 +5,14 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:ui_common/ui_common.dart';
 
-import 'browse_manga_state.dart';
+import 'browse_manga_screen_state.dart';
 
-class BrowseMangaCubit extends Cubit<BrowseMangaState> {
+class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState> {
   final GetMangaSourceUseCase _getMangaSourceUseCase;
   final SearchMangaUseCase _searchMangaUseCase;
 
-  BrowseMangaCubit({
-    required BrowseMangaState initialState,
+  BrowseMangaScreenCubit({
+    required BrowseMangaScreenState initialState,
     required GetMangaSourceUseCase getMangaSourceUseCase,
     required SearchMangaUseCase searchMangaUseCase,
   })  : _getMangaSourceUseCase = getMangaSourceUseCase,

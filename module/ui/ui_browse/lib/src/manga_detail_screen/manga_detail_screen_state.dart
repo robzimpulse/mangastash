@@ -17,7 +17,7 @@ enum DownloadOption {
   const DownloadOption(this.value);
 }
 
-class MangaDetailState extends Equatable {
+class MangaDetailScreenState extends Equatable {
   final bool isLoading;
   final Exception? error;
   final String? mangaId;
@@ -32,7 +32,7 @@ class MangaDetailState extends Equatable {
   late final bool isOnLibrary;
   late final Map<num?, Map<num?, List<MangaChapter>>>? processedChapters;
 
-  MangaDetailState({
+  MangaDetailScreenState({
     this.isLoading = false,
     this.error,
     this.mangaId,
@@ -137,7 +137,7 @@ class MangaDetailState extends Equatable {
         libraries,
       ];
 
-  MangaDetailState copyWith({
+  MangaDetailScreenState copyWith({
     bool? isLoading,
     ValueGetter<Exception?>? error,
     String? mangaId,
@@ -149,7 +149,7 @@ class MangaDetailState extends Equatable {
     AuthState? authState,
     List<Manga>? libraries,
   }) {
-    return MangaDetailState(
+    return MangaDetailScreenState(
       config: config ?? this.config,
       isLoading: isLoading ?? this.isLoading,
       error: error != null ? error() : this.error,

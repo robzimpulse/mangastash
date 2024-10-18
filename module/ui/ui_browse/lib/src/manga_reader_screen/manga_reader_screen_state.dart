@@ -1,8 +1,8 @@
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 
-class MangaReaderState extends Equatable {
-  const MangaReaderState({
+class MangaReaderScreenState extends Equatable {
+  const MangaReaderScreenState({
     this.isLoading = false,
     this.chapter,
     this.error,
@@ -31,7 +31,7 @@ class MangaReaderState extends Equatable {
     return [mangaId, chapterId, isLoading, chapter, error, sourceId, source];
   }
 
-  MangaReaderState copyWith({
+  MangaReaderScreenState copyWith({
     String? mangaId,
     String? chapterId,
     bool? isLoading,
@@ -40,7 +40,7 @@ class MangaReaderState extends Equatable {
     String? sourceId,
     MangaSource? source,
   }) {
-    return MangaReaderState(
+    return MangaReaderScreenState(
       mangaId: mangaId ?? this.mangaId,
       chapterId: chapterId ?? this.chapterId,
       isLoading: isLoading ?? this.isLoading,

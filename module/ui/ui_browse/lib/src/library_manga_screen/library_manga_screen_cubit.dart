@@ -3,12 +3,12 @@ import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
-import 'library_manga_state.dart';
+import 'library_manga_screen_state.dart';
 
-class LibraryMangaCubit extends Cubit<LibraryMangaState>
+class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     with AutoSubscriptionMixin {
-  LibraryMangaCubit({
-    required LibraryMangaState initialState,
+  LibraryMangaScreenCubit({
+    required LibraryMangaScreenState initialState,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
     required ListenAuthUseCase listenAuthUseCase,
   }) : super(initialState) {
