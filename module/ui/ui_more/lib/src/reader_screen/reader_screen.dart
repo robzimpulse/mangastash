@@ -18,7 +18,7 @@ class ReaderScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Reader Screen'),
       ),
-      body: ListView(
+      body: AdaptivePhysicListView(
         children: const [],
       ),
     );

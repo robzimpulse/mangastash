@@ -18,7 +18,7 @@ class DownloadScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Download Screen'),
       ),
-      body: ListView(
+      body: AdaptivePhysicListView(
         children: const [],
       ),
     );

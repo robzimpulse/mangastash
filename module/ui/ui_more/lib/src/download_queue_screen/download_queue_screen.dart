@@ -18,7 +18,7 @@ class DownloadQueueScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Download Queue'),
       ),
-      body: ListView(
+      body: AdaptivePhysicListView(
         children: const [],
       ),
     );

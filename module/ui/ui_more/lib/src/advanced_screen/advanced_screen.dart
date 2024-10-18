@@ -34,7 +34,7 @@ class AdvancedScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Advanced Screen'),
       ),
-      body: ListView(
+      body: AdaptivePhysicListView(
         children: [
           ListTile(
             title: const Text('HTTP Inspector'),

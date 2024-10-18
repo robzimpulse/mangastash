@@ -74,7 +74,7 @@ class SettingScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Setting'),
       ),
-      body: ListView(
+      body: AdaptivePhysicListView(
         children: [
           ListTile(
             leading: const Icon(Icons.tune_outlined),

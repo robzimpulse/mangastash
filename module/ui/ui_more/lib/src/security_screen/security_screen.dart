@@ -18,7 +18,7 @@ class SecurityScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Security Screen'),
       ),
-      body: ListView(
+      body: AdaptivePhysicListView(
         children: const [],
       ),
     );

@@ -18,7 +18,7 @@ class LibraryScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Library Screen'),
       ),
-      body: ListView(
+      body: AdaptivePhysicListView(
         children: const [],
       ),
     );

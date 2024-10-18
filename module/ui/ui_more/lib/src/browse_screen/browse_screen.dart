@@ -18,7 +18,7 @@ class BrowseScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Browse Screen'),
       ),
-      body: ListView(
+      body: AdaptivePhysicListView(
         children: const [],
       ),
     );

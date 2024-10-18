@@ -18,7 +18,7 @@ class BackupRestoreScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Backup and Restore'),
       ),
-      body: ListView(
+      body: AdaptivePhysicListView(
         children: const [],
       ),
     );

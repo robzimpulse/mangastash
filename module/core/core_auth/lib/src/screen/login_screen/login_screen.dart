@@ -18,6 +18,7 @@ class LoginScreen extends StatelessWidget {
       create: (context) => LoginScreenCubit(
         loginUseCase: locator(),
         listenAuthUseCase: locator(),
+        loginAnonymouslyUseCase: locator(),
       ),
       child: const LoginScreen(),
     );
@@ -33,6 +34,112 @@ class LoginScreen extends StatelessWidget {
       buildWhen: buildWhen,
       builder: builder,
     );
+  }
+
+  List<Widget> _content(BuildContext context, bool isLoading) {
+    return [
+      TextField(
+        decoration: const InputDecoration(
+          labelText: 'Email',
+          border: OutlineInputBorder(),
+          prefixIcon: Icon(Icons.email),
+        ),
+        onChanged: (value) => _cubit(context).update(
+          email: value,
+        ),
+        onSubmitted: (value) => _cubit(context).update(
+          email: value,
+        ),
+      ),
+      const SizedBox(height: 8),
+      TextField(
+        obscureText: true,
+        decoration: const InputDecoration(
+          labelText: 'Password',
+          border: OutlineInputBorder(),
+          prefixIcon: Icon(Icons.password),
+        ),
+        onChanged: (value) => _cubit(context).update(
+          password: value,
+        ),
+        onSubmitted: (value) => _cubit(context).update(
+          password: value,
+        ),
+      ),
+      const SizedBox(height: 8),
+      _builder(
+        buildWhen: (prev, curr) => prev.error != curr.error,
+        builder: (context, state) {
+          final error = state.error;
+          return error != null
+              ? Text(
+                  error.toString(),
+                  style: Theme.of(context)
+                      .textTheme
+                      .labelSmall
+                      ?.copyWith(color: Colors.red),
+                )
+              : const SizedBox.shrink();
+        },
+      ),
+      const SizedBox(height: 8),
+      ElevatedButton(
+        style: ButtonStyle(
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        onPressed: () => _cubit(context).login(),
+        child:
+            isLoading ? const CircularProgressIndicator() : const Text('Login'),
+      ),
+      const SizedBox(height: 16),
+      Text(
+        'Or Register with',
+        style: Theme.of(context).textTheme.labelLarge,
+        textAlign: TextAlign.center,
+      ),
+      const SizedBox(height: 16),
+      Wrap(
+        runAlignment: WrapAlignment.center,
+        children: [
+          TextButton.icon(
+            onPressed: null,
+            icon: const Icon(Icons.facebook),
+            label: Text(
+              'Facebook',
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+          ),
+          TextButton.icon(
+            onPressed: null,
+            icon: const Icon(Icons.g_mobiledata),
+            label: Text(
+              'Google',
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+          ),
+          TextButton.icon(
+            onPressed: null,
+            icon: const Icon(Icons.apple),
+            label: Text(
+              'Apple',
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+          ),
+          TextButton.icon(
+            onPressed: () => _cubit(context).loginAnonymously(),
+            icon: const Icon(Icons.person),
+            label: Text(
+              'Anonymous',
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+          ),
+        ],
+      ),
+    ];
   }
 
   @override
@@ -60,66 +167,7 @@ class LoginScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  TextField(
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.email),
-                    ),
-                    onChanged: (value) => _cubit(context).update(
-                      email: value,
-                    ),
-                    onSubmitted: (value) => _cubit(context).update(
-                      email: value,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.password),
-                    ),
-                    onChanged: (value) => _cubit(context).update(
-                      password: value,
-                    ),
-                    onSubmitted: (value) => _cubit(context).update(
-                      password: value,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _builder(
-                    buildWhen: (prev, curr) => prev.error != curr.error,
-                    builder: (context, state) {
-                      final error = state.error;
-                      return error != null
-                          ? Text(
-                              error.toString(),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelSmall
-                                  ?.copyWith(color: Colors.red),
-                            )
-                          : const SizedBox.shrink();
-                    },
-                  ),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                    onPressed: () => _cubit(context).login(),
-                    child: state.isLoading
-                        ? const CircularProgressIndicator()
-                        : const Text('Login'),
-                  ),
-                ],
+                children: _content(context, state.isLoading),
               ),
             ),
           ),

@@ -18,7 +18,7 @@ class TrackingScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Tracking Screen'),
       ),
-      body: ListView(
+      body: AdaptivePhysicListView(
         children: const [],
       ),
     );

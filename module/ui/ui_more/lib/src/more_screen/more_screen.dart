@@ -8,7 +8,6 @@ class MoreScreen extends StatelessWidget {
   final VoidCallback? onTapDownloadQueue;
   final VoidCallback? onTapAbout;
 
-
   const MoreScreen({
     super.key,
     this.onTapSetting,

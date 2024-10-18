@@ -18,7 +18,7 @@ class StatisticScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Statistic'),
       ),
-      body: ListView(
+      body: AdaptivePhysicListView(
         children: const [],
       ),
     );

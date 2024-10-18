@@ -18,7 +18,7 @@ class AboutScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('About Screen'),
       ),
-      body: ListView(
+      body: AdaptivePhysicListView(
         children: const [],
       ),
     );
