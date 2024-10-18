@@ -4,59 +4,40 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import 'manga_misc_cubit.dart';
-import 'manga_misc_state.dart';
+import 'manga_misc_screen_cubit.dart';
+import 'manga_misc_screen_state.dart';
 
-class MangaMiscBottomSheetRoute extends BottomSheetRoute {
-  MangaMiscBottomSheetRoute({
-    super.key,
-    super.name,
-    required ServiceLocator locator,
-    MangaChapterConfig? config,
-  }) : super(
-          child: MangaMiscBottomSheet.create(
-            locator: locator,
-            config: config,
-          ),
-          draggable: true,
-          elevation: 16,
-          expanded: false,
-        );
-}
-
-class MangaMiscBottomSheet extends StatefulWidget {
-  const MangaMiscBottomSheet({super.key});
+class MangaMiscScreen extends StatefulWidget {
+  const MangaMiscScreen({super.key});
 
   static Widget create({
     required ServiceLocator locator,
     MangaChapterConfig? config,
   }) {
     return BlocProvider(
-      create: (context) => MangaMiscCubit(
-        initialState: MangaMiscState(
+      create: (context) => MangaMiscScreenCubit(
+        initialState: MangaMiscScreenState(
           config: config ?? const MangaChapterConfig(),
         ),
       ),
-      child: const MangaMiscBottomSheet(),
+      child: const MangaMiscScreen(),
     );
   }
 
   @override
-  State<MangaMiscBottomSheet> createState() => _MangaMiscBottomSheetState();
+  State<MangaMiscScreen> createState() => _MangaMiscBottomScreen();
 }
 
-class _MangaMiscBottomSheetState extends State<MangaMiscBottomSheet> {
+class _MangaMiscBottomScreen extends State<MangaMiscScreen> {
   final ValueNotifier<Size> _currentSize = ValueNotifier(Size.zero);
 
-  MangaMiscCubit _cubit(BuildContext context) {
-    return context.read<MangaMiscCubit>();
-  }
+  MangaMiscScreenCubit _cubit(BuildContext context) => context.read();
 
   Widget _bloc({
-    required BlocWidgetBuilder<MangaMiscState> builder,
-    BlocBuilderCondition<MangaMiscState>? buildWhen,
+    required BlocWidgetBuilder<MangaMiscScreenState> builder,
+    BlocBuilderCondition<MangaMiscScreenState>? buildWhen,
   }) {
-    return BlocBuilder<MangaMiscCubit, MangaMiscState>(
+    return BlocBuilder<MangaMiscScreenCubit, MangaMiscScreenState>(
       buildWhen: buildWhen,
       builder: builder,
     );

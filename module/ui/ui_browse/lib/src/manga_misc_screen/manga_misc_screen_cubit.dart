@@ -2,11 +2,12 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/foundation.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
-import 'manga_misc_state.dart';
+import 'manga_misc_screen_state.dart';
 
-class MangaMiscCubit extends Cubit<MangaMiscState> with AutoSubscriptionMixin {
-  MangaMiscCubit({
-    MangaMiscState initialState = const MangaMiscState(),
+class MangaMiscScreenCubit extends Cubit<MangaMiscScreenState>
+    with AutoSubscriptionMixin {
+  MangaMiscScreenCubit({
+    MangaMiscScreenState initialState = const MangaMiscScreenState(),
   }) : super(initialState);
 
   void update({

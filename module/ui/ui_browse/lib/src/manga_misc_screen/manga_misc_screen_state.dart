@@ -1,18 +1,18 @@
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 
-class MangaMiscState extends Equatable {
+class MangaMiscScreenState extends Equatable {
 
   final MangaChapterConfig? config;
 
-  const MangaMiscState({
+  const MangaMiscScreenState({
     this.config,
   });
 
-  MangaMiscState copyWith({
+  MangaMiscScreenState copyWith({
     MangaChapterConfig? config,
   }) {
-    return MangaMiscState(
+    return MangaMiscScreenState(
       config: config ?? this.config,
     );
   }
