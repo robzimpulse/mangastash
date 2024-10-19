@@ -44,7 +44,12 @@ class DomainMangaRegistrar extends Registrar {
     // manga dex repositories
     locator.registerFactory(() => AtHomeRepository(service: locator()));
     locator.registerFactory(() => MangaRepository(service: locator()));
-    locator.registerFactory(() => ChapterRepository(service: locator()));
+    locator.registerFactory(
+      () => ChapterRepository(
+        mangaService: locator(),
+        chapterService: locator(),
+      ),
+    );
     locator.registerFactory(() => AuthorRepository(service: locator()));
     locator.registerFactory(() => CoverRepository(service: locator()));
 

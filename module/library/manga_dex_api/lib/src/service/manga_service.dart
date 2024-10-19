@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/http.dart';
 
 import '../dio/mangadex_dio.dart';
+import '../model/chapter/search_chapter_response.dart';
 import '../model/manga/manga_response.dart';
 import '../model/manga/search_manga_response.dart';
 import '../model/tag/tag_response.dart';
@@ -47,5 +48,27 @@ abstract class MangaService {
   Future<MangaResponse> detail({
     @Path('id') String? id,
     @Query('includes[]') List<String>? includes,
+  });
+
+  @GET('/manga/{id}/feed')
+  Future<SearchChapterResponse> feed({
+    @Path('id') String? id,
+    @Query('limit') int? limit,
+    @Query('offset') int? offset,
+    @Query('translatedLanguage[]') List<String>? translatedLanguage,
+    @Query('originalLanguage[]') List<String>? originalLanguage,
+    @Query('excludedOriginalLanguage[]') List<String>? excludedOriginalLanguage,
+    @Query('contentRating[]') List<String>? contentRating,
+    @Query('excludedGroups[]') List<String>? excludedGroups,
+    @Query('excludedUploaders[]') List<String>? excludedUploaders,
+    @Query('includeFutureUpdates') String? includeFutureUpdates,
+    @Query('createdAtSince') String? createdAtSince,
+    @Query('updatedAtSince') String? updatedAtSince,
+    @Query('publishedAtSince') String? publishedAtSince,
+    @Query('order') Map<String, String>? orders,
+    @Query('includes[]') List<String>? includes,
+    @Query('includeEmptyPages') int? includeEmptyPages,
+    @Query('includeFuturePublishAt') int? includeFuturePublishAt,
+    @Query('includeExternalUrl') int? includeExternalUrl,
   });
 }

@@ -22,10 +22,11 @@ class SearchChapterOnMangaDexUseCase {
       List<MangaChapter> chapters = [];
 
       do {
-        final result = await _chapterRepository.search(
+        final result = await _chapterRepository.feed(
           mangaId: mangaId ?? '',
           limit: 20,
           translatedLanguage: language?.languageCodes,
+          offset: chapters.length,
         );
 
         final data = result.data ?? [];
