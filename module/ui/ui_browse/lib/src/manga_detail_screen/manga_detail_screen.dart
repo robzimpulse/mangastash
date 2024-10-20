@@ -421,8 +421,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 Expanded(
                   child: Text(
                     [
-                      if (chapter.readableAt != null)
-                        '${chapter.readableAt?.asDateTime?.ddLLLLyy}',
+                      if (chapter.publishAt != null)
+                        '${chapter.publishAt?.asDateTime?.readableFormat}',
                       if (title != null) title,
                     ].join(' - '),
                   ),

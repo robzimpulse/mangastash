@@ -17,6 +17,8 @@ class MangaChapter extends Equatable {
 
   final String? readableAt;
 
+  final String? publishAt;
+
   final List<String>? images;
 
   late final num? numVolume = num.tryParse(volume ?? '');
@@ -30,6 +32,7 @@ class MangaChapter extends Equatable {
     this.volume,
     this.chapter,
     this.readableAt,
+    this.publishAt,
     this.images,
   });
 
@@ -41,6 +44,7 @@ class MangaChapter extends Equatable {
         volume,
         chapter,
         readableAt,
+        publishAt,
         images,
       ];
 
@@ -57,6 +61,7 @@ class MangaChapter extends Equatable {
     String? volume,
     String? chapter,
     String? readableAt,
+    String? publishAt,
     List<String>? images,
   }) {
     return MangaChapter(
@@ -66,6 +71,7 @@ class MangaChapter extends Equatable {
       volume: volume ?? this.volume,
       chapter: chapter ?? this.chapter,
       readableAt: readableAt ?? this.readableAt,
+      publishAt: publishAt ?? this.publishAt,
       images: images ?? this.images,
     );
   }

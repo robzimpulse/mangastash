@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -40,6 +39,7 @@ class SearchChapterOnMangaDexUseCase {
               chapter: e.attributes?.chapter,
               volume: e.attributes?.volume,
               readableAt: e.attributes?.readableAt,
+              publishAt: e.attributes?.publishAt,
             ),
           ),
         );
