@@ -31,6 +31,7 @@ class MangaDetailScreenState extends Equatable {
 
   late final bool isOnLibrary;
   late final Map<num?, Map<num?, List<MangaChapter>>>? processedChapters;
+  late final int? totalChapter;
 
   MangaDetailScreenState({
     this.isLoading = false,
@@ -61,6 +62,9 @@ class MangaDetailScreenState extends Equatable {
       ),
     );
     processedChapters = groupByVolumeAndChapter;
+    totalChapter = groupByVolumeAndChapter?.values
+        .map((e) => e.values)
+        .fold<int>(0, (prev, e) => e.length + prev);
 
     // TODO: perform sorting
 

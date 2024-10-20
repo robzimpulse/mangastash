@@ -103,7 +103,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
 
-  void _onTapAddToLibrary(BuildContext context, MangaDetailScreenState state) async {
+  void _onTapAddToLibrary(
+    BuildContext context,
+    MangaDetailScreenState state,
+  ) async {
     final status = state.authState?.status;
     if (status != AuthStatus.loggedIn) {
       final result = await context.push<AuthState>(AuthRoutePath.login);
@@ -247,7 +250,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           child: Row(
             children: [
               Text(
-                '${chapters.length} Chapters',
+                '${state.totalChapter} Chapters',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ],
