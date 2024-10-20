@@ -257,71 +257,97 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           ),
         ),
       ),
-      for (final group in chapters.entries)
-        SliverPadding(
-          padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
-          sliver: MultiSliver(
-            pushPinnedChildren: true,
-            children: [
-              SliverPinnedHeader(
-                child: Container(
-                  color: Theme.of(context).cardColor,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(
-                    children: [
-                      Text(
-                        'Volume ${group.key}',
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              for (final chapter in group.value.entries)
-                SliverPadding(
-                  padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
-                  sliver: MultiSliver(
-                    pushPinnedChildren: true,
-                    children: [
-                      SliverPinnedHeader(
-                        child: Container(
-                          color: Theme.of(context).cardColor,
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: Row(
-                            children: [
-                              Text(
-                                'Chapter ${chapter.key}',
-                                style: Theme.of(context).textTheme.titleSmall,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          childCount: (chapter.value.length * 2) - 1,
-                          semanticIndexCallback: (Widget _, int index) {
-                            return index.isEven ? index ~/ 2 : null;
-                          },
-                          (context, index) {
-                            final int itemIndex = index ~/ 2;
-                            return index.isOdd
-                                ? _separator()
-                                : _chapter(
-                                    context: context,
-                                    chapter: chapter.value[itemIndex],
-                                    config: state.config,
-                                  );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-        ),
+      ..._group(context: context, volumes: chapters, config: state.config)
     ];
+  }
+
+  List<Widget> _group({
+    required BuildContext context,
+    required Map<num?, Map<num?, List<MangaChapter>>> volumes,
+    required MangaChapterConfig? config,
+  }) {
+    List<Widget> view = [];
+    for (final volume in volumes.entries) {
+      List<Widget> children = [];
+      for (final chapter in volume.value.entries) {
+        children.add(
+          SliverPadding(
+            padding: const EdgeInsets.only(left: 12),
+            sliver: MultiSliver(
+              pushPinnedChildren: true,
+              children: [
+                SliverPinnedHeader(
+                  child: Container(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Chapter ${chapter.key}',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    childCount: (chapter.value.length * 2) - 1,
+                    semanticIndexCallback: (Widget _, int index) {
+                      return index.isEven ? index ~/ 2 : null;
+                    },
+                    (context, index) {
+                      final int itemIndex = index ~/ 2;
+                      return index.isOdd
+                          ? _separator()
+                          : _chapter(
+                              context: context,
+                              chapter: chapter.value[itemIndex],
+                              config: config,
+                            );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      final key = volume.key;
+
+      if (key == null) {
+        view.addAll(children);
+      } else {
+        view.add(
+          SliverPadding(
+            padding: const EdgeInsets.only(left: 12),
+            sliver: MultiSliver(
+              pushPinnedChildren: true,
+              children: [
+                SliverPinnedHeader(
+                  child: Container(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Volume $key',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                ...children,
+              ],
+            ),
+          ),
+        );
+      }
+    }
+
+    return view;
   }
 
   Widget _content() {

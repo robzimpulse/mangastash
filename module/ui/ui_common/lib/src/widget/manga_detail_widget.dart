@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:intersperse/intersperse.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 
 import 'shimmer_loading_widget.dart';
 
@@ -276,6 +277,10 @@ class MangaDetailWidget extends StatelessWidget {
     );
   }
 
+  Widget _children(BuildContext context) {
+    return MultiSliver(children: child);
+  }
+
   @override
   Widget build(BuildContext context) {
     final widgets = [
@@ -283,7 +288,7 @@ class MangaDetailWidget extends StatelessWidget {
       _buttons(context),
       _description(context),
       isLoading ? _loadingTags(context) : _loadedTags(context),
-      ...child,
+      _children(context),
     ].whereType<Widget>().intersperse(_separator(context));
 
     return CustomScrollView(slivers: [_separator(context), ...widgets]);
