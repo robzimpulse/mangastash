@@ -23,12 +23,11 @@ class SearchMangaOnMangaDexUseCase {
   }) async {
     try {
       log('${parameter.toJson()}', name: '$SearchMangaOnMangaDexUseCase');
-      final offset = int.tryParse(parameter.offset ?? '') ?? 0;
 
       final result = await _mangaService.search(
         title: parameter.title,
         limit: parameter.limit?.toInt(),
-        offset: (offset + (parameter.limit ?? 0)).toInt(),
+        offset: int.tryParse(parameter.offset ?? '') ?? 0,
       );
 
       final promises = result.data?.map(_mapManga).toList() ?? [];
