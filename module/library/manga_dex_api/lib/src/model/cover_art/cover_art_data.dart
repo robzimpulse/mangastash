@@ -17,6 +17,5 @@ class CoverArtData extends Identifier {
     return _$CoverArtDataFromJson(json);
   }
 
-  @override
   Map<String, dynamic> toJson() => _$CoverArtDataToJson(this);
 }

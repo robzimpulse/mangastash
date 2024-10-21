@@ -1,6 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import '../common/relationship.dart';
 import '../common/response.dart';
 import 'author_data.dart';
 

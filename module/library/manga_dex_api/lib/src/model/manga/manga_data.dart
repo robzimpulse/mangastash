@@ -17,6 +17,5 @@ class MangaData extends Identifier {
     return _$MangaDataFromJson(json);
   }
 
-  @override
   Map<String, dynamic> toJson() => _$MangaDataToJson(this);
 }

@@ -37,7 +37,6 @@ class ChapterData extends Identifier {
     return _$ChapterDataFromJson(json);
   }
 
-  @override
   Map<String, dynamic> toJson() => _$ChapterDataToJson(this);
 }
 

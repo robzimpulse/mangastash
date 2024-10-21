@@ -41,7 +41,6 @@ class TagData extends Identifier {
     return _$TagDataFromJson(json);
   }
 
-  @override
   Map<String, dynamic> toJson() => _$TagDataToJson(this);
 }
 

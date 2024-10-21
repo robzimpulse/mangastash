@@ -17,6 +17,5 @@ class AuthorData extends Identifier {
     return _$AuthorDataFromJson(json);
   }
 
-  @override
   Map<String, dynamic> toJson() => _$AuthorDataToJson(this);
 }

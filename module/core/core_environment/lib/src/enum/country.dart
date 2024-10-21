@@ -1,6 +1,5 @@
-import 'package:country_flags/country_flags.dart';
-
 import 'package:collection/collection.dart';
+import 'package:country_flags/country_flags.dart';
 import 'package:flutter/foundation.dart';
 
 enum Country {

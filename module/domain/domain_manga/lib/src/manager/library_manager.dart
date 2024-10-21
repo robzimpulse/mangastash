@@ -38,7 +38,6 @@ class LibraryManager
       [_switchLatestStream.listen(_updateLibraryState)],
       detach: this,
     );
-    ;
   }
 
   @override

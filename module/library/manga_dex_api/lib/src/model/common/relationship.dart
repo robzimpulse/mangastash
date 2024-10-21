@@ -15,6 +15,5 @@ class Relationship extends Identifier {
     return _$RelationshipFromJson(json);
   }
 
-  @override
   Map<String, dynamic> toJson() => _$RelationshipToJson(this);
 }
