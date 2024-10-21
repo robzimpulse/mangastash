@@ -9,6 +9,8 @@ part 'manga_data.g.dart';
 @JsonSerializable()
 class MangaData extends Identifier {
   final MangaDataAttributes? attributes;
+
+  @JsonKey(name: 'relationships', fromJson: Relationship.from)
   final List<Relationship>? relationships;
 
   MangaData(super.id, super.type, this.attributes, this.relationships);

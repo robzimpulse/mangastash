@@ -17,6 +17,7 @@ export 'src/model/at_home/at_home_response.dart';
 export 'src/model/author/author_response.dart';
 export 'src/model/chapter/chapter_response.dart';
 export 'src/model/chapter/search_chapter_response.dart';
+export 'src/model/common/relationship.dart';
 export 'src/model/manga/manga_data.dart';
 export 'src/model/manga/manga_data_attributes.dart';
 export 'src/model/manga/manga_response.dart';

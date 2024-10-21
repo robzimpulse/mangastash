@@ -13,9 +13,7 @@ CoverArtData _$CoverArtDataFromJson(Map<String, dynamic> json) => CoverArtData(
           ? null
           : CoverArtDataAttributes.fromJson(
               json['attributes'] as Map<String, dynamic>),
-      (json['relationships'] as List<dynamic>?)
-          ?.map((e) => Relationship.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      Relationship.from(json['relationships'] as List),
     );
 
 Map<String, dynamic> _$CoverArtDataToJson(CoverArtData instance) =>
@@ -23,5 +21,9 @@ Map<String, dynamic> _$CoverArtDataToJson(CoverArtData instance) =>
       'id': instance.id,
       'type': instance.type,
       'attributes': instance.attributes,
-      'relationships': instance.relationships,
+      'relationships': instance.relationships
+          ?.map((e) => e.toJson(
+                (value) => value,
+              ))
+          .toList(),
     };

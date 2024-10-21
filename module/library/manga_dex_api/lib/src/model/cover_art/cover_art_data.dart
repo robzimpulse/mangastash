@@ -9,6 +9,8 @@ part 'cover_art_data.g.dart';
 @JsonSerializable()
 class CoverArtData extends Identifier {
   final CoverArtDataAttributes? attributes;
+
+  @JsonKey(name: 'relationships', fromJson: Relationship.from)
   final List<Relationship>? relationships;
 
   CoverArtData(super.id, super.type, this.attributes, this.relationships);

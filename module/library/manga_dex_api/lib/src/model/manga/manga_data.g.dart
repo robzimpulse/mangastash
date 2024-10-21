@@ -13,14 +13,16 @@ MangaData _$MangaDataFromJson(Map<String, dynamic> json) => MangaData(
           ? null
           : MangaDataAttributes.fromJson(
               json['attributes'] as Map<String, dynamic>),
-      (json['relationships'] as List<dynamic>?)
-          ?.map((e) => Relationship.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      Relationship.from(json['relationships'] as List),
     );
 
 Map<String, dynamic> _$MangaDataToJson(MangaData instance) => <String, dynamic>{
       'id': instance.id,
       'type': instance.type,
       'attributes': instance.attributes,
-      'relationships': instance.relationships,
+      'relationships': instance.relationships
+          ?.map((e) => e.toJson(
+                (value) => value,
+              ))
+          .toList(),
     };

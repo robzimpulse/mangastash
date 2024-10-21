@@ -1,13 +1,14 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../common/attribute.dart';
+import '../common/title.dart';
 
 part 'scanlation_group_data_attributes.g.dart';
 
 @JsonSerializable()
 class ScanlationGroupDataAttributes extends Attribute {
   final String? name;
-  final List<String>? altNames;
+  final List<Title>? altNames;
   final bool? locked;
   final String? website;
   final String? ircServer;

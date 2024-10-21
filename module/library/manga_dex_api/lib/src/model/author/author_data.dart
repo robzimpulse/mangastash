@@ -9,6 +9,8 @@ part 'author_data.g.dart';
 @JsonSerializable()
 class AuthorData extends Identifier {
   final AuthorDataAttributes? attributes;
+
+  @JsonKey(name: 'relationships', fromJson: Relationship.from)
   final List<Relationship>? relationships;
 
   AuthorData(super.id, super.type, this.attributes, this.relationships);

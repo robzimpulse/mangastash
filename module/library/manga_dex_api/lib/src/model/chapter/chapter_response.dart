@@ -29,6 +29,8 @@ class ChapterResponse extends Response {
 @JsonSerializable()
 class ChapterData extends Identifier {
   ChapterDataAttributes? attributes;
+
+  @JsonKey(name: 'relationships', fromJson: Relationship.from)
   List<Relationship>? relationships;
 
   ChapterData(super.id, super.type, this.attributes, this.relationships);

@@ -10,7 +10,9 @@ ScanlationGroupDataAttributes _$ScanlationGroupDataAttributesFromJson(
         Map<String, dynamic> json) =>
     ScanlationGroupDataAttributes(
       json['name'] as String?,
-      (json['altNames'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      (json['altNames'] as List<dynamic>?)
+          ?.map((e) => Title.fromJson(e as Map<String, dynamic>))
+          .toList(),
       json['locked'] as bool?,
       json['website'] as String?,
       json['ircServer'] as String?,
