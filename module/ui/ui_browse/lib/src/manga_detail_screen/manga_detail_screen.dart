@@ -4,6 +4,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -257,7 +258,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           ),
         ),
       ),
-      ..._group(context: context, volumes: chapters, config: state.config)
+      ..._group(context: context, volumes: chapters, config: state.config),
     ];
   }
 
@@ -290,22 +291,36 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                     ),
                   ),
                 ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    childCount: (chapter.value.length * 2) - 1,
-                    semanticIndexCallback: (Widget _, int index) {
-                      return index.isEven ? index ~/ 2 : null;
-                    },
-                    (context, index) {
-                      final int itemIndex = index ~/ 2;
-                      return index.isOdd
-                          ? _separator()
-                          : _chapter(
-                              context: context,
-                              chapter: chapter.value[itemIndex],
-                              config: config,
-                            );
-                    },
+                SliverPadding(
+                  padding: const EdgeInsets.only(right: 12),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      childCount: (chapter.value.length * 2) - 1,
+                      semanticIndexCallback: (Widget _, int index) {
+                        return index.isEven ? index ~/ 2 : null;
+                      },
+                      (context, index) {
+                        final int itemIndex = index ~/ 2;
+                        final value = chapter.value[itemIndex];
+                        return index.isOdd
+                            ? _separator()
+                            : MangaChapterTileWidget(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
+                                onTap: () => widget.onTapChapter?.call(
+                                  value.id,
+                                ),
+                                onTapDownload: () {},
+                                title: 'Chapter ${value.chapter}',
+                                language: Language.fromCode(
+                                  value.translatedLanguage,
+                                ),
+                                uploadedAt: value.publishAt?.asDateTime,
+                                groups: value.scanlationGroup,
+                              );
+                      },
+                    ),
                   ),
                 ),
               ],
@@ -375,63 +390,63 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   Widget _separator() => const Divider(height: 1);
 
-  Widget _chapter({
-    required BuildContext context,
-    required MangaChapter? chapter,
-    required MangaChapterConfig? config,
-  }) {
-    if (chapter == null) return const SizedBox.shrink();
-
-    final display = config?.display;
-
-    String? title = chapter.title;
-    String? chapterName = chapter.chapter;
-
-    if (display != null) {
-      switch (display) {
-        case MangaChapterDisplayEnum.title:
-          chapterName = null;
-          break;
-        case MangaChapterDisplayEnum.chapter:
-          title = null;
-          break;
-      }
-    }
-
-    return InkWell(
-      onTap: () => widget.onTapChapter?.call(chapter.id),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Text(
-                  [
-                    if (chapter.volume != null) 'Vol ${chapter.volume}',
-                    if (chapterName != null) 'Ch $chapterName',
-                  ].join(' '),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    [
-                      if (chapter.publishAt != null)
-                        '${chapter.publishAt?.asDateTime?.readableFormat}',
-                      if (title != null) title,
-                    ].join(' - '),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _chapter({
+  //   required BuildContext context,
+  //   required MangaChapter? chapter,
+  //   required MangaChapterConfig? config,
+  // }) {
+  //   if (chapter == null) return const SizedBox.shrink();
+  //
+  //   final display = config?.display;
+  //
+  //   String? title = chapter.title;
+  //   String? chapterName = chapter.chapter;
+  //
+  //   if (display != null) {
+  //     switch (display) {
+  //       case MangaChapterDisplayEnum.title:
+  //         chapterName = null;
+  //         break;
+  //       case MangaChapterDisplayEnum.chapter:
+  //         title = null;
+  //         break;
+  //     }
+  //   }
+  //
+  //   return InkWell(
+  //     onTap: () => widget.onTapChapter?.call(chapter.id),
+  //     child: Padding(
+  //       padding: const EdgeInsets.symmetric(vertical: 8),
+  //       child: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           Row(
+  //             children: [
+  //               Text(
+  //                 [
+  //                   if (chapter.volume != null) 'Vol ${chapter.volume}',
+  //                   if (chapterName != null) 'Ch $chapterName',
+  //                 ].join(' '),
+  //               ),
+  //             ],
+  //           ),
+  //           const SizedBox(height: 8),
+  //           Row(
+  //             children: [
+  //               Expanded(
+  //                 child: Text(
+  //                   [
+  //                     if (chapter.publishAt != null)
+  //                       '${chapter.publishAt?.asDateTime?.readableFormat}',
+  //                     if (title != null) title,
+  //                   ].join(' - '),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 }

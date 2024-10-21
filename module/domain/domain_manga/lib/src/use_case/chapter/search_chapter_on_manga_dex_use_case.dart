@@ -26,6 +26,7 @@ class SearchChapterOnMangaDexUseCase {
           limit: 20,
           translatedLanguage: language?.languageCodes,
           offset: chapters.length,
+          includes: [Include.scanlationGroup],
         );
 
         final data = result.data ?? [];

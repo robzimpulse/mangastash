@@ -22,6 +22,8 @@ export 'src/util/debounce.dart';
 export 'src/widget/adaptive_physic_list_view.dart';
 export 'src/widget/child_size_notifier_widget.dart';
 export 'src/widget/gapped_toggle_button_widget.dart';
+export 'src/widget/icon_with_text_widget.dart';
+export 'src/widget/manga_chapter_tile_widget.dart';
 export 'src/widget/manga_detail_widget.dart';
 export 'src/widget/manga_shelf_widget/manga_shelf_item.dart';
 export 'src/widget/manga_shelf_widget/manga_shelf_item_layout.dart';

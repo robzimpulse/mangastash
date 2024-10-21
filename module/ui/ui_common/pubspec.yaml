@@ -16,6 +16,7 @@ dependencies:
   intersperse: ^2.0.0
   sliver_tools: ^0.2.12
   equatable: ^2.0.5
+  collection: ^1.16.0
 
   # core
   core_route:

@@ -1,4 +1,6 @@
 import 'package:collection/collection.dart';
+import 'package:country_flags/country_flags.dart';
+import 'package:flutter/material.dart';
 
 enum Language {
   abkhazian(code: 'ab', name: 'Abkhazian'),
@@ -204,6 +206,19 @@ enum Language {
     return Language.values.firstWhere(
       (e) => e.name == name,
       orElse: () => Language.english,
+    );
+  }
+
+  CountryFlag flag({
+    double? height,
+    double? width,
+    Key? key,
+  }) {
+    return CountryFlag.fromLanguageCode(
+      code,
+      height: height,
+      width: width,
+      key: key,
     );
   }
 

@@ -33,6 +33,7 @@ class GetChapterOnMangaDexUseCase {
           chapter: chapter.data?.attributes?.chapter,
           volume: chapter.data?.attributes?.volume,
           images: atHome.images,
+          translatedLanguage: chapter.data?.attributes?.translatedLanguage,
         ),
       );
     } on Exception catch (e) {

@@ -1,5 +1,7 @@
-// TODO: move this file to enum directory
+import 'package:country_flags/country_flags.dart';
+
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 
 enum Country {
   afghanistan(name: 'Afghanistan', code: 'AF', dialCode: '+93'),
@@ -347,6 +349,21 @@ enum Country {
     return Country.values.firstWhere(
       (e) => e.name == name,
       orElse: () => Country.indonesia,
+    );
+  }
+
+  CountryFlag flag({
+    Shape shape = const Rectangle(),
+    double? height,
+    double? width,
+    Key? key,
+  }) {
+    return CountryFlag.fromCountryCode(
+      code,
+      shape: shape,
+      height: height,
+      width: width,
+      key: key,
     );
   }
 

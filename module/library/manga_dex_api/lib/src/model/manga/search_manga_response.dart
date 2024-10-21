@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../common/response.dart';
-import 'manga_response.dart';
+import 'manga_data.dart';
 
 part 'search_manga_response.g.dart';
 

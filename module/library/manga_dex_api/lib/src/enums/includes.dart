@@ -3,7 +3,10 @@ enum Include {
   author('author'),
   artist('artist'),
   tag('tag'),
-  creator('creator');
+  creator('creator'),
+  scanlationGroup('scanlation_group'),
+  manga('manga'),
+  user('user');
 
   final String rawValue;
 

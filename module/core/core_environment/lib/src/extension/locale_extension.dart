@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import '../enum/country.dart';
+import '../enum/language.dart';
 
 extension CountryExt on Locale {
   Country? get country {
@@ -8,4 +9,6 @@ extension CountryExt on Locale {
     if (code == null) return null;
     return Country.fromCode(code);
   }
+
+  Language get language => Language.fromCode(languageCode);
 }
