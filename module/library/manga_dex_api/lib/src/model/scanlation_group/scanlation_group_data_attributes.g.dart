@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'scanlation_group_attributes.dart';
+part of 'scanlation_group_data_attributes.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator

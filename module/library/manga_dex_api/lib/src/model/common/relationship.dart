@@ -7,6 +7,7 @@ part 'relationship.g.dart';
 @JsonSerializable()
 class Relationship extends Identifier {
   final String? related;
+  // TODO: add general factory model that extends attributes
 
   Relationship(super.id, super.type, this.related);
 

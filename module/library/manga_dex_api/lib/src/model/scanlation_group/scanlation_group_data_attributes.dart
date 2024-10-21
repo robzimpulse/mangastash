@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 import '../common/attribute.dart';
 
-part 'scanlation_group_attributes.g.dart';
+part 'scanlation_group_data_attributes.g.dart';
 
 @JsonSerializable()
 class ScanlationGroupDataAttributes extends Attribute {
