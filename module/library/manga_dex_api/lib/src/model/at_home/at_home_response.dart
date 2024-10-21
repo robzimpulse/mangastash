@@ -1,9 +1,9 @@
-///@nodoc
 import 'package:json_annotation/json_annotation.dart';
+
+import 'at_home_chapter.dart';
 
 part 'at_home_response.g.dart';
 
-///@nodoc
 @JsonSerializable()
 class AtHomeResponse {
   final String? result;
@@ -24,20 +24,4 @@ class AtHomeResponse {
   }
 
   Map<String, dynamic> toJson() => _$AtHomeResponseToJson(this);
-}
-
-///@nodoc
-@JsonSerializable()
-class AtHomeChapter {
-  final String? hash;
-  final List<String>? data;
-  final List<String>? dataSaver;
-
-  AtHomeChapter(this.hash, this.data, this.dataSaver);
-
-  factory AtHomeChapter.fromJson(Map<String, dynamic> json) {
-    return _$AtHomeChapterFromJson(json);
-  }
-
-  Map<String, dynamic> toJson() => _$AtHomeChapterToJson(this);
 }

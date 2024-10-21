@@ -21,17 +21,3 @@ Map<String, dynamic> _$AtHomeResponseToJson(AtHomeResponse instance) =>
       'baseUrl': instance.baseUrl,
       'chapter': instance.chapter,
     };
-
-AtHomeChapter _$AtHomeChapterFromJson(Map<String, dynamic> json) =>
-    AtHomeChapter(
-      json['hash'] as String?,
-      (json['data'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      (json['dataSaver'] as List<dynamic>?)?.map((e) => e as String).toList(),
-    );
-
-Map<String, dynamic> _$AtHomeChapterToJson(AtHomeChapter instance) =>
-    <String, dynamic>{
-      'hash': instance.hash,
-      'data': instance.data,
-      'dataSaver': instance.dataSaver,
-    };
