@@ -1,4 +1,4 @@
-name: Build APK
+name: Build Linux
 
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
@@ -6,9 +6,10 @@ env:
 on: [push, workflow_dispatch]
 
 jobs:
+
   build:
     timeout-minutes: 30
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: "Git Checkout"
         uses: actions/checkout@v4
@@ -21,12 +22,6 @@ jobs:
           flutter-version: '3.19.6'
           cache: true
 
-      - name: "Install Java"
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'zulu'
-          java-version: '11'
-
       - name: "Install Melos"
         run: flutter pub global activate melos 2.9.0
 
@@ -37,10 +32,10 @@ jobs:
         run: melos get --verbose
 
       - name: "Build Application"
-        run: flutter build apk
+        run: flutter build linux
 
       - name: 'Save Artifact'
         uses: actions/upload-artifact@v4
         with:
           name: release
-          path: build/app/outputs/apk/release/app-release.apk
+          path: build/linux

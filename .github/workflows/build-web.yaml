@@ -31,7 +31,7 @@ jobs:
       - name: "Install Dependency"
         run: melos get --verbose
 
-      - name: "Build Flutter Web"
+      - name: "Build Application"
         run: flutter build web
 
       - name: 'Deploy to Firebase'
@@ -55,5 +55,5 @@ jobs:
       - name: 'Save Artifact'
         uses: actions/upload-artifact@v4
         with:
-          name: release-web
+          name: release
           path: build/web
