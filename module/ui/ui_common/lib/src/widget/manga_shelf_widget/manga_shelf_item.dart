@@ -10,11 +10,14 @@ class MangaShelfItem extends StatelessWidget {
     required this.coverUrl,
     required this.layout,
     this.onTap,
+    this.isOnLibrary = false,
   });
 
   final String title;
 
   final String coverUrl;
+
+  final bool isOnLibrary;
 
   final MangaShelfItemLayout layout;
 
@@ -65,6 +68,7 @@ class MangaShelfItem extends StatelessWidget {
             child: Text(title),
           ),
         ),
+        if (isOnLibrary) const Icon(Icons.bookmark),
       ],
     );
   }
@@ -90,9 +94,8 @@ class MangaShelfItem extends StatelessWidget {
             ),
           ),
         ),
-        Visibility(
-          visible: title.isNotEmpty == true,
-          child: Container(
+        if (title.isNotEmpty == true)
+          Container(
             width: double.infinity,
             color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.7),
             padding: const EdgeInsets.all(4.0),
@@ -102,7 +105,28 @@ class MangaShelfItem extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-        ),
+        if (isOnLibrary) ...[
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.5),
+            ),
+          ),
+          Positioned(
+            top: 4,
+            left: 4,
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+              ),
+              child: Text(
+                'In Library',
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -111,24 +135,45 @@ class MangaShelfItem extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          child: CachedNetworkImage(
-            fit: BoxFit.fill,
-            imageUrl: coverUrl,
-            placeholder: (context, url) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            },
-            errorWidget: (context, url, error) {
-              return const Center(
-                child: Icon(Icons.error),
-              );
-            },
+          child: Stack(
+            children: [
+              CachedNetworkImage(
+                fit: BoxFit.fill,
+                imageUrl: coverUrl,
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => const Center(
+                  child: Icon(Icons.error),
+                ),
+              ),
+              if (isOnLibrary) ...[
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.black.withOpacity(0.5),
+                  ),
+                ),
+                Positioned(
+                  top: 4,
+                  left: 4,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                    ),
+                    child: Text(
+                      'In Library',
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ),
+                ),
+              ]
+            ],
           ),
         ),
-        Visibility(
-          visible: title.isNotEmpty == true,
-          child: Container(
+        if (title.isNotEmpty == true)
+          Container(
             width: double.infinity,
             color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.7),
             padding: const EdgeInsets.all(4.0),
@@ -138,7 +183,6 @@ class MangaShelfItem extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-        ),
       ],
     );
   }

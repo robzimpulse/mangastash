@@ -25,6 +25,9 @@ class Manga extends Equatable {
 
   final MangaSource? source;
 
+  @JsonKey(includeToJson: false, includeFromJson: false)
+  final bool isOnLibrary;
+
   const Manga({
     this.id,
     this.title,
@@ -35,6 +38,7 @@ class Manga extends Equatable {
     this.tags,
     this.webUrl,
     this.source,
+    this.isOnLibrary = false,
   });
 
   @override
@@ -49,6 +53,7 @@ class Manga extends Equatable {
       tags,
       webUrl,
       source,
+      isOnLibrary,
     ];
   }
 
@@ -68,6 +73,7 @@ class Manga extends Equatable {
     List<MangaTag>? tags,
     String? webUrl,
     MangaSource? source,
+    bool? isOnLibrary,
   }) {
     return Manga(
       id: id ?? this.id,
@@ -79,6 +85,7 @@ class Manga extends Equatable {
       tags: tags ?? this.tags,
       webUrl: webUrl ?? this.webUrl,
       source: source ?? this.source,
+      isOnLibrary: isOnLibrary ?? this.isOnLibrary,
     );
   }
 }

@@ -7,7 +7,8 @@ import 'package:ui_common/ui_common.dart';
 
 import 'browse_manga_screen_state.dart';
 
-class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState> {
+class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
+    with AutoSubscriptionMixin {
   final GetMangaSourceUseCase _getMangaSourceUseCase;
   final SearchMangaUseCase _searchMangaUseCase;
 
@@ -15,9 +16,19 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState> {
     required BrowseMangaScreenState initialState,
     required GetMangaSourceUseCase getMangaSourceUseCase,
     required SearchMangaUseCase searchMangaUseCase,
+    required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
   })  : _getMangaSourceUseCase = getMangaSourceUseCase,
         _searchMangaUseCase = searchMangaUseCase,
-        super(initialState);
+        super(initialState) {
+    addSubscription(
+      listenMangaFromLibraryUseCase.libraryStateStream
+          .listen(_updateLibraryState),
+    );
+  }
+
+  void _updateLibraryState(List<Manga> libraryState) {
+    emit(state.copyWith(libraries: libraryState));
+  }
 
   Future<void> init({String? title}) async {
     emit(

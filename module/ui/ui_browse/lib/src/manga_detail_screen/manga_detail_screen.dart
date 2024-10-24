@@ -72,7 +72,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   MangaDetailScreenCubit _cubit(BuildContext context) => context.read();
 
   void _onTapWebsite(BuildContext context, MangaDetailScreenState state) async {
-    final url = state.manga?.webUrl;
+    final url = state.displayManga?.webUrl;
 
     if (url == null || url.isEmpty) {
       context.showSnackBar(message: 'Could not launch source url');
@@ -177,7 +177,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         width: 100,
         height: 20,
         lines: 1,
-        child: Text(state.manga?.title ?? ''),
+        child: Text(state.displayManga?.title ?? ''),
       ),
     );
   }
@@ -389,19 +389,19 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   Widget _content() {
     return _builder(
       builder: (context, state) => MangaDetailWidget(
-        coverUrl: state.manga?.coverUrl,
-        title: state.manga?.title,
-        author: state.manga?.author,
-        status: state.manga?.status,
-        description: state.manga?.description,
-        tags: state.manga?.tags?.map((e) => e.name).whereNotNull().toList(),
+        coverUrl: state.displayManga?.coverUrl,
+        title: state.displayManga?.title,
+        author: state.displayManga?.author,
+        status: state.displayManga?.status,
+        description: state.displayManga?.description,
+        tags: state.displayManga?.tags?.map((e) => e.name).whereNotNull().toList(),
         horizontalPadding: 12,
-        isOnLibrary: state.isOnLibrary == true,
+        isOnLibrary: state.displayManga?.isOnLibrary == true,
         onTapAddToLibrary: () => _onTapAddToLibrary(context, state),
         onTapWebsite: () => _onTapWebsite(context, state),
         onTapTag: (name) => _onTapTag(
           context,
-          tag: state.manga?.tags?.firstWhere((e) => e.name == name),
+          tag: state.displayManga?.tags?.firstWhere((e) => e.name == name),
         ),
         isLoading: state.isLoading,
         child: _chapters(context, state),

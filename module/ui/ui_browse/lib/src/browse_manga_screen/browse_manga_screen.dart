@@ -31,6 +31,7 @@ class BrowseMangaScreen extends StatefulWidget {
         ),
         getMangaSourceUseCase: locator(),
         searchMangaUseCase: locator(),
+        listenMangaFromLibraryUseCase: locator(),
       )..init(),
       child: BrowseMangaScreen(
         launchUrlUseCase: locator(),
@@ -245,18 +246,19 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
           );
         }
 
-        if (state.mangas.isEmpty) {
+        if (state.displayMangas.isEmpty) {
           return const Center(
             child: Text('Manga Empty'),
           );
         }
 
-        final children = state.mangas.map(
+        final children = state.displayMangas.map(
           (e) => MangaShelfItem(
             title: e.title ?? '',
             coverUrl: e.coverUrl ?? '',
             layout: state.layout,
             onTap: () => widget.onTapManga?.call(e.id),
+            isOnLibrary: e.isOnLibrary,
           ),
         );
 

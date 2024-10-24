@@ -9,6 +9,8 @@ class BrowseMangaScreenState extends Equatable {
 
   final List<Manga> mangas;
 
+  final List<Manga> libraries;
+
   final MangaShelfItemLayout layout;
 
   final String? sourceId;
@@ -23,7 +25,9 @@ class BrowseMangaScreenState extends Equatable {
 
   final SearchMangaParameter parameter;
 
-  const BrowseMangaScreenState({
+  late final List<Manga> displayMangas;
+
+  BrowseMangaScreenState({
     this.isLoading = false,
     this.hasNextPage = false,
     this.isPagingNextPage = false,
@@ -33,8 +37,21 @@ class BrowseMangaScreenState extends Equatable {
     this.sourceId,
     this.source,
     this.mangas = const [],
+    this.libraries = const [],
     this.parameter = const SearchMangaParameter(),
-  });
+  }) {
+    final libraryMapById = {
+      for (final manga in libraries) manga.id: manga,
+    };
+
+    displayMangas = List.of(
+      mangas.map(
+        (manga) => manga.copyWith(
+          isOnLibrary: libraryMapById[manga.id] != null,
+        ),
+      ),
+    );
+  }
 
   @override
   List<Object?> get props {
@@ -49,6 +66,7 @@ class BrowseMangaScreenState extends Equatable {
       mangas,
       parameter,
       isSearchActive,
+      libraries,
     ];
   }
 
@@ -62,6 +80,7 @@ class BrowseMangaScreenState extends Equatable {
     String? sourceId,
     MangaSource? source,
     List<Manga>? mangas,
+    List<Manga>? libraries,
     SearchMangaParameter? parameter,
   }) {
     return BrowseMangaScreenState(
@@ -70,6 +89,7 @@ class BrowseMangaScreenState extends Equatable {
       isPagingNextPage: isPagingNextPage ?? this.isPagingNextPage,
       isSearchActive: isSearchActive ?? this.isSearchActive,
       mangas: mangas ?? this.mangas,
+      libraries: libraries ?? this.libraries,
       error: error != null ? error() : this.error,
       layout: layout ?? this.layout,
       sourceId: sourceId ?? this.sourceId,
