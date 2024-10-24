@@ -1,44 +1,44 @@
-name: Build Linux
-
-env:
-  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-
-on: [push, workflow_dispatch]
-
-jobs:
-
-  build:
-    timeout-minutes: 30
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Git Checkout"
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: "Install Flutter"
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.19.6'
-          cache: true
-
-      - name: "Install Melos"
-        run: flutter pub global activate melos 2.9.0
-
-      - name: "Bootstrap Workspace"
-        run: melos bootstrap --verbose
-
-      - name: "Install Dependency"
-        run: melos get --verbose
-
-      - name: "Install Linux Dependency"
-        run: sudo apt-get install build-essential libgtk-3-dev ninja-build
-
-      - name: "Build Application"
-        run: flutter build linux
-
-      - name: 'Save Artifact'
-        uses: actions/upload-artifact@v4
-        with:
-          name: release
-          path: build/linux
+#name: Build Linux
+#
+#env:
+#  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+#
+#on: [push, workflow_dispatch]
+#
+#jobs:
+#
+#  build:
+#    timeout-minutes: 30
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: "Git Checkout"
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#
+#      - name: "Install Flutter"
+#        uses: subosito/flutter-action@v2
+#        with:
+#          flutter-version: '3.19.6'
+#          cache: true
+#
+#      - name: "Install Melos"
+#        run: flutter pub global activate melos 2.9.0
+#
+#      - name: "Bootstrap Workspace"
+#        run: melos bootstrap --verbose
+#
+#      - name: "Install Dependency"
+#        run: melos get --verbose
+#
+#      - name: "Install Linux Dependency"
+#        run: sudo apt-get install build-essential libgtk-3-dev ninja-build
+#
+#      - name: "Build Application"
+#        run: flutter build linux
+#
+#      - name: 'Save Artifact'
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: release
+#          path: build/linux

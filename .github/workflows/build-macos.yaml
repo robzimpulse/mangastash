@@ -1,41 +1,41 @@
-name: Build Macos
-
-env:
-  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-
-on: [push, workflow_dispatch]
-
-jobs:
-
-  build:
-    timeout-minutes: 30
-    runs-on: macos-latest
-    steps:
-      - name: "Git Checkout"
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: "Install Flutter"
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.19.6'
-          cache: true
-
-      - name: "Install Melos"
-        run: flutter pub global activate melos 2.9.0
-
-      - name: "Bootstrap Workspace"
-        run: melos bootstrap --verbose
-
-      - name: "Install Dependency"
-        run: melos get --verbose
-
-      - name: "Build Application"
-        run: flutter build macos
-
-      - name: 'Save Artifact'
-        uses: actions/upload-artifact@v4
-        with:
-          name: release
-          path: build/macos
+#name: Build Macos
+#
+#env:
+#  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+#
+#on: [push, workflow_dispatch]
+#
+#jobs:
+#
+#  build:
+#    timeout-minutes: 30
+#    runs-on: macos-latest
+#    steps:
+#      - name: "Git Checkout"
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#
+#      - name: "Install Flutter"
+#        uses: subosito/flutter-action@v2
+#        with:
+#          flutter-version: '3.19.6'
+#          cache: true
+#
+#      - name: "Install Melos"
+#        run: flutter pub global activate melos 2.9.0
+#
+#      - name: "Bootstrap Workspace"
+#        run: melos bootstrap --verbose
+#
+#      - name: "Install Dependency"
+#        run: melos get --verbose
+#
+#      - name: "Build Application"
+#        run: flutter build macos
+#
+#      - name: 'Save Artifact'
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: release
+#          path: build/macos
