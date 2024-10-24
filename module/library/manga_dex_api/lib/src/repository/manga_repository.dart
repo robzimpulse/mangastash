@@ -13,7 +13,7 @@ import '../service/manga_service.dart';
 class MangaRepository {
   final MangaService _service;
 
-  MangaRepository({
+  const MangaRepository({
     required MangaService service,
   }) : _service = service;
 

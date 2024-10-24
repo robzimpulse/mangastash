@@ -4,7 +4,7 @@ import '../service/at_home_service.dart';
 class AtHomeRepository {
   final AtHomeService _service;
 
-  AtHomeRepository({
+  const AtHomeRepository({
     required AtHomeService service,
   }) : _service = service;
 

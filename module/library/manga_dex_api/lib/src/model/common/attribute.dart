@@ -8,7 +8,7 @@ class Attribute {
   final String? updatedAt;
   final num? version;
 
-  Attribute(
+  const Attribute(
     this.createdAt,
     this.updatedAt,
     this.version,

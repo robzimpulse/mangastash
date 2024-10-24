@@ -22,7 +22,7 @@ class AuthorDataAttributes extends Attribute {
   final String? naver;
   final String? website;
 
-  AuthorDataAttributes(
+  const AuthorDataAttributes(
       super.createdAt,
       super.updatedAt,
       super.version,

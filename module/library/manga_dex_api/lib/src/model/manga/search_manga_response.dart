@@ -13,7 +13,7 @@ class SearchMangaResponse extends Response {
   final num? offset;
   final num? total;
 
-  SearchMangaResponse(
+  const SearchMangaResponse(
     super.result,
     super.response,
     this.data,

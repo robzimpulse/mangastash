@@ -7,7 +7,7 @@ class Response {
   final String? result;
   final String? response;
 
-  Response(
+  const Response(
     this.result,
     this.response,
   );

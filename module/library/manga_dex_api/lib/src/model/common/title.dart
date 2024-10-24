@@ -12,7 +12,7 @@ class Title {
   @JsonKey(name: 'ja-ro')
   final String? jaRo;
 
-  Title(this.en, this.fr, this.it, this.zh, this.jaRo);
+  const Title(this.en, this.fr, this.it, this.zh, this.jaRo);
 
   factory Title.fromJson(Map<String, dynamic> json) => _$TitleFromJson(json);
 

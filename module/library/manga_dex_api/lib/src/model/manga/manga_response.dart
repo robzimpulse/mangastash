@@ -10,7 +10,7 @@ part 'manga_response.g.dart';
 class MangaResponse extends Response {
   final MangaData? data;
 
-  MangaResponse(
+  const MangaResponse(
     super.result,
     super.response,
     this.data,

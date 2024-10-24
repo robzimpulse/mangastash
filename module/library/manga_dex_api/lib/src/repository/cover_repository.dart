@@ -5,7 +5,7 @@ import '../service/cover_art_service.dart';
 class CoverRepository {
   final CoverArtService _service;
 
-  CoverRepository({
+  const CoverRepository({
     required CoverArtService service,
   }) : _service = service;
 

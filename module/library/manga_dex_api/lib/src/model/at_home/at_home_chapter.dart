@@ -9,7 +9,7 @@ class AtHomeChapter {
   final List<String>? data;
   final List<String>? dataSaver;
 
-  AtHomeChapter(this.hash, this.data, this.dataSaver);
+  const AtHomeChapter(this.hash, this.data, this.dataSaver);
 
   factory AtHomeChapter.fromJson(Map<String, dynamic> json) {
     return _$AtHomeChapterFromJson(json);

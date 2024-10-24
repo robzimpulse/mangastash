@@ -25,7 +25,7 @@ class ScanlationGroupDataAttributes extends Attribute {
   final String? publishDelay;
   final bool? exLicensed;
 
-  ScanlationGroupDataAttributes(
+  const ScanlationGroupDataAttributes(
     this.name,
     this.altNames,
     this.locked,

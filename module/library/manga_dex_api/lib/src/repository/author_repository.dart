@@ -5,7 +5,7 @@ import '../service/author_service.dart';
 class AuthorRepository {
   final AuthorService _service;
 
-  AuthorRepository({
+  const AuthorRepository({
     required AuthorService service,
   }) : _service = service;
 

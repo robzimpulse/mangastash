@@ -13,7 +13,7 @@ class MangaData extends Identifier {
   @JsonKey(name: 'relationships', fromJson: Relationship.from)
   final List<Relationship>? relationships;
 
-  MangaData(super.id, super.type, this.attributes, this.relationships);
+  const MangaData(super.id, super.type, this.attributes, this.relationships);
 
   factory MangaData.fromJson(Map<String, dynamic> json) {
     return _$MangaDataFromJson(json);

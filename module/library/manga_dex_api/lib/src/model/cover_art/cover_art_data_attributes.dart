@@ -11,7 +11,7 @@ class CoverArtDataAttributes extends Attribute {
   final String? fileName;
   final String? locale;
 
-  CoverArtDataAttributes(
+  const CoverArtDataAttributes(
       this.description,
       this.volume,
       this.fileName,

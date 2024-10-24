@@ -5,7 +5,7 @@ import '../author/author_data_attributes.dart';
 import '../cover_art/cover_art_data_attributes.dart';
 import '../manga/manga_data_attributes.dart';
 import '../scanlation_group/scanlation_group_data_attributes.dart';
-import '../tag/tag_response.dart';
+import '../tag/tag_data_attributes.dart';
 import 'attribute.dart';
 import 'identifier.dart';
 
@@ -16,7 +16,7 @@ class Relationship<T extends Attribute> extends Identifier {
   final String? related;
   final T? attributes;
 
-  Relationship(super.id, super.type, this.related, this.attributes);
+  const Relationship(super.id, super.type, this.related, this.attributes);
 
   factory Relationship.fromJson(
     Map<String, dynamic> json,

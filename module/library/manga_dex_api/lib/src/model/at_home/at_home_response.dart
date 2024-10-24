@@ -10,14 +10,24 @@ class AtHomeResponse {
   final String? baseUrl;
   final AtHomeChapter? chapter;
 
-  late final List<String>? images =
-      chapter?.data?.map((e) => '$baseUrl/data/${chapter?.hash}/$e').toList();
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  late final List<String>? images;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  late final List<String>? imagesDataSaver;
 
-  late final List<String>? imagesDataSaver = chapter?.dataSaver
-      ?.map((e) => '$baseUrl/data-saver/${chapter?.hash}/$e')
-      .toList();
+  AtHomeResponse(this.result, this.baseUrl, this.chapter) {
+    final hash = chapter?.hash;
+    final data = chapter?.data ?? [];
+    final saver = chapter?.dataSaver ?? [];
 
-  AtHomeResponse(this.result, this.baseUrl, this.chapter);
+    imagesDataSaver = hash != null
+        ? [for (final chapter in saver) '$baseUrl/data-saver/$hash/$chapter']
+        : [];
+
+    images = hash != null
+        ? [for (final chapter in data) '$baseUrl/data/$hash/$chapter']
+        : [];
+  }
 
   factory AtHomeResponse.fromJson(Map<String, dynamic> json) {
     return _$AtHomeResponseFromJson(json);

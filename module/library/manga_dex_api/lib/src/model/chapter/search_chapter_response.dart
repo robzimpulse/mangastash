@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../common/response.dart';
-import 'chapter_response.dart';
+import 'chapter_data.dart';
 
 part 'search_chapter_response.g.dart';
 
@@ -13,7 +13,7 @@ class SearchChapterResponse extends Response {
   final num? offset;
   final num? total;
 
-  SearchChapterResponse(
+  const SearchChapterResponse(
     super.result,
     super.response,
     this.data,

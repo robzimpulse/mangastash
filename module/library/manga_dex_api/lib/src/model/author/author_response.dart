@@ -9,7 +9,7 @@ part 'author_response.g.dart';
 class AuthorResponse extends Response {
   final AuthorData? data;
 
-  AuthorResponse(
+  const AuthorResponse(
     super.result,
     super.response,
     this.data,

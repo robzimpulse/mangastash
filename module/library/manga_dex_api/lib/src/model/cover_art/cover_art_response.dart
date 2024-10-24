@@ -10,7 +10,7 @@ part 'cover_art_response.g.dart';
 class CoverArtResponse extends Response {
   final CoverArtData? data;
 
-  CoverArtResponse(super.result, super.response, this.data);
+  const CoverArtResponse(super.result, super.response, this.data);
 
   factory CoverArtResponse.fromJson(Map<String, dynamic> json) {
     return _$CoverArtResponseFromJson(json);

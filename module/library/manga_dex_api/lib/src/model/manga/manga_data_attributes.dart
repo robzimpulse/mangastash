@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 import '../common/attribute.dart';
 import '../common/title.dart';
-import '../tag/tag_response.dart';
+import '../tag/tag_data.dart';
 
 part 'manga_data_attributes.g.dart';
 
@@ -27,7 +27,7 @@ class MangaDataAttributes extends Attribute {
   final List<String?>? availableTranslatedLanguages;
   final List<TagData>? tags;
 
-  MangaDataAttributes(
+  const MangaDataAttributes(
       this.title,
       this.description,
       this.isLocked,

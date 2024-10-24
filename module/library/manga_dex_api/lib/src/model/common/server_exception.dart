@@ -8,7 +8,7 @@ class ServerException {
   final String? result;
   final List<Error>? errors;
 
-  ServerException(this.result, this.errors);
+  const ServerException(this.result, this.errors);
 
   factory ServerException.fromJson(Map<String, dynamic> json) {
     return _$ServerExceptionFromJson(json);
@@ -25,7 +25,7 @@ class Error {
   final String? title;
   final String? detail;
 
-  Error(this.id, this.status, this.title, this.detail);
+  const Error(this.id, this.status, this.title, this.detail);
 
   factory Error.fromJson(Map<String, dynamic> json) => _$ErrorFromJson(json);
 

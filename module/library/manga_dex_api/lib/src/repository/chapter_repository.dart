@@ -11,7 +11,7 @@ class ChapterRepository {
   final ChapterService _chapterService;
   final MangaService _mangaService;
 
-  ChapterRepository({
+  const ChapterRepository({
     required MangaService mangaService,
     required ChapterService chapterService,
   })  : _chapterService = chapterService,

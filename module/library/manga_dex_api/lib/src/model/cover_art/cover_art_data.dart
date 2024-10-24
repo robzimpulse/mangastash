@@ -13,7 +13,7 @@ class CoverArtData extends Identifier {
   @JsonKey(name: 'relationships', fromJson: Relationship.from)
   final List<Relationship>? relationships;
 
-  CoverArtData(super.id, super.type, this.attributes, this.relationships);
+  const CoverArtData(super.id, super.type, this.attributes, this.relationships);
 
   factory CoverArtData.fromJson(Map<String, dynamic> json) {
     return _$CoverArtDataFromJson(json);

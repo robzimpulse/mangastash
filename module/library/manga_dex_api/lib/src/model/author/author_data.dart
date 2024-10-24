@@ -13,7 +13,7 @@ class AuthorData extends Identifier {
   @JsonKey(name: 'relationships', fromJson: Relationship.from)
   final List<Relationship>? relationships;
 
-  AuthorData(super.id, super.type, this.attributes, this.relationships);
+  const AuthorData(super.id, super.type, this.attributes, this.relationships);
 
   factory AuthorData.fromJson(Map<String, dynamic> json) {
     return _$AuthorDataFromJson(json);
