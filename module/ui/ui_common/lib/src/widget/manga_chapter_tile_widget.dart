@@ -9,6 +9,7 @@ class MangaChapterTileWidget extends StatelessWidget {
     super.key,
     this.onTap,
     this.onTapDownload,
+    this.onLongPress,
     this.padding,
     this.title,
     this.language,
@@ -19,6 +20,7 @@ class MangaChapterTileWidget extends StatelessWidget {
 
   final VoidCallback? onTap;
   final VoidCallback? onTapDownload;
+  final VoidCallback? onLongPress;
   final EdgeInsetsGeometry? padding;
   final String? title;
   final String? groups;
@@ -29,6 +31,7 @@ class MangaChapterTileWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      onLongPress: onLongPress,
       onTap: onTap,
       child: Padding(
         padding: padding ?? EdgeInsets.zero,

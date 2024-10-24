@@ -98,6 +98,16 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     context.showSnackBar(message: '🚧🚧🚧 Under Construction $option 🚧🚧🚧');
   }
 
+  void _onTapDownloadChapter(BuildContext context, MangaChapter chapter) {
+    // TODO: implement this
+    context.showSnackBar(message: '🚧🚧🚧 Under Construction $chapter 🚧🚧🚧');
+  }
+
+  void _onTapMenuChapter(BuildContext context, MangaChapter chapter) {
+    // TODO: implement this
+    context.showSnackBar(message: '🚧🚧🚧 Under Construction $chapter 🚧🚧🚧');
+  }
+
   void _onTapShare(BuildContext context) {
     // TODO: implement this
     context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
@@ -315,7 +325,14 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                                 onTap: () => widget.onTapChapter?.call(
                                   value.id,
                                 ),
-                                onTapDownload: () {},
+                                onTapDownload: () => _onTapDownloadChapter(
+                                  context,
+                                  value,
+                                ),
+                                onLongPress: () => _onTapMenuChapter(
+                                  context,
+                                  value,
+                                ),
                                 title: 'Chapter ${value.chapter}',
                                 language: Language.fromCode(
                                   value.translatedLanguage,
