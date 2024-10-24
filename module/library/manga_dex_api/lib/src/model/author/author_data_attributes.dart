@@ -23,25 +23,25 @@ class AuthorDataAttributes extends Attribute {
   final String? website;
 
   const AuthorDataAttributes(
-      super.createdAt,
-      super.updatedAt,
-      super.version,
-      this.name,
-      this.imageUrl,
-      this.twitter,
-      this.pixiv,
-      this.melonBook,
-      this.fanBox,
-      this.booth,
-      this.nicoVideo,
-      this.skeb,
-      this.fantia,
-      this.tumblr,
-      this.youtube,
-      this.weibo,
-      this.naver,
-      this.website,
-      );
+    super.createdAt,
+    super.updatedAt,
+    super.version,
+    this.name,
+    this.imageUrl,
+    this.twitter,
+    this.pixiv,
+    this.melonBook,
+    this.fanBox,
+    this.booth,
+    this.nicoVideo,
+    this.skeb,
+    this.fantia,
+    this.tumblr,
+    this.youtube,
+    this.weibo,
+    this.naver,
+    this.website,
+  );
 
   factory AuthorDataAttributes.fromJson(Map<String, dynamic> json) {
     return _$AuthorDataAttributesFromJson(json);

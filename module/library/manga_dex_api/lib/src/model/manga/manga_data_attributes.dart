@@ -28,26 +28,26 @@ class MangaDataAttributes extends Attribute {
   final List<TagData>? tags;
 
   const MangaDataAttributes(
-      this.title,
-      this.description,
-      this.isLocked,
-      this.originalLanguage,
-      this.lastVolume,
-      this.lastChapter,
-      this.publicationDemographic,
-      this.status,
-      this.year,
-      this.contentRating,
-      this.state,
-      this.chapterNumbersResetOnNewVolume,
-      super.createdAt,
-      super.updatedAt,
-      super.version,
-      this.latestUploadedChapter,
-      this.availableTranslatedLanguages,
-      this.tags,
-      this.altTitle,
-      );
+    this.title,
+    this.description,
+    this.isLocked,
+    this.originalLanguage,
+    this.lastVolume,
+    this.lastChapter,
+    this.publicationDemographic,
+    this.status,
+    this.year,
+    this.contentRating,
+    this.state,
+    this.chapterNumbersResetOnNewVolume,
+    super.createdAt,
+    super.updatedAt,
+    super.version,
+    this.latestUploadedChapter,
+    this.availableTranslatedLanguages,
+    this.tags,
+    this.altTitle,
+  );
 
   factory MangaDataAttributes.fromJson(Map<String, dynamic> json) {
     return _$MangaDataAttributesFromJson(json);

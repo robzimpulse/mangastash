@@ -22,4 +22,3 @@ class AuthorResponse extends Response {
   @override
   Map<String, dynamic> toJson() => _$AuthorResponseToJson(this);
 }
-

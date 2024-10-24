@@ -58,8 +58,6 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => SearchMangaOnMangaDexUseCase(
         mangaService: locator(),
-        authorService: locator(),
-        coverArtService: locator(),
       ),
     );
     locator.registerFactory(
@@ -76,8 +74,6 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => GetMangaOnMangaDexUseCase(
         mangaService: locator(),
-        authorService: locator(),
-        coverArtService: locator(),
       ),
     );
     locator.registerFactory(
@@ -122,7 +118,11 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
     locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
 
-    locator.registerSingleton(MangaSourceManager(mangaSourceServiceFirebase: locator(),),);
+    locator.registerSingleton(
+      MangaSourceManager(
+        mangaSourceServiceFirebase: locator(),
+      ),
+    );
     locator.alias<GetMangaSourcesUseCase, MangaSourceManager>();
     locator.alias<ListenMangaSourceUseCase, MangaSourceManager>();
     locator.alias<GetMangaSourceUseCase, MangaSourceManager>();

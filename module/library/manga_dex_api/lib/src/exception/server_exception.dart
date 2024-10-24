@@ -6,7 +6,12 @@ class MangadexServerException implements Exception {
   static const Map<String, dynamic> _defaultValue = {
     'result': 'error',
     'errors': [
-      {'id': 'string', 'status': 0, 'title': 'string', 'detail': 'string',},
+      {
+        'id': 'string',
+        'status': 0,
+        'title': 'string',
+        'detail': 'string',
+      },
     ],
   };
 

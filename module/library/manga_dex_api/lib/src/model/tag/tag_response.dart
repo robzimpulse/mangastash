@@ -28,6 +28,3 @@ class TagResponse extends Response {
   @override
   Map<String, dynamic> toJson() => _$TagResponseToJson(this);
 }
-
-
-

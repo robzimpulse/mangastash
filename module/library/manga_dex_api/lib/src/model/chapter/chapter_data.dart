@@ -21,4 +21,3 @@ class ChapterData extends Identifier {
 
   Map<String, dynamic> toJson() => _$ChapterDataToJson(this);
 }
-

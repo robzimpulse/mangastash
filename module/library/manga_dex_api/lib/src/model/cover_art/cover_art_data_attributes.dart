@@ -12,14 +12,14 @@ class CoverArtDataAttributes extends Attribute {
   final String? locale;
 
   const CoverArtDataAttributes(
-      this.description,
-      this.volume,
-      this.fileName,
-      this.locale,
-      super.createdAt,
-      super.updatedAt,
-      super.version,
-      );
+    this.description,
+    this.volume,
+    this.fileName,
+    this.locale,
+    super.createdAt,
+    super.updatedAt,
+    super.version,
+  );
 
   factory CoverArtDataAttributes.fromJson(Map<String, dynamic> json) {
     return _$CoverArtDataAttributesFromJson(json);

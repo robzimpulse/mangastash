@@ -15,17 +15,17 @@ class ChapterDataAttributes extends Attribute {
   final String? readableAt;
 
   const ChapterDataAttributes(
-      this.volume,
-      this.chapter,
-      this.title,
-      this.translatedLanguage,
-      this.externalUrl,
-      this.publishAt,
-      this.readableAt,
-      super.createdAt,
-      super.updatedAt,
-      super.version,
-      );
+    this.volume,
+    this.chapter,
+    this.title,
+    this.translatedLanguage,
+    this.externalUrl,
+    this.publishAt,
+    this.readableAt,
+    super.createdAt,
+    super.updatedAt,
+    super.version,
+  );
 
   factory ChapterDataAttributes.fromJson(Map<String, dynamic> json) {
     return _$ChapterDataAttributesFromJson(json);

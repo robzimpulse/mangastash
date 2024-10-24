@@ -91,7 +91,7 @@ class Relationship<T extends Attribute> extends Identifier {
             ),
           );
         case Include.user:
-        // TODO: add this relationship when user data attribute exists
+          // TODO: add this relationship when user data attribute exists
           break;
       }
     }

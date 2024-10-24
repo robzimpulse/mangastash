@@ -19,7 +19,3 @@ class CoverArtResponse extends Response {
   @override
   Map<String, dynamic> toJson() => _$CoverArtResponseToJson(this);
 }
-
-
-
-

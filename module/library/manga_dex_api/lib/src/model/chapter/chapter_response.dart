@@ -23,4 +23,3 @@ class ChapterResponse extends Response {
   @override
   Map<String, dynamic> toJson() => _$ChapterResponseToJson(this);
 }
-
