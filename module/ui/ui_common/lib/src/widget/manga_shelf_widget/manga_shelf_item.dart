@@ -168,7 +168,7 @@ class MangaShelfItem extends StatelessWidget {
                     ),
                   ),
                 ),
-              ]
+              ],
             ],
           ),
         ),

@@ -1,9 +1,11 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import '../../../manga_dex_api.dart';
 import '../../enums/includes.dart';
 import '../author/author_data_attributes.dart';
 import '../cover_art/cover_art_data_attributes.dart';
+import '../manga/manga_data_attributes.dart';
+import '../scanlation_group/scanlation_group_data_attributes.dart';
+import '../tag/tag_response.dart';
 import 'attribute.dart';
 import 'identifier.dart';
 

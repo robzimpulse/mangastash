@@ -12,15 +12,11 @@ class LibraryManager
     implements GetMangaFromLibraryUseCase, ListenMangaFromLibraryUseCase {
   late final SwitchLatestStream<List<Manga>> _switchLatestStream;
 
-  static final _finalizer = Finalizer<List<StreamSubscription>>(
-    (events) {
-      for (final event in events) {
-        event.cancel();
-      }
-    },
+  static final _finalizer = Finalizer<StreamSubscription>(
+    (event) => event.cancel(),
   );
 
-  final _libraryStateSubject = BehaviorSubject<List<Manga>>.seeded([]);
+  final _stateSubject = BehaviorSubject<List<Manga>>.seeded([]);
 
   LibraryManager({
     required MangaLibraryServiceFirebase mangaLibraryServiceFirebase,
@@ -30,24 +26,23 @@ class LibraryManager
       listenAuthUseCase.authStateStream.map((authState) {
         final userId = authState?.user?.uid;
         if (userId == null) return Stream.value(<Manga>[]);
-        return mangaLibraryServiceFirebase.listen(userId);
+        return mangaLibraryServiceFirebase.stream(userId);
       }),
     );
     _finalizer.attach(
       this,
-      [_switchLatestStream.listen(_updateLibraryState)],
+      _switchLatestStream.listen(_updateState),
       detach: this,
     );
   }
 
   @override
-  ValueStream<List<Manga>> get libraryStateStream =>
-      _libraryStateSubject.stream;
+  ValueStream<List<Manga>> get libraryStateStream => _stateSubject.stream;
 
   @override
-  List<Manga> get libraryState => _libraryStateSubject.valueOrNull ?? [];
+  List<Manga> get libraryState => _stateSubject.valueOrNull ?? [];
 
-  void _updateLibraryState(List<Manga> library) {
-    _libraryStateSubject.add(library);
+  void _updateState(List<Manga> library) {
+    _stateSubject.add(library);
   }
 }

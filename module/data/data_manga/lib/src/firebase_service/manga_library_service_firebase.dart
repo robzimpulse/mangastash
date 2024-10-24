@@ -57,7 +57,7 @@ class MangaLibraryServiceFirebase {
     ];
   }
 
-  Stream<List<Manga>> listen(String userId) {
+  Stream<List<Manga>> stream(String userId) {
     final stream = _ref.doc(userId).snapshots();
     return stream.map((event) {
       final values = event.data();

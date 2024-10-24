@@ -51,6 +51,23 @@ class MangaSourceServiceFirebase {
     return Success(MangaSource.fromJson(data).copyWith(id: id));
   }
 
+  Stream<List<MangaSource>> stream() {
+    final stream = _ref.snapshots();
+    return stream.map((event) {
+      final values = event.docs;
+
+      List<MangaSource> data = [];
+
+      for (final value in values) {
+        final id = value.id;
+        final json = value.data();
+        data.add(MangaSource.fromJson(json).copyWith(id: id));
+      }
+
+      return data;
+    });
+  }
+
   Future<Result<Pagination<MangaSource>>> search({
     MangaSourceEnum? name,
     String? url,

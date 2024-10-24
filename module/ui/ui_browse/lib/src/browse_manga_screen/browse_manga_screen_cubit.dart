@@ -9,7 +9,6 @@ import 'browse_manga_screen_state.dart';
 
 class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     with AutoSubscriptionMixin {
-  final GetMangaSourceUseCase _getMangaSourceUseCase;
   final SearchMangaUseCase _searchMangaUseCase;
 
   BrowseMangaScreenCubit({
@@ -17,9 +16,12 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     required GetMangaSourceUseCase getMangaSourceUseCase,
     required SearchMangaUseCase searchMangaUseCase,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
-  })  : _getMangaSourceUseCase = getMangaSourceUseCase,
-        _searchMangaUseCase = searchMangaUseCase,
-        super(initialState) {
+  })  : _searchMangaUseCase = searchMangaUseCase,
+        super(
+          initialState.copyWith(
+            source: getMangaSourceUseCase.get(initialState.sourceId),
+          ),
+        ) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
           .listen(_updateLibraryState),
@@ -41,24 +43,8 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
         ),
       ),
     );
-    await _fetchSource();
     await _fetchManga();
     emit(state.copyWith(isLoading: false));
-  }
-
-  Future<void> _fetchSource() async {
-    final id = state.sourceId;
-    if (id == null || id.isEmpty) return;
-
-    final result = await _getMangaSourceUseCase.execute(id);
-
-    if (result is Success<MangaSource>) {
-      emit(state.copyWith(source: result.data));
-    }
-
-    if (result is Error<MangaSource>) {
-      emit(state.copyWith(error: () => result.error));
-    }
   }
 
   Future<void> _fetchManga() async {

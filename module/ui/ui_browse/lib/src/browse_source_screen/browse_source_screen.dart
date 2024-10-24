@@ -24,16 +24,14 @@ class BrowseSourceScreen extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (context) => BrowseSourceScreenCubit(
-        getAllMangaSourcesUseCase: locator(),
-      )..init(),
+        listenMangaSourceUseCase: locator(),
+      ),
       child: BrowseSourceScreen(
         onTapSearchManga: onTapSearchManga,
         onTapSource: onTapSource,
       ),
     );
   }
-
-  BrowseSourceScreenCubit _cubit(BuildContext context) => context.read();
 
   @override
   Widget build(BuildContext context) {
@@ -48,23 +46,18 @@ class BrowseSourceScreen extends StatelessWidget {
         ],
       ),
       body: BlocBuilder<BrowseSourceScreenCubit, BrowseSourceScreenState>(
-        builder: (context, state) => RefreshIndicator(
-          onRefresh: () => _cubit(context).init(),
-          child: AdaptivePhysicListView.separated(
-            separatorBuilder: (context, index) => const Divider(
-              height: 1,
-              thickness: 1,
-            ),
-            itemBuilder: (context, index) => state.isLoading
-                ? const SourceMangaWidget.shimmer()
-                : SourceMangaWidget(
-                    iconUrl: state.sources[index].iconUrl ?? '',
-                    url: state.sources[index].url ?? '',
-                    name: state.sources[index].name?.value ?? '',
-                    onTap: () => onTapSource?.call(state.sources[index]),
-                  ),
-            itemCount: state.isLoading ? 100 : state.sources.length,
+        builder: (context, state) => AdaptivePhysicListView.separated(
+          separatorBuilder: (context, index) => const Divider(
+            height: 1,
+            thickness: 1,
           ),
+          itemBuilder: (context, index) => SourceMangaWidget(
+            iconUrl: state.sources[index].iconUrl ?? '',
+            url: state.sources[index].url ?? '',
+            name: state.sources[index].name?.value ?? '',
+            onTap: () => onTapSource?.call(state.sources[index]),
+          ),
+          itemCount: state.sources.length,
         ),
       ),
     );

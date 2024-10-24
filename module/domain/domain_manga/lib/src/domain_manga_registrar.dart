@@ -5,6 +5,7 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager/library_manager.dart';
+import 'manager/manga_source_manager.dart';
 import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
 import 'use_case/chapter/search_chapter_on_manga_dex_use_case.dart';
@@ -17,11 +18,9 @@ import 'use_case/manga/get_manga_on_mangadex_use_case.dart';
 import 'use_case/manga/get_manga_use_case.dart';
 import 'use_case/manga/search_manga_on_mangadex_use_case.dart';
 import 'use_case/manga/search_manga_use_case.dart';
-import 'use_case/manga_source/add_manga_source_use_case.dart';
-import 'use_case/manga_source/get_list_manga_sources_use_case.dart';
 import 'use_case/manga_source/get_manga_source_use_case.dart';
-import 'use_case/manga_source/search_manga_source_use_case.dart';
-import 'use_case/manga_source/update_manga_source_use_case.dart';
+import 'use_case/manga_source/get_manga_sources_use_case.dart';
+import 'use_case/manga_source/listen_manga_source_use_case.dart';
 import 'use_case/manga_tags/get_list_tags_use_case.dart';
 
 class DomainMangaRegistrar extends Registrar {
@@ -53,21 +52,6 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(() => AuthorRepository(service: locator()));
     locator.registerFactory(() => CoverRepository(service: locator()));
 
-    locator.registerFactory(
-      () => AddMangaSourcesUseCase(service: locator()),
-    );
-    locator.registerFactory(
-      () => UpdateMangaSourcesUseCase(service: locator()),
-    );
-    locator.registerFactory(
-      () => GetListMangaSourcesUseCase(service: locator()),
-    );
-    locator.registerFactory(
-      () => GetMangaSourceUseCase(service: locator()),
-    );
-    locator.registerFactory(
-      () => SearchMangaSourcesUseCase(service: locator()),
-    );
     locator.registerFactory(
       () => GetListTagsUseCase(service: locator()),
     );
@@ -137,6 +121,11 @@ class DomainMangaRegistrar extends Registrar {
     );
     locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
     locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
+
+    locator.registerSingleton(MangaSourceManager(mangaSourceServiceFirebase: locator(),),);
+    locator.alias<GetMangaSourcesUseCase, MangaSourceManager>();
+    locator.alias<ListenMangaSourceUseCase, MangaSourceManager>();
+    locator.alias<GetMangaSourceUseCase, MangaSourceManager>();
 
     log('finish register', name: runtimeType.toString(), time: DateTime.now());
   }
