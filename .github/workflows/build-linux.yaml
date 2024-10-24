@@ -32,7 +32,7 @@ jobs:
         run: melos get --verbose
 
       - name: "Install Ninja Build"
-        run: apt install ninja-build
+        run: sudo apt install ninja-build
 
       - name: "Build Application"
         run: flutter build linux
