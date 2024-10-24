@@ -194,7 +194,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     if (state.isLoading) {
       return [
         SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           sliver: SliverToBoxAdapter(
             child: Row(
               children: [
@@ -212,13 +212,18 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
-              (context, index) => ShimmerLoading.multiline(
-                isLoading: state.isLoading,
-                width: double.infinity,
-                height: 15,
-                lines: 3,
-              ),
-              childCount: 50,
+              (context, index) => index.isOdd
+                  ? const SizedBox(height: 4)
+                  : ShimmerLoading.multiline(
+                      isLoading: state.isLoading,
+                      width: double.infinity,
+                      height: 15,
+                      lines: 3,
+                    ),
+              childCount: (50 * 2) - 1,
+              semanticIndexCallback: (Widget _, int index) {
+                return index.isEven ? index ~/ 2 : null;
+              },
             ),
           ),
         ),
@@ -388,64 +393,4 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   Widget _separator() => const Divider(height: 1);
-
-  // Widget _chapter({
-  //   required BuildContext context,
-  //   required MangaChapter? chapter,
-  //   required MangaChapterConfig? config,
-  // }) {
-  //   if (chapter == null) return const SizedBox.shrink();
-  //
-  //   final display = config?.display;
-  //
-  //   String? title = chapter.title;
-  //   String? chapterName = chapter.chapter;
-  //
-  //   if (display != null) {
-  //     switch (display) {
-  //       case MangaChapterDisplayEnum.title:
-  //         chapterName = null;
-  //         break;
-  //       case MangaChapterDisplayEnum.chapter:
-  //         title = null;
-  //         break;
-  //     }
-  //   }
-  //
-  //   return InkWell(
-  //     onTap: () => widget.onTapChapter?.call(chapter.id),
-  //     child: Padding(
-  //       padding: const EdgeInsets.symmetric(vertical: 8),
-  //       child: Column(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: [
-  //           Row(
-  //             children: [
-  //               Text(
-  //                 [
-  //                   if (chapter.volume != null) 'Vol ${chapter.volume}',
-  //                   if (chapterName != null) 'Ch $chapterName',
-  //                 ].join(' '),
-  //               ),
-  //             ],
-  //           ),
-  //           const SizedBox(height: 8),
-  //           Row(
-  //             children: [
-  //               Expanded(
-  //                 child: Text(
-  //                   [
-  //                     if (chapter.publishAt != null)
-  //                       '${chapter.publishAt?.asDateTime?.readableFormat}',
-  //                     if (title != null) title,
-  //                   ].join(' - '),
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 }
