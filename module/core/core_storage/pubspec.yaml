@@ -12,6 +12,8 @@ dependencies:
     sdk: flutter
   shared_preferences: ^2.0.15
   shared_preferences_android: 2.0.17
+  flutter_cache_manager: ^3.3.1
+  file: ^6.1.4
 
   service_locator:
     path: ../../library/service_locator

@@ -1,3 +1,4 @@
+import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -10,9 +11,12 @@ class LibraryMangaScreen extends StatelessWidget {
   const LibraryMangaScreen({
     super.key,
     this.onTapManga,
+    this.cacheManager,
   });
 
   final ValueSetter<Manga?>? onTapManga;
+
+  final BaseCacheManager? cacheManager;
 
   static Widget create({
     required ServiceLocator locator,
@@ -26,6 +30,7 @@ class LibraryMangaScreen extends StatelessWidget {
         listenAuthUseCase: locator(),
       ),
       child: LibraryMangaScreen(
+        cacheManager: locator(),
         onTapManga: onTapManga,
       ),
     );
@@ -88,6 +93,7 @@ class LibraryMangaScreen extends StatelessWidget {
 
         final children = state.mangas.map(
           (e) => MangaShelfItem(
+            cacheManager: cacheManager,
             title: e.title ?? '',
             coverUrl: e.coverUrl ?? '',
             layout: MangaShelfItemLayout.comfortableGrid,

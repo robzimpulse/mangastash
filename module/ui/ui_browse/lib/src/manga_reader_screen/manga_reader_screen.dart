@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:core_storage/core_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -12,7 +13,9 @@ import 'manga_reader_screen_cubit.dart';
 import 'manga_reader_screen_state.dart';
 
 class MangaReaderScreen extends StatefulWidget {
-  const MangaReaderScreen({super.key});
+  const MangaReaderScreen({super.key, this.cacheManager});
+
+  final BaseCacheManager? cacheManager;
 
   static Widget create({
     required ServiceLocator locator,
@@ -30,7 +33,9 @@ class MangaReaderScreen extends StatefulWidget {
         getChapterUseCase: locator(),
         getMangaSourceUseCase: locator(),
       )..init(),
-      child: const MangaReaderScreen(),
+      child: MangaReaderScreen(
+        cacheManager: locator(),
+      ),
     );
   }
 
@@ -128,6 +133,7 @@ class _MangaReaderScreenState extends State<MangaReaderScreen> {
                 },
                 key: ValueKey<int>(index),
                 child: CachedNetworkImage(
+                  cacheManager: widget.cacheManager,
                   imageUrl: images[index],
                   errorWidget: (context, url, error) => const Icon(
                     Icons.error,

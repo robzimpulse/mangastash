@@ -1,4 +1,5 @@
 import 'package:core_network/core_network.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -12,11 +13,14 @@ class BrowseMangaScreen extends StatefulWidget {
     super.key,
     required this.launchUrlUseCase,
     this.onTapManga,
+    this.cacheManager,
   });
 
   final LaunchUrlUseCase launchUrlUseCase;
 
   final ValueSetter<String?>? onTapManga;
+
+  final BaseCacheManager? cacheManager;
 
   static Widget create({
     required ServiceLocator locator,
@@ -35,6 +39,7 @@ class BrowseMangaScreen extends StatefulWidget {
       )..init(),
       child: BrowseMangaScreen(
         launchUrlUseCase: locator(),
+        cacheManager: locator(),
         onTapManga: onTapManga,
       ),
     );
@@ -254,6 +259,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
 
         final children = state.displayMangas.map(
           (e) => MangaShelfItem(
+            cacheManager: widget.cacheManager,
             title: e.title ?? '',
             coverUrl: e.coverUrl ?? '',
             layout: state.layout,

@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:intersperse/intersperse.dart';
@@ -22,6 +23,7 @@ class MangaDetailWidget extends StatelessWidget {
     this.separator = const SizedBox(height: 8),
     this.isLoading = false,
     this.isOnLibrary = false,
+    this.cacheManager,
     required this.child,
   });
 
@@ -53,6 +55,8 @@ class MangaDetailWidget extends StatelessWidget {
 
   final bool isOnLibrary;
 
+  final BaseCacheManager? cacheManager;
+
   Widget _header(BuildContext context) {
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -64,6 +68,7 @@ class MangaDetailWidget extends StatelessWidget {
               width: 100,
               height: 150,
               child: CachedNetworkImage(
+                cacheManager: cacheManager,
                 imageUrl: coverUrl ?? '',
                 width: 100,
                 height: 150,

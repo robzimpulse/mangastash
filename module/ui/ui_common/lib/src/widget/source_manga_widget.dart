@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:flutter/material.dart';
 
 import 'shimmer_loading_widget.dart';
@@ -11,6 +12,7 @@ class SourceMangaWidget extends StatelessWidget {
     this.onTap,
     this.iconUrl = '',
     this.isLoading = false,
+    this.cacheManager,
   });
 
   const SourceMangaWidget.shimmer({
@@ -19,7 +21,8 @@ class SourceMangaWidget extends StatelessWidget {
         url = '',
         iconUrl = '',
         name = '',
-        onTap = null;
+        onTap = null,
+        cacheManager = null;
 
   final String iconUrl;
 
@@ -31,6 +34,8 @@ class SourceMangaWidget extends StatelessWidget {
 
   final bool isLoading;
 
+  final BaseCacheManager? cacheManager;
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -40,6 +45,7 @@ class SourceMangaWidget extends StatelessWidget {
           isLoading: isLoading,
           size: 16,
           child: CachedNetworkImage(
+            cacheManager: cacheManager,
             imageUrl: iconUrl,
             width: 16,
             height: 16,

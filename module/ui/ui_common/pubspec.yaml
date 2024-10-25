@@ -23,6 +23,8 @@ dependencies:
     path: ../../core/core_route
   core_environment:
     path: ../../core/core_environment
+  core_storage:
+    path: ../../core/core_storage
 
   # library
   safe_bloc:

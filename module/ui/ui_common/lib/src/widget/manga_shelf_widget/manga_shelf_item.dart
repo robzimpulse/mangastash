@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:flutter/material.dart';
 
 import 'manga_shelf_item_layout.dart';
@@ -11,6 +12,7 @@ class MangaShelfItem extends StatelessWidget {
     required this.layout,
     this.onTap,
     this.isOnLibrary = false,
+    this.cacheManager,
   });
 
   final String title;
@@ -22,6 +24,8 @@ class MangaShelfItem extends StatelessWidget {
   final MangaShelfItemLayout layout;
 
   final VoidCallback? onTap;
+
+  final BaseCacheManager? cacheManager;
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +50,7 @@ class MangaShelfItem extends StatelessWidget {
     return Row(
       children: [
         CachedNetworkImage(
+          cacheManager: cacheManager,
           imageUrl: coverUrl,
           width: 50,
           height: 50,
@@ -83,6 +88,7 @@ class MangaShelfItem extends StatelessWidget {
               border: Border.all(color: Theme.of(context).dividerColor),
             ),
             child: CachedNetworkImage(
+              cacheManager: cacheManager,
               fit: BoxFit.fill,
               imageUrl: coverUrl,
               placeholder: (context, url) => const Center(
@@ -138,6 +144,7 @@ class MangaShelfItem extends StatelessWidget {
           child: Stack(
             children: [
               CachedNetworkImage(
+                cacheManager: cacheManager,
                 fit: BoxFit.fill,
                 imageUrl: coverUrl,
                 placeholder: (context, url) => const Center(

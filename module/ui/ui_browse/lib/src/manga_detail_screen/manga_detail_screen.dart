@@ -3,6 +3,7 @@ import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -16,6 +17,7 @@ class MangaDetailScreen extends StatefulWidget {
     super.key,
     this.onTapChapter,
     this.onTapSort,
+    this.cacheManager,
     required this.launchUrlUseCase,
   });
 
@@ -24,6 +26,8 @@ class MangaDetailScreen extends StatefulWidget {
   final Future<MangaChapterConfig?> Function(MangaChapterConfig?)? onTapSort;
 
   final LaunchUrlUseCase launchUrlUseCase;
+
+  final BaseCacheManager? cacheManager;
 
   static Widget create({
     required ServiceLocator locator,
@@ -47,6 +51,7 @@ class MangaDetailScreen extends StatefulWidget {
         listenMangaFromLibraryUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
+        cacheManager: locator(),
         onTapChapter: onTapChapter,
         onTapSort: onTapSort,
         launchUrlUseCase: locator(),
@@ -389,6 +394,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   Widget _content() {
     return _builder(
       builder: (context, state) => MangaDetailWidget(
+        cacheManager: widget.cacheManager,
         coverUrl: state.displayManga?.coverUrl,
         title: state.displayManga?.title,
         author: state.displayManga?.author,
