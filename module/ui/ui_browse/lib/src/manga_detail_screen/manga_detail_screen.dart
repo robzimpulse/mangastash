@@ -49,8 +49,7 @@ class MangaDetailScreen extends StatefulWidget {
         listenAuth: locator(),
         removeFromLibraryUseCase: locator(),
         listenMangaFromLibraryUseCase: locator(),
-        cacheManager: locator(),
-        getChapterUseCase: locator(),
+        downloadChapterUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         cacheManager: locator(),
@@ -345,6 +344,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                                 ),
                                 uploadedAt: value.publishAt?.asDateTime,
                                 groups: value.scanlationGroup,
+                                downloadProgress: value.downloadProgress,
                               );
                       },
                     ),

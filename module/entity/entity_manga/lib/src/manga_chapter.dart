@@ -29,6 +29,9 @@ class MangaChapter extends Equatable {
 
   late final num? numChapter = num.tryParse(chapter ?? '');
 
+  @JsonKey(includeToJson: false, includeFromJson: false)
+  final double downloadProgress;
+
   MangaChapter({
     this.id,
     this.mangaId,
@@ -40,6 +43,7 @@ class MangaChapter extends Equatable {
     this.images,
     this.translatedLanguage,
     this.scanlationGroup,
+    this.downloadProgress = 0,
   });
 
   @override
@@ -54,6 +58,7 @@ class MangaChapter extends Equatable {
         images,
         translatedLanguage,
         scanlationGroup,
+        downloadProgress,
       ];
 
   factory MangaChapter.fromJson(Map<String, dynamic> json) {
@@ -73,6 +78,7 @@ class MangaChapter extends Equatable {
     String? translatedLanguage,
     String? scanlationGroup,
     List<String>? images,
+    double? downloadProgress,
   }) {
     return MangaChapter(
       id: id ?? this.id,
@@ -85,6 +91,7 @@ class MangaChapter extends Equatable {
       images: images ?? this.images,
       translatedLanguage: translatedLanguage ?? this.translatedLanguage,
       scanlationGroup: scanlationGroup ?? this.scanlationGroup,
+      downloadProgress: downloadProgress ?? this.downloadProgress,
     );
   }
 }

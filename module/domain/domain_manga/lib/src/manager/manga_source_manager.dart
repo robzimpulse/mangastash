@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:collection/collection.dart';
 import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/src/manga_source.dart';
@@ -14,20 +12,13 @@ class MangaSourceManager
         ListenMangaSourceUseCase,
         GetMangaSourcesUseCase,
         GetMangaSourceUseCase {
-  static final _finalizer = Finalizer<StreamSubscription>(
-    (event) => event.cancel(),
-  );
 
   final _stateSubject = BehaviorSubject<List<MangaSource>>.seeded([]);
 
   MangaSourceManager({
     required MangaSourceServiceFirebase mangaSourceServiceFirebase,
   }) {
-    _finalizer.attach(
-      this,
-      mangaSourceServiceFirebase.stream().listen(_updateState),
-      detach: this,
-    );
+    _stateSubject.addStream(mangaSourceServiceFirebase.stream());
   }
 
   @override
@@ -40,8 +31,4 @@ class MangaSourceManager
   @override
   MangaSource? get(String? id) =>
       mangaSourceState?.firstWhereOrNull((e) => e.id == id);
-
-  void _updateState(List<MangaSource> sources) {
-    _stateSubject.add(sources);
-  }
 }

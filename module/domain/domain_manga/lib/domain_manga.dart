@@ -3,6 +3,7 @@ library domain_manga;
 export 'package:manga_dex_api/manga_dex_api.dart';
 
 export 'src/domain_manga_registrar.dart';
+export 'src/use_case/chapter/download_chapter_use_case.dart';
 export 'src/use_case/chapter/get_chapter_use_case.dart';
 export 'src/use_case/chapter/search_chapter_use_case.dart';
 export 'src/use_case/library/add_to_library_use_case.dart';
