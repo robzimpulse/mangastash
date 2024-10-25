@@ -13,7 +13,7 @@ class MangaChapterTileWidget extends StatelessWidget {
     this.padding,
     this.title,
     this.language,
-    this.isDownloaded = false,
+    this.downloadProgress = 0,
     this.uploadedAt,
     this.groups,
   });
@@ -25,7 +25,7 @@ class MangaChapterTileWidget extends StatelessWidget {
   final String? title;
   final String? groups;
   final Language? language;
-  final bool isDownloaded;
+  final double downloadProgress;
   final DateTime? uploadedAt;
 
   @override
@@ -56,13 +56,21 @@ class MangaChapterTileWidget extends StatelessWidget {
                 ),
               ].intersperse(const SizedBox(height: 4)).toList(),
             ),
-            if (isDownloaded)
-              const Icon(Icons.download_done)
-            else
+            if (downloadProgress == 1)
+              const Icon(Icons.download_done, size: 20)
+            else if (downloadProgress == 0)
               IconButton(
-              onPressed: onTapDownload,
-              icon: const Icon(Icons.download),
-            ),
+                onPressed: onTapDownload,
+                icon: const Icon(Icons.download, size: 20),
+              )
+            else
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  value: downloadProgress,
+                ),
+              ),
           ],
         ),
       ),

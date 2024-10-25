@@ -1,8 +1,11 @@
 import 'package:core_auth/core_auth.dart';
 import 'package:core_network/core_network.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:safe_bloc/safe_bloc.dart';
+import 'package:ui_common/ui_common.dart';
 
 import 'manga_detail_screen_state.dart';
 
@@ -12,23 +15,31 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   final SearchChapterUseCase _getListChapterUseCase;
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
   final AddToLibraryUseCase _addToLibraryUseCase;
+  final GetChapterUseCase _getChapterUseCase;
+  final BaseCacheManager _cacheManager;
 
   MangaDetailScreenCubit({
     required MangaDetailScreenState initialState,
     required GetMangaUseCase getMangaUseCase,
     required SearchChapterUseCase getListChapterUseCase,
+    required GetChapterUseCase getChapterUseCase,
     required GetMangaSourceUseCase getMangaSourceUseCase,
     required AddToLibraryUseCase addToLibraryUseCase,
     required RemoveFromLibraryUseCase removeFromLibraryUseCase,
     required ListenAuthUseCase listenAuth,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
+    required BaseCacheManager cacheManager,
   })  : _getMangaUseCase = getMangaUseCase,
         _getListChapterUseCase = getListChapterUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
-        super(initialState.copyWith(
-        source: getMangaSourceUseCase.get(initialState.sourceId),
-      ),) {
+        _getChapterUseCase = getChapterUseCase,
+        _cacheManager = cacheManager,
+        super(
+          initialState.copyWith(
+            source: getMangaSourceUseCase.get(initialState.sourceId),
+          ),
+        ) {
     addSubscription(listenAuth.authStateStream.listen(_updateAuthState));
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
@@ -113,5 +124,32 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     } else {
       await _removeFromLibraryUseCase.execute(manga: manga, userId: userId);
     }
+  }
+
+  void downloadChapter({required String? chapterId}) async {
+    // TODO: perform download chapter
+  //   final response = await _getChapterUseCase.execute(
+  //     chapterId: chapterId,
+  //     source: state.source?.name,
+  //     mangaId: state.mangaId,
+  //   );
+  //
+  //   if (response is Success<MangaChapter>) {
+  //     final images = response.data.images ?? [];
+  //     final combiner = CombineLatestStream(
+  //       images.map((e) => _cacheManager.getFileStream(e, withProgress: true)),
+  //       (values) {
+  //         final progress = values.whereType<DownloadProgress>();
+  //         return progress.fold<double>(
+  //           0,
+  //           (prev, element) => (element.progress ?? 0) / progress.length,
+  //         );
+  //       },
+  //     );
+  //
+  //     combiner.listen((value) {
+  //       print(value);
+  //     });
+  //   }
   }
 }

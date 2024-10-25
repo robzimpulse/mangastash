@@ -49,6 +49,8 @@ class MangaDetailScreen extends StatefulWidget {
         listenAuth: locator(),
         removeFromLibraryUseCase: locator(),
         listenMangaFromLibraryUseCase: locator(),
+        cacheManager: locator(),
+        getChapterUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         cacheManager: locator(),
@@ -103,9 +105,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     context.showSnackBar(message: '🚧🚧🚧 Under Construction $option 🚧🚧🚧');
   }
 
-  void _onTapDownloadChapter(BuildContext context, MangaChapter chapter) {
-    // TODO: implement this
-    context.showSnackBar(message: '🚧🚧🚧 Under Construction $chapter 🚧🚧🚧');
+  void _onTapDownloadChapter(BuildContext context, MangaChapter chapter) async {
+    _cubit(context).downloadChapter(chapterId: chapter.id);
   }
 
   void _onTapMenuChapter(BuildContext context, MangaChapter chapter) {
@@ -400,7 +401,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         author: state.displayManga?.author,
         status: state.displayManga?.status,
         description: state.displayManga?.description,
-        tags: state.displayManga?.tags?.map((e) => e.name).whereNotNull().toList(),
+        tags: state.displayManga?.tags
+            ?.map((e) => e.name)
+            .whereNotNull()
+            .toList(),
         horizontalPadding: 12,
         isOnLibrary: state.displayManga?.isOnLibrary == true,
         onTapAddToLibrary: () => _onTapAddToLibrary(context, state),

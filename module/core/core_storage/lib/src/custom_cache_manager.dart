@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -8,6 +9,8 @@ class CustomCacheManager extends CacheManager {
   CustomCacheManager._() : super(Config(_key));
 
   factory CustomCacheManager.create() => CustomCacheManager._();
+
+  final Map<String, StreamSubscription> _streams = {};
 
   @override
   Future<FileInfo?> getFileFromCache(
@@ -42,19 +45,28 @@ class CustomCacheManager extends CacheManager {
       withProgress: withProgress,
     );
 
-    final broadcast = stream.asBroadcastStream();
+    final broadcast = stream.asBroadcastStream(
+      onCancel: (subscription) => log(
+        'Cancelling $subscription',
+        name: runtimeType.toString(),
+        time: DateTime.now(),
+      ),
+    );
 
-    broadcast.listen((event) {
-      if (event is FileInfo) {
-        log(
-          // TODO: close this stream after get image
-          '[getFileStream] ${event.source} | ${event.originalUrl}',
-          name: runtimeType.toString(),
-          time: DateTime.now(),
-        );
-      }
-    });
+    _streams[url] = broadcast
+        .map((event) => event is FileInfo ? event : null)
+        .listen((event) => _onFinishDownloadFile(url, event));
 
     return broadcast;
+  }
+
+  void _onFinishDownloadFile(String key, FileInfo? fileInfo) async {
+    if (fileInfo == null) return;
+    _streams[key]?.cancel();
+    log(
+      '[_onFinishDownloadFile] ${fileInfo.source} | ${fileInfo.originalUrl}',
+      name: runtimeType.toString(),
+      time: DateTime.now(),
+    );
   }
 }
