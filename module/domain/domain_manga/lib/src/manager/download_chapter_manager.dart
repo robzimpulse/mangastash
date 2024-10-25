@@ -37,29 +37,18 @@ class DownloadChapterManager implements DownloadChapterUseCase {
       final streams = images.map(
         (e) => _cacheManager.getFileStream(e, withProgress: true),
       );
-
-      // TODO: change to concat eager stream for downloading
-      // ConcatEagerStream(streams).listen(
-      //   (value) {
-      //     if (value is DownloadProgress) {
-      //       print(value.progress ?? 0 / length.toDouble());
-      //     }
-      //   },
-      // );
-
-      final stream = CombineLatestStream(
-        streams,
-        (values) {
-          final progress = values.whereType<DownloadProgress>();
-          final finish = values.whereType<FileInfo>();
-          return progress.fold<double>(
-            finish.length / values.length,
-            (a, b) => (b.progress ?? 0.0) / values.length,
-          );
+      final length = streams.length;
+      final transformer = StreamTransformer<FileResponse, double>.fromHandlers(
+        handleData: (value, sink) {
+          if (value is DownloadProgress) {
+            final index = images.indexOf(value.originalUrl);
+            final progress = value.progress ?? 0.0;
+            sink.add((index.toDouble() + progress) / length);
+          }
         },
       );
 
-      return stream.shareValue();
+      return ConcatEagerStream(streams).transform(transformer).shareValue();
     }
 
     return null;
