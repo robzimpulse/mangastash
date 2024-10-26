@@ -67,11 +67,14 @@ class MangaChapterTileWidget extends StatelessWidget {
                 icon: const Icon(Icons.download, size: 20),
               )
             else
-              SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  value: downloadProgress,
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    value: downloadProgress,
+                  ),
                 ),
               ),
           ],

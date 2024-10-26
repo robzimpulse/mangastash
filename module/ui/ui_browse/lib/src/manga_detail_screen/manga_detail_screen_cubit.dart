@@ -100,7 +100,17 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     );
 
     if (result is Success<List<MangaChapter>>) {
-      emit(state.copyWith(chapters: result.data));
+      final chapters = result.data.map(
+        (e) => e.copyWith(
+          downloadProgress: _downloadChapterUseCase.downloadChapterProgress(
+            source: state.source?.name,
+            mangaId: state.mangaId,
+            chapterId: e.id,
+          ),
+        ),
+      );
+
+      emit(state.copyWith(chapters: chapters.toList()));
     }
 
     if (result is Error<List<MangaChapter>>) {
@@ -123,16 +133,11 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   void downloadChapter({required String? chapterId}) async {
     _updateDownloadChapterProgress(chapterId, 0.0);
 
-    final stream = await _downloadChapterUseCase.downloadChapter(
+    final stream = _downloadChapterUseCase.downloadChapterProgressStream(
       source: state.source?.name,
       mangaId: state.mangaId,
       chapterId: chapterId,
     );
-
-    if (stream == null) {
-      _updateDownloadChapterProgress(chapterId, 0.0);
-      return;
-    }
 
     addSubscription(
       stream.listen(

@@ -3,16 +3,25 @@ import 'dart:async';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../use_case/chapter/download_chapter_use_case.dart';
 import '../use_case/chapter/get_chapter_use_case.dart';
 
+typedef DownloadChapterKey = (
+  MangaSourceEnum? source,
+  String? mangaId,
+  String? chapterId
+);
+
+typedef FileResponsesStream = Iterable<Stream<FileResponse>>;
+
 class DownloadChapterManager implements DownloadChapterUseCase {
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final BaseCacheManager _cacheManager;
+
+  final Map<DownloadChapterKey?, BehaviorSubject<double>> _progress = {};
 
   DownloadChapterManager({
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
@@ -21,36 +30,74 @@ class DownloadChapterManager implements DownloadChapterUseCase {
         _cacheManager = cacheManager;
 
   @override
-  Future<ValueStream<double>?> downloadChapter({
+  ValueStream<double> downloadChapterProgressStream({
     MangaSourceEnum? source,
     String? mangaId,
     String? chapterId,
-  }) async {
-    final result = await _getChapterUseCase().execute(
-      chapterId: chapterId,
-      source: source,
-      mangaId: mangaId,
+  }) {
+    final DownloadChapterKey key = (source, mangaId, chapterId);
+
+    final progress = _progress[key] ?? BehaviorSubject.seeded(0.0);
+
+    _progress.putIfAbsent(key, () => progress);
+
+    final streams = Stream.fromFuture(
+      _getChapterUseCase().execute(
+        chapterId: chapterId,
+        source: source,
+        mangaId: mangaId,
+      ),
+    ).transform(
+      StreamTransformer<Result<MangaChapter>, FileResponsesStream>.fromHandlers(
+        handleData: (value, sink) {
+          if (value is Success<MangaChapter>) {
+            final images = value.data.images ?? [];
+            final streams = images.map(
+              (e) => _cacheManager.getFileStream(e, withProgress: true),
+            );
+            sink.add(streams.toList());
+            return;
+          }
+          sink.add(<Stream<FileResponse>>[]);
+        },
+      ),
+    ).asyncExpand(
+      (event) {
+        int counter = 0;
+        return ConcatEagerStream(event).transform(
+          StreamTransformer<FileResponse, double?>.fromHandlers(
+            handleData: (value, sink) {
+              if (value is DownloadProgress) {
+                sink.add(
+                  ((value.progress ?? 0) + counter) / event.length,
+                );
+              }
+
+              if (value is FileInfo) {
+                counter++;
+              }
+            },
+          ),
+        ).whereNotNull();
+      },
     );
 
-    if (result is Success<MangaChapter>) {
-      final images = result.data.images ?? [];
-      final streams = images.map(
-        (e) => _cacheManager.getFileStream(e, withProgress: true),
-      );
-      final length = streams.length;
-      final transformer = StreamTransformer<FileResponse, double>.fromHandlers(
-        handleData: (value, sink) {
-          if (value is DownloadProgress) {
-            final index = images.indexOf(value.originalUrl);
-            final progress = value.progress ?? 0.0;
-            sink.add((index.toDouble() + progress) / length);
-          }
-        },
-      );
+    progress.addStream(streams);
 
-      return ConcatEagerStream(streams).transform(transformer).shareValue();
-    }
+    progress.listen((value) {print(value);});
 
-    return null;
+    return progress.stream;
+  }
+
+  @override
+  double downloadChapterProgress({
+    MangaSourceEnum? source,
+    String? mangaId,
+    String? chapterId,
+  }) {
+    final DownloadChapterKey key = (source, mangaId, chapterId);
+    final progress = _progress[key] ?? BehaviorSubject.seeded(0.0);
+    _progress.putIfAbsent(key, () => progress);
+    return progress.valueOrNull ?? 0.0;
   }
 }
