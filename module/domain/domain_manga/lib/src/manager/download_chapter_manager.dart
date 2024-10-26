@@ -84,8 +84,6 @@ class DownloadChapterManager implements DownloadChapterUseCase {
 
     progress.addStream(streams);
 
-    progress.listen((value) {print(value);});
-
     return progress.stream;
   }
 
