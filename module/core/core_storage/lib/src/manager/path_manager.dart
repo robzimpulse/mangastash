@@ -34,7 +34,12 @@ class PathManager
   }) async {
     Directory? downloadDirectory;
     final path = storage.getString(_key);
-    final rootDirectory = await getApplicationDocumentsDirectory();
+
+    final documentDirectory = await getApplicationDocumentsDirectory();
+    final rootDirectory = Platform.isAndroid
+        ? await getExternalStorageDirectory() ?? documentDirectory
+        : documentDirectory;
+
     if (path != null && path.isNotEmpty) {
       final candidate = Directory.fromUri(Uri.file(path));
       downloadDirectory = await candidate.exists() ? candidate : rootDirectory;
