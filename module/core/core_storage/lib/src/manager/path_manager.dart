@@ -36,7 +36,7 @@ class PathManager
     final path = storage.getString(_key);
     final rootDirectory = await getApplicationDocumentsDirectory();
     if (path != null && path.isNotEmpty) {
-      final candidate = Directory.fromUri(Uri.directory(path));
+      final candidate = Directory.fromUri(Uri.file(path));
       downloadDirectory = await candidate.exists() ? candidate : rootDirectory;
     }
     return PathManager._(
@@ -49,7 +49,7 @@ class PathManager
   @override
   void setDownloadPath(String path) async {
     if (path.isEmpty) return;
-    final candidate = Directory.fromUri(Uri.directory(path));
+    final candidate = Directory.fromUri(Uri.file(path));
     final isExists = await candidate.exists();
     if (!isExists) return;
     _storage.setString(_key, candidate.path);
