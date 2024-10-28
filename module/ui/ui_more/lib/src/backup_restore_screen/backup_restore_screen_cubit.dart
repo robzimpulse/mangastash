@@ -7,5 +7,5 @@ class BackupRestoreScreenCubit extends Cubit<BackupRestoreScreenState> {
   BackupRestoreScreenCubit({
     BackupRestoreScreenState initialState = const BackupRestoreScreenState(),
     required GetRootPathUseCase getRootPathUseCase,
-  }) : super(initialState.copyWith(path: getRootPathUseCase.rootPath));
+  }) : super(initialState.copyWith(root: getRootPathUseCase.rootPath));
 }

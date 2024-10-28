@@ -16,5 +16,5 @@ class RootPathManager implements GetRootPathUseCase {
   }
 
   @override
-  String get rootPath => _rootDirectory.path;
+  Directory get rootPath => _rootDirectory;
 }

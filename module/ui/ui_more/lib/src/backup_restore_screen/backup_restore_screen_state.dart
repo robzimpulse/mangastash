@@ -1,16 +1,18 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 
 class BackupRestoreScreenState extends Equatable {
 
-  final String? path;
+  final Directory? root;
 
-  const BackupRestoreScreenState({this.path});
+  const BackupRestoreScreenState({this.root});
 
   @override
-  List<Object?> get props => [path];
+  List<Object?> get props => [root];
 
-  BackupRestoreScreenState copyWith ({String? path}) {
-    return BackupRestoreScreenState(path: path ?? this.path);
+  BackupRestoreScreenState copyWith ({Directory? root}) {
+    return BackupRestoreScreenState(root: root ?? this.root);
   }
 
 }

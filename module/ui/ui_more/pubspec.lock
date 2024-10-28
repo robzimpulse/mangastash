@@ -265,7 +265,7 @@ packages:
     source: hosted
     version: "6.1.4"
   filesystem_picker:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: filesystem_picker
       sha256: cc2bfe7e5a4ce21afd5b1b03824c0e6e5386a981ed6cce7bda062b1af805cf62

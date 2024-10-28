@@ -1,3 +1,5 @@
+import 'dart:io';
+
 abstract class GetRootPathUseCase {
-  String get rootPath;
+  Directory get rootPath;
 }

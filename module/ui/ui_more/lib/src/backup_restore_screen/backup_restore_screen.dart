@@ -1,3 +1,4 @@
+import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -43,7 +44,24 @@ class BackupRestoreScreen extends StatelessWidget {
             builder: (context, state) => SliverToBoxAdapter(
               child: ListTile(
                 title: const Text('Backup Location'),
-                subtitle: Text(state.path ?? 'Unsupported Platform'),
+                subtitle: Text(state.root?.path ?? 'Unsupported Platform'),
+                onTap: () async {
+
+                  final path = await FilesystemPicker.open(
+                    title: 'Save to folder',
+                    context: context,
+                    rootDirectory: state.root,
+                    fsType: FilesystemType.folder,
+                    pickText: 'Save file to this folder',
+                    contextActions: [
+                      FilesystemPickerNewFolderContextAction(),
+                    ],
+                  );
+
+                  if (!context.mounted) return;
+
+                  context.showSnackBar(message: path ?? 'Unsupported Platform');
+                },
               ),
             ),
           ),
