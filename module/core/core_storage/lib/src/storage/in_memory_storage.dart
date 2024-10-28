@@ -4,7 +4,7 @@ class InMemoryStorage extends Storage {
 
   final Map<String, Object> _impl;
 
-  InMemoryStorage(this._impl);
+  InMemoryStorage({Map<String, Object> impl = const {}}) : _impl = impl;
 
   @override
   Future<bool> clear() async {

@@ -15,7 +15,7 @@ class DateManager implements ListenCurrentTimezoneUseCase {
     _update(Timer.periodic(const Duration(minutes: 5), _update));
   }
 
-  static Future<DateManager> init() async {
+  static Future<DateManager> create() async {
     await initializeTimeZone();
     return DateManager();
   }

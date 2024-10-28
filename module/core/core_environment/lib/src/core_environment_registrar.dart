@@ -24,7 +24,7 @@ class CoreEnvironmentRegistrar extends Registrar {
     locator.alias<UpdateLocaleUseCase, LocaleManager>();
     locator.alias<ListenLocaleUseCase, LocaleManager>();
 
-    locator.registerSingleton(await DateManager.init());
+    locator.registerSingleton(await DateManager.create());
     locator.alias<ListenCurrentTimezoneUseCase, DateManager>();
 
     locator.registerSingleton(BackgroundWorker());

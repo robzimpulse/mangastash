@@ -5,7 +5,12 @@ import 'storage.dart';
 class SharedPreferencesStorage extends Storage {
   final SharedPreferences _impl;
 
-  SharedPreferencesStorage(this._impl);
+  SharedPreferencesStorage._({required SharedPreferences impl}) : _impl = impl;
+
+  static Future<SharedPreferencesStorage> create() async {
+    final local = await SharedPreferences.getInstance();
+    return SharedPreferencesStorage._(impl: local);
+  }
 
   @override
   Set<String> getKeys() => _impl.getKeys();
