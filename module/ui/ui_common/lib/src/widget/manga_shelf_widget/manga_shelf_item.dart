@@ -79,6 +79,7 @@ class MangaShelfItem extends StatelessWidget {
   }
 
   Widget _compactGrid(BuildContext context) {
+    final style = Theme.of(context).textTheme.labelSmall;
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
@@ -91,9 +92,6 @@ class MangaShelfItem extends StatelessWidget {
               cacheManager: cacheManager,
               fit: BoxFit.fill,
               imageUrl: coverUrl,
-              placeholder: (context, url) => const Center(
-                child: CircularProgressIndicator(),
-              ),
               errorWidget: (context, url, error) => const Center(
                 child: Icon(Icons.error),
               ),
@@ -131,9 +129,7 @@ class MangaShelfItem extends StatelessWidget {
               ),
               child: Text(
                 'In Library',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Colors.black,
-                    ),
+                style: style?.copyWith(color: Colors.black),
               ),
             ),
           ),
@@ -143,6 +139,7 @@ class MangaShelfItem extends StatelessWidget {
   }
 
   Widget _comfortableGrid(BuildContext context) {
+    final style = Theme.of(context).textTheme.labelSmall;
     return Column(
       children: [
         Expanded(
@@ -176,9 +173,7 @@ class MangaShelfItem extends StatelessWidget {
                     ),
                     child: Text(
                       'In Library',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Colors.black,
-                          ),
+                      style: style?.copyWith(color: Colors.black),
                     ),
                   ),
                 ),
