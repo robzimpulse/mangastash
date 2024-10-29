@@ -15,7 +15,7 @@ typedef DownloadChapterKey = (
   String? chapterId
 );
 
-typedef FileResponsesStream = Iterable<Stream<FileResponse>>;
+typedef _FileStream = Iterable<Stream<FileResponse>>;
 
 class DownloadChapterManager implements DownloadChapterUseCase {
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
@@ -51,8 +51,7 @@ class DownloadChapterManager implements DownloadChapterUseCase {
           mangaId: mangaId,
         ),
       ).transform(
-        StreamTransformer<Result<MangaChapter>,
-            FileResponsesStream>.fromHandlers(
+        StreamTransformer<Result<MangaChapter>, _FileStream>.fromHandlers(
           handleData: (value, sink) {
             if (value is Success<MangaChapter>) {
               final images = value.data.images ?? [];
