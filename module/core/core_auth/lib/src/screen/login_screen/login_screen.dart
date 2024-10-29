@@ -185,9 +185,11 @@ class LoginScreen extends StatelessWidget {
               ),
               body: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: _content(context, state.isLoading),
+                child: CustomScrollView(
+                  slivers: [
+                    for (final child in _content(context, state.isLoading))
+                      SliverToBoxAdapter(child: child),
+                  ],
                 ),
               ),
             ),
