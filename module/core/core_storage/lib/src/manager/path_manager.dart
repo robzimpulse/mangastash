@@ -32,21 +32,22 @@ class PathManager
   static Future<PathManager> create({
     required SharedPreferencesStorage storage,
   }) async {
-    Directory? downloadDirectory;
+    final root = Directory.fromUri(Uri.file('/storage/emulated/0'));
+    final rootDirectory = (await root.exists() && Platform.isAndroid)
+        ? root
+        : await getApplicationDocumentsDirectory();
+
     final path = storage.getString(_key);
+    final candidate = path != null ? Directory.fromUri(Uri.file(path)) : null;
+    final downloadDirectory = candidate != null
+        ? await candidate.exists()
+            ? candidate
+            : rootDirectory
+        : rootDirectory;
 
-    final documentDirectory = await getApplicationDocumentsDirectory();
-    final rootDirectory = Platform.isAndroid
-        ? await getDownloadsDirectory() ?? documentDirectory
-        : documentDirectory;
-
-    if (path != null && path.isNotEmpty) {
-      final candidate = Directory.fromUri(Uri.file(path));
-      downloadDirectory = await candidate.exists() ? candidate : rootDirectory;
-    }
     return PathManager._(
       rootDirectory: rootDirectory,
-      downloadDirectory: downloadDirectory ?? rootDirectory,
+      downloadDirectory: downloadDirectory,
       storage: storage,
     );
   }
