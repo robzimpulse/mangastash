@@ -152,9 +152,6 @@ class MangaShelfItem extends StatelessWidget {
                 cacheManager: cacheManager,
                 fit: BoxFit.fill,
                 imageUrl: coverUrl,
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(),
-                ),
                 errorWidget: (context, url, error) => const Center(
                   child: Icon(Icons.error),
                 ),
