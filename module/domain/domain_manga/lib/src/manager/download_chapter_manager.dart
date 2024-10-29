@@ -41,31 +41,33 @@ class DownloadChapterManager implements DownloadChapterUseCase {
 
     _progress.putIfAbsent(key, () => progress);
 
-    final streams = Stream.fromFuture(
-      _getChapterUseCase().execute(
-        chapterId: chapterId,
-        source: source,
-        mangaId: mangaId,
-      ),
-    ).transform(
-      StreamTransformer<Result<MangaChapter>, FileResponsesStream>.fromHandlers(
-        handleData: (value, sink) {
-          if (value is Success<MangaChapter>) {
-            final images = value.data.images ?? [];
-            final streams = images.map(
-              (e) => _cacheManager.getFileStream(e, withProgress: true),
-            );
-            sink.add(streams.toList());
-            return;
-          }
-          sink.add(<Stream<FileResponse>>[]);
-        },
-      ),
-    ).asyncExpand(
-      (event) {
-        int counter = 0;
-        return ConcatEagerStream(event).transform(
-          StreamTransformer<FileResponse, double?>.fromHandlers(
+    int counter = 0;
+
+    progress.addStream(
+      Stream.fromFuture(
+        _getChapterUseCase().execute(
+          chapterId: chapterId,
+          source: source,
+          mangaId: mangaId,
+        ),
+      ).transform(
+        StreamTransformer<Result<MangaChapter>,
+            FileResponsesStream>.fromHandlers(
+          handleData: (value, sink) {
+            if (value is Success<MangaChapter>) {
+              final images = value.data.images ?? [];
+              final streams = images.map(
+                (e) => _cacheManager.getFileStream(e, withProgress: true),
+              );
+              sink.add(streams.toList());
+              return;
+            }
+            sink.add(<Stream<FileResponse>>[]);
+          },
+        ),
+      ).asyncExpand(
+        (event) => ConcatEagerStream(event).transform(
+          StreamTransformer<FileResponse, double>.fromHandlers(
             handleData: (value, sink) {
               if (value is DownloadProgress) {
                 sink.add(
@@ -78,11 +80,9 @@ class DownloadChapterManager implements DownloadChapterUseCase {
               }
             },
           ),
-        ).whereNotNull();
-      },
+        ),
+      ),
     );
-
-    progress.addStream(streams);
 
     return progress.stream;
   }
