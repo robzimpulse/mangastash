@@ -28,7 +28,6 @@ class CoreStorageRegistrar extends Registrar {
     locator.alias<ListenDownloadPathUseCase, PathManager>();
     locator.alias<SetDownloadPathUseCase, PathManager>();
 
-
     log('finish register', name: runtimeType.toString());
   }
 }
