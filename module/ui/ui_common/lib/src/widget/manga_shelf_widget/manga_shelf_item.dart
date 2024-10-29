@@ -128,7 +128,9 @@ class MangaShelfItem extends StatelessWidget {
               ),
               child: Text(
                 'In Library',
-                style: Theme.of(context).textTheme.labelSmall,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Colors.black,
+                ),
               ),
             ),
           ),
@@ -171,7 +173,9 @@ class MangaShelfItem extends StatelessWidget {
                     ),
                     child: Text(
                       'In Library',
-                      style: Theme.of(context).textTheme.labelSmall,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: Colors.black,
+                      ),
                     ),
                   ),
                 ),
