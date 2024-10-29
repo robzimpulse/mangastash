@@ -55,13 +55,13 @@ class MangaShelfItem extends StatelessWidget {
           width: 50,
           height: 50,
           errorWidget: (context, url, error) => const Icon(Icons.error),
-          progressIndicatorBuilder: (context, url, downloadProgress) {
+          progressIndicatorBuilder: (context, url, progress) {
             return Center(
               child: SizedBox(
                 width: 16,
                 height: 16,
                 child: CircularProgressIndicator(
-                  value: downloadProgress.progress,
+                  value: progress.progress,
                 ),
               ),
             );
@@ -97,6 +97,9 @@ class MangaShelfItem extends StatelessWidget {
               errorWidget: (context, url, error) => const Center(
                 child: Icon(Icons.error),
               ),
+              progressIndicatorBuilder: (context, url, progress) => Center(
+                child: CircularProgressIndicator(value: progress.progress),
+              ),
             ),
           ),
         ),
@@ -129,8 +132,8 @@ class MangaShelfItem extends StatelessWidget {
               child: Text(
                 'In Library',
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: Colors.black,
-                ),
+                      color: Colors.black,
+                    ),
               ),
             ),
           ),
@@ -155,6 +158,9 @@ class MangaShelfItem extends StatelessWidget {
                 errorWidget: (context, url, error) => const Center(
                   child: Icon(Icons.error),
                 ),
+                progressIndicatorBuilder: (context, url, progress) => Center(
+                  child: CircularProgressIndicator(value: progress.progress),
+                ),
               ),
               if (isOnLibrary) ...[
                 Positioned.fill(
@@ -174,8 +180,8 @@ class MangaShelfItem extends StatelessWidget {
                     child: Text(
                       'In Library',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: Colors.black,
-                      ),
+                            color: Colors.black,
+                          ),
                     ),
                   ),
                 ),
