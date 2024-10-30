@@ -44,7 +44,7 @@ class DownloadQueueScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('${data.key}'),
-                  Text('${data.value.$1} / total'),
+                  Text('${data.value.$1} files downloaded'),
                   LinearProgressIndicator(
                     value: data.value.$2,
                   ),

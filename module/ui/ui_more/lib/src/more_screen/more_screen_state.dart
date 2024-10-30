@@ -5,16 +5,20 @@ class MoreScreenState extends Equatable {
 
   final AuthState? authState;
 
-  const MoreScreenState({this.authState});
+  final int? totalActiveDownload;
+
+  const MoreScreenState({this.authState, this.totalActiveDownload});
 
   @override
-  List<Object?> get props => [authState];
+  List<Object?> get props => [authState, totalActiveDownload];
 
   MoreScreenState copyWith({
     AuthState? authState,
+    int? totalActiveDownload,
   }) {
     return MoreScreenState(
       authState: authState ?? this.authState,
+      totalActiveDownload: totalActiveDownload ?? this.totalActiveDownload,
     );
   }
 

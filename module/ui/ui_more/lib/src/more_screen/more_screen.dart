@@ -40,6 +40,7 @@ class MoreScreen extends StatelessWidget {
       create: (context) => MoreScreenCubit(
         listenAuthUseCase: locator(),
         logoutUseCase: locator(),
+        listenActiveDownloadUseCase: locator(),
       ),
       child: MoreScreen(
         onTapSetting: onTapSetting,
@@ -110,13 +111,18 @@ class MoreScreen extends StatelessWidget {
                   ),
                 ),
                 const Divider(height: 1, thickness: 1),
-                ListTile(
-                  title: const Text('Download Queue'),
-                  subtitle: const Text('22 remaining'),
-                  onTap: onTapDownloadQueue,
-                  leading: const SizedBox(
-                    height: double.infinity,
-                    child: Icon(Icons.download),
+                _builder(
+                  buildWhen: (prev, curr) {
+                    return prev.totalActiveDownload != curr.totalActiveDownload;
+                  },
+                  builder: (context, state) => ListTile(
+                    title: const Text('Download Queue'),
+                    subtitle: Text('${state.totalActiveDownload} remaining'),
+                    onTap: onTapDownloadQueue,
+                    leading: const SizedBox(
+                      height: double.infinity,
+                      child: Icon(Icons.download),
+                    ),
                   ),
                 ),
                 ListTile(
@@ -161,6 +167,9 @@ class MoreScreen extends StatelessWidget {
                   ),
                 ),
                 _builder(
+                  buildWhen: (prev, curr) {
+                    return prev.authState != curr.authState;
+                  },
                   builder: (context, state) => Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
