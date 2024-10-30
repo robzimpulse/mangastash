@@ -9,6 +9,8 @@ class MangaChapter extends Equatable {
 
   final String? mangaId;
 
+  final String? mangaTitle;
+
   final String? title;
 
   final String? volume;
@@ -35,6 +37,7 @@ class MangaChapter extends Equatable {
   MangaChapter({
     this.id,
     this.mangaId,
+    this.mangaTitle,
     this.title,
     this.volume,
     this.chapter,
@@ -50,6 +53,7 @@ class MangaChapter extends Equatable {
   List<Object?> get props => [
         id,
         mangaId,
+        mangaTitle,
         title,
         volume,
         chapter,
@@ -70,6 +74,7 @@ class MangaChapter extends Equatable {
   MangaChapter copyWith({
     String? id,
     String? mangaId,
+    String? mangaTitle,
     String? title,
     String? volume,
     String? chapter,
@@ -83,6 +88,7 @@ class MangaChapter extends Equatable {
     return MangaChapter(
       id: id ?? this.id,
       mangaId: mangaId ?? this.mangaId,
+      mangaTitle: mangaTitle ?? this.mangaTitle,
       title: title ?? this.title,
       volume: volume ?? this.volume,
       chapter: chapter ?? this.chapter,

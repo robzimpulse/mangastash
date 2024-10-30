@@ -141,7 +141,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     addSubscription(
       stream.listen(
-        (event) => _updateDownloadChapterProgress(chapterId, event),
+        (event) => _updateDownloadChapterProgress(chapterId, event.$2),
       ),
     );
   }

@@ -21,7 +21,7 @@ class DownloadChapterManager implements DownloadChapterUseCase {
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final BaseCacheManager _cacheManager;
 
-  final Map<DownloadChapterKey?, BehaviorSubject<double>> _progress = {};
+  final Map<DownloadChapterKey?, BehaviorSubject<(int, double)>> _progress = {};
 
   DownloadChapterManager({
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
@@ -30,18 +30,26 @@ class DownloadChapterManager implements DownloadChapterUseCase {
         _cacheManager = cacheManager;
 
   @override
-  ValueStream<double> downloadChapterProgressStream({
+  ValueStream<(int, double)> downloadChapterProgressStream({
     MangaSourceEnum? source,
     String? mangaId,
     String? chapterId,
   }) {
     final DownloadChapterKey key = (source, mangaId, chapterId);
-
-    final progress = _progress[key] ?? BehaviorSubject.seeded(0.0);
-
+    final progress = _progress[key] ?? BehaviorSubject.seeded((0, 0.0));
     _progress.putIfAbsent(key, () => progress);
+    return progress.stream;
+  }
 
-    int counter = 0;
+  @override
+  void downloadChapter({
+    MangaSourceEnum? source,
+    String? mangaId,
+    String? chapterId,
+  }) {
+    final DownloadChapterKey key = (source, mangaId, chapterId);
+    final progress = _progress[key] ?? BehaviorSubject.seeded((0, 0.0));
+    _progress.putIfAbsent(key, () => progress);
 
     progress.addStream(
       Stream.fromFuture(
@@ -65,25 +73,26 @@ class DownloadChapterManager implements DownloadChapterUseCase {
           },
         ),
       ).asyncExpand(
-        (event) => ConcatEagerStream(event).transform(
-          StreamTransformer<FileResponse, double>.fromHandlers(
-            handleData: (value, sink) {
-              if (value is DownloadProgress) {
-                sink.add(
-                  ((value.progress ?? 0) + counter) / event.length,
-                );
-              }
+        (event) {
+          int counter = 0;
+          return ConcatEagerStream(event).transform(
+            StreamTransformer<FileResponse, (int, double)>.fromHandlers(
+              handleData: (value, sink) {
+                if (value is DownloadProgress) {
+                  sink.add(
+                    (counter, ((value.progress ?? 0) + counter) / event.length),
+                  );
+                }
 
-              if (value is FileInfo) {
-                counter++;
-              }
-            },
-          ),
-        ),
+                if (value is FileInfo) {
+                  counter++;
+                }
+              },
+            ),
+          );
+        },
       ),
     );
-
-    return progress.stream;
   }
 
   @override
@@ -93,8 +102,8 @@ class DownloadChapterManager implements DownloadChapterUseCase {
     String? chapterId,
   }) {
     final DownloadChapterKey key = (source, mangaId, chapterId);
-    final progress = _progress[key] ?? BehaviorSubject.seeded(0.0);
+    final progress = _progress[key] ?? BehaviorSubject.seeded((0, 0.0));
     _progress.putIfAbsent(key, () => progress);
-    return progress.valueOrNull ?? 0.0;
+    return progress.valueOrNull?.$2 ?? 0.0;
   }
 }
