@@ -15,15 +15,12 @@ class DownloadQueueScreen extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (context) => DownloadQueueScreenCubit(
-        downloadChapterUseCase: locator(),
         downloadChapterProgressStreamUseCase: locator(),
-        downloadChapterProgressUseCase: locator(),
+        listenActiveDownloadUseCase: locator(),
       ),
       child: const DownloadQueueScreen(),
     );
   }
-
-  DownloadQueueScreenCubit _cubit(BuildContext context) => context.read();
 
   Widget _builder({
     required BlocWidgetBuilder<DownloadQueueScreenState> builder,
@@ -41,9 +38,18 @@ class DownloadQueueScreen extends StatelessWidget {
       children: [
         for (final data in progress)
           SliverToBoxAdapter(
-            child: ListTile(
-              title: Text('${data.key}'),
-              subtitle: Text('${data.value}'),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('${data.key}'),
+                  Text('${data.value.$1} / total'),
+                  LinearProgressIndicator(
+                    value: data.value.$2,
+                  ),
+                ],
+              ),
             ),
           ),
       ],

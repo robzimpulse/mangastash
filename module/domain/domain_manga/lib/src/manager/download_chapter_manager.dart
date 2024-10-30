@@ -1,26 +1,33 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 import '../typedef/download_chapter_keys_typedef.dart';
 import '../use_case/chapter/download_chapter_progress_stream_use_case.dart';
 import '../use_case/chapter/download_chapter_progress_use_case.dart';
 import '../use_case/chapter/download_chapter_use_case.dart';
 import '../use_case/chapter/get_chapter_use_case.dart';
+import '../use_case/chapter/listen_active_download_use_case.dart';
 
 typedef _FileStream = Iterable<Stream<FileResponse>>;
 
 class DownloadChapterManager
     implements
+        ListenActiveDownloadUseCase,
         DownloadChapterUseCase,
         DownloadChapterProgressStreamUseCase,
         DownloadChapterProgressUseCase {
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final BaseCacheManager _cacheManager;
+
+  final BehaviorSubject<Set<DownloadChapterKey>> _active =
+      BehaviorSubject.seeded({});
 
   final Map<DownloadChapterKey, BehaviorSubject<(int, double)>> _progress = {};
 
@@ -29,10 +36,6 @@ class DownloadChapterManager
     required BaseCacheManager cacheManager,
   })  : _getChapterUseCase = getChapterUseCase,
         _cacheManager = cacheManager;
-
-  @override
-  Map<DownloadChapterKey, BehaviorSubject<(int, double)>> get progress =>
-      _progress;
 
   @override
   ValueStream<(int, double)> downloadChapterProgressStream({
@@ -55,6 +58,14 @@ class DownloadChapterManager
     final DownloadChapterKey key = (source, mangaId, chapterId);
     final progress = _progress[key] ?? BehaviorSubject.seeded((0, 0.0));
     _progress.putIfAbsent(key, () => progress);
+
+    _active.add((_active.valueOrNull ?? {})..add(key));
+
+    log(
+      'Adding $key to active download',
+      name: runtimeType.toString(),
+      time: DateTime.now(),
+    );
 
     final stream = Stream.fromFuture(
       _getChapterUseCase().execute(
@@ -93,11 +104,26 @@ class DownloadChapterManager
               }
             },
           ),
-        );
+        ).doOnDone(() {
+          _active.add((_active.valueOrNull ?? {})..remove(key));
+          log(
+            'Removing $key from active download',
+            name: runtimeType.toString(),
+            time: DateTime.now(),
+          );
+        });
       },
     );
 
-    progress.addStream(stream);
+    progress.listen(
+      (value) => log(
+        'progress: $value',
+        name: runtimeType.toString(),
+        time: DateTime.now(),
+      ),
+    );
+
+    progress.addStream(stream.throttleTime(const Duration(seconds: 1)));
   }
 
   @override
@@ -111,4 +137,8 @@ class DownloadChapterManager
     _progress.putIfAbsent(key, () => progress);
     return progress.valueOrNull?.$2 ?? 0.0;
   }
+
+  @override
+  ValueStream<Set<DownloadChapterKey>> get activeDownloadStream =>
+      _active.stream;
 }

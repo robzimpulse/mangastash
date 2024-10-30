@@ -12,6 +12,7 @@ import 'use_case/chapter/download_chapter_progress_use_case.dart';
 import 'use_case/chapter/download_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
+import 'use_case/chapter/listen_active_download_use_case.dart';
 import 'use_case/chapter/search_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
 import 'use_case/library/add_to_library_use_case.dart';
@@ -141,6 +142,7 @@ class DomainMangaRegistrar extends Registrar {
     locator
         .alias<DownloadChapterProgressStreamUseCase, DownloadChapterManager>();
     locator.alias<DownloadChapterProgressUseCase, DownloadChapterManager>();
+    locator.alias<ListenActiveDownloadUseCase, DownloadChapterManager>();
 
     log('finish register', name: runtimeType.toString(), time: DateTime.now());
   }

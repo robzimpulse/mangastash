@@ -8,6 +8,7 @@ export 'src/use_case/chapter/download_chapter_progress_stream_use_case.dart';
 export 'src/use_case/chapter/download_chapter_progress_use_case.dart';
 export 'src/use_case/chapter/download_chapter_use_case.dart';
 export 'src/use_case/chapter/get_chapter_use_case.dart';
+export 'src/use_case/chapter/listen_active_download_use_case.dart';
 export 'src/use_case/chapter/search_chapter_use_case.dart';
 export 'src/use_case/library/add_to_library_use_case.dart';
 export 'src/use_case/library/get_manga_from_library_use_case.dart';

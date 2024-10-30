@@ -141,7 +141,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   }
 
   void downloadChapter({required String? chapterId}) async {
-    _updateDownloadChapterProgress(chapterId, 0.0);
+    _updateDownloadChapterProgress(chapterId, 0.005);
 
     _downloadChapterUseCase.downloadChapter(
       source: state.source?.name,

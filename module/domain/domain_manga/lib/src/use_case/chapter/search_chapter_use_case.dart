@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -24,8 +22,6 @@ class SearchChapterUseCase {
 
     final Result<List<MangaChapter>> result;
     final locale = _listenLocaleUseCase.localeDataStream.valueOrNull;
-
-    log('locale: $locale', name: 'SearchChapterUseCase');
 
     switch (source) {
       case MangaSourceEnum.mangadex:
