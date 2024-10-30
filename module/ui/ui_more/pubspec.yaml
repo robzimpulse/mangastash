@@ -13,6 +13,7 @@ dependencies:
   equatable: ^2.0.5
   collection: ^1.16.0
   filesystem_picker: ^4.1.0
+  rxdart: ^0.27.7
 
   # library
   service_locator:

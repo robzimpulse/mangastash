@@ -13,6 +13,9 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
   final AddToLibraryUseCase _addToLibraryUseCase;
   final DownloadChapterUseCase _downloadChapterUseCase;
+  final DownloadChapterProgressUseCase _downloadChapterProgressUseCase;
+  final DownloadChapterProgressStreamUseCase
+      _downloadChapterProgressStreamUseCase;
 
   MangaDetailScreenCubit({
     required MangaDetailScreenState initialState,
@@ -24,11 +27,17 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required ListenAuthUseCase listenAuth,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
     required DownloadChapterUseCase downloadChapterUseCase,
+    required DownloadChapterProgressUseCase downloadChapterProgressUseCase,
+    required DownloadChapterProgressStreamUseCase
+        downloadChapterProgressStreamUseCase,
   })  : _getMangaUseCase = getMangaUseCase,
         _getListChapterUseCase = getListChapterUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         _downloadChapterUseCase = downloadChapterUseCase,
+        _downloadChapterProgressUseCase = downloadChapterProgressUseCase,
+        _downloadChapterProgressStreamUseCase =
+            downloadChapterProgressStreamUseCase,
         super(
           initialState.copyWith(
             source: getMangaSourceUseCase.get(initialState.sourceId),
@@ -102,7 +111,8 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     if (result is Success<List<MangaChapter>>) {
       final chapters = result.data.map(
         (e) => e.copyWith(
-          downloadProgress: _downloadChapterUseCase.downloadChapterProgress(
+          downloadProgress:
+              _downloadChapterProgressUseCase.downloadChapterProgress(
             source: state.source?.name,
             mangaId: state.mangaId,
             chapterId: e.id,
@@ -133,7 +143,14 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   void downloadChapter({required String? chapterId}) async {
     _updateDownloadChapterProgress(chapterId, 0.0);
 
-    final stream = _downloadChapterUseCase.downloadChapterProgressStream(
+    _downloadChapterUseCase.downloadChapter(
+      source: state.source?.name,
+      mangaId: state.mangaId,
+      chapterId: chapterId,
+    );
+
+    final stream =
+        _downloadChapterProgressStreamUseCase.downloadChapterProgressStream(
       source: state.source?.name,
       mangaId: state.mangaId,
       chapterId: chapterId,
