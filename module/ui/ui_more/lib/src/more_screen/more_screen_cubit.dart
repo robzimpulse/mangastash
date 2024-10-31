@@ -1,5 +1,6 @@
 import 'package:core_auth/core_auth.dart';
 import 'package:domain_manga/domain_manga.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import 'more_screen_state.dart';
@@ -26,7 +27,7 @@ class MoreScreenCubit extends Cubit<MoreScreenState>
     emit(state.copyWith(authState: authState));
   }
 
-  void _updateTotalActiveDownload(Set<DownloadChapterKey> values) {
+  void _updateTotalActiveDownload(Set<DownloadChapter> values) {
     emit(state.copyWith(totalActiveDownload: values.length));
   }
 

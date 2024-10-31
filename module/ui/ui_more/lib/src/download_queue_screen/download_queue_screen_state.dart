@@ -1,8 +1,8 @@
-import 'package:domain_manga/domain_manga.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 
 class DownloadQueueScreenState extends Equatable {
-  final Map<DownloadChapterKey, (int, double)>? progress;
+  final Map<DownloadChapter, (int, double)>? progress;
 
   const DownloadQueueScreenState({this.progress});
 
@@ -10,7 +10,7 @@ class DownloadQueueScreenState extends Equatable {
   List<Object?> get props => [progress];
 
   DownloadQueueScreenState copyWith({
-    Map<DownloadChapterKey, (int, double)>? progress,
+    Map<DownloadChapter, (int, double)>? progress,
   }) {
     return DownloadQueueScreenState(
       progress: progress ?? this.progress,

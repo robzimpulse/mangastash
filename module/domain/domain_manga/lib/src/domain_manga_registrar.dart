@@ -7,7 +7,6 @@ import 'package:service_locator/service_locator.dart';
 import 'manager/download_chapter_manager.dart';
 import 'manager/library_manager.dart';
 import 'manager/manga_source_manager.dart';
-import 'use_case/chapter/download_chapter_progress_stream_use_case.dart';
 import 'use_case/chapter/download_chapter_progress_use_case.dart';
 import 'use_case/chapter/download_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
@@ -139,8 +138,6 @@ class DomainMangaRegistrar extends Registrar {
       ),
     );
     locator.alias<DownloadChapterUseCase, DownloadChapterManager>();
-    locator
-        .alias<DownloadChapterProgressStreamUseCase, DownloadChapterManager>();
     locator.alias<DownloadChapterProgressUseCase, DownloadChapterManager>();
     locator.alias<ListenActiveDownloadUseCase, DownloadChapterManager>();
 

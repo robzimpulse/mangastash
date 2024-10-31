@@ -15,7 +15,7 @@ class DownloadQueueScreen extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (context) => DownloadQueueScreenCubit(
-        downloadChapterProgressStreamUseCase: locator(),
+        downloadChapterProgressUseCase: locator(),
         listenActiveDownloadUseCase: locator(),
       ),
       child: const DownloadQueueScreen(),
@@ -43,12 +43,13 @@ class DownloadQueueScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${data.key}'),
+                  Text('${data.key.manga?.title}'),
+                  Text('Chapter ${data.key.chapter?.chapter}'),
                   Text('${data.value.$1} files downloaded'),
                   LinearProgressIndicator(
                     value: data.value.$2,
                   ),
-                ],
+                ].intersperse(const SizedBox(height: 4)).toList(),
               ),
             ),
           ),

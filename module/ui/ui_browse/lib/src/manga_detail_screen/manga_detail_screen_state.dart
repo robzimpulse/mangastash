@@ -29,6 +29,7 @@ class MangaDetailScreenState extends Equatable {
   final MangaChapterConfig? config;
   final AuthState? authState;
   final List<Manga> libraries;
+  final Map<String?, double>? downloadProgress;
 
   late final Map<num?, Map<num?, List<MangaChapter>>>? processedChapters;
   late final int? totalChapter;
@@ -46,6 +47,7 @@ class MangaDetailScreenState extends Equatable {
     this.config,
     this.authState,
     this.libraries = const [],
+    this.downloadProgress,
   }) {
     isOnLibrary = libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
 
@@ -142,6 +144,7 @@ class MangaDetailScreenState extends Equatable {
         config,
         authState,
         libraries,
+        downloadProgress,
       ];
 
   MangaDetailScreenState copyWith({
@@ -157,20 +160,21 @@ class MangaDetailScreenState extends Equatable {
     MangaChapterConfig? config,
     AuthState? authState,
     List<Manga>? libraries,
+    Map<String?, double>? downloadProgress,
   }) {
     return MangaDetailScreenState(
-      config: config ?? this.config,
-      isLoadingChapters: isLoadingChapters ?? this.isLoadingChapters,
-      isLoadingManga: isLoadingManga ?? this.isLoadingManga,
-      errorChapters:
-          errorChapters != null ? errorChapters() : this.errorChapters,
-      errorManga: errorManga != null ? errorManga() : this.errorManga,
-      mangaId: mangaId ?? this.mangaId,
-      manga: manga ?? this.manga,
-      chapters: chapters ?? this.chapters,
-      source: source ?? this.source,
-      authState: authState ?? this.authState,
-      libraries: libraries ?? this.libraries,
-    );
+        config: config ?? this.config,
+        isLoadingChapters: isLoadingChapters ?? this.isLoadingChapters,
+        isLoadingManga: isLoadingManga ?? this.isLoadingManga,
+        errorChapters:
+            errorChapters != null ? errorChapters() : this.errorChapters,
+        errorManga: errorManga != null ? errorManga() : this.errorManga,
+        mangaId: mangaId ?? this.mangaId,
+        manga: manga ?? this.manga,
+        chapters: chapters ?? this.chapters,
+        source: source ?? this.source,
+        authState: authState ?? this.authState,
+        libraries: libraries ?? this.libraries,
+        downloadProgress: downloadProgress ?? this.downloadProgress);
   }
 }

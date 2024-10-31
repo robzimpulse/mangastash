@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
@@ -51,7 +50,6 @@ class MangaDetailScreen extends StatefulWidget {
         listenMangaFromLibraryUseCase: locator(),
         downloadChapterUseCase: locator(),
         downloadChapterProgressUseCase: locator(),
-        downloadChapterProgressStreamUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         cacheManager: locator(),
@@ -107,7 +105,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   void _onTapDownloadChapter(BuildContext context, MangaChapter chapter) async {
-    _cubit(context).downloadChapter(chapterId: chapter.id);
+    _cubit(context).downloadChapter(chapter: chapter);
   }
 
   void _onTapMenuChapter(BuildContext context, MangaChapter chapter) {
@@ -280,12 +278,18 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           ),
         ),
       ),
-      ..._group(context: context, volumes: chapters, config: state.config),
+      ..._group(
+        context: context,
+        volumes: chapters,
+        progress: state.downloadProgress,
+        config: state.config,
+      ),
     ];
   }
 
   List<Widget> _group({
     required BuildContext context,
+    required Map<String?, double>? progress,
     required Map<num?, Map<num?, List<MangaChapter>>> volumes,
     required MangaChapterConfig? config,
   }) {
@@ -347,7 +351,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                                 ),
                                 uploadedAt: value.publishAt?.asDateTime,
                                 groups: value.scanlationGroup,
-                                downloadProgress: value.downloadProgress,
+                                downloadProgress: progress?[value.id] ?? 0.0,
                               );
                       },
                     ),
@@ -420,9 +424,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           ),
         ),
         _builder(
-          buildWhen: (prev, curr) {
-            return prev.isLoadingChapters != curr.isLoadingChapters;
-          },
+          buildWhen: (prev, curr) => [
+            prev.isLoadingChapters != curr.isLoadingChapters,
+            prev.downloadProgress != curr.downloadProgress,
+          ].any((e) => e),
           builder: (context, state) => MultiSliver(
             children: _chapters(context, state),
           ),

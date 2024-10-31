@@ -1,9 +1,12 @@
 import 'package:entity_manga/entity_manga.dart';
+import 'package:rxdart/rxdart.dart';
 
 abstract class DownloadChapterProgressUseCase {
   double downloadChapterProgress({
-    MangaSourceEnum? source,
-    String? mangaId,
-    String? chapterId,
+    required DownloadChapter key,
+  });
+
+  ValueStream<(int, double)> downloadChapterProgressStream({
+    required DownloadChapter key,
   });
 }
