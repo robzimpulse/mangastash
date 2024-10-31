@@ -18,8 +18,10 @@ enum DownloadOption {
 }
 
 class MangaDetailScreenState extends Equatable {
-  final bool isLoading;
-  final Exception? error;
+  final bool isLoadingManga;
+  final bool isLoadingChapters;
+  final Exception? errorManga;
+  final Exception? errorChapters;
   final String? mangaId;
   final Manga? manga;
   final List<MangaChapter>? chapters;
@@ -33,8 +35,10 @@ class MangaDetailScreenState extends Equatable {
   late final bool isOnLibrary;
 
   MangaDetailScreenState({
-    this.isLoading = false,
-    this.error,
+    this.isLoadingManga = false,
+    this.isLoadingChapters = false,
+    this.errorManga,
+    this.errorChapters,
     this.mangaId,
     this.manga,
     this.chapters,
@@ -127,8 +131,10 @@ class MangaDetailScreenState extends Equatable {
 
   @override
   List<Object?> get props => [
-        isLoading,
-        error,
+        isLoadingManga,
+        isLoadingChapters,
+        errorManga,
+        errorChapters,
         mangaId,
         manga,
         chapters,
@@ -139,8 +145,10 @@ class MangaDetailScreenState extends Equatable {
       ];
 
   MangaDetailScreenState copyWith({
-    bool? isLoading,
-    ValueGetter<Exception?>? error,
+    bool? isLoadingManga,
+    bool? isLoadingChapters,
+    ValueGetter<Exception?>? errorChapters,
+    ValueGetter<Exception?>? errorManga,
     String? mangaId,
     Manga? manga,
     List<MangaChapter>? chapters,
@@ -152,8 +160,11 @@ class MangaDetailScreenState extends Equatable {
   }) {
     return MangaDetailScreenState(
       config: config ?? this.config,
-      isLoading: isLoading ?? this.isLoading,
-      error: error != null ? error() : this.error,
+      isLoadingChapters: isLoadingChapters ?? this.isLoadingChapters,
+      isLoadingManga: isLoadingManga ?? this.isLoadingManga,
+      errorChapters:
+          errorChapters != null ? errorChapters() : this.errorChapters,
+      errorManga: errorManga != null ? errorManga() : this.errorManga,
       mangaId: mangaId ?? this.mangaId,
       manga: manga ?? this.manga,
       chapters: chapters ?? this.chapters,

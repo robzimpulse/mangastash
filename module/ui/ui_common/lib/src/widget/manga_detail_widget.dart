@@ -24,7 +24,6 @@ class MangaDetailWidget extends StatelessWidget {
     this.isLoading = false,
     this.isOnLibrary = false,
     this.cacheManager,
-    required this.child,
   });
 
   final String? coverUrl;
@@ -44,8 +43,6 @@ class MangaDetailWidget extends StatelessWidget {
   final void Function()? onTapWebsite;
 
   final void Function(String)? onTapTag;
-
-  final List<Widget> child;
 
   final double horizontalPadding;
 
@@ -282,10 +279,6 @@ class MangaDetailWidget extends StatelessWidget {
     );
   }
 
-  Widget _children(BuildContext context) {
-    return MultiSliver(children: child);
-  }
-
   @override
   Widget build(BuildContext context) {
     final widgets = [
@@ -293,9 +286,8 @@ class MangaDetailWidget extends StatelessWidget {
       _buttons(context),
       _description(context),
       isLoading ? _loadingTags(context) : _loadedTags(context),
-      _children(context),
     ].whereType<Widget>().intersperse(_separator(context));
 
-    return CustomScrollView(slivers: [_separator(context), ...widgets]);
+    return MultiSliver(children: [_separator(context), ...widgets]);
   }
 }

@@ -58,22 +58,13 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     emit(state.copyWith(config: config));
   }
 
-  Future<void> init() async {
-    emit(
-      state.copyWith(
-        isLoading: true,
-        error: () => null,
-      ),
-    );
-
-    await Future.wait([_fetchManga(), _fetchChapter()]);
-
-    emit(state.copyWith(isLoading: false));
-  }
+  Future<void> init() => Future.wait([_fetchManga(), _fetchChapter()]);
 
   Future<void> _fetchManga() async {
     final id = state.mangaId;
     if (id == null || id.isEmpty) return;
+
+    emit(state.copyWith(isLoadingManga: true, errorManga: () => null));
 
     final result = await _getMangaUseCase.execute(
       mangaId: id,
@@ -91,13 +82,17 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
 
     if (result is Error<Manga>) {
-      emit(state.copyWith(error: () => result.error));
+      emit(state.copyWith(errorManga: () => result.error));
     }
+
+    emit(state.copyWith(isLoadingManga: false));
   }
 
   Future<void> _fetchChapter() async {
     final id = state.mangaId;
     if (id == null || id.isEmpty) return;
+
+    emit(state.copyWith(isLoadingChapters: true, errorChapters: () => null));
 
     final result = await _getListChapterUseCase.execute(
       mangaId: id,
@@ -120,8 +115,10 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
 
     if (result is Error<List<MangaChapter>>) {
-      emit(state.copyWith(error: () => result.error));
+      emit(state.copyWith(errorChapters: () => result.error));
     }
+
+    emit(state.copyWith(isLoadingChapters: false));
   }
 
   Future<void> addToLibrary({User? user}) async {

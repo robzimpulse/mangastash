@@ -179,8 +179,9 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   Widget _title() {
     return _builder(
+      buildWhen: (prev, curr) => prev.isLoadingManga != curr.isLoadingManga,
       builder: (context, state) => ShimmerLoading.multiline(
-        isLoading: state.isLoading,
+        isLoading: state.isLoadingManga,
         width: 100,
         height: 20,
         lines: 1,
@@ -190,7 +191,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   List<Widget> _chapters(BuildContext context, MangaDetailScreenState state) {
-    final error = state.error;
+    final error = state.errorChapters;
     if (error != null) {
       return [
         SliverFillRemaining(
@@ -208,7 +209,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       ];
     }
 
-    if (state.isLoading) {
+    if (state.isLoadingChapters) {
       return [
         SliverPadding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -216,7 +217,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             child: Row(
               children: [
                 ShimmerLoading.multiline(
-                  isLoading: state.isLoading,
+                  isLoading: state.isLoadingChapters,
                   width: 50,
                   height: 15,
                   lines: 1,
@@ -232,7 +233,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               (context, index) => index.isOdd
                   ? const SizedBox(height: 4)
                   : ShimmerLoading.multiline(
-                      isLoading: state.isLoading,
+                      isLoading: state.isLoadingChapters,
                       width: double.infinity,
                       height: 15,
                       lines: 3,
@@ -395,26 +396,38 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   Widget _content() {
-    return _builder(
-      builder: (context, state) => MangaDetailWidget(
-        cacheManager: widget.cacheManager,
-        coverUrl: state.manga?.coverUrl,
-        title: state.manga?.title,
-        author: state.manga?.author,
-        status: state.manga?.status,
-        description: state.manga?.description,
-        tags: state.manga?.tags?.map((e) => e.name).whereNotNull().toList(),
-        horizontalPadding: 12,
-        isOnLibrary: state.isOnLibrary,
-        onTapAddToLibrary: () => _onTapAddToLibrary(context, state),
-        onTapWebsite: () => _onTapWebsite(context, state),
-        onTapTag: (name) => _onTapTag(
-          context,
-          tag: state.manga?.tags?.firstWhere((e) => e.name == name),
+    return CustomScrollView(
+      slivers: [
+        _builder(
+          buildWhen: (prev, curr) => prev.isLoadingManga != curr.isLoadingManga,
+          builder: (context, state) => MangaDetailWidget(
+            cacheManager: widget.cacheManager,
+            coverUrl: state.manga?.coverUrl,
+            title: state.manga?.title,
+            author: state.manga?.author,
+            status: state.manga?.status,
+            description: state.manga?.description,
+            tags: state.manga?.tags?.map((e) => e.name).whereNotNull().toList(),
+            horizontalPadding: 12,
+            isOnLibrary: state.isOnLibrary,
+            onTapAddToLibrary: () => _onTapAddToLibrary(context, state),
+            onTapWebsite: () => _onTapWebsite(context, state),
+            onTapTag: (name) => _onTapTag(
+              context,
+              tag: state.manga?.tags?.firstWhere((e) => e.name == name),
+            ),
+            isLoading: state.isLoadingManga,
+          ),
         ),
-        isLoading: state.isLoading,
-        child: _chapters(context, state),
-      ),
+        _builder(
+          buildWhen: (prev, curr) {
+            return prev.isLoadingChapters != curr.isLoadingChapters;
+          },
+          builder: (context, state) => MultiSliver(
+            children: _chapters(context, state),
+          ),
+        ),
+      ],
     );
   }
 
