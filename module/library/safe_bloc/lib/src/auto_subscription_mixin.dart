@@ -7,11 +7,9 @@ mixin AutoSubscriptionMixin<S> on BlocBase<S> {
 
   @override
   Future<void> close() async {
-    for (var sub in _subscriptions) {
-      sub.cancel();
-    }
+    await Future.wait(_subscriptions.map((e) => e.cancel()));
     _subscriptions.clear();
-    super.close();
+    await super.close();
   }
 
   void addSubscription(StreamSubscription subscription) {
