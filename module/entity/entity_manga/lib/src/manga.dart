@@ -23,7 +23,7 @@ class Manga extends Equatable {
 
   final String? webUrl;
 
-  final MangaSource? source;
+  final MangaSourceEnum? source;
 
   const Manga({
     this.id,
@@ -67,7 +67,7 @@ class Manga extends Equatable {
     String? description,
     List<MangaTag>? tags,
     String? webUrl,
-    MangaSource? source,
+    MangaSourceEnum? source,
   }) {
     return Manga(
       id: id ?? this.id,

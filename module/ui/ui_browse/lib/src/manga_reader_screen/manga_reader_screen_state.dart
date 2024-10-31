@@ -9,7 +9,6 @@ class MangaReaderScreenState extends Equatable {
     this.mangaId,
     this.chapterId,
     this.source,
-    this.sourceId,
   });
 
   final bool isLoading;
@@ -22,13 +21,11 @@ class MangaReaderScreenState extends Equatable {
 
   final String? chapterId;
 
-  final String? sourceId;
-
-  final MangaSource? source;
+  final MangaSourceEnum? source;
 
   @override
   List<Object?> get props {
-    return [mangaId, chapterId, isLoading, chapter, error, sourceId, source];
+    return [mangaId, chapterId, isLoading, chapter, error, source];
   }
 
   MangaReaderScreenState copyWith({
@@ -37,8 +34,7 @@ class MangaReaderScreenState extends Equatable {
     bool? isLoading,
     MangaChapter? chapter,
     Exception? Function()? error,
-    String? sourceId,
-    MangaSource? source,
+    MangaSourceEnum? source,
   }) {
     return MangaReaderScreenState(
       mangaId: mangaId ?? this.mangaId,
@@ -46,7 +42,6 @@ class MangaReaderScreenState extends Equatable {
       isLoading: isLoading ?? this.isLoading,
       chapter: chapter ?? this.chapter,
       error: error != null ? error() : this.error,
-      sourceId: sourceId ?? this.sourceId,
       source: source ?? this.source,
     );
   }

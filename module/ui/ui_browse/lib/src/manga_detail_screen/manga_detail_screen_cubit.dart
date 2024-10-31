@@ -38,11 +38,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
         _downloadChapterProgressUseCase = downloadChapterProgressUseCase,
         _downloadChapterProgressStreamUseCase =
             downloadChapterProgressStreamUseCase,
-        super(
-          initialState.copyWith(
-            source: getMangaSourceUseCase.get(initialState.sourceId),
-          ),
-        ) {
+        super(initialState) {
     addSubscription(listenAuth.authStateStream.listen(_updateAuthState));
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
@@ -81,7 +77,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     final result = await _getMangaUseCase.execute(
       mangaId: id,
-      source: state.source?.name,
+      source: state.source,
     );
 
     if (result is Success<Manga>) {
@@ -105,7 +101,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     final result = await _getListChapterUseCase.execute(
       mangaId: id,
-      source: state.source?.name,
+      source: state.source,
     );
 
     if (result is Success<List<MangaChapter>>) {
@@ -113,7 +109,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
         (e) => e.copyWith(
           downloadProgress:
               _downloadChapterProgressUseCase.downloadChapterProgress(
-            source: state.source?.name,
+            source: state.source,
             mangaId: state.mangaId,
             chapterId: e.id,
           ),
@@ -144,14 +140,14 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     _updateDownloadChapterProgress(chapterId, 0.005);
 
     _downloadChapterUseCase.downloadChapter(
-      source: state.source?.name,
+      source: state.source,
       mangaId: state.mangaId,
       chapterId: chapterId,
     );
 
     final stream =
         _downloadChapterProgressStreamUseCase.downloadChapterProgressStream(
-      source: state.source?.name,
+      source: state.source,
       mangaId: state.mangaId,
       chapterId: chapterId,
     );

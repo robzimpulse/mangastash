@@ -17,9 +17,7 @@ Manga _$MangaFromJson(Map<String, dynamic> json) => Manga(
           ?.map((e) => MangaTag.fromJson(e as Map<String, dynamic>))
           .toList(),
       webUrl: json['web_url'] as String?,
-      source: json['source'] == null
-          ? null
-          : MangaSource.fromJson(json['source'] as Map<String, dynamic>),
+      source: $enumDecodeNullable(_$MangaSourceEnumEnumMap, json['source']),
     );
 
 Map<String, dynamic> _$MangaToJson(Manga instance) => <String, dynamic>{
@@ -31,5 +29,10 @@ Map<String, dynamic> _$MangaToJson(Manga instance) => <String, dynamic>{
       'description': instance.description,
       'tags': instance.tags?.map((e) => e.toJson()).toList(),
       'web_url': instance.webUrl,
-      'source': instance.source?.toJson(),
+      'source': _$MangaSourceEnumEnumMap[instance.source],
     };
+
+const _$MangaSourceEnumEnumMap = {
+  MangaSourceEnum.mangadex: 'Manga Dex',
+  MangaSourceEnum.asurascan: 'Asura Scans',
+};

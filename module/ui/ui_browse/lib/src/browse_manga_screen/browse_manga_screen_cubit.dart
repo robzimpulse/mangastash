@@ -17,11 +17,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     required SearchMangaUseCase searchMangaUseCase,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
   })  : _searchMangaUseCase = searchMangaUseCase,
-        super(
-          initialState.copyWith(
-            source: getMangaSourceUseCase.get(initialState.sourceId),
-          ),
-        ) {
+        super(initialState) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
           .listen(_updateLibraryState),
@@ -49,7 +45,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
   Future<void> _fetchManga() async {
     final result = await _searchMangaUseCase.execute(
-      source: state.source?.name,
+      source: state.source,
       parameter: state.parameter,
     );
 

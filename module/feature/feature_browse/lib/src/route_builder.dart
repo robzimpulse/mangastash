@@ -45,13 +45,10 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         name: BrowseRoutePath.browseManga,
         builder: (context, state) => BrowseMangaScreen.create(
           locator: locator,
-          sourceId: state.pathParameters['sourceId'].asOrNull<String>(),
+          source: MangaSourceEnum.fromValue(state.pathParameters['source']),
           onTapManga: (mangaId) => context.push(
             BrowseRoutePath.mangaDetail
-                .replaceAll(
-                  ':sourceId',
-                  state.pathParameters['sourceId'].asOrNull<String>() ?? '',
-                )
+                .replaceAll(':source', state.pathParameters['source'] ?? '')
                 .replaceAll(':mangaId', mangaId ?? ''),
           ),
         ),
@@ -62,18 +59,12 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         name: BrowseRoutePath.mangaDetail,
         builder: (context, state) => MangaDetailScreen.create(
           locator: locator,
-          sourceId: state.pathParameters['sourceId'].asOrNull<String>(),
-          mangaId: state.pathParameters['mangaId'].asOrNull<String>(),
+          source: MangaSourceEnum.fromValue(state.pathParameters['source']),
+          mangaId: state.pathParameters['mangaId'],
           onTapChapter: (chapterId) => context.push(
             BrowseRoutePath.chapterDetail
-                .replaceAll(
-                  ':sourceId',
-                  state.pathParameters['sourceId'].asOrNull<String>() ?? '',
-                )
-                .replaceAll(
-                  ':mangaId',
-                  state.pathParameters['mangaId'].asOrNull<String>() ?? '',
-                )
+                .replaceAll(':source', state.pathParameters['source'] ?? '')
+                .replaceAll(':mangaId', state.pathParameters['mangaId'] ?? '')
                 .replaceAll(':chapterId', chapterId ?? ''),
           ),
           onTapSort: (config) => context.push<MangaChapterConfig>(
@@ -88,9 +79,9 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         name: BrowseRoutePath.chapterDetail,
         builder: (context, state) => MangaReaderScreen.create(
           locator: locator,
-          sourceId: state.pathParameters['sourceId'].asOrNull<String>(),
-          mangaId: state.pathParameters['mangaId'].asOrNull<String>(),
-          chapterId: state.pathParameters['chapterId'].asOrNull<String>(),
+          source: MangaSourceEnum.fromValue(state.pathParameters['source']),
+          mangaId: state.pathParameters['mangaId'],
+          chapterId: state.pathParameters['chapterId'],
         ),
       ),
       GoRoute(

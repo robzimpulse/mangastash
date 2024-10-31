@@ -31,7 +31,7 @@ class MangaDetailScreen extends StatefulWidget {
 
   static Widget create({
     required ServiceLocator locator,
-    required String? sourceId,
+    required MangaSourceEnum? source,
     required String? mangaId,
     ValueSetter<String?>? onTapChapter,
     Future<MangaChapterConfig?> Function(MangaChapterConfig?)? onTapSort,
@@ -40,7 +40,7 @@ class MangaDetailScreen extends StatefulWidget {
       create: (context) => MangaDetailScreenCubit(
         initialState: MangaDetailScreenState(
           mangaId: mangaId,
-          sourceId: sourceId,
+          source: source,
         ),
         getMangaUseCase: locator(),
         getListChapterUseCase: locator(),
@@ -403,10 +403,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         author: state.manga?.author,
         status: state.manga?.status,
         description: state.manga?.description,
-        tags: state.manga?.tags
-            ?.map((e) => e.name)
-            .whereNotNull()
-            .toList(),
+        tags: state.manga?.tags?.map((e) => e.name).whereNotNull().toList(),
         horizontalPadding: 12,
         isOnLibrary: state.isOnLibrary,
         onTapAddToLibrary: () => _onTapAddToLibrary(context, state),

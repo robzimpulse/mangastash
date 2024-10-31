@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:data_manga/data_manga.dart';
-import 'package:entity_manga/src/manga_source.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../use_case/manga_source/get_manga_source_use_case.dart';
@@ -12,7 +12,6 @@ class MangaSourceManager
         ListenMangaSourceUseCase,
         GetMangaSourcesUseCase,
         GetMangaSourceUseCase {
-
   final _stateSubject = BehaviorSubject<List<MangaSource>>.seeded([]);
 
   MangaSourceManager({
@@ -29,6 +28,6 @@ class MangaSourceManager
       _stateSubject.stream;
 
   @override
-  MangaSource? get(String? id) =>
-      mangaSourceState?.firstWhereOrNull((e) => e.id == id);
+  MangaSource? get(MangaSourceEnum source) =>
+      mangaSourceState?.firstWhereOrNull((e) => e.name == source);
 }

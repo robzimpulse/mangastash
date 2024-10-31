@@ -13,11 +13,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState> {
     required GetMangaSourceUseCase getMangaSourceUseCase,
     MangaReaderScreenState initialState = const MangaReaderScreenState(),
   })  : _getChapterUseCase = getChapterUseCase,
-        super(
-          initialState.copyWith(
-            source: getMangaSourceUseCase.get(initialState.sourceId),
-          ),
-        );
+        super(initialState);
 
   Future<void> init() async {
     emit(state.copyWith(isLoading: true));
@@ -30,7 +26,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState> {
   Future<void> _fetchChapter() async {
     final response = await _getChapterUseCase.execute(
       chapterId: state.chapterId,
-      source: state.source?.name,
+      source: state.source,
       mangaId: state.mangaId,
     );
 

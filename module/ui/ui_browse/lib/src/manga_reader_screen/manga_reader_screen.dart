@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:core_storage/core_storage.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/services.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -19,7 +20,7 @@ class MangaReaderScreen extends StatefulWidget {
 
   static Widget create({
     required ServiceLocator locator,
-    required String? sourceId,
+    required MangaSourceEnum? source,
     required String? mangaId,
     required String? chapterId,
   }) {
@@ -28,7 +29,7 @@ class MangaReaderScreen extends StatefulWidget {
         initialState: MangaReaderScreenState(
           mangaId: mangaId,
           chapterId: chapterId,
-          sourceId: sourceId,
+          source: source,
         ),
         getChapterUseCase: locator(),
         getMangaSourceUseCase: locator(),

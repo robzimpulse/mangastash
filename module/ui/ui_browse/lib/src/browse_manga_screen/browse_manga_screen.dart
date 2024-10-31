@@ -1,5 +1,6 @@
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -12,6 +13,7 @@ class BrowseMangaScreen extends StatefulWidget {
   const BrowseMangaScreen({
     super.key,
     required this.launchUrlUseCase,
+    required this.getMangaSourceUseCase,
     this.onTapManga,
     this.cacheManager,
   });
@@ -22,15 +24,17 @@ class BrowseMangaScreen extends StatefulWidget {
 
   final BaseCacheManager? cacheManager;
 
+  final GetMangaSourceUseCase getMangaSourceUseCase;
+
   static Widget create({
     required ServiceLocator locator,
     ValueSetter<String?>? onTapManga,
-    String? sourceId,
+    MangaSourceEnum? source,
   }) {
     return BlocProvider(
       create: (context) => BrowseMangaScreenCubit(
         initialState: BrowseMangaScreenState(
-          sourceId: sourceId,
+          source: source,
           layout: MangaShelfItemLayout.comfortableGrid,
         ),
         getMangaSourceUseCase: locator(),
@@ -40,6 +44,7 @@ class BrowseMangaScreen extends StatefulWidget {
       child: BrowseMangaScreen(
         launchUrlUseCase: locator(),
         cacheManager: locator(),
+        getMangaSourceUseCase: locator(),
         onTapManga: onTapManga,
       ),
     );
@@ -91,9 +96,14 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
 
   void _onTapOpenInBrowser({
     required BuildContext context,
-    MangaSource? source,
+    MangaSourceEnum? source,
   }) async {
-    final url = source?.url;
+    if (source == null) {
+      context.showSnackBar(message: 'Could not launch source url');
+      return;
+    }
+
+    final url = widget.getMangaSourceUseCase.get(source)?.url;
 
     if (url == null || url.isEmpty) {
       context.showSnackBar(message: 'Could not launch source url');
@@ -210,9 +220,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               width: 200,
               height: 15,
               lines: 1,
-              child: Text(
-                state.source?.name?.value ?? '',
-              ),
+              child: Text(state.source?.value ?? ''),
             )
           : Container(
               alignment: Alignment.centerLeft,
