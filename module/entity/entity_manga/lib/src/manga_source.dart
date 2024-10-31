@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import 'enum/manga_source_enum.dart';
+
 part 'manga_source.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
@@ -42,13 +44,4 @@ class MangaSource extends Equatable {
       id: id ?? this.id,
     );
   }
-}
-
-enum MangaSourceEnum {
-  @JsonValue("Manga Dex") mangadex('Manga Dex'),
-  @JsonValue("Asura Scans") asurascan('Asura Scans');
-
-  final String value;
-
-  const MangaSourceEnum(this.value);
 }
