@@ -25,7 +25,11 @@ class Manga extends Equatable {
 
   final MangaSourceEnum? source;
 
-  const Manga({
+  late final List<String> tagsName;
+
+  late final Map<String, MangaTag> mapTagsByName;
+
+  Manga({
     this.id,
     this.title,
     this.coverUrl,
@@ -35,7 +39,20 @@ class Manga extends Equatable {
     this.tags,
     this.webUrl,
     this.source,
-  });
+  }) {
+    final Map<String, MangaTag> mapTagsByName = {};
+    final List<String> tagsName = [];
+
+    for (final tag in tags ?? <MangaTag>[]) {
+      final name = tag.name;
+      if (name == null) continue;
+      mapTagsByName[name] = tag;
+      tagsName.add(name);
+    }
+
+    this.mapTagsByName = mapTagsByName;
+    this.tagsName = tagsName;
+  }
 
   @override
   List<Object?> get props {
