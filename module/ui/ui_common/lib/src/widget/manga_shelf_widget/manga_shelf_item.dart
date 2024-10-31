@@ -84,21 +84,51 @@ class MangaShelfItem extends StatelessWidget {
       alignment: Alignment.bottomCenter,
       children: [
         Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Theme.of(context).dividerColor),
-            ),
-            child: CachedNetworkImage(
-              cacheManager: cacheManager,
-              fit: BoxFit.fill,
-              imageUrl: coverUrl,
-              errorWidget: (context, url, error) => const Center(
-                child: Icon(Icons.error),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Theme.of(context).dividerColor),
+                  ),
+                  child: CachedNetworkImage(
+                    cacheManager: cacheManager,
+                    fit: BoxFit.fill,
+                    imageUrl: coverUrl,
+                    errorWidget: (context, url, error) => const Center(
+                      child: Icon(Icons.error),
+                    ),
+                    progressIndicatorBuilder: (context, url, progress) =>
+                        Center(
+                      child:
+                          CircularProgressIndicator(value: progress.progress),
+                    ),
+                  ),
+                ),
               ),
-              progressIndicatorBuilder: (context, url, progress) => Center(
-                child: CircularProgressIndicator(value: progress.progress),
-              ),
-            ),
+              if (isOnLibrary) ...[
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.black.withOpacity(0.5),
+                  ),
+                ),
+                Positioned(
+                  top: 4,
+                  left: 4,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                    ),
+                    child: Text(
+                      'In Library',
+                      style: style?.copyWith(color: Colors.black),
+                    ),
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
         if (title.isNotEmpty == true)
@@ -112,28 +142,6 @@ class MangaShelfItem extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-        if (isOnLibrary) ...[
-          Positioned.fill(
-            child: Container(
-              color: Colors.black.withOpacity(0.5),
-            ),
-          ),
-          Positioned(
-            top: 4,
-            left: 4,
-            child: Container(
-              padding: const EdgeInsets.all(2),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(4)),
-              ),
-              child: Text(
-                'In Library',
-                style: style?.copyWith(color: Colors.black),
-              ),
-            ),
-          ),
-        ],
       ],
     );
   }

@@ -6,7 +6,6 @@ import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:rxdart/subjects.dart';
 
 import '../typedef/download_chapter_keys_typedef.dart';
 import '../use_case/chapter/download_chapter_progress_stream_use_case.dart';

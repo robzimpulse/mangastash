@@ -25,7 +25,7 @@ class BrowseMangaScreenState extends Equatable {
 
   final SearchMangaParameter parameter;
 
-  late final List<Manga> displayMangas;
+  late final Map<String, Manga> libraryMapById;
 
   BrowseMangaScreenState({
     this.isLoading = false,
@@ -40,17 +40,15 @@ class BrowseMangaScreenState extends Equatable {
     this.libraries = const [],
     this.parameter = const SearchMangaParameter(),
   }) {
-    final libraryMapById = {
-      for (final manga in libraries) manga.id: manga,
-    };
+    final Map<String, Manga> libraryMapById = {};
 
-    displayMangas = List.of(
-      mangas.map(
-        (manga) => manga.copyWith(
-          isOnLibrary: libraryMapById[manga.id] != null,
-        ),
-      ),
-    );
+    for (final manga in libraries) {
+      final id = manga.id;
+      if (id == null) continue;
+      libraryMapById.putIfAbsent(id, () => manga);
+    }
+
+    this.libraryMapById = libraryMapById;
   }
 
   @override

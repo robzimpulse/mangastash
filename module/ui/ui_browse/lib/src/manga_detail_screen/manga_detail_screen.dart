@@ -80,7 +80,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   MangaDetailScreenCubit _cubit(BuildContext context) => context.read();
 
   void _onTapWebsite(BuildContext context, MangaDetailScreenState state) async {
-    final url = state.displayManga?.webUrl;
+    final url = state.manga?.webUrl;
 
     if (url == null || url.isEmpty) {
       context.showSnackBar(message: 'Could not launch source url');
@@ -184,7 +184,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         width: 100,
         height: 20,
         lines: 1,
-        child: Text(state.displayManga?.title ?? ''),
+        child: Text(state.manga?.title ?? ''),
       ),
     );
   }
@@ -398,22 +398,22 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     return _builder(
       builder: (context, state) => MangaDetailWidget(
         cacheManager: widget.cacheManager,
-        coverUrl: state.displayManga?.coverUrl,
-        title: state.displayManga?.title,
-        author: state.displayManga?.author,
-        status: state.displayManga?.status,
-        description: state.displayManga?.description,
-        tags: state.displayManga?.tags
+        coverUrl: state.manga?.coverUrl,
+        title: state.manga?.title,
+        author: state.manga?.author,
+        status: state.manga?.status,
+        description: state.manga?.description,
+        tags: state.manga?.tags
             ?.map((e) => e.name)
             .whereNotNull()
             .toList(),
         horizontalPadding: 12,
-        isOnLibrary: state.displayManga?.isOnLibrary == true,
+        isOnLibrary: state.isOnLibrary,
         onTapAddToLibrary: () => _onTapAddToLibrary(context, state),
         onTapWebsite: () => _onTapWebsite(context, state),
         onTapTag: (name) => _onTapTag(
           context,
-          tag: state.displayManga?.tags?.firstWhere((e) => e.name == name),
+          tag: state.manga?.tags?.firstWhere((e) => e.name == name),
         ),
         isLoading: state.isLoading,
         child: _chapters(context, state),

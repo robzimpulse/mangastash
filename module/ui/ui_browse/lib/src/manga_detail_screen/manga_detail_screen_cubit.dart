@@ -129,14 +129,14 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   }
 
   Future<void> addToLibrary({User? user}) async {
-    final manga = state.displayManga;
+    final manga = state.manga;
     final userId = user?.uid ?? state.authState?.user?.uid;
     if (manga == null || userId == null) return;
 
-    if (!manga.isOnLibrary) {
-      await _addToLibraryUseCase.execute(manga: manga, userId: userId);
-    } else {
+    if (state.isOnLibrary) {
       await _removeFromLibraryUseCase.execute(manga: manga, userId: userId);
+    } else {
+      await _addToLibraryUseCase.execute(manga: manga, userId: userId);
     }
   }
 

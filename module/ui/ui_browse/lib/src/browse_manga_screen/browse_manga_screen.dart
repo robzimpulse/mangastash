@@ -251,20 +251,20 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
           );
         }
 
-        if (state.displayMangas.isEmpty) {
+        if (state.mangas.isEmpty) {
           return const Center(
             child: Text('Manga Empty'),
           );
         }
 
-        final children = state.displayMangas.map(
+        final children = state.mangas.map(
           (e) => MangaShelfItem(
             cacheManager: widget.cacheManager,
             title: e.title ?? '',
             coverUrl: e.coverUrl ?? '',
             layout: state.layout,
             onTap: () => widget.onTapManga?.call(e.id),
-            isOnLibrary: e.isOnLibrary,
+            isOnLibrary: state.libraryMapById[e.id] != null,
           ),
         );
 

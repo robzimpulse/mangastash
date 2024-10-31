@@ -31,7 +31,7 @@ class MangaDetailScreenState extends Equatable {
 
   late final Map<num?, Map<num?, List<MangaChapter>>>? processedChapters;
   late final int? totalChapter;
-  late final Manga? displayManga;
+  late final bool isOnLibrary;
 
   MangaDetailScreenState({
     this.isLoading = false,
@@ -45,9 +45,7 @@ class MangaDetailScreenState extends Equatable {
     this.authState,
     this.libraries = const [],
   }) {
-    displayManga = manga?.copyWith(
-      isOnLibrary: libraries.firstWhereOrNull((e) => e.id == mangaId) != null,
-    );
+    isOnLibrary = libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
 
     final groupByVolume = chapters
         ?.sortedBy((e) => e.numVolume ?? 0)
