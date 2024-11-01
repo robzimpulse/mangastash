@@ -49,9 +49,9 @@ class PathManager
         : await getApplicationDocumentsDirectory();
 
     final defaultPath = Directory.fromUri(Uri.file('$rootPath/Mangastash'));
-    final defaultDirectory = Platform.isAndroid
-        ? await defaultPath.create(recursive: true)
-        : await getApplicationDocumentsDirectory();
+    final defaultDirectory = (await defaultPath.exists() && Platform.isAndroid)
+        ? defaultPath
+        : rootDirectory;
 
     final downloadPath = storage.getString(_downloadPathKey);
     final candidateDownloadPath =

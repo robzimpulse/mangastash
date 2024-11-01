@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -62,6 +63,19 @@ class BackupRestoreScreen extends StatelessWidget {
                     contextActions: [
                       FilesystemPickerNewFolderContextAction(),
                     ],
+                    requestPermission: () async {
+                      await [
+                        Permission.manageExternalStorage,
+                        Permission.storage,
+                      ].request();
+
+                      final isGranted = await Future.wait([
+                        Permission.manageExternalStorage.isGranted,
+                        Permission.storage.isGranted,
+                      ]);
+
+                      return isGranted.any((element) => true);
+                    },
                   );
 
                   if (!context.mounted || path == null) return;
