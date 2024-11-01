@@ -114,25 +114,31 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     );
 
     if (result is Success<List<MangaChapter>>) {
+      final Map<String?, double> downloadProgress = {};
+      final List<Stream<(String?, int, double)>> streams = [];
       final chapters = result.data;
+      for (final chapter in chapters) {
+        final key = DownloadChapter(manga: state.manga, chapter: chapter);
+        streams.add(
+          _downloadChapterProgressUseCase
+              .downloadChapterProgressStream(key: key)
+              .map((event) => (chapter.id, event.$1, event.$2)),
+        );
+        downloadProgress[chapter.id] =
+            _downloadChapterProgressUseCase.downloadChapterProgress(key: key);
+      }
+
       _activeSubscriptions?.cancel();
-
-      final streams = chapters.map(
-        (e) => _downloadChapterProgressUseCase
-            .downloadChapterProgressStream(
-              key: DownloadChapter(
-                manga: state.manga,
-                chapter: e,
-              ),
-            )
-            .map((event) => (e.id, event.$1, event.$2)),
-      );
-
       _activeSubscriptions = CombineLatestStream(streams, (values) => values)
           .throttleTime(const Duration(seconds: 1), trailing: true)
           .listen(_updateDownloadChapterProgress);
 
-      emit(state.copyWith(chapters: result.data));
+      emit(
+        state.copyWith(
+          chapters: result.data,
+          downloadProgress: downloadProgress,
+        ),
+      );
     }
 
     if (result is Error<List<MangaChapter>>) {
