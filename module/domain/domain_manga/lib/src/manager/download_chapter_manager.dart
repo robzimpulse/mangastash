@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
@@ -21,6 +22,7 @@ class DownloadChapterManager
         DownloadChapterProgressUseCase {
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final BaseCacheManager _cacheManager;
+  final ListenDownloadPathUseCase _listenDownloadPathUseCase;
 
   final _active = BehaviorSubject<Set<DownloadChapter>>.seeded({});
 
@@ -29,8 +31,10 @@ class DownloadChapterManager
   DownloadChapterManager({
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required BaseCacheManager cacheManager,
+    required ListenDownloadPathUseCase listenDownloadPathUseCase,
   })  : _cacheManager = cacheManager,
-        _getChapterUseCase = getChapterUseCase;
+        _getChapterUseCase = getChapterUseCase,
+        _listenDownloadPathUseCase = listenDownloadPathUseCase;
 
   @override
   ValueStream<(int, double)> downloadChapterProgressStream({
@@ -93,6 +97,7 @@ class DownloadChapterManager
               if (value is FileInfo) {
                 counter++;
                 sink.add((counter, counter / event.length));
+                _saveChapterToDownloadPath(key, value, counter);
               }
             },
           ),
@@ -131,4 +136,47 @@ class DownloadChapterManager
 
   @override
   ValueStream<Set<DownloadChapter>> get activeDownloadStream => _active.stream;
+
+  void _saveChapterToDownloadPath(
+    DownloadChapter key,
+    FileInfo file,
+    int counter,
+  ) async {
+    final root = _listenDownloadPathUseCase.downloadPathStream.valueOrNull;
+    final title = key.manga?.title;
+    final chapter = key.chapter?.numChapter;
+    final ext = file.file.path.split('.').lastOrNull;
+
+    if (root == null || title == null || chapter == null || ext == null) {
+      return;
+    }
+
+    final newPath = '${root.path}/$title/$chapter/$counter.$ext';
+
+    log(
+      'Start Move ${key.hashCode} file ${file.originalUrl} to `$newPath`',
+      name: runtimeType.toString(),
+      time: DateTime.now(),
+    );
+
+    try {
+
+      final isExists = await File(newPath).exists();
+      if (!isExists) { await File(newPath).create(recursive: true); }
+      await file.file.copy(newPath);
+
+      log(
+        'Finish Move ${key.hashCode} file ${file.originalUrl} to `$newPath`',
+        name: runtimeType.toString(),
+        time: DateTime.now(),
+      );
+
+    } catch (e) {
+      log(
+        'Error Move ${key.hashCode} file ${file.originalUrl}: $e',
+        name: runtimeType.toString(),
+        time: DateTime.now(),
+      );
+    }
+  }
 }
