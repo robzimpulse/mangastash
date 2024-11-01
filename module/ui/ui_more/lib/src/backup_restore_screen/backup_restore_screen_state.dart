@@ -3,21 +3,21 @@ import 'dart:io';
 import 'package:equatable/equatable.dart';
 
 class BackupRestoreScreenState extends Equatable {
-  final Directory? downloadPath;
+  final Directory? backupPath;
 
   final Directory? rootPath;
 
-  const BackupRestoreScreenState({this.downloadPath, this.rootPath});
+  const BackupRestoreScreenState({this.backupPath, this.rootPath});
 
   @override
-  List<Object?> get props => [downloadPath, rootPath];
+  List<Object?> get props => [backupPath, rootPath];
 
   BackupRestoreScreenState copyWith({
-    Directory? downloadPath,
+    Directory? backupPath,
     Directory? rootPath,
   }) {
     return BackupRestoreScreenState(
-      downloadPath: downloadPath ?? this.downloadPath,
+      backupPath: backupPath ?? this.backupPath,
       rootPath: rootPath ?? this.rootPath,
     );
   }

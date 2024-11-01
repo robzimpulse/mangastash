@@ -7,25 +7,25 @@ import 'backup_restore_screen_state.dart';
 
 class BackupRestoreScreenCubit extends Cubit<BackupRestoreScreenState>
     with AutoSubscriptionMixin {
-  final SetDownloadPathUseCase _setDownloadPathUseCase;
+  final SetBackupPathUseCase _setBackupPathUseCase;
 
   BackupRestoreScreenCubit({
     BackupRestoreScreenState initialState = const BackupRestoreScreenState(),
-    required ListenDownloadPathUseCase listenDownloadPathUseCase,
     required GetRootPathUseCase getRootPathUseCase,
-    required SetDownloadPathUseCase setDownloadPathUseCase,
-  })  : _setDownloadPathUseCase = setDownloadPathUseCase,
+    required ListenBackupPathUseCase listenBackupPathUseCase,
+    required SetBackupPathUseCase setBackupPathUseCase,
+  })  : _setBackupPathUseCase = setBackupPathUseCase,
         super(initialState.copyWith(rootPath: getRootPathUseCase.rootPath)) {
     addSubscription(
-      listenDownloadPathUseCase.downloadPathStream.listen(_updateDownloadPath),
+      listenBackupPathUseCase.backupPathStream.listen(_updateBackupPath),
     );
   }
 
-  void _updateDownloadPath(Directory path) {
-    emit(state.copyWith(downloadPath: path));
+  void _updateBackupPath(Directory path) {
+    emit(state.copyWith(backupPath: path));
   }
 
-  void setDownloadPath(String path) {
-    _setDownloadPathUseCase.setDownloadPath(path);
+  void setBackupPath(String path) {
+    _setBackupPathUseCase.setBackupPath(path);
   }
 }

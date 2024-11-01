@@ -5,49 +5,76 @@ import 'package:rxdart/rxdart.dart';
 
 import '../storage/shared_preferences_storage.dart';
 import '../use_case/get_root_path_use_case.dart';
+import '../use_case/listen_backup_path_use_case.dart';
 import '../use_case/listen_download_path_use_case.dart';
+import '../use_case/set_backup_path_use_case.dart';
 import '../use_case/set_download_path_use_case.dart';
 
 class PathManager
     implements
         ListenDownloadPathUseCase,
         SetDownloadPathUseCase,
+        ListenBackupPathUseCase,
+        SetBackupPathUseCase,
         GetRootPathUseCase {
   final Directory _rootDirectory;
 
   final BehaviorSubject<Directory> _downloadDirectory;
 
+  final BehaviorSubject<Directory> _backupDirectory;
+
   final SharedPreferencesStorage _storage;
 
-  static const _key = 'download_path';
+  static const _downloadPathKey = 'download_path';
+  static const _backupPathKey = 'backup_path';
 
   PathManager._({
     required Directory rootDirectory,
+    required Directory backupDirectory,
     required Directory downloadDirectory,
     required SharedPreferencesStorage storage,
   })  : _downloadDirectory = BehaviorSubject.seeded(downloadDirectory),
+        _backupDirectory = BehaviorSubject.seeded(backupDirectory),
         _storage = storage,
         _rootDirectory = rootDirectory;
 
   static Future<PathManager> create({
     required SharedPreferencesStorage storage,
   }) async {
-    final root = Directory.fromUri(Uri.file('/storage/emulated/0'));
+    const rootPath = '/storage/emulated/0';
+
+    final root = Directory.fromUri(Uri.file(rootPath));
     final rootDirectory = (await root.exists() && Platform.isAndroid)
         ? root
         : await getApplicationDocumentsDirectory();
 
-    final path = storage.getString(_key);
-    final candidate = path != null ? Directory.fromUri(Uri.file(path)) : null;
-    final downloadDirectory = candidate != null
-        ? await candidate.exists()
-            ? candidate
-            : rootDirectory
-        : rootDirectory;
+    final defaultPath = Directory.fromUri(Uri.file('$rootPath/Mangastash'));
+    final defaultDirectory = Platform.isAndroid
+        ? await defaultPath.create(recursive: true)
+        : await getApplicationDocumentsDirectory();
+
+    final downloadPath = storage.getString(_downloadPathKey);
+    final candidateDownloadPath =
+        downloadPath != null ? Directory.fromUri(Uri.file(downloadPath)) : null;
+    final downloadDirectory = candidateDownloadPath != null
+        ? await candidateDownloadPath.exists()
+            ? candidateDownloadPath
+            : defaultDirectory
+        : defaultDirectory;
+
+    final backupPath = storage.getString(_backupPathKey);
+    final candidateBackupPath =
+        backupPath != null ? Directory.fromUri(Uri.file(backupPath)) : null;
+    final backupDirectory = candidateBackupPath != null
+        ? await candidateBackupPath.exists()
+            ? candidateBackupPath
+            : defaultDirectory
+        : defaultDirectory;
 
     return PathManager._(
       rootDirectory: rootDirectory,
       downloadDirectory: downloadDirectory,
+      backupDirectory: backupDirectory,
       storage: storage,
     );
   }
@@ -58,7 +85,7 @@ class PathManager
     final candidate = Directory.fromUri(Uri.file(path));
     final isExists = await candidate.exists();
     if (!isExists) return;
-    _storage.setString(_key, candidate.path);
+    _storage.setString(_downloadPathKey, candidate.path);
     _downloadDirectory.add(candidate);
   }
 
@@ -67,4 +94,17 @@ class PathManager
 
   @override
   Directory get rootPath => _rootDirectory;
+
+  @override
+  ValueStream<Directory> get backupPathStream => _backupDirectory.stream;
+
+  @override
+  void setBackupPath(String path) async {
+    if (path.isEmpty) return;
+    final candidate = Directory.fromUri(Uri.file(path));
+    final isExists = await candidate.exists();
+    if (!isExists) return;
+    _storage.setString(_backupPathKey, candidate.path);
+    _downloadDirectory.add(candidate);
+  }
 }

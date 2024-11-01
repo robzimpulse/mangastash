@@ -16,9 +16,9 @@ class BackupRestoreScreen extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (context) => BackupRestoreScreenCubit(
-        listenDownloadPathUseCase: locator(),
         getRootPathUseCase: locator(),
-        setDownloadPathUseCase: locator(),
+        listenBackupPathUseCase: locator(),
+        setBackupPathUseCase: locator(),
       ),
       child: const BackupRestoreScreen(),
     );
@@ -49,14 +49,14 @@ class BackupRestoreScreen extends StatelessWidget {
               child: ListTile(
                 title: const Text('Backup Location'),
                 subtitle: Text(
-                  state.downloadPath?.path ?? 'Unsupported Platform',
+                  state.backupPath?.path ?? 'Unsupported Platform',
                 ),
                 onTap: () async {
                   final path = await FilesystemPicker.open(
                     title: 'Save to folder',
                     context: context,
                     rootDirectory: state.rootPath,
-                    directory: state.downloadPath,
+                    directory: state.backupPath,
                     fsType: FilesystemType.folder,
                     pickText: 'Save file to this folder',
                     contextActions: [
@@ -66,7 +66,7 @@ class BackupRestoreScreen extends StatelessWidget {
 
                   if (!context.mounted || path == null) return;
 
-                  _cubit(context).setDownloadPath(path);
+                  _cubit(context).setBackupPath(path);
                 },
               ),
             ),
