@@ -99,9 +99,23 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
 
-  void _onTapDownload(BuildContext context, DownloadOption option) {
-    // TODO: implement this
-    context.showSnackBar(message: '🚧🚧🚧 Under Construction $option 🚧🚧🚧');
+  void _onTapDownload(
+    BuildContext context,
+    DownloadOption option,
+    MangaDetailScreenState state,
+  ) {
+    final chapters = state.chapters ?? [];
+    switch (option) {
+      case DownloadOption.all:
+        for (final chapter in chapters) {
+          _cubit(context).downloadChapter(chapter: chapter);
+        }
+      default:
+        // TODO: implement this
+        context.showSnackBar(
+          message: '🚧🚧🚧 Under Construction $option 🚧🚧🚧',
+        );
+    }
   }
 
   void _onTapDownloadChapter(BuildContext context, MangaChapter chapter) async {
@@ -142,17 +156,26 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         title: _title(),
         elevation: 0,
         actions: [
-          PopupMenuButton<DownloadOption>(
-            icon: const Icon(Icons.download),
-            onSelected: (value) => _onTapDownload(context, value),
-            itemBuilder: (context) => [
-              ...DownloadOption.values.map(
-                (e) => PopupMenuItem<DownloadOption>(
-                  value: e,
-                  child: Text(e.value),
-                ),
-              ),
-            ],
+          _builder(
+            buildWhen: (prev, curr) => [
+              prev.isLoadingChapters != curr.isLoadingChapters,
+              prev.chapters != curr.chapters,
+            ].any((e) => e),
+            builder: (context, state) => state.chapters?.isNotEmpty == true
+                ? PopupMenuButton<DownloadOption>(
+                    icon: const Icon(Icons.download),
+                    onSelected: (value) =>
+                        _onTapDownload(context, value, state),
+                    itemBuilder: (context) => [
+                      ...DownloadOption.values.map(
+                        (e) => PopupMenuItem<DownloadOption>(
+                          value: e,
+                          child: Text(e.value),
+                        ),
+                      ),
+                    ],
+                  )
+                : const SizedBox.shrink(),
           ),
           _builder(
             builder: (context, state) => IconButton(
