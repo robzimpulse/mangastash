@@ -103,7 +103,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     BuildContext context,
     DownloadOption option,
     MangaDetailScreenState state,
-  ) {
+  ) async {
+    await [Permission.storage, Permission.manageExternalStorage].request();
+    if (!context.mounted) return;
+
     final chapters = state.chapters ?? [];
     switch (option) {
       case DownloadOption.all:
