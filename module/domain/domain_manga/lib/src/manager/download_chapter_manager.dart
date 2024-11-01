@@ -48,7 +48,10 @@ class DownloadChapterManager
     final progress = _progress[key] ?? BehaviorSubject.seeded((0, 0.0));
     _progress.putIfAbsent(key, () => progress);
 
+    if (_active.valueOrNull?.contains(key) == true) return;
+
     _active.add((_active.valueOrNull ?? {})..add(key));
+
     log(
       'Adding ${key.hashCode} to active download',
       name: runtimeType.toString(),
