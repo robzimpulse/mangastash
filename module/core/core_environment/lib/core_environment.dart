@@ -1,6 +1,7 @@
 library core_environment;
 
 export 'package:intl/intl.dart';
+export 'package:permission_handler/permission_handler.dart';
 export 'package:timezone/timezone.dart';
 
 export 'src/core_environment_registrar.dart';

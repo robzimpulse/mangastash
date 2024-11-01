@@ -105,6 +105,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   void _onTapDownloadChapter(BuildContext context, MangaChapter chapter) async {
+    await [Permission.storage, Permission.manageExternalStorage].request();
+    if (!context.mounted) return;
     _cubit(context).downloadChapter(chapter: chapter);
   }
 

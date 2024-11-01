@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -150,6 +151,9 @@ class DownloadChapterManager
     if (root == null || title == null || chapter == null || ext == null) {
       return;
     }
+
+    if (!(await Permission.storage.isGranted)) return;
+    if (!(await Permission.manageExternalStorage.isGranted)) return;
 
     final newPath = '${root.path}/$title/$chapter/$counter.$ext';
 
