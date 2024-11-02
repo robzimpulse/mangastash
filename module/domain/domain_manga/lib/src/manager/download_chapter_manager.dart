@@ -152,8 +152,12 @@ class DownloadChapterManager
       return;
     }
 
-    if (!(await Permission.storage.isGranted)) return;
-    if (!(await Permission.manageExternalStorage.isGranted)) return;
+    final isPermissionGranted = await Future.wait([
+      Permission.storage.isGranted,
+      Permission.manageExternalStorage.isGranted
+    ]);
+
+    if (isPermissionGranted.every((e) => !e)) return;
 
     final newPath = '${root.path}/$title/$chapter/$counter.$ext';
 
