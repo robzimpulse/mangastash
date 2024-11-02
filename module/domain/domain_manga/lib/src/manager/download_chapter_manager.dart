@@ -154,7 +154,7 @@ class DownloadChapterManager
 
     final isPermissionGranted = await Future.wait([
       Permission.storage.isGranted,
-      Permission.manageExternalStorage.isGranted
+      Permission.manageExternalStorage.isGranted,
     ]);
 
     if (isPermissionGranted.every((e) => !e)) return;
@@ -168,9 +168,10 @@ class DownloadChapterManager
     );
 
     try {
-
       final isExists = await File(newPath).exists();
-      if (!isExists) { await File(newPath).create(recursive: true); }
+      if (!isExists) {
+        await File(newPath).create(recursive: true);
+      }
       await file.file.copy(newPath);
 
       log(
@@ -178,7 +179,6 @@ class DownloadChapterManager
         name: runtimeType.toString(),
         time: DateTime.now(),
       );
-
     } catch (e) {
       log(
         'Error Move ${key.hashCode} file ${file.originalUrl}: $e',
