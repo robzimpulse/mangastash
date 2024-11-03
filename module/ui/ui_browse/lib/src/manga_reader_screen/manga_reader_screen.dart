@@ -13,15 +13,12 @@ class MangaReaderScreen extends StatefulWidget {
   const MangaReaderScreen({
     super.key,
     this.cacheManager,
-    this.onTapNext,
-    this.onTapPrevious,
+    this.onTapShortcut,
   });
 
   final BaseCacheManager? cacheManager;
 
-  final void Function(String?)? onTapPrevious;
-
-  final void Function(String?)? onTapNext;
+  final void Function(String?)? onTapShortcut;
 
   static Widget create({
     required ServiceLocator locator,
@@ -29,8 +26,7 @@ class MangaReaderScreen extends StatefulWidget {
     required String? mangaId,
     required String? chapterId,
     List<String>? chapterIds,
-    void Function(String?)? onTapPrevious,
-    void Function(String?)? onTapNext,
+    void Function(String?)? onTapShortcut,
   }) {
     return BlocProvider(
       create: (context) => MangaReaderScreenCubit(
@@ -45,8 +41,7 @@ class MangaReaderScreen extends StatefulWidget {
       )..init(),
       child: MangaReaderScreen(
         cacheManager: locator(),
-        onTapNext: onTapNext,
-        onTapPrevious: onTapPrevious,
+        onTapShortcut: onTapShortcut,
       ),
     );
   }
@@ -125,7 +120,7 @@ class _MangaReaderScreenState extends State<MangaReaderScreen> {
                                 ),
                               ),
                             ),
-                            onPressed: () => widget.onTapPrevious?.call(
+                            onPressed: () => widget.onTapShortcut?.call(
                               state.previousChapterId,
                             ),
                             child: const Text('Previous Chapter'),
@@ -183,7 +178,7 @@ class _MangaReaderScreenState extends State<MangaReaderScreen> {
                                 ),
                               ),
                             ),
-                            onPressed: () => widget.onTapNext?.call(
+                            onPressed: () => widget.onTapShortcut?.call(
                               state.nextChapterId,
                             ),
                             child: const Text('Next Chapter'),

@@ -343,7 +343,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                       language: Language.fromCode(
                         value?.translatedLanguage,
                       ),
-                      uploadedAt: value?.publishAt?.asDateTime,
+                      uploadedAt: value?.readableAt?.asDateTime,
                       groups: value?.scanlationGroup,
                       downloadProgress:
                           state.downloadProgress?[value?.id] ?? 0.0,
