@@ -4,7 +4,6 @@ import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -21,7 +20,7 @@ class MangaDetailScreen extends StatefulWidget {
     required this.launchUrlUseCase,
   });
 
-  final ValueSetter<String?>? onTapChapter;
+  final Function(String?, List<String>?)? onTapChapter;
 
   final Future<MangaChapterConfig?> Function(MangaChapterConfig?)? onTapSort;
 
@@ -33,7 +32,7 @@ class MangaDetailScreen extends StatefulWidget {
     required ServiceLocator locator,
     required MangaSourceEnum? source,
     required String? mangaId,
-    ValueSetter<String?>? onTapChapter,
+    Function(String?, List<String>?)? onTapChapter,
     Future<MangaChapterConfig?> Function(MangaChapterConfig?)? onTapSort,
   }) {
     return BlocProvider(
@@ -123,7 +122,9 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   void _onTapDownloadChapter(
-      BuildContext context, MangaChapter? chapter) async {
+    BuildContext context,
+    MangaChapter? chapter,
+  ) async {
     await [Permission.storage, Permission.manageExternalStorage].request();
     if (!context.mounted || chapter == null) return;
     _cubit(context).downloadChapter(chapter: chapter);
@@ -328,6 +329,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                       ),
                       onTap: () => widget.onTapChapter?.call(
                         value?.id,
+                        state.chapterIds,
                       ),
                       onTapDownload: () => _onTapDownloadChapter(
                         context,

@@ -17,7 +17,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
   MangaReaderScreenCubit({
     required GetChapterUseCase getChapterUseCase,
     required GetMangaSourceUseCase getMangaSourceUseCase,
-    MangaReaderScreenState initialState = const MangaReaderScreenState(),
+    required MangaReaderScreenState initialState,
   })  : _getChapterUseCase = getChapterUseCase,
         super(initialState);
 

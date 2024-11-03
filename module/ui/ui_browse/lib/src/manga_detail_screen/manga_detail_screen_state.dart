@@ -32,6 +32,7 @@ class MangaDetailScreenState extends Equatable {
   final List<Manga> libraries;
   final Map<String?, double>? downloadProgress;
 
+  late final List<String> chapterIds;
   late final Set<num> chaptersKey;
   late final Map<num, MangaChapter> processedChapters;
   late final int totalChapter;
@@ -54,6 +55,7 @@ class MangaDetailScreenState extends Equatable {
     isOnLibrary = libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
 
     final Map<num, MangaChapter> processedChapters = {};
+    final List<String> chapterIds = [];
 
     for (final data in chapters ?? <MangaChapter>[]) {
       final chapter = data.numChapter;
@@ -82,7 +84,17 @@ class MangaDetailScreenState extends Equatable {
 
     this.processedChapters = processedChapters;
     chaptersKey = {...processedChapters.keys.sorted((a, b) => b.compareTo(a))};
+    final reversedChaptersKey = {
+      ...processedChapters.keys.sorted((a, b) => a.compareTo(b)),
+    };
     totalChapter = processedChapters.length;
+
+    for (final key in reversedChaptersKey) {
+      final id = processedChapters[key]?.id;
+      if (id != null) chapterIds.add(id);
+    }
+
+    this.chapterIds = chapterIds;
 
     // TODO: perform sorting
 
@@ -177,18 +189,19 @@ class MangaDetailScreenState extends Equatable {
     Map<String?, double>? downloadProgress,
   }) {
     return MangaDetailScreenState(
-        config: config ?? this.config,
-        isLoadingChapters: isLoadingChapters ?? this.isLoadingChapters,
-        isLoadingManga: isLoadingManga ?? this.isLoadingManga,
-        errorChapters:
-            errorChapters != null ? errorChapters() : this.errorChapters,
-        errorManga: errorManga != null ? errorManga() : this.errorManga,
-        mangaId: mangaId ?? this.mangaId,
-        manga: manga ?? this.manga,
-        chapters: chapters ?? this.chapters,
-        source: source ?? this.source,
-        authState: authState ?? this.authState,
-        libraries: libraries ?? this.libraries,
-        downloadProgress: downloadProgress ?? this.downloadProgress);
+      config: config ?? this.config,
+      isLoadingChapters: isLoadingChapters ?? this.isLoadingChapters,
+      isLoadingManga: isLoadingManga ?? this.isLoadingManga,
+      errorChapters:
+          errorChapters != null ? errorChapters() : this.errorChapters,
+      errorManga: errorManga != null ? errorManga() : this.errorManga,
+      mangaId: mangaId ?? this.mangaId,
+      manga: manga ?? this.manga,
+      chapters: chapters ?? this.chapters,
+      source: source ?? this.source,
+      authState: authState ?? this.authState,
+      libraries: libraries ?? this.libraries,
+      downloadProgress: downloadProgress ?? this.downloadProgress,
+    );
   }
 }

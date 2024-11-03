@@ -10,15 +10,27 @@ import 'manga_reader_screen_cubit.dart';
 import 'manga_reader_screen_state.dart';
 
 class MangaReaderScreen extends StatefulWidget {
-  const MangaReaderScreen({super.key, this.cacheManager});
+  const MangaReaderScreen({
+    super.key,
+    this.cacheManager,
+    this.onTapNext,
+    this.onTapPrevious,
+  });
 
   final BaseCacheManager? cacheManager;
+
+  final void Function(String?)? onTapPrevious;
+
+  final void Function(String?)? onTapNext;
 
   static Widget create({
     required ServiceLocator locator,
     required MangaSourceEnum? source,
     required String? mangaId,
     required String? chapterId,
+    List<String>? chapterIds,
+    void Function(String?)? onTapPrevious,
+    void Function(String?)? onTapNext,
   }) {
     return BlocProvider(
       create: (context) => MangaReaderScreenCubit(
@@ -26,12 +38,15 @@ class MangaReaderScreen extends StatefulWidget {
           mangaId: mangaId,
           chapterId: chapterId,
           source: source,
+          chapterIds: chapterIds,
         ),
         getChapterUseCase: locator(),
         getMangaSourceUseCase: locator(),
       )..init(),
       child: MangaReaderScreen(
         cacheManager: locator(),
+        onTapNext: onTapNext,
+        onTapPrevious: onTapPrevious,
       ),
     );
   }
@@ -99,9 +114,9 @@ class _MangaReaderScreenState extends State<MangaReaderScreen> {
                 SliverToBoxAdapter(
                   child: _builder(
                     buildWhen: (prev, curr) => [
-                      prev.hasPreviousChapter != curr.hasPreviousChapter,
+                      prev.previousChapterId != curr.previousChapterId,
                     ].any((e) => e),
-                    builder: (context, state) => state.hasPreviousChapter
+                    builder: (context, state) => state.previousChapterId != null
                         ? ElevatedButton(
                             style: ButtonStyle(
                               shape: MaterialStateProperty.all(
@@ -110,7 +125,9 @@ class _MangaReaderScreenState extends State<MangaReaderScreen> {
                                 ),
                               ),
                             ),
-                            onPressed: () => {},
+                            onPressed: () => widget.onTapPrevious?.call(
+                              state.previousChapterId,
+                            ),
                             child: const Text('Previous Chapter'),
                           )
                         : const SizedBox.shrink(),
@@ -154,9 +171,9 @@ class _MangaReaderScreenState extends State<MangaReaderScreen> {
                 SliverToBoxAdapter(
                   child: _builder(
                     buildWhen: (prev, curr) => [
-                      prev.hasNextChapter != curr.hasNextChapter,
+                      prev.nextChapterId != curr.nextChapterId,
                     ].any((e) => e),
-                    builder: (context, state) => state.hasNextChapter
+                    builder: (context, state) => state.nextChapterId != null
                         ? ElevatedButton(
                             style: ButtonStyle(
                               shape: MaterialStateProperty.all<
@@ -166,7 +183,9 @@ class _MangaReaderScreenState extends State<MangaReaderScreen> {
                                 ),
                               ),
                             ),
-                            onPressed: () => {},
+                            onPressed: () => widget.onTapNext?.call(
+                              state.nextChapterId,
+                            ),
                             child: const Text('Next Chapter'),
                           )
                         : const SizedBox.shrink(),
