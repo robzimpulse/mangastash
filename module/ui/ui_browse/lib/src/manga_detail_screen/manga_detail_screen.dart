@@ -431,7 +431,11 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     return CustomScrollView(
       slivers: [
         _builder(
-          buildWhen: (prev, curr) => prev.isLoadingManga != curr.isLoadingManga,
+          buildWhen: (prev, curr) => [
+            prev.isLoadingManga != curr.isLoadingManga,
+            prev.isOnLibrary != curr.isOnLibrary,
+            prev.manga != curr.manga,
+          ].any((e) => e),
           builder: (context, state) => MangaDetailWidget(
             cacheManager: widget.cacheManager,
             coverUrl: state.manga?.coverUrl,
