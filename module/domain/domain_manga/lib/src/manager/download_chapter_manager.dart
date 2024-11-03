@@ -14,8 +14,6 @@ import '../use_case/chapter/download_chapter_use_case.dart';
 import '../use_case/chapter/get_chapter_use_case.dart';
 import '../use_case/chapter/listen_active_download_use_case.dart';
 
-typedef _FileStream = Iterable<Stream<FileResponse>>;
-
 class DownloadChapterManager
     implements
         ListenActiveDownloadUseCase,
@@ -49,7 +47,7 @@ class DownloadChapterManager
   @override
   void downloadChapter({
     required DownloadChapter key,
-  }) {
+  }) async {
     final progress = _progress[key] ?? BehaviorSubject.seeded((0, 0.0));
     _progress.putIfAbsent(key, () => progress);
 
@@ -63,67 +61,70 @@ class DownloadChapterManager
       time: DateTime.now(),
     );
 
-    final stream = Stream.fromFuture(
-      _getChapterUseCase().execute(
-        chapterId: key.chapter?.id,
-        source: key.manga?.source,
-        mangaId: key.manga?.id,
-      ),
-    ).transform(
-      StreamTransformer<Result<MangaChapter>, _FileStream>.fromHandlers(
-        handleData: (value, sink) {
-          if (value is Success<MangaChapter>) {
-            final images = value.data.images ?? [];
-            final streams = images.map(
-              (e) => _cacheManager.getFileStream(e, withProgress: true),
-            );
-            sink.add(streams.toList());
-            return;
-          }
-          sink.add(<Stream<FileResponse>>[]);
-        },
-      ),
-    ).asyncExpand(
-      (event) {
-        int counter = 0;
-        return ConcatEagerStream(event).transform(
-          StreamTransformer<FileResponse, (int, double)>.fromHandlers(
-            handleData: (value, sink) {
-              if (value is DownloadProgress) {
-                sink.add(
-                  (counter, ((value.progress ?? 0) + counter) / event.length),
-                );
-              }
-
-              if (value is FileInfo) {
-                counter++;
-                sink.add((counter, counter / event.length));
-                _saveChapterToDownloadPath(key, value, counter);
-              }
-            },
-          ),
-        ).doOnDone(() {
-          _active.add((_active.valueOrNull ?? {})..remove(key));
-          log(
-            'Removing ${key.hashCode} from active download',
-            name: runtimeType.toString(),
-            time: DateTime.now(),
-          );
-        });
-      },
+    final result = await _getChapterUseCase().execute(
+      chapterId: key.chapter?.id,
+      source: key.manga?.source,
+      mangaId: key.manga?.id,
     );
 
-    progress.listen(
-      (value) => log(
-        'progress: $value for key ${key.hashCode}',
+    if (result is Success<MangaChapter>) {
+      log(
+        'Success fetching chapter images for ${key.hashCode}',
         name: runtimeType.toString(),
         time: DateTime.now(),
-      ),
-    );
+      );
 
-    progress.addStream(
-      stream.throttleTime(const Duration(milliseconds: 500), trailing: true),
-    );
+      final images = result.data.images ?? [];
+      final streams = images.map(
+        (e) => _cacheManager.getFileStream(e, withProgress: true),
+      );
+
+      int counter = 0;
+      final stream = ConcatEagerStream(streams).transform(
+        StreamTransformer<FileResponse, (int, double)>.fromHandlers(
+          handleData: (value, sink) {
+            if (value is DownloadProgress) {
+              sink.add(
+                (counter, ((value.progress ?? 0) + counter) / streams.length),
+              );
+            }
+
+            if (value is FileInfo) {
+              counter++;
+              sink.add((counter, counter / streams.length));
+              _saveChapterToDownloadPath(key, value, counter);
+            }
+          },
+        ),
+      ).doOnDone(() {
+        _active.add((_active.valueOrNull ?? {})..remove(key));
+        log(
+          'Removing ${key.hashCode} from active download',
+          name: runtimeType.toString(),
+          time: DateTime.now(),
+        );
+      });
+
+      progress.listen(
+        (value) => log(
+          'progress: $value for key ${key.hashCode}',
+          name: runtimeType.toString(),
+          time: DateTime.now(),
+        ),
+      );
+
+      progress.addStream(
+        stream.throttleTime(const Duration(milliseconds: 500), trailing: true),
+      );
+    }
+
+    if (result is Error<MangaChapter>) {
+      log(
+        'Failed fetching chapter images for ${key.hashCode}',
+        name: runtimeType.toString(),
+        time: DateTime.now(),
+      );
+    }
   }
 
   @override
