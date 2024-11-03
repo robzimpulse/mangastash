@@ -94,37 +94,70 @@ class _MangaReaderScreenState extends State<MangaReaderScreen> {
         return Stack(
           alignment: Alignment.bottomCenter,
           children: [
-            ListView.builder(
-              padding: EdgeInsets.zero,
-              itemBuilder: (context, index) => VisibilityDetector(
-                onVisibilityChanged: (info) => _cubit(context).onVisibility(
-                  key: images[index],
-                  visibleFraction: info.visibleFraction,
-                ),
-                key: ValueKey<int>(index),
-                child: CachedNetworkImage(
-                  cacheManager: widget.cacheManager,
-                  imageUrl: images[index],
-                  errorWidget: (context, url, error) => const Icon(
-                    Icons.error,
-                  ),
-                  progressIndicatorBuilder: (context, url, progress) {
-                    return ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 300),
-                      child: Center(
-                        child: SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            value: progress.progress,
-                          ),
+            CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                    );
-                  },
+                    ),
+                    onPressed: () => {},
+                    child: const Text('Previous Chapter'),
+                  ),
                 ),
-              ),
-              itemCount: images.length,
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    childCount: images.length,
+                    (context, index) => VisibilityDetector(
+                      onVisibilityChanged: (info) {
+                        _cubit(context).onVisibility(
+                          key: images[index],
+                          visibleFraction: info.visibleFraction,
+                        );
+                      },
+                      key: ValueKey<int>(index),
+                      child: CachedNetworkImage(
+                        cacheManager: widget.cacheManager,
+                        imageUrl: images[index],
+                        errorWidget: (context, url, error) => const Icon(
+                          Icons.error,
+                        ),
+                        progressIndicatorBuilder: (context, url, progress) {
+                          return ConstrainedBox(
+                            constraints: const BoxConstraints(maxHeight: 300),
+                            child: Center(
+                              child: SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  value: progress.progress,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                    onPressed: () => {},
+                    child: const Text('Next Chapter'),
+                  ),
+                ),
+              ],
             ),
             _builder(
               buildWhen: (prev, curr) => prev.progress != curr.progress,

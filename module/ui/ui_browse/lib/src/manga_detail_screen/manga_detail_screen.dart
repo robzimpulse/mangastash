@@ -309,7 +309,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         ),
       ),
       SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         sliver: SliverList(
           delegate: SliverChildBuilderDelegate(
             childCount: (chapters.length * 2) - 1,
@@ -343,7 +343,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                       ),
                       uploadedAt: value?.publishAt?.asDateTime,
                       groups: value?.scanlationGroup,
-                      downloadProgress: state.downloadProgress?[value?.id] ?? 0.0,
+                      downloadProgress:
+                          state.downloadProgress?[value?.id] ?? 0.0,
                     );
             },
           ),
