@@ -97,16 +97,23 @@ class _MangaReaderScreenState extends State<MangaReaderScreen> {
             CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                    onPressed: () => {},
-                    child: const Text('Previous Chapter'),
+                  child: _builder(
+                    buildWhen: (prev, curr) => [
+                      prev.hasPreviousChapter != curr.hasPreviousChapter,
+                    ].any((e) => e),
+                    builder: (context, state) => state.hasPreviousChapter
+                        ? ElevatedButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                            onPressed: () => {},
+                            child: const Text('Previous Chapter'),
+                          )
+                        : const SizedBox.shrink(),
                   ),
                 ),
                 SliverList(
@@ -145,16 +152,24 @@ class _MangaReaderScreenState extends State<MangaReaderScreen> {
                   ),
                 ),
                 SliverToBoxAdapter(
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                    onPressed: () => {},
-                    child: const Text('Next Chapter'),
+                  child: _builder(
+                    buildWhen: (prev, curr) => [
+                      prev.hasNextChapter != curr.hasNextChapter,
+                    ].any((e) => e),
+                    builder: (context, state) => state.hasNextChapter
+                        ? ElevatedButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                            onPressed: () => {},
+                            child: const Text('Next Chapter'),
+                          )
+                        : const SizedBox.shrink(),
                   ),
                 ),
               ],
