@@ -34,11 +34,7 @@ class DomainMangaRegistrar extends Registrar {
 
     // manga dex dio client
     locator.registerFactory(
-      () => MangaDexDio(interceptors: [
-        locator<Alice>().getDioInterceptor(),
-        /// rate limiting for mangadex services, 5 request per second
-        DioThrottlerInterceptor(const Duration(milliseconds: 200)),
-      ]),
+      () => MangaDexDio(interceptors: [locator<Alice>().getDioInterceptor()]),
     );
 
     // manga dex services

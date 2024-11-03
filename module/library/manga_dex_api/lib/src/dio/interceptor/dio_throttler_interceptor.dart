@@ -21,10 +21,10 @@ class DioThrottlerInterceptor extends Interceptor {
   final Mutex _mutex = Mutex();
 
   DioThrottlerInterceptor(
-    this.interval, {
-    this.shouldThrottle,
-    this.onThrottled,
-  });
+      this.interval, {
+        this.shouldThrottle,
+        this.onThrottled,
+      });
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
@@ -51,7 +51,7 @@ class DioThrottlerInterceptor extends Interceptor {
         onThrottled?.call(options, scheduledTime);
         Future.delayed(
           scheduledTime.difference(now),
-          () => handler.next(options),
+              () => handler.next(options),
         );
       } else {
         handler.next(options);
