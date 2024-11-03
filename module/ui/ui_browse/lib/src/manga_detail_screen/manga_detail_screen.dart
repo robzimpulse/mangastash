@@ -4,6 +4,7 @@ import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -121,13 +122,14 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     }
   }
 
-  void _onTapDownloadChapter(BuildContext context, MangaChapter chapter) async {
+  void _onTapDownloadChapter(
+      BuildContext context, MangaChapter? chapter) async {
     await [Permission.storage, Permission.manageExternalStorage].request();
-    if (!context.mounted) return;
+    if (!context.mounted || chapter == null) return;
     _cubit(context).downloadChapter(chapter: chapter);
   }
 
-  void _onTapMenuChapter(BuildContext context, MangaChapter chapter) {
+  void _onTapMenuChapter(BuildContext context, MangaChapter? chapter) {
     // TODO: implement this
     context.showSnackBar(message: '🚧🚧🚧 Under Construction $chapter 🚧🚧🚧');
   }
@@ -274,8 +276,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       ];
     }
 
-    final chapters = state.processedChapters;
-    if (chapters == null || chapters.isEmpty == true) {
+    final chapters = state.chaptersKey;
+    if (chapters.isEmpty == true) {
       return [
         const SliverFillRemaining(
           hasScrollBody: false,
@@ -306,125 +308,48 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           ),
         ),
       ),
-      ..._group(
-        context: context,
-        volumes: chapters,
-        progress: state.downloadProgress,
-        config: state.config,
+      SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+        sliver: SliverList(
+          delegate: SliverChildBuilderDelegate(
+            childCount: (chapters.length * 2) - 1,
+            semanticIndexCallback: (Widget _, int index) {
+              return index.isEven ? index ~/ 2 : null;
+            },
+            (context, index) {
+              final int itemIndex = index ~/ 2;
+              final key = chapters.elementAtOrNull(itemIndex);
+              final value = state.processedChapters[key];
+              return index.isOdd
+                  ? _separator()
+                  : MangaChapterTileWidget(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                      ),
+                      onTap: () => widget.onTapChapter?.call(
+                        value?.id,
+                      ),
+                      onTapDownload: () => _onTapDownloadChapter(
+                        context,
+                        value,
+                      ),
+                      onLongPress: () => _onTapMenuChapter(
+                        context,
+                        value,
+                      ),
+                      title: 'Chapter ${value?.chapter}',
+                      language: Language.fromCode(
+                        value?.translatedLanguage,
+                      ),
+                      uploadedAt: value?.publishAt?.asDateTime,
+                      groups: value?.scanlationGroup,
+                      downloadProgress: state.downloadProgress?[value?.id] ?? 0.0,
+                    );
+            },
+          ),
+        ),
       ),
     ];
-  }
-
-  List<Widget> _group({
-    required BuildContext context,
-    required Map<String?, double>? progress,
-    required Map<num?, Map<num?, List<MangaChapter>>> volumes,
-    required MangaChapterConfig? config,
-  }) {
-    List<Widget> view = [];
-    for (final volume in volumes.entries) {
-      List<Widget> children = [];
-      for (final chapter in volume.value.entries) {
-        children.add(
-          SliverPadding(
-            padding: const EdgeInsets.only(left: 12),
-            sliver: MultiSliver(
-              pushPinnedChildren: true,
-              children: [
-                SliverPinnedHeader(
-                  child: Container(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Chapter ${chapter.key}',
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.only(right: 12),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      childCount: (chapter.value.length * 2) - 1,
-                      semanticIndexCallback: (Widget _, int index) {
-                        return index.isEven ? index ~/ 2 : null;
-                      },
-                      (context, index) {
-                        final int itemIndex = index ~/ 2;
-                        final value = chapter.value[itemIndex];
-                        return index.isOdd
-                            ? _separator()
-                            : MangaChapterTileWidget(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8,
-                                ),
-                                onTap: () => widget.onTapChapter?.call(
-                                  value.id,
-                                ),
-                                onTapDownload: () => _onTapDownloadChapter(
-                                  context,
-                                  value,
-                                ),
-                                onLongPress: () => _onTapMenuChapter(
-                                  context,
-                                  value,
-                                ),
-                                title: 'Chapter ${value.chapter}',
-                                language: Language.fromCode(
-                                  value.translatedLanguage,
-                                ),
-                                uploadedAt: value.publishAt?.asDateTime,
-                                groups: value.scanlationGroup,
-                                downloadProgress: progress?[value.id] ?? 0.0,
-                              );
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }
-
-      final key = volume.key;
-
-      if (key == null) {
-        view.addAll(children);
-      } else {
-        view.add(
-          SliverPadding(
-            padding: const EdgeInsets.only(left: 12),
-            sliver: MultiSliver(
-              pushPinnedChildren: true,
-              children: [
-                SliverPinnedHeader(
-                  child: Container(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Volume $key',
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                ...children,
-              ],
-            ),
-          ),
-        );
-      }
-    }
-
-    return view;
   }
 
   Widget _content() {

@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:core_auth/core_auth.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ui_common/ui_common.dart';
@@ -31,8 +32,9 @@ class MangaDetailScreenState extends Equatable {
   final List<Manga> libraries;
   final Map<String?, double>? downloadProgress;
 
-  late final Map<num?, Map<num?, List<MangaChapter>>>? processedChapters;
-  late final int? totalChapter;
+  late final Set<num> chaptersKey;
+  late final Map<num, MangaChapter> processedChapters;
+  late final int totalChapter;
   late final bool isOnLibrary;
 
   MangaDetailScreenState({
@@ -51,24 +53,36 @@ class MangaDetailScreenState extends Equatable {
   }) {
     isOnLibrary = libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
 
-    final groupByVolume = chapters
-        ?.sortedBy((e) => e.numVolume ?? 0)
-        .reversed
-        .groupListsBy((e) => e.numVolume);
+    final Map<num, MangaChapter> processedChapters = {};
 
-    final groupByVolumeAndChapter = groupByVolume?.map(
-      (key, value) => MapEntry(
-        key,
-        value
-            .sortedBy((e) => e.numChapter ?? 0)
-            .reversed
-            .groupListsBy((e) => e.numChapter),
-      ),
-    );
-    processedChapters = groupByVolumeAndChapter;
-    totalChapter = groupByVolumeAndChapter?.values
-        .map((e) => e.values)
-        .fold<int>(0, (prev, e) => e.length + prev);
+    for (final data in chapters ?? <MangaChapter>[]) {
+      final chapter = data.numChapter;
+
+      if (chapter != null) {
+        processedChapters.update(
+          chapter,
+          (value) {
+            final oldDate = value.publishAt?.asDateTime;
+            final newDate = data.publishAt?.asDateTime;
+
+            if (oldDate == null) {
+              return data;
+            }
+
+            if (newDate == null) {
+              return value;
+            }
+
+            return newDate.isBefore(oldDate) ? value : data;
+          },
+          ifAbsent: () => data,
+        );
+      }
+    }
+
+    this.processedChapters = processedChapters;
+    chaptersKey = {...processedChapters.keys.sorted((a, b) => b.compareTo(a))};
+    totalChapter = processedChapters.length;
 
     // TODO: perform sorting
 
