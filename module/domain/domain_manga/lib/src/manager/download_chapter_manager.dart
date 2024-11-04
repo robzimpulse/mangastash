@@ -114,7 +114,8 @@ class DownloadChapterManager
               final progressValue = received / total * 100;
               final totalProgressValue = index / images.length;
               // TODO: fix progress
-              progress.add((index, progressValue + totalProgressValue));
+              final data = (index, progressValue + totalProgressValue);
+              progress.add(data);
             },
           );
 
@@ -145,6 +146,8 @@ class DownloadChapterManager
             time: DateTime.now(),
           );
         }
+
+        await Future.delayed(const Duration(seconds: 1));
       }
 
       _active.add((_active.valueOrNull ?? {})..remove(key));
