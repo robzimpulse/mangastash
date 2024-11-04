@@ -15,7 +15,7 @@ class SearchMangaOnMangaDexUseCase {
     required SearchMangaParameter parameter,
   }) async {
     try {
-      log('${parameter.toJson()}', name: '$SearchMangaOnMangaDexUseCase');
+      log('${parameter.toJson()}', name: runtimeType.toString(), time: DateTime.now());
 
       final result = await _mangaService.search(
         title: parameter.title,

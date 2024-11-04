@@ -11,7 +11,7 @@ import 'firebase_service/manga_tag_service_firebase.dart';
 class DataMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    log('start register', name: runtimeType.toString());
+    log('start register', name: runtimeType.toString(), time: DateTime.now());
 
     locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
 
@@ -23,6 +23,6 @@ class DataMangaRegistrar extends Registrar {
 
     locator.registerFactory(() => MangaLibraryServiceFirebase(app: locator()));
 
-    log('finish register', name: runtimeType.toString());
+    log('finish register', name: runtimeType.toString(), time: DateTime.now());
   }
 }

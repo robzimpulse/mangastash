@@ -16,7 +16,7 @@ import 'use_case/set_download_path_use_case.dart';
 class CoreStorageRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    log('start register', name: runtimeType.toString());
+    log('start register', name: runtimeType.toString(), time: DateTime.now());
 
     locator.registerSingleton(await SharedPreferencesStorage.create());
 
@@ -32,6 +32,6 @@ class CoreStorageRegistrar extends Registrar {
     locator.alias<ListenBackupPathUseCase, PathManager>();
     locator.alias<SetBackupPathUseCase, PathManager>();
 
-    log('finish register', name: runtimeType.toString());
+    log('finish register', name: runtimeType.toString(), time: DateTime.now());
   }
 }

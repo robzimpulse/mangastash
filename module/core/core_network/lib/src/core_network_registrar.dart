@@ -13,7 +13,7 @@ import 'use_case/launch_url_use_case.dart';
 class CoreNetworkRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    log('start register', name: runtimeType.toString());
+    log('start register', name: runtimeType.toString(), time: DateTime.now());
     locator.registerSingleton(Alice());
 
     locator.registerSingleton(await SystemProxyManager.init());
@@ -23,14 +23,21 @@ class CoreNetworkRegistrar extends Registrar {
     locator.alias<LaunchUrlUseCase, UrlLauncherManager>();
 
     locator.registerFactory(
-          () => Dio()
+      () => Dio()
         ..interceptors.addAll(
           [
             locator<Alice>().getDioInterceptor(),
-            DioThrottlerInterceptor(const Duration(milliseconds: 200))
+            DioThrottlerInterceptor(
+              const Duration(seconds: 1),
+              onThrottled: (req, scheduled) => log(
+                'Delay request for ${req.uri} until $scheduled',
+                name: runtimeType.toString(),
+                time: DateTime.now(),
+              ),
+            ),
           ],
         ),
     );
-    log('finish register', name: runtimeType.toString());
+    log('finish register', name: runtimeType.toString(), time: DateTime.now());
   }
 }

@@ -113,7 +113,7 @@ class DownloadChapterManager
               if (total == -1) return;
               final progressValue = received / total * 100;
               final totalProgressValue = index / images.length;
-
+              // TODO: fix progress
               progress.add((index, progressValue + totalProgressValue));
             },
           );
@@ -154,48 +154,6 @@ class DownloadChapterManager
         name: runtimeType.toString(),
         time: DateTime.now(),
       );
-
-      // final streams = images.map(
-      //   (e) => _cacheManager.getFileStream(e, withProgress: true),
-      // );
-
-      //   int counter = 0;
-      //   final stream = ConcatEagerStream(streams).transform(
-      //     StreamTransformer<FileResponse, (int, double)>.fromHandlers(
-      //       handleData: (value, sink) {
-      //         if (value is DownloadProgress) {
-      //           sink.add(
-      //             (counter, ((value.progress ?? 0) + counter) / streams.length),
-      //           );
-      //         }
-      //
-      //         if (value is FileInfo) {
-      //           counter++;
-      //           sink.add((counter, counter / streams.length));
-      //           _saveChapterToDownloadPath(key, value, counter);
-      //         }
-      //       },
-      //     ),
-      //   ).doOnDone(() {
-      //     _active.add((_active.valueOrNull ?? {})..remove(key));
-      //     log(
-      //       'Removing ${key.hashCode} from active download',
-      //       name: runtimeType.toString(),
-      //       time: DateTime.now(),
-      //     );
-      //   });
-      //
-      //   progress.listen(
-      //     (value) => log(
-      //       'progress: $value for key ${key.hashCode}',
-      //       name: runtimeType.toString(),
-      //       time: DateTime.now(),
-      //     ),
-      //   );
-      //
-      //   progress.addStream(
-      //     stream.throttleTime(const Duration(milliseconds: 500), trailing: true),
-      //   );
     }
 
     if (result is Error<MangaChapter>) {
@@ -218,47 +176,4 @@ class DownloadChapterManager
 
   @override
   ValueStream<Set<DownloadChapter>> get activeDownloadStream => _active.stream;
-
-  // void _saveChapterToDownloadPath(
-  //   DownloadChapter key,
-  //   FileInfo file,
-  //   int counter,
-  // ) async {
-  //   final root = _listenDownloadPathUseCase.downloadPathStream.valueOrNull;
-  //   final title = key.manga?.title;
-  //   final chapter = key.chapter?.numChapter;
-  //   final ext = file.file.path.split('.').lastOrNull;
-  //
-  //   if (root == null || title == null || chapter == null || ext == null) {
-  //     return;
-  //   }
-  //
-  //   final newPath = '${root.path}/$title/$chapter/$counter.$ext';
-  //
-  //   log(
-  //     'Start Move ${key.hashCode} file ${file.originalUrl} to `$newPath`',
-  //     name: runtimeType.toString(),
-  //     time: DateTime.now(),
-  //   );
-  //
-  //   try {
-  //     final isExists = await File(newPath).exists();
-  //     if (!isExists) {
-  //       await File(newPath).create(recursive: true);
-  //     }
-  //     await file.file.copy(newPath);
-  //
-  //     log(
-  //       'Finish Move ${key.hashCode} file ${file.originalUrl} to `$newPath`',
-  //       name: runtimeType.toString(),
-  //       time: DateTime.now(),
-  //     );
-  //   } catch (e) {
-  //     log(
-  //       'Error Move ${key.hashCode} file ${file.originalUrl}: $e',
-  //       name: runtimeType.toString(),
-  //       time: DateTime.now(),
-  //     );
-  //   }
-  // }
 }
