@@ -20,8 +20,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   // Service locator/dependency injector code here
   ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
-  final locator = ServiceLocator.asNewInstance();
-  runApp(MangaStashApp(locator: locator));
+  runApp(MangaStashApp(locator: ServiceLocator.asNewInstance()));
 }
 
 class MangaStashApp extends StatefulWidget {
