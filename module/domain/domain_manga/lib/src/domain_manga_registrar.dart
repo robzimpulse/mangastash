@@ -127,6 +127,7 @@ class DomainMangaRegistrar extends Registrar {
 
     locator.registerSingleton(
       DownloadChapterManager(
+        dio: () => locator(),
         getChapterUseCase: () => locator(),
         cacheManager: locator(),
         listenDownloadPathUseCase: locator(),

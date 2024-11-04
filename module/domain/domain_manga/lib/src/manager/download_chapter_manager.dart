@@ -19,6 +19,7 @@ class DownloadChapterManager
         ListenActiveDownloadUseCase,
         DownloadChapterUseCase,
         DownloadChapterProgressUseCase {
+  final ValueGetter<Dio> _dio;
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final BaseCacheManager _cacheManager;
   final ListenDownloadPathUseCase _listenDownloadPathUseCase;
@@ -28,10 +29,12 @@ class DownloadChapterManager
   final _progress = <DownloadChapter, BehaviorSubject<(int, double)>>{};
 
   DownloadChapterManager({
+    required ValueGetter<Dio> dio,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required BaseCacheManager cacheManager,
     required ListenDownloadPathUseCase listenDownloadPathUseCase,
   })  : _cacheManager = cacheManager,
+        _dio = dio,
         _getChapterUseCase = getChapterUseCase,
         _listenDownloadPathUseCase = listenDownloadPathUseCase;
 
@@ -52,6 +55,13 @@ class DownloadChapterManager
     _progress.putIfAbsent(key, () => progress);
 
     if (_active.valueOrNull?.contains(key) == true) return;
+
+    final isPermissionGranted = await Future.wait([
+      Permission.storage.isGranted,
+      Permission.manageExternalStorage.isGranted,
+    ]);
+
+    if (isPermissionGranted.every((e) => !e)) return;
 
     _active.add((_active.valueOrNull ?? {})..add(key));
 
@@ -75,47 +85,117 @@ class DownloadChapterManager
       );
 
       final images = result.data.images ?? [];
-      final streams = images.map(
-        (e) => _cacheManager.getFileStream(e, withProgress: true),
+      final root = _listenDownloadPathUseCase.downloadPathStream.valueOrNull;
+      final title = key.manga?.title;
+      final chapter = key.chapter?.numChapter;
+
+      for (final (index, url) in images.indexed) {
+        final ext = url.split('.').lastOrNull;
+
+        if (root == null || title == null || chapter == null || ext == null) {
+          continue;
+        }
+
+        final newPath = '${root.path}/$title/$chapter/${index + 1}.$ext';
+
+        try {
+
+          log(
+            'Start download chapter image for ${key.hashCode} - $url',
+            name: runtimeType.toString(),
+            time: DateTime.now(),
+          );
+
+          await _dio().download(
+            url,
+            newPath,
+            onReceiveProgress: (received, total) {
+              if (total == -1) return;
+              final progressValue = received / total * 100;
+              final totalProgressValue = index / images.length;
+
+              progress.add((index, progressValue + totalProgressValue));
+            },
+          );
+
+          log(
+            'Finish download chapter image for ${key.hashCode} - $url',
+            name: runtimeType.toString(),
+            time: DateTime.now(),
+          );
+
+          log(
+            'Start registering cache chapter image for ${key.hashCode} - $url',
+            name: runtimeType.toString(),
+            time: DateTime.now(),
+          );
+
+          await _cacheManager.putFile(url, File(newPath).readAsBytesSync());
+
+          log(
+            'Finish registering cache chapter image for ${key.hashCode} - $url',
+            name: runtimeType.toString(),
+            time: DateTime.now(),
+          );
+
+        } catch (e) {
+          log(
+            'Failed download chapter image for ${key.hashCode}: $e',
+            name: runtimeType.toString(),
+            time: DateTime.now(),
+          );
+        }
+      }
+
+      _active.add((_active.valueOrNull ?? {})..remove(key));
+
+      log(
+        'Removing ${key.hashCode} from active download',
+        name: runtimeType.toString(),
+        time: DateTime.now(),
       );
 
-      int counter = 0;
-      final stream = ConcatEagerStream(streams).transform(
-        StreamTransformer<FileResponse, (int, double)>.fromHandlers(
-          handleData: (value, sink) {
-            if (value is DownloadProgress) {
-              sink.add(
-                (counter, ((value.progress ?? 0) + counter) / streams.length),
-              );
-            }
+      // final streams = images.map(
+      //   (e) => _cacheManager.getFileStream(e, withProgress: true),
+      // );
 
-            if (value is FileInfo) {
-              counter++;
-              sink.add((counter, counter / streams.length));
-              _saveChapterToDownloadPath(key, value, counter);
-            }
-          },
-        ),
-      ).doOnDone(() {
-        _active.add((_active.valueOrNull ?? {})..remove(key));
-        log(
-          'Removing ${key.hashCode} from active download',
-          name: runtimeType.toString(),
-          time: DateTime.now(),
-        );
-      });
-
-      progress.listen(
-        (value) => log(
-          'progress: $value for key ${key.hashCode}',
-          name: runtimeType.toString(),
-          time: DateTime.now(),
-        ),
-      );
-
-      progress.addStream(
-        stream.throttleTime(const Duration(milliseconds: 500), trailing: true),
-      );
+      //   int counter = 0;
+      //   final stream = ConcatEagerStream(streams).transform(
+      //     StreamTransformer<FileResponse, (int, double)>.fromHandlers(
+      //       handleData: (value, sink) {
+      //         if (value is DownloadProgress) {
+      //           sink.add(
+      //             (counter, ((value.progress ?? 0) + counter) / streams.length),
+      //           );
+      //         }
+      //
+      //         if (value is FileInfo) {
+      //           counter++;
+      //           sink.add((counter, counter / streams.length));
+      //           _saveChapterToDownloadPath(key, value, counter);
+      //         }
+      //       },
+      //     ),
+      //   ).doOnDone(() {
+      //     _active.add((_active.valueOrNull ?? {})..remove(key));
+      //     log(
+      //       'Removing ${key.hashCode} from active download',
+      //       name: runtimeType.toString(),
+      //       time: DateTime.now(),
+      //     );
+      //   });
+      //
+      //   progress.listen(
+      //     (value) => log(
+      //       'progress: $value for key ${key.hashCode}',
+      //       name: runtimeType.toString(),
+      //       time: DateTime.now(),
+      //     ),
+      //   );
+      //
+      //   progress.addStream(
+      //     stream.throttleTime(const Duration(milliseconds: 500), trailing: true),
+      //   );
     }
 
     if (result is Error<MangaChapter>) {
@@ -139,53 +219,46 @@ class DownloadChapterManager
   @override
   ValueStream<Set<DownloadChapter>> get activeDownloadStream => _active.stream;
 
-  void _saveChapterToDownloadPath(
-    DownloadChapter key,
-    FileInfo file,
-    int counter,
-  ) async {
-    final root = _listenDownloadPathUseCase.downloadPathStream.valueOrNull;
-    final title = key.manga?.title;
-    final chapter = key.chapter?.numChapter;
-    final ext = file.file.path.split('.').lastOrNull;
-
-    if (root == null || title == null || chapter == null || ext == null) {
-      return;
-    }
-
-    final isPermissionGranted = await Future.wait([
-      Permission.storage.isGranted,
-      Permission.manageExternalStorage.isGranted,
-    ]);
-
-    if (isPermissionGranted.every((e) => !e)) return;
-
-    final newPath = '${root.path}/$title/$chapter/$counter.$ext';
-
-    log(
-      'Start Move ${key.hashCode} file ${file.originalUrl} to `$newPath`',
-      name: runtimeType.toString(),
-      time: DateTime.now(),
-    );
-
-    try {
-      final isExists = await File(newPath).exists();
-      if (!isExists) {
-        await File(newPath).create(recursive: true);
-      }
-      await file.file.copy(newPath);
-
-      log(
-        'Finish Move ${key.hashCode} file ${file.originalUrl} to `$newPath`',
-        name: runtimeType.toString(),
-        time: DateTime.now(),
-      );
-    } catch (e) {
-      log(
-        'Error Move ${key.hashCode} file ${file.originalUrl}: $e',
-        name: runtimeType.toString(),
-        time: DateTime.now(),
-      );
-    }
-  }
+  // void _saveChapterToDownloadPath(
+  //   DownloadChapter key,
+  //   FileInfo file,
+  //   int counter,
+  // ) async {
+  //   final root = _listenDownloadPathUseCase.downloadPathStream.valueOrNull;
+  //   final title = key.manga?.title;
+  //   final chapter = key.chapter?.numChapter;
+  //   final ext = file.file.path.split('.').lastOrNull;
+  //
+  //   if (root == null || title == null || chapter == null || ext == null) {
+  //     return;
+  //   }
+  //
+  //   final newPath = '${root.path}/$title/$chapter/$counter.$ext';
+  //
+  //   log(
+  //     'Start Move ${key.hashCode} file ${file.originalUrl} to `$newPath`',
+  //     name: runtimeType.toString(),
+  //     time: DateTime.now(),
+  //   );
+  //
+  //   try {
+  //     final isExists = await File(newPath).exists();
+  //     if (!isExists) {
+  //       await File(newPath).create(recursive: true);
+  //     }
+  //     await file.file.copy(newPath);
+  //
+  //     log(
+  //       'Finish Move ${key.hashCode} file ${file.originalUrl} to `$newPath`',
+  //       name: runtimeType.toString(),
+  //       time: DateTime.now(),
+  //     );
+  //   } catch (e) {
+  //     log(
+  //       'Error Move ${key.hashCode} file ${file.originalUrl}: $e',
+  //       name: runtimeType.toString(),
+  //       time: DateTime.now(),
+  //     );
+  //   }
+  // }
 }
