@@ -28,3 +28,9 @@ class TagResponse extends Response {
   @override
   Map<String, dynamic> toJson() => _$TagResponseToJson(this);
 }
+
+Map<String, dynamic> serializeTagResponse(TagResponse object) =>
+    object.toJson();
+
+TagResponse deserializeTagResponse(Map<String, dynamic> json) =>
+    TagResponse.fromJson(json);

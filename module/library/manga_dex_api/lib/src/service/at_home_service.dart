@@ -1,15 +1,23 @@
-import 'package:dio/dio.dart';
+import 'package:dio/dio.dart' hide Headers;
+import 'package:flutter/foundation.dart';
 import 'package:retrofit/http.dart';
 
-import '../dio/mangadex_dio.dart';
 import '../model/at_home/at_home_response.dart';
 
 part 'at_home_service.g.dart';
 
-@RestApi()
+@RestApi(
+  baseUrl: 'https://api.mangadex.org',
+  parser: Parser.FlutterCompute,
+
+)
 abstract class AtHomeService {
-  factory AtHomeService(MangaDexDio dio, {String baseUrl}) = _AtHomeService;
+  factory AtHomeService(Dio dio, {String baseUrl}) = _AtHomeService;
 
   @GET('/at-home/server/{id}')
+  @Headers(<String, dynamic>{
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  })
   Future<AtHomeResponse> url(@Path() String id);
 }

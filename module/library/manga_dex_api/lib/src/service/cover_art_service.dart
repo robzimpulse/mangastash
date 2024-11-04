@@ -1,16 +1,23 @@
-import 'package:dio/dio.dart';
+import 'package:dio/dio.dart' hide Headers;
+import 'package:flutter/foundation.dart';
 import 'package:retrofit/http.dart';
 
-import '../dio/mangadex_dio.dart';
 import '../model/cover_art/cover_art_response.dart';
 
 part 'cover_art_service.g.dart';
 
-@RestApi()
+@RestApi(
+  baseUrl: 'https://api.mangadex.org',
+  parser: Parser.FlutterCompute,
+)
 abstract class CoverArtService {
-  factory CoverArtService(MangaDexDio dio, {String baseUrl}) = _CoverArtService;
+  factory CoverArtService(Dio dio, {String baseUrl}) = _CoverArtService;
 
   @GET('/cover/{id}')
+  @Headers(<String, dynamic>{
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  })
   Future<CoverArtResponse> detail({
     @Path('id') String? id,
     @Query('includes[]') List<String>? includes,

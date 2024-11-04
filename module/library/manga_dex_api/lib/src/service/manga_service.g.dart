@@ -12,7 +12,9 @@ class _MangaService implements MangaService {
   _MangaService(
     this._dio, {
     this.baseUrl,
-  });
+  }) {
+    baseUrl ??= 'https://api.mangadex.org';
+  }
 
   final Dio _dio;
 
@@ -69,13 +71,18 @@ class _MangaService implements MangaService {
       r'order': orders,
     };
     queryParameters.removeWhere((k, v) => v == null);
-    final _headers = <String, dynamic>{};
+    final _headers = <String, dynamic>{
+      r'Content-Type': 'application/json',
+      r'Accept': 'application/json',
+    };
+    _headers.removeWhere((k, v) => v == null);
     final _data = <String, dynamic>{};
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<SearchMangaResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
+      contentType: 'application/json',
     )
             .compose(
               _dio.options,
@@ -84,7 +91,7 @@ class _MangaService implements MangaService {
               data: _data,
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = SearchMangaResponse.fromJson(_result.data!);
+    final value = await compute(deserializeSearchMangaResponse, _result.data!);
     return value;
   }
 
@@ -92,13 +99,18 @@ class _MangaService implements MangaService {
   Future<TagResponse> tags() async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{};
+    final _headers = <String, dynamic>{
+      r'Content-Type': 'application/json',
+      r'Accept': 'application/json',
+    };
+    _headers.removeWhere((k, v) => v == null);
     final _data = <String, dynamic>{};
     final _result = await _dio
         .fetch<Map<String, dynamic>>(_setStreamType<TagResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
+      contentType: 'application/json',
     )
             .compose(
               _dio.options,
@@ -107,7 +119,7 @@ class _MangaService implements MangaService {
               data: _data,
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = TagResponse.fromJson(_result.data!);
+    final value = await compute(deserializeTagResponse, _result.data!);
     return value;
   }
 
@@ -119,13 +131,18 @@ class _MangaService implements MangaService {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'includes[]': includes};
     queryParameters.removeWhere((k, v) => v == null);
-    final _headers = <String, dynamic>{};
+    final _headers = <String, dynamic>{
+      r'Content-Type': 'application/json',
+      r'Accept': 'application/json',
+    };
+    _headers.removeWhere((k, v) => v == null);
     final _data = <String, dynamic>{};
     final _result = await _dio
         .fetch<Map<String, dynamic>>(_setStreamType<MangaResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
+      contentType: 'application/json',
     )
             .compose(
               _dio.options,
@@ -134,7 +151,7 @@ class _MangaService implements MangaService {
               data: _data,
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = MangaResponse.fromJson(_result.data!);
+    final value = await compute(deserializeMangaResponse, _result.data!);
     return value;
   }
 
@@ -180,13 +197,18 @@ class _MangaService implements MangaService {
       r'includeExternalUrl': includeExternalUrl,
     };
     queryParameters.removeWhere((k, v) => v == null);
-    final _headers = <String, dynamic>{};
+    final _headers = <String, dynamic>{
+      r'Content-Type': 'application/json',
+      r'Accept': 'application/json',
+    };
+    _headers.removeWhere((k, v) => v == null);
     final _data = <String, dynamic>{};
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<SearchChapterResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
+      contentType: 'application/json',
     )
             .compose(
               _dio.options,
@@ -195,7 +217,8 @@ class _MangaService implements MangaService {
               data: _data,
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = SearchChapterResponse.fromJson(_result.data!);
+    final value =
+        await compute(deserializeSearchChapterResponse, _result.data!);
     return value;
   }
 

@@ -12,7 +12,9 @@ class _CoverArtService implements CoverArtService {
   _CoverArtService(
     this._dio, {
     this.baseUrl,
-  });
+  }) {
+    baseUrl ??= 'https://api.mangadex.org';
+  }
 
   final Dio _dio;
 
@@ -26,13 +28,18 @@ class _CoverArtService implements CoverArtService {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'includes[]': includes};
     queryParameters.removeWhere((k, v) => v == null);
-    final _headers = <String, dynamic>{};
+    final _headers = <String, dynamic>{
+      r'Content-Type': 'application/json',
+      r'Accept': 'application/json',
+    };
+    _headers.removeWhere((k, v) => v == null);
     final _data = <String, dynamic>{};
     final _result = await _dio
         .fetch<Map<String, dynamic>>(_setStreamType<CoverArtResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
+      contentType: 'application/json',
     )
             .compose(
               _dio.options,
@@ -41,7 +48,7 @@ class _CoverArtService implements CoverArtService {
               data: _data,
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = CoverArtResponse.fromJson(_result.data!);
+    final value = await compute(deserializeCoverArtResponse, _result.data!);
     return value;
   }
 

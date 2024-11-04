@@ -1,17 +1,24 @@
-import 'package:dio/dio.dart';
+import 'package:dio/dio.dart' hide Headers;
+import 'package:flutter/foundation.dart';
 import 'package:retrofit/http.dart';
 
-import '../dio/mangadex_dio.dart';
 import '../model/chapter/chapter_response.dart';
 import '../model/chapter/search_chapter_response.dart';
 
 part 'chapter_service.g.dart';
 
-@RestApi()
+@RestApi(
+  baseUrl: 'https://api.mangadex.org',
+  parser: Parser.FlutterCompute,
+)
 abstract class ChapterService {
-  factory ChapterService(MangaDexDio dio, {String baseUrl}) = _ChapterService;
+  factory ChapterService(Dio dio, {String baseUrl}) = _ChapterService;
 
   @GET('/chapter')
+  @Headers(<String, dynamic>{
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  })
   Future<SearchChapterResponse> search({
     @Query('manga') String? mangaId,
     @Query('ids[]') List<String>? ids,
@@ -34,6 +41,10 @@ abstract class ChapterService {
   });
 
   @GET('/chapter/{id}')
+  @Headers(<String, dynamic>{
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  })
   Future<ChapterResponse> detail({
     @Path('id') String? id,
     @Query('includes[]') List<String>? includes,

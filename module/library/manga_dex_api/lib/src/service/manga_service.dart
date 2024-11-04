@@ -1,7 +1,7 @@
-import 'package:dio/dio.dart';
+import 'package:dio/dio.dart' hide Headers;
+import 'package:flutter/foundation.dart';
 import 'package:retrofit/http.dart';
 
-import '../dio/mangadex_dio.dart';
 import '../model/chapter/search_chapter_response.dart';
 import '../model/manga/manga_response.dart';
 import '../model/manga/search_manga_response.dart';
@@ -9,11 +9,18 @@ import '../model/tag/tag_response.dart';
 
 part 'manga_service.g.dart';
 
-@RestApi()
+@RestApi(
+  baseUrl: 'https://api.mangadex.org',
+  parser: Parser.FlutterCompute,
+)
 abstract class MangaService {
-  factory MangaService(MangaDexDio dio, {String baseUrl}) = _MangaService;
+  factory MangaService(Dio dio, {String baseUrl}) = _MangaService;
 
   @GET('/manga')
+  @Headers(<String, dynamic>{
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  })
   Future<SearchMangaResponse> search({
     @Query('title') String? title,
     @Query('limit') int? limit,
@@ -42,15 +49,27 @@ abstract class MangaService {
   });
 
   @GET('/manga/tag')
+  @Headers(<String, dynamic>{
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  })
   Future<TagResponse> tags();
 
   @GET('/manga/{id}')
+  @Headers(<String, dynamic>{
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  })
   Future<MangaResponse> detail({
     @Path('id') String? id,
     @Query('includes[]') List<String>? includes,
   });
 
   @GET('/manga/{id}/feed')
+  @Headers(<String, dynamic>{
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  })
   Future<SearchChapterResponse> feed({
     @Path('id') String? id,
     @Query('limit') int? limit,

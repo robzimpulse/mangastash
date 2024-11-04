@@ -29,3 +29,13 @@ class SearchMangaResponse extends Response {
   @override
   Map<String, dynamic> toJson() => _$SearchMangaResponseToJson(this);
 }
+
+Map<String, dynamic> serializeSearchMangaResponse(
+  SearchMangaResponse object,
+) =>
+    object.toJson();
+
+SearchMangaResponse deserializeSearchMangaResponse(
+  Map<String, dynamic> json,
+) =>
+    SearchMangaResponse.fromJson(json);

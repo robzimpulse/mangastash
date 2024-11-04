@@ -23,3 +23,9 @@ class ChapterResponse extends Response {
   @override
   Map<String, dynamic> toJson() => _$ChapterResponseToJson(this);
 }
+
+Map<String, dynamic> serializeChapterResponse(ChapterResponse object) =>
+    object.toJson();
+
+ChapterResponse deserializeChapterResponse(Map<String, dynamic> json) =>
+    ChapterResponse.fromJson(json);

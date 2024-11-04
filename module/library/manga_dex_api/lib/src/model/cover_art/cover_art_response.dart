@@ -19,3 +19,9 @@ class CoverArtResponse extends Response {
   @override
   Map<String, dynamic> toJson() => _$CoverArtResponseToJson(this);
 }
+
+Map<String, dynamic> serializeCoverArtResponse(CoverArtResponse object) =>
+    object.toJson();
+
+CoverArtResponse deserializeCoverArtResponse(Map<String, dynamic> json) =>
+    CoverArtResponse.fromJson(json);

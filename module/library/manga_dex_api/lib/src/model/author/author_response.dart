@@ -22,3 +22,9 @@ class AuthorResponse extends Response {
   @override
   Map<String, dynamic> toJson() => _$AuthorResponseToJson(this);
 }
+
+Map<String, dynamic> serializeAuthorResponse(AuthorResponse object) =>
+    object.toJson();
+
+AuthorResponse deserializeAuthorResponse(Map<String, dynamic> json) =>
+    AuthorResponse.fromJson(json);

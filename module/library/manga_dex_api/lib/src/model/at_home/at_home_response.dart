@@ -35,3 +35,9 @@ class AtHomeResponse {
 
   Map<String, dynamic> toJson() => _$AtHomeResponseToJson(this);
 }
+
+Map<String, dynamic> serializeAtHomeResponse(AtHomeResponse object) =>
+    object.toJson();
+
+AtHomeResponse deserializeAtHomeResponse(Map<String, dynamic> json) =>
+    AtHomeResponse.fromJson(json);

@@ -1,8 +1,10 @@
 import 'dart:developer';
 
 import 'package:alice_lightweight/alice.dart';
+import 'package:dio/dio.dart';
 import 'package:service_locator/service_locator.dart';
 
+import 'interceptor/dio_throttler_interceptor.dart';
 import 'manager/system_proxy_manager.dart';
 import 'manager/url_launcher_manager.dart';
 import 'use_case/get_proxy_use_case.dart';
@@ -19,6 +21,16 @@ class CoreNetworkRegistrar extends Registrar {
 
     locator.registerSingleton(UrlLauncherManager());
     locator.alias<LaunchUrlUseCase, UrlLauncherManager>();
+
+    locator.registerFactory(
+          () => Dio()
+        ..interceptors.addAll(
+          [
+            locator<Alice>().getDioInterceptor(),
+            DioThrottlerInterceptor(const Duration(milliseconds: 200))
+          ],
+        ),
+    );
     log('finish register', name: runtimeType.toString());
   }
 }

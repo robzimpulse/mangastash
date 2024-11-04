@@ -12,7 +12,9 @@ class _ChapterService implements ChapterService {
   _ChapterService(
     this._dio, {
     this.baseUrl,
-  });
+  }) {
+    baseUrl ??= 'https://api.mangadex.org';
+  }
 
   final Dio _dio;
 
@@ -61,13 +63,18 @@ class _ChapterService implements ChapterService {
       r'offset': offset,
     };
     queryParameters.removeWhere((k, v) => v == null);
-    final _headers = <String, dynamic>{};
+    final _headers = <String, dynamic>{
+      r'Content-Type': 'application/json',
+      r'Accept': 'application/json',
+    };
+    _headers.removeWhere((k, v) => v == null);
     final _data = <String, dynamic>{};
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<SearchChapterResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
+      contentType: 'application/json',
     )
             .compose(
               _dio.options,
@@ -76,7 +83,8 @@ class _ChapterService implements ChapterService {
               data: _data,
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = SearchChapterResponse.fromJson(_result.data!);
+    final value =
+        await compute(deserializeSearchChapterResponse, _result.data!);
     return value;
   }
 
@@ -88,13 +96,18 @@ class _ChapterService implements ChapterService {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'includes[]': includes};
     queryParameters.removeWhere((k, v) => v == null);
-    final _headers = <String, dynamic>{};
+    final _headers = <String, dynamic>{
+      r'Content-Type': 'application/json',
+      r'Accept': 'application/json',
+    };
+    _headers.removeWhere((k, v) => v == null);
     final _data = <String, dynamic>{};
     final _result = await _dio
         .fetch<Map<String, dynamic>>(_setStreamType<ChapterResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
+      contentType: 'application/json',
     )
             .compose(
               _dio.options,
@@ -103,7 +116,7 @@ class _ChapterService implements ChapterService {
               data: _data,
             )
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = ChapterResponse.fromJson(_result.data!);
+    final value = await compute(deserializeChapterResponse, _result.data!);
     return value;
   }
 

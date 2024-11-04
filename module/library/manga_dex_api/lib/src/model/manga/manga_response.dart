@@ -23,3 +23,13 @@ class MangaResponse extends Response {
   @override
   Map<String, dynamic> toJson() => _$MangaResponseToJson(this);
 }
+
+Map<String, dynamic> serializeMangaResponse(
+  MangaResponse object,
+) =>
+    object.toJson();
+
+MangaResponse deserializeMangaResponse(
+  Map<String, dynamic> json,
+) =>
+    MangaResponse.fromJson(json);

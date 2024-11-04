@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:core_network/core_network.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
@@ -31,11 +30,6 @@ class DomainMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     log('start register', name: runtimeType.toString(), time: DateTime.now());
-
-    // manga dex dio client
-    locator.registerFactory(
-      () => MangaDexDio(interceptors: [locator<Alice>().getDioInterceptor()]),
-    );
 
     // manga dex services
     locator.registerFactory(() => MangaService(locator()));

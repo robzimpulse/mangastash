@@ -25,8 +25,10 @@ class Manga extends Equatable {
 
   final MangaSourceEnum? source;
 
+  @JsonKey(includeToJson: false, includeFromJson: false)
   late final List<String> tagsName;
 
+  @JsonKey(includeToJson: false, includeFromJson: false)
   late final Map<String, MangaTag> mapTagsByName;
 
   Manga({
