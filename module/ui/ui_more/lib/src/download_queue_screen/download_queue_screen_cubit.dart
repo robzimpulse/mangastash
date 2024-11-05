@@ -38,11 +38,10 @@ class DownloadQueueScreenCubit extends Cubit<DownloadQueueScreenState>
     }
     emit(state.copyWith(progress: progress));
 
-    final stream = CombineLatestStream(streams, (values) => values)
-        .throttleTime(const Duration(seconds: 1), trailing: true);
-
     _activeSubscription?.cancel();
-    _activeSubscription = stream.listen(_updateProgress);
+    _activeSubscription = CombineLatestStream(streams, (values) => values)
+        .throttleTime(const Duration(seconds: 1), trailing: true)
+        .listen(_updateProgress);
   }
 
   void _updateProgress(List<(DownloadChapter key, int, double)> values) {
