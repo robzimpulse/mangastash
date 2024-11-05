@@ -45,7 +45,9 @@ class DownloadQueueScreenCubit extends Cubit<DownloadQueueScreenState>
   }
 
   void _updateProgress(List<(DownloadChapter key, int, double)> values) {
-    final progress = state.progress ?? {};
+    final progress = Map.of(
+      state.progress ?? <DownloadChapter, (int, double)>{},
+    );
     for (final value in values) {
       progress.update(value.$1, (value) => (value.$1, value.$2));
     }
