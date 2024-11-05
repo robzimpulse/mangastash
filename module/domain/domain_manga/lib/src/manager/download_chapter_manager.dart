@@ -53,23 +53,40 @@ class DownloadChapterManager
   }) async {
     final progress = _progress[key] ?? BehaviorSubject.seeded((0, 0.0));
     _progress.putIfAbsent(key, () => progress);
-
     if (_active.valueOrNull?.contains(key) == true) return;
+    _active.add((_active.valueOrNull ?? {})..add(key));
+    log(
+      'Adding ${key.hashCode} to active download',
+      name: runtimeType.toString(),
+      time: DateTime.now(),
+    );
+    _startDownload();
+  }
+
+  @override
+  double downloadChapterProgress({
+    required DownloadChapter key,
+  }) {
+    final progress = _progress[key] ?? BehaviorSubject.seeded((0, 0.0));
+    _progress.putIfAbsent(key, () => progress);
+    return progress.valueOrNull?.$2 ?? 0.0;
+  }
+
+  @override
+  ValueStream<Set<DownloadChapter>> get activeDownloadStream => _active.stream;
+
+  void _startDownload() async {
+
+    final key = _active.valueOrNull?.firstOrNull;
+
+    if (key == null) return;
 
     final isPermissionGranted = await Future.wait([
       Permission.storage.isGranted,
       Permission.manageExternalStorage.isGranted,
     ]);
 
-    if (isPermissionGranted.every((e) => !e)) return;
-
-    _active.add((_active.valueOrNull ?? {})..add(key));
-
-    log(
-      'Adding ${key.hashCode} to active download',
-      name: runtimeType.toString(),
-      time: DateTime.now(),
-    );
+    if (isPermissionGranted.any((e) => e)) return;
 
     final result = await _getChapterUseCase().execute(
       chapterId: key.chapter?.id,
@@ -106,18 +123,9 @@ class DownloadChapterManager
             time: DateTime.now(),
           );
 
-          await _dio().download(
-            url,
-            newPath,
-            onReceiveProgress: (received, total) {
-              if (total == -1) return;
-              final progressValue = received / total * 100;
-              final totalProgressValue = index / images.length;
-              // TODO: fix progress
-              final data = (index, progressValue + totalProgressValue);
-              progress.add(data);
-            },
-          );
+          await _dio().download(url, newPath);
+
+          _progress[key]?.add((index, index / images.length));
 
           log(
             'Finish download chapter image for ${key.hashCode} - $url',
@@ -141,13 +149,11 @@ class DownloadChapterManager
 
         } catch (e) {
           log(
-            'Failed download chapter image for ${key.hashCode}: $e',
+            'Failed download chapter image for ${key.hashCode} | $e',
             name: runtimeType.toString(),
             time: DateTime.now(),
           );
         }
-
-        await Future.delayed(const Duration(seconds: 1));
       }
 
       _active.add((_active.valueOrNull ?? {})..remove(key));
@@ -161,22 +167,12 @@ class DownloadChapterManager
 
     if (result is Error<MangaChapter>) {
       log(
-        'Failed fetching chapter images for ${key.hashCode}',
+        'Failed fetching chapter images for ${key.hashCode} | ${result.error}',
         name: runtimeType.toString(),
         time: DateTime.now(),
       );
     }
-  }
 
-  @override
-  double downloadChapterProgress({
-    required DownloadChapter key,
-  }) {
-    final progress = _progress[key] ?? BehaviorSubject.seeded((0, 0.0));
-    _progress.putIfAbsent(key, () => progress);
-    return progress.valueOrNull?.$2 ?? 0.0;
+    _startDownload();
   }
-
-  @override
-  ValueStream<Set<DownloadChapter>> get activeDownloadStream => _active.stream;
 }

@@ -107,10 +107,9 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     await [Permission.storage, Permission.manageExternalStorage].request();
     if (!context.mounted) return;
 
-    final chapters = state.chapters ?? [];
     switch (option) {
       case DownloadOption.all:
-        for (final chapter in chapters) {
+        for (final chapter in state.processedChapters.values) {
           _cubit(context).downloadChapter(chapter: chapter);
         }
       default:

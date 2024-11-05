@@ -74,7 +74,7 @@ class BackupRestoreScreen extends StatelessWidget {
                         Permission.storage.isGranted,
                       ]);
 
-                      return isGranted.any((element) => true);
+                      return isGranted.any((e) => e);
                     },
                   );
 
