@@ -124,23 +124,23 @@ class DownloadChapterManager
 
         try {
           log(
-            'Start download chapter image for ${key.hashCode} - $url',
+            'Start download chapter image $url',
             name: runtimeType.toString(),
             time: DateTime.now(),
           );
 
           await _dio().download(url, newPath);
 
-          _progress[key]?.add((index, index / images.length));
+          _progress[key]?.add((index, index / (images.length - 1)));
 
           log(
-            'Finish download chapter image for ${key.hashCode} - $url',
+            'Finish download chapter image $url',
             name: runtimeType.toString(),
             time: DateTime.now(),
           );
 
           log(
-            'Start registering cache chapter image for ${key.hashCode} - $url',
+            'Start registering cache chapter image for $url',
             name: runtimeType.toString(),
             time: DateTime.now(),
           );
@@ -148,19 +148,17 @@ class DownloadChapterManager
           await _cacheManager.putFile(url, File(newPath).readAsBytesSync());
 
           log(
-            'Finish registering cache chapter image for ${key.hashCode} - $url',
+            'Finish registering cache chapter image for $url',
             name: runtimeType.toString(),
             time: DateTime.now(),
           );
         } catch (e) {
           log(
-            'Failed download chapter image for ${key.hashCode} | $e',
+            'Failed download chapter image for $url | $e',
             name: runtimeType.toString(),
             time: DateTime.now(),
           );
         }
-
-        await Future.delayed(const Duration(seconds: 1));
       }
     }
 
@@ -171,8 +169,6 @@ class DownloadChapterManager
         time: DateTime.now(),
       );
     }
-
-    await Future.delayed(const Duration(seconds: 1));
 
     _active.add((_active.valueOrNull ?? {})..remove(key));
 
