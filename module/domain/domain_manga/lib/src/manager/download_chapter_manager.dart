@@ -23,9 +23,7 @@ class DownloadChapterManager
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final BaseCacheManager _cacheManager;
   final ListenDownloadPathUseCase _listenDownloadPathUseCase;
-
   final _active = BehaviorSubject<Set<DownloadChapter>>.seeded({});
-
   final _progress = <DownloadChapter, BehaviorSubject<(int, double)>>{};
 
   DownloadChapterManager({
@@ -36,7 +34,10 @@ class DownloadChapterManager
   })  : _cacheManager = cacheManager,
         _dio = dio,
         _getChapterUseCase = getChapterUseCase,
-        _listenDownloadPathUseCase = listenDownloadPathUseCase;
+        _listenDownloadPathUseCase = listenDownloadPathUseCase {
+
+    _active.map((event) => event.firstOrNull).distinct().listen(_startDownload);
+  }
 
   @override
   ValueStream<(int, double)> downloadChapterProgressStream({
@@ -60,7 +61,6 @@ class DownloadChapterManager
       name: runtimeType.toString(),
       time: DateTime.now(),
     );
-    _startDownload();
   }
 
   @override
@@ -75,10 +75,7 @@ class DownloadChapterManager
   @override
   ValueStream<Set<DownloadChapter>> get activeDownloadStream => _active.stream;
 
-  void _startDownload() async {
-
-    final key = _active.valueOrNull?.firstOrNull;
-
+  void _startDownload(DownloadChapter? key) async {
     if (key == null) return;
 
     final isPermissionGranted = await Future.wait([
@@ -86,7 +83,17 @@ class DownloadChapterManager
       Permission.manageExternalStorage.isGranted,
     ]);
 
-    if (isPermissionGranted.any((e) => e)) return;
+    if (!isPermissionGranted.any((e) => e)) {
+      _active.add((_active.valueOrNull ?? {})..remove(key));
+
+      log(
+        'Removing ${key.hashCode} from active download',
+        name: runtimeType.toString(),
+        time: DateTime.now(),
+      );
+
+      return;
+    }
 
     final result = await _getChapterUseCase().execute(
       chapterId: key.chapter?.id,
@@ -116,7 +123,6 @@ class DownloadChapterManager
         final newPath = '${root.path}/$title/$chapter/${index + 1}.$ext';
 
         try {
-
           log(
             'Start download chapter image for ${key.hashCode} - $url',
             name: runtimeType.toString(),
@@ -146,7 +152,6 @@ class DownloadChapterManager
             name: runtimeType.toString(),
             time: DateTime.now(),
           );
-
         } catch (e) {
           log(
             'Failed download chapter image for ${key.hashCode} | $e',
@@ -154,15 +159,9 @@ class DownloadChapterManager
             time: DateTime.now(),
           );
         }
+
+        await Future.delayed(const Duration(seconds: 1));
       }
-
-      _active.add((_active.valueOrNull ?? {})..remove(key));
-
-      log(
-        'Removing ${key.hashCode} from active download',
-        name: runtimeType.toString(),
-        time: DateTime.now(),
-      );
     }
 
     if (result is Error<MangaChapter>) {
@@ -173,6 +172,14 @@ class DownloadChapterManager
       );
     }
 
-    _startDownload();
+    await Future.delayed(const Duration(seconds: 1));
+
+    _active.add((_active.valueOrNull ?? {})..remove(key));
+
+    log(
+      'Removing ${key.hashCode} from active download',
+      name: runtimeType.toString(),
+      time: DateTime.now(),
+    );
   }
 }
