@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:service_locator/service_locator.dart';
 
-import '../core_network.dart';
 import 'interceptor/dio_throttler_interceptor.dart';
 import 'manager/system_proxy_manager.dart';
 import 'manager/url_launcher_manager.dart';
