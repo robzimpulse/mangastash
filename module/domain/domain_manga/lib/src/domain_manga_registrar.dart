@@ -107,8 +107,8 @@ class DomainMangaRegistrar extends Registrar {
       ),
     );
 
-    locator.registerLazySingleton(
-      () => LibraryManager(
+    locator.registerSingleton(
+      LibraryManager(
         mangaLibraryServiceFirebase: locator(),
         listenAuthUseCase: locator(),
       ),
@@ -116,8 +116,8 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
     locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
 
-    locator.registerLazySingleton(
-      () => MangaSourceManager(
+    locator.registerSingleton(
+      MangaSourceManager(
         mangaSourceServiceFirebase: locator(),
       ),
     );
@@ -125,8 +125,8 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<ListenMangaSourceUseCase, MangaSourceManager>();
     locator.alias<GetMangaSourceUseCase, MangaSourceManager>();
 
-    locator.registerLazySingleton(
-      () => DownloadChapterManager(
+    locator.registerSingleton(
+      DownloadChapterManager(
         dio: () => locator(),
         getChapterUseCase: () => locator(),
         cacheManager: locator(),

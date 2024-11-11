@@ -18,18 +18,14 @@ class CoreStorageRegistrar extends Registrar {
   Future<void> register(ServiceLocator locator) async {
     log('start register', name: runtimeType.toString(), time: DateTime.now());
 
-    locator.registerLazySingletonAsync(
-      () async => SharedPreferencesStorage.create(),
-    );
+    locator.registerSingleton(await SharedPreferencesStorage.create());
 
-    locator.registerLazySingleton(() => InMemoryStorage());
+    locator.registerSingleton(InMemoryStorage());
 
-    locator.registerLazySingleton(() => CustomCacheManager.create());
+    locator.registerSingleton(CustomCacheManager.create());
     locator.alias<BaseCacheManager, CustomCacheManager>();
 
-    locator.registerLazySingletonAsync(
-      () async => PathManager.create(storage: locator()),
-    );
+    locator.registerSingleton(await PathManager.create(storage: locator()));
     locator.alias<GetRootPathUseCase, PathManager>();
     locator.alias<ListenDownloadPathUseCase, PathManager>();
     locator.alias<SetDownloadPathUseCase, PathManager>();

@@ -16,18 +16,18 @@ class CoreEnvironmentRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     log('start register', name: runtimeType.toString(), time: DateTime.now());
-    locator.registerLazySingleton(() => ThemeManager(storage: locator()));
+    locator.registerSingleton(ThemeManager(storage: locator()));
     locator.alias<UpdateThemeUseCase, ThemeManager>();
     locator.alias<ListenThemeUseCase, ThemeManager>();
 
-    locator.registerLazySingleton(() => LocaleManager(storage: locator()));
+    locator.registerSingleton(LocaleManager(storage: locator()));
     locator.alias<UpdateLocaleUseCase, LocaleManager>();
     locator.alias<ListenLocaleUseCase, LocaleManager>();
 
-    locator.registerLazySingletonAsync(() async => DateManager.create());
+    locator.registerSingleton(await DateManager.create());
     locator.alias<ListenCurrentTimezoneUseCase, DateManager>();
 
-    locator.registerLazySingleton(() => BackgroundWorker());
+    locator.registerSingleton(BackgroundWorker());
     log('finish register', name: runtimeType.toString(), time: DateTime.now());
   }
 }
