@@ -62,8 +62,8 @@ class _MangaStashAppState extends State<MangaStashApp> {
   Future<void> initiateAppLocator() async {
     if (widget.testing) return;
 
-    widget.locator.registerSingleton(
-      await Firebase.initializeApp(
+    widget.locator.registerLazySingletonAsync(
+      () async => Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       ),
     );

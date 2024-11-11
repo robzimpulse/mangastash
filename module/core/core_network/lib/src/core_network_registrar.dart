@@ -15,12 +15,12 @@ class CoreNetworkRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     log('start register', name: runtimeType.toString(), time: DateTime.now());
-    locator.registerSingleton(Alice());
+    locator.registerLazySingleton(() => Alice());
 
-    locator.registerSingleton(await SystemProxyManager.init());
+    locator.registerLazySingletonAsync(() async => SystemProxyManager.init());
     locator.alias<GetSystemProxyUseCase, SystemProxyManager>();
 
-    locator.registerSingleton(UrlLauncherManager());
+    locator.registerLazySingleton(() => UrlLauncherManager());
     locator.alias<LaunchUrlUseCase, UrlLauncherManager>();
 
     locator.registerFactory(
