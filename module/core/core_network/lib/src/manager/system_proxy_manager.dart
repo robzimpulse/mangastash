@@ -15,7 +15,7 @@ class SystemProxyManager implements GetSystemProxyUseCase {
 
   SystemProxyManager({this.host, this.port});
 
-  static Future<SystemProxyManager> init() async {
+  static Future<SystemProxyManager> create() async {
     String? host;
     String? port;
 

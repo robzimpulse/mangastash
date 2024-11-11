@@ -17,7 +17,7 @@ class CoreNetworkRegistrar extends Registrar {
     log('start register', name: runtimeType.toString(), time: DateTime.now());
     locator.registerSingleton(Alice());
 
-    locator.registerSingleton(await SystemProxyManager.init());
+    locator.registerSingleton(await SystemProxyManager.create());
     locator.alias<GetSystemProxyUseCase, SystemProxyManager>();
 
     locator.registerSingleton(UrlLauncherManager());
