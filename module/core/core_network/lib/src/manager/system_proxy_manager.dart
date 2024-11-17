@@ -26,20 +26,24 @@ class SystemProxyManager implements GetSystemProxyUseCase {
     }
 
     if (kDebugMode && port != null && host != null) {
-      HttpOverrides.global = SystemProxyHttpOverrides(port: port, host: host);
-      log('Using proxy with host: $host:$port', name: 'Core Network');
+      HttpOverrides.global = _SystemProxyHttpOverrides(port: port, host: host);
+      log(
+        'Using proxy with host: $host:$port',
+        name: 'SystemProxyManager',
+        time: DateTime.now(),
+      );
     }
 
     return SystemProxyManager(host: host, port: port);
   }
 }
 
-class SystemProxyHttpOverrides extends HttpOverrides {
+class _SystemProxyHttpOverrides extends HttpOverrides {
   String port;
   String host;
   bool? bypassSslValidation;
 
-  SystemProxyHttpOverrides({
+  _SystemProxyHttpOverrides({
     required this.port,
     required this.host,
     this.bypassSslValidation,
