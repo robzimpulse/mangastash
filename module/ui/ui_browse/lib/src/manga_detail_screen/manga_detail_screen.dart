@@ -104,7 +104,12 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     DownloadOption option,
     MangaDetailScreenState state,
   ) async {
-    await [Permission.storage, Permission.manageExternalStorage].request();
+    await [
+      Permission.storage,
+      Permission.manageExternalStorage,
+      Permission.notification,
+    ].request();
+
     if (!context.mounted) return;
 
     switch (option) {
@@ -112,6 +117,17 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         for (final chapter in state.processedChapters.values) {
           _cubit(context).downloadChapter(chapter: chapter);
         }
+        break;
+      // case DownloadOption.next:
+      // // TODO: Handle this case.
+      // case DownloadOption.next5:
+      // // TODO: Handle this case.
+      // case DownloadOption.next10:
+      // // TODO: Handle this case.
+      // case DownloadOption.custom:
+      // // TODO: Handle this case.
+      // case DownloadOption.unread:
+      // // TODO: Handle this case.
       default:
         // TODO: implement this
         context.showSnackBar(
@@ -124,7 +140,12 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     BuildContext context,
     MangaChapter? chapter,
   ) async {
-    await [Permission.storage, Permission.manageExternalStorage].request();
+    await [
+      Permission.storage,
+      Permission.manageExternalStorage,
+      Permission.notification,
+    ].request();
+
     if (!context.mounted || chapter == null) return;
     _cubit(context).downloadChapter(chapter: chapter);
   }
