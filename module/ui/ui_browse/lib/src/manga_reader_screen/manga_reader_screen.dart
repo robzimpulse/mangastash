@@ -133,6 +133,7 @@ class _MangaReaderScreenState extends State<MangaReaderScreen> {
                     childCount: images.length,
                     (context, index) => VisibilityDetector(
                       onVisibilityChanged: (info) {
+                        if (!context.mounted) return;
                         _cubit(context).onVisibility(
                           key: images[index],
                           visibleFraction: info.visibleFraction,
@@ -171,8 +172,7 @@ class _MangaReaderScreenState extends State<MangaReaderScreen> {
                     builder: (context, state) => state.nextChapterId != null
                         ? ElevatedButton(
                             style: ButtonStyle(
-                              shape: MaterialStateProperty.all<
-                                  RoundedRectangleBorder>(
+                              shape: MaterialStateProperty.all(
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
