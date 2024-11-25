@@ -11,23 +11,27 @@ import '../use_case/update_locale_use_case.dart';
 class LocaleManager implements ListenLocaleUseCase, UpdateLocaleUseCase {
   final SharedPreferencesStorage _storage;
 
-  final _localeDataStream = BehaviorSubject<Locale?>.seeded(null);
+  late final BehaviorSubject<Locale> _localeDataStream;
 
   static const _key = 'locale';
 
-  LocaleManager({
+  static Future<LocaleManager> create({
     required SharedPreferencesStorage storage,
-  }) : _storage = storage {
-    _init();
+  }) async {
+    final value = storage.getString(_key) ?? await findSystemLocale();
+    final language = value.split('_').firstOrNull ?? 'en';
+    final country = value.split('_').lastOrNull;
+    return LocaleManager._(
+      storage: storage,
+      initialLocale: Locale(language, country),
+    );
   }
 
-  void _init() async {
-    final value = _storage.getString(_key) ?? await findSystemLocale();
-    final language = value.split('_').firstOrNull;
-    final country = value.split('_').lastOrNull;
-    if (language == null) return;
-    updateLocale(locale: Locale(language, country));
-  }
+  LocaleManager._({
+    required SharedPreferencesStorage storage,
+    required Locale initialLocale,
+  })  : _storage = storage,
+        _localeDataStream = BehaviorSubject.seeded(initialLocale);
 
   @override
   ValueStream<Locale?> get localeDataStream => _localeDataStream.stream;

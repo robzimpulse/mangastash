@@ -20,7 +20,7 @@ class CoreEnvironmentRegistrar extends Registrar {
     locator.alias<UpdateThemeUseCase, ThemeManager>();
     locator.alias<ListenThemeUseCase, ThemeManager>();
 
-    locator.registerSingleton(LocaleManager(storage: locator()));
+    locator.registerSingleton(await LocaleManager.create(storage: locator()));
     locator.alias<UpdateLocaleUseCase, LocaleManager>();
     locator.alias<ListenLocaleUseCase, LocaleManager>();
 
