@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart' hide Headers;
 import 'package:flutter/foundation.dart';
-import 'package:retrofit/http.dart';
+import 'package:retrofit/retrofit.dart';
 
 import '../model/chapter/search_chapter_response.dart';
 import '../model/manga/manga_response.dart';
@@ -14,7 +14,11 @@ part 'manga_service.g.dart';
   parser: Parser.FlutterCompute,
 )
 abstract class MangaService {
-  factory MangaService(Dio dio, {String baseUrl}) = _MangaService;
+  factory MangaService(
+    Dio dio, {
+    String baseUrl,
+    ParseErrorLogger? errorLogger,
+  }) = _MangaService;
 
   @GET('/manga')
   @Headers(<String, dynamic>{

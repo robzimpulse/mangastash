@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart' hide Headers;
 import 'package:flutter/foundation.dart';
-import 'package:retrofit/http.dart';
+import 'package:retrofit/retrofit.dart';
 
 import '../model/cover_art/cover_art_response.dart';
 
@@ -11,7 +11,11 @@ part 'cover_art_service.g.dart';
   parser: Parser.FlutterCompute,
 )
 abstract class CoverArtService {
-  factory CoverArtService(Dio dio, {String baseUrl}) = _CoverArtService;
+  factory CoverArtService(
+    Dio dio, {
+    String baseUrl,
+    ParseErrorLogger? errorLogger,
+  }) = _CoverArtService;
 
   @GET('/cover/{id}')
   @Headers(<String, dynamic>{

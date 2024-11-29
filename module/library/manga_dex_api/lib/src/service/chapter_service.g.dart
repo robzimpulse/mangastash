@@ -6,12 +6,13 @@ part of 'chapter_service.dart';
 // RetrofitGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers
+// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element
 
 class _ChapterService implements ChapterService {
   _ChapterService(
     this._dio, {
     this.baseUrl,
+    this.errorLogger,
   }) {
     baseUrl ??= 'https://api.mangadex.org';
   }
@@ -20,28 +21,30 @@ class _ChapterService implements ChapterService {
 
   String? baseUrl;
 
+  final ParseErrorLogger? errorLogger;
+
   @override
   Future<SearchChapterResponse> search({
-    mangaId,
-    ids,
-    title,
-    groups,
-    uploader,
-    volume,
-    chapter,
-    translatedLanguage,
-    originalLanguage,
-    excludedOriginalLanguage,
-    contentRating,
-    createdAtSince,
-    updatedAtSince,
-    publishedAtSince,
-    includes,
-    orders,
-    limit,
-    offset,
+    String? mangaId,
+    List<String>? ids,
+    String? title,
+    List<String>? groups,
+    String? uploader,
+    String? volume,
+    String? chapter,
+    List<String>? translatedLanguage,
+    List<String>? originalLanguage,
+    List<String>? excludedOriginalLanguage,
+    List<String>? contentRating,
+    String? createdAtSince,
+    String? updatedAtSince,
+    String? publishedAtSince,
+    List<String>? includes,
+    Map<String, String>? orders,
+    int? limit,
+    int? offset,
   }) async {
-    const _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'manga': mangaId,
       r'ids[]': ids,
@@ -68,32 +71,41 @@ class _ChapterService implements ChapterService {
       r'Accept': 'application/json',
     };
     _headers.removeWhere((k, v) => v == null);
-    final _data = <String, dynamic>{};
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<SearchChapterResponse>(Options(
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<SearchChapterResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
       contentType: 'application/json',
     )
-            .compose(
-              _dio.options,
-              '/chapter',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value =
-        await compute(deserializeSearchChapterResponse, _result.data!);
-    return value;
+        .compose(
+          _dio.options,
+          '/chapter',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late SearchChapterResponse _value;
+    try {
+      _value = await compute(deserializeSearchChapterResponse, _result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
   Future<ChapterResponse> detail({
-    id,
-    includes,
+    String? id,
+    List<String>? includes,
   }) async {
-    const _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'includes[]': includes};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{
@@ -101,23 +113,33 @@ class _ChapterService implements ChapterService {
       r'Accept': 'application/json',
     };
     _headers.removeWhere((k, v) => v == null);
-    final _data = <String, dynamic>{};
-    final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<ChapterResponse>(Options(
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<ChapterResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
       contentType: 'application/json',
     )
-            .compose(
-              _dio.options,
-              '/chapter/${id}',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = await compute(deserializeChapterResponse, _result.data!);
-    return value;
+        .compose(
+          _dio.options,
+          '/chapter/${id}',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ChapterResponse _value;
+    try {
+      _value = await compute(deserializeChapterResponse, _result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
@@ -131,5 +153,22 @@ class _ChapterService implements ChapterService {
       }
     }
     return requestOptions;
+  }
+
+  String _combineBaseUrls(
+    String dioBaseUrl,
+    String? baseUrl,
+  ) {
+    if (baseUrl == null || baseUrl.trim().isEmpty) {
+      return dioBaseUrl;
+    }
+
+    final url = Uri.parse(baseUrl);
+
+    if (url.isAbsolute) {
+      return url.toString();
+    }
+
+    return Uri.parse(dioBaseUrl).resolveUri(url).toString();
   }
 }

@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart' hide Headers;
 import 'package:flutter/foundation.dart';
-import 'package:retrofit/http.dart';
+import 'package:retrofit/retrofit.dart';
 
 import '../model/chapter/chapter_response.dart';
 import '../model/chapter/search_chapter_response.dart';
@@ -12,7 +12,11 @@ part 'chapter_service.g.dart';
   parser: Parser.FlutterCompute,
 )
 abstract class ChapterService {
-  factory ChapterService(Dio dio, {String baseUrl}) = _ChapterService;
+  factory ChapterService(
+    Dio dio, {
+    String baseUrl,
+    ParseErrorLogger? errorLogger,
+  }) = _ChapterService;
 
   @GET('/chapter')
   @Headers(<String, dynamic>{

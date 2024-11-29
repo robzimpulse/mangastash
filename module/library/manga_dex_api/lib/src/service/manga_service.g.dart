@@ -6,12 +6,13 @@ part of 'manga_service.dart';
 // RetrofitGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers
+// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element
 
 class _MangaService implements MangaService {
   _MangaService(
     this._dio, {
     this.baseUrl,
+    this.errorLogger,
   }) {
     baseUrl ??= 'https://api.mangadex.org';
   }
@@ -20,32 +21,34 @@ class _MangaService implements MangaService {
 
   String? baseUrl;
 
+  final ParseErrorLogger? errorLogger;
+
   @override
   Future<SearchMangaResponse> search({
-    title,
-    limit,
-    offset,
-    authors,
-    artists,
-    year,
-    includedTags,
-    includedTagsMode,
-    excludedTags,
-    excludedTagsMode,
-    status,
-    originalLanguage,
-    excludedOriginalLanguages,
-    availableTranslatedLanguage,
-    publicationDemographic,
-    ids,
-    contentRating,
-    createdAtSince,
-    updatedAtSince,
-    includes,
-    group,
-    orders,
+    String? title,
+    int? limit,
+    int? offset,
+    List<String>? authors,
+    List<String>? artists,
+    int? year,
+    List<String>? includedTags,
+    String? includedTagsMode,
+    List<String>? excludedTags,
+    String? excludedTagsMode,
+    List<String>? status,
+    List<String>? originalLanguage,
+    List<String>? excludedOriginalLanguages,
+    List<String>? availableTranslatedLanguage,
+    List<String>? publicationDemographic,
+    List<String>? ids,
+    List<String>? contentRating,
+    String? createdAtSince,
+    String? updatedAtSince,
+    List<String>? includes,
+    String? group,
+    Map<String, String>? orders,
   }) async {
-    const _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'title': title,
       r'limit': limit,
@@ -76,59 +79,79 @@ class _MangaService implements MangaService {
       r'Accept': 'application/json',
     };
     _headers.removeWhere((k, v) => v == null);
-    final _data = <String, dynamic>{};
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<SearchMangaResponse>(Options(
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<SearchMangaResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
       contentType: 'application/json',
     )
-            .compose(
-              _dio.options,
-              '/manga',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = await compute(deserializeSearchMangaResponse, _result.data!);
-    return value;
+        .compose(
+          _dio.options,
+          '/manga',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late SearchMangaResponse _value;
+    try {
+      _value = await compute(deserializeSearchMangaResponse, _result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
   Future<TagResponse> tags() async {
-    const _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{
       r'Content-Type': 'application/json',
       r'Accept': 'application/json',
     };
     _headers.removeWhere((k, v) => v == null);
-    final _data = <String, dynamic>{};
-    final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<TagResponse>(Options(
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<TagResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
       contentType: 'application/json',
     )
-            .compose(
-              _dio.options,
-              '/manga/tag',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = await compute(deserializeTagResponse, _result.data!);
-    return value;
+        .compose(
+          _dio.options,
+          '/manga/tag',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late TagResponse _value;
+    try {
+      _value = await compute(deserializeTagResponse, _result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
   Future<MangaResponse> detail({
-    id,
-    includes,
+    String? id,
+    List<String>? includes,
   }) async {
-    const _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'includes[]': includes};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{
@@ -136,47 +159,57 @@ class _MangaService implements MangaService {
       r'Accept': 'application/json',
     };
     _headers.removeWhere((k, v) => v == null);
-    final _data = <String, dynamic>{};
-    final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<MangaResponse>(Options(
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<MangaResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
       contentType: 'application/json',
     )
-            .compose(
-              _dio.options,
-              '/manga/${id}',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = await compute(deserializeMangaResponse, _result.data!);
-    return value;
+        .compose(
+          _dio.options,
+          '/manga/${id}',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late MangaResponse _value;
+    try {
+      _value = await compute(deserializeMangaResponse, _result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
   Future<SearchChapterResponse> feed({
-    id,
-    limit,
-    offset,
-    translatedLanguage,
-    originalLanguage,
-    excludedOriginalLanguage,
-    contentRating,
-    excludedGroups,
-    excludedUploaders,
-    includeFutureUpdates,
-    createdAtSince,
-    updatedAtSince,
-    publishedAtSince,
-    orders,
-    includes,
-    includeEmptyPages,
-    includeFuturePublishAt,
-    includeExternalUrl,
+    String? id,
+    int? limit,
+    int? offset,
+    List<String>? translatedLanguage,
+    List<String>? originalLanguage,
+    List<String>? excludedOriginalLanguage,
+    List<String>? contentRating,
+    List<String>? excludedGroups,
+    List<String>? excludedUploaders,
+    String? includeFutureUpdates,
+    String? createdAtSince,
+    String? updatedAtSince,
+    String? publishedAtSince,
+    Map<String, String>? orders,
+    List<String>? includes,
+    int? includeEmptyPages,
+    int? includeFuturePublishAt,
+    int? includeExternalUrl,
   }) async {
-    const _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'limit': limit,
       r'offset': offset,
@@ -202,24 +235,33 @@ class _MangaService implements MangaService {
       r'Accept': 'application/json',
     };
     _headers.removeWhere((k, v) => v == null);
-    final _data = <String, dynamic>{};
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<SearchChapterResponse>(Options(
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<SearchChapterResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
       contentType: 'application/json',
     )
-            .compose(
-              _dio.options,
-              '/manga/${id}/feed',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value =
-        await compute(deserializeSearchChapterResponse, _result.data!);
-    return value;
+        .compose(
+          _dio.options,
+          '/manga/${id}/feed',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late SearchChapterResponse _value;
+    try {
+      _value = await compute(deserializeSearchChapterResponse, _result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
@@ -233,5 +275,22 @@ class _MangaService implements MangaService {
       }
     }
     return requestOptions;
+  }
+
+  String _combineBaseUrls(
+    String dioBaseUrl,
+    String? baseUrl,
+  ) {
+    if (baseUrl == null || baseUrl.trim().isEmpty) {
+      return dioBaseUrl;
+    }
+
+    final url = Uri.parse(baseUrl);
+
+    if (url.isAbsolute) {
+      return url.toString();
+    }
+
+    return Uri.parse(dioBaseUrl).resolveUri(url).toString();
   }
 }

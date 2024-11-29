@@ -10,8 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  dio: ^4.0.6
-  dio_smart_retry: ^1.4.0
+  dio: ^5.7.0
+  dio_smart_retry: ^6.0.0
   alice_lightweight: ^3.3.0
   system_proxy: ^0.1.0
   url_launcher: ^6.1.11
