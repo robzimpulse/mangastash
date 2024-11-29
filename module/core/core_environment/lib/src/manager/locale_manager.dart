@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -18,6 +19,7 @@ class LocaleManager implements ListenLocaleUseCase, UpdateLocaleUseCase {
   static Future<LocaleManager> create({
     required SharedPreferencesStorage storage,
   }) async {
+    await initializeDateFormatting();
     final value = storage.getString(_key) ?? await findSystemLocale();
     final language = value.split('_').firstOrNull ?? 'en';
     final country = value.split('_').lastOrNull;
