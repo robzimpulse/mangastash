@@ -7,20 +7,20 @@ class Error<T> extends Result<T> {
 
   Exception get error => _error;
 
+  num? get statusCode {
+    if (error is DioException) {
+      return (error as DioException?)?.response?.statusCode;
+    }
+    return null;
+  }
+
   Error(Object error) {
-    if (error is DioError &&
-        error.error is! DioError &&
-        error.error is Exception) {
-      // there is a chance that DioError.error is instance of DioError
-      // which will cause stack overflow error
+    if (error is DioException && error.error is Exception) {
       _error = error.error as Exception;
-    } else if (error is Exception && error is! DioError) {
+    } else if (error is Exception) {
       _error = error;
     } else {
-      // to prevent stack overflow just print the class name
-      // if the error class is unknown
-      final message = error is String ? error : error.runtimeType.toString();
-      _error = Exception('Unknown error: $message');
+      _error = Exception('Unknown error: $error');
     }
   }
 }
