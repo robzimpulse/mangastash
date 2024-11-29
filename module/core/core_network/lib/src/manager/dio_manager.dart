@@ -21,7 +21,7 @@ class DioManager {
         [
           alice.getDioInterceptor(),
           DioThrottlerInterceptor(
-            const Duration(seconds: 1),
+            const Duration(milliseconds: 200),
             onThrottled: (req, scheduled) => log(
               'Delay request for ${req.uri} until $scheduled',
               name: 'DioManager',
