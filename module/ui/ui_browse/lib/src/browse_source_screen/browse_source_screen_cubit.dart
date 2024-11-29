@@ -6,13 +6,13 @@ import 'browse_source_screen_state.dart';
 
 class BrowseSourceScreenCubit extends Cubit<BrowseSourceScreenState>
     with AutoSubscriptionMixin {
-
   BrowseSourceScreenCubit({
     BrowseSourceScreenState initialState = const BrowseSourceScreenState(),
     required ListenMangaSourceUseCase listenMangaSourceUseCase,
   }) : super(initialState) {
     addSubscription(
       listenMangaSourceUseCase.mangaSourceStateStream
+          .distinct()
           .listen(_updateSourceState),
     );
   }

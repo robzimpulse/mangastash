@@ -21,6 +21,7 @@ class DownloadQueueScreenCubit extends Cubit<DownloadQueueScreenState>
         super(initialState) {
     addSubscription(
       listenActiveDownloadUseCase.activeDownloadStream
+          .distinct()
           .listen(_updateActiveDownload),
     );
   }

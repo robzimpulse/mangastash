@@ -15,7 +15,9 @@ class RegisterScreenCubit extends Cubit<RegisterScreenState>
     required RegisterUseCase registerUseCase,
   })  : _registerUseCase = registerUseCase,
         super(initialState) {
-    addSubscription(listenAuthUseCase.authStateStream.listen(_updateAuthState));
+    addSubscription(
+      listenAuthUseCase.authStateStream.distinct().listen(_updateAuthState),
+    );
   }
 
   void update({String? email, String? password}) {

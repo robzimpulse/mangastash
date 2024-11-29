@@ -15,7 +15,7 @@ class AppearanceScreenCubit extends Cubit<AppearanceScreenState>
   })  : _updateThemeUseCase = updateThemeUseCase,
         super(initialState) {
     addSubscription(
-      listenThemeUseCase.themeDataStream.listen(_updateThemeData),
+      listenThemeUseCase.themeDataStream.distinct().listen(_updateThemeData),
     );
   }
 

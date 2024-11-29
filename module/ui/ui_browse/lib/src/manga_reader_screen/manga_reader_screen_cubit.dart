@@ -52,6 +52,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
       addSubscription(
         CombineLatestStream.list(streams)
             .map((event) => event.indexOf(event.reduce(max)))
+            .distinct()
             .listen((event) => _onProgress(event + 1)),
       );
 

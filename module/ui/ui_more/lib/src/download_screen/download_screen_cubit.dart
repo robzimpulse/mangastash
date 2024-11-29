@@ -17,7 +17,9 @@ class DownloadScreenCubit extends Cubit<DownloadScreenState>
   })  : _setDownloadPathUseCase = setDownloadPathUseCase,
         super(initialState.copyWith(rootPath: getRootPathUseCase.rootPath)) {
     addSubscription(
-      listenDownloadPathUseCase.downloadPathStream.listen(_updateDownloadPath),
+      listenDownloadPathUseCase.downloadPathStream
+          .distinct()
+          .listen(_updateDownloadPath),
     );
   }
 

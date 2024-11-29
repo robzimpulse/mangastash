@@ -13,10 +13,11 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     required ListenAuthUseCase listenAuthUseCase,
   }) : super(initialState) {
     addSubscription(
-      listenAuthUseCase.authStateStream.listen(_updateAuthState),
+      listenAuthUseCase.authStateStream.distinct().listen(_updateAuthState),
     );
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
+          .distinct()
           .listen(_updateLibraryState),
     );
   }

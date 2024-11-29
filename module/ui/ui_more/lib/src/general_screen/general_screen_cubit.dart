@@ -5,7 +5,8 @@ import 'package:safe_bloc/safe_bloc.dart';
 
 import 'general_screen_state.dart';
 
-class GeneralScreenCubit extends Cubit<GeneralScreenState> with AutoSubscriptionMixin {
+class GeneralScreenCubit extends Cubit<GeneralScreenState>
+    with AutoSubscriptionMixin {
   final UpdateLocaleUseCase _updateLocaleUseCase;
 
   GeneralScreenCubit({
@@ -15,7 +16,7 @@ class GeneralScreenCubit extends Cubit<GeneralScreenState> with AutoSubscription
   })  : _updateLocaleUseCase = updateLocaleUseCase,
         super(initialState) {
     addSubscription(
-      listenLocaleUseCase.localeDataStream.listen(_updateLocaleData),
+      listenLocaleUseCase.localeDataStream.distinct().listen(_updateLocaleData),
     );
   }
 

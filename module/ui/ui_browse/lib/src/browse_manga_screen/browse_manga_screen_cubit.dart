@@ -20,6 +20,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
         super(initialState) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
+          .distinct()
           .listen(_updateLibraryState),
     );
   }

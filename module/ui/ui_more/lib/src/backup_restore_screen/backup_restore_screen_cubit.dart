@@ -17,7 +17,9 @@ class BackupRestoreScreenCubit extends Cubit<BackupRestoreScreenState>
   })  : _setBackupPathUseCase = setBackupPathUseCase,
         super(initialState.copyWith(rootPath: getRootPathUseCase.rootPath)) {
     addSubscription(
-      listenBackupPathUseCase.backupPathStream.listen(_updateBackupPath),
+      listenBackupPathUseCase.backupPathStream
+          .distinct()
+          .listen(_updateBackupPath),
     );
   }
 

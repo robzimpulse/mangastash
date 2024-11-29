@@ -21,7 +21,9 @@ class LoginScreenCubit extends Cubit<LoginScreenState>
   })  : _loginUseCase = loginUseCase,
         _loginAnonymouslyUseCase = loginAnonymouslyUseCase,
         super(initialState) {
-    addSubscription(listenAuthUseCase.authStateStream.listen(_updateAuthState));
+    addSubscription(
+      listenAuthUseCase.authStateStream.distinct().listen(_updateAuthState),
+    );
   }
 
   void update({String? email, String? password, bool? isVisible}) {

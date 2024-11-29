@@ -38,9 +38,12 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
         _downloadChapterUseCase = downloadChapterUseCase,
         _downloadChapterProgressUseCase = downloadChapterProgressUseCase,
         super(initialState) {
-    addSubscription(listenAuth.authStateStream.listen(_updateAuthState));
+    addSubscription(
+      listenAuth.authStateStream.distinct().listen(_updateAuthState),
+    );
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
+          .distinct()
           .listen(_updateMangaLibrary),
     );
   }
