@@ -83,7 +83,7 @@ class RegisterScreen extends StatelessWidget {
       const SizedBox(height: 8),
       ElevatedButton(
         style: ButtonStyle(
-          shape: MaterialStateProperty.all(
+          shape: WidgetStateProperty.all(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),

@@ -114,7 +114,7 @@ class _MangaReaderScreenState extends State<MangaReaderScreen> {
                     builder: (context, state) => state.previousChapterId != null
                         ? ElevatedButton(
                             style: ButtonStyle(
-                              shape: MaterialStateProperty.all(
+                              shape: WidgetStateProperty.all(
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -172,7 +172,7 @@ class _MangaReaderScreenState extends State<MangaReaderScreen> {
                     builder: (context, state) => state.nextChapterId != null
                         ? ElevatedButton(
                             style: ButtonStyle(
-                              shape: MaterialStateProperty.all(
+                              shape: WidgetStateProperty.all(
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),

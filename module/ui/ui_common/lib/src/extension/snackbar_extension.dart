@@ -15,7 +15,7 @@ extension SnackbarExtension on BuildContext {
             ...?actions,
           ],
         ),
-        backgroundColor: Theme.of(this).colorScheme.background,
+        backgroundColor: Theme.of(this).colorScheme.surface,
       ),
     );
   }

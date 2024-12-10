@@ -174,7 +174,7 @@ class MoreScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
                       style: ButtonStyle(
-                        shape: MaterialStateProperty.all(
+                        shape: WidgetStateProperty.all(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),

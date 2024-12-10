@@ -236,7 +236,7 @@ class _MangaMiscBottomScreen extends State<MangaMiscScreen> {
             child: _bloc(
               builder: (context, state) => ElevatedButton(
                 style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  shape: WidgetStateProperty.all(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),

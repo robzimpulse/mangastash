@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:service_locator/service_locator.dart';
 
-import 'manager/custom_cache_manager.dart';
+import 'manager/custom_cache_manager/custom_cache_manager.dart';
 import 'manager/path_manager.dart';
 import 'storage/in_memory_storage.dart';
 import 'storage/shared_preferences_storage.dart';
@@ -22,15 +22,17 @@ class CoreStorageRegistrar extends Registrar {
 
     locator.registerSingleton(InMemoryStorage());
 
-    locator.registerSingleton(CustomCacheManager.create());
-    locator.alias<BaseCacheManager, CustomCacheManager>();
-
     locator.registerSingleton(await PathManager.create(storage: locator()));
     locator.alias<GetRootPathUseCase, PathManager>();
     locator.alias<ListenDownloadPathUseCase, PathManager>();
     locator.alias<SetDownloadPathUseCase, PathManager>();
     locator.alias<ListenBackupPathUseCase, PathManager>();
     locator.alias<SetBackupPathUseCase, PathManager>();
+
+    locator.registerSingleton(
+      CustomCacheManager.create(listenDownloadPathUseCase: locator()),
+    );
+    locator.alias<BaseCacheManager, CustomCacheManager>();
 
     log('finish register', name: runtimeType.toString(), time: DateTime.now());
   }
