@@ -1,5 +1,4 @@
 import 'package:core_environment/core_environment.dart';
-import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -17,7 +16,6 @@ void main() {
 
   setUp(() {
     locator.registerSingleton<SharedPreferencesStorage>(MockStorage());
-    locator.registerSingleton<Alice>(Alice());
     locator.registerSingleton<ListenThemeUseCase>(MockListenThemeUseCase());
   });
 

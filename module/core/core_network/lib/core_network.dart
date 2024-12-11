@@ -1,6 +1,5 @@
 library core_network;
 
-export 'package:alice_lightweight/alice.dart';
 export 'package:dio/dio.dart';
 export 'package:url_launcher/url_launcher.dart';
 

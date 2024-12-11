@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:alice_lightweight/alice.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager/dio_manager.dart';
@@ -13,7 +12,6 @@ class CoreNetworkRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     log('start register', name: runtimeType.toString(), time: DateTime.now());
-    locator.registerSingleton(Alice());
 
     locator.registerSingleton(await SystemProxyManager.create());
     locator.alias<GetSystemProxyUseCase, SystemProxyManager>();
@@ -21,7 +19,7 @@ class CoreNetworkRegistrar extends Registrar {
     locator.registerSingleton(UrlLauncherManager());
     locator.alias<LaunchUrlUseCase, UrlLauncherManager>();
 
-    locator.registerSingleton(DioManager.create(alice: locator()));
+    locator.registerSingleton(DioManager.create());
     log('finish register', name: runtimeType.toString(), time: DateTime.now());
   }
 }

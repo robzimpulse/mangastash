@@ -54,9 +54,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
 
   Future<GoRouter> _initializeApp() async {
     await initiateAppLocator();
-    final route = _route(locator: widget.locator);
-    widget.locator<Alice>().setNavigatorKey(route.routerDelegate.navigatorKey);
-    return route;
+    return _route(locator: widget.locator);
   }
 
   Future<void> initiateAppLocator() async {
