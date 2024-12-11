@@ -73,11 +73,15 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
       }
     }
 
-
-
     return DownloadChapterManagerV2._(
       cacheManager: cacheManager,
-      fileDownloader: fileDownloader,
+      fileDownloader: fileDownloader.registerCallbacks(
+        taskNotificationTapCallback: (task, notificationType) => log(
+          'Tap Notification for  ${task.taskId} with $notificationType',
+          name: 'DownloadChapterManagerV2',
+          time: DateTime.now(),
+        ),
+      ),
       getChapterUseCase: getChapterUseCase,
     );
   }
@@ -143,6 +147,24 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
       final title = key.manga?.title;
       final chapter = key.chapter?.numChapter;
 
+      _fileDownloader.configureNotificationForGroup(
+        '${key.hashCode}',
+        running: TaskNotification(
+          'Downloading $title chapter $chapter',
+          '{numFinished} out of {numTotal}',
+        ),
+        complete: TaskNotification(
+          "Finish Downloading $title chapter $chapter",
+          "Loaded {numTotal} files",
+        ),
+        error: const TaskNotification(
+          'Error',
+          '{numFailed}/{numTotal} failed',
+        ),
+        progressBar: false,
+        groupNotificationId: '${key.hashCode}',
+      );
+
       for (final (index, url) in images.indexed) {
         final extension = url.split('.').lastOrNull;
 
@@ -156,7 +178,7 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
           directory: '$title/$chapter',
           filename: '${index + 1}.$extension',
           retries: 3,
-          group: '$hashCode',
+          group: '${key.hashCode}',
           creationTime: DateTime.now(),
           requiresWiFi: true,
         );
