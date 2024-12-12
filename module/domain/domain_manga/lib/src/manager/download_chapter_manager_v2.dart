@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:background_downloader/background_downloader.dart';
+import 'package:collection/collection.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart' hide Config;
 import 'package:entity_manga/entity_manga.dart';
@@ -31,51 +32,19 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
       globalConfig: [
         (Config.requestTimeout, const Duration(minutes: 1)),
         (Config.resourceTimeout, const Duration(minutes: 10)),
-        (Config.holdingQueue, (5, null, null)),
+        (Config.holdingQueue, (null, 5, null)),
       ],
       androidConfig: [
         (Config.useCacheDir, Config.whenAble),
       ],
       iOSConfig: [
-        (Config.localize, {'Cancel': 'StopIt'}),
+        (Config.excludeFromCloudBackup, Config.always),
       ],
     );
 
-    await Future.wait([cacheManager.emptyCache(), fileDownloader.trackTasks()]);
-
-    final records = await fileDownloader.database.allRecordsWithStatus(
-      TaskStatus.complete,
-    );
-
-    for (final record in records) {
-      final task = record.task;
-      if (task is DownloadTask) {
-        final path = await fileDownloader.moveToSharedStorage(
-              task,
-              SharedStorage.downloads,
-              directory: 'Mangastash/${task.directory}',
-            ) ??
-            await fileDownloader.pathInSharedStorage(
-              task.filename,
-              SharedStorage.downloads,
-              directory: 'Mangastash/${task.directory}',
-            );
-        if (path == null) continue;
-        cacheManager.putFile(
-          record.task.url,
-          await File(path).readAsBytes(),
-        );
-        log(
-          'Adding ${record.task.url} - $path to cache',
-          name: 'DownloadChapterManagerV2',
-          time: DateTime.now(),
-        );
-      }
-    }
-
     return DownloadChapterManagerV2._(
       cacheManager: cacheManager,
-      fileDownloader: fileDownloader.registerCallbacks(
+      fileDownloader: (await fileDownloader.trackTasks()).registerCallbacks(
         taskNotificationTapCallback: (task, notificationType) => log(
           'Tap Notification for  ${task.taskId} with $notificationType',
           name: 'DownloadChapterManagerV2',
@@ -93,7 +62,43 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
   })  : _fileDownloader = fileDownloader,
         _cacheManager = cacheManager,
         _getChapterUseCase = getChapterUseCase {
+    _init();
     fileDownloader.updates.distinct().listen(_onUpdate);
+  }
+
+  void _init() async {
+    final records = await _fileDownloader.database.allRecordsWithStatus(
+      TaskStatus.complete,
+    );
+
+    for (final record in records) {
+      final task = record.task;
+      if (task is DownloadTask) {
+        String? path = await _fileDownloader.pathInSharedStorage(
+          task.filename,
+          SharedStorage.downloads,
+          directory: 'Mangastash/${task.directory}',
+        );
+
+        path ??= await _fileDownloader.moveToSharedStorage(
+          task,
+          SharedStorage.downloads,
+          directory: 'Mangastash/${task.directory}',
+        );
+
+        if (path == null) continue;
+        await _cacheManager.removeFile(record.task.url);
+        await _cacheManager.putFile(
+          record.task.url,
+          await File(path).readAsBytes(),
+        );
+        log(
+          'Adding ${record.task.url} - $path to cache',
+          name: 'DownloadChapterManagerV2',
+          time: DateTime.now(),
+        );
+      }
+    }
   }
 
   void _onUpdate(TaskUpdate event) async {
@@ -107,7 +112,8 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
           directory: 'Mangastash/${task.directory}',
         );
         if (path == null) return;
-        _cacheManager.putFile(
+        await _cacheManager.removeFile(event.task.url);
+        await _cacheManager.putFile(
           event.task.url,
           await File(path).readAsBytes(),
         );
@@ -189,6 +195,39 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
 
         log(
           '$text enqueue download task for $url',
+          name: runtimeType.toString(),
+          time: DateTime.now(),
+        );
+      }
+
+      final cover = key.manga?.coverUrl;
+      final coverExt = cover?.split('.').lastOrNull;
+
+      final records = await _fileDownloader.database.allRecords(
+        group: '$key.hashCode',
+      );
+
+      final recordCover = records.firstWhereOrNull((e) => e.task.url == cover);
+      if (recordCover == null && cover != null && coverExt != null) {
+        final result = await _fileDownloader.enqueue(
+          DownloadTask(
+            url: cover,
+            headers: {HttpHeaders.userAgentHeader: _userAgent},
+            baseDirectory: BaseDirectory.applicationDocuments,
+            updates: Updates.statusAndProgress,
+            directory: '$title',
+            filename: 'cover.$coverExt',
+            retries: 5,
+            group: '${key.hashCode}',
+            creationTime: DateTime.now(),
+            requiresWiFi: true,
+          ),
+        );
+
+        final text = result ? 'Success' : 'Failed';
+
+        log(
+          '$text enqueue download task for $cover',
           name: runtimeType.toString(),
           time: DateTime.now(),
         );
