@@ -44,6 +44,8 @@ dependencies:
     path: module/library/safe_bloc
   service_locator:
     path: module/library/service_locator
+  dio_inspector:
+    path: module/library/dio_inspector
 
   # core
   core_auth:

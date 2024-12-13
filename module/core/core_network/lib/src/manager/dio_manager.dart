@@ -1,12 +1,13 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
+import 'package:dio_inspector/dio_inspector.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 
 import '../interceptor/dio_throttler_interceptor.dart';
 
 class DioManager {
-  static Dio create() {
+  static Dio create({required DioInspector inspector}) {
     const userAgent = 'Mozilla/5.0 '
         '(Macintosh; Intel Mac OS X 10_15_7) '
         'AppleWebKit/537.36 (KHTML, like Gecko) '
@@ -14,7 +15,8 @@ class DioManager {
         'Safari/537.36';
 
     final dio = Dio(BaseOptions(headers: {'User-Agent': userAgent}))
-      ..interceptors.add(
+      ..interceptors.addAll([
+        inspector.getDioRequestInterceptor(),
         DioThrottlerInterceptor(
           const Duration(milliseconds: 200),
           onThrottled: (req, scheduled) => log(
@@ -23,7 +25,7 @@ class DioManager {
             time: DateTime.now(),
           ),
         ),
-      );
+      ],);
 
     return dio
       ..interceptors.add(

@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:dio_inspector/dio_inspector.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager/dio_manager.dart';
@@ -19,7 +20,9 @@ class CoreNetworkRegistrar extends Registrar {
     locator.registerSingleton(UrlLauncherManager());
     locator.alias<LaunchUrlUseCase, UrlLauncherManager>();
 
-    locator.registerSingleton(DioManager.create());
+    locator.registerSingleton(DioInspector(isDebugMode: true));
+
+    locator.registerSingleton(DioManager.create(inspector: locator()));
     log('finish register', name: runtimeType.toString(), time: DateTime.now());
   }
 }

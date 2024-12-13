@@ -9,8 +9,8 @@ import '../model/http_activity_model.dart';
 import '../model/http_error_model.dart';
 import '../model/http_request_model.dart';
 import '../model/http_response_model.dart';
-import 'extensions.dart';
 import 'http_activity_storage.dart';
+import 'helper.dart';
 
 class InspectorInterceptor extends InterceptorsWrapper {
   final bool kIsDebug;
@@ -86,13 +86,13 @@ class InspectorInterceptor extends InterceptorsWrapper {
         secure: options.uri.scheme == 'https',
         request: HttpRequestModel.create(
           queryParameters: mergedQueryParameters,
-          headers: options.headers.encodeRawJson,
+          headers: Helper.encodeRawJson(options.headers),
           contentType: options.contentType.toString(),
           size: data == null ? 0 : utf8.encode(data.toString()).length,
           body: fieldsJson.isNotEmpty
               ? jsonEncode(fieldsJson)
               : data is FormData
-                  ? data.encodeRawJson
+                  ? Helper.encodeRawJson(data)
                   : null,
           formDataFiles: files.isEmpty ? null : files,
           formDataFields: fields.isEmpty ? null : fields,
@@ -119,7 +119,7 @@ class InspectorInterceptor extends InterceptorsWrapper {
       response: HttpResponseModel.create(
         status: response.statusCode,
         headers: response.headers.map,
-        body: data.encodeRawJson,
+        body: Helper.encodeRawJson(data),
         size: data == null ? 0 : utf8.encode(response.data.toString()).length,
       ),
     );
@@ -135,7 +135,7 @@ class InspectorInterceptor extends InterceptorsWrapper {
     }
 
     final response = err.response;
-    final data = response?.data;
+    final dynamic data = response?.data;
 
     storage.addError(
       id: err.requestOptions.hashCode,
@@ -151,7 +151,7 @@ class InspectorInterceptor extends InterceptorsWrapper {
         status: response == null ? -1 : response.statusCode,
         headers: err.response?.headers.map,
         size: data == null ? 0 : utf8.encode(data.toString()).length,
-        body: data.encodeRawJson,
+        body: Helper.encodeRawJson(data),
       ),
     );
 

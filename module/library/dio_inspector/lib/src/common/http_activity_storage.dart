@@ -38,4 +38,6 @@ class HttpActivityStorage {
         ),
     );
   }
+
+  void clear() => _activities.add({});
 }

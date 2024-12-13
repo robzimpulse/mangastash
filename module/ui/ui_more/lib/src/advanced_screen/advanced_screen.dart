@@ -1,3 +1,4 @@
+import 'package:dio_inspector/dio_inspector.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -6,8 +7,12 @@ import 'advanced_screen_cubit.dart';
 import 'advanced_screen_state.dart';
 
 class AdvancedScreen extends StatelessWidget {
+
+  final DioInspector inspector;
+
   const AdvancedScreen({
     super.key,
+    required this.inspector,
   });
 
   static Widget create({
@@ -17,7 +22,9 @@ class AdvancedScreen extends StatelessWidget {
       create: (_) => AdvancedScreenCubit(
         initialState: const AdvancedScreenState(),
       ),
-      child: const AdvancedScreen(),
+      child: AdvancedScreen(
+        inspector: locator(),
+      ),
     );
   }
 
@@ -31,8 +38,8 @@ class AdvancedScreen extends StatelessWidget {
         children: [
           ListTile(
             title: const Text('HTTP Inspector'),
-            onTap: () => context.showSnackBar(
-              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+            onTap: () => inspector.navigateToInspector(
+              theme: Theme.of(context),
             ),
             leading: const SizedBox(
               height: double.infinity,

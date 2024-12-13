@@ -20,6 +20,8 @@ dependencies:
     path: ../../library/service_locator
   safe_bloc:
     path: ../../library/safe_bloc
+  dio_inspector:
+    path: ../../library/dio_inspector
 
   # core
   core_environment:

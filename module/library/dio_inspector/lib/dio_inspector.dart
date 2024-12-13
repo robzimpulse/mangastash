@@ -8,8 +8,8 @@ import 'src/screen/dashboard/dashboard_screen.dart';
 
 class DioInspector {
   static final DioInspector _instance = DioInspector._internal();
-  static final HttpActivityStorage _storage = HttpActivityStorage();
-  static final navigatorObserver = NavigatorObserver();
+  final HttpActivityStorage _storage = HttpActivityStorage();
+  final navigatorObserver = NavigatorObserver();
 
   bool _isDebugMode;
   String? _password;
@@ -41,12 +41,15 @@ class DioInspector {
     );
   }
 
-  void navigateToInspector() {
+  void navigateToInspector({ThemeData? theme}) {
     navigatorObserver.navigator?.push(
       MaterialPageRoute<dynamic>(
-        builder: (_) => DashboardScreen(
-          password: _password ?? '',
-          storage: _storage,
+        builder: (context) => Theme(
+          data: theme ?? Theme.of(context),
+          child: DashboardScreen(
+            password: _password ?? '',
+            storage: _storage,
+          ),
         ),
       ),
     );
