@@ -15,7 +15,6 @@ class HttpActivityModel extends Equatable {
     required this.endpoint,
     required this.server,
     required this.uri,
-    required this.duration,
     this.request,
     this.response,
     this.error,
@@ -30,11 +29,20 @@ class HttpActivityModel extends Equatable {
   final String endpoint;
   final String server;
   final String uri;
-  final int duration;
 
   final HttpRequestModel? request;
   final HttpResponseModel? response;
   final HttpErrorModel? error;
+
+  int get duration {
+    var duration = Duration.zero;
+    final request = this.request;
+    final response = this.response;
+    if (request != null && response != null) {
+      duration = response.time.difference(request.time);
+    }
+    return duration.inMilliseconds;
+  }
 
   factory HttpActivityModel.empty() {
     return HttpActivityModel._(
@@ -47,7 +55,6 @@ class HttpActivityModel extends Equatable {
       endpoint: '',
       server: '',
       uri: '',
-      duration: 0,
     );
   }
 
@@ -60,7 +67,6 @@ class HttpActivityModel extends Equatable {
     String endpoint = '',
     String server = '',
     String uri = '',
-    int duration = 0,
     HttpRequestModel? request,
     HttpResponseModel? response,
     HttpErrorModel? error,
@@ -75,7 +81,6 @@ class HttpActivityModel extends Equatable {
       endpoint: endpoint,
       server: server,
       uri: uri,
-      duration: duration,
       request: request,
       response: response,
       error: error,
@@ -107,11 +112,10 @@ class HttpActivityModel extends Equatable {
     String? endpoint,
     String? server,
     String? uri,
-    int? duration,
     HttpRequestModel? request,
     HttpResponseModel? response,
     HttpErrorModel? error,
-}) {
+  }) {
     return HttpActivityModel._(
       id: id,
       createdTime: createdTime,
@@ -122,7 +126,6 @@ class HttpActivityModel extends Equatable {
       endpoint: endpoint ?? this.endpoint,
       server: server ?? this.server,
       uri: uri ?? this.uri,
-      duration: duration ?? this.duration,
       request: request ?? this.request,
       response: response ?? this.response,
       error: error ?? this.error,
