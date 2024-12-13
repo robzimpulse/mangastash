@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../common/http_activity_storage.dart';
 import '../../common/sort_activity_enum.dart';
 import '../../model/http_activity_model.dart';
+import '../detail/detail_screen.dart';
 import 'widget/item_response_widget.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -281,19 +282,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
             itemCount: filteredActivities.length,
             itemBuilder: (context, index) {
               var data = filteredActivities[index];
-
               return ItemResponseWidget(
                 data: data,
                 onTap: () {
-                  // TODO: Implement
-                  // Navigator.push<void>(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => DetailPage(
-                  //       data: data,
-                  //     ),
-                  //   ),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailScreen(data: data),
+                    ),
+                  );
                 },
               );
             },

@@ -1,7 +1,10 @@
 import 'dart:convert';
 
-class Helper {
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
+class Helper {
   static const int _kilobyteAsByte = 1000;
   static const int _megabyteAsByte = 1000000;
   static const int _secondAsMillisecond = 1000;
@@ -12,6 +15,14 @@ class Helper {
   static const String _milliseconds = "ms";
   static const String _seconds = "s";
   static const String _minutes = "min";
+
+  static Map<String, dynamic> decodeRawJson(String json) {
+    try {
+      return jsonDecode(json) as Map<String, dynamic>;
+    } catch (e) {
+      return {};
+    }
+  }
 
   static String? encodeRawJson(dynamic rawJson) {
     if (rawJson == null) {
@@ -50,10 +61,22 @@ class Helper {
   static String _formatDouble(double value) => value.toStringAsFixed(2);
 
   static String formatBytes(int bytes) => switch (bytes) {
-    int bytes when bytes < 0 => '-1 $_bytes',
-    int bytes when bytes <= _kilobyteAsByte => '$bytes $_bytes',
-    int bytes when bytes <= _megabyteAsByte =>
-    '${_formatDouble(bytes / _kilobyteAsByte)} $_kiloBytes',
-    _ => '${_formatDouble(bytes / _megabyteAsByte)} $_megaBytes',
-  };
+        int bytes when bytes < 0 => '-1 $_bytes',
+        int bytes when bytes <= _kilobyteAsByte => '$bytes $_bytes',
+        int bytes when bytes <= _megabyteAsByte =>
+          '${_formatDouble(bytes / _kilobyteAsByte)} $_kiloBytes',
+        _ => '${_formatDouble(bytes / _megabyteAsByte)} $_megaBytes',
+      };
+
+  static void copyToClipboard({
+    String text = '',
+    required BuildContext context,
+    String message = 'Copied to clipboard',
+  }) async {
+    await Clipboard.setData(ClipboardData(text: text));
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
 }
