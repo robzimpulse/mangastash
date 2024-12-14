@@ -141,6 +141,7 @@ class DomainMangaRegistrar extends Registrar {
         cacheManager: locator(),
         getChapterUseCase: () => locator(),
       ),
+      dispose: (instance) => instance.dispose(),
     );
     locator.alias<DownloadChapterUseCase, DownloadChapterManagerV2>();
     locator.alias<ListenActiveDownloadUseCase, DownloadChapterManagerV2>();

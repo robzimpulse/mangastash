@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -15,10 +16,19 @@ import '../use_case/chapter/listen_active_download_use_case.dart';
 
 class DownloadChapterManagerV2
     implements DownloadChapterUseCase, ListenActiveDownloadUseCase {
+  static const _finalStateTask = [
+    TaskStatus.complete,
+    TaskStatus.canceled,
+    TaskStatus.notFound,
+    TaskStatus.failed,
+  ];
+
   final FileDownloader _fileDownloader;
   final BaseCacheManager _cacheManager;
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final BehaviorSubject<Set<DownloadChapter>> _active;
+
+  StreamSubscription? _streamSubscription;
 
   final _userAgent = 'Mozilla/5.0 '
       '(Macintosh; Intel Mac OS X 10_15_7) '
@@ -47,18 +57,11 @@ class DownloadChapterManagerV2
     );
 
     await fileDownloader.trackTasks();
-    final database = fileDownloader.database;
-
-    final runningDownloadRecords = await database.allRecordsWithStatus(
-      TaskStatus.running,
-    );
-    final group = runningDownloadRecords.groupListsBy((record) => record.group);
-    final activeDownload = group.keys.map(
-      (key) => DownloadChapter.fromJsonString(key),
-    );
+    final records = await fileDownloader.database.allRecords();
 
     return DownloadChapterManagerV2._(
       cacheManager: cacheManager,
+      getChapterUseCase: getChapterUseCase,
       fileDownloader: fileDownloader.registerCallbacks(
         taskNotificationTapCallback: (task, notificationType) => log(
           'Tap Notification for ${task.taskId} with $notificationType',
@@ -66,8 +69,15 @@ class DownloadChapterManagerV2
           time: DateTime.now(),
         ),
       ),
-      activeDownload: activeDownload.toSet(),
-      getChapterUseCase: getChapterUseCase,
+      activeDownloadKey: records
+          .where((record) => record.status == TaskStatus.running)
+          .groupListsBy((record) => record.group)
+          .keys
+          .map((key) => DownloadChapter.fromJsonString(key))
+          .toSet(),
+      completeRecords: records
+          .where((record) => record.status == TaskStatus.complete)
+          .toList(),
     );
   }
 
@@ -75,21 +85,22 @@ class DownloadChapterManagerV2
     required FileDownloader fileDownloader,
     required BaseCacheManager cacheManager,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
-    required Set<DownloadChapter> activeDownload,
+    required Set<DownloadChapter> activeDownloadKey,
+    required List<TaskRecord> completeRecords,
   })  : _fileDownloader = fileDownloader,
         _cacheManager = cacheManager,
         _getChapterUseCase = getChapterUseCase,
-        _active = BehaviorSubject.seeded(activeDownload) {
-    _init();
-    fileDownloader.updates.distinct().listen(_onUpdate);
+        _active = BehaviorSubject.seeded(activeDownloadKey) {
+    _init(completeRecords);
+    _streamSubscription = fileDownloader.updates.distinct().listen(_onUpdate);
   }
 
-  void _init() async {
-    final records = await _fileDownloader.database.allRecordsWithStatus(
-      TaskStatus.complete,
-    );
+  void dispose() {
+    _streamSubscription?.cancel();
+  }
 
-    for (final record in records) {
+  void _init(List<TaskRecord> completeRecords) async {
+    for (final record in completeRecords) {
       final task = record.task;
       if (task is DownloadTask) {
         String? path = await _fileDownloader.pathInSharedStorage(
@@ -120,6 +131,8 @@ class DownloadChapterManagerV2
   }
 
   void _onUpdate(TaskUpdate event) async {
+    final key = DownloadChapter.fromJsonString(event.task.group);
+
     if (event is TaskStatusUpdate) {
       if (event.status != TaskStatus.complete) return;
       final task = event.task;
@@ -144,13 +157,11 @@ class DownloadChapterManagerV2
       final records = await _fileDownloader.database.allRecords(
         group: task.group,
       );
-      final finalState = [TaskStatus.complete, TaskStatus.canceled, TaskStatus.notFound, TaskStatus.failed];
       final nonFinalStateRecords = records.where(
-        (task) => !finalState.contains(task.status),
+        (task) => !_finalStateTask.contains(task.status),
       );
       if (nonFinalStateRecords.isNotEmpty) return;
-      final downloadChapter = DownloadChapter.fromJsonString(task.group);
-      _active.add(Set.of(_active.value)..remove(downloadChapter));
+      _active.add(Set.of(_active.value)..remove(key));
       log(
         'Removing ${task.group} from active download',
         name: runtimeType.toString(),
@@ -178,7 +189,6 @@ class DownloadChapterManagerV2
     );
 
     if (result is Success<MangaChapter>) {
-
       _active.add(Set.of(_active.value)..add(key));
       log(
         'Adding $keyString to active download',
