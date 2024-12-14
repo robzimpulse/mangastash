@@ -119,7 +119,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ];
               },
               onSelected: _sortAllResponses,
-            )
+            ),
           ],
           title: _title(context),
         ),
@@ -269,7 +269,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),

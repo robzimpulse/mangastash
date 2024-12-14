@@ -7,14 +7,18 @@ import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart' hide Config;
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/foundation.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../use_case/chapter/download_chapter_use_case.dart';
 import '../use_case/chapter/get_chapter_use_case.dart';
+import '../use_case/chapter/listen_active_download_use_case.dart';
 
-class DownloadChapterManagerV2 implements DownloadChapterUseCase {
+class DownloadChapterManagerV2
+    implements DownloadChapterUseCase, ListenActiveDownloadUseCase {
   final FileDownloader _fileDownloader;
   final BaseCacheManager _cacheManager;
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
+  final BehaviorSubject<Set<DownloadChapter>> _active;
 
   final _userAgent = 'Mozilla/5.0 '
       '(Macintosh; Intel Mac OS X 10_15_7) '
@@ -42,15 +46,27 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
       ],
     );
 
+    await fileDownloader.trackTasks();
+    final database = fileDownloader.database;
+
+    final runningDownloadRecords = await database.allRecordsWithStatus(
+      TaskStatus.running,
+    );
+    final group = runningDownloadRecords.groupListsBy((record) => record.group);
+    final activeDownload = group.keys.map(
+      (key) => DownloadChapter.fromJsonString(key),
+    );
+
     return DownloadChapterManagerV2._(
       cacheManager: cacheManager,
-      fileDownloader: (await fileDownloader.trackTasks()).registerCallbacks(
+      fileDownloader: fileDownloader.registerCallbacks(
         taskNotificationTapCallback: (task, notificationType) => log(
-          'Tap Notification for  ${task.taskId} with $notificationType',
+          'Tap Notification for ${task.taskId} with $notificationType',
           name: 'DownloadChapterManagerV2',
           time: DateTime.now(),
         ),
       ),
+      activeDownload: activeDownload.toSet(),
       getChapterUseCase: getChapterUseCase,
     );
   }
@@ -59,9 +75,11 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
     required FileDownloader fileDownloader,
     required BaseCacheManager cacheManager,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
+    required Set<DownloadChapter> activeDownload,
   })  : _fileDownloader = fileDownloader,
         _cacheManager = cacheManager,
-        _getChapterUseCase = getChapterUseCase {
+        _getChapterUseCase = getChapterUseCase,
+        _active = BehaviorSubject.seeded(activeDownload) {
     _init();
     fileDownloader.updates.distinct().listen(_onUpdate);
   }
@@ -123,6 +141,21 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
           time: DateTime.now(),
         );
       }
+      final records = await _fileDownloader.database.allRecords(
+        group: task.group,
+      );
+      final finalState = [TaskStatus.complete, TaskStatus.canceled, TaskStatus.notFound, TaskStatus.failed];
+      final nonFinalStateRecords = records.where(
+        (task) => !finalState.contains(task.status),
+      );
+      if (nonFinalStateRecords.isNotEmpty) return;
+      final downloadChapter = DownloadChapter.fromJsonString(task.group);
+      _active.add(Set.of(_active.value)..remove(downloadChapter));
+      log(
+        'Removing ${task.group} from active download',
+        name: runtimeType.toString(),
+        time: DateTime.now(),
+      );
     }
 
     if (event is TaskProgressUpdate) {
@@ -136,6 +169,8 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
 
   @override
   void downloadChapter({required DownloadChapter key}) async {
+    final keyString = key.toJsonString();
+
     final result = await _getChapterUseCase().execute(
       chapterId: key.chapter?.id,
       source: key.manga?.source,
@@ -143,8 +178,16 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
     );
 
     if (result is Success<MangaChapter>) {
+
+      _active.add(Set.of(_active.value)..add(key));
       log(
-        'Success fetching chapter images for ${key.hashCode}',
+        'Adding $keyString to active download',
+        name: runtimeType.toString(),
+        time: DateTime.now(),
+      );
+
+      log(
+        'Success fetching chapter images for $keyString',
         name: runtimeType.toString(),
         time: DateTime.now(),
       );
@@ -154,7 +197,7 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
       final chapter = key.chapter?.numChapter;
 
       _fileDownloader.configureNotificationForGroup(
-        '${key.hashCode}',
+        keyString,
         running: TaskNotification(
           'Downloading $title chapter $chapter',
           '{numFinished} out of {numTotal}',
@@ -168,7 +211,7 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
           '{numFailed}/{numTotal} failed',
         ),
         progressBar: false,
-        groupNotificationId: '${key.hashCode}',
+        groupNotificationId: keyString,
       );
 
       for (final (index, url) in images.indexed) {
@@ -184,7 +227,7 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
           directory: '$title/$chapter',
           filename: '${index + 1}.$extension',
           retries: 3,
-          group: '${key.hashCode}',
+          group: keyString,
           creationTime: DateTime.now(),
           requiresWiFi: true,
         );
@@ -204,7 +247,7 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
       final coverExt = cover?.split('.').lastOrNull;
 
       final records = await _fileDownloader.database.allRecords(
-        group: '$key.hashCode',
+        group: keyString,
       );
 
       final recordCover = records.firstWhereOrNull((e) => e.task.url == cover);
@@ -218,7 +261,7 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
             directory: '$title',
             filename: 'cover.$coverExt',
             retries: 5,
-            group: '${key.hashCode}',
+            group: keyString,
             creationTime: DateTime.now(),
             requiresWiFi: true,
           ),
@@ -242,4 +285,7 @@ class DownloadChapterManagerV2 implements DownloadChapterUseCase {
       );
     }
   }
+
+  @override
+  ValueStream<Set<DownloadChapter>> get activeDownloadStream => _active.stream;
 }

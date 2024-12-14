@@ -135,7 +135,6 @@ class DomainMangaRegistrar extends Registrar {
       ),
     );
     locator.alias<DownloadChapterProgressUseCase, DownloadChapterManager>();
-    locator.alias<ListenActiveDownloadUseCase, DownloadChapterManager>();
 
     locator.registerSingleton(
       await DownloadChapterManagerV2.create(
@@ -144,6 +143,7 @@ class DomainMangaRegistrar extends Registrar {
       ),
     );
     locator.alias<DownloadChapterUseCase, DownloadChapterManagerV2>();
+    locator.alias<ListenActiveDownloadUseCase, DownloadChapterManagerV2>();
 
     log('finish register', name: runtimeType.toString(), time: DateTime.now());
   }

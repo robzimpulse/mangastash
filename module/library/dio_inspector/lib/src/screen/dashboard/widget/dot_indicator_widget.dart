@@ -13,7 +13,7 @@ class DotIndicatorWidget extends StatefulWidget {
   });
 
   @override
-  _DotIndicatorWidgetState createState() => _DotIndicatorWidgetState();
+  State<DotIndicatorWidget> createState() => _DotIndicatorWidgetState();
 }
 
 class _DotIndicatorWidgetState extends State<DotIndicatorWidget> with SingleTickerProviderStateMixin {

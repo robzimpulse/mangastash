@@ -93,7 +93,7 @@ class ItemRow extends StatelessWidget {
           ),
           const Padding(
             padding: EdgeInsets.only(bottom: 18),
-          )
+          ),
         ],
       ),
     );

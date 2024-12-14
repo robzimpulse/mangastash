@@ -9,8 +9,8 @@ import '../model/http_activity_model.dart';
 import '../model/http_error_model.dart';
 import '../model/http_request_model.dart';
 import '../model/http_response_model.dart';
-import 'http_activity_storage.dart';
 import 'helper.dart';
+import 'http_activity_storage.dart';
 
 class InspectorInterceptor extends InterceptorsWrapper {
   final bool kIsDebug;
