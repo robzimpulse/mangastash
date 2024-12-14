@@ -163,9 +163,9 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
   }
 
-  void downloadChapter({required MangaChapter chapter}) async {
+  Future<void> downloadChapter({required MangaChapter chapter}) async {
     final key = DownloadChapter(manga: state.manga, chapter: chapter);
-    _downloadChapterUseCase.downloadChapter(key: key);
+    await _downloadChapterUseCase.downloadChapter(key: key);
   }
 
   void _updateDownloadChapterProgress(List<(String?, int, double)> progress) {

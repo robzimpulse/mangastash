@@ -3,6 +3,7 @@ library core_environment;
 export 'package:intl/intl.dart';
 export 'package:permission_handler/permission_handler.dart';
 export 'package:timezone/timezone.dart';
+export 'package:worker_manager/worker_manager.dart';
 
 export 'src/core_environment_registrar.dart';
 export 'src/enum/country.dart';

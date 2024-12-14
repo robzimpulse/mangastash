@@ -1,7 +1,7 @@
 import 'dart:developer';
 
-import 'package:background_worker/background_worker.dart';
 import 'package:service_locator/service_locator.dart';
+import 'package:worker_manager/worker_manager.dart' ;
 
 import 'manager/date_manager.dart';
 import 'manager/locale_manager.dart';
@@ -27,7 +27,7 @@ class CoreEnvironmentRegistrar extends Registrar {
     locator.registerSingleton(await DateManager.create());
     locator.alias<ListenCurrentTimezoneUseCase, DateManager>();
 
-    locator.registerSingleton(BackgroundWorker());
+    await workerManager.init(dynamicSpawning: true);
     log('finish register', name: runtimeType.toString(), time: DateTime.now());
   }
 }

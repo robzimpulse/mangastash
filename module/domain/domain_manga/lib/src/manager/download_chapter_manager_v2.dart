@@ -91,7 +91,11 @@ class DownloadChapterManagerV2
         _cacheManager = cacheManager,
         _getChapterUseCase = getChapterUseCase,
         _active = BehaviorSubject.seeded(activeDownloadKey) {
-    _init(completeRecords);
+    for (final record in completeRecords) {
+      final task = record.task;
+      if (task is! DownloadTask) continue;
+      _moveFileToSharedStorage(task: task);
+    }
     _streamSubscription = fileDownloader.updates.distinct().listen(_onUpdate);
   }
 
@@ -99,61 +103,14 @@ class DownloadChapterManagerV2
     _streamSubscription?.cancel();
   }
 
-  void _init(List<TaskRecord> completeRecords) async {
-    for (final record in completeRecords) {
-      final task = record.task;
-      if (task is DownloadTask) {
-        String? path = await _fileDownloader.pathInSharedStorage(
-          task.filename,
-          SharedStorage.downloads,
-          directory: 'Mangastash/${task.directory}',
-        );
-
-        path ??= await _fileDownloader.moveToSharedStorage(
-          task,
-          SharedStorage.downloads,
-          directory: 'Mangastash/${task.directory}',
-        );
-
-        if (path == null) continue;
-        await _cacheManager.removeFile(record.task.url);
-        await _cacheManager.putFile(
-          record.task.url,
-          await File(path).readAsBytes(),
-        );
-        log(
-          'Adding ${record.task.url} - $path to cache',
-          name: 'DownloadChapterManagerV2',
-          time: DateTime.now(),
-        );
-      }
-    }
-  }
-
   void _onUpdate(TaskUpdate event) async {
     final key = DownloadChapter.fromJsonString(event.task.group);
-
+    final task = event.task;
     if (event is TaskStatusUpdate) {
       if (event.status != TaskStatus.complete) return;
-      final task = event.task;
-      if (task is DownloadTask) {
-        final path = await _fileDownloader.moveToSharedStorage(
-          task,
-          SharedStorage.downloads,
-          directory: 'Mangastash/${task.directory}',
-        );
-        if (path == null) return;
-        await _cacheManager.removeFile(event.task.url);
-        await _cacheManager.putFile(
-          event.task.url,
-          await File(path).readAsBytes(),
-        );
-        log(
-          'Adding ${event.task.url} - $path to cache',
-          name: runtimeType.toString(),
-          time: DateTime.now(),
-        );
-      }
+      if (task is! DownloadTask) return;
+      await _moveFileToSharedStorage(task: task);
+
       final records = await _fileDownloader.database.allRecords(
         group: task.group,
       );
@@ -179,7 +136,7 @@ class DownloadChapterManagerV2
   }
 
   @override
-  void downloadChapter({required DownloadChapter key}) async {
+  Future<void> downloadChapter({required DownloadChapter key}) async {
     final keyString = key.toJsonString();
 
     final result = await _getChapterUseCase().execute(
@@ -298,4 +255,32 @@ class DownloadChapterManagerV2
 
   @override
   ValueStream<Set<DownloadChapter>> get activeDownloadStream => _active.stream;
+
+  Future<void> _moveFileToSharedStorage({
+    required DownloadTask task,
+  }) async {
+    String? path = await _fileDownloader.pathInSharedStorage(
+      task.filename,
+      SharedStorage.downloads,
+      directory: 'Mangastash/${task.directory}',
+    );
+
+    path ??= await _fileDownloader.moveToSharedStorage(
+      task,
+      SharedStorage.downloads,
+      directory: 'Mangastash/${task.directory}',
+    );
+
+    if (path == null) return;
+    await _cacheManager.removeFile(task.url);
+    await _cacheManager.putFile(
+      task.url,
+      await File(path).readAsBytes(),
+    );
+    log(
+      'Adding ${task.url} - $path to cache',
+      name: 'DownloadChapterManagerV2',
+      time: DateTime.now(),
+    );
+  }
 }

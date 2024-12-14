@@ -115,7 +115,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     switch (option) {
       case DownloadOption.all:
         for (final chapter in state.processedChapters.values) {
-          _cubit(context).downloadChapter(chapter: chapter);
+          await _cubit(context).downloadChapter(chapter: chapter);
         }
         break;
       // case DownloadOption.next:

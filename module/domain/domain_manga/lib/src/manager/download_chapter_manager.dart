@@ -49,7 +49,7 @@ class DownloadChapterManager
   }
 
   @override
-  void downloadChapter({
+  Future<void> downloadChapter({
     required DownloadChapter key,
   }) async {
     final progress = _progress[key] ?? BehaviorSubject.seeded((0, 0.0));
