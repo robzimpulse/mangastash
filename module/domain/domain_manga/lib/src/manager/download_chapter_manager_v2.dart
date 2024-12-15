@@ -10,12 +10,16 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../use_case/chapter/download_chapter_progress_use_case.dart';
 import '../use_case/chapter/download_chapter_use_case.dart';
 import '../use_case/chapter/get_chapter_use_case.dart';
 import '../use_case/chapter/listen_active_download_use_case.dart';
 
 class DownloadChapterManagerV2
-    implements DownloadChapterUseCase, ListenActiveDownloadUseCase {
+    implements
+        DownloadChapterUseCase,
+        ListenActiveDownloadUseCase,
+        DownloadChapterProgressUseCase {
   static const _finalStateTask = [
     TaskStatus.complete,
     TaskStatus.canceled,
@@ -96,7 +100,8 @@ class DownloadChapterManagerV2
       if (task is! DownloadTask) continue;
       _moveFileToSharedStorage(task: task);
     }
-    _streamSubscription = fileDownloader.updates.distinct().listen(_onUpdate);
+    _streamSubscription =
+        fileDownloader.updates.share().distinct().listen(_onUpdate);
   }
 
   void dispose() {
@@ -282,5 +287,52 @@ class DownloadChapterManagerV2
       name: 'DownloadChapterManagerV2',
       time: DateTime.now(),
     );
+  }
+
+  @override
+  Future<double> downloadChapterProgress({required DownloadChapter key}) async {
+    final keyString = key.toJsonString();
+    final records = await _fileDownloader.database.allRecords(group: keyString);
+    final total = records.fold(0.0, (prev, record) => prev + record.progress);
+    return total / records.length;
+  }
+
+  @override
+  ValueStream<(int, double)> downloadChapterProgressStream({
+    required DownloadChapter key,
+  }) {
+    final keyString = key.toJsonString();
+    final records = _fileDownloader.database.allRecords(group: keyString);
+
+    return Stream.fromFuture(records).flatMap(
+      (records) {
+        final streams = records.map(
+          (record) => _fileDownloader.updates
+              .share()
+              .where((update) => update.task.taskId == record.taskId)
+              .whereType<TaskProgressUpdate>(),
+        );
+
+        return CombineLatestStream(
+          streams,
+          (values) {
+            final totalProgress = values.fold(
+              0.0,
+              (prev, value) => prev + value.progress,
+            );
+
+            final finishedProgress = values.fold(
+              0.0,
+              (prev, value) => prev + (value.progress == 1.0 ? 1.0 : 0.0),
+            );
+
+            return (
+              finishedProgress.toInt(),
+              totalProgress / streams.length,
+            );
+          },
+        );
+      },
+    ).shareValue();
   }
 }

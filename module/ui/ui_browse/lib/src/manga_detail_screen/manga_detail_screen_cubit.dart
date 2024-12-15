@@ -122,13 +122,14 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       final chapters = result.data;
       for (final chapter in chapters) {
         final key = DownloadChapter(manga: state.manga, chapter: chapter);
+        final progress =
+            _downloadChapterProgressUseCase.downloadChapterProgress(key: key);
         streams.add(
           _downloadChapterProgressUseCase
               .downloadChapterProgressStream(key: key)
               .map((event) => (chapter.id, event.$1, event.$2)),
         );
-        downloadProgress[chapter.id] =
-            _downloadChapterProgressUseCase.downloadChapterProgress(key: key);
+        downloadProgress[chapter.id] = await progress;
       }
 
       _activeSubscriptions?.cancel();

@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
-import 'manager/download_chapter_manager.dart';
 import 'manager/download_chapter_manager_v2.dart';
 import 'manager/library_manager.dart';
 import 'manager/manga_source_manager.dart';
@@ -127,16 +126,6 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<GetMangaSourceUseCase, MangaSourceManager>();
 
     locator.registerSingleton(
-      DownloadChapterManager(
-        dio: () => locator(),
-        getChapterUseCase: () => locator(),
-        cacheManager: locator(),
-        listenDownloadPathUseCase: locator(),
-      ),
-    );
-    locator.alias<DownloadChapterProgressUseCase, DownloadChapterManager>();
-
-    locator.registerSingleton(
       await DownloadChapterManagerV2.create(
         cacheManager: locator(),
         getChapterUseCase: () => locator(),
@@ -145,6 +134,7 @@ class DomainMangaRegistrar extends Registrar {
     );
     locator.alias<DownloadChapterUseCase, DownloadChapterManagerV2>();
     locator.alias<ListenActiveDownloadUseCase, DownloadChapterManagerV2>();
+    locator.alias<DownloadChapterProgressUseCase, DownloadChapterManagerV2>();
 
     log('finish register', name: runtimeType.toString(), time: DateTime.now());
   }
