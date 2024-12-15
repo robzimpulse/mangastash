@@ -30,8 +30,8 @@ class DownloadChapterManager
   final FileDownloader _fileDownloader;
   final BaseCacheManager _cacheManager;
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
-  final BehaviorSubject<Set<DownloadChapter>> _active;
-  final Map<DownloadChapter, BehaviorSubject<(int, double)>> _progress;
+  final BehaviorSubject<Set<DownloadChapterKey>> _active;
+  final Map<DownloadChapterKey, BehaviorSubject<(int, double)>> _progress;
 
   StreamSubscription? _streamSubscription;
 
@@ -78,13 +78,13 @@ class DownloadChapterManager
           .where((record) => record.status == TaskStatus.running)
           .groupListsBy((record) => record.group)
           .keys
-          .map((key) => DownloadChapter.fromJsonString(key))
+          .map((key) => DownloadChapterKey.fromJsonString(key))
           .toSet(),
       completeRecords: records
           .where((record) => record.status == TaskStatus.complete)
           .toList(),
-      initialProgress: records.groupFoldBy<DownloadChapter, (int, double)>(
-        (record) => DownloadChapter.fromJsonString(record.group),
+      initialProgress: records.groupFoldBy<DownloadChapterKey, (int, double)>(
+        (record) => DownloadChapterKey.fromJsonString(record.group),
         (result, current) {
           final total = (result?.$1 ?? 0) + 1;
           return (total, (result?.$2 ?? 0.0) + current.progress);
@@ -97,9 +97,9 @@ class DownloadChapterManager
     required FileDownloader fileDownloader,
     required BaseCacheManager cacheManager,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
-    required Set<DownloadChapter> activeDownloadKey,
+    required Set<DownloadChapterKey> activeDownloadKey,
     required List<TaskRecord> completeRecords,
-    required Map<DownloadChapter, (int, double)> initialProgress,
+    required Map<DownloadChapterKey, (int, double)> initialProgress,
   })  : _fileDownloader = fileDownloader,
         _cacheManager = cacheManager,
         _getChapterUseCase = getChapterUseCase,
@@ -120,7 +120,7 @@ class DownloadChapterManager
   }
 
   void _onUpdate(TaskUpdate event) async {
-    final key = DownloadChapter.fromJsonString(event.task.group);
+    final key = DownloadChapterKey.fromJsonString(event.task.group);
     final task = event.task;
     if (event is TaskStatusUpdate) {
       if (event.status != TaskStatus.complete) return;
@@ -153,7 +153,7 @@ class DownloadChapterManager
   }
 
   @override
-  Future<void> downloadChapter({required DownloadChapter key}) async {
+  Future<void> downloadChapter({required DownloadChapterKey key}) async {
     final keyString = key.toJsonString();
 
     final result = await _getChapterUseCase().execute(
@@ -271,7 +271,8 @@ class DownloadChapterManager
   }
 
   @override
-  ValueStream<Set<DownloadChapter>> get activeDownloadStream => _active.stream;
+  ValueStream<Set<DownloadChapterKey>> get activeDownloadStream =>
+      _active.stream;
 
   Future<void> _moveFileToSharedStorage({
     required DownloadTask task,
@@ -302,13 +303,13 @@ class DownloadChapterManager
   }
 
   @override
-  double downloadChapterProgress({required DownloadChapter key}) {
+  double downloadChapterProgress({required DownloadChapterKey key}) {
     return downloadChapterProgressStream(key: key).value.$2;
   }
 
   @override
   ValueStream<(int, double)> downloadChapterProgressStream({
-    required DownloadChapter key,
+    required DownloadChapterKey key,
   }) {
     return _progress
         .putIfAbsent(

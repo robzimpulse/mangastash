@@ -1,6 +1,6 @@
 library entity_manga;
 
-export 'src/download_chapter.dart';
+export 'src/download_chapter_key.dart';
 export 'src/enum/manga_chapter_display_enum.dart';
 export 'src/enum/manga_chapter_sort_option_enum.dart';
 export 'src/enum/manga_chapter_sort_order_enum.dart';

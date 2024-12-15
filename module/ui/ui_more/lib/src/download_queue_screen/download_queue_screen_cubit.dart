@@ -26,9 +26,9 @@ class DownloadQueueScreenCubit extends Cubit<DownloadQueueScreenState>
     );
   }
 
-  void _updateActiveDownload(Set<DownloadChapter> values) {
-    final Map<DownloadChapter, (int, double)> progress = {};
-    final List<Stream<(DownloadChapter, int, double)>> streams = [];
+  void _updateActiveDownload(Set<DownloadChapterKey> values) {
+    final Map<DownloadChapterKey, (int, double)> progress = {};
+    final List<Stream<(DownloadChapterKey, int, double)>> streams = [];
     for (final value in values) {
       progress[value] = (0, 0.0);
       streams.add(
@@ -45,9 +45,9 @@ class DownloadQueueScreenCubit extends Cubit<DownloadQueueScreenState>
         .listen(_updateProgress);
   }
 
-  void _updateProgress(List<(DownloadChapter key, int, double)> values) {
+  void _updateProgress(List<(DownloadChapterKey key, int, double)> values) {
     final progress = Map.of(
-      state.progress ?? <DownloadChapter, (int, double)>{},
+      state.progress ?? <DownloadChapterKey, (int, double)>{},
     );
     for (final (key, downloaded, data) in values) {
       progress.update(key, (value) => (downloaded, data));

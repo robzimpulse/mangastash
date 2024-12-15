@@ -3,10 +3,10 @@ import 'package:rxdart/rxdart.dart';
 
 abstract class DownloadChapterProgressUseCase {
   double downloadChapterProgress({
-    required DownloadChapter key,
+    required DownloadChapterKey key,
   });
 
   ValueStream<(int, double)> downloadChapterProgressStream({
-    required DownloadChapter key,
+    required DownloadChapterKey key,
   });
 }

@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'download_chapter.dart';
+part of 'download_chapter_key.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-DownloadChapter _$DownloadChapterFromJson(Map<String, dynamic> json) =>
-    DownloadChapter(
+DownloadChapterKey _$DownloadChapterKeyFromJson(Map<String, dynamic> json) =>
+    DownloadChapterKey(
       manga: json['manga'] == null
           ? null
           : Manga.fromJson(json['manga'] as Map<String, dynamic>),
@@ -16,7 +16,7 @@ DownloadChapter _$DownloadChapterFromJson(Map<String, dynamic> json) =>
           : MangaChapter.fromJson(json['chapter'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$DownloadChapterToJson(DownloadChapter instance) =>
+Map<String, dynamic> _$DownloadChapterKeyToJson(DownloadChapterKey instance) =>
     <String, dynamic>{
       'manga': instance.manga?.toJson(),
       'chapter': instance.chapter?.toJson(),
