@@ -143,7 +143,22 @@ class DownloadChapterManager
     }
 
     if (event is TaskProgressUpdate) {
-      // TODO: passing data progress to prop [_progress]
+      final records = await _fileDownloader.database.allRecords(
+        group: task.group,
+      );
+      final overallProgress = records.fold<(int, double)>(
+        (records.length, 0.0),
+        (result, current) {
+          return (records.length, result.$2 + current.progress);
+        },
+      );
+      final progress = _progress.putIfAbsent(
+        key,
+        () => BehaviorSubject.seeded((records.length, 0.0)),
+      );
+      progress.add(
+        (overallProgress.$1, overallProgress.$2 / overallProgress.$1),
+      );
       log(
         'Receive TaskProgressUpdate for ${event.task.taskId}: ${event.progress} %',
         name: runtimeType.toString(),
@@ -157,9 +172,9 @@ class DownloadChapterManager
     final keyString = key.toJsonString();
 
     final result = await _getChapterUseCase().execute(
-      chapterId: key.chapter?.id,
-      source: key.manga?.source,
-      mangaId: key.manga?.id,
+      chapterId: key.chapterId,
+      source: key.mangaSource,
+      mangaId: key.mangaId,
     );
 
     if (result is Success<MangaChapter>) {
@@ -177,8 +192,8 @@ class DownloadChapterManager
       );
 
       final images = result.data.images ?? [];
-      final title = key.manga?.title;
-      final chapter = key.chapter?.numChapter;
+      final title = key.mangaTitle;
+      final chapter = key.chapterNumber;
 
       _fileDownloader.configureNotificationForGroup(
         keyString,
@@ -198,45 +213,37 @@ class DownloadChapterManager
         groupNotificationId: keyString,
       );
 
+      final List<DownloadTask> tasks = [];
       for (final (index, url) in images.indexed) {
         final extension = url.split('.').lastOrNull;
 
         if (title == null || chapter == null || extension == null) continue;
 
-        final task = DownloadTask(
-          url: url,
-          headers: {HttpHeaders.userAgentHeader: _userAgent},
-          baseDirectory: BaseDirectory.applicationDocuments,
-          updates: Updates.statusAndProgress,
-          directory: '$title/$chapter',
-          filename: '${index + 1}.$extension',
-          retries: 3,
-          group: keyString,
-          creationTime: DateTime.now(),
-          requiresWiFi: true,
-        );
-
-        final result = await _fileDownloader.enqueue(task);
-
-        final text = result ? 'Success' : 'Failed';
-
-        log(
-          '$text enqueue download task for $url',
-          name: runtimeType.toString(),
-          time: DateTime.now(),
+        tasks.add(
+          DownloadTask(
+            url: url,
+            headers: {HttpHeaders.userAgentHeader: _userAgent},
+            baseDirectory: BaseDirectory.applicationDocuments,
+            updates: Updates.statusAndProgress,
+            directory: '$title/$chapter',
+            filename: '${index + 1}.$extension',
+            retries: 3,
+            group: keyString,
+            creationTime: DateTime.now(),
+            allowPause: true,
+            requiresWiFi: true,
+          ),
         );
       }
 
-      final cover = key.manga?.coverUrl;
+      final cover = key.mangaCoverUrl;
       final coverExt = cover?.split('.').lastOrNull;
-
       final records = await _fileDownloader.database.allRecords(
         group: keyString,
       );
-
       final recordCover = records.firstWhereOrNull((e) => e.task.url == cover);
       if (recordCover == null && cover != null && coverExt != null) {
-        final result = await _fileDownloader.enqueue(
+        tasks.add(
           DownloadTask(
             url: cover,
             headers: {HttpHeaders.userAgentHeader: _userAgent},
@@ -248,17 +255,12 @@ class DownloadChapterManager
             group: keyString,
             creationTime: DateTime.now(),
             requiresWiFi: true,
+            allowPause: true,
           ),
         );
-
-        final text = result ? 'Success' : 'Failed';
-
-        log(
-          '$text enqueue download task for $cover',
-          name: runtimeType.toString(),
-          time: DateTime.now(),
-        );
       }
+
+      await Future.wait(tasks.map((e) => _fileDownloader.enqueue(e)));
     }
 
     if (result is Error<MangaChapter>) {

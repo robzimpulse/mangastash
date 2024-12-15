@@ -43,8 +43,8 @@ class DownloadQueueScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${data.key.manga?.title}'),
-                  Text('Chapter ${data.key.chapter?.chapter}'),
+                  Text('${data.key.mangaTitle}'),
+                  Text('Chapter ${data.key.chapterNumber}'),
                   Text('${data.value.$1} files downloaded'),
                   LinearProgressIndicator(
                     value: data.value.$2,

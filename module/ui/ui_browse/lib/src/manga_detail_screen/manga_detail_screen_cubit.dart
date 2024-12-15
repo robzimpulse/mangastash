@@ -121,7 +121,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       final List<Stream<(String?, int, double)>> streams = [];
       final chapters = result.data;
       for (final chapter in chapters) {
-        final key = DownloadChapterKey(manga: state.manga, chapter: chapter);
+        final key = DownloadChapterKey.create(manga: state.manga, chapter: chapter,);
         streams.add(
           _downloadChapterProgressUseCase
               .downloadChapterProgressStream(key: key)
@@ -164,8 +164,14 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   }
 
   Future<void> downloadChapter({required MangaChapter chapter}) async {
-    final key = DownloadChapterKey(manga: state.manga, chapter: chapter);
+    final key = DownloadChapterKey.create(manga: state.manga, chapter: chapter);
     await _downloadChapterUseCase.downloadChapter(key: key);
+  }
+
+  Future<void> downloadAllChapter() async {
+    for (final chapter in state.processedChapters.values) {
+      await downloadChapter(chapter: chapter);
+    }
   }
 
   void _updateDownloadChapterProgress(List<(String?, int, double)> progress) {

@@ -9,15 +9,32 @@ part 'download_chapter_key.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class DownloadChapterKey extends Equatable {
+  final String? mangaId;
+  final String? mangaTitle;
+  final String? mangaCoverUrl;
 
-  final Manga? manga;
+  final String? chapterId;
+  final num? chapterNumber;
+  final MangaSourceEnum? mangaSource;
 
-  final MangaChapter? chapter;
-
-  const DownloadChapterKey({this.manga, this.chapter});
+  const DownloadChapterKey({
+    this.mangaId,
+    this.chapterId,
+    this.mangaSource,
+    this.mangaTitle,
+    this.chapterNumber,
+    this.mangaCoverUrl,
+  });
 
   @override
-  List<Object?> get props => [manga, chapter];
+  List<Object?> get props => [
+        mangaId,
+        chapterId,
+        mangaSource,
+        mangaTitle,
+        chapterNumber,
+        mangaCoverUrl,
+      ];
 
   factory DownloadChapterKey.fromJson(Map<String, dynamic> json) {
     return _$DownloadChapterKeyFromJson(json);
@@ -27,9 +44,20 @@ class DownloadChapterKey extends Equatable {
 
   String toJsonString() => json.encode(toJson());
 
+  factory DownloadChapterKey.create({Manga? manga, MangaChapter? chapter}) {
+    return DownloadChapterKey(
+      mangaId: manga?.id,
+      mangaSource: manga?.source,
+      mangaTitle: manga?.title,
+      chapterId: chapter?.id,
+      chapterNumber: chapter?.numChapter,
+    );
+  }
+
   factory DownloadChapterKey.fromJsonString(String json) {
     try {
-      return DownloadChapterKey.fromJson(jsonDecode(json) as Map<String, dynamic>);
+      return DownloadChapterKey.fromJson(
+          jsonDecode(json) as Map<String, dynamic>);
     } catch (e) {
       return const DownloadChapterKey();
     }
