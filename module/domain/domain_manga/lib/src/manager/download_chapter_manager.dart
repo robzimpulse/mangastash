@@ -15,7 +15,7 @@ import '../use_case/chapter/download_chapter_use_case.dart';
 import '../use_case/chapter/get_chapter_use_case.dart';
 import '../use_case/chapter/listen_active_download_use_case.dart';
 
-class DownloadChapterManagerV2
+class DownloadChapterManager
     implements
         DownloadChapterUseCase,
         ListenActiveDownloadUseCase,
@@ -40,7 +40,7 @@ class DownloadChapterManagerV2
       'Chrome/127.0.0.0 '
       'Safari/537.36';
 
-  static Future<DownloadChapterManagerV2> create({
+  static Future<DownloadChapterManager> create({
     required BaseCacheManager cacheManager,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
   }) async {
@@ -63,7 +63,7 @@ class DownloadChapterManagerV2
     await fileDownloader.trackTasks();
     final records = await fileDownloader.database.allRecords();
 
-    return DownloadChapterManagerV2._(
+    return DownloadChapterManager._(
       cacheManager: cacheManager,
       getChapterUseCase: getChapterUseCase,
       fileDownloader: fileDownloader.registerCallbacks(
@@ -85,7 +85,7 @@ class DownloadChapterManagerV2
     );
   }
 
-  DownloadChapterManagerV2._({
+  DownloadChapterManager._({
     required FileDownloader fileDownloader,
     required BaseCacheManager cacheManager,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
