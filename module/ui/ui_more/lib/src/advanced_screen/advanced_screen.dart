@@ -7,7 +7,6 @@ import 'advanced_screen_cubit.dart';
 import 'advanced_screen_state.dart';
 
 class AdvancedScreen extends StatelessWidget {
-
   final DioInspector inspector;
 
   const AdvancedScreen({
@@ -44,6 +43,16 @@ class AdvancedScreen extends StatelessWidget {
             leading: const SizedBox(
               height: double.infinity,
               child: Icon(Icons.http),
+            ),
+          ),
+          ListTile(
+            title: const Text('Log Inspector'),
+            onTap: () => context.showSnackBar(
+              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+            ),
+            leading: const SizedBox(
+              height: double.infinity,
+              child: Icon(Icons.wrap_text),
             ),
           ),
         ],
