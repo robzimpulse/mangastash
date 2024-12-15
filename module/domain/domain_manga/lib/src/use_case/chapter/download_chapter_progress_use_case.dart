@@ -2,7 +2,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:rxdart/rxdart.dart';
 
 abstract class DownloadChapterProgressUseCase {
-  Future<double> downloadChapterProgress({
+  double downloadChapterProgress({
     required DownloadChapter key,
   });
 

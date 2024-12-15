@@ -31,6 +31,7 @@ class DownloadChapterManager
   final BaseCacheManager _cacheManager;
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final BehaviorSubject<Set<DownloadChapter>> _active;
+  final Map<DownloadChapter, BehaviorSubject<(int, double)>> _progress;
 
   StreamSubscription? _streamSubscription;
 
@@ -82,6 +83,13 @@ class DownloadChapterManager
       completeRecords: records
           .where((record) => record.status == TaskStatus.complete)
           .toList(),
+      initialProgress: records.groupFoldBy<DownloadChapter, (int, double)>(
+        (record) => DownloadChapter.fromJsonString(record.group),
+        (result, current) {
+          final total = (result?.$1 ?? 0) + 1;
+          return (total, (result?.$2 ?? 0.0) + current.progress);
+        },
+      ).map((key, value) => MapEntry(key, (value.$1, value.$2 / value.$1))),
     );
   }
 
@@ -91,17 +99,20 @@ class DownloadChapterManager
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required Set<DownloadChapter> activeDownloadKey,
     required List<TaskRecord> completeRecords,
+    required Map<DownloadChapter, (int, double)> initialProgress,
   })  : _fileDownloader = fileDownloader,
         _cacheManager = cacheManager,
         _getChapterUseCase = getChapterUseCase,
-        _active = BehaviorSubject.seeded(activeDownloadKey) {
+        _active = BehaviorSubject.seeded(activeDownloadKey),
+        _progress = Map.of(initialProgress).map(
+          (key, value) => MapEntry(key, BehaviorSubject.seeded(value)),
+        ) {
     for (final record in completeRecords) {
       final task = record.task;
       if (task is! DownloadTask) continue;
       _moveFileToSharedStorage(task: task);
     }
-    _streamSubscription =
-        fileDownloader.updates.share().distinct().listen(_onUpdate);
+    _streamSubscription = fileDownloader.updates.distinct().listen(_onUpdate);
   }
 
   void dispose() {
@@ -132,6 +143,7 @@ class DownloadChapterManager
     }
 
     if (event is TaskProgressUpdate) {
+      // TODO: passing data progress to prop [_progress]
       log(
         'Receive TaskProgressUpdate for ${event.task.taskId}: ${event.progress} %',
         name: runtimeType.toString(),
@@ -290,49 +302,19 @@ class DownloadChapterManager
   }
 
   @override
-  Future<double> downloadChapterProgress({required DownloadChapter key}) async {
-    final keyString = key.toJsonString();
-    final records = await _fileDownloader.database.allRecords(group: keyString);
-    final total = records.fold(0.0, (prev, record) => prev + record.progress);
-    return total / records.length;
+  double downloadChapterProgress({required DownloadChapter key}) {
+    return downloadChapterProgressStream(key: key).value.$2;
   }
 
   @override
   ValueStream<(int, double)> downloadChapterProgressStream({
     required DownloadChapter key,
   }) {
-    final keyString = key.toJsonString();
-    final records = _fileDownloader.database.allRecords(group: keyString);
-
-    return Stream.fromFuture(records).flatMap(
-      (records) {
-        final streams = records.map(
-          (record) => _fileDownloader.updates
-              .share()
-              .where((update) => update.task.taskId == record.taskId)
-              .whereType<TaskProgressUpdate>(),
-        );
-
-        return CombineLatestStream(
-          streams,
-          (values) {
-            final totalProgress = values.fold(
-              0.0,
-              (prev, value) => prev + value.progress,
-            );
-
-            final finishedProgress = values.fold(
-              0.0,
-              (prev, value) => prev + (value.progress == 1.0 ? 1.0 : 0.0),
-            );
-
-            return (
-              finishedProgress.toInt(),
-              totalProgress / streams.length,
-            );
-          },
-        );
-      },
-    ).shareValue();
+    return _progress
+        .putIfAbsent(
+          key,
+          () => BehaviorSubject.seeded((0, 0.0)),
+        )
+        .stream;
   }
 }
