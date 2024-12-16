@@ -1,6 +1,5 @@
-import 'dart:developer';
-
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:log_box/log_box.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager/custom_cache_manager/custom_cache_manager.dart';
@@ -16,10 +15,10 @@ import 'use_case/set_download_path_use_case.dart';
 class CoreStorageRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    log('start register', name: runtimeType.toString(), time: DateTime.now());
+    final LogBox log = locator();
+    log.log('start register', name: runtimeType.toString(), time: DateTime.now());
 
     locator.registerSingleton(await SharedPreferencesStorage.create());
-
     locator.registerSingleton(InMemoryStorage());
 
     locator.registerSingleton(await PathManager.create(storage: locator()));
@@ -32,6 +31,6 @@ class CoreStorageRegistrar extends Registrar {
     locator.registerSingleton(CustomCacheManager.create(dio: locator()));
     locator.alias<BaseCacheManager, CustomCacheManager>();
 
-    log('finish register', name: runtimeType.toString(), time: DateTime.now());
+    log.log('finish register', name: runtimeType.toString(), time: DateTime.now());
   }
 }

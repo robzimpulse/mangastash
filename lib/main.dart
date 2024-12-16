@@ -8,6 +8,7 @@ import 'package:dio_inspector/dio_inspector.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:log_box/log_box.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
@@ -67,6 +68,8 @@ class _MangaStashAppState extends State<MangaStashApp> {
       ),
     );
 
+    widget.locator.registerSingleton(LogBox());
+
     // TODO: register module registrar here
     await widget.locator.registerRegistrar(CoreAuthRegistrar());
     await widget.locator.registerRegistrar(CoreNetworkRegistrar());
@@ -109,7 +112,10 @@ class _MangaStashAppState extends State<MangaStashApp> {
         locator: locator,
         rootNavigatorKey: rootNavigatorKey,
       ),
-      observers: [BaseRouteObserver(), inspector.navigatorObserver],
+      observers: [
+        BaseRouteObserver(log: locator()),
+        inspector.navigatorObserver,
+      ],
     );
   }
 }

@@ -18,6 +18,8 @@ dependencies:
   # library
   service_locator:
     path: ../../library/service_locator
+  log_box:
+    path: ../../library/log_box
 
   # entity
   entity_manga:

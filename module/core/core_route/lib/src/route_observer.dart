@@ -1,9 +1,11 @@
-import 'dart:developer';
-
 import 'package:flutter/widgets.dart';
+import 'package:log_box/log_box.dart';
 
 class BaseRouteObserver extends NavigatorObserver {
-  BaseRouteObserver();
+
+  final LogBox log;
+
+  BaseRouteObserver({required this.log});
 
   @override
   void didPush(Route route, Route? previousRoute) {
@@ -32,7 +34,7 @@ class BaseRouteObserver extends NavigatorObserver {
   void _update(Route? route) {
     final location = route?.settings.name;
     final arguments = route?.settings.arguments;
-    log('location: $location', name: runtimeType.toString(), time: DateTime.now());
-    log('arguments: $arguments', name: runtimeType.toString(), time: DateTime.now());
+    log.log('location: $location', name: runtimeType.toString(), time: DateTime.now());
+    log.log('arguments: $arguments', name: runtimeType.toString(), time: DateTime.now());
   }
 }

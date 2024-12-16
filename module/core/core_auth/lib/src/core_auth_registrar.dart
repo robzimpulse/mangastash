@@ -1,5 +1,4 @@
-import 'dart:developer';
-
+import 'package:log_box/log_box.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager/auth_manager.dart';
@@ -14,7 +13,8 @@ import 'use_case/register_use_case.dart';
 class CoreAuthRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    log('start register', name: runtimeType.toString(), time: DateTime.now());
+    final LogBox log = locator();
+    log.log('start register', name: runtimeType.toString(), time: DateTime.now());
 
     locator.registerFactory(() => AuthService(app: locator()));
     locator.registerFactory(
@@ -27,6 +27,6 @@ class CoreAuthRegistrar extends Registrar {
     locator.registerSingleton(AuthManager(service: locator()));
     locator.alias<ListenAuthUseCase, AuthManager>();
     locator.alias<GetAuthUseCase, AuthManager>();
-    log('finish register', name: runtimeType.toString(), time: DateTime.now());
+    log.log('finish register', name: runtimeType.toString(), time: DateTime.now());
   }
 }

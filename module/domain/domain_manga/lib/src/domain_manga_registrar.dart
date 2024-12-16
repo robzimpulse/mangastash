@@ -1,5 +1,4 @@
-import 'dart:developer';
-
+import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
@@ -29,7 +28,8 @@ import 'use_case/manga_tags/get_list_tags_use_case.dart';
 class DomainMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    log('start register', name: runtimeType.toString(), time: DateTime.now());
+    final LogBox log = locator();
+    log.log('start register', name: runtimeType.toString(), time: DateTime.now());
 
     // manga dex services
     locator.registerFactory(() => MangaService(locator()));
@@ -136,6 +136,6 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<ListenActiveDownloadUseCase, DownloadChapterManager>();
     locator.alias<DownloadChapterProgressUseCase, DownloadChapterManager>();
 
-    log('finish register', name: runtimeType.toString(), time: DateTime.now());
+    log.log('finish register', name: runtimeType.toString(), time: DateTime.now());
   }
 }

@@ -16,6 +16,8 @@ dependencies:
   # library
   service_locator:
     path: ../../library/service_locator
+  log_box:
+    path: ../../library/log_box
 
 dev_dependencies:
   flutter_test:

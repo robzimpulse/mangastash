@@ -21,6 +21,8 @@ dependencies:
     path: ../../library/service_locator
   safe_bloc:
     path: ../../library/safe_bloc
+  log_box:
+    path: ../../library/log_box
 
   # core
   core_storage:

@@ -21,6 +21,8 @@ dependencies:
     path: ../../library/service_locator
   dio_inspector:
     path: ../../library/dio_inspector
+  log_box:
+    path: ../../library/log_box
 
 dev_dependencies:
   flutter_test:

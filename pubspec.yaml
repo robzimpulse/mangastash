@@ -46,6 +46,8 @@ dependencies:
     path: module/library/service_locator
   dio_inspector:
     path: module/library/dio_inspector
+  log_box:
+    path: module/library/log_box
 
   # core
   core_auth:

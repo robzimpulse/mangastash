@@ -1,5 +1,4 @@
-import 'dart:developer';
-
+import 'package:log_box/log_box.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:worker_manager/worker_manager.dart' ;
 
@@ -15,7 +14,8 @@ import 'use_case/update_theme_use_case.dart';
 class CoreEnvironmentRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    log('start register', name: runtimeType.toString(), time: DateTime.now());
+    final LogBox log = locator();
+    log.log('start register', name: runtimeType.toString(), time: DateTime.now());
     locator.registerSingleton(ThemeManager(storage: locator()));
     locator.alias<UpdateThemeUseCase, ThemeManager>();
     locator.alias<ListenThemeUseCase, ThemeManager>();
@@ -28,6 +28,6 @@ class CoreEnvironmentRegistrar extends Registrar {
     locator.alias<ListenCurrentTimezoneUseCase, DateManager>();
 
     await workerManager.init(dynamicSpawning: true);
-    log('finish register', name: runtimeType.toString(), time: DateTime.now());
+    log.log('finish register', name: runtimeType.toString(), time: DateTime.now());
   }
 }
