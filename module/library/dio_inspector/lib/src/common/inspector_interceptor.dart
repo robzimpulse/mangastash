@@ -13,23 +13,16 @@ import 'helper.dart';
 import 'http_activity_storage.dart';
 
 class InspectorInterceptor extends InterceptorsWrapper {
-  final bool kIsDebug;
   final HttpActivityStorage storage;
   NavigatorObserver? navigatorKey;
 
   InspectorInterceptor({
-    required this.kIsDebug,
     required this.storage,
     this.navigatorKey,
   });
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    if (!kIsDebug) {
-      handler.next(options);
-      return;
-    }
-
     final mergedQueryParameters = <String, dynamic>{};
 
     for (final entry in options.queryParameters.entries) {
@@ -108,11 +101,6 @@ class InspectorInterceptor extends InterceptorsWrapper {
     Response<dynamic> response,
     ResponseInterceptorHandler handler,
   ) {
-    if (!kIsDebug) {
-      handler.next(response);
-      return;
-    }
-
     final data = response.data;
     storage.addResponse(
       id: response.requestOptions.hashCode,
@@ -129,10 +117,6 @@ class InspectorInterceptor extends InterceptorsWrapper {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    if (!kIsDebug) {
-      handler.next(err);
-      return;
-    }
 
     final response = err.response;
     final dynamic data = response?.data;

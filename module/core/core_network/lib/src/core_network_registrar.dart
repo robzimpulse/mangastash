@@ -24,7 +24,7 @@ class CoreNetworkRegistrar extends Registrar {
     locator.registerSingleton(UrlLauncherManager());
     locator.alias<LaunchUrlUseCase, UrlLauncherManager>();
 
-    locator.registerSingleton(DioInspector(isDebugMode: true));
+    locator.registerSingleton(DioInspector());
 
     locator.registerSingleton(
       DioManager.create(inspector: locator(), log: locator()),

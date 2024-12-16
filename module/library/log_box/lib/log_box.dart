@@ -8,20 +8,12 @@ import 'src/common/log_storage.dart';
 import 'src/model/log_model.dart';
 
 class LogBox {
-  static final LogBox _instance = LogBox._internal();
+  static final LogBox _instance = LogBox._();
   final LogStorage _storage = LogStorage();
 
-  String? _password;
+  factory LogBox() => _instance;
 
-  factory LogBox({String? password = ''}) {
-    return _instance.._init(password);
-  }
-
-  LogBox._internal() : _password = '';
-
-  void _init(String? password) {
-    _password = password;
-  }
+  LogBox._();
 
   void log(
     String message, {

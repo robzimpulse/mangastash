@@ -9,10 +9,9 @@ import '../detail/detail_screen.dart';
 import 'widget/item_response_widget.dart';
 
 class DashboardScreen extends StatefulWidget {
-  final String password;
   final HttpActivityStorage storage;
 
-  const DashboardScreen({super.key, this.password = '', required this.storage});
+  const DashboardScreen({super.key, required this.storage});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -26,13 +25,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String query = '';
   bool isSearch = false;
   SortActivity currentSort = SortActivity.byTime;
-
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-  //   // if (widget.password.isEmpty) return;
-  //   // WidgetsBinding.instance.addPostFrameCallback((_) => _dialogInputPassword());
-  // }
 
   @override
   void dispose() {
