@@ -1,7 +1,7 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:log_box/log_box.dart';
 import 'package:system_proxy/system_proxy.dart';
 
 import '../use_case/get_proxy_use_case.dart';
@@ -15,7 +15,7 @@ class SystemProxyManager implements GetSystemProxyUseCase {
 
   SystemProxyManager({this.host, this.port});
 
-  static Future<SystemProxyManager> create() async {
+  static Future<SystemProxyManager> create({required LogBox log}) async {
     String? host;
     String? port;
 
@@ -27,7 +27,7 @@ class SystemProxyManager implements GetSystemProxyUseCase {
 
     if (kDebugMode && port != null && host != null) {
       HttpOverrides.global = _SystemProxyHttpOverrides(port: port, host: host);
-      log(
+      log.log(
         'Using proxy with host: $host:$port',
         name: 'SystemProxyManager',
         time: DateTime.now(),

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:background_downloader/background_downloader.dart';
@@ -8,6 +7,7 @@ import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart' hide Config;
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/foundation.dart';
+import 'package:log_box/log_box.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../use_case/chapter/download_chapter_progress_use_case.dart';
@@ -32,6 +32,7 @@ class DownloadChapterManager
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final BehaviorSubject<Set<DownloadChapterKey>> _active;
   final Map<DownloadChapterKey, BehaviorSubject<(int, double)>> _progress;
+  final LogBox _log;
 
   StreamSubscription? _streamSubscription;
 
@@ -44,6 +45,7 @@ class DownloadChapterManager
   static Future<DownloadChapterManager> create({
     required BaseCacheManager cacheManager,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
+    required LogBox log,
   }) async {
     final fileDownloader = FileDownloader();
 
@@ -67,8 +69,9 @@ class DownloadChapterManager
     return DownloadChapterManager._(
       cacheManager: cacheManager,
       getChapterUseCase: getChapterUseCase,
+      log: log,
       fileDownloader: fileDownloader.registerCallbacks(
-        taskNotificationTapCallback: (task, notificationType) => log(
+        taskNotificationTapCallback: (task, notificationType) => log.log(
           'Tap Notification for ${task.taskId} with $notificationType',
           name: 'DownloadChapterManagerV2',
           time: DateTime.now(),
@@ -96,12 +99,14 @@ class DownloadChapterManager
   DownloadChapterManager._({
     required FileDownloader fileDownloader,
     required BaseCacheManager cacheManager,
+    required LogBox log,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required Set<DownloadChapterKey> activeDownloadKey,
     required List<TaskRecord> completeRecords,
     required Map<DownloadChapterKey, (int, double)> initialProgress,
   })  : _fileDownloader = fileDownloader,
         _cacheManager = cacheManager,
+        _log = log,
         _getChapterUseCase = getChapterUseCase,
         _active = BehaviorSubject.seeded(activeDownloadKey),
         _progress = Map.of(initialProgress).map(
@@ -135,7 +140,7 @@ class DownloadChapterManager
       );
       if (nonFinalStateRecords.isNotEmpty) return;
       _active.add(Set.of(_active.value)..remove(key));
-      log(
+      _log.log(
         'Removing ${task.group} from active download',
         name: runtimeType.toString(),
         time: DateTime.now(),
@@ -159,7 +164,7 @@ class DownloadChapterManager
       progress.add(
         (overallProgress.$1, overallProgress.$2 / overallProgress.$1),
       );
-      log(
+      _log.log(
         'Receive TaskProgressUpdate for ${event.task.taskId}: ${event.progress} %',
         name: runtimeType.toString(),
         time: DateTime.now(),
@@ -179,13 +184,13 @@ class DownloadChapterManager
 
     if (result is Success<MangaChapter>) {
       _active.add(Set.of(_active.value)..add(key));
-      log(
+      _log.log(
         'Adding $keyString to active download',
         name: runtimeType.toString(),
         time: DateTime.now(),
       );
 
-      log(
+      _log.log(
         'Success fetching chapter images for $keyString',
         name: runtimeType.toString(),
         time: DateTime.now(),
@@ -264,7 +269,7 @@ class DownloadChapterManager
     }
 
     if (result is Error<MangaChapter>) {
-      log(
+      _log.log(
         'Failed fetching chapter images for ${key.hashCode} | ${result.error}',
         name: runtimeType.toString(),
         time: DateTime.now(),
@@ -297,7 +302,7 @@ class DownloadChapterManager
       task.url,
       await File(path).readAsBytes(),
     );
-    log(
+    _log.log(
       'Adding ${task.url} - $path to cache',
       name: 'DownloadChapterManagerV2',
       time: DateTime.now(),

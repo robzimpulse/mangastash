@@ -1,21 +1,27 @@
-import 'dart:developer';
-
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 class SearchMangaOnMangaDexUseCase {
   final MangaService _mangaService;
+  final LogBox _log;
 
   const SearchMangaOnMangaDexUseCase({
     required MangaService mangaService,
-  }) : _mangaService = mangaService;
+    required LogBox log,
+  })  : _mangaService = mangaService,
+        _log = log;
 
   Future<Result<Pagination<Manga>>> execute({
     required SearchMangaParameter parameter,
   }) async {
     try {
-      log('${parameter.toJson()}', name: runtimeType.toString(), time: DateTime.now());
+      _log.log(
+        '${parameter.toJson()}',
+        name: runtimeType.toString(),
+        time: DateTime.now(),
+      );
 
       final result = await _mangaService.search(
         title: parameter.title,
@@ -56,7 +62,8 @@ class SearchMangaOnMangaDexUseCase {
       }
       if (relationship is Relationship<CoverArtDataAttributes>) {
         final filename = relationship.attributes?.fileName;
-        coverArtUrl = 'https://uploads.mangadex.org/covers/${data.id}/$filename';
+        coverArtUrl =
+            'https://uploads.mangadex.org/covers/${data.id}/$filename';
       }
     }
 

@@ -12,9 +12,13 @@ class CoreNetworkRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
-    log.log('start register', name: runtimeType.toString(), time: DateTime.now());
+    log.log(
+      'start register',
+      name: runtimeType.toString(),
+      time: DateTime.now(),
+    );
 
-    locator.registerSingleton(await SystemProxyManager.create());
+    locator.registerSingleton(await SystemProxyManager.create(log: locator()));
     locator.alias<GetSystemProxyUseCase, SystemProxyManager>();
 
     locator.registerSingleton(UrlLauncherManager());
@@ -22,7 +26,13 @@ class CoreNetworkRegistrar extends Registrar {
 
     locator.registerSingleton(DioInspector(isDebugMode: true));
 
-    locator.registerSingleton(DioManager.create(inspector: locator()));
-    log.log('finish register', name: runtimeType.toString(), time: DateTime.now());
+    locator.registerSingleton(
+      DioManager.create(inspector: locator(), log: locator()),
+    );
+    log.log(
+      'finish register',
+      name: runtimeType.toString(),
+      time: DateTime.now(),
+    );
   }
 }

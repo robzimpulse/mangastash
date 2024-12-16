@@ -29,7 +29,11 @@ class DomainMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
-    log.log('start register', name: runtimeType.toString(), time: DateTime.now());
+    log.log(
+      'start register',
+      name: runtimeType.toString(),
+      time: DateTime.now(),
+    );
 
     // manga dex services
     locator.registerFactory(() => MangaService(locator()));
@@ -56,6 +60,7 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => SearchMangaOnMangaDexUseCase(
         mangaService: locator(),
+        log: locator(),
       ),
     );
     locator.registerFactory(
@@ -127,6 +132,7 @@ class DomainMangaRegistrar extends Registrar {
 
     locator.registerSingleton(
       await DownloadChapterManager.create(
+        log: locator(),
         cacheManager: locator(),
         getChapterUseCase: () => locator(),
       ),
@@ -136,6 +142,10 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<ListenActiveDownloadUseCase, DownloadChapterManager>();
     locator.alias<DownloadChapterProgressUseCase, DownloadChapterManager>();
 
-    log.log('finish register', name: runtimeType.toString(), time: DateTime.now());
+    log.log(
+      'finish register',
+      name: runtimeType.toString(),
+      time: DateTime.now(),
+    );
   }
 }
