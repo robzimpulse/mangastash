@@ -1,6 +1,7 @@
 library log_box;
 
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 
@@ -36,6 +37,16 @@ class LogBox {
         error: error,
         stackTrace: stackTrace,
       ),
+    );
+    dev.log(
+      message,
+      time: time ?? DateTime.now(),
+      sequenceNumber: sequenceNumber,
+      level: level,
+      name: name,
+      zone: zone,
+      error: error,
+      stackTrace: stackTrace,
     );
   }
 

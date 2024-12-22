@@ -20,13 +20,6 @@ class DownloadChapterManager
         DownloadChapterUseCase,
         ListenActiveDownloadUseCase,
         DownloadChapterProgressUseCase {
-  static const _finalStateTask = [
-    TaskStatus.complete,
-    TaskStatus.canceled,
-    TaskStatus.notFound,
-    TaskStatus.failed,
-  ];
-
   final FileDownloader _fileDownloader;
   final BaseCacheManager _cacheManager;
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
@@ -125,56 +118,51 @@ class DownloadChapterManager
   }
 
   void _onUpdate(TaskUpdate event) async {
-    final key = DownloadChapterKey.fromJsonString(event.task.group);
     final task = event.task;
-    if (event is TaskStatusUpdate) {
-      if (event.status != TaskStatus.complete) return;
-      if (task is! DownloadTask) return;
-      await _moveFileToSharedStorage(task: task);
-
+    if (event is TaskStatusUpdate && event.status == TaskStatus.complete) {
       final records = await _fileDownloader.database.allRecords(
         group: task.group,
       );
-      final nonFinalStateRecords = records.where(
-        (task) => !_finalStateTask.contains(task.status),
-      );
-      if (nonFinalStateRecords.isNotEmpty) return;
-      _active.add(Set.of(_active.value)..remove(key));
-      _log.log(
-        'Removing ${task.group} from active download',
-        name: runtimeType.toString(),
-        time: DateTime.now(),
-      );
+      if (records.every((record) => record.status.isFinalState)) {
+        final key = DownloadChapterKey.fromJsonString(event.task.group);
+        _active.add(Set.of(_active.value)..remove(key));
+        _log.log(
+          'Removing ${task.group} from active download',
+          name: runtimeType.toString(),
+          time: DateTime.now(),
+        );
+      }
+      if (task is DownloadTask) {
+        _moveFileToSharedStorage(task: task);
+      }
     }
 
     if (event is TaskProgressUpdate) {
-      final records = await _fileDownloader.database.allRecords(
-        group: task.group,
-      );
-      final overallProgress = records.fold<(int, double)>(
-        (records.length, 0.0),
-        (result, current) {
-          return (records.length, result.$2 + current.progress);
-        },
-      );
-      final progress = _progress.putIfAbsent(
-        key,
-        () => BehaviorSubject.seeded((records.length, 0.0)),
-      );
-      progress.add(
-        (overallProgress.$1, overallProgress.$2 / overallProgress.$1),
-      );
       _log.log(
-        'Receive TaskProgressUpdate for ${event.task.taskId}: ${event.progress} %',
+        'TaskProgressUpdate for ${event.task.taskId}: ${event.progress} %',
         name: runtimeType.toString(),
         time: DateTime.now(),
       );
     }
   }
 
+  String _generateTaskId({
+    String? url,
+    String? directory,
+    String? filename,
+    String? group,
+  }) {
+    return [url, directory, filename, group]
+        .whereNotNull()
+        .join('')
+        .hashCode
+        .toString();
+  }
+
   @override
   Future<void> downloadChapter({required DownloadChapterKey key}) async {
-    final keyString = key.toJsonString();
+    final groupId = key.toJsonString();
+    final info = '${key.mangaTitle} - chapter ${key.chapterNumber}';
 
     final result = await _getChapterUseCase().execute(
       chapterId: key.chapterId,
@@ -183,15 +171,8 @@ class DownloadChapterManager
     );
 
     if (result is Success<MangaChapter>) {
-      _active.add(Set.of(_active.value)..add(key));
       _log.log(
-        'Adding $keyString to active download',
-        name: runtimeType.toString(),
-        time: DateTime.now(),
-      );
-
-      _log.log(
-        'Success fetching chapter images for $keyString',
+        '[$info] Success fetching chapter images',
         name: runtimeType.toString(),
         time: DateTime.now(),
       );
@@ -201,7 +182,7 @@ class DownloadChapterManager
       final chapter = key.chapterNumber;
 
       _fileDownloader.configureNotificationForGroup(
-        keyString,
+        groupId,
         running: TaskNotification(
           'Downloading $title chapter $chapter',
           '{numFinished} out of {numTotal}',
@@ -215,7 +196,7 @@ class DownloadChapterManager
           '{numFailed}/{numTotal} failed',
         ),
         progressBar: false,
-        groupNotificationId: keyString,
+        groupNotificationId: groupId,
       );
 
       final List<DownloadTask> tasks = [];
@@ -224,16 +205,25 @@ class DownloadChapterManager
 
         if (title == null || chapter == null || extension == null) continue;
 
+        final directory = '$title/$chapter';
+        final filename = '${index + 1}.$extension';
+
         tasks.add(
           DownloadTask(
+            taskId: _generateTaskId(
+              url: url,
+              directory: directory,
+              filename: filename,
+              group: groupId,
+            ),
             url: url,
             headers: {HttpHeaders.userAgentHeader: _userAgent},
             baseDirectory: BaseDirectory.applicationDocuments,
             updates: Updates.statusAndProgress,
-            directory: '$title/$chapter',
-            filename: '${index + 1}.$extension',
+            directory: directory,
+            filename: filename,
             retries: 3,
-            group: keyString,
+            group: groupId,
             creationTime: DateTime.now(),
             allowPause: true,
             requiresWiFi: true,
@@ -242,22 +232,26 @@ class DownloadChapterManager
       }
 
       final cover = key.mangaCoverUrl;
-      final coverExt = cover?.split('.').lastOrNull;
-      final records = await _fileDownloader.database.allRecords(
-        group: keyString,
-      );
-      final recordCover = records.firstWhereOrNull((e) => e.task.url == cover);
-      if (recordCover == null && cover != null && coverExt != null) {
+      final extension = cover?.split('.').lastOrNull;
+      if (cover != null && extension != null && title != null) {
+        final filename = 'cover.$extension';
+
         tasks.add(
           DownloadTask(
+            taskId: _generateTaskId(
+              url: cover,
+              directory: title,
+              filename: filename,
+              group: groupId,
+            ),
             url: cover,
             headers: {HttpHeaders.userAgentHeader: _userAgent},
             baseDirectory: BaseDirectory.applicationDocuments,
             updates: Updates.statusAndProgress,
-            directory: '$title',
-            filename: 'cover.$coverExt',
-            retries: 5,
-            group: keyString,
+            directory: title,
+            filename: filename,
+            retries: 3,
+            group: groupId,
             creationTime: DateTime.now(),
             requiresWiFi: true,
             allowPause: true,
@@ -265,7 +259,22 @@ class DownloadChapterManager
         );
       }
 
-      await Future.wait(tasks.map((e) => _fileDownloader.enqueue(e)));
+      final records = await _fileDownloader.database.recordsForIds(
+        tasks.map((task) => task.taskId),
+      );
+      final recordKeyedByTaskId = Map.fromEntries(
+        records.map((e) => MapEntry(e.taskId, e)),
+      );
+      for (final task in tasks) {
+        if (recordKeyedByTaskId[task.taskId] != null) continue;
+        _fileDownloader.enqueue(task);
+        _active.add(Set.of(_active.value)..add(key));
+        _log.log(
+          '[$info] Adding to active download',
+          name: runtimeType.toString(),
+          time: DateTime.now(),
+        );
+      }
     }
 
     if (result is Error<MangaChapter>) {
@@ -304,25 +313,22 @@ class DownloadChapterManager
     );
     _log.log(
       'Adding ${task.url} - $path to cache',
-      name: 'DownloadChapterManagerV2',
+      name: runtimeType.toString(),
       time: DateTime.now(),
     );
   }
 
   @override
   double downloadChapterProgress({required DownloadChapterKey key}) {
-    return downloadChapterProgressStream(key: key).value.$2;
+    // TODO: implement this
+    return 0.0;
   }
 
   @override
   ValueStream<(int, double)> downloadChapterProgressStream({
     required DownloadChapterKey key,
   }) {
-    return _progress
-        .putIfAbsent(
-          key,
-          () => BehaviorSubject.seeded((0, 0.0)),
-        )
-        .stream;
+    // TODO: implement this
+    return Stream.value((0, 0.0)).shareValueSeeded((0, 0.0));
   }
 }
