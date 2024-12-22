@@ -49,7 +49,7 @@ class MangaDetailScreen extends StatefulWidget {
         removeFromLibraryUseCase: locator(),
         listenMangaFromLibraryUseCase: locator(),
         downloadChapterUseCase: locator(),
-        downloadChapterProgressUseCase: locator(),
+        getDownloadProgressUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         cacheManager: locator(),

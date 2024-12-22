@@ -2,14 +2,16 @@ import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
-import 'manager/download_chapter_manager.dart';
+import '../domain_manga.dart';
+import 'manager/active_download_manager.dart';
+import 'manager/file_download_manager.dart';
 import 'manager/library_manager.dart';
 import 'manager/manga_source_manager.dart';
-import 'use_case/chapter/download_chapter_progress_use_case.dart';
 import 'use_case/chapter/download_chapter_use_case.dart';
+import 'use_case/chapter/get_active_download_use_case.dart';
 import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
-import 'use_case/chapter/listen_active_download_use_case.dart';
+import 'use_case/chapter/get_download_progress_use_case.dart';
 import 'use_case/chapter/search_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
 import 'use_case/library/add_to_library_use_case.dart';
@@ -34,6 +36,12 @@ class DomainMangaRegistrar extends Registrar {
       name: runtimeType.toString(),
       time: DateTime.now(),
     );
+
+    locator.registerSingleton(await FileDownloadManager.create(log: log));
+    locator.registerSingleton(
+      await ActiveDownloadManager.create(fileDownloader: locator(), log: log),
+    );
+    locator.alias<ListenActiveDownloadUseCase, ActiveDownloadManager>();
 
     // manga dex services
     locator.registerFactory(() => MangaService(locator()));
@@ -111,6 +119,19 @@ class DomainMangaRegistrar extends Registrar {
         mangaLibraryServiceFirebase: locator(),
       ),
     );
+    locator.registerFactory(
+      () => DownloadChapterUseCase(
+        fileDownloader: locator(),
+        getChapterUseCase: locator(),
+        log: log,
+      ),
+    );
+    locator.registerFactory(
+      () => GetActiveDownloadUseCase(fileDownloader: locator()),
+    );
+    locator.registerFactory(
+      () => GetDownloadProgressUseCase(fileDownloader: locator()),
+    );
 
     locator.registerSingleton(
       LibraryManager(
@@ -130,17 +151,17 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<ListenMangaSourceUseCase, MangaSourceManager>();
     locator.alias<GetMangaSourceUseCase, MangaSourceManager>();
 
-    locator.registerSingleton(
-      await DownloadChapterManager.create(
-        log: locator(),
-        cacheManager: locator(),
-        getChapterUseCase: () => locator(),
-      ),
-      dispose: (instance) => instance.dispose(),
-    );
-    locator.alias<DownloadChapterUseCase, DownloadChapterManager>();
-    locator.alias<ListenActiveDownloadUseCase, DownloadChapterManager>();
-    locator.alias<DownloadChapterProgressUseCase, DownloadChapterManager>();
+    // locator.registerSingleton(
+    //   await DownloadChapterManager.create(
+    //     log: locator(),
+    //     cacheManager: locator(),
+    //     getChapterUseCase: () => locator(),
+    //   ),
+    //   dispose: (instance) => instance.dispose(),
+    // );
+    // locator.alias<DownloadChapterUseCase, DownloadChapterManager>();
+    // locator.alias<ListenActiveDownloadUseCase, DownloadChapterManager>();
+    // locator.alias<DownloadChapterProgressUseCase, DownloadChapterManager>();
 
     log.log(
       'finish register',

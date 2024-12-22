@@ -4,7 +4,6 @@ import 'package:core_auth/core_auth.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import 'manga_detail_screen_state.dart';
@@ -16,7 +15,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
   final AddToLibraryUseCase _addToLibraryUseCase;
   final DownloadChapterUseCase _downloadChapterUseCase;
-  final DownloadChapterProgressUseCase _downloadChapterProgressUseCase;
+  final GetDownloadProgressUseCase _getDownloadProgressUseCase;
 
   StreamSubscription? _activeSubscriptions;
 
@@ -30,13 +29,13 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required ListenAuthUseCase listenAuth,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
     required DownloadChapterUseCase downloadChapterUseCase,
-    required DownloadChapterProgressUseCase downloadChapterProgressUseCase,
+    required GetDownloadProgressUseCase getDownloadProgressUseCase,
   })  : _getMangaUseCase = getMangaUseCase,
         _getListChapterUseCase = getListChapterUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         _downloadChapterUseCase = downloadChapterUseCase,
-        _downloadChapterProgressUseCase = downloadChapterProgressUseCase,
+        _getDownloadProgressUseCase = getDownloadProgressUseCase,
         super(initialState) {
     addSubscription(
       listenAuth.authStateStream.distinct().listen(_updateAuthState),
@@ -117,7 +116,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     );
 
     if (result is Success<List<MangaChapter>>) {
-      final Map<String?, double> downloadProgress = {};
+      final Map<String?, double> progress = {};
       // TODO: update progress
       // final List<Stream<(String?, int, double)>> streams = [];
       final chapters = result.data;
@@ -126,16 +125,19 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
           manga: state.manga,
           chapter: chapter,
         );
+        progress[chapter.id] = await _getDownloadProgressUseCase.execute(
+          key: key,
+        );
         // TODO: update progress
         // streams.add(
         //   _downloadChapterProgressUseCase
         //       .downloadChapterProgressStream(key: key)
         //       .map((event) => (chapter.id, event.$1, event.$2)),
         // );
-        downloadProgress[chapter.id] =
-            await _downloadChapterProgressUseCase.downloadChapterProgress(
-          key: key,
-        );
+        // downloadProgress[chapter.id] =
+        //     await _downloadChapterProgressUseCase.downloadChapterProgress(
+        //   key: key,
+        // );
       }
 
       // TODO: update progress
@@ -147,7 +149,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       emit(
         state.copyWith(
           chapters: result.data,
-          downloadProgress: downloadProgress,
+          downloadProgress: progress,
         ),
       );
     }
@@ -173,7 +175,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
   Future<void> downloadChapter({required MangaChapter chapter}) async {
     final key = DownloadChapterKey.create(manga: state.manga, chapter: chapter);
-    await _downloadChapterUseCase.downloadChapter(key: key);
+    await _downloadChapterUseCase.execute(key: key);
   }
 
   Future<void> downloadAllChapter() async {
@@ -182,21 +184,21 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
   }
 
-  void _updateDownloadChapterProgress(List<(String?, int, double)> progress) {
-    final downloadProgress = Map.of(
-      state.downloadProgress ?? <String?, double>{},
-    );
-
-    for (final data in progress) {
-      final chapterId = data.$1;
-      final totalProgress = data.$3;
-      downloadProgress.update(
-        chapterId,
-        (value) => totalProgress,
-        ifAbsent: () => 0.0,
-      );
-    }
-
-    emit(state.copyWith(downloadProgress: downloadProgress));
-  }
+  // void _updateDownloadChapterProgress(List<(String?, int, double)> progress) {
+  //   final downloadProgress = Map.of(
+  //     state.downloadProgress ?? <String?, double>{},
+  //   );
+  //
+  //   for (final data in progress) {
+  //     final chapterId = data.$1;
+  //     final totalProgress = data.$3;
+  //     downloadProgress.update(
+  //       chapterId,
+  //       (value) => totalProgress,
+  //       ifAbsent: () => 0.0,
+  //     );
+  //   }
+  //
+  //   emit(state.copyWith(downloadProgress: downloadProgress));
+  // }
 }
