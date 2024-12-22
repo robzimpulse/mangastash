@@ -319,8 +319,41 @@ class DownloadChapterManager
   }
 
   @override
-  double downloadChapterProgress({required DownloadChapterKey key}) {
-    // TODO: implement this
+  Future<double> downloadChapterProgress({
+    required DownloadChapterKey key,
+  }) async {
+    final groupId = key.toJsonString();
+    final result = await _getChapterUseCase().execute(
+      chapterId: key.chapterId,
+      source: key.mangaSource,
+      mangaId: key.mangaId,
+    );
+
+    if (result is Success<MangaChapter>) {
+      final images = result.data.images ?? [];
+      final title = key.mangaTitle;
+      final chapter = key.chapterNumber;
+      final List<String> taskIds = [];
+      for (final (index, url) in images.indexed) {
+        final extension = url.split('.').lastOrNull;
+        if (title == null || chapter == null || extension == null) continue;
+        final directory = '$title/$chapter';
+        final filename = '${index + 1}.$extension';
+        taskIds.add(
+          _generateTaskId(
+            url: url,
+            directory: directory,
+            filename: filename,
+            group: groupId,
+          ),
+        );
+      }
+
+      final records = await _fileDownloader.database.recordsForIds(taskIds);
+      final total = records.fold(0.0, (total, curr) => total + curr.progress);
+      return total / records.length;
+    }
+
     return 0.0;
   }
 

@@ -118,23 +118,31 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     if (result is Success<List<MangaChapter>>) {
       final Map<String?, double> downloadProgress = {};
-      final List<Stream<(String?, int, double)>> streams = [];
+      // TODO: update progress
+      // final List<Stream<(String?, int, double)>> streams = [];
       final chapters = result.data;
       for (final chapter in chapters) {
-        final key = DownloadChapterKey.create(manga: state.manga, chapter: chapter,);
-        streams.add(
-          _downloadChapterProgressUseCase
-              .downloadChapterProgressStream(key: key)
-              .map((event) => (chapter.id, event.$1, event.$2)),
+        final key = DownloadChapterKey.create(
+          manga: state.manga,
+          chapter: chapter,
         );
+        // TODO: update progress
+        // streams.add(
+        //   _downloadChapterProgressUseCase
+        //       .downloadChapterProgressStream(key: key)
+        //       .map((event) => (chapter.id, event.$1, event.$2)),
+        // );
         downloadProgress[chapter.id] =
-            _downloadChapterProgressUseCase.downloadChapterProgress(key: key);
+            await _downloadChapterProgressUseCase.downloadChapterProgress(
+          key: key,
+        );
       }
 
-      _activeSubscriptions?.cancel();
-      _activeSubscriptions = CombineLatestStream(streams, (values) => values)
-          .throttleTime(const Duration(seconds: 1), trailing: true)
-          .listen(_updateDownloadChapterProgress);
+      // TODO: update progress
+      // _activeSubscriptions?.cancel();
+      // _activeSubscriptions = CombineLatestStream(streams, (values) => values)
+      //     .throttleTime(const Duration(seconds: 1), trailing: true)
+      //     .listen(_updateDownloadChapterProgress);
 
       emit(
         state.copyWith(
