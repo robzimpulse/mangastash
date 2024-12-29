@@ -15,8 +15,8 @@ class DownloadQueueScreen extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (context) => DownloadQueueScreenCubit(
-        // downloadChapterProgressUseCase: locator(),
         listenActiveDownloadUseCase: locator(),
+        listenProgressDownloadUseCase: locator(),
       ),
       child: const DownloadQueueScreen(),
     );
@@ -33,7 +33,7 @@ class DownloadQueueScreen extends StatelessWidget {
   }
 
   Widget _content(BuildContext context, DownloadQueueScreenState state) {
-    final progress = state.progress?.entries ?? [];
+    final progress = state.progress.entries;
     return MultiSliver(
       children: [
         for (final data in progress)
@@ -45,9 +45,9 @@ class DownloadQueueScreen extends StatelessWidget {
                 children: [
                   Text('${data.key.mangaTitle}'),
                   Text('Chapter ${data.key.chapterNumber}'),
-                  Text('${data.value.$1} files downloaded'),
+                  Text('${data.value.total} files downloaded'),
                   LinearProgressIndicator(
-                    value: data.value.$2,
+                    value: data.value.progress?.toDouble() ?? 0.0,
                   ),
                 ].intersperse(const SizedBox(height: 4)).toList(),
               ),

@@ -6,8 +6,10 @@ import 'package:log_box/log_box.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../use_case/chapter/listen_active_download_use_case.dart';
+import '../use_case/chapter/listen_progress_download_use_case.dart';
 
-class ActiveDownloadManager implements ListenActiveDownloadUseCase {
+class ActiveDownloadManager
+    implements ListenActiveDownloadUseCase, ListenProgressDownloadUseCase {
   final BehaviorSubject<Set<DownloadChapterKey>> _active;
   final FileDownloader _fileDownloader;
   final LogBox _log;
@@ -87,4 +89,39 @@ class ActiveDownloadManager implements ListenActiveDownloadUseCase {
   @override
   ValueStream<Set<DownloadChapterKey>> get activeDownloadStream =>
       _active.stream;
+
+  @override
+  ValueStream<DownloadChapterProgress> progress(DownloadChapterKey key) {
+    final group = key.toJsonString();
+    final stream = _fileDownloader.updates.asBroadcastStream();
+    final update = stream.where((task) => task.task.group == group);
+    final Stream<Map<String, TaskUpdate>> chapter = update.scan(
+      (result, current, _) => Map.of(result)
+        ..update(
+          current.task.taskId,
+          (old) {
+            if (current is TaskProgressUpdate && old is TaskProgressUpdate) {
+              if (current.progress > old.progress) {
+                return current;
+              } else {
+                return old;
+              }
+            }
+
+            return current;
+          },
+          ifAbsent: () => current,
+        ),
+      {},
+    );
+
+    final result = chapter.map(
+      (chapter) => DownloadChapterProgress(
+        total: chapter.length,
+        progress: 0,
+      ),
+    );
+
+    return result.shareValue();
+  }
 }

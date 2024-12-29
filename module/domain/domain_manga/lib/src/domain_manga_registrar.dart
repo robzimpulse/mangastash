@@ -2,7 +2,6 @@ import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
-import '../domain_manga.dart';
 import 'manager/active_download_manager.dart';
 import 'manager/file_download_manager.dart';
 import 'manager/library_manager.dart';
@@ -12,6 +11,8 @@ import 'use_case/chapter/get_active_download_use_case.dart';
 import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
 import 'use_case/chapter/get_download_progress_use_case.dart';
+import 'use_case/chapter/listen_active_download_use_case.dart';
+import 'use_case/chapter/listen_progress_download_use_case.dart';
 import 'use_case/chapter/search_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
 import 'use_case/library/add_to_library_use_case.dart';
@@ -42,6 +43,8 @@ class DomainMangaRegistrar extends Registrar {
       await ActiveDownloadManager.create(fileDownloader: locator(), log: log),
     );
     locator.alias<ListenActiveDownloadUseCase, ActiveDownloadManager>();
+    locator.alias<ListenProgressDownloadUseCase, ActiveDownloadManager>();
+
 
     // manga dex services
     locator.registerFactory(() => MangaService(locator()));
