@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:background_downloader/background_downloader.dart';
-import 'package:collection/collection.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:rxdart/rxdart.dart';
@@ -19,17 +18,18 @@ class ActiveDownloadManager implements ListenActiveDownloadUseCase {
     required LogBox log,
   }) async {
     final records = await fileDownloader.database.allRecords();
+    final Map<DownloadChapterKey, List<TaskRecord>> activeDownloadRecord = {};
+
+    for (final record in records) {
+      if (record.status.isFinalState) continue;
+      final key = DownloadChapterKey.fromJsonString(record.group);
+      (activeDownloadRecord[key] ??= []).add(record);
+    }
+
     return ActiveDownloadManager(
       fileDownloader: fileDownloader,
       log: log,
-      activeDownloadKey: Set.of(
-        records
-            .where((record) => record.status.isNotFinalState)
-            .groupListsBy(
-              (record) => DownloadChapterKey.fromJsonString(record.group),
-            )
-            .keys,
-      ),
+      activeDownloadKey: Set.of(activeDownloadRecord.keys),
     );
   }
 
@@ -49,19 +49,38 @@ class ActiveDownloadManager implements ListenActiveDownloadUseCase {
 
   void _onUpdate(TaskUpdate event) async {
     final task = event.task;
-    if (event is TaskStatusUpdate && event.status.isFinalState) {
-      final records = await _fileDownloader.database.allRecords(
-        group: task.group,
-      );
-      if (records.every((record) => record.status.isFinalState)) {
-        final key = DownloadChapterKey.fromJsonString(event.task.group);
-        _active.add(Set.of(_active.value)..remove(key));
+    final key = DownloadChapterKey.fromJsonString(event.task.group);
+
+    if (event is TaskStatusUpdate) {
+      if (event.status.isFinalState) {
+        final records = await _fileDownloader.database.allRecords(
+          group: task.group,
+        );
+        if (records.every((record) => record.status.isFinalState)) {
+          _active.add(Set.of(_active.value)..remove(key));
+          _log.log(
+            'Removing ${task.group} from active download',
+            name: runtimeType.toString(),
+            time: DateTime.now(),
+          );
+        }
+      } else {
+        _active.add(Set.of(_active.value)..add(key));
         _log.log(
-          'Removing ${task.group} from active download',
+          'Adding ${task.group} to active download',
           name: runtimeType.toString(),
           time: DateTime.now(),
         );
       }
+    }
+
+    if (event is TaskProgressUpdate) {
+      _active.add(Set.of(_active.value)..add(key));
+      _log.log(
+        'Adding ${task.group} to active download',
+        name: runtimeType.toString(),
+        time: DateTime.now(),
+      );
     }
   }
 
