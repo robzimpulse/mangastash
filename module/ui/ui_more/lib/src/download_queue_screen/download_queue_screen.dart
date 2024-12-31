@@ -15,7 +15,7 @@ class DownloadQueueScreen extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (context) => DownloadQueueScreenCubit(
-        listenActiveDownloadUseCase: locator(),
+        listenDownloadProgressUseCase: locator(),
       ),
       child: const DownloadQueueScreen(),
     );

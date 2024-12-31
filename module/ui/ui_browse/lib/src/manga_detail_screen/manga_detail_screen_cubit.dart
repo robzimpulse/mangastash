@@ -15,7 +15,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
   final AddToLibraryUseCase _addToLibraryUseCase;
   final DownloadChapterUseCase _downloadChapterUseCase;
-  final GetDownloadProgressUseCase _getDownloadProgressUseCase;
 
   StreamSubscription? _activeSubscriptions;
 
@@ -29,13 +28,12 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required ListenAuthUseCase listenAuth,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
     required DownloadChapterUseCase downloadChapterUseCase,
-    required GetDownloadProgressUseCase getDownloadProgressUseCase,
+    required ListenDownloadProgressUseCase listenDownloadProgressUseCase,
   })  : _getMangaUseCase = getMangaUseCase,
         _getListChapterUseCase = getListChapterUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         _downloadChapterUseCase = downloadChapterUseCase,
-        _getDownloadProgressUseCase = getDownloadProgressUseCase,
         super(initialState) {
     addSubscription(
       listenAuth.authStateStream.distinct().listen(_updateAuthState),
@@ -45,11 +43,14 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
           .distinct()
           .listen(_updateMangaLibrary),
     );
+    addSubscription(
+      listenDownloadProgressUseCase.all.distinct().listen(_updateMangaProgress),
+    );
   }
 
   @override
   Future<void> close() async {
-    _activeSubscriptions?.cancel();
+    await _activeSubscriptions?.cancel();
     await super.close();
   }
 
@@ -63,6 +64,12 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
   void updateMangaConfig(MangaChapterConfig config) {
     emit(state.copyWith(config: config));
+  }
+
+  void _updateMangaProgress(
+    Map<DownloadChapterKey, DownloadChapterProgress> progress,
+  ) {
+    emit(state.copyWith(progress: progress));
   }
 
   Future<void> init() async {
@@ -116,42 +123,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     );
 
     if (result is Success<List<MangaChapter>>) {
-      final Map<String?, double> progress = {};
-      // TODO: update progress
-      // final List<Stream<(String?, int, double)>> streams = [];
-      final chapters = result.data;
-      for (final chapter in chapters) {
-        final key = DownloadChapterKey.create(
-          manga: state.manga,
-          chapter: chapter,
-        );
-        progress[chapter.id] = await _getDownloadProgressUseCase.execute(
-          key: key,
-        );
-        // TODO: update progress
-        // streams.add(
-        //   _downloadChapterProgressUseCase
-        //       .downloadChapterProgressStream(key: key)
-        //       .map((event) => (chapter.id, event.$1, event.$2)),
-        // );
-        // downloadProgress[chapter.id] =
-        //     await _downloadChapterProgressUseCase.downloadChapterProgress(
-        //   key: key,
-        // );
-      }
-
-      // TODO: update progress
-      // _activeSubscriptions?.cancel();
-      // _activeSubscriptions = CombineLatestStream(streams, (values) => values)
-      //     .throttleTime(const Duration(seconds: 1), trailing: true)
-      //     .listen(_updateDownloadChapterProgress);
-
-      emit(
-        state.copyWith(
-          chapters: result.data,
-          downloadProgress: progress,
-        ),
-      );
+      emit(state.copyWith(chapters: result.data));
     }
 
     if (result is Error<List<MangaChapter>>) {

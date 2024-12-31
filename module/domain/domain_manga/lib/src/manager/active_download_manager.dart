@@ -7,13 +7,13 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../use_case/chapter/listen_active_download_use_case.dart';
+import '../use_case/chapter/listen_download_progress_use_case.dart';
 
 typedef Key = DownloadChapterKey;
 typedef Update = Map<String, double>;
 typedef Progress = DownloadChapterProgress;
 
-class ActiveDownloadManager implements ListenActiveDownloadUseCase {
+class ActiveDownloadManager implements ListenDownloadProgressUseCase {
   final BehaviorSubject<Map<Key, Update>> _progress;
   final FileDownloader _fileDownloader;
   final LogBox _log;
@@ -94,37 +94,52 @@ class ActiveDownloadManager implements ListenActiveDownloadUseCase {
       },
     );
 
-    _log.log(
-      'Updating new progress',
-      name: '_onUpdate',
-      time: DateTime.now(),
-    );
-
     _progress.add(progress);
+
+    if (event is TaskStatusUpdate) {
+      // TODO: move to cache
+    }
   }
 
   @override
-  ValueStream<Map<DownloadChapterKey, DownloadChapterProgress>>
-      get activeDownloadStream {
-    return _progress
+  ValueStream<Map<DownloadChapterKey, DownloadChapterProgress>> get all {
+    final transformed = _progress.map(
+      (value) => Map.of(value).map(
+        (key, value) => MapEntry(
+          key,
+          DownloadChapterProgress(
+            total: value.length,
+            progress: value.values.sum / value.length,
+          ),
+        ),
+      ),
+    );
+
+    return transformed.shareValue();
+  }
+
+  @override
+  ValueStream<Map<DownloadChapterKey, DownloadChapterProgress>> get active {
+    return all
         .map(
           (value) => Map.of(value)
             ..removeWhere(
-              (key, value) => (value.isEmpty)
-                  ? false
-                  : (value.values.sum / value.values.length) == 1,
+              (_, value) => value.progress == 1,
             ),
         )
+        .shareValue();
+  }
+
+  @override
+  ValueStream<Map<DownloadChapterKey, DownloadChapterProgress>> progress(
+    List<DownloadChapterKey> keys,
+  ) {
+    return all
         .map(
-          (value) => Map.of(value).map(
-            (key, value) => MapEntry(
-              key,
-              DownloadChapterProgress(
-                total: value.length,
-                progress: value.values.sum / value.length,
-              ),
+          (value) => Map.of(value)
+            ..removeWhere(
+              (key, _) => keys.contains(key),
             ),
-          ),
         )
         .shareValue();
   }

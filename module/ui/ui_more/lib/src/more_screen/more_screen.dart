@@ -40,7 +40,7 @@ class MoreScreen extends StatelessWidget {
       create: (context) => MoreScreenCubit(
         listenAuthUseCase: locator(),
         logoutUseCase: locator(),
-        listenActiveDownloadUseCase: locator(),
+        listenDownloadProgressUseCase: locator(),
       ),
       child: MoreScreen(
         onTapSetting: onTapSetting,

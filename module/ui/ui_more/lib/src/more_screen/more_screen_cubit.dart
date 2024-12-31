@@ -13,14 +13,14 @@ class MoreScreenCubit extends Cubit<MoreScreenState>
     MoreScreenState initialState = const MoreScreenState(),
     required ListenAuthUseCase listenAuthUseCase,
     required LogoutUseCase logoutUseCase,
-    required ListenActiveDownloadUseCase listenActiveDownloadUseCase,
+    required ListenDownloadProgressUseCase listenDownloadProgressUseCase,
   })  : _logoutUseCase = logoutUseCase,
         super(initialState) {
     addSubscription(
       listenAuthUseCase.authStateStream.distinct().listen(_updateAuthState),
     );
     addSubscription(
-      listenActiveDownloadUseCase.activeDownloadStream
+      listenDownloadProgressUseCase.active
           .distinct()
           .listen(_updateTotalActiveDownload),
     );

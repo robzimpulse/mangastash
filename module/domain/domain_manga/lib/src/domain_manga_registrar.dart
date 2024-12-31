@@ -11,7 +11,7 @@ import 'use_case/chapter/get_active_download_use_case.dart';
 import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
 import 'use_case/chapter/get_download_progress_use_case.dart';
-import 'use_case/chapter/listen_active_download_use_case.dart';
+import 'use_case/chapter/listen_download_progress_use_case.dart';
 import 'use_case/chapter/search_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
 import 'use_case/library/add_to_library_use_case.dart';
@@ -41,7 +41,7 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerSingleton(
       await ActiveDownloadManager.create(fileDownloader: locator(), log: log),
     );
-    locator.alias<ListenActiveDownloadUseCase, ActiveDownloadManager>();
+    locator.alias<ListenDownloadProgressUseCase, ActiveDownloadManager>();
 
 
     // manga dex services

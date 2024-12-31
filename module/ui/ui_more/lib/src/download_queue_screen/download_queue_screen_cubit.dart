@@ -1,5 +1,4 @@
 import 'package:domain_manga/domain_manga.dart';
-import 'package:entity_manga/entity_manga.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
@@ -8,20 +7,14 @@ import 'download_queue_screen_state.dart';
 class DownloadQueueScreenCubit extends Cubit<DownloadQueueScreenState>
     with AutoSubscriptionMixin {
   DownloadQueueScreenCubit({
-    required ListenActiveDownloadUseCase listenActiveDownloadUseCase,
+    required ListenDownloadProgressUseCase listenDownloadProgressUseCase,
     DownloadQueueScreenState initialState = const DownloadQueueScreenState(),
   }) : super(initialState) {
     addSubscription(
-      listenActiveDownloadUseCase.activeDownloadStream
+      listenDownloadProgressUseCase.active
           .distinct()
-          .throttleTime(const Duration(seconds: 1))
-          .listen(_updateProgress),
+          .throttleTime(const Duration(milliseconds: 200))
+          .listen((progress) => emit(state.copyWith(progress: progress))),
     );
-  }
-
-  void _updateProgress(
-    Map<DownloadChapterKey, DownloadChapterProgress> progress,
-  ) {
-    emit(state.copyWith(progress: progress));
   }
 }

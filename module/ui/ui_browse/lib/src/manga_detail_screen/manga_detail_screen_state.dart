@@ -30,7 +30,7 @@ class MangaDetailScreenState extends Equatable {
   final MangaChapterConfig? config;
   final AuthState? authState;
   final List<Manga> libraries;
-  final Map<String?, double>? downloadProgress;
+  final Map<DownloadChapterKey, DownloadChapterProgress>? progress;
 
   late final List<String> chapterIds;
   late final Set<num> chaptersKey;
@@ -50,7 +50,7 @@ class MangaDetailScreenState extends Equatable {
     this.config,
     this.authState,
     this.libraries = const [],
-    this.downloadProgress,
+    this.progress,
   }) {
     isOnLibrary = libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
 
@@ -170,7 +170,7 @@ class MangaDetailScreenState extends Equatable {
         config,
         authState,
         libraries,
-        downloadProgress,
+        progress,
       ];
 
   MangaDetailScreenState copyWith({
@@ -186,7 +186,7 @@ class MangaDetailScreenState extends Equatable {
     MangaChapterConfig? config,
     AuthState? authState,
     List<Manga>? libraries,
-    Map<String?, double>? downloadProgress,
+    Map<DownloadChapterKey, DownloadChapterProgress>? progress,
   }) {
     return MangaDetailScreenState(
       config: config ?? this.config,
@@ -201,7 +201,7 @@ class MangaDetailScreenState extends Equatable {
       source: source ?? this.source,
       authState: authState ?? this.authState,
       libraries: libraries ?? this.libraries,
-      downloadProgress: downloadProgress ?? this.downloadProgress,
+      progress: progress ?? this.progress,
     );
   }
 }
