@@ -30,7 +30,9 @@ class MoreScreenCubit extends Cubit<MoreScreenState>
     emit(state.copyWith(authState: authState));
   }
 
-  void _updateTotalActiveDownload(Set<DownloadChapterKey> values) {
+  void _updateTotalActiveDownload(
+    Map<DownloadChapterKey, DownloadChapterProgress> values,
+  ) {
     emit(state.copyWith(totalActiveDownload: values.length));
   }
 

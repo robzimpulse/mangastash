@@ -1,127 +1,131 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:background_downloader/background_downloader.dart';
+import 'package:collection/collection.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../use_case/chapter/listen_active_download_use_case.dart';
-import '../use_case/chapter/listen_progress_download_use_case.dart';
 
-class ActiveDownloadManager
-    implements ListenActiveDownloadUseCase, ListenProgressDownloadUseCase {
-  final BehaviorSubject<Set<DownloadChapterKey>> _active;
+typedef Key = DownloadChapterKey;
+typedef Update = Map<String, double>;
+typedef Progress = DownloadChapterProgress;
+
+class ActiveDownloadManager implements ListenActiveDownloadUseCase {
+  final BehaviorSubject<Map<Key, Update>> _progress;
   final FileDownloader _fileDownloader;
   final LogBox _log;
-  StreamSubscription? _streamSubscription;
+
+  late final StreamSubscription _streamSubscription;
 
   static Future<ActiveDownloadManager> create({
     required FileDownloader fileDownloader,
     required LogBox log,
   }) async {
     final records = await fileDownloader.database.allRecords();
-    final Map<DownloadChapterKey, List<TaskRecord>> activeDownloadRecord = {};
-
-    for (final record in records) {
-      if (record.status.isFinalState) continue;
-      final key = DownloadChapterKey.fromJsonString(record.group);
-      (activeDownloadRecord[key] ??= []).add(record);
-    }
 
     return ActiveDownloadManager(
       fileDownloader: fileDownloader,
       log: log,
-      activeDownloadKey: Set.of(activeDownloadRecord.keys),
+      progress: records.groupFoldBy<Key, Update>(
+        (record) => Key.fromJsonString(record.group),
+        (result, current) => (result != null)
+            ? (Map.of(result)..[current.taskId] = current.progress)
+            : {current.taskId: current.progress},
+      ),
     );
   }
 
   ActiveDownloadManager({
-    required Set<DownloadChapterKey> activeDownloadKey,
+    required Map<Key, Update> progress,
     required FileDownloader fileDownloader,
     required LogBox log,
-  })  : _active = BehaviorSubject.seeded(activeDownloadKey),
+  })  : _progress = BehaviorSubject.seeded(progress),
         _log = log,
         _fileDownloader = fileDownloader {
-    _streamSubscription = fileDownloader.updates.distinct().listen(_onUpdate);
+    _streamSubscription = _fileDownloader.updates.distinct().listen(_onUpdate);
   }
 
-  void dispose() {
-    _streamSubscription?.cancel();
+  Future<void> dispose() async {
+    await _streamSubscription.cancel();
   }
 
   void _onUpdate(TaskUpdate event) async {
-    final task = event.task;
-    final key = DownloadChapterKey.fromJsonString(event.task.group);
+    final progress = Map.of(_progress.valueOrNull ?? <Key, Update>{});
 
-    if (event is TaskStatusUpdate) {
-      if (event.status.isFinalState) {
-        final records = await _fileDownloader.database.allRecords(
-          group: task.group,
+    progress.update(
+      Key.fromJsonString(event.task.group),
+      (old) {
+        final data = Map.of(old);
+        data.update(
+          event.task.taskId,
+          (oldData) {
+            if (event is TaskStatusUpdate) {
+              return event.status == TaskStatus.complete ? 1 : 0;
+            }
+            if (event is TaskProgressUpdate) {
+              return max(event.progress, oldData);
+            }
+            return 0;
+          },
+          ifAbsent: () {
+            if (event is TaskStatusUpdate) {
+              return event.status == TaskStatus.complete ? 1 : 0;
+            }
+            if (event is TaskProgressUpdate) {
+              return event.progress;
+            }
+            return 0;
+          },
         );
-        if (records.every((record) => record.status.isFinalState)) {
-          _active.add(Set.of(_active.value)..remove(key));
-          _log.log(
-            'Removing ${task.group} from active download',
-            name: runtimeType.toString(),
-            time: DateTime.now(),
-          );
+        return data;
+      },
+      ifAbsent: () {
+        final data = <String, double>{};
+        if (event is TaskStatusUpdate) {
+          data[event.task.taskId] = 1;
         }
-      } else {
-        _active.add(Set.of(_active.value)..add(key));
-        _log.log(
-          'Adding ${task.group} to active download',
-          name: runtimeType.toString(),
-          time: DateTime.now(),
-        );
-      }
-    }
+        if (event is TaskProgressUpdate) {
+          data[event.task.taskId] = event.progress;
+        }
+        return data;
+      },
+    );
 
-    if (event is TaskProgressUpdate) {
-      _active.add(Set.of(_active.value)..add(key));
-      _log.log(
-        'Adding ${task.group} to active download',
-        name: runtimeType.toString(),
-        time: DateTime.now(),
-      );
-    }
+    _log.log(
+      'Updating new progress',
+      name: '_onUpdate',
+      time: DateTime.now(),
+    );
+
+    _progress.add(progress);
   }
 
   @override
-  ValueStream<Set<DownloadChapterKey>> get activeDownloadStream =>
-      _active.stream;
-
-  @override
-  ValueStream<DownloadChapterProgress> progress(DownloadChapterKey key) {
-    final group = key.toJsonString();
-    final stream = _fileDownloader.updates.asBroadcastStream();
-    final update = stream.where((task) => task.task.group == group);
-    final Stream<Map<String, TaskUpdate>> chapter = update.scan(
-      (result, current, _) => Map.of(result)
-        ..update(
-          current.task.taskId,
-          (old) {
-            if (current is TaskProgressUpdate && old is TaskProgressUpdate) {
-              if (current.progress > old.progress) {
-                return current;
-              } else {
-                return old;
-              }
-            }
-
-            return current;
-          },
-          ifAbsent: () => current,
-        ),
-      {},
-    );
-
-    final result = chapter.map(
-      (chapter) => DownloadChapterProgress(
-        total: chapter.length,
-        progress: 0,
-      ),
-    );
-
-    return result.shareValue();
+  ValueStream<Map<DownloadChapterKey, DownloadChapterProgress>>
+      get activeDownloadStream {
+    return _progress
+        .map(
+          (value) => Map.of(value)
+            ..removeWhere(
+              (key, value) => (value.isEmpty)
+                  ? false
+                  : (value.values.sum / value.values.length) == 1,
+            ),
+        )
+        .map(
+          (value) => Map.of(value).map(
+            (key, value) => MapEntry(
+              key,
+              DownloadChapterProgress(
+                total: value.length,
+                progress: value.values.sum / value.length,
+              ),
+            ),
+          ),
+        )
+        .shareValue();
   }
 }
