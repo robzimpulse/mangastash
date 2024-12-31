@@ -180,7 +180,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(4),
             ),
-            color: Colors.white,
+            // color: Colors.white,
             child: ListTileTheme(
               contentPadding: const EdgeInsets.all(0),
               dense: true,

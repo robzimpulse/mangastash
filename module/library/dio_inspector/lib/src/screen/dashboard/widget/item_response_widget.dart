@@ -25,7 +25,7 @@ class ItemResponseWidget extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
         ),
-        color: Colors.white,
+        // color: Colors.white,
         child: InkWell(
           customBorder: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(4),
@@ -57,10 +57,7 @@ class ItemResponseWidget extends StatelessWidget {
               children: [
                 Text(
                   data.method,
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelLarge
-                      ?.copyWith(color: Colors.black),
+                  style: Theme.of(context).textTheme.labelLarge,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -68,20 +65,14 @@ class ItemResponseWidget extends StatelessWidget {
                     data.endpoint,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelLarge
-                        ?.copyWith(color: Colors.black),
+                    style: Theme.of(context).textTheme.labelLarge,
                   ),
                 ),
               ],
             ),
             Text(
               data.uri,
-              style: Theme.of(context)
-                  .textTheme
-                  .labelMedium
-                  ?.copyWith(color: Colors.black),
+              style: Theme.of(context).textTheme.labelMedium,
             ),
             const Divider(color: Colors.grey),
             Row(
