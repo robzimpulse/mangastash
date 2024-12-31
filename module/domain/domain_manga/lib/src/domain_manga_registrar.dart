@@ -37,10 +37,13 @@ class DomainMangaRegistrar extends Registrar {
 
     locator.registerSingleton(await FileDownloadManager.create(log: log));
     locator.registerSingleton(
-      await DownloadProgressManager.create(fileDownloader: locator(), log: log),
+      await DownloadProgressManager.create(
+        fileDownloader: locator(),
+        log: log,
+        cacheManager: locator(),
+      ),
     );
     locator.alias<ListenDownloadProgressUseCase, DownloadProgressManager>();
-
 
     // manga dex services
     locator.registerFactory(() => MangaService(locator()));
