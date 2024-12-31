@@ -2,7 +2,7 @@ import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
-import 'manager/active_download_manager.dart';
+import 'manager/download_progress_manager.dart';
 import 'manager/file_download_manager.dart';
 import 'manager/library_manager.dart';
 import 'manager/manga_source_manager.dart';
@@ -39,9 +39,9 @@ class DomainMangaRegistrar extends Registrar {
 
     locator.registerSingleton(await FileDownloadManager.create(log: log));
     locator.registerSingleton(
-      await ActiveDownloadManager.create(fileDownloader: locator(), log: log),
+      await DownloadProgressManager.create(fileDownloader: locator(), log: log),
     );
-    locator.alias<ListenDownloadProgressUseCase, ActiveDownloadManager>();
+    locator.alias<ListenDownloadProgressUseCase, DownloadProgressManager>();
 
 
     // manga dex services

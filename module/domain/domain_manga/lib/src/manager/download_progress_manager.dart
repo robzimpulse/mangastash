@@ -13,20 +13,20 @@ typedef Key = DownloadChapterKey;
 typedef Update = Map<String, double>;
 typedef Progress = DownloadChapterProgress;
 
-class ActiveDownloadManager implements ListenDownloadProgressUseCase {
+class DownloadProgressManager implements ListenDownloadProgressUseCase {
   final BehaviorSubject<Map<Key, Update>> _progress;
   final FileDownloader _fileDownloader;
   final LogBox _log;
 
   late final StreamSubscription _streamSubscription;
 
-  static Future<ActiveDownloadManager> create({
+  static Future<DownloadProgressManager> create({
     required FileDownloader fileDownloader,
     required LogBox log,
   }) async {
     final records = await fileDownloader.database.allRecords();
 
-    return ActiveDownloadManager(
+    return DownloadProgressManager(
       fileDownloader: fileDownloader,
       log: log,
       progress: records.groupFoldBy<Key, Update>(
@@ -38,7 +38,7 @@ class ActiveDownloadManager implements ListenDownloadProgressUseCase {
     );
   }
 
-  ActiveDownloadManager({
+  DownloadProgressManager({
     required Map<Key, Update> progress,
     required FileDownloader fileDownloader,
     required LogBox log,
