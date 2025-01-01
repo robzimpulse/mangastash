@@ -63,8 +63,7 @@ class ItemColumn extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: Card(
-              elevation: 0,
-              color: Colors.grey[100],
+              elevation: 2,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -72,10 +71,7 @@ class ItemColumn extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   value.isJson ? value.prettify : value,
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelSmall
-                      ?.copyWith(color: Colors.black),
+                  style: Theme.of(context).textTheme.labelSmall,
                 ),
               ),
             ),

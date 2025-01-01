@@ -1,0 +1,1 @@
+enum SortLog { byTime, byName }

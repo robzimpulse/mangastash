@@ -7,10 +7,12 @@ import 'package:flutter/material.dart';
 
 import 'src/common/log_storage.dart';
 import 'src/model/log_model.dart';
+import 'src/screen/dashboard/dashboard_screen.dart';
 
 class LogBox {
   static final LogBox _instance = LogBox._();
   final LogStorage _storage = LogStorage();
+  final navigatorObserver = NavigatorObserver();
 
   factory LogBox() => _instance;
 
@@ -51,16 +53,15 @@ class LogBox {
   }
 
   void navigateToLogBox({ThemeData? theme}) {
-    // navigatorObserver.navigator?.push(
-    //   MaterialPageRoute<dynamic>(
-    //     builder: (context) => Theme(
-    //       data: theme ?? Theme.of(context),
-    //       child: DashboardScreen(
-    //         password: _password ?? '',
-    //         storage: _storage,
-    //       ),
-    //     ),
-    //   ),
-    // );
+    navigatorObserver.navigator?.push(
+      MaterialPageRoute<dynamic>(
+        builder: (context) => Theme(
+          data: theme ?? Theme.of(context),
+          child: DashboardScreen(
+            storage: _storage,
+          ),
+        ),
+      ),
+    );
   }
 }

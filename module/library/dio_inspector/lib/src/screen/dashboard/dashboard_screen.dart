@@ -20,7 +20,6 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   TextEditingController searchController = TextEditingController();
   FocusNode focusNode = FocusNode();
-  StreamSubscription<List<HttpActivityModel>>? activitiesSubscription;
 
   String query = '';
   bool isSearch = false;
@@ -28,7 +27,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   void dispose() {
-    activitiesSubscription?.cancel();
     searchController.dispose();
     focusNode.dispose();
     super.dispose();
@@ -50,7 +48,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  void _sortAllResponses(SortActivity sortType) {
+  void _sort(SortActivity sortType) {
     setState(() {
       currentSort = sortType;
     });
@@ -110,7 +108,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ];
               },
-              onSelected: _sortAllResponses,
+              onSelected: _sort,
             ),
           ],
           title: _title(context),
@@ -276,14 +274,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               var data = filteredActivities[index];
               return ItemResponseWidget(
                 data: data,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DetailScreen(data: data),
-                    ),
-                  );
-                },
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailScreen(data: data),
+                  ),
+                ),
               );
             },
           ),

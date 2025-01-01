@@ -22,6 +22,8 @@ dependencies:
     path: ../../library/safe_bloc
   dio_inspector:
     path: ../../library/dio_inspector
+  log_box:
+    path: ../../library/log_box
 
   # core
   core_environment:
