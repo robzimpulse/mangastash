@@ -15,12 +15,6 @@ dependencies:
   visibility_detector: ^0.4.0+2
   rxdart: ^0.27.7
 
-  # github
-  expansion_tile_group:
-    git:
-      url: https://github.com/robzimpulse/Expansion-Tile-Group.git
-      ref: main
-
   # domain
   domain_manga:
     path: ../../domain/domain_manga

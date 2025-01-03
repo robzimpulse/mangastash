@@ -17,6 +17,7 @@ dependencies:
   sliver_tools: ^0.2.12
   equatable: ^2.0.5
   collection: ^1.16.0
+  expansion_tile_group: ^2.1.0
 
   # core
   core_route:

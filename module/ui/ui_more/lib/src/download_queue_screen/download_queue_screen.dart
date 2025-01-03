@@ -1,3 +1,4 @@
+import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -31,28 +32,45 @@ class DownloadQueueScreen extends StatelessWidget {
     );
   }
 
-  Widget _content(BuildContext context, DownloadQueueScreenState state) {
-    final progress = state.progress.entries;
-    return MultiSliver(
-      children: [
-        for (final data in progress)
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('${data.key.mangaTitle}'),
-                  Text('Chapter ${data.key.chapterNumber}'),
-                  Text('${data.value.total} files downloaded'),
-                  LinearProgressIndicator(
-                    value: data.value.progress.toDouble(),
-                  ),
-                ].intersperse(const SizedBox(height: 4)).toList(),
-              ),
+  Widget _item({
+    required DownloadChapterKey key,
+    required DownloadChapterProgress progress,
+    required Map<String, String> filenames,
+  }) {
+    final child = progress.values.entries.where((e) => e.value < 1.0);
+    return ExpansionTile(
+      title: Text('${key.mangaTitle}'),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Chapter ${key.chapterNumber}'),
+          Text(
+            '${progress.finish} files downloaded '
+            'from ${progress.total} files',
+          ),
+          LinearProgressIndicator(
+            value: progress.progress.toDouble(),
+          ),
+        ],
+      ),
+      children: List.of(
+        child.map(
+          (value) => Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 8,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(filenames[value.key] ?? value.key),
+                const SizedBox(height: 4),
+                LinearProgressIndicator(value: value.value),
+              ],
             ),
           ),
-      ],
+        ),
+      ),
     );
   }
 
@@ -63,8 +81,22 @@ class DownloadQueueScreen extends StatelessWidget {
         title: const Text('Download Queue'),
       ),
       body: _builder(
+        buildWhen: (prev, curr) => [
+          prev.progress != curr.progress,
+          prev.filenames != curr.filenames,
+        ].any((e) => e),
         builder: (context, state) => CustomScrollView(
-          slivers: [_content(context, state)],
+          slivers: List.of(
+            state.progress.entries.map(
+              (e) => SliverToBoxAdapter(
+                child: _item(
+                  key: e.key,
+                  progress: e.value,
+                  filenames: state.filenames,
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );

@@ -16,5 +16,11 @@ class DownloadQueueScreenCubit extends Cubit<DownloadQueueScreenState>
           .throttleTime(const Duration(milliseconds: 200))
           .listen((progress) => emit(state.copyWith(progress: progress))),
     );
+    addSubscription(
+      listenDownloadProgressUseCase.filenames
+          .distinct()
+          .throttleTime(const Duration(milliseconds: 200))
+          .listen((filenames) => emit(state.copyWith(filenames: filenames))),
+    );
   }
 }

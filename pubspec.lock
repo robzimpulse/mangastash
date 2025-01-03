@@ -33,14 +33,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
-  auto_size_text:
-    dependency: transitive
-    description:
-      name: auto_size_text
-      sha256: "3f5261cd3fb5f2a9ab4e2fc3fba84fd9fcaac8821f20a1d4e71f557521b22599"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.0"
   background_downloader:
     dependency: transitive
     description:
@@ -299,12 +291,11 @@ packages:
   expansion_tile_group:
     dependency: transitive
     description:
-      path: "."
-      ref: main
-      resolved-ref: "83e9cd16491ab705d7e045bde071b74706cefa1f"
-      url: "https://github.com/robzimpulse/Expansion-Tile-Group.git"
-    source: git
-    version: "1.2.2"
+      name: expansion_tile_group
+      sha256: "4e54d21767241c1922ccee1b18636d8447835b82f94c9e177b31c21b968644cb"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   fake_async:
     dependency: transitive
     description:

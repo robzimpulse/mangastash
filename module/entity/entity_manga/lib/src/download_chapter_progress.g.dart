@@ -9,13 +9,13 @@ part of 'download_chapter_progress.dart';
 DownloadChapterProgress _$DownloadChapterProgressFromJson(
         Map<String, dynamic> json) =>
     DownloadChapterProgress(
-      total: json['total'] as num?,
-      progress: json['progress'] as num?,
+      values: (json['values'] as Map<String, dynamic>).map(
+        (k, e) => MapEntry(k, (e as num).toDouble()),
+      ),
     );
 
 Map<String, dynamic> _$DownloadChapterProgressToJson(
         DownloadChapterProgress instance) =>
     <String, dynamic>{
-      'total': instance.total,
-      'progress': instance.progress,
+      'values': instance.values,
     };

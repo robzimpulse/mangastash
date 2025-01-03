@@ -17,6 +17,7 @@ typedef Progress = DownloadChapterProgress;
 
 class DownloadProgressManager implements ListenDownloadProgressUseCase {
   final BehaviorSubject<Map<Key, Update>> _progress;
+  final BehaviorSubject<Map<String, Task>> _tasks;
   final FileDownloader _fileDownloader;
   final BaseCacheManager _cacheManager;
   final LogBox _log;
@@ -34,6 +35,7 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
       fileDownloader: fileDownloader,
       cacheManager: cacheManager,
       log: log,
+      tasks: Map.fromEntries(records.map((e) => MapEntry(e.taskId, e.task))),
       completeRecords: List.of(
         records.where((record) => record.status.isFinalState),
       ),
@@ -48,6 +50,7 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
 
   DownloadProgressManager({
     required LogBox log,
+    required Map<String, Task> tasks,
     required Map<Key, Update> progress,
     required FileDownloader fileDownloader,
     required BaseCacheManager cacheManager,
@@ -55,6 +58,7 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
   })  : _log = log,
         _cacheManager = cacheManager,
         _fileDownloader = fileDownloader,
+        _tasks = BehaviorSubject.seeded(tasks),
         _progress = BehaviorSubject.seeded(progress) {
     _streamSubscription = _fileDownloader.updates.distinct().listen(_onUpdate);
     for (final record in completeRecords) {
@@ -105,7 +109,32 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
     );
   }
 
-  void _onUpdate(TaskUpdate event) async {
+  void _onUpdate(TaskUpdate event) {
+    _updateProgress(event);
+    _updateTasks(event);
+    _moveFile(event);
+  }
+
+  void _moveFile(TaskUpdate event) {
+    if (event is! TaskStatusUpdate) return;
+    final task = event.task;
+    if (task is! DownloadTask) return;
+    _moveFileToSharedStorage(task: task);
+  }
+
+  void _updateTasks(TaskUpdate event) {
+    final tasks = Map.of(_tasks.valueOrNull ?? <String, Task>{});
+
+    tasks.update(
+      event.task.taskId,
+      (_) => event.task,
+      ifAbsent: () => event.task,
+    );
+
+    _tasks.add(tasks);
+  }
+
+  void _updateProgress(TaskUpdate event) {
     final progress = Map.of(_progress.valueOrNull ?? <Key, Update>{});
 
     progress.update(
@@ -148,13 +177,6 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
     );
 
     _progress.add(progress);
-
-    if (event is TaskStatusUpdate) {
-      final task = event.task;
-      if (task is DownloadTask) {
-        _moveFileToSharedStorage(task: task);
-      }
-    }
   }
 
   @override
@@ -190,6 +212,15 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
             ..removeWhere(
               (key, _) => keys.contains(key),
             ),
+        )
+        .shareValue();
+  }
+
+  @override
+  ValueStream<Map<String, String>> get filenames {
+    return _tasks
+        .map(
+          (value) => value.map((key, value) => MapEntry(key, value.filename)),
         )
         .shareValue();
   }

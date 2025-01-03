@@ -9,4 +9,6 @@ abstract class ListenDownloadProgressUseCase {
   ValueStream<Map<DownloadChapterKey, DownloadChapterProgress>> get active;
 
   ValueStream<Map<DownloadChapterKey, DownloadChapterProgress>> get all;
+
+  ValueStream<Map<String, String>> get filenames;
 }
