@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:log_box/log_box.dart';
 
 class BaseRouteObserver extends NavigatorObserver {
-
   final LogBox log;
 
   BaseRouteObserver({required this.log});
@@ -34,7 +33,11 @@ class BaseRouteObserver extends NavigatorObserver {
   void _update(Route? route) {
     final location = route?.settings.name;
     final arguments = route?.settings.arguments;
-    log.log('location: $location', name: runtimeType.toString(), time: DateTime.now());
-    log.log('arguments: $arguments', name: runtimeType.toString(), time: DateTime.now());
+    if (location == null) return;
+    log.log(
+      'location: $location\narguments: $arguments',
+      name: runtimeType.toString(),
+      time: DateTime.now(),
+    );
   }
 }

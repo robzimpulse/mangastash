@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../common/log_storage.dart';
 import '../../common/sort_log_enum.dart';
 import '../../model/log_model.dart';
+import '../detail/detail_screen.dart';
 import 'widget/item_log_widget.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -104,7 +105,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 final aTime = a.time;
                 final bTime = b.time;
                 if (aTime == null || bTime == null) return 0;
-                return aTime.isBefore(bTime) ? -1 : 1;
+                return aTime.isBefore(bTime) ? 1 : -1;
               }
 
               int sortByName(LogModel a, LogModel b) {
@@ -172,12 +173,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               var data = filteredActivities[index];
               return ItemLogWidget(
                 data: data,
-                // onTap: () => Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => DetailScreen(data: data),
-                //   ),
-                // ),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailScreen(data: data),
+                  ),
+                ),
               );
             },
           ),
