@@ -46,7 +46,7 @@ class DownloadQueueScreen extends StatelessWidget {
                   Text('Chapter ${data.key.chapterNumber}'),
                   Text('${data.value.total} files downloaded'),
                   LinearProgressIndicator(
-                    value: data.value.progress?.toDouble() ?? 0.0,
+                    value: data.value.progress.toDouble(),
                   ),
                 ].intersperse(const SizedBox(height: 4)).toList(),
               ),

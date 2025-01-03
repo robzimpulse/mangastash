@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -5,11 +6,14 @@ part 'download_chapter_progress.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class DownloadChapterProgress extends Equatable {
-  final num? total;
 
-  final num? progress;
+  final Map<String, double> values;
 
-  const DownloadChapterProgress({this.total, this.progress});
+  late final num total = values.length;
+
+  late final num progress = values.values.sum / values.length;
+
+  DownloadChapterProgress({required this.values});
 
   @override
   List<Object?> get props => [total, progress];
@@ -20,17 +24,7 @@ class DownloadChapterProgress extends Equatable {
 
   Map<String, dynamic> toJson() => _$DownloadChapterProgressToJson(this);
 
-  DownloadChapterProgress copyWith({
-    num? total,
-    num? progress,
-  }) {
-    return DownloadChapterProgress(
-      total: total,
-      progress: progress,
-    );
-  }
-
   factory DownloadChapterProgress.zero() {
-    return const DownloadChapterProgress(total: 0, progress: 0);
+    return DownloadChapterProgress(values: const {});
   }
 }

@@ -161,13 +161,7 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
   ValueStream<Map<DownloadChapterKey, DownloadChapterProgress>> get all {
     final transformed = _progress.map(
       (value) => Map.of(value).map(
-        (key, value) => MapEntry(
-          key,
-          DownloadChapterProgress(
-            total: value.length,
-            progress: value.values.sum / value.length,
-          ),
-        ),
+        (key, value) => MapEntry(key, DownloadChapterProgress(values: value)),
       ),
     );
 

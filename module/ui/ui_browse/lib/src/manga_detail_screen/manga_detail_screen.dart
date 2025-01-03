@@ -354,37 +354,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
                     return index.isOdd
                         ? _separator()
-                        : _builder(
-                            buildWhen: (prev, curr) => [
-                              prev.progress?[key] != curr.progress?[key],
-                            ].any((e) => e),
-                            builder: (context, state) => MangaChapterTileWidget(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 8,
-                              ),
-                              onTap: () => widget.onTapChapter?.call(
-                                value?.id,
-                                state.chapterIds,
-                              ),
-                              onTapDownload: () => _onTapDownloadChapter(
-                                context,
-                                value,
-                              ),
-                              onLongPress: () => _onTapMenuChapter(
-                                context,
-                                value,
-                              ),
-                              title: 'Chapter ${value?.chapter}',
-                              language: Language.fromCode(
-                                value?.translatedLanguage,
-                              ),
-                              uploadedAt: value?.readableAt?.asDateTime,
-                              groups: value?.scanlationGroup,
-                              downloadProgress:
-                                  state.progress?[key]?.progress?.toDouble() ??
-                                      0.0,
-                            ),
-                          );
+                        : _chapterItem(key: key, value: value);
                   },
                 ),
               ),
@@ -396,6 +366,26 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           children: children,
         );
       },
+    );
+  }
+
+  Widget _chapterItem({required DownloadChapterKey key, MangaChapter? value}) {
+    if (value == null) return const SizedBox.shrink();
+    return _builder(
+      buildWhen: (prev, curr) => prev.progress?[key] != curr.progress?[key],
+      builder: (context, state) => MangaChapterTileWidget(
+        padding: const EdgeInsets.symmetric(
+          vertical: 8,
+        ),
+        onTap: () => widget.onTapChapter?.call(value.id, state.chapterIds),
+        onTapDownload: () => _onTapDownloadChapter(context, value),
+        onLongPress: () => _onTapMenuChapter(context, value),
+        title: 'Chapter ${value.chapter}',
+        language: Language.fromCode(value.translatedLanguage),
+        uploadedAt: value.readableAt?.asDateTime,
+        groups: value.scanlationGroup,
+        downloadProgress: state.progress?[key]?.progress.toDouble() ?? 0.0,
+      ),
     );
   }
 
