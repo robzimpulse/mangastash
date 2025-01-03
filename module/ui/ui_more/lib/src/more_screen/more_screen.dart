@@ -73,10 +73,7 @@ class MoreScreen extends StatelessWidget {
           const SafeArea(
             child: Padding(
               padding: EdgeInsets.all(16),
-              child: Text(
-                'Manga Stash',
-                style: TextStyle(fontSize: 56),
-              ),
+              child: AutoSizeText('MangaStash', maxLines: 1),
             ),
           ),
           const Divider(height: 1, thickness: 1),
