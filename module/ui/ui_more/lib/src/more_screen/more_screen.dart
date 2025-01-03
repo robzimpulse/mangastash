@@ -70,10 +70,14 @@ class MoreScreen extends StatelessWidget {
     return ScaffoldScreen(
       body: Column(
         children: [
-          const SafeArea(
+          SafeArea(
             child: Padding(
-              padding: EdgeInsets.all(16),
-              child: AutoSizeText('MangaStash', maxLines: 1),
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                'Manga Stash',
+                maxLines: 1,
+                style: Theme.of(context).textTheme.headlineLarge,
+              ),
             ),
           ),
           const Divider(height: 1, thickness: 1),
