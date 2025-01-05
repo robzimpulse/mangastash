@@ -26,7 +26,6 @@ class DioManager {
           onThrottled: (req, scheduled) => log.log(
             'Delay request for ${req.uri} until $scheduled',
             name: 'DioManager',
-            time: DateTime.now(),
           ),
         ),
       ],
@@ -36,11 +35,7 @@ class DioManager {
       RetryInterceptor(
         dio: dio,
         retryableExtraStatuses: {status400BadRequest},
-        logPrint: (msg) => log.log(
-          msg,
-          name: 'DioManager',
-          time: DateTime.now(),
-        ),
+        logPrint: (msg) => log.log(msg, name: 'DioManager'),
       ),
     );
 

@@ -90,7 +90,6 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
     _log.log(
       'Move ${task.url} - $path to shared storage',
       name: runtimeType.toString(),
-      time: DateTime.now(),
     );
 
     if (path == null) return;
@@ -105,7 +104,6 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
     _log.log(
       'Adding ${task.url} - $path to cache',
       name: runtimeType.toString(),
-      time: DateTime.now(),
     );
   }
 

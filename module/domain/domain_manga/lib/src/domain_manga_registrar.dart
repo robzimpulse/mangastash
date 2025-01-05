@@ -4,6 +4,7 @@ import 'package:service_locator/service_locator.dart';
 
 import 'manager/download_progress_manager.dart';
 import 'manager/file_download_manager.dart';
+import 'manager/headless_webview_manager.dart';
 import 'manager/library_manager.dart';
 import 'manager/manga_source_manager.dart';
 import 'use_case/chapter/download_chapter_use_case.dart';
@@ -18,6 +19,8 @@ import 'use_case/library/listen_manga_from_library_use_case.dart';
 import 'use_case/library/remove_from_library_use_case.dart';
 import 'use_case/manga/get_manga_on_mangadex_use_case.dart';
 import 'use_case/manga/get_manga_use_case.dart';
+import 'use_case/manga/search_manga_on_asura_scan_use_case.dart';
+import 'use_case/manga/search_manga_on_manga_clash_use_case.dart';
 import 'use_case/manga/search_manga_on_mangadex_use_case.dart';
 import 'use_case/manga/search_manga_use_case.dart';
 import 'use_case/manga_source/get_manga_source_use_case.dart';
@@ -29,10 +32,11 @@ class DomainMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
-    log.log(
-      'start register',
-      name: runtimeType.toString(),
-      time: DateTime.now(),
+    log.log('start register', name: runtimeType.toString());
+
+    locator.registerSingleton(
+      await HeadlessWebviewManager.create(log: log),
+      dispose: (e) => e.dispose(),
     );
 
     locator.registerSingleton(await FileDownloadManager.create(log: log));
@@ -79,6 +83,15 @@ class DomainMangaRegistrar extends Registrar {
       ),
     );
     locator.registerFactory(
+      () => SearchMangaOnAsuraScanUseCase(
+        log: log,
+        webview: locator(),
+      ),
+    );
+    locator.registerFactory(
+      () => SearchMangaOnMangaClashUseCaseUseCase(log: log, webview: locator()),
+    );
+    locator.registerFactory(
       () => GetChapterOnMangaDexUseCase(
         chapterRepository: locator(),
         atHomeRepository: locator(),
@@ -92,6 +105,8 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => SearchMangaUseCase(
         searchMangaOnMangaDexUseCase: locator(),
+        searchMangaOnAsuraScanUseCase: locator(),
+        searchMangaOnMangaClashUseCaseUseCase: locator(),
       ),
     );
     locator.registerFactory(
@@ -103,7 +118,6 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => GetMangaUseCase(
         getMangaOnMangaDexUseCase: locator(),
-        getMangaFromLibraryUseCase: locator(),
       ),
     );
     locator.registerFactory(
@@ -147,10 +161,6 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<ListenMangaSourceUseCase, MangaSourceManager>();
     locator.alias<GetMangaSourceUseCase, MangaSourceManager>();
 
-    log.log(
-      'finish register',
-      name: runtimeType.toString(),
-      time: DateTime.now(),
-    );
+    log.log('finish register', name: runtimeType.toString());
   }
 }

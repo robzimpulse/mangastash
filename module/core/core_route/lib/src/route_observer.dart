@@ -37,7 +37,6 @@ class BaseRouteObserver extends NavigatorObserver {
     log.log(
       'location: $location\narguments: $arguments',
       name: runtimeType.toString(),
-      time: DateTime.now(),
     );
   }
 }

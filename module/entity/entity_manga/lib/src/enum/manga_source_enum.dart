@@ -4,7 +4,10 @@ enum MangaSourceEnum {
   @JsonValue("Manga Dex")
   mangadex('Manga Dex'),
   @JsonValue("Asura Scans")
-  asurascan('Asura Scans');
+  asurascan('Asura Scans'),
+  @JsonValue("Manga Clash")
+  mangaclash('Manga Clash'),
+  ;
 
   final String value;
 

@@ -19,22 +19,27 @@ class SearchChapterUseCase {
     required String? mangaId,
   }) async {
     if (source == null) return Error(Exception('Empty Source'));
+    final language = Language.fromCode(
+      _listenLocaleUseCase.localeDataStream.valueOrNull?.languageCode,
+    );
 
-    final Result<List<MangaChapter>> result;
-    final locale = _listenLocaleUseCase.localeDataStream.valueOrNull;
-
-    switch (source) {
-      case MangaSourceEnum.mangadex:
-        result = await _searchChapterOnMangaDexUseCase.execute(
+    return switch (source) {
+      MangaSourceEnum.mangadex => _searchChapterOnMangaDexUseCase.execute(
           mangaId: mangaId,
-          language: Language.fromCode(locale?.languageCode),
-        );
-        break;
-      case MangaSourceEnum.asurascan:
-        result = Error(Exception('Unimplemented for ${source.name}'));
-        break;
-    }
-
-    return result;
+          language: language,
+        ),
+      // TODO: Handle this case.
+      MangaSourceEnum.asurascan => Future.value(
+          Error(
+            Exception('Unimplemented for ${source.name}'),
+          ),
+        ),
+      // TODO: Handle this case.
+      MangaSourceEnum.mangaclash => Future.value(
+          Error(
+            Exception('Unimplemented for ${source.name}'),
+          ),
+        ),
+    };
   }
 }

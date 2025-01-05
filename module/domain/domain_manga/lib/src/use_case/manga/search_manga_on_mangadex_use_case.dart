@@ -20,7 +20,6 @@ class SearchMangaOnMangaDexUseCase {
       _log.log(
         '${parameter.toJson()}',
         name: runtimeType.toString(),
-        time: DateTime.now(),
       );
 
       final result = await _mangaService.search(

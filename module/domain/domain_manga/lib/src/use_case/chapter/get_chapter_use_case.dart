@@ -8,7 +8,7 @@ class GetChapterUseCase {
 
   GetChapterUseCase({
     required GetChapterOnMangaDexUseCase getChapterOnMangaDexUseCase,
-  })  : _getChapterOnMangaDexUseCase = getChapterOnMangaDexUseCase;
+  }) : _getChapterOnMangaDexUseCase = getChapterOnMangaDexUseCase;
 
   Future<Result<MangaChapter>> execute({
     required MangaSourceEnum? source,
@@ -19,20 +19,23 @@ class GetChapterUseCase {
     if (mangaId == null) return Error(Exception('Empty Manga Id'));
     if (chapterId == null) return Error(Exception('Empty Chapter Id'));
 
-    final Result<MangaChapter> result;
-
-    switch (source) {
-      case MangaSourceEnum.mangadex:
-        result = await _getChapterOnMangaDexUseCase.execute(
+    return switch (source) {
+      MangaSourceEnum.mangadex => _getChapterOnMangaDexUseCase.execute(
           chapterId: chapterId,
           mangaId: mangaId,
-        );
-        break;
-      case MangaSourceEnum.asurascan:
-        result = Error(Exception('Unimplemented for ${source.name}'));
-        break;
-    }
-
-    return result;
+        ),
+      // TODO: Handle this case.
+      MangaSourceEnum.asurascan => Future.value(
+          Error(
+            Exception('Unimplemented for ${source.name}'),
+          ),
+        ),
+      // TODO: Handle this case.
+      MangaSourceEnum.mangaclash => Future.value(
+          Error(
+            Exception('Unimplemented for ${source.name}'),
+          ),
+        ),
+    };
   }
 }

@@ -30,7 +30,6 @@ class SystemProxyManager implements GetSystemProxyUseCase {
       log.log(
         'Using proxy with host: $host:$port',
         name: 'SystemProxyManager',
-        time: DateTime.now(),
       );
     }
 

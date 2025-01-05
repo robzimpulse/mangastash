@@ -36,7 +36,6 @@ class DownloadChapterUseCase with GenerateTaskIdMixin, UserAgentMixin {
       _log.log(
         '[$info] Success fetching chapter images',
         name: runtimeType.toString(),
-        time: DateTime.now(),
       );
 
       final images = result.data.images ?? [];
@@ -137,7 +136,6 @@ class DownloadChapterUseCase with GenerateTaskIdMixin, UserAgentMixin {
       _log.log(
         'Failed fetching chapter images for ${key.hashCode} | ${result.error}',
         name: runtimeType.toString(),
-        time: DateTime.now(),
       );
     }
   }

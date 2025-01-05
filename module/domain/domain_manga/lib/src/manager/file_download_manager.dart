@@ -25,7 +25,6 @@ class FileDownloadManager {
       taskNotificationTapCallback: (task, notificationType) => log.log(
         'Tap Notification for ${task.taskId} with $notificationType',
         name: 'FileDownloadManager',
-        time: DateTime.now(),
       ),
     );
   }
