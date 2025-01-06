@@ -94,6 +94,7 @@ class DomainMangaRegistrar extends Registrar {
         log: log,
         webview: locator(),
         mangaServiceFirebase: locator(),
+        mangaTagServiceFirebase: locator(),
       ),
     );
     locator.registerFactory(

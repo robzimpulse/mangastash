@@ -13,14 +13,17 @@ class SearchMangaOnMangaClashUseCaseUseCase {
   final LogBox _log;
   final HeadlessWebviewManager _webview;
   final MangaServiceFirebase _mangaServiceFirebase;
+  final MangaTagServiceFirebase _mangaTagServiceFirebase;
 
   SearchMangaOnMangaClashUseCaseUseCase({
     required LogBox log,
     required HeadlessWebviewManager webview,
     required MangaServiceFirebase mangaServiceFirebase,
+    required MangaTagServiceFirebase mangaTagServiceFirebase,
   })  : _log = log,
         _webview = webview,
-        _mangaServiceFirebase = mangaServiceFirebase;
+        _mangaServiceFirebase = mangaServiceFirebase,
+        _mangaTagServiceFirebase = mangaTagServiceFirebase;
 
   Future<Result<Pagination<Manga>>> execute({
     required SearchMangaParameter parameter,
@@ -65,8 +68,8 @@ class SearchMangaOnMangaClashUseCaseUseCase {
           .querySelector('div.post-content_item.mg_genres')
           ?.querySelector('div.summary-content')
           ?.text
-          .trim()
-          .split(',');
+          .split(',')
+          .map((e) => e.trim());
       final status = element
           .querySelector('div.post-content_item.mg_status')
           ?.querySelector('div.summary-content')
@@ -85,21 +88,55 @@ class SearchMangaOnMangaClashUseCaseUseCase {
       );
     }
 
-    final cached = await _mangaServiceFirebase.search(
-      webUrl: mangas.map((e) => e.webUrl).whereNotNull().toList(),
-      limit: 100,
+    final slicesUrls = mangas.map((e) => e.webUrl).whereNotNull().slices(10);
+    final promisesUrls = slicesUrls.map(
+      (urls) => _mangaServiceFirebase.search(
+        webUrl: urls.whereNotNull().toList(),
+        limit: 100,
+      ),
     );
+    final results1 = await Future.wait(promisesUrls);
+    final cachedMangas = results1.expand((result) => result.data ?? <Manga>[]);
+
+    final slicesTags =
+        mangas.expand((e) => e.tagsName).whereNotNull().slices(10);
+    final promisesTags = slicesTags.map(
+      (tags) => _mangaTagServiceFirebase.search(
+        name: tags,
+      ),
+    );
+    final results2 = await Future.wait(promisesTags);
+    final cachedTags = results2.expand((result) => result.data ?? <MangaTag>[]);
 
     final List<Manga> result = [];
 
     for (final manga in mangas) {
-      final cache = cached.data?.firstWhereOrNull(
+      final List<MangaTag> tags = [];
+      for (final tag in manga.tags ?? <MangaTag>[]) {
+        final cache = cachedTags.firstWhereOrNull(
+          (cache) => cache.name == tag.name,
+        );
+        tags.add(
+          cache == null
+              ? await _mangaTagServiceFirebase.add(tag)
+              : await _mangaTagServiceFirebase.update(
+                  cache.copyWith(name: tag.name),
+                ),
+        );
+      }
+
+      final cacheManga = cachedMangas.firstWhereOrNull(
         (cache) => cache.webUrl == manga.webUrl,
       );
+
       result.add(
-        cache == null
-            ? await _mangaServiceFirebase.add(manga)
-            : await _mangaServiceFirebase.update(manga.copyWith(id: cache.id)),
+        cacheManga == null
+            ? await _mangaServiceFirebase.add(
+                manga.copyWith(tags: tags),
+              )
+            : await _mangaServiceFirebase.update(
+                manga.copyWith(id: cacheManga.id, tags: tags),
+              ),
       );
     }
 

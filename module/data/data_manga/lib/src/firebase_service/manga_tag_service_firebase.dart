@@ -15,8 +15,16 @@ class MangaTagServiceFirebase {
 
   MangaTagServiceFirebase({required FirebaseApp app}) : _app = app;
 
-  Future<void> update(MangaTag value) async {
+  Future<MangaTag> add(MangaTag value) async {
+    final ref = await _ref.add(value.toJson());
+    final data = value.copyWith(id: ref.id);
+    await ref.update(data.toJson());
+    return data;
+  }
+
+  Future<MangaTag> update(MangaTag value) async {
     await _ref.doc(value.id).set(value.toJson());
+    return value;
   }
 
   Future<bool> exists(String id) async {
@@ -29,15 +37,15 @@ class MangaTagServiceFirebase {
     return Success(data);
   }
 
-  Future<Result<Pagination<MangaTag>>> search({
-    String? name,
+  Future<Pagination<MangaTag>> search({
+    List<String>? name,
     int limit = 30,
     int? offset,
   }) async {
     Query<Map<String, dynamic>> queries = _ref;
 
     if (name != null) {
-      queries = queries.where('name', isEqualTo: name);
+      queries = queries.where('name', whereIn: name);
     }
 
     if (offset != null) {
@@ -47,15 +55,13 @@ class MangaTagServiceFirebase {
     final count = await queries.count().get();
     final data = await queries.limit(limit).get();
 
-    return Success(
-      Pagination<MangaTag>(
-        data: data.docs
-            .map((e) => MangaTag.fromJson(e.data()).copyWith(id: e.id))
-            .toList(),
-        limit: limit,
-        offset: data.docs.lastOrNull?.id,
-        total: count.count,
-      ),
+    return Pagination<MangaTag>(
+      data: data.docs
+          .map((e) => MangaTag.fromJson(e.data()).copyWith(id: e.id))
+          .toList(),
+      limit: limit,
+      offset: data.docs.lastOrNull?.id,
+      total: count.count,
     );
   }
 }
