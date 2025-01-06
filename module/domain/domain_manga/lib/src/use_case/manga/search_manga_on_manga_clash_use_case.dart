@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:core_network/core_network.dart';
@@ -24,11 +25,12 @@ class SearchMangaOnMangaClashUseCaseUseCase {
       '${parameter.toJson()}',
       name: runtimeType.toString(),
     );
+    final page = max(1, int.tryParse(parameter.page ?? '0') ?? 0);
     final url = [
       [
         'https://toonclash.com',
         'page',
-        parameter.page ?? '0',
+        '$page',
       ].join('/'),
       {
         's': parameter.title ?? '',
@@ -41,14 +43,9 @@ class SearchMangaOnMangaClashUseCaseUseCase {
     if (document == null) {
       return Error(Exception('Error parsing html'));
     }
-    final pagination = document.querySelector('.wp-pagenavi');
-    final total = pagination?.querySelector('.pages')?.text;
-    final page = total?.split(' ').map((e) => int.tryParse(e)).whereNotNull();
-    final data = document.querySelectorAll('.c-tabs-item__content');
 
     final List<Manga> mangas = [];
-
-    for (final element in data) {
+    for (final element in document.querySelectorAll('.c-tabs-item__content')) {
       final title = element.querySelector('div.post-title')?.text.trim();
       final webUrl = element
           .querySelector('div.post-title')
@@ -73,12 +70,21 @@ class SearchMangaOnMangaClashUseCaseUseCase {
       );
     }
 
+    final total = document
+        .querySelector('.wp-pagenavi')
+        ?.querySelector('.pages')
+        ?.text
+        .split(' ')
+        .map((e) => int.tryParse(e))
+        .whereNotNull()
+        .last;
+
     return Success(
       Pagination<Manga>(
         data: mangas,
-        offset: '${page?.first ?? 1}',
-        limit: data.length,
-        total: page?.last ?? 0,
+        page: '$page',
+        limit: mangas.length,
+        total: total ?? 0,
       ),
     );
   }
