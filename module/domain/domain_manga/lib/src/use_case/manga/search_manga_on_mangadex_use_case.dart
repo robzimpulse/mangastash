@@ -29,12 +29,9 @@ class SearchMangaOnMangaDexUseCase {
         includes: [Include.author.rawValue, Include.coverArt.rawValue],
       );
 
-      final promises = result.data?.map(_mapManga).toList() ?? [];
-      final mangas = await Future.wait(promises);
-
       return Success(
         Pagination<Manga>(
-          data: mangas,
+          data: result.data?.map((e) => Manga.from(data: e)).toList(),
           offset: (result.offset ?? 0).toString(),
           limit: result.limit?.toInt() ?? 0,
           total: result.total?.toInt() ?? 0,
@@ -43,41 +40,5 @@ class SearchMangaOnMangaDexUseCase {
     } on Exception catch (e) {
       return Error(e);
     }
-  }
-
-  Future<Manga> _mapManga(MangaData data) async {
-    final tags = data.attributes?.tags?.map(
-      (e) => MangaTag(name: e.attributes?.name?.en, id: e.id),
-    );
-
-    List<String> authors = [];
-    String? coverArtUrl;
-
-    final relationships = data.relationships ?? [];
-    for (final relationship in relationships) {
-      if (relationship is Relationship<AuthorDataAttributes>) {
-        final name = relationship.attributes?.name;
-        if (name != null) authors.add(name);
-      }
-      if (relationship is Relationship<CoverArtDataAttributes>) {
-        final filename = relationship.attributes?.fileName;
-        coverArtUrl = [
-          'https://uploads.mangadex.org',
-          'covers',
-          data.id,
-          filename,
-        ].join('/');
-      }
-    }
-
-    return Manga(
-      id: data.id,
-      coverUrl: coverArtUrl,
-      title: data.attributes?.title?.en,
-      status: data.attributes?.status,
-      description: data.attributes?.description?.en,
-      author: authors.join(' | '),
-      tags: tags?.toList(),
-    );
   }
 }

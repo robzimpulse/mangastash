@@ -1,5 +1,7 @@
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../entity_manga.dart';
 
@@ -98,6 +100,33 @@ class Manga extends Equatable {
       tags: tags ?? this.tags,
       webUrl: webUrl ?? this.webUrl,
       source: source ?? this.source,
+    );
+  }
+
+  factory Manga.from({required MangaData data}) {
+    final filename = data.relationships
+        ?.whereType<Relationship<CoverArtDataAttributes>>()
+        .firstOrNull
+        ?.attributes
+        ?.fileName;
+
+    return Manga(
+      id: data.id,
+      title: data.attributes?.title?.en,
+      description: data.attributes?.description?.en,
+      coverUrl: filename != null
+          ? 'https://uploads.mangadex.org/covers/${data.id}/$filename'
+          : null,
+      status: data.attributes?.status,
+      tags: data.attributes?.tags
+          ?.map((e) => MangaTag(name: e.attributes?.name?.en, id: e.id))
+          .toList(),
+      author: data.relationships
+          ?.whereType<Relationship<AuthorDataAttributes>>()
+          .map((e) => e.attributes?.name)
+          .whereNotNull()
+          .join(' | '),
+      webUrl: 'https://mangadex.org/title/${data.id}',
     );
   }
 }
