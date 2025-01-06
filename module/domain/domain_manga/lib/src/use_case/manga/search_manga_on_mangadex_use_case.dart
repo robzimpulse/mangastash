@@ -61,8 +61,12 @@ class SearchMangaOnMangaDexUseCase {
       }
       if (relationship is Relationship<CoverArtDataAttributes>) {
         final filename = relationship.attributes?.fileName;
-        coverArtUrl =
-            'https://uploads.mangadex.org/covers/${data.id}/$filename';
+        coverArtUrl = [
+          'https://uploads.mangadex.org',
+          'covers',
+          data.id,
+          filename,
+        ].join('/');
       }
     }
 

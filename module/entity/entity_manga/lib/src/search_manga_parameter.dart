@@ -8,11 +8,13 @@ class SearchMangaParameter extends Equatable {
   final String? title;
   final num? limit;
   final String? offset;
+  final String? page;
 
   const SearchMangaParameter({
     this.title,
     this.limit,
     this.offset,
+    this.page,
   });
 
   @override
@@ -21,6 +23,7 @@ class SearchMangaParameter extends Equatable {
       title,
       limit,
       offset,
+      page,
     ];
   }
 
@@ -34,11 +37,13 @@ class SearchMangaParameter extends Equatable {
     String? title,
     num? limit,
     String? offset,
+    String? page,
   }) {
     return SearchMangaParameter(
       title: title ?? this.title,
       limit: limit ?? this.limit,
       offset: offset ?? this.offset,
+      page: page ?? this.page,
     );
   }
 }

@@ -24,10 +24,19 @@ class SearchMangaOnMangaClashUseCaseUseCase {
       '${parameter.toJson()}',
       name: runtimeType.toString(),
     );
+    final url = [
+      [
+        'https://toonclash.com',
+        'page',
+        parameter.page ?? '0',
+      ].join('/'),
+      {
+        's': parameter.title ?? '',
+        'post_type': 'wp-manga',
+      }.entries.map((e) => '${e.key}=${e.value}').join('&'),
+    ].join('?');
 
-    final document = await _webview.open(
-      'https://toonclash.com/?s=${parameter.title ?? ''}&post_type=wp-manga',
-    );
+    final document = await _webview.open(url);
 
     if (document == null) {
       return Error(Exception('Error parsing html'));
@@ -37,19 +46,36 @@ class SearchMangaOnMangaClashUseCaseUseCase {
     final page = total?.split(' ').map((e) => int.tryParse(e)).whereNotNull();
     final data = document.querySelectorAll('.c-tabs-item__content');
 
+    final List<Manga> mangas = [];
+
+    for (final element in data) {
+      final title = element.querySelector('div.post-title')?.text.trim();
+      final webUrl = element
+          .querySelector('div.post-title')
+          ?.querySelector('a')
+          ?.attributes['href'];
+      final coverUrl = element
+          .querySelector('.tab-thumb')
+          ?.querySelector('img')
+          ?.attributes['data-src'];
+
+      mangas.add(
+        Manga(
+          title: title,
+          coverUrl: coverUrl,
+          webUrl: webUrl,
+          source: MangaSourceEnum.mangaclash,
+          // this.author,
+          // this.status,
+          // this.description,
+          // this.tags,
+        ),
+      );
+    }
+
     return Success(
       Pagination<Manga>(
-        data: data.map(
-          (e) {
-            final thumbnail = e.querySelector('.tab-thumb');
-            final title = thumbnail?.querySelector('a')?.attributes['title'];
-            final coverUrl = thumbnail?.querySelector('img')?.attributes['data-src'];
-            return Manga(
-              title: title,
-              coverUrl: coverUrl,
-            );
-          },
-        ).toList(),
+        data: mangas,
         offset: '${page?.first ?? 1}',
         limit: data.length,
         total: page?.last ?? 0,

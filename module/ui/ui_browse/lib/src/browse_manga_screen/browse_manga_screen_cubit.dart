@@ -52,6 +52,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
     if (result is Success<Pagination<Manga>>) {
       final offset = int.tryParse(result.data.offset ?? '') ?? 0;
+      final page = int.tryParse(result.data.page ?? '') ?? 0;
       final limit = result.data.limit ?? 0;
       final total = result.data.total ?? 0;
       final mangas = result.data.data ?? [];
@@ -61,6 +62,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
           mangas: [...state.mangas, ...mangas].distinct(),
           hasNextPage: [...state.mangas, ...mangas].distinct().length < total,
           parameter: state.parameter.copyWith(
+            page: (page + 1).toString(),
             offset: (offset + limit).toString(),
             limit: limit,
           ),

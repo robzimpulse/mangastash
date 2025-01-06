@@ -12,6 +12,7 @@ SearchMangaParameter _$SearchMangaParameterFromJson(
       title: json['title'] as String?,
       limit: json['limit'] as num?,
       offset: json['offset'] as String?,
+      page: json['page'] as String?,
     );
 
 Map<String, dynamic> _$SearchMangaParameterToJson(
@@ -20,4 +21,5 @@ Map<String, dynamic> _$SearchMangaParameterToJson(
       'title': instance.title,
       'limit': instance.limit,
       'offset': instance.offset,
+      'page': instance.page,
     };
