@@ -49,6 +49,7 @@ class HeadlessWebviewManager {
       return null;
     }
 
+    await _controller.stopLoading();
     await _controller.loadUrl(urlRequest: URLRequest(url: uri));
 
     final onLoadStartCompleter = Completer();

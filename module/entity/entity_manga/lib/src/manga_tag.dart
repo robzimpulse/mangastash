@@ -10,8 +10,8 @@ class MangaTag extends Equatable {
   final String? id;
 
   const MangaTag({
-    required this.name,
-    required this.id,
+    this.name,
+    this.id,
   });
 
   @override

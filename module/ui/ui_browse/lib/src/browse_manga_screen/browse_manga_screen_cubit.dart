@@ -77,7 +77,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   }
 
   Future<void> next() async {
-    if (!state.hasNextPage) return;
+    if (!state.hasNextPage || state.isPagingNextPage) return;
     emit(state.copyWith(isPagingNextPage: true));
     await _fetchManga();
     emit(state.copyWith(isPagingNextPage: false));

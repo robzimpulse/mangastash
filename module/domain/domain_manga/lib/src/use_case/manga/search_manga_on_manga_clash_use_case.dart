@@ -55,6 +55,13 @@ class SearchMangaOnMangaClashUseCaseUseCase {
           .querySelector('.tab-thumb')
           ?.querySelector('img')
           ?.attributes['data-src'];
+      final genres = element
+          .querySelector('div.post-content_item.mg_genres')
+          ?.querySelector('div.summary-content')
+          ?.text.trim().split(',');
+      final status = element
+          .querySelector('div.post-content_item.mg_status')
+          ?.querySelector('div.summary-content')?.text;
 
       mangas.add(
         Manga(
@@ -62,10 +69,8 @@ class SearchMangaOnMangaClashUseCaseUseCase {
           coverUrl: coverUrl,
           webUrl: webUrl,
           source: MangaSourceEnum.mangaclash,
-          // this.author,
-          // this.status,
-          // this.description,
-          // this.tags,
+          tags: genres?.map((e) => MangaTag(name: e)).toList(),
+          status: status,
         ),
       );
     }
