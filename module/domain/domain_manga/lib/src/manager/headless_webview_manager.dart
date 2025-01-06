@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
@@ -20,27 +22,10 @@ class HeadlessWebviewManager {
           name: 'HeadlessWebviewManager',
         );
       },
-      onConsoleMessage: (controller, consoleMessage) {
+      onConsoleMessage: (controller, consoleMessage) async {
+        final url = await controller.getUrl();
         log.log(
-          'onConsoleMessage: ${consoleMessage.message}',
-          name: 'HeadlessWebviewManager',
-        );
-      },
-      onLoadStart: (controller, url) async {
-        log.log(
-          'onLoadStart: $url',
-          name: 'HeadlessWebviewManager',
-        );
-      },
-      onLoadStop: (controller, url) async {
-        log.log(
-          'onLoadStop: $url - [${controller.getHtml()}]',
-          name: 'HeadlessWebviewManager',
-        );
-      },
-      onLoadError: (controller, url, code, message) async {
-        log.log(
-          'onLoadError: $url - $code - $message',
+          'onConsoleMessage $url: ${consoleMessage.message}',
           name: 'HeadlessWebviewManager',
         );
       },
@@ -63,9 +48,51 @@ class HeadlessWebviewManager {
       _log.log('Error parsing url: $url', name: runtimeType.toString());
       return null;
     }
-    final request = URLRequest(url: uri);
-    await _controller.loadUrl(urlRequest: request);
+
+    await _controller.loadUrl(urlRequest: URLRequest(url: uri));
+
+    final onLoadStartCompleter = Completer();
+    final onLoadStopCompleter = Completer();
+    final onLoadErrorCompleter = Completer();
+
+    _webview.onLoadStart = (controller, url) async {
+      _log.log(
+        'onLoadStart: $url',
+        name: 'HeadlessWebviewManager',
+      );
+      onLoadStartCompleter.complete();
+    };
+
+    _webview.onLoadStop = (controller, url) async {
+      _log.log(
+        'onLoadStop: $url',
+        name: 'HeadlessWebviewManager',
+      );
+      onLoadStopCompleter.complete();
+    };
+
+    _webview.onLoadError = (controller, url, code, message) async {
+      _log.log(
+        'onLoadError: $url - $code - $message',
+        name: 'HeadlessWebviewManager',
+      );
+      onLoadErrorCompleter.complete();
+    };
+
+    await Future.wait(
+      [
+        onLoadStartCompleter.future,
+        Future.any(
+          [
+            onLoadStopCompleter.future,
+            onLoadErrorCompleter.future,
+          ],
+        ),
+      ],
+    );
+
     final html = await _controller.getHtml();
+
     if (html == null) return null;
     return parse(html);
   }

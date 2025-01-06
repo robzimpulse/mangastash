@@ -30,4 +30,5 @@ Map<String, dynamic> _$DownloadChapterKeyToJson(DownloadChapterKey instance) =>
 const _$MangaSourceEnumEnumMap = {
   MangaSourceEnum.mangadex: 'Manga Dex',
   MangaSourceEnum.asurascan: 'Asura Scans',
+  MangaSourceEnum.mangaclash: 'Manga Clash',
 };

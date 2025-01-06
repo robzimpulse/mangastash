@@ -35,4 +35,5 @@ Map<String, dynamic> _$MangaToJson(Manga instance) => <String, dynamic>{
 const _$MangaSourceEnumEnumMap = {
   MangaSourceEnum.mangadex: 'Manga Dex',
   MangaSourceEnum.asurascan: 'Asura Scans',
+  MangaSourceEnum.mangaclash: 'Manga Clash',
 };
