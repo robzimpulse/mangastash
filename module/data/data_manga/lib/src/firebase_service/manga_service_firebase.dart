@@ -15,6 +15,12 @@ class MangaServiceFirebase {
 
   MangaServiceFirebase({required FirebaseApp app}) : _app = app;
 
+  Future<void> add(Manga value) async {
+    final ref = await _ref.add(value.toJson());
+    final manga = value.copyWith(id: ref.id);
+    await ref.update(manga.toJson());
+  }
+
   Future<void> update(Manga value) async {
     await _ref.doc(value.id).set(value.toJson());
   }
@@ -29,46 +35,50 @@ class MangaServiceFirebase {
     return Manga.fromJson(value);
   }
 
-  Future<Result<List<Manga>>> list() async {
+  Future<List<Manga>> list() async {
     final value = await _ref.get();
-    final data = value.docs.map((e) => Manga.fromJson(e.data())).toList();
-    return Success(data);
+    return value.docs.map((e) => Manga.fromJson(e.data())).toList();
   }
 
-  Future<Result<Pagination<Manga>>> search({
-    String? title,
-    String? coverUrl,
-    String? author,
-    String? status,
-    String? description,
-    MangaSourceEnum? source,
+  Future<Pagination<Manga>> search({
+    List<String>? title,
+    List<String>? coverUrl,
+    List<String>? author,
+    List<String>? status,
+    List<String>? description,
+    List<String>? webUrl,
+    List<MangaSourceEnum>? source,
     int limit = 30,
     int? offset,
   }) async {
     Query<Map<String, dynamic>> queries = _ref;
 
     if (title != null) {
-      queries = queries.where('title', isEqualTo: title);
+      queries = queries.where('title', whereIn: title);
     }
 
     if (coverUrl != null) {
-      queries = queries.where('coverUrl', isEqualTo: coverUrl);
+      queries = queries.where('coverUrl', whereIn: coverUrl);
     }
 
     if (author != null) {
-      queries = queries.where('author', isEqualTo: author);
+      queries = queries.where('author', whereIn: author);
     }
 
     if (status != null) {
-      queries = queries.where('status', isEqualTo: status);
+      queries = queries.where('status', whereIn: status);
     }
 
     if (description != null) {
-      queries = queries.where('description', isEqualTo: description);
+      queries = queries.where('description', whereIn: description);
     }
 
     if (source != null) {
-      queries = queries.where('source', isEqualTo: source.value);
+      queries = queries.where('source', whereIn: source.map((e) => e.value));
+    }
+
+    if (webUrl != null) {
+      queries = queries.where('web_url', whereIn: webUrl);
     }
 
     if (offset != null) {
@@ -78,15 +88,13 @@ class MangaServiceFirebase {
     final count = await queries.count().get();
     final data = await queries.limit(limit).get();
 
-    return Success(
-      Pagination<Manga>(
-        data: data.docs
-            .map((e) => Manga.fromJson(e.data()).copyWith(id: e.id))
-            .toList(),
-        limit: limit,
-        offset: data.docs.lastOrNull?.id,
-        total: count.count,
-      ),
+    return Pagination(
+      data: data.docs
+          .map((e) => Manga.fromJson(e.data()).copyWith(id: e.id))
+          .toList(),
+      limit: limit,
+      offset: data.docs.lastOrNull?.id,
+      total: count.count,
     );
   }
 }

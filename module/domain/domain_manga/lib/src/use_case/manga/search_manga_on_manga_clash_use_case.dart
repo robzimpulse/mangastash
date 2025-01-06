@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:core_network/core_network.dart';
+import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 
@@ -11,12 +12,15 @@ import '../../manager/headless_webview_manager.dart';
 class SearchMangaOnMangaClashUseCaseUseCase {
   final LogBox _log;
   final HeadlessWebviewManager _webview;
+  final MangaServiceFirebase _mangaServiceFirebase;
 
   SearchMangaOnMangaClashUseCaseUseCase({
     required LogBox log,
     required HeadlessWebviewManager webview,
+    required MangaServiceFirebase mangaServiceFirebase,
   })  : _log = log,
-        _webview = webview;
+        _webview = webview,
+        _mangaServiceFirebase = mangaServiceFirebase;
 
   Future<Result<Pagination<Manga>>> execute({
     required SearchMangaParameter parameter,
@@ -50,18 +54,24 @@ class SearchMangaOnMangaClashUseCaseUseCase {
       final webUrl = element
           .querySelector('div.post-title')
           ?.querySelector('a')
-          ?.attributes['href'];
+          ?.attributes['href']
+          ?.trim();
       final coverUrl = element
           .querySelector('.tab-thumb')
           ?.querySelector('img')
-          ?.attributes['data-src'];
+          ?.attributes['data-src']
+          ?.trim();
       final genres = element
           .querySelector('div.post-content_item.mg_genres')
           ?.querySelector('div.summary-content')
-          ?.text.trim().split(',');
+          ?.text
+          .trim()
+          .split(',');
       final status = element
           .querySelector('div.post-content_item.mg_status')
-          ?.querySelector('div.summary-content')?.text;
+          ?.querySelector('div.summary-content')
+          ?.text
+          .trim();
 
       mangas.add(
         Manga(
@@ -73,6 +83,22 @@ class SearchMangaOnMangaClashUseCaseUseCase {
           status: status,
         ),
       );
+    }
+
+    final cached = await _mangaServiceFirebase.search(
+      webUrl: mangas.map((e) => e.webUrl).whereNotNull().toList(),
+      limit: 100,
+    );
+
+    for (final manga in mangas) {
+      final cache = cached.data?.firstWhereOrNull(
+        (cache) => cache.webUrl == manga.webUrl,
+      );
+      if (cache == null) {
+        _mangaServiceFirebase.add(manga);
+      } else {
+        _mangaServiceFirebase.update(manga.copyWith(id: cache.id));
+      }
     }
 
     final total = document
