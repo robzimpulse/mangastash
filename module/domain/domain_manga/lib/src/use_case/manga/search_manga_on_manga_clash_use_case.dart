@@ -90,15 +90,17 @@ class SearchMangaOnMangaClashUseCaseUseCase {
       limit: 100,
     );
 
+    final List<Manga> result = [];
+
     for (final manga in mangas) {
       final cache = cached.data?.firstWhereOrNull(
         (cache) => cache.webUrl == manga.webUrl,
       );
-      if (cache == null) {
-        _mangaServiceFirebase.add(manga);
-      } else {
-        _mangaServiceFirebase.update(manga.copyWith(id: cache.id));
-      }
+      result.add(
+        cache == null
+            ? await _mangaServiceFirebase.add(manga)
+            : await _mangaServiceFirebase.update(manga.copyWith(id: cache.id)),
+      );
     }
 
     final total = document
@@ -112,9 +114,9 @@ class SearchMangaOnMangaClashUseCaseUseCase {
 
     return Success(
       Pagination<Manga>(
-        data: mangas,
+        data: result,
         page: '$page',
-        limit: mangas.length,
+        limit: result.length,
         total: total ?? 0,
       ),
     );

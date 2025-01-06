@@ -15,14 +15,16 @@ class MangaServiceFirebase {
 
   MangaServiceFirebase({required FirebaseApp app}) : _app = app;
 
-  Future<void> add(Manga value) async {
+  Future<Manga> add(Manga value) async {
     final ref = await _ref.add(value.toJson());
     final manga = value.copyWith(id: ref.id);
     await ref.update(manga.toJson());
+    return manga;
   }
 
-  Future<void> update(Manga value) async {
+  Future<Manga> update(Manga value) async {
     await _ref.doc(value.id).set(value.toJson());
+    return value;
   }
 
   Future<bool> exists(String id) async {
