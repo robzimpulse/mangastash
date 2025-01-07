@@ -14,20 +14,28 @@ class MangaServiceFirebase {
 
   MangaServiceFirebase({required FirebaseApp app}) : _app = app;
 
-  Future<Manga> add(Manga value) async {
-    final ref = await _ref.add(value.toJson());
-    final manga = value.copyWith(id: ref.id);
-    await ref.update(manga.toJson());
-    return manga;
-  }
+  Future<Manga> update({
+    String? key,
+    required Future<Manga> Function(Manga value) update,
+    required Future<Manga> Function() ifAbsent,
+  }) async {
+    if (key != null) {
+      final data = (await _ref.doc(key).get()).data();
+      if (data != null) {
+        final updated = await update(Manga.fromJson(data));
+        if (updated.toJson() == data) return updated;
+        await _ref.doc(key).set(updated.toJson());
+        return updated;
+      }
+      final newData = (await ifAbsent()).copyWith(id: key);
+      await _ref.doc(key).set(newData.toJson());
+      return newData;
+    }
 
-  Future<Manga> update(Manga value) async {
-    await _ref.doc(value.id).set(value.toJson());
-    return value;
-  }
-
-  Future<bool> exists(String id) async {
-    return (await _ref.doc(id).get()).exists;
+    final id = (await _ref.add({})).id;
+    final newData = (await ifAbsent()).copyWith(id: id);
+    await _ref.doc(id).set(newData.toJson());
+    return newData;
   }
 
   Future<Manga> get(String id) async {
@@ -36,66 +44,51 @@ class MangaServiceFirebase {
     return Manga.fromJson(value);
   }
 
-  Future<List<Manga>> list() async {
-    final value = await _ref.get();
-    return value.docs.map((e) => Manga.fromJson(e.data())).toList();
-  }
-
-  Future<Pagination<Manga>> search({
-    List<String>? title,
-    List<String>? coverUrl,
-    List<String>? author,
-    List<String>? status,
-    List<String>? description,
-    List<String>? webUrl,
-    List<MangaSourceEnum>? source,
-    int limit = 30,
-    int? offset,
+  Future<List<Manga>> search({
+    required List<Manga> mangas,
   }) async {
-    Query<Map<String, dynamic>> queries = _ref;
+    final List<Manga> data = [];
 
-    if (title != null) {
-      queries = queries.where('title', whereIn: title);
+    for (final manga in mangas.slices(10)) {
+      for (final item in manga) {
+        final List<Manga> temp = [];
+        Query<Map<String, dynamic>> ref = _ref;
+        if (item.title != null) {
+          ref = ref.where('title', isEqualTo: item.title);
+        }
+        if (item.coverUrl != null) {
+          ref = ref.where('coverUrl', isEqualTo: item.coverUrl);
+        }
+        if (item.author != null) {
+          ref = ref.where('author', isEqualTo: item.author);
+        }
+        if (item.status != null) {
+          ref = ref.where('status', isEqualTo: item.status);
+        }
+        if (item.description != null) {
+          ref = ref.where('description', isEqualTo: item.description);
+        }
+        if (item.source != null) {
+          ref = ref.where('source', isEqualTo: item.source?.value);
+        }
+        if (item.webUrl != null) {
+          ref = ref.where('web_url', isEqualTo: item.webUrl);
+        }
+
+        final total = (await ref.count().get()).count ?? 0;
+        String? offset;
+
+        do {
+          final docs = (await ref.startAfter([offset]).limit(100).get()).docs;
+          offset = docs.lastOrNull?.id;
+          temp.addAll(
+            docs.map((e) => Manga.fromJson(e.data()).copyWith(id: e.id)),
+          );
+        } while(temp.length < total);
+        data.addAll(temp);
+      }
     }
 
-    if (coverUrl != null) {
-      queries = queries.where('coverUrl', whereIn: coverUrl);
-    }
-
-    if (author != null) {
-      queries = queries.where('author', whereIn: author);
-    }
-
-    if (status != null) {
-      queries = queries.where('status', whereIn: status);
-    }
-
-    if (description != null) {
-      queries = queries.where('description', whereIn: description);
-    }
-
-    if (source != null) {
-      queries = queries.where('source', whereIn: source.map((e) => e.value));
-    }
-
-    if (webUrl != null) {
-      queries = queries.where('web_url', whereIn: webUrl);
-    }
-
-    if (offset != null) {
-      queries = queries.startAfter([offset]);
-    }
-
-    final count = await queries.count().get();
-    final data = await queries.limit(limit).get();
-
-    return Pagination(
-      data: data.docs
-          .map((e) => Manga.fromJson(e.data()).copyWith(id: e.id))
-          .toList(),
-      limit: limit,
-      offset: data.docs.lastOrNull?.id,
-      total: count.count,
-    );
+    return data;
   }
 }

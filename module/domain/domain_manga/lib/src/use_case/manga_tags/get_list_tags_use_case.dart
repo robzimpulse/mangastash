@@ -9,6 +9,6 @@ class GetListTagsUseCase {
       : _service = service;
 
   Future<Result<List<MangaTag>>> execute() async {
-    return _service.list();
+    return Success(await _service.list());
   }
 }

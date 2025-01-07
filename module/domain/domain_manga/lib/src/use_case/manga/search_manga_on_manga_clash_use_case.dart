@@ -69,12 +69,13 @@ class SearchMangaOnMangaClashUseCaseUseCase {
           ?.querySelector('div.summary-content')
           ?.text
           .split(',')
-          .map((e) => e.trim());
+          .map((e) => e.trim().toLowerCase());
       final status = element
           .querySelector('div.post-content_item.mg_status')
           ?.querySelector('div.summary-content')
           ?.text
-          .trim();
+          .trim()
+          .toLowerCase();
 
       mangas.add(
         Manga(
@@ -82,61 +83,48 @@ class SearchMangaOnMangaClashUseCaseUseCase {
           coverUrl: coverUrl,
           webUrl: webUrl,
           source: MangaSourceEnum.mangaclash,
-          tags: genres?.map((e) => MangaTag(name: e)).toList(),
           status: status,
+          tags: genres?.map((e) => MangaTag(name: e)).toList(),
         ),
       );
     }
 
-    final slicesUrls = mangas.map((e) => e.webUrl).whereNotNull().slices(10);
-    final promisesUrls = slicesUrls.map(
-      (urls) => _mangaServiceFirebase.search(
-        webUrl: urls.whereNotNull().toList(),
-        limit: 100,
-      ),
+    final cachedTags = await _mangaTagServiceFirebase.search(
+      tags: mangas.expand((e) => e.tags ?? <MangaTag>[]).toList(),
     );
-    final results1 = await Future.wait(promisesUrls);
-    final cachedMangas = results1.expand((result) => result.data ?? <Manga>[]);
 
-    final slicesTags =
-        mangas.expand((e) => e.tagsName).whereNotNull().slices(10);
-    final promisesTags = slicesTags.map(
-      (tags) => _mangaTagServiceFirebase.search(
-        name: tags,
-      ),
-    );
-    final results2 = await Future.wait(promisesTags);
-    final cachedTags = results2.expand((result) => result.data ?? <MangaTag>[]);
+    final cachedManga = await _mangaServiceFirebase.search(mangas: mangas);
 
-    final List<Manga> result = [];
-
+    final List<Manga> data = [];
     for (final manga in mangas) {
-      final List<MangaTag> tags = [];
-      for (final tag in manga.tags ?? <MangaTag>[]) {
-        final cache = cachedTags.firstWhereOrNull(
-          (cache) => cache.name == tag.name,
-        );
-        tags.add(
-          cache == null
-              ? await _mangaTagServiceFirebase.add(tag)
-              : await _mangaTagServiceFirebase.update(
-                  cache.copyWith(name: tag.name),
-                ),
-        );
-      }
-
-      final cacheManga = cachedMangas.firstWhereOrNull(
+      final cached = cachedManga.firstWhereOrNull(
         (cache) => cache.webUrl == manga.webUrl,
       );
 
-      result.add(
-        cacheManga == null
-            ? await _mangaServiceFirebase.add(
-                manga.copyWith(tags: tags),
-              )
-            : await _mangaServiceFirebase.update(
-                manga.copyWith(id: cacheManga.id, tags: tags),
-              ),
+      final List<MangaTag> tags = [];
+      for (final tag in manga.tags ?? <MangaTag>[]) {
+        final cached = cachedTags.firstWhereOrNull(
+          (cache) => cache.name == tag.name,
+        );
+        tags.add(
+          await _mangaTagServiceFirebase.update(
+            key: cached?.id,
+            update: (old) async => tag,
+            ifAbsent: () async => tag,
+          ),
+        );
+      }
+
+      data.add(
+        await _mangaServiceFirebase.update(
+          key: cached?.id,
+          update: (old) async => manga.copyWith(
+            tags: tags,
+          ),
+          ifAbsent: () async => manga.copyWith(
+            tags: tags,
+          ),
+        ),
       );
     }
 
@@ -149,13 +137,13 @@ class SearchMangaOnMangaClashUseCaseUseCase {
         .whereNotNull()
         .last;
 
-    final data = Pagination<Manga>(
-      data: result,
-      page: '$page',
-      limit: result.length,
-      total: total ?? 0,
+    return Success(
+      Pagination<Manga>(
+        data: data,
+        page: '$page',
+        limit: data.length,
+        total: total ?? 0,
+      ),
     );
-
-    return Success(data);
   }
 }

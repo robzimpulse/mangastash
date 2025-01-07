@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
-import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -22,46 +21,64 @@ class MangaTagServiceFirebase {
     return data;
   }
 
-  Future<MangaTag> update(MangaTag value) async {
-    await _ref.doc(value.id).set(value.toJson());
-    return value;
-  }
-
-  Future<bool> exists(String id) async {
-    return (await _ref.doc(id).get()).exists;
-  }
-
-  Future<Result<List<MangaTag>>> list() async {
-    final value = await _ref.get();
-    final data = value.docs.map((e) => MangaTag.fromJson(e.data())).toList();
-    return Success(data);
-  }
-
-  Future<Pagination<MangaTag>> search({
-    List<String>? name,
-    int limit = 30,
-    int? offset,
+  Future<MangaTag> update({
+    String? key,
+    required Future<MangaTag> Function(MangaTag value) update,
+    required Future<MangaTag> Function() ifAbsent,
   }) async {
-    Query<Map<String, dynamic>> queries = _ref;
-
-    if (name != null) {
-      queries = queries.where('name', whereIn: name);
+    if (key != null) {
+      final data = (await _ref.doc(key).get()).data();
+      if (data != null) {
+        final updated = await update(MangaTag.fromJson(data));
+        if (updated.toJson() == data) return updated;
+        await _ref.doc(key).set(updated.toJson());
+        return updated;
+      }
+      final newData = (await ifAbsent()).copyWith(id: key);
+      await _ref.doc(key).set(newData.toJson());
+      return newData;
     }
 
-    if (offset != null) {
-      queries = queries.startAfter([offset]);
+    final id = (await _ref.add({})).id;
+    final newData = (await ifAbsent()).copyWith(id: id);
+    await _ref.doc(id).set(newData.toJson());
+    return newData;
+  }
+
+  Future<MangaTag> get(String id) async {
+    final value = (await _ref.doc(id).get()).data();
+    if (value == null) throw Exception('Data not Found');
+    return MangaTag.fromJson(value);
+  }
+
+  Future<List<MangaTag>> list() async {
+    return (await _ref.get())
+        .docs
+        .map((e) => MangaTag.fromJson(e.data()))
+        .toList();
+  }
+
+  Future<List<MangaTag>> search({
+    required List<MangaTag> tags,
+  }) async {
+    final List<MangaTag> data = [];
+
+    for (final tag in tags.slices(10)) {
+      final List<MangaTag> temp = [];
+      final names = tag.map((e) => e.name).whereNotNull();
+      final ref = _ref.where('name', whereIn: names);
+      final total = (await ref.count().get()).count ?? 0;
+      String? offset;
+      do {
+        final docs = (await ref.startAfter([offset]).limit(100).get()).docs;
+        offset = docs.lastOrNull?.id;
+        temp.addAll(
+          docs.map((e) => MangaTag.fromJson(e.data()).copyWith(id: e.id)),
+        );
+      } while (temp.length < total);
+      data.addAll(temp);
     }
 
-    final count = await queries.count().get();
-    final data = await queries.limit(limit).get();
-
-    return Pagination<MangaTag>(
-      data: data.docs
-          .map((e) => MangaTag.fromJson(e.data()).copyWith(id: e.id))
-          .toList(),
-      limit: limit,
-      offset: data.docs.lastOrNull?.id,
-      total: count.count,
-    );
+    return data;
   }
 }
