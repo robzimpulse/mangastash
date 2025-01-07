@@ -36,7 +36,7 @@ class DomainMangaRegistrar extends Registrar {
     log.log('start register', name: runtimeType.toString());
 
     locator.registerSingleton(
-      await HeadlessWebviewManager.create(log: log),
+      await HeadlessWebviewManager.create(log: log, cacheManager: locator()),
       dispose: (e) => e.dispose(),
     );
 
@@ -95,7 +95,6 @@ class DomainMangaRegistrar extends Registrar {
         webview: locator(),
         mangaServiceFirebase: locator(),
         mangaTagServiceFirebase: locator(),
-        cacheManager: locator(),
       ),
     );
     locator.registerFactory(

@@ -15,7 +15,7 @@ class CoreEnvironmentRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
-    log.log('start register', name: runtimeType.toString(), time: DateTime.now());
+    log.log('start register', name: runtimeType.toString());
     locator.registerSingleton(ThemeManager(storage: locator()));
     locator.alias<UpdateThemeUseCase, ThemeManager>();
     locator.alias<ListenThemeUseCase, ThemeManager>();
@@ -28,6 +28,6 @@ class CoreEnvironmentRegistrar extends Registrar {
     locator.alias<ListenCurrentTimezoneUseCase, DateManager>();
 
     await workerManager.init(dynamicSpawning: true);
-    log.log('finish register', name: runtimeType.toString(), time: DateTime.now());
+    log.log('finish register', name: runtimeType.toString());
   }
 }

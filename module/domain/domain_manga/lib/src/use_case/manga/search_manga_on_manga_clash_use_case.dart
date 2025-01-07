@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:core_network/core_network.dart';
-import 'package:core_storage/core_storage.dart';
 import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
@@ -16,17 +14,14 @@ class SearchMangaOnMangaClashUseCaseUseCase {
   final HeadlessWebviewManager _webview;
   final MangaServiceFirebase _mangaServiceFirebase;
   final MangaTagServiceFirebase _mangaTagServiceFirebase;
-  final BaseCacheManager _cacheManager;
 
   SearchMangaOnMangaClashUseCaseUseCase({
     required LogBox log,
-    required BaseCacheManager cacheManager,
     required HeadlessWebviewManager webview,
     required MangaServiceFirebase mangaServiceFirebase,
     required MangaTagServiceFirebase mangaTagServiceFirebase,
   })  : _log = log,
         _webview = webview,
-        _cacheManager = cacheManager,
         _mangaServiceFirebase = mangaServiceFirebase,
         _mangaTagServiceFirebase = mangaTagServiceFirebase;
 
@@ -49,17 +44,6 @@ class SearchMangaOnMangaClashUseCaseUseCase {
         'post_type': 'wp-manga',
       }.entries.map((e) => '${e.key}=${e.value}').join('&'),
     ].join('?');
-
-    final cache = await _cacheManager.getFileFromCache(url);
-
-    if (cache != null) {
-      final cachedData = await cache.file.readAsString();
-      final data = Pagination<Manga>.fromJson(
-        jsonDecode(cachedData) as Map<String, dynamic>,
-        (object) => Manga.fromJson(object as Map<String, dynamic>),
-      );
-      return Success(data);
-    }
 
     final document = await _webview.open(url);
 
@@ -170,12 +154,6 @@ class SearchMangaOnMangaClashUseCaseUseCase {
       page: '$page',
       limit: result.length,
       total: total ?? 0,
-    );
-
-    await _cacheManager.putFile(
-      url,
-      utf8.encode(jsonEncode(data.toJson((object) => object.toJson()))),
-      fileExtension: 'json',
     );
 
     return Success(data);

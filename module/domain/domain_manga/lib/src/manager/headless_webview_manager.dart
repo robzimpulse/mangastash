@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:core_storage/core_storage.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
@@ -8,11 +10,13 @@ import 'package:log_box/log_box.dart';
 class HeadlessWebviewManager {
   final LogBox _log;
   final HeadlessInAppWebView _webview;
+  final BaseCacheManager _cacheManager;
 
   InAppWebViewController get _controller => _webview.webViewController;
 
   static Future<HeadlessWebviewManager> create({
     required LogBox log,
+    required BaseCacheManager cacheManager,
   }) async {
     final webview = HeadlessInAppWebView(
       initialUrlRequest: URLRequest(url: Uri.parse('https://google.com')),
@@ -33,14 +37,20 @@ class HeadlessWebviewManager {
 
     await webview.run();
 
-    return HeadlessWebviewManager(log: log, webview: webview);
+    return HeadlessWebviewManager(
+      log: log,
+      webview: webview,
+      cacheManager: cacheManager,
+    );
   }
 
   HeadlessWebviewManager({
     required LogBox log,
     required HeadlessInAppWebView webview,
+    required BaseCacheManager cacheManager,
   })  : _log = log,
-        _webview = webview;
+        _webview = webview,
+        _cacheManager = cacheManager;
 
   Future<Document?> open(String url) async {
     final uri = Uri.tryParse(url);
@@ -49,7 +59,11 @@ class HeadlessWebviewManager {
       return null;
     }
 
-    await _controller.stopLoading();
+    final cache = await _cacheManager.getFileFromCache(url);
+    if (cache != null) {
+      return parse(await cache.file.readAsString());
+    }
+
     await _controller.loadUrl(urlRequest: URLRequest(url: uri));
 
     final onLoadStartCompleter = Completer();
@@ -93,8 +107,14 @@ class HeadlessWebviewManager {
     );
 
     final html = await _controller.getHtml();
-
     if (html == null) return null;
+
+    await _cacheManager.putFile(
+      url,
+      utf8.encode(html),
+      fileExtension: 'html',
+    );
+
     return parse(html);
   }
 

@@ -14,7 +14,7 @@ class CoreAuthRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
-    log.log('start register', name: runtimeType.toString(), time: DateTime.now());
+    log.log('start register', name: runtimeType.toString());
 
     locator.registerFactory(() => AuthService(app: locator()));
     locator.registerFactory(
@@ -27,6 +27,6 @@ class CoreAuthRegistrar extends Registrar {
     locator.registerSingleton(AuthManager(service: locator()));
     locator.alias<ListenAuthUseCase, AuthManager>();
     locator.alias<GetAuthUseCase, AuthManager>();
-    log.log('finish register', name: runtimeType.toString(), time: DateTime.now());
+    log.log('finish register', name: runtimeType.toString());
   }
 }

@@ -11,7 +11,7 @@ class DataMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
-    log.log('start register', name: runtimeType.toString(), time: DateTime.now());
+    log.log('start register', name: runtimeType.toString());
 
     locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
     locator.registerFactory(() => MangaServiceFirebase(app: locator()));
@@ -19,6 +19,6 @@ class DataMangaRegistrar extends Registrar {
     locator.registerFactory(() => MangaChapterServiceFirebase(app: locator()));
     locator.registerFactory(() => MangaLibraryServiceFirebase(app: locator()));
 
-    log.log('finish register', name: runtimeType.toString(), time: DateTime.now());
+    log.log('finish register', name: runtimeType.toString());
   }
 }
