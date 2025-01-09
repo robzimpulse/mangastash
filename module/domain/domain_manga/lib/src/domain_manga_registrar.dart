@@ -27,7 +27,6 @@ import 'use_case/manga/search_manga_use_case.dart';
 import 'use_case/manga_source/get_manga_source_use_case.dart';
 import 'use_case/manga_source/get_manga_sources_use_case.dart';
 import 'use_case/manga_source/listen_manga_source_use_case.dart';
-import 'use_case/manga_tags/get_list_tags_use_case.dart';
 
 class DomainMangaRegistrar extends Registrar {
   @override
@@ -69,9 +68,6 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(() => AuthorRepository(service: locator()));
     locator.registerFactory(() => CoverRepository(service: locator()));
 
-    locator.registerFactory(
-      () => GetListTagsUseCase(service: locator()),
-    );
     locator.registerFactory(
       () => SearchMangaOnMangaDexUseCase(
         mangaService: locator(),

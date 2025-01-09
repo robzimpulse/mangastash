@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collection/collection.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -14,12 +13,12 @@ class MangaTagServiceFirebase {
 
   MangaTagServiceFirebase({required FirebaseApp app}) : _app = app;
 
-  Future<MangaTag> add(MangaTag value) async {
-    final ref = await _ref.add(value.toJson());
-    final data = value.copyWith(id: ref.id);
-    await ref.update(data.toJson());
-    return data;
-  }
+  // Future<MangaTag> add(MangaTag value) async {
+  //   final ref = await _ref.add(value.toJson());
+  //   final data = value.copyWith(id: ref.id);
+  //   await ref.update(data.toJson());
+  //   return data;
+  // }
 
   Future<MangaTag> update({
     String? key,
@@ -51,34 +50,34 @@ class MangaTagServiceFirebase {
     return MangaTag.fromJson(value);
   }
 
-  Future<List<MangaTag>> list() async {
-    return (await _ref.get())
-        .docs
-        .map((e) => MangaTag.fromJson(e.data()))
-        .toList();
-  }
+  // Future<List<MangaTag>> list() async {
+  //   return (await _ref.get())
+  //       .docs
+  //       .map((e) => MangaTag.fromJson(e.data()))
+  //       .toList();
+  // }
 
-  Future<List<MangaTag>> search({
-    required List<MangaTag> tags,
-  }) async {
-    final List<MangaTag> data = [];
-
-    for (final tag in tags.slices(10)) {
-      final List<MangaTag> temp = [];
-      final names = tag.map((e) => e.name).whereNotNull();
-      final ref = _ref.where('name', whereIn: names);
-      final total = (await ref.count().get()).count ?? 0;
-      String? offset;
-      do {
-        final docs = (await ref.startAfter([offset]).limit(100).get()).docs;
-        offset = docs.lastOrNull?.id;
-        temp.addAll(
-          docs.map((e) => MangaTag.fromJson(e.data()).copyWith(id: e.id)),
-        );
-      } while (temp.length < total);
-      data.addAll(temp);
-    }
-
-    return data;
-  }
+  // Future<List<MangaTag>> search({
+  //   required List<MangaTag> tags,
+  // }) async {
+  //   final List<MangaTag> data = [];
+  //
+  //   for (final tag in tags.slices(10)) {
+  //     final List<MangaTag> temp = [];
+  //     final names = tag.map((e) => e.name).whereNotNull();
+  //     final ref = _ref.where('name', whereIn: names).orderBy('name');
+  //     final total = (await ref.count().get()).count ?? 0;
+  //     String? offset;
+  //     do {
+  //       final docs = (await ref.startAfter([offset]).limit(100).get()).docs;
+  //       offset = docs.lastOrNull?.id;
+  //       temp.addAll(
+  //         docs.map((e) => MangaTag.fromJson(e.data()).copyWith(id: e.id)),
+  //       );
+  //     } while (temp.length < total);
+  //     data.addAll(temp);
+  //   }
+  //
+  //   return data;
+  // }
 }

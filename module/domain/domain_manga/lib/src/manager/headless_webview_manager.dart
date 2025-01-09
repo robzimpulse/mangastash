@@ -26,13 +26,6 @@ class HeadlessWebviewManager {
           name: 'HeadlessWebviewManager',
         );
       },
-      onConsoleMessage: (controller, consoleMessage) async {
-        final url = await controller.getUrl();
-        log.log(
-          'onConsoleMessage $url: ${consoleMessage.message}',
-          name: 'HeadlessWebviewManager',
-        );
-      },
     );
 
     await webview.run();

@@ -89,44 +89,44 @@ class SearchMangaOnMangaClashUseCaseUseCase {
       );
     }
 
-    final cachedTags = await _mangaTagServiceFirebase.search(
-      tags: mangas.expand((e) => e.tags ?? <MangaTag>[]).toList(),
-    );
-
-    final cachedManga = await _mangaServiceFirebase.search(mangas: mangas);
-
-    final List<Manga> data = [];
-    for (final manga in mangas) {
-      final cached = cachedManga.firstWhereOrNull(
-        (cache) => cache.webUrl == manga.webUrl,
-      );
-
-      final List<MangaTag> tags = [];
-      for (final tag in manga.tags ?? <MangaTag>[]) {
-        final cached = cachedTags.firstWhereOrNull(
-          (cache) => cache.name == tag.name,
-        );
-        tags.add(
-          await _mangaTagServiceFirebase.update(
-            key: cached?.id,
-            update: (old) async => tag,
-            ifAbsent: () async => tag,
-          ),
-        );
-      }
-
-      data.add(
-        await _mangaServiceFirebase.update(
-          key: cached?.id,
-          update: (old) async => manga.copyWith(
-            tags: tags,
-          ),
-          ifAbsent: () async => manga.copyWith(
-            tags: tags,
-          ),
-        ),
-      );
-    }
+    // final cachedTags = await _mangaTagServiceFirebase.search(
+    //   tags: mangas.expand((e) => e.tags ?? <MangaTag>[]).toList(),
+    // );
+    //
+    // final cachedManga = await _mangaServiceFirebase.search(mangas: mangas);
+    //
+    // final List<Manga> data = [];
+    // for (final manga in mangas) {
+    //   final cached = cachedManga.firstWhereOrNull(
+    //     (cache) => cache.webUrl == manga.webUrl,
+    //   );
+    //
+    //   final List<MangaTag> tags = [];
+    //   for (final tag in manga.tags ?? <MangaTag>[]) {
+    //     final cached = cachedTags.firstWhereOrNull(
+    //       (cache) => cache.name == tag.name,
+    //     );
+    //     tags.add(
+    //       await _mangaTagServiceFirebase.update(
+    //         key: cached?.id,
+    //         update: (old) async => tag,
+    //         ifAbsent: () async => tag,
+    //       ),
+    //     );
+    //   }
+    //
+    //   data.add(
+    //     await _mangaServiceFirebase.update(
+    //       key: cached?.id,
+    //       update: (old) async => manga.copyWith(
+    //         tags: tags,
+    //       ),
+    //       ifAbsent: () async => manga.copyWith(
+    //         tags: tags,
+    //       ),
+    //     ),
+    //   );
+    // }
 
     final total = document
         .querySelector('.wp-pagenavi')
@@ -139,9 +139,9 @@ class SearchMangaOnMangaClashUseCaseUseCase {
 
     return Success(
       Pagination<Manga>(
-        data: data,
+        data: mangas,
         page: '$page',
-        limit: data.length,
+        limit: mangas.length,
         total: total ?? 0,
       ),
     );
