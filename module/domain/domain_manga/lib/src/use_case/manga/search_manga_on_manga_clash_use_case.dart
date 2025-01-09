@@ -71,13 +71,12 @@ class SearchMangaOnMangaClashUseCaseUseCase {
           ?.querySelector('div.summary-content')
           ?.text
           .split(',')
-          .map((e) => toBeginningOfSentenceCase(e.trim().toLowerCase()));
+          .map((e) => toBeginningOfSentenceCase(e.trim()));
       final status = element
           .querySelector('div.post-content_item.mg_status')
           ?.querySelector('div.summary-content')
           ?.text
-          .trim()
-          .toLowerCase();
+          .trim();
 
       mangas.add(
         Manga(
@@ -85,7 +84,7 @@ class SearchMangaOnMangaClashUseCaseUseCase {
           coverUrl: coverUrl,
           webUrl: webUrl,
           source: MangaSourceEnum.mangaclash,
-          status: status,
+          status: toBeginningOfSentenceCase(status),
           tags: genres?.map((e) => MangaTag(name: e)).toList(),
         ),
       );
