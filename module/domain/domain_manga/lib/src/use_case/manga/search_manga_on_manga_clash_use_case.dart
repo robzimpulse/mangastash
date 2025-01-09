@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:core_environment/core_environment.dart'
+    show toBeginningOfSentenceCase;
 import 'package:core_network/core_network.dart';
 import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -69,7 +71,7 @@ class SearchMangaOnMangaClashUseCaseUseCase {
           ?.querySelector('div.summary-content')
           ?.text
           .split(',')
-          .map((e) => e.trim().toLowerCase());
+          .map((e) => toBeginningOfSentenceCase(e.trim().toLowerCase()));
       final status = element
           .querySelector('div.post-content_item.mg_status')
           ?.querySelector('div.summary-content')
@@ -89,44 +91,34 @@ class SearchMangaOnMangaClashUseCaseUseCase {
       );
     }
 
-    // final cachedTags = await _mangaTagServiceFirebase.search(
-    //   tags: mangas.expand((e) => e.tags ?? <MangaTag>[]).toList(),
-    // );
-    //
-    // final cachedManga = await _mangaServiceFirebase.search(mangas: mangas);
-    //
-    // final List<Manga> data = [];
-    // for (final manga in mangas) {
-    //   final cached = cachedManga.firstWhereOrNull(
-    //     (cache) => cache.webUrl == manga.webUrl,
-    //   );
-    //
-    //   final List<MangaTag> tags = [];
-    //   for (final tag in manga.tags ?? <MangaTag>[]) {
-    //     final cached = cachedTags.firstWhereOrNull(
-    //       (cache) => cache.name == tag.name,
-    //     );
-    //     tags.add(
-    //       await _mangaTagServiceFirebase.update(
-    //         key: cached?.id,
-    //         update: (old) async => tag,
-    //         ifAbsent: () async => tag,
-    //       ),
-    //     );
-    //   }
-    //
-    //   data.add(
-    //     await _mangaServiceFirebase.update(
-    //       key: cached?.id,
-    //       update: (old) async => manga.copyWith(
-    //         tags: tags,
-    //       ),
-    //       ifAbsent: () async => manga.copyWith(
-    //         tags: tags,
-    //       ),
-    //     ),
-    //   );
-    // }
+    final mangaTags = mangas.expand((e) => e.tagsName).toSet();
+    final cachedTags = await _mangaTagServiceFirebase.search(
+      tags: mangaTags.map((e) => MangaTag(name: e)).toList(),
+    );
+    final List<MangaTag> tags = [];
+
+    for (final tag in mangaTags) {
+      final cached = cachedTags.firstWhereOrNull((e) => e.name == tag);
+      tags.add(
+        cached ?? await _mangaTagServiceFirebase.add(MangaTag(name: tag)),
+      );
+    }
+
+    final cachedManga = await _mangaServiceFirebase.search(mangas: mangas);
+
+    final List<Manga> data = [];
+    for (final manga in mangas) {
+      final mangaTags = tags.where((tag) => manga.tagsName.contains(tag.name));
+      final cached = cachedManga.firstWhereOrNull(
+        (cache) => cache.webUrl == manga.webUrl,
+      );
+      data.add(
+        cached ??
+            await _mangaServiceFirebase.add(
+              manga.copyWith(tags: mangaTags.toList()),
+            ),
+      );
+    }
 
     final total = document
         .querySelector('.wp-pagenavi')
@@ -139,10 +131,10 @@ class SearchMangaOnMangaClashUseCaseUseCase {
 
     return Success(
       Pagination<Manga>(
-        data: mangas,
+        data: data,
         page: '$page',
-        limit: mangas.length,
-        total: total ?? mangas.length,
+        limit: data.length,
+        total: total ?? data.length,
       ),
     );
   }
