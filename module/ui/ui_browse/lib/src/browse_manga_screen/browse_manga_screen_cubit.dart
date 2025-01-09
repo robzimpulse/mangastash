@@ -37,6 +37,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
         parameter: state.parameter.copyWith(
           title: title,
           offset: '0',
+          page: '0',
         ),
       ),
     );

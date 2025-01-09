@@ -142,7 +142,7 @@ class SearchMangaOnMangaClashUseCaseUseCase {
         data: mangas,
         page: '$page',
         limit: mangas.length,
-        total: total ?? 0,
+        total: total ?? mangas.length,
       ),
     );
   }
