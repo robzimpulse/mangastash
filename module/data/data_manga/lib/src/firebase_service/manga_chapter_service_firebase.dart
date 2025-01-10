@@ -39,11 +39,29 @@ class MangaChapterServiceFirebase {
   //   return (await _ref.doc(id).get()).exists;
   // }
   //
-  // Future<MangaChapter> get(String id) async {
-  //   final value = (await _ref.doc(id).get()).data();
-  //   if (value == null) throw Exception('Data not Found');
-  //   return MangaChapter.fromJson(value);
-  // }
+  Future<MangaChapter?> get({required String id}) async {
+    final value = (await _ref.doc(id).get()).data();
+    if (value == null) return null;
+    return MangaChapter.fromJson(value);
+  }
+
+  Future<MangaChapter> update({
+    required String key,
+    required Future<MangaChapter> Function(MangaChapter value) update,
+    required Future<MangaChapter> Function() ifAbsent,
+  }) async {
+    final data = (await _ref.doc(key).get()).data();
+    if (data != null) {
+      final updated = await update(MangaChapter.fromJson(data));
+      if (updated.toJson() == data) return updated;
+      await _ref.doc(key).set(updated.toJson());
+      return updated;
+    }
+    final newData = (await ifAbsent()).copyWith(id: key);
+    await _ref.doc(key).set(newData.toJson());
+    return newData;
+  }
+
   //
   // Future<Result<List<MangaChapter>>> list() async {
   //   final value = await _ref.get();

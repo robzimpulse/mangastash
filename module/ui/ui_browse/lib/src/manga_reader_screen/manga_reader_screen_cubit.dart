@@ -23,7 +23,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
 
   @override
   Future<void> close() async {
-    Future.wait(_pageSizeStreams.values.map((e) => e.close()));
+    await Future.wait(_pageSizeStreams.values.map((e) => e.close()));
     super.close();
   }
 

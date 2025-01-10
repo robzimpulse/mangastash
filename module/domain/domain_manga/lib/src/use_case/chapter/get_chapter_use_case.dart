@@ -1,14 +1,18 @@
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 
+import 'get_chapter_on_manga_clash_use_case.dart';
 import 'get_chapter_on_manga_dex_use_case.dart';
 
 class GetChapterUseCase {
   final GetChapterOnMangaDexUseCase _getChapterOnMangaDexUseCase;
+  final GetChapterOnMangaClashUseCase _getChapterOnMangaClashUseCase;
 
   GetChapterUseCase({
     required GetChapterOnMangaDexUseCase getChapterOnMangaDexUseCase,
-  }) : _getChapterOnMangaDexUseCase = getChapterOnMangaDexUseCase;
+    required GetChapterOnMangaClashUseCase getChapterOnMangaClashUseCase,
+  })  : _getChapterOnMangaDexUseCase = getChapterOnMangaDexUseCase,
+        _getChapterOnMangaClashUseCase = getChapterOnMangaClashUseCase;
 
   Future<Result<MangaChapter>> execute({
     required MangaSourceEnum? source,
@@ -28,9 +32,9 @@ class GetChapterUseCase {
       MangaSourceEnum.asurascan => Future.value(
           Error(Exception('Unimplemented for ${source.name}')),
         ),
-      // TODO: implement this
-      MangaSourceEnum.mangaclash => Future.value(
-          Error(Exception('Unimplemented for ${source.name}')),
+      MangaSourceEnum.mangaclash => _getChapterOnMangaClashUseCase.execute(
+          chapterId: chapterId,
+          mangaId: mangaId,
         ),
     };
   }
