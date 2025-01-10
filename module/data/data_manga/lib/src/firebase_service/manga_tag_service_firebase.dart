@@ -14,6 +14,15 @@ class MangaTagServiceFirebase {
 
   MangaTagServiceFirebase({required FirebaseApp app}) : _app = app;
 
+  Future<List<MangaTag>> sync(List<MangaTag> tags) async {
+    final cache = await Future.wait(tags.map((tag) => search(tag: tag)));
+    final oldTags = cache.expand((e) => e);
+    final names = Set.of(oldTags.map((tag) => tag.name).whereNotNull());
+    final diff = List.of(tags)..removeWhere((tag) => names.contains(tag.name));
+    final newTags = await Future.wait(diff.map((tag) => add(tag)));
+    return [...oldTags, ...newTags];
+  }
+
   Future<MangaTag> add(MangaTag value) async {
     final ref = await _ref.add(value.toJson());
     final data = value.copyWith(id: ref.id);
@@ -49,26 +58,18 @@ class MangaTagServiceFirebase {
   }
 
   Future<List<MangaTag>> search({
-    required List<MangaTag> tags,
+    required MangaTag tag,
   }) async {
     final List<MangaTag> data = [];
+    final ref = _ref.where('name', isEqualTo: tag.name).orderBy('name');
+    final total = (await ref.count().get()).count ?? 0;
+    String? offset;
 
-    for (final tag in tags.slices(10)) {
-      for (final item in tag) {
-        final List<MangaTag> temp = [];
-        final ref = _ref.where('name', isEqualTo: item.name).orderBy('name');
-        final total = (await ref.count().get()).count ?? 0;
-        String? offset;
-
-        do {
-          final query = await ref.startAfter([offset]).limit(100).get();
-          offset = query.docs.lastOrNull?.id;
-          temp.addAll(query.docs.map((e) => MangaTag.fromJson(e.data())));
-        } while (temp.length < total);
-
-        data.addAll(temp);
-      }
-    }
+    do {
+      final query = await ref.startAfter([offset]).limit(100).get();
+      offset = query.docs.lastOrNull?.id;
+      data.addAll(query.docs.map((e) => MangaTag.fromJson(e.data())));
+    } while (data.length < total);
 
     return data;
   }

@@ -90,18 +90,11 @@ class SearchMangaOnMangaClashUseCaseUseCase {
       );
     }
 
-    final mangaTags = mangas.expand((e) => e.tagsName).toSet();
-    final cachedTags = await _mangaTagServiceFirebase.search(
-      tags: mangaTags.map((e) => MangaTag(name: e)).toList(),
+    final tags = await _mangaTagServiceFirebase.sync(
+      List.of(
+        Set.of(mangas.expand((e) => e.tagsName).map((e) => MangaTag(name: e))),
+      ),
     );
-    final List<MangaTag> tags = [];
-
-    for (final tag in mangaTags) {
-      final cached = cachedTags.firstWhereOrNull((e) => e.name == tag);
-      tags.add(
-        cached ?? await _mangaTagServiceFirebase.add(MangaTag(name: tag)),
-      );
-    }
 
     final cachedManga = await _mangaServiceFirebase.search(mangas: mangas);
 
