@@ -143,8 +143,17 @@ class _MangaReaderScreenState extends State<MangaReaderScreen> {
                       child: CachedNetworkImage(
                         cacheManager: widget.cacheManager,
                         imageUrl: images[index],
-                        errorWidget: (context, url, error) => const Icon(
-                          Icons.error,
+                        errorWidget: (context, url, error) => ConstrainedBox(
+                          constraints: const BoxConstraints(maxHeight: 300),
+                          child: Center(
+                            child: Row(
+                              children: [
+                                const Icon(Icons.error),
+                                const SizedBox(width: 8),
+                                Expanded(child: Text(error.toString())),
+                              ],
+                            ),
+                          ),
                         ),
                         progressIndicatorBuilder: (context, url, progress) {
                           return ConstrainedBox(
