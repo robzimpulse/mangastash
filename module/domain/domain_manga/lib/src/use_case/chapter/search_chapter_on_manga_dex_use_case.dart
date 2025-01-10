@@ -17,13 +17,15 @@ class SearchChapterOnMangaDexUseCase {
     required String? mangaId,
     Language? language,
   }) async {
+    if (mangaId == null) return Error(Exception('Manga ID Empty'));
+
     try {
       var total = 0;
       List<MangaChapter> chapters = [];
 
       do {
         final result = await _chapterRepository.feed(
-          mangaId: mangaId ?? '',
+          mangaId: mangaId,
           limit: 50,
           translatedLanguage: language?.languageCodes,
           offset: chapters.length,

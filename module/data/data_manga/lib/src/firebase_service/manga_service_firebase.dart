@@ -18,7 +18,8 @@ class MangaServiceFirebase {
     final cache = await Future.wait(values.map((e) => search(value: e)));
     final oldValues = cache.expand((e) => e);
     final ids = Set.of(oldValues.map((e) => e.webUrl).whereNotNull());
-    final diff = List.of(values)..removeWhere((e) => ids.contains(e.webUrl));
+    final diff = List.of(values);
+    diff.removeWhere((e) => ids.contains(e.webUrl));
     final newValues = await Future.wait(diff.map((e) => add(value: e)));
     return [...oldValues, ...newValues];
   }

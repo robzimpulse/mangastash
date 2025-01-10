@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
@@ -380,9 +381,12 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         onTap: () => widget.onTapChapter?.call(value.id, state.chapterIds),
         onTapDownload: () => _onTapDownloadChapter(context, value),
         onLongPress: () => _onTapMenuChapter(context, value),
-        title: 'Chapter ${value.chapter}',
+        title: [
+          'Chapter ${value.chapter}',
+          value.title,
+        ].whereNotNull().join(' - '),
         language: Language.fromCode(value.translatedLanguage),
-        uploadedAt: value.readableAt?.asDateTime,
+        uploadedAt: value.readableAt?.asDateTimeFromISO8601,
         groups: value.scanlationGroup,
         downloadProgress: state.progress?[key]?.progress.toDouble() ?? 0.0,
       ),

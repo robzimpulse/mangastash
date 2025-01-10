@@ -1,5 +1,3 @@
-import 'package:core_environment/core_environment.dart'
-    show toBeginningOfSentenceCase;
 import 'package:core_network/core_network.dart';
 import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -20,7 +18,9 @@ class GetMangaOnMangaClashUseCase {
     final result = await _mangaServiceFirebase.get(id: mangaId);
     final url = result?.webUrl;
 
-    if (result == null || url == null) return Error('Data not found');
+    if (result == null || url == null) {
+      return Error(Exception('Data not found'));
+    }
 
     final document = await _webview.open(url);
 

@@ -11,6 +11,7 @@ import 'use_case/chapter/download_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
 import 'use_case/chapter/listen_download_progress_use_case.dart';
+import 'use_case/chapter/search_chapter_on_manga_clash_use_case.dart';
 import 'use_case/chapter/search_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
 import 'use_case/library/add_to_library_use_case.dart';
@@ -87,6 +88,13 @@ class DomainMangaRegistrar extends Registrar {
       ),
     );
     locator.registerFactory(
+      () => SearchChapterOnMangaClashUseCase(
+        mangaServiceFirebase: locator(),
+        webview: locator(),
+        mangaChapterServiceFirebase: locator(),
+      ),
+    );
+    locator.registerFactory(
       () => GetChapterOnMangaDexUseCase(
         chapterRepository: locator(),
         atHomeRepository: locator(),
@@ -113,6 +121,7 @@ class DomainMangaRegistrar extends Registrar {
       () => SearchChapterUseCase(
         searchChapterOnMangaDexUseCase: locator(),
         listenLocaleUseCase: locator(),
+        searchChapterOnMangaClashUseCase: locator(),
       ),
     );
     locator.registerFactory(

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class MangaChapterServiceFirebase {
@@ -11,6 +12,23 @@ class MangaChapterServiceFirebase {
   late final _stream = _ref.snapshots();
 
   MangaChapterServiceFirebase({required FirebaseApp app}) : _app = app;
+
+  Future<List<MangaChapter>> sync({required List<MangaChapter> values}) async {
+    final cache = await Future.wait(values.map((e) => search(value: e)));
+    final oldValues = cache.expand((e) => e);
+    final ids = Set.of(oldValues.map((e) => (e.mangaId, e.title)));
+    final diff = List.of(values);
+    diff.removeWhere((e) => ids.contains((e.mangaId, e.title)),);
+    final newValues = await Future.wait(diff.map((e) => add(value: e)));
+    return [...oldValues, ...newValues];
+  }
+
+  Future<MangaChapter> add({required MangaChapter value}) async {
+    final ref = await _ref.add(value.toJson());
+    final data = value.copyWith(id: ref.id);
+    await ref.update(data.toJson());
+    return data;
+  }
 
   // Future<void> update(MangaChapter value) async {
   //   await _ref.doc(value.id).set(value.toJson());
@@ -32,6 +50,35 @@ class MangaChapterServiceFirebase {
   //   return Success(data);
   // }
   //
+
+  Future<List<MangaChapter>> search({
+    required MangaChapter value,
+  }) async {
+    final List<MangaChapter> data = [];
+
+    final ref = _ref
+        .where('manga_id', isEqualTo: value.mangaId)
+        .where('manga_title', isEqualTo: value.mangaTitle)
+        .where('volume', isEqualTo: value.volume)
+        .where('chapter', isEqualTo: value.chapter)
+        .where('readable_at', isEqualTo: value.readableAt)
+        .where('publish_at', isEqualTo: value.publishAt)
+        .where('translated_language', isEqualTo: value.translatedLanguage)
+        .where('scanlation_group', isEqualTo: value.scanlationGroup)
+        .orderBy('manga_id');
+
+    final total = (await ref.count().get()).count ?? 0;
+    String? offset;
+
+    do {
+      final query = await ref.startAfter([offset]).limit(100).get();
+      offset = query.docs.lastOrNull?.id;
+      data.addAll(query.docs.map((e) => MangaChapter.fromJson(e.data())));
+    } while (data.length < total);
+
+    return data;
+  }
+
   // Future<Result<Pagination<MangaChapter>>> search({
   //   String? mangaId,
   //   String? title,

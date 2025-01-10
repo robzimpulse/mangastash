@@ -1,9 +1,16 @@
 import 'package:intl/intl.dart';
 
 extension ParseableDateStringExtension on String {
-  DateTime? get asDateTime {
+  DateTime? get asDateTimeFromISO8601 {
     try {
-      return DateFormat('yyyy-MM-DDThh:mm:ssZ').parse(this).toUtc();
+      return DateFormat('yyyy-MM-ddTHH:mm:ss.mmmZ').parse(this).toUtc();
+    } on Exception {
+      return null;
+    }
+  }
+  DateTime? get asDateTimeFromMMddyyyy {
+    try {
+      return DateFormat('MM/dd/yyyy').parse(this).toUtc();
     } on Exception {
       return null;
     }

@@ -17,8 +17,10 @@ class MangaChapter extends Equatable {
 
   final String? chapter;
 
+  /// must be in ISO8601 Format (yyyy-MM-ddTHH:mm:ss.mmmuuuZ)
   final String? readableAt;
 
+  /// must be in ISO8601 Format (yyyy-MM-ddTHH:mm:ss.mmmuuuZ)
   final String? publishAt;
 
   final List<String>? images;

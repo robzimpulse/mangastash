@@ -106,6 +106,7 @@ class HeadlessWebviewManager {
       url,
       utf8.encode(html),
       fileExtension: 'html',
+      maxAge: const Duration(minutes: 5),
     );
 
     return parse(html);
