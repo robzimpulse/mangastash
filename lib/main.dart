@@ -79,18 +79,21 @@ class _MangaStashAppState extends State<MangaStashApp> {
     await widget.locator.registerRegistrar(DomainMangaRegistrar());
 
     FlutterError.onError = (details) {
-      // TODO: register error handler logger
-      if (kDebugMode) {
-        print(details);
-      }
+      final LogBox log = widget.locator();
+      log.log(
+        details.exceptionAsString(),
+        name: 'FlutterError',
+        stackTrace: details.stack,
+      );
     };
 
     PlatformDispatcher.instance.onError = (error, stack) {
-      // TODO: register error handler logger
-      if (kDebugMode) {
-        print(error);
-        print(stack);
-      }
+      final LogBox log = widget.locator();
+      log.log(
+        error.toString(),
+        name: 'FlutterError',
+        stackTrace: stack,
+      );
       return true;
     };
   }
