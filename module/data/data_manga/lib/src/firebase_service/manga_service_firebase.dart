@@ -12,9 +12,21 @@ class MangaServiceFirebase {
     'mangas',
   );
 
+  late final Stream<QuerySnapshot<Map<String, dynamic>>> _stream =
+      _ref.snapshots();
+
   MangaServiceFirebase({required FirebaseApp app}) : _app = app;
 
-  Future<Manga> add(Manga value) async {
+  Future<List<Manga>> sync({required List<Manga> values}) async {
+    final cache = await Future.wait(values.map((e) => search(value: e)));
+    final oldValues = cache.expand((e) => e);
+    final ids = Set.of(oldValues.map((e) => e.webUrl).whereNotNull());
+    final diff = List.of(values)..removeWhere((e) => ids.contains(e.webUrl));
+    final newValues = await Future.wait(diff.map((e) => add(value: e)));
+    return [...oldValues, ...newValues];
+  }
+
+  Future<Manga> add({required Manga value}) async {
     final ref = await _ref.add(value.toJson());
     final data = value.copyWith(id: ref.id);
     await ref.update(data.toJson());
@@ -39,42 +51,38 @@ class MangaServiceFirebase {
       return newData;
     }
 
-    return add(await ifAbsent());
+    return add(value: await ifAbsent());
   }
 
-  Future<Manga?> get(String id) async {
+  Future<Manga?> get({required String id}) async {
     final value = (await _ref.doc(id).get()).data();
     if (value == null) return null;
     return Manga.fromJson(value);
   }
 
   Future<List<Manga>> search({
-    required List<Manga> mangas,
+    required Manga value,
   }) async {
     final List<Manga> data = [];
 
-    for (final item in mangas) {
-      final List<Manga> temp = [];
-      final ref = _ref
-          .where('title', isEqualTo: item.title)
-          .where('cover_url', isEqualTo: item.coverUrl)
-          .where('author', isEqualTo: item.author)
-          .where('status', isEqualTo: item.status)
-          .where('description', isEqualTo: item.description)
-          .where('source', isEqualTo: item.source?.value)
-          .where('web_url', isEqualTo: item.webUrl)
-          .orderBy('source');
+    final ref = _ref
+        .where('title', isEqualTo: value.title)
+        .where('cover_url', isEqualTo: value.coverUrl)
+        .where('author', isEqualTo: value.author)
+        .where('status', isEqualTo: value.status)
+        .where('description', isEqualTo: value.description)
+        .where('source', isEqualTo: value.source?.value)
+        .where('web_url', isEqualTo: value.webUrl)
+        .orderBy('source');
 
-      final total = (await ref.count().get()).count ?? 0;
-      String? offset;
+    final total = (await ref.count().get()).count ?? 0;
+    String? offset;
 
-      do {
-        final query = await ref.startAfter([offset]).limit(100).get();
-        offset = query.docs.lastOrNull?.id;
-        temp.addAll(query.docs.map((e) => Manga.fromJson(e.data())));
-      } while (temp.length < total);
-      data.addAll(temp);
-    }
+    do {
+      final query = await ref.startAfter([offset]).limit(100).get();
+      offset = query.docs.lastOrNull?.id;
+      data.addAll(query.docs.map((e) => Manga.fromJson(e.data())));
+    } while (data.length < total);
 
     return data;
   }

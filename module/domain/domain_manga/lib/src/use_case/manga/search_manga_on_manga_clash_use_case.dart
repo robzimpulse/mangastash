@@ -91,26 +91,22 @@ class SearchMangaOnMangaClashUseCaseUseCase {
     }
 
     final tags = await _mangaTagServiceFirebase.sync(
-      List.of(
+      values: List.of(
         Set.of(mangas.expand((e) => e.tagsName).map((e) => MangaTag(name: e))),
       ),
     );
 
-    final cachedManga = await _mangaServiceFirebase.search(mangas: mangas);
-
-    final List<Manga> data = [];
-    for (final manga in mangas) {
-      final mangaTags = tags.where((tag) => manga.tagsName.contains(tag.name));
-      final cached = cachedManga.firstWhereOrNull(
-        (cache) => cache.webUrl == manga.webUrl,
-      );
-      data.add(
-        cached ??
-            await _mangaServiceFirebase.add(
-              manga.copyWith(tags: mangaTags.toList()),
+    final data = await _mangaServiceFirebase.sync(
+      values: List.of(
+        mangas.map(
+          (manga) => manga.copyWith(
+            tags: List.of(
+              tags.where((tag) => manga.tagsName.contains(tag.name)),
             ),
-      );
-    }
+          ),
+        ),
+      ),
+    );
 
     final total = document
         .querySelector('.wp-pagenavi')

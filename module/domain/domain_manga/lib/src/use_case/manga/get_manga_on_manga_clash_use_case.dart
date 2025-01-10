@@ -10,7 +10,7 @@ class GetMangaOnMangaClashUseCase {
   })  : _mangaServiceFirebase = mangaServiceFirebase;
 
   Future<Result<Manga>> execute({required String mangaId}) async {
-    final result = await _mangaServiceFirebase.get(mangaId);
+    final result = await _mangaServiceFirebase.get(id: mangaId);
     return result == null ? Error('Data not found') : Success(result);
   }
 }
