@@ -8,15 +8,13 @@ import 'package:firebase_core/firebase_core.dart';
 class MangaLibraryServiceFirebase {
   final FirebaseApp _app;
 
-  late final FirebaseFirestore _db = FirebaseFirestore.instanceFor(app: _app);
+  late final _db = FirebaseFirestore.instanceFor(app: _app);
 
-  late final CollectionReference<Map<String, dynamic>> _ref = _db.collection(
-    'libraries',
-  );
+  late final _ref = _db.collection('libraries');
 
-  MangaLibraryServiceFirebase({
-    required FirebaseApp app,
-  }) : _app = app;
+  late final _stream = _ref.snapshots();
+
+  MangaLibraryServiceFirebase({required FirebaseApp app}) : _app = app;
 
   Future<bool> add(Manga value, String userId) async {
     final existing = (await get(userId));

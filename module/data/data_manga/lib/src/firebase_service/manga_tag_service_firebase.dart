@@ -6,14 +6,11 @@ import 'package:firebase_core/firebase_core.dart';
 class MangaTagServiceFirebase {
   final FirebaseApp _app;
 
-  late final FirebaseFirestore _db = FirebaseFirestore.instanceFor(app: _app);
+  late final _db = FirebaseFirestore.instanceFor(app: _app);
 
-  late final CollectionReference<Map<String, dynamic>> _ref = _db.collection(
-    'tags',
-  );
+  late final _ref = _db.collection('tags');
 
-  late final Stream<QuerySnapshot<Map<String, dynamic>>> _stream =
-      _ref.snapshots();
+  late final _stream = _ref.snapshots();
 
   MangaTagServiceFirebase({required FirebaseApp app}) : _app = app;
 
