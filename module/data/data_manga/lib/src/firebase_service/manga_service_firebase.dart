@@ -30,26 +30,26 @@ class MangaServiceFirebase {
     return data;
   }
 
-  Future<Manga> update({
-    String? key,
-    required Future<Manga> Function(Manga value) update,
-    required Future<Manga> Function() ifAbsent,
-  }) async {
-    if (key != null) {
-      final data = (await _ref.doc(key).get()).data();
-      if (data != null) {
-        final updated = await update(Manga.fromJson(data));
-        if (updated.toJson() == data) return updated;
-        await _ref.doc(key).set(updated.toJson());
-        return updated;
-      }
-      final newData = (await ifAbsent()).copyWith(id: key);
-      await _ref.doc(key).set(newData.toJson());
-      return newData;
-    }
-
-    return add(value: await ifAbsent());
-  }
+  // Future<Manga> update({
+  //   String? key,
+  //   required Future<Manga> Function(Manga value) update,
+  //   required Future<Manga> Function() ifAbsent,
+  // }) async {
+  //   if (key != null) {
+  //     final data = (await _ref.doc(key).get()).data();
+  //     if (data != null) {
+  //       final updated = await update(Manga.fromJson(data));
+  //       if (updated.toJson() == data) return updated;
+  //       await _ref.doc(key).set(updated.toJson());
+  //       return updated;
+  //     }
+  //     final newData = (await ifAbsent()).copyWith(id: key);
+  //     await _ref.doc(key).set(newData.toJson());
+  //     return newData;
+  //   }
+  //
+  //   return add(value: await ifAbsent());
+  // }
 
   Future<Manga?> get({required String id}) async {
     final value = (await _ref.doc(id).get()).data();
