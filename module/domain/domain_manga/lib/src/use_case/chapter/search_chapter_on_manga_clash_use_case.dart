@@ -41,6 +41,7 @@ class SearchChapterOnMangaClashUseCase {
     final List<MangaChapter> chapters = [];
 
     for (final element in document.querySelectorAll('li.wp-manga-chapter')) {
+      final url = element.querySelector('a')?.attributes['href'];
       final title = element.querySelector('a')?.text.split('-').lastOrNull;
       final text = element.querySelector('a')?.text.split(' ').map(
         (text) {
@@ -69,6 +70,7 @@ class SearchChapterOnMangaClashUseCase {
           title: title?.trim(),
           chapter: chapter != null ? '$chapter' : null,
           readableAt: releaseDate,
+          webUrl: url,
         ),
       );
     }

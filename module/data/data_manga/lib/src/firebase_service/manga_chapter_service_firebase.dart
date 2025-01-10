@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -16,9 +17,9 @@ class MangaChapterServiceFirebase {
   Future<List<MangaChapter>> sync({required List<MangaChapter> values}) async {
     final cache = await Future.wait(values.map((e) => search(value: e)));
     final oldValues = cache.expand((e) => e);
-    final ids = Set.of(oldValues.map((e) => (e.mangaId, e.title)));
+    final ids = Set.of(oldValues.map((e) => e.webUrl).whereNotNull());
     final diff = List.of(values);
-    diff.removeWhere((e) => ids.contains((e.mangaId, e.title)),);
+    diff.removeWhere((e) => ids.contains(e.webUrl));
     final newValues = await Future.wait(diff.map((e) => add(value: e)));
     return [...oldValues, ...newValues];
   }
