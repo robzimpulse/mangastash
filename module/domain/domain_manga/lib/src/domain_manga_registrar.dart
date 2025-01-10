@@ -107,6 +107,7 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => GetMangaOnMangaClashUseCase(
         mangaServiceFirebase: locator(),
+        webview: locator(),
       ),
     );
     locator.registerFactory(
