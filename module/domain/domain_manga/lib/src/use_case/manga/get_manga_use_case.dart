@@ -24,11 +24,9 @@ class GetMangaUseCase {
       MangaSourceEnum.mangadex => _getMangaOnMangaDexUseCase.execute(
           mangaId: mangaId,
         ),
-      // TODO: Handle this case.
+      // TODO: implement this
       MangaSourceEnum.asurascan => Future.value(
-          Error(
-            Exception('Unimplemented for ${source.name}'),
-          ),
+          Error(Exception('Unimplemented for ${source.name}')),
         ),
       MangaSourceEnum.mangaclash => _getMangaOnMangaClashUseCase.execute(
           mangaId: mangaId,

@@ -24,17 +24,13 @@ class GetChapterUseCase {
           chapterId: chapterId,
           mangaId: mangaId,
         ),
-      // TODO: Handle this case.
+      // TODO: implement this
       MangaSourceEnum.asurascan => Future.value(
-          Error(
-            Exception('Unimplemented for ${source.name}'),
-          ),
+          Error(Exception('Unimplemented for ${source.name}')),
         ),
-      // TODO: Handle this case.
+      // TODO: implement this
       MangaSourceEnum.mangaclash => Future.value(
-          Error(
-            Exception('Unimplemented for ${source.name}'),
-          ),
+          Error(Exception('Unimplemented for ${source.name}')),
         ),
     };
   }

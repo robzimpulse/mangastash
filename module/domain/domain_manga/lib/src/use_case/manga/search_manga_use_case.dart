@@ -27,8 +27,10 @@ class SearchMangaUseCase {
       MangaSourceEnum.mangadex => _searchMangaOnMangaDexUseCase.execute(
           parameter: parameter,
         ),
-      MangaSourceEnum.asurascan =>
-        Future.value(Error(Exception('Unimplemented for ${source.name}'))),
+      // TODO: implement this
+      MangaSourceEnum.asurascan => Future.value(
+          Error(Exception('Unimplemented for ${source.name}')),
+        ),
       MangaSourceEnum.mangaclash =>
         _searchMangaOnMangaClashUseCaseUseCase.execute(
           parameter: parameter,
