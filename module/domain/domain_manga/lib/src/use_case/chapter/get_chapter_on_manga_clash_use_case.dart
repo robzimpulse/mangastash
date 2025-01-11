@@ -21,6 +21,11 @@ class GetChapterOnMangaClashUseCase {
   }) async {
     final result = await _mangaChapterServiceFirebase.get(id: chapterId);
     final url = result?.webUrl;
+    final imageUrls = result?.images;
+
+    if (result != null && imageUrls?.isNotEmpty == true) {
+      return Success(result);
+    }
 
     if (result == null || url == null) {
       return Error(Exception('Data not found'));
