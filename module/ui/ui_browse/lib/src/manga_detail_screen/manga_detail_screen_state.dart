@@ -64,8 +64,8 @@ class MangaDetailScreenState extends Equatable {
         processedChapters.update(
           chapter,
           (value) {
-            final oldDate = value.publishAt?.asDateTimeFromISO8601;
-            final newDate = data.publishAt?.asDateTimeFromISO8601;
+            final oldDate = value.publishAt?.asDateTime;
+            final newDate = data.publishAt?.asDateTime;
 
             if (oldDate == null) {
               return data;

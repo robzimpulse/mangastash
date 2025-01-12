@@ -386,7 +386,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           value.title,
         ].whereNotNull().join(' - '),
         language: Language.fromCode(value.translatedLanguage),
-        uploadedAt: value.readableAt?.asDateTimeFromISO8601,
+        uploadedAt: value.readableAt?.asDateTime,
         groups: value.scanlationGroup,
         downloadProgress: state.progress?[key]?.progress.toDouble() ?? 0.0,
       ),

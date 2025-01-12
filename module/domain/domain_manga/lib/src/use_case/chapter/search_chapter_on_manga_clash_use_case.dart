@@ -59,7 +59,7 @@ class SearchChapterOnMangaClashUseCase {
           .querySelector('.chapter-release-date')
           ?.text
           .trim()
-          .asDateTimeFromMMddyyyy
+          .asDateTime
           ?.toIso8601String();
       final chapter = text?.whereNotNull().firstOrNull;
 

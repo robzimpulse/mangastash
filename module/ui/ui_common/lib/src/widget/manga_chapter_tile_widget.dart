@@ -38,23 +38,31 @@ class MangaChapterTileWidget extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                IconWithTextWidget(
-                  icon: language?.flag(width: 20, height: 10),
-                  text: Text(title ?? ' - '),
-                ),
-                IconWithTextWidget(
-                  icon: const Icon(Icons.people, size: 20),
-                  text: Text(groups ?? ' - '),
-                ),
-                IconWithTextWidget(
-                  icon: const Icon(Icons.access_time, size: 20),
-                  text: Text(uploadedAt?.readableFormat ?? ' - '),
-                ),
-              ].intersperse(const SizedBox(height: 4)).toList(),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  IconWithTextWidget(
+                    icon: language?.flag(width: 20, height: 10),
+                    text: Expanded(
+                      child: Text(
+                        title ?? ' - ',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                  IconWithTextWidget(
+                    icon: const Icon(Icons.people, size: 20),
+                    text: Text(groups ?? ' - '),
+                  ),
+                  IconWithTextWidget(
+                    icon: const Icon(Icons.access_time, size: 20),
+                    text: Text(uploadedAt?.readableFormat ?? ' - '),
+                  ),
+                ].intersperse(const SizedBox(height: 4)).toList(),
+              ),
             ),
             if (downloadProgress == 1)
               const Padding(
