@@ -10,11 +10,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
   LibraryMangaScreenCubit({
     required LibraryMangaScreenState initialState,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
-    required ListenAuthUseCase listenAuthUseCase,
   }) : super(initialState) {
-    addSubscription(
-      listenAuthUseCase.authStateStream.distinct().listen(_updateAuthState),
-    );
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
           .distinct()
@@ -22,11 +18,19 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     );
   }
 
-  void _updateAuthState(AuthState? authState) {
-    emit(state.copyWith(authState: authState));
-  }
-
   void _updateLibraryState(List<Manga> libraryState) {
     emit(state.copyWith(mangas: libraryState));
+  }
+
+  void update({
+    bool? isSearchActive,
+    String? mangaTitle,
+  }) {
+    emit(
+      state.copyWith(
+        isSearchActive: isSearchActive,
+        mangaTitle: mangaTitle,
+      ),
+    );
   }
 }

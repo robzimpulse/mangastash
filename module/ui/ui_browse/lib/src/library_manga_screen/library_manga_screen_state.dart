@@ -10,14 +10,24 @@ class LibraryMangaScreenState extends Equatable {
 
   final List<Manga> mangas;
 
-  final AuthState? authState;
+  final bool isSearchActive;
 
-  const LibraryMangaScreenState({
+  final String? mangaTitle;
+
+  late final List<Manga> filteredMangas;
+
+  LibraryMangaScreenState({
     this.isLoading = false,
     this.error,
     this.mangas = const [],
-    this.authState,
-  });
+    this.isSearchActive = false,
+    this.mangaTitle,
+  }) {
+    final title = mangaTitle;
+    filteredMangas = isSearchActive && title != null
+        ? List.of(mangas.where((manga) => manga.title?.contains(title) == true))
+        : mangas;
+  }
 
   @override
   List<Object?> get props {
@@ -25,7 +35,8 @@ class LibraryMangaScreenState extends Equatable {
       isLoading,
       error,
       mangas,
-      authState,
+      isSearchActive,
+      mangaTitle,
     ];
   }
 
@@ -33,13 +44,15 @@ class LibraryMangaScreenState extends Equatable {
     bool? isLoading,
     ValueGetter<Exception?>? error,
     List<Manga>? mangas,
-    AuthState? authState,
+    bool? isSearchActive,
+    String? mangaTitle,
   }) {
     return LibraryMangaScreenState(
       isLoading: isLoading ?? this.isLoading,
       mangas: mangas ?? this.mangas,
       error: error != null ? error() : this.error,
-      authState: authState ?? this.authState,
+      isSearchActive: isSearchActive ?? this.isSearchActive,
+      mangaTitle: mangaTitle ?? this.mangaTitle,
     );
   }
 }
