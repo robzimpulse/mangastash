@@ -1,4 +1,3 @@
-import 'package:core_auth/core_auth.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
