@@ -24,7 +24,11 @@ class LibraryMangaScreenState extends Equatable {
   }) {
     final title = mangaTitle;
     filteredMangas = isSearchActive && title != null
-        ? List.of(mangas.where((manga) => manga.title?.contains(title) == true))
+        ? List.of(
+            mangas.where(
+              (manga) => manga.title?.toLowerCase().contains(title) == true,
+            ),
+          )
         : mangas;
   }
 
