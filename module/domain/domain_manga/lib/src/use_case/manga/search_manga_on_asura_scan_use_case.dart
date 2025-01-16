@@ -56,7 +56,6 @@ class SearchMangaOnAsuraScanUseCase {
     for (final element in contentMangas ?? <Element>[]) {
       final webUrl = [
         'https://asuracomic.net',
-        'series',
         element.attributes['href'],
       ].join('/');
       final status =
