@@ -9,6 +9,7 @@ extension ParseableDateStringExtension on String {
     final formats = [
       'yyyy-MM-ddTHH:mm:ss.mmmZ',
       'yyyy-MM-ddTHH:mm:ssZ',
+      'MMMM dd yyyy',
       'MM/dd/yyyy',
     ];
 
