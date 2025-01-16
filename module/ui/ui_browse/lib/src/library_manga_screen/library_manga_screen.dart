@@ -108,6 +108,9 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
                 ),
                 cursorColor: DefaultTextStyle.of(context).style.color,
                 style: DefaultTextStyle.of(context).style,
+                onChanged: (value) => _cubit(context).update(
+                  mangaTitle: value,
+                ),
                 onSubmitted: (value) => _cubit(context).update(
                   mangaTitle: value,
                 ),
