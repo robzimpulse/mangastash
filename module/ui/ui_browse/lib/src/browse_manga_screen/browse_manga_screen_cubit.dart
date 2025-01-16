@@ -57,11 +57,13 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
       final limit = result.data.limit ?? 0;
       final total = result.data.total ?? 0;
       final mangas = result.data.data ?? [];
+      final hasNextPage = result.data.hasNextPage;
 
       emit(
         state.copyWith(
           mangas: [...state.mangas, ...mangas].distinct(),
-          hasNextPage: [...state.mangas, ...mangas].distinct().length < total,
+          hasNextPage: hasNextPage ??
+              [...state.mangas, ...mangas].distinct().length < total,
           parameter: state.parameter.copyWith(
             page: (page + 1).toString(),
             offset: (offset + limit).toString(),

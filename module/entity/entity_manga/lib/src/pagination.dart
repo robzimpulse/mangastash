@@ -14,11 +14,19 @@ class Pagination<T extends Equatable> extends Equatable {
   final int? limit;
   final String? offset;
   final int? total;
+  final bool? hasNextPage;
 
-  const Pagination({this.data, this.page, this.limit, this.offset, this.total});
+  const Pagination({
+    this.data,
+    this.page,
+    this.limit,
+    this.offset,
+    this.total,
+    this.hasNextPage,
+  });
 
   @override
-  List<Object?> get props => [limit, page, offset, total, data];
+  List<Object?> get props => [limit, page, offset, total, data, hasNextPage];
 
   factory Pagination.fromJson(
     Map<String, dynamic> json,

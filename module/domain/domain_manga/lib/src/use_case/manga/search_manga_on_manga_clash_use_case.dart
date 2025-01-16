@@ -12,7 +12,6 @@ import 'package:log_box/log_box.dart';
 import '../../manager/headless_webview_manager.dart';
 
 class SearchMangaOnMangaClashUseCaseUseCase {
-  final LogBox _log;
   final HeadlessWebviewManager _webview;
   final MangaServiceFirebase _mangaServiceFirebase;
   final MangaTagServiceFirebase _mangaTagServiceFirebase;
@@ -22,18 +21,13 @@ class SearchMangaOnMangaClashUseCaseUseCase {
     required HeadlessWebviewManager webview,
     required MangaServiceFirebase mangaServiceFirebase,
     required MangaTagServiceFirebase mangaTagServiceFirebase,
-  })  : _log = log,
-        _webview = webview,
+  })  : _webview = webview,
         _mangaServiceFirebase = mangaServiceFirebase,
         _mangaTagServiceFirebase = mangaTagServiceFirebase;
 
   Future<Result<Pagination<Manga>>> execute({
     required SearchMangaParameter parameter,
   }) async {
-    _log.log(
-      '${parameter.toJson()}',
-      name: runtimeType.toString(),
-    );
     final page = max(1, int.tryParse(parameter.page ?? '0') ?? 0);
     final url = [
       [
