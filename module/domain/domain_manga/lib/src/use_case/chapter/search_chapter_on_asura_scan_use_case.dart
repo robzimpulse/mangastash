@@ -56,21 +56,35 @@ class SearchChapterOnAsuraScanUseCase {
 
     for (final element in container?.children ?? <Element>[]) {
       final url = element.querySelector('a')?.attributes['href'];
-      final titles = element
-          .querySelector('h3.text-sm.text-white.font-medium.flex.flex-row')
-          ?.text
-          .split(' ')
-          .map((e) => e.trim());
-      final chapter = titles?.map((text) {
-        final value = double.tryParse(text);
 
+      final container = element.querySelector(
+        [
+          'h3',
+          'text-sm',
+          'text-white',
+          'font-medium',
+          'flex',
+          'flex-row',
+        ].join('.'),
+      );
+
+      // if (container?.children.lastOrNull?.hasChildNodes() == true) {
+      //   continue;
+      // }
+
+      final chapterContainer = container?.children.firstOrNull;
+      final chapterData = chapterContainer?.text.trim().split(' ');
+      final title = chapterContainer?.nextElementSibling?.text.trim();
+
+      final chapter = chapterData?.map((text) {
+        final value = double.tryParse(text);
         if (value != null) {
           final fraction = value - value.truncate();
           if (fraction > 0.0) return value;
         }
-
         return int.tryParse(text);
       }).lastOrNull;
+
       final releaseDate = element
           .querySelector('h3.text-xs')
           ?.text
@@ -86,6 +100,7 @@ class SearchChapterOnAsuraScanUseCase {
         MangaChapter(
           mangaId: mangaId,
           mangaTitle: result.title,
+          title: title,
           chapter: chapter != null ? '$chapter' : null,
           readableAt: releaseDate,
           webUrl: ['https://asuracomic.net', 'series', url].join('/'),

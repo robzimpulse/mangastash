@@ -12,6 +12,8 @@ class HeadlessWebviewManager {
   final HeadlessInAppWebView _webview;
   final BaseCacheManager _cacheManager;
 
+  final Map<Uri, Future<String?>> _queue = {};
+
   InAppWebViewController get _controller => _webview.webViewController;
 
   static Future<HeadlessWebviewManager> create({
@@ -51,14 +53,18 @@ class HeadlessWebviewManager {
       _log.log('Error parsing url: $url', name: runtimeType.toString());
       return null;
     }
+    final html = await _queue.putIfAbsent(uri, () => _fetch(uri: uri));
+    if (html == null) return null;
+    return parse(html);
+  }
 
-    final cache = await _cacheManager.getFileFromCache(url);
+  Future<String?> _fetch({required Uri uri}) async {
+    final cache = await _cacheManager.getFileFromCache(uri.toString());
     if (cache != null) {
-      return parse(await cache.file.readAsString());
+      return await cache.file.readAsString();
     }
 
     await _controller.loadUrl(urlRequest: URLRequest(url: uri));
-
     final onLoadStartCompleter = Completer();
     final onLoadStopCompleter = Completer();
     final onLoadErrorCompleter = Completer();
@@ -103,13 +109,13 @@ class HeadlessWebviewManager {
     if (html == null) return null;
 
     await _cacheManager.putFile(
-      url,
+      uri.toString(),
       utf8.encode(html),
       fileExtension: 'html',
       maxAge: const Duration(minutes: 5),
     );
 
-    return parse(html);
+    return html;
   }
 
   Future<void> dispose() => _webview.dispose();
