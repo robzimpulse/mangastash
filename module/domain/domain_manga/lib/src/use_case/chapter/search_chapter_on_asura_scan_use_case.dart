@@ -68,14 +68,13 @@ class SearchChapterOnAsuraScanUseCase {
         ].join('.'),
       );
 
-      // if (container?.children.lastOrNull?.hasChildNodes() == true) {
-      //   continue;
-      // }
+      final spans = container?.querySelectorAll('span');
+      final title = spans?.firstOrNull?.text.trim();
+      final isNotPublished = spans?.lastOrNull?.hasChildNodes() == true;
 
-      final chapterContainer = container?.children.firstOrNull;
-      final chapterData = chapterContainer?.text.trim().split(' ');
-      final title = chapterContainer?.nextElementSibling?.text.trim();
+      if (isNotPublished) continue;
 
+      final chapterData = container?.nodes.firstOrNull?.text?.trim().split(' ');
       final chapter = chapterData?.map((text) {
         final value = double.tryParse(text);
         if (value != null) {
