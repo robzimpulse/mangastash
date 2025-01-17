@@ -30,7 +30,7 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  LoginScreenCubit _cubit(BuildContext context) => context.read();
+  LoginScreenCubit? _cubit(BuildContext context) => context.mounted ? context.read() : null;
 
   Widget _builder({
     required BlocWidgetBuilder<LoginScreenState> builder,
@@ -50,10 +50,10 @@ class LoginScreen extends StatelessWidget {
           border: OutlineInputBorder(),
           prefixIcon: Icon(Icons.email),
         ),
-        onChanged: (value) => _cubit(context).update(
+        onChanged: (value) => _cubit(context)?.update(
           email: value,
         ),
-        onSubmitted: (value) => _cubit(context).update(
+        onSubmitted: (value) => _cubit(context)?.update(
           email: value,
         ),
       ),
@@ -65,10 +65,10 @@ class LoginScreen extends StatelessWidget {
           border: OutlineInputBorder(),
           prefixIcon: Icon(Icons.password),
         ),
-        onChanged: (value) => _cubit(context).update(
+        onChanged: (value) => _cubit(context)?.update(
           password: value,
         ),
-        onSubmitted: (value) => _cubit(context).update(
+        onSubmitted: (value) => _cubit(context)?.update(
           password: value,
         ),
       ),
@@ -97,7 +97,7 @@ class LoginScreen extends StatelessWidget {
             ),
           ),
         ),
-        onPressed: () => _cubit(context).login(),
+        onPressed: () => _cubit(context)?.login(),
         child:
             isLoading ? const CircularProgressIndicator() : const Text('Login'),
       ),
@@ -136,7 +136,7 @@ class LoginScreen extends StatelessWidget {
             ),
           ),
           TextButton.icon(
-            onPressed: () => _cubit(context).loginAnonymously(),
+            onPressed: () => _cubit(context)?.loginAnonymously(),
             icon: const Icon(Icons.person),
             label: Text(
               'Anonymous',
@@ -177,8 +177,8 @@ class LoginScreen extends StatelessWidget {
         builder: (context, state) => PopScope(
           canPop: !state.isLoading,
           child: FocusDetector(
-            onVisibilityGained: () => _cubit(context).update(isVisible: true),
-            onVisibilityLost: () => _cubit(context).update(isVisible: false),
+            onVisibilityGained: () => _cubit(context)?.update(isVisible: true),
+            onVisibilityLost: () => _cubit(context)?.update(isVisible: false),
             child: Scaffold(
               appBar: AppBar(
                 title: const Text('Login Screen'),
