@@ -21,6 +21,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   FocusNode focusNode = FocusNode();
 
   String query = '';
+  bool isHtml = false;
   bool isSearch = false;
   SortLog currentSort = SortLog.byTime;
 
@@ -38,6 +39,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         searchController.clear();
         focusNode.unfocus();
       }
+    });
+  }
+
+  void _toggleHtml() {
+    setState(() {
+      isHtml = !isHtml;
     });
   }
 
@@ -64,6 +71,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             IconButton(
               onPressed: _toggleSearch,
               icon: Icon(isSearch ? Icons.close : Icons.search),
+            ),
+            IconButton(
+              onPressed: _toggleHtml,
+              icon: Icon(isHtml ? Icons.web_asset_off : Icons.web),
             ),
             PopupMenuButton(
               icon: const Icon(Icons.sort),
@@ -92,14 +103,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
         body: StreamBuilder(
           stream: widget.storage.activities.map(
             (value) {
-              final data = !isSearch
-                  ? value
-                  : value.where(
-                      (activity) {
-                        final text = activity.toString().toLowerCase();
-                        return text.contains(query.toLowerCase());
-                      },
-                    ).toList();
+              var data = value;
+
+              if (isSearch) {
+                data = data.where(
+                  (activity) {
+                    final text = activity.toString().toLowerCase();
+                    return text.contains(query.toLowerCase());
+                  },
+                ).toList();
+              }
+
+              if (isHtml) {
+                data = [...data.where((activity) => activity.isHtmlMessage)];
+              }
 
               int sortByTime(LogModel a, LogModel b) {
                 final aTime = a.time;

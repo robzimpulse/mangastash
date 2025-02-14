@@ -11,6 +11,7 @@ class LogModel extends Equatable {
   final Zone? zone;
   final Object? error;
   final StackTrace? stackTrace;
+  final bool isHtmlMessage;
 
   const LogModel({
     required this.message,
@@ -21,6 +22,7 @@ class LogModel extends Equatable {
     this.zone,
     this.error,
     this.stackTrace,
+    this.isHtmlMessage = false,
   });
 
   @override
@@ -33,5 +35,6 @@ class LogModel extends Equatable {
         zone,
         error,
         stackTrace,
+        isHtmlMessage,
       ];
 }

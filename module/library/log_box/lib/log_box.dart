@@ -18,6 +18,31 @@ class LogBox {
 
   LogBox._();
 
+  void logHtml(
+    String message, {
+    DateTime? time,
+    int? sequenceNumber,
+    int level = 0,
+    String name = '',
+    Zone? zone,
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
+    _storage.addLog(
+      log: LogModel(
+        message: message,
+        time: time ?? DateTime.now(),
+        sequenceNumber: sequenceNumber,
+        level: level,
+        name: name,
+        zone: zone,
+        error: error,
+        stackTrace: stackTrace,
+        isHtmlMessage: true,
+      ),
+    );
+  }
+
   void log(
     String message, {
     DateTime? time,

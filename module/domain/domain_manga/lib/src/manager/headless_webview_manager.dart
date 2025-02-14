@@ -115,6 +115,8 @@ class HeadlessWebviewManager {
       maxAge: const Duration(minutes: 5),
     );
 
+    _log.logHtml(html, name: 'HeadlessWebviewManager');
+
     return html;
   }
 

@@ -36,6 +36,28 @@ class DetailScreen extends StatelessWidget {
         onPressed: () => Navigator.pop(context),
         icon: const Icon(Icons.arrow_back),
       ),
+      actions: [
+        if (data.isHtmlMessage)
+          IconButton(
+            // TODO: open webview & display message as html
+            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '🚧🚧🚧 Under Construction 🚧🚧🚧',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ),
+                  ],
+                ),
+                backgroundColor: Theme.of(context).colorScheme.surface,
+              ),
+            ),
+            icon: const Icon(Icons.web),
+          ),
+      ],
       bottom: const TabBar(
         labelColor: Colors.white,
         unselectedLabelColor: Colors.white,
@@ -82,7 +104,7 @@ class DetailScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         child: Column(
           children: [
-            ItemColumn(name: 'Message', value: data.message,),
+            ItemColumn(name: 'Message', value: data.message),
           ],
         ),
       ),

@@ -87,7 +87,7 @@ class GetMangaOnAsuraScanUseCase {
               update: (old) async => old.copyWith(
                 author: author,
                 description: description,
-                tags: tags
+                tags: tags,
               ),
               ifAbsent: () async => result.copyWith(
                 author: author,
