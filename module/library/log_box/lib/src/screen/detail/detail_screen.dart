@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../model/log_html_model.dart';
 import '../../model/log_model.dart';
+import '../webview/webview_screen.dart';
 import 'widget/item_column.dart';
 
 class DetailScreen extends StatelessWidget {
@@ -29,6 +31,7 @@ class DetailScreen extends StatelessWidget {
   }
 
   PreferredSizeWidget _appBar(BuildContext context) {
+    final data = this.data;
     return AppBar(
       title: const Text('Detail Activities'),
       elevation: 3,
@@ -37,22 +40,12 @@ class DetailScreen extends StatelessWidget {
         icon: const Icon(Icons.arrow_back),
       ),
       actions: [
-        if (data.isHtmlMessage)
+        if (data is LogHtmlModel)
           IconButton(
-            // TODO: open webview & display message as html
-            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        '🚧🚧🚧 Under Construction 🚧🚧🚧',
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ),
-                  ],
-                ),
-                backgroundColor: Theme.of(context).colorScheme.surface,
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => WebviewScreen(html: data.html),
               ),
             ),
             icon: const Icon(Icons.web),

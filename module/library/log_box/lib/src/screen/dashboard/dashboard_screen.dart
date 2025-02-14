@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../common/log_storage.dart';
 import '../../common/sort_log_enum.dart';
+import '../../model/log_html_model.dart';
 import '../../model/log_model.dart';
 import '../detail/detail_screen.dart';
 import 'widget/item_log_widget.dart';
@@ -115,7 +116,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               }
 
               if (isHtml) {
-                data = [...data.where((activity) => activity.isHtmlMessage)];
+                data = [...data.whereType<LogHtmlModel>()];
               }
 
               int sortByTime(LogModel a, LogModel b) {

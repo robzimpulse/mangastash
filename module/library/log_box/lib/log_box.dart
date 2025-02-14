@@ -6,6 +6,7 @@ import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
 
 import 'src/common/log_storage.dart';
+import 'src/model/log_html_model.dart';
 import 'src/model/log_model.dart';
 import 'src/screen/dashboard/dashboard_screen.dart';
 
@@ -19,7 +20,8 @@ class LogBox {
   LogBox._();
 
   void logHtml(
-    String message, {
+    String url,
+    String html, {
     DateTime? time,
     int? sequenceNumber,
     int level = 0,
@@ -29,8 +31,9 @@ class LogBox {
     StackTrace? stackTrace,
   }) {
     _storage.addLog(
-      log: LogModel(
-        message: message,
+      log: LogHtmlModel(
+        url: url,
+        html: html,
         time: time ?? DateTime.now(),
         sequenceNumber: sequenceNumber,
         level: level,
@@ -38,7 +41,6 @@ class LogBox {
         zone: zone,
         error: error,
         stackTrace: stackTrace,
-        isHtmlMessage: true,
       ),
     );
   }
