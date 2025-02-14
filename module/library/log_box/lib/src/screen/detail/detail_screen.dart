@@ -45,7 +45,10 @@ class DetailScreen extends StatelessWidget {
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => WebviewScreen(html: data.html),
+                builder: (context) => WebviewScreen(
+                  html: data.html,
+                  uri: data.uri,
+                ),
               ),
             ),
             icon: const Icon(Icons.web),
@@ -81,9 +84,9 @@ class DetailScreen extends StatelessWidget {
           children: [
             ItemColumn(name: 'Name', value: data.name),
             ItemColumn(name: 'Time', value: data.time?.toIso8601String()),
-            ItemColumn(name: 'Sequence Number', value: '${data.sequenceNumber}'),
+            ItemColumn(
+                name: 'Sequence Number', value: '${data.sequenceNumber}'),
             ItemColumn(name: 'Level', value: '${data.level}'),
-
           ],
         ),
       ),

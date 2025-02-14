@@ -20,7 +20,7 @@ class LogBox {
   LogBox._();
 
   void logHtml(
-    String url,
+    Uri uri,
     String html, {
     DateTime? time,
     int? sequenceNumber,
@@ -32,7 +32,7 @@ class LogBox {
   }) {
     _storage.addLog(
       log: LogHtmlModel(
-        url: url,
+        uri: uri,
         html: html,
         time: time ?? DateTime.now(),
         sequenceNumber: sequenceNumber,

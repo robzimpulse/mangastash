@@ -3,11 +3,11 @@ import 'log_model.dart';
 class LogHtmlModel extends LogModel {
   final String html;
 
-  final String url;
+  final Uri uri;
 
   const LogHtmlModel({
     required this.html,
-    required this.url,
+    required this.uri,
     super.time,
     super.sequenceNumber,
     super.level,
@@ -15,8 +15,8 @@ class LogHtmlModel extends LogModel {
     super.zone,
     super.error,
     super.stackTrace,
-  }) : super(message: 'Url: $url');
+  }) : super(message: 'Url: $uri');
 
   @override
-  List<Object?> get props => [...super.props, html, url];
+  List<Object?> get props => [...super.props, html, uri];
 }

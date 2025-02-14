@@ -62,7 +62,7 @@ class HeadlessWebviewManager {
     final cache = await _cacheManager.getFileFromCache(uri.toString());
     if (cache != null) {
       final html = await cache.file.readAsString();
-      _log.logHtml(uri.toString(), html, name: 'HeadlessWebviewManager');
+      _log.logHtml(uri, html, name: 'HeadlessWebviewManager');
       return html;
     }
 
@@ -117,7 +117,7 @@ class HeadlessWebviewManager {
       maxAge: const Duration(minutes: 5),
     );
 
-    _log.logHtml(uri.toString(), html, name: 'HeadlessWebviewManager');
+    _log.logHtml(uri, html, name: 'HeadlessWebviewManager');
 
     return html;
   }

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebviewScreen extends StatelessWidget {
-  const WebviewScreen({super.key, required this.html});
+  const WebviewScreen({super.key, required this.html, required this.uri});
 
   final String html;
+
+  final Uri uri;
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +83,7 @@ class WebviewScreen extends StatelessWidget {
               controller: WebViewController()
                 ..setJavaScriptMode(JavaScriptMode.unrestricted)
                 ..setNavigationDelegate(delegate)
-                ..loadHtmlString(html),
+                ..loadHtmlString(html, baseUrl: uri.host),
             ),
           ),
           Flexible(
