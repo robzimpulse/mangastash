@@ -17,7 +17,7 @@ extension ParseableDateStringExtension on String {
       try {
         return DateFormat(format).parse(this).toUtc();
       } on Exception catch (e) {
-        log(e.toString(), name: 'ParseableDateStringExtension');
+        log('$e', name: 'ParseableDateStringExtension');
       }
     }
 

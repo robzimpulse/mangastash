@@ -55,15 +55,14 @@ class HeadlessWebviewManager {
     }
     final html = await _queue.putIfAbsent(uri, () => _fetch(uri: uri));
     if (html == null) return null;
+    _log.logHtml(uri, html, name: 'HeadlessWebviewManager');
     return parse(html);
   }
 
   Future<String?> _fetch({required Uri uri}) async {
     final cache = await _cacheManager.getFileFromCache(uri.toString());
     if (cache != null) {
-      final html = await cache.file.readAsString();
-      _log.logHtml(uri, html, name: 'HeadlessWebviewManager');
-      return html;
+      return await cache.file.readAsString();
     }
 
     await _controller.loadUrl(urlRequest: URLRequest(url: uri));
@@ -116,8 +115,6 @@ class HeadlessWebviewManager {
       fileExtension: 'html',
       maxAge: const Duration(minutes: 5),
     );
-
-    _log.logHtml(uri, html, name: 'HeadlessWebviewManager');
 
     return html;
   }
