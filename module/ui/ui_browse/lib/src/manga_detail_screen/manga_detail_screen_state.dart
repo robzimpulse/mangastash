@@ -82,11 +82,12 @@ class MangaDetailScreenState extends Equatable {
       }
     }
 
-    this.processedChapters = processedChapters;
-    chaptersKey = {...processedChapters.keys.sorted((a, b) => b.compareTo(a))};
     final reversedChaptersKey = {
       ...processedChapters.keys.sorted((a, b) => a.compareTo(b)),
     };
+
+    this.processedChapters = processedChapters;
+    chaptersKey = {...processedChapters.keys.sorted((a, b) => b.compareTo(a))};
     totalChapter = processedChapters.length;
 
     for (final key in reversedChaptersKey) {

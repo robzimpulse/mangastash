@@ -100,7 +100,7 @@ class SearchChapterOnAsuraScanUseCase {
           mangaId: mangaId,
           mangaTitle: result.title,
           title: title?.isNotEmpty == true ? title : null,
-          chapter: chapter != null ? '$chapter' : null,
+          chapter: '${chapter ?? url?.split('/').lastOrNull}',
           readableAt: releaseDate,
           webUrl: ['https://asuracomic.net', 'series', url].join('/'),
         ),
