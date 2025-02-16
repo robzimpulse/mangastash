@@ -180,16 +180,15 @@ class _MangaMiscBottomScreen extends State<MangaMiscScreen> {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ChildSizeNotifierWidget(
-                      builder: (context, size, _) {
+                    SizeNotifierWidget(
+                      size: (context, size) {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
-                          final value = size ?? Size.zero;
-                          if (!context.mounted || value.isEmpty) return;
-                          if (_currentSize.value.height > value.height) return;
-                          _currentSize.value = value;
+                          if (!context.mounted || size.isEmpty) return;
+                          if (_currentSize.value.height > size.height) return;
+                          _currentSize.value = size;
                         });
-                        return _filter(context);
                       },
+                      child: _filter(context),
                     ),
                     const Spacer(),
                   ],
@@ -197,16 +196,15 @@ class _MangaMiscBottomScreen extends State<MangaMiscScreen> {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ChildSizeNotifierWidget(
-                      builder: (context, size, _) {
+                    SizeNotifierWidget(
+                      size: (context, size) {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
-                          final value = size ?? Size.zero;
-                          if (!context.mounted || value.isEmpty) return;
-                          if (_currentSize.value.height > value.height) return;
-                          _currentSize.value = value;
+                          if (!context.mounted || size.isEmpty) return;
+                          if (_currentSize.value.height > size.height) return;
+                          _currentSize.value = size;
                         });
-                        return _sort(context);
                       },
+                      child: _sort(context),
                     ),
                     const Spacer(),
                   ],
@@ -214,16 +212,15 @@ class _MangaMiscBottomScreen extends State<MangaMiscScreen> {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ChildSizeNotifierWidget(
-                      builder: (context, size, _) {
+                    SizeNotifierWidget(
+                      size: (context, size) {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
-                          final value = size ?? Size.zero;
-                          if (!context.mounted || value.isEmpty) return;
-                          if (_currentSize.value.height > value.height) return;
-                          _currentSize.value = value;
+                          if (!context.mounted || size.isEmpty) return;
+                          if (_currentSize.value.height > size.height) return;
+                          _currentSize.value = size;
                         });
-                        return _display(context);
                       },
+                      child: _display(context),
                     ),
                     const Spacer(),
                   ],
