@@ -192,32 +192,28 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) => [
-          SliverAppBar(
-            pinned: true,
-            floating: false,
-            snap: false,
-            title: _title(context),
-            forceElevated: innerBoxIsScrolled,
-            actions: [
-              _layoutSearch(context: context),
-              _layoutIcon(context: context),
-              _layoutSource(context: context),
-            ],
-          ),
-          SliverToBoxAdapter(
+      appBar: AppBar(
+        title: _title(context),
+        actions: [
+          _layoutSearch(context: context),
+          _layoutIcon(context: context),
+          _layoutSource(context: context),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(44),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 44),
             child: Container(
               color: Theme.of(context).appBarTheme.backgroundColor,
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: _menus(context),
             ),
           ),
-        ],
-        body: RefreshIndicator(
-          onRefresh: () => _cubit(context).init(),
-          child: _content(context),
         ),
+      ),
+      body: RefreshIndicator(
+        onRefresh: () => _cubit(context).init(),
+        child: _content(context),
       ),
     );
   }
