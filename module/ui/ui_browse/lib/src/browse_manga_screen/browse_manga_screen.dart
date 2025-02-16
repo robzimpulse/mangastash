@@ -193,7 +193,6 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               return prev.isSearchActive != curr.isSearchActive;
             },
             listener: (context, state) {
-              // _searchController.clear();
               _searchFocusNode.requestFocus();
             },
           ),
