@@ -29,7 +29,10 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     emit(state.copyWith(libraries: libraryState));
   }
 
-  Future<void> init({String? title, SearchOrders? order}) async {
+  Future<void> init({
+    String? title,
+    SearchOrders order = SearchOrders.relevance,
+  }) async {
     emit(
       state.copyWith(
         isLoading: true,
@@ -38,10 +41,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
           title: title,
           offset: '0',
           page: '0',
-          orders: {
-            if (order != null)
-              order: OrderDirections.descending,
-          },
+          orders: {order: OrderDirections.descending},
         ),
       ),
     );
