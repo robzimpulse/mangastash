@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:manga_dex_api/manga_dex_api.dart';
 
 part 'search_manga_parameter.g.dart';
 
@@ -9,12 +10,14 @@ class SearchMangaParameter extends Equatable {
   final num? limit;
   final String? offset;
   final String? page;
+  final Map<SearchOrders, OrderDirections>? orders;
 
   const SearchMangaParameter({
     this.title,
     this.limit,
     this.offset,
     this.page,
+    this.orders,
   });
 
   @override
@@ -24,6 +27,7 @@ class SearchMangaParameter extends Equatable {
       limit,
       offset,
       page,
+      orders,
     ];
   }
 
@@ -38,12 +42,14 @@ class SearchMangaParameter extends Equatable {
     num? limit,
     String? offset,
     String? page,
+    Map<SearchOrders, OrderDirections>? orders,
   }) {
     return SearchMangaParameter(
       title: title ?? this.title,
       limit: limit ?? this.limit,
       offset: offset ?? this.offset,
       page: page ?? this.page,
+      orders: orders ?? this.orders,
     );
   }
 }

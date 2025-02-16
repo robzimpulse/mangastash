@@ -1,3 +1,4 @@
+import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ui_common/ui_common.dart';
@@ -21,6 +22,8 @@ class BrowseMangaScreenState extends Equatable {
 
   final bool isSearchActive;
 
+  final bool isFavoriteActive;
+
   final SearchMangaParameter parameter;
 
   late final Map<String, Manga> libraryMapById;
@@ -30,6 +33,7 @@ class BrowseMangaScreenState extends Equatable {
     this.hasNextPage = false,
     this.isPagingNextPage = false,
     this.isSearchActive = false,
+    this.isFavoriteActive = false,
     this.error,
     required this.layout,
     this.source,
@@ -60,6 +64,7 @@ class BrowseMangaScreenState extends Equatable {
       mangas,
       parameter,
       isSearchActive,
+      isFavoriteActive,
       libraries,
     ];
   }
@@ -69,6 +74,7 @@ class BrowseMangaScreenState extends Equatable {
     bool? hasNextPage,
     bool? isPagingNextPage,
     bool? isSearchActive,
+    bool? isFavoriteActive,
     ValueGetter<Exception?>? error,
     MangaShelfItemLayout? layout,
     MangaSourceEnum? source,
@@ -81,6 +87,7 @@ class BrowseMangaScreenState extends Equatable {
       hasNextPage: hasNextPage ?? this.hasNextPage,
       isPagingNextPage: isPagingNextPage ?? this.isPagingNextPage,
       isSearchActive: isSearchActive ?? this.isSearchActive,
+      isFavoriteActive: isFavoriteActive ?? this.isFavoriteActive,
       mangas: mangas ?? this.mangas,
       libraries: libraries ?? this.libraries,
       error: error != null ? error() : this.error,

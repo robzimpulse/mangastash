@@ -8,6 +8,7 @@ import 'package:core_network/core_network.dart';
 import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
+import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../manager/headless_webview_manager.dart';
 
@@ -38,6 +39,8 @@ class SearchMangaOnMangaClashUseCaseUseCase {
       {
         's': parameter.title ?? '',
         'post_type': 'wp-manga',
+        if (parameter.orders?.containsKey(SearchOrders.rating) == true)
+          'm_orderby': 'rating',
       }.entries.map((e) => '${e.key}=${e.value}').join('&'),
     ].join('?');
 

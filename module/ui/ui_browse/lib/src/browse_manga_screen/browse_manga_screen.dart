@@ -232,12 +232,21 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     return Wrap(
       spacing: 4,
       children: [
-        OutlinedButton.icon(
-          style: buttonStyle,
-          icon: Icon(Icons.favorite, color: color),
-          label: Text('Favorite', style: labelStyle?.copyWith(color: color)),
-          onPressed: () => context.showSnackBar(
-            message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+        _builder(
+          buildWhen: (prev, curr) => [
+            prev.isFavoriteActive != curr.isFavoriteActive,
+          ].any((e) => e),
+          builder: (context, state) => OutlinedButton.icon(
+            style: buttonStyle.copyWith(
+              backgroundColor: state.isFavoriteActive
+                  ? const WidgetStatePropertyAll(Colors.grey)
+                  : null,
+            ),
+            icon: Icon(Icons.favorite, color: color),
+            label: Text('Favorite', style: labelStyle?.copyWith(color: color)),
+            onPressed: () => _cubit(context).update(
+              isFavoriteActive: !state.isFavoriteActive,
+            ),
           ),
         ),
         OutlinedButton.icon(

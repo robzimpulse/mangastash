@@ -6,6 +6,7 @@ import 'package:core_network/core_network.dart';
 import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:html/dom.dart';
+import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../manager/headless_webview_manager.dart';
 
@@ -31,6 +32,8 @@ class SearchMangaOnAsuraScanUseCase {
       {
         'name': parameter.title ?? '',
         'page': page,
+        if (parameter.orders?.containsKey(SearchOrders.rating) == true)
+          'order': 'rating',
       }.entries.map((e) => '${e.key}=${e.value}').join('&'),
     ].join('?');
 

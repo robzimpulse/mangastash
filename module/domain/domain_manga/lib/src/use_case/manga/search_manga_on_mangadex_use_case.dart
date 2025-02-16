@@ -26,7 +26,13 @@ class SearchMangaOnMangaDexUseCase {
         title: parameter.title,
         limit: parameter.limit?.toInt(),
         offset: int.tryParse(parameter.offset ?? '') ?? 0,
-        includes: [Include.author.rawValue, Include.coverArt.rawValue],
+        includes: [
+          Include.author.rawValue,
+          Include.coverArt.rawValue,
+        ],
+        orders: parameter.orders?.map(
+          (key, value) => MapEntry(key.rawValue, value.rawValue),
+        ),
       );
 
       return Success(

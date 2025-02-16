@@ -30,6 +30,19 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   }
 
   Future<void> init({String? title}) async {
+    final orders = Map.of(
+      state.parameter.orders ?? <SearchOrders, OrderDirections>{},
+    );
+
+    if (state.isFavoriteActive) {
+      orders.putIfAbsent(
+        SearchOrders.rating,
+        () => OrderDirections.descending,
+      );
+    } else {
+      orders.remove(SearchOrders.rating);
+    }
+
     emit(
       state.copyWith(
         isLoading: true,
@@ -38,9 +51,11 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
           title: title,
           offset: '0',
           page: '0',
+          orders: orders,
         ),
       ),
     );
+
     await _fetchManga();
     emit(state.copyWith(isLoading: false));
   }
@@ -59,11 +74,12 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
       final mangas = result.data.data ?? [];
       final hasNextPage = result.data.hasNextPage;
 
+      final allMangas = [...state.mangas, ...mangas].distinct();
+
       emit(
         state.copyWith(
-          mangas: [...state.mangas, ...mangas].distinct(),
-          hasNextPage: hasNextPage ??
-              [...state.mangas, ...mangas].distinct().length < total,
+          mangas: allMangas,
+          hasNextPage: hasNextPage ?? allMangas.length < total,
           parameter: state.parameter.copyWith(
             page: (page + 1).toString(),
             offset: (offset + limit).toString(),
@@ -89,12 +105,16 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   void update({
     MangaShelfItemLayout? layout,
     bool? isSearchActive,
+    bool? isFavoriteActive,
   }) {
     emit(
       state.copyWith(
         layout: layout,
         isSearchActive: isSearchActive,
+        isFavoriteActive: isFavoriteActive,
       ),
     );
+
+    if (isFavoriteActive != null) init();
   }
 }
