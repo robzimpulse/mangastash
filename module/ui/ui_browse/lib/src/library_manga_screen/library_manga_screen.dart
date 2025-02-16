@@ -50,7 +50,7 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
 
   LibraryMangaScreenCubit _cubit(BuildContext context) => context.read();
 
-  Widget _builder({
+  BlocBuilder _builder({
     required BlocWidgetBuilder<LibraryMangaScreenState> builder,
     BlocBuilderCondition<LibraryMangaScreenState>? buildWhen,
   }) {

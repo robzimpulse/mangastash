@@ -24,7 +24,7 @@ class PickerBottomSheet extends StatelessWidget {
 
   PickerBottomSheetCubit _cubit(BuildContext context) => context.read();
 
-  Widget _builder({
+  BlocBuilder _builder({
     required BlocWidgetBuilder<PickerBottomSheetState> builder,
     BlocBuilderCondition<PickerBottomSheetState>? buildWhen,
   }) {

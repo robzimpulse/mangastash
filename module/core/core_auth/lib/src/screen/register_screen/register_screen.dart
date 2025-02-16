@@ -24,7 +24,7 @@ class RegisterScreen extends StatelessWidget {
 
   RegisterScreenCubit _cubit(BuildContext context) => context.read();
 
-  Widget _builder({
+  BlocBuilder _builder({
     required BlocWidgetBuilder<RegisterScreenState> builder,
     BlocBuilderCondition<RegisterScreenState>? buildWhen,
   }) {

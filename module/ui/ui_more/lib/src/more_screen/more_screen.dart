@@ -55,7 +55,7 @@ class MoreScreen extends StatelessWidget {
 
   MoreScreenCubit _cubit(BuildContext context) => context.read();
 
-  Widget _builder({
+  BlocBuilder _builder({
     required BlocWidgetBuilder<MoreScreenState> builder,
     BlocBuilderCondition<MoreScreenState>? buildWhen,
   }) {

@@ -27,7 +27,7 @@ class BackupRestoreScreen extends StatelessWidget {
 
   BackupRestoreScreenCubit _cubit(BuildContext context) => context.read();
 
-  Widget _builder({
+  BlocBuilder _builder({
     required BlocWidgetBuilder<BackupRestoreScreenState> builder,
     BlocBuilderCondition<BackupRestoreScreenState>? buildWhen,
   }) {

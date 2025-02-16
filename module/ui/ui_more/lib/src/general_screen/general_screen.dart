@@ -37,7 +37,7 @@ class GeneralScreen extends StatelessWidget {
 
   GeneralScreenCubit _cubit(BuildContext context) => context.read();
 
-  Widget _builder({
+  BlocBuilder _builder({
     required BlocWidgetBuilder<GeneralScreenState> builder,
     BlocBuilderCondition<GeneralScreenState>? buildWhen,
   }) {

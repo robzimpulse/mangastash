@@ -22,7 +22,7 @@ class DownloadQueueScreen extends StatelessWidget {
     );
   }
 
-  Widget _builder({
+  BlocBuilder _builder({
     required BlocWidgetBuilder<DownloadQueueScreenState> builder,
     BlocBuilderCondition<DownloadQueueScreenState>? buildWhen,
   }) {

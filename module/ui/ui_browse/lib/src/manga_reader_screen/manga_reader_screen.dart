@@ -53,7 +53,7 @@ class MangaReaderScreen extends StatefulWidget {
 class _MangaReaderScreenState extends State<MangaReaderScreen> {
   MangaReaderScreenCubit _cubit(BuildContext context) => context.read();
 
-  Widget _builder({
+  BlocBuilder _builder({
     required BlocWidgetBuilder<MangaReaderScreenState> builder,
     BlocBuilderCondition<MangaReaderScreenState>? buildWhen,
   }) {

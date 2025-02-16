@@ -32,7 +32,7 @@ class LoginScreen extends StatelessWidget {
 
   LoginScreenCubit? _cubit(BuildContext context) => context.mounted ? context.read() : null;
 
-  Widget _builder({
+  BlocBuilder _builder({
     required BlocWidgetBuilder<LoginScreenState> builder,
     BlocBuilderCondition<LoginScreenState>? buildWhen,
   }) {

@@ -25,7 +25,7 @@ class AppearanceScreen extends StatelessWidget {
 
   AppearanceScreenCubit _cubit(BuildContext context) => context.read();
 
-  Widget _builder({
+  BlocBuilder _builder({
     required BlocWidgetBuilder<AppearanceScreenState> builder,
     BlocBuilderCondition<AppearanceScreenState>? buildWhen,
   }) {

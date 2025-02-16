@@ -66,7 +66,7 @@ class MangaDetailScreen extends StatefulWidget {
 }
 
 class _MangaDetailScreenState extends State<MangaDetailScreen> {
-  Widget _builder({
+  BlocBuilder _builder({
     required BlocWidgetBuilder<MangaDetailScreenState> builder,
     BlocBuilderCondition<MangaDetailScreenState>? buildWhen,
   }) {

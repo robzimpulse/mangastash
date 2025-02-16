@@ -26,7 +26,7 @@ class DownloadScreen extends StatelessWidget {
 
   DownloadScreenCubit _cubit(BuildContext context) => context.read();
 
-  Widget _builder({
+  BlocBuilder _builder({
     required BlocWidgetBuilder<DownloadScreenState> builder,
     BlocBuilderCondition<DownloadScreenState>? buildWhen,
   }) {
