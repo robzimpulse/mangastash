@@ -84,13 +84,27 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     return ResponsiveBreakpoints.of(context);
   }
 
-  Widget _builder({
+  BlocBuilder _builder({
     required BlocWidgetBuilder<BrowseMangaScreenState> builder,
     BlocBuilderCondition<BrowseMangaScreenState>? buildWhen,
   }) {
     return BlocBuilder<BrowseMangaScreenCubit, BrowseMangaScreenState>(
       buildWhen: buildWhen,
       builder: builder,
+    );
+  }
+
+  BlocConsumer _consumer({
+    required BlocWidgetBuilder<BrowseMangaScreenState> builder,
+    BlocBuilderCondition<BrowseMangaScreenState>? buildWhen,
+    required BlocWidgetListener<BrowseMangaScreenState> listener,
+    BlocListenerCondition<BrowseMangaScreenState>? listenWhen,
+  }) {
+    return BlocConsumer<BrowseMangaScreenCubit, BrowseMangaScreenState>(
+      buildWhen: buildWhen,
+      builder: builder,
+      listener: listener,
+      listenWhen: listenWhen,
     );
   }
 
@@ -186,27 +200,17 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
           _layoutSource(context: context),
         ],
       ),
-      body: MultiBlocListener(
-        listeners: [
-          BlocListener<BrowseMangaScreenCubit, BrowseMangaScreenState>(
-            listenWhen: (prev, curr) {
-              return prev.isSearchActive != curr.isSearchActive;
-            },
-            listener: (context, state) {
-              _searchFocusNode.requestFocus();
-            },
-          ),
-        ],
-        child: RefreshIndicator(
-          onRefresh: () => _cubit(context).init(),
-          child: _content(context),
-        ),
+      body: RefreshIndicator(
+        onRefresh: () => _cubit(context).init(),
+        child: _content(context),
       ),
     );
   }
 
   Widget _title(BuildContext context) {
-    return _builder(
+    return _consumer(
+      listenWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
+      listener: (context, state) => _searchFocusNode.requestFocus(),
       buildWhen: (prev, curr) {
         final isSourceChanged = prev.source != curr.source;
         final isLoadingChanged = prev.isLoading != curr.isLoading;
