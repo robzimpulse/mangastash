@@ -192,18 +192,75 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      appBar: AppBar(
-        title: _title(context),
-        actions: [
-          _layoutSearch(context: context),
-          _layoutIcon(context: context),
-          _layoutSource(context: context),
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) => [
+          SliverAppBar(
+            pinned: true,
+            floating: false,
+            snap: false,
+            title: _title(context),
+            forceElevated: innerBoxIsScrolled,
+            actions: [
+              _layoutSearch(context: context),
+              _layoutIcon(context: context),
+              _layoutSource(context: context),
+            ],
+          ),
+          SliverToBoxAdapter(
+            child: Container(
+              color: Theme.of(context).appBarTheme.backgroundColor,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: _menus(context),
+            ),
+          ),
         ],
+        body: RefreshIndicator(
+          onRefresh: () => _cubit(context).init(),
+          child: _content(context),
+        ),
       ),
-      body: RefreshIndicator(
-        onRefresh: () => _cubit(context).init(),
-        child: _content(context),
+    );
+  }
+
+  Widget _menus(BuildContext context) {
+    final color = Theme.of(context).appBarTheme.iconTheme?.color;
+    final labelStyle = Theme.of(context).textTheme.labelSmall;
+    final buttonStyle = OutlinedButton.styleFrom(
+      visualDensity: VisualDensity.compact,
+      side: const BorderSide(width: 1).copyWith(color: color),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
       ),
+    );
+
+    return Wrap(
+      spacing: 4,
+      children: [
+        OutlinedButton.icon(
+          style: buttonStyle,
+          icon: Icon(Icons.favorite, color: color),
+          label: Text('Favorite', style: labelStyle?.copyWith(color: color)),
+          onPressed: () => context.showSnackBar(
+            message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+          ),
+        ),
+        OutlinedButton.icon(
+          style: buttonStyle,
+          icon: Icon(Icons.update, color: color),
+          label: Text('Updated', style: labelStyle?.copyWith(color: color)),
+          onPressed: () => context.showSnackBar(
+            message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+          ),
+        ),
+        OutlinedButton.icon(
+          style: buttonStyle,
+          icon: Icon(Icons.filter_list, color: color),
+          label: Text('Filter', style: labelStyle?.copyWith(color: color)),
+          onPressed: () => context.showSnackBar(
+            message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+          ),
+        ),
+      ],
     );
   }
 
