@@ -85,7 +85,9 @@ class DetailScreen extends StatelessWidget {
             ItemColumn(name: 'Name', value: data.name),
             ItemColumn(name: 'Time', value: data.time?.toIso8601String()),
             ItemColumn(
-                name: 'Sequence Number', value: '${data.sequenceNumber}'),
+              name: 'Sequence Number',
+              value: '${data.sequenceNumber}',
+            ),
             ItemColumn(name: 'Level', value: '${data.level}'),
           ],
         ),

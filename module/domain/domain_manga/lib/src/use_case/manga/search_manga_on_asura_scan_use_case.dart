@@ -34,6 +34,8 @@ class SearchMangaOnAsuraScanUseCase {
         'page': page,
         if (parameter.orders?.containsKey(SearchOrders.rating) == true)
           'order': 'rating',
+        if (parameter.orders?.containsKey(SearchOrders.updatedAt) == true)
+          'order': 'update',
       }.entries.map((e) => '${e.key}=${e.value}').join('&'),
     ].join('?');
 

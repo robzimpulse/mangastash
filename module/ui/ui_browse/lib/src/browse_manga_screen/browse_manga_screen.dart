@@ -244,17 +244,24 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             ),
             icon: Icon(Icons.favorite, color: color),
             label: Text('Favorite', style: labelStyle?.copyWith(color: color)),
-            onPressed: () => _cubit(context).update(
-              isFavoriteActive: !state.isFavoriteActive,
-            ),
+            onPressed: () => _cubit(context).init(order: SearchOrders.rating),
           ),
         ),
-        OutlinedButton.icon(
-          style: buttonStyle,
-          icon: Icon(Icons.update, color: color),
-          label: Text('Updated', style: labelStyle?.copyWith(color: color)),
-          onPressed: () => context.showSnackBar(
-            message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+        _builder(
+          buildWhen: (prev, curr) => [
+            prev.isUpdatedActive != curr.isUpdatedActive,
+          ].any((e) => e),
+          builder: (context, state) => OutlinedButton.icon(
+            style: buttonStyle.copyWith(
+              backgroundColor: state.isUpdatedActive
+                  ? const WidgetStatePropertyAll(Colors.grey)
+                  : null,
+            ),
+            icon: Icon(Icons.update, color: color),
+            label: Text('Updated', style: labelStyle?.copyWith(color: color)),
+            onPressed: () => _cubit(context).init(
+              order: SearchOrders.updatedAt,
+            ),
           ),
         ),
         OutlinedButton.icon(
@@ -273,20 +280,12 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     return _consumer(
       listenWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
       listener: (context, state) => _searchFocusNode.requestFocus(),
-      buildWhen: (prev, curr) {
-        final isSourceChanged = prev.source != curr.source;
-        final isLoadingChanged = prev.isLoading != curr.isLoading;
-        final isSearchChanged = prev.isSearchActive != curr.isSearchActive;
-        return isSourceChanged || isLoadingChanged || isSearchChanged;
-      },
+      buildWhen: (prev, curr) => [
+        prev.source != curr.source,
+        prev.isSearchActive != curr.isSearchActive,
+      ].any((e) => e),
       builder: (context, state) => !state.isSearchActive
-          ? ShimmerLoading.multiline(
-              isLoading: state.isLoading,
-              width: 200,
-              height: 15,
-              lines: 1,
-              child: Text(state.source?.value ?? ''),
-            )
+          ? Text(state.source?.value ?? '')
           : Container(
               alignment: Alignment.centerLeft,
               child: TextField(

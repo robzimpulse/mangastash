@@ -41,6 +41,8 @@ class SearchMangaOnMangaClashUseCaseUseCase {
         'post_type': 'wp-manga',
         if (parameter.orders?.containsKey(SearchOrders.rating) == true)
           'm_orderby': 'rating',
+        if (parameter.orders?.containsKey(SearchOrders.updatedAt) == true)
+          'm_orderby': 'latest',
       }.entries.map((e) => '${e.key}=${e.value}').join('&'),
     ].join('?');
 
