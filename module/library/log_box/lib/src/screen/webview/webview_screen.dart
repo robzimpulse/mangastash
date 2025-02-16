@@ -17,51 +17,51 @@ class WebviewScreen extends StatelessWidget {
     final delegate = NavigationDelegate(
       onNavigationRequest: (request) {
         messages.value = [
-          ...messages.value,
           'onNavigationRequest: ${request.url}',
+          ...messages.value,
         ];
         return NavigationDecision.navigate;
       },
       onPageStarted: (request) {
         messages.value = [
-          ...messages.value,
           'onPageStarted: $request',
+          ...messages.value,
         ];
       },
       onHttpAuthRequest: (request) {
         messages.value = [
-          ...messages.value,
           'onHttpAuthRequest: ${request.host}',
+          ...messages.value,
         ];
       },
       onHttpError: (request) {
         messages.value = [
-          ...messages.value,
           'onHttpError: ${request.response?.uri} - ${request.response?.statusCode}',
+          ...messages.value,
         ];
       },
       onPageFinished: (request) {
         messages.value = [
-          ...messages.value,
           'onPageFinished: $request',
+          ...messages.value,
         ];
       },
       onProgress: (request) {
         messages.value = [
-          ...messages.value,
           'onProgress: $request',
+          ...messages.value,
         ];
       },
       onUrlChange: (request) {
         messages.value = [
-          ...messages.value,
           'onUrlChange: ${request.url}',
+          ...messages.value,
         ];
       },
       onWebResourceError: (request) {
         messages.value = [
-          ...messages.value,
           'onWebResourceError: ${request.url} - ${request.errorType} - ${request.errorCode}',
+          ...messages.value,
         ];
       },
     );
@@ -83,7 +83,13 @@ class WebviewScreen extends StatelessWidget {
               controller: WebViewController()
                 ..setJavaScriptMode(JavaScriptMode.unrestricted)
                 ..setNavigationDelegate(delegate)
-                ..loadHtmlString(html, baseUrl: uri.host),
+                ..setOnConsoleMessage(
+                  (message) => messages.value = [
+                    'onJavascriptMessage: ${message.message} - ${message.level}',
+                    ...messages.value,
+                  ],
+                )
+                ..loadHtmlString(html, baseUrl: '${uri.scheme}://${uri.host}'),
             ),
           ),
           Flexible(
