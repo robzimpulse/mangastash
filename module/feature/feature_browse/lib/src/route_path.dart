@@ -4,4 +4,5 @@ class BrowseRoutePath {
   static const mangaDetail = '/browse_manga/:source/:mangaId';
   static const chapterDetail = '/browse_manga/:source/:mangaId/:chapterId';
   static const chapterConfig = '/manga_chapter_config';
+  static const searchParamConfig = '/manga_search_param_config';
 }

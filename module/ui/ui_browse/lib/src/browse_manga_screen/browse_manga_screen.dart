@@ -15,12 +15,17 @@ class BrowseMangaScreen extends StatefulWidget {
     required this.launchUrlUseCase,
     required this.getMangaSourceUseCase,
     this.onTapManga,
+    this.onTapFilter,
     this.cacheManager,
   });
 
   final LaunchUrlUseCase launchUrlUseCase;
 
   final ValueSetter<String?>? onTapManga;
+
+  final Future<SearchMangaParameter?>? Function(
+    SearchMangaParameter? value,
+  )? onTapFilter;
 
   final BaseCacheManager? cacheManager;
 
@@ -29,6 +34,9 @@ class BrowseMangaScreen extends StatefulWidget {
   static Widget create({
     required ServiceLocator locator,
     ValueSetter<String?>? onTapManga,
+    Future<SearchMangaParameter?>? Function(
+      SearchMangaParameter? value,
+    )? onTapFilter,
     MangaSourceEnum? source,
   }) {
     return BlocProvider(
@@ -46,6 +54,7 @@ class BrowseMangaScreen extends StatefulWidget {
         cacheManager: locator(),
         getMangaSourceUseCase: locator(),
         onTapManga: onTapManga,
+        onTapFilter: onTapFilter,
       ),
     );
   }
@@ -264,12 +273,20 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             ),
           ),
         ),
-        OutlinedButton.icon(
-          style: buttonStyle,
-          icon: Icon(Icons.filter_list, color: color),
-          label: Text('Filter', style: labelStyle?.copyWith(color: color)),
-          onPressed: () => context.showSnackBar(
-            message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+        _builder(
+          buildWhen: (prev, curr) => prev.parameter != curr.parameter,
+          builder: (context, state) => OutlinedButton.icon(
+            style: buttonStyle,
+            icon: Icon(Icons.filter_list, color: color),
+            label: Text('Filter', style: labelStyle?.copyWith(color: color)),
+            onPressed: () async {
+              final result = await widget.onTapFilter?.call(state.parameter);
+              if (context.mounted && result != null) {
+                context.showSnackBar(
+                  message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+                );
+              }
+            },
           ),
         ),
       ],

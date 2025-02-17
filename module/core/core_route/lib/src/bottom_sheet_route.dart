@@ -36,6 +36,7 @@ class BottomSheetRoute<T> extends Page<T> {
   Route<T> createRoute(BuildContext context) {
     final statusBar = MediaQuery.of(context).viewPadding.top;
     final maxHeight = MediaQuery.of(context).size.height - statusBar;
+
     return ModalSheetRoute(
       expanded: expanded,
       isDismissible: cancelable,
