@@ -10,17 +10,23 @@ import 'manga_search_param_configurator_screen_state.dart';
 class MangaSearchParamConfiguratorScreen extends StatelessWidget {
   const MangaSearchParamConfiguratorScreen({
     super.key,
+    this.scrollController,
   });
+
+  final ScrollController? scrollController;
 
   static Widget create({
     required ServiceLocator locator,
     SearchMangaParameter? param,
+    ScrollController? scrollController,
   }) {
     return BlocProvider(
       create: (context) => MangaSearchParamConfiguratorScreenCubit(
         initialState: const MangaSearchParamConfiguratorScreenState(),
       ),
-      child: const MangaSearchParamConfiguratorScreen(),
+      child: MangaSearchParamConfiguratorScreen(
+          scrollController: scrollController,
+      ),
     );
   }
 
@@ -54,6 +60,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
           ),
         ),
         ListView(
+          controller: scrollController,
           shrinkWrap: true,
           children: [
             _builder(

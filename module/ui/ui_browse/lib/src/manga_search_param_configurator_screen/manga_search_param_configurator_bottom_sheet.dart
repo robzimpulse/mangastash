@@ -4,18 +4,21 @@ import 'package:service_locator/service_locator.dart';
 
 import 'manga_search_param_configurator_screen.dart';
 
-class MangaSearchParamConfiguratorBottomSheet extends BottomSheetRoute {
+class MangaSearchParamConfiguratorBottomSheet extends BottomSheetRouteV2 {
   MangaSearchParamConfiguratorBottomSheet({
     super.key,
     super.name,
     required ServiceLocator locator,
     SearchMangaParameter? parameter,
   }) : super(
-          child: MangaSearchParamConfiguratorScreen.create(
-            locator: locator,
-          ),
+          child: (context, controller) {
+            return MangaSearchParamConfiguratorScreen.create(
+              locator: locator,
+              scrollController: controller,
+            );
+          },
           draggable: true,
           elevation: 16,
-          expanded: false,
+          isScrollControlled: true,
         );
 }
