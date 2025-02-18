@@ -6,13 +6,14 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:log_box/log_box.dart';
+import 'package:queue/queue.dart';
 
 class HeadlessWebviewManager {
   final LogBox _log;
   final HeadlessInAppWebView _webview;
   final BaseCacheManager _cacheManager;
 
-  final Map<Uri, Future<String?>> _queue = {};
+  final _queue = Queue(delay: const Duration(milliseconds: 200));
 
   InAppWebViewController get _controller => _webview.webViewController;
 
@@ -53,7 +54,7 @@ class HeadlessWebviewManager {
       _log.log('Error parsing url: $url', name: runtimeType.toString());
       return null;
     }
-    final html = await _queue.putIfAbsent(uri, () => _fetch(uri: uri));
+    final html = await _queue.add(() => _fetch(uri: uri));
     if (html == null) return null;
     _log.logHtml(uri, html, name: 'HeadlessWebviewManager');
     return parse(html);
@@ -119,5 +120,8 @@ class HeadlessWebviewManager {
     return html;
   }
 
-  Future<void> dispose() => _webview.dispose();
+  Future<void> dispose() async {
+    _queue.cancel();
+    await _webview.dispose();
+  }
 }

@@ -15,6 +15,7 @@ dependencies:
   background_downloader: ^8.7.1
   flutter_inappwebview: ^5.8.0
   html: ^0.15.5
+  queue: ^3.4.0
 
   # core
   core_network:
