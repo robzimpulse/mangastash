@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
@@ -76,7 +77,7 @@ class HeadlessWebviewManager {
         'onLoadStart: $url',
         name: 'HeadlessWebviewManager',
       );
-      onLoadStartCompleter.complete();
+      onLoadStartCompleter.safeComplete();
     };
 
     _webview.onLoadStop = (controller, url) async {
@@ -84,7 +85,7 @@ class HeadlessWebviewManager {
         'onLoadStop: $url',
         name: 'HeadlessWebviewManager',
       );
-      onLoadStopCompleter.complete();
+      onLoadStopCompleter.safeComplete();
     };
 
     _webview.onLoadError = (controller, url, code, message) async {
@@ -92,7 +93,7 @@ class HeadlessWebviewManager {
         'onLoadError: $url - $code - $message',
         name: 'HeadlessWebviewManager',
       );
-      onLoadErrorCompleter.complete();
+      onLoadErrorCompleter.safeComplete();
     };
 
     await Future.wait(
