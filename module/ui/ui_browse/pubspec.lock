@@ -544,7 +544,7 @@ packages:
     source: hosted
     version: "2.1.1"
   log_box:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "../../library/log_box"
       relative: true

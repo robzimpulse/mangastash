@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../common/extension.dart';
+
 class WebviewScreen extends StatelessWidget {
-  const WebviewScreen({super.key, required this.html, required this.uri});
+  const WebviewScreen({
+    super.key,
+    required this.html,
+    required this.uri,
+    this.onTapSnapshot,
+  });
 
   final String html;
 
   final Uri uri;
+
+  final ValueSetter<String?>? onTapSnapshot;
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +75,17 @@ class WebviewScreen extends StatelessWidget {
       },
     );
 
+    final controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(delegate)
+      ..setOnConsoleMessage(
+        (message) => messages.value = [
+          'onJavascriptMessage: ${message.message} - ${message.level}',
+          ...messages.value,
+        ],
+      )
+      ..loadHtmlString(html, baseUrl: '${uri.scheme}://${uri.host}');
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Web Preview'),
@@ -74,23 +94,38 @@ class WebviewScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back),
         ),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              await controller.loadRequest(uri);
+              messages.value = [
+                'Refresh: $uri',
+                ...messages.value,
+              ];
+            },
+            icon: const Icon(Icons.refresh),
+          ),
+          if (onTapSnapshot != null)
+            IconButton(
+              onPressed: () async {
+                final html = await controller.getHtml();
+
+                messages.value = [
+                  'Snapshot: $html',
+                  ...messages.value,
+                ];
+
+                onTapSnapshot?.call(html);
+              },
+              icon: const Icon(Icons.camera_alt),
+            ),
+        ],
       ),
       body: Column(
         children: [
           Flexible(
             flex: 3,
-            child: WebViewWidget(
-              controller: WebViewController()
-                ..setJavaScriptMode(JavaScriptMode.unrestricted)
-                ..setNavigationDelegate(delegate)
-                ..setOnConsoleMessage(
-                  (message) => messages.value = [
-                    'onJavascriptMessage: ${message.message} - ${message.level}',
-                    ...messages.value,
-                  ],
-                )
-                ..loadHtmlString(html, baseUrl: '${uri.scheme}://${uri.host}'),
-            ),
+            child: WebViewWidget(controller: controller),
           ),
           Flexible(
             flex: 1,

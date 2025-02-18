@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:core_network/core_network.dart';
@@ -32,8 +33,16 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     super.close();
   }
 
-  Future<void> init() async {
+  Future<void> init({Uri? uri, String? html}) async {
     emit(state.copyWith(isLoading: true));
+    if (html != null && uri != null) {
+      await _cacheManager.putFile(
+        uri.toString(),
+        utf8.encode(html),
+        fileExtension: 'html',
+        maxAge: const Duration(minutes: 5),
+      );
+    }
     await _fetchChapter();
     emit(state.copyWith(isLoading: false));
   }

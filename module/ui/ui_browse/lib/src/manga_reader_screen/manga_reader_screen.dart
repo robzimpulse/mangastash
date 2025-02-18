@@ -192,7 +192,6 @@ class MangaReaderScreen extends StatelessWidget {
                     prev.chapter?.webUrl != curr.chapter?.webUrl,
                   ].any((e) => e),
                   builder: (context, state) {
-
                     final html = state.rawHtml;
                     final uri = Uri.tryParse(state.chapter?.webUrl ?? '');
 
@@ -206,9 +205,13 @@ class MangaReaderScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      // TODO: show debug web view to replace cache
-                      onPressed: () => context.showSnackBar(
-                        message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+                      onPressed: () => logBox.navigateToWebview(
+                        uri: uri,
+                        html: html,
+                        onTapSnapshot: (value) => _cubit(context).init(
+                          uri: uri,
+                          html: value,
+                        ),
                       ),
                       child: const Text('Open Debug Browser'),
                     );

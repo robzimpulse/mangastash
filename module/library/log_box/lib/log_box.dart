@@ -9,6 +9,7 @@ import 'src/common/log_storage.dart';
 import 'src/model/log_html_model.dart';
 import 'src/model/log_model.dart';
 import 'src/screen/dashboard/dashboard_screen.dart';
+import 'src/screen/webview/webview_screen.dart';
 
 class LogBox {
   static final LogBox _instance = LogBox._();
@@ -86,6 +87,26 @@ class LogBox {
           data: theme ?? Theme.of(context),
           child: DashboardScreen(
             storage: _storage,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void navigateToWebview({
+    required Uri uri,
+    required String html,
+    ThemeData? theme,
+    ValueSetter<String?>? onTapSnapshot,
+  }) {
+    navigatorObserver.navigator?.push(
+      MaterialPageRoute<dynamic>(
+        builder: (context) => Theme(
+          data: theme ?? Theme.of(context),
+          child: WebviewScreen(
+            uri: uri,
+            html: html,
+            onTapSnapshot: onTapSnapshot,
           ),
         ),
       ),

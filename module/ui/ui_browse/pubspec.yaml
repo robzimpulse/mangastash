@@ -30,6 +30,8 @@ dependencies:
     path: ../../library/safe_bloc
   manga_dex_api:
     path: ../../library/manga_dex_api
+  log_box:
+    path: ../../library/log_box
 
   # core
   core_environment:
