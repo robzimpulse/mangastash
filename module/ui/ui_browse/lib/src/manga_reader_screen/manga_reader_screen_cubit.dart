@@ -61,14 +61,12 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
             .listen((event) => _onProgress(event + 1)),
       );
 
-      final cache = await _cacheManager.getFileFromCache(
-        response.data.webUrl ?? '',
-      );
-
       emit(
         state.copyWith(
           chapter: response.data,
-          rawHtml: await cache?.file.readAsString(),
+          rawHtml: await _cacheManager
+              .getFileFromCache(response.data.webUrl ?? '')
+              .then((file) => file?.file.readAsString()),
         ),
       );
     }
