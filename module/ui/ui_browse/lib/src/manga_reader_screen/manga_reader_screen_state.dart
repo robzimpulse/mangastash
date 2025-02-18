@@ -11,6 +11,7 @@ class MangaReaderScreenState extends Equatable {
     this.source,
     this.progress = 0,
     this.chapterIds,
+    this.rawHtml,
   }) {
     final ids = chapterIds ?? [];
     final index = ids.indexOf(chapterId);
@@ -34,6 +35,8 @@ class MangaReaderScreenState extends Equatable {
 
   final List<String?>? chapterIds;
 
+  final String? rawHtml;
+
   late final String? previousChapterId;
 
   late final String? nextChapterId;
@@ -49,6 +52,7 @@ class MangaReaderScreenState extends Equatable {
       source,
       progress,
       chapterIds,
+      rawHtml,
     ];
   }
 
@@ -61,6 +65,7 @@ class MangaReaderScreenState extends Equatable {
     MangaSourceEnum? source,
     int? progress,
     List<String?>? chapterIds,
+    String? rawHtml,
   }) {
     return MangaReaderScreenState(
       mangaId: mangaId ?? this.mangaId,
@@ -71,6 +76,7 @@ class MangaReaderScreenState extends Equatable {
       source: source ?? this.source,
       progress: progress ?? this.progress,
       chapterIds: chapterIds ?? this.chapterIds,
+      rawHtml: rawHtml ?? this.rawHtml,
     );
   }
 }

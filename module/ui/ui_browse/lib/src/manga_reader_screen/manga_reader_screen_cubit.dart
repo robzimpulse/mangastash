@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:core_network/core_network.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:rxdart/rxdart.dart';
@@ -12,13 +13,17 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     with AutoSubscriptionMixin {
   final GetChapterUseCase _getChapterUseCase;
 
+  final BaseCacheManager _cacheManager;
+
   final Map<String, BehaviorSubject<double>> _pageSizeStreams = {};
 
   MangaReaderScreenCubit({
     required GetChapterUseCase getChapterUseCase,
     required GetMangaSourceUseCase getMangaSourceUseCase,
     required MangaReaderScreenState initialState,
+    required BaseCacheManager cacheManager,
   })  : _getChapterUseCase = getChapterUseCase,
+        _cacheManager = cacheManager,
         super(initialState);
 
   @override
@@ -56,7 +61,16 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
             .listen((event) => _onProgress(event + 1)),
       );
 
-      emit(state.copyWith(chapter: response.data));
+      final cache = await _cacheManager.getFileFromCache(
+        response.data.webUrl ?? '',
+      );
+
+      emit(
+        state.copyWith(
+          chapter: response.data,
+          rawHtml: await cache?.file.readAsString(),
+        ),
+      );
     }
 
     if (response is Error<MangaChapter>) {

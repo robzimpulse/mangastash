@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:log_box/log_box.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -12,11 +13,14 @@ import 'manga_reader_screen_state.dart';
 class MangaReaderScreen extends StatelessWidget {
   const MangaReaderScreen({
     super.key,
-    this.cacheManager,
+    required this.cacheManager,
+    required this.logBox,
     this.onTapShortcut,
   });
 
-  final BaseCacheManager? cacheManager;
+  final BaseCacheManager cacheManager;
+
+  final LogBox logBox;
 
   final void Function(String?)? onTapShortcut;
 
@@ -37,10 +41,12 @@ class MangaReaderScreen extends StatelessWidget {
           chapterIds: chapterIds,
         ),
         getChapterUseCase: locator(),
+        cacheManager: locator(),
         getMangaSourceUseCase: locator(),
       )..init(),
       child: MangaReaderScreen(
         cacheManager: locator(),
+        logBox: locator(),
         onTapShortcut: onTapShortcut,
       ),
     );
@@ -108,9 +114,7 @@ class MangaReaderScreen extends StatelessWidget {
 
   Widget _content() {
     return _builder(
-      buildWhen: (prev, curr) => [
-        prev.chapter?.images != curr.chapter?.images,
-      ].any((e) => e),
+      buildWhen: (prev, curr) => prev.chapter?.images != curr.chapter?.images,
       builder: (context, state) => Column(
         children: [
           Row(children: [Expanded(child: _prevButton())]),
@@ -151,9 +155,7 @@ class MangaReaderScreen extends StatelessWidget {
 
   Widget _nextButton() {
     return _builder(
-      buildWhen: (prev, curr) => [
-        prev.nextChapterId != curr.nextChapterId,
-      ].any((e) => e),
+      buildWhen: (prev, curr) => prev.nextChapterId != curr.nextChapterId,
       builder: (context, state) => state.nextChapterId != null
           ? ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -184,16 +186,33 @@ class MangaReaderScreen extends StatelessWidget {
               children: [
                 const Text('Images Empty'),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () => context.showSnackBar(
-                    message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-                  ),
-                  child: const Text('Open Debug Browser'),
+                _builder(
+                  buildWhen: (prev, curr) => [
+                    prev.rawHtml != curr.rawHtml,
+                    prev.chapter?.webUrl != curr.chapter?.webUrl,
+                  ].any((e) => e),
+                  builder: (context, state) {
+
+                    final html = state.rawHtml;
+                    final uri = Uri.tryParse(state.chapter?.webUrl ?? '');
+
+                    if (html == null || uri == null) {
+                      return const SizedBox.shrink();
+                    }
+
+                    return ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      // TODO: show debug web view to replace cache
+                      onPressed: () => context.showSnackBar(
+                        message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+                      ),
+                      child: const Text('Open Debug Browser'),
+                    );
+                  },
                 ),
               ],
             ),
