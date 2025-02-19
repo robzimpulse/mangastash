@@ -5,6 +5,7 @@ import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:flutter/foundation.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -77,6 +78,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   MangaDetailScreenCubit _cubit(BuildContext context) => context.read();
+
+  FlexibleSpaceBarSettings? _flexibleSpaceBarSettings(BuildContext context) => context.dependOnInheritedWidgetOfExactType();
 
   void _onTapWebsite(BuildContext context, MangaDetailScreenState state) async {
     final url = state.manga?.webUrl;
@@ -179,65 +182,163 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      appBar: AppBar(
-        title: _title(),
-        elevation: 0,
-        actions: [
-          _builder(
-            buildWhen: (prev, curr) => [
-              prev.chapters != curr.chapters,
-            ].any((e) => e),
-            builder: (context, state) => state.chapters?.isNotEmpty == true
-                ? PopupMenuButton<DownloadOption>(
-                    icon: const Icon(Icons.download),
-                    onSelected: (value) => _onTapDownload(
-                      context,
-                      value,
-                      state,
-                    ),
-                    itemBuilder: (context) => [
-                      ...DownloadOption.values.map(
-                        (e) => PopupMenuItem<DownloadOption>(
-                          value: e,
-                          child: Text(e.value),
-                        ),
-                      ),
-                    ],
-                  )
-                : const SizedBox.shrink(),
-          ),
-          _builder(
-            builder: (context, state) => IconButton(
-              icon: const Icon(Icons.sort),
-              onPressed: () async {
-                final result = await widget.onTapSort?.call(state.config);
-                if (!context.mounted || result == null) return;
-                _cubit(context).updateMangaConfig(result);
-              },
+      body: NestedScrollView(
+        headerSliverBuilder: (context, isInnerBoxScrolled) => [
+          SliverAppBar(
+            stretch: true,
+            pinned: true,
+            elevation: 0,
+            expandedHeight: MediaQuery.of(context).size.height * 0.25,
+            flexibleSpace: FlexibleSpaceBar(
+              title: _title(),
+              stretchModes: const <StretchMode>[
+                StretchMode.zoomBackground,
+                StretchMode.fadeTitle,
+                StretchMode.blurBackground,
+              ],
+              background: _appBarBackground(),
             ),
+            actions: [
+              _downloadButton(),
+              _filterButton(),
+              _shareButton(context: context),
+            ],
           ),
-          IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: () => _onTapShare(context),
+        ],
+        body: RefreshIndicator(
+          onRefresh: () => _cubit(context).init(),
+          child: _content(),
+        ),
+      ),
+    );
+  }
+
+  Widget _appBarBackground() {
+    return _builder(
+      buildWhen: (prev, curr) => prev.manga?.coverUrl != curr.manga?.coverUrl,
+      builder: (context, state) => Stack(
+        fit: StackFit.expand,
+        children: [
+          CachedNetworkImage(
+            fit: BoxFit.cover,
+            cacheManager: widget.cacheManager,
+            imageUrl: state.manga?.coverUrl ?? '',
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+            progressIndicatorBuilder: (context, url, progress) {
+              return Center(
+                child: SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    value: progress.progress,
+                  ),
+                ),
+              );
+            },
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: <Color>[
+                  Colors.transparent,
+                  Theme.of(context).scaffoldBackgroundColor,
+                ],
+              ),
+            ),
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () => _cubit(context).init(),
-        child: _content(),
+    );
+  }
+
+  Widget _downloadButton() {
+    return _builder(
+      buildWhen: (prev, curr) => prev.chapters != curr.chapters,
+      builder: (context, state) => state.chapters?.isNotEmpty == true
+          ? PopupMenuButton<DownloadOption>(
+              icon: const Icon(Icons.download),
+              onSelected: (value) => _onTapDownload(
+                context,
+                value,
+                state,
+              ),
+              itemBuilder: (context) => [
+                ...DownloadOption.values.map(
+                  (e) => PopupMenuItem<DownloadOption>(
+                    value: e,
+                    child: Text(e.value),
+                  ),
+                ),
+              ],
+            )
+          : const SizedBox.shrink(),
+    );
+  }
+
+  Widget _filterButton() {
+    return _builder(
+      buildWhen: (prev, curr) => prev.config != curr.config,
+      builder: (context, state) => IconButton(
+        icon: const Icon(Icons.filter_list),
+        onPressed: () async {
+          final result = await widget.onTapSort?.call(state.config);
+          if (!context.mounted || result == null) return;
+          _cubit(context).updateMangaConfig(result);
+        },
       ),
+    );
+  }
+
+  Widget _shareButton({required BuildContext context}) {
+    return IconButton(
+      icon: const Icon(Icons.share),
+      onPressed: () => _onTapShare(context),
     );
   }
 
   Widget _title() {
     return _builder(
-      buildWhen: (prev, curr) => prev.isLoadingManga != curr.isLoadingManga,
+      buildWhen: (prev, curr) => [
+        prev.isLoadingManga != curr.isLoadingManga,
+        prev.manga?.title != curr.manga?.title,
+      ].any((e) => e),
       builder: (context, state) => ShimmerLoading.multiline(
         isLoading: state.isLoadingManga,
         width: 100,
         height: 20,
         lines: 1,
-        child: Text(state.manga?.title ?? ''),
+        child: Builder(
+          builder: (context) {
+            final settings = _flexibleSpaceBarSettings(context);
+
+            if (settings == null) return const SizedBox.shrink();
+
+            final brightness = Theme.of(context).brightness;
+            final style = Theme.of(context).textTheme.titleLarge;
+            final double deltaExtent = settings.maxExtent - settings.minExtent;
+            final double progress = clampDouble(
+              1.0 - (settings.currentExtent - settings.minExtent) / deltaExtent,
+              0.0,
+              1.0,
+            );
+
+            return Text(
+              state.manga?.title ?? '',
+              style: style?.copyWith(
+                color: Color.lerp(
+                  switch(brightness) {
+                    Brightness.dark => Colors.white,
+                    Brightness.light => Colors.black,
+                  },
+                  Colors.white,
+                  progress,
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
