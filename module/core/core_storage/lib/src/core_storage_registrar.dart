@@ -4,8 +4,8 @@ import 'package:service_locator/service_locator.dart';
 
 import 'manager/custom_cache_manager/custom_cache_manager.dart';
 import 'manager/path_manager.dart';
-import 'storage/in_memory_storage.dart';
 import 'storage/shared_preferences_storage.dart';
+import 'storage/storage.dart';
 import 'use_case/get_root_path_use_case.dart';
 import 'use_case/listen_backup_path_use_case.dart';
 import 'use_case/listen_download_path_use_case.dart';
@@ -19,7 +19,7 @@ class CoreStorageRegistrar extends Registrar {
     log.log('start register', name: runtimeType.toString());
 
     locator.registerSingleton(await SharedPreferencesStorage.create());
-    locator.registerSingleton(InMemoryStorage());
+    locator.alias<Storage, SharedPreferencesStorage>();
 
     locator.registerSingleton(await PathManager.create(storage: locator()));
     locator.alias<GetRootPathUseCase, PathManager>();

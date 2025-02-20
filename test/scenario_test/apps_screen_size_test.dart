@@ -15,7 +15,7 @@ void main() {
   final locator = ServiceLocator.asNewInstance();
 
   setUp(() {
-    locator.registerSingleton<SharedPreferencesStorage>(MockStorage());
+    locator.registerSingleton<Storage>(MockStorage());
     locator.registerSingleton<ListenThemeUseCase>(MockListenThemeUseCase());
   });
 

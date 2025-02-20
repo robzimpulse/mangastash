@@ -1,6 +1,6 @@
 import 'package:core_storage/core_storage.dart';
 
-class MockStorage implements SharedPreferencesStorage {
+class MockStorage implements Storage {
 
   final Map<String, Object> _data = {};
 
