@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
@@ -72,10 +71,7 @@ class MangaReaderScreen extends StatelessWidget {
           buildWhen: (prev, curr) => prev.isLoading != curr.isLoading,
           builder: (context, state) => state.isLoading
               ? const Center(child: CircularProgressIndicator())
-              : Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: [_content(), _indicator()],
-                ),
+              : _content(),
         ),
       ),
     );
@@ -119,11 +115,12 @@ class MangaReaderScreen extends StatelessWidget {
         children: [
           Row(children: [Expanded(child: _prevButton())]),
           Expanded(
-            child: CustomScrollView(
-              slivers: _images(
-                context: context,
-                images: state.chapter?.images ?? [],
-              ),
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                _images(images: state.chapter?.images ?? []),
+                _indicator(),
+              ],
             ),
           ),
           Row(children: [Expanded(child: _nextButton())]),
@@ -144,9 +141,7 @@ class MangaReaderScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onPressed: () => onTapShortcut?.call(
-                state.previousChapterId,
-              ),
+              onPressed: () => onTapShortcut?.call(state.previousChapterId),
               child: const Text('Previous Chapter'),
             )
           : const SizedBox.shrink(),
@@ -163,112 +158,101 @@ class MangaReaderScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onPressed: () => onTapShortcut?.call(
-                state.nextChapterId,
-              ),
+              onPressed: () => onTapShortcut?.call(state.nextChapterId),
               child: const Text('Next Chapter'),
             )
           : const SizedBox.shrink(),
     );
   }
 
-  List<Widget> _images({
-    required BuildContext context,
+  Widget _images({
     required List<String> images,
   }) {
     if (images.isEmpty) {
-      return [
-        SliverFillRemaining(
-          hasScrollBody: false,
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Images Empty'),
-                const SizedBox(height: 16),
-                _builder(
-                  buildWhen: (prev, curr) => [
-                    prev.rawHtml != curr.rawHtml,
-                    prev.chapter?.webUrl != curr.chapter?.webUrl,
-                  ].any((e) => e),
-                  builder: (context, state) {
-                    final html = state.rawHtml;
-                    final uri = Uri.tryParse(state.chapter?.webUrl ?? '');
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Images Empty'),
+            const SizedBox(height: 16),
+            _builder(
+              buildWhen: (prev, curr) => [
+                prev.rawHtml != curr.rawHtml,
+                prev.chapter?.webUrl != curr.chapter?.webUrl,
+              ].any((e) => e),
+              builder: (context, state) {
+                final html = state.rawHtml;
+                final uri = Uri.tryParse(state.chapter?.webUrl ?? '');
 
-                    if (html == null || uri == null) {
-                      return const SizedBox.shrink();
-                    }
+                if (html == null || uri == null) {
+                  return const SizedBox.shrink();
+                }
 
-                    return ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      onPressed: () => logBox.navigateToWebview(
-                        uri: uri,
-                        html: html,
-                        onTapSnapshot: (value) => _cubit(context).init(
-                          uri: uri,
-                          html: value,
-                        ),
-                      ),
-                      child: const Text('Open Debug Browser'),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
-      ];
-    }
-
-    return List.from(
-      images.mapIndexed(
-        (index, image) => SliverToBoxAdapter(
-          child: VisibilityDetector(
-            key: ValueKey<int>(index),
-            onVisibilityChanged: (info) {
-              if (!context.mounted) return;
-              _cubit(context).onVisibility(
-                key: '$index',
-                visibleFraction: info.visibleFraction,
-              );
-            },
-            child: CachedNetworkImage(
-              cacheManager: cacheManager,
-              imageUrl: image,
-              errorWidget: (context, url, error) => ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 300),
-                child: Center(
-                  child: Row(
-                    children: [
-                      const Icon(Icons.error),
-                      const SizedBox(width: 8),
-                      Expanded(child: Text(error.toString())),
-                    ],
-                  ),
-                ),
-              ),
-              progressIndicatorBuilder: (context, url, progress) {
-                return ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 300),
-                  child: Center(
-                    child: SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        value: progress.progress,
-                      ),
+                return ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
+                  onPressed: () => logBox.navigateToWebview(
+                    uri: uri,
+                    html: html,
+                    onTapSnapshot: (value) => _cubit(context).init(
+                      uri: uri,
+                      html: value,
+                    ),
+                  ),
+                  child: const Text('Open Debug Browser'),
                 );
               },
             ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      itemBuilder: (context, index) => VisibilityDetector(
+        key: ValueKey(index),
+        onVisibilityChanged: (info) {
+          if (!context.mounted) return;
+          _cubit(context).onVisibility(
+            key: '$index',
+            visibleFraction: info.visibleFraction,
+          );
+        },
+        child: CachedNetworkImage(
+          cacheManager: cacheManager,
+          imageUrl: images[index],
+          errorWidget: (context, url, error) => ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 300),
+            child: Center(
+              child: Row(
+                children: [
+                  const Icon(Icons.error),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(error.toString())),
+                ],
+              ),
+            ),
           ),
+          progressIndicatorBuilder: (context, url, progress) {
+            return ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 300),
+              child: Center(
+                child: SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    value: progress.progress,
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
+      itemCount: images.length,
     );
   }
 }
