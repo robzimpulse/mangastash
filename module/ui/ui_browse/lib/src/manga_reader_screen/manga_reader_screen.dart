@@ -4,7 +4,6 @@ import 'package:log_box/log_box.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 
 import 'manga_reader_screen_cubit.dart';
 import 'manga_reader_screen_state.dart';
@@ -77,52 +76,13 @@ class MangaReaderScreen extends StatelessWidget {
     );
   }
 
-  Widget _indicator() {
-    return _builder(
-      buildWhen: (prev, curr) => [
-        prev.progress != curr.progress,
-        prev.chapter?.images != curr.chapter?.images,
-      ].any((e) => e),
-      builder: (context, state) => Positioned(
-        bottom: double.minPositive,
-        child: SafeArea(
-          child: Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.5),
-              borderRadius: const BorderRadius.all(
-                Radius.circular(4),
-              ),
-            ),
-            child: Text(
-              'Page ${state.progress} of ${state.chapter?.images?.length}',
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _content() {
     return _builder(
       buildWhen: (prev, curr) => prev.chapter?.images != curr.chapter?.images,
       builder: (context, state) => Column(
         children: [
           Row(children: [Expanded(child: _prevButton())]),
-          Expanded(
-            child: Stack(
-              alignment: Alignment.bottomCenter,
-              children: [
-                _images(images: state.chapter?.images ?? []),
-                _indicator(),
-              ],
-            ),
-          ),
+          Expanded(child: _images(images: state.chapter?.images ?? [])),
           Row(children: [Expanded(child: _nextButton())]),
         ],
       ),
@@ -212,45 +172,35 @@ class MangaReaderScreen extends StatelessWidget {
     }
 
     return ListView.builder(
-      itemBuilder: (context, index) => VisibilityDetector(
-        key: ValueKey(index),
-        onVisibilityChanged: (info) {
-          if (!context.mounted) return;
-          _cubit(context).onVisibility(
-            key: '$index',
-            visibleFraction: info.visibleFraction,
-          );
-        },
-        child: CachedNetworkImage(
-          cacheManager: cacheManager,
-          imageUrl: images[index],
-          errorWidget: (context, url, error) => ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 300),
-            child: Center(
-              child: Row(
-                children: [
-                  const Icon(Icons.error),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text(error.toString())),
-                ],
-              ),
+      itemBuilder: (context, index) => CachedNetworkImage(
+        cacheManager: cacheManager,
+        imageUrl: images[index],
+        errorWidget: (context, url, error) => ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 300),
+          child: Center(
+            child: Row(
+              children: [
+                const Icon(Icons.error),
+                const SizedBox(width: 8),
+                Expanded(child: Text(error.toString())),
+              ],
             ),
           ),
-          progressIndicatorBuilder: (context, url, progress) {
-            return ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 300),
-              child: Center(
-                child: SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    value: progress.progress,
-                  ),
+        ),
+        progressIndicatorBuilder: (context, url, progress) {
+          return ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 300),
+            child: Center(
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  value: progress.progress,
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
       itemCount: images.length,
     );

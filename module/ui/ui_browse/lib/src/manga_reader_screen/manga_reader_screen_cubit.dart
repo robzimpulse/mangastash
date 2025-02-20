@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
@@ -55,21 +54,6 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     );
 
     if (response is Success<MangaChapter>) {
-      final images = response.data.images ?? [];
-
-      final List<ValueStream<double>> streams = [];
-      for (final image in images) {
-        final subject = _pageSizeStreams[image] ?? BehaviorSubject.seeded(0.0);
-        _pageSizeStreams.putIfAbsent(image, () => subject);
-        streams.add(subject.stream);
-      }
-      addSubscription(
-        CombineLatestStream.list(streams)
-            .map((event) => event.indexOf(event.reduce(max)))
-            .distinct()
-            .listen((event) => _onProgress(event + 1)),
-      );
-
       emit(
         state.copyWith(
           chapter: response.data,
@@ -83,16 +67,5 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     if (response is Error<MangaChapter>) {
       emit(state.copyWith(error: () => response.error));
     }
-  }
-
-  void onVisibility({
-    required String key,
-    required double visibleFraction,
-  }) {
-    _pageSizeStreams[key]?.add(visibleFraction);
-  }
-
-  void _onProgress(int value) {
-    emit(state.copyWith(progress: value));
   }
 }
