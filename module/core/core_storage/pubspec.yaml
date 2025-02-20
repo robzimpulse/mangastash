@@ -19,7 +19,6 @@ dependencies:
   file: ^7.0.0
   path: ^1.9.0
   dio: ^5.7.0
-  dio_cache_interceptor: ^3.5.1
 
   service_locator:
     path: ../../library/service_locator
