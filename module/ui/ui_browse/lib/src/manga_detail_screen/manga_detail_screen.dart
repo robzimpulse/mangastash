@@ -189,7 +189,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             pinned: true,
             elevation: 0,
             expandedHeight: MediaQuery.of(context).size.height * 0.25,
+            titleSpacing: 0,
             flexibleSpace: FlexibleSpaceBar(
+              titlePadding: const EdgeInsets.only(left: 56),
+              // TODO: @robzimpulse - overlapping title with actions button
               title: _title(),
               stretchModes: const <StretchMode>[
                 StretchMode.zoomBackground,
@@ -304,28 +307,30 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         prev.isLoadingManga != curr.isLoadingManga,
         prev.manga?.title != curr.manga?.title,
       ].any((e) => e),
-      builder: (context, state) => ShimmerLoading.multiline(
-        isLoading: state.isLoadingManga,
-        width: 100,
-        height: 20,
-        lines: 1,
-        child: Builder(
-          builder: (context) {
-            final settings = _flexibleSpaceBarSettings(context);
+      builder: (context, state) => Builder(
+        builder: (context) {
+          final settings = _flexibleSpaceBarSettings(context);
 
-            if (settings == null) return const SizedBox.shrink();
+          if (settings == null) return const SizedBox.shrink();
 
-            final brightness = Theme.of(context).brightness;
-            final style = Theme.of(context).textTheme.titleLarge;
-            final double deltaExtent = settings.maxExtent - settings.minExtent;
-            final double progress = clampDouble(
-              1.0 - (settings.currentExtent - settings.minExtent) / deltaExtent,
-              0.0,
-              1.0,
-            );
+          final brightness = Theme.of(context).brightness;
+          final style = Theme.of(context).textTheme.titleLarge;
+          final double deltaExtent = settings.maxExtent - settings.minExtent;
+          final double progress = clampDouble(
+            1.0 - (settings.currentExtent - settings.minExtent) / deltaExtent,
+            0.0,
+            1.0,
+          );
 
-            return Text(
+          return ShimmerLoading.multiline(
+            isLoading: state.isLoadingManga,
+            width: 100,
+            height: 20,
+            lines: 1,
+            child: Text(
               state.manga?.title ?? '',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: style?.copyWith(
                 color: Color.lerp(
                   switch(brightness) {
@@ -336,9 +341,9 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   progress,
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
