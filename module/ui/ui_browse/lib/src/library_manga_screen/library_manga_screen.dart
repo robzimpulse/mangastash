@@ -60,6 +60,20 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
     );
   }
 
+  BlocConsumer _consumer({
+    required BlocWidgetBuilder<LibraryMangaScreenState> builder,
+    BlocBuilderCondition<LibraryMangaScreenState>? buildWhen,
+    required BlocWidgetListener<LibraryMangaScreenState> listener,
+    BlocListenerCondition<LibraryMangaScreenState>? listenWhen,
+  }) {
+    return BlocConsumer<LibraryMangaScreenCubit, LibraryMangaScreenState>(
+      buildWhen: buildWhen,
+      builder: builder,
+      listener: listener,
+      listenWhen: listenWhen,
+    );
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -91,7 +105,9 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
   }
 
   Widget _title({required BuildContext context}) {
-    return _builder(
+    return _consumer(
+      listenWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
+      listener: (context, state) => _searchFocusNode.requestFocus(),
       buildWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
       builder: (context, state) => !state.isSearchActive
           ? const Text('Library')
