@@ -1,6 +1,7 @@
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
+import 'package:ui_common/ui_common.dart';
 
 class LibraryMangaScreenState extends Equatable {
   final bool isLoading;
@@ -13,14 +14,20 @@ class LibraryMangaScreenState extends Equatable {
 
   final String? mangaTitle;
 
+  final Map<MangaSourceEnum?, MangaSource> sources;
+
+  final MangaShelfItemLayout layout;
+
   late final List<Manga> filteredMangas;
 
   LibraryMangaScreenState({
     this.isLoading = false,
     this.error,
     this.mangas = const [],
+    this.sources = const {},
     this.isSearchActive = false,
     this.mangaTitle,
+    this.layout = MangaShelfItemLayout.comfortableGrid,
   }) {
     final title = mangaTitle;
     filteredMangas = isSearchActive && title != null
@@ -40,6 +47,8 @@ class LibraryMangaScreenState extends Equatable {
       mangas,
       isSearchActive,
       mangaTitle,
+      sources,
+      layout,
     ];
   }
 
@@ -47,15 +56,19 @@ class LibraryMangaScreenState extends Equatable {
     bool? isLoading,
     ValueGetter<Exception?>? error,
     List<Manga>? mangas,
+    Map<MangaSourceEnum?, MangaSource>? sources,
     bool? isSearchActive,
     String? mangaTitle,
+    MangaShelfItemLayout? layout,
   }) {
     return LibraryMangaScreenState(
       isLoading: isLoading ?? this.isLoading,
       mangas: mangas ?? this.mangas,
+      sources: sources ?? this.sources,
       error: error != null ? error() : this.error,
       isSearchActive: isSearchActive ?? this.isSearchActive,
       mangaTitle: mangaTitle ?? this.mangaTitle,
+        layout: layout ?? this.layout,
     );
   }
 }

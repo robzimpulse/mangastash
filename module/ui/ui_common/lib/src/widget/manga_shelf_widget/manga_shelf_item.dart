@@ -13,6 +13,7 @@ class MangaShelfItem extends StatelessWidget {
     this.onTap,
     this.isOnLibrary = false,
     this.cacheManager,
+    this.sourceIconUrl,
   });
 
   final String title;
@@ -26,6 +27,8 @@ class MangaShelfItem extends StatelessWidget {
   final VoidCallback? onTap;
 
   final BaseCacheManager? cacheManager;
+
+  final String? sourceIconUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -69,11 +72,38 @@ class MangaShelfItem extends StatelessWidget {
         ),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.only(left: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Text(title),
           ),
         ),
         if (isOnLibrary) const Icon(Icons.bookmark),
+        if (sourceIconUrl != null) ...[
+          Container(
+            width: 24,
+            height: 24,
+            color: isOnLibrary
+                ? Colors.transparent
+                : Colors.black.withOpacity(0.5),
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: CachedNetworkImage(
+                cacheManager: cacheManager,
+                imageUrl: sourceIconUrl ?? '',
+                fit: BoxFit.contain,
+                errorWidget: (context, _, error) => const Center(
+                  child: Icon(Icons.error),
+                ),
+                progressIndicatorBuilder: (context, _, progress) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: progress.progress,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -122,6 +152,37 @@ class MangaShelfItem extends StatelessWidget {
             ),
           ),
         ],
+        if (sourceIconUrl != null) ...[
+          Positioned(
+            right: 0,
+            top: 0,
+            child: Container(
+              width: 24,
+              height: 24,
+              color: isOnLibrary
+                  ? Colors.transparent
+                  : Colors.black.withOpacity(0.5),
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: CachedNetworkImage(
+                  cacheManager: cacheManager,
+                  imageUrl: sourceIconUrl ?? '',
+                  fit: BoxFit.contain,
+                  errorWidget: (context, _, error) => const Center(
+                    child: Icon(Icons.error),
+                  ),
+                  progressIndicatorBuilder: (context, _, progress) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: progress.progress,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
         if (title.isNotEmpty == true)
           Positioned(
             bottom: 0,
@@ -160,6 +221,35 @@ class MangaShelfItem extends StatelessWidget {
                   child: CircularProgressIndicator(value: progress.progress),
                 ),
               ),
+              if (sourceIconUrl != null) ...[
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    color: Colors.black.withOpacity(0.5),
+                    child: Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: CachedNetworkImage(
+                        cacheManager: cacheManager,
+                        imageUrl: sourceIconUrl ?? '',
+                        fit: BoxFit.contain,
+                        errorWidget: (context, _, error) => const Center(
+                          child: Icon(Icons.error),
+                        ),
+                        progressIndicatorBuilder: (context, _, progress) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: progress.progress,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
               if (isOnLibrary) ...[
                 Positioned.fill(
                   child: Container(
