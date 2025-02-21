@@ -69,6 +69,7 @@ class ShimmerLoading extends StatefulWidget {
           child: !isLoading
               ? child
               : Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: List.generate(
                     lines,
                     (index) => Container(

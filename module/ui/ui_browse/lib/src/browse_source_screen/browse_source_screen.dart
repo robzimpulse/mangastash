@@ -43,6 +43,7 @@ class BrowseSourceScreen extends StatelessWidget {
     return ScaffoldScreen(
       appBar: AppBar(
         title: const Text('Browse Sources'),
+        centerTitle: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.screen_search_desktop_outlined),
