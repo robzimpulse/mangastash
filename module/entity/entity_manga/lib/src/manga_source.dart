@@ -15,15 +15,24 @@ class MangaSource extends Equatable {
 
   final String? id;
 
+  final bool? crawlable;
+
   const MangaSource({
     this.iconUrl,
     this.name,
     this.url,
     this.id,
+    this.crawlable,
   });
 
   @override
-  List<Object?> get props => [iconUrl, name, url, id];
+  List<Object?> get props => [
+        iconUrl,
+        name,
+        url,
+        id,
+        crawlable,
+      ];
 
   factory MangaSource.fromJson(Map<String, dynamic> json) {
     return _$MangaSourceFromJson(json);
@@ -36,12 +45,14 @@ class MangaSource extends Equatable {
     MangaSourceEnum? name,
     String? url,
     String? id,
+    bool? crawlable,
   }) {
     return MangaSource(
       iconUrl: iconUrl ?? this.iconUrl,
       name: name ?? this.name,
       url: url ?? this.url,
       id: id ?? this.id,
+      crawlable: crawlable ?? this.crawlable,
     );
   }
 }
