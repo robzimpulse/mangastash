@@ -80,21 +80,19 @@ class GetMangaOnAsuraScanUseCase {
           );
 
     return Success(
-      result.author == author && result.description == description
-          ? result
-          : await _mangaServiceFirebase.update(
-              key: mangaId,
-              update: (old) async => old.copyWith(
-                author: author,
-                description: description,
-                tags: tags,
-              ),
-              ifAbsent: () async => result.copyWith(
-                author: author,
-                description: description,
-                tags: tags,
-              ),
-            ),
+      await _mangaServiceFirebase.update(
+        key: mangaId,
+        update: (old) async => old.copyWith(
+          author: author,
+          description: description,
+          tags: tags,
+        ),
+        ifAbsent: () async => result.copyWith(
+          author: author,
+          description: description,
+          tags: tags,
+        ),
+      ),
     );
   }
 }
