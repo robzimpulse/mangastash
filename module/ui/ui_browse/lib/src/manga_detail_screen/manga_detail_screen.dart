@@ -5,7 +5,6 @@ import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:flutter/foundation.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -78,8 +77,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   MangaDetailScreenCubit _cubit(BuildContext context) => context.read();
-
-  FlexibleSpaceBarSettings? _flexibleSpaceBarSettings(BuildContext context) => context.dependOnInheritedWidgetOfExactType();
 
   void _onTapWebsite(BuildContext context, MangaDetailScreenState state) async {
     final url = state.manga?.webUrl;
@@ -188,24 +185,22 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             stretch: true,
             pinned: true,
             elevation: 0,
-            expandedHeight: MediaQuery.of(context).size.height * 0.25,
+            expandedHeight: MediaQuery.of(context).size.height * 0.4,
             titleSpacing: 0,
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.only(left: 56),
-              // TODO: @robzimpulse - overlapping title with actions button
-              title: _title(),
-              stretchModes: const <StretchMode>[
-                StretchMode.zoomBackground,
-                StretchMode.fadeTitle,
-                StretchMode.blurBackground,
-              ],
-              background: _appBarBackground(),
+            flexibleSpace: FlexibleAppBarBuilder(
+              builder: (context, progress) => MangaDetailAppBarWidget(
+                progress: progress,
+                background: _appBarBackground(),
+                leading: const BackButton(),
+                // title: Container(color: Colors.red),
+                title: _title(),
+                actions: [
+                  _downloadButton(),
+                  _filterButton(),
+                  _shareButton(context: context),
+                ],
+              ),
             ),
-            actions: [
-              _downloadButton(),
-              _filterButton(),
-              _shareButton(context: context),
-            ],
           ),
         ],
         body: RefreshIndicator(
@@ -307,43 +302,17 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         prev.isLoadingManga != curr.isLoadingManga,
         prev.manga?.title != curr.manga?.title,
       ].any((e) => e),
-      builder: (context, state) => Builder(
-        builder: (context) {
-          final settings = _flexibleSpaceBarSettings(context);
-
-          if (settings == null) return const SizedBox.shrink();
-
-          final brightness = Theme.of(context).brightness;
-          final style = Theme.of(context).textTheme.titleLarge;
-          final double deltaExtent = settings.maxExtent - settings.minExtent;
-          final double progress = clampDouble(
-            1.0 - (settings.currentExtent - settings.minExtent) / deltaExtent,
-            0.0,
-            1.0,
-          );
-
-          return ShimmerLoading.multiline(
-            isLoading: state.isLoadingManga,
-            width: 100,
-            height: 20,
-            lines: 1,
-            child: Text(
-              state.manga?.title ?? '',
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: style?.copyWith(
-                color: Color.lerp(
-                  switch(brightness) {
-                    Brightness.dark => Colors.white,
-                    Brightness.light => Colors.black,
-                  },
-                  Colors.white,
-                  progress,
-                ),
-              ),
-            ),
-          );
-        },
+      builder: (context, state) => ShimmerLoading.multiline(
+        isLoading: state.isLoadingManga,
+        width: 100,
+        height: 20,
+        lines: 1,
+        child: Text(
+          state.manga?.title ?? '',
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
       ),
     );
   }

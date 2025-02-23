@@ -25,6 +25,7 @@ export 'src/widget/flexible_app_bar_builder.dart';
 export 'src/widget/gapped_toggle_button_widget.dart';
 export 'src/widget/icon_with_text_widget.dart';
 export 'src/widget/manga_chapter_tile_widget.dart';
+export 'src/widget/manga_detail_app_bar_widget.dart';
 export 'src/widget/manga_detail_widget.dart';
 export 'src/widget/manga_shelf_widget/manga_shelf_item.dart';
 export 'src/widget/manga_shelf_widget/manga_shelf_item_layout.dart';
