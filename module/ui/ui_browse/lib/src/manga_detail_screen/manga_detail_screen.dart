@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:collection/collection.dart';
 import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
@@ -186,14 +188,16 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             pinned: true,
             elevation: 0,
             expandedHeight: MediaQuery.of(context).size.height * 0.4,
-            titleSpacing: 0,
+            automaticallyImplyLeading: false,
             flexibleSpace: FlexibleAppBarBuilder(
               builder: (context, progress) => MangaDetailAppBarWidget(
                 progress: progress,
                 background: _appBarBackground(),
-                leading: const BackButton(),
+                leading: BackButton(
+                  color: Theme.of(context).appBarTheme.iconTheme?.color,
+                ),
                 // title: Container(color: Colors.red),
-                title: _title(),
+                title: _title(progress: progress),
                 actions: [
                   _downloadButton(),
                   _filterButton(),
@@ -256,7 +260,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       buildWhen: (prev, curr) => prev.chapters != curr.chapters,
       builder: (context, state) => state.chapters?.isNotEmpty == true
           ? PopupMenuButton<DownloadOption>(
-              icon: const Icon(Icons.download),
+              icon: Icon(
+                Icons.download,
+                color: Theme.of(context).appBarTheme.iconTheme?.color,
+              ),
               onSelected: (value) => _onTapDownload(
                 context,
                 value,
@@ -279,7 +286,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     return _builder(
       buildWhen: (prev, curr) => prev.config != curr.config,
       builder: (context, state) => IconButton(
-        icon: const Icon(Icons.filter_list),
+        icon: Icon(
+          Icons.filter_list,
+          color: Theme.of(context).appBarTheme.iconTheme?.color,
+        ),
         onPressed: () async {
           final result = await widget.onTapSort?.call(state.config);
           if (!context.mounted || result == null) return;
@@ -291,12 +301,17 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   Widget _shareButton({required BuildContext context}) {
     return IconButton(
-      icon: const Icon(Icons.share),
+      icon: Icon(
+        Icons.share,
+        color: Theme.of(context).appBarTheme.iconTheme?.color,
+      ),
       onPressed: () => _onTapShare(context),
     );
   }
 
-  Widget _title() {
+  Widget _title({required double progress}) {
+    final textStyle = Theme.of(context).textTheme.titleMedium;
+
     return _builder(
       buildWhen: (prev, curr) => [
         prev.isLoadingManga != curr.isLoadingManga,
@@ -311,7 +326,15 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           state.manga?.title ?? '',
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.titleLarge,
+          textAlign: TextAlign.center,
+          style: textStyle?.copyWith(
+            color: Theme.of(context).appBarTheme.iconTheme?.color,
+            fontSize: lerpDouble(
+              Theme.of(context).textTheme.headlineLarge?.fontSize ?? 0,
+              Theme.of(context).textTheme.titleMedium?.fontSize ?? 0,
+              progress,
+            ),
+          ),
         ),
       ),
     );
