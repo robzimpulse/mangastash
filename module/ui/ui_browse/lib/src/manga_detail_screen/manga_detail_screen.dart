@@ -221,32 +221,46 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       builder: (context, state) => Stack(
         fit: StackFit.expand,
         children: [
-          CachedNetworkImage(
-            fit: BoxFit.cover,
-            cacheManager: widget.cacheManager,
-            imageUrl: state.manga?.coverUrl ?? '',
-            errorWidget: (context, url, error) => const Icon(Icons.error),
-            progressIndicatorBuilder: (context, url, progress) {
-              return Center(
-                child: SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    value: progress.progress,
+          Positioned.fill(
+            child: CachedNetworkImage(
+              fit: BoxFit.cover,
+              cacheManager: widget.cacheManager,
+              imageUrl: state.manga?.coverUrl ?? '',
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+              progressIndicatorBuilder: (context, url, progress) {
+                return Center(
+                  child: SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      value: progress.progress,
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: <Color>[
-                  Colors.transparent,
-                  Theme.of(context).scaffoldBackgroundColor,
-                ],
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.5,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: <Color>[
+                    Colors.transparent,
+                    Theme.of(context).scaffoldBackgroundColor,
+                  ],
+                ),
               ),
             ),
           ),
@@ -330,7 +344,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           style: textStyle?.copyWith(
             color: Theme.of(context).appBarTheme.iconTheme?.color,
             fontSize: lerpDouble(
-              Theme.of(context).textTheme.headlineLarge?.fontSize ?? 0,
+              Theme.of(context).textTheme.headlineMedium?.fontSize ?? 0,
               Theme.of(context).textTheme.titleMedium?.fontSize ?? 0,
               progress,
             ),

@@ -59,14 +59,16 @@ class MangaDetailAppBarWidget extends StatelessWidget {
             top: 0,
             bottom: 0,
             child: SafeArea(
-              child: Padding(
+              child: Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: lerpDouble(16, 0, progress) ?? 0,
                 ),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: title,
+                alignment: Alignment.lerp(
+                  Alignment.center,
+                  Alignment.centerLeft,
+                  progress,
                 ),
+                child: title,
               ),
             ),
           ),

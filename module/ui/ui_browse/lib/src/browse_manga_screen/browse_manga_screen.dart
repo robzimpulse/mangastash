@@ -214,7 +214,8 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             constraints: const BoxConstraints(maxHeight: 44),
             child: Container(
               color: Theme.of(context).appBarTheme.backgroundColor,
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              alignment: Alignment.centerLeft,
               child: _menus(context),
             ),
           ),
