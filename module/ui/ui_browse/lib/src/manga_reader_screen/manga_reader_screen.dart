@@ -1,6 +1,5 @@
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:log_box/log_box.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -12,13 +11,10 @@ class MangaReaderScreen extends StatelessWidget {
   const MangaReaderScreen({
     super.key,
     required this.cacheManager,
-    required this.logBox,
     this.onTapShortcut,
   });
 
   final BaseCacheManager cacheManager;
-
-  final LogBox logBox;
 
   final void Function(String?)? onTapShortcut;
 
@@ -35,16 +31,15 @@ class MangaReaderScreen extends StatelessWidget {
         initialState: MangaReaderScreenState(
           mangaId: mangaId,
           chapterId: chapterId,
-          source: source,
+          sourceEnum: source,
           chapterIds: chapterIds,
         ),
         getChapterUseCase: locator(),
-        cacheManager: locator(),
         getMangaSourceUseCase: locator(),
+        crawlChapterUseCase: locator(),
       )..init(),
       child: MangaReaderScreen(
         cacheManager: locator(),
-        logBox: locator(),
         onTapShortcut: onTapShortcut,
       ),
     );
@@ -78,11 +73,20 @@ class MangaReaderScreen extends StatelessWidget {
 
   Widget _content() {
     return _builder(
-      buildWhen: (prev, curr) => prev.chapter?.images != curr.chapter?.images,
+      buildWhen: (prev, curr) => [
+        prev.chapter?.images != curr.chapter?.images,
+        prev.crawlable != curr.crawlable,
+      ].any((e) => e),
       builder: (context, state) => Column(
         children: [
           Row(children: [Expanded(child: _prevButton())]),
-          Expanded(child: _images(images: state.chapter?.images ?? [])),
+          Expanded(
+            child: _images(
+              context: context,
+              images: state.chapter?.images ?? [],
+              crawlable: state.crawlable,
+            ),
+          ),
           Row(children: [Expanded(child: _nextButton())]),
         ],
       ),
@@ -126,6 +130,8 @@ class MangaReaderScreen extends StatelessWidget {
   }
 
   Widget _images({
+    required BuildContext context,
+    required bool crawlable,
     required List<String> images,
   }) {
     if (images.isEmpty) {
@@ -134,38 +140,18 @@ class MangaReaderScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text('Images Empty'),
-            const SizedBox(height: 16),
-            _builder(
-              buildWhen: (prev, curr) => [
-                prev.rawHtml != curr.rawHtml,
-                prev.chapter?.webUrl != curr.chapter?.webUrl,
-              ].any((e) => e),
-              builder: (context, state) {
-                final html = state.rawHtml;
-                final uri = Uri.tryParse(state.chapter?.webUrl ?? '');
-
-                if (html == null || uri == null) {
-                  return const SizedBox.shrink();
-                }
-
-                return ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+            if (crawlable) ...[
+              const SizedBox(height: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  onPressed: () => logBox.navigateToWebview(
-                    uri: uri,
-                    html: html,
-                    onTapSnapshot: (value) => _cubit(context).init(
-                      uri: uri,
-                      html: value,
-                    ),
-                  ),
-                  child: const Text('Open Debug Browser'),
-                );
-              },
-            ),
+                ),
+                onPressed: () => _cubit(context).recrawl(),
+                child: const Text('Open Debug Browser'),
+              ),
+            ],
           ],
         ),
       );

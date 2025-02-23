@@ -93,13 +93,13 @@ class LogBox {
     );
   }
 
-  void navigateToWebview({
+  Future<void> navigateToWebview({
     required Uri uri,
     required String html,
     ThemeData? theme,
     ValueSetter<String?>? onTapSnapshot,
-  }) {
-    navigatorObserver.navigator?.push(
+  }) async {
+    await navigatorObserver.navigator?.push(
       MaterialPageRoute<dynamic>(
         builder: (context) => Theme(
           data: theme ?? Theme.of(context),
