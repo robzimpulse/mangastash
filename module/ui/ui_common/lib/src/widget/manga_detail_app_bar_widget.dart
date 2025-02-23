@@ -39,22 +39,24 @@ class MangaDetailAppBarWidget extends StatelessWidget {
           ),
         if (leading != null)
           Positioned(
-            left: 4,
-            top: 28,
-            child: leading,
+            left: 0,
+            top: 4,
+            child: SafeArea(child: leading),
           ),
         if (actions != null)
           Positioned(
             right: 0,
-            top: 28,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: actions,
+            top: 4,
+            child: SafeArea(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: actions,
+              ),
             ),
           ),
         if (title != null)
           Positioned(
-            left: lerpDouble(0, 56, progress),
+            left: lerpDouble(0, 48, progress),
             right: lerpDouble(0, 48 * (actions?.length ?? 0.0), progress),
             top: 0,
             bottom: 0,
