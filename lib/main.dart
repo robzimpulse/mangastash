@@ -75,6 +75,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
     await widget.locator.registerRegistrar(CoreNetworkRegistrar());
     await widget.locator.registerRegistrar(CoreStorageRegistrar());
     await widget.locator.registerRegistrar(CoreEnvironmentRegistrar());
+    await widget.locator.registerRegistrar(CoreRouteRegistrar());
     await widget.locator.registerRegistrar(DataMangaRegistrar());
     await widget.locator.registerRegistrar(DomainMangaRegistrar());
 
