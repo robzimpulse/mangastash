@@ -77,6 +77,13 @@ class MangaChapterServiceFirebase {
 
     final ref = _ref
         .where('manga_id', isEqualTo: value.mangaId)
+        .where('manga_title', isEqualTo: value.mangaTitle)
+        .where('volume', isEqualTo: value.volume)
+        .where('chapter', isEqualTo: value.chapter)
+        .where('readable_at', isEqualTo: value.readableAt)
+        .where('publish_at', isEqualTo: value.publishAt)
+        .where('translated_language', isEqualTo: value.translatedLanguage)
+        .where('scanlation_group', isEqualTo: value.scanlationGroup)
         .where('web_url', isEqualTo: value.webUrl)
         .orderBy('manga_id');
 
