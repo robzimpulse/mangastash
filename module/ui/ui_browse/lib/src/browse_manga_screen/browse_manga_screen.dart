@@ -354,6 +354,9 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             coverUrl: e.coverUrl ?? '',
             layout: state.layout,
             onTap: () => widget.onTapManga?.call(e.id),
+            onLongPress: () => context.showSnackBar(
+              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+            ),
             isOnLibrary: state.libraryMapById[e.id] != null,
           ),
         );

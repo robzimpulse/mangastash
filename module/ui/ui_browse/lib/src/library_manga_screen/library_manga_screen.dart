@@ -219,6 +219,9 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
             sourceIconUrl: state.sources[e.source]?.iconUrl,
             layout: state.layout,
             onTap: () => widget.onTapManga?.call(e),
+            onLongPress: () => context.showSnackBar(
+              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+            ),
           ),
         );
 

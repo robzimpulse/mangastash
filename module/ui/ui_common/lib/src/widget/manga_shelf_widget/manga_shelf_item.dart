@@ -11,6 +11,7 @@ class MangaShelfItem extends StatelessWidget {
     required this.coverUrl,
     required this.layout,
     this.onTap,
+    this.onLongPress,
     this.isOnLibrary = false,
     this.cacheManager,
     this.sourceIconUrl,
@@ -26,6 +27,8 @@ class MangaShelfItem extends StatelessWidget {
 
   final VoidCallback? onTap;
 
+  final VoidCallback? onLongPress;
+
   final BaseCacheManager? cacheManager;
 
   final String? sourceIconUrl;
@@ -33,8 +36,9 @@ class MangaShelfItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      onTap: onTap,
+      onLongPress: onLongPress,
       child: _content(context),
-      onTap: () => onTap?.call(),
     );
   }
 
