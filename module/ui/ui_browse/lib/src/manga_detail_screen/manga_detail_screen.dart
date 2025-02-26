@@ -105,7 +105,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   void _onTapDownload(
     BuildContext context,
     DownloadOption option,
-    MangaDetailScreenState state,
   ) async {
     await [
       Permission.storage,
@@ -278,11 +277,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 Icons.download,
                 color: Theme.of(context).appBarTheme.iconTheme?.color,
               ),
-              onSelected: (value) => _onTapDownload(
-                context,
-                value,
-                state,
-              ),
+              onSelected: (value) => _onTapDownload(context, value),
               itemBuilder: (context) => [
                 ...DownloadOption.values.map(
                   (e) => PopupMenuItem<DownloadOption>(
