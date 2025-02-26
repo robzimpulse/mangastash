@@ -95,12 +95,12 @@ class SearchMangaOnMangaClashUseCaseUseCase {
       ),
     );
 
-    final data = await _mangaServiceFirebase.sync(
-      values: List.of(
-        mangas.map(
-          (manga) => manga.copyWith(
+    final data = await Future.wait(
+      mangas.map(
+        (e) => _mangaServiceFirebase.sync(
+          value: e.copyWith(
             tags: List.of(
-              tags.where((tag) => manga.tagsName.contains(tag.name)),
+              tags.where((tag) => e.tagsName.contains(tag.name)),
             ),
           ),
         ),

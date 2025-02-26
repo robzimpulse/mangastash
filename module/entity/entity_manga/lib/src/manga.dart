@@ -2,13 +2,14 @@ import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
+import 'package:text_similarity/text_similarity.dart';
 
 import '../entity_manga.dart';
 
 part 'manga.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class Manga extends Equatable {
+class Manga extends Equatable implements Comparable {
   final String? id;
 
   final String? title;
@@ -128,5 +129,32 @@ class Manga extends Equatable {
           .join(' | '),
       webUrl: 'https://mangadex.org/title/${data.id}',
     );
+  }
+
+
+
+  double similarity(Manga other) {
+    final matcher = StringMatcher(
+      term: TermEnum.char,
+      algorithm: const LevenshteinAlgorithm(),
+    );
+
+    final score = [
+      matcher.similar(title, other.title)?.ratio ?? 0,
+      matcher.similar(coverUrl, other.coverUrl)?.ratio ?? 0,
+      matcher.similar(author, other.author)?.ratio ?? 0,
+      matcher.similar(status, other.status)?.ratio ?? 0,
+      matcher.similar(description, other.description)?.ratio ?? 0,
+      matcher.similar(webUrl, other.webUrl)?.ratio ?? 0,
+      matcher.similar(source?.name, other.source?.name)?.ratio ?? 0,
+    ];
+
+    return score.average;
+  }
+
+  @override
+  int compareTo(other) {
+    if (other is! Manga) return 0;
+    return (similarity(other) * 100000).toInt();
   }
 }

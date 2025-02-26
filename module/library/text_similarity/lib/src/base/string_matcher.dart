@@ -21,8 +21,6 @@ typedef StringTypeParser = List<String> Function(
 );
 
 class StringMatcher {
-  // String first_string;
-  // String second_string;
 
   final _supportsTypes = <Type, StringTypeParser>{
     String: (value, term, splitters, ngramValue) {
@@ -62,6 +60,11 @@ class StringMatcher {
   /// the result as [StringMasterValue], which is wrapper over
   /// values: ratio, percent, distance.
   StringMatcherValue? similar(dynamic first, dynamic second) {
+
+    if (first == null && second == null) {
+      return StringMatcherValue(ratio: 1, maxLength: 0);
+    }
+
     final isTypeValid = [
       _supportsTypes.keys.contains(first.runtimeType),
       _supportsTypes.keys.contains(first.runtimeType),

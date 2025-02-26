@@ -94,7 +94,9 @@ class SearchMangaOnAsuraScanUseCase {
     final haveNextPage =
         contentPagination?.attributes['style'] == 'pointer-events:auto';
 
-    final data = await _mangaServiceFirebase.sync(values: mangas);
+    final data = await Future.wait(
+      mangas.map((e) => _mangaServiceFirebase.sync(value: e)),
+    );
 
     return Success(
       Pagination<Manga>(

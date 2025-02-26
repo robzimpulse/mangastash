@@ -22,6 +22,8 @@ dependencies:
   # library
   manga_dex_api:
     path: ../../library/manga_dex_api
+  text_similarity:
+    path: ../../library/text_similarity
 
 dev_dependencies:
   flutter_test:

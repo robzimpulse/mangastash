@@ -7,12 +7,12 @@ void main() {
   group('Levenshtein', () {
     final levenshteinChar = StringMatcher(
       term: TermEnum.char,
-      algorithm: LevenshteinAlgorithm(),
+      algorithm: const LevenshteinAlgorithm(),
     );
 
     final levenshteinWord = StringMatcher(
       term: TermEnum.word,
-      algorithm: LevenshteinAlgorithm(),
+      algorithm: const LevenshteinAlgorithm(),
       separators: [' ', ','],
     );
 
@@ -62,7 +62,7 @@ void main() {
         'anime',
         'spider',
         'dart_best_language',
-        'fuzzy'
+        'fuzzy',
       ];
 
       test('Limit more than elements in list', () {

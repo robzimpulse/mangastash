@@ -4,6 +4,9 @@ import 'algorithm.dart';
 
 /// Levenshtein distance is a string metric for measuring the difference between two sequences
 class LevenshteinAlgorithm implements Algorithm {
+
+  const LevenshteinAlgorithm();
+
   /// This ratio transform to percent and distance.
   @override
   double getRatio(List<String> first, List<String> second) {

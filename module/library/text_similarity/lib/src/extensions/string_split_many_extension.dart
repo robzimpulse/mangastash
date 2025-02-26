@@ -66,8 +66,14 @@ extension StringSplitMany on String {
         }
         currentCountNgram++;
         if (currentCountNgram == ngramValue) {
-          result.add(_subReplacer(
-              startIndex, isReplacePunctuationsOnSpace, splitters, i));
+          result.add(
+            _subReplacer(
+              startIndex,
+              isReplacePunctuationsOnSpace,
+              splitters,
+              i,
+            ),
+          );
           startIndex = i + 1;
           currentCountNgram = 0;
         }

@@ -14,14 +14,24 @@ class MangaServiceFirebase {
 
   MangaServiceFirebase({required FirebaseApp app}) : _app = app;
 
-  Future<List<Manga>> sync({required List<Manga> values}) async {
-    final cache = await Future.wait(values.map((e) => search(value: e)));
-    final oldValues = cache.expand((e) => e);
-    final ids = Set.of(oldValues.map((e) => e.webUrl).whereNotNull());
-    final diff = List.of(values);
-    diff.removeWhere((e) => ids.contains(e.webUrl));
-    final newValues = await Future.wait(diff.map((e) => add(value: e)));
-    return [...oldValues, ...newValues];
+  Future<Manga> sync({required Manga value}) async {
+    final founds = await search(value: value);
+
+    final match = founds
+        .sorted((a, b) => value.compareTo(a) - value.compareTo(b))
+        .lastOrNull;
+
+    final candidate = match ?? await add(value: value);
+
+    final trash = founds.whereNot((e) => e.id == candidate.id);
+
+    await Future.wait(trash.map((e) => delete(value: e)));
+
+    return await update(
+      key: candidate.id,
+      update: (old) async => candidate,
+      ifAbsent: () async => candidate,
+    );
   }
 
   Future<Manga> add({required Manga value}) async {
@@ -31,21 +41,28 @@ class MangaServiceFirebase {
     return data;
   }
 
+  Future<void> delete({required Manga value}) {
+    return _ref.doc(value.id).delete();
+  }
+
   Future<Manga> update({
-    required String key,
+    required String? key,
     required Future<Manga> Function(Manga value) update,
     required Future<Manga> Function() ifAbsent,
   }) async {
-    final data = (await _ref.doc(key).get()).data();
-    if (data != null) {
-      final updated = await update(Manga.fromJson(data));
-      if (updated.toJson() == data) return updated;
-      await _ref.doc(key).set(updated.toJson());
-      return updated;
+    if (key == null) {
+      return add(value: await ifAbsent());
     }
-    final newData = (await ifAbsent()).copyWith(id: key);
-    await _ref.doc(key).set(newData.toJson());
-    return newData;
+    final data = (await _ref.doc(key).get()).data();
+    if (data == null) {
+      final value = (await ifAbsent()).copyWith(id: key);
+      await _ref.doc(key).set(value.toJson());
+      return value;
+    }
+    final updated = await update(Manga.fromJson(data));
+    if (updated.toJson() == data) return updated;
+    await _ref.doc(key).set(updated.toJson());
+    return updated;
   }
 
   Future<Manga?> get({required String id}) async {
