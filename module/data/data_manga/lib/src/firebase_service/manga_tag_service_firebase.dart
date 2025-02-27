@@ -10,8 +10,6 @@ class MangaTagServiceFirebase {
 
   late final _ref = _db.collection('tags');
 
-  late final _stream = _ref.snapshots();
-
   MangaTagServiceFirebase({required FirebaseApp app}) : _app = app;
 
   Future<List<MangaTag>> sync({required List<MangaTag> values}) async {

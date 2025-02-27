@@ -12,8 +12,6 @@ class MangaLibraryServiceFirebase {
 
   late final _ref = _db.collection('libraries');
 
-  late final _stream = _ref.snapshots();
-
   MangaLibraryServiceFirebase({required FirebaseApp app}) : _app = app;
 
   Future<bool> add(Manga value, String userId) async {

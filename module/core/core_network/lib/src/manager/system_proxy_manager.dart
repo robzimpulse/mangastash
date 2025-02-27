@@ -26,7 +26,11 @@ class SystemProxyManager implements GetSystemProxyUseCase {
     }
 
     if (kDebugMode && port != null && host != null) {
-      HttpOverrides.global = _SystemProxyHttpOverrides(port: port, host: host);
+      HttpOverrides.global = _SystemProxyHttpOverrides(
+        port: port,
+        host: host,
+        bypassSslValidation: true,
+      );
       log.log(
         'Using proxy with host: $host:$port',
         name: 'SystemProxyManager',
