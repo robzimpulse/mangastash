@@ -2,28 +2,27 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:core_storage/core_storage.dart';
-import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 
-class CrawlChapterUseCase {
+class CrawlUrlUseCase {
   final LogBox _logBox;
 
   final BaseCacheManager _cacheManager;
 
-  CrawlChapterUseCase({
+  CrawlUrlUseCase({
     required LogBox logBox,
     required BaseCacheManager cacheManager,
   })  : _logBox = logBox,
         _cacheManager = cacheManager;
 
   Future<void> execute({
-    MangaChapter? chapter,
+    required String url,
   }) async {
-    final uri = Uri.tryParse(chapter?.webUrl ?? '');
+    final uri = Uri.tryParse(url);
     if (uri == null) return;
 
     final String? cached = await _cacheManager
-        .getFileFromCache(chapter?.webUrl ?? '')
+        .getFileFromCache(url)
         .then((file) => file?.file.readAsString());
 
     await _logBox.navigateToWebview(

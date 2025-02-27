@@ -7,7 +7,7 @@ import 'manager/file_download_manager.dart';
 import 'manager/headless_webview_manager.dart';
 import 'manager/library_manager.dart';
 import 'manager/manga_source_manager.dart';
-import 'use_case/chapter/crawl_chapter_use_case.dart';
+import 'use_case/chapter/crawl_url_use_case.dart';
 import 'use_case/chapter/download_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_on_asura_scan_use_case.dart';
 import 'use_case/chapter/get_chapter_on_manga_clash_use_case.dart';
@@ -75,7 +75,7 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(() => CoverRepository(service: locator()));
 
     locator.registerFactory(
-      () => CrawlChapterUseCase(
+      () => CrawlUrlUseCase(
         logBox: log,
         cacheManager: locator(),
       ),
@@ -83,7 +83,6 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => SearchMangaOnMangaDexUseCase(
         mangaService: locator(),
-        log: locator(),
       ),
     );
     locator.registerFactory(

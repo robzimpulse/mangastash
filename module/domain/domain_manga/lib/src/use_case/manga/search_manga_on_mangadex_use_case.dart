@@ -1,27 +1,18 @@
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 class SearchMangaOnMangaDexUseCase {
   final MangaService _mangaService;
-  final LogBox _log;
 
   const SearchMangaOnMangaDexUseCase({
     required MangaService mangaService,
-    required LogBox log,
-  })  : _mangaService = mangaService,
-        _log = log;
+  }) : _mangaService = mangaService;
 
   Future<Result<Pagination<Manga>>> execute({
     required SearchMangaParameter parameter,
   }) async {
     try {
-      _log.log(
-        '${parameter.toJson()}',
-        name: runtimeType.toString(),
-      );
-
       final result = await _mangaService.search(
         title: parameter.title,
         limit: parameter.limit?.toInt(),

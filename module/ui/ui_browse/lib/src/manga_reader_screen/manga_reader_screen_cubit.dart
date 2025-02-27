@@ -10,7 +10,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     with AutoSubscriptionMixin {
   final GetChapterUseCase _getChapterUseCase;
 
-  final CrawlChapterUseCase _crawlChapterUseCase;
+  final CrawlUrlUseCase _crawlUrlUseCase;
 
   final Map<String, BehaviorSubject<double>> _pageSizeStreams = {};
 
@@ -19,11 +19,11 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
   MangaReaderScreenCubit({
     required GetChapterUseCase getChapterUseCase,
     required GetMangaSourceUseCase getMangaSourceUseCase,
-    required CrawlChapterUseCase crawlChapterUseCase,
+    required CrawlUrlUseCase crawlUrlUseCase,
     required MangaReaderScreenState initialState,
   })  : _getChapterUseCase = getChapterUseCase,
         _getMangaSourceUseCase = getMangaSourceUseCase,
-        _crawlChapterUseCase = crawlChapterUseCase,
+        _crawlUrlUseCase = crawlUrlUseCase,
         super(initialState);
 
   @override
@@ -61,7 +61,9 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
   }
 
   void recrawl() async {
-    await _crawlChapterUseCase.execute(chapter: state.chapter);
+    final url = state.chapter?.webUrl;
+    if (url == null) return;
+    await _crawlUrlUseCase.execute(url: url);
     await _fetchChapter();
   }
 }
