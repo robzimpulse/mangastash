@@ -78,12 +78,14 @@ class MangaChapterServiceFirebase {
         .orderBy('manga_id');
 
     final total = (await ref.count().get()).count ?? 0;
-    String? offset;
+    DocumentSnapshot? offset;
 
     do {
-      final query = await ref.startAfter([offset]).limit(100).get();
-      offset = query.docs.lastOrNull?.id;
-      data.addAll(query.docs.map((e) => MangaChapter.fromJson(e.data())));
+      final result = (offset == null)
+          ? await (ref.limit(100).get())
+          : await (ref.startAfterDocument(offset).limit(100).get());
+      data.addAll(result.docs.map((e) => MangaChapter.fromJson(e.data())));
+      offset = result.docs.lastOrNull;
     } while (data.length < total);
 
     return data;

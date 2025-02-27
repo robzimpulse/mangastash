@@ -61,12 +61,14 @@ class MangaTagServiceFirebase {
     final List<MangaTag> data = [];
     final ref = _ref.where('name', isEqualTo: value.name).orderBy('name');
     final total = (await ref.count().get()).count ?? 0;
-    String? offset;
+    DocumentSnapshot? offset;
 
     do {
-      final query = await ref.startAfter([offset]).limit(100).get();
-      offset = query.docs.lastOrNull?.id;
-      data.addAll(query.docs.map((e) => MangaTag.fromJson(e.data())));
+      final result = (offset == null)
+          ? await (ref.limit(100).get())
+          : await (ref.startAfterDocument(offset).limit(100).get());
+      data.addAll(result.docs.map((e) => MangaTag.fromJson(e.data())));
+      offset = result.docs.lastOrNull;
     } while (data.length < total);
 
     return data;

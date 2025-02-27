@@ -49,34 +49,25 @@ class SearchMangaUseCase {
 
     if (result is Success<Pagination<Manga>>) {
       final mangas = result.data.data;
-
-      final tags = await Future.wait([
-        ...?mangas?.expand((e) => e.tagsName).toSet().map(
-              (e) => _mangaTagServiceFirebase.sync(
-                value: MangaTag(name: e),
-              ),
-            ),
+      final uniqueTags = [
+        ...?mangas?.expand((e) => [...?e.tags]).toSet()
+      ];
+      final syncedTags = await Future.wait([
+        ...uniqueTags.map((e) => _mangaTagServiceFirebase.sync(value: e)),
       ]);
-
-      return Success(
-        result.data.copyWith(
-          data: await Future.wait(
-            [
-              ...?mangas?.map(
-                (e) => _mangaServiceFirebase.sync(
-                  value: e.copyWith(
-                    tags: [
-                      ...tags.where(
-                        (tag) => e.tagsName.contains(tag.name),
-                      ),
-                    ],
-                  ),
-                ),
+      final promiseData = mangas?.map(
+        (e) => _mangaServiceFirebase.sync(
+          value: e.copyWith(
+            tags: [
+              ...syncedTags.where(
+                (tag) => e.tagsName.contains(tag.name),
               ),
             ],
           ),
         ),
       );
+      final data = await Future.wait([...?promiseData]);
+      return Success(result.data.copyWith(data: data));
     }
 
     return result;
