@@ -1,10 +1,12 @@
-import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:text_similarity/text_similarity.dart';
+
+import 'base/base_model.dart';
 
 part 'manga_tag.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class MangaTag extends Equatable {
+class MangaTag extends BaseModel {
   final String? name;
 
   final String? id;
@@ -26,4 +28,17 @@ class MangaTag extends Equatable {
   MangaTag copyWith({String? name, String? id}) {
     return MangaTag(name: name ?? this.name, id: id ?? this.id);
   }
+
+  @override
+  double similarity(other) {
+    if (other is! MangaTag) return 0;
+
+    final matcher = StringMatcher(
+      term: TermEnum.char,
+      algorithm: const LevenshteinAlgorithm(),
+    );
+
+    return matcher.similar(name, other.name)?.ratio ?? 0;
+  }
+
 }

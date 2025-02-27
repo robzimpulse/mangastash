@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:core_environment/core_environment.dart'
     show toBeginningOfSentenceCase;
 import 'package:core_network/core_network.dart';
-import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:html/dom.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
@@ -12,13 +11,10 @@ import '../../manager/headless_webview_manager.dart';
 
 class SearchMangaOnAsuraScanUseCase {
   final HeadlessWebviewManager _webview;
-  final MangaServiceFirebase _mangaServiceFirebase;
 
   SearchMangaOnAsuraScanUseCase({
     required HeadlessWebviewManager webview,
-    required MangaServiceFirebase mangaServiceFirebase,
-  })  : _webview = webview,
-        _mangaServiceFirebase = mangaServiceFirebase;
+  }) : _webview = webview;
 
   Future<Result<Pagination<Manga>>> execute({
     required SearchMangaParameter parameter,
@@ -94,16 +90,12 @@ class SearchMangaOnAsuraScanUseCase {
     final haveNextPage =
         contentPagination?.attributes['style'] == 'pointer-events:auto';
 
-    final data = await Future.wait(
-      mangas.map((e) => _mangaServiceFirebase.sync(value: e)),
-    );
-
     return Success(
       Pagination<Manga>(
-        data: data,
+        data: mangas,
         page: '$page',
-        limit: data.length,
-        total: data.length,
+        limit: mangas.length,
+        total: mangas.length,
         hasNextPage: haveNextPage,
       ),
     );

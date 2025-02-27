@@ -20,12 +20,10 @@ class MangaChapterServiceFirebase {
         .sorted((a, b) => value.compareTo(a) - value.compareTo(b))
         .lastOrNull;
 
-    final candidate = match ?? await add(value: value);
-
     return await update(
-      key: candidate.id,
-      update: (old) async => candidate,
-      ifAbsent: () async => candidate,
+      key: match?.id,
+      update: (old) async => value,
+      ifAbsent: () async => value,
     );
   }
 
@@ -53,12 +51,12 @@ class MangaChapterServiceFirebase {
     final data = (await _ref.doc(key).get()).data();
     if (data == null) {
       final value = (await ifAbsent()).copyWith(id: key);
-      await _ref.doc(key).set(value.toJson());
+      await _ref.doc(key).set(value.copyWith(id: key).toJson());
       return value;
     }
     final updated = await update(MangaChapter.fromJson(data));
     if (updated.toJson() == data) return updated;
-    await _ref.doc(key).set(updated.toJson());
+    await _ref.doc(key).set(updated.copyWith(id: key).toJson());
     return updated;
   }
 

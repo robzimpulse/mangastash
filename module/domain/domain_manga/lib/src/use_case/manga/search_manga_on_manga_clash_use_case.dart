@@ -5,26 +5,17 @@ import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart'
     show toBeginningOfSentenceCase;
 import 'package:core_network/core_network.dart';
-import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../manager/headless_webview_manager.dart';
 
 class SearchMangaOnMangaClashUseCaseUseCase {
   final HeadlessWebviewManager _webview;
-  final MangaServiceFirebase _mangaServiceFirebase;
-  final MangaTagServiceFirebase _mangaTagServiceFirebase;
 
   SearchMangaOnMangaClashUseCaseUseCase({
-    required LogBox log,
     required HeadlessWebviewManager webview,
-    required MangaServiceFirebase mangaServiceFirebase,
-    required MangaTagServiceFirebase mangaTagServiceFirebase,
-  })  : _webview = webview,
-        _mangaServiceFirebase = mangaServiceFirebase,
-        _mangaTagServiceFirebase = mangaTagServiceFirebase;
+  }) : _webview = webview;
 
   Future<Result<Pagination<Manga>>> execute({
     required SearchMangaParameter parameter,
@@ -89,24 +80,6 @@ class SearchMangaOnMangaClashUseCaseUseCase {
       );
     }
 
-    final tags = await _mangaTagServiceFirebase.sync(
-      values: List.of(
-        Set.of(mangas.expand((e) => e.tagsName).map((e) => MangaTag(name: e))),
-      ),
-    );
-
-    final data = await Future.wait(
-      mangas.map(
-        (e) => _mangaServiceFirebase.sync(
-          value: e.copyWith(
-            tags: List.of(
-              tags.where((tag) => e.tagsName.contains(tag.name)),
-            ),
-          ),
-        ),
-      ),
-    );
-
     final total = document
         .querySelector('.wp-pagenavi')
         ?.querySelector('.pages')
@@ -118,10 +91,10 @@ class SearchMangaOnMangaClashUseCaseUseCase {
 
     return Success(
       Pagination<Manga>(
-        data: data,
+        data: mangas,
         page: '$page',
-        limit: data.length,
-        total: total ?? data.length,
+        limit: mangas.length,
+        total: total ?? mangas.length,
       ),
     );
   }

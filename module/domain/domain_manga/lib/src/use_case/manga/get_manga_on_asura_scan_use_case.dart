@@ -75,8 +75,12 @@ class GetMangaOnAsuraScanUseCase {
 
     final List<MangaTag> tags = genres == null
         ? []
-        : await _mangaTagServiceFirebase.sync(
-            values: List.of(genres.map((e) => MangaTag(name: e))),
+        : await Future.wait(
+            [
+              ...genres.map(
+                (e) => _mangaTagServiceFirebase.sync(value: MangaTag(name: e)),
+              ),
+            ],
           );
 
     return Success(

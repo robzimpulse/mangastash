@@ -39,4 +39,22 @@ class Pagination<T extends Equatable> extends Equatable {
     Object? Function(T value) toJsonT,
   ) =>
       _$PaginationToJson(this, toJsonT);
+
+  Pagination<T> copyWith({
+    List<T>? data,
+    String? page,
+    int? limit,
+    String? offset,
+    int? total,
+    bool? hasNextPage,
+  }) {
+    return Pagination(
+      data: data ?? this.data,
+      page: page ?? this.page,
+      limit: limit ?? this.limit,
+      offset: offset ?? this.offset,
+      total: total ?? this.total,
+      hasNextPage: hasNextPage ?? this.hasNextPage,
+    );
+  }
 }

@@ -31,7 +31,7 @@ class MangaUpdatesScreen extends StatelessWidget {
               message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
             ),
             icon: const Icon(Icons.refresh),
-          )
+          ),
         ],
       ),
       body: const Center(

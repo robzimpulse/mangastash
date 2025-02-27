@@ -12,14 +12,20 @@ class MangaTagServiceFirebase {
 
   MangaTagServiceFirebase({required FirebaseApp app}) : _app = app;
 
-  Future<List<MangaTag>> sync({required List<MangaTag> values}) async {
-    final cache = await Future.wait(values.map((e) => search(value: e)));
-    final oldValues = cache.expand((e) => e);
-    final ids = Set.of(oldValues.map((e) => e.name).whereNotNull());
-    final diff = List.of(values);
-    diff.removeWhere((e) => ids.contains(e.name));
-    final newValues = await Future.wait(diff.map((e) => add(value: e)));
-    return [...oldValues, ...newValues];
+  Future<MangaTag> sync({required MangaTag value}) async {
+
+    final founds = await search(value: value);
+
+    final match = founds
+        .where((a) => value.similarity(a) > 0.9)
+        .sorted((a, b) => value.compareTo(a) - value.compareTo(b))
+        .lastOrNull;
+
+    return await update(
+      key: match?.id,
+      update: (old) async => value,
+      ifAbsent: () async => value,
+    );
   }
 
   Future<MangaTag> add({required MangaTag value}) async {
@@ -29,32 +35,25 @@ class MangaTagServiceFirebase {
     return data;
   }
 
-  // Future<MangaTag> update({
-  //   String? key,
-  //   required Future<MangaTag> Function(MangaTag value) update,
-  //   required Future<MangaTag> Function() ifAbsent,
-  // }) async {
-  //   if (key != null) {
-  //     final data = (await _ref.doc(key).get()).data();
-  //     if (data != null) {
-  //       final updated = await update(MangaTag.fromJson(data));
-  //       if (updated.toJson() == data) return updated;
-  //       await _ref.doc(key).set(updated.toJson());
-  //       return updated;
-  //     }
-  //     final newData = (await ifAbsent()).copyWith(id: key);
-  //     await _ref.doc(key).set(newData.toJson());
-  //     return newData;
-  //   }
-  //
-  //   return add(value: await ifAbsent());
-  // }
-
-  // Future<MangaTag?> get({required String id}) async {
-  //   final value = (await _ref.doc(id).get()).data();
-  //   if (value == null) return null;
-  //   return MangaTag.fromJson(value);
-  // }
+  Future<MangaTag> update({
+    required String? key,
+    required Future<MangaTag> Function(MangaTag value) update,
+    required Future<MangaTag> Function() ifAbsent,
+  }) async {
+    if (key == null) {
+      return add(value: await ifAbsent());
+    }
+    final data = (await _ref.doc(key).get()).data();
+    if (data == null) {
+      final value = (await ifAbsent()).copyWith(id: key);
+      await _ref.doc(key).set(value.copyWith(id: key).toJson());
+      return value;
+    }
+    final updated = await update(MangaTag.fromJson(data));
+    if (updated.toJson() == data) return updated;
+    await _ref.doc(key).set(updated.copyWith(id: key).toJson());
+    return updated;
+  }
 
   Future<List<MangaTag>> search({
     required MangaTag value,
