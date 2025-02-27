@@ -18,14 +18,11 @@ class MangaServiceFirebase {
     final founds = await search(value: value);
 
     final match = founds
+        .where((a) => value.similarity(a) > 0.9)
         .sorted((a, b) => value.compareTo(a) - value.compareTo(b))
         .lastOrNull;
 
     final candidate = match ?? await add(value: value);
-
-    final trash = founds.whereNot((e) => e.id == candidate.id);
-
-    await Future.wait(trash.map((e) => delete(value: e)));
 
     return await update(
       key: candidate.id,

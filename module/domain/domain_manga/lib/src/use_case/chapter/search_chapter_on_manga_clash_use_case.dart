@@ -75,6 +75,12 @@ class SearchChapterOnMangaClashUseCase {
       );
     }
 
-    return Success(await _mangaChapterServiceFirebase.sync(values: chapters));
+    return Success(
+      await Future.wait(
+        chapters.map(
+          (e) => _mangaChapterServiceFirebase.sync(value: e),
+        ),
+      ),
+    );
   }
 }

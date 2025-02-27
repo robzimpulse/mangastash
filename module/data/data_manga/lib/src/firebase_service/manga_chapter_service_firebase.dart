@@ -14,14 +14,21 @@ class MangaChapterServiceFirebase {
 
   MangaChapterServiceFirebase({required FirebaseApp app}) : _app = app;
 
-  Future<List<MangaChapter>> sync({required List<MangaChapter> values}) async {
-    final cache = await Future.wait(values.map((e) => search(value: e)));
-    final oldValues = cache.expand((e) => e);
-    final ids = Set.of(oldValues.map((e) => e.webUrl).whereNotNull());
-    final diff = List.of(values);
-    diff.removeWhere((e) => ids.contains(e.webUrl));
-    final newValues = await Future.wait(diff.map((e) => add(value: e)));
-    return [...oldValues, ...newValues];
+  Future<MangaChapter> sync({required MangaChapter value}) async {
+    final founds = await search(value: value);
+
+    final match = founds
+        .where((a) => value.similarity(a) > 0.9)
+        .sorted((a, b) => value.compareTo(a) - value.compareTo(b))
+        .lastOrNull;
+
+    final candidate = match ?? await add(value: value);
+
+    return await update(
+      key: candidate.id,
+      update: (old) async => candidate,
+      ifAbsent: () async => candidate,
+    );
   }
 
   Future<MangaChapter> add({required MangaChapter value}) async {
@@ -31,14 +38,6 @@ class MangaChapterServiceFirebase {
     return data;
   }
 
-  // Future<void> update(MangaChapter value) async {
-  //   await _ref.doc(value.id).set(value.toJson());
-  // }
-  //
-  // Future<bool> exists(String id) async {
-  //   return (await _ref.doc(id).get()).exists;
-  // }
-  //
   Future<MangaChapter?> get({required String id}) async {
     final value = (await _ref.doc(id).get()).data();
     if (value == null) return null;
@@ -46,29 +45,24 @@ class MangaChapterServiceFirebase {
   }
 
   Future<MangaChapter> update({
-    required String key,
+    required String? key,
     required Future<MangaChapter> Function(MangaChapter value) update,
     required Future<MangaChapter> Function() ifAbsent,
   }) async {
-    final data = (await _ref.doc(key).get()).data();
-    if (data != null) {
-      final updated = await update(MangaChapter.fromJson(data));
-      if (updated.toJson() == data) return updated;
-      await _ref.doc(key).set(updated.toJson());
-      return updated;
+    if (key == null) {
+      return add(value: await ifAbsent());
     }
-    final newData = (await ifAbsent()).copyWith(id: key);
-    await _ref.doc(key).set(newData.toJson());
-    return newData;
+    final data = (await _ref.doc(key).get()).data();
+    if (data == null) {
+      final value = (await ifAbsent()).copyWith(id: key);
+      await _ref.doc(key).set(value.toJson());
+      return value;
+    }
+    final updated = await update(MangaChapter.fromJson(data));
+    if (updated.toJson() == data) return updated;
+    await _ref.doc(key).set(updated.toJson());
+    return updated;
   }
-
-  //
-  // Future<Result<List<MangaChapter>>> list() async {
-  //   final value = await _ref.get();
-  //   final data = value.docs.map((e) => MangaChapter.fromJson(e.data())).toList();
-  //   return Success(data);
-  // }
-  //
 
   Future<List<MangaChapter>> search({
     required MangaChapter value,
@@ -98,54 +92,4 @@ class MangaChapterServiceFirebase {
 
     return data;
   }
-
-  // Future<Result<Pagination<MangaChapter>>> search({
-  //   String? mangaId,
-  //   String? title,
-  //   String? volume,
-  //   String? chapter,
-  //   String? readableAt,
-  //   int limit = 30,
-  //   int? offset,
-  // }) async {
-  //   Query<Map<String, dynamic>> queries = _ref;
-  //
-  //   if (title != null) {
-  //     queries = queries.where('title', isEqualTo: title);
-  //   }
-  //
-  //   if (mangaId != null) {
-  //     queries = queries.where('mangaId', isEqualTo: mangaId);
-  //   }
-  //
-  //   if (volume != null) {
-  //     queries = queries.where('volume', isEqualTo: volume);
-  //   }
-  //
-  //   if (readableAt != null) {
-  //     queries = queries.where('readableAt', isEqualTo: readableAt);
-  //   }
-  //
-  //   if (chapter != null) {
-  //     queries = queries.where('chapter', isEqualTo: chapter);
-  //   }
-  //
-  //   if (offset != null) {
-  //     queries = queries.startAfter([offset]);
-  //   }
-  //
-  //   final count = await queries.count().get();
-  //   final data = await queries.limit(limit).get();
-  //
-  //   return Success(
-  //     Pagination<MangaChapter>(
-  //       data: data.docs
-  //           .map((e) => MangaChapter.fromJson(e.data()).copyWith(id: e.id))
-  //           .toList(),
-  //       limit: limit,
-  //       offset: data.docs.lastOrNull?.id,
-  //       total: count.count,
-  //     ),
-  //   );
-  // }
 }

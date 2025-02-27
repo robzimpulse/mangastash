@@ -1,15 +1,15 @@
 import 'package:collection/collection.dart';
-import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:text_similarity/text_similarity.dart';
 
 import '../entity_manga.dart';
+import 'base/base_model.dart';
 
 part 'manga.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class Manga extends Equatable implements Comparable {
+class Manga extends BaseModel {
   final String? id;
 
   final String? title;
@@ -131,9 +131,10 @@ class Manga extends Equatable implements Comparable {
     );
   }
 
+  @override
+  double similarity(other) {
+    if (other is! Manga) return 0;
 
-
-  double similarity(Manga other) {
     final matcher = StringMatcher(
       term: TermEnum.char,
       algorithm: const LevenshteinAlgorithm(),
@@ -150,11 +151,5 @@ class Manga extends Equatable implements Comparable {
     ];
 
     return score.average;
-  }
-
-  @override
-  int compareTo(other) {
-    if (other is! Manga) return 0;
-    return (similarity(other) * 100000).toInt();
   }
 }
