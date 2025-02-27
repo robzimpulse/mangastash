@@ -20,7 +20,7 @@ class MangaLibraryServiceFirebase {
     if (isExists) return true;
     await _ref.doc(userId).set(
       {
-        for (final (index, value) in [...existing, value].indexed)
+        for (final (index, value) in [value, ...existing].indexed)
           '$index': value.toJson(),
       },
     );
@@ -40,11 +40,6 @@ class MangaLibraryServiceFirebase {
     return true;
   }
 
-  Future<bool> exists(Manga value, String userId) async {
-    final existing = (await get(userId));
-    return existing.firstWhereOrNull((e) => e.id == value.id) != null;
-  }
-
   Future<List<Manga>> get(String userId) async {
     final values = (await _ref.doc(userId).get()).data();
     if (values == null) return [];
@@ -55,10 +50,10 @@ class MangaLibraryServiceFirebase {
 
   Stream<List<Manga>> stream(String userId) {
     final stream = _ref.doc(userId).snapshots();
-    return stream.map((event) {
-      final values = event.data();
-      if (values == null) return [];
-      return [for (final value in values.entries) Manga.fromJson(value.value)];
-    });
+    return stream.map(
+      (event) => [
+        ...?event.data()?.values.map((e) => Manga.fromJson(e)).toList(),
+      ],
+    );
   }
 }
