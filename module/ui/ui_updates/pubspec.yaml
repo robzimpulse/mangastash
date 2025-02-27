@@ -1,0 +1,54 @@
+name: ui_updates
+description: "A new Flutter project."
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.7.12"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  rxdart: ^0.27.7
+  equatable: ^2.0.5
+  collection: ^1.16.0
+
+  # domain
+  domain_manga:
+    path: ../../domain/domain_manga
+
+  # entity
+  entity_manga:
+    path: ../../entity/entity_manga
+
+  # library
+  service_locator:
+    path: ../../library/service_locator
+  safe_bloc:
+    path: ../../library/safe_bloc
+  manga_dex_api:
+    path: ../../library/manga_dex_api
+  log_box:
+    path: ../../library/log_box
+
+  # core
+  core_environment:
+    path: ../../core/core_environment
+  core_route:
+    path: ../../core/core_route
+  core_network:
+    path: ../../core/core_network
+  core_auth:
+    path: ../../core/core_auth
+  core_storage:
+    path: ../../core/core_storage
+
+  #ui
+  ui_common:
+    path: ../../ui/ui_common
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0

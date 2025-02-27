@@ -23,6 +23,10 @@ dependencies:
   core_auth:
     path: ../../core/core_auth
 
+  # ui
+  ui_updates:
+    path: ../../ui/ui_updates
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

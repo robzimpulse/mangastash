@@ -1215,6 +1215,13 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  ui_updates:
+    dependency: transitive
+    description:
+      path: "module/ui/ui_updates"
+      relative: true
+    source: path
+    version: "0.0.1"
   uri:
     dependency: transitive
     description:
