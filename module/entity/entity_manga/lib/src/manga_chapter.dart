@@ -129,4 +129,23 @@ class MangaChapter extends BaseModel {
 
     return score.average;
   }
+
+  @override
+  MangaChapter merge(other) {
+    if (other is! MangaChapter) return this;
+
+    return copyWith(
+      id: id ?? other.id,
+      mangaId: mangaId ?? other.mangaId,
+      mangaTitle: mangaTitle ?? other.mangaTitle,
+      volume: volume ?? other.volume,
+      chapter: chapter ?? other.chapter,
+      readableAt: readableAt ?? other.readableAt,
+      publishAt: publishAt ?? other.publishAt,
+      images: images ?? other.images,
+      translatedLanguage: translatedLanguage ?? other.translatedLanguage,
+      scanlationGroup: scanlationGroup ?? other.scanlationGroup,
+      webUrl: webUrl ?? other.webUrl,
+    );
+  }
 }

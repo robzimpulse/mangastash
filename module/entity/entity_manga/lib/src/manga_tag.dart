@@ -41,4 +41,13 @@ class MangaTag extends BaseModel {
     return matcher.similar(name, other.name)?.ratio ?? 0;
   }
 
+  @override
+  MangaTag merge(other) {
+    if (other is! MangaTag) return this;
+
+    return copyWith(
+      id: id ?? other.id,
+      name: name ?? other.name,
+    );
+  }
 }

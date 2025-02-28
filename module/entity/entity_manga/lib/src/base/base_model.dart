@@ -16,4 +16,6 @@ abstract class BaseModel extends Equatable implements Similarity, Comparable {
   @override
   double similarity(other);
 
+  BaseModel merge(other);
+
 }

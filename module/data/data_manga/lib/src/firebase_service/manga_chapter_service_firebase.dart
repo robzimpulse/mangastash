@@ -17,17 +17,24 @@ class MangaChapterServiceFirebase {
         .lastOrNull;
 
     return await update(
-      key: match?.id,
-      update: (old) async => value,
+      key: match?.id ?? value.id,
+      update: (old) async => value.merge(old),
       ifAbsent: () async => value,
     );
   }
 
   Future<MangaChapter> add({required MangaChapter value}) async {
-    final ref = await _ref.add(value.toJson());
-    final data = value.copyWith(id: ref.id);
-    await ref.update(data.toJson());
-    return data;
+    final id = value.id;
+
+    if (id == null) {
+      final ref = await _ref.add(value.toJson());
+      final data = value.copyWith(id: ref.id);
+      await ref.update(data.toJson());
+      return data;
+    }
+
+    await _ref.doc(id).set(value.toJson());
+    return value;
   }
 
   Future<MangaChapter?> get({required String id}) async {
@@ -41,17 +48,20 @@ class MangaChapterServiceFirebase {
     required Future<MangaChapter> Function(MangaChapter value) update,
     required Future<MangaChapter> Function() ifAbsent,
   }) async {
-    if (key == null) return add(value: await ifAbsent());
-    final data = (await _ref.doc(key).get()).data();
-    if (data == null) {
-      final value = (await ifAbsent()).copyWith(id: key);
-      await _ref.doc(key).set(value.copyWith(id: key).toJson());
-      return value;
+    if (key == null) {
+      return add(value: await ifAbsent());
     }
-    final updated = await update(MangaChapter.fromJson(data));
-    if (updated.toJson() == data) return updated;
-    await _ref.doc(key).set(updated.copyWith(id: key).toJson());
-    return updated.copyWith(id: key);
+
+    final data = await get(id: key);
+    if (data == null) {
+      return add(value: await ifAbsent());
+    }
+
+    final updated = await update(data);
+    if (updated != data) {
+      await _ref.doc(key).set(updated.toJson());
+    }
+    return updated;
   }
 
   Future<List<MangaChapter>> search({
