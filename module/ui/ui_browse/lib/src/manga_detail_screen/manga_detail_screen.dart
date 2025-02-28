@@ -35,12 +35,14 @@ class MangaDetailScreen extends StatefulWidget {
     required ServiceLocator locator,
     required MangaSourceEnum? source,
     required String? mangaId,
+    Manga? manga,
     Function(String?, List<String>?)? onTapChapter,
     Future<MangaChapterConfig?> Function(MangaChapterConfig?)? onTapSort,
   }) {
     return BlocProvider(
       create: (context) => MangaDetailScreenCubit(
         initialState: MangaDetailScreenState(
+          manga: manga,
           mangaId: mangaId,
           sourceEnum: source,
         ),

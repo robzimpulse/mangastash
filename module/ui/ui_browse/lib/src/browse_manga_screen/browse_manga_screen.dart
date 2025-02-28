@@ -21,7 +21,7 @@ class BrowseMangaScreen extends StatefulWidget {
 
   final LaunchUrlUseCase launchUrlUseCase;
 
-  final ValueSetter<String?>? onTapManga;
+  final ValueSetter<Manga>? onTapManga;
 
   final Future<SearchMangaParameter?>? Function(
     SearchMangaParameter? value,
@@ -33,7 +33,7 @@ class BrowseMangaScreen extends StatefulWidget {
 
   static Widget create({
     required ServiceLocator locator,
-    ValueSetter<String?>? onTapManga,
+    ValueSetter<Manga>? onTapManga,
     Future<SearchMangaParameter?>? Function(
       SearchMangaParameter? value,
     )? onTapFilter,
@@ -353,7 +353,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             title: e.title ?? '',
             coverUrl: e.coverUrl ?? '',
             layout: state.layout,
-            onTap: () => widget.onTapManga?.call(e.id),
+            onTap: () => widget.onTapManga?.call(e),
             onLongPress: () => context.showSnackBar(
               message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
             ),

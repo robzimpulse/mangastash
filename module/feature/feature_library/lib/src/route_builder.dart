@@ -20,6 +20,7 @@ class LibraryRouteBuilder extends BaseRouteBuilder {
           onTapManga: (manga) => context.push(
             // TODO: how to cross access route on another module
             '/browse_manga/${manga?.source?.value}/${manga?.id}',
+            extra: manga,
           ),
         ),
       ),
