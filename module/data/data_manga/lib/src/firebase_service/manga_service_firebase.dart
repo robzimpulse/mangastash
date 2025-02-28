@@ -98,4 +98,14 @@ class MangaServiceFirebase {
 
     return data;
   }
+
+  Stream<Manga?> stream({required String id}) {
+    final stream = _ref.doc(id).snapshots();
+    return stream.map(
+      (e) {
+        final json = e.data();
+        return json == null ? null : Manga.fromJson(json).copyWith(id: e.id);
+      },
+    );
+  }
 }

@@ -23,13 +23,19 @@ class LibraryManager
         listenAuthUseCase.authStateStream.map(
           (authState) {
             final userId = authState?.user?.uid;
+
             if (userId == null) return Stream.value(<Manga>[]);
+
             final stream = mangaLibraryServiceFirebase.stream(userId: userId);
-            return stream.asyncExpand(
-              (ids) => Stream.fromFuture(
-                Future.wait(ids.map((id) => mangaServiceFirebase.get(id: id))),
-              ).map((e) => e.whereNotNull().toList()),
+
+            final combine = stream.map(
+              (ids) => CombineLatestStream(
+                ids.map((id) => mangaServiceFirebase.stream(id: id)),
+                (values) => values.whereNotNull().toList(),
+              ).share(),
             );
+            
+            return combine.asyncExpand((e) => e);
           },
         ),
       ),
