@@ -43,9 +43,7 @@ class MangaServiceFirebase {
     required Future<Manga> Function(Manga value) update,
     required Future<Manga> Function() ifAbsent,
   }) async {
-    if (key == null) {
-      return add(value: await ifAbsent());
-    }
+    if (key == null) return add(value: await ifAbsent());
     final data = (await _ref.doc(key).get()).data();
     if (data == null) {
       final value = (await ifAbsent()).copyWith(id: key);
@@ -55,7 +53,7 @@ class MangaServiceFirebase {
     final updated = await update(Manga.fromJson(data));
     if (updated.toJson() == data) return updated;
     await _ref.doc(key).set(updated.copyWith(id: key).toJson());
-    return updated;
+    return updated.copyWith(id: key);
   }
 
   Future<Manga?> get({required String id}) async {

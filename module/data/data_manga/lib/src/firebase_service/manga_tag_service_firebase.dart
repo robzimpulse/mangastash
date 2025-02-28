@@ -40,9 +40,7 @@ class MangaTagServiceFirebase {
     required Future<MangaTag> Function(MangaTag value) update,
     required Future<MangaTag> Function() ifAbsent,
   }) async {
-    if (key == null) {
-      return add(value: await ifAbsent());
-    }
+    if (key == null) return add(value: await ifAbsent());
     final data = (await _ref.doc(key).get()).data();
     if (data == null) {
       final value = (await ifAbsent()).copyWith(id: key);
@@ -52,7 +50,7 @@ class MangaTagServiceFirebase {
     final updated = await update(MangaTag.fromJson(data));
     if (updated.toJson() == data) return updated;
     await _ref.doc(key).set(updated.copyWith(id: key).toJson());
-    return updated;
+    return updated.copyWith(id: key);
   }
 
   Future<List<MangaTag>> search({
