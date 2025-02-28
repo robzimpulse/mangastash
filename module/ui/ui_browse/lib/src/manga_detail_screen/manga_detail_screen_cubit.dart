@@ -83,12 +83,13 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   }
 
   Future<void> _fetchManga() async {
-    final id = state.mangaId;
+    final id = state.manga?.id ?? state.mangaId;
     if (id == null || id.isEmpty) return;
 
     emit(
       state.copyWith(
-        isLoadingManga: true,
+        isLoadingChapters: true,
+        isLoadingManga: state.manga == null,
         errorManga: () => null,
       ),
     );
