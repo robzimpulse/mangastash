@@ -28,7 +28,13 @@ class SearchMangaOnMangaDexUseCase {
 
       return Success(
         Pagination<Manga>(
-          data: result.data?.map((e) => Manga.from(data: e)).toList(),
+          data: result.data
+              ?.map(
+                (e) => Manga.from(data: e).copyWith(
+                  source: MangaSourceEnum.mangadex,
+                ),
+              )
+              .toList(),
           offset: (result.offset ?? 0).toString(),
           limit: result.limit?.toInt() ?? 0,
           total: result.total?.toInt() ?? 0,

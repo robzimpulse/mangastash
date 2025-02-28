@@ -13,7 +13,6 @@ class MangaChapterServiceFirebase {
     final founds = await search(value: value);
 
     final match = founds
-        .where((a) => value.similarity(a) > 0.9)
         .sorted((a, b) => value.compareTo(a) - value.compareTo(b))
         .lastOrNull;
 
@@ -34,7 +33,7 @@ class MangaChapterServiceFirebase {
   Future<MangaChapter?> get({required String id}) async {
     final value = (await _ref.doc(id).get()).data();
     if (value == null) return null;
-    return MangaChapter.fromJson(value);
+    return MangaChapter.fromJson(value).copyWith(id: id);
   }
 
   Future<MangaChapter> update({
@@ -79,7 +78,7 @@ class MangaChapterServiceFirebase {
       final result = (offset == null)
           ? await (ref.limit(100).get())
           : await (ref.startAfterDocument(offset).limit(100).get());
-      data.addAll(result.docs.map((e) => MangaChapter.fromJson(e.data())));
+      data.addAll(result.docs.map((e) => MangaChapter.fromJson(e.data()).copyWith(id: e.id)));
       offset = result.docs.lastOrNull;
     } while (data.length < total);
 

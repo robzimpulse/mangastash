@@ -13,7 +13,6 @@ class MangaServiceFirebase {
     final founds = await search(value: value);
 
     final match = founds
-        .where((a) => value.similarity(a) > 0.9)
         .sorted((a, b) => value.compareTo(a) - value.compareTo(b))
         .lastOrNull;
 
@@ -47,7 +46,7 @@ class MangaServiceFirebase {
       await _ref.doc(key).set(value.copyWith(id: key).toJson());
       return value;
     }
-    final updated = await update(Manga.fromJson(data));
+    final updated = await update(Manga.fromJson(data).copyWith(id: key));
     if (updated.toJson() == data) return updated;
     await _ref.doc(key).set(updated.copyWith(id: key).toJson());
     return updated.copyWith(id: key);
@@ -56,7 +55,7 @@ class MangaServiceFirebase {
   Future<Manga?> get({required String id}) async {
     final value = (await _ref.doc(id).get()).data();
     if (value == null) return null;
-    return Manga.fromJson(value);
+    return Manga.fromJson(value).copyWith(id: id);
   }
 
   Future<List<Manga>> search({
@@ -71,6 +70,7 @@ class MangaServiceFirebase {
         .where('status', isEqualTo: value.status)
         .where('description', isEqualTo: value.description)
         .where('source', isEqualTo: value.source?.value)
+        .where('web_url', isEqualTo: value.webUrl)
         .orderBy('source');
 
     final total = (await ref.count().get()).count ?? 0;
@@ -80,7 +80,9 @@ class MangaServiceFirebase {
       final result = (offset == null)
           ? await (ref.limit(100).get())
           : await (ref.startAfterDocument(offset).limit(100).get());
-      data.addAll(result.docs.map((e) => Manga.fromJson(e.data())));
+      data.addAll(
+        result.docs.map((e) => Manga.fromJson(e.data()).copyWith(id: e.id)),
+      );
       offset = result.docs.lastOrNull;
     } while (data.length < total);
 

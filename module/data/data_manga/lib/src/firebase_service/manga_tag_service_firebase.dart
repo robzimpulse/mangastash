@@ -13,7 +13,6 @@ class MangaTagServiceFirebase {
     final founds = await search(value: value);
 
     final match = founds
-        .where((a) => value.similarity(a) > 0.9)
         .sorted((a, b) => value.compareTo(a) - value.compareTo(b))
         .lastOrNull;
 
