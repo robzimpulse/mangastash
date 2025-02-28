@@ -4,16 +4,12 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class MangaTagServiceFirebase {
-  final FirebaseApp _app;
+  final CollectionReference<Map<String, dynamic>> _ref;
 
-  late final _db = FirebaseFirestore.instanceFor(app: _app);
-
-  late final _ref = _db.collection('tags');
-
-  MangaTagServiceFirebase({required FirebaseApp app}) : _app = app;
+  MangaTagServiceFirebase({required FirebaseApp app})
+      : _ref = FirebaseFirestore.instanceFor(app: app).collection('tags');
 
   Future<MangaTag> sync({required MangaTag value}) async {
-
     final founds = await search(value: value);
 
     final match = founds

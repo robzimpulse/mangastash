@@ -4,13 +4,10 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class MangaServiceFirebase {
-  final FirebaseApp _app;
+  final CollectionReference<Map<String, dynamic>> _ref;
 
-  late final _db = FirebaseFirestore.instanceFor(app: _app);
-
-  late final _ref = _db.collection('mangas');
-
-  MangaServiceFirebase({required FirebaseApp app}) : _app = app;
+  MangaServiceFirebase({required FirebaseApp app})
+      : _ref = FirebaseFirestore.instanceFor(app: app).collection('mangas');
 
   Future<Manga> sync({required Manga value}) async {
     final founds = await search(value: value);

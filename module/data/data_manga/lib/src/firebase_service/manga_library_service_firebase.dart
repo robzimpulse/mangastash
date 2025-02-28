@@ -6,13 +6,10 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class MangaLibraryServiceFirebase {
-  final FirebaseApp _app;
+  final CollectionReference<Map<String, dynamic>> _ref;
 
-  late final _db = FirebaseFirestore.instanceFor(app: _app);
-
-  late final _ref = _db.collection('libraries');
-
-  MangaLibraryServiceFirebase({required FirebaseApp app}) : _app = app;
+  MangaLibraryServiceFirebase({required FirebaseApp app})
+      : _ref = FirebaseFirestore.instanceFor(app: app).collection('libraries');
 
   Future<bool> add(Manga value, String userId) async {
     final existing = (await get(userId));
