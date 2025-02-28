@@ -26,8 +26,6 @@ class BottomSheetRouteV2<T> extends Page<T> {
 
   final double elevation;
 
-  // final Widget child;
-
   final Widget Function(BuildContext, ScrollController?) child;
 
   @override
@@ -41,31 +39,13 @@ class BottomSheetRouteV2<T> extends Page<T> {
       isDismissible: cancelable,
       enableDrag: draggable,
       modalBarrierColor: modalBarrierColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       elevation: elevation,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (draggable)
-            Container(
-              alignment: Alignment.center,
-              height: 16,
-              child: Container(
-                width: 36,
-                height: 4,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-          ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: maxHeight),
-            child: child.call(
-              context,
-              null,
-            ),
-          ),
-        ],
+      showDragHandle: true,
+      constraints: BoxConstraints(maxHeight: maxHeight),
+      builder: (context) => DraggableScrollableSheet(
+        expand: false,
+        builder: (context, controller) => child(context, controller),
       ),
     );
   }

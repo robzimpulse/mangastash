@@ -11,6 +11,7 @@ class SearchMangaParameter extends Equatable {
   final String? offset;
   final String? page;
   final Map<SearchOrders, OrderDirections>? orders;
+  final List<MangaStatus>? status;
 
   const SearchMangaParameter({
     this.title,
@@ -18,6 +19,7 @@ class SearchMangaParameter extends Equatable {
     this.offset,
     this.page,
     this.orders,
+    this.status,
   });
 
   @override
@@ -28,6 +30,7 @@ class SearchMangaParameter extends Equatable {
       offset,
       page,
       orders,
+      status,
     ];
   }
 
@@ -43,6 +46,7 @@ class SearchMangaParameter extends Equatable {
     String? offset,
     String? page,
     Map<SearchOrders, OrderDirections>? orders,
+    List<MangaStatus>? status,
   }) {
     return SearchMangaParameter(
       title: title ?? this.title,
@@ -50,6 +54,7 @@ class SearchMangaParameter extends Equatable {
       offset: offset ?? this.offset,
       page: page ?? this.page,
       orders: orders ?? this.orders,
+      status: status ?? this.status,
     );
   }
 }

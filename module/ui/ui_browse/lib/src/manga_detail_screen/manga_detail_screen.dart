@@ -328,7 +328,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       buildWhen: (prev, curr) => [
         prev.isLoadingManga != curr.isLoadingManga,
         prev.manga?.title != curr.manga?.title,
-      ].any((e) => e),
+      ].contains(true),
       builder: (context, state) => ShimmerLoading.multiline(
         isLoading: state.isLoadingManga,
         width: 100,
@@ -359,7 +359,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         prev.isLoadingChapters != curr.isLoadingChapters,
         prev.chaptersKey != curr.chaptersKey,
         prev.crawlable != curr.crawlable,
-      ].any((e) => e),
+      ].contains(true),
       builder: (context, state) {
         List<Widget> children;
 
@@ -529,7 +529,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             prev.isLoadingManga != curr.isLoadingManga,
             prev.isOnLibrary != curr.isOnLibrary,
             prev.manga != curr.manga,
-          ].any((e) => e),
+          ].contains(true),
           builder: (context, state) => MangaDetailWidget(
             cacheManager: widget.cacheManager,
             coverUrl: state.manga?.coverUrl,

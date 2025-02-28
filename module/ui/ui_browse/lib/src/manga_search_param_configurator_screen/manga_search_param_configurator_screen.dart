@@ -1,3 +1,4 @@
+import 'package:core_route/core_route.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -22,10 +23,13 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (context) => MangaSearchParamConfiguratorScreenCubit(
-        initialState: const MangaSearchParamConfiguratorScreenState(),
+        initialState: MangaSearchParamConfiguratorScreenState(
+          original: param,
+          modified: param,
+        ),
       ),
       child: MangaSearchParamConfiguratorScreen(
-          scrollController: scrollController,
+        scrollController: scrollController,
       ),
     );
   }
@@ -46,86 +50,129 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              OutlinedButton(onPressed: () {}, child: const Text('Reset')),
-              OutlinedButton(onPressed: () {}, child: const Text('Filter')),
-            ],
+    return CustomScrollView(
+      controller: scrollController,
+      slivers: [
+        SliverPinnedHeader(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            color: Theme.of(context).scaffoldBackgroundColor,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                OutlinedButton(
+                  onPressed: () => _cubit(context).reset,
+                  child: const Text('Reset'),
+                ),
+                _builder(
+                  buildWhen: (prev, curr) => prev.modified != curr.modified,
+                  builder: (context, state) => OutlinedButton(
+                    onPressed: () => context.pop(state.modified),
+                    child: const Text('Filter'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-        ListView(
-          controller: scrollController,
-          shrinkWrap: true,
-          children: [
-            _builder(
-              buildWhen: (prev, curr) => [
-                prev.hasAvailableChapters != curr.hasAvailableChapters,
-              ].any((e) => e),
-              builder: (context, state) => CheckboxListTile(
-                title: const Text('Has Available Chapter'),
-                value: state.hasAvailableChapters,
-                onChanged: (value) => _cubit(context).update(
-                  hasAvailableChapters: value,
+        SliverToBoxAdapter(
+          child: _builder(
+            buildWhen: (prev, curr) => [
+              prev.modified?.status != curr.modified?.status,
+            ].contains(true),
+            builder: (context, state) => ExpansionTile(
+              title: const Text('Status'),
+              children: [
+                ...MangaStatus.values.map(
+                  (key) => CheckboxListTile(
+                    title: Text(key.rawValue.toCapitalized()),
+                    value: state.modified?.status?.contains(key) == true,
+                    onChanged: (value) {
+                      if (value == null) return;
+                      final values = [...?state.modified?.status];
+                      if (value) {
+                        values.add(key);
+                      } else {
+                        values.remove(key);
+                      }
+                      _cubit(context).update(
+                        modified: state.modified?.copyWith(status: values),
+                      );
+                    },
+                  ),
                 ),
-              ),
+              ],
             ),
-            _builder(
-              buildWhen: (prev, curr) => [
-                prev.originalLanguage != curr.originalLanguage,
-              ].any((e) => e),
-              builder: (context, state) => ExpansionTile(
-                title: const Text('Original Language'),
-                children: [
-                  for (final key in LanguageCodes.values)
-                    CheckboxListTile(
-                      title: Text(key.rawValue),
-                      value: state.originalLanguage[key],
-                      tristate: true,
-                      onChanged: (value) => _cubit(context).update(
-                        originalLanguage: Map.of(state.originalLanguage)
-                          ..update(
-                            key,
-                            (_) => value,
-                            ifAbsent: () => value,
-                          ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            _builder(
-              buildWhen: (prev, curr) => [
-                prev.contentRating != curr.contentRating,
-              ].any((e) => e),
-              builder: (context, state) => ExpansionTile(
-                title: const Text('Content Rating'),
-                children: [
-                  for (final key in ContentRating.values)
-                    CheckboxListTile(
-                      title: Text(key.rawValue),
-                      value: state.contentRating.contains(key),
-                      onChanged: (value) {
-                        if (value == null) return;
-                        final contentRating = List.of(state.contentRating);
-                        if (value) {
-                          contentRating.add(key);
-                        } else {
-                          contentRating.remove(key);
-                        }
-                        _cubit(context).update(contentRating: contentRating);
-                      },
-                    ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
+        // SliverToBoxAdapter(
+        //   child: _builder(
+        //     buildWhen: (prev, curr) => [
+        //       prev.modified != curr.hasAvailableChapters,
+        //     ].contains(true),
+        //     builder: (context, state) => CheckboxListTile(
+        //       title: const Text('Has Available Chapter'),
+        //       value: state.hasAvailableChapters,
+        //       onChanged: (value) => _cubit(context).update(
+        //         hasAvailableChapters: value,
+        //       ),
+        //     ),
+        //   ),
+        // ),
+        // SliverToBoxAdapter(
+        //   child: _builder(
+        //     buildWhen: (prev, curr) => [
+        //       prev.originalLanguage != curr.originalLanguage,
+        //     ].contains(true),
+        //     builder: (context, state) => ExpansionTile(
+        //       title: const Text('Original Language'),
+        //       children: [
+        //         for (final key in LanguageCodes.values)
+        //           CheckboxListTile(
+        //             title: Text(key.rawValue),
+        //             value: state.originalLanguage[key],
+        //             tristate: true,
+        //             onChanged: (value) => _cubit(context).update(
+        //               originalLanguage: Map.of(state.originalLanguage)
+        //                 ..update(
+        //                   key,
+        //                   (_) => value,
+        //                   ifAbsent: () => value,
+        //                 ),
+        //             ),
+        //           ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
+        // SliverToBoxAdapter(
+        //   child: _builder(
+        //     buildWhen: (prev, curr) => [
+        //       prev.contentRating != curr.contentRating,
+        //     ].contains(true),
+        //     builder: (context, state) => ExpansionTile(
+        //       title: const Text('Content Rating'),
+        //       children: [
+        //         for (final key in ContentRating.values)
+        //           CheckboxListTile(
+        //             title: Text(key.rawValue),
+        //             value: state.contentRating.contains(key),
+        //             onChanged: (value) {
+        //               if (value == null) return;
+        //               final contentRating = List.of(state.contentRating);
+        //               if (value) {
+        //                 contentRating.add(key);
+        //               } else {
+        //                 contentRating.remove(key);
+        //               }
+        //               _cubit(context).update(contentRating: contentRating);
+        //             },
+        //           ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
+        // TODO: add more parameter
       ],
     );
   }

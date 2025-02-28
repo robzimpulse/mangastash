@@ -245,7 +245,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         _builder(
           buildWhen: (prev, curr) => [
             prev.isFavoriteActive != curr.isFavoriteActive,
-          ].any((e) => e),
+          ].contains(true),
           builder: (context, state) => OutlinedButton.icon(
             style: buttonStyle.copyWith(
               backgroundColor: state.isFavoriteActive
@@ -254,13 +254,17 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             ),
             icon: Icon(Icons.favorite, color: color),
             label: Text('Favorite', style: labelStyle?.copyWith(color: color)),
-            onPressed: () => _cubit(context).init(order: SearchOrders.rating),
+            onPressed: () => _cubit(context).init(
+              order: state.isFavoriteActive
+                  ? SearchOrders.relevance
+                  : SearchOrders.rating,
+            ),
           ),
         ),
         _builder(
           buildWhen: (prev, curr) => [
             prev.isUpdatedActive != curr.isUpdatedActive,
-          ].any((e) => e),
+          ].contains(true),
           builder: (context, state) => OutlinedButton.icon(
             style: buttonStyle.copyWith(
               backgroundColor: state.isUpdatedActive
@@ -270,22 +274,30 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             icon: Icon(Icons.update, color: color),
             label: Text('Updated', style: labelStyle?.copyWith(color: color)),
             onPressed: () => _cubit(context).init(
-              order: SearchOrders.updatedAt,
+              order: state.isUpdatedActive
+                  ? SearchOrders.relevance
+                  : SearchOrders.updatedAt,
             ),
           ),
         ),
         _builder(
-          buildWhen: (prev, curr) => prev.parameter != curr.parameter,
+          buildWhen: (prev, curr) => [
+            prev.parameter != curr.parameter,
+            prev.isFilterActive != curr.isFilterActive,
+          ].contains(true),
           builder: (context, state) => OutlinedButton.icon(
-            style: buttonStyle,
+            style: buttonStyle.copyWith(
+              backgroundColor: state.isFilterActive
+                  ? const WidgetStatePropertyAll(Colors.grey)
+                  : null,
+            ),
             icon: Icon(Icons.filter_list, color: color),
             label: Text('Filter', style: labelStyle?.copyWith(color: color)),
             onPressed: () async {
               final result = await widget.onTapFilter?.call(state.parameter);
               if (context.mounted && result != null) {
-                context.showSnackBar(
-                  message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-                );
+                _cubit(context).update(parameter: result);
+                _cubit(context).init();
               }
             },
           ),
@@ -301,7 +313,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
       buildWhen: (prev, curr) => [
         prev.source != curr.source,
         prev.isSearchActive != curr.isSearchActive,
-      ].any((e) => e),
+      ].contains(true),
       builder: (context, state) => !state.isSearchActive
           ? Text(state.source?.value ?? '')
           : Container(

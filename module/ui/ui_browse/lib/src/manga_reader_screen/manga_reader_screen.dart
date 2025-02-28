@@ -76,7 +76,7 @@ class MangaReaderScreen extends StatelessWidget {
       buildWhen: (prev, curr) => [
         prev.chapter?.images != curr.chapter?.images,
         prev.crawlable != curr.crawlable,
-      ].any((e) => e),
+      ].contains(true),
       builder: (context, state) => Column(
         children: [
           Row(children: [Expanded(child: _prevButton())]),
@@ -97,7 +97,7 @@ class MangaReaderScreen extends StatelessWidget {
     return _builder(
       buildWhen: (prev, curr) => [
         prev.previousChapterId != curr.previousChapterId,
-      ].any((e) => e),
+      ].contains(true),
       builder: (context, state) => state.previousChapterId != null
           ? ElevatedButton(
               style: ElevatedButton.styleFrom(

@@ -84,7 +84,7 @@ class DownloadQueueScreen extends StatelessWidget {
         buildWhen: (prev, curr) => [
           prev.progress != curr.progress,
           prev.filenames != curr.filenames,
-        ].any((e) => e),
+        ].contains(true),
         builder: (context, state) => CustomScrollView(
           slivers: List.of(
             state.progress.entries.map(

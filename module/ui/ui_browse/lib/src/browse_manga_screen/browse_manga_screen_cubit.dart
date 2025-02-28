@@ -95,11 +95,13 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   void update({
     MangaShelfItemLayout? layout,
     bool? isSearchActive,
+    SearchMangaParameter? parameter,
   }) {
     emit(
       state.copyWith(
         layout: layout,
         isSearchActive: isSearchActive,
+        parameter: parameter,
       ),
     );
   }

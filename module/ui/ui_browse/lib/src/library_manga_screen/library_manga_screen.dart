@@ -188,7 +188,7 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
         prev.filteredMangas != curr.filteredMangas,
         prev.sources != curr.sources,
         prev.layout != curr.layout,
-      ].any((e) => e),
+      ].contains(true),
       builder: (context, state) {
         if (state.isLoading) {
           return const Center(

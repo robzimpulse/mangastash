@@ -15,6 +15,7 @@ class MangaSearchParamConfiguratorBottomSheet extends BottomSheetRouteV2 {
             return MangaSearchParamConfiguratorScreen.create(
               locator: locator,
               scrollController: controller,
+              param: parameter,
             );
           },
           draggable: true,

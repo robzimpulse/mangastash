@@ -30,6 +30,8 @@ class BrowseMangaScreenState extends Equatable {
 
   late final bool isUpdatedActive;
 
+  late final bool isFilterActive;
+
   BrowseMangaScreenState({
     this.isLoading = false,
     this.hasNextPage = false,
@@ -57,6 +59,11 @@ class BrowseMangaScreenState extends Equatable {
 
     isUpdatedActive =
         parameter.orders?.containsKey(SearchOrders.updatedAt) == true;
+
+    isFilterActive = [
+      parameter.status != null,
+      // TODO: add more param properties
+    ].contains(true);
   }
 
   @override

@@ -24,6 +24,7 @@ class SearchMangaOnMangaDexUseCase {
         orders: parameter.orders?.map(
           (key, value) => MapEntry(key.rawValue, value.rawValue),
         ),
+        status: parameter.status?.map((e) => e.rawValue).toList(),
       );
 
       return Success(
