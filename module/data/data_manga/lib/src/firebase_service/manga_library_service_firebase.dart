@@ -1,8 +1,6 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collection/collection.dart';
-import 'package:entity_manga/entity_manga.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class MangaLibraryServiceFirebase {
@@ -11,46 +9,40 @@ class MangaLibraryServiceFirebase {
   MangaLibraryServiceFirebase({required FirebaseApp app})
       : _ref = FirebaseFirestore.instanceFor(app: app).collection('libraries');
 
-  Future<bool> add(Manga value, String userId) async {
-    final existing = (await get(userId));
-    final isExists = existing.firstWhereOrNull((e) => e.id == value.id) != null;
-    if (isExists) return true;
+  Future<bool> add({required String mangaId, required String userId}) async {
+    final libraries = await get(userId: userId);
+    if (libraries.contains(mangaId)) return true;
     await _ref.doc(userId).set(
       {
-        for (final (index, value) in [value, ...existing].indexed)
-          '$index': value.toJson(),
+        for (final (index, value) in [mangaId, ...libraries].indexed)
+          '$index': value,
       },
     );
     return true;
   }
 
-  Future<bool> remove(Manga value, String userId) async {
-    final existing = (await get(userId));
-    final isExists = existing.firstWhereOrNull((e) => e.id == value.id) != null;
-    if (!isExists) return true;
-    final newList = [...existing]..removeWhere((e) => e.id == value.id);
+  Future<bool> remove({required String mangaId, required String userId}) async {
+    final libraries = await get(userId: userId);
+    if (!libraries.contains(mangaId)) return true;
+    final newList = [...libraries]..remove(mangaId);
     await _ref.doc(userId).set(
       {
-        for (final (index, value) in newList.indexed) '$index': value.toJson(),
+        for (final (index, value) in newList.indexed) '$index': value,
       },
     );
     return true;
   }
 
-  Future<List<Manga>> get(String userId) async {
+  Future<List<String>> get({required String userId}) async {
     final values = (await _ref.doc(userId).get()).data();
     if (values == null) return [];
-    return [
-      for (final value in values.entries) Manga.fromJson(value.value),
-    ];
+    return values.values.whereType<String>().toList();
   }
 
-  Stream<List<Manga>> stream(String userId) {
+  Stream<List<String>> stream({required String userId}) {
     final stream = _ref.doc(userId).snapshots();
     return stream.map(
-      (event) => [
-        ...?event.data()?.values.map((e) => Manga.fromJson(e)).toList(),
-      ],
+      (event) => [...?event.data()?.values.whereType<String>().toList()],
     );
   }
 }

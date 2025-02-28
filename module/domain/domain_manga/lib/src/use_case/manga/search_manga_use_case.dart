@@ -50,7 +50,7 @@ class SearchMangaUseCase {
     if (result is Success<Pagination<Manga>>) {
       final mangas = result.data.data;
       final uniqueTags = [
-        ...?mangas?.expand((e) => [...?e.tags]).toSet()
+        ...?mangas?.expand((e) => [...?e.tags]).toSet(),
       ];
       final syncedTags = await Future.wait([
         ...uniqueTags.map((e) => _mangaTagServiceFirebase.sync(value: e)),

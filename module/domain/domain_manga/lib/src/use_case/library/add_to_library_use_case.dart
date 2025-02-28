@@ -13,8 +13,16 @@ class AddToLibraryUseCase {
     required Manga manga,
     required String userId,
   }) async {
+    final mangaId = manga.id;
+    if (mangaId == null) return Error(Exception('Manga id is null'));
+
     try {
-      return Success(await _mangaLibraryServiceFirebase.add(manga, userId));
+      return Success(
+        await _mangaLibraryServiceFirebase.add(
+          mangaId: mangaId,
+          userId: userId,
+        ),
+      );
     } catch (e) {
       return Error(e);
     }

@@ -13,11 +13,18 @@ class RemoveFromLibraryUseCase {
     required Manga manga,
     required String userId,
   }) async {
+    final mangaId = manga.id;
+    if (mangaId == null) return Error(Exception('Manga id is null'));
+
     try {
-      return Success(await _mangaLibraryServiceFirebase.remove(manga, userId));
+      return Success(
+        await _mangaLibraryServiceFirebase.remove(
+          mangaId: mangaId,
+          userId: userId,
+        ),
+      );
     } catch (e) {
       return Error(e);
     }
   }
-
 }

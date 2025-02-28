@@ -203,6 +203,7 @@ class DomainMangaRegistrar extends Registrar {
       LibraryManager(
         mangaLibraryServiceFirebase: locator(),
         listenAuthUseCase: locator(),
+        mangaServiceFirebase: locator(),
       ),
     );
     locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
