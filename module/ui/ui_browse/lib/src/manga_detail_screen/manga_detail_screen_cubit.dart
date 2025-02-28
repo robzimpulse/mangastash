@@ -15,6 +15,8 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
   final AddToLibraryUseCase _addToLibraryUseCase;
   final DownloadChapterUseCase _downloadChapterUseCase;
+  final GetMangaSourceUseCase _getMangaSourceUseCase;
+  final CrawlUrlUseCase _crawlUrlUseCase;
 
   StreamSubscription? _activeSubscriptions;
 
@@ -29,11 +31,14 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
     required DownloadChapterUseCase downloadChapterUseCase,
     required ListenDownloadProgressUseCase listenDownloadProgressUseCase,
+    required CrawlUrlUseCase crawlUrlUseCase,
   })  : _getMangaUseCase = getMangaUseCase,
         _getListChapterUseCase = getListChapterUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         _downloadChapterUseCase = downloadChapterUseCase,
+        _getMangaSourceUseCase = getMangaSourceUseCase,
+        _crawlUrlUseCase = crawlUrlUseCase,
         super(initialState) {
     addSubscription(
       listenAuth.authStateStream.distinct().listen(_updateAuthState),
@@ -73,7 +78,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   }
 
   Future<void> init() async {
-    await _fetchManga();
+    await Future.wait([_fetchSource(), _fetchManga()]);
     await _fetchChapter();
   }
 
@@ -91,14 +96,14 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     final result = await _getMangaUseCase.execute(
       mangaId: id,
-      source: state.source,
+      source: state.sourceEnum,
     );
 
     if (result is Success<Manga>) {
       emit(
         state.copyWith(
           manga: result.data.copyWith(
-            source: state.source,
+            source: state.sourceEnum,
           ),
         ),
       );
@@ -119,7 +124,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     final result = await _getListChapterUseCase.execute(
       mangaId: id,
-      source: state.source,
+      source: state.sourceEnum,
     );
 
     if (result is Success<List<MangaChapter>>) {
@@ -131,6 +136,12 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
 
     emit(state.copyWith(isLoadingChapters: false));
+  }
+
+  Future<void> _fetchSource() async {
+    final sourceEnum = state.sourceEnum;
+    if (sourceEnum == null) return;
+    emit(state.copyWith(source: _getMangaSourceUseCase.get(sourceEnum)));
   }
 
   Future<void> addToLibrary({User? user}) async {
@@ -154,6 +165,13 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     for (final chapter in state.processedChapters.values) {
       await downloadChapter(chapter: chapter);
     }
+  }
+
+  void recrawl() async {
+    final url = state.manga?.webUrl;
+    if (url == null) return;
+    await _crawlUrlUseCase.execute(url: url);
+    await _fetchChapter();
   }
 
   // void _updateDownloadChapterProgress(List<(String?, int, double)> progress) {

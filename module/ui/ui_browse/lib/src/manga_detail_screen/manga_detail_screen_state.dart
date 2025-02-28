@@ -26,7 +26,8 @@ class MangaDetailScreenState extends Equatable {
   final String? mangaId;
   final Manga? manga;
   final List<MangaChapter>? chapters;
-  final MangaSourceEnum? source;
+  final MangaSourceEnum? sourceEnum;
+  final MangaSource? source;
   final MangaChapterConfig? config;
   final AuthState? authState;
   final List<Manga> libraries;
@@ -37,6 +38,7 @@ class MangaDetailScreenState extends Equatable {
   late final Map<num, MangaChapter> processedChapters;
   late final int totalChapter;
   late final bool isOnLibrary;
+  late final bool crawlable;
 
   MangaDetailScreenState({
     this.isLoadingManga = false,
@@ -47,6 +49,7 @@ class MangaDetailScreenState extends Equatable {
     this.manga,
     this.chapters,
     this.source,
+    this.sourceEnum,
     this.config,
     this.authState,
     this.libraries = const [],
@@ -96,6 +99,8 @@ class MangaDetailScreenState extends Equatable {
     }
 
     this.chapterIds = chapterIds;
+
+    crawlable = source?.crawlable == true;
 
     // TODO: perform sorting
 
@@ -168,6 +173,7 @@ class MangaDetailScreenState extends Equatable {
         manga,
         chapters,
         source,
+        sourceEnum,
         config,
         authState,
         libraries,
@@ -183,7 +189,8 @@ class MangaDetailScreenState extends Equatable {
     Manga? manga,
     List<MangaChapter>? chapters,
     String? sourceId,
-    MangaSourceEnum? source,
+    MangaSourceEnum? sourceEnum,
+    MangaSource? source,
     MangaChapterConfig? config,
     AuthState? authState,
     List<Manga>? libraries,
@@ -200,6 +207,7 @@ class MangaDetailScreenState extends Equatable {
       manga: manga ?? this.manga,
       chapters: chapters ?? this.chapters,
       source: source ?? this.source,
+      sourceEnum: sourceEnum ?? this.sourceEnum,
       authState: authState ?? this.authState,
       libraries: libraries ?? this.libraries,
       progress: progress ?? this.progress,

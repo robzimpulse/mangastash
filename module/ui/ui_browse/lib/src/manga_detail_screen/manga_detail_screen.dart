@@ -42,7 +42,7 @@ class MangaDetailScreen extends StatefulWidget {
       create: (context) => MangaDetailScreenCubit(
         initialState: MangaDetailScreenState(
           mangaId: mangaId,
-          source: source,
+          sourceEnum: source,
         ),
         getMangaUseCase: locator(),
         getListChapterUseCase: locator(),
@@ -53,6 +53,7 @@ class MangaDetailScreen extends StatefulWidget {
         listenMangaFromLibraryUseCase: locator(),
         downloadChapterUseCase: locator(),
         listenDownloadProgressUseCase: locator(),
+        crawlUrlUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         cacheManager: locator(),
@@ -355,6 +356,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         prev.errorChapters != curr.errorChapters,
         prev.isLoadingChapters != curr.isLoadingChapters,
         prev.chaptersKey != curr.chaptersKey,
+        prev.crawlable != curr.crawlable,
       ].any((e) => e),
       builder: (context, state) {
         List<Widget> children;
@@ -415,14 +417,31 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           ];
         } else if (chapters.isEmpty == true) {
           children = [
-            const SliverFillRemaining(
+            SliverFillRemaining(
               hasScrollBody: false,
               child: Padding(
-                padding: EdgeInsets.all(24),
+                padding: const EdgeInsets.all(24),
                 child: Center(
-                  child: Text(
-                    'No Chapter',
-                    textAlign: TextAlign.center,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'No Chapter',
+                        textAlign: TextAlign.center,
+                      ),
+                      if (state.crawlable) ...[
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          onPressed: () => _cubit(context).recrawl(),
+                          child: const Text('Open Debug Browser'),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               ),
