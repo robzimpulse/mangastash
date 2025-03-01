@@ -17,7 +17,7 @@ class MangaServiceFirebase {
 
     if (founds.length > 1) {
       _logBox.log(
-        'Duplicate `Manga` entry',
+        'Duplicate entry',
         extra: {
           'value': value.toJson(),
           'duplicated': founds.map((e) => e.toJson()).toList(),
@@ -47,7 +47,7 @@ class MangaServiceFirebase {
 
       _logBox.log(
         'Add new entry',
-        extra: {'value': value.toJson()},
+        extra: {'value': data.toJson()},
         name: runtimeType.toString(),
       );
       return data;
@@ -84,7 +84,7 @@ class MangaServiceFirebase {
     final updated = await update(data);
     if (updated != data) {
       _logBox.log(
-        'Update existing  entry',
+        'Update existing entry',
         extra: {
           'value': data.toJson(),
           'updated': updated.toJson(),

@@ -19,7 +19,7 @@ class MangaChapterServiceFirebase {
 
     if (founds.length > 1) {
       _logBox.log(
-        'Duplicate `MangaChapter` entry',
+        'Duplicate entry',
         extra: {
           'value': value.toJson(),
           'duplicated': founds.map((e) => e.toJson()).toList(),
@@ -48,8 +48,8 @@ class MangaChapterServiceFirebase {
       await ref.update(data.toJson());
 
       _logBox.log(
-        'Add new `MangaChapter` entry',
-        extra: {'value': value.toJson()},
+        'Add new entry',
+        extra: {'value': data.toJson()},
         name: runtimeType.toString(),
       );
 
@@ -57,7 +57,7 @@ class MangaChapterServiceFirebase {
     }
 
     _logBox.log(
-      'Update new `MangaChapter` entry',
+      'Update new entry',
       extra: {'value': value.toJson()},
       name: runtimeType.toString(),
     );
@@ -69,7 +69,7 @@ class MangaChapterServiceFirebase {
   Future<MangaChapter?> get({required String id}) async {
     final value = (await _ref.doc(id).get()).data();
     _logBox.log(
-      'Get `MangaChapter` entry',
+      'Get entry',
       extra: {'value': value},
       name: runtimeType.toString(),
     );
@@ -94,7 +94,7 @@ class MangaChapterServiceFirebase {
     final updated = await update(data);
     if (updated != data) {
       _logBox.log(
-        'Update existing `MangaChapter` entry',
+        'Update existing entry',
         extra: {
           'value': data.toJson(),
           'updated': updated.toJson(),
@@ -133,7 +133,7 @@ class MangaChapterServiceFirebase {
     } while (data.length < total);
 
     _logBox.log(
-      'Search existing `MangaChapter` entry',
+      'Search existing entry',
       extra: {
         'value': value.toJson(),
         'matched': data.map((e) => e.toJson()).toList(),

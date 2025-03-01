@@ -48,7 +48,7 @@ class MangaTagServiceFirebase {
       await ref.update(data.toJson());
       _logBox.log(
         'Update new entry',
-        extra: {'value': value.toJson()},
+        extra: {'value': data.toJson()},
         name: runtimeType.toString(),
       );
       return data;
