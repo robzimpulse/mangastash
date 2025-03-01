@@ -90,11 +90,7 @@ class MangaServiceFirebase {
     final ref = _ref
         .where('title', isEqualTo: value.title)
         .where('cover_url', isEqualTo: value.coverUrl)
-        .where('author', isEqualTo: value.author)
-        .where('status', isEqualTo: value.status)
-        .where('description', isEqualTo: value.description)
         .where('source', isEqualTo: value.source?.value)
-        .where('web_url', isEqualTo: value.webUrl)
         .orderBy('source');
 
     final total = (await ref.count().get()).count ?? 0;
