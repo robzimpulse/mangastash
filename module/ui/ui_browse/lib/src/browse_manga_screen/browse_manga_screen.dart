@@ -239,70 +239,72 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
       ),
     );
 
-    return Wrap(
-      spacing: 4,
-      children: [
-        _builder(
-          buildWhen: (prev, curr) => [
-            prev.isFavoriteActive != curr.isFavoriteActive,
-          ].contains(true),
-          builder: (context, state) => OutlinedButton.icon(
-            style: buttonStyle.copyWith(
-              backgroundColor: state.isFavoriteActive
-                  ? const WidgetStatePropertyAll(Colors.grey)
-                  : null,
-            ),
-            icon: Icon(Icons.favorite, color: color),
-            label: Text('Favorite', style: labelStyle?.copyWith(color: color)),
-            onPressed: () => _cubit(context).init(
-              order: state.isFavoriteActive
-                  ? SearchOrders.relevance
-                  : SearchOrders.rating,
-            ),
-          ),
-        ),
-        _builder(
-          buildWhen: (prev, curr) => [
-            prev.isUpdatedActive != curr.isUpdatedActive,
-          ].contains(true),
-          builder: (context, state) => OutlinedButton.icon(
-            style: buttonStyle.copyWith(
-              backgroundColor: state.isUpdatedActive
-                  ? const WidgetStatePropertyAll(Colors.grey)
-                  : null,
-            ),
-            icon: Icon(Icons.update, color: color),
-            label: Text('Updated', style: labelStyle?.copyWith(color: color)),
-            onPressed: () => _cubit(context).init(
-              order: state.isUpdatedActive
-                  ? SearchOrders.relevance
-                  : SearchOrders.updatedAt,
+    return Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          _builder(
+            buildWhen: (prev, curr) => [
+              prev.isFavoriteActive != curr.isFavoriteActive,
+            ].contains(true),
+            builder: (context, state) => OutlinedButton.icon(
+              style: buttonStyle.copyWith(
+                backgroundColor: state.isFavoriteActive
+                    ? const WidgetStatePropertyAll(Colors.grey)
+                    : null,
+              ),
+              icon: Icon(Icons.favorite, color: color),
+              label: Text('Favorite', style: labelStyle?.copyWith(color: color)),
+              onPressed: () => _cubit(context).init(
+                order: state.isFavoriteActive
+                    ? SearchOrders.relevance
+                    : SearchOrders.rating,
+              ),
             ),
           ),
-        ),
-        _builder(
-          buildWhen: (prev, curr) => [
-            prev.parameter != curr.parameter,
-            prev.isFilterActive != curr.isFilterActive,
-          ].contains(true),
-          builder: (context, state) => OutlinedButton.icon(
-            style: buttonStyle.copyWith(
-              backgroundColor: state.isFilterActive
-                  ? const WidgetStatePropertyAll(Colors.grey)
-                  : null,
+          _builder(
+            buildWhen: (prev, curr) => [
+              prev.isUpdatedActive != curr.isUpdatedActive,
+            ].contains(true),
+            builder: (context, state) => OutlinedButton.icon(
+              style: buttonStyle.copyWith(
+                backgroundColor: state.isUpdatedActive
+                    ? const WidgetStatePropertyAll(Colors.grey)
+                    : null,
+              ),
+              icon: Icon(Icons.update, color: color),
+              label: Text('Updated', style: labelStyle?.copyWith(color: color)),
+              onPressed: () => _cubit(context).init(
+                order: state.isUpdatedActive
+                    ? SearchOrders.relevance
+                    : SearchOrders.updatedAt,
+              ),
             ),
-            icon: Icon(Icons.filter_list, color: color),
-            label: Text('Filter', style: labelStyle?.copyWith(color: color)),
-            onPressed: () async {
-              final result = await widget.onTapFilter?.call(state.parameter);
-              if (context.mounted && result != null) {
-                _cubit(context).update(parameter: result);
-                _cubit(context).init();
-              }
-            },
           ),
-        ),
-      ],
+          _builder(
+            buildWhen: (prev, curr) => [
+              prev.parameter != curr.parameter,
+              prev.isFilterActive != curr.isFilterActive,
+            ].contains(true),
+            builder: (context, state) => OutlinedButton.icon(
+              style: buttonStyle.copyWith(
+                backgroundColor: state.isFilterActive
+                    ? const WidgetStatePropertyAll(Colors.grey)
+                    : null,
+              ),
+              icon: Icon(Icons.filter_list, color: color),
+              label: Text('Filter', style: labelStyle?.copyWith(color: color)),
+              onPressed: () async {
+                final result = await widget.onTapFilter?.call(state.parameter);
+                if (context.mounted && result != null) {
+                  _cubit(context).update(parameter: result);
+                  _cubit(context).init();
+                }
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 

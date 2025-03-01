@@ -89,7 +89,6 @@ class MangaServiceFirebase {
 
     final ref = _ref
         .where('title', isEqualTo: value.title)
-        .where('cover_url', isEqualTo: value.coverUrl)
         .where('source', isEqualTo: value.source?.value)
         .orderBy('source');
 
