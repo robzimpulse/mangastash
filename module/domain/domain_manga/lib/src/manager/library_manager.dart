@@ -11,7 +11,8 @@ import '../use_case/library/listen_manga_from_library_use_case.dart';
 
 class LibraryManager
     implements GetMangaFromLibraryUseCase, ListenMangaFromLibraryUseCase {
-  final _stateSubject = BehaviorSubject<List<Manga>>.seeded([]);
+  final _stateSubject = BehaviorSubject<List<String>>.seeded([]);
+  final _libraryStateSubject = BehaviorSubject<List<Manga>>.seeded([]);
 
   LibraryManager({
     required MangaLibraryServiceFirebase mangaLibraryServiceFirebase,
@@ -20,31 +21,32 @@ class LibraryManager
   }) {
     _stateSubject.addStream(
       SwitchLatestStream(
-        listenAuthUseCase.authStateStream.map(
-          (authState) {
-            final userId = authState?.user?.uid;
-
-            if (userId == null) return Stream.value(<Manga>[]);
-
-            final stream = mangaLibraryServiceFirebase.stream(userId: userId);
-
-            final combine = stream.map(
-              (ids) => CombineLatestStream(
-                ids.map((id) => mangaServiceFirebase.stream(id: id)),
-                (values) => values.whereNotNull().toList(),
-              ).share(),
-            );
-            
-            return combine.asyncExpand((e) => e);
-          },
-        ),
+        listenAuthUseCase.authStateStream.map((authState) {
+          final userId = authState?.user?.uid;
+          if (userId == null) return Stream.value(<String>[]);
+          return mangaLibraryServiceFirebase.stream(userId: userId);
+        }),
       ),
+    );
+    _libraryStateSubject.addStream(
+      _stateSubject
+          .map(
+            (ids) => CombineLatestStream(
+              ids.map((id) => mangaServiceFirebase.stream(id: id)),
+              (e) => e.whereNotNull().toList(),
+            ).share(),
+          )
+          .asyncExpand((e) => e),
     );
   }
 
   @override
-  ValueStream<List<Manga>> get libraryStateStream => _stateSubject.stream;
+  ValueStream<List<String>> get libraryIdsStateStream => _stateSubject.stream;
 
   @override
-  List<Manga> get libraryState => _stateSubject.valueOrNull ?? [];
+  ValueStream<List<Manga>> get libraryStateStream =>
+      _libraryStateSubject.stream;
+
+  @override
+  List<Manga> get libraryState => _libraryStateSubject.valueOrNull ?? [];
 }

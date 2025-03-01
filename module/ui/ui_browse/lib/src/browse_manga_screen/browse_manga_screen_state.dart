@@ -10,7 +10,7 @@ class BrowseMangaScreenState extends Equatable {
 
   final List<Manga> mangas;
 
-  final List<Manga> libraries;
+  final List<String> libraries;
 
   final MangaShelfItemLayout layout;
 
@@ -23,8 +23,6 @@ class BrowseMangaScreenState extends Equatable {
   final bool isSearchActive;
 
   final SearchMangaParameter parameter;
-
-  late final Map<String, Manga> libraryMapById;
 
   late final bool isFavoriteActive;
 
@@ -44,16 +42,6 @@ class BrowseMangaScreenState extends Equatable {
     this.libraries = const [],
     this.parameter = const SearchMangaParameter(),
   }) {
-    final Map<String, Manga> libraryMapById = {};
-
-    for (final manga in libraries) {
-      final id = manga.id;
-      if (id == null) continue;
-      libraryMapById.putIfAbsent(id, () => manga);
-    }
-
-    this.libraryMapById = libraryMapById;
-
     isFavoriteActive =
         parameter.orders?.containsKey(SearchOrders.rating) == true;
 
@@ -91,7 +79,7 @@ class BrowseMangaScreenState extends Equatable {
     MangaShelfItemLayout? layout,
     MangaSourceEnum? source,
     List<Manga>? mangas,
-    List<Manga>? libraries,
+    List<String>? libraries,
     SearchMangaParameter? parameter,
   }) {
     return BrowseMangaScreenState(

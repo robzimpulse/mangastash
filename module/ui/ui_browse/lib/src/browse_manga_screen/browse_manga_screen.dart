@@ -369,7 +369,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             onLongPress: () => context.showSnackBar(
               message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
             ),
-            isOnLibrary: state.libraryMapById[e.id] != null,
+            isOnLibrary: state.libraries.contains(e.id) == true,
           ),
         );
 

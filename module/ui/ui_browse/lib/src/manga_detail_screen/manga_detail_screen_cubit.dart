@@ -44,7 +44,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       listenAuth.authStateStream.distinct().listen(_updateAuthState),
     );
     addSubscription(
-      listenMangaFromLibraryUseCase.libraryStateStream
+      listenMangaFromLibraryUseCase.libraryIdsStateStream
           .distinct()
           .listen(_updateMangaLibrary),
     );
@@ -63,7 +63,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     emit(state.copyWith(authState: authState));
   }
 
-  void _updateMangaLibrary(List<Manga> library) {
+  void _updateMangaLibrary(List<String> library) {
     emit(state.copyWith(libraries: library));
   }
 

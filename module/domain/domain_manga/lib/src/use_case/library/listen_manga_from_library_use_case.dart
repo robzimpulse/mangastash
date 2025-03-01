@@ -3,4 +3,5 @@ import 'package:rxdart/streams.dart';
 
 abstract class ListenMangaFromLibraryUseCase {
   ValueStream<List<Manga>> get libraryStateStream;
+  ValueStream<List<String>> get libraryIdsStateStream;
 }

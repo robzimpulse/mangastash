@@ -19,13 +19,13 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   })  : _searchMangaUseCase = searchMangaUseCase,
         super(initialState) {
     addSubscription(
-      listenMangaFromLibraryUseCase.libraryStateStream
+      listenMangaFromLibraryUseCase.libraryIdsStateStream
           .distinct()
           .listen(_updateLibraryState),
     );
   }
 
-  void _updateLibraryState(List<Manga> libraryState) {
+  void _updateLibraryState(List<String> libraryState) {
     emit(state.copyWith(libraries: libraryState));
   }
 
