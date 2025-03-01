@@ -24,7 +24,7 @@ class MangaChapterServiceFirebase {
           'value': value.toJson(),
           'duplicated': founds.map((e) => e.toJson()).toList(),
         },
-        name: 'MangaChapterServiceFirebase',
+        name: runtimeType.toString(),
       );
     }
 
@@ -46,8 +46,21 @@ class MangaChapterServiceFirebase {
       final ref = await _ref.add(value.toJson());
       final data = value.copyWith(id: ref.id);
       await ref.update(data.toJson());
+
+      _logBox.log(
+        'Add new `MangaChapter` entry',
+        extra: {'value': value.toJson()},
+        name: runtimeType.toString(),
+      );
+
       return data;
     }
+
+    _logBox.log(
+      'Update new `MangaChapter` entry',
+      extra: {'value': value.toJson()},
+      name: runtimeType.toString(),
+    );
 
     await _ref.doc(id).set(value.toJson());
     return value;
@@ -55,6 +68,11 @@ class MangaChapterServiceFirebase {
 
   Future<MangaChapter?> get({required String id}) async {
     final value = (await _ref.doc(id).get()).data();
+    _logBox.log(
+      'Get `MangaChapter` entry',
+      extra: {'value': value},
+      name: runtimeType.toString(),
+    );
     if (value == null) return null;
     return MangaChapter.fromJson(value).copyWith(id: id);
   }
@@ -75,6 +93,14 @@ class MangaChapterServiceFirebase {
 
     final updated = await update(data);
     if (updated != data) {
+      _logBox.log(
+        'Update existing `MangaChapter` entry',
+        extra: {
+          'value': data.toJson(),
+          'updated': updated.toJson(),
+        },
+        name: runtimeType.toString(),
+      );
       await _ref.doc(key).set(updated.toJson());
     }
     return updated;
@@ -98,10 +124,22 @@ class MangaChapterServiceFirebase {
       final result = (offset == null)
           ? await (ref.limit(100).get())
           : await (ref.startAfterDocument(offset).limit(100).get());
-      data.addAll(result.docs
-          .map((e) => MangaChapter.fromJson(e.data()).copyWith(id: e.id)));
+      data.addAll(
+        result.docs.map(
+          (e) => MangaChapter.fromJson(e.data()).copyWith(id: e.id),
+        ),
+      );
       offset = result.docs.lastOrNull;
     } while (data.length < total);
+
+    _logBox.log(
+      'Search existing `MangaChapter` entry',
+      extra: {
+        'value': value.toJson(),
+        'matched': data.map((e) => e.toJson()).toList(),
+      },
+      name: runtimeType.toString(),
+    );
 
     return data;
   }

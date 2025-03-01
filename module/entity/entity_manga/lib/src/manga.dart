@@ -4,7 +4,6 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:text_similarity/text_similarity.dart';
 
 import '../entity_manga.dart';
-import 'base/base_model.dart';
 
 part 'manga.g.dart';
 

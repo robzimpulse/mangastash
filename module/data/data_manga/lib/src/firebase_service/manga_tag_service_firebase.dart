@@ -19,12 +19,12 @@ class MangaTagServiceFirebase {
 
     if (founds.length > 1) {
       _logBox.log(
-        'Duplicate `MangaTag` entry',
+        'Duplicate entry',
         extra: {
           'value': value.toJson(),
           'duplicated': founds.map((e) => e.toJson()).toList(),
         },
-        name: 'MangaTagServiceFirebase',
+        name: runtimeType.toString(),
       );
     }
 
@@ -46,15 +46,30 @@ class MangaTagServiceFirebase {
       final ref = await _ref.add(value.toJson());
       final data = value.copyWith(id: ref.id);
       await ref.update(data.toJson());
+      _logBox.log(
+        'Update new entry',
+        extra: {'value': value.toJson()},
+        name: runtimeType.toString(),
+      );
       return data;
     }
 
+    _logBox.log(
+      'Update new entry',
+      extra: {'value': value.toJson()},
+      name: runtimeType.toString(),
+    );
     await _ref.doc(id).set(value.toJson());
     return value;
   }
 
   Future<MangaTag?> get({required String id}) async {
     final value = (await _ref.doc(id).get()).data();
+    _logBox.log(
+      'Get entry',
+      extra: {'value': value},
+      name: runtimeType.toString(),
+    );
     if (value == null) return null;
     return MangaTag.fromJson(value).copyWith(id: id);
   }
@@ -75,6 +90,14 @@ class MangaTagServiceFirebase {
 
     final updated = await update(data);
     if (updated != data) {
+      _logBox.log(
+        'Update existing entry',
+        extra: {
+          'value': data.toJson(),
+          'updated': updated.toJson(),
+        },
+        name: runtimeType.toString(),
+      );
       await _ref.doc(key).set(updated.toJson());
     }
     return updated;
@@ -97,6 +120,15 @@ class MangaTagServiceFirebase {
       );
       offset = result.docs.lastOrNull;
     } while (data.length < total);
+
+    _logBox.log(
+      'Search existing entry',
+      extra: {
+        'value': value.toJson(),
+        'matched': data.map((e) => e.toJson()).toList(),
+      },
+      name: runtimeType.toString(),
+    );
 
     return data;
   }

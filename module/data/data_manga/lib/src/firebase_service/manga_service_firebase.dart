@@ -44,8 +44,20 @@ class MangaServiceFirebase {
       final ref = await _ref.add(value.toJson());
       final data = value.copyWith(id: ref.id);
       await ref.update(data.toJson());
+
+      _logBox.log(
+        'Add new entry',
+        extra: {'value': value.toJson()},
+        name: runtimeType.toString(),
+      );
       return data;
     }
+
+    _logBox.log(
+      'Update existing entry',
+      extra: {'value': value.toJson()},
+      name: runtimeType.toString(),
+    );
 
     await _ref.doc(id).set(value.toJson());
     return value;
@@ -71,6 +83,14 @@ class MangaServiceFirebase {
 
     final updated = await update(data);
     if (updated != data) {
+      _logBox.log(
+        'Update existing  entry',
+        extra: {
+          'value': data.toJson(),
+          'updated': updated.toJson(),
+        },
+        name: runtimeType.toString(),
+      );
       await _ref.doc(key).set(updated.toJson());
     }
     return updated;
@@ -78,6 +98,11 @@ class MangaServiceFirebase {
 
   Future<Manga?> get({required String id}) async {
     final value = (await _ref.doc(id).get()).data();
+    _logBox.log(
+      'Get entry',
+      extra: {'value': value},
+      name: runtimeType.toString(),
+    );
     if (value == null) return null;
     return Manga.fromJson(value).copyWith(id: id);
   }
@@ -104,6 +129,15 @@ class MangaServiceFirebase {
       );
       offset = result.docs.lastOrNull;
     } while (data.length < total);
+
+    _logBox.log(
+      'Search existing entry',
+      extra: {
+        'value': value.toJson(),
+        'matched': data.map((e) => e.toJson()).toList(),
+      },
+      name: runtimeType.toString(),
+    );
 
     return data;
   }
