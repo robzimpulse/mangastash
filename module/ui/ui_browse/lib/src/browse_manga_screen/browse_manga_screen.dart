@@ -242,19 +242,18 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
-        children: [
+        children: <Widget>[
           _builder(
             buildWhen: (prev, curr) => [
               prev.isFavoriteActive != curr.isFavoriteActive,
             ].contains(true),
-            builder: (context, state) => OutlinedButton.icon(
+            builder: (context, state) => IconButton.outlined(
               style: buttonStyle.copyWith(
                 backgroundColor: state.isFavoriteActive
                     ? const WidgetStatePropertyAll(Colors.grey)
                     : null,
               ),
               icon: Icon(Icons.favorite, color: color),
-              label: Text('Favorite', style: labelStyle?.copyWith(color: color)),
               onPressed: () => _cubit(context).init(
                 order: state.isFavoriteActive
                     ? SearchOrders.relevance
@@ -266,14 +265,13 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             buildWhen: (prev, curr) => [
               prev.isUpdatedActive != curr.isUpdatedActive,
             ].contains(true),
-            builder: (context, state) => OutlinedButton.icon(
+            builder: (context, state) => IconButton.outlined(
               style: buttonStyle.copyWith(
                 backgroundColor: state.isUpdatedActive
                     ? const WidgetStatePropertyAll(Colors.grey)
                     : null,
               ),
               icon: Icon(Icons.update, color: color),
-              label: Text('Updated', style: labelStyle?.copyWith(color: color)),
               onPressed: () => _cubit(context).init(
                 order: state.isUpdatedActive
                     ? SearchOrders.relevance
@@ -303,7 +301,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               },
             ),
           ),
-        ],
+        ].intersperse(const SizedBox(width: 4)).toList(),
       ),
     );
   }
