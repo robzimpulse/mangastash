@@ -183,6 +183,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required List<LogModel> filteredActivities,
   }) {
     final groups = filteredActivities.groupListsBy((e) => e.name);
+    final tabs = groups.entries.mapIndexed(
+      (index, entry) => TabData(
+        index: index,
+        title: Tab(child: Text(entry.key ?? 'Unnamed')),
+        content: ListView.builder(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          physics: const BouncingScrollPhysics(),
+          itemCount: entry.value.length,
+          itemBuilder: (context, index) => ItemLogWidget(
+            data: entry.value[index],
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetailScreen(
+                  data: entry.value[index],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
     return Column(
       children: [
         Expanded(
@@ -192,47 +215,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             showNextIcon: false,
             tabAlignment: TabAlignment.center,
             onTabChanged: (index) {},
-            dynamicTabs: [
-              for (final (index, entry) in groups.entries.indexed)
-                TabData(
-                  index: index,
-                  title: Tab(child: Text(entry.key ?? 'Unnamed')),
-                  content: ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: entry.value.length,
-                    itemBuilder: (context, index) => ItemLogWidget(
-                      data: entry.value[index],
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DetailScreen(
-                            data: entry.value[index],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
             onTabControllerUpdated: (controller) {},
+            dynamicTabs: tabs.toList(),
           ),
-          // child: ListView.builder(
-          //   physics: const BouncingScrollPhysics(),
-          //   itemCount: filteredActivities.length,
-          //   itemBuilder: (context, index) {
-          //     var data = filteredActivities[index];
-          //     return ItemLogWidget(
-          //       data: data,
-          //       onTap: () => Navigator.push(
-          //         context,
-          //         MaterialPageRoute(
-          //           builder: (context) => DetailScreen(data: data),
-          //         ),
-          //       ),
-          //     );
-          //   },
-          // ),
         ),
       ],
     );
