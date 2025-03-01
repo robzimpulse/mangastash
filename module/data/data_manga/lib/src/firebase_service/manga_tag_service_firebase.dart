@@ -18,12 +18,14 @@ class MangaTagServiceFirebase {
     final founds = await search(value: value);
 
     if (founds.length > 1) {
-      String message = 'Duplicate `MangaTag` entry: ';
-      message += '\nvalue: ${value.id} - ${value.name} ';
-      for (final found in founds) {
-        message += '\nfound: ${found.id} - ${found.name}';
-      }
-      _logBox.log(message, name: 'MangaTagServiceFirebase');
+      _logBox.log(
+        'Duplicate `MangaTag` entry',
+        extra: {
+          'value': value.toJson(),
+          'duplicated': founds.map((e) => e.toJson()).toList(),
+        },
+        name: 'MangaTagServiceFirebase',
+      );
     }
 
     final match = founds

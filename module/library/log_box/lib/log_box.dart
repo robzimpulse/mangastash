@@ -48,6 +48,7 @@ class LogBox {
 
   void log(
     String message, {
+    Map<String, dynamic>? extra,
     DateTime? time,
     int? sequenceNumber,
     int level = 0,
@@ -60,6 +61,7 @@ class LogBox {
       log: LogModel(
         message: message,
         time: time ?? DateTime.now(),
+        extra: extra,
         sequenceNumber: sequenceNumber,
         level: level,
         name: name,

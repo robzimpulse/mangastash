@@ -18,12 +18,14 @@ class MangaChapterServiceFirebase {
     final founds = await search(value: value);
 
     if (founds.length > 1) {
-      String message = 'Duplicate `MangaChapter` entry: ';
-      message += '\nvalue: ${value.id} - ${value.chapter} ';
-      for (final found in founds) {
-        message += '\nfound: ${found.id} - ${found.chapter}';
-      }
-      _logBox.log(message, name: 'MangaChapterServiceFirebase');
+      _logBox.log(
+        'Duplicate `MangaChapter` entry',
+        extra: {
+          'value': value.toJson(),
+          'duplicated': founds.map((e) => e.toJson()).toList(),
+        },
+        name: 'MangaChapterServiceFirebase',
+      );
     }
 
     final match = founds
