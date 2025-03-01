@@ -96,6 +96,7 @@ class DetailScreen extends StatelessWidget {
   }
 
   Widget _messageWidget() {
+    final extras = data.extra?.entries ?? [];
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Padding(
@@ -103,6 +104,8 @@ class DetailScreen extends StatelessWidget {
         child: Column(
           children: [
             ItemColumn(name: 'Message', value: data.message),
+            for (final group in extras)
+              ItemColumn(name: group.key, value: group.value.toString()),
           ],
         ),
       ),

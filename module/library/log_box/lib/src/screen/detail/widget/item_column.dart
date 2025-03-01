@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../common/extension.dart';
 import '../../../common/helper.dart';
 
 class ItemColumn extends StatelessWidget {
@@ -58,7 +59,7 @@ class ItemColumn extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                value,
+                value.isJson ? value.prettify : value,
                 style: Theme.of(context).textTheme.labelSmall,
               ),
             ),
