@@ -12,13 +12,13 @@ import '../use_case/library/listen_manga_from_library_use_case.dart';
 class LibraryManager
     implements GetMangaFromLibraryUseCase, ListenMangaFromLibraryUseCase {
   final _stateSubject = BehaviorSubject<List<String>>.seeded([]);
-  final _libraryStateSubject = BehaviorSubject<List<Manga>>.seeded([]);
+  final MangaServiceFirebase _mangaServiceFirebase;
 
   LibraryManager({
     required MangaLibraryServiceFirebase mangaLibraryServiceFirebase,
     required MangaServiceFirebase mangaServiceFirebase,
     required ListenAuthUseCase listenAuthUseCase,
-  }) {
+  }): _mangaServiceFirebase = mangaServiceFirebase {
     _stateSubject.addStream(
       SwitchLatestStream(
         listenAuthUseCase.authStateStream.map((authState) {
@@ -28,25 +28,15 @@ class LibraryManager
         }),
       ),
     );
-    _libraryStateSubject.addStream(
-      _stateSubject
-          .map(
-            (ids) => CombineLatestStream(
-              ids.map((id) => mangaServiceFirebase.stream(id: id)),
-              (e) => e.whereNotNull().toList(),
-            ).share(),
-          )
-          .asyncExpand((e) => e),
-    );
   }
 
   @override
-  ValueStream<List<String>> get libraryIdsStateStream => _stateSubject.stream;
+  ValueStream<List<String>> get libraryStateStream => _stateSubject.stream;
 
   @override
-  ValueStream<List<Manga>> get libraryStateStream =>
-      _libraryStateSubject.stream;
-
-  @override
-  List<Manga> get libraryState => _libraryStateSubject.valueOrNull ?? [];
+  Future<List<Manga>> get libraryState {
+    final ids = _stateSubject.valueOrNull ?? [];
+    final futures = ids.map((e) => _mangaServiceFirebase.get(id: e));
+    return Future.wait(futures).then((e) => e.whereNotNull().toList());
+  }
 }
