@@ -2,15 +2,27 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:log_box/log_box.dart';
 
 class MangaServiceFirebase {
   final CollectionReference<Map<String, dynamic>> _ref;
+  final LogBox _logBox;
 
-  MangaServiceFirebase({required FirebaseApp app})
-      : _ref = FirebaseFirestore.instanceFor(app: app).collection('mangas');
+  MangaServiceFirebase({required FirebaseApp app, required LogBox logBox,})
+      : _ref = FirebaseFirestore.instanceFor(app: app).collection('mangas'),
+        _logBox = logBox;
 
   Future<Manga> sync({required Manga value}) async {
     final founds = await search(value: value);
+
+    if (founds.length > 1) {
+      String message = 'Duplicate `Manga` entry: ';
+      message += '\nvalue: ${value.id} - ${value.title} ';
+      for (final found in founds) {
+        message += '\nfound: ${found.id} - ${found.title}';
+      }
+      _logBox.log(message, name: 'MangaServiceFirebase');
+    }
 
     final match = founds
         .sorted((a, b) => value.compareTo(a) - value.compareTo(b))

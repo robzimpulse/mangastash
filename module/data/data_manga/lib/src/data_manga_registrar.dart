@@ -14,9 +14,24 @@ class DataMangaRegistrar extends Registrar {
     log.log('start register', name: runtimeType.toString());
 
     locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
-    locator.registerFactory(() => MangaServiceFirebase(app: locator()));
-    locator.registerFactory(() => MangaTagServiceFirebase(app: locator()));
-    locator.registerFactory(() => MangaChapterServiceFirebase(app: locator()));
+    locator.registerFactory(
+      () => MangaServiceFirebase(
+        app: locator(),
+        logBox: log,
+      ),
+    );
+    locator.registerFactory(
+      () => MangaTagServiceFirebase(
+        app: locator(),
+        logBox: log,
+      ),
+    );
+    locator.registerFactory(
+      () => MangaChapterServiceFirebase(
+        app: locator(),
+        logBox: log,
+      ),
+    );
     locator.registerFactory(() => MangaLibraryServiceFirebase(app: locator()));
 
     log.log('finish register', name: runtimeType.toString());

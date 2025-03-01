@@ -2,15 +2,29 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:log_box/log_box.dart';
 
 class MangaChapterServiceFirebase {
   final CollectionReference<Map<String, dynamic>> _ref;
+  final LogBox _logBox;
 
-  MangaChapterServiceFirebase({required FirebaseApp app})
-      : _ref = FirebaseFirestore.instanceFor(app: app).collection('chapters');
+  MangaChapterServiceFirebase({
+    required FirebaseApp app,
+    required LogBox logBox,
+  })  : _ref = FirebaseFirestore.instanceFor(app: app).collection('chapters'),
+        _logBox = logBox;
 
   Future<MangaChapter> sync({required MangaChapter value}) async {
     final founds = await search(value: value);
+
+    if (founds.length > 1) {
+      String message = 'Duplicate `MangaChapter` entry: ';
+      message += '\nvalue: ${value.id} - ${value.chapter} ';
+      for (final found in founds) {
+        message += '\nfound: ${found.id} - ${found.chapter}';
+      }
+      _logBox.log(message, name: 'MangaChapterServiceFirebase');
+    }
 
     final match = founds
         .sorted((a, b) => value.compareTo(a) - value.compareTo(b))
@@ -88,7 +102,8 @@ class MangaChapterServiceFirebase {
       final result = (offset == null)
           ? await (ref.limit(100).get())
           : await (ref.startAfterDocument(offset).limit(100).get());
-      data.addAll(result.docs.map((e) => MangaChapter.fromJson(e.data()).copyWith(id: e.id)));
+      data.addAll(result.docs
+          .map((e) => MangaChapter.fromJson(e.data()).copyWith(id: e.id)));
       offset = result.docs.lastOrNull;
     } while (data.length < total);
 
