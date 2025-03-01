@@ -16,6 +16,7 @@ dependencies:
   collection: ^1.16.0
   webview_flutter: ^4.8.0
   webview_flutter_android: ^3.16.8
+  dynamic_tabbar: ^1.0.9
 
 dev_dependencies:
   flutter_test:
