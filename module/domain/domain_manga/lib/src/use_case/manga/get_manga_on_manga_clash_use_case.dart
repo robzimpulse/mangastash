@@ -3,15 +3,19 @@ import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 
 import '../../manager/headless_webview_manager.dart';
+import '../../mixin/sync_manga_mixin.dart';
 
-class GetMangaOnMangaClashUseCase {
+class GetMangaOnMangaClashUseCase with SyncMangaMixin {
+  final MangaTagServiceFirebase _mangaTagServiceFirebase;
   final MangaServiceFirebase _mangaServiceFirebase;
   final HeadlessWebviewManager _webview;
 
   GetMangaOnMangaClashUseCase({
+    required MangaTagServiceFirebase mangaTagServiceFirebase,
     required MangaServiceFirebase mangaServiceFirebase,
     required HeadlessWebviewManager webview,
   })  : _mangaServiceFirebase = mangaServiceFirebase,
+        _mangaTagServiceFirebase = mangaTagServiceFirebase,
         _webview = webview;
 
   Future<Result<Manga>> execute({required String mangaId}) async {
@@ -35,13 +39,11 @@ class GetMangaOnMangaClashUseCase {
         .join('\n\n');
 
     return Success(
-      result.description == description
-          ? result
-          : await _mangaServiceFirebase.update(
-              key: mangaId,
-              update: (old) async => old.copyWith(description: description),
-              ifAbsent: () async => result.copyWith(description: description),
-            ),
+      await sync(
+        mangaTagServiceFirebase: _mangaTagServiceFirebase,
+        mangaServiceFirebase: _mangaServiceFirebase,
+        manga: result.copyWith(description: description),
+      ),
     );
   }
 }

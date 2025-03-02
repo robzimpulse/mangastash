@@ -134,12 +134,15 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => GetMangaOnMangaDexUseCase(
         mangaService: locator(),
+        mangaTagServiceFirebase: locator(),
+        mangaServiceFirebase: locator(),
       ),
     );
     locator.registerFactory(
       () => GetMangaOnMangaClashUseCase(
-        mangaServiceFirebase: locator(),
         webview: locator(),
+        mangaServiceFirebase: locator(),
+        mangaTagServiceFirebase: locator(),
       ),
     );
     locator.registerFactory(

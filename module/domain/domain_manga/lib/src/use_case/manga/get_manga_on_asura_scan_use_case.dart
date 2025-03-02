@@ -3,8 +3,9 @@ import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 
 import '../../manager/headless_webview_manager.dart';
+import '../../mixin/sync_manga_mixin.dart';
 
-class GetMangaOnAsuraScanUseCase {
+class GetMangaOnAsuraScanUseCase with SyncMangaMixin {
   final MangaTagServiceFirebase _mangaTagServiceFirebase;
   final MangaServiceFirebase _mangaServiceFirebase;
   final HeadlessWebviewManager _webview;
@@ -73,28 +74,14 @@ class GetMangaOnAsuraScanUseCase {
         ?.children
         .map((e) => e.text.trim());
 
-    final List<MangaTag> tags = genres == null
-        ? []
-        : await Future.wait(
-            [
-              ...genres.map(
-                (e) => _mangaTagServiceFirebase.sync(value: MangaTag(name: e)),
-              ),
-            ],
-          );
-
     return Success(
-      await _mangaServiceFirebase.update(
-        key: mangaId,
-        update: (old) async => old.copyWith(
+      await sync(
+        mangaTagServiceFirebase: _mangaTagServiceFirebase,
+        mangaServiceFirebase: _mangaServiceFirebase,
+        manga: result.copyWith(
           author: author,
           description: description,
-          tags: tags,
-        ),
-        ifAbsent: () async => result.copyWith(
-          author: author,
-          description: description,
-          tags: tags,
+          tags: genres?.map((e) => MangaTag(name: e)).toList(),
         ),
       ),
     );
