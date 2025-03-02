@@ -15,6 +15,7 @@ class Pagination<T extends Equatable> extends Equatable {
   final String? offset;
   final int? total;
   final bool? hasNextPage;
+  final String? sourceUrl;
 
   const Pagination({
     this.data,
@@ -23,10 +24,19 @@ class Pagination<T extends Equatable> extends Equatable {
     this.offset,
     this.total,
     this.hasNextPage,
+    this.sourceUrl,
   });
 
   @override
-  List<Object?> get props => [limit, page, offset, total, data, hasNextPage];
+  List<Object?> get props => [
+        limit,
+        page,
+        offset,
+        total,
+        data,
+        hasNextPage,
+        sourceUrl,
+      ];
 
   factory Pagination.fromJson(
     Map<String, dynamic> json,
@@ -47,6 +57,7 @@ class Pagination<T extends Equatable> extends Equatable {
     String? offset,
     int? total,
     bool? hasNextPage,
+    String? sourceUrl,
   }) {
     return Pagination(
       data: data ?? this.data,
@@ -55,6 +66,7 @@ class Pagination<T extends Equatable> extends Equatable {
       offset: offset ?? this.offset,
       total: total ?? this.total,
       hasNextPage: hasNextPage ?? this.hasNextPage,
+      sourceUrl: sourceUrl ?? this.sourceUrl,
     );
   }
 }

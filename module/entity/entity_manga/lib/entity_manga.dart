@@ -13,4 +13,5 @@ export 'src/manga_chapter.dart';
 export 'src/manga_chapter_config.dart';
 export 'src/manga_source.dart';
 export 'src/manga_tag.dart';
+export 'src/search_manga_chapter_parameter.dart';
 export 'src/search_manga_parameter.dart';
