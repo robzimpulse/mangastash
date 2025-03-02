@@ -16,7 +16,7 @@ class GetMangaOnMangaDexUseCase {
         includes: [Include.author.rawValue, Include.coverArt.rawValue],
       );
       final manga = result.data;
-      if (manga == null) throw Exception('Manga not found');
+      if (manga == null) return Error(Exception('Manga not found'));
       return Success(Manga.from(data: manga));
     } on Exception catch (e) {
       return Error(e);
