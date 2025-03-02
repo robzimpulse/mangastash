@@ -83,6 +83,8 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => SearchMangaOnMangaDexUseCase(
         mangaService: locator(),
+        mangaTagServiceFirebase: locator(),
+        mangaServiceFirebase: locator(),
       ),
     );
     locator.registerFactory(
@@ -100,6 +102,8 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => SearchMangaOnMangaClashUseCaseUseCase(
         webview: locator(),
+        mangaTagServiceFirebase: locator(),
+        mangaServiceFirebase: locator(),
       ),
     );
     locator.registerFactory(
@@ -148,6 +152,8 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => SearchMangaOnAsuraScanUseCase(
         webview: locator(),
+        mangaTagServiceFirebase: locator(),
+        mangaServiceFirebase: locator(),
       ),
     );
     locator.registerFactory(
@@ -155,8 +161,6 @@ class DomainMangaRegistrar extends Registrar {
         searchMangaOnMangaDexUseCase: locator(),
         searchMangaOnMangaClashUseCaseUseCase: locator(),
         searchMangaOnAsuraScanUseCase: locator(),
-        mangaServiceFirebase: locator(),
-        mangaTagServiceFirebase: locator(),
       ),
     );
     locator.registerFactory(

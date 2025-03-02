@@ -3,18 +3,26 @@ import 'dart:math';
 import 'package:core_environment/core_environment.dart'
     show toBeginningOfSentenceCase;
 import 'package:core_network/core_network.dart';
+import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:html/dom.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../manager/headless_webview_manager.dart';
+import '../../mixin/sync_manga_mixin.dart';
 
-class SearchMangaOnAsuraScanUseCase {
+class SearchMangaOnAsuraScanUseCase with SyncMangaMixin {
   final HeadlessWebviewManager _webview;
+  final MangaTagServiceFirebase _mangaTagServiceFirebase;
+  final MangaServiceFirebase _mangaServiceFirebase;
 
   SearchMangaOnAsuraScanUseCase({
     required HeadlessWebviewManager webview,
-  }) : _webview = webview;
+    required MangaTagServiceFirebase mangaTagServiceFirebase,
+    required MangaServiceFirebase mangaServiceFirebase,
+  })  : _webview = webview,
+        _mangaServiceFirebase = mangaServiceFirebase,
+        _mangaTagServiceFirebase = mangaTagServiceFirebase;
 
   Future<Result<Pagination<Manga>>> execute({
     required SearchMangaParameter parameter,
@@ -90,12 +98,18 @@ class SearchMangaOnAsuraScanUseCase {
     final haveNextPage =
         contentPagination?.attributes['style'] == 'pointer-events:auto';
 
+    final data = await sync(
+      mangaTagServiceFirebase: _mangaTagServiceFirebase,
+      mangaServiceFirebase: _mangaServiceFirebase,
+      mangas: mangas,
+    );
+
     return Success(
-      Pagination<Manga>(
-        data: mangas,
+      Pagination(
+        data: data,
         page: '$page',
-        limit: mangas.length,
-        total: mangas.length,
+        limit: data.length,
+        total: data.length,
         hasNextPage: haveNextPage,
       ),
     );
