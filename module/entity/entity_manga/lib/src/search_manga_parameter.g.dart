@@ -17,6 +17,9 @@ SearchMangaParameter _$SearchMangaParameterFromJson(
         (k, e) => MapEntry($enumDecode(_$SearchOrdersEnumMap, k),
             $enumDecode(_$OrderDirectionsEnumMap, e)),
       ),
+      status: (json['status'] as List<dynamic>?)
+          ?.map((e) => $enumDecode(_$MangaStatusEnumMap, e))
+          .toList(),
     );
 
 Map<String, dynamic> _$SearchMangaParameterToJson(
@@ -28,6 +31,7 @@ Map<String, dynamic> _$SearchMangaParameterToJson(
       'page': instance.page,
       'orders': instance.orders?.map((k, e) =>
           MapEntry(_$SearchOrdersEnumMap[k]!, _$OrderDirectionsEnumMap[e]!)),
+      'status': instance.status?.map((e) => _$MangaStatusEnumMap[e]!).toList(),
     };
 
 const _$OrderDirectionsEnumMap = {
@@ -44,4 +48,11 @@ const _$SearchOrdersEnumMap = {
   SearchOrders.followedCount: 'followedCount',
   SearchOrders.relevance: 'relevance',
   SearchOrders.rating: 'rating',
+};
+
+const _$MangaStatusEnumMap = {
+  MangaStatus.ongoing: 'ongoing',
+  MangaStatus.completed: 'completed',
+  MangaStatus.haitus: 'haitus',
+  MangaStatus.cancelled: 'cancelled',
 };
