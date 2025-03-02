@@ -1,7 +1,7 @@
 import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 
-mixin SyncMangaMixin {
+mixin SyncMangasMixin {
   Future<List<Manga>> sync({
     required MangaTagServiceFirebase mangaTagServiceFirebase,
     required MangaServiceFirebase mangaServiceFirebase,

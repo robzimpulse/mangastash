@@ -3,9 +3,9 @@ import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-import '../../mixin/sync_manga_mixin.dart';
+import '../../mixin/sync_mangas_mixin.dart';
 
-class SearchMangaOnMangaDexUseCase with SyncMangaMixin {
+class SearchMangaOnMangaDexUseCase with SyncMangasMixin {
   final MangaService _mangaService;
   final MangaTagServiceFirebase _mangaTagServiceFirebase;
   final MangaServiceFirebase _mangaServiceFirebase;

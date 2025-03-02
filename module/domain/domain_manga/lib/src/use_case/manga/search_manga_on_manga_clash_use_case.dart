@@ -10,9 +10,9 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../manager/headless_webview_manager.dart';
-import '../../mixin/sync_manga_mixin.dart';
+import '../../mixin/sync_mangas_mixin.dart';
 
-class SearchMangaOnMangaClashUseCaseUseCase with SyncMangaMixin {
+class SearchMangaOnMangaClashUseCaseUseCase with SyncMangasMixin {
   final HeadlessWebviewManager _webview;
   final MangaTagServiceFirebase _mangaTagServiceFirebase;
   final MangaServiceFirebase _mangaServiceFirebase;
