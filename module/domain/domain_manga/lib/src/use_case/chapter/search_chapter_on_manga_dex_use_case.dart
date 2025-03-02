@@ -1,17 +1,22 @@
 import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
+import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../helper/language_code_converter.dart';
+import '../../mixin/sync_chapters_mixin.dart';
 
-class SearchChapterOnMangaDexUseCase {
+class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
   final ChapterRepository _chapterRepository;
+  final MangaChapterServiceFirebase _mangaChapterServiceFirebase;
 
   const SearchChapterOnMangaDexUseCase({
     required ChapterRepository chapterRepository,
-  }) : _chapterRepository = chapterRepository;
+    required MangaChapterServiceFirebase mangaChapterServiceFirebase,
+  })  : _chapterRepository = chapterRepository,
+        _mangaChapterServiceFirebase = mangaChapterServiceFirebase;
 
   Future<Result<List<MangaChapter>>> execute({
     required String? mangaId,
@@ -61,7 +66,12 @@ class SearchChapterOnMangaDexUseCase {
         total = (result.total ?? 0).toInt();
       } while (chapters.length < total);
 
-      return Success(chapters);
+      return Success(
+        await sync(
+          mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
+          values: chapters,
+        ),
+      );
     } on Exception catch (e) {
       return Error(e);
     }

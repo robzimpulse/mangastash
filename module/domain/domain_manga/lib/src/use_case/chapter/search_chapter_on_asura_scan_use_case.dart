@@ -5,8 +5,9 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:html/dom.dart';
 
 import '../../manager/headless_webview_manager.dart';
+import '../../mixin/sync_chapters_mixin.dart';
 
-class SearchChapterOnAsuraScanUseCase {
+class SearchChapterOnAsuraScanUseCase with SyncChaptersMixin {
   final MangaServiceFirebase _mangaServiceFirebase;
   final MangaChapterServiceFirebase _mangaChapterServiceFirebase;
   final HeadlessWebviewManager _webview;
@@ -108,10 +109,9 @@ class SearchChapterOnAsuraScanUseCase {
     }
 
     return Success(
-      await Future.wait(
-        chapters.map(
-          (e) => _mangaChapterServiceFirebase.sync(value: e),
-        ),
+      await sync(
+        mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
+        values: chapters,
       ),
     );
   }
