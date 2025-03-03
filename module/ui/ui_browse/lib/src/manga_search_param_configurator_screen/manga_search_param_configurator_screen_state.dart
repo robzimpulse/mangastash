@@ -1,4 +1,4 @@
-import 'package:entity_manga/entity_manga.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:equatable/equatable.dart';
 
 class MangaSearchParamConfiguratorScreenState extends Equatable {

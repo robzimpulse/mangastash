@@ -1,11 +1,6 @@
-import '../enums/content_rating.dart';
 import '../enums/includes.dart';
-import '../enums/language_codes.dart';
-import '../enums/manga_status.dart';
-import '../enums/order_enums.dart';
-import '../enums/publication_demographic.dart';
-import '../enums/tag_modes.dart';
 import '../model/manga/manga_response.dart';
+import '../model/manga/search_manga_parameter.dart';
 import '../model/manga/search_manga_response.dart';
 import '../model/tag/tag_response.dart';
 import '../service/manga_service.dart';
@@ -18,55 +13,36 @@ class MangaRepository {
   }) : _service = service;
 
   Future<SearchMangaResponse> search({
-    String? title,
-    int? limit,
-    int? offset,
-    List<String>? authors,
-    List<String>? artists,
-    int? year,
-    List<String>? includedTags,
-    TagsMode? includedTagsMode,
-    List<String>? excludedTags,
-    TagsMode? excludedTagsMode,
-    List<MangaStatus>? status,
-    List<LanguageCodes>? originalLanguage,
-    List<LanguageCodes>? excludedOriginalLanguages,
-    List<LanguageCodes>? availableTranslatedLanguage,
-    List<PublicDemographic>? publicationDemographic,
-    List<String>? ids,
-    List<ContentRating>? contentRating,
-    String? createdAtSince,
-    String? updatedAtSince,
-    List<Include>? includes,
-    String? group,
-    Map<SearchOrders, OrderDirections>? orders,
+    SearchMangaParameter? parameter,
   }) {
     return _service.search(
-      title: title,
-      limit: limit,
-      offset: offset,
-      authors: authors,
-      artists: artists,
-      year: year,
-      includedTags: includedTags,
-      includedTagsMode: includedTagsMode?.rawValue,
-      excludedTags: excludedTags,
-      excludedTagsMode: excludedTagsMode?.rawValue,
-      status: status?.map((e) => e.rawValue).toList(),
-      originalLanguage: originalLanguage?.map((e) => e.rawValue).toList(),
+      title: parameter?.title,
+      limit: parameter?.limit,
+      offset: parameter?.offset,
+      authors: parameter?.authors,
+      artists: parameter?.artists,
+      year: parameter?.year,
+      includedTags: parameter?.includedTags,
+      includedTagsMode: parameter?.includedTagsMode?.rawValue,
+      excludedTags: parameter?.excludedTags,
+      excludedTagsMode: parameter?.excludedTagsMode?.rawValue,
+      status: parameter?.status?.map((e) => e.rawValue).toList(),
+      originalLanguage:
+          parameter?.originalLanguage?.map((e) => e.rawValue).toList(),
       excludedOriginalLanguages:
-          excludedOriginalLanguages?.map((e) => e.rawValue).toList(),
-      availableTranslatedLanguage:
-          availableTranslatedLanguage?.map((e) => e.rawValue).toList(),
+          parameter?.excludedOriginalLanguages?.map((e) => e.rawValue).toList(),
+      availableTranslatedLanguage: parameter?.availableTranslatedLanguage
+          ?.map((e) => e.rawValue)
+          .toList(),
       publicationDemographic:
-          publicationDemographic?.map((e) => e.rawValue).toList(),
-      ids: ids,
-      contentRating: contentRating?.map((e) => e.rawValue).toList(),
-      createdAtSince: createdAtSince,
-      updatedAtSince: updatedAtSince,
-      includes: includes?.map((e) => e.rawValue).toList(),
-      group: group,
-      orders: orders?.map(
+          parameter?.publicationDemographic?.map((e) => e.rawValue).toList(),
+      ids: parameter?.ids,
+      contentRating: parameter?.contentRating?.map((e) => e.rawValue).toList(),
+      createdAtSince: parameter?.createdAtSince,
+      updatedAtSince: parameter?.updatedAtSince,
+      includes: parameter?.includes?.map((e) => e.rawValue).toList(),
+      group: parameter?.group,
+      orders: parameter?.orders?.map(
         (key, value) => MapEntry(key.rawValue, value.rawValue),
       ),
     );

@@ -1,8 +1,6 @@
-import '../enums/content_rating.dart';
 import '../enums/includes.dart';
-import '../enums/language_codes.dart';
-import '../enums/order_enums.dart';
 import '../model/chapter/chapter_response.dart';
+import '../model/chapter/search_chapter_parameter.dart';
 import '../model/chapter/search_chapter_response.dart';
 import '../service/chapter_service.dart';
 import '../service/manga_service.dart';
@@ -26,40 +24,26 @@ class ChapterRepository {
 
   Future<SearchChapterResponse> feed({
     required String mangaId,
-    List<String>? ids,
-    String? title,
-    List<String>? groups,
-    String? uploader,
-    String? volume,
-    String? chapter,
-    List<LanguageCodes>? translatedLanguage,
-    List<LanguageCodes>? originalLanguage,
-    List<LanguageCodes>? excludedOriginalLanguage,
-    List<ContentRating>? contentRating,
-    String? createdAtSince,
-    String? updatedAtSince,
-    String? publishedAtSince,
-    List<Include>? includes,
-    Map<ChapterOrders, OrderDirections>? orders,
-    int? limit,
-    int? offset,
+    SearchChapterParameter? parameter,
   }) {
     return _mangaService.feed(
       id: mangaId,
-      limit: limit,
-      offset: offset,
-      translatedLanguage: translatedLanguage?.map((e) => e.rawValue).toList(),
-      originalLanguage: originalLanguage?.map((e) => e.rawValue).toList(),
+      limit: parameter?.limit,
+      offset: parameter?.offset,
+      translatedLanguage:
+          parameter?.translatedLanguage?.map((e) => e.rawValue).toList(),
+      originalLanguage:
+          parameter?.originalLanguage?.map((e) => e.rawValue).toList(),
       excludedOriginalLanguage:
-          excludedOriginalLanguage?.map((e) => e.rawValue).toList(),
-      excludedGroups: [],
-      excludedUploaders: [],
-      contentRating: contentRating?.map((e) => e.rawValue).toList(),
-      createdAtSince: createdAtSince,
-      updatedAtSince: updatedAtSince,
-      publishedAtSince: publishedAtSince,
-      includes: includes?.map((e) => e.rawValue).toList(),
-      orders: orders?.map(
+          parameter?.excludedOriginalLanguages?.map((e) => e.rawValue).toList(),
+      excludedGroups: parameter?.excludedGroups,
+      excludedUploaders: parameter?.excludedUploaders,
+      contentRating: parameter?.contentRating?.map((e) => e.rawValue).toList(),
+      createdAtSince: parameter?.createdAtSince,
+      updatedAtSince: parameter?.updatedAtSince,
+      publishedAtSince: parameter?.publishedAtSince,
+      includes: parameter?.includes?.map((e) => e.rawValue).toList(),
+      orders: parameter?.orders?.map(
         (key, value) => MapEntry(key.rawValue, value.rawValue),
       ),
       // TODO: include this param

@@ -39,8 +39,8 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
         mangas: [],
         parameter: state.parameter.copyWith(
           title: title,
-          offset: '0',
-          page: '0',
+          offset: 0,
+          page: 0,
           orders: {order: OrderDirections.descending},
         ),
       ),
@@ -71,8 +71,8 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
           mangas: allMangas,
           hasNextPage: hasNextPage ?? allMangas.length < total,
           parameter: state.parameter.copyWith(
-            page: (page + 1).toString(),
-            offset: (offset + limit).toString(),
+            page: page + 1,
+            offset: offset + limit,
             limit: limit,
           ),
           error: () => null,

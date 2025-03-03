@@ -3,6 +3,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_chapters_mixin.dart';
@@ -22,7 +23,7 @@ class SearchChapterOnMangaClashUseCase with SyncChaptersMixin {
 
   Future<Result<List<MangaChapter>>> execute({
     required String? mangaId,
-    Language? language,
+    SearchChapterParameter? parameter,
   }) async {
     if (mangaId == null) return Error(Exception('Manga ID Empty'));
 

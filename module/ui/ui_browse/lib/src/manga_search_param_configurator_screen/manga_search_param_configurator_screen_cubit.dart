@@ -1,4 +1,4 @@
-import 'package:entity_manga/entity_manga.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import 'manga_search_param_configurator_screen_state.dart';

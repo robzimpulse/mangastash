@@ -1,5 +1,5 @@
 import 'package:core_route/core_route.dart';
-import 'package:entity_manga/entity_manga.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manga_search_param_configurator_screen.dart';

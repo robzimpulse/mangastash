@@ -23,15 +23,13 @@ class SearchMangaOnMangaDexUseCase with SyncMangasMixin {
   }) async {
     try {
       final result = await _mangaRepository.search(
-        title: parameter.title,
-        limit: parameter.limit?.toInt(),
-        offset: int.tryParse(parameter.offset ?? '') ?? 0,
-        includes: [
-          Include.author,
-          Include.coverArt,
-        ],
-        orders: parameter.orders,
-        status: parameter.status,
+        parameter: parameter.copyWith(
+          includes: [
+            ...?parameter.includes,
+            Include.author,
+            Include.coverArt,
+          ],
+        ),
       );
 
       final mangas = result.data?.map(

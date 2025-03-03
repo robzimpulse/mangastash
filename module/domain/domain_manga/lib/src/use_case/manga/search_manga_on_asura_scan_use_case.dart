@@ -27,7 +27,7 @@ class SearchMangaOnAsuraScanUseCase with SyncMangasMixin {
   Future<Result<Pagination<Manga>>> execute({
     required SearchMangaParameter parameter,
   }) async {
-    final page = max(1, int.tryParse(parameter.page ?? '0') ?? 0);
+    final page = max(1, parameter.page ?? 0);
     final url = [
       [
         'https://asuracomic.net',
