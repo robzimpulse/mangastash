@@ -22,7 +22,6 @@ export 'src/scaffold_screen.dart';
 export 'src/util/debounce.dart';
 export 'src/widget/adaptive_physic_list_view.dart';
 export 'src/widget/flexible_app_bar_builder.dart';
-export 'src/widget/gapped_toggle_button_widget.dart';
 export 'src/widget/icon_with_text_widget.dart';
 export 'src/widget/manga_chapter_tile_widget.dart';
 export 'src/widget/manga_detail_app_bar_widget.dart';
