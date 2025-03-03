@@ -106,7 +106,7 @@ class SearchMangaOnMangaClashUseCaseUseCase with SyncMangasMixin {
     return Success(
       Pagination(
         data: data,
-        page: '$page',
+        page: page,
         limit: data.length,
         total: total ?? data.length,
       ),

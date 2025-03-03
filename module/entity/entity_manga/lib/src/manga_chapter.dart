@@ -1,7 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:text_similarity/text_similarity.dart';
 
+import '../entity_manga.dart';
 import 'base/base_model.dart';
 
 part 'manga_chapter.g.dart';
@@ -104,6 +106,24 @@ class MangaChapter extends BaseModel {
       translatedLanguage: translatedLanguage ?? this.translatedLanguage,
       scanlationGroup: scanlationGroup ?? this.scanlationGroup,
       webUrl: webUrl ?? this.webUrl,
+    );
+  }
+
+  factory MangaChapter.from({required ChapterData data}) {
+    final scanlation = data.relationships?.firstWhereOrNull(
+      (e) => e.type == Include.scanlationGroup.rawValue,
+    );
+
+    return MangaChapter(
+      id: data.id,
+      title: data.attributes?.title,
+      chapter: data.attributes?.chapter,
+      volume: data.attributes?.volume,
+      readableAt: data.attributes?.readableAt,
+      publishAt: data.attributes?.publishAt,
+      scanlationGroup: scanlation is Relationship<ScanlationGroupDataAttributes>
+          ? scanlation.attributes?.name
+          : null,
     );
   }
 

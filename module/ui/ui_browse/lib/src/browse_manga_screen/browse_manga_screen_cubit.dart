@@ -41,6 +41,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
           title: title,
           offset: 0,
           page: 0,
+          limit: 50,
           orders: {order: OrderDirections.descending},
         ),
       ),
@@ -57,8 +58,8 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     );
 
     if (result is Success<Pagination<Manga>>) {
-      final offset = int.tryParse(result.data.offset ?? '') ?? 0;
-      final page = int.tryParse(result.data.page ?? '') ?? 0;
+      final offset = result.data.offset ?? 0;
+      final page = result.data.page ?? 0;
       final limit = result.data.limit ?? 0;
       final total = result.data.total ?? 0;
       final mangas = result.data.data ?? [];
@@ -80,7 +81,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
       );
     }
 
-    if (result is Error<Pagination<Manga>> && state.mangas.isEmpty) {
+    if (result is Error<Pagination<Manga>>) {
       emit(state.copyWith(error: () => result.error));
     }
   }

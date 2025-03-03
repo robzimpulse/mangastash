@@ -10,9 +10,9 @@ part 'pagination.g.dart';
 )
 class Pagination<T extends Equatable> extends Equatable {
   final List<T>? data;
-  final String? page;
+  final int? page;
   final int? limit;
-  final String? offset;
+  final int? offset;
   final int? total;
   final bool? hasNextPage;
   final String? sourceUrl;
@@ -52,9 +52,9 @@ class Pagination<T extends Equatable> extends Equatable {
 
   Pagination<T> copyWith({
     List<T>? data,
-    String? page,
+    int? page,
     int? limit,
-    String? offset,
+    int? offset,
     int? total,
     bool? hasNextPage,
     String? sourceUrl,

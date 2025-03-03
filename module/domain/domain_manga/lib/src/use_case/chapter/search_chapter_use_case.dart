@@ -24,7 +24,7 @@ class SearchChapterUseCase {
         _searchChapterOnAsuraScanUseCase = searchChapterOnAsuraScanUseCase,
         _listenLocaleUseCase = listenLocaleUseCase;
 
-  Future<Result<List<MangaChapter>>> execute({
+  Future<Result<Pagination<MangaChapter>>> execute({
     required MangaSourceEnum? source,
     required String? mangaId,
     required SearchChapterParameter parameter,

@@ -45,7 +45,7 @@ class SearchMangaOnMangaDexUseCase with SyncMangasMixin {
             mangaServiceFirebase: _mangaServiceFirebase,
             mangas: mangas?.toList() ?? [],
           ),
-          offset: (result.offset ?? 0).toString(),
+          offset: result.offset?.toInt(),
           limit: result.limit?.toInt() ?? 0,
           total: result.total?.toInt() ?? 0,
         ),

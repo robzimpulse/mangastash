@@ -47,7 +47,7 @@ class MangaDetailScreen extends StatefulWidget {
           sourceEnum: source,
         ),
         getMangaUseCase: locator(),
-        getListChapterUseCase: locator(),
+        searchChapterUseCase: locator(),
         getMangaSourceUseCase: locator(),
         addToLibraryUseCase: locator(),
         listenAuth: locator(),

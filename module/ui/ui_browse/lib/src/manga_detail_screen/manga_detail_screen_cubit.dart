@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:core_auth/core_auth.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -11,7 +12,7 @@ import 'manga_detail_screen_state.dart';
 class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     with AutoSubscriptionMixin {
   final GetMangaUseCase _getMangaUseCase;
-  final SearchChapterUseCase _getListChapterUseCase;
+  final SearchChapterUseCase _searchChapterUseCase;
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
   final AddToLibraryUseCase _addToLibraryUseCase;
   final DownloadChapterUseCase _downloadChapterUseCase;
@@ -23,7 +24,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   MangaDetailScreenCubit({
     required MangaDetailScreenState initialState,
     required GetMangaUseCase getMangaUseCase,
-    required SearchChapterUseCase getListChapterUseCase,
+    required SearchChapterUseCase searchChapterUseCase,
     required GetMangaSourceUseCase getMangaSourceUseCase,
     required AddToLibraryUseCase addToLibraryUseCase,
     required RemoveFromLibraryUseCase removeFromLibraryUseCase,
@@ -33,7 +34,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required ListenDownloadProgressUseCase listenDownloadProgressUseCase,
     required CrawlUrlUseCase crawlUrlUseCase,
   })  : _getMangaUseCase = getMangaUseCase,
-        _getListChapterUseCase = getListChapterUseCase,
+        _searchChapterUseCase = searchChapterUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         _downloadChapterUseCase = downloadChapterUseCase,
@@ -77,7 +78,18 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     emit(state.copyWith(progress: progress));
   }
 
-  Future<void> init() async {
+  Future<void> init({ChapterOrders order = ChapterOrders.chapter}) async {
+    emit(
+      state.copyWith(
+        parameter: state.parameter.copyWith(
+          offset: 0,
+          page: 0,
+          limit: 50,
+          orders: {order: OrderDirections.descending},
+        ),
+      ),
+    );
+
     await Future.wait([_fetchSource(), _fetchManga()]);
     await _fetchChapter();
   }
@@ -122,17 +134,37 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     emit(state.copyWith(isLoadingChapters: true, errorChapters: () => null));
 
-    final result = await _getListChapterUseCase.execute(
+    final result = await _searchChapterUseCase.execute(
       mangaId: id,
       source: state.sourceEnum,
       parameter: state.parameter,
     );
 
-    if (result is Success<List<MangaChapter>>) {
-      emit(state.copyWith(chapters: result.data));
+    if (result is Success<Pagination<MangaChapter>>) {
+      final offset = result.data.offset ?? 0;
+      final page = result.data.page ?? 0;
+      final limit = result.data.limit ?? 0;
+      final total = result.data.total ?? 0;
+      final chapters = result.data.data ?? [];
+      final hasNextPage = result.data.hasNextPage;
+
+      final allChapters = [...?state.chapters, ...chapters].distinct();
+
+      emit(
+        state.copyWith(
+          chapters: allChapters,
+          hasNextPage: hasNextPage ?? allChapters.length < total,
+          parameter: state.parameter.copyWith(
+            page: page + 1,
+            offset: offset + limit,
+            limit: limit,
+          ),
+          errorChapters: () => null,
+        ),
+      );
     }
 
-    if (result is Error<List<MangaChapter>>) {
+    if (result is Error<Pagination<MangaChapter>>) {
       emit(state.copyWith(errorChapters: () => result.error));
     }
 
@@ -143,6 +175,13 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     final sourceEnum = state.sourceEnum;
     if (sourceEnum == null) return;
     emit(state.copyWith(source: _getMangaSourceUseCase.get(sourceEnum)));
+  }
+
+  Future<void> next() async {
+    if (!state.hasNextPage || state.isPagingNextPage) return;
+    emit(state.copyWith(isPagingNextPage: true));
+    await _fetchChapter();
+    emit(state.copyWith(isPagingNextPage: false));
   }
 
   Future<void> addToLibrary({User? user}) async {

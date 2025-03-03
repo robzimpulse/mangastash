@@ -107,7 +107,7 @@ class SearchMangaOnAsuraScanUseCase with SyncMangasMixin {
     return Success(
       Pagination(
         data: data,
-        page: '$page',
+        page: page,
         limit: data.length,
         total: data.length,
         hasNextPage: haveNextPage,

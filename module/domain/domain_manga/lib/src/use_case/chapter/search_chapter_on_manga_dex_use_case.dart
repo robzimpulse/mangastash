@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:core_network/core_network.dart';
 import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -16,59 +15,37 @@ class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
   })  : _chapterRepository = chapterRepository,
         _mangaChapterServiceFirebase = mangaChapterServiceFirebase;
 
-  Future<Result<List<MangaChapter>>> execute({
+  Future<Result<Pagination<MangaChapter>>> execute({
     required String? mangaId,
     required SearchChapterParameter parameter,
   }) async {
     if (mangaId == null) return Error(Exception('Manga ID Empty'));
 
     try {
-      var total = 0;
-      List<MangaChapter> chapters = [];
+      final result = await _chapterRepository.feed(
+        mangaId: mangaId,
+        parameter: parameter.copyWith(
+          includes: [Include.scanlationGroup, ...?parameter.includes],
+        ),
+      );
 
-      do {
-        final result = await _chapterRepository.feed(
-          mangaId: mangaId,
-          parameter: parameter.copyWith(
-            limit: 50,
-            includes: [Include.scanlationGroup, ...?parameter.includes],
-            offset: chapters.length,
-          ),
-        );
-
-        final data = result.data ?? [];
-
-        chapters.addAll(
-          data.map(
-            (e) {
-              final scanlation = e.relationships?.firstWhereOrNull(
-                (e) => e.type == Include.scanlationGroup.rawValue,
-              );
-
-              return MangaChapter(
-                id: e.id,
-                mangaId: mangaId,
-                title: e.attributes?.title,
-                chapter: e.attributes?.chapter,
-                volume: e.attributes?.volume,
-                readableAt: e.attributes?.readableAt,
-                publishAt: e.attributes?.publishAt,
-                scanlationGroup:
-                    scanlation is Relationship<ScanlationGroupDataAttributes>
-                        ? scanlation.attributes?.name
-                        : null,
-              );
-            },
-          ),
-        );
-
-        total = (result.total ?? 0).toInt();
-      } while (chapters.length < total);
+      final data = result.data ?? [];
 
       return Success(
-        await sync(
-          mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
-          values: chapters,
+        Pagination(
+          data: await sync(
+            mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
+            values: data
+                .map(
+                  (e) => MangaChapter.from(data: e).copyWith(
+                    mangaId: mangaId,
+                  ),
+                )
+                .toList(),
+          ),
+          offset: result.offset?.toInt(),
+          limit: result.limit?.toInt() ?? 0,
+          total: result.total?.toInt() ?? 0,
         ),
       );
     } on Exception catch (e) {

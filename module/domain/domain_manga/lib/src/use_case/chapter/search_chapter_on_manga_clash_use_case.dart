@@ -21,7 +21,7 @@ class SearchChapterOnMangaClashUseCase with SyncChaptersMixin {
         _mangaChapterServiceFirebase = mangaChapterServiceFirebase,
         _webview = webview;
 
-  Future<Result<List<MangaChapter>>> execute({
+  Future<Result<Pagination<MangaChapter>>> execute({
     required String? mangaId,
     required SearchChapterParameter parameter,
   }) async {
@@ -77,10 +77,18 @@ class SearchChapterOnMangaClashUseCase with SyncChaptersMixin {
       );
     }
 
+    final data = await sync(
+      mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
+      values: chapters,
+    );
+
     return Success(
-      await sync(
-        mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
-        values: chapters,
+      Pagination(
+        data: data,
+        page: 1,
+        limit: data.length,
+        total: data.length,
+        hasNextPage: false,
       ),
     );
   }
