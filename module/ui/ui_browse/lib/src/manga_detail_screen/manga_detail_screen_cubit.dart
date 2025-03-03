@@ -178,6 +178,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   }
 
   Future<void> next() async {
+    if (state.isLoadingChapters) return;
     if (!state.hasNextPage || state.isPagingNextPage) return;
     emit(state.copyWith(isPagingNextPage: true));
     await _fetchChapter();
