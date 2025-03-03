@@ -21,6 +21,7 @@ export 'src/model/chapter/chapter_data_attributes.dart';
 export 'src/model/chapter/chapter_response.dart';
 export 'src/model/chapter/search_chapter_response.dart';
 export 'src/model/common/relationship.dart';
+export 'src/model/common/search_parameter.dart';
 export 'src/model/common/title.dart';
 export 'src/model/cover_art/cover_art_data.dart';
 export 'src/model/cover_art/cover_art_data_attributes.dart';

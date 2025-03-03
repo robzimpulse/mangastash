@@ -1,8 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-import 'base/search_parameter.dart';
-
 part 'search_manga_parameter.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
