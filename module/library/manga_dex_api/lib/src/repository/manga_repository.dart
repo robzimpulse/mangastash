@@ -13,36 +13,36 @@ class MangaRepository {
   }) : _service = service;
 
   Future<SearchMangaResponse> search({
-    SearchMangaParameter? parameter,
+    required SearchMangaParameter parameter,
   }) {
     return _service.search(
-      title: parameter?.title,
-      limit: parameter?.limit,
-      offset: parameter?.offset,
-      authors: parameter?.authors,
-      artists: parameter?.artists,
-      year: parameter?.year,
-      includedTags: parameter?.includedTags,
-      includedTagsMode: parameter?.includedTagsMode?.rawValue,
-      excludedTags: parameter?.excludedTags,
-      excludedTagsMode: parameter?.excludedTagsMode?.rawValue,
-      status: parameter?.status?.map((e) => e.rawValue).toList(),
+      title: parameter.title,
+      limit: parameter.limit,
+      offset: parameter.offset,
+      authors: parameter.authors,
+      artists: parameter.artists,
+      year: parameter.year,
+      includedTags: parameter.includedTags,
+      includedTagsMode: parameter.includedTagsMode?.rawValue,
+      excludedTags: parameter.excludedTags,
+      excludedTagsMode: parameter.excludedTagsMode?.rawValue,
+      status: parameter.status?.map((e) => e.rawValue).toList(),
       originalLanguage:
-          parameter?.originalLanguage?.map((e) => e.rawValue).toList(),
+          parameter.originalLanguage?.map((e) => e.rawValue).toList(),
       excludedOriginalLanguages:
-          parameter?.excludedOriginalLanguages?.map((e) => e.rawValue).toList(),
-      availableTranslatedLanguage: parameter?.availableTranslatedLanguage
+          parameter.excludedOriginalLanguages?.map((e) => e.rawValue).toList(),
+      availableTranslatedLanguage: parameter.availableTranslatedLanguage
           ?.map((e) => e.rawValue)
           .toList(),
       publicationDemographic:
-          parameter?.publicationDemographic?.map((e) => e.rawValue).toList(),
-      ids: parameter?.ids,
-      contentRating: parameter?.contentRating?.map((e) => e.rawValue).toList(),
-      createdAtSince: parameter?.createdAtSince,
-      updatedAtSince: parameter?.updatedAtSince,
-      includes: parameter?.includes?.map((e) => e.rawValue).toList(),
-      group: parameter?.group,
-      orders: parameter?.orders?.map(
+          parameter.publicationDemographic?.map((e) => e.rawValue).toList(),
+      ids: parameter.ids,
+      contentRating: parameter.contentRating?.map((e) => e.rawValue).toList(),
+      createdAtSince: parameter.createdAtSince,
+      updatedAtSince: parameter.updatedAtSince,
+      includes: parameter.includes?.map((e) => e.rawValue).toList(),
+      group: parameter.group,
+      orders: parameter.orders?.map(
         (key, value) => MapEntry(key.rawValue, value.rawValue),
       ),
     );
