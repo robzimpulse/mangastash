@@ -7,7 +7,7 @@ part 'search_manga_chapter_parameter.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class SearchMangaChapterParameter extends SearchParameter {
-  final Map<SearchOrders, OrderDirections>? orders;
+  final Map<ChapterOrders, OrderDirections>? orders;
   final List<MangaStatus>? status;
 
   const SearchMangaChapterParameter({
@@ -37,7 +37,7 @@ class SearchMangaChapterParameter extends SearchParameter {
     num? limit,
     String? offset,
     String? page,
-    Map<SearchOrders, OrderDirections>? orders,
+    Map<ChapterOrders, OrderDirections>? orders,
     List<MangaStatus>? status,
   }) {
     return SearchMangaChapterParameter(

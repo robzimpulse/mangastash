@@ -14,7 +14,7 @@ SearchMangaChapterParameter _$SearchMangaChapterParameterFromJson(
       offset: json['offset'] as String?,
       page: json['page'] as String?,
       orders: (json['orders'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry($enumDecode(_$SearchOrdersEnumMap, k),
+        (k, e) => MapEntry($enumDecode(_$ChapterOrdersEnumMap, k),
             $enumDecode(_$OrderDirectionsEnumMap, e)),
       ),
       status: (json['status'] as List<dynamic>?)
@@ -30,7 +30,7 @@ Map<String, dynamic> _$SearchMangaChapterParameterToJson(
       'offset': instance.offset,
       'page': instance.page,
       'orders': instance.orders?.map((k, e) =>
-          MapEntry(_$SearchOrdersEnumMap[k]!, _$OrderDirectionsEnumMap[e]!)),
+          MapEntry(_$ChapterOrdersEnumMap[k]!, _$OrderDirectionsEnumMap[e]!)),
       'status': instance.status?.map((e) => _$MangaStatusEnumMap[e]!).toList(),
     };
 
@@ -39,15 +39,13 @@ const _$OrderDirectionsEnumMap = {
   OrderDirections.descending: 'descending',
 };
 
-const _$SearchOrdersEnumMap = {
-  SearchOrders.title: 'title',
-  SearchOrders.year: 'year',
-  SearchOrders.createdAt: 'createdAt',
-  SearchOrders.updatedAt: 'updatedAt',
-  SearchOrders.latestUploadedChapter: 'latestUploadedChapter',
-  SearchOrders.followedCount: 'followedCount',
-  SearchOrders.relevance: 'relevance',
-  SearchOrders.rating: 'rating',
+const _$ChapterOrdersEnumMap = {
+  ChapterOrders.createdAt: 'createdAt',
+  ChapterOrders.updatedAt: 'updatedAt',
+  ChapterOrders.publishAt: 'publishAt',
+  ChapterOrders.readableAt: 'readableAt',
+  ChapterOrders.volume: 'volume',
+  ChapterOrders.chapter: 'chapter',
 };
 
 const _$MangaStatusEnumMap = {
