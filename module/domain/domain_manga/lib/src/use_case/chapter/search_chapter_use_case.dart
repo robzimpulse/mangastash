@@ -27,7 +27,7 @@ class SearchChapterUseCase {
   Future<Result<List<MangaChapter>>> execute({
     required MangaSourceEnum? source,
     required String? mangaId,
-    SearchChapterParameter? parameter,
+    required SearchChapterParameter parameter,
   }) async {
     if (source == null) return Error(Exception('Empty Source'));
     final language = Language.fromCode(
@@ -37,19 +37,19 @@ class SearchChapterUseCase {
     return switch (source) {
       MangaSourceEnum.mangadex => _searchChapterOnMangaDexUseCase.execute(
           mangaId: mangaId,
-          parameter: parameter?.copyWith(
+          parameter: parameter.copyWith(
             translatedLanguage: language.languageCodes,
           ),
         ),
       MangaSourceEnum.asurascan => _searchChapterOnAsuraScanUseCase.execute(
           mangaId: mangaId,
-          parameter: parameter?.copyWith(
+          parameter: parameter.copyWith(
             translatedLanguage: language.languageCodes,
           ),
         ),
       MangaSourceEnum.mangaclash => _searchChapterOnMangaClashUseCase.execute(
           mangaId: mangaId,
-          parameter: parameter?.copyWith(
+          parameter: parameter.copyWith(
             translatedLanguage: language.languageCodes,
           ),
         ),

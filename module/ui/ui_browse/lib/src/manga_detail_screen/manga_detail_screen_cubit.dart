@@ -125,6 +125,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     final result = await _getListChapterUseCase.execute(
       mangaId: id,
       source: state.sourceEnum,
+      parameter: state.parameter,
     );
 
     if (result is Success<List<MangaChapter>>) {

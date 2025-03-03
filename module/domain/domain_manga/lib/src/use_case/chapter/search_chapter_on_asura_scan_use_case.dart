@@ -23,7 +23,7 @@ class SearchChapterOnAsuraScanUseCase with SyncChaptersMixin {
 
   Future<Result<List<MangaChapter>>> execute({
     required String? mangaId,
-    SearchChapterParameter? parameter,
+    required SearchChapterParameter parameter,
   }) async {
     if (mangaId == null) return Error(Exception('Manga ID Empty'));
 

@@ -18,7 +18,7 @@ class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
 
   Future<Result<List<MangaChapter>>> execute({
     required String? mangaId,
-    SearchChapterParameter? parameter,
+    required SearchChapterParameter parameter,
   }) async {
     if (mangaId == null) return Error(Exception('Manga ID Empty'));
 
@@ -29,7 +29,7 @@ class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
       do {
         final result = await _chapterRepository.feed(
           mangaId: mangaId,
-          parameter: parameter?.copyWith(
+          parameter: parameter.copyWith(
             limit: 50,
             includes: [Include.scanlationGroup, ...?parameter.includes],
             offset: chapters.length,

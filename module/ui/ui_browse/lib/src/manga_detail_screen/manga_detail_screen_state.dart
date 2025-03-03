@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ui_common/ui_common.dart';
@@ -33,6 +34,8 @@ class MangaDetailScreenState extends Equatable {
   final List<String> libraries;
   final Map<DownloadChapterKey, DownloadChapterProgress>? progress;
 
+  final SearchChapterParameter parameter;
+
   late final List<String> chapterIds;
   late final Set<num> chaptersKey;
   late final Map<num, MangaChapter> processedChapters;
@@ -54,6 +57,7 @@ class MangaDetailScreenState extends Equatable {
     this.authState,
     this.libraries = const [],
     this.progress,
+    this.parameter = const SearchChapterParameter(),
   }) {
     isOnLibrary = libraries.contains(mangaId);
 
@@ -178,6 +182,7 @@ class MangaDetailScreenState extends Equatable {
         authState,
         libraries,
         progress,
+        parameter,
       ];
 
   MangaDetailScreenState copyWith({
@@ -195,6 +200,7 @@ class MangaDetailScreenState extends Equatable {
     AuthState? authState,
     List<String>? libraries,
     Map<DownloadChapterKey, DownloadChapterProgress>? progress,
+    SearchChapterParameter? parameter,
   }) {
     return MangaDetailScreenState(
       config: config ?? this.config,
@@ -211,6 +217,7 @@ class MangaDetailScreenState extends Equatable {
       authState: authState ?? this.authState,
       libraries: libraries ?? this.libraries,
       progress: progress ?? this.progress,
+      parameter: parameter ?? this.parameter,
     );
   }
 }
