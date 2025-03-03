@@ -71,6 +71,16 @@ class MangaDetailScreen extends StatefulWidget {
 }
 
 class _MangaDetailScreenState extends State<MangaDetailScreen> {
+  late final PagingScrollController _scrollController = PagingScrollController(
+    onLoadNextPage: (context) => _cubit(context).next(),
+  );
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   BlocBuilder _builder({
     required BlocWidgetBuilder<MangaDetailScreenState> builder,
     BlocBuilderCondition<MangaDetailScreenState>? buildWhen,
@@ -183,35 +193,38 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      body: NestedScrollView(
-        headerSliverBuilder: (context, isInnerBoxScrolled) => [
-          SliverAppBar(
-            stretch: true,
-            pinned: true,
-            elevation: 0,
-            expandedHeight: MediaQuery.of(context).size.height * 0.4,
-            automaticallyImplyLeading: false,
-            flexibleSpace: FlexibleAppBarBuilder(
-              builder: (context, progress) => MangaDetailAppBarWidget(
-                progress: progress,
-                background: _appBarBackground(),
-                leading: BackButton(
-                  color: Theme.of(context).appBarTheme.iconTheme?.color,
+      body: PrimaryScrollController(
+        controller: _scrollController,
+        child: NestedScrollView(
+          headerSliverBuilder: (context, isInnerBoxScrolled) => [
+            SliverAppBar(
+              stretch: true,
+              pinned: true,
+              elevation: 0,
+              expandedHeight: MediaQuery.of(context).size.height * 0.4,
+              automaticallyImplyLeading: false,
+              flexibleSpace: FlexibleAppBarBuilder(
+                builder: (context, progress) => MangaDetailAppBarWidget(
+                  progress: progress,
+                  background: _appBarBackground(),
+                  leading: BackButton(
+                    color: Theme.of(context).appBarTheme.iconTheme?.color,
+                  ),
+                  // title: Container(color: Colors.red),
+                  title: _title(progress: progress),
+                  actions: [
+                    _downloadButton(),
+                    _filterButton(),
+                    _shareButton(context: context),
+                  ],
                 ),
-                // title: Container(color: Colors.red),
-                title: _title(progress: progress),
-                actions: [
-                  _downloadButton(),
-                  _filterButton(),
-                  _shareButton(context: context),
-                ],
               ),
             ),
+          ],
+          body: RefreshIndicator(
+            onRefresh: () => _cubit(context).init(),
+            child: _content(),
           ),
-        ],
-        body: RefreshIndicator(
-          onRefresh: () => _cubit(context).init(),
-          child: _content(),
         ),
       ),
     );
@@ -522,35 +535,56 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   Widget _content() {
-    return CustomScrollView(
-      slivers: [
-        _builder(
-          buildWhen: (prev, curr) => [
-            prev.isLoadingManga != curr.isLoadingManga,
-            prev.isOnLibrary != curr.isOnLibrary,
-            prev.manga != curr.manga,
-          ].contains(true),
-          builder: (context, state) => MangaDetailWidget(
-            cacheManager: widget.cacheManager,
-            coverUrl: state.manga?.coverUrl,
-            title: state.manga?.title,
-            author: state.manga?.author,
-            status: state.manga?.status,
-            description: state.manga?.description,
-            tags: state.manga?.tagsName,
-            horizontalPadding: 12,
-            isOnLibrary: state.isOnLibrary,
-            onTapAddToLibrary: () => _onTapAddToLibrary(context, state),
-            onTapWebsite: () => _onTapWebsite(context, state),
-            onTapTag: (name) => _onTapTag(
-              context,
-              tag: state.manga?.mapTagsByName[name],
+    return NotificationListener<ScrollNotification>(
+      onNotification: (scrollNotification) {
+        return _scrollController.onScrollNotification(
+          context,
+          scrollNotification,
+        );
+      },
+      child: CustomScrollView(
+        slivers: [
+          _builder(
+            buildWhen: (prev, curr) => [
+              prev.isLoadingManga != curr.isLoadingManga,
+              prev.isOnLibrary != curr.isOnLibrary,
+              prev.manga != curr.manga,
+            ].contains(true),
+            builder: (context, state) => MangaDetailWidget(
+              cacheManager: widget.cacheManager,
+              coverUrl: state.manga?.coverUrl,
+              title: state.manga?.title,
+              author: state.manga?.author,
+              status: state.manga?.status,
+              description: state.manga?.description,
+              tags: state.manga?.tagsName,
+              horizontalPadding: 12,
+              isOnLibrary: state.isOnLibrary,
+              onTapAddToLibrary: () => _onTapAddToLibrary(context, state),
+              onTapWebsite: () => _onTapWebsite(context, state),
+              onTapTag: (name) => _onTapTag(
+                context,
+                tag: state.manga?.mapTagsByName[name],
+              ),
+              isLoading: state.isLoadingManga,
             ),
-            isLoading: state.isLoadingManga,
           ),
-        ),
-        _chapters(),
-      ],
+          _chapters(),
+          SliverToBoxAdapter(
+            child: _builder(
+              buildWhen: (prev, curr) => prev.hasNextPage != curr.hasNextPage,
+              builder: (context, state) => state.hasNextPage
+                  ? const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

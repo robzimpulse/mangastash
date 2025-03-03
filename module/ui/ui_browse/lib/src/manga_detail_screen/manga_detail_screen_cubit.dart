@@ -84,9 +84,11 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
         parameter: state.parameter.copyWith(
           offset: 0,
           page: 0,
-          limit: 50,
+          limit: 20,
           orders: {order: OrderDirections.descending},
         ),
+        isLoadingChapters: true,
+        errorChapters: () => null,
       ),
     );
 
@@ -131,8 +133,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   Future<void> _fetchChapter() async {
     final id = state.mangaId;
     if (id == null || id.isEmpty) return;
-
-    emit(state.copyWith(isLoadingChapters: true, errorChapters: () => null));
 
     final result = await _searchChapterUseCase.execute(
       mangaId: id,
