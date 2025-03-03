@@ -82,7 +82,7 @@ class DomainMangaRegistrar extends Registrar {
     );
     locator.registerFactory(
       () => SearchMangaOnMangaDexUseCase(
-        mangaService: locator(),
+        mangaRepository: locator(),
         mangaTagServiceFirebase: locator(),
         mangaServiceFirebase: locator(),
       ),

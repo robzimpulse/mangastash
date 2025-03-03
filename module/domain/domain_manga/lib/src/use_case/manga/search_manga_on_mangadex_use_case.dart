@@ -6,15 +6,15 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 
 class SearchMangaOnMangaDexUseCase with SyncMangasMixin {
-  final MangaService _mangaService;
+  final MangaRepository _mangaRepository;
   final MangaTagServiceFirebase _mangaTagServiceFirebase;
   final MangaServiceFirebase _mangaServiceFirebase;
 
   const SearchMangaOnMangaDexUseCase({
-    required MangaService mangaService,
+    required MangaRepository mangaRepository,
     required MangaTagServiceFirebase mangaTagServiceFirebase,
     required MangaServiceFirebase mangaServiceFirebase,
-  })  : _mangaService = mangaService,
+  })  : _mangaRepository = mangaRepository,
         _mangaServiceFirebase = mangaServiceFirebase,
         _mangaTagServiceFirebase = mangaTagServiceFirebase;
 
@@ -22,18 +22,16 @@ class SearchMangaOnMangaDexUseCase with SyncMangasMixin {
     required SearchMangaParameter parameter,
   }) async {
     try {
-      final result = await _mangaService.search(
+      final result = await _mangaRepository.search(
         title: parameter.title,
         limit: parameter.limit?.toInt(),
         offset: int.tryParse(parameter.offset ?? '') ?? 0,
         includes: [
-          Include.author.rawValue,
-          Include.coverArt.rawValue,
+          Include.author,
+          Include.coverArt,
         ],
-        orders: parameter.orders?.map(
-          (key, value) => MapEntry(key.rawValue, value.rawValue),
-        ),
-        status: parameter.status?.map((e) => e.rawValue).toList(),
+        orders: parameter.orders,
+        status: parameter.status,
       );
 
       final mangas = result.data?.map(
