@@ -1,5 +1,7 @@
 import 'package:core_storage/core_storage.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -62,11 +64,51 @@ class MangaReaderScreen extends StatelessWidget {
     return ScaffoldScreen(
       body: SafeArea(
         child: _builder(
-          buildWhen: (prev, curr) => prev.isLoading != curr.isLoading,
-          builder: (context, state) => state.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _content(),
+          buildWhen: (prev, curr) => [
+            prev.isLoading != curr.isLoading,
+            prev.error != curr.error,
+          ].contains(true),
+          builder: (context, state) {
+            final error = state.error;
+            if (error != null) {
+              return _errorContent(context: context, error: error);
+            }
+
+            if (state.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            return _content();
+          },
         ),
+      ),
+    );
+  }
+
+  Widget _errorContent({
+    required BuildContext context,
+    required Exception error,
+  }) {
+    return Center(
+      child: Column(
+        children: [
+          Text(
+            error.toString(),
+            textAlign: TextAlign.center,
+          ),
+          if (error is FailedParsingHtmlException) ...[
+            const SizedBox(height: 16),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: () => _cubit(context).recrawl(url: error.url),
+              child: const Text('Open Debug Browser'),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -75,7 +117,7 @@ class MangaReaderScreen extends StatelessWidget {
     return _builder(
       buildWhen: (prev, curr) => [
         prev.chapter?.images != curr.chapter?.images,
-        prev.crawlable != curr.crawlable,
+        prev.chapter?.webUrl != curr.chapter?.webUrl,
       ].contains(true),
       builder: (context, state) => Column(
         children: [
@@ -84,7 +126,7 @@ class MangaReaderScreen extends StatelessWidget {
             child: _images(
               context: context,
               images: state.chapter?.images ?? [],
-              crawlable: state.crawlable,
+              sourceUrl: state.chapter?.webUrl,
             ),
           ),
           Row(children: [Expanded(child: _nextButton())]),
@@ -131,16 +173,17 @@ class MangaReaderScreen extends StatelessWidget {
 
   Widget _images({
     required BuildContext context,
-    required bool crawlable,
     required List<String> images,
+    String? sourceUrl,
   }) {
+    final url = sourceUrl;
     if (images.isEmpty) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text('Images Empty'),
-            if (crawlable) ...[
+            if (url != null) ...[
               const SizedBox(height: 16),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -148,7 +191,7 @@ class MangaReaderScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                onPressed: () => _cubit(context).recrawl(),
+                onPressed: () => _cubit(context).recrawl(url: url),
                 child: const Text('Open Debug Browser'),
               ),
             ],

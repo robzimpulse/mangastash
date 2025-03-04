@@ -374,7 +374,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       ].contains(true),
       builder: (context, state) {
         final error = state.errorChapters;
-        if (error != null) return _errorChapter(error);
+        if (error != null) return _errorChapter(context: context, error: error);
         if (state.isLoadingChapters) return _loadingChapter();
 
         final chapters = state.chaptersKey;
@@ -513,7 +513,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
-  Widget _errorChapter(Exception error) {
+  Widget _errorChapter({
+    required BuildContext context,
+    required Exception error,
+  }) {
     return MultiSliver(
       children: [
         SliverFillRemaining(
@@ -535,7 +538,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      onPressed: () => _cubit(context).recrawl(error.url),
+                      onPressed: () => _cubit(context).recrawl(url: error.url),
                       child: const Text('Open Debug Browser'),
                     ),
                   ],

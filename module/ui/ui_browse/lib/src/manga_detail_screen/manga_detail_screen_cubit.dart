@@ -202,7 +202,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
   }
 
-  void recrawl(String url) async {
+  void recrawl({required String url}) async {
     await _crawlUrlUseCase.execute(url: url);
     await init();
   }

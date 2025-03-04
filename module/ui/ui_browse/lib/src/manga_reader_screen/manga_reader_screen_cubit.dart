@@ -14,15 +14,12 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
 
   final Map<String, BehaviorSubject<double>> _pageSizeStreams = {};
 
-  final GetMangaSourceUseCase _getMangaSourceUseCase;
-
   MangaReaderScreenCubit({
     required GetChapterUseCase getChapterUseCase,
     required GetMangaSourceUseCase getMangaSourceUseCase,
     required CrawlUrlUseCase crawlUrlUseCase,
     required MangaReaderScreenState initialState,
   })  : _getChapterUseCase = getChapterUseCase,
-        _getMangaSourceUseCase = getMangaSourceUseCase,
         _crawlUrlUseCase = crawlUrlUseCase,
         super(initialState);
 
@@ -32,13 +29,11 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     super.close();
   }
 
-  Future<void> init() async {
-    emit(state.copyWith(isLoading: true));
-    await Future.wait([_fetchSource(), _fetchChapter()]);
-    emit(state.copyWith(isLoading: false));
-  }
+  Future<void> init() => _fetchChapter();
 
   Future<void> _fetchChapter() async {
+    emit(state.copyWith(isLoading: true));
+
     final response = await _getChapterUseCase.execute(
       chapterId: state.chapterId,
       source: state.sourceEnum,
@@ -52,18 +47,12 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     if (response is Error<MangaChapter>) {
       emit(state.copyWith(error: () => response.error));
     }
+
+    emit(state.copyWith(isLoading: false));
   }
 
-  Future<void> _fetchSource() async {
-    final sourceEnum = state.sourceEnum;
-    if (sourceEnum == null) return;
-    emit(state.copyWith(source: _getMangaSourceUseCase.get(sourceEnum)));
-  }
-
-  void recrawl() async {
-    final url = state.chapter?.webUrl;
-    if (url == null) return;
+  void recrawl({required String url}) async {
     await _crawlUrlUseCase.execute(url: url);
-    await _fetchChapter();
+    await init();
   }
 }
