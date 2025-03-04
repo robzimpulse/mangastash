@@ -49,8 +49,27 @@ class BrowseMangaScreenState extends Equatable {
         parameter.orders?.containsKey(SearchOrders.updatedAt) == true;
 
     isFilterActive = [
-      parameter.status != null,
-      // TODO: add more param properties
+      parameter.updatedAtSince?.isNotEmpty == true,
+      parameter.includes?.isNotEmpty == true,
+      parameter.contentRating?.isNotEmpty == true,
+      parameter.originalLanguage?.isNotEmpty == true,
+      parameter.excludedOriginalLanguages?.isNotEmpty == true,
+      parameter.createdAtSince?.isNotEmpty == true,
+      parameter.authors?.isNotEmpty == true,
+      parameter.artists?.isNotEmpty == true,
+      parameter.year != null,
+      [
+        parameter.includedTags?.isNotEmpty == true,
+        parameter.includedTagsMode != null,
+      ].every((e) => e),
+      [
+        parameter.excludedTags?.isNotEmpty == true,
+        parameter.excludedTagsMode != null,
+      ].every((e) => e),
+      parameter.status?.isNotEmpty == true,
+      parameter.availableTranslatedLanguage?.isNotEmpty == true,
+      parameter.publicationDemographic?.isNotEmpty == true,
+      parameter.group?.isNotEmpty == true,
     ].contains(true);
   }
 

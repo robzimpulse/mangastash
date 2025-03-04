@@ -104,6 +104,38 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
             ),
           ),
         ),
+        SliverToBoxAdapter(
+          child: _builder(
+            buildWhen: (prev, curr) => [
+              prev.modified?.contentRating != curr.modified?.contentRating,
+            ].contains(true),
+            builder: (context, state) => ExpansionTile(
+              title: const Text('Content Rating'),
+              children: [
+                ...ContentRating.values.map(
+                  (key) => CheckboxListTile(
+                    title: Text(key.rawValue.toCapitalized()),
+                    value: state.modified?.contentRating?.contains(key) == true,
+                    onChanged: (value) {
+                      if (value == null) return;
+                      final values = [...?state.modified?.contentRating];
+                      if (value) {
+                        values.add(key);
+                      } else {
+                        values.remove(key);
+                      }
+                      _cubit(context).update(
+                        modified: state.modified?.copyWith(
+                          contentRating: values,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         // SliverToBoxAdapter(
         //   child: _builder(
         //     buildWhen: (prev, curr) => [
