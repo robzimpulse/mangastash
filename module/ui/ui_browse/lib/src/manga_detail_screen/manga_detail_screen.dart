@@ -6,6 +6,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -33,7 +34,7 @@ class MangaDetailScreen extends StatefulWidget {
 
   static Widget create({
     required ServiceLocator locator,
-    required MangaSourceEnum? source,
+    required MangaSourceEnum? sourceEnum,
     required String? mangaId,
     Manga? manga,
     Function(String?, List<String>?)? onTapChapter,
@@ -44,11 +45,10 @@ class MangaDetailScreen extends StatefulWidget {
         initialState: MangaDetailScreenState(
           manga: manga,
           mangaId: mangaId,
-          sourceEnum: source,
+          sourceEnum: sourceEnum,
         ),
         getMangaUseCase: locator(),
         searchChapterUseCase: locator(),
-        getMangaSourceUseCase: locator(),
         addToLibraryUseCase: locator(),
         listenAuth: locator(),
         removeFromLibraryUseCase: locator(),
@@ -371,99 +371,17 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         prev.errorChapters != curr.errorChapters,
         prev.isLoadingChapters != curr.isLoadingChapters,
         prev.chaptersKey != curr.chaptersKey,
-        prev.crawlable != curr.crawlable,
       ].contains(true),
       builder: (context, state) {
-        List<Widget> children;
-
         final error = state.errorChapters;
+        if (error != null) return _errorChapter(error);
+        if (state.isLoadingChapters) return _loadingChapter();
+
         final chapters = state.chaptersKey;
-        if (error != null) {
-          children = [
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Center(
-                  child: Text(
-                    error.toString(),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ),
-          ];
-        } else if (state.isLoadingChapters) {
-          children = [
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              sliver: SliverToBoxAdapter(
-                child: Row(
-                  children: [
-                    ShimmerLoading.multiline(
-                      isLoading: state.isLoadingChapters,
-                      width: 50,
-                      height: 15,
-                      lines: 1,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) => index.isOdd
-                      ? const SizedBox(height: 4)
-                      : ShimmerLoading.multiline(
-                          isLoading: state.isLoadingChapters,
-                          width: double.infinity,
-                          height: 15,
-                          lines: 3,
-                        ),
-                  childCount: (50 * 2) - 1,
-                  semanticIndexCallback: (Widget _, int index) {
-                    return index.isEven ? index ~/ 2 : null;
-                  },
-                ),
-              ),
-            ),
-          ];
-        } else if (chapters.isEmpty == true) {
-          children = [
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'No Chapter',
-                        textAlign: TextAlign.center,
-                      ),
-                      if (state.crawlable) ...[
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          onPressed: () => _cubit(context).recrawl(),
-                          child: const Text('Open Debug Browser'),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ];
-        } else {
-          children = [
+        if (chapters.isEmpty) return _emptyChapter();
+
+        return MultiSliver(
+          children: [
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.only(left: 12, right: 12, top: 12),
@@ -501,11 +419,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 ),
               ),
             ),
-          ];
-        }
-
-        return MultiSliver(
-          children: children,
+          ],
         );
       },
     );
@@ -531,6 +445,106 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         groups: value.scanlationGroup,
         downloadProgress: state.progress?[key]?.progress.toDouble() ?? 0.0,
       ),
+    );
+  }
+
+  Widget _emptyChapter() {
+    return MultiSliver(
+      children: const [
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'No Chapter',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _loadingChapter() {
+    return MultiSliver(
+      children: [
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          sliver: SliverToBoxAdapter(
+            child: Row(
+              children: [
+                ShimmerLoading.multiline(
+                  isLoading: true,
+                  width: 50,
+                  height: 15,
+                  lines: 1,
+                ),
+              ],
+            ),
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          sliver: SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => index.isOdd
+                  ? const SizedBox(height: 4)
+                  : ShimmerLoading.multiline(
+                      isLoading: true,
+                      width: double.infinity,
+                      height: 15,
+                      lines: 3,
+                    ),
+              childCount: (50 * 2) - 1,
+              semanticIndexCallback: (Widget _, int index) {
+                return index.isEven ? index ~/ 2 : null;
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _errorChapter(Exception error) {
+    return MultiSliver(
+      children: [
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Center(
+              child: Column(
+                children: [
+                  Text(
+                    error.toString(),
+                    textAlign: TextAlign.center,
+                  ),
+                  if (error is FailedParsingHtmlException) ...[
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () => _cubit(context).recrawl(error.url),
+                      child: const Text('Open Debug Browser'),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

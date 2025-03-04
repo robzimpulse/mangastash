@@ -28,7 +28,6 @@ class MangaDetailScreenState extends Equatable {
   final Manga? manga;
   final List<MangaChapter>? chapters;
   final MangaSourceEnum? sourceEnum;
-  final MangaSource? source;
   final MangaChapterConfig? config;
   final AuthState? authState;
   final List<String> libraries;
@@ -37,13 +36,13 @@ class MangaDetailScreenState extends Equatable {
   final SearchChapterParameter parameter;
   final bool hasNextPage;
   final bool isPagingNextPage;
+  final String? sourceUrl;
 
   late final List<String> chapterIds;
   late final Set<num> chaptersKey;
   late final Map<num, MangaChapter> processedChapters;
   late final int totalChapter;
   late final bool isOnLibrary;
-  late final bool crawlable;
 
   MangaDetailScreenState({
     this.isLoadingManga = false,
@@ -53,7 +52,6 @@ class MangaDetailScreenState extends Equatable {
     this.mangaId,
     this.manga,
     this.chapters,
-    this.source,
     this.sourceEnum,
     this.config,
     this.authState,
@@ -62,6 +60,7 @@ class MangaDetailScreenState extends Equatable {
     this.parameter = const SearchChapterParameter(),
     this.hasNextPage = false,
     this.isPagingNextPage = false,
+    this.sourceUrl,
   }) {
     isOnLibrary = libraries.contains(mangaId);
 
@@ -107,8 +106,6 @@ class MangaDetailScreenState extends Equatable {
     }
 
     this.chapterIds = chapterIds;
-
-    crawlable = source?.crawlable == true;
 
     // TODO: perform sorting
 
@@ -180,7 +177,6 @@ class MangaDetailScreenState extends Equatable {
         mangaId,
         manga,
         chapters,
-        source,
         sourceEnum,
         config,
         authState,
@@ -189,6 +185,7 @@ class MangaDetailScreenState extends Equatable {
         parameter,
         hasNextPage,
         isPagingNextPage,
+        sourceUrl,
       ];
 
   MangaDetailScreenState copyWith({
@@ -209,6 +206,7 @@ class MangaDetailScreenState extends Equatable {
     SearchChapterParameter? parameter,
     bool? hasNextPage,
     bool? isPagingNextPage,
+    ValueGetter<String?>? sourceUrl,
   }) {
     return MangaDetailScreenState(
       config: config ?? this.config,
@@ -220,7 +218,6 @@ class MangaDetailScreenState extends Equatable {
       mangaId: mangaId ?? this.mangaId,
       manga: manga ?? this.manga,
       chapters: chapters ?? this.chapters,
-      source: source ?? this.source,
       sourceEnum: sourceEnum ?? this.sourceEnum,
       authState: authState ?? this.authState,
       libraries: libraries ?? this.libraries,
@@ -228,6 +225,7 @@ class MangaDetailScreenState extends Equatable {
       parameter: parameter ?? this.parameter,
       hasNextPage: hasNextPage ?? this.hasNextPage,
       isPagingNextPage: isPagingNextPage ?? this.isPagingNextPage,
+      sourceUrl: sourceUrl != null ? sourceUrl() : this.sourceUrl,
     );
   }
 }

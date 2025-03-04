@@ -11,7 +11,6 @@ MangaSource _$MangaSourceFromJson(Map<String, dynamic> json) => MangaSource(
       name: $enumDecodeNullable(_$MangaSourceEnumEnumMap, json['name']),
       url: json['url'] as String?,
       id: json['id'] as String?,
-      crawlable: json['crawlable'] as bool?,
     );
 
 Map<String, dynamic> _$MangaSourceToJson(MangaSource instance) =>
@@ -20,7 +19,6 @@ Map<String, dynamic> _$MangaSourceToJson(MangaSource instance) =>
       'name': _$MangaSourceEnumEnumMap[instance.name],
       'url': instance.url,
       'id': instance.id,
-      'crawlable': instance.crawlable,
     };
 
 const _$MangaSourceEnumEnumMap = {

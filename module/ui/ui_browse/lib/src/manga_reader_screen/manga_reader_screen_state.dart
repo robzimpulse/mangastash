@@ -8,7 +8,6 @@ class MangaReaderScreenState extends Equatable {
     this.error,
     this.mangaId,
     this.chapterId,
-    this.source,
     this.sourceEnum,
     this.chapterIds,
   }) {
@@ -16,7 +15,6 @@ class MangaReaderScreenState extends Equatable {
     final index = ids.indexOf(chapterId);
     previousChapterId = index <= 0 ? null : ids.elementAtOrNull(index - 1);
     nextChapterId = index < 0 ? null : ids.elementAtOrNull(index + 1);
-    crawlable = source?.crawlable == true;
   }
 
   final bool isLoading;
@@ -31,15 +29,11 @@ class MangaReaderScreenState extends Equatable {
 
   final MangaSourceEnum? sourceEnum;
 
-  final MangaSource? source;
-
   final List<String?>? chapterIds;
 
   late final String? previousChapterId;
 
   late final String? nextChapterId;
-
-  late final bool crawlable;
 
   @override
   List<Object?> get props {
@@ -49,7 +43,6 @@ class MangaReaderScreenState extends Equatable {
       isLoading,
       chapter,
       error,
-      source,
       sourceEnum,
       chapterIds,
     ];
@@ -72,7 +65,6 @@ class MangaReaderScreenState extends Equatable {
       chapter: chapter ?? this.chapter,
       error: error != null ? error() : this.error,
       sourceEnum: sourceEnum ?? this.sourceEnum,
-      source: source ?? this.source,
       chapterIds: chapterIds ?? this.chapterIds,
     );
   }

@@ -30,7 +30,9 @@ class GetMangaOnMangaDexUseCase with SyncMangaMixin {
         await sync(
           mangaTagServiceFirebase: _mangaTagServiceFirebase,
           mangaServiceFirebase: _mangaServiceFirebase,
-          manga: Manga.from(data: manga),
+          manga: Manga.from(data: manga).copyWith(
+            source: MangaSourceEnum.mangadex,
+          ),
         ),
       );
     } on Exception catch (e) {

@@ -79,6 +79,7 @@ class GetMangaOnAsuraScanUseCase with SyncMangaMixin {
         mangaTagServiceFirebase: _mangaTagServiceFirebase,
         mangaServiceFirebase: _mangaServiceFirebase,
         manga: result.copyWith(
+          source: MangaSourceEnum.asurascan,
           author: author,
           description: description,
           tags: genres?.map((e) => MangaTag(name: e)).toList(),

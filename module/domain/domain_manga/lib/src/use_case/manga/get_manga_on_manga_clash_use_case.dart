@@ -42,7 +42,10 @@ class GetMangaOnMangaClashUseCase with SyncMangaMixin {
       await sync(
         mangaTagServiceFirebase: _mangaTagServiceFirebase,
         mangaServiceFirebase: _mangaServiceFirebase,
-        manga: result.copyWith(description: description),
+        manga: result.copyWith(
+          description: description,
+          source: MangaSourceEnum.mangaclash,
+        ),
       ),
     );
   }
