@@ -5,6 +5,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:html/dom.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
+import '../../exception/failed_parsing_html_exception.dart';
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_chapters_mixin.dart';
 
@@ -37,7 +38,7 @@ class SearchChapterOnAsuraScanUseCase with SyncChaptersMixin {
     final document = await _webview.open(url);
 
     if (document == null) {
-      return Error(Exception('Error parsing html'));
+      return Error(FailedParsingHtmlException(url));
     }
 
     final List<MangaChapter> chapters = [];
@@ -121,6 +122,7 @@ class SearchChapterOnAsuraScanUseCase with SyncChaptersMixin {
         limit: data.length,
         total: data.length,
         hasNextPage: false,
+        sourceUrl: url,
       ),
     );
   }
