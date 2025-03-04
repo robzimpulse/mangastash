@@ -15,20 +15,22 @@ class MangaServiceFirebase {
   Future<Manga> sync({required Manga value}) async {
     final founds = await search(value: value);
 
+    final match = founds
+        .sorted((a, b) => value.compareTo(a) - value.compareTo(b))
+        .lastOrNull;
+
     if (founds.length > 1) {
       _logBox.log(
         'Duplicate entry',
         extra: {
           'value': value.toJson(),
+          'match': match?.toJson(),
+          'similarity': value.similarity(match),
           'duplicated': founds.map((e) => e.toJson()).toList(),
         },
-        name: 'MangaServiceFirebase',
+        name: runtimeType.toString(),
       );
     }
-
-    final match = founds
-        .sorted((a, b) => value.compareTo(a) - value.compareTo(b))
-        .lastOrNull;
 
     return await update(
       key: match?.id ?? value.id,
