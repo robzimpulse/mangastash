@@ -1,7 +1,6 @@
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import 'manga_reader_screen_state.dart';
@@ -12,8 +11,6 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
 
   final CrawlUrlUseCase _crawlUrlUseCase;
 
-  final Map<String, BehaviorSubject<double>> _pageSizeStreams = {};
-
   MangaReaderScreenCubit({
     required GetChapterUseCase getChapterUseCase,
     required GetMangaSourceUseCase getMangaSourceUseCase,
@@ -22,12 +19,6 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
   })  : _getChapterUseCase = getChapterUseCase,
         _crawlUrlUseCase = crawlUrlUseCase,
         super(initialState);
-
-  @override
-  Future<void> close() async {
-    await Future.wait(_pageSizeStreams.values.map((e) => e.close()));
-    super.close();
-  }
 
   Future<void> init() => _fetchChapter();
 
