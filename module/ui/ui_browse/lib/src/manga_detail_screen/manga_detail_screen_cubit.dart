@@ -128,7 +128,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     emit(
       state.copyWith(
-        isLoadingChapters: state.chapters?.isEmpty == true,
+        isLoadingChapters: !(state.chapters?.isNotEmpty == true),
         errorChapters: () => null,
       ),
     );

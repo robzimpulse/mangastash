@@ -365,6 +365,70 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
+  Widget _manga() {
+    return _builder(
+      buildWhen: (prev, curr) => [
+        prev.isLoadingManga != curr.isLoadingManga,
+        prev.isOnLibrary != curr.isOnLibrary,
+        prev.manga != curr.manga,
+        prev.errorManga != curr.errorManga,
+      ].contains(true),
+      builder: (context, state) {
+        final error = state.errorManga;
+    
+        if (error != null) {
+          return SliverToBoxAdapter(
+            child: SizedBox(
+              height: 200,
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      error.toString(),
+                      textAlign: TextAlign.center,
+                    ),
+                    if (error is FailedParsingHtmlException) ...[
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () => _cubit(context).recrawl(url: error.url),
+                        child: const Text('Open Debug Browser'),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+    
+        return MangaDetailWidget(
+          cacheManager: widget.cacheManager,
+          coverUrl: state.manga?.coverUrl,
+          title: state.manga?.title,
+          author: state.manga?.author,
+          status: state.manga?.status,
+          description: state.manga?.description,
+          tags: state.manga?.tagsName,
+          horizontalPadding: 12,
+          isOnLibrary: state.isOnLibrary,
+          onTapAddToLibrary: () => _onTapAddToLibrary(context, state),
+          onTapWebsite: () => _onTapWebsite(context, state),
+          onTapTag: (name) => _onTapTag(
+            context,
+            tag: state.manga?.mapTagsByName[name],
+          ),
+          isLoading: state.isLoadingManga,
+        );
+      },
+    );
+  }
+
   Widget _chapters() {
     return _builder(
       buildWhen: (prev, curr) => [
@@ -561,31 +625,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       },
       child: CustomScrollView(
         slivers: [
-          _builder(
-            buildWhen: (prev, curr) => [
-              prev.isLoadingManga != curr.isLoadingManga,
-              prev.isOnLibrary != curr.isOnLibrary,
-              prev.manga != curr.manga,
-            ].contains(true),
-            builder: (context, state) => MangaDetailWidget(
-              cacheManager: widget.cacheManager,
-              coverUrl: state.manga?.coverUrl,
-              title: state.manga?.title,
-              author: state.manga?.author,
-              status: state.manga?.status,
-              description: state.manga?.description,
-              tags: state.manga?.tagsName,
-              horizontalPadding: 12,
-              isOnLibrary: state.isOnLibrary,
-              onTapAddToLibrary: () => _onTapAddToLibrary(context, state),
-              onTapWebsite: () => _onTapWebsite(context, state),
-              onTapTag: (name) => _onTapTag(
-                context,
-                tag: state.manga?.mapTagsByName[name],
-              ),
-              isLoading: state.isLoadingManga,
-            ),
-          ),
+          _manga(),
           _chapters(),
           SliverToBoxAdapter(
             child: _builder(
