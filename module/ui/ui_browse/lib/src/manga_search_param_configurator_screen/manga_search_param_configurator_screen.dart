@@ -80,7 +80,6 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
           _contentRating(),
           _includes(),
           _originalLanguage(),
-          _excludedOriginalLanguage(),
           _availableTranslatedLanguage(),
           _publicationDemographic(),
         ].map((e) => SliverToBoxAdapter(child: e)),
@@ -187,71 +186,102 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
 
   Widget _originalLanguage() {
     return _builder(
-      buildWhen: (prev, curr) => [
-        prev.modified?.originalLanguage != curr.modified?.originalLanguage,
-      ].contains(true),
+      buildWhen: (prev, curr) {
+        final a = prev.modified;
+        final b = curr.modified;
+
+        return [
+          a?.originalLanguage != b?.originalLanguage,
+          a?.excludedOriginalLanguages != b?.excludedOriginalLanguages,
+        ].contains(true);
+      },
       builder: (context, state) => ExpansionTile(
         title: const Text('Original Language'),
         children: [
           ...LanguageCodes.values.map(
-            (key) => CheckboxListTile(
-              title: Text(key.label),
-              value: state.modified?.originalLanguage?.contains(key) == true,
-              onChanged: (value) {
-                if (value == null) return;
-                final values = [...?state.modified?.originalLanguage];
-                if (value) {
-                  values.add(key);
-                } else {
-                  values.remove(key);
-                }
-                _cubit(context).update(
-                  modified: state.modified?.copyWith(
-                    originalLanguage: values,
-                  ),
-                );
-              },
-            ),
+            (key) {
+              final data = state.modified;
+              final included = data?.originalLanguage;
+              final excluded = data?.excludedOriginalLanguages;
+
+              return CheckboxListTile(
+                title: Text(key.label),
+                tristate: true,
+                value: (included?.contains(key) ?? false)
+                    ? true
+                    : (excluded?.contains(key) ?? false)
+                        ? null
+                        : false,
+                onChanged: (value) {
+                  if (value == null) {
+                    _cubit(context).update(
+                      modified: data?.copyWith(
+                        originalLanguage: [...?included]..remove(key),
+                        excludedOriginalLanguages: [...?excluded, key],
+                      ),
+                    );
+                    return;
+                  }
+
+                  if (value) {
+                    _cubit(context).update(
+                      modified: data?.copyWith(
+                        originalLanguage: [...?included, key],
+                        excludedOriginalLanguages: [...?excluded]..remove(key),
+                      ),
+                    );
+                    return;
+                  }
+
+                  _cubit(context).update(
+                    modified: data?.copyWith(
+                      originalLanguage: [...?included]..remove(key),
+                      excludedOriginalLanguages: [...?excluded]..remove(key),
+                    ),
+                  );
+                },
+              );
+            },
           ),
         ],
       ),
     );
   }
 
-  Widget _excludedOriginalLanguage() {
-    return _builder(
-      buildWhen: (prev, curr) => [
-        prev.modified?.excludedOriginalLanguages !=
-            curr.modified?.excludedOriginalLanguages,
-      ].contains(true),
-      builder: (context, state) => ExpansionTile(
-        title: const Text('Excluded Original Language'),
-        children: [
-          ...LanguageCodes.values.map(
-            (key) => CheckboxListTile(
-              title: Text(key.label),
-              value: state.modified?.excludedOriginalLanguages?.contains(key) ==
-                  true,
-              onChanged: (value) {
-                if (value == null) return;
-                final values = [...?state.modified?.excludedOriginalLanguages];
-                if (value) {
-                  values.add(key);
-                } else {
-                  values.remove(key);
-                }
-                _cubit(context).update(
-                  modified: state.modified?.copyWith(
-                    originalLanguage: values,
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _excludedOriginalLanguage() {
+  //   return _builder(
+  //     buildWhen: (prev, curr) => [
+  //       prev.modified?.excludedOriginalLanguages !=
+  //           curr.modified?.excludedOriginalLanguages,
+  //     ].contains(true),
+  //     builder: (context, state) => ExpansionTile(
+  //       title: const Text('Excluded Original Language'),
+  //       children: [
+  //         ...LanguageCodes.values.map(
+  //           (key) => CheckboxListTile(
+  //             title: Text(key.label),
+  //             value: state.modified?.excludedOriginalLanguages?.contains(key) ==
+  //                 true,
+  //             onChanged: (value) {
+  //               if (value == null) return;
+  //               final values = [...?state.modified?.excludedOriginalLanguages];
+  //               if (value) {
+  //                 values.add(key);
+  //               } else {
+  //                 values.remove(key);
+  //               }
+  //               _cubit(context).update(
+  //                 modified: state.modified?.copyWith(
+  //                   originalLanguage: values,
+  //                 ),
+  //               );
+  //             },
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _availableTranslatedLanguage() {
     return _builder(
