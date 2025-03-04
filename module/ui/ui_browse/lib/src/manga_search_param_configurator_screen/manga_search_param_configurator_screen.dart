@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -83,7 +84,6 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
           _availableTranslatedLanguage(),
           _publicationDemographic(),
         ].map((e) => SliverToBoxAdapter(child: e)),
-
       ],
     );
   }
@@ -98,7 +98,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
         children: [
           ...MangaStatus.values.map(
             (key) => CheckboxListTile(
-              title: Text(key.name.toCapitalized()),
+              title: Text(key.label),
               value: state.modified?.status?.contains(key) == true,
               onChanged: (value) {
                 if (value == null) return;
@@ -129,7 +129,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
         children: [
           ...ContentRating.values.map(
             (key) => CheckboxListTile(
-              title: Text(key.name.toCapitalized()),
+              title: Text(key.label),
               value: state.modified?.contentRating?.contains(key) == true,
               onChanged: (value) {
                 if (value == null) return;
@@ -162,7 +162,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
         children: [
           ...Include.values.map(
             (key) => CheckboxListTile(
-              title: Text(key.name.toCapitalized()),
+              title: Text(key.label),
               value: state.modified?.includes?.contains(key) == true,
               onChanged: (value) {
                 if (value == null) return;
@@ -195,7 +195,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
         children: [
           ...LanguageCodes.values.map(
             (key) => CheckboxListTile(
-              title: Text(key.name.toCapitalized()),
+              title: Text(key.label),
               value: state.modified?.originalLanguage?.contains(key) == true,
               onChanged: (value) {
                 if (value == null) return;
@@ -229,7 +229,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
         children: [
           ...LanguageCodes.values.map(
             (key) => CheckboxListTile(
-              title: Text(key.name.toCapitalized()),
+              title: Text(key.label),
               value: state.modified?.excludedOriginalLanguages?.contains(key) ==
                   true,
               onChanged: (value) {
@@ -264,7 +264,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
         children: [
           ...LanguageCodes.values.map(
             (key) => CheckboxListTile(
-              title: Text(key.name.toCapitalized()),
+              title: Text(key.label),
               value:
                   state.modified?.availableTranslatedLanguage?.contains(key) ==
                       true,
@@ -302,7 +302,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
         children: [
           ...PublicDemographic.values.map(
             (key) => CheckboxListTile(
-              title: Text(key.name.toCapitalized()),
+              title: Text(key.label),
               value:
                   state.modified?.publicationDemographic?.contains(key) == true,
               onChanged: (value) {

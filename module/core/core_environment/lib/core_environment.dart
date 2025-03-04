@@ -9,6 +9,7 @@ export 'src/core_environment_registrar.dart';
 export 'src/enum/country.dart';
 export 'src/enum/language.dart';
 export 'src/extension/completer_extension.dart';
+export 'src/extension/displayable_enum_extension.dart';
 export 'src/extension/locale_extension.dart';
 export 'src/extension/parseable_date_string_extension.dart';
 export 'src/extension/readable_date_format_extension.dart';
