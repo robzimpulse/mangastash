@@ -1,13 +1,13 @@
 enum LanguageCodes {
   english('en'),
   simplifiedChinese('zh'),
-  traditionalChinese('zh_hk'),
-  brazillianPortugese('pt_br'),
+  traditionalChinese('zh-hk'),
+  brazillianPortugese('pt-br'),
   castilianSpanish('es'),
-  latinAmericaSpanish('es_la'),
-  romanizedJapanese('ja_ro'),
-  romanizedKorean('ko_ro'),
-  romanizedChinese('zh_ro');
+  latinAmericaSpanish('es-la'),
+  romanizedJapanese('ja-ro'),
+  romanizedKorean('ko-ro'),
+  romanizedChinese('zh-ro');
 
   final String rawValue;
 
