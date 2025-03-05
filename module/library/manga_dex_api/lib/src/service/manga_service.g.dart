@@ -62,7 +62,7 @@ class _MangaService implements MangaService {
       r'excludedTagsMode': excludedTagsMode,
       r'status[]': status,
       r'originalLanguage[]': originalLanguage,
-      r'excludedOriginalLanguages[]': excludedOriginalLanguages,
+      r'excludedOriginalLanguage[]': excludedOriginalLanguages,
       r'availableTranslatedLanguage[]': availableTranslatedLanguage,
       r'publicationDemographic[]': publicationDemographic,
       r'ids[]': ids,

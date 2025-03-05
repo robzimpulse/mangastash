@@ -38,7 +38,7 @@ abstract class MangaService {
     @Query('excludedTagsMode') String? excludedTagsMode,
     @Query('status[]') List<String>? status,
     @Query('originalLanguage[]') List<String>? originalLanguage,
-    @Query('excludedOriginalLanguages[]')
+    @Query('excludedOriginalLanguage[]')
     List<String>? excludedOriginalLanguages,
     @Query('availableTranslatedLanguage[]')
     List<String>? availableTranslatedLanguage,

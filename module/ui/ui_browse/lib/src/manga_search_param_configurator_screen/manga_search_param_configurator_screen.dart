@@ -213,31 +213,18 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
                         ? null
                         : false,
                 onChanged: (value) {
-                  if (value == null) {
-                    _cubit(context).update(
-                      modified: data?.copyWith(
-                        originalLanguage: [...?included]..remove(key),
-                        excludedOriginalLanguages: [...?excluded, key],
-                      ),
-                    );
-                    return;
-                  }
+                  final originalLanguage = (value == true)
+                      ? ([...?included, key])
+                      : ([...?included]..remove(key));
 
-                  if (value) {
-                    _cubit(context).update(
-                      modified: data?.copyWith(
-                        originalLanguage: [...?included, key],
-                        excludedOriginalLanguages: [...?excluded]..remove(key),
-                      ),
-                    );
-                    return;
-                  }
+                  final excludedOriginalLanguages = (value == null)
+                      ? ([...?excluded, key])
+                      : ([...?excluded]..remove(key));
 
                   _cubit(context).update(
                     modified: data?.copyWith(
-                      originalLanguage: [...?included]..remove(key),
-                      excludedOriginalLanguages: [...?excluded]..remove(key),
-                    ),
+                        originalLanguage: originalLanguage,
+                        excludedOriginalLanguages: excludedOriginalLanguages),
                   );
                 },
               );
@@ -247,41 +234,6 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
       ),
     );
   }
-
-  // Widget _excludedOriginalLanguage() {
-  //   return _builder(
-  //     buildWhen: (prev, curr) => [
-  //       prev.modified?.excludedOriginalLanguages !=
-  //           curr.modified?.excludedOriginalLanguages,
-  //     ].contains(true),
-  //     builder: (context, state) => ExpansionTile(
-  //       title: const Text('Excluded Original Language'),
-  //       children: [
-  //         ...LanguageCodes.values.map(
-  //           (key) => CheckboxListTile(
-  //             title: Text(key.label),
-  //             value: state.modified?.excludedOriginalLanguages?.contains(key) ==
-  //                 true,
-  //             onChanged: (value) {
-  //               if (value == null) return;
-  //               final values = [...?state.modified?.excludedOriginalLanguages];
-  //               if (value) {
-  //                 values.add(key);
-  //               } else {
-  //                 values.remove(key);
-  //               }
-  //               _cubit(context).update(
-  //                 modified: state.modified?.copyWith(
-  //                   originalLanguage: values,
-  //                 ),
-  //               );
-  //             },
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Widget _availableTranslatedLanguage() {
     return _builder(
