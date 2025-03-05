@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
@@ -18,8 +19,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   final DownloadChapterUseCase _downloadChapterUseCase;
   final CrawlUrlUseCase _crawlUrlUseCase;
 
-  StreamSubscription? _activeSubscriptions;
-
   MangaDetailScreenCubit({
     required MangaDetailScreenState initialState,
     required GetMangaUseCase getMangaUseCase,
@@ -31,6 +30,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required DownloadChapterUseCase downloadChapterUseCase,
     required ListenDownloadProgressUseCase listenDownloadProgressUseCase,
     required CrawlUrlUseCase crawlUrlUseCase,
+    required ListenLocaleUseCase listenLocaleUseCase,
   })  : _getMangaUseCase = getMangaUseCase,
         _searchChapterUseCase = searchChapterUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
@@ -49,12 +49,9 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     addSubscription(
       listenDownloadProgressUseCase.all.distinct().listen(_updateMangaProgress),
     );
-  }
-
-  @override
-  Future<void> close() async {
-    await _activeSubscriptions?.cancel();
-    await super.close();
+    addSubscription(
+      listenLocaleUseCase.localeDataStream.distinct().listen(_updateLocale),
+    );
   }
 
   void _updateAuthState(AuthState? authState) {
@@ -73,6 +70,26 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     Map<DownloadChapterKey, DownloadChapterProgress> progress,
   ) {
     emit(state.copyWith(progress: progress));
+  }
+
+  void _updateLocale(Locale? locale) {
+    final codes = Language.fromCode(locale?.languageCode).languageCodes;
+    final included = state.parameter.originalLanguage;
+    final excluded = state.parameter.excludedOriginalLanguages;
+
+    emit(
+      state.copyWith(
+        parameter: state.parameter.copyWith(
+          originalLanguage: [...?included, ...codes],
+          excludedOriginalLanguages: [...?excluded]
+            ..removeWhere((e) => codes.contains(e)),
+          translatedLanguage: [
+            ...?state.parameter.translatedLanguage,
+            ...codes,
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> init({ChapterOrders order = ChapterOrders.chapter}) async {

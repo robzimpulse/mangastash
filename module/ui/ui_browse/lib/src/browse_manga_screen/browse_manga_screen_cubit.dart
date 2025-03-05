@@ -16,6 +16,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     required GetMangaSourceUseCase getMangaSourceUseCase,
     required SearchMangaUseCase searchMangaUseCase,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
+    required ListenLocaleUseCase listenLocaleUseCase,
   })  : _searchMangaUseCase = searchMangaUseCase,
         super(initialState) {
     addSubscription(
@@ -23,10 +24,33 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
           .distinct()
           .listen(_updateLibraryState),
     );
+    addSubscription(
+      listenLocaleUseCase.localeDataStream.distinct().listen(_updateLocale),
+    );
   }
 
   void _updateLibraryState(List<String> libraryState) {
     emit(state.copyWith(libraries: libraryState));
+  }
+
+  void _updateLocale(Locale? locale) {
+    final codes = Language.fromCode(locale?.languageCode).languageCodes;
+    final included = state.parameter.originalLanguage;
+    final excluded = state.parameter.excludedOriginalLanguages;
+
+    emit(
+      state.copyWith(
+        parameter: state.parameter.copyWith(
+          originalLanguage: [...?included, ...codes],
+          excludedOriginalLanguages: [...?excluded]
+            ..removeWhere((e) => codes.contains(e)),
+          availableTranslatedLanguage: [
+            ...?state.parameter.availableTranslatedLanguage,
+            ...codes,
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> init({
@@ -41,7 +65,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
           title: title,
           offset: 0,
           page: 0,
-          limit: 50,
+          limit: 20,
           orders: {order: OrderDirections.descending},
         ),
       ),

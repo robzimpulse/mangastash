@@ -56,6 +56,7 @@ class MangaDetailScreen extends StatefulWidget {
         downloadChapterUseCase: locator(),
         listenDownloadProgressUseCase: locator(),
         crawlUrlUseCase: locator(),
+        listenLocaleUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         cacheManager: locator(),
@@ -375,7 +376,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       ].contains(true),
       builder: (context, state) {
         final error = state.errorManga;
-    
+
         if (error != null) {
           return SliverToBoxAdapter(
             child: SizedBox(
@@ -396,7 +397,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        onPressed: () => _cubit(context).recrawl(url: error.url),
+                        onPressed: () =>
+                            _cubit(context).recrawl(url: error.url),
                         child: const Text('Open Debug Browser'),
                       ),
                     ],
@@ -406,7 +408,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             ),
           );
         }
-    
+
         return MangaDetailWidget(
           cacheManager: widget.cacheManager,
           coverUrl: state.manga?.coverUrl,

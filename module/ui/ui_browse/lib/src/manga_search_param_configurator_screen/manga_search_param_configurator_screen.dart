@@ -223,8 +223,9 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
 
                   _cubit(context).update(
                     modified: data?.copyWith(
-                        originalLanguage: originalLanguage,
-                        excludedOriginalLanguages: excludedOriginalLanguages),
+                      originalLanguage: originalLanguage,
+                      excludedOriginalLanguages: excludedOriginalLanguages,
+                    ),
                   );
                 },
               );
@@ -253,7 +254,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
               onChanged: (value) {
                 if (value == null) return;
                 final values = [
-                  ...?state.modified?.availableTranslatedLanguage
+                  ...?state.modified?.availableTranslatedLanguage,
                 ];
                 if (value) {
                   values.add(key);
