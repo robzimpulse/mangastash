@@ -21,6 +21,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   TextEditingController searchController = TextEditingController();
   FocusNode focusNode = FocusNode();
+  late final logs = widget.storage.activities.map(_filter);
 
   String query = '';
   bool isHtml = false;
@@ -60,6 +61,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() {
       currentSort = sortType;
     });
+  }
+
+  List<LogModel> _filter(List<LogModel> value) {
+    var data = value;
+
+    if (isSearch) {
+      data = [
+        ...data.where(
+              (e) => e.message.toLowerCase().contains(query.toLowerCase()),
+        ),
+      ];
+    }
+
+    if (isHtml) {
+      data = [...data.whereType<LogHtmlModel>()];
+    }
+
+    int sortByTime(LogModel a, LogModel b) {
+      final aTime = a.time;
+      final bTime = b.time;
+      if (aTime == null || bTime == null) return 0;
+      return aTime.isBefore(bTime) ? 1 : -1;
+    }
+
+    int sortByName(LogModel a, LogModel b) {
+      final aName = a.name;
+      final bName = b.name;
+      if (aName == null || bName == null) return 0;
+      return aName.compareTo(bName);
+    }
+
+    return switch (currentSort) {
+      SortLog.byTime => data.sorted(sortByTime),
+      SortLog.byName => data.sorted(sortByName),
+    };
   }
 
   @override
@@ -103,43 +139,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           onPressed: () => widget.storage.clear(),
         ),
         body: StreamBuilder(
-          stream: widget.storage.activities.map(
-            (value) {
-              var data = value;
-
-              if (isSearch) {
-                data = data.where(
-                  (activity) {
-                    final text = activity.toString().toLowerCase();
-                    return text.contains(query.toLowerCase());
-                  },
-                ).toList();
-              }
-
-              if (isHtml) {
-                data = [...data.whereType<LogHtmlModel>()];
-              }
-
-              int sortByTime(LogModel a, LogModel b) {
-                final aTime = a.time;
-                final bTime = b.time;
-                if (aTime == null || bTime == null) return 0;
-                return aTime.isBefore(bTime) ? 1 : -1;
-              }
-
-              int sortByName(LogModel a, LogModel b) {
-                final aName = a.name;
-                final bName = b.name;
-                if (aName == null || bName == null) return 0;
-                return aName.compareTo(bName);
-              }
-
-              return switch (currentSort) {
-                SortLog.byTime => data.sorted(sortByTime),
-                SortLog.byName => data.sorted(sortByName),
-              };
-            },
-          ),
+          stream: logs,
           builder: (context, snapshot) {
             final data = snapshot.data;
 
