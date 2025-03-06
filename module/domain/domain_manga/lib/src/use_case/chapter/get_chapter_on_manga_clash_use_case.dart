@@ -27,6 +27,8 @@ class GetChapterOnMangaClashUseCase with SyncChapterMixin {
       return Error(Exception('Data not found'));
     }
 
+    if (result.images?.isNotEmpty == true) return Success(result);
+
     final document = await _webview.open(url);
 
     if (document == null) {

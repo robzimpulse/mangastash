@@ -23,6 +23,10 @@ class GetChapterOnMangaDexUseCase with SyncChapterMixin {
     required String chapterId,
     required String mangaId,
   }) async {
+    final result = await _mangaChapterServiceFirebase.get(id: chapterId);
+
+    if (result != null) return Success(result);
+
     try {
       final response = await Future.wait([
         _chapterRepository.detail(chapterId, includes: [Include.manga]),

@@ -26,6 +26,8 @@ class GetMangaOnMangaClashUseCase with SyncMangaMixin {
       return Error(Exception('Data not found'));
     }
 
+    if (result.description != null) return Success(result);
+
     final document = await _webview.open(url);
 
     if (document == null) {

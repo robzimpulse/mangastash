@@ -26,6 +26,14 @@ class GetMangaOnAsuraScanUseCase with SyncMangaMixin {
       return Error(Exception('Data not found'));
     }
 
+    final isValid = [
+      result.author != null,
+      result.description != null,
+      result.tags != null,
+    ].every((e) => e);
+
+    if (isValid) return Success(result);
+
     final document = await _webview.open(url);
 
     if (document == null) {
