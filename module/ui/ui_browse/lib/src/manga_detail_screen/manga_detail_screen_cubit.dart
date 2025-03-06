@@ -80,13 +80,13 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     emit(
       state.copyWith(
         parameter: state.parameter.copyWith(
-          originalLanguage: [...?included, ...codes],
-          excludedOriginalLanguages: [...?excluded]
+          originalLanguage: {...?included, ...codes}.toList(),
+          excludedOriginalLanguages: {...?excluded}.toList()
             ..removeWhere((e) => codes.contains(e)),
-          translatedLanguage: [
+          translatedLanguage: {
             ...?state.parameter.translatedLanguage,
             ...codes,
-          ],
+          }.toList(),
         ),
       ),
     );

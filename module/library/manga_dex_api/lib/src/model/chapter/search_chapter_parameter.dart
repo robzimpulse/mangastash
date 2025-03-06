@@ -98,4 +98,19 @@ class SearchChapterParameter extends SearchParameter {
       excludedUploaders: excludedUploaders ?? this.excludedUploaders,
     );
   }
+
+  factory SearchChapterParameter.from(SearchParameter param) {
+    return SearchChapterParameter(
+      limit: param.limit,
+      offset: param.offset,
+      page: param.page,
+      updatedAtSince: param.updatedAtSince,
+      includes: param.includes,
+      contentRating: param.contentRating,
+      originalLanguage: param.originalLanguage,
+      excludedOriginalLanguages: param.excludedOriginalLanguages,
+      createdAtSince: param.createdAtSince,
+      ids: param.ids,
+    );
+  }
 }

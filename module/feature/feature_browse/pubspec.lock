@@ -235,7 +235,7 @@ packages:
     source: hosted
     version: "2.0.0"
   domain_manga:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "../../domain/domain_manga"
       relative: true

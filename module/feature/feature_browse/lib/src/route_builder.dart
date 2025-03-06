@@ -5,6 +5,7 @@ import 'package:service_locator/service_locator.dart';
 import 'package:ui_browse/ui_browse.dart';
 import 'package:ui_common/ui_common.dart';
 
+import 'model/manga_detail_extra.dart';
 import 'route_path.dart';
 
 class BrowseRouteBuilder extends BaseRouteBuilder {
@@ -46,11 +47,11 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         builder: (context, state) => BrowseMangaScreen.create(
           locator: locator,
           source: MangaSourceEnum.fromValue(state.pathParameters['source']),
-          onTapManga: (manga) => context.push(
+          onTapManga: (manga, param) => context.push(
             BrowseRoutePath.mangaDetail
                 .replaceAll(':source', state.pathParameters['source'] ?? '')
                 .replaceAll(':mangaId', manga.id ?? ''),
-            extra: manga,
+            extra: MangaDetailExtra(manga: manga, param: param),
           ),
           onTapFilter: (param) => context.push(
             BrowseRoutePath.searchParamConfig,
@@ -64,7 +65,8 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         name: BrowseRoutePath.mangaDetail,
         builder: (context, state) => MangaDetailScreen.create(
           locator: locator,
-          manga: state.extra.asOrNull(),
+          manga: state.extra.asOrNull<MangaDetailExtra>()?.manga,
+          param: state.extra.asOrNull<MangaDetailExtra>()?.param,
           sourceEnum: MangaSourceEnum.fromValue(state.pathParameters['source']),
           mangaId: state.pathParameters['mangaId'],
           onTapChapter: (chapterId, chapterIds) => context.pushNamed(

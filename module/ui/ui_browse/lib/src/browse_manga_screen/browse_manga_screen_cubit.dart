@@ -41,13 +41,13 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     emit(
       state.copyWith(
         parameter: state.parameter.copyWith(
-          originalLanguage: [...?included, ...codes],
-          excludedOriginalLanguages: [...?excluded]
+          originalLanguage: {...?included, ...codes}.toList(),
+          excludedOriginalLanguages: {...?excluded}.toList()
             ..removeWhere((e) => codes.contains(e)),
-          availableTranslatedLanguage: [
+          availableTranslatedLanguage: {
             ...?state.parameter.availableTranslatedLanguage,
             ...codes,
-          ],
+          }.toList(),
         ),
       ),
     );

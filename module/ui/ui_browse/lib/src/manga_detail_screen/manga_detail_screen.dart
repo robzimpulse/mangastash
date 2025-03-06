@@ -34,9 +34,10 @@ class MangaDetailScreen extends StatefulWidget {
 
   static Widget create({
     required ServiceLocator locator,
-    required MangaSourceEnum? sourceEnum,
-    required String? mangaId,
+    MangaSourceEnum? sourceEnum,
+    String? mangaId,
     Manga? manga,
+    SearchParameter? param,
     Function(String?, List<String>?)? onTapChapter,
     Future<MangaChapterConfig?> Function(MangaChapterConfig?)? onTapSort,
   }) {
@@ -46,6 +47,9 @@ class MangaDetailScreen extends StatefulWidget {
           manga: manga,
           mangaId: mangaId,
           sourceEnum: sourceEnum,
+          parameter: SearchChapterParameter.from(
+            param ?? const SearchParameter(),
+          ),
         ),
         getMangaUseCase: locator(),
         searchChapterUseCase: locator(),
