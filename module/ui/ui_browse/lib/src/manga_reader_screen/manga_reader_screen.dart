@@ -63,24 +63,21 @@ class MangaReaderScreen extends StatelessWidget {
     return ScaffoldScreen(
       appBar: AppBar(
         title: _title(),
+        actions: [_recrawlButton()],
       ),
-      body: _builder(
-        buildWhen: (prev, curr) => [
-          prev.isLoading != curr.isLoading,
-          prev.error != curr.error,
-        ].contains(true),
-        builder: (context, state) {
-          final error = state.error;
-          if (error != null) {
-            return _errorContent(context: context, error: error);
-          }
-
-          if (state.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          return _content();
-        },
+      body: Column(
+        children: [
+          Expanded(
+            child: _content(),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _prevButton(),
+              _nextButton(),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -132,27 +129,60 @@ class MangaReaderScreen extends StatelessWidget {
   Widget _content() {
     return _builder(
       buildWhen: (prev, curr) => [
+        prev.isLoading != curr.isLoading,
+        prev.error != curr.error,
         prev.chapter?.images != curr.chapter?.images,
-        prev.chapter?.webUrl != curr.chapter?.webUrl,
       ].contains(true),
-      builder: (context, state) => Column(
-        children: [
-          Expanded(
-            child: _images(
-              context: context,
-              images: state.chapter?.images ?? [],
-              sourceUrl: state.chapter?.webUrl,
+      builder: (context, state) {
+        final error = state.error;
+        final images = state.chapter?.images ?? [];
+
+        if (error != null) {
+          return _errorContent(context: context, error: error);
+        }
+
+        if (state.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (images.isEmpty) {
+          return const Center(child: Text('Images Empty'));
+        }
+
+        return ListView.builder(
+          itemBuilder: (context, index) => CachedNetworkImage(
+            cacheManager: cacheManager,
+            imageUrl: images[index],
+            errorWidget: (context, url, error) => ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 300),
+              child: Center(
+                child: Row(
+                  children: [
+                    const Icon(Icons.error),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(error.toString())),
+                  ],
+                ),
+              ),
             ),
+            progressIndicatorBuilder: (context, url, progress) {
+              return ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 300),
+                child: Center(
+                  child: SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      value: progress.progress,
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _prevButton(),
-              _nextButton(),
-            ],
-          ),
-        ],
-      ),
+          itemCount: images.length,
+        );
+      },
     );
   }
 
@@ -161,98 +191,47 @@ class MangaReaderScreen extends StatelessWidget {
       buildWhen: (prev, curr) => [
         prev.previousChapterId != curr.previousChapterId,
       ].contains(true),
-      builder: (context, state) => state.previousChapterId != null
-          ? ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onPressed: () => onTapShortcut?.call(state.previousChapterId),
-              child: const Text('Previous Chapter'),
-            )
-          : const SizedBox.shrink(),
+      builder: (context, state) {
+        if (state.previousChapterId == null) {
+          return const SizedBox.shrink();
+        }
+        return IconButton(
+          onPressed: () => onTapShortcut?.call(state.previousChapterId),
+          icon: const Icon(Icons.navigate_before),
+        );
+      },
     );
   }
 
   Widget _nextButton() {
     return _builder(
       buildWhen: (prev, curr) => prev.nextChapterId != curr.nextChapterId,
-      builder: (context, state) => state.nextChapterId != null
-          ? ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onPressed: () => onTapShortcut?.call(state.nextChapterId),
-              child: const Text('Next Chapter'),
-            )
-          : const SizedBox.shrink(),
+      builder: (context, state) {
+        if (state.nextChapterId == null) {
+          return const SizedBox.shrink();
+        }
+        return IconButton(
+          onPressed: () => onTapShortcut?.call(state.nextChapterId),
+          icon: const Icon(Icons.navigate_next),
+        );
+      },
     );
   }
 
-  Widget _images({
-    required BuildContext context,
-    required List<String> images,
-    String? sourceUrl,
-  }) {
-    final url = sourceUrl;
-    if (images.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Images Empty'),
-            if (url != null) ...[
-              const SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                onPressed: () => _cubit(context).recrawl(url: url),
-                child: const Text('Open Debug Browser'),
-              ),
-            ],
-          ],
-        ),
-      );
-    }
+  Widget _recrawlButton() {
+    return _builder(
+      buildWhen: (prev, curr) => prev.chapter?.webUrl != curr.chapter?.webUrl,
+      builder: (context, state) {
+        final url = state.chapter?.webUrl;
+        if (url == null) {
+          return const SizedBox.shrink();
+        }
 
-    return ListView.builder(
-      itemBuilder: (context, index) => CachedNetworkImage(
-        cacheManager: cacheManager,
-        imageUrl: images[index],
-        errorWidget: (context, url, error) => ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 300),
-          child: Center(
-            child: Row(
-              children: [
-                const Icon(Icons.error),
-                const SizedBox(width: 8),
-                Expanded(child: Text(error.toString())),
-              ],
-            ),
-          ),
-        ),
-        progressIndicatorBuilder: (context, url, progress) {
-          return ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 300),
-            child: Center(
-              child: SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  value: progress.progress,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-      itemCount: images.length,
+        return IconButton(
+          onPressed: () => _cubit(context).recrawl(url: url),
+          icon: const Icon(Icons.web),
+        );
+      },
     );
   }
 }

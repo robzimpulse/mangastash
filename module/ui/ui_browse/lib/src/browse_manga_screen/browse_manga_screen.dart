@@ -188,14 +188,12 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
   Widget _layoutSearch({required BuildContext context}) {
     return _builder(
       buildWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
-      builder: (context, state) {
-        return IconButton(
-          icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
-          onPressed: () => _cubit(context).update(
-            isSearchActive: !state.isSearchActive,
-          ),
-        );
-      },
+      builder: (context, state) => IconButton(
+        icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
+        onPressed: () => _cubit(context).update(
+          isSearchActive: !state.isSearchActive,
+        ),
+      ),
     );
   }
 
