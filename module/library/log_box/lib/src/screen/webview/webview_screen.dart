@@ -15,7 +15,7 @@ class WebviewScreen extends StatelessWidget {
 
   final Uri uri;
 
-  final ValueSetter<String?>? onTapSnapshot;
+  final Function(String? url, String? html)? onTapSnapshot;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,20 @@ class WebviewScreen extends StatelessWidget {
           'onNavigationRequest: ${request.url}',
           ...messages.value,
         ];
-        return NavigationDecision.navigate;
+
+        final destination = Uri.tryParse(request.url);
+        if (destination == null) {
+          return NavigationDecision.prevent;
+        }
+
+        final isSame = [
+          destination.scheme == uri.scheme,
+          destination.host == uri.host,
+        ].every((e) => e);
+
+        return isSame
+            ? NavigationDecision.navigate
+            : NavigationDecision.prevent;
       },
       onPageStarted: (request) {
         messages.value = [
@@ -83,8 +96,13 @@ class WebviewScreen extends StatelessWidget {
           'onJavascriptMessage: ${message.message} - ${message.level}',
           ...messages.value,
         ],
-      )
-      ..loadHtmlString(html, baseUrl: '${uri.scheme}://${uri.host}');
+      );
+
+    if (html.isEmpty) {
+      controller.loadRequest(uri);
+    } else {
+      controller.loadHtmlString(html, baseUrl: '${uri.scheme}://${uri.host}');
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -115,7 +133,7 @@ class WebviewScreen extends StatelessWidget {
                   ...messages.value,
                 ];
 
-                onTapSnapshot?.call(html);
+                onTapSnapshot?.call(await controller.currentUrl(), html);
               },
               icon: const Icon(Icons.camera_alt),
             ),

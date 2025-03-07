@@ -28,9 +28,9 @@ class CrawlUrlUseCase {
     await _logBox.navigateToWebview(
       uri: uri,
       html: cached ?? '',
-      onTapSnapshot: (value) => _cacheManager.putFile(
-        uri.toString(),
-        utf8.encode(value ?? ''),
+      onTapSnapshot: (url, html) => _cacheManager.putFile(
+        url ?? uri.toString(),
+        utf8.encode(html ?? ''),
         fileExtension: 'html',
         maxAge: const Duration(minutes: 5),
       ),

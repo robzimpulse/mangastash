@@ -99,7 +99,7 @@ class LogBox {
     required Uri uri,
     required String html,
     ThemeData? theme,
-    ValueSetter<String?>? onTapSnapshot,
+    Function(String? url, String? html)? onTapSnapshot,
   }) async {
     await navigatorObserver.navigator?.push(
       MaterialPageRoute<dynamic>(
