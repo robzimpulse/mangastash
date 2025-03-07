@@ -61,6 +61,9 @@ class MangaReaderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
+      appBar: AppBar(
+        title: _title(),
+      ),
       body: _builder(
         buildWhen: (prev, curr) => [
           prev.isLoading != curr.isLoading,
@@ -78,6 +81,22 @@ class MangaReaderScreen extends StatelessWidget {
 
           return _content();
         },
+      ),
+    );
+  }
+
+  Widget _title() {
+    return _builder(
+      buildWhen: (prev, curr) => [
+        prev.chapter?.chapter != curr.chapter?.chapter,
+        prev.isLoading != curr.isLoading,
+      ].contains(true),
+      builder: (context, state) => ShimmerLoading.multiline(
+        isLoading: state.isLoading,
+        width: 100,
+        height: 20,
+        lines: 1,
+        child: Text('Chapter ${state.chapter?.chapter}'),
       ),
     );
   }
@@ -118,7 +137,6 @@ class MangaReaderScreen extends StatelessWidget {
       ].contains(true),
       builder: (context, state) => Column(
         children: [
-          Row(children: [Expanded(child: _prevButton())]),
           Expanded(
             child: _images(
               context: context,
@@ -126,7 +144,13 @@ class MangaReaderScreen extends StatelessWidget {
               sourceUrl: state.chapter?.webUrl,
             ),
           ),
-          Row(children: [Expanded(child: _nextButton())]),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _prevButton(),
+              _nextButton(),
+            ],
+          ),
         ],
       ),
     );
