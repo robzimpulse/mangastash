@@ -61,25 +61,23 @@ class MangaReaderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      body: SafeArea(
-        child: _builder(
-          buildWhen: (prev, curr) => [
-            prev.isLoading != curr.isLoading,
-            prev.error != curr.error,
-          ].contains(true),
-          builder: (context, state) {
-            final error = state.error;
-            if (error != null) {
-              return _errorContent(context: context, error: error);
-            }
+      body: _builder(
+        buildWhen: (prev, curr) => [
+          prev.isLoading != curr.isLoading,
+          prev.error != curr.error,
+        ].contains(true),
+        builder: (context, state) {
+          final error = state.error;
+          if (error != null) {
+            return _errorContent(context: context, error: error);
+          }
 
-            if (state.isLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
+          if (state.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            return _content();
-          },
-        ),
+          return _content();
+        },
       ),
     );
   }
