@@ -7,7 +7,7 @@ class BottomSheetRouteV2<T> extends Page<T> {
     this.draggable = true,
     this.cancelable = true,
     this.backgroundColor,
-    this.modalBarrierColor,
+    this.barrierColor,
     this.elevation = 0,
     super.key,
     super.name,
@@ -22,7 +22,7 @@ class BottomSheetRouteV2<T> extends Page<T> {
 
   final Color? backgroundColor;
 
-  final Color? modalBarrierColor;
+  final Color? barrierColor;
 
   final double elevation;
 
@@ -38,7 +38,7 @@ class BottomSheetRouteV2<T> extends Page<T> {
       isScrollControlled: isScrollControlled,
       isDismissible: cancelable,
       enableDrag: draggable,
-      modalBarrierColor: modalBarrierColor,
+      modalBarrierColor: barrierColor,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       elevation: elevation,
       showDragHandle: true,
