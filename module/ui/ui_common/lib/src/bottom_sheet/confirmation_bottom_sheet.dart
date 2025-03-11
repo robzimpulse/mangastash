@@ -44,7 +44,7 @@ class ConfirmationBottomSheet extends StatelessWidget {
                 ),
               if (positiveButtonText != null)
                 Expanded(
-                  child: ElevatedButton(
+                  child: OutlinedButton(
                     onPressed: () => context.pop(true),
                     child: Text(positiveButtonText ?? ''),
                   ),

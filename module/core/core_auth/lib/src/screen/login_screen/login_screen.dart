@@ -30,7 +30,8 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  LoginScreenCubit? _cubit(BuildContext context) => context.mounted ? context.read() : null;
+  LoginScreenCubit? _cubit(BuildContext context) =>
+      context.mounted ? context.read() : null;
 
   BlocBuilder _builder({
     required BlocWidgetBuilder<LoginScreenState> builder,
@@ -89,17 +90,14 @@ class LoginScreen extends StatelessWidget {
         },
       ),
       const SizedBox(height: 8),
-      ElevatedButton(
-        style: ButtonStyle(
-          shape: WidgetStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
+      OutlinedButton(
         onPressed: () => _cubit(context)?.login(),
-        child:
-            isLoading ? const CircularProgressIndicator() : const Text('Login'),
+        child: isLoading
+            ? const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: CircularProgressIndicator(),
+              )
+            : const Text('Login'),
       ),
       const SizedBox(height: 16),
       Text(

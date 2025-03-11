@@ -81,14 +81,7 @@ class RegisterScreen extends StatelessWidget {
         },
       ),
       const SizedBox(height: 8),
-      ElevatedButton(
-        style: ButtonStyle(
-          shape: WidgetStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
+      OutlinedButton(
         onPressed: () => _cubit(context).registerWithEmail(),
         child: isLoading
             ? const CircularProgressIndicator()

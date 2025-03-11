@@ -168,27 +168,16 @@ class MoreScreen extends StatelessWidget {
                   ),
                 ),
                 _builder(
-                  buildWhen: (prev, curr) {
-                    return prev.authState != curr.authState;
-                  },
+                  buildWhen: (prev, curr) => prev.authState != curr.authState,
                   builder: (context, state) => Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        shape: WidgetStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
+                    child: OutlinedButton(
                       onPressed: state.authState?.status == AuthStatus.loggedOut
                           ? onTapLogin
                           : () => _cubit(context).logout(),
-                      child: Text(
-                        state.authState?.status == AuthStatus.loggedOut
-                            ? 'Login'
-                            : 'Logout',
-                      ),
+                      child: state.authState?.status == AuthStatus.loggedOut
+                          ? const Text('Login')
+                          : const Text('Logout'),
                     ),
                   ),
                 ),

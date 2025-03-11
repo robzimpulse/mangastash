@@ -111,12 +111,7 @@ class MangaReaderScreen extends StatelessWidget {
           ),
           if (error is FailedParsingHtmlException) ...[
             const SizedBox(height: 16),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
+            OutlinedButton(
               onPressed: () => _cubit(context).recrawl(url: error.url),
               child: const Text('Open Debug Browser'),
             ),

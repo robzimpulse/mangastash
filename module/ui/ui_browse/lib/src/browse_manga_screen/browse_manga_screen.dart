@@ -230,13 +230,12 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
   Widget _menus(BuildContext context) {
     final color = Theme.of(context).appBarTheme.iconTheme?.color;
     final labelStyle = Theme.of(context).textTheme.labelSmall;
-    final buttonStyle = OutlinedButton.styleFrom(
-      visualDensity: VisualDensity.compact,
-      side: const BorderSide(width: 1).copyWith(color: color),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-    );
+    final buttonStyle = Theme.of(context).outlinedButtonTheme.style?.copyWith(
+          visualDensity: VisualDensity.compact,
+          side: WidgetStatePropertyAll(
+            const BorderSide(width: 1).copyWith(color: color),
+          ),
+        );
 
     return Center(
       child: Row(
@@ -247,7 +246,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               prev.isFavoriteActive != curr.isFavoriteActive,
             ].contains(true),
             builder: (context, state) => IconButton.outlined(
-              style: buttonStyle.copyWith(
+              style: buttonStyle?.copyWith(
                 backgroundColor: state.isFavoriteActive
                     ? const WidgetStatePropertyAll(Colors.grey)
                     : null,
@@ -265,7 +264,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               prev.isUpdatedActive != curr.isUpdatedActive,
             ].contains(true),
             builder: (context, state) => IconButton.outlined(
-              style: buttonStyle.copyWith(
+              style: buttonStyle?.copyWith(
                 backgroundColor: state.isUpdatedActive
                     ? const WidgetStatePropertyAll(Colors.grey)
                     : null,
@@ -284,7 +283,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               prev.isFilterActive != curr.isFilterActive,
             ].contains(true),
             builder: (context, state) => OutlinedButton.icon(
-              style: buttonStyle.copyWith(
+              style: buttonStyle?.copyWith(
                 backgroundColor: state.isFilterActive
                     ? const WidgetStatePropertyAll(Colors.grey)
                     : null,

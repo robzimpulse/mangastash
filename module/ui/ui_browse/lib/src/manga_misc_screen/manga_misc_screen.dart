@@ -231,14 +231,7 @@ class _MangaMiscBottomScreen extends State<MangaMiscScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: _bloc(
-              builder: (context, state) => ElevatedButton(
-                style: ButtonStyle(
-                  shape: WidgetStateProperty.all(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
+              builder: (context, state) => OutlinedButton(
                 onPressed: () => context.pop(state.config),
                 child: Text(
                   'Apply',
