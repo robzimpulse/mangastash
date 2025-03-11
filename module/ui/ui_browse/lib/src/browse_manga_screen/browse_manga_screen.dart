@@ -43,7 +43,6 @@ class BrowseMangaScreen extends StatefulWidget {
       create: (context) => BrowseMangaScreenCubit(
         initialState: BrowseMangaScreenState(
           source: source,
-          layout: MangaShelfItemLayout.comfortableGrid,
         ),
         getMangaSourceUseCase: locator(),
         searchMangaUseCase: locator(),

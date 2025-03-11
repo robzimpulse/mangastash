@@ -26,7 +26,7 @@ class LibraryMangaScreenState extends Equatable {
     this.sources = const {},
     this.isSearchActive = false,
     this.mangaTitle,
-    this.layout = MangaShelfItemLayout.comfortableGrid,
+    this.layout = MangaShelfItemLayout.compactGrid,
   }) {
     final title = mangaTitle;
     filteredMangas = isSearchActive && title != null

@@ -36,7 +36,7 @@ class BrowseMangaScreenState extends Equatable {
     this.isPagingNextPage = false,
     this.isSearchActive = false,
     this.error,
-    required this.layout,
+    this.layout = MangaShelfItemLayout.compactGrid,
     this.source,
     this.mangas = const [],
     this.libraries = const [],
