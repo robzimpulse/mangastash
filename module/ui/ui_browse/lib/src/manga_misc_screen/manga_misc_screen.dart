@@ -7,12 +7,15 @@ import 'package:ui_common/ui_common.dart';
 import 'manga_misc_screen_cubit.dart';
 import 'manga_misc_screen_state.dart';
 
-class MangaMiscScreen extends StatefulWidget {
-  const MangaMiscScreen({super.key});
+class MangaMiscScreen extends StatelessWidget {
+  const MangaMiscScreen({super.key, this.controller});
+
+  final ScrollController? controller;
 
   static Widget create({
     required ServiceLocator locator,
     MangaChapterConfig? config,
+    ScrollController? controller,
   }) {
     return BlocProvider(
       create: (context) => MangaMiscScreenCubit(
@@ -20,20 +23,61 @@ class MangaMiscScreen extends StatefulWidget {
           config: config ?? const MangaChapterConfig(),
         ),
       ),
-      child: const MangaMiscScreen(),
+      child: MangaMiscScreen(
+        controller: controller,
+      ),
     );
   }
 
   @override
-  State<MangaMiscScreen> createState() => _MangaMiscBottomScreen();
-}
-
-class _MangaMiscBottomScreen extends State<MangaMiscScreen> {
-  final ValueNotifier<Size> _currentSize = ValueNotifier(Size.zero);
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 3,
+      child: CustomScrollView(
+        controller: controller,
+        slivers: [
+          const SliverPinnedHeader(
+            child: TabBar(
+              indicatorSize: TabBarIndicatorSize.tab,
+              tabs: [
+                Tab(text: 'Filter'),
+                Tab(text: 'Sort'),
+                Tab(text: 'Display'),
+              ],
+            ),
+          ),
+          SliverToBoxAdapter(child: _filter(context),),
+          // TODO: @robzimpulse
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: _builder(
+                    buildWhen: (prev, curr) => prev.config != curr.config,
+                    builder: (context, state) => OutlinedButton(
+                      onPressed: () => context.pop(state.config),
+                      child: Text(
+                        'Apply',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   MangaMiscScreenCubit _cubit(BuildContext context) => context.read();
 
-  Widget _bloc({
+  Widget _builder({
     required BlocWidgetBuilder<MangaMiscScreenState> builder,
     BlocBuilderCondition<MangaMiscScreenState>? buildWhen,
   }) {
@@ -47,10 +91,10 @@ class _MangaMiscBottomScreen extends State<MangaMiscScreen> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _bloc(
-          buildWhen: (prev, curr) {
-            return prev.config?.downloaded != curr.config?.downloaded;
-          },
+        _builder(
+          buildWhen: (prev, curr) => [
+            prev.config?.downloaded != curr.config?.downloaded,
+          ].contains(true),
           builder: (context, state) => CheckboxListTile(
             tristate: true,
             value: state.config?.downloaded,
@@ -60,10 +104,10 @@ class _MangaMiscBottomScreen extends State<MangaMiscScreen> {
             title: const Text('Downloaded'),
           ),
         ),
-        _bloc(
-          buildWhen: (prev, curr) {
-            return prev.config?.unread != curr.config?.unread;
-          },
+        _builder(
+          buildWhen: (prev, curr) => [
+            prev.config?.unread != curr.config?.unread,
+          ].contains(true),
           builder: (context, state) => CheckboxListTile(
             tristate: true,
             value: state.config?.unread,
@@ -73,10 +117,10 @@ class _MangaMiscBottomScreen extends State<MangaMiscScreen> {
             title: const Text('Unread'),
           ),
         ),
-        _bloc(
-          buildWhen: (prev, curr) {
-            return prev.config?.bookmarked != curr.config?.bookmarked;
-          },
+        _builder(
+          buildWhen: (prev, curr) => [
+            prev.config?.bookmarked != curr.config?.bookmarked,
+          ].contains(true),
           builder: (context, state) => CheckboxListTile(
             tristate: true,
             value: state.config?.bookmarked,
@@ -95,14 +139,11 @@ class _MangaMiscBottomScreen extends State<MangaMiscScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         for (final options in MangaChapterSortOptionEnum.values)
-          _bloc(
-            buildWhen: (prev, curr) {
-              final isSortOptionChanged =
-                  prev.config?.sortOption != curr.config?.sortOption;
-              final isSortOrderChanged =
-                  prev.config?.sortOrder != curr.config?.sortOrder;
-              return isSortOptionChanged || isSortOrderChanged;
-            },
+          _builder(
+            buildWhen: (prev, curr) => [
+              prev.config?.sortOption != curr.config?.sortOption,
+              prev.config?.sortOrder != curr.config?.sortOrder,
+            ].contains(true),
             builder: (context, state) => ListTile(
               leading: (state.config?.sortOption == options)
                   ? (state.config?.sortOrder == MangaChapterSortOrderEnum.desc)
@@ -134,10 +175,10 @@ class _MangaMiscBottomScreen extends State<MangaMiscScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         for (final display in MangaChapterDisplayEnum.values)
-          _bloc(
-            buildWhen: (prev, curr) {
-              return prev.config?.display != curr.config?.display;
-            },
+          _builder(
+            buildWhen: (prev, curr) => [
+              prev.config?.display != curr.config?.display,
+            ].contains(true),
             builder: (context, state) => RadioListTile<MangaChapterDisplayEnum>(
               title: Text(display.value),
               value: display,
@@ -150,98 +191,98 @@ class _MangaMiscBottomScreen extends State<MangaMiscScreen> {
       ],
     );
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      animationDuration: const Duration(milliseconds: 100),
-      length: 3,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const TabBar(
-            indicatorSize: TabBarIndicatorSize.tab,
-            tabs: [
-              Tab(text: 'Filter'),
-              Tab(text: 'Sort'),
-              Tab(text: 'Display'),
-            ],
-          ),
-          ValueListenableBuilder(
-            valueListenable: _currentSize,
-            builder: (context, size, child) => AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              constraints: BoxConstraints(maxHeight: size.height),
-              child: child,
-            ),
-            child: TabBarView(
-              children: [
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizeNotifierWidget(
-                      size: (context, size) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (!context.mounted || size.isEmpty) return;
-                          if (_currentSize.value.height > size.height) return;
-                          _currentSize.value = size;
-                        });
-                      },
-                      child: _filter(context),
-                    ),
-                    const Spacer(),
-                  ],
-                ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizeNotifierWidget(
-                      size: (context, size) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (!context.mounted || size.isEmpty) return;
-                          if (_currentSize.value.height > size.height) return;
-                          _currentSize.value = size;
-                        });
-                      },
-                      child: _sort(context),
-                    ),
-                    const Spacer(),
-                  ],
-                ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizeNotifierWidget(
-                      size: (context, size) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (!context.mounted || size.isEmpty) return;
-                          if (_currentSize.value.height > size.height) return;
-                          _currentSize.value = size;
-                        });
-                      },
-                      child: _display(context),
-                    ),
-                    const Spacer(),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: _bloc(
-              builder: (context, state) => OutlinedButton(
-                onPressed: () => context.pop(state.config),
-                child: Text(
-                  'Apply',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  //
+  // @override
+  // Widget build(BuildContext context) {
+  //   return DefaultTabController(
+  //     animationDuration: const Duration(milliseconds: 100),
+  //     length: 3,
+  //     child: Column(
+  //       mainAxisSize: MainAxisSize.min,
+  //       crossAxisAlignment: CrossAxisAlignment.stretch,
+  //       children: [
+  //         const TabBar(
+  //           indicatorSize: TabBarIndicatorSize.tab,
+  //           tabs: [
+  //             Tab(text: 'Filter'),
+  //             Tab(text: 'Sort'),
+  //             Tab(text: 'Display'),
+  //           ],
+  //         ),
+  //         ValueListenableBuilder(
+  //           valueListenable: _currentSize,
+  //           builder: (context, size, child) => AnimatedContainer(
+  //             duration: const Duration(milliseconds: 200),
+  //             constraints: BoxConstraints(maxHeight: size.height),
+  //             child: child,
+  //           ),
+  //           child: TabBarView(
+  //             children: [
+  //               Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   SizeNotifierWidget(
+  //                     size: (context, size) {
+  //                       WidgetsBinding.instance.addPostFrameCallback((_) {
+  //                         if (!context.mounted || size.isEmpty) return;
+  //                         if (_currentSize.value.height > size.height) return;
+  //                         _currentSize.value = size;
+  //                       });
+  //                     },
+  //                     child: _filter(context),
+  //                   ),
+  //                   const Spacer(),
+  //                 ],
+  //               ),
+  //               Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   SizeNotifierWidget(
+  //                     size: (context, size) {
+  //                       WidgetsBinding.instance.addPostFrameCallback((_) {
+  //                         if (!context.mounted || size.isEmpty) return;
+  //                         if (_currentSize.value.height > size.height) return;
+  //                         _currentSize.value = size;
+  //                       });
+  //                     },
+  //                     child: _sort(context),
+  //                   ),
+  //                   const Spacer(),
+  //                 ],
+  //               ),
+  //               Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   SizeNotifierWidget(
+  //                     size: (context, size) {
+  //                       WidgetsBinding.instance.addPostFrameCallback((_) {
+  //                         if (!context.mounted || size.isEmpty) return;
+  //                         if (_currentSize.value.height > size.height) return;
+  //                         _currentSize.value = size;
+  //                       });
+  //                     },
+  //                     child: _display(context),
+  //                   ),
+  //                   const Spacer(),
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         Padding(
+  //           padding: const EdgeInsets.all(8.0),
+  //           child: _bloc(
+  //             builder: (context, state) => OutlinedButton(
+  //               onPressed: () => context.pop(state.config),
+  //               child: Text(
+  //                 'Apply',
+  //                 style: Theme.of(context).textTheme.titleMedium,
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }

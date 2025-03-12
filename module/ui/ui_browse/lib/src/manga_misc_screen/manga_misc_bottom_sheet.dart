@@ -14,8 +14,10 @@ class MangaMiscBottomSheetRoute extends BottomSheetRoute {
           child: (context, controller) => MangaMiscScreen.create(
             locator: locator,
             config: config,
+            controller: controller,
           ),
           draggable: true,
           elevation: 16,
+          isScrollControlled: true,
         );
 }
