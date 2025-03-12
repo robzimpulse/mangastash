@@ -4,7 +4,7 @@ import 'package:service_locator/service_locator.dart';
 
 import 'manga_search_param_configurator_screen.dart';
 
-class MangaSearchParamConfiguratorBottomSheet extends BottomSheetRouteV2 {
+class MangaSearchParamConfiguratorBottomSheet extends BottomSheetRoute {
   MangaSearchParamConfiguratorBottomSheet({
     super.key,
     super.name,

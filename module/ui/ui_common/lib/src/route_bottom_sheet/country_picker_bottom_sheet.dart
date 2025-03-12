@@ -11,13 +11,13 @@ class CountryPickerBottomSheet extends BottomSheetRoute {
     required ServiceLocator locator,
     Country? selected,
   }) : super(
-          child: PickerBottomSheet.create(
+          child: (context, controller) => PickerBottomSheet.create(
             locator: locator,
             options: Country.values.map((e) => e.name).toList(),
             selected: selected?.name,
+            controller: controller,
           ),
           draggable: true,
           elevation: 16,
-          expanded: false,
         );
 }

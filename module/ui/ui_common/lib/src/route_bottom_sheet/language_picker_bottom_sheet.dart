@@ -11,13 +11,13 @@ class LanguagePickerBottomSheet extends BottomSheetRoute {
     required ServiceLocator locator,
     Language? selected,
   }) : super(
-          child: PickerBottomSheet.create(
+          child: (context, controller) => PickerBottomSheet.create(
             locator: locator,
             options: Language.values.map((e) => e.name).toList(),
             selected: selected?.name,
+            controller: controller,
           ),
           draggable: true,
           elevation: 16,
-          expanded: false,
         );
 }

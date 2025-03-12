@@ -11,12 +11,11 @@ class MangaMiscBottomSheetRoute extends BottomSheetRoute {
     required ServiceLocator locator,
     MangaChapterConfig? config,
   }) : super(
-          child: MangaMiscScreen.create(
+          child: (context, controller) => MangaMiscScreen.create(
             locator: locator,
             config: config,
           ),
           draggable: true,
           elevation: 16,
-          expanded: false,
         );
 }
