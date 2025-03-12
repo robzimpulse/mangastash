@@ -1,5 +1,6 @@
 import 'package:core_route/core_route.dart';
 import 'package:flutter/material.dart';
+import 'package:intersperse/intersperse.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -20,7 +21,10 @@ class PickerBottomSheet extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (_) => PickerBottomSheetCubit(
-        initialState: PickerBottomSheetState(options: options),
+        initialState: PickerBottomSheetState(
+          options: options,
+          selected: selected,
+        ),
       ),
       child: PickerBottomSheet(
         controller: controller,
@@ -68,17 +72,23 @@ class PickerBottomSheet extends StatelessWidget {
           ].contains(true),
           builder: (context, state) => MultiSliver(
             children: [
-              for (final element in state.filtered)
-                SliverToBoxAdapter(
-                  child: ListTile(
-                    title: Text(element),
-                    trailing: Visibility(
-                      visible: element == state.selected,
-                      child: const Icon(Icons.check),
+              ...state.filtered
+                  .map<Widget>(
+                    (e) => ListTile(
+                      title: Text(e),
+                      trailing: Visibility(
+                        visible: e == state.selected,
+                        child: const Icon(Icons.check),
+                      ),
+                      onTap: () => context.pop(e),
                     ),
-                    onTap: () => context.pop(element),
+                  )
+                  .intersperse(const Divider(height: 1, thickness: 1))
+                  .map(
+                    (e) => SliverToBoxAdapter(
+                      child: e,
+                    ),
                   ),
-                ),
             ],
           ),
         ),

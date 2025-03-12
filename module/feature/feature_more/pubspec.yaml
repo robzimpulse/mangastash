@@ -22,6 +22,8 @@ dependencies:
     path: ../../core/core_route
   core_auth:
     path: ../../core/core_auth
+  core_environment:
+    path: ../../core/core_environment
 
   # ui
   ui_more:

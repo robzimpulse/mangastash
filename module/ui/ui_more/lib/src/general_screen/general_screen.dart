@@ -1,5 +1,4 @@
 import 'package:core_environment/core_environment.dart';
-import 'package:flutter/foundation.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -8,8 +7,8 @@ import 'general_screen_cubit.dart';
 import 'general_screen_state.dart';
 
 class GeneralScreen extends StatelessWidget {
-  final AsyncValueGetter<String?>? onTapLanguageMenu;
-  final AsyncValueGetter<String?>? onTapCountryMenu;
+  final Future<String?> Function(Language?)? onTapLanguageMenu;
+  final Future<String?> Function(Country?)? onTapCountryMenu;
 
   const GeneralScreen({
     super.key,
@@ -19,8 +18,8 @@ class GeneralScreen extends StatelessWidget {
 
   static Widget create({
     required ServiceLocator locator,
-    AsyncValueGetter<String?>? onTapLanguageMenu,
-    AsyncValueGetter<String?>? onTapCountryMenu,
+    Future<String?> Function(Language?)? onTapLanguageMenu,
+    Future<String?> Function(Country?)? onTapCountryMenu,
   }) {
     return BlocProvider(
       create: (_) => GeneralScreenCubit(
@@ -30,7 +29,7 @@ class GeneralScreen extends StatelessWidget {
       ),
       child: GeneralScreen(
         onTapLanguageMenu: onTapLanguageMenu,
-          onTapCountryMenu: onTapCountryMenu,
+        onTapCountryMenu: onTapCountryMenu,
       ),
     );
   }
@@ -66,7 +65,9 @@ class GeneralScreen extends StatelessWidget {
                   child: Icon(Icons.translate),
                 ),
                 onTap: () async {
-                  final result = await onTapLanguageMenu?.call();
+                  final result = await onTapLanguageMenu?.call(
+                    state.locale?.language,
+                  );
                   if (result == null || !context.mounted) return;
                   _cubit(context).changeLanguage(result);
                 },
@@ -84,7 +85,9 @@ class GeneralScreen extends StatelessWidget {
                   child: Icon(Icons.translate),
                 ),
                 onTap: () async {
-                  final result = await onTapCountryMenu?.call();
+                  final result = await onTapCountryMenu?.call(
+                    state.locale?.country,
+                  );
                   if (result == null || !context.mounted) return;
                   _cubit(context).changeCountry(result);
                 },

@@ -1,4 +1,5 @@
 import 'package:core_auth/core_auth.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -99,8 +100,14 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         name: MoreRoutePath.general,
         builder: (context, state) => GeneralScreen.create(
           locator: locator,
-          onTapLanguageMenu: () => context.push(MoreRoutePath.languagePicker),
-          onTapCountryMenu: () => context.push(MoreRoutePath.countryPicker),
+          onTapLanguageMenu: (value) => context.push(
+            MoreRoutePath.languagePicker,
+            extra: value,
+          ),
+          onTapCountryMenu: (value) => context.push(
+            MoreRoutePath.countryPicker,
+            extra: value,
+          ),
         ),
       ),
       GoRoute(
@@ -170,6 +177,7 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         name: MoreRoutePath.languagePicker,
         pageBuilder: (context, state) => LanguagePickerBottomSheet(
           locator: locator,
+          selected: state.extra?.asOrNull(),
         ),
       ),
       GoRoute(
@@ -178,9 +186,9 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         name: MoreRoutePath.countryPicker,
         pageBuilder: (context, state) => CountryPickerBottomSheet(
           locator: locator,
+          selected: state.extra?.asOrNull(),
         ),
       ),
-
     ];
   }
 }

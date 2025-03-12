@@ -19,5 +19,6 @@ class CountryPickerBottomSheet extends BottomSheetRoute {
           ),
           draggable: true,
           elevation: 16,
+          isScrollControlled: true,
         );
 }

@@ -145,7 +145,7 @@ packages:
     source: path
     version: "0.0.1"
   core_environment:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "../../core/core_environment"
       relative: true
