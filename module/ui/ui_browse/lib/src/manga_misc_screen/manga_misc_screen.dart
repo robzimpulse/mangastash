@@ -7,7 +7,7 @@ import 'package:ui_common/ui_common.dart';
 import 'manga_misc_screen_cubit.dart';
 import 'manga_misc_screen_state.dart';
 
-class MangaMiscScreen extends StatelessWidget {
+class MangaMiscScreen extends StatefulWidget {
   const MangaMiscScreen({super.key, this.controller});
 
   final ScrollController? controller;
@@ -30,11 +30,20 @@ class MangaMiscScreen extends StatelessWidget {
   }
 
   @override
+  State<MangaMiscScreen> createState() => _MangaMiscScreenState();
+}
+
+class _MangaMiscScreenState extends State<MangaMiscScreen> {
+  final ValueNotifier<Size> size = ValueNotifier(
+    const Size(double.infinity, 500),
+  );
+
+  @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
       child: CustomScrollView(
-        controller: controller,
+        controller: widget.controller,
         slivers: [
           const SliverPinnedHeader(
             child: TabBar(
@@ -46,14 +55,20 @@ class MangaMiscScreen extends StatelessWidget {
               ],
             ),
           ),
-          SliverToBoxAdapter(child: _filter(context),),
-          // TODO: @robzimpulse
           SliverFillRemaining(
             hasScrollBody: false,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                AutoScaleTabBarView(
+                  children: [
+                    _filter(context),
+                    _sort(context),
+                    _display(context),
+                  ],
+                ),
+                const Spacer(),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: _builder(
@@ -191,98 +206,4 @@ class MangaMiscScreen extends StatelessWidget {
       ],
     );
   }
-  //
-  // @override
-  // Widget build(BuildContext context) {
-  //   return DefaultTabController(
-  //     animationDuration: const Duration(milliseconds: 100),
-  //     length: 3,
-  //     child: Column(
-  //       mainAxisSize: MainAxisSize.min,
-  //       crossAxisAlignment: CrossAxisAlignment.stretch,
-  //       children: [
-  //         const TabBar(
-  //           indicatorSize: TabBarIndicatorSize.tab,
-  //           tabs: [
-  //             Tab(text: 'Filter'),
-  //             Tab(text: 'Sort'),
-  //             Tab(text: 'Display'),
-  //           ],
-  //         ),
-  //         ValueListenableBuilder(
-  //           valueListenable: _currentSize,
-  //           builder: (context, size, child) => AnimatedContainer(
-  //             duration: const Duration(milliseconds: 200),
-  //             constraints: BoxConstraints(maxHeight: size.height),
-  //             child: child,
-  //           ),
-  //           child: TabBarView(
-  //             children: [
-  //               Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   SizeNotifierWidget(
-  //                     size: (context, size) {
-  //                       WidgetsBinding.instance.addPostFrameCallback((_) {
-  //                         if (!context.mounted || size.isEmpty) return;
-  //                         if (_currentSize.value.height > size.height) return;
-  //                         _currentSize.value = size;
-  //                       });
-  //                     },
-  //                     child: _filter(context),
-  //                   ),
-  //                   const Spacer(),
-  //                 ],
-  //               ),
-  //               Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   SizeNotifierWidget(
-  //                     size: (context, size) {
-  //                       WidgetsBinding.instance.addPostFrameCallback((_) {
-  //                         if (!context.mounted || size.isEmpty) return;
-  //                         if (_currentSize.value.height > size.height) return;
-  //                         _currentSize.value = size;
-  //                       });
-  //                     },
-  //                     child: _sort(context),
-  //                   ),
-  //                   const Spacer(),
-  //                 ],
-  //               ),
-  //               Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   SizeNotifierWidget(
-  //                     size: (context, size) {
-  //                       WidgetsBinding.instance.addPostFrameCallback((_) {
-  //                         if (!context.mounted || size.isEmpty) return;
-  //                         if (_currentSize.value.height > size.height) return;
-  //                         _currentSize.value = size;
-  //                       });
-  //                     },
-  //                     child: _display(context),
-  //                   ),
-  //                   const Spacer(),
-  //                 ],
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //         Padding(
-  //           padding: const EdgeInsets.all(8.0),
-  //           child: _bloc(
-  //             builder: (context, state) => OutlinedButton(
-  //               onPressed: () => context.pop(state.config),
-  //               child: Text(
-  //                 'Apply',
-  //                 style: Theme.of(context).textTheme.titleMedium,
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 }

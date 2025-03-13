@@ -1,5 +1,6 @@
 library ui_common;
 
+export 'package:autoscale_tabbarview/autoscale_tabbarview.dart';
 export 'package:cached_network_image/cached_network_image.dart';
 export 'package:expandable/expandable.dart';
 export 'package:expansion_tile_group/expansion_tile_group.dart';
