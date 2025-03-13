@@ -28,11 +28,11 @@ class MangaDetailScreenState extends Equatable {
   final Manga? manga;
   final List<MangaChapter>? chapters;
   final MangaSourceEnum? sourceEnum;
-  final MangaChapterConfig? config;
   final AuthState? authState;
   final List<String> libraries;
   final Map<DownloadChapterKey, DownloadChapterProgress>? progress;
 
+  final MangaChapterConfig config;
   final SearchChapterParameter parameter;
   final bool hasNextPage;
   final bool isPagingNextPage;
@@ -53,7 +53,7 @@ class MangaDetailScreenState extends Equatable {
     this.manga,
     this.chapters,
     this.sourceEnum,
-    this.config,
+    this.config = const MangaChapterConfig(),
     this.authState,
     this.libraries = const [],
     this.progress,

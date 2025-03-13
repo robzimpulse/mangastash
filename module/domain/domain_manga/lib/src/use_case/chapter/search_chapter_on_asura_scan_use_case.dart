@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:data_manga/data_manga.dart';
@@ -7,9 +8,11 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../exception/failed_parsing_html_exception.dart';
 import '../../manager/headless_webview_manager.dart';
+import '../../mixin/sort_chapters_mixin.dart';
 import '../../mixin/sync_chapters_mixin.dart';
 
-class SearchChapterOnAsuraScanUseCase with SyncChaptersMixin {
+class SearchChapterOnAsuraScanUseCase
+    with SyncChaptersMixin, SortChaptersMixin {
   final MangaServiceFirebase _mangaServiceFirebase;
   final MangaChapterServiceFirebase _mangaChapterServiceFirebase;
   final HeadlessWebviewManager _webview;
@@ -110,9 +113,12 @@ class SearchChapterOnAsuraScanUseCase with SyncChaptersMixin {
       );
     }
 
-    final data = await sync(
-      mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
-      values: chapters,
+    final data = sortChapters(
+      chapters: await sync(
+        mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
+        values: chapters,
+      ),
+      parameter: parameter,
     );
 
     return Success(

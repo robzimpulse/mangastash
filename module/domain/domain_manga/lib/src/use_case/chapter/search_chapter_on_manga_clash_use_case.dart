@@ -7,9 +7,11 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../exception/failed_parsing_html_exception.dart';
 import '../../manager/headless_webview_manager.dart';
+import '../../mixin/sort_chapters_mixin.dart';
 import '../../mixin/sync_chapters_mixin.dart';
 
-class SearchChapterOnMangaClashUseCase with SyncChaptersMixin {
+class SearchChapterOnMangaClashUseCase
+    with SyncChaptersMixin, SortChaptersMixin {
   final MangaServiceFirebase _mangaServiceFirebase;
   final MangaChapterServiceFirebase _mangaChapterServiceFirebase;
   final HeadlessWebviewManager _webview;
@@ -78,9 +80,12 @@ class SearchChapterOnMangaClashUseCase with SyncChaptersMixin {
       );
     }
 
-    final data = await sync(
-      mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
-      values: chapters,
+    final data = sortChapters(
+      chapters: await sync(
+        mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
+        values: chapters,
+      ),
+      parameter: parameter,
     );
 
     return Success(
