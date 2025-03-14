@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:ui_common/ui_common.dart';
 
 class MainScreen extends StatelessWidget {
@@ -8,12 +9,14 @@ class MainScreen extends StatelessWidget {
   final int index;
 
   final ValueSetter<int>? onTapMenu;
+  final AsyncValueGetter<bool?>? onTapClosedApps;
 
   const MainScreen({
     super.key,
     required this.child,
     required this.index,
-    required this.onTapMenu,
+    this.onTapMenu,
+    this.onTapClosedApps,
   });
 
   final Map<String, IconData> _menus = const {
@@ -26,14 +29,7 @@ class MainScreen extends StatelessWidget {
 
   void _onPopInvoked(BuildContext context, bool didPop) async {
     if (didPop) return;
-    final result = await context.showBottomSheet<bool>(
-      builder: (context) => const ConfirmationBottomSheet(
-        content: 'Are you sure want to quit?',
-        positiveButtonText: 'Yes',
-        negativeButtonText: 'No',
-      ),
-    );
-
+    final result = await onTapClosedApps?.call();
     if (context.mounted && result == true) exit(0);
   }
 

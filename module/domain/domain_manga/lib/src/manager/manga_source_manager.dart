@@ -12,22 +12,23 @@ class MangaSourceManager
         ListenMangaSourceUseCase,
         GetMangaSourcesUseCase,
         GetMangaSourceUseCase {
-  final _stateSubject = BehaviorSubject<List<MangaSource>>.seeded([]);
+  final _stateSubject = BehaviorSubject<Map<String, MangaSource>>.seeded({});
 
   MangaSourceManager({
     required MangaSourceServiceFirebase mangaSourceServiceFirebase,
   }) {
-    _stateSubject.addStream(mangaSourceServiceFirebase.stream());
+    _stateSubject.addStream(mangaSourceServiceFirebase.stream);
   }
 
   @override
-  List<MangaSource>? get mangaSourceState => mangaSourceStateStream.valueOrNull;
+  Map<String, MangaSource> get mangaSourceState =>
+      mangaSourceStateStream.valueOrNull ?? {};
 
   @override
-  ValueStream<List<MangaSource>> get mangaSourceStateStream =>
+  ValueStream<Map<String, MangaSource>> get mangaSourceStateStream =>
       _stateSubject.stream;
 
   @override
   MangaSource? get(MangaSourceEnum source) =>
-      mangaSourceState?.firstWhereOrNull((e) => e.name == source);
+      mangaSourceState.values.firstWhereOrNull((e) => e.name == source);
 }

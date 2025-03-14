@@ -43,10 +43,12 @@ class BottomSheetRoute<T> extends Page<T> {
       elevation: elevation,
       showDragHandle: true,
       constraints: BoxConstraints(maxHeight: maxHeight),
-      builder: (context) => DraggableScrollableSheet(
-        expand: false,
-        builder: (context, controller) => child(context, controller),
-      ),
+      builder: (context) => isScrollControlled
+          ? DraggableScrollableSheet(
+              expand: false,
+              builder: (context, controller) => child(context, controller),
+            )
+          : child(context, null),
     );
   }
 }

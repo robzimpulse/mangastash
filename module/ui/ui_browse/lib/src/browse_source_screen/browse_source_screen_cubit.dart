@@ -17,7 +17,7 @@ class BrowseSourceScreenCubit extends Cubit<BrowseSourceScreenState>
     );
   }
 
-  void _updateSourceState(List<MangaSource> sources) {
-    emit(state.copyWith(sources: sources));
+  void _updateSourceState(Map<String, MangaSource> sources) {
+    emit(state.copyWith(sources: sources.values.toList()));
   }
 }

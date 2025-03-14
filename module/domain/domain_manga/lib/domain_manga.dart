@@ -19,3 +19,4 @@ export 'src/use_case/manga/search_manga_use_case.dart';
 export 'src/use_case/manga_source/get_manga_source_use_case.dart';
 export 'src/use_case/manga_source/get_manga_sources_use_case.dart';
 export 'src/use_case/manga_source/listen_manga_source_use_case.dart';
+export 'src/use_case/manga_tag/listen_manga_tag_use_case.dart';

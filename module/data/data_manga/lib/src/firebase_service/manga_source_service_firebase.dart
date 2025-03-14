@@ -8,13 +8,17 @@ class MangaSourceServiceFirebase {
   MangaSourceServiceFirebase({required FirebaseApp app})
       : _ref = FirebaseFirestore.instanceFor(app: app).collection('sources');
 
-  Stream<List<MangaSource>> stream() {
-    return _ref.snapshots().map(
-          (event) => List.of(
-            event.docs.map(
-              (doc) => MangaSource.fromJson(doc.data()).copyWith(id: doc.id),
-            ),
+  Stream<Map<String, MangaSource>> get stream {
+    final stream = _ref.snapshots();
+    return stream.map(
+      (event) => Map.fromEntries(
+        event.docs.map(
+          (doc) => MapEntry(
+            doc.id,
+            MangaSource.fromJson(doc.data()).copyWith(id: doc.id),
           ),
-        );
+        ),
+      ),
+    );
   }
 }

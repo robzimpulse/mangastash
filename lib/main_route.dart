@@ -5,15 +5,14 @@ import 'package:feature_history/feature_history.dart';
 import 'package:feature_library/feature_library.dart';
 import 'package:feature_more/feature_more.dart';
 import 'package:feature_updates/feature_updates.dart';
-import 'package:flutter/widgets.dart';
 import 'package:service_locator/service_locator.dart';
+import 'package:ui_common/ui_common.dart';
 
 import 'main_path.dart';
 import 'screen/error_screen.dart';
 import 'screen/main_screen.dart';
 
 class MainRouteBuilder extends BaseRouteBuilder {
-
   @override
   List<RouteBase> routes({
     required ServiceLocator locator,
@@ -25,6 +24,20 @@ class MainRouteBuilder extends BaseRouteBuilder {
         path: MainPath.main,
         name: MainPath.main,
         redirect: (context, state) => LibraryRoutePath.library,
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MainPath.exit,
+        name: MainPath.exit,
+        pageBuilder: (context, state) => ConfirmationRouteBottomSheet(
+          locator: locator,
+          title: state.uri.queryParameters[MainPath.exitTitle],
+          content: state.uri.queryParameters[MainPath.exitContent] ?? '',
+          positiveButtonText:
+              state.uri.queryParameters[MainPath.exitPositiveButtonText],
+          negativeButtonText:
+              state.uri.queryParameters[MainPath.exitNegativeButtonText],
+        ),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
@@ -71,6 +84,15 @@ class MainRouteBuilder extends BaseRouteBuilder {
         onTapMenu: (index) => shell.goBranch(
           index,
           initialLocation: index == shell.currentIndex,
+        ),
+        onTapClosedApps: () => context.pushNamed<bool>(
+          MainPath.exit,
+          queryParameters: {
+            MainPath.exitTitle: 'Exit',
+            MainPath.exitContent: 'Are you sure want to quit?',
+            MainPath.exitNegativeButtonText: 'No',
+            MainPath.exitPositiveButtonText: 'Yes',
+          },
         ),
         child: shell,
       ),

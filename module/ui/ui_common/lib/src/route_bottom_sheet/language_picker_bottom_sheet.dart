@@ -2,7 +2,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
 import 'package:service_locator/service_locator.dart';
 
-import '../../ui_common.dart';
+import '../bottom_sheet/picker_bottom_sheet/picker_bottom_sheet.dart';
 
 class LanguagePickerBottomSheet extends BottomSheetRoute {
   LanguagePickerBottomSheet({

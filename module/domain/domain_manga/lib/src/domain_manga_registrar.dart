@@ -7,6 +7,7 @@ import 'manager/file_download_manager.dart';
 import 'manager/headless_webview_manager.dart';
 import 'manager/library_manager.dart';
 import 'manager/manga_source_manager.dart';
+import 'manager/manga_tag_manager.dart';
 import 'use_case/chapter/crawl_url_use_case.dart';
 import 'use_case/chapter/download_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_on_asura_scan_use_case.dart';
@@ -33,6 +34,9 @@ import 'use_case/manga/search_manga_use_case.dart';
 import 'use_case/manga_source/get_manga_source_use_case.dart';
 import 'use_case/manga_source/get_manga_sources_use_case.dart';
 import 'use_case/manga_source/listen_manga_source_use_case.dart';
+import 'use_case/manga_tag/get_manga_tag_use_case.dart';
+import 'use_case/manga_tag/get_manga_tags_use_case.dart';
+import 'use_case/manga_tag/listen_manga_tag_use_case.dart';
 
 class DomainMangaRegistrar extends Registrar {
   @override
@@ -225,6 +229,11 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<GetMangaSourcesUseCase, MangaSourceManager>();
     locator.alias<ListenMangaSourceUseCase, MangaSourceManager>();
     locator.alias<GetMangaSourceUseCase, MangaSourceManager>();
+
+    locator.registerSingleton(MangaTagManager(mangaTagServiceFirebase: locator(),),);
+    locator.alias<GetMangaTagsUseCase, MangaTagManager>();
+    locator.alias<ListenMangaTagUseCase, MangaTagManager>();
+    locator.alias<GetMangaTagUseCase, MangaTagManager>();
 
     log.log('finish register', name: runtimeType.toString());
   }

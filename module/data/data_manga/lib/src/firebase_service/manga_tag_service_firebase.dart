@@ -134,4 +134,18 @@ class MangaTagServiceFirebase {
 
     return data;
   }
+
+  Stream<Map<String, MangaTag>> get stream {
+    final stream = _ref.snapshots();
+    return stream.map(
+      (event) => Map.fromEntries(
+        event.docs.map(
+          (doc) => MapEntry(
+            doc.id,
+            MangaTag.fromJson(doc.data()).copyWith(id: doc.id),
+          ),
+        ),
+      ),
+    );
+  }
 }
