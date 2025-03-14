@@ -50,7 +50,7 @@ class SearchMangaOnMangaDexUseCase with SyncMangasMixin {
           total: result.total?.toInt() ?? 0,
         ),
       );
-    } on Exception catch (e) {
+    } catch (e) {
       return Error(e);
     }
   }

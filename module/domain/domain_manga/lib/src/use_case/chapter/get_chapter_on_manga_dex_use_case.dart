@@ -58,7 +58,7 @@ class GetChapterOnMangaDexUseCase with SyncChapterMixin {
           ),
         ),
       );
-    } on Exception catch (e) {
+    } catch (e) {
       return Error(e);
     }
   }

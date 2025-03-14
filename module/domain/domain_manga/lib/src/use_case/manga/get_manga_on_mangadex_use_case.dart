@@ -39,7 +39,7 @@ class GetMangaOnMangaDexUseCase with SyncMangaMixin {
           ),
         ),
       );
-    } on Exception catch (e) {
+    } catch (e) {
       return Error(e);
     }
   }

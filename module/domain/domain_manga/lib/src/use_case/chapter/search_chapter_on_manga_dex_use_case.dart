@@ -48,7 +48,7 @@ class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
           total: result.total?.toInt() ?? 0,
         ),
       );
-    } on Exception catch (e) {
+    } catch (e) {
       return Error(e);
     }
   }
