@@ -78,7 +78,6 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
         ...[
           _status(),
           _contentRating(),
-          _includes(),
           _originalLanguage(),
           _availableTranslatedLanguage(),
           _publicationDemographic(),
@@ -141,39 +140,6 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
                 _cubit(context).update(
                   modified: state.modified?.copyWith(
                     contentRating: values,
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _includes() {
-    return _builder(
-      buildWhen: (prev, curr) => [
-        prev.modified?.includes != curr.modified?.includes,
-      ].contains(true),
-      builder: (context, state) => ExpansionTile(
-        title: const Text('Includes'),
-        children: [
-          ...Include.values.map(
-            (key) => CheckboxListTile(
-              title: Text(key.label),
-              value: state.modified?.includes?.contains(key) == true,
-              onChanged: (value) {
-                if (value == null) return;
-                final values = [...?state.modified?.includes];
-                if (value) {
-                  values.add(key);
-                } else {
-                  values.remove(key);
-                }
-                _cubit(context).update(
-                  modified: state.modified?.copyWith(
-                    includes: values,
                   ),
                 );
               },
