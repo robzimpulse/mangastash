@@ -182,7 +182,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required BuildContext context,
     required List<LogModel> filteredActivities,
   }) {
+
+    if (filteredActivities.isEmpty) {
+      return const Center(child: Text('No Data'));
+    }
+
     final groups = filteredActivities.groupListsBy((e) => e.name);
+
     final tabs = groups.entries.mapIndexed(
       (index, entry) => TabData(
         index: index,
@@ -217,6 +223,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             onTabChanged: (index) {},
             onTabControllerUpdated: (controller) {},
             dynamicTabs: tabs.toList(),
+            onAddTabMoveTo: MoveToTab.idol,
           ),
         ),
       ],
