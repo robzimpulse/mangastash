@@ -25,7 +25,9 @@ class GetChapterOnMangaDexUseCase with SyncChapterMixin {
   }) async {
     final result = await _mangaChapterServiceFirebase.get(id: chapterId);
 
-    if (result != null) return Success(result);
+    if (result != null && result.images?.isNotEmpty == true) {
+      return Success(result);
+    }
 
     try {
       final response = await Future.wait([

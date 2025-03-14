@@ -75,15 +75,10 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
   void _updateLocale(Locale? locale) {
     final codes = Language.fromCode(locale?.languageCode).languageCodes;
-    final included = state.parameter.originalLanguage;
-    final excluded = state.parameter.excludedOriginalLanguages;
 
     emit(
       state.copyWith(
         parameter: state.parameter.copyWith(
-          originalLanguage: {...?included, ...codes}.toList(),
-          excludedOriginalLanguages: {...?excluded}.toList()
-            ..removeWhere((e) => codes.contains(e)),
           translatedLanguage: {
             ...?state.parameter.translatedLanguage,
             ...codes,
