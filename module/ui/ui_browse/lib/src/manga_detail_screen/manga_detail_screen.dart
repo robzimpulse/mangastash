@@ -188,11 +188,11 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     if (status != AuthStatus.loggedIn) {
       final result = await context.push<AuthState>(AuthRoutePath.login);
       if (result == null || !context.mounted) return;
-      _cubit(context).addToLibrary(user: result.user);
+      _cubit(context).addToLibrary(userUid: result.user?.uid);
       return;
     }
 
-    _cubit(context).addToLibrary(user: state.authState?.user);
+    _cubit(context).addToLibrary(userUid: state.authState?.user?.uid);
   }
 
   @override

@@ -1,8 +1,8 @@
 import 'package:log_box/log_box.dart';
+import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager/auth_manager.dart';
-import 'service/auth_service.dart';
 import 'use_case/get_auth_use_case.dart';
 import 'use_case/listen_auth_use_case.dart';
 import 'use_case/login_anonymously_use_case.dart';

@@ -1,6 +1,6 @@
 library core_auth;
 
-export 'package:firebase_auth/firebase_auth.dart';
+export 'package:manga_service_firebase/manga_service_firebase.dart';
 
 export 'src/core_auth_registrar.dart';
 export 'src/enum/auth_status.dart';

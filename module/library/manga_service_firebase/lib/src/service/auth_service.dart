@@ -2,11 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class AuthService {
-  final FirebaseApp _app;
+  final FirebaseAuth _firebaseAuth;
 
-  late final _firebaseAuth = FirebaseAuth.instanceFor(app: _app);
-
-  AuthService({required FirebaseApp app}) : _app = app;
+  AuthService({required FirebaseApp app})
+      : _firebaseAuth = FirebaseAuth.instanceFor(app: app);
 
   User? currentUser() => _firebaseAuth.currentUser;
 

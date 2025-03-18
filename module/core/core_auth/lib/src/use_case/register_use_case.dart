@@ -1,7 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 import '../model/result.dart';
-import '../service/auth_service.dart';
 
 class RegisterUseCase {
   final AuthService _authService;

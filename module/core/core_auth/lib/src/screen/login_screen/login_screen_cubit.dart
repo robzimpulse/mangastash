@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import '../../model/auth_state.dart';

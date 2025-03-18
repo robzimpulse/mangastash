@@ -589,6 +589,13 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  manga_service_firebase:
+    dependency: transitive
+    description:
+      path: "../../library/manga_service_firebase"
+      relative: true
+    source: path
+    version: "0.0.1"
   matcher:
     dependency: transitive
     description:
@@ -1214,5 +1221,5 @@ packages:
     source: hosted
     version: "6.5.0"
 sdks:
-  dart: ">=3.4.0 <4.0.0"
+  dart: ">=3.4.4 <4.0.0"
   flutter: ">=3.22.0"

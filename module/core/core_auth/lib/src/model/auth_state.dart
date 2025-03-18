@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 import '../enum/auth_status.dart';
 

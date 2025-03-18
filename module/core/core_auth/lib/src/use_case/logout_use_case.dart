@@ -1,4 +1,4 @@
-import '../service/auth_service.dart';
+import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 class LogoutUseCase {
   final AuthService _authService;
