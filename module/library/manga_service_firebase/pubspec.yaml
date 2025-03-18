@@ -13,8 +13,17 @@ dependencies:
 
   firebase_core: ^2.24.2
   firebase_auth: ^4.20.0
+  cloud_firestore: ^4.14.0
+  equatable: ^2.0.5
+  json_annotation: ^4.9.0
+  collection: ^1.16.0
+
+  text_similarity:
+    path: ../../library/text_similarity
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+  build_runner: ^2.3.3
+  json_serializable: ^6.6.1
