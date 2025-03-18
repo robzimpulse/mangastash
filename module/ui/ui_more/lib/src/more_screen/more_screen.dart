@@ -1,4 +1,5 @@
 import 'package:core_auth/core_auth.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -179,6 +180,16 @@ class MoreScreen extends StatelessWidget {
                           ? const Text('Login')
                           : const Text('Logout'),
                     ),
+                  ),
+                ),
+                FutureBuilder(
+                  future: PackageInfo.fromPlatform(),
+                  builder: (context, snapshot) => Text(
+                    [
+                      snapshot.data?.version,
+                      '(${snapshot.data?.buildNumber})',
+                    ].join(' '),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],

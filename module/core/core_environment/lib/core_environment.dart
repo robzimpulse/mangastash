@@ -1,6 +1,7 @@
 library core_environment;
 
 export 'package:intl/intl.dart';
+export 'package:package_info_plus/package_info_plus.dart';
 export 'package:permission_handler/permission_handler.dart';
 export 'package:timezone/timezone.dart';
 export 'package:worker_manager/worker_manager.dart';
