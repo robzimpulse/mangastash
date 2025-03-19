@@ -11,7 +11,7 @@ class MangaTagServiceFirebase {
 
   MangaTagServiceFirebase({
     required FirebaseApp app,
-    required LoggerCallback logger,
+    LoggerCallback? logger,
   })  : _ref = FirebaseFirestore.instanceFor(app: app).collection('tags'),
         _logger = logger;
 

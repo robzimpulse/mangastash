@@ -1,17 +1,40 @@
 import 'package:log_box/log_box.dart';
+import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'firebase_service/manga_chapter_service_firebase.dart';
 import 'firebase_service/manga_library_service_firebase.dart';
 import 'firebase_service/manga_service_firebase.dart';
 import 'firebase_service/manga_source_service_firebase.dart';
-import 'firebase_service/manga_tag_service_firebase.dart';
 
 class DataMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
     log.log('start register', name: runtimeType.toString());
+
+    void logger(
+      message, {
+      error,
+      extra,
+      level,
+      name,
+      sequenceNumber,
+      stackTrace,
+      time,
+      zone,
+    }) {
+      return log.log(
+        message,
+        name: name ?? runtimeType.toString(),
+        sequenceNumber: sequenceNumber,
+        level: level ?? 0,
+        zone: zone,
+        error: error,
+        stackTrace: stackTrace,
+        time: time,
+      );
+    }
 
     locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
     locator.registerFactory(
@@ -23,7 +46,7 @@ class DataMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => MangaTagServiceFirebase(
         app: locator(),
-        logBox: log,
+        logger: logger,
       ),
     );
     locator.registerFactory(

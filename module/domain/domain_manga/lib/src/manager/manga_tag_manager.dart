@@ -13,7 +13,16 @@ class MangaTagManager
   MangaTagManager({
     required MangaTagServiceFirebase mangaTagServiceFirebase,
   }) {
-    _stateSubject.addStream(mangaTagServiceFirebase.stream);
+    _stateSubject.addStream(
+      mangaTagServiceFirebase.stream.map(
+        (event) => event.map(
+          (key, value) => MapEntry(
+            key,
+            MangaTag.fromFirebaseService(value),
+          ),
+        ),
+      ),
+    );
   }
 
   @override

@@ -12,7 +12,9 @@ mixin SyncMangaMixin {
         tags: await Future.wait(
           [
             ...manga.tagsName.map(
-              (e) => mangaTagServiceFirebase.sync(value: MangaTag(name: e)),
+              (e) => mangaTagServiceFirebase
+                  .sync(value: MangaTagFirebase(name: e))
+                  .then((value) => MangaTag.fromFirebaseService(value)),
             ),
           ],
         ),

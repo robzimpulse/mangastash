@@ -1,6 +1,8 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:text_similarity/text_similarity.dart';
 
+import '../entity_manga.dart';
 import 'base/base_model.dart';
 
 part 'manga_tag.g.dart';
@@ -18,6 +20,14 @@ class MangaTag extends BaseModel {
 
   @override
   List<Object?> get props => [name, id];
+
+  factory MangaTag.fromFirebaseService(MangaTagFirebase tag) {
+    return MangaTag(name: tag.name, id: tag.id);
+  }
+
+  MangaTagFirebase toFirebaseService() {
+    return MangaTagFirebase(name: name, id: id);
+  }
 
   factory MangaTag.fromJson(Map<String, dynamic> json) {
     return _$MangaTagFromJson(json);

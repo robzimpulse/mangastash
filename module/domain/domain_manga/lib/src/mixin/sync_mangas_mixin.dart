@@ -11,7 +11,11 @@ mixin SyncMangasMixin {
       mangas
           .expand((e) => [...?e.tags])
           .toSet()
-          .map((e) => mangaTagServiceFirebase.sync(value: e))
+          .map(
+            (e) => mangaTagServiceFirebase
+                .sync(value: e.toFirebaseService())
+                .then((value) => MangaTag.fromFirebaseService(value)),
+          )
           .toList(),
     );
 

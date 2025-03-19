@@ -24,6 +24,8 @@ dependencies:
     path: ../../library/manga_dex_api
   text_similarity:
     path: ../../library/text_similarity
+  manga_service_firebase:
+    path: ../../library/manga_service_firebase
 
 dev_dependencies:
   flutter_test:

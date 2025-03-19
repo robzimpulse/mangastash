@@ -20,6 +20,8 @@ dependencies:
     path: ../../library/service_locator
   log_box:
     path: ../../library/log_box
+  manga_service_firebase:
+    path: ../../library/manga_service_firebase
 
   # entity
   entity_manga:
