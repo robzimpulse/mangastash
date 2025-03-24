@@ -3,23 +3,14 @@ extension DistinctList<X> on List<X> {
 }
 
 extension NullableGeneric<T> on T? {
-  T or(T replace) {
-    final self = this;
-    return (self == null) ? replace : self;
-  }
+  T or(T replace) => this ?? replace;
 
   R? let<R>(R Function(T) applicator) {
     final self = this;
     return self != null ? applicator(self) : null;
   }
 
-  R? castOrNull<R>() {
-    final self = this;
-    return self is R ? self : null;
-  }
+  R? castOrNull<R>() => this as R?;
 
-  R? castOrFallback<R>(R fallback) {
-    final self = this as R?;
-    return self ?? fallback;
-  }
+  R castOrFallback<R>(R fallback) => castOrNull() ?? fallback;
 }
