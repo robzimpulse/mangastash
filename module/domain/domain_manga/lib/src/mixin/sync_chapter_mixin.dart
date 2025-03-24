@@ -6,6 +6,8 @@ mixin SyncChapterMixin {
     required MangaChapterServiceFirebase mangaChapterServiceFirebase,
     required MangaChapter value,
   }) {
-    return mangaChapterServiceFirebase.sync(value: value);
+    return mangaChapterServiceFirebase
+        .sync(value: value.toFirebaseService())
+        .then((e) => MangaChapter.fromFirebaseService(e));
   }
 }

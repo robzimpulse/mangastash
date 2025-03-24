@@ -177,7 +177,7 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         name: MoreRoutePath.languagePicker,
         pageBuilder: (context, state) => LanguagePickerBottomSheet(
           locator: locator,
-          selected: state.extra?.asOrNull(),
+          selected: state.extra?.castOrNull(),
         ),
       ),
       GoRoute(
@@ -186,7 +186,7 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         name: MoreRoutePath.countryPicker,
         pageBuilder: (context, state) => CountryPickerBottomSheet(
           locator: locator,
-          selected: state.extra?.asOrNull(),
+          selected: state.extra?.castOrNull(),
         ),
       ),
     ];

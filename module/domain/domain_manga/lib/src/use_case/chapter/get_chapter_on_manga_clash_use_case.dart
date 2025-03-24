@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -20,7 +21,8 @@ class GetChapterOnMangaClashUseCase with SyncChapterMixin {
     required String chapterId,
     required String mangaId,
   }) async {
-    final result = await _mangaChapterServiceFirebase.get(id: chapterId);
+    final raw = await _mangaChapterServiceFirebase.get(id: chapterId);
+    final result = raw.let((e) => MangaChapter.fromFirebaseService(e));
     final url = result?.webUrl;
 
     if (result == null || url == null) {

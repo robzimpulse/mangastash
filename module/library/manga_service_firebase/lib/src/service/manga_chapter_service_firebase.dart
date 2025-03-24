@@ -1,20 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
-import 'package:entity_manga/entity_manga.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:log_box/log_box.dart';
+import 'package:flutter/foundation.dart';
+
+import '../model/manga_chapter_firebase.dart';
+import '../util/typedef.dart';
 
 class MangaChapterServiceFirebase {
   final CollectionReference<Map<String, dynamic>> _ref;
-  final LogBox _logBox;
+  final LoggerCallback? _logger;
 
   MangaChapterServiceFirebase({
     required FirebaseApp app,
-    required LogBox logBox,
+    LoggerCallback? logger,
   })  : _ref = FirebaseFirestore.instanceFor(app: app).collection('chapters'),
-        _logBox = logBox;
+        _logger = logger;
 
-  Future<MangaChapter> sync({required MangaChapter value}) async {
+  Future<MangaChapterFirebase> sync({
+    required MangaChapterFirebase value,
+  }) async {
     final founds = await search(value: value);
 
     final match = founds
@@ -22,7 +26,7 @@ class MangaChapterServiceFirebase {
         .lastOrNull;
 
     if (founds.length > 1) {
-      _logBox.log(
+      _logger?.call(
         'Duplicate entry',
         extra: {
           'value': value.toJson(),
@@ -41,7 +45,9 @@ class MangaChapterServiceFirebase {
     );
   }
 
-  Future<MangaChapter> add({required MangaChapter value}) async {
+  Future<MangaChapterFirebase> add({
+    required MangaChapterFirebase value,
+  }) async {
     final id = value.id;
 
     if (id == null) {
@@ -49,7 +55,7 @@ class MangaChapterServiceFirebase {
       final data = value.copyWith(id: ref.id);
       await ref.update(data.toJson());
 
-      _logBox.log(
+      _logger?.call(
         'Add new entry',
         extra: {'value': data.toJson()},
         name: runtimeType.toString(),
@@ -58,7 +64,7 @@ class MangaChapterServiceFirebase {
       return data;
     }
 
-    _logBox.log(
+    _logger?.call(
       'Update new entry',
       extra: {'value': value.toJson()},
       name: runtimeType.toString(),
@@ -68,21 +74,22 @@ class MangaChapterServiceFirebase {
     return value;
   }
 
-  Future<MangaChapter?> get({required String id}) async {
-    final value = (await _ref.doc(id).get()).data();
-    _logBox.log(
+  Future<MangaChapterFirebase?> get({required String id}) async {
+    final value = await _ref.doc(id).get();
+    final data = value.data();
+    _logger?.call(
       'Get entry',
-      extra: {'value': value},
+      extra: {'value': data},
       name: runtimeType.toString(),
     );
-    if (value == null) return null;
-    return MangaChapter.fromJson(value).copyWith(id: id);
+    if (data == null) return null;
+    return MangaChapterFirebase.fromFirebase(value);
   }
 
-  Future<MangaChapter> update({
+  Future<MangaChapterFirebase> update({
     required String? key,
-    required Future<MangaChapter> Function(MangaChapter value) update,
-    required Future<MangaChapter> Function() ifAbsent,
+    required AsyncValueUpdater<MangaChapterFirebase> update,
+    required AsyncValueGetter<MangaChapterFirebase> ifAbsent,
   }) async {
     if (key == null) {
       return add(value: await ifAbsent());
@@ -95,7 +102,7 @@ class MangaChapterServiceFirebase {
 
     final updated = await update(data);
     if (updated != data) {
-      _logBox.log(
+      _logger?.call(
         'Update existing entry',
         extra: {
           'value': data.toJson(),
@@ -108,10 +115,10 @@ class MangaChapterServiceFirebase {
     return updated;
   }
 
-  Future<List<MangaChapter>> search({
-    required MangaChapter value,
+  Future<List<MangaChapterFirebase>> search({
+    required MangaChapterFirebase value,
   }) async {
-    final List<MangaChapter> data = [];
+    final List<MangaChapterFirebase> data = [];
 
     final ref = _ref
         .where('manga_id', isEqualTo: value.mangaId)
@@ -128,13 +135,13 @@ class MangaChapterServiceFirebase {
           : await (ref.startAfterDocument(offset).limit(100).get());
       data.addAll(
         result.docs.map(
-          (e) => MangaChapter.fromJson(e.data()).copyWith(id: e.id),
+          (e) => MangaChapterFirebase.fromFirebase(e),
         ),
       );
       offset = result.docs.lastOrNull;
     } while (data.length < total);
 
-    _logBox.log(
+    _logger?.call(
       'Search existing entry',
       extra: {
         'value': value.toJson(),

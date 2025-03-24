@@ -7,7 +7,11 @@ mixin SyncChaptersMixin {
     required List<MangaChapter> values,
   }) {
     return Future.wait(
-      values.map((e) => mangaChapterServiceFirebase.sync(value: e)),
+      values.map(
+        (e) => mangaChapterServiceFirebase
+            .sync(value: e.toFirebaseService())
+            .then((e) => MangaChapter.fromFirebaseService(e)),
+      ),
     );
   }
 }

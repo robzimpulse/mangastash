@@ -65,8 +65,8 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         name: BrowseRoutePath.mangaDetail,
         builder: (context, state) => MangaDetailScreen.create(
           locator: locator,
-          manga: state.extra.asOrNull<MangaDetailExtra>()?.manga,
-          param: state.extra.asOrNull<MangaDetailExtra>()?.param,
+          manga: state.extra.castOrNull<MangaDetailExtra>()?.manga,
+          param: state.extra.castOrNull<MangaDetailExtra>()?.param,
           sourceEnum: MangaSourceEnum.fromValue(state.pathParameters['source']),
           mangaId: state.pathParameters['mangaId'],
           onTapChapter: (chapterId, chapterIds) => context.pushNamed(
@@ -115,7 +115,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         name: BrowseRoutePath.chapterConfig,
         pageBuilder: (context, state) => MangaMiscBottomSheetRoute(
           locator: locator,
-          config: state.extra.asOrNull(),
+          config: state.extra.castOrNull(),
         ),
       ),
       GoRoute(
@@ -125,7 +125,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         pageBuilder: (context, state) {
           return MangaSearchParamConfiguratorBottomSheet(
             locator: locator,
-            parameter: state.extra.asOrNull(),
+            parameter: state.extra.castOrNull(),
           );
         },
       ),

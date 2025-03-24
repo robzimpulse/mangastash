@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 
 import '../model/manga_tag_firebase.dart';
 import '../util/typedef.dart';
@@ -80,8 +81,8 @@ class MangaTagServiceFirebase {
 
   Future<MangaTagFirebase> update({
     required String? key,
-    required Future<MangaTagFirebase> Function(MangaTagFirebase value) update,
-    required Future<MangaTagFirebase> Function() ifAbsent,
+    required AsyncValueUpdater<MangaTagFirebase> update,
+    required AsyncValueGetter<MangaTagFirebase> ifAbsent,
   }) async {
     if (key == null) {
       return add(value: await ifAbsent());

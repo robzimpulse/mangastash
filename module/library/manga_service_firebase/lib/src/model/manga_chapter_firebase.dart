@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:text_similarity/text_similarity.dart';
@@ -57,19 +58,29 @@ class MangaChapterFirebase extends BaseModel {
 
   @override
   List<Object?> get props => [
-    id,
-    mangaId,
-    mangaTitle,
-    title,
-    volume,
-    chapter,
-    readableAt,
-    publishAt,
-    images,
-    translatedLanguage,
-    scanlationGroup,
-    webUrl,
-  ];
+        id,
+        mangaId,
+        mangaTitle,
+        title,
+        volume,
+        chapter,
+        readableAt,
+        publishAt,
+        images,
+        translatedLanguage,
+        scanlationGroup,
+        webUrl,
+      ];
+
+  factory MangaChapterFirebase.fromFirebase(
+    DocumentSnapshot<Map<String, dynamic>> json,
+  ) {
+    final data = json.data();
+    final object = data == null
+        ? MangaChapterFirebase()
+        : MangaChapterFirebase.fromJson(data);
+    return object.copyWith(id: json.id);
+  }
 
   factory MangaChapterFirebase.fromJson(Map<String, dynamic> json) {
     return _$MangaChapterFirebaseFromJson(json);
