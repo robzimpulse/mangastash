@@ -7,5 +7,6 @@ export 'src/model/manga_firebase.dart';
 export 'src/model/manga_tag_firebase.dart';
 export 'src/service/auth_service.dart';
 export 'src/service/manga_chapter_service_firebase.dart';
+export 'src/service/manga_detail_service_firebase.dart';
 export 'src/service/manga_tag_service_firebase.dart';
 export 'src/util/typedef.dart';
