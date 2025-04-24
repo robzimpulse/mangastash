@@ -56,7 +56,7 @@ class MangaReaderScreenState extends Equatable {
     MangaChapter? chapter,
     Exception? Function()? error,
     MangaSourceEnum? sourceEnum,
-    MangaSource? source,
+    MangaSourceFirebase? source,
     List<String?>? chapterIds,
   }) {
     return MangaReaderScreenState(

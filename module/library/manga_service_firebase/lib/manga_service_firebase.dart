@@ -4,7 +4,7 @@ export 'package:firebase_auth/firebase_auth.dart';
 
 export 'src/model/manga_chapter_firebase.dart';
 export 'src/model/manga_firebase.dart';
-export 'src/model/manga_source.dart';
+export 'src/model/manga_source_firebase.dart';
 export 'src/model/manga_tag_firebase.dart';
 export 'src/service/auth_service.dart';
 export 'src/service/manga_chapter_service_firebase.dart';

@@ -16,14 +16,14 @@ class BrowseSourceScreen extends StatelessWidget {
 
   final VoidCallback? onTapSearchManga;
 
-  final ValueSetter<MangaSource>? onTapSource;
+  final ValueSetter<MangaSourceFirebase>? onTapSource;
 
   final BaseCacheManager? cacheManager;
 
   static Widget create({
     required ServiceLocator locator,
     VoidCallback? onTapSearchManga,
-    ValueSetter<MangaSource>? onTapSource,
+    ValueSetter<MangaSourceFirebase>? onTapSource,
   }) {
     return BlocProvider(
       create: (context) => BrowseSourceScreenCubit(

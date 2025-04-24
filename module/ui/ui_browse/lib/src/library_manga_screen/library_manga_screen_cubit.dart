@@ -36,7 +36,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     );
   }
 
-  void _updateSourceState(Map<String, MangaSource> sources) {
+  void _updateSourceState(Map<String, MangaSourceFirebase> sources) {
     emit(
       state.copyWith(
         sources: {

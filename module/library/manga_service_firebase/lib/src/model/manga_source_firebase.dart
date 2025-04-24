@@ -1,10 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'manga_source.g.dart';
+part 'manga_source_firebase.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class MangaSource extends Equatable {
+class MangaSourceFirebase extends Equatable {
   final String? iconUrl;
 
   final String? name;
@@ -13,7 +13,7 @@ class MangaSource extends Equatable {
 
   final String? id;
 
-  const MangaSource({
+  const MangaSourceFirebase({
     this.iconUrl,
     this.name,
     this.url,
@@ -28,19 +28,19 @@ class MangaSource extends Equatable {
         id,
       ];
 
-  factory MangaSource.fromJson(Map<String, dynamic> json) {
-    return _$MangaSourceFromJson(json);
+  factory MangaSourceFirebase.fromJson(Map<String, dynamic> json) {
+    return _$MangaSourceFirebaseFromJson(json);
   }
 
-  Map<String, dynamic> toJson() => _$MangaSourceToJson(this);
+  Map<String, dynamic> toJson() => _$MangaSourceFirebaseToJson(this);
 
-  MangaSource copyWith({
+  MangaSourceFirebase copyWith({
     String? iconUrl,
     String? name,
     String? url,
     String? id,
   }) {
-    return MangaSource(
+    return MangaSourceFirebase(
       iconUrl: iconUrl ?? this.iconUrl,
       name: name ?? this.name,
       url: url ?? this.url,

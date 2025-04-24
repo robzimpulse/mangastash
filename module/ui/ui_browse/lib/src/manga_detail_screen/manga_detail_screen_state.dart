@@ -198,7 +198,7 @@ class MangaDetailScreenState extends Equatable {
     List<MangaChapter>? chapters,
     String? sourceId,
     MangaSourceEnum? sourceEnum,
-    MangaSource? source,
+    MangaSourceFirebase? source,
     MangaChapterConfig? config,
     AuthState? authState,
     List<String>? libraries,

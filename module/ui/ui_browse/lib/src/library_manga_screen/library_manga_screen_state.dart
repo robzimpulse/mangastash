@@ -13,7 +13,7 @@ class LibraryMangaScreenState extends Equatable {
 
   final String? mangaTitle;
 
-  final Map<MangaSourceEnum?, MangaSource> sources;
+  final Map<MangaSourceEnum?, MangaSourceFirebase> sources;
 
   final MangaShelfItemLayout layout;
 
@@ -55,7 +55,7 @@ class LibraryMangaScreenState extends Equatable {
     bool? isLoading,
     ValueGetter<Exception?>? error,
     List<Manga>? mangas,
-    Map<MangaSourceEnum?, MangaSource>? sources,
+    Map<MangaSourceEnum?, MangaSourceFirebase>? sources,
     bool? isSearchActive,
     String? mangaTitle,
     MangaShelfItemLayout? layout,
