@@ -40,7 +40,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     emit(
       state.copyWith(
         sources: {
-          for (final source in sources.values) source.name: source,
+          for (final source in sources.values) source.asEnum : source,
         },
       ),
     );

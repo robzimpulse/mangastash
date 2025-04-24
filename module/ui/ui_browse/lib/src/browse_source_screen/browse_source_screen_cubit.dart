@@ -1,6 +1,6 @@
 import 'package:domain_manga/domain_manga.dart';
-import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
+import 'package:ui_common/ui_common.dart';
 
 import 'browse_source_screen_state.dart';
 

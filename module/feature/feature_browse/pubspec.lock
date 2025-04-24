@@ -590,7 +590,7 @@ packages:
     source: path
     version: "0.0.1"
   manga_service_firebase:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "../../library/manga_service_firebase"
       relative: true

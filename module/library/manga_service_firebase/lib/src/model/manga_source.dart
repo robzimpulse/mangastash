@@ -1,15 +1,13 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import 'enum/manga_source_enum.dart';
-
 part 'manga_source.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class MangaSource extends Equatable {
   final String? iconUrl;
 
-  final MangaSourceEnum? name;
+  final String? name;
 
   final String? url;
 
@@ -38,7 +36,7 @@ class MangaSource extends Equatable {
 
   MangaSource copyWith({
     String? iconUrl,
-    MangaSourceEnum? name,
+    String? name,
     String? url,
     String? id,
   }) {

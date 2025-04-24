@@ -1,5 +1,5 @@
-import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
+import 'package:ui_common/ui_common.dart';
 
 class BrowseSourceScreenState extends Equatable {
   final List<MangaSource> sources;

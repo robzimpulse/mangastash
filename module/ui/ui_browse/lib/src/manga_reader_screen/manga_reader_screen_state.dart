@@ -1,5 +1,6 @@
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
+import 'package:ui_common/ui_common.dart';
 
 class MangaReaderScreenState extends Equatable {
   MangaReaderScreenState({

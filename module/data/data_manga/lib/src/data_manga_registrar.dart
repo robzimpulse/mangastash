@@ -4,7 +4,6 @@ import 'package:service_locator/service_locator.dart';
 
 import 'firebase_service/manga_library_service_firebase.dart';
 import 'firebase_service/manga_service_firebase.dart';
-import 'firebase_service/manga_source_service_firebase.dart';
 
 class DataMangaRegistrar extends Registrar {
   @override

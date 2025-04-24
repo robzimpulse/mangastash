@@ -26,7 +26,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
           onTapSource: (source) => context.push(
             BrowseRoutePath.browseManga.replaceAll(
               ':source',
-              source.name?.value ?? '',
+              source.name ?? '',
             ),
           ),
         ),

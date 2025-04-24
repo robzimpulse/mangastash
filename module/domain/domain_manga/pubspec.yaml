@@ -40,6 +40,8 @@ dependencies:
     path: ../../library/service_locator
   manga_dex_api:
     path: ../../library/manga_dex_api
+  manga_service_firebase:
+    path: ../../library/manga_service_firebase
   log_box:
     path: ../../library/log_box
 

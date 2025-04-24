@@ -30,5 +30,5 @@ class MangaSourceManager
 
   @override
   MangaSource? get(MangaSourceEnum source) =>
-      mangaSourceState.values.firstWhereOrNull((e) => e.name == source);
+      mangaSourceState.values.firstWhereOrNull((e) => e.name == source.value);
 }

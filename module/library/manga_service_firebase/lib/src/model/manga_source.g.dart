@@ -8,7 +8,7 @@ part of 'manga_source.dart';
 
 MangaSource _$MangaSourceFromJson(Map<String, dynamic> json) => MangaSource(
       iconUrl: json['icon_url'] as String?,
-      name: $enumDecodeNullable(_$MangaSourceEnumEnumMap, json['name']),
+      name: json['name'] as String?,
       url: json['url'] as String?,
       id: json['id'] as String?,
     );
@@ -16,13 +16,7 @@ MangaSource _$MangaSourceFromJson(Map<String, dynamic> json) => MangaSource(
 Map<String, dynamic> _$MangaSourceToJson(MangaSource instance) =>
     <String, dynamic>{
       'icon_url': instance.iconUrl,
-      'name': _$MangaSourceEnumEnumMap[instance.name],
+      'name': instance.name,
       'url': instance.url,
       'id': instance.id,
     };
-
-const _$MangaSourceEnumEnumMap = {
-  MangaSourceEnum.mangadex: 'Manga Dex',
-  MangaSourceEnum.asurascan: 'Asura Scans',
-  MangaSourceEnum.mangaclash: 'Manga Clash',
-};

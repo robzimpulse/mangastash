@@ -1,5 +1,4 @@
 import 'package:core_storage/core_storage.dart';
-import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -61,7 +60,7 @@ class BrowseSourceScreen extends StatelessWidget {
             cacheManager: cacheManager,
             iconUrl: state.sources[index].iconUrl ?? '',
             url: state.sources[index].url ?? '',
-            name: state.sources[index].name?.value ?? '',
+            name: state.sources[index].name ?? '',
             onTap: () => onTapSource?.call(state.sources[index]),
           ),
           itemCount: state.sources.length,
