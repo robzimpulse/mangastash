@@ -2,7 +2,6 @@ import 'package:log_box/log_box.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:service_locator/service_locator.dart';
 
-import 'firebase_service/manga_library_service_firebase.dart';
 import 'firebase_service/manga_service_firebase.dart';
 
 class DataMangaRegistrar extends Registrar {
@@ -53,7 +52,12 @@ class DataMangaRegistrar extends Registrar {
         logger: logger,
       ),
     );
-    locator.registerFactory(() => MangaLibraryServiceFirebase(app: locator()));
+    locator.registerFactory(
+      () => MangaLibraryServiceFirebase(
+        app: locator(),
+        logger: logger,
+      ),
+    );
 
     log.log('finish register', name: runtimeType.toString());
   }
