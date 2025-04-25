@@ -6,7 +6,6 @@ export 'package:expandable/expandable.dart';
 export 'package:expansion_tile_group/expansion_tile_group.dart';
 export 'package:flutter/material.dart';
 export 'package:intersperse/intersperse.dart';
-export 'package:manga_service_firebase/manga_service_firebase.dart';
 export 'package:responsive_framework/responsive_framework.dart';
 export 'package:sliver_tools/sliver_tools.dart';
 

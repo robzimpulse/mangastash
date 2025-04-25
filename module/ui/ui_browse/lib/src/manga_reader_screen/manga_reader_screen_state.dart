@@ -1,6 +1,5 @@
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ui_common/ui_common.dart';
 
 class MangaReaderScreenState extends Equatable {
   MangaReaderScreenState({
@@ -56,7 +55,6 @@ class MangaReaderScreenState extends Equatable {
     MangaChapter? chapter,
     Exception? Function()? error,
     MangaSourceEnum? sourceEnum,
-    MangaSourceFirebase? source,
     List<String?>? chapterIds,
   }) {
     return MangaReaderScreenState(

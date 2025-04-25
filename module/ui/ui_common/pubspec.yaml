@@ -33,8 +33,6 @@ dependencies:
     path: ../../library/safe_bloc
   service_locator:
     path: ../../library/service_locator
-  manga_service_firebase:
-    path: ../../library/manga_service_firebase
 
 dev_dependencies:
   flutter_test:

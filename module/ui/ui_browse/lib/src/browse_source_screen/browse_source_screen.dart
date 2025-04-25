@@ -1,4 +1,5 @@
 import 'package:core_storage/core_storage.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -16,14 +17,14 @@ class BrowseSourceScreen extends StatelessWidget {
 
   final VoidCallback? onTapSearchManga;
 
-  final ValueSetter<MangaSourceFirebase>? onTapSource;
+  final ValueSetter<MangaSource>? onTapSource;
 
   final BaseCacheManager? cacheManager;
 
   static Widget create({
     required ServiceLocator locator,
     VoidCallback? onTapSearchManga,
-    ValueSetter<MangaSourceFirebase>? onTapSource,
+    ValueSetter<MangaSource>? onTapSource,
   }) {
     return BlocProvider(
       create: (context) => BrowseSourceScreenCubit(
@@ -60,7 +61,7 @@ class BrowseSourceScreen extends StatelessWidget {
             cacheManager: cacheManager,
             iconUrl: state.sources[index].iconUrl ?? '',
             url: state.sources[index].url ?? '',
-            name: state.sources[index].name ?? '',
+            name: state.sources[index].name?.value ?? '',
             onTap: () => onTapSource?.call(state.sources[index]),
           ),
           itemCount: state.sources.length,

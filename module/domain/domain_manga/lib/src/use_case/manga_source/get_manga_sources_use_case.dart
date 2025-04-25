@@ -1,5 +1,5 @@
-import 'package:data_manga/data_manga.dart';
+import 'package:entity_manga/entity_manga.dart';
 
 abstract class GetMangaSourcesUseCase {
-  Map<String, MangaSourceFirebase> get mangaSourceState;
+  Map<String, MangaSource> get mangaSourceState;
 }
