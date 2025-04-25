@@ -106,7 +106,7 @@ class HeadlessWebviewManager {
           ],
         ),
       ],
-    );
+    ).timeout(const Duration(seconds: 5));
 
     final html = await _controller.getHtml();
     if (html == null) return null;
