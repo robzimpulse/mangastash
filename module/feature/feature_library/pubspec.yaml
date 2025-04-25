@@ -17,6 +17,10 @@ dependencies:
   service_locator:
     path: ../../library/service_locator
 
+  # entity
+  entity_manga:
+    path: ../../entity/entity_manga
+
   # core
   core_route:
     path: ../../core/core_route

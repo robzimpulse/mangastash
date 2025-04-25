@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:collection/collection.dart';
 import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
-import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
@@ -21,14 +20,14 @@ class MangaDetailScreen extends StatefulWidget {
     this.onTapChapter,
     this.onTapSort,
     this.cacheManager,
-    required this.launchUrlUseCase,
+    required this.crawlUrlUseCase,
   });
 
   final Function(String?, List<String>?)? onTapChapter;
 
   final Future<MangaChapterConfig?> Function(MangaChapterConfig?)? onTapSort;
 
-  final LaunchUrlUseCase launchUrlUseCase;
+  final CrawlUrlUseCase crawlUrlUseCase;
 
   final BaseCacheManager? cacheManager;
 
@@ -66,7 +65,7 @@ class MangaDetailScreen extends StatefulWidget {
         cacheManager: locator(),
         onTapChapter: onTapChapter,
         onTapSort: onTapSort,
-        launchUrlUseCase: locator(),
+        crawlUrlUseCase: locator(),
       ),
     );
   }
@@ -106,13 +105,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       return;
     }
 
-    final result = await widget.launchUrlUseCase.launch(
-      url: url,
-      mode: LaunchMode.externalApplication,
-    );
-
-    if (result || !context.mounted) return;
-    context.showSnackBar(message: 'Could not launch $url');
+    await widget.crawlUrlUseCase.execute(url: url);
   }
 
   void _onTapTag(BuildContext context, {MangaTag? tag}) {

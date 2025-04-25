@@ -5,7 +5,6 @@ import 'package:service_locator/service_locator.dart';
 import 'package:ui_browse/ui_browse.dart';
 import 'package:ui_common/ui_common.dart';
 
-import 'model/manga_detail_extra.dart';
 import 'route_path.dart';
 
 class BrowseRouteBuilder extends BaseRouteBuilder {

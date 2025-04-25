@@ -1,4 +1,3 @@
-import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -12,14 +11,14 @@ import 'browse_manga_screen_state.dart';
 class BrowseMangaScreen extends StatefulWidget {
   const BrowseMangaScreen({
     super.key,
-    required this.launchUrlUseCase,
+    required this.crawlUrlUseCase,
     required this.getMangaSourceUseCase,
     this.onTapManga,
     this.onTapFilter,
     this.cacheManager,
   });
 
-  final LaunchUrlUseCase launchUrlUseCase;
+  final CrawlUrlUseCase crawlUrlUseCase;
 
   final Function(Manga, SearchMangaParameter)? onTapManga;
 
@@ -50,7 +49,7 @@ class BrowseMangaScreen extends StatefulWidget {
         listenLocaleUseCase: locator(),
       )..init(),
       child: BrowseMangaScreen(
-        launchUrlUseCase: locator(),
+        crawlUrlUseCase: locator(),
         cacheManager: locator(),
         getMangaSourceUseCase: locator(),
         onTapManga: onTapManga,
@@ -133,13 +132,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
       return;
     }
 
-    final result = await widget.launchUrlUseCase.launch(
-      url: url,
-      mode: LaunchMode.externalApplication,
-    );
-
-    if (result || !context.mounted) return;
-    context.showSnackBar(message: 'Could not launch $url');
+    await widget.crawlUrlUseCase.execute(url: url);
   }
 
   Widget _layoutIcon({required BuildContext context}) {

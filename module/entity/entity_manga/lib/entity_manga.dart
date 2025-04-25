@@ -11,5 +11,6 @@ export 'src/enum/manga_source_enum.dart';
 export 'src/manga.dart';
 export 'src/manga_chapter.dart';
 export 'src/manga_chapter_config.dart';
+export 'src/manga_detail_extra.dart';
 export 'src/manga_source.dart';
 export 'src/manga_tag.dart';

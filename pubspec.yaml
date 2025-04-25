@@ -73,3 +73,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+global_options:
+  manga_service_firebase:manga_service_firebase:
+    runs_before:
+      - build_resolvers:transitive_digests
