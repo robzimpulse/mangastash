@@ -21,7 +21,7 @@ class GetMangaOnMangaDexUseCase with SyncMangaMixin {
   Future<Result<Manga>> execute({required String mangaId}) async {
     final result = await _mangaServiceFirebase.get(id: mangaId);
 
-    if (result != null) return Success(result);
+    if (result != null) return Success(Manga.fromFirebaseService(result));
 
     try {
       final result = await _mangaService.detail(

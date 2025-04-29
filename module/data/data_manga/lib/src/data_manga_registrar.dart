@@ -2,8 +2,6 @@ import 'package:log_box/log_box.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:service_locator/service_locator.dart';
 
-import 'firebase_service/manga_service_firebase.dart';
-
 class DataMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
@@ -37,7 +35,7 @@ class DataMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => MangaServiceFirebase(
         app: locator(),
-        logBox: log,
+        logger: logger,
       ),
     );
     locator.registerFactory(

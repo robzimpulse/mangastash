@@ -19,14 +19,19 @@ mixin SyncMangasMixin {
           .toList(),
     );
 
-    final data = mangas.map(
-      (e) => mangaServiceFirebase.sync(
-        value: e.copyWith(
-          tags: tags.where((tag) => e.tagsName.contains(tag.name)).toList(),
+    final data = await Future.wait(
+      mangas.map(
+        (e) => mangaServiceFirebase.sync(
+          value: e
+              .copyWith(
+                tags:
+                    tags.where((tag) => e.tagsName.contains(tag.name)).toList(),
+              )
+              .toFirebaseService(),
         ),
       ),
     );
 
-    return Future.wait(data.toList());
+    return data.map((e) => Manga.fromFirebaseService(e)).toList();
   }
 }

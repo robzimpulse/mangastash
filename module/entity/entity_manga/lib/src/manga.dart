@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
+import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:text_similarity/text_similarity.dart';
 
 import '../entity_manga.dart';
@@ -71,6 +72,35 @@ class Manga extends BaseModel {
       webUrl,
       source,
     ];
+  }
+
+  factory Manga.fromFirebaseService(MangaFirebase manga) {
+    return Manga(
+      id: manga.id,
+      title: manga.title,
+      coverUrl: manga.coverUrl,
+      author: manga.author,
+      status: manga.status,
+      description: manga.description,
+      webUrl: manga.webUrl,
+      source:
+          manga.source != null ? MangaSourceEnum.fromValue(manga.source) : null,
+      // TODO: add tags mapping from firebase
+    );
+  }
+
+  MangaFirebase toFirebaseService() {
+    return MangaFirebase(
+      id: id,
+      title: title,
+      coverUrl: coverUrl,
+      author: author,
+      status: status,
+      description: description,
+      webUrl: webUrl,
+      source: source?.value,
+      tagsId: tags?.map((e) => e.id).whereNotNull().toList(),
+    );
   }
 
   factory Manga.fromJson(Map<String, dynamic> json) {

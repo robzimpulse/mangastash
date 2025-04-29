@@ -37,6 +37,6 @@ class LibraryManager
   Future<List<Manga>> get libraryState {
     final ids = _stateSubject.valueOrNull ?? [];
     final futures = ids.map((e) => _mangaServiceFirebase.get(id: e));
-    return Future.wait(futures).then((e) => e.whereNotNull().toList());
+    return Future.wait(futures).then((e) => e.whereNotNull().map((e) => Manga.fromFirebaseService(e)).toList());
   }
 }

@@ -7,18 +7,18 @@ mixin SyncMangaMixin {
     required MangaServiceFirebase mangaServiceFirebase,
     required Manga manga,
   }) async {
-    return mangaServiceFirebase.sync(
-      value: manga.copyWith(
-        tags: await Future.wait(
-          [
-            ...manga.tagsName.map(
-              (e) => mangaTagServiceFirebase
-                  .sync(value: MangaTagFirebase(name: e))
-                  .then((value) => MangaTag.fromFirebaseService(value)),
-            ),
-          ],
-        ),
-      ),
+    final tags = manga.tags?.map(
+      (e) => mangaTagServiceFirebase
+          .sync(value: e.toFirebaseService())
+          .then((e) => MangaTag.fromFirebaseService(e)),
     );
+
+    final data = await mangaServiceFirebase.sync(
+      value: manga
+          .copyWith(tags: await Future.wait(tags ?? []))
+          .toFirebaseService(),
+    );
+
+    return Manga.fromFirebaseService(data);
   }
 }

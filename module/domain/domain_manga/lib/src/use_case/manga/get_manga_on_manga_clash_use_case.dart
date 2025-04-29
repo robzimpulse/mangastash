@@ -26,7 +26,9 @@ class GetMangaOnMangaClashUseCase with SyncMangaMixin {
       return Error(Exception('Data not found'));
     }
 
-    if (result.description != null) return Success(result);
+    if (result.description != null) {
+      return Success(Manga.fromFirebaseService(result));
+    }
 
     final document = await _webview.open(url);
 
@@ -44,9 +46,11 @@ class GetMangaOnMangaClashUseCase with SyncMangaMixin {
       await sync(
         mangaTagServiceFirebase: _mangaTagServiceFirebase,
         mangaServiceFirebase: _mangaServiceFirebase,
-        manga: result.copyWith(
-          description: description,
-          source: MangaSourceEnum.mangaclash,
+        manga: Manga.fromFirebaseService(
+          result.copyWith(
+            description: description,
+            source: MangaSourceEnum.mangaclash.value,
+          ),
         ),
       ),
     );

@@ -258,7 +258,7 @@ packages:
     source: hosted
     version: "1.0.9"
   entity_manga:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "../../entity/entity_manga"
       relative: true

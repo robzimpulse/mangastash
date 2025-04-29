@@ -29,10 +29,11 @@ class GetMangaOnAsuraScanUseCase with SyncMangaMixin {
     final isValid = [
       result.author != null,
       result.description != null,
-      result.tags != null,
+      result.tagsId != null,
+      result.tagsId?.isNotEmpty == true,
     ].every((e) => e);
 
-    if (isValid) return Success(result);
+    if (isValid) return Success(Manga.fromFirebaseService(result));
 
     final document = await _webview.open(url);
 
@@ -86,10 +87,13 @@ class GetMangaOnAsuraScanUseCase with SyncMangaMixin {
       await sync(
         mangaTagServiceFirebase: _mangaTagServiceFirebase,
         mangaServiceFirebase: _mangaServiceFirebase,
-        manga: result.copyWith(
-          source: MangaSourceEnum.asurascan,
-          author: author,
-          description: description,
+        manga: Manga.fromFirebaseService(
+          result.copyWith(
+            source: MangaSourceEnum.asurascan.value,
+            author: author,
+            description: description,
+          ),
+        ).copyWith(
           tags: genres?.map((e) => MangaTag(name: e)).toList(),
         ),
       ),
