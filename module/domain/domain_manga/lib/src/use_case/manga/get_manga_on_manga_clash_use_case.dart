@@ -3,9 +3,9 @@ import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 
 import '../../manager/headless_webview_manager.dart';
-import '../../mixin/sync_manga_mixin.dart';
+import '../../mixin/sync_mangas_mixin.dart';
 
-class GetMangaOnMangaClashUseCase with SyncMangaMixin {
+class GetMangaOnMangaClashUseCase with SyncMangasMixin {
   final MangaTagServiceFirebase _mangaTagServiceFirebase;
   final MangaServiceFirebase _mangaServiceFirebase;
   final HeadlessWebviewManager _webview;
@@ -42,17 +42,25 @@ class GetMangaOnMangaClashUseCase with SyncMangaMixin {
         .map((e) => e.text.trim())
         .join('\n\n');
 
-    return Success(
-      await sync(
-        mangaTagServiceFirebase: _mangaTagServiceFirebase,
-        mangaServiceFirebase: _mangaServiceFirebase,
-        manga: Manga.fromFirebaseService(
+    final process = sync(
+      mangaTagServiceFirebase: _mangaTagServiceFirebase,
+      mangaServiceFirebase: _mangaServiceFirebase,
+      mangas: [
+        Manga.fromFirebaseService(
           result.copyWith(
             description: description,
             source: MangaSourceEnum.mangaclash.value,
           ),
         ),
-      ),
+      ],
     );
+
+    final data = (await process).firstOrNull;
+
+    if (data == null) {
+      return Error(Exception('Error syncing manga'));
+    }
+
+    return Success(data);
   }
 }

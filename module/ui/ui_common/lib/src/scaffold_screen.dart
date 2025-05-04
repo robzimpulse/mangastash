@@ -10,7 +10,7 @@ class ScaffoldScreen extends StatelessWidget {
 
   final bool canPop;
 
-  final PopInvokedCallback? onPopInvoked;
+  final ValueSetter<bool>? onPopInvoked;
 
   final PreferredSizeWidget? appBar;
 
@@ -38,7 +38,7 @@ class ScaffoldScreen extends StatelessWidget {
       ),
       child: PopScope(
         canPop: canPop,
-        onPopInvoked: onPopInvoked,
+        onPopInvokedWithResult: (success, _) => onPopInvoked?.call(success),
         child: ShimmerAreaWidget(
           child: Scaffold(
             backgroundColor: backgroundColor,

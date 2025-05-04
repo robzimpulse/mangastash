@@ -74,7 +74,7 @@ class Manga extends BaseModel {
     ];
   }
 
-  factory Manga.fromFirebaseService(MangaFirebase manga) {
+  factory Manga.fromFirebaseService(MangaFirebase manga, {List<MangaTag>? tags,}) {
     return Manga(
       id: manga.id,
       title: manga.title,
@@ -85,7 +85,7 @@ class Manga extends BaseModel {
       webUrl: manga.webUrl,
       source:
           manga.source != null ? MangaSourceEnum.fromValue(manga.source) : null,
-      // TODO: add tags mapping from firebase
+      tags: tags,
     );
   }
 

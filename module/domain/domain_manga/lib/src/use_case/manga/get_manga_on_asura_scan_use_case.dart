@@ -3,9 +3,9 @@ import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 
 import '../../manager/headless_webview_manager.dart';
-import '../../mixin/sync_manga_mixin.dart';
+import '../../mixin/sync_mangas_mixin.dart';
 
-class GetMangaOnAsuraScanUseCase with SyncMangaMixin {
+class GetMangaOnAsuraScanUseCase with SyncMangasMixin {
   final MangaTagServiceFirebase _mangaTagServiceFirebase;
   final MangaServiceFirebase _mangaServiceFirebase;
   final HeadlessWebviewManager _webview;
@@ -83,11 +83,11 @@ class GetMangaOnAsuraScanUseCase with SyncMangaMixin {
         ?.children
         .map((e) => e.text.trim());
 
-    return Success(
-      await sync(
-        mangaTagServiceFirebase: _mangaTagServiceFirebase,
-        mangaServiceFirebase: _mangaServiceFirebase,
-        manga: Manga.fromFirebaseService(
+    final process = sync(
+      mangaTagServiceFirebase: _mangaTagServiceFirebase,
+      mangaServiceFirebase: _mangaServiceFirebase,
+      mangas: [
+        Manga.fromFirebaseService(
           result.copyWith(
             source: MangaSourceEnum.asurascan.value,
             author: author,
@@ -96,7 +96,15 @@ class GetMangaOnAsuraScanUseCase with SyncMangaMixin {
         ).copyWith(
           tags: genres?.map((e) => MangaTag(name: e)).toList(),
         ),
-      ),
+      ],
     );
+
+    final data = (await process).firstOrNull;
+
+    if (data == null) {
+      return Error(Exception('Error syncing manga'));
+    }
+
+    return Success(data);
   }
 }

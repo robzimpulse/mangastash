@@ -18,7 +18,7 @@ class LibraryManager
     required MangaLibraryServiceFirebase mangaLibraryServiceFirebase,
     required MangaServiceFirebase mangaServiceFirebase,
     required ListenAuthUseCase listenAuthUseCase,
-  }): _mangaServiceFirebase = mangaServiceFirebase {
+  }) : _mangaServiceFirebase = mangaServiceFirebase {
     _stateSubject.addStream(
       SwitchLatestStream(
         listenAuthUseCase.authStateStream.map((authState) {
@@ -37,6 +37,8 @@ class LibraryManager
   Future<List<Manga>> get libraryState {
     final ids = _stateSubject.valueOrNull ?? [];
     final futures = ids.map((e) => _mangaServiceFirebase.get(id: e));
-    return Future.wait(futures).then((e) => e.whereNotNull().map((e) => Manga.fromFirebaseService(e)).toList());
+    return Future.wait(futures).then(
+      (e) => e.whereNotNull().map((e) => Manga.fromFirebaseService(e)).toList(),
+    );
   }
 }

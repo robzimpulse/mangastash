@@ -80,7 +80,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: !isSearch,
-      onPopInvoked: (success) => !success ? _toggleSearch() : {},
+      onPopInvokedWithResult: (success, _) => !success ? _toggleSearch() : {},
       child: Scaffold(
         appBar: AppBar(
           actions: [
