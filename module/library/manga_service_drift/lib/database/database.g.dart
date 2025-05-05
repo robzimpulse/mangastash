@@ -3,56 +3,56 @@
 part of 'database.dart';
 
 // ignore_for_file: type=lint
-class $MangaTablesTable extends MangaTables with TableInfo<$MangaTablesTable, MangaTable>{
+class $MangaChapterImageTablesTable extends MangaChapterImageTables with TableInfo<$MangaChapterImageTablesTable, MangaChapterImageTable>{
 @override final GeneratedDatabase attachedDatabase;
 final String? _alias;
-$MangaTablesTable(this.attachedDatabase, [this._alias]);
+$MangaChapterImageTablesTable(this.attachedDatabase, [this._alias]);
 @override
 List<GeneratedColumn> get $columns => [];
 @override
 String get aliasedName => _alias ?? actualTableName;
 @override
  String get actualTableName => $name;
-static const String $name = 'manga_tables';
+static const String $name = 'manga_chapter_image_tables';
 @override
-Set<GeneratedColumn> get $primaryKey => const {};@override MangaTable map(Map<String, dynamic> data, {String? tablePrefix})  {
-final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';return MangaTable();
+Set<GeneratedColumn> get $primaryKey => const {};@override MangaChapterImageTable map(Map<String, dynamic> data, {String? tablePrefix})  {
+final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';return MangaChapterImageTable();
 }
 @override
-$MangaTablesTable createAlias(String alias) {
-return $MangaTablesTable(attachedDatabase, alias);}}class MangaTable extends DataClass implements Insertable<MangaTable> 
+$MangaChapterImageTablesTable createAlias(String alias) {
+return $MangaChapterImageTablesTable(attachedDatabase, alias);}}class MangaChapterImageTable extends DataClass implements Insertable<MangaChapterImageTable> 
 {
-const MangaTable({});@override
+const MangaChapterImageTable({});@override
 Map<String, Expression> toColumns(bool nullToAbsent) {
 final map = <String, Expression> {};return map; 
 }
-MangaTablesCompanion toCompanion(bool nullToAbsent) {
-return MangaTablesCompanion();
+MangaChapterImageTablesCompanion toCompanion(bool nullToAbsent) {
+return MangaChapterImageTablesCompanion();
 }
-factory MangaTable.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+factory MangaChapterImageTable.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
 serializer ??= driftRuntimeOptions.defaultSerializer;
-return MangaTable();}
+return MangaChapterImageTable();}
 @override Map<String, dynamic> toJson({ValueSerializer? serializer}) {
 serializer ??= driftRuntimeOptions.defaultSerializer;
 return <String, dynamic>{
-};}MangaTable copyWith({}) => MangaTable();MangaTable copyWithCompanion(MangaTablesCompanion data) {
-return MangaTable(
+};}MangaChapterImageTable copyWith({}) => MangaChapterImageTable();MangaChapterImageTable copyWithCompanion(MangaChapterImageTablesCompanion data) {
+return MangaChapterImageTable(
 );
 }
 @override
-String toString() {return (StringBuffer('MangaTable(')..write(')')).toString();}
+String toString() {return (StringBuffer('MangaChapterImageTable(')..write(')')).toString();}
 @override
  int get hashCode => identityHashCode(this);@override
-bool operator ==(Object other) => identical(this, other) || (other is MangaTable);
-}class MangaTablesCompanion extends UpdateCompanion<MangaTable> {
+bool operator ==(Object other) => identical(this, other) || (other is MangaChapterImageTable);
+}class MangaChapterImageTablesCompanion extends UpdateCompanion<MangaChapterImageTable> {
 final Value<int> rowid;
-const MangaTablesCompanion({this.rowid = const Value.absent(),});
-MangaTablesCompanion.insert({this.rowid = const Value.absent(),});
-static Insertable<MangaTable> custom({Expression<int>? rowid, 
+const MangaChapterImageTablesCompanion({this.rowid = const Value.absent(),});
+MangaChapterImageTablesCompanion.insert({this.rowid = const Value.absent(),});
+static Insertable<MangaChapterImageTable> custom({Expression<int>? rowid, 
 }) {
 return RawValuesInsertable({if (rowid != null)'rowid': rowid,});
-}MangaTablesCompanion copyWith({Value<int>? rowid}) {
-return MangaTablesCompanion(rowid: rowid ?? this.rowid,);
+}MangaChapterImageTablesCompanion copyWith({Value<int>? rowid}) {
+return MangaChapterImageTablesCompanion(rowid: rowid ?? this.rowid,);
 }
 @override
 Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -61,7 +61,7 @@ map['rowid'] = Variable<int>(rowid.value);}
 return map; 
 }
 @override
-String toString() {return (StringBuffer('MangaTablesCompanion(')..write('rowid: $rowid')..write(')')).toString();}
+String toString() {return (StringBuffer('MangaChapterImageTablesCompanion(')..write('rowid: $rowid')..write(')')).toString();}
 }
 class $MangaChapterTablesTable extends MangaChapterTables with TableInfo<$MangaChapterTablesTable, MangaChapterTable>{
 @override final GeneratedDatabase attachedDatabase;
@@ -123,56 +123,56 @@ return map;
 @override
 String toString() {return (StringBuffer('MangaChapterTablesCompanion(')..write('rowid: $rowid')..write(')')).toString();}
 }
-class $MangaChapterImageTablesTable extends MangaChapterImageTables with TableInfo<$MangaChapterImageTablesTable, MangaChapterImageTable>{
+class $MangaLibraryTablesTable extends MangaLibraryTables with TableInfo<$MangaLibraryTablesTable, MangaLibraryTable>{
 @override final GeneratedDatabase attachedDatabase;
 final String? _alias;
-$MangaChapterImageTablesTable(this.attachedDatabase, [this._alias]);
+$MangaLibraryTablesTable(this.attachedDatabase, [this._alias]);
 @override
 List<GeneratedColumn> get $columns => [];
 @override
 String get aliasedName => _alias ?? actualTableName;
 @override
  String get actualTableName => $name;
-static const String $name = 'manga_chapter_image_tables';
+static const String $name = 'manga_library_tables';
 @override
-Set<GeneratedColumn> get $primaryKey => const {};@override MangaChapterImageTable map(Map<String, dynamic> data, {String? tablePrefix})  {
-final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';return MangaChapterImageTable();
+Set<GeneratedColumn> get $primaryKey => const {};@override MangaLibraryTable map(Map<String, dynamic> data, {String? tablePrefix})  {
+final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';return MangaLibraryTable();
 }
 @override
-$MangaChapterImageTablesTable createAlias(String alias) {
-return $MangaChapterImageTablesTable(attachedDatabase, alias);}}class MangaChapterImageTable extends DataClass implements Insertable<MangaChapterImageTable> 
+$MangaLibraryTablesTable createAlias(String alias) {
+return $MangaLibraryTablesTable(attachedDatabase, alias);}}class MangaLibraryTable extends DataClass implements Insertable<MangaLibraryTable> 
 {
-const MangaChapterImageTable({});@override
+const MangaLibraryTable({});@override
 Map<String, Expression> toColumns(bool nullToAbsent) {
 final map = <String, Expression> {};return map; 
 }
-MangaChapterImageTablesCompanion toCompanion(bool nullToAbsent) {
-return MangaChapterImageTablesCompanion();
+MangaLibraryTablesCompanion toCompanion(bool nullToAbsent) {
+return MangaLibraryTablesCompanion();
 }
-factory MangaChapterImageTable.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+factory MangaLibraryTable.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
 serializer ??= driftRuntimeOptions.defaultSerializer;
-return MangaChapterImageTable();}
+return MangaLibraryTable();}
 @override Map<String, dynamic> toJson({ValueSerializer? serializer}) {
 serializer ??= driftRuntimeOptions.defaultSerializer;
 return <String, dynamic>{
-};}MangaChapterImageTable copyWith({}) => MangaChapterImageTable();MangaChapterImageTable copyWithCompanion(MangaChapterImageTablesCompanion data) {
-return MangaChapterImageTable(
+};}MangaLibraryTable copyWith({}) => MangaLibraryTable();MangaLibraryTable copyWithCompanion(MangaLibraryTablesCompanion data) {
+return MangaLibraryTable(
 );
 }
 @override
-String toString() {return (StringBuffer('MangaChapterImageTable(')..write(')')).toString();}
+String toString() {return (StringBuffer('MangaLibraryTable(')..write(')')).toString();}
 @override
  int get hashCode => identityHashCode(this);@override
-bool operator ==(Object other) => identical(this, other) || (other is MangaChapterImageTable);
-}class MangaChapterImageTablesCompanion extends UpdateCompanion<MangaChapterImageTable> {
+bool operator ==(Object other) => identical(this, other) || (other is MangaLibraryTable);
+}class MangaLibraryTablesCompanion extends UpdateCompanion<MangaLibraryTable> {
 final Value<int> rowid;
-const MangaChapterImageTablesCompanion({this.rowid = const Value.absent(),});
-MangaChapterImageTablesCompanion.insert({this.rowid = const Value.absent(),});
-static Insertable<MangaChapterImageTable> custom({Expression<int>? rowid, 
+const MangaLibraryTablesCompanion({this.rowid = const Value.absent(),});
+MangaLibraryTablesCompanion.insert({this.rowid = const Value.absent(),});
+static Insertable<MangaLibraryTable> custom({Expression<int>? rowid, 
 }) {
 return RawValuesInsertable({if (rowid != null)'rowid': rowid,});
-}MangaChapterImageTablesCompanion copyWith({Value<int>? rowid}) {
-return MangaChapterImageTablesCompanion(rowid: rowid ?? this.rowid,);
+}MangaLibraryTablesCompanion copyWith({Value<int>? rowid}) {
+return MangaLibraryTablesCompanion(rowid: rowid ?? this.rowid,);
 }
 @override
 Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -181,7 +181,67 @@ map['rowid'] = Variable<int>(rowid.value);}
 return map; 
 }
 @override
-String toString() {return (StringBuffer('MangaChapterImageTablesCompanion(')..write('rowid: $rowid')..write(')')).toString();}
+String toString() {return (StringBuffer('MangaLibraryTablesCompanion(')..write('rowid: $rowid')..write(')')).toString();}
+}
+class $MangaTablesTable extends MangaTables with TableInfo<$MangaTablesTable, MangaTable>{
+@override final GeneratedDatabase attachedDatabase;
+final String? _alias;
+$MangaTablesTable(this.attachedDatabase, [this._alias]);
+@override
+List<GeneratedColumn> get $columns => [];
+@override
+String get aliasedName => _alias ?? actualTableName;
+@override
+ String get actualTableName => $name;
+static const String $name = 'manga_tables';
+@override
+Set<GeneratedColumn> get $primaryKey => const {};@override MangaTable map(Map<String, dynamic> data, {String? tablePrefix})  {
+final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';return MangaTable();
+}
+@override
+$MangaTablesTable createAlias(String alias) {
+return $MangaTablesTable(attachedDatabase, alias);}}class MangaTable extends DataClass implements Insertable<MangaTable> 
+{
+const MangaTable({});@override
+Map<String, Expression> toColumns(bool nullToAbsent) {
+final map = <String, Expression> {};return map; 
+}
+MangaTablesCompanion toCompanion(bool nullToAbsent) {
+return MangaTablesCompanion();
+}
+factory MangaTable.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+serializer ??= driftRuntimeOptions.defaultSerializer;
+return MangaTable();}
+@override Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+serializer ??= driftRuntimeOptions.defaultSerializer;
+return <String, dynamic>{
+};}MangaTable copyWith({}) => MangaTable();MangaTable copyWithCompanion(MangaTablesCompanion data) {
+return MangaTable(
+);
+}
+@override
+String toString() {return (StringBuffer('MangaTable(')..write(')')).toString();}
+@override
+ int get hashCode => identityHashCode(this);@override
+bool operator ==(Object other) => identical(this, other) || (other is MangaTable);
+}class MangaTablesCompanion extends UpdateCompanion<MangaTable> {
+final Value<int> rowid;
+const MangaTablesCompanion({this.rowid = const Value.absent(),});
+MangaTablesCompanion.insert({this.rowid = const Value.absent(),});
+static Insertable<MangaTable> custom({Expression<int>? rowid, 
+}) {
+return RawValuesInsertable({if (rowid != null)'rowid': rowid,});
+}MangaTablesCompanion copyWith({Value<int>? rowid}) {
+return MangaTablesCompanion(rowid: rowid ?? this.rowid,);
+}
+@override
+Map<String, Expression> toColumns(bool nullToAbsent) {
+final map = <String, Expression> {};if (rowid.present) {
+map['rowid'] = Variable<int>(rowid.value);}
+return map; 
+}
+@override
+String toString() {return (StringBuffer('MangaTablesCompanion(')..write('rowid: $rowid')..write(')')).toString();}
 }
 class $MangaTagTablesTable extends MangaTagTables with TableInfo<$MangaTagTablesTable, MangaTagTable>{
 @override final GeneratedDatabase attachedDatabase;
@@ -246,21 +306,22 @@ String toString() {return (StringBuffer('MangaTagTablesCompanion(')..write('rowi
 abstract class _$AppDatabase extends GeneratedDatabase{
 _$AppDatabase(QueryExecutor e): super(e);
 $AppDatabaseManager get managers => $AppDatabaseManager(this);
-late final $MangaTablesTable mangaTables = $MangaTablesTable(this);
-late final $MangaChapterTablesTable mangaChapterTables = $MangaChapterTablesTable(this);
 late final $MangaChapterImageTablesTable mangaChapterImageTables = $MangaChapterImageTablesTable(this);
+late final $MangaChapterTablesTable mangaChapterTables = $MangaChapterTablesTable(this);
+late final $MangaLibraryTablesTable mangaLibraryTables = $MangaLibraryTablesTable(this);
+late final $MangaTablesTable mangaTables = $MangaTablesTable(this);
 late final $MangaTagTablesTable mangaTagTables = $MangaTagTablesTable(this);
 @override
 Iterable<TableInfo<Table, Object?>> get allTables => allSchemaEntities.whereType<TableInfo<Table, Object?>>();
 @override
-List<DatabaseSchemaEntity> get allSchemaEntities => [mangaTables, mangaChapterTables, mangaChapterImageTables, mangaTagTables];
+List<DatabaseSchemaEntity> get allSchemaEntities => [mangaChapterImageTables, mangaChapterTables, mangaLibraryTables, mangaTables, mangaTagTables];
 }
-typedef $$MangaTablesTableCreateCompanionBuilder = MangaTablesCompanion Function({Value<int> rowid,});
-typedef $$MangaTablesTableUpdateCompanionBuilder = MangaTablesCompanion Function({Value<int> rowid,});
-class $$MangaTablesTableFilterComposer extends Composer<
+typedef $$MangaChapterImageTablesTableCreateCompanionBuilder = MangaChapterImageTablesCompanion Function({Value<int> rowid,});
+typedef $$MangaChapterImageTablesTableUpdateCompanionBuilder = MangaChapterImageTablesCompanion Function({Value<int> rowid,});
+class $$MangaChapterImageTablesTableFilterComposer extends Composer<
         _$AppDatabase,
-        $MangaTablesTable> {
-        $$MangaTablesTableFilterComposer({
+        $MangaChapterImageTablesTable> {
+        $$MangaChapterImageTablesTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -269,10 +330,10 @@ class $$MangaTablesTableFilterComposer extends Composer<
   });
           
         }
-      class $$MangaTablesTableOrderingComposer extends Composer<
+      class $$MangaChapterImageTablesTableOrderingComposer extends Composer<
         _$AppDatabase,
-        $MangaTablesTable> {
-        $$MangaTablesTableOrderingComposer({
+        $MangaChapterImageTablesTable> {
+        $$MangaChapterImageTablesTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -281,10 +342,10 @@ class $$MangaTablesTableFilterComposer extends Composer<
   });
           
         }
-      class $$MangaTablesTableAnnotationComposer extends Composer<
+      class $$MangaChapterImageTablesTableAnnotationComposer extends Composer<
         _$AppDatabase,
-        $MangaTablesTable> {
-        $$MangaTablesTableAnnotationComposer({
+        $MangaChapterImageTablesTable> {
+        $$MangaChapterImageTablesTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -293,27 +354,27 @@ class $$MangaTablesTableFilterComposer extends Composer<
   });
           
         }
-      class $$MangaTablesTableTableManager extends RootTableManager    <_$AppDatabase,
-    $MangaTablesTable,
-    MangaTable,
-    $$MangaTablesTableFilterComposer,
-    $$MangaTablesTableOrderingComposer,
-    $$MangaTablesTableAnnotationComposer,
-    $$MangaTablesTableCreateCompanionBuilder,
-    $$MangaTablesTableUpdateCompanionBuilder,
-    (MangaTable,BaseReferences<_$AppDatabase,$MangaTablesTable,MangaTable>),
-    MangaTable,
+      class $$MangaChapterImageTablesTableTableManager extends RootTableManager    <_$AppDatabase,
+    $MangaChapterImageTablesTable,
+    MangaChapterImageTable,
+    $$MangaChapterImageTablesTableFilterComposer,
+    $$MangaChapterImageTablesTableOrderingComposer,
+    $$MangaChapterImageTablesTableAnnotationComposer,
+    $$MangaChapterImageTablesTableCreateCompanionBuilder,
+    $$MangaChapterImageTablesTableUpdateCompanionBuilder,
+    (MangaChapterImageTable,BaseReferences<_$AppDatabase,$MangaChapterImageTablesTable,MangaChapterImageTable>),
+    MangaChapterImageTable,
     PrefetchHooks Function()
     > {
-    $$MangaTablesTableTableManager(_$AppDatabase db, $MangaTablesTable table) : super(
+    $$MangaChapterImageTablesTableTableManager(_$AppDatabase db, $MangaChapterImageTablesTable table) : super(
       TableManagerState(
         db: db,
         table: table,
-        createFilteringComposer: () => $$MangaTablesTableFilterComposer($db: db,$table:table),
-        createOrderingComposer: () => $$MangaTablesTableOrderingComposer($db: db,$table:table),
-        createComputedFieldComposer: () => $$MangaTablesTableAnnotationComposer($db: db,$table:table),
-        updateCompanionCallback: ({Value<int> rowid = const Value.absent(),})=> MangaTablesCompanion(rowid: rowid,),
-        createCompanionCallback: ({Value<int> rowid = const Value.absent(),})=> MangaTablesCompanion.insert(rowid: rowid,),
+        createFilteringComposer: () => $$MangaChapterImageTablesTableFilterComposer($db: db,$table:table),
+        createOrderingComposer: () => $$MangaChapterImageTablesTableOrderingComposer($db: db,$table:table),
+        createComputedFieldComposer: () => $$MangaChapterImageTablesTableAnnotationComposer($db: db,$table:table),
+        updateCompanionCallback: ({Value<int> rowid = const Value.absent(),})=> MangaChapterImageTablesCompanion(rowid: rowid,),
+        createCompanionCallback: ({Value<int> rowid = const Value.absent(),})=> MangaChapterImageTablesCompanion.insert(rowid: rowid,),
         withReferenceMapper: (p0) => p0
               .map(
                   (e) =>
@@ -323,16 +384,16 @@ class $$MangaTablesTableFilterComposer extends Composer<
         prefetchHooksCallback: null,
         ));
         }
-    typedef $$MangaTablesTableProcessedTableManager = ProcessedTableManager    <_$AppDatabase,
-    $MangaTablesTable,
-    MangaTable,
-    $$MangaTablesTableFilterComposer,
-    $$MangaTablesTableOrderingComposer,
-    $$MangaTablesTableAnnotationComposer,
-    $$MangaTablesTableCreateCompanionBuilder,
-    $$MangaTablesTableUpdateCompanionBuilder,
-    (MangaTable,BaseReferences<_$AppDatabase,$MangaTablesTable,MangaTable>),
-    MangaTable,
+    typedef $$MangaChapterImageTablesTableProcessedTableManager = ProcessedTableManager    <_$AppDatabase,
+    $MangaChapterImageTablesTable,
+    MangaChapterImageTable,
+    $$MangaChapterImageTablesTableFilterComposer,
+    $$MangaChapterImageTablesTableOrderingComposer,
+    $$MangaChapterImageTablesTableAnnotationComposer,
+    $$MangaChapterImageTablesTableCreateCompanionBuilder,
+    $$MangaChapterImageTablesTableUpdateCompanionBuilder,
+    (MangaChapterImageTable,BaseReferences<_$AppDatabase,$MangaChapterImageTablesTable,MangaChapterImageTable>),
+    MangaChapterImageTable,
     PrefetchHooks Function()
     >;typedef $$MangaChapterTablesTableCreateCompanionBuilder = MangaChapterTablesCompanion Function({Value<int> rowid,});
 typedef $$MangaChapterTablesTableUpdateCompanionBuilder = MangaChapterTablesCompanion Function({Value<int> rowid,});
@@ -413,12 +474,12 @@ class $$MangaChapterTablesTableFilterComposer extends Composer<
     (MangaChapterTable,BaseReferences<_$AppDatabase,$MangaChapterTablesTable,MangaChapterTable>),
     MangaChapterTable,
     PrefetchHooks Function()
-    >;typedef $$MangaChapterImageTablesTableCreateCompanionBuilder = MangaChapterImageTablesCompanion Function({Value<int> rowid,});
-typedef $$MangaChapterImageTablesTableUpdateCompanionBuilder = MangaChapterImageTablesCompanion Function({Value<int> rowid,});
-class $$MangaChapterImageTablesTableFilterComposer extends Composer<
+    >;typedef $$MangaLibraryTablesTableCreateCompanionBuilder = MangaLibraryTablesCompanion Function({Value<int> rowid,});
+typedef $$MangaLibraryTablesTableUpdateCompanionBuilder = MangaLibraryTablesCompanion Function({Value<int> rowid,});
+class $$MangaLibraryTablesTableFilterComposer extends Composer<
         _$AppDatabase,
-        $MangaChapterImageTablesTable> {
-        $$MangaChapterImageTablesTableFilterComposer({
+        $MangaLibraryTablesTable> {
+        $$MangaLibraryTablesTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -427,10 +488,10 @@ class $$MangaChapterImageTablesTableFilterComposer extends Composer<
   });
           
         }
-      class $$MangaChapterImageTablesTableOrderingComposer extends Composer<
+      class $$MangaLibraryTablesTableOrderingComposer extends Composer<
         _$AppDatabase,
-        $MangaChapterImageTablesTable> {
-        $$MangaChapterImageTablesTableOrderingComposer({
+        $MangaLibraryTablesTable> {
+        $$MangaLibraryTablesTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -439,10 +500,10 @@ class $$MangaChapterImageTablesTableFilterComposer extends Composer<
   });
           
         }
-      class $$MangaChapterImageTablesTableAnnotationComposer extends Composer<
+      class $$MangaLibraryTablesTableAnnotationComposer extends Composer<
         _$AppDatabase,
-        $MangaChapterImageTablesTable> {
-        $$MangaChapterImageTablesTableAnnotationComposer({
+        $MangaLibraryTablesTable> {
+        $$MangaLibraryTablesTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -451,27 +512,27 @@ class $$MangaChapterImageTablesTableFilterComposer extends Composer<
   });
           
         }
-      class $$MangaChapterImageTablesTableTableManager extends RootTableManager    <_$AppDatabase,
-    $MangaChapterImageTablesTable,
-    MangaChapterImageTable,
-    $$MangaChapterImageTablesTableFilterComposer,
-    $$MangaChapterImageTablesTableOrderingComposer,
-    $$MangaChapterImageTablesTableAnnotationComposer,
-    $$MangaChapterImageTablesTableCreateCompanionBuilder,
-    $$MangaChapterImageTablesTableUpdateCompanionBuilder,
-    (MangaChapterImageTable,BaseReferences<_$AppDatabase,$MangaChapterImageTablesTable,MangaChapterImageTable>),
-    MangaChapterImageTable,
+      class $$MangaLibraryTablesTableTableManager extends RootTableManager    <_$AppDatabase,
+    $MangaLibraryTablesTable,
+    MangaLibraryTable,
+    $$MangaLibraryTablesTableFilterComposer,
+    $$MangaLibraryTablesTableOrderingComposer,
+    $$MangaLibraryTablesTableAnnotationComposer,
+    $$MangaLibraryTablesTableCreateCompanionBuilder,
+    $$MangaLibraryTablesTableUpdateCompanionBuilder,
+    (MangaLibraryTable,BaseReferences<_$AppDatabase,$MangaLibraryTablesTable,MangaLibraryTable>),
+    MangaLibraryTable,
     PrefetchHooks Function()
     > {
-    $$MangaChapterImageTablesTableTableManager(_$AppDatabase db, $MangaChapterImageTablesTable table) : super(
+    $$MangaLibraryTablesTableTableManager(_$AppDatabase db, $MangaLibraryTablesTable table) : super(
       TableManagerState(
         db: db,
         table: table,
-        createFilteringComposer: () => $$MangaChapterImageTablesTableFilterComposer($db: db,$table:table),
-        createOrderingComposer: () => $$MangaChapterImageTablesTableOrderingComposer($db: db,$table:table),
-        createComputedFieldComposer: () => $$MangaChapterImageTablesTableAnnotationComposer($db: db,$table:table),
-        updateCompanionCallback: ({Value<int> rowid = const Value.absent(),})=> MangaChapterImageTablesCompanion(rowid: rowid,),
-        createCompanionCallback: ({Value<int> rowid = const Value.absent(),})=> MangaChapterImageTablesCompanion.insert(rowid: rowid,),
+        createFilteringComposer: () => $$MangaLibraryTablesTableFilterComposer($db: db,$table:table),
+        createOrderingComposer: () => $$MangaLibraryTablesTableOrderingComposer($db: db,$table:table),
+        createComputedFieldComposer: () => $$MangaLibraryTablesTableAnnotationComposer($db: db,$table:table),
+        updateCompanionCallback: ({Value<int> rowid = const Value.absent(),})=> MangaLibraryTablesCompanion(rowid: rowid,),
+        createCompanionCallback: ({Value<int> rowid = const Value.absent(),})=> MangaLibraryTablesCompanion.insert(rowid: rowid,),
         withReferenceMapper: (p0) => p0
               .map(
                   (e) =>
@@ -481,16 +542,95 @@ class $$MangaChapterImageTablesTableFilterComposer extends Composer<
         prefetchHooksCallback: null,
         ));
         }
-    typedef $$MangaChapterImageTablesTableProcessedTableManager = ProcessedTableManager    <_$AppDatabase,
-    $MangaChapterImageTablesTable,
-    MangaChapterImageTable,
-    $$MangaChapterImageTablesTableFilterComposer,
-    $$MangaChapterImageTablesTableOrderingComposer,
-    $$MangaChapterImageTablesTableAnnotationComposer,
-    $$MangaChapterImageTablesTableCreateCompanionBuilder,
-    $$MangaChapterImageTablesTableUpdateCompanionBuilder,
-    (MangaChapterImageTable,BaseReferences<_$AppDatabase,$MangaChapterImageTablesTable,MangaChapterImageTable>),
-    MangaChapterImageTable,
+    typedef $$MangaLibraryTablesTableProcessedTableManager = ProcessedTableManager    <_$AppDatabase,
+    $MangaLibraryTablesTable,
+    MangaLibraryTable,
+    $$MangaLibraryTablesTableFilterComposer,
+    $$MangaLibraryTablesTableOrderingComposer,
+    $$MangaLibraryTablesTableAnnotationComposer,
+    $$MangaLibraryTablesTableCreateCompanionBuilder,
+    $$MangaLibraryTablesTableUpdateCompanionBuilder,
+    (MangaLibraryTable,BaseReferences<_$AppDatabase,$MangaLibraryTablesTable,MangaLibraryTable>),
+    MangaLibraryTable,
+    PrefetchHooks Function()
+    >;typedef $$MangaTablesTableCreateCompanionBuilder = MangaTablesCompanion Function({Value<int> rowid,});
+typedef $$MangaTablesTableUpdateCompanionBuilder = MangaTablesCompanion Function({Value<int> rowid,});
+class $$MangaTablesTableFilterComposer extends Composer<
+        _$AppDatabase,
+        $MangaTablesTable> {
+        $$MangaTablesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+          
+        }
+      class $$MangaTablesTableOrderingComposer extends Composer<
+        _$AppDatabase,
+        $MangaTablesTable> {
+        $$MangaTablesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+          
+        }
+      class $$MangaTablesTableAnnotationComposer extends Composer<
+        _$AppDatabase,
+        $MangaTablesTable> {
+        $$MangaTablesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+          
+        }
+      class $$MangaTablesTableTableManager extends RootTableManager    <_$AppDatabase,
+    $MangaTablesTable,
+    MangaTable,
+    $$MangaTablesTableFilterComposer,
+    $$MangaTablesTableOrderingComposer,
+    $$MangaTablesTableAnnotationComposer,
+    $$MangaTablesTableCreateCompanionBuilder,
+    $$MangaTablesTableUpdateCompanionBuilder,
+    (MangaTable,BaseReferences<_$AppDatabase,$MangaTablesTable,MangaTable>),
+    MangaTable,
+    PrefetchHooks Function()
+    > {
+    $$MangaTablesTableTableManager(_$AppDatabase db, $MangaTablesTable table) : super(
+      TableManagerState(
+        db: db,
+        table: table,
+        createFilteringComposer: () => $$MangaTablesTableFilterComposer($db: db,$table:table),
+        createOrderingComposer: () => $$MangaTablesTableOrderingComposer($db: db,$table:table),
+        createComputedFieldComposer: () => $$MangaTablesTableAnnotationComposer($db: db,$table:table),
+        updateCompanionCallback: ({Value<int> rowid = const Value.absent(),})=> MangaTablesCompanion(rowid: rowid,),
+        createCompanionCallback: ({Value<int> rowid = const Value.absent(),})=> MangaTablesCompanion.insert(rowid: rowid,),
+        withReferenceMapper: (p0) => p0
+              .map(
+                  (e) =>
+                     (e.readTable(table), BaseReferences(db, table, e))
+                  )
+              .toList(),
+        prefetchHooksCallback: null,
+        ));
+        }
+    typedef $$MangaTablesTableProcessedTableManager = ProcessedTableManager    <_$AppDatabase,
+    $MangaTablesTable,
+    MangaTable,
+    $$MangaTablesTableFilterComposer,
+    $$MangaTablesTableOrderingComposer,
+    $$MangaTablesTableAnnotationComposer,
+    $$MangaTablesTableCreateCompanionBuilder,
+    $$MangaTablesTableUpdateCompanionBuilder,
+    (MangaTable,BaseReferences<_$AppDatabase,$MangaTablesTable,MangaTable>),
+    MangaTable,
     PrefetchHooks Function()
     >;typedef $$MangaTagTablesTableCreateCompanionBuilder = MangaTagTablesCompanion Function({Value<int> rowid,});
 typedef $$MangaTagTablesTableUpdateCompanionBuilder = MangaTagTablesCompanion Function({Value<int> rowid,});
@@ -574,8 +714,9 @@ class $$MangaTagTablesTableFilterComposer extends Composer<
     >;class $AppDatabaseManager {
 final _$AppDatabase _db;
 $AppDatabaseManager(this._db);
-$$MangaTablesTableTableManager get mangaTables => $$MangaTablesTableTableManager(_db, _db.mangaTables);
-$$MangaChapterTablesTableTableManager get mangaChapterTables => $$MangaChapterTablesTableTableManager(_db, _db.mangaChapterTables);
 $$MangaChapterImageTablesTableTableManager get mangaChapterImageTables => $$MangaChapterImageTablesTableTableManager(_db, _db.mangaChapterImageTables);
+$$MangaChapterTablesTableTableManager get mangaChapterTables => $$MangaChapterTablesTableTableManager(_db, _db.mangaChapterTables);
+$$MangaLibraryTablesTableTableManager get mangaLibraryTables => $$MangaLibraryTablesTableTableManager(_db, _db.mangaLibraryTables);
+$$MangaTablesTableTableManager get mangaTables => $$MangaTablesTableTableManager(_db, _db.mangaTables);
 $$MangaTagTablesTableTableManager get mangaTagTables => $$MangaTagTablesTableTableManager(_db, _db.mangaTagTables);
 }
