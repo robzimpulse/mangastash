@@ -5,6 +5,8 @@ import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 
+import '../dao/manga_dao.dart';
+import '../model/manga_drift.dart';
 import '../tables/manga_chapter_image_tables.dart';
 import '../tables/manga_chapter_tables.dart';
 import '../tables/manga_library_tables.dart';
@@ -21,6 +23,9 @@ part 'database.g.dart';
     MangaLibraryTables,
     MangaTables,
     MangaTagTables,
+  ],
+  daos: [
+    MangaDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
