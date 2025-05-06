@@ -3,45 +3,82 @@ import 'package:drift/drift.dart';
 import '../database/database.dart';
 import '../model/manga_drift.dart';
 import '../tables/manga_tables.dart';
+import '../tables/manga_tag_relationship_tables.dart';
+import '../tables/manga_tag_tables.dart';
 
 part 'manga_dao.g.dart';
 
-@DriftAccessor(tables: [MangaTables])
+@DriftAccessor(
+  tables: [
+    MangaTables,
+    MangaTagTables,
+    MangaTagRelationshipTables,
+  ],
+)
 class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
   // this constructor is required so that the main database can create an instance
   // of this object.
   MangaDao(AppDatabase db) : super(db);
 
-  /// TODO: search by tags
   Future<List<MangaDrift>> search({
-    String? title,
-    String? coverUrl,
-    String? author,
-    String? status,
-    String? description,
-    String? webUrl,
-    String? source,
+    List<String> ids = const [],
+    List<String> titles = const [],
+    List<String> coverUrls = const [],
+    List<String> authors = const [],
+    List<String> statuses = const [],
+    List<String> descriptions = const [],
+    List<String> webUrls = const [],
+    List<String> sources = const [],
+    List<String> tagsNames = const [],
   }) async {
-    final selector = select(db.mangaTables)
-      ..where(
-        (f) => [
-          if (title != null) f.title.like('%$title%'),
-          if (coverUrl != null) f.coverUrl.like('%$coverUrl%'),
-          if (author != null) f.author.like('%$author%'),
-          if (status != null) f.status.like('$status%'),
-          if (description != null) f.description.like('%$description%'),
-          if (webUrl != null) f.webUrl.like('%$webUrl%'),
-          if (source != null) f.source.like('%$source%'),
-        ].reduce((result, element) => result | element),
-      )
-      ..orderBy(
-        [
-          (f) => OrderingTerm(expression: f.updatedAt, mode: OrderingMode.desc),
-          (f) => OrderingTerm(expression: f.title, mode: OrderingMode.asc),
-        ],
-      );
+    return transaction(
+      () async {
+        final tags = select(db.mangaTagRelationshipTables).join(
+          [
+            innerJoin(
+              db.mangaTagRelationshipTables,
+              db.mangaTagRelationshipTables.tagId
+                  .equalsExp(db.mangaTagTables.id),
+            ),
+          ],
+        )..where(
+            [
+              ...tagsNames.map((e) => db.mangaTagTables.name.equals(e)),
+            ].reduce((result, element) => result | element),
+          );
 
-    return selector.get();
+        final resultTags = await tags.get();
+
+        final mangaIds = resultTags.map(
+          (value) => value.read(db.mangaTagRelationshipTables.mangaId),
+        );
+
+        final selector = select(db.mangaTables)
+          ..where(
+            (f) => [
+              for (final mangaId in mangaIds)
+                if (mangaId != null) f.id.equals(mangaId),
+              ...ids.map((e) => f.id.equals(e)),
+              ...titles.map((e) => f.title.like('%$e}%')),
+              ...coverUrls.map((e) => f.coverUrl.like('%$e}%')),
+              ...authors.map((e) => f.author.like('%$e}%')),
+              ...statuses.map((e) => f.status.like('%$e}%')),
+              ...descriptions.map((e) => f.description.like('%$e}%')),
+              ...webUrls.map((e) => f.webUrl.like('%$e}%')),
+              ...sources.map((e) => f.source.like('%$e}%')),
+            ].reduce((result, element) => result | element),
+          )
+          ..orderBy(
+            [
+              (f) => OrderingTerm(
+                  expression: f.updatedAt, mode: OrderingMode.desc),
+              (f) => OrderingTerm(expression: f.title, mode: OrderingMode.asc),
+            ],
+          );
+
+        return selector.get();
+      },
+    );
   }
 
   Future<MangaDrift> insert(MangaDrift manga) {

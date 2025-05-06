@@ -1650,6 +1650,242 @@ class MangaTagTablesCompanion extends UpdateCompanion<MangaTagTable> {
   }
 }
 
+class $MangaTagRelationshipTablesTable extends MangaTagRelationshipTables
+    with
+        TableInfo<$MangaTagRelationshipTablesTable, MangaTagRelationshipTable> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MangaTagRelationshipTablesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _tagIdMeta = const VerificationMeta('tagId');
+  @override
+  late final GeneratedColumn<String> tagId = GeneratedColumn<String>(
+      'tag_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _mangaIdMeta =
+      const VerificationMeta('mangaId');
+  @override
+  late final GeneratedColumn<String> mangaId = GeneratedColumn<String>(
+      'manga_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => DateTime.timestamp().toIso8601String());
+  @override
+  List<GeneratedColumn> get $columns => [tagId, mangaId, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'manga_tag_relationship_tables';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<MangaTagRelationshipTable> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('tag_id')) {
+      context.handle(
+          _tagIdMeta, tagId.isAcceptableOrUnknown(data['tag_id']!, _tagIdMeta));
+    } else if (isInserting) {
+      context.missing(_tagIdMeta);
+    }
+    if (data.containsKey('manga_id')) {
+      context.handle(_mangaIdMeta,
+          mangaId.isAcceptableOrUnknown(data['manga_id']!, _mangaIdMeta));
+    } else if (isInserting) {
+      context.missing(_mangaIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => const {};
+  @override
+  MangaTagRelationshipTable map(Map<String, dynamic> data,
+      {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MangaTagRelationshipTable(
+      tagId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}tag_id'])!,
+      mangaId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}manga_id'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $MangaTagRelationshipTablesTable createAlias(String alias) {
+    return $MangaTagRelationshipTablesTable(attachedDatabase, alias);
+  }
+}
+
+class MangaTagRelationshipTable extends DataClass
+    implements Insertable<MangaTagRelationshipTable> {
+  final String tagId;
+  final String mangaId;
+  final String createdAt;
+  const MangaTagRelationshipTable(
+      {required this.tagId, required this.mangaId, required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['tag_id'] = Variable<String>(tagId);
+    map['manga_id'] = Variable<String>(mangaId);
+    map['created_at'] = Variable<String>(createdAt);
+    return map;
+  }
+
+  MangaTagRelationshipTablesCompanion toCompanion(bool nullToAbsent) {
+    return MangaTagRelationshipTablesCompanion(
+      tagId: Value(tagId),
+      mangaId: Value(mangaId),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory MangaTagRelationshipTable.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MangaTagRelationshipTable(
+      tagId: serializer.fromJson<String>(json['tagId']),
+      mangaId: serializer.fromJson<String>(json['mangaId']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'tagId': serializer.toJson<String>(tagId),
+      'mangaId': serializer.toJson<String>(mangaId),
+      'createdAt': serializer.toJson<String>(createdAt),
+    };
+  }
+
+  MangaTagRelationshipTable copyWith(
+          {String? tagId, String? mangaId, String? createdAt}) =>
+      MangaTagRelationshipTable(
+        tagId: tagId ?? this.tagId,
+        mangaId: mangaId ?? this.mangaId,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  MangaTagRelationshipTable copyWithCompanion(
+      MangaTagRelationshipTablesCompanion data) {
+    return MangaTagRelationshipTable(
+      tagId: data.tagId.present ? data.tagId.value : this.tagId,
+      mangaId: data.mangaId.present ? data.mangaId.value : this.mangaId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MangaTagRelationshipTable(')
+          ..write('tagId: $tagId, ')
+          ..write('mangaId: $mangaId, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(tagId, mangaId, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MangaTagRelationshipTable &&
+          other.tagId == this.tagId &&
+          other.mangaId == this.mangaId &&
+          other.createdAt == this.createdAt);
+}
+
+class MangaTagRelationshipTablesCompanion
+    extends UpdateCompanion<MangaTagRelationshipTable> {
+  final Value<String> tagId;
+  final Value<String> mangaId;
+  final Value<String> createdAt;
+  final Value<int> rowid;
+  const MangaTagRelationshipTablesCompanion({
+    this.tagId = const Value.absent(),
+    this.mangaId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MangaTagRelationshipTablesCompanion.insert({
+    required String tagId,
+    required String mangaId,
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : tagId = Value(tagId),
+        mangaId = Value(mangaId);
+  static Insertable<MangaTagRelationshipTable> custom({
+    Expression<String>? tagId,
+    Expression<String>? mangaId,
+    Expression<String>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (tagId != null) 'tag_id': tagId,
+      if (mangaId != null) 'manga_id': mangaId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MangaTagRelationshipTablesCompanion copyWith(
+      {Value<String>? tagId,
+      Value<String>? mangaId,
+      Value<String>? createdAt,
+      Value<int>? rowid}) {
+    return MangaTagRelationshipTablesCompanion(
+      tagId: tagId ?? this.tagId,
+      mangaId: mangaId ?? this.mangaId,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (tagId.present) {
+      map['tag_id'] = Variable<String>(tagId.value);
+    }
+    if (mangaId.present) {
+      map['manga_id'] = Variable<String>(mangaId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MangaTagRelationshipTablesCompanion(')
+          ..write('tagId: $tagId, ')
+          ..write('mangaId: $mangaId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1661,6 +1897,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MangaLibraryTablesTable mangaLibraryTables =
       $MangaLibraryTablesTable(this);
   late final $MangaTagTablesTable mangaTagTables = $MangaTagTablesTable(this);
+  late final $MangaTagRelationshipTablesTable mangaTagRelationshipTables =
+      $MangaTagRelationshipTablesTable(this);
   late final MangaDao mangaDao = MangaDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -1671,7 +1909,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         mangaChapterTables,
         mangaTables,
         mangaLibraryTables,
-        mangaTagTables
+        mangaTagTables,
+        mangaTagRelationshipTables
       ];
 }
 
@@ -2837,6 +3076,156 @@ typedef $$MangaTagTablesTableProcessedTableManager = ProcessedTableManager<
     ),
     MangaTagTable,
     PrefetchHooks Function()>;
+typedef $$MangaTagRelationshipTablesTableCreateCompanionBuilder
+    = MangaTagRelationshipTablesCompanion Function({
+  required String tagId,
+  required String mangaId,
+  Value<String> createdAt,
+  Value<int> rowid,
+});
+typedef $$MangaTagRelationshipTablesTableUpdateCompanionBuilder
+    = MangaTagRelationshipTablesCompanion Function({
+  Value<String> tagId,
+  Value<String> mangaId,
+  Value<String> createdAt,
+  Value<int> rowid,
+});
+
+class $$MangaTagRelationshipTablesTableFilterComposer
+    extends Composer<_$AppDatabase, $MangaTagRelationshipTablesTable> {
+  $$MangaTagRelationshipTablesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get tagId => $composableBuilder(
+      column: $table.tagId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get mangaId => $composableBuilder(
+      column: $table.mangaId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$MangaTagRelationshipTablesTableOrderingComposer
+    extends Composer<_$AppDatabase, $MangaTagRelationshipTablesTable> {
+  $$MangaTagRelationshipTablesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get tagId => $composableBuilder(
+      column: $table.tagId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get mangaId => $composableBuilder(
+      column: $table.mangaId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$MangaTagRelationshipTablesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MangaTagRelationshipTablesTable> {
+  $$MangaTagRelationshipTablesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get tagId =>
+      $composableBuilder(column: $table.tagId, builder: (column) => column);
+
+  GeneratedColumn<String> get mangaId =>
+      $composableBuilder(column: $table.mangaId, builder: (column) => column);
+
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$MangaTagRelationshipTablesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $MangaTagRelationshipTablesTable,
+    MangaTagRelationshipTable,
+    $$MangaTagRelationshipTablesTableFilterComposer,
+    $$MangaTagRelationshipTablesTableOrderingComposer,
+    $$MangaTagRelationshipTablesTableAnnotationComposer,
+    $$MangaTagRelationshipTablesTableCreateCompanionBuilder,
+    $$MangaTagRelationshipTablesTableUpdateCompanionBuilder,
+    (
+      MangaTagRelationshipTable,
+      BaseReferences<_$AppDatabase, $MangaTagRelationshipTablesTable,
+          MangaTagRelationshipTable>
+    ),
+    MangaTagRelationshipTable,
+    PrefetchHooks Function()> {
+  $$MangaTagRelationshipTablesTableTableManager(
+      _$AppDatabase db, $MangaTagRelationshipTablesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MangaTagRelationshipTablesTableFilterComposer(
+                  $db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MangaTagRelationshipTablesTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MangaTagRelationshipTablesTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> tagId = const Value.absent(),
+            Value<String> mangaId = const Value.absent(),
+            Value<String> createdAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              MangaTagRelationshipTablesCompanion(
+            tagId: tagId,
+            mangaId: mangaId,
+            createdAt: createdAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String tagId,
+            required String mangaId,
+            Value<String> createdAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              MangaTagRelationshipTablesCompanion.insert(
+            tagId: tagId,
+            mangaId: mangaId,
+            createdAt: createdAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$MangaTagRelationshipTablesTableProcessedTableManager
+    = ProcessedTableManager<
+        _$AppDatabase,
+        $MangaTagRelationshipTablesTable,
+        MangaTagRelationshipTable,
+        $$MangaTagRelationshipTablesTableFilterComposer,
+        $$MangaTagRelationshipTablesTableOrderingComposer,
+        $$MangaTagRelationshipTablesTableAnnotationComposer,
+        $$MangaTagRelationshipTablesTableCreateCompanionBuilder,
+        $$MangaTagRelationshipTablesTableUpdateCompanionBuilder,
+        (
+          MangaTagRelationshipTable,
+          BaseReferences<_$AppDatabase, $MangaTagRelationshipTablesTable,
+              MangaTagRelationshipTable>
+        ),
+        MangaTagRelationshipTable,
+        PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2852,4 +3241,8 @@ class $AppDatabaseManager {
       $$MangaLibraryTablesTableTableManager(_db, _db.mangaLibraryTables);
   $$MangaTagTablesTableTableManager get mangaTagTables =>
       $$MangaTagTablesTableTableManager(_db, _db.mangaTagTables);
+  $$MangaTagRelationshipTablesTableTableManager
+      get mangaTagRelationshipTables =>
+          $$MangaTagRelationshipTablesTableTableManager(
+              _db, _db.mangaTagRelationshipTables);
 }

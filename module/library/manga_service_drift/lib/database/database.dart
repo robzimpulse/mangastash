@@ -11,6 +11,7 @@ import '../tables/manga_chapter_image_tables.dart';
 import '../tables/manga_chapter_tables.dart';
 import '../tables/manga_library_tables.dart';
 import '../tables/manga_tables.dart';
+import '../tables/manga_tag_relationship_tables.dart';
 import '../tables/manga_tag_tables.dart';
 import '../util/typedef.dart';
 
@@ -23,6 +24,7 @@ part 'database.g.dart';
     MangaLibraryTables,
     MangaTables,
     MangaTagTables,
+    MangaTagRelationshipTables,
   ],
   daos: [
     MangaDao,
