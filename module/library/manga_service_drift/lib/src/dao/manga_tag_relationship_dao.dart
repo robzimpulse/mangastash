@@ -43,7 +43,7 @@ class MangaTagRelationshipDao extends DatabaseAccessor<AppDatabase>
         try {
           /// if insert item were success, add to array [success]
           success.add(
-              await into(mangaTagRelationshipTables).insertReturning(item));
+              await into(mangaTagRelationshipTables).insertReturning(item),);
         } catch (e) {
           /// if failed to insert item do nothing
         }

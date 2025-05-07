@@ -1,0 +1,4 @@
+global_options:
+  manga_service_drift:manga_service_drift:
+    runs_before:
+      - build_resolvers:transitive_digests
