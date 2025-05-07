@@ -12,12 +12,48 @@ part 'manga_dao.g.dart';
 
 @DriftAccessor(tables: [MangaTables])
 class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
-
   final Uuid _uuid;
 
   MangaDao({required AppDatabase db, Uuid? uuid})
       : _uuid = uuid ?? const Uuid(),
         super(db);
+
+  Future<List<MangaTable>> search({
+    List<MangaTablesCompanion> mangas = const [],
+  }) async {
+    if (mangas.isEmpty) return [];
+
+    final selector = select(mangaTables)
+      ..where(
+        (f) => [
+          for (final manga in mangas)
+            [
+              if (manga.title.value?.isNotEmpty == true)
+                f.title.like('%${manga.title}%'),
+              if (manga.coverUrl.value?.isNotEmpty == true)
+                f.title.like('%${manga.coverUrl}%'),
+              if (manga.author.value?.isNotEmpty == true)
+                f.title.like('%${manga.author}%'),
+              if (manga.status.value?.isNotEmpty == true)
+                f.title.like('%${manga.status}%'),
+              if (manga.description.value?.isNotEmpty == true)
+                f.title.like('%${manga.description}%'),
+              if (manga.webUrl.value?.isNotEmpty == true)
+                f.title.like('%${manga.webUrl}%'),
+              if (manga.source.value?.isNotEmpty == true)
+                f.title.like('%${manga.source}%'),
+            ].reduce((result, element) => result & element),
+        ].reduce((result, element) => result | element),
+      )
+      ..orderBy(
+        [
+          (f) => OrderingTerm(expression: f.updatedAt, mode: OrderingMode.desc),
+          (f) => OrderingTerm(expression: f.title, mode: OrderingMode.asc),
+        ],
+      );
+
+    return selector.get();
+  }
 
   // Future<List<MangaTagDrift>> _searchTags({
   //   List<String> names = const [],
@@ -157,74 +193,6 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
   //   // );
   // }
   //
-  // // Future<List<MangaDrift>> search({
-  // //   List<String> ids = const [],
-  // //   List<String> titles = const [],
-  // //   List<String> coverUrls = const [],
-  // //   List<String> authors = const [],
-  // //   List<String> statuses = const [],
-  // //   List<String> descriptions = const [],
-  // //   List<String> webUrls = const [],
-  // //   List<String> sources = const [],
-  // //   List<String> tagsNames = const [],
-  // // }) async {
-  // //   return transaction(
-  // //     () async {
-  // //       final tags = select(db.mangaTagRelationshipTables).join(
-  // //         [
-  // //           innerJoin(
-  // //             db.mangaTagRelationshipTables,
-  // //             db.mangaTagRelationshipTables.tagId.equalsExp(
-  // //               db.mangaTagTables.id,
-  // //             ),
-  // //           ),
-  // //         ],
-  // //       )..where(
-  // //           [
-  // //             ...tagsNames.map((e) => db.mangaTagTables.name.equals(e)),
-  // //           ].reduce((result, element) => result | element),
-  // //         );
-  // //
-  // //       final resultTags = await tags.get();
-  // //
-  // //       final mangaIds = resultTags.map(
-  // //         (value) => value.read(db.mangaTagRelationshipTables.mangaId),
-  // //       );
-  // //
-  // //       final mangaSelector = select(db.mangaTables)
-  // //         ..where(
-  // //           (f) => [
-  // //             for (final mangaId in mangaIds)
-  // //               if (mangaId != null) f.id.equals(mangaId),
-  // //             ...ids.map((e) => f.id.equals(e)),
-  // //             ...titles.map((e) => f.title.like('%$e}%')),
-  // //             ...coverUrls.map((e) => f.coverUrl.like('%$e}%')),
-  // //             ...authors.map((e) => f.author.like('%$e}%')),
-  // //             ...statuses.map((e) => f.status.like('%$e}%')),
-  // //             ...descriptions.map((e) => f.description.like('%$e}%')),
-  // //             ...webUrls.map((e) => f.webUrl.like('%$e}%')),
-  // //             ...sources.map((e) => f.source.like('%$e}%')),
-  // //           ].reduce((result, element) => result | element),
-  // //         )
-  // //         ..orderBy(
-  // //           [
-  // //             (f) => OrderingTerm(
-  // //                   expression: f.updatedAt,
-  // //                   mode: OrderingMode.desc,
-  // //                 ),
-  // //             (f) => OrderingTerm(expression: f.title, mode: OrderingMode.asc),
-  // //           ],
-  // //         );
-  // //
-  // //       final mangas = await mangaSelector.get();
-  // //
-  // //       // TODO: add tags
-  // //       return mangas
-  // //           .map((e) => MangaDrift.fromDb(manga: e, tags: []))
-  // //           .toList();
-  // //     },
-  // //   );
-  // // }
   //
   // //
   // // Future<void> batchInsert(List<MangaTable> mangas) {
