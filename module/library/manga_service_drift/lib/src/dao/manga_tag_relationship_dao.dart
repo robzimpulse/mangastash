@@ -58,18 +58,19 @@ class MangaTagRelationshipDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<List<MangaTagRelationshipTable>> remove({
-    List<String> tagIds = const [],
-    List<String> mangaIds = const [],
+    List<MangaTagRelationshipTable> relationships = const [],
   }) async {
-    if (tagIds.isEmpty && mangaIds.isEmpty) return [];
+    if (relationships.isEmpty) return [];
     return transaction(() async {
       final selector = delete(mangaTagRelationshipTables)
         ..where(
           (f) => [
-            for (final e in tagIds)
-              if (e.isNotEmpty) f.tagId.equals(e),
-            for (final e in mangaIds)
-              if (e.isNotEmpty) f.mangaId.equals(e),
+            [
+              for (final e in relationships) ...[
+                if (e.mangaId.isNotEmpty) f.mangaId.equals(e.mangaId),
+                if (e.tagId.isNotEmpty) f.tagId.equals(e.tagId),
+              ],
+            ].reduce((result, element) => result & element),
           ].reduce((result, element) => result | element),
         );
 
