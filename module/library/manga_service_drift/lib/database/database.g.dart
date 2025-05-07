@@ -1894,7 +1894,7 @@ class $MangaTagRelationshipTablesTable extends MangaTagRelationshipTables
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {tagId, mangaId};
   @override
   MangaTagRelationshipTable map(Map<String, dynamic> data,
       {String? tablePrefix}) {
@@ -2086,6 +2086,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $MangaTagRelationshipTablesTable(this);
   late final MangaDao mangaDao = MangaDao(this as AppDatabase);
   late final MangaTagDao mangaTagDao = MangaTagDao(this as AppDatabase);
+  late final MangaTagRelationshipDao mangaTagRelationshipDao =
+      MangaTagRelationshipDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();

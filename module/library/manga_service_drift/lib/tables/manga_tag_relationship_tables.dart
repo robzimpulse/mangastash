@@ -9,4 +9,7 @@ class MangaTagRelationshipTables extends Table {
   TextColumn get createdAt => text()
       .named('created_at')
       .clientDefault(() => DateTime.timestamp().toIso8601String())();
+
+  @override
+  Set<Column<Object>>? get primaryKey => {tagId, mangaId};
 }

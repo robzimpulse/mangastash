@@ -16,6 +16,7 @@ class MangaTagDao extends DatabaseAccessor<AppDatabase>
         super(db);
 
   Future<List<MangaTagTable>> search({List<String> names = const []}) async {
+    if (names.isEmpty) return [];
     final selector = select(db.mangaTagTables)
       ..where(
         (e) => [
@@ -53,10 +54,9 @@ class MangaTagDao extends DatabaseAccessor<AppDatabase>
     });
   }
 
-  Future<List<MangaTagTable>> remove(List<MangaTagTable> tags) async {
+  Future<List<MangaTagTable>> remove({List<String> names = const []}) async {
+    if (names.isEmpty) return [];
     return transaction(() async {
-      final names = tags.map((e) => e.name).toList();
-
       final selector = delete(mangaTagTables)
         ..where(
           (e) => [
