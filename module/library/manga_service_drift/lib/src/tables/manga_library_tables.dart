@@ -1,14 +1,9 @@
 import 'package:drift/drift.dart';
 
-import 'manga_tables.dart';
+import '../mixin/auto_timestamp_table.dart';
 
-class MangaLibraryTables extends Table {
+class MangaLibraryTables extends Table with AutoTimestampTable {
   Int64Column get id => int64().named('id').autoIncrement()();
 
-  TextColumn get mangaId =>
-      text().named('manga_id').references(MangaTables, #id)();
-
-  TextColumn get createdAt => text()
-      .named('created_at')
-      .clientDefault(() => DateTime.timestamp().toIso8601String())();
+  TextColumn get mangaId => text().named('manga_id')();
 }

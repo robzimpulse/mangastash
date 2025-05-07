@@ -1,13 +1,11 @@
 import 'package:drift/drift.dart';
 
-class MangaChapterImageTables extends Table {
+import '../mixin/auto_timestamp_table.dart';
+
+class MangaChapterImageTables extends Table with AutoTimestampTable {
   Int64Column get id => int64().autoIncrement().named('id')();
 
-  TextColumn get chapterId => text().named('chapter_id').nullable()();
+  TextColumn get chapterId => text().named('chapter_id')();
 
-  TextColumn get webUrl => text().named('webUrl').nullable()();
-
-  TextColumn get createdAt => text()
-      .named('created_at')
-      .clientDefault(() => DateTime.timestamp().toIso8601String())();
+  TextColumn get webUrl => text().named('webUrl')();
 }

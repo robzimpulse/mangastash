@@ -1,6 +1,8 @@
 import 'package:drift/drift.dart';
 
-class MangaChapterTables extends Table {
+import '../mixin/auto_timestamp_table.dart';
+
+class MangaChapterTables extends Table with AutoTimestampTable {
   TextColumn get id => text().named('id')();
 
   TextColumn get mangaId => text().named('manga_id').nullable()();
@@ -26,10 +28,6 @@ class MangaChapterTables extends Table {
 
   /// must be in ISO8601 Format (yyyy-MM-ddTHH:mm:ss.mmmuuuZ)
   TextColumn get publishAt => text().named('publish_at').nullable()();
-
-  TextColumn get createdAt => text()
-      .named('created_at')
-      .clientDefault(() => DateTime.timestamp().toIso8601String())();
 
   @override
   Set<Column<Object>>? get primaryKey => {id};
