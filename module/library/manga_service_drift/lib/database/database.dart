@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 
 import '../dao/manga_dao.dart';
-import '../model/manga_drift.dart';
+import '../dao/manga_tag_dao.dart';
 import '../tables/manga_chapter_image_tables.dart';
 import '../tables/manga_chapter_tables.dart';
 import '../tables/manga_library_tables.dart';
@@ -28,6 +28,7 @@ part 'database.g.dart';
   ],
   daos: [
     MangaDao,
+    MangaTagDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {

@@ -1,9 +1,8 @@
-import 'package:drift/drift.dart';
-
 import '../database/database.dart';
+import 'manga_tag_drift.dart';
 
-class MangaDrift implements Insertable<MangaDrift> {
-  final String? id;
+class MangaDrift {
+  final String id;
   final String? title;
   final String? coverUrl;
   final String? author;
@@ -11,12 +10,12 @@ class MangaDrift implements Insertable<MangaDrift> {
   final String? description;
   final String? webUrl;
   final String? source;
-  final String? createdAt;
-  final String? updatedAt;
+  final String createdAt;
+  final String updatedAt;
+  final List<MangaTagDrift>? tags;
 
-  /// TODO: add tags
   const MangaDrift({
-    this.id,
+    required this.id,
     this.title,
     this.coverUrl,
     this.author,
@@ -24,23 +23,42 @@ class MangaDrift implements Insertable<MangaDrift> {
     this.description,
     this.webUrl,
     this.source,
-    this.createdAt,
-    this.updatedAt,
+    required this.createdAt,
+    required this.updatedAt,
+    this.tags,
   });
 
-  @override
-  Map<String, Expression<Object>> toColumns(bool nullToAbsent) {
-    return MangaTablesCompanion(
-      id: id == null ? const Value.absent() : Value(id),
-      title: title == null ? const Value.absent() : Value(title),
-      coverUrl: coverUrl == null ? const Value.absent() : Value(coverUrl),
-      author: author == null ? const Value.absent() : Value(author),
-      status: status == null ? const Value.absent() : Value(status),
-      description:
-          description == null ? const Value.absent() : Value(description),
-      webUrl: webUrl == null ? const Value.absent() : Value(webUrl),
-      source: source == null ? const Value.absent() : Value(source),
-      updatedAt: Value(DateTime.now().toIso8601String()),
-    ).toColumns(false);
+  factory MangaDrift.fromDb({
+    required MangaTable manga,
+    List<MangaTagTable>? tags,
+  }) {
+    return MangaDrift(
+      id: manga.id,
+      title: manga.title,
+      coverUrl: manga.coverUrl,
+      author: manga.author,
+      status: manga.status,
+      description: manga.description,
+      webUrl: manga.webUrl,
+      source: manga.source,
+      createdAt: manga.createdAt,
+      updatedAt: manga.updatedAt,
+      tags: tags?.map((e) => MangaTagDrift.fromDb(tag: e)).toList(),
+    );
+  }
+
+  MangaTable toDb() {
+    return MangaTable(
+      id: id,
+      title: title,
+      coverUrl: coverUrl,
+      author: author,
+      status: status,
+      description: description,
+      webUrl: webUrl,
+      source: source,
+      createdAt: createdAt,
+      updatedAt: DateTime.now().toIso8601String(),
+    );
   }
 }

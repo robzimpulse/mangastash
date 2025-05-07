@@ -1,10 +1,7 @@
 import 'package:drift/drift.dart';
 
-import '../model/manga_drift.dart';
-
-@UseRowClass(MangaDrift)
 class MangaTables extends Table {
-  TextColumn get id => text().named('id').nullable()();
+  TextColumn get id => text().named('id')();
 
   TextColumn get title => text().named('title').nullable()();
 
@@ -27,4 +24,7 @@ class MangaTables extends Table {
   TextColumn get updatedAt => text()
       .named('updated_at')
       .clientDefault(() => DateTime.timestamp().toIso8601String())();
+
+  @override
+  Set<Column<Object>>? get primaryKey => {id};
 }
