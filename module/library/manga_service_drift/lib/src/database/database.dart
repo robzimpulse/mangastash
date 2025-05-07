@@ -8,6 +8,7 @@ import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 import '../dao/manga_dao.dart';
 import '../dao/manga_tag_dao.dart';
 import '../dao/manga_tag_relationship_dao.dart';
+import '../interceptor/log_interceptor.dart';
 import '../tables/manga_chapter_image_tables.dart';
 import '../tables/manga_chapter_tables.dart';
 import '../tables/manga_library_tables.dart';
@@ -42,7 +43,8 @@ class AppDatabase extends _$AppDatabase {
     LoggerCallback? logger,
   }) : super(
           LazyDatabase(
-            () async => executor ?? await _openConnection(logger: logger),
+            () async => (executor ?? await _openConnection(logger: logger))
+              ..interceptWith(LogInterceptor(logger: logger)),
           ),
         );
 
