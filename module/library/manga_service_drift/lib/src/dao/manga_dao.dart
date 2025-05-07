@@ -19,30 +19,44 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
         super(db);
 
   Future<List<MangaTable>> search({
-    List<MangaTablesCompanion> mangas = const [],
+    List<String> titles = const [],
+    List<String> coverUrls = const [],
+    List<String> authors = const [],
+    List<String> statuses = const [],
+    List<String> descriptions = const [],
+    List<String> webUrls = const [],
+    List<String> sources = const [],
   }) async {
-    if (mangas.isEmpty) return [];
+
+    final isAllEmpty = [
+      titles.isEmpty,
+      coverUrls.isEmpty,
+      authors.isEmpty,
+      statuses.isEmpty,
+      descriptions.isEmpty,
+      webUrls.isEmpty,
+      sources.isEmpty
+    ].every((isTrue) => isTrue);
+
+    if (isAllEmpty) return [];
 
     final selector = select(mangaTables)
       ..where(
         (f) => [
-          for (final manga in mangas)
-            [
-              if (manga.title.value?.isNotEmpty == true)
-                f.title.like('%${manga.title}%'),
-              if (manga.coverUrl.value?.isNotEmpty == true)
-                f.title.like('%${manga.coverUrl}%'),
-              if (manga.author.value?.isNotEmpty == true)
-                f.title.like('%${manga.author}%'),
-              if (manga.status.value?.isNotEmpty == true)
-                f.title.like('%${manga.status}%'),
-              if (manga.description.value?.isNotEmpty == true)
-                f.title.like('%${manga.description}%'),
-              if (manga.webUrl.value?.isNotEmpty == true)
-                f.title.like('%${manga.webUrl}%'),
-              if (manga.source.value?.isNotEmpty == true)
-                f.title.like('%${manga.source}%'),
-            ].reduce((result, element) => result & element),
+          for (final e in titles)
+            if (e.isNotEmpty) f.title.like('%$e%'),
+          for (final e in coverUrls)
+            if (e.isNotEmpty) f.coverUrl.like('%$e%'),
+          for (final e in authors)
+            if (e.isNotEmpty) f.author.like('%$e%'),
+          for (final e in statuses)
+            if (e.isNotEmpty) f.status.like('%$e%'),
+          for (final e in descriptions)
+            if (e.isNotEmpty) f.description.like('%$e%'),
+          for (final e in webUrls)
+            if (e.isNotEmpty) f.webUrl.like('%$e%'),
+          for (final e in sources)
+            if (e.isNotEmpty) f.source.like('%$e%'),
         ].reduce((result, element) => result | element),
       )
       ..orderBy(
