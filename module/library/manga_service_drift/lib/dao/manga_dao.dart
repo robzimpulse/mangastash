@@ -12,11 +12,12 @@ part 'manga_dao.g.dart';
 
 @DriftAccessor(tables: [MangaTables])
 class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
-  // this constructor is required so that the main database can create an instance
-  // of this object.
-  MangaDao(AppDatabase db) : super(db);
 
-  final _uuid = const Uuid();
+  final Uuid _uuid;
+
+  MangaDao({required AppDatabase db, Uuid? uuid})
+      : _uuid = uuid ?? const Uuid(),
+        super(db);
 
   // Future<List<MangaTagDrift>> _searchTags({
   //   List<String> names = const [],
