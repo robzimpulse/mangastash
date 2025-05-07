@@ -18,8 +18,10 @@ class MangaTagRelationshipDao extends DatabaseAccessor<AppDatabase>
     final selector = select(mangaTagRelationshipTables)
       ..where(
         (f) => [
-          ...tagIds.map((e) => f.tagId.equals(e)),
-          ...mangaIds.map((e) => f.mangaId.equals(e)),
+          for (final e in tagIds)
+            if (e.isNotEmpty) f.tagId.equals(e),
+          for (final e in mangaIds)
+            if (e.isNotEmpty) f.mangaId.equals(e),
         ].reduce((result, element) => result | element),
       );
 
@@ -43,7 +45,8 @@ class MangaTagRelationshipDao extends DatabaseAccessor<AppDatabase>
         try {
           /// if insert item were success, add to array [success]
           success.add(
-              await into(mangaTagRelationshipTables).insertReturning(item),);
+            await into(mangaTagRelationshipTables).insertReturning(item),
+          );
         } catch (e) {
           /// if failed to insert item do nothing
         }
@@ -63,8 +66,10 @@ class MangaTagRelationshipDao extends DatabaseAccessor<AppDatabase>
       final selector = delete(mangaTagRelationshipTables)
         ..where(
           (f) => [
-            ...tagIds.map((e) => f.tagId.equals(e)),
-            ...mangaIds.map((e) => f.mangaId.equals(e)),
+            for (final e in tagIds)
+              if (e.isNotEmpty) f.tagId.equals(e),
+            for (final e in mangaIds)
+              if (e.isNotEmpty) f.mangaId.equals(e),
           ].reduce((result, element) => result | element),
         );
 

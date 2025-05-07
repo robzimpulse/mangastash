@@ -19,8 +19,9 @@ class MangaTagDao extends DatabaseAccessor<AppDatabase>
     if (names.isEmpty) return [];
     final selector = select(db.mangaTagTables)
       ..where(
-        (e) => [
-          ...names.map((name) => e.name.equals(name)),
+        (f) => [
+          for (final e in names)
+            if (e.isNotEmpty) f.name.equals(e),
         ].reduce((result, element) => result | element),
       );
 
@@ -59,8 +60,9 @@ class MangaTagDao extends DatabaseAccessor<AppDatabase>
     return transaction(() async {
       final selector = delete(mangaTagTables)
         ..where(
-          (e) => [
-            ...names.map((name) => e.name.equals(name)),
+          (f) => [
+            for (final e in names)
+              if (e.isNotEmpty) f.name.equals(e),
           ].reduce((result, element) => result | element),
         );
 
