@@ -4,7 +4,9 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
+import 'package:text_similarity/text_similarity.dart';
 
+import '../dao/sync_mangas_dao.dart';
 import '../interceptor/log_interceptor.dart';
 import '../tables/manga_chapter_image_tables.dart';
 import '../tables/manga_chapter_tables.dart';
@@ -24,6 +26,9 @@ part 'database.g.dart';
     MangaTables,
     MangaTagTables,
     MangaTagRelationshipTables,
+  ],
+  daos: [
+    SyncMangasDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -67,4 +72,27 @@ Future<QueryExecutor> _openConnection({LoggerCallback? logger}) async {
       },
     ),
   );
+}
+
+extension MangaTablesCompanionSimilarity on MangaTablesCompanion {
+
+  double similarity(MangaTablesCompanion other) {
+    final matcher = StringMatcher(
+      term: TermEnum.char,
+      algorithm: const LevenshteinAlgorithm(),
+    );
+
+    final score = [
+      matcher.similar(title.value, other.title.value)?.ratio ?? 0,
+      matcher.similar(coverUrl.value, other.coverUrl.value)?.ratio ?? 0,
+      matcher.similar(author.value, other.author.value)?.ratio ?? 0,
+      matcher.similar(status.value, other.status.value)?.ratio ?? 0,
+      matcher.similar(description.value, other.description.value)?.ratio ?? 0,
+      matcher.similar(webUrl.value, other.webUrl.value)?.ratio ?? 0,
+      matcher.similar(source.value, other.source.value)?.ratio ?? 0,
+    ];
+
+    return score.reduce((a, b) => a + b) / score.length;
+  }
+
 }
