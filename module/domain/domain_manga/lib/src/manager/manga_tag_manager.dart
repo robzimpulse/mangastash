@@ -1,5 +1,5 @@
-import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../use_case/manga_tag/get_manga_tag_use_case.dart';

@@ -27,10 +27,6 @@ dependencies:
   core_storage:
     path: ../../core/core_storage
 
-  # data
-  data_manga:
-    path: ../../data/data_manga
-
   # entity
   entity_manga:
     path: ../../entity/entity_manga

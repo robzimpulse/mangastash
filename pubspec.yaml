@@ -42,10 +42,6 @@ dependencies:
   core_storage:
     path: module/core/core_storage
 
-  # data
-  data_manga:
-    path: module/data/data_manga
-
   # domain
   domain_manga:
     path: module/domain/domain_manga

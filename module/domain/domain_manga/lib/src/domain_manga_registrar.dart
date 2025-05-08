@@ -1,5 +1,7 @@
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
+import 'package:manga_service_drift/manga_service_drift.dart';
+import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager/download_progress_manager.dart';
@@ -43,6 +45,61 @@ class DomainMangaRegistrar extends Registrar {
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
     log.log('start register', name: runtimeType.toString());
+
+    void logger(
+      message, {
+      error,
+      extra,
+      level,
+      name,
+      sequenceNumber,
+      stackTrace,
+      time,
+      zone,
+    }) {
+      return log.log(
+        message,
+        name: name ?? runtimeType.toString(),
+        sequenceNumber: sequenceNumber,
+        level: level ?? 0,
+        zone: zone,
+        error: error,
+        stackTrace: stackTrace,
+        time: time,
+      );
+    }
+
+    locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
+    locator.registerFactory(
+      () => MangaServiceFirebase(
+        app: locator(),
+        logger: logger,
+      ),
+    );
+    locator.registerFactory(
+      () => MangaTagServiceFirebase(
+        app: locator(),
+        logger: logger,
+      ),
+    );
+    locator.registerFactory(
+      () => MangaChapterServiceFirebase(
+        app: locator(),
+        logger: logger,
+      ),
+    );
+    locator.registerFactory(
+      () => MangaLibraryServiceFirebase(
+        app: locator(),
+        logger: logger,
+      ),
+    );
+
+    locator.registerFactory(
+      () => AppDatabase(logger: logger),
+    );
+
+    locator.registerFactory(() => SyncMangasDao(locator()));
 
     locator.registerSingleton(
       HeadlessWebviewManager(log: log, cacheManager: locator()),

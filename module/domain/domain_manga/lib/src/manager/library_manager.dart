@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:core_auth/core_auth.dart';
-import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../use_case/library/get_manga_from_library_use_case.dart';

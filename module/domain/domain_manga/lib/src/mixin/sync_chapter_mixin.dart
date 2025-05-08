@@ -1,5 +1,5 @@
-import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 mixin SyncChapterMixin {
   Future<MangaChapter> sync({

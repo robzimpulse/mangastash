@@ -3,7 +3,6 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
-import 'package:data_manga/data_manga.dart';
 import 'package:dio_inspector/dio_inspector.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:flutter/foundation.dart';
@@ -75,7 +74,6 @@ class _MangaStashAppState extends State<MangaStashApp> {
     await widget.locator.registerRegistrar(CoreStorageRegistrar());
     await widget.locator.registerRegistrar(CoreEnvironmentRegistrar());
     await widget.locator.registerRegistrar(CoreRouteRegistrar());
-    await widget.locator.registerRegistrar(DataMangaRegistrar());
     await widget.locator.registerRegistrar(DomainMangaRegistrar());
 
     FlutterError.onError = (details) {

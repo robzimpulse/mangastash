@@ -1,7 +1,7 @@
 import 'package:core_network/core_network.dart';
-import 'package:data_manga/data_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
+import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 import '../../mixin/sync_mangas_mixin.dart';
 

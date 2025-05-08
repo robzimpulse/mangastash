@@ -5,3 +5,6 @@ global_options:
   manga_service_firebase:manga_service_firebase:
     runs_before:
       - build_resolvers:transitive_digests
+  manga_dex_api:manga_dex_api:
+    runs_before:
+      - build_resolvers:transitive_digests
