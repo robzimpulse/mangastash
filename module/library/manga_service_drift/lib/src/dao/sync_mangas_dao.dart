@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 import '../database/database.dart';
+import '../model/manga_drift.dart';
 import '../tables/manga_tables.dart';
 import '../tables/manga_tag_relationship_tables.dart';
 import '../tables/manga_tag_tables.dart';
@@ -19,8 +20,10 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
     with _$SyncMangasDaoMixin {
   SyncMangasDao(AppDatabase db) : super(db);
 
-  Future<List<MangaTable>> sync(List<MangaTablesCompanion> mangas) async {
+  Future<List<MangaDrift>> sync(List<MangaDrift> mangas) async {
     if (mangas.isEmpty) return [];
+
+    /// TODO: sync tags
 
     final toUpdate = <MangaTablesCompanion>[];
     final toSync = <MangaTablesCompanion>[];
@@ -28,10 +31,10 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
 
     /// separate manga that have id (scraped) and those that don't
     for (final manga in mangas) {
-      if (manga.id.present) {
-        toUpdate.add(manga);
+      if (manga.id?.isNotEmpty == true) {
+        toSync.add(manga.toCompanion());
       } else {
-        toSync.add(manga);
+        toUpdate.add(manga.toCompanion());
       }
     }
 
@@ -92,7 +95,13 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
         for (final manga in toUpdate) {
           final selector = update(mangaTables)
             ..where((f) => f.id.equals(manga.id.value));
-          final result = await selector.writeReturning(manga);
+          final result = await selector.writeReturning(
+            manga.copyWith(
+              updatedAt: Value(
+                DateTime.now().toIso8601String(),
+              ),
+            ),
+          );
           all.addAll(result);
         }
 
@@ -100,13 +109,19 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
         for (final manga in toUpdateExisting) {
           final selector = update(mangaTables)
             ..where((f) => f.id.equals(manga.id.value));
-          final result = await selector.writeReturning(manga);
+          final result = await selector.writeReturning(
+            manga.copyWith(
+              updatedAt: Value(
+                DateTime.now().toIso8601String(),
+              ),
+            ),
+          );
           all.addAll(result);
         }
 
         /// insert manga that don't have id and don't have similar data
         for (final manga in temp) {
-          into(mangaTables).insertReturning(
+          final result = await into(mangaTables).insertReturning(
             manga,
             onConflict: DoUpdate(
               (old) => manga.copyWith(
@@ -116,9 +131,12 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
               ),
             ),
           );
+          all.add(result);
         }
 
-        return all;
+        return all
+            .map((e) => MangaDrift.fromCompanion(e.toCompanion(false), []))
+            .toList();
       },
     );
   }
