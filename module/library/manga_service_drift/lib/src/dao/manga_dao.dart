@@ -30,7 +30,7 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
       statuses.isEmpty,
       descriptions.isEmpty,
       webUrls.isEmpty,
-      sources.isEmpty
+      sources.isEmpty,
     ].every((isTrue) => isTrue);
 
     if (isAllEmpty) return [];
