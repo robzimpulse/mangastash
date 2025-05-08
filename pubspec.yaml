@@ -15,7 +15,6 @@ dependencies:
   ios_willpop_transition_theme: ^0.0.6
   flex_color_scheme: ^7.3.1
   rxdart: ^0.27.7
-  firebase_core: ^2.24.2
 
   # library
   safe_bloc:
@@ -28,6 +27,8 @@ dependencies:
     path: module/library/log_box
   manga_service_firebase:
     path: module/library/manga_service_firebase
+  manga_service_drift:
+    path: module/library/manga_service_drift
 
   # core
   core_auth:

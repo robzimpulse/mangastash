@@ -12,8 +12,6 @@ dependencies:
     sdk: flutter
   equatable: ^2.0.5
   collection: ^1.16.0
-  firebase_core: ^2.24.2
-  cloud_firestore: ^4.14.0
 
   # library
   service_locator:
@@ -22,6 +20,8 @@ dependencies:
     path: ../../library/log_box
   manga_service_firebase:
     path: ../../library/manga_service_firebase
+  manga_service_drift:
+    path: ../../library/manga_service_drift
 
   # entity
   entity_manga:

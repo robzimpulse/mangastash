@@ -1,6 +1,7 @@
 library manga_service_firebase;
 
 export 'package:firebase_auth/firebase_auth.dart';
+export 'package:firebase_core/firebase_core.dart';
 
 export 'src/model/manga_chapter_firebase.dart';
 export 'src/model/manga_firebase.dart';

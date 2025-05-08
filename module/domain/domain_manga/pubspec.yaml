@@ -13,7 +13,7 @@ dependencies:
   collection: ^1.16.0
   rxdart: ^0.27.7
   background_downloader: ^8.7.1
-  flutter_inappwebview: ^5.8.0
+  flutter_inappwebview: ^6.1.0
   html: ^0.15.5
   queue: ^3.4.0
 

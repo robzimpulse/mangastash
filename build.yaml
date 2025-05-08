@@ -2,3 +2,6 @@ global_options:
   manga_service_drift:manga_service_drift:
     runs_before:
       - build_resolvers:transitive_digests
+  manga_service_firebase:manga_service_firebase:
+    runs_before:
+      - build_resolvers:transitive_digests

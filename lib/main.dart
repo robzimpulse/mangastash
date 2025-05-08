@@ -6,7 +6,6 @@ import 'package:core_storage/core_storage.dart';
 import 'package:data_manga/data_manga.dart';
 import 'package:dio_inspector/dio_inspector.dart';
 import 'package:domain_manga/domain_manga.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:log_box/log_box.dart';
 import 'package:service_locator/service_locator.dart';

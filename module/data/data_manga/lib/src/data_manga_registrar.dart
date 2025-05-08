@@ -1,4 +1,5 @@
 import 'package:log_box/log_box.dart';
+import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:service_locator/service_locator.dart';
 
@@ -55,6 +56,10 @@ class DataMangaRegistrar extends Registrar {
         app: locator(),
         logger: logger,
       ),
+    );
+
+    locator.registerFactory(
+      () => AppDatabase(logger: logger),
     );
 
     log.log('finish register', name: runtimeType.toString());
