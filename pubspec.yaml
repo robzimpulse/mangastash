@@ -27,8 +27,6 @@ dependencies:
     path: module/library/log_box
   manga_service_firebase:
     path: module/library/manga_service_firebase
-  manga_service_drift:
-    path: module/library/manga_service_drift
 
   # core
   core_auth:
@@ -70,3 +68,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+dependency_overrides:
+  firebase_auth: 5.5.2
+  cloud_firestore: 5.6.6
