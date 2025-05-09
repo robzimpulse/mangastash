@@ -191,13 +191,13 @@ packages:
     source: hosted
     version: "1.1.1"
   cloud_firestore:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: cloud_firestore
-      sha256: "6ca737017131a77940fdcca3e13bf6efb5633d50b83514bba24f5fd68e7f340f"
+      sha256: "89a5e32716794b6a8d0ec1b5dfda988194e92daedaa3f3bed66fa0d0a595252e"
       url: "https://pub.dev"
     source: hosted
-    version: "5.6.7"
+    version: "5.6.6"
   cloud_firestore_platform_interface:
     dependency: transitive
     description:
@@ -474,13 +474,13 @@ packages:
     source: hosted
     version: "4.1.0"
   firebase_auth:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: firebase_auth
-      sha256: "06787c45d773af3db3ae693ff648ef488e6048a00b654620b3b8849988f63793"
+      sha256: "54c62b2d187709114dd09ce658a8803ee91f9119b0e0d3fc2245130ad9bff9ad"
       url: "https://pub.dev"
     source: hosted
-    version: "5.5.3"
+    version: "5.5.2"
   firebase_auth_platform_interface:
     dependency: transitive
     description:
@@ -1336,13 +1336,13 @@ packages:
     source: hosted
     version: "2.7.5"
   sqlite3_flutter_libs:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: sqlite3_flutter_libs
-      sha256: "1a96b59227828d9eb1463191d684b37a27d66ee5ed7597fcf42eee6452c88a14"
+      sha256: "50a7e3f294c741d3142eed0ff228e38498334e11e0ccb9d73e0496e005949e44"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.32"
+    version: "0.5.29"
   sqlparser:
     dependency: transitive
     description:

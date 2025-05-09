@@ -1,6 +1,7 @@
 library domain_manga;
 
 export 'package:manga_dex_api/manga_dex_api.dart';
+export 'package:manga_service_drift/manga_service_drift.dart';
 export 'package:manga_service_firebase/manga_service_firebase.dart';
 
 export 'src/domain_manga_registrar.dart';

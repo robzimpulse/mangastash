@@ -15,7 +15,7 @@ dependencies:
   drift_dev: ^2.19.1
   path_provider: ^2.1.5
   sqlite3: ^2.4.5
-  sqlite3_flutter_libs: 0.5.29
+  sqlite3_flutter_libs: ^0.5.0
   uuid: ^4.5.1
   path: ^1.9.0
 

@@ -8,6 +8,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_core
   flutter_inappwebview_windows
   permission_handler_windows
+  sqlite3_flutter_libs
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

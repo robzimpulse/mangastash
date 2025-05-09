@@ -1,5 +1,6 @@
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
+import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:service_locator/service_locator.dart';
 
@@ -68,6 +69,8 @@ class DomainMangaRegistrar extends Registrar {
       );
     }
 
+    locator.registerFactory(() => AppDatabase(logger: logger));
+    locator.registerFactory(() => SyncMangasDao(locator()));
     locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
     locator.registerFactory(
       () => MangaServiceFirebase(
