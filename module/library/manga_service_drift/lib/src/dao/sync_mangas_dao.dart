@@ -24,57 +24,84 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
     if (mangas.isEmpty) return [];
 
     /// TODO: sync tags
-
     final toUpdate = <MangaTablesCompanion>[];
-    final toSync = <MangaTablesCompanion>[];
-    final toUpdateExisting = <MangaTablesCompanion>[];
+    final toInsert = <MangaTablesCompanion>[];
 
     /// separate manga that have id (scraped) and those that don't
     for (final manga in mangas) {
       if (manga.id?.isNotEmpty == true) {
-        toSync.add(manga.toCompanion());
-      } else {
         toUpdate.add(manga.toCompanion());
+      } else {
+        toInsert.add(manga.toCompanion());
       }
     }
 
-    /// select all manga that have properties like [mangas]
-    final selector = select(mangaTables)
-      ..where(
-        (f) => [
-          for (final manga in toSync) ...[
-            if (manga.title.present) f.title.like('%${manga.title.value}%'),
-            if (manga.coverUrl.present)
-              f.coverUrl.like('%${manga.coverUrl.value}%'),
-            if (manga.author.present) f.author.like('%${manga.author.value}%'),
-            if (manga.status.present) f.status.like('%${manga.status.value}%'),
-            if (manga.description.present)
-              f.description.like('%${manga.description.value}%'),
-            if (manga.webUrl.present) f.webUrl.like('%${manga.webUrl.value}%'),
-            if (manga.source.present) f.source.like('%${manga.source.value}%'),
-          ],
-        ].reduce((a, b) => a | b),
-      );
+    /// variable for full scan existing record
+    final titles = <String?>[];
+    final coverUrls = <String?>[];
+    final authors = <String?>[];
+    final statuses = <String?>[];
+    final descriptions = <String?>[];
+    final webUrls = <String?>[];
+    final sources = <String?>[];
+    final entries = <String?>[];
+    for (final manga in toInsert) {
+      titles.add(manga.title.value);
+      coverUrls.add(manga.coverUrl.value);
+      authors.add(manga.author.value);
+      statuses.add(manga.status.value);
+      descriptions.add(manga.description.value);
+      webUrls.add(manga.webUrl.value);
+      sources.add(manga.source.value);
 
-    final existing = await selector.get();
+      entries.addAll([
+        manga.title.value,
+        manga.coverUrl.value,
+        manga.author.value,
+        manga.status.value,
+        manga.description.value,
+        manga.webUrl.value,
+        manga.source.value,
+      ]);
+    }
 
-    final temp = toSync;
+    /// perform full scan to select all manga that have similar value
+    final selector = entries.nonNulls.isEmpty
+        ? null
+        : (select(mangaTables)
+          ..where(
+            (f) => [
+              for (final value in titles.nonNulls) f.title.like('%$value%'),
+              for (final value in coverUrls.nonNulls)
+                f.coverUrl.like('%$value%'),
+              for (final value in authors.nonNulls) f.author.like('%$value%'),
+              for (final value in statuses.nonNulls) f.status.like('%$value%'),
+              for (final value in descriptions.nonNulls)
+                f.description.like('%$value%'),
+              for (final value in webUrls.nonNulls) f.webUrl.like('%$value%'),
+              for (final value in sources.nonNulls) f.source.like('%$value%'),
+            ].reduce((a, b) => a | b),
+          ));
+
+    final existing = (await selector?.get()) ?? [];
+
+    // final temp = toUpsert;
     for (final manga in existing) {
       /// exit if nothing found
-      if (temp.isEmpty) break;
+      if (toInsert.isEmpty) break;
 
       /// convert existing manga record to companion
       final comp = manga.toCompanion(false);
 
       /// sort by similarity
-      temp.sort(
+      toInsert.sort(
         (a, b) => ((comp.similarity(a) - comp.similarity(b)) * 1000).toInt(),
       );
 
       /// pop the first similar
-      final result = temp.removeAt(0);
+      final result = toInsert.removeAt(0);
 
-      toUpdateExisting.add(
+      toUpdate.add(
         comp.copyWith(
           title: result.title,
           coverUrl: result.coverUrl,
@@ -105,29 +132,15 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
           all.addAll(result);
         }
 
-        /// update manga that don't have id but have similar data
-        for (final manga in toUpdateExisting) {
-          final selector = update(mangaTables)
-            ..where((f) => f.id.equals(manga.id.value));
-          final result = await selector.writeReturning(
-            manga.copyWith(
-              updatedAt: Value(
-                DateTime.now().toIso8601String(),
-              ),
-            ),
-          );
-          all.addAll(result);
-        }
-
         /// insert manga that don't have id and don't have similar data
-        for (final manga in temp) {
+        for (final manga in toInsert) {
           final result = await into(mangaTables).insertReturning(
-            manga,
+            manga.copyWith(
+              id: Value(const Uuid().v4().toString()),
+            ),
             onConflict: DoUpdate(
               (old) => manga.copyWith(
-                id: Value(
-                  const Uuid().v4().toString(),
-                ),
+                id: Value(const Uuid().v4().toString()),
               ),
             ),
           );
