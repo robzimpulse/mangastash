@@ -19,21 +19,51 @@ void main() {
 
   tearDown(() => database.close());
 
-  test('manga can be synced', () async {
-    final mangas = [
-      const MangaDrift(
-        title: 'title',
-        author: 'author',
-        coverUrl: 'coverUrl',
-        status: 'status',
-        description: 'description',
-        webUrl: 'webUrl',
-        source: 'source',
-      ),
-    ];
+  test('manga can be inserted', () async {
+    const manga = MangaDrift(
+      title: 'title',
+      author: 'author',
+      coverUrl: 'coverUrl',
+      status: 'status',
+      description: 'description',
+      webUrl: 'webUrl',
+      source: 'source',
+    );
 
-    final result = await syncMangasDao.sync(mangas);
+    final result = await syncMangasDao.sync([manga]);
 
     expect(result.length, equals(1));
   });
+
+  // test('manga can be updated', () async {
+  //
+  //   const ori = MangaDrift(
+  //     id: 'id',
+  //     title: 'title',
+  //     author: 'author',
+  //     coverUrl: 'coverUrl',
+  //     status: 'status',
+  //     description: 'description',
+  //     webUrl: 'webUrl',
+  //     source: 'source',
+  //   );
+  //
+  //   const updated = MangaDrift(
+  //     id: 'id',
+  //     title: 'title_updated',
+  //     author: 'author_updated',
+  //     coverUrl: 'coverUrl_updated',
+  //     status: 'status_updated',
+  //     description: 'description_updated',
+  //     webUrl: 'webUrl_updated',
+  //     source: 'source_updated',
+  //   );
+  //
+  //   await syncMangasDao.sync([ori]);
+  //
+  //   final result = await syncMangasDao.sync([updated]);
+  //
+  //   expect(result.length, equals(1));
+  //   expect(result.contains(updated), isTrue);
+  // });
 }

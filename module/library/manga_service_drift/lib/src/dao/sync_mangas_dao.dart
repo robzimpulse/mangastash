@@ -124,9 +124,8 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
             ..where((f) => f.id.equals(manga.id.value));
           final result = await selector.writeReturning(
             manga.copyWith(
-              updatedAt: Value(
-                DateTime.now().toIso8601String(),
-              ),
+              id: const Value.absent(),
+              updatedAt: Value(DateTime.now().toIso8601String()),
             ),
           );
           all.addAll(result);
