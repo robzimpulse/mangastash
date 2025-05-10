@@ -66,7 +66,7 @@ class SearchChapterOnMangaClashUseCase
           .trim()
           .asDateTime
           ?.toIso8601String();
-      final chapter = text?.whereNotNull().firstOrNull;
+      final chapter = text?.nonNulls.firstOrNull;
 
       chapters.add(
         MangaChapter(

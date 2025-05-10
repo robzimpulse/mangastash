@@ -43,7 +43,7 @@ class LocaleManager implements ListenLocaleUseCase, UpdateLocaleUseCase {
     final values = [
       locale.languageCode,
       locale.countryCode,
-    ].whereNotNull().join('_');
+    ].nonNulls.join('_');
     _storage.setString(_key, values);
     _localeDataStream.add(locale);
   }

@@ -1,5 +1,3 @@
-import 'package:collection/collection.dart';
-
 mixin GenerateTaskIdMixin {
   String generateTaskId({
     String? url,
@@ -8,7 +6,7 @@ mixin GenerateTaskIdMixin {
     String? group,
   }) {
     return [url, directory, filename, group]
-        .whereNotNull()
+        .nonNulls
         .join('')
         .hashCode
         .toString();

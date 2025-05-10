@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart'
     show toBeginningOfSentenceCase;
 import 'package:core_network/core_network.dart';
@@ -99,7 +98,7 @@ class SearchMangaOnMangaClashUseCaseUseCase with SyncMangasMixin {
         ?.text
         .split(' ')
         .map((e) => int.tryParse(e))
-        .whereNotNull()
+        .nonNulls
         .last;
 
     final data = await sync(

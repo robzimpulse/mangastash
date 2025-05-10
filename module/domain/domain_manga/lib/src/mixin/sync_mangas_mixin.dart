@@ -40,7 +40,6 @@ mixin SyncMangasMixin {
             e,
             tags: tags
                 .where((tag) => e.tagsId?.contains(tag.id) == true)
-                .map((e) => MangaTag.fromFirebaseService(e))
                 .toList(),
           ),
         )

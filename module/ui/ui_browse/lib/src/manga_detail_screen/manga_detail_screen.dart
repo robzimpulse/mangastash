@@ -498,7 +498,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         title: [
           'Chapter ${value.chapter}',
           value.title,
-        ].whereNotNull().join(' - '),
+        ].nonNulls.join(' - '),
         language: Language.fromCode(value.translatedLanguage),
         uploadedAt: value.readableAt?.asDateTime,
         groups: value.scanlationGroup,

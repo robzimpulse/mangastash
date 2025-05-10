@@ -1,6 +1,5 @@
 library entity_manga;
 
-export 'src/base/base_model.dart';
 export 'src/base/pagination.dart';
 export 'src/download_chapter_key.dart';
 export 'src/download_chapter_progress.dart';

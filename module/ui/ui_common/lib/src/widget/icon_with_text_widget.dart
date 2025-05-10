@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:intersperse/intersperse.dart';
 
@@ -14,7 +13,7 @@ class IconWithTextWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final children = [icon, text].whereNotNull();
+    final children = [icon, text].nonNulls;
     if (children.isEmpty) return const SizedBox.shrink();
     return Row(
       mainAxisSize: MainAxisSize.min,
