@@ -1,6 +1,7 @@
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
+import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 import '../../mixin/sync_mangas_mixin.dart';
@@ -9,12 +10,15 @@ class GetMangaOnMangaDexUseCase with SyncMangasMixin {
   final MangaService _mangaService;
   final MangaTagServiceFirebase _mangaTagServiceFirebase;
   final MangaServiceFirebase _mangaServiceFirebase;
+  final SyncMangasDao _syncMangasDao;
 
   GetMangaOnMangaDexUseCase({
     required MangaTagServiceFirebase mangaTagServiceFirebase,
     required MangaServiceFirebase mangaServiceFirebase,
     required MangaService mangaService,
+    required SyncMangasDao syncMangasDao,
   })  : _mangaService = mangaService,
+        _syncMangasDao = syncMangasDao,
         _mangaServiceFirebase = mangaServiceFirebase,
         _mangaTagServiceFirebase = mangaTagServiceFirebase;
 
@@ -34,6 +38,7 @@ class GetMangaOnMangaDexUseCase with SyncMangasMixin {
       if (manga == null) return Error(Exception('Manga not found'));
 
       final process = sync(
+        syncMangasDao: _syncMangasDao,
         mangaTagServiceFirebase: _mangaTagServiceFirebase,
         mangaServiceFirebase: _mangaServiceFirebase,
         mangas: [

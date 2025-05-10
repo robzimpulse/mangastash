@@ -7,6 +7,7 @@ import 'package:core_environment/core_environment.dart'
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
+import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 import '../../exception/failed_parsing_html_exception.dart';
@@ -17,13 +18,16 @@ class SearchMangaOnMangaClashUseCaseUseCase with SyncMangasMixin {
   final HeadlessWebviewManager _webview;
   final MangaTagServiceFirebase _mangaTagServiceFirebase;
   final MangaServiceFirebase _mangaServiceFirebase;
+  final SyncMangasDao _syncMangasDao;
 
   SearchMangaOnMangaClashUseCaseUseCase({
     required HeadlessWebviewManager webview,
     required MangaTagServiceFirebase mangaTagServiceFirebase,
     required MangaServiceFirebase mangaServiceFirebase,
+    required SyncMangasDao syncMangasDao,
   })  : _webview = webview,
         _mangaServiceFirebase = mangaServiceFirebase,
+        _syncMangasDao = syncMangasDao,
         _mangaTagServiceFirebase = mangaTagServiceFirebase;
 
   Future<Result<Pagination<Manga>>> execute({
@@ -99,6 +103,7 @@ class SearchMangaOnMangaClashUseCaseUseCase with SyncMangasMixin {
         .last;
 
     final data = await sync(
+      syncMangasDao: _syncMangasDao,
       mangaTagServiceFirebase: _mangaTagServiceFirebase,
       mangaServiceFirebase: _mangaServiceFirebase,
       mangas: mangas,
