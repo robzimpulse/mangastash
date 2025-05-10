@@ -96,3 +96,20 @@ extension MangaTablesCompanionSimilarity on MangaTablesCompanion {
   }
 
 }
+
+extension MangaTagTablesCompanionSimilarity on MangaTagTablesCompanion {
+
+  double similarity(MangaTagTablesCompanion other) {
+    final matcher = StringMatcher(
+      term: TermEnum.char,
+      algorithm: const LevenshteinAlgorithm(),
+    );
+
+    final score = [
+      matcher.similar(name.value, other.name.value)?.ratio ?? 0,
+    ];
+
+    return score.reduce((a, b) => a + b) / score.length;
+  }
+
+}

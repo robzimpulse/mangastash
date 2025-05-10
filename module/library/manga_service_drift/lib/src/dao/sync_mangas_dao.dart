@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../manga_service_drift.dart';
 import '../database/database.dart';
 import '../model/manga_drift.dart';
 import '../tables/manga_tables.dart';
@@ -22,9 +23,10 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<MangaDrift>> sync(List<MangaDrift> mangas) async {
     if (mangas.isEmpty) return [];
+    final tags = mangas.expand((e) => e.tags ?? <MangaTagDrift>[]).toList();
 
     /// variable for full scan existing record
-    final existing = await scan(
+    final existingMangas = await searchMangas(
       ids: mangas.map((e) => e.id).nonNulls.toList(),
       titles: mangas.map((e) => e.title).nonNulls.toList(),
       coverUrls: mangas.map((e) => e.coverUrl).nonNulls.toList(),
@@ -35,22 +37,46 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
       sources: mangas.map((e) => e.source).nonNulls.toList(),
     );
 
-    /// TODO: sync tags
-    final toUpdate = <MangaTablesCompanion>[];
-    final toInsert = mangas.map((e) => e.toCompanion()).toList();
-    for (final manga in existing) {
+    final existingTags = await searchTags(
+      ids: tags.map((e) => e.id).nonNulls.toList(),
+      names: tags.map((e) => e.name).nonNulls.toList(),
+    );
+
+    final toUpdateManga = <MangaTablesCompanion>[];
+    final toInsertManga = mangas.map((e) => e.toCompanion()).toList();
+
+    final toUpdateTags = <MangaTagTablesCompanion>[];
+    final toInsertTags = tags.map((e) => e.toCompanion()).toList();
+
+    for (final tag in existingTags) {
+      final comp = tag.toCompanion(false);
+
+      toInsertTags.sort(
+        (a, b) => ((comp.similarity(a) - comp.similarity(b)) * 1000).toInt(),
+      );
+
+      final result = toInsertTags.removeAt(0);
+
+      toUpdateTags.add(
+        comp.copyWith(
+          name: result.name,
+        ),
+      );
+    }
+
+    for (final manga in existingMangas) {
       /// convert existing manga record to companion
       final comp = manga.toCompanion(false);
 
       /// sort by similarity
-      toInsert.sort(
+      toInsertManga.sort(
         (a, b) => ((comp.similarity(a) - comp.similarity(b)) * 1000).toInt(),
       );
 
       /// pop the first similar
-      final result = toInsert.removeAt(0);
+      final result = toInsertManga.removeAt(0);
 
-      toUpdate.add(
+      toUpdateManga.add(
         comp.copyWith(
           title: result.title,
           coverUrl: result.coverUrl,
@@ -65,20 +91,30 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
 
     return transaction(
       () async {
-        final all = <MangaTable>[];
+        final allManga = <MangaTable>[];
+        final allTag = <MangaTagTable>[];
 
         /// update manga
-        for (final manga in toUpdate) {
+        for (final manga in toUpdateManga) {
           final selector = update(mangaTables)
             ..where((f) => f.id.equals(manga.id.value));
           final result = await selector.writeReturning(
             manga.copyWith(updatedAt: Value(DateTime.now().toIso8601String())),
           );
-          all.addAll(result);
+          allManga.addAll(result);
+        }
+
+        for (final tag in toUpdateTags) {
+          final selector = update(mangaTagTables)
+            ..where((f) => f.id.equals(tag.id.value));
+          final result = await selector.writeReturning(
+            tag.copyWith(updatedAt: Value(DateTime.now().toIso8601String())),
+          );
+          allTag.addAll(result);
         }
 
         /// insert manga
-        for (final manga in toInsert) {
+        for (final manga in toInsertManga) {
           final result = await into(mangaTables).insertReturning(
             manga.copyWith(
               id: manga.id.present ? null : Value(const Uuid().v4().toString()),
@@ -89,17 +125,56 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
               ),
             ),
           );
-          all.add(result);
+          allManga.add(result);
         }
 
-        return all
-            .map((e) => MangaDrift.fromCompanion(e.toCompanion(false), []))
+        for (final tag in toInsertTags) {
+          final result = await into(mangaTagTables).insertReturning(
+            tag.copyWith(
+              id: tag.id.present ? null : Value(const Uuid().v4().toString()),
+            ),
+            onConflict: DoUpdate(
+              (old) => tag.copyWith(
+                id: Value(const Uuid().v4().toString()),
+              ),
+            ),
+          );
+          allTag.add(result);
+        }
+
+        // TODO: sync tags
+        return allManga
+            .map(
+              (e) => MangaDrift.fromCompanion(
+                e.toCompanion(false),
+                [],
+              ),
+            )
             .toList();
       },
     );
   }
 
-  Future<List<MangaTable>> scan({
+  Future<List<MangaTagTable>> searchTags({
+    List<String> ids = const [],
+    List<String> names = const [],
+  }) async {
+    final isAllEmpty = [...ids, ...names].isEmpty;
+
+    if (isAllEmpty) return [];
+
+    final selector = select(mangaTagTables)
+      ..where(
+        (f) => [
+          for (final e in ids) f.id.equals(e),
+          for (final e in names) f.name.equals(e),
+        ].reduce((a, b) => a | b),
+      );
+
+    return selector.get();
+  }
+
+  Future<List<MangaTable>> searchMangas({
     List<String> ids = const [],
     List<String> titles = const [],
     List<String> coverUrls = const [],
