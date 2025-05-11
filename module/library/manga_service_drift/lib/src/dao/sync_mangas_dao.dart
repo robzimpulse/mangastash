@@ -1,9 +1,10 @@
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../manga_service_drift.dart';
 import '../database/database.dart';
+import '../extension/non_empty_string_list_extension.dart';
 import '../model/manga_drift.dart';
+import '../model/manga_tag_drift.dart';
 import '../tables/manga_tables.dart';
 import '../tables/manga_tag_relationship_tables.dart';
 import '../tables/manga_tag_tables.dart';
@@ -174,15 +175,15 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
     List<String> ids = const [],
     List<String> names = const [],
   }) async {
-    final isAllEmpty = [...ids, ...names].isEmpty;
+    final isAllEmpty = [...ids.nonEmpty, ...names.nonEmpty].isEmpty;
 
     if (isAllEmpty) return [];
 
     final selector = select(mangaTagTables)
       ..where(
         (f) => [
-          for (final e in ids) f.id.equals(e),
-          for (final e in names) f.name.equals(e),
+          for (final e in ids.nonEmpty) f.id.equals(e),
+          for (final e in names.nonEmpty) f.name.equals(e),
         ].reduce((a, b) => a | b),
       );
 
@@ -200,14 +201,14 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
     List<String> sources = const [],
   }) async {
     final isAllEmpty = [
-      ...ids,
-      ...titles,
-      ...coverUrls,
-      ...authors,
-      ...statuses,
-      ...descriptions,
-      ...webUrls,
-      ...sources,
+      ...ids.nonEmpty,
+      ...titles.nonEmpty,
+      ...coverUrls.nonEmpty,
+      ...authors.nonEmpty,
+      ...statuses.nonEmpty,
+      ...descriptions.nonEmpty,
+      ...webUrls.nonEmpty,
+      ...sources.nonEmpty,
     ].isEmpty;
 
     if (isAllEmpty) return [];
@@ -215,14 +216,33 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
     final selector = select(mangaTables)
       ..where(
         (f) => [
-          for (final e in ids) f.id.equals(e),
-          for (final e in titles) f.title.like('%$e%'),
-          for (final e in coverUrls) f.coverUrl.like('%$e%'),
-          for (final e in authors) f.author.like('%$e%'),
-          for (final e in statuses) f.status.like('%$e%'),
-          for (final e in descriptions) f.description.like('%$e%'),
-          for (final e in webUrls) f.webUrl.like('%$e%'),
-          for (final e in sources) f.source.like('%$e%'),
+          for (final e in ids.nonEmpty) f.id.equals(e),
+          for (final e in titles.nonEmpty) f.title.like('%$e%'),
+          for (final e in coverUrls.nonEmpty) f.coverUrl.like('%$e%'),
+          for (final e in authors.nonEmpty) f.author.like('%$e%'),
+          for (final e in statuses.nonEmpty) f.status.like('%$e%'),
+          for (final e in descriptions.nonEmpty) f.description.like('%$e%'),
+          for (final e in webUrls.nonEmpty) f.webUrl.like('%$e%'),
+          for (final e in sources.nonEmpty) f.source.like('%$e%'),
+        ].reduce((a, b) => a | b),
+      );
+
+    return selector.get();
+  }
+
+  Future<List<MangaTagRelationshipTable>> searchRelationship({
+    List<String> mangaIds = const [],
+    List<String> tagIds = const [],
+  }) async {
+    final isAllEmpty = [...mangaIds.nonEmpty, ...tagIds.nonEmpty].isEmpty;
+
+    if (isAllEmpty) return [];
+
+    final selector = select(mangaTagRelationshipTables)
+      ..where(
+        (f) => [
+          for (final e in mangaIds.nonEmpty) f.mangaId.equals(e),
+          for (final e in tagIds.nonEmpty) f.tagId.equals(e),
         ].reduce((a, b) => a | b),
       );
 
