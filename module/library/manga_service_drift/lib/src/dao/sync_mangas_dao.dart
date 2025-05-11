@@ -42,7 +42,7 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
       names: tags.map((e) => e.name).nonNulls.toList(),
     );
 
-    final toUpdateManga = <MangaTablesCompanion>[];
+    final toUpdateManga = <(MangaTablesCompanion, List<String>)>[];
     final toInsertManga = mangas;
 
     final toUpdateTags = <MangaTagTablesCompanion>[];
@@ -88,21 +88,24 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
       final result = toInsertManga.removeAt(0);
 
       toUpdateManga.add(
-        comp.copyWith(
-          title: Value.absentIfNull(result.title),
-          coverUrl: Value.absentIfNull(result.coverUrl),
-          author: Value.absentIfNull(result.author),
-          status: Value.absentIfNull(result.status),
-          description: Value.absentIfNull(result.description),
-          webUrl: Value.absentIfNull(result.webUrl),
-          source: Value.absentIfNull(result.source),
+        (
+          comp.copyWith(
+            title: Value.absentIfNull(result.title),
+            coverUrl: Value.absentIfNull(result.coverUrl),
+            author: Value.absentIfNull(result.author),
+            status: Value.absentIfNull(result.status),
+            description: Value.absentIfNull(result.description),
+            webUrl: Value.absentIfNull(result.webUrl),
+            source: Value.absentIfNull(result.source),
+          ),
+          result.tags?.map((e) => e.name).nonNulls.toList() ?? [],
         ),
       );
     }
 
     return transaction(
       () async {
-        final allManga = <MangaTable>[];
+        final allManga = <(MangaTable, List<MangaTagTable>)>[];
         final allTag = <MangaTagTable>[];
 
         /// insert tag
@@ -132,17 +135,35 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
         }
 
         /// update manga
-        for (final manga in toUpdateManga) {
+        for (final (manga, tagNames) in toUpdateManga) {
           final selector = update(mangaTables)
             ..where((f) => f.id.equals(manga.id.value));
           final results = await selector.writeReturning(
             manga.copyWith(updatedAt: Value(DateTime.now().toIso8601String())),
           );
-          allManga.addAll(results);
+          for (final result in results) {
+            /// delete existing relationship for updated manga
+            await (delete(mangaTagRelationshipTables)
+                  ..where((f) => f.mangaId.equals(manga.id.value)))
+                .go();
+
+            final newTags = [...allTag.where((e) => tagNames.contains(e.name))];
+            for (final tag in newTags) {
+              await into(mangaTagRelationshipTables).insert(
+                MangaTagRelationshipTablesCompanion.insert(
+                  tagId: tag.id,
+                  mangaId: result.id,
+                ),
+              );
+            }
+            allManga.add((result, newTags));
+          }
         }
 
         /// insert manga
         for (final manga in toInsertManga) {
+          final tags = manga.tags?.map((e) => e.name).nonNulls.toList() ?? [];
+          final newTags = [...allTag.where((e) => tags.contains(e.name))];
           final tmp = manga.toCompanion();
           final result = await into(mangaTables).insertReturning(
             tmp.copyWith(
@@ -154,15 +175,22 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
               ),
             ),
           );
-          allManga.add(result);
+          for (final tag in newTags) {
+            await into(mangaTagRelationshipTables).insert(
+              MangaTagRelationshipTablesCompanion.insert(
+                tagId: tag.id,
+                mangaId: result.id,
+              ),
+            );
+          }
+          allManga.add((result, newTags));
         }
 
         return allManga
             .map(
               (e) => MangaDrift.fromCompanion(
-                e.toCompanion(false),
-                // TODO: update manga-tags relationship
-                [],
+                e.$1.toCompanion(false),
+                e.$2.map((e) => e.toCompanion(false)).toList(),
               ),
             )
             .toList();
@@ -229,22 +257,22 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
     return selector.get();
   }
 
-  Future<List<MangaTagRelationshipTable>> searchRelationship({
-    List<String> mangaIds = const [],
-    List<String> tagIds = const [],
-  }) async {
-    final isAllEmpty = [...mangaIds.nonEmpty, ...tagIds.nonEmpty].isEmpty;
-
-    if (isAllEmpty) return [];
-
-    final selector = select(mangaTagRelationshipTables)
-      ..where(
-        (f) => [
-          for (final e in mangaIds.nonEmpty) f.mangaId.equals(e),
-          for (final e in tagIds.nonEmpty) f.tagId.equals(e),
-        ].reduce((a, b) => a | b),
-      );
-
-    return selector.get();
-  }
+  // Future<List<MangaTagRelationshipTable>> removeRelationship({
+  //   List<String> mangaIds = const [],
+  //   List<String> tagIds = const [],
+  // }) async {
+  //   final isAllEmpty = [...mangaIds.nonEmpty, ...tagIds.nonEmpty].isEmpty;
+  //
+  //   if (isAllEmpty) return [];
+  //
+  //   final selector = select(mangaTagRelationshipTables)
+  //     ..where(
+  //       (f) => [
+  //         for (final e in mangaIds.nonEmpty) f.mangaId.equals(e),
+  //         for (final e in tagIds.nonEmpty) f.tagId.equals(e),
+  //       ].reduce((a, b) => a | b),
+  //     );
+  //
+  //   return selector.get();
+  // }
 }

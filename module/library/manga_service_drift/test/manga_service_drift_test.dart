@@ -47,10 +47,11 @@ void main() {
       expect(data.length, equals(1));
     }
 
-    // {
-    //   final data = await database.select(database.mangaTagRelationshipTables).get();
-    //   expect(data.length, equals(1));
-    // }
+    {
+      final data =
+          await database.select(database.mangaTagRelationshipTables).get();
+      expect(data.length, equals(1));
+    }
   });
 
   test('manga can be updated', () async {
@@ -95,9 +96,10 @@ void main() {
       expect(data.length, equals(1));
     }
 
-    // {
-    //   final data = await database.select(database.mangaTagRelationshipTables).get();
-    //   expect(data.length, equals(0));
-    // }
+    {
+      final data =
+          await database.select(database.mangaTagRelationshipTables).get();
+      expect(data.length, equals(0));
+    }
   });
 }
