@@ -126,33 +126,30 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
 
         /// insert manga
         for (final manga in toInsertManga) {
+          final tmp = manga.toCompanion();
           final result = await into(mangaTables).insertReturning(
-            manga.toCompanion().copyWith(
-                  id: manga.toCompanion().id.present
-                      ? null
-                      : Value(const Uuid().v4().toString()),
-                ),
+            tmp.copyWith(
+              id: tmp.id.present ? null : Value(const Uuid().v4().toString()),
+            ),
             onConflict: DoUpdate(
-              (old) => manga.toCompanion()
-                ..copyWith(
-                  id: Value(const Uuid().v4().toString()),
-                ),
+              (old) => tmp.copyWith(
+                id: Value(const Uuid().v4().toString()),
+              ),
             ),
           );
           allManga.add(result);
         }
 
         for (final tag in toInsertTags) {
+          final tmp = tag.toCompanion();
           final result = await into(mangaTagTables).insertReturning(
-            tag.toCompanion().copyWith(
-                  id: tag.toCompanion().id.present
-                      ? null
-                      : Value(const Uuid().v4().toString()),
-                ),
+            tmp.copyWith(
+              id: tmp.id.present ? null : Value(const Uuid().v4().toString()),
+            ),
             onConflict: DoUpdate(
-              (old) => tag.toCompanion().copyWith(
-                    id: Value(const Uuid().v4().toString()),
-                  ),
+              (old) => tmp.copyWith(
+                id: Value(const Uuid().v4().toString()),
+              ),
             ),
           );
           allTag.add(result);
