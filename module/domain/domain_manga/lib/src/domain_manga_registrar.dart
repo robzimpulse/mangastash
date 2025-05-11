@@ -69,7 +69,7 @@ class DomainMangaRegistrar extends Registrar {
       );
     }
 
-    locator.registerFactory(() => AppDatabase(logger: logger));
+    locator.registerSingleton(AppDatabase(logger: logger));
     locator.registerFactory(() => SyncMangasDao(locator()));
     locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
     locator.registerFactory(
