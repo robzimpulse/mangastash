@@ -4,7 +4,6 @@ import 'package:uuid/uuid.dart';
 import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
 import '../model/manga_drift.dart';
-import '../model/manga_tag_drift.dart';
 import '../tables/manga_tables.dart';
 import '../tables/manga_tag_relationship_tables.dart';
 import '../tables/manga_tag_tables.dart';
@@ -24,7 +23,7 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<MangaDrift>> sync(List<MangaDrift> mangas) async {
     if (mangas.isEmpty) return [];
-    final tags = mangas.expand((e) => e.tags ?? <MangaTagDrift>[]).toList();
+    final tags = mangas.expand((e) => e.tags).toList();
 
     final existingMangas = await searchMangas(
       ids: mangas.map((e) => e.id).nonNulls.toList(),
@@ -98,7 +97,7 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
             webUrl: Value.absentIfNull(result.webUrl),
             source: Value.absentIfNull(result.source),
           ),
-          result.tags?.map((e) => e.name).nonNulls.toList() ?? [],
+          result.tags.map((e) => e.name).nonNulls.toList(),
         ),
       );
     }
@@ -162,7 +161,7 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
 
         /// insert manga
         for (final manga in toInsertManga) {
-          final tags = manga.tags?.map((e) => e.name).nonNulls.toList() ?? [];
+          final tags = manga.tags.map((e) => e.name).nonNulls.toList();
           final newTags = [...allTag.where((e) => tags.contains(e.name))];
           final tmp = manga.toCompanion();
           final result = await into(mangaTables).insertReturning(

@@ -1,9 +1,10 @@
 import 'package:drift/drift.dart';
+import 'package:equatable/equatable.dart';
 
 import '../database/database.dart';
 import 'manga_tag_drift.dart';
 
-class MangaDrift {
+class MangaDrift extends Equatable {
   final String? id;
   final String? title;
   final String? coverUrl;
@@ -12,7 +13,7 @@ class MangaDrift {
   final String? description;
   final String? webUrl;
   final String? source;
-  final List<MangaTagDrift>? tags;
+  final List<MangaTagDrift> tags;
 
   const MangaDrift({
     this.id,
@@ -23,7 +24,7 @@ class MangaDrift {
     this.description,
     this.webUrl,
     this.source,
-    this.tags,
+    this.tags = const [],
   });
 
   factory MangaDrift.fromCompanion(
@@ -57,4 +58,16 @@ class MangaDrift {
       source: Value.absentIfNull(source),
     );
   }
+
+  @override
+  List<Object?> get props => [
+        title,
+        coverUrl,
+        author,
+        status,
+        description,
+        webUrl,
+        source,
+        tags.map((e) => e.name),
+      ];
 }

@@ -126,7 +126,8 @@ class Manga extends Equatable {
   }
 
   MangaDrift toDriftService() {
-    return MangaDrift(id: id,
+    return MangaDrift(
+      id: id,
       title: title,
       coverUrl: coverUrl,
       author: author,
@@ -134,7 +135,8 @@ class Manga extends Equatable {
       description: description,
       webUrl: webUrl,
       source: source?.value,
-      tags: tags?.map((e) => e.toDriftService()).nonNulls.toList(),);
+      tags: tags?.map((e) => e.toDriftService()).nonNulls.toList() ?? [],
+    );
   }
 
   factory Manga.fromJson(Map<String, dynamic> json) {

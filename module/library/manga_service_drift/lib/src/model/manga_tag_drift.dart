@@ -1,8 +1,9 @@
 import 'package:drift/drift.dart';
+import 'package:equatable/equatable.dart';
 
 import '../database/database.dart';
 
-class MangaTagDrift {
+class MangaTagDrift extends Equatable {
   final String? id;
   final String? name;
 
@@ -26,4 +27,7 @@ class MangaTagDrift {
       name: Value.absentIfNull(name),
     );
   }
+
+  @override
+  List<Object?> get props => [id, name];
 }
