@@ -105,16 +105,23 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
         final allManga = <MangaTable>[];
         final allTag = <MangaTagTable>[];
 
-        /// update manga
-        for (final manga in toUpdateManga) {
-          final selector = update(mangaTables)
-            ..where((f) => f.id.equals(manga.id.value));
-          final result = await selector.writeReturning(
-            manga.copyWith(updatedAt: Value(DateTime.now().toIso8601String())),
+        /// insert tag
+        for (final tag in toInsertTags) {
+          final tmp = tag.toCompanion();
+          final result = await into(mangaTagTables).insertReturning(
+            tmp.copyWith(
+              id: tmp.id.present ? null : Value(const Uuid().v4().toString()),
+            ),
+            onConflict: DoUpdate(
+              (old) => tmp.copyWith(
+                id: Value(const Uuid().v4().toString()),
+              ),
+            ),
           );
-          allManga.addAll(result);
+          allTag.add(result);
         }
 
+        /// update tag
         for (final tag in toUpdateTags) {
           final selector = update(mangaTagTables)
             ..where((f) => f.id.equals(tag.id.value));
@@ -122,6 +129,16 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
             tag.copyWith(updatedAt: Value(DateTime.now().toIso8601String())),
           );
           allTag.addAll(result);
+        }
+
+        /// update manga
+        for (final manga in toUpdateManga) {
+          final selector = update(mangaTables)
+            ..where((f) => f.id.equals(manga.id.value));
+          final results = await selector.writeReturning(
+            manga.copyWith(updatedAt: Value(DateTime.now().toIso8601String())),
+          );
+          allManga.addAll(results);
         }
 
         /// insert manga
@@ -138,21 +155,6 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
             ),
           );
           allManga.add(result);
-        }
-
-        for (final tag in toInsertTags) {
-          final tmp = tag.toCompanion();
-          final result = await into(mangaTagTables).insertReturning(
-            tmp.copyWith(
-              id: tmp.id.present ? null : Value(const Uuid().v4().toString()),
-            ),
-            onConflict: DoUpdate(
-              (old) => tmp.copyWith(
-                id: Value(const Uuid().v4().toString()),
-              ),
-            ),
-          );
-          allTag.add(result);
         }
 
         return allManga
