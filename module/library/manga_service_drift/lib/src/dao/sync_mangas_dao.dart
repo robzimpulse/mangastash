@@ -48,26 +48,6 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
     final toInsertTags = tags;
 
     for (final tag in existingTags) {
-      final comp = tag.toCompanion(false);
-
-      toInsertTags.sort(
-        (a, b) {
-          final left = comp.similarity(a.toCompanion());
-          final right = comp.similarity(b.toCompanion());
-          return ((left - right) * 1000).toInt();
-        },
-      );
-
-      final result = toInsertTags.removeAt(0);
-
-      toUpdateTags.add(
-        comp.copyWith(
-          name: Value.absentIfNull(result.name),
-        ),
-      );
-    }
-
-    for (final tag in existingTags) {
       /// convert existing record to companion
       final comp = tag.toCompanion(false);
 
