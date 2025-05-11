@@ -4,58 +4,95 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 
 void main() {
-  late AppDatabase database;
+  late AppDatabase db;
   late SyncMangasDao syncMangasDao;
 
   setUp(() {
-    database = AppDatabase(
+    db = AppDatabase(
       executor: DatabaseConnection(
         NativeDatabase.memory(),
         closeStreamsSynchronously: true,
       ),
     );
-    syncMangasDao = SyncMangasDao(database);
+    syncMangasDao = SyncMangasDao(db);
   });
 
-  tearDown(() => database.close());
+  tearDown(() => db.close());
 
-  test('manga can be inserted', () async {
-    const manga = MangaDrift(
-      title: 'title',
-      author: 'author',
-      coverUrl: 'coverUrl',
-      status: 'status',
-      description: 'description',
-      webUrl: 'webUrl',
-      source: 'source',
-      tags: [
-        MangaTagDrift(
-          name: 'Test',
-        ),
-      ],
-    );
+  group('Insert', () {
+    test('New Manga', () async {
+      const manga = MangaDrift(
+        title: 'title',
+        author: 'author',
+        coverUrl: 'coverUrl',
+        status: 'status',
+        description: 'description',
+        webUrl: 'webUrl',
+        source: 'source',
+        tags: [
+          MangaTagDrift(
+            name: 'Test',
+          ),
+        ],
+      );
 
-    await syncMangasDao.sync([manga]);
+      await syncMangasDao.sync([manga]);
 
-    {
-      final data = await database.select(database.mangaTables).get();
-      expect(data.length, equals(1));
-    }
+      {
+        final data = await db.select(db.mangaTables).get();
+        expect(data.length, equals(1));
+      }
 
-    {
-      final data = await database.select(database.mangaTagTables).get();
-      expect(data.length, equals(1));
-    }
+      {
+        final data = await db.select(db.mangaTagTables).get();
+        expect(data.length, equals(1));
+      }
 
-    {
-      final data =
-          await database.select(database.mangaTagRelationshipTables).get();
-      expect(data.length, equals(1));
-    }
+      {
+        final data = await db.select(db.mangaTagRelationshipTables).get();
+        expect(data.length, equals(1));
+      }
+    });
+
+    test('Existing Manga', () async {
+      const manga = MangaDrift(
+        id: 'id',
+        title: 'title',
+        author: 'author',
+        coverUrl: 'coverUrl',
+        status: 'status',
+        description: 'description',
+        webUrl: 'webUrl',
+        source: 'source',
+        tags: [
+          MangaTagDrift(
+            id: 'id',
+            name: 'Test',
+          ),
+        ],
+      );
+
+      await syncMangasDao.sync([manga]);
+
+      {
+        final data = await db.select(db.mangaTables).get();
+        expect(data.length, equals(1));
+      }
+
+      {
+        final data = await db.select(db.mangaTagTables).get();
+        expect(data.length, equals(1));
+      }
+
+      {
+        final data = await db.select(db.mangaTagRelationshipTables).get();
+        expect(data.length, equals(1));
+      }
+    });
   });
 
-  test('manga can be updated', () async {
-    const ori = MangaDrift(
+  group('Update', () {
+    const existing = MangaDrift(
       id: 'testing',
       title: 'title',
       author: 'author',
@@ -66,40 +103,48 @@ void main() {
       source: 'source',
       tags: [
         MangaTagDrift(
+          id: 'testing',
           name: 'Test',
         ),
       ],
     );
 
-    await syncMangasDao.sync([ori]);
+    setUp(() async => await syncMangasDao.sync([existing]));
 
-    const updated = MangaDrift(
-      id: 'testing',
-      title: 'title_updated',
-      author: 'author_updated',
-      coverUrl: 'coverUrl_updated',
-      status: 'status_updated',
-      description: 'description_updated',
-      webUrl: 'webUrl_updated',
-      source: 'source_updated',
-    );
+    test('Manga can be updated', () async {
+      final updated = existing.toCompanion();
+      await syncMangasDao.sync(
+        [
+          MangaDrift.fromCompanion(
+            updated.copyWith(
+              title: const Value('title_updated'),
+            ),
+            existing.tags
+                .map(
+                  (e) => e
+                      .toCompanion()
+                      .copyWith(name: const Value('name_updated')),
+                )
+                .toList(),
+          ),
+        ],
+      );
 
-    await syncMangasDao.sync([updated]);
+      {
+        final data = await db.select(db.mangaTables).get();
+        expect(data.length, equals(1));
+      }
 
-    {
-      final data = await database.select(database.mangaTables).get();
-      expect(data.length, equals(1));
-    }
+      {
+        final data = await db.select(db.mangaTagTables).get();
+        expect(data.length, equals(1));
+      }
 
-    {
-      final data = await database.select(database.mangaTagTables).get();
-      expect(data.length, equals(1));
-    }
+      {
+        final data = await db.select(db.mangaTagRelationshipTables).get();
+        expect(data.length, equals(1));
+      }
 
-    {
-      final data =
-          await database.select(database.mangaTagRelationshipTables).get();
-      expect(data.length, equals(0));
-    }
+    });
   });
 }
