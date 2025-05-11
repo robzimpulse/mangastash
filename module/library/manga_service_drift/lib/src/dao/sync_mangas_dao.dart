@@ -25,7 +25,6 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
     if (mangas.isEmpty) return [];
     final tags = mangas.expand((e) => e.tags ?? <MangaTagDrift>[]).toList();
 
-    /// variable for full scan existing record
     final existingMangas = await searchMangas(
       ids: mangas.map((e) => e.id).nonNulls.toList(),
       titles: mangas.map((e) => e.title).nonNulls.toList(),
@@ -43,34 +42,65 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
     );
 
     final toUpdateManga = <MangaTablesCompanion>[];
-    final toInsertManga = mangas.map((e) => e.toCompanion()).toList();
+    final toInsertManga = mangas;
 
     final toUpdateTags = <MangaTagTablesCompanion>[];
-    final toInsertTags = tags.map((e) => e.toCompanion()).toList();
+    final toInsertTags = tags;
 
     for (final tag in existingTags) {
       final comp = tag.toCompanion(false);
 
       toInsertTags.sort(
-        (a, b) => ((comp.similarity(a) - comp.similarity(b)) * 1000).toInt(),
+        (a, b) {
+          final left = comp.similarity(a.toCompanion());
+          final right = comp.similarity(b.toCompanion());
+          return ((left - right) * 1000).toInt();
+        },
       );
 
       final result = toInsertTags.removeAt(0);
 
       toUpdateTags.add(
         comp.copyWith(
-          name: result.name,
+          name: Value.absentIfNull(result.name),
+        ),
+      );
+    }
+
+    for (final tag in existingTags) {
+      /// convert existing record to companion
+      final comp = tag.toCompanion(false);
+
+      /// sort by similarity
+      toInsertTags.sort(
+        (a, b) {
+          final left = comp.similarity(a.toCompanion());
+          final right = comp.similarity(b.toCompanion());
+          return ((left - right) * 1000).toInt();
+        },
+      );
+
+      /// pop the first similar
+      final result = toInsertTags.removeAt(0);
+
+      toUpdateTags.add(
+        comp.copyWith(
+          name: Value.absentIfNull(result.name),
         ),
       );
     }
 
     for (final manga in existingMangas) {
-      /// convert existing manga record to companion
+      /// convert existing record to companion
       final comp = manga.toCompanion(false);
 
       /// sort by similarity
       toInsertManga.sort(
-        (a, b) => ((comp.similarity(a) - comp.similarity(b)) * 1000).toInt(),
+        (a, b) {
+          final left = comp.similarity(a.toCompanion());
+          final right = comp.similarity(b.toCompanion());
+          return ((left - right) * 1000).toInt();
+        },
       );
 
       /// pop the first similar
@@ -78,13 +108,13 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
 
       toUpdateManga.add(
         comp.copyWith(
-          title: result.title,
-          coverUrl: result.coverUrl,
-          author: result.author,
-          status: result.status,
-          description: result.description,
-          webUrl: result.webUrl,
-          source: result.source,
+          title: Value.absentIfNull(result.title),
+          coverUrl: Value.absentIfNull(result.coverUrl),
+          author: Value.absentIfNull(result.author),
+          status: Value.absentIfNull(result.status),
+          description: Value.absentIfNull(result.description),
+          webUrl: Value.absentIfNull(result.webUrl),
+          source: Value.absentIfNull(result.source),
         ),
       );
     }
@@ -116,13 +146,16 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
         /// insert manga
         for (final manga in toInsertManga) {
           final result = await into(mangaTables).insertReturning(
-            manga.copyWith(
-              id: manga.id.present ? null : Value(const Uuid().v4().toString()),
-            ),
+            manga.toCompanion().copyWith(
+                  id: manga.toCompanion().id.present
+                      ? null
+                      : Value(const Uuid().v4().toString()),
+                ),
             onConflict: DoUpdate(
-              (old) => manga.copyWith(
-                id: Value(const Uuid().v4().toString()),
-              ),
+              (old) => manga.toCompanion()
+                ..copyWith(
+                  id: Value(const Uuid().v4().toString()),
+                ),
             ),
           );
           allManga.add(result);
@@ -130,23 +163,25 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
 
         for (final tag in toInsertTags) {
           final result = await into(mangaTagTables).insertReturning(
-            tag.copyWith(
-              id: tag.id.present ? null : Value(const Uuid().v4().toString()),
-            ),
+            tag.toCompanion().copyWith(
+                  id: tag.toCompanion().id.present
+                      ? null
+                      : Value(const Uuid().v4().toString()),
+                ),
             onConflict: DoUpdate(
-              (old) => tag.copyWith(
-                id: Value(const Uuid().v4().toString()),
-              ),
+              (old) => tag.toCompanion().copyWith(
+                    id: Value(const Uuid().v4().toString()),
+                  ),
             ),
           );
           allTag.add(result);
         }
 
-        // TODO: sync tags
         return allManga
             .map(
               (e) => MangaDrift.fromCompanion(
                 e.toCompanion(false),
+                // TODO: update manga-tags relationship
                 [],
               ),
             )

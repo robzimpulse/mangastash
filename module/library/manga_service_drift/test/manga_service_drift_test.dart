@@ -28,6 +28,11 @@ void main() {
       description: 'description',
       webUrl: 'webUrl',
       source: 'source',
+      tags: [
+        MangaTagDrift(
+          name: 'Test',
+        ),
+      ],
     );
 
     await syncMangasDao.sync([manga]);
@@ -36,6 +41,16 @@ void main() {
       final data = await database.select(database.mangaTables).get();
       expect(data.length, equals(1));
     }
+
+    {
+      final data = await database.select(database.mangaTagTables).get();
+      expect(data.length, equals(1));
+    }
+
+    // {
+    //   final data = await database.select(database.mangaTagRelationshipTables).get();
+    //   expect(data.length, equals(1));
+    // }
   });
 
   test('manga can be updated', () async {
@@ -48,6 +63,11 @@ void main() {
       description: 'description',
       webUrl: 'webUrl',
       source: 'source',
+      tags: [
+        MangaTagDrift(
+          name: 'Test',
+        ),
+      ],
     );
 
     await syncMangasDao.sync([ori]);
@@ -69,5 +89,15 @@ void main() {
       final data = await database.select(database.mangaTables).get();
       expect(data.length, equals(1));
     }
+
+    {
+      final data = await database.select(database.mangaTagTables).get();
+      expect(data.length, equals(1));
+    }
+
+    // {
+    //   final data = await database.select(database.mangaTagRelationshipTables).get();
+    //   expect(data.length, equals(0));
+    // }
   });
 }
