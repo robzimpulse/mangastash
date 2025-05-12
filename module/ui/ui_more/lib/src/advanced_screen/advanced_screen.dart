@@ -1,4 +1,5 @@
 import 'package:dio_inspector/dio_inspector.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -10,11 +11,15 @@ import 'advanced_screen_state.dart';
 class AdvancedScreen extends StatelessWidget {
   final DioInspector inspector;
   final LogBox logBox;
+  final DatabaseViewer viewer;
+  final AppDatabase database;
 
   const AdvancedScreen({
     super.key,
     required this.inspector,
     required this.logBox,
+    required this.viewer,
+    required this.database,
   });
 
   static Widget create({
@@ -27,6 +32,8 @@ class AdvancedScreen extends StatelessWidget {
       child: AdvancedScreen(
         inspector: locator(),
         logBox: locator(),
+        database: locator(),
+        viewer: locator(),
       ),
     );
   }
@@ -55,6 +62,14 @@ class AdvancedScreen extends StatelessWidget {
             leading: const SizedBox(
               height: double.infinity,
               child: Icon(Icons.wrap_text),
+            ),
+          ),
+          ListTile(
+            title: const Text('Database Inspector'),
+            onTap: () => viewer.navigateToViewer(database: database),
+            leading: const SizedBox(
+              height: double.infinity,
+              child: Icon(Icons.storage),
             ),
           ),
         ],

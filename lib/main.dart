@@ -103,6 +103,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
     final rootNavigatorKey = GlobalKey<NavigatorState>();
     final DioInspector inspector = locator();
     final LogBox logBox = locator();
+    final DatabaseViewer viewer = locator();
     return GoRouter(
       navigatorKey: rootNavigatorKey,
       initialLocation: initialRoute,
@@ -118,6 +119,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
         BaseRouteObserver(updateCurrentRouteSettingUseCase: locator()),
         inspector.navigatorObserver,
         logBox.navigatorObserver,
+        viewer.navigatorObserver,
       ],
     );
   }
