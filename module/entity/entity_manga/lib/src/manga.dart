@@ -107,10 +107,7 @@ class Manga extends Equatable {
     );
   }
 
-  factory Manga.fromDriftService(
-    MangaDrift manga, {
-    List<MangaTagDrift>? tags,
-  }) {
+  factory Manga.fromDriftService(MangaDrift manga) {
     return Manga(
       id: manga.id,
       title: manga.title,
@@ -121,7 +118,7 @@ class Manga extends Equatable {
       webUrl: manga.webUrl,
       source:
           manga.source != null ? MangaSourceEnum.fromValue(manga.source) : null,
-      tags: tags?.map((e) => MangaTag.fromDriftService(e)).toList(),
+      tags: manga.tags.map((e) => MangaTag.fromDriftService(e)).toList(),
     );
   }
 

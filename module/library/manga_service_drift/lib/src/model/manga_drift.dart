@@ -76,7 +76,7 @@ class MangaDrift extends Equatable {
         webUrl,
         source,
         tags.map((e) => e.name),
-    createdAt,
-    updatedAt,
+        createdAt,
+        updatedAt,
       ];
 }

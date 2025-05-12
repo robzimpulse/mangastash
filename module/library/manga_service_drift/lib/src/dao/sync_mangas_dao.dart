@@ -23,7 +23,7 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<MangaDrift>> sync(List<MangaDrift> mangas) async {
     if (mangas.isEmpty) return [];
-    final tags = mangas.expand((e) => e.tags).toList();
+    final tags = mangas.expand((e) => e.tags).toSet().toList();
 
     final existingMangas = await searchMangas(
       ids: mangas.map((e) => e.id).nonNulls.toList(),
