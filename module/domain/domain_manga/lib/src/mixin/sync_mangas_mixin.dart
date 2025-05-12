@@ -9,6 +9,12 @@ mixin SyncMangasMixin {
     required SyncMangasDao syncMangasDao,
     required List<Manga> mangas,
   }) async {
+
+    /// TODO: fix stutter when sync manga with database
+    // return syncMangasDao
+    //     .sync(mangas.map((e) => e.toDriftService()).toList())
+    //     .then((mangas) => [...mangas.map((e) => Manga.fromDriftService(e))]);
+
     final tagNames = mangas.expand((e) => [...e.tagsName]).toSet();
 
     final tags = await Future.wait(
