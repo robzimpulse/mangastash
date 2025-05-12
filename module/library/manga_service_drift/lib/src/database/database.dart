@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 import 'package:text_similarity/text_similarity.dart';
 
+import '../dao/sync_chapters_dao.dart';
 import '../dao/sync_mangas_dao.dart';
 import '../interceptor/log_interceptor.dart';
 import '../tables/manga_chapter_image_tables.dart';
@@ -29,6 +30,7 @@ part 'database.g.dart';
   ],
   daos: [
     SyncMangasDao,
+    SyncChaptersDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -75,7 +77,6 @@ Future<QueryExecutor> _openConnection({LoggerCallback? logger}) async {
 }
 
 extension MangaTablesCompanionSimilarity on MangaTablesCompanion {
-
   double similarity(MangaTablesCompanion other) {
     final matcher = StringMatcher(
       term: TermEnum.char,
@@ -94,11 +95,9 @@ extension MangaTablesCompanionSimilarity on MangaTablesCompanion {
 
     return score.reduce((a, b) => a + b) / score.length;
   }
-
 }
 
 extension MangaTagTablesCompanionSimilarity on MangaTagTablesCompanion {
-
   double similarity(MangaTagTablesCompanion other) {
     final matcher = StringMatcher(
       term: TermEnum.char,
@@ -111,5 +110,33 @@ extension MangaTagTablesCompanionSimilarity on MangaTagTablesCompanion {
 
     return score.reduce((a, b) => a + b) / score.length;
   }
+}
 
+extension MangaChapterTablesCompanionSimilarity on MangaChapterTablesCompanion {
+  double similarity(MangaChapterTablesCompanion other) {
+    final matcher = StringMatcher(
+      term: TermEnum.char,
+      algorithm: const LevenshteinAlgorithm(),
+    );
+
+    final score = [
+      matcher.similar(other.title.value, other.title.value)?.ratio ?? 0,
+      matcher.similar(other.volume.value, other.volume.value)?.ratio ?? 0,
+      matcher.similar(other.chapter.value, other.chapter.value)?.ratio ?? 0,
+      matcher
+              .similar(
+                other.translatedLanguage.value,
+                other.translatedLanguage.value,
+              )
+              ?.ratio ??
+          0,
+      matcher
+              .similar(other.scanlationGroup.value, other.scanlationGroup.value)
+              ?.ratio ??
+          0,
+      matcher.similar(other.webUrl.value, other.webUrl.value)?.ratio ?? 0,
+    ];
+
+    return score.reduce((a, b) => a + b) / score.length;
+  }
 }

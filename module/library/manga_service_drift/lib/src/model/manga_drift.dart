@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:equatable/equatable.dart';
 
 import '../database/database.dart';
+import '../extension/value_or_null_extension.dart';
 import 'manga_tag_drift.dart';
 
 class MangaDrift extends Equatable {
@@ -14,6 +15,8 @@ class MangaDrift extends Equatable {
   final String? webUrl;
   final String? source;
   final List<MangaTagDrift> tags;
+  final String? createdAt;
+  final String? updatedAt;
 
   const MangaDrift({
     this.id,
@@ -25,6 +28,8 @@ class MangaDrift extends Equatable {
     this.webUrl,
     this.source,
     this.tags = const [],
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory MangaDrift.fromCompanion(
@@ -32,22 +37,24 @@ class MangaDrift extends Equatable {
     List<MangaTagTablesCompanion> tags,
   ) {
     return MangaDrift(
-      id: manga.id.value,
-      title: manga.title.value,
-      coverUrl: manga.coverUrl.value,
-      author: manga.author.value,
-      status: manga.status.value,
-      description: manga.description.value,
-      webUrl: manga.webUrl.value,
-      source: manga.source.value,
+      id: manga.id.valueOrNull,
+      title: manga.title.valueOrNull,
+      coverUrl: manga.coverUrl.valueOrNull,
+      author: manga.author.valueOrNull,
+      status: manga.status.valueOrNull,
+      description: manga.description.valueOrNull,
+      webUrl: manga.webUrl.valueOrNull,
+      source: manga.source.valueOrNull,
       tags: tags.map((e) => MangaTagDrift.fromCompanion(e)).toList(),
+      createdAt: manga.createdAt.valueOrNull,
+      updatedAt: manga.updatedAt.valueOrNull,
     );
   }
 
   MangaTablesCompanion toCompanion() {
     return MangaTablesCompanion(
-      createdAt: Value(DateTime.now().toIso8601String()),
-      updatedAt: Value(DateTime.now().toIso8601String()),
+      createdAt: Value.absentIfNull(createdAt),
+      updatedAt: Value.absentIfNull(updatedAt),
       id: Value.absentIfNull(id),
       title: Value.absentIfNull(title),
       coverUrl: Value.absentIfNull(coverUrl),
@@ -69,5 +76,7 @@ class MangaDrift extends Equatable {
         webUrl,
         source,
         tags.map((e) => e.name),
+    createdAt,
+    updatedAt,
       ];
 }

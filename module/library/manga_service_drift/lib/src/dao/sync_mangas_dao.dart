@@ -113,10 +113,14 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
           final result = await into(mangaTagTables).insertReturning(
             tmp.copyWith(
               id: tmp.id.present ? null : Value(const Uuid().v4().toString()),
+              createdAt: Value(DateTime.now().toIso8601String()),
+              updatedAt: Value(DateTime.now().toIso8601String()),
             ),
             onConflict: DoUpdate(
               (old) => tmp.copyWith(
                 id: Value(const Uuid().v4().toString()),
+                createdAt: Value(DateTime.now().toIso8601String()),
+                updatedAt: Value(DateTime.now().toIso8601String()),
               ),
             ),
           );
@@ -167,10 +171,14 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
           final result = await into(mangaTables).insertReturning(
             tmp.copyWith(
               id: tmp.id.present ? null : Value(const Uuid().v4().toString()),
+              createdAt: Value(DateTime.now().toIso8601String()),
+              updatedAt: Value(DateTime.now().toIso8601String()),
             ),
             onConflict: DoUpdate(
               (old) => tmp.copyWith(
                 id: Value(const Uuid().v4().toString()),
+                createdAt: Value(DateTime.now().toIso8601String()),
+                updatedAt: Value(DateTime.now().toIso8601String()),
               ),
             ),
           );
@@ -255,23 +263,4 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
 
     return selector.get();
   }
-
-  // Future<List<MangaTagRelationshipTable>> removeRelationship({
-  //   List<String> mangaIds = const [],
-  //   List<String> tagIds = const [],
-  // }) async {
-  //   final isAllEmpty = [...mangaIds.nonEmpty, ...tagIds.nonEmpty].isEmpty;
-  //
-  //   if (isAllEmpty) return [];
-  //
-  //   final selector = select(mangaTagRelationshipTables)
-  //     ..where(
-  //       (f) => [
-  //         for (final e in mangaIds.nonEmpty) f.mangaId.equals(e),
-  //         for (final e in tagIds.nonEmpty) f.tagId.equals(e),
-  //       ].reduce((a, b) => a | b),
-  //     );
-  //
-  //   return selector.get();
-  // }
 }

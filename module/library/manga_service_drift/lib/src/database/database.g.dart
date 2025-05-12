@@ -25,15 +25,11 @@ class $MangaChapterImageTablesTable extends MangaChapterImageTables
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       clientDefault: () => DateTime.timestamp().toIso8601String());
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  static const VerificationMeta _orderMeta = const VerificationMeta('order');
   @override
-  late final GeneratedColumn<BigInt> id = GeneratedColumn<BigInt>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.bigInt,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  late final GeneratedColumn<int> order = GeneratedColumn<int>(
+      'order', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _chapterIdMeta =
       const VerificationMeta('chapterId');
   @override
@@ -45,9 +41,14 @@ class $MangaChapterImageTablesTable extends MangaChapterImageTables
   late final GeneratedColumn<String> webUrl = GeneratedColumn<String>(
       'webUrl', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [createdAt, updatedAt, id, chapterId, webUrl];
+      [createdAt, updatedAt, order, chapterId, webUrl, id];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -67,8 +68,11 @@ class $MangaChapterImageTablesTable extends MangaChapterImageTables
       context.handle(_updatedAtMeta,
           updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
     }
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    if (data.containsKey('order')) {
+      context.handle(
+          _orderMeta, order.isAcceptableOrUnknown(data['order']!, _orderMeta));
+    } else if (isInserting) {
+      context.missing(_orderMeta);
     }
     if (data.containsKey('chapter_id')) {
       context.handle(_chapterIdMeta,
@@ -81,6 +85,11 @@ class $MangaChapterImageTablesTable extends MangaChapterImageTables
           webUrl.isAcceptableOrUnknown(data['webUrl']!, _webUrlMeta));
     } else if (isInserting) {
       context.missing(_webUrlMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     return context;
   }
@@ -95,12 +104,14 @@ class $MangaChapterImageTablesTable extends MangaChapterImageTables
           .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}updated_at'])!,
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.bigInt, data['${effectivePrefix}id'])!,
+      order: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}order'])!,
       chapterId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}chapter_id'])!,
       webUrl: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}webUrl'])!,
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
     );
   }
 
@@ -114,23 +125,26 @@ class MangaChapterImageTable extends DataClass
     implements Insertable<MangaChapterImageTable> {
   final String createdAt;
   final String updatedAt;
-  final BigInt id;
+  final int order;
   final String chapterId;
   final String webUrl;
+  final String id;
   const MangaChapterImageTable(
       {required this.createdAt,
       required this.updatedAt,
-      required this.id,
+      required this.order,
       required this.chapterId,
-      required this.webUrl});
+      required this.webUrl,
+      required this.id});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['created_at'] = Variable<String>(createdAt);
     map['updated_at'] = Variable<String>(updatedAt);
-    map['id'] = Variable<BigInt>(id);
+    map['order'] = Variable<int>(order);
     map['chapter_id'] = Variable<String>(chapterId);
     map['webUrl'] = Variable<String>(webUrl);
+    map['id'] = Variable<String>(id);
     return map;
   }
 
@@ -138,9 +152,10 @@ class MangaChapterImageTable extends DataClass
     return MangaChapterImageTablesCompanion(
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
-      id: Value(id),
+      order: Value(order),
       chapterId: Value(chapterId),
       webUrl: Value(webUrl),
+      id: Value(id),
     );
   }
 
@@ -150,9 +165,10 @@ class MangaChapterImageTable extends DataClass
     return MangaChapterImageTable(
       createdAt: serializer.fromJson<String>(json['createdAt']),
       updatedAt: serializer.fromJson<String>(json['updatedAt']),
-      id: serializer.fromJson<BigInt>(json['id']),
+      order: serializer.fromJson<int>(json['order']),
       chapterId: serializer.fromJson<String>(json['chapterId']),
       webUrl: serializer.fromJson<String>(json['webUrl']),
+      id: serializer.fromJson<String>(json['id']),
     );
   }
   @override
@@ -161,33 +177,37 @@ class MangaChapterImageTable extends DataClass
     return <String, dynamic>{
       'createdAt': serializer.toJson<String>(createdAt),
       'updatedAt': serializer.toJson<String>(updatedAt),
-      'id': serializer.toJson<BigInt>(id),
+      'order': serializer.toJson<int>(order),
       'chapterId': serializer.toJson<String>(chapterId),
       'webUrl': serializer.toJson<String>(webUrl),
+      'id': serializer.toJson<String>(id),
     };
   }
 
   MangaChapterImageTable copyWith(
           {String? createdAt,
           String? updatedAt,
-          BigInt? id,
+          int? order,
           String? chapterId,
-          String? webUrl}) =>
+          String? webUrl,
+          String? id}) =>
       MangaChapterImageTable(
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
-        id: id ?? this.id,
+        order: order ?? this.order,
         chapterId: chapterId ?? this.chapterId,
         webUrl: webUrl ?? this.webUrl,
+        id: id ?? this.id,
       );
   MangaChapterImageTable copyWithCompanion(
       MangaChapterImageTablesCompanion data) {
     return MangaChapterImageTable(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
-      id: data.id.present ? data.id.value : this.id,
+      order: data.order.present ? data.order.value : this.order,
       chapterId: data.chapterId.present ? data.chapterId.value : this.chapterId,
       webUrl: data.webUrl.present ? data.webUrl.value : this.webUrl,
+      id: data.id.present ? data.id.value : this.id,
     );
   }
 
@@ -196,76 +216,95 @@ class MangaChapterImageTable extends DataClass
     return (StringBuffer('MangaChapterImageTable(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
-          ..write('id: $id, ')
+          ..write('order: $order, ')
           ..write('chapterId: $chapterId, ')
-          ..write('webUrl: $webUrl')
+          ..write('webUrl: $webUrl, ')
+          ..write('id: $id')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(createdAt, updatedAt, id, chapterId, webUrl);
+  int get hashCode =>
+      Object.hash(createdAt, updatedAt, order, chapterId, webUrl, id);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is MangaChapterImageTable &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
-          other.id == this.id &&
+          other.order == this.order &&
           other.chapterId == this.chapterId &&
-          other.webUrl == this.webUrl);
+          other.webUrl == this.webUrl &&
+          other.id == this.id);
 }
 
 class MangaChapterImageTablesCompanion
     extends UpdateCompanion<MangaChapterImageTable> {
   final Value<String> createdAt;
   final Value<String> updatedAt;
-  final Value<BigInt> id;
+  final Value<int> order;
   final Value<String> chapterId;
   final Value<String> webUrl;
+  final Value<String> id;
+  final Value<int> rowid;
   const MangaChapterImageTablesCompanion({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-    this.id = const Value.absent(),
+    this.order = const Value.absent(),
     this.chapterId = const Value.absent(),
     this.webUrl = const Value.absent(),
+    this.id = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   MangaChapterImageTablesCompanion.insert({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-    this.id = const Value.absent(),
+    required int order,
     required String chapterId,
     required String webUrl,
-  })  : chapterId = Value(chapterId),
-        webUrl = Value(webUrl);
+    required String id,
+    this.rowid = const Value.absent(),
+  })  : order = Value(order),
+        chapterId = Value(chapterId),
+        webUrl = Value(webUrl),
+        id = Value(id);
   static Insertable<MangaChapterImageTable> custom({
     Expression<String>? createdAt,
     Expression<String>? updatedAt,
-    Expression<BigInt>? id,
+    Expression<int>? order,
     Expression<String>? chapterId,
     Expression<String>? webUrl,
+    Expression<String>? id,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
-      if (id != null) 'id': id,
+      if (order != null) 'order': order,
       if (chapterId != null) 'chapter_id': chapterId,
       if (webUrl != null) 'webUrl': webUrl,
+      if (id != null) 'id': id,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   MangaChapterImageTablesCompanion copyWith(
       {Value<String>? createdAt,
       Value<String>? updatedAt,
-      Value<BigInt>? id,
+      Value<int>? order,
       Value<String>? chapterId,
-      Value<String>? webUrl}) {
+      Value<String>? webUrl,
+      Value<String>? id,
+      Value<int>? rowid}) {
     return MangaChapterImageTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      id: id ?? this.id,
+      order: order ?? this.order,
       chapterId: chapterId ?? this.chapterId,
       webUrl: webUrl ?? this.webUrl,
+      id: id ?? this.id,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -278,14 +317,20 @@ class MangaChapterImageTablesCompanion
     if (updatedAt.present) {
       map['updated_at'] = Variable<String>(updatedAt.value);
     }
-    if (id.present) {
-      map['id'] = Variable<BigInt>(id.value);
+    if (order.present) {
+      map['order'] = Variable<int>(order.value);
     }
     if (chapterId.present) {
       map['chapter_id'] = Variable<String>(chapterId.value);
     }
     if (webUrl.present) {
       map['webUrl'] = Variable<String>(webUrl.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
     }
     return map;
   }
@@ -295,9 +340,11 @@ class MangaChapterImageTablesCompanion
     return (StringBuffer('MangaChapterImageTablesCompanion(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
-          ..write('id: $id, ')
+          ..write('order: $order, ')
           ..write('chapterId: $chapterId, ')
-          ..write('webUrl: $webUrl')
+          ..write('webUrl: $webUrl, ')
+          ..write('id: $id, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -2278,6 +2325,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MangaTagRelationshipTablesTable mangaTagRelationshipTables =
       $MangaTagRelationshipTablesTable(this);
   late final SyncMangasDao syncMangasDao = SyncMangasDao(this as AppDatabase);
+  late final SyncChaptersDao syncChaptersDao =
+      SyncChaptersDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2296,17 +2345,21 @@ typedef $$MangaChapterImageTablesTableCreateCompanionBuilder
     = MangaChapterImageTablesCompanion Function({
   Value<String> createdAt,
   Value<String> updatedAt,
-  Value<BigInt> id,
+  required int order,
   required String chapterId,
   required String webUrl,
+  required String id,
+  Value<int> rowid,
 });
 typedef $$MangaChapterImageTablesTableUpdateCompanionBuilder
     = MangaChapterImageTablesCompanion Function({
   Value<String> createdAt,
   Value<String> updatedAt,
-  Value<BigInt> id,
+  Value<int> order,
   Value<String> chapterId,
   Value<String> webUrl,
+  Value<String> id,
+  Value<int> rowid,
 });
 
 class $$MangaChapterImageTablesTableFilterComposer
@@ -2324,14 +2377,17 @@ class $$MangaChapterImageTablesTableFilterComposer
   ColumnFilters<String> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<BigInt> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get order => $composableBuilder(
+      column: $table.order, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get chapterId => $composableBuilder(
       column: $table.chapterId, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get webUrl => $composableBuilder(
       column: $table.webUrl, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
 }
 
 class $$MangaChapterImageTablesTableOrderingComposer
@@ -2349,14 +2405,17 @@ class $$MangaChapterImageTablesTableOrderingComposer
   ColumnOrderings<String> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<BigInt> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get order => $composableBuilder(
+      column: $table.order, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get chapterId => $composableBuilder(
       column: $table.chapterId, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get webUrl => $composableBuilder(
       column: $table.webUrl, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
 }
 
 class $$MangaChapterImageTablesTableAnnotationComposer
@@ -2374,14 +2433,17 @@ class $$MangaChapterImageTablesTableAnnotationComposer
   GeneratedColumn<String> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
-  GeneratedColumn<BigInt> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
+  GeneratedColumn<int> get order =>
+      $composableBuilder(column: $table.order, builder: (column) => column);
 
   GeneratedColumn<String> get chapterId =>
       $composableBuilder(column: $table.chapterId, builder: (column) => column);
 
   GeneratedColumn<String> get webUrl =>
       $composableBuilder(column: $table.webUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
 }
 
 class $$MangaChapterImageTablesTableTableManager extends RootTableManager<
@@ -2417,30 +2479,38 @@ class $$MangaChapterImageTablesTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<String> createdAt = const Value.absent(),
             Value<String> updatedAt = const Value.absent(),
-            Value<BigInt> id = const Value.absent(),
+            Value<int> order = const Value.absent(),
             Value<String> chapterId = const Value.absent(),
             Value<String> webUrl = const Value.absent(),
+            Value<String> id = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
           }) =>
               MangaChapterImageTablesCompanion(
             createdAt: createdAt,
             updatedAt: updatedAt,
-            id: id,
+            order: order,
             chapterId: chapterId,
             webUrl: webUrl,
+            id: id,
+            rowid: rowid,
           ),
           createCompanionCallback: ({
             Value<String> createdAt = const Value.absent(),
             Value<String> updatedAt = const Value.absent(),
-            Value<BigInt> id = const Value.absent(),
+            required int order,
             required String chapterId,
             required String webUrl,
+            required String id,
+            Value<int> rowid = const Value.absent(),
           }) =>
               MangaChapterImageTablesCompanion.insert(
             createdAt: createdAt,
             updatedAt: updatedAt,
-            id: id,
+            order: order,
             chapterId: chapterId,
             webUrl: webUrl,
+            id: id,
+            rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
