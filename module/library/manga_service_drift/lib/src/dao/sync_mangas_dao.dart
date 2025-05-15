@@ -263,4 +263,186 @@ class SyncMangasDao extends DatabaseAccessor<AppDatabase>
 
     return selector.get();
   }
+
+// Future<List<MangaData>> updateManga(MangaTablesCompanion data) {
+//   final selector = update(mangaTables)..whereSamePrimaryKey(data);
+//
+//   return transaction(
+//     () => selector.writeReturning(
+//       data.copyWith(
+//         id: const Value.absent(),
+//         updatedAt: Value(DateTime.now().toIso8601String()),
+//       ),
+//     ),
+//   );
+// }
+//
+// Future<MangaData> insertManga(MangaTablesCompanion data) {
+//   return transaction(
+//     () => into(mangaTables).insertReturning(
+//       data.copyWith(
+//         id: Value(data.id.valueOrNull ?? const Uuid().v4().toString()),
+//         createdAt: Value(DateTime.now().toIso8601String()),
+//         updatedAt: Value(DateTime.now().toIso8601String()),
+//       ),
+//       onConflict: DoUpdate(
+//         (old) => data.copyWith(
+//           id: Value(const Uuid().v4().toString()),
+//           createdAt: Value(DateTime.now().toIso8601String()),
+//           updatedAt: Value(DateTime.now().toIso8601String()),
+//         ),
+//       ),
+//     ),
+//   );
+// }
+//
+// Future<List<TagData>> updateTag(MangaTagTablesCompanion data) {
+//   final selector = update(mangaTagTables)..whereSamePrimaryKey(data);
+//
+//   return transaction(
+//     () => selector.writeReturning(
+//       data.copyWith(updatedAt: Value(DateTime.now().toIso8601String())),
+//     ),
+//   );
+// }
+//
+// Future<TagData> insertTag(MangaTagTablesCompanion data) {
+//   return transaction(
+//     () => into(mangaTagTables).insertReturning(
+//       data.copyWith(
+//         id: Value(data.id.valueOrNull ?? const Uuid().v4().toString()),
+//         createdAt: Value(DateTime.now().toIso8601String()),
+//         updatedAt: Value(DateTime.now().toIso8601String()),
+//       ),
+//       onConflict: DoUpdate(
+//         (old) => data.copyWith(
+//           id: Value(const Uuid().v4().toString()),
+//           createdAt: Value(DateTime.now().toIso8601String()),
+//           updatedAt: Value(DateTime.now().toIso8601String()),
+//         ),
+//       ),
+//     ),
+//   );
+// }
+//
+// Future<void> unlinkAllTagFromManga(String mangaId) {
+//   final selector = delete(mangaTagRelationshipTables)
+//     ..where((f) => f.mangaId.equals(mangaId));
+//
+//   return transaction(() => selector.go());
+// }
+//
+// Future<void> linkTagToManga(String mangaId, String tagId) {
+//   return transaction(
+//     () => into(mangaTagRelationshipTables).insert(
+//       MangaTagRelationshipTablesCompanion.insert(
+//         tagId: tagId,
+//         mangaId: mangaId,
+//       ),
+//     ),
+//   );
+// }
+
+// Future<SimilarTagData?> getSimilarTag(
+//   MangaTagTablesCompanion source,
+// ) async {
+//   return transaction(
+//     () async {
+//       /// delete all [similarTag] content
+//       await delete(similarTag).go();
+//
+//       /// populate [similarTag] table based on [mangaTagTables] content
+//       await into(similarTag).insertFromSelect(
+//         select(mangaTagTables),
+//         columns: Map.fromEntries(
+//           similarTag.columnsByName.entries.map(
+//             (e) {
+//               final pair = mangaTagTables.columnsByName[e.key];
+//               if (pair == null) return null;
+//               return MapEntry(e.value, pair);
+//             },
+//           ).nonNulls,
+//         ),
+//       );
+//
+//       /// filter for column that only exists in [similarTag]
+//       final columns = source.toColumns(true)
+//         ..removeWhere(
+//           (key, value) => [
+//             !similarTag.columnsByName.keys.contains(key),
+//             mangaTagTables.primaryKey.contains(key),
+//           ].any((isTrue) => isTrue),
+//         );
+//
+//       final selector = customSelect(
+//         [
+//           'SELECT * FROM similar_tag',
+//           'WHERE',
+//           [
+//             for (final key in columns.keys) '$key match ?',
+//           ].join(' AND '),
+//           'ORDER BY rank',
+//         ].join(' '),
+//         variables: [...columns.values.whereType<Variable>(),],
+//       );
+//
+//       final result = await selector.getSingleOrNull();
+//
+//       if (result == null) return null;
+//
+//       return SimilarTagData.fromJson(result.data);
+//     },
+//   );
+// }
+//
+// Future<SimilarMangaData?> getSimilarManga(
+//   MangaTablesCompanion source,
+// ) async {
+//   return transaction(
+//     () async {
+//       /// delete all [similarManga] content
+//       await delete(similarManga).go();
+//
+//       /// populate [similarManga] table based on [mangaTable] content
+//       await into(similarManga).insertFromSelect(
+//         select(mangaTables),
+//         columns: Map.fromEntries(
+//           similarManga.columnsByName.entries.map(
+//             (e) {
+//               final pair = mangaTables.columnsByName[e.key];
+//               if (pair == null) return null;
+//               return MapEntry(e.value, pair);
+//             },
+//           ).nonNulls,
+//         ),
+//       );
+//
+//       final columns = source.toColumns(true)
+//         ..removeWhere(
+//           (key, value) => [
+//             !similarManga.columnsByName.keys.contains(key),
+//             mangaTables.primaryKey.contains(key),
+//           ].any((isTrue) => isTrue),
+//         );
+//
+//       final selector = customSelect(
+//         [
+//           'SELECT * FROM similar_manga',
+//           'WHERE',
+//           [
+//             for (final key in columns.keys) '$key match ?',
+//           ].join(' AND '),
+//           'ORDER BY rank',
+//         ].join(' '),
+//         variables: [...columns.values.whereType<Variable>()],
+//       );
+//
+//       final result = await selector.getSingleOrNull();
+//
+//       if (result == null) return null;
+//
+//       return SimilarMangaData.fromJson(result.data);
+//     },
+//   );
+// }
 }
