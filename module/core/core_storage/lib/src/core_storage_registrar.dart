@@ -16,7 +16,7 @@ class CoreStorageRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
-    log.log('start register', name: runtimeType.toString());
+    log.log('Start Register ${runtimeType.toString()}', name: 'Services');
 
     locator.registerSingleton(await SharedPreferencesStorage.create());
     locator.alias<Storage, SharedPreferencesStorage>();
@@ -34,6 +34,6 @@ class CoreStorageRegistrar extends Registrar {
     );
     locator.alias<BaseCacheManager, CustomCacheManager>();
 
-    log.log('finish register', name: runtimeType.toString());
+    log.log('Finish Register ${runtimeType.toString()}', name: 'Services');
   }
 }

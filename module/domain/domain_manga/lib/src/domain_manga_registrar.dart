@@ -44,7 +44,7 @@ class DomainMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
-    log.log('start register', name: runtimeType.toString());
+    log.log('Start Register ${runtimeType.toString()}', name: 'Services');
 
     void logger(
       message, {
@@ -66,6 +66,7 @@ class DomainMangaRegistrar extends Registrar {
         error: error,
         stackTrace: stackTrace,
         time: time,
+        extra: extra,
       );
     }
 
@@ -299,6 +300,6 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<ListenMangaTagUseCase, MangaTagManager>();
     locator.alias<GetMangaTagUseCase, MangaTagManager>();
 
-    log.log('finish register', name: runtimeType.toString());
+    log.log('Finish Register ${runtimeType.toString()}', name: 'Services');
   }
 }

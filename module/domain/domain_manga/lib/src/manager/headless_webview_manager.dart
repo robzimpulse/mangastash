@@ -63,17 +63,22 @@ class HeadlessWebviewManager {
       },
     );
 
-    await Future.wait(
+    await Future.any(
       [
-        onLoadStartCompleter.future,
-        Future.any(
+        Future.delayed(const Duration(seconds: 5)),
+        Future.wait(
           [
-            onLoadStopCompleter.future,
-            onLoadErrorCompleter.future,
+            onLoadStartCompleter.future,
+            Future.any(
+              [
+                onLoadStopCompleter.future,
+                onLoadErrorCompleter.future,
+              ],
+            ),
           ],
-        ),
+        )
       ],
-    ).timeout(const Duration(seconds: 5));
+    );
 
     final html = await webview.webViewController?.getHtml();
     if (html == null) return null;
