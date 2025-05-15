@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
@@ -87,8 +88,7 @@ class Manga extends Equatable {
       status: manga.status,
       description: manga.description,
       webUrl: manga.webUrl,
-      source:
-          manga.source != null ? MangaSourceEnum.fromValue(manga.source) : null,
+      source: manga.source?.let((source) => MangaSourceEnum.fromValue(source)),
       tags: tags?.map((e) => MangaTag.fromFirebaseService(e)).toList(),
     );
   }
@@ -116,8 +116,7 @@ class Manga extends Equatable {
       status: manga.status,
       description: manga.description,
       webUrl: manga.webUrl,
-      source:
-          manga.source != null ? MangaSourceEnum.fromValue(manga.source) : null,
+      source: manga.source?.let((source) => MangaSourceEnum.fromValue(source)),
       tags: manga.tags.map((e) => MangaTag.fromDriftService(e)).toList(),
     );
   }
@@ -177,9 +176,11 @@ class Manga extends Equatable {
       id: data.id,
       title: data.attributes?.title?.en,
       description: data.attributes?.description?.en,
-      coverUrl: filename != null
-          ? 'https://uploads.mangadex.org/covers/${data.id}/$filename'
-          : null,
+      coverUrl: filename?.let<String?>(
+        (filename) => data.id?.let(
+          (id) => 'https://uploads.mangadex.org/covers/$id/$filename',
+        ),
+      ),
       status: data.attributes?.status,
       tags: data.attributes?.tags
           ?.map((e) => MangaTag(name: e.attributes?.name?.en, id: e.id))
@@ -189,7 +190,7 @@ class Manga extends Equatable {
           .map((e) => e.attributes?.name)
           .nonNulls
           .join(' | '),
-      webUrl: 'https://mangadex.org/title/${data.id}',
+      webUrl: data.id?.let((id) => 'https://mangadex.org/title/$id}'),
     );
   }
 }
