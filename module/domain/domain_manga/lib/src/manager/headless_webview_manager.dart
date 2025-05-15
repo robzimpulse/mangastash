@@ -65,7 +65,7 @@ class HeadlessWebviewManager {
 
     await Future.any(
       [
-        Future.delayed(const Duration(seconds: 5)),
+        Future.delayed(const Duration(seconds: 10)),
         Future.wait(
           [
             onLoadStartCompleter.future,
