@@ -32,6 +32,10 @@ part 'database.g.dart';
     SyncMangasDao,
     SyncChaptersDao,
   ],
+  include: {
+    'drift_file/virtual_manga_table.drift',
+    'drift_file/virtual_tag_table.drift',
+  },
 )
 class AppDatabase extends _$AppDatabase {
   // After generating code, this class needs to define a `schemaVersion` getter
