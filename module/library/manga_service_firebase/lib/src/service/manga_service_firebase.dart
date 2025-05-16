@@ -113,40 +113,37 @@ class MangaServiceFirebase {
   }
 
   Future<List<MangaFirebase>> search({
-    required MangaFirebase value,
+    List<MangaFirebase> values = const [],
   }) async {
-    final List<MangaFirebase> data = [];
+    final Map<String, List<dynamic>> params = {};
+    for (final value in values) {
+      final json = value.toJson();
+      for (final key in json.keys) {
+        params.update(key, (old) => old..add(json[key]), ifAbsent: () => []);
+      }
+    }
 
-    final ref = _ref
-        .where('title', isEqualTo: value.title)
-        .where('source', isEqualTo: value.source)
-        .orderBy('source');
+    final data = <MangaFirebase>{};
 
-    final total = (await ref.count().get()).count ?? 0;
-    DocumentSnapshot? offset;
+    for (final param in params.entries) {
+      final array = param.value.whereType<String>().nonEmpty.toList();
+      if (array.isNotEmpty) {
+        final ref = _ref.where(param.key, whereIn: array).orderBy(param.key);
+        final total = (await ref.count().get()).count ?? 0;
+        DocumentSnapshot? offsetId;
 
-    do {
-      final result = (offset == null)
-          ? await (ref.limit(100).get())
-          : await (ref.startAfterDocument(offset).limit(100).get());
-      data.addAll(
-        result.docs.map(
-          (e) => MangaFirebase.fromJson(e.data()).copyWith(id: e.id),
-        ),
-      );
-      offset = result.docs.lastOrNull;
-    } while (data.length < total);
+        do {
+          final result = (offsetId == null)
+              ? await (ref.limit(100).get())
+              : await (ref.startAfterDocument(offsetId).limit(100).get());
 
-    _logger?.call(
-      'Search existing entry',
-      extra: {
-        'value': value.toJson(),
-        'matched': data.map((e) => e.toJson()).toList(),
-      },
-      name: runtimeType.toString(),
-    );
+          data.addAll(result.docs.map((e) => MangaFirebase.fromFirebase(e)));
+          offsetId = result.docs.lastOrNull;
+        } while (data.length < total);
+      }
+    }
 
-    return data;
+    return [...data];
   }
 
   Stream<MangaFirebase?> stream({required String id}) {

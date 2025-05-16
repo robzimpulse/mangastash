@@ -78,7 +78,7 @@ class Manga extends Equatable with SimilarityMixin {
   }
 
   @override
-  List<Object?> get similarProp => props;
+  List<Object?> get similarProp => [id, webUrl, source, title];
 
   factory Manga.fromFirebaseService(
     MangaFirebase manga, {

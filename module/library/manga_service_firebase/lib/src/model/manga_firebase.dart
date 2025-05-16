@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -48,6 +49,15 @@ class MangaFirebase extends Equatable {
       webUrl,
       source,
     ];
+  }
+
+  factory MangaFirebase.fromFirebase(
+    DocumentSnapshot<Map<String, dynamic>> json,
+  ) {
+    final data = json.data();
+    final object =
+        data == null ? const MangaFirebase() : MangaFirebase.fromJson(data);
+    return object.copyWith(id: json.id);
   }
 
   factory MangaFirebase.fromJson(Map<String, dynamic> json) {
