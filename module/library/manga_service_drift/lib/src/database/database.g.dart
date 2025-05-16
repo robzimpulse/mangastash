@@ -673,7 +673,7 @@ class $MangaChapterImageTablesTable extends MangaChapterImageTables
   static const VerificationMeta _webUrlMeta = const VerificationMeta('webUrl');
   @override
   late final GeneratedColumn<String> webUrl = GeneratedColumn<String>(
-      'webUrl', aliasedName, false,
+      'web_url', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
@@ -714,9 +714,9 @@ class $MangaChapterImageTablesTable extends MangaChapterImageTables
     } else if (isInserting) {
       context.missing(_chapterIdMeta);
     }
-    if (data.containsKey('webUrl')) {
+    if (data.containsKey('web_url')) {
       context.handle(_webUrlMeta,
-          webUrl.isAcceptableOrUnknown(data['webUrl']!, _webUrlMeta));
+          webUrl.isAcceptableOrUnknown(data['web_url']!, _webUrlMeta));
     } else if (isInserting) {
       context.missing(_webUrlMeta);
     }
@@ -743,7 +743,7 @@ class $MangaChapterImageTablesTable extends MangaChapterImageTables
       chapterId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}chapter_id'])!,
       webUrl: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}webUrl'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}web_url'])!,
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
     );
@@ -777,7 +777,7 @@ class MangaChapterImageTable extends DataClass
     map['updated_at'] = Variable<String>(updatedAt);
     map['order'] = Variable<int>(order);
     map['chapter_id'] = Variable<String>(chapterId);
-    map['webUrl'] = Variable<String>(webUrl);
+    map['web_url'] = Variable<String>(webUrl);
     map['id'] = Variable<String>(id);
     return map;
   }
@@ -917,7 +917,7 @@ class MangaChapterImageTablesCompanion
       if (updatedAt != null) 'updated_at': updatedAt,
       if (order != null) 'order': order,
       if (chapterId != null) 'chapter_id': chapterId,
-      if (webUrl != null) 'webUrl': webUrl,
+      if (webUrl != null) 'web_url': webUrl,
       if (id != null) 'id': id,
       if (rowid != null) 'rowid': rowid,
     });
@@ -958,7 +958,7 @@ class MangaChapterImageTablesCompanion
       map['chapter_id'] = Variable<String>(chapterId.value);
     }
     if (webUrl.present) {
-      map['webUrl'] = Variable<String>(webUrl.value);
+      map['web_url'] = Variable<String>(webUrl.value);
     }
     if (id.present) {
       map['id'] = Variable<String>(id.value);
