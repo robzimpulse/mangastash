@@ -306,7 +306,6 @@ class DomainMangaRegistrar extends Registrar {
       'Finish Register ${runtimeType.toString()}',
       name: 'Services',
       extra: {'duration': measurement.elapsed},
-      stackTrace: StackTrace.current,
     );
   }
 }
