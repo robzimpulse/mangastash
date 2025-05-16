@@ -7,7 +7,7 @@ class MangaChapterImageTables extends Table with AutoTimestampTable {
 
   TextColumn get chapterId => text().named('chapter_id')();
 
-  TextColumn get webUrl => text().named('webUrl')();
+  TextColumn get webUrl => text().named('web_url')();
 
   TextColumn get id => text().named('id')();
 
