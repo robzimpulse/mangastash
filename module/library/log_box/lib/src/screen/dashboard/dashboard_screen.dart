@@ -21,7 +21,6 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   TextEditingController searchController = TextEditingController();
   FocusNode focusNode = FocusNode();
-  late final logs = widget.storage.activities.map(_filter);
 
   String query = '';
   bool isHtml = false;
@@ -139,7 +138,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           onPressed: () => widget.storage.clear(),
         ),
         body: StreamBuilder(
-          stream: logs,
+          stream: widget.storage.activities.map(_filter),
           builder: (context, snapshot) {
             final data = snapshot.data;
 
