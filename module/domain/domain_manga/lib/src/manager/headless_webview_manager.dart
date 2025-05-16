@@ -63,20 +63,15 @@ class HeadlessWebviewManager {
       },
     );
 
-    await Future.any(
+    await Future.wait(
       [
-        Future.delayed(const Duration(seconds: 10)),
-        Future.wait(
+        onLoadStartCompleter.future,
+        Future.any(
           [
-            onLoadStartCompleter.future,
-            Future.any(
-              [
-                onLoadStopCompleter.future,
-                onLoadErrorCompleter.future,
-              ],
-            ),
+            onLoadStopCompleter.future,
+            onLoadErrorCompleter.future,
           ],
-        )
+        ),
       ],
     );
 
