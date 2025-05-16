@@ -13,10 +13,7 @@ class HeadlessWebviewManager {
   final LogBox _log;
   final BaseCacheManager _cacheManager;
 
-  final _queue = Queue(
-    delay: const Duration(milliseconds: 200),
-    timeout: const Duration(seconds: 10),
-  );
+  final _queue = Queue(delay: const Duration(milliseconds: 200));
 
   HeadlessWebviewManager({
     required LogBox log,
