@@ -39,29 +39,16 @@ class HeadlessWebviewManager {
 
     final webview = HeadlessInAppWebView(
       initialUrlRequest: URLRequest(url: uri),
-      onWebViewCreated: (controller) => _log.log(
-        'onWebViewCreated',
-        name: runtimeType.toString(),
-      ),
-      onLoadStart: (controller, url) {
-        _log.log('onLoadStart: $url', name: runtimeType.toString());
-        onLoadStartCompleter.safeComplete();
-      },
-      onLoadStop: (controller, url) {
-        _log.log('onLoadStop: $url', name: runtimeType.toString());
-        onLoadStopCompleter.safeComplete();
-      },
+      onLoadStart: (controller, url) => onLoadStartCompleter.safeComplete(),
+      onLoadStop: (controller, url) => onLoadStopCompleter.safeComplete(),
       onReceivedError: (controller, request, error) {
-        _log.log(
-          'onReceivedError: $request - $error',
-          name: runtimeType.toString(),
-        );
         onLoadErrorCompleter.safeComplete();
       },
     );
 
     await Future.wait(
       [
+        webview.run(),
         onLoadStartCompleter.future,
         Future.any(
           [
@@ -73,6 +60,7 @@ class HeadlessWebviewManager {
     );
 
     final html = await webview.webViewController?.getHtml();
+    await webview.dispose();
     if (html == null) return null;
 
     await _cacheManager.putFile(
