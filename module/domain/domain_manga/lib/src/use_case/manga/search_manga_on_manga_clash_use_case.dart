@@ -5,6 +5,7 @@ import 'package:core_environment/core_environment.dart'
     show toBeginningOfSentenceCase;
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
@@ -18,15 +19,18 @@ class SearchMangaOnMangaClashUseCaseUseCase with SyncMangasMixin {
   final MangaTagServiceFirebase _mangaTagServiceFirebase;
   final MangaServiceFirebase _mangaServiceFirebase;
   final SyncMangasDao _syncMangasDao;
+  final LogBox _logBox;
 
   SearchMangaOnMangaClashUseCaseUseCase({
     required HeadlessWebviewManager webview,
     required MangaTagServiceFirebase mangaTagServiceFirebase,
     required MangaServiceFirebase mangaServiceFirebase,
     required SyncMangasDao syncMangasDao,
+    required LogBox logBox,
   })  : _webview = webview,
         _mangaServiceFirebase = mangaServiceFirebase,
         _syncMangasDao = syncMangasDao,
+        _logBox = logBox,
         _mangaTagServiceFirebase = mangaTagServiceFirebase;
 
   Future<Result<Pagination<Manga>>> execute({
@@ -102,6 +106,7 @@ class SearchMangaOnMangaClashUseCaseUseCase with SyncMangasMixin {
         .last;
 
     final data = await sync(
+      logBox: _logBox,
       syncMangasDao: _syncMangasDao,
       mangaTagServiceFirebase: _mangaTagServiceFirebase,
       mangaServiceFirebase: _mangaServiceFirebase,

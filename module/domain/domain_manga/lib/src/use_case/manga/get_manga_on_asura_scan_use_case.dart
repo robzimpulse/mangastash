@@ -1,5 +1,6 @@
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:log_box/log_box.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 
@@ -11,15 +12,18 @@ class GetMangaOnAsuraScanUseCase with SyncMangasMixin {
   final MangaServiceFirebase _mangaServiceFirebase;
   final SyncMangasDao _syncMangasDao;
   final HeadlessWebviewManager _webview;
+  final LogBox _logBox;
 
   GetMangaOnAsuraScanUseCase({
     required MangaTagServiceFirebase mangaTagServiceFirebase,
     required MangaServiceFirebase mangaServiceFirebase,
     required SyncMangasDao syncMangasDao,
     required HeadlessWebviewManager webview,
+    required LogBox logBox,
   })  : _mangaServiceFirebase = mangaServiceFirebase,
         _mangaTagServiceFirebase = mangaTagServiceFirebase,
         _syncMangasDao = syncMangasDao,
+        _logBox = logBox,
         _webview = webview;
 
   Future<Result<Manga>> execute({required String mangaId}) async {
@@ -88,6 +92,7 @@ class GetMangaOnAsuraScanUseCase with SyncMangasMixin {
         .map((e) => e.text.trim());
 
     final process = sync(
+      logBox: _logBox,
       syncMangasDao: _syncMangasDao,
       mangaTagServiceFirebase: _mangaTagServiceFirebase,
       mangaServiceFirebase: _mangaServiceFirebase,
