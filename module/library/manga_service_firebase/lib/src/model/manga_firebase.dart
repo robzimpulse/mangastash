@@ -1,13 +1,10 @@
-import 'package:collection/collection.dart';
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:text_similarity/text_similarity.dart';
-
-import 'base_model.dart';
 
 part 'manga_firebase.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class MangaFirebase extends BaseModel {
+class MangaFirebase extends Equatable {
   final String? id;
 
   final String? title;
@@ -80,45 +77,6 @@ class MangaFirebase extends BaseModel {
       tagsId: tagsId ?? this.tagsId,
       webUrl: webUrl ?? this.webUrl,
       source: source ?? this.source,
-    );
-  }
-
-  @override
-  double similarity(other) {
-    if (other is! MangaFirebase) return 0;
-
-    final matcher = StringMatcher(
-      term: TermEnum.char,
-      algorithm: const LevenshteinAlgorithm(),
-    );
-
-    final score = [
-      matcher.similar(title, other.title)?.ratio ?? 0,
-      matcher.similar(coverUrl, other.coverUrl)?.ratio ?? 0,
-      matcher.similar(author, other.author)?.ratio ?? 0,
-      matcher.similar(status, other.status)?.ratio ?? 0,
-      matcher.similar(description, other.description)?.ratio ?? 0,
-      matcher.similar(webUrl, other.webUrl)?.ratio ?? 0,
-      matcher.similar(source, other.source)?.ratio ?? 0,
-    ];
-
-    return score.average;
-  }
-
-  @override
-  MangaFirebase merge(other) {
-    if (other is! MangaFirebase) return this;
-
-    return copyWith(
-      id: id ?? other.id,
-      title: title ?? other.title,
-      coverUrl: coverUrl ?? other.coverUrl,
-      author: author ?? other.author,
-      status: status ?? other.status,
-      description: description ?? other.description,
-      tagsId: tagsId ?? other.tagsId,
-      webUrl: webUrl ?? other.webUrl,
-      source: source ?? other.source,
     );
   }
 }

@@ -5,9 +5,9 @@ import 'package:html/dom.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 import '../../manager/headless_webview_manager.dart';
-import '../../mixin/sync_chapter_mixin.dart';
+import '../../mixin/sync_chapters_mixin.dart';
 
-class GetChapterOnAsuraScanUseCase with SyncChapterMixin {
+class GetChapterOnAsuraScanUseCase with SyncChaptersMixin {
   final MangaChapterServiceFirebase _mangaChapterServiceFirebase;
   final HeadlessWebviewManager _webview;
 
@@ -53,11 +53,17 @@ class GetChapterOnAsuraScanUseCase with SyncChapterMixin {
     final tmp = List.of(data)..sort((a, b) => a.$1.compareTo(b.$1));
     final images = List.of(tmp.map((e) => e.$2));
 
-    return Success(
-      await sync(
-        mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
-        value: result.copyWith(images: images),
-      ),
+    final chapters = await sync(
+      mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
+      values: [result.copyWith(images: images)],
     );
+
+    final value = chapters.firstOrNull;
+
+    if (value == null) {
+      return Error('Empty Sync Chapter');
+    }
+
+    return Success(value);
   }
 }

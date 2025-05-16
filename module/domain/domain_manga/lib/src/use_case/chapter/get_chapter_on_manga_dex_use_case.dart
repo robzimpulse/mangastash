@@ -5,9 +5,9 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 
-import '../../mixin/sync_chapter_mixin.dart';
+import '../../mixin/sync_chapters_mixin.dart';
 
-class GetChapterOnMangaDexUseCase with SyncChapterMixin {
+class GetChapterOnMangaDexUseCase with SyncChaptersMixin {
   final ChapterRepository _chapterRepository;
   final AtHomeRepository _atHomeRepository;
   final MangaChapterServiceFirebase _mangaChapterServiceFirebase;
@@ -40,10 +40,10 @@ class GetChapterOnMangaDexUseCase with SyncChapterMixin {
       final chapter = response[0] as ChapterResponse;
       final atHome = response[1] as AtHomeResponse;
 
-      return Success(
-        await sync(
-          mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
-          value: MangaChapter(
+      final chapters = await sync(
+        mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
+        values: [
+          MangaChapter(
             id: chapter.data?.id,
             title: chapter.data?.attributes?.title,
             chapter: chapter.data?.attributes?.chapter,
@@ -58,8 +58,16 @@ class GetChapterOnMangaDexUseCase with SyncChapterMixin {
                 ?.title
                 ?.en,
           ),
-        ),
+        ],
       );
+
+      final value = chapters.firstOrNull;
+
+      if (value == null) {
+        return Error('Empty Sync Chapter');
+      }
+
+      return Success(value);
     } catch (e) {
       return Error(e);
     }

@@ -1,14 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collection/collection.dart';
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:text_similarity/text_similarity.dart';
-
-import 'base_model.dart';
 
 part 'manga_chapter_firebase.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class MangaChapterFirebase extends BaseModel {
+class MangaChapterFirebase extends Equatable {
   final String? id;
 
   final String? mangaId;
@@ -115,48 +112,6 @@ class MangaChapterFirebase extends BaseModel {
       translatedLanguage: translatedLanguage ?? this.translatedLanguage,
       scanlationGroup: scanlationGroup ?? this.scanlationGroup,
       webUrl: webUrl ?? this.webUrl,
-    );
-  }
-
-  @override
-  double similarity(other) {
-    if (other is! MangaChapterFirebase) return 0;
-
-    final matcher = StringMatcher(
-      term: TermEnum.char,
-      algorithm: const LevenshteinAlgorithm(),
-    );
-
-    final score = [
-      matcher.similar(mangaId, other.mangaId)?.ratio ?? 0,
-      matcher.similar(mangaTitle, other.mangaTitle)?.ratio ?? 0,
-      matcher.similar(volume, other.volume)?.ratio ?? 0,
-      matcher.similar(chapter, other.chapter)?.ratio ?? 0,
-      matcher.similar(readableAt, other.readableAt)?.ratio ?? 0,
-      matcher.similar(translatedLanguage, other.translatedLanguage)?.ratio ?? 0,
-      matcher.similar(scanlationGroup, scanlationGroup)?.ratio ?? 0,
-      matcher.similar(webUrl, webUrl)?.ratio ?? 0,
-    ];
-
-    return score.average;
-  }
-
-  @override
-  MangaChapterFirebase merge(other) {
-    if (other is! MangaChapterFirebase) return this;
-
-    return copyWith(
-      id: id ?? other.id,
-      mangaId: mangaId ?? other.mangaId,
-      mangaTitle: mangaTitle ?? other.mangaTitle,
-      volume: volume ?? other.volume,
-      chapter: chapter ?? other.chapter,
-      readableAt: readableAt ?? other.readableAt,
-      publishAt: publishAt ?? other.publishAt,
-      images: images ?? other.images,
-      translatedLanguage: translatedLanguage ?? other.translatedLanguage,
-      scanlationGroup: scanlationGroup ?? other.scanlationGroup,
-      webUrl: webUrl ?? other.webUrl,
     );
   }
 }

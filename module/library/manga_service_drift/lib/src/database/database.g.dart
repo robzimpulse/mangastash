@@ -3,6 +3,640 @@
 part of 'database.dart';
 
 // ignore_for_file: type=lint
+class SimilarTag extends Table
+    with
+        TableInfo<SimilarTag, SimilarTagData>,
+        VirtualTableInfo<SimilarTag, SimilarTagData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  SimilarTag(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      $customConstraints: '');
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      $customConstraints: '');
+  @override
+  List<GeneratedColumn> get $columns => [id, name];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'similar_tag';
+  @override
+  VerificationContext validateIntegrity(Insertable<SimilarTagData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => const {};
+  @override
+  SimilarTagData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SimilarTagData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+    );
+  }
+
+  @override
+  SimilarTag createAlias(String alias) {
+    return SimilarTag(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+  @override
+  String get moduleAndArgs => 'fts5(id, name)';
+}
+
+class SimilarTagData extends DataClass implements Insertable<SimilarTagData> {
+  final String id;
+  final String name;
+  const SimilarTagData({required this.id, required this.name});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    return map;
+  }
+
+  SimilarTagCompanion toCompanion(bool nullToAbsent) {
+    return SimilarTagCompanion(
+      id: Value(id),
+      name: Value(name),
+    );
+  }
+
+  factory SimilarTagData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SimilarTagData(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+    };
+  }
+
+  SimilarTagData copyWith({String? id, String? name}) => SimilarTagData(
+        id: id ?? this.id,
+        name: name ?? this.name,
+      );
+  SimilarTagData copyWithCompanion(SimilarTagCompanion data) {
+    return SimilarTagData(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SimilarTagData(')
+          ..write('id: $id, ')
+          ..write('name: $name')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SimilarTagData &&
+          other.id == this.id &&
+          other.name == this.name);
+}
+
+class SimilarTagCompanion extends UpdateCompanion<SimilarTagData> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<int> rowid;
+  const SimilarTagCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SimilarTagCompanion.insert({
+    required String id,
+    required String name,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        name = Value(name);
+  static Insertable<SimilarTagData> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SimilarTagCompanion copyWith(
+      {Value<String>? id, Value<String>? name, Value<int>? rowid}) {
+    return SimilarTagCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SimilarTagCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class SimilarManga extends Table
+    with
+        TableInfo<SimilarManga, SimilarMangaData>,
+        VirtualTableInfo<SimilarManga, SimilarMangaData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  SimilarManga(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      $customConstraints: '');
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+      'title', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      $customConstraints: '');
+  static const VerificationMeta _coverUrlMeta =
+      const VerificationMeta('coverUrl');
+  late final GeneratedColumn<String> coverUrl = GeneratedColumn<String>(
+      'cover_url', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      $customConstraints: '');
+  static const VerificationMeta _authorMeta = const VerificationMeta('author');
+  late final GeneratedColumn<String> author = GeneratedColumn<String>(
+      'author', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      $customConstraints: '');
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+      'status', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      $customConstraints: '');
+  static const VerificationMeta _descriptionMeta =
+      const VerificationMeta('description');
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+      'description', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      $customConstraints: '');
+  static const VerificationMeta _webUrlMeta = const VerificationMeta('webUrl');
+  late final GeneratedColumn<String> webUrl = GeneratedColumn<String>(
+      'web_url', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      $customConstraints: '');
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+      'source', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      $customConstraints: '');
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, title, coverUrl, author, status, description, webUrl, source];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'similar_manga';
+  @override
+  VerificationContext validateIntegrity(Insertable<SimilarMangaData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('cover_url')) {
+      context.handle(_coverUrlMeta,
+          coverUrl.isAcceptableOrUnknown(data['cover_url']!, _coverUrlMeta));
+    } else if (isInserting) {
+      context.missing(_coverUrlMeta);
+    }
+    if (data.containsKey('author')) {
+      context.handle(_authorMeta,
+          author.isAcceptableOrUnknown(data['author']!, _authorMeta));
+    } else if (isInserting) {
+      context.missing(_authorMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(_statusMeta,
+          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+          _descriptionMeta,
+          description.isAcceptableOrUnknown(
+              data['description']!, _descriptionMeta));
+    } else if (isInserting) {
+      context.missing(_descriptionMeta);
+    }
+    if (data.containsKey('web_url')) {
+      context.handle(_webUrlMeta,
+          webUrl.isAcceptableOrUnknown(data['web_url']!, _webUrlMeta));
+    } else if (isInserting) {
+      context.missing(_webUrlMeta);
+    }
+    if (data.containsKey('source')) {
+      context.handle(_sourceMeta,
+          source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
+    } else if (isInserting) {
+      context.missing(_sourceMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => const {};
+  @override
+  SimilarMangaData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SimilarMangaData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      title: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
+      coverUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}cover_url'])!,
+      author: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}author'])!,
+      status: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
+      description: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}description'])!,
+      webUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}web_url'])!,
+      source: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}source'])!,
+    );
+  }
+
+  @override
+  SimilarManga createAlias(String alias) {
+    return SimilarManga(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+  @override
+  String get moduleAndArgs =>
+      'fts5(id, title, cover_url, author, status, description, web_url, source)';
+}
+
+class SimilarMangaData extends DataClass
+    implements Insertable<SimilarMangaData> {
+  final String id;
+  final String title;
+  final String coverUrl;
+  final String author;
+  final String status;
+  final String description;
+  final String webUrl;
+  final String source;
+  const SimilarMangaData(
+      {required this.id,
+      required this.title,
+      required this.coverUrl,
+      required this.author,
+      required this.status,
+      required this.description,
+      required this.webUrl,
+      required this.source});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['title'] = Variable<String>(title);
+    map['cover_url'] = Variable<String>(coverUrl);
+    map['author'] = Variable<String>(author);
+    map['status'] = Variable<String>(status);
+    map['description'] = Variable<String>(description);
+    map['web_url'] = Variable<String>(webUrl);
+    map['source'] = Variable<String>(source);
+    return map;
+  }
+
+  SimilarMangaCompanion toCompanion(bool nullToAbsent) {
+    return SimilarMangaCompanion(
+      id: Value(id),
+      title: Value(title),
+      coverUrl: Value(coverUrl),
+      author: Value(author),
+      status: Value(status),
+      description: Value(description),
+      webUrl: Value(webUrl),
+      source: Value(source),
+    );
+  }
+
+  factory SimilarMangaData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SimilarMangaData(
+      id: serializer.fromJson<String>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      coverUrl: serializer.fromJson<String>(json['cover_url']),
+      author: serializer.fromJson<String>(json['author']),
+      status: serializer.fromJson<String>(json['status']),
+      description: serializer.fromJson<String>(json['description']),
+      webUrl: serializer.fromJson<String>(json['web_url']),
+      source: serializer.fromJson<String>(json['source']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'title': serializer.toJson<String>(title),
+      'cover_url': serializer.toJson<String>(coverUrl),
+      'author': serializer.toJson<String>(author),
+      'status': serializer.toJson<String>(status),
+      'description': serializer.toJson<String>(description),
+      'web_url': serializer.toJson<String>(webUrl),
+      'source': serializer.toJson<String>(source),
+    };
+  }
+
+  SimilarMangaData copyWith(
+          {String? id,
+          String? title,
+          String? coverUrl,
+          String? author,
+          String? status,
+          String? description,
+          String? webUrl,
+          String? source}) =>
+      SimilarMangaData(
+        id: id ?? this.id,
+        title: title ?? this.title,
+        coverUrl: coverUrl ?? this.coverUrl,
+        author: author ?? this.author,
+        status: status ?? this.status,
+        description: description ?? this.description,
+        webUrl: webUrl ?? this.webUrl,
+        source: source ?? this.source,
+      );
+  SimilarMangaData copyWithCompanion(SimilarMangaCompanion data) {
+    return SimilarMangaData(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      coverUrl: data.coverUrl.present ? data.coverUrl.value : this.coverUrl,
+      author: data.author.present ? data.author.value : this.author,
+      status: data.status.present ? data.status.value : this.status,
+      description:
+          data.description.present ? data.description.value : this.description,
+      webUrl: data.webUrl.present ? data.webUrl.value : this.webUrl,
+      source: data.source.present ? data.source.value : this.source,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SimilarMangaData(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('coverUrl: $coverUrl, ')
+          ..write('author: $author, ')
+          ..write('status: $status, ')
+          ..write('description: $description, ')
+          ..write('webUrl: $webUrl, ')
+          ..write('source: $source')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id, title, coverUrl, author, status, description, webUrl, source);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SimilarMangaData &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.coverUrl == this.coverUrl &&
+          other.author == this.author &&
+          other.status == this.status &&
+          other.description == this.description &&
+          other.webUrl == this.webUrl &&
+          other.source == this.source);
+}
+
+class SimilarMangaCompanion extends UpdateCompanion<SimilarMangaData> {
+  final Value<String> id;
+  final Value<String> title;
+  final Value<String> coverUrl;
+  final Value<String> author;
+  final Value<String> status;
+  final Value<String> description;
+  final Value<String> webUrl;
+  final Value<String> source;
+  final Value<int> rowid;
+  const SimilarMangaCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.coverUrl = const Value.absent(),
+    this.author = const Value.absent(),
+    this.status = const Value.absent(),
+    this.description = const Value.absent(),
+    this.webUrl = const Value.absent(),
+    this.source = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SimilarMangaCompanion.insert({
+    required String id,
+    required String title,
+    required String coverUrl,
+    required String author,
+    required String status,
+    required String description,
+    required String webUrl,
+    required String source,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        title = Value(title),
+        coverUrl = Value(coverUrl),
+        author = Value(author),
+        status = Value(status),
+        description = Value(description),
+        webUrl = Value(webUrl),
+        source = Value(source);
+  static Insertable<SimilarMangaData> custom({
+    Expression<String>? id,
+    Expression<String>? title,
+    Expression<String>? coverUrl,
+    Expression<String>? author,
+    Expression<String>? status,
+    Expression<String>? description,
+    Expression<String>? webUrl,
+    Expression<String>? source,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (coverUrl != null) 'cover_url': coverUrl,
+      if (author != null) 'author': author,
+      if (status != null) 'status': status,
+      if (description != null) 'description': description,
+      if (webUrl != null) 'web_url': webUrl,
+      if (source != null) 'source': source,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SimilarMangaCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? title,
+      Value<String>? coverUrl,
+      Value<String>? author,
+      Value<String>? status,
+      Value<String>? description,
+      Value<String>? webUrl,
+      Value<String>? source,
+      Value<int>? rowid}) {
+    return SimilarMangaCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      coverUrl: coverUrl ?? this.coverUrl,
+      author: author ?? this.author,
+      status: status ?? this.status,
+      description: description ?? this.description,
+      webUrl: webUrl ?? this.webUrl,
+      source: source ?? this.source,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (coverUrl.present) {
+      map['cover_url'] = Variable<String>(coverUrl.value);
+    }
+    if (author.present) {
+      map['author'] = Variable<String>(author.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (webUrl.present) {
+      map['web_url'] = Variable<String>(webUrl.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SimilarMangaCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('coverUrl: $coverUrl, ')
+          ..write('author: $author, ')
+          ..write('status: $status, ')
+          ..write('description: $description, ')
+          ..write('webUrl: $webUrl, ')
+          ..write('source: $source, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $MangaChapterImageTablesTable extends MangaChapterImageTables
     with TableInfo<$MangaChapterImageTablesTable, MangaChapterImageTable> {
   @override
@@ -2314,6 +2948,8 @@ class MangaTagRelationshipTablesCompanion
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
+  late final SimilarTag similarTag = SimilarTag(this);
+  late final SimilarManga similarManga = SimilarManga(this);
   late final $MangaChapterImageTablesTable mangaChapterImageTables =
       $MangaChapterImageTablesTable(this);
   late final $MangaChapterTablesTable mangaChapterTables =
@@ -2332,6 +2968,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
+        similarTag,
+        similarManga,
         mangaChapterImageTables,
         mangaChapterTables,
         mangaLibraryTables,
@@ -2341,6 +2979,340 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       ];
 }
 
+typedef $SimilarTagCreateCompanionBuilder = SimilarTagCompanion Function({
+  required String id,
+  required String name,
+  Value<int> rowid,
+});
+typedef $SimilarTagUpdateCompanionBuilder = SimilarTagCompanion Function({
+  Value<String> id,
+  Value<String> name,
+  Value<int> rowid,
+});
+
+class $SimilarTagFilterComposer extends Composer<_$AppDatabase, SimilarTag> {
+  $SimilarTagFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+}
+
+class $SimilarTagOrderingComposer extends Composer<_$AppDatabase, SimilarTag> {
+  $SimilarTagOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+}
+
+class $SimilarTagAnnotationComposer
+    extends Composer<_$AppDatabase, SimilarTag> {
+  $SimilarTagAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+}
+
+class $SimilarTagTableManager extends RootTableManager<
+    _$AppDatabase,
+    SimilarTag,
+    SimilarTagData,
+    $SimilarTagFilterComposer,
+    $SimilarTagOrderingComposer,
+    $SimilarTagAnnotationComposer,
+    $SimilarTagCreateCompanionBuilder,
+    $SimilarTagUpdateCompanionBuilder,
+    (SimilarTagData, BaseReferences<_$AppDatabase, SimilarTag, SimilarTagData>),
+    SimilarTagData,
+    PrefetchHooks Function()> {
+  $SimilarTagTableManager(_$AppDatabase db, SimilarTag table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $SimilarTagFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $SimilarTagOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $SimilarTagAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              SimilarTagCompanion(
+            id: id,
+            name: name,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String name,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              SimilarTagCompanion.insert(
+            id: id,
+            name: name,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $SimilarTagProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    SimilarTag,
+    SimilarTagData,
+    $SimilarTagFilterComposer,
+    $SimilarTagOrderingComposer,
+    $SimilarTagAnnotationComposer,
+    $SimilarTagCreateCompanionBuilder,
+    $SimilarTagUpdateCompanionBuilder,
+    (SimilarTagData, BaseReferences<_$AppDatabase, SimilarTag, SimilarTagData>),
+    SimilarTagData,
+    PrefetchHooks Function()>;
+typedef $SimilarMangaCreateCompanionBuilder = SimilarMangaCompanion Function({
+  required String id,
+  required String title,
+  required String coverUrl,
+  required String author,
+  required String status,
+  required String description,
+  required String webUrl,
+  required String source,
+  Value<int> rowid,
+});
+typedef $SimilarMangaUpdateCompanionBuilder = SimilarMangaCompanion Function({
+  Value<String> id,
+  Value<String> title,
+  Value<String> coverUrl,
+  Value<String> author,
+  Value<String> status,
+  Value<String> description,
+  Value<String> webUrl,
+  Value<String> source,
+  Value<int> rowid,
+});
+
+class $SimilarMangaFilterComposer
+    extends Composer<_$AppDatabase, SimilarManga> {
+  $SimilarMangaFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get coverUrl => $composableBuilder(
+      column: $table.coverUrl, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get author => $composableBuilder(
+      column: $table.author, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get webUrl => $composableBuilder(
+      column: $table.webUrl, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnFilters(column));
+}
+
+class $SimilarMangaOrderingComposer
+    extends Composer<_$AppDatabase, SimilarManga> {
+  $SimilarMangaOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get coverUrl => $composableBuilder(
+      column: $table.coverUrl, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get author => $composableBuilder(
+      column: $table.author, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get webUrl => $composableBuilder(
+      column: $table.webUrl, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnOrderings(column));
+}
+
+class $SimilarMangaAnnotationComposer
+    extends Composer<_$AppDatabase, SimilarManga> {
+  $SimilarMangaAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get coverUrl =>
+      $composableBuilder(column: $table.coverUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get author =>
+      $composableBuilder(column: $table.author, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => column);
+
+  GeneratedColumn<String> get webUrl =>
+      $composableBuilder(column: $table.webUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+}
+
+class $SimilarMangaTableManager extends RootTableManager<
+    _$AppDatabase,
+    SimilarManga,
+    SimilarMangaData,
+    $SimilarMangaFilterComposer,
+    $SimilarMangaOrderingComposer,
+    $SimilarMangaAnnotationComposer,
+    $SimilarMangaCreateCompanionBuilder,
+    $SimilarMangaUpdateCompanionBuilder,
+    (
+      SimilarMangaData,
+      BaseReferences<_$AppDatabase, SimilarManga, SimilarMangaData>
+    ),
+    SimilarMangaData,
+    PrefetchHooks Function()> {
+  $SimilarMangaTableManager(_$AppDatabase db, SimilarManga table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $SimilarMangaFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $SimilarMangaOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $SimilarMangaAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> title = const Value.absent(),
+            Value<String> coverUrl = const Value.absent(),
+            Value<String> author = const Value.absent(),
+            Value<String> status = const Value.absent(),
+            Value<String> description = const Value.absent(),
+            Value<String> webUrl = const Value.absent(),
+            Value<String> source = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              SimilarMangaCompanion(
+            id: id,
+            title: title,
+            coverUrl: coverUrl,
+            author: author,
+            status: status,
+            description: description,
+            webUrl: webUrl,
+            source: source,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String title,
+            required String coverUrl,
+            required String author,
+            required String status,
+            required String description,
+            required String webUrl,
+            required String source,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              SimilarMangaCompanion.insert(
+            id: id,
+            title: title,
+            coverUrl: coverUrl,
+            author: author,
+            status: status,
+            description: description,
+            webUrl: webUrl,
+            source: source,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $SimilarMangaProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    SimilarManga,
+    SimilarMangaData,
+    $SimilarMangaFilterComposer,
+    $SimilarMangaOrderingComposer,
+    $SimilarMangaAnnotationComposer,
+    $SimilarMangaCreateCompanionBuilder,
+    $SimilarMangaUpdateCompanionBuilder,
+    (
+      SimilarMangaData,
+      BaseReferences<_$AppDatabase, SimilarManga, SimilarMangaData>
+    ),
+    SimilarMangaData,
+    PrefetchHooks Function()>;
 typedef $$MangaChapterImageTablesTableCreateCompanionBuilder
     = MangaChapterImageTablesCompanion Function({
   Value<String> createdAt,
@@ -3559,6 +4531,10 @@ typedef $$MangaTagRelationshipTablesTableProcessedTableManager
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
+  $SimilarTagTableManager get similarTag =>
+      $SimilarTagTableManager(_db, _db.similarTag);
+  $SimilarMangaTableManager get similarManga =>
+      $SimilarMangaTableManager(_db, _db.similarManga);
   $$MangaChapterImageTablesTableTableManager get mangaChapterImageTables =>
       $$MangaChapterImageTablesTableTableManager(
           _db, _db.mangaChapterImageTables);

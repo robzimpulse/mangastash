@@ -16,32 +16,32 @@ class MangaTagServiceFirebase {
   })  : _ref = FirebaseFirestore.instanceFor(app: app).collection('tags'),
         _logger = logger;
 
-  Future<MangaTagFirebase> sync({required MangaTagFirebase value}) async {
-    final founds = await search(value: value);
-
-    final match = founds
-        .sorted((a, b) => value.compareTo(a) - value.compareTo(b))
-        .lastOrNull;
-
-    if (founds.length > 1) {
-      _logger?.call(
-        'Duplicate entry',
-        extra: {
-          'value': value.toJson(),
-          'match': match?.toJson(),
-          'similarity': value.similarity(match),
-          'duplicated': founds.map((e) => e.toJson()).toList(),
-        },
-        name: runtimeType.toString(),
-      );
-    }
-
-    return await update(
-      key: match?.id ?? value.id,
-      update: (old) async => value.merge(old),
-      ifAbsent: () async => value,
-    );
-  }
+  // Future<MangaTagFirebase> sync({required MangaTagFirebase value}) async {
+  //   final founds = await search(value: value);
+  //
+  //   final match = founds
+  //       .sorted((a, b) => value.compareTo(a) - value.compareTo(b))
+  //       .lastOrNull;
+  //
+  //   if (founds.length > 1) {
+  //     _logger?.call(
+  //       'Duplicate entry',
+  //       extra: {
+  //         'value': value.toJson(),
+  //         'match': match?.toJson(),
+  //         'similarity': value.similarity(match),
+  //         'duplicated': founds.map((e) => e.toJson()).toList(),
+  //       },
+  //       name: runtimeType.toString(),
+  //     );
+  //   }
+  //
+  //   return await update(
+  //     key: match?.id ?? value.id,
+  //     update: (old) async => value.merge(old),
+  //     ifAbsent: () async => value,
+  //   );
+  // }
 
   Future<MangaTagFirebase> add({required MangaTagFirebase value}) async {
     final id = value.id;

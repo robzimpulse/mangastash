@@ -3,11 +3,12 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
+import 'package:text_similarity/text_similarity.dart';
 
 part 'manga_chapter.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class MangaChapter extends Equatable {
+class MangaChapter extends Equatable with SimilarityMixin {
   final String? id;
 
   final String? mangaId;
@@ -70,6 +71,9 @@ class MangaChapter extends Equatable {
         scanlationGroup,
         webUrl,
       ];
+
+  @override
+  List<Object?> get similarProp => props;
 
   factory MangaChapter.fromFirebaseService(MangaChapterFirebase chapter) {
     return MangaChapter(

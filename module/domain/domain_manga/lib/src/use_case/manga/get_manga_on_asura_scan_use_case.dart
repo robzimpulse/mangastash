@@ -107,7 +107,7 @@ class GetMangaOnAsuraScanUseCase with SyncMangasMixin {
     final data = (await process).firstOrNull;
 
     if (data == null) {
-      return Error(Exception('Error syncing manga'));
+      return Error(Exception('Error Syncing Manga'));
     }
 
     return Success(data);

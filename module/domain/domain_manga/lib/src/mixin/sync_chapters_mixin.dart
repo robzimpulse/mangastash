@@ -5,13 +5,8 @@ mixin SyncChaptersMixin {
   Future<List<MangaChapter>> sync({
     required MangaChapterServiceFirebase mangaChapterServiceFirebase,
     required List<MangaChapter> values,
-  }) {
-    return Future.wait(
-      values.map(
-        (e) => mangaChapterServiceFirebase
-            .sync(value: e.toFirebaseService())
-            .then((e) => MangaChapter.fromFirebaseService(e)),
-      ),
-    );
+  }) async {
+    /// TODO: sync with firebase and local database
+    return values;
   }
 }

@@ -1132,7 +1132,7 @@ packages:
     source: hosted
     version: "0.7.2"
   text_similarity:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "../../library/text_similarity"
       relative: true

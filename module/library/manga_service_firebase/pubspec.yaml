@@ -18,9 +18,6 @@ dependencies:
   json_annotation: ^4.9.0
   collection: ^1.16.0
 
-  text_similarity:
-    path: ../../library/text_similarity
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
