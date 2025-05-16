@@ -14,19 +14,27 @@ class CoreAuthRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
-    log.log('Start Register ${runtimeType.toString()}', name: 'Services');
+    final MeasureProcessUseCase measurement = locator();
 
-    locator.registerFactory(() => AuthService(app: locator()));
-    locator.registerFactory(
-      () => LoginAnonymouslyUseCase(authService: locator()),
+    await measurement.execute(() async {
+      locator.registerFactory(() => AuthService(app: locator()));
+      locator.registerFactory(
+        () => LoginAnonymouslyUseCase(authService: locator()),
+      );
+      locator.registerFactory(() => LogoutUseCase(authService: locator()));
+      locator.registerFactory(() => LoginUseCase(authService: locator()));
+      locator.registerFactory(() => RegisterUseCase(authService: locator()));
+
+      locator.registerSingleton(AuthManager(service: locator()));
+      locator.alias<ListenAuthUseCase, AuthManager>();
+      locator.alias<GetAuthUseCase, AuthManager>();
+    });
+
+    log.log(
+      'Finish Register ${runtimeType.toString()}',
+      name: 'Services',
+      extra: {'duration': measurement.elapsed},
+      stackTrace: StackTrace.current,
     );
-    locator.registerFactory(() => LogoutUseCase(authService: locator()));
-    locator.registerFactory(() => LoginUseCase(authService: locator()));
-    locator.registerFactory(() => RegisterUseCase(authService: locator()));
-
-    locator.registerSingleton(AuthManager(service: locator()));
-    locator.alias<ListenAuthUseCase, AuthManager>();
-    locator.alias<GetAuthUseCase, AuthManager>();
-    log.log('Finish Register ${runtimeType.toString()}', name: 'Services');
   }
 }

@@ -16,24 +16,31 @@ class CoreStorageRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
-    log.log('Start Register ${runtimeType.toString()}', name: 'Services');
+    final MeasureProcessUseCase measurement = locator();
 
-    locator.registerSingleton(await SharedPreferencesStorage.create());
-    locator.alias<Storage, SharedPreferencesStorage>();
+    await measurement.execute(() async {
+      locator.registerSingleton(await SharedPreferencesStorage.create());
+      locator.alias<Storage, SharedPreferencesStorage>();
 
-    locator.registerSingleton(await PathManager.create(storage: locator()));
-    locator.alias<GetRootPathUseCase, PathManager>();
-    locator.alias<ListenDownloadPathUseCase, PathManager>();
-    locator.alias<SetDownloadPathUseCase, PathManager>();
-    locator.alias<ListenBackupPathUseCase, PathManager>();
-    locator.alias<SetBackupPathUseCase, PathManager>();
+      locator.registerSingleton(await PathManager.create(storage: locator()));
+      locator.alias<GetRootPathUseCase, PathManager>();
+      locator.alias<ListenDownloadPathUseCase, PathManager>();
+      locator.alias<SetDownloadPathUseCase, PathManager>();
+      locator.alias<ListenBackupPathUseCase, PathManager>();
+      locator.alias<SetBackupPathUseCase, PathManager>();
 
-    locator.registerSingleton(
-      CustomCacheManager.create(dio: locator()),
-      dispose: (e) => e.dispose(),
+      locator.registerSingleton(
+        CustomCacheManager.create(dio: locator()),
+        dispose: (e) => e.dispose(),
+      );
+      locator.alias<BaseCacheManager, CustomCacheManager>();
+    });
+
+    log.log(
+      'Finish Register ${runtimeType.toString()}',
+      name: 'Services',
+      extra: {'duration': measurement.elapsed},
+      stackTrace: StackTrace.current,
     );
-    locator.alias<BaseCacheManager, CustomCacheManager>();
-
-    log.log('Finish Register ${runtimeType.toString()}', name: 'Services');
   }
 }

@@ -1,6 +1,6 @@
 import 'package:log_box/log_box.dart';
 import 'package:service_locator/service_locator.dart';
-import 'package:worker_manager/worker_manager.dart' ;
+import 'package:worker_manager/worker_manager.dart';
 
 import 'manager/date_manager.dart';
 import 'manager/locale_manager.dart';
@@ -15,19 +15,28 @@ class CoreEnvironmentRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
-    log.log('Start Register ${runtimeType.toString()}', name: 'Services');
-    locator.registerSingleton(ThemeManager(storage: locator()));
-    locator.alias<UpdateThemeUseCase, ThemeManager>();
-    locator.alias<ListenThemeUseCase, ThemeManager>();
+    final MeasureProcessUseCase measurement = locator();
 
-    locator.registerSingleton(await LocaleManager.create(storage: locator()));
-    locator.alias<UpdateLocaleUseCase, LocaleManager>();
-    locator.alias<ListenLocaleUseCase, LocaleManager>();
+    await measurement.execute(() async {
+      locator.registerSingleton(ThemeManager(storage: locator()));
+      locator.alias<UpdateThemeUseCase, ThemeManager>();
+      locator.alias<ListenThemeUseCase, ThemeManager>();
 
-    locator.registerSingleton(await DateManager.create());
-    locator.alias<ListenCurrentTimezoneUseCase, DateManager>();
+      locator.registerSingleton(await LocaleManager.create(storage: locator()));
+      locator.alias<UpdateLocaleUseCase, LocaleManager>();
+      locator.alias<ListenLocaleUseCase, LocaleManager>();
 
-    await workerManager.init(dynamicSpawning: true);
-    log.log('Finish Register ${runtimeType.toString()}', name: 'Services');
+      locator.registerSingleton(await DateManager.create());
+      locator.alias<ListenCurrentTimezoneUseCase, DateManager>();
+
+      await workerManager.init(dynamicSpawning: true);
+    });
+
+    log.log(
+      'Finish Register ${runtimeType.toString()}',
+      name: 'Services',
+      extra: {'duration': measurement.elapsed},
+      stackTrace: StackTrace.current,
+    );
   }
 }

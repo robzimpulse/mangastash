@@ -10,16 +10,26 @@ class CoreNetworkRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
-    log.log('Start Register ${runtimeType.toString()}', name: 'Services');
+    final MeasureProcessUseCase measurement = locator();
 
-    locator.registerSingleton(await SystemProxyManager.create(log: locator()));
-    locator.alias<GetSystemProxyUseCase, SystemProxyManager>();
+    await measurement.execute(() async {
+      locator.registerSingleton(
+        await SystemProxyManager.create(log: locator()),
+      );
+      locator.alias<GetSystemProxyUseCase, SystemProxyManager>();
 
-    locator.registerSingleton(DioInspector());
+      locator.registerSingleton(DioInspector());
 
-    locator.registerSingleton(
-      DioManager.create(inspector: locator(), log: locator()),
+      locator.registerSingleton(
+        DioManager.create(inspector: locator(), log: locator()),
+      );
+    });
+
+    log.log(
+      'Finish Register ${runtimeType.toString()}',
+      name: 'Services',
+      extra: {'duration': measurement.elapsed},
+      stackTrace: StackTrace.current,
     );
-    log.log('Finish Register ${runtimeType.toString()}', name: 'Services');
   }
 }

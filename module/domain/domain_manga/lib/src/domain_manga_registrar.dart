@@ -44,7 +44,7 @@ class DomainMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
-    log.log('Start Register ${runtimeType.toString()}', name: 'Services');
+    final MeasureProcessUseCase measurement = locator();
 
     void logger(
       message, {
@@ -70,236 +70,243 @@ class DomainMangaRegistrar extends Registrar {
       );
     }
 
-    locator.registerSingleton(DatabaseViewer());
-    locator.registerSingleton(AppDatabase(logger: logger));
-    locator.registerFactory(() => SyncMangasDao(locator()));
-    locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
-    locator.registerFactory(
-      () => MangaServiceFirebase(
-        app: locator(),
-        logger: logger,
-      ),
-    );
-    locator.registerFactory(
-      () => MangaTagServiceFirebase(
-        app: locator(),
-        logger: logger,
-      ),
-    );
-    locator.registerFactory(
-      () => MangaChapterServiceFirebase(
-        app: locator(),
-        logger: logger,
-      ),
-    );
-    locator.registerFactory(
-      () => MangaLibraryServiceFirebase(
-        app: locator(),
-        logger: logger,
-      ),
-    );
+    await measurement.execute(() async {
+      locator.registerSingleton(DatabaseViewer());
+      locator.registerSingleton(AppDatabase(logger: logger));
+      locator.registerFactory(() => SyncMangasDao(locator()));
+      locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
+      locator.registerFactory(
+        () => MangaServiceFirebase(
+          app: locator(),
+          logger: logger,
+        ),
+      );
+      locator.registerFactory(
+        () => MangaTagServiceFirebase(
+          app: locator(),
+          logger: logger,
+        ),
+      );
+      locator.registerFactory(
+        () => MangaChapterServiceFirebase(
+          app: locator(),
+          logger: logger,
+        ),
+      );
+      locator.registerFactory(
+        () => MangaLibraryServiceFirebase(
+          app: locator(),
+          logger: logger,
+        ),
+      );
 
-    locator.registerSingleton(
-      HeadlessWebviewManager(log: log, cacheManager: locator()),
-      dispose: (e) => e.dispose(),
-    );
+      locator.registerSingleton(
+        HeadlessWebviewManager(log: log, cacheManager: locator()),
+        dispose: (e) => e.dispose(),
+      );
 
-    locator.registerSingleton(await FileDownloadManager.create(log: log));
-    locator.registerSingleton(
-      await DownloadProgressManager.create(
-        fileDownloader: locator(),
-        log: log,
-        cacheManager: locator(),
-      ),
-    );
-    locator.alias<ListenDownloadProgressUseCase, DownloadProgressManager>();
+      locator.registerSingleton(await FileDownloadManager.create(log: log));
+      locator.registerSingleton(
+        await DownloadProgressManager.create(
+          fileDownloader: locator(),
+          log: log,
+          cacheManager: locator(),
+        ),
+      );
+      locator.alias<ListenDownloadProgressUseCase, DownloadProgressManager>();
 
-    // manga dex services
-    locator.registerFactory(() => MangaService(locator()));
-    locator.registerFactory(() => ChapterService(locator()));
-    locator.registerFactory(() => AtHomeService(locator()));
-    locator.registerFactory(() => AuthorService(locator()));
-    locator.registerFactory(() => CoverArtService(locator()));
+      // manga dex services
+      locator.registerFactory(() => MangaService(locator()));
+      locator.registerFactory(() => ChapterService(locator()));
+      locator.registerFactory(() => AtHomeService(locator()));
+      locator.registerFactory(() => AuthorService(locator()));
+      locator.registerFactory(() => CoverArtService(locator()));
 
-    // manga dex repositories
-    locator.registerFactory(() => AtHomeRepository(service: locator()));
-    locator.registerFactory(() => MangaRepository(service: locator()));
-    locator.registerFactory(
-      () => ChapterRepository(
-        mangaService: locator(),
-        chapterService: locator(),
-      ),
-    );
-    locator.registerFactory(() => AuthorRepository(service: locator()));
-    locator.registerFactory(() => CoverRepository(service: locator()));
+      // manga dex repositories
+      locator.registerFactory(() => AtHomeRepository(service: locator()));
+      locator.registerFactory(() => MangaRepository(service: locator()));
+      locator.registerFactory(
+        () => ChapterRepository(
+          mangaService: locator(),
+          chapterService: locator(),
+        ),
+      );
+      locator.registerFactory(() => AuthorRepository(service: locator()));
+      locator.registerFactory(() => CoverRepository(service: locator()));
 
-    locator.registerFactory(
-      () => CrawlUrlUseCase(
-        logBox: log,
-        cacheManager: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => SearchMangaOnMangaDexUseCase(
-        mangaRepository: locator(),
-        mangaTagServiceFirebase: locator(),
-        mangaServiceFirebase: locator(),
-        syncMangasDao: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => SearchChapterOnMangaDexUseCase(
-        chapterRepository: locator(),
-        mangaChapterServiceFirebase: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => SearchChapterOnAsuraScanUseCase(
-        mangaServiceFirebase: locator(),
-        mangaChapterServiceFirebase: locator(),
-        webview: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => SearchMangaOnMangaClashUseCaseUseCase(
-        webview: locator(),
-        mangaTagServiceFirebase: locator(),
-        mangaServiceFirebase: locator(),
-        syncMangasDao: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => SearchChapterOnMangaClashUseCase(
-        mangaServiceFirebase: locator(),
-        webview: locator(),
-        mangaChapterServiceFirebase: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => GetChapterOnMangaDexUseCase(
-        chapterRepository: locator(),
-        atHomeRepository: locator(),
-        mangaChapterServiceFirebase: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => GetChapterOnMangaClashUseCase(
-        mangaChapterServiceFirebase: locator(),
-        webview: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => GetChapterOnAsuraScanUseCase(
-        mangaChapterServiceFirebase: locator(),
-        webview: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => GetMangaOnMangaDexUseCase(
-        mangaService: locator(),
-        mangaTagServiceFirebase: locator(),
-        mangaServiceFirebase: locator(),
-        syncMangasDao: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => GetMangaOnMangaClashUseCase(
-        webview: locator(),
-        mangaServiceFirebase: locator(),
-        mangaTagServiceFirebase: locator(),
-        syncMangasDao: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => GetMangaOnAsuraScanUseCase(
-        mangaServiceFirebase: locator(),
-        webview: locator(),
-        mangaTagServiceFirebase: locator(),
-        syncMangasDao: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => SearchMangaOnAsuraScanUseCase(
-        webview: locator(),
-        mangaTagServiceFirebase: locator(),
-        mangaServiceFirebase: locator(),
-        syncMangasDao: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => SearchMangaUseCase(
-        searchMangaOnMangaDexUseCase: locator(),
-        searchMangaOnMangaClashUseCaseUseCase: locator(),
-        searchMangaOnAsuraScanUseCase: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => SearchChapterUseCase(
-        searchChapterOnMangaDexUseCase: locator(),
-        searchChapterOnMangaClashUseCase: locator(),
-        searchChapterOnAsuraScanUseCase: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => GetMangaUseCase(
-        getMangaOnAsuraScanUseCase: locator(),
-        getMangaOnMangaDexUseCase: locator(),
-        getMangaOnMangaClashUseCase: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => GetChapterUseCase(
-        getChapterOnMangaDexUseCase: locator(),
-        getChapterOnMangaClashUseCase: locator(),
-        getChapterOnAsuraScanUseCase: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => AddToLibraryUseCase(
-        mangaLibraryServiceFirebase: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => RemoveFromLibraryUseCase(
-        mangaLibraryServiceFirebase: locator(),
-      ),
-    );
-    locator.registerFactory(
-      () => DownloadChapterUseCase(
-        fileDownloader: locator(),
-        getChapterUseCase: locator(),
-        log: log,
-      ),
-    );
+      locator.registerFactory(
+        () => CrawlUrlUseCase(
+          logBox: log,
+          cacheManager: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => SearchMangaOnMangaDexUseCase(
+          mangaRepository: locator(),
+          mangaTagServiceFirebase: locator(),
+          mangaServiceFirebase: locator(),
+          syncMangasDao: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => SearchChapterOnMangaDexUseCase(
+          chapterRepository: locator(),
+          mangaChapterServiceFirebase: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => SearchChapterOnAsuraScanUseCase(
+          mangaServiceFirebase: locator(),
+          mangaChapterServiceFirebase: locator(),
+          webview: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => SearchMangaOnMangaClashUseCaseUseCase(
+          webview: locator(),
+          mangaTagServiceFirebase: locator(),
+          mangaServiceFirebase: locator(),
+          syncMangasDao: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => SearchChapterOnMangaClashUseCase(
+          mangaServiceFirebase: locator(),
+          webview: locator(),
+          mangaChapterServiceFirebase: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => GetChapterOnMangaDexUseCase(
+          chapterRepository: locator(),
+          atHomeRepository: locator(),
+          mangaChapterServiceFirebase: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => GetChapterOnMangaClashUseCase(
+          mangaChapterServiceFirebase: locator(),
+          webview: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => GetChapterOnAsuraScanUseCase(
+          mangaChapterServiceFirebase: locator(),
+          webview: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => GetMangaOnMangaDexUseCase(
+          mangaService: locator(),
+          mangaTagServiceFirebase: locator(),
+          mangaServiceFirebase: locator(),
+          syncMangasDao: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => GetMangaOnMangaClashUseCase(
+          webview: locator(),
+          mangaServiceFirebase: locator(),
+          mangaTagServiceFirebase: locator(),
+          syncMangasDao: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => GetMangaOnAsuraScanUseCase(
+          mangaServiceFirebase: locator(),
+          webview: locator(),
+          mangaTagServiceFirebase: locator(),
+          syncMangasDao: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => SearchMangaOnAsuraScanUseCase(
+          webview: locator(),
+          mangaTagServiceFirebase: locator(),
+          mangaServiceFirebase: locator(),
+          syncMangasDao: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => SearchMangaUseCase(
+          searchMangaOnMangaDexUseCase: locator(),
+          searchMangaOnMangaClashUseCaseUseCase: locator(),
+          searchMangaOnAsuraScanUseCase: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => SearchChapterUseCase(
+          searchChapterOnMangaDexUseCase: locator(),
+          searchChapterOnMangaClashUseCase: locator(),
+          searchChapterOnAsuraScanUseCase: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => GetMangaUseCase(
+          getMangaOnAsuraScanUseCase: locator(),
+          getMangaOnMangaDexUseCase: locator(),
+          getMangaOnMangaClashUseCase: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => GetChapterUseCase(
+          getChapterOnMangaDexUseCase: locator(),
+          getChapterOnMangaClashUseCase: locator(),
+          getChapterOnAsuraScanUseCase: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => AddToLibraryUseCase(
+          mangaLibraryServiceFirebase: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => RemoveFromLibraryUseCase(
+          mangaLibraryServiceFirebase: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => DownloadChapterUseCase(
+          fileDownloader: locator(),
+          getChapterUseCase: locator(),
+          log: log,
+        ),
+      );
 
-    locator.registerSingleton(
-      LibraryManager(
-        mangaLibraryServiceFirebase: locator(),
-        listenAuthUseCase: locator(),
-        mangaServiceFirebase: locator(),
-      ),
-    );
-    locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
-    locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
+      locator.registerSingleton(
+        LibraryManager(
+          mangaLibraryServiceFirebase: locator(),
+          listenAuthUseCase: locator(),
+          mangaServiceFirebase: locator(),
+        ),
+      );
+      locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
+      locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
 
-    locator.registerSingleton(
-      MangaSourceManager(
-        mangaSourceServiceFirebase: locator(),
-      ),
-    );
-    locator.alias<GetMangaSourcesUseCase, MangaSourceManager>();
-    locator.alias<ListenMangaSourceUseCase, MangaSourceManager>();
-    locator.alias<GetMangaSourceUseCase, MangaSourceManager>();
+      locator.registerSingleton(
+        MangaSourceManager(
+          mangaSourceServiceFirebase: locator(),
+        ),
+      );
+      locator.alias<GetMangaSourcesUseCase, MangaSourceManager>();
+      locator.alias<ListenMangaSourceUseCase, MangaSourceManager>();
+      locator.alias<GetMangaSourceUseCase, MangaSourceManager>();
 
-    locator.registerSingleton(
-      MangaTagManager(
-        mangaTagServiceFirebase: locator(),
-      ),
-    );
-    locator.alias<GetMangaTagsUseCase, MangaTagManager>();
-    locator.alias<ListenMangaTagUseCase, MangaTagManager>();
-    locator.alias<GetMangaTagUseCase, MangaTagManager>();
+      locator.registerSingleton(
+        MangaTagManager(
+          mangaTagServiceFirebase: locator(),
+        ),
+      );
+      locator.alias<GetMangaTagsUseCase, MangaTagManager>();
+      locator.alias<ListenMangaTagUseCase, MangaTagManager>();
+      locator.alias<GetMangaTagUseCase, MangaTagManager>();
+    });
 
-    log.log('Finish Register ${runtimeType.toString()}', name: 'Services');
+    log.log(
+      'Finish Register ${runtimeType.toString()}',
+      name: 'Services',
+      extra: {'duration': measurement.elapsed},
+      stackTrace: StackTrace.current,
+    );
   }
 }
