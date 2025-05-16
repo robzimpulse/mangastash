@@ -109,35 +109,45 @@ class MangaTagServiceFirebase {
   }
 
   Future<List<MangaTagFirebase>> search({
-    required MangaTagFirebase value,
+    List<MangaTagFirebase> values = const [],
   }) async {
-    final List<MangaTagFirebase> data = [];
-    final ref = _ref.where('name', isEqualTo: value.name).orderBy('name');
-    final total = (await ref.count().get()).count ?? 0;
-    DocumentSnapshot? offset;
+    final ids = values.map((e) => e.id).nonNulls.nonEmpty;
+    final names = values.map((e) => e.name).nonNulls.nonEmpty;
 
-    do {
-      final result = (offset == null)
-          ? await (ref.limit(100).get())
-          : await (ref.startAfterDocument(offset).limit(100).get());
-      data.addAll(
-        result.docs.map(
-          (e) => MangaTagFirebase.fromFirebase(e),
-        ),
-      );
-      offset = result.docs.lastOrNull;
-    } while (data.length < total);
+    final data = <MangaTagFirebase>{};
 
-    _logger?.call(
-      'Search existing entry',
-      extra: {
-        'value': value.toJson(),
-        'matched': data.map((e) => e.toJson()).toList(),
-      },
-      name: runtimeType.toString(),
-    );
+    /// looping for `ids`
+    if (ids.isNotEmpty) {
+      final refId = _ref.where('id', whereIn: ids).orderBy('id');
+      final totalId = (await refId.count().get()).count ?? 0;
+      DocumentSnapshot? offsetId;
 
-    return data;
+      do {
+        final result = (offsetId == null)
+            ? await (refId.limit(100).get())
+            : await (refId.startAfterDocument(offsetId).limit(100).get());
+
+        data.addAll(result.docs.map((e) => MangaTagFirebase.fromFirebase(e)));
+        offsetId = result.docs.lastOrNull;
+      } while (data.length < totalId);
+    }
+
+    if (names.isNotEmpty) {
+      /// looping for `name`
+      final refName = _ref.where('name', whereIn: names).orderBy('id');
+      final totalName = (await refName.count().get()).count ?? 0;
+      DocumentSnapshot? offsetName;
+
+      do {
+        final result = (offsetName == null)
+            ? await (refName.limit(100).get())
+            : await (refName.startAfterDocument(offsetName).limit(100).get());
+        data.addAll(result.docs.map((e) => MangaTagFirebase.fromFirebase(e)));
+        offsetName = result.docs.lastOrNull;
+      } while (data.length < totalName);
+    }
+
+    return [...data];
   }
 
   Stream<Map<String, MangaTagFirebase>> get stream {

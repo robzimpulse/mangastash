@@ -50,7 +50,7 @@ class GetMangaOnMangaClashUseCase with SyncMangasMixin {
       syncMangasDao: _syncMangasDao,
       mangaTagServiceFirebase: _mangaTagServiceFirebase,
       mangaServiceFirebase: _mangaServiceFirebase,
-      mangas: [
+      values: [
         Manga.fromFirebaseService(
           result.copyWith(
             description: description,

@@ -15,3 +15,7 @@ typedef LoggerCallback = void Function(
 typedef ValueUpdater<T> = T Function(T value);
 
 typedef AsyncValueUpdater<T> = Future<T> Function(T value);
+
+extension NonEmptyStringIterableExtension on Iterable<String> {
+  Iterable<String> get nonEmpty => where((e) => e.isNotEmpty);
+}

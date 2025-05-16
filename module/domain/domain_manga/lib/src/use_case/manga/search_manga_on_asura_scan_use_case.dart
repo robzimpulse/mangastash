@@ -107,7 +107,7 @@ class SearchMangaOnAsuraScanUseCase with SyncMangasMixin {
       syncMangasDao: _syncMangasDao,
       mangaTagServiceFirebase: _mangaTagServiceFirebase,
       mangaServiceFirebase: _mangaServiceFirebase,
-      mangas: mangas,
+      values: mangas,
     );
 
     return Success(

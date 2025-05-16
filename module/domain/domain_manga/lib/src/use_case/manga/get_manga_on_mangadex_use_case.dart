@@ -41,7 +41,7 @@ class GetMangaOnMangaDexUseCase with SyncMangasMixin {
         syncMangasDao: _syncMangasDao,
         mangaTagServiceFirebase: _mangaTagServiceFirebase,
         mangaServiceFirebase: _mangaServiceFirebase,
-        mangas: [
+        values: [
           Manga.from(data: manga).copyWith(
             source: MangaSourceEnum.mangadex,
           ),
