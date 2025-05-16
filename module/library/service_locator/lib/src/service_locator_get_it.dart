@@ -436,8 +436,7 @@ class GetItServiceLocator implements ServiceLocator {
     FutureOr Function(T p1)? disposingFunction,
   }) {
     return _getIt.resetLazySingleton<T>(
-      instance: instance
-          as T?, // TODO: remove the cast when upgrading the major version
+      instance: instance as T?,
       instanceName: instanceName,
       disposingFunction: disposingFunction,
     );
