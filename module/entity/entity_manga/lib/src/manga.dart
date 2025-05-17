@@ -3,6 +3,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
+import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:text_similarity/text_similarity.dart';
 
@@ -107,6 +108,33 @@ class Manga extends Equatable with SimilarityMixin {
       webUrl: webUrl,
       source: source?.value,
       tagsId: tags?.map((e) => e.id).nonNulls.toList(),
+    );
+  }
+
+  factory Manga.fromDrift(MangaDrift manga, {List<TagDrift> tags = const []}) {
+    return Manga(
+      id: manga.id,
+      title: manga.title,
+      coverUrl: manga.coverUrl,
+      author: manga.author,
+      status: manga.status,
+      description: manga.description,
+      webUrl: manga.webUrl,
+      source: manga.source?.let((source) => MangaSourceEnum.fromValue(source)),
+      tags: tags.map((e) => MangaTag.fromDrift(e)).toList(),
+    );
+  }
+
+  MangaTablesCompanion get toDrift {
+    return MangaTablesCompanion(
+      id: Value.absentIfNull(id),
+      title: Value.absentIfNull(title),
+      coverUrl: Value.absentIfNull(coverUrl),
+      author: Value.absentIfNull(author),
+      status: Value.absentIfNull(status),
+      description: Value.absentIfNull(description),
+      webUrl: Value.absentIfNull(webUrl),
+      source: Value.absentIfNull(source?.value),
     );
   }
 

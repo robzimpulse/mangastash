@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
@@ -24,10 +23,7 @@ mixin SyncMangasMixin {
     );
     for (final tag in tags) {
       final match = tagResults.firstWhereOrNull((e) => e.name == tag.name);
-      final data = MangaTagTablesCompanion(
-        id: Value.absentIfNull(match?.id ?? tag.id),
-        name: Value.absentIfNull(tag.name),
-      );
+      final data = tag.toDrift.copyWith(id: Value.absentIfNull(match?.id));
       match != null ? toUpdateTags.add(data) : toInsertTags.add(data);
     }
 
@@ -64,16 +60,7 @@ mixin SyncMangasMixin {
           e.source == manga.source?.value,
         ].every((isTrue) => isTrue),
       );
-      final data = MangaTablesCompanion(
-        id: Value.absentIfNull(match?.id ?? manga.id),
-        title: Value.absentIfNull(manga.title ?? manga.title),
-        coverUrl: Value.absentIfNull(manga.coverUrl ?? manga.coverUrl),
-        author: Value.absentIfNull(manga.author ?? manga.author),
-        status: Value.absentIfNull(manga.status ?? manga.status),
-        description: Value.absentIfNull(manga.description ?? manga.description),
-        webUrl: Value.absentIfNull(manga.webUrl ?? manga.webUrl),
-        source: Value.absentIfNull(manga.source?.value ?? manga.source?.value),
-      );
+      final data = manga.toDrift.copyWith(id: Value.absentIfNull(match?.id));
       match != null
           ? toUpdateMangas.add((data, manga.tagsName))
           : toInsertMangas.add((data, manga.tagsName));
@@ -114,19 +101,9 @@ mixin SyncMangasMixin {
 
     return [
       for (final (value, tagIds) in updatedMangas)
-        Manga(
-          id: value.id,
-          title: value.title,
-          coverUrl: value.coverUrl,
-          author: value.author,
-          status: value.status,
-          description: value.description,
-          webUrl: value.webUrl,
-          source: value.source?.let((e) => MangaSourceEnum.fromValue(e)),
-          tags: updatedTags
-              .where((e) => tagIds.contains(e))
-              .map((e) => MangaTag(name: e.name, id: e.id))
-              .toList(),
+        Manga.fromDrift(
+          value,
+          tags: updatedTags.where((e) => tagIds.contains(e)).toList(),
         ),
     ];
   }
