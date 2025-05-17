@@ -16,7 +16,7 @@ class MangaTables extends Table with AutoTimestampTable {
 
   TextColumn get description => text().named('description').nullable()();
 
-  TextColumn get webUrl => text().named('webUrl').nullable()();
+  TextColumn get webUrl => text().named('web_url').nullable()();
 
   TextColumn get source => text().named('source').nullable()();
 

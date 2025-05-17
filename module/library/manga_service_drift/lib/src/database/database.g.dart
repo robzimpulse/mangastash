@@ -1953,7 +1953,7 @@ class $MangaTablesTable extends MangaTables
   static const VerificationMeta _webUrlMeta = const VerificationMeta('webUrl');
   @override
   late final GeneratedColumn<String> webUrl = GeneratedColumn<String>(
-      'webUrl', aliasedName, true,
+      'web_url', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _sourceMeta = const VerificationMeta('source');
   @override
@@ -2018,9 +2018,9 @@ class $MangaTablesTable extends MangaTables
           description.isAcceptableOrUnknown(
               data['description']!, _descriptionMeta));
     }
-    if (data.containsKey('webUrl')) {
+    if (data.containsKey('web_url')) {
       context.handle(_webUrlMeta,
-          webUrl.isAcceptableOrUnknown(data['webUrl']!, _webUrlMeta));
+          webUrl.isAcceptableOrUnknown(data['web_url']!, _webUrlMeta));
     }
     if (data.containsKey('source')) {
       context.handle(_sourceMeta,
@@ -2052,7 +2052,7 @@ class $MangaTablesTable extends MangaTables
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
       webUrl: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}webUrl']),
+          .read(DriftSqlType.string, data['${effectivePrefix}web_url']),
       source: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}source']),
     );
@@ -2108,7 +2108,7 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
       map['description'] = Variable<String>(description);
     }
     if (!nullToAbsent || webUrl != null) {
-      map['webUrl'] = Variable<String>(webUrl);
+      map['web_url'] = Variable<String>(webUrl);
     }
     if (!nullToAbsent || source != null) {
       map['source'] = Variable<String>(source);
@@ -2308,7 +2308,7 @@ class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
       if (author != null) 'author': author,
       if (status != null) 'status': status,
       if (description != null) 'description': description,
-      if (webUrl != null) 'webUrl': webUrl,
+      if (webUrl != null) 'web_url': webUrl,
       if (source != null) 'source': source,
       if (rowid != null) 'rowid': rowid,
     });
@@ -2369,7 +2369,7 @@ class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
       map['description'] = Variable<String>(description.value);
     }
     if (webUrl.present) {
-      map['webUrl'] = Variable<String>(webUrl.value);
+      map['web_url'] = Variable<String>(webUrl.value);
     }
     if (source.present) {
       map['source'] = Variable<String>(source.value);
