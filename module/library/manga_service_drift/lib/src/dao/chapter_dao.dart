@@ -127,8 +127,12 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
         await selector.go();
 
         final datas = <ImageDrift>[];
-        for (final image in images) {
-          final data = MangaChapterImageTablesCompanion(webUrl: Value(image));
+        for (final (index, image) in images.indexed) {
+          final data = MangaChapterImageTablesCompanion(
+            webUrl: Value(image),
+            chapterId: Value(chapterId),
+            order: Value(index),
+          );
           final result = await into(mangaChapterImageTables).insertReturning(
             data.copyWith(
               id: Value(const Uuid().v4().toString()),
