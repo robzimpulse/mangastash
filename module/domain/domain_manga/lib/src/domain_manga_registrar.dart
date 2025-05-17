@@ -165,6 +165,7 @@ class DomainMangaRegistrar extends Registrar {
           webview: locator(),
           chapterDao: locator(),
           logBox: locator(),
+          mangaDao: locator(),
         ),
       );
       locator.registerFactory(
@@ -183,6 +184,7 @@ class DomainMangaRegistrar extends Registrar {
           mangaChapterServiceFirebase: locator(),
           chapterDao: locator(),
           logBox: locator(),
+          mangaDao: locator(),
         ),
       );
       locator.registerFactory(

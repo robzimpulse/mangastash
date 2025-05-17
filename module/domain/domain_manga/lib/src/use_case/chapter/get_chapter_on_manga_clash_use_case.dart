@@ -29,8 +29,13 @@ class GetChapterOnMangaClashUseCase with SyncChaptersMixin {
     required String chapterId,
     required String mangaId,
   }) async {
-    final raw = await _mangaChapterServiceFirebase.get(id: chapterId);
-    final result = raw.let((e) => MangaChapter.fromFirebaseService(e));
+    final raw = await _chapterDao.getChapter(chapterId);
+    final result = await raw?.let(
+      (e) async => MangaChapter.fromDrift(
+        e,
+        images: await _chapterDao.getImages(chapterId),
+      ),
+    );
     final url = result?.webUrl;
 
     if (result == null || url == null) {

@@ -17,6 +17,7 @@ class SearchChapterOnMangaClashUseCase
   final MangaServiceFirebase _mangaServiceFirebase;
   final MangaChapterServiceFirebase _mangaChapterServiceFirebase;
   final HeadlessWebviewManager _webview;
+  final MangaDao _mangaDao;
   final ChapterDao _chapterDao;
   final LogBox _logBox;
 
@@ -25,10 +26,12 @@ class SearchChapterOnMangaClashUseCase
     required MangaChapterServiceFirebase mangaChapterServiceFirebase,
     required HeadlessWebviewManager webview,
     required ChapterDao chapterDao,
+    required MangaDao mangaDao,
     required LogBox logBox,
   })  : _mangaServiceFirebase = mangaServiceFirebase,
         _mangaChapterServiceFirebase = mangaChapterServiceFirebase,
         _chapterDao = chapterDao,
+        _mangaDao = mangaDao,
         _logBox = logBox,
         _webview = webview;
 
@@ -38,7 +41,7 @@ class SearchChapterOnMangaClashUseCase
   }) async {
     if (mangaId == null) return Error(Exception('Manga ID Empty'));
 
-    final result = await _mangaServiceFirebase.get(id: mangaId);
+    final result = await _mangaDao.getManga(mangaId);
     final url = result?.webUrl;
 
     if (result == null || url == null) {

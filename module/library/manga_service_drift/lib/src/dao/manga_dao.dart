@@ -31,14 +31,14 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     List<String> sources = const [],
   }) async {
     final isAllEmpty = [
-      ...ids.nonEmpty,
-      ...titles.nonEmpty,
-      ...coverUrls.nonEmpty,
-      ...authors.nonEmpty,
-      ...statuses.nonEmpty,
-      ...descriptions.nonEmpty,
-      ...webUrls.nonEmpty,
-      ...sources.nonEmpty,
+      ...ids.nonEmpty.distinct,
+      ...titles.nonEmpty.distinct,
+      ...coverUrls.nonEmpty.distinct,
+      ...authors.nonEmpty.distinct,
+      ...statuses.nonEmpty.distinct,
+      ...descriptions.nonEmpty.distinct,
+      ...webUrls.nonEmpty.distinct,
+      ...sources.nonEmpty.distinct,
     ].isEmpty;
 
     if (isAllEmpty) return [];
@@ -46,14 +46,15 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     final selector = select(mangaTables)
       ..where(
         (f) => [
-          for (final e in ids.nonEmpty) f.id.equals(e),
-          for (final e in titles.nonEmpty) f.title.like('%$e%'),
-          for (final e in coverUrls.nonEmpty) f.coverUrl.like('%$e%'),
-          for (final e in authors.nonEmpty) f.author.like('%$e%'),
-          for (final e in statuses.nonEmpty) f.status.like('%$e%'),
-          for (final e in descriptions.nonEmpty) f.description.like('%$e%'),
-          for (final e in webUrls.nonEmpty) f.webUrl.like('%$e%'),
-          for (final e in sources.nonEmpty) f.source.like('%$e%'),
+          for (final e in ids.nonEmpty.distinct) f.id.equals(e),
+          for (final e in titles.nonEmpty.distinct) f.title.like('%$e%'),
+          for (final e in coverUrls.nonEmpty.distinct) f.coverUrl.like('%$e%'),
+          for (final e in authors.nonEmpty.distinct) f.author.like('%$e%'),
+          for (final e in statuses.nonEmpty.distinct) f.status.like('%$e%'),
+          for (final e in descriptions.nonEmpty.distinct)
+            f.description.like('%$e%'),
+          for (final e in webUrls.nonEmpty.distinct) f.webUrl.like('%$e%'),
+          for (final e in sources.nonEmpty.distinct) f.source.like('%$e%'),
         ].reduce((a, b) => a | b),
       );
 
@@ -103,15 +104,18 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     List<String> ids = const [],
     List<String> names = const [],
   }) async {
-    final isAllEmpty = [...ids.nonEmpty, ...names.nonEmpty].isEmpty;
+    final isAllEmpty = [
+      ...ids.nonEmpty.distinct,
+      ...names.nonEmpty.distinct,
+    ].isEmpty;
 
     if (isAllEmpty) return [];
 
     final selector = select(mangaTagTables)
       ..where(
-            (f) => [
-          for (final e in ids.nonEmpty) f.id.equals(e),
-          for (final e in names.nonEmpty) f.name.equals(e),
+        (f) => [
+          for (final e in ids.nonEmpty.distinct) f.id.equals(e),
+          for (final e in names.nonEmpty.distinct) f.name.equals(e),
         ].reduce((a, b) => a | b),
       );
 

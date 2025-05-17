@@ -19,14 +19,45 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
   ChapterDao(AppDatabase db) : super(db);
 
   Future<List<ChapterDrift>> searchChapters({
+    List<String> ids = const [],
     List<String> mangaIds = const [],
+    List<String> mangaTitles = const [],
+    List<String> titles = const [],
+    List<String> volumes = const [],
+    List<String> chapters = const [],
+    List<String> translatedLanguages = const [],
+    List<String> scanlationGroups = const [],
+    List<String> webUrls = const [],
   }) async {
-    if (mangaIds.nonEmpty.isNotEmpty) return [];
+    final isAllEmpty = [
+      ...ids.nonEmpty.distinct,
+      ...mangaIds.nonEmpty.distinct,
+      ...mangaTitles.nonEmpty.distinct,
+      ...titles.nonEmpty.distinct,
+      ...volumes.nonEmpty.distinct,
+      ...chapters.nonEmpty.distinct,
+      ...translatedLanguages.nonEmpty.distinct,
+      ...scanlationGroups.nonEmpty.distinct,
+      ...webUrls.nonEmpty.distinct,
+    ].isEmpty;
+
+    if (isAllEmpty) return [];
 
     final selector = select(mangaChapterTables)
       ..where(
         (f) => [
-          for (final e in mangaIds.nonEmpty) f.mangaId.equals(e),
+          for (final e in ids.nonEmpty.distinct) f.id.equals(e),
+          for (final e in mangaIds.nonEmpty.distinct) f.mangaId.equals(e),
+          for (final e in mangaTitles.nonEmpty.distinct)
+            f.mangaTitle.like('%$e%'),
+          for (final e in titles.nonEmpty.distinct) f.title.like('%$e%'),
+          for (final e in volumes.nonEmpty.distinct) f.volume.like('%$e%'),
+          for (final e in chapters.nonEmpty.distinct) f.chapter.like('%$e%'),
+          for (final e in translatedLanguages.nonEmpty.distinct)
+            f.translatedLanguage.like('%$e%'),
+          for (final e in scanlationGroups.nonEmpty.distinct)
+            f.scanlationGroup.like('%$e%'),
+          for (final e in webUrls.nonEmpty.distinct) f.webUrl.like('%$e%'),
         ].reduce((a, b) => a | b),
       );
 
