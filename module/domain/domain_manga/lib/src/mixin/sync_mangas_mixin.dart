@@ -16,23 +16,24 @@ mixin SyncMangasMixin {
 
     var toUpdateTags = <MangaTag>{};
     var toInsertTags = <MangaTag>{};
-    final results = await syncMangasDao.searchTags(
+
+    final tagResults = await syncMangasDao.searchTags(
       ids: tags.map((e) => e.id).nonNulls.nonEmpty.toList(),
       names: tags.map((e) => e.name).nonNulls.nonEmpty.toList(),
     );
     for (final tag in tags) {
-      final match = results.firstWhereOrNull((e) => e.name == tag.name);
+      final match = tagResults.firstWhereOrNull((e) => e.name == tag.name);
       if (match != null) {
-        toUpdateTags.add(tag.copyWith(id: match.id, name: match.name));
+        toUpdateTags.add(tag.copyWith(id: match.id));
       } else {
         toInsertTags.add(tag);
       }
     }
 
     logBox.log(
-      'Tags',
+      'Filtering Insert & Update Tags',
       extra: {
-        'existing record found': results.length,
+        'existing record found': tagResults.length,
         'inserted count': toInsertTags.length,
         'updated count': toUpdateTags.length,
         'total data': tags.length,
@@ -40,7 +41,48 @@ mixin SyncMangasMixin {
       name: 'Sync Process',
     );
 
-    /// TODO: sync with firebase and local database
+    // TODO: Insert Tags
+
+    // TODO: Update Tags
+
+    var toUpdateMangas = <Manga>{};
+    var toInsertMangas = <Manga>{};
+    final mangaResults = await syncMangasDao.searchMangas(
+      ids: values.map((e) => e.id).nonNulls.nonEmpty.toList(),
+      titles: values.map((e) => e.title).nonNulls.nonEmpty.toList(),
+      webUrls: values.map((e) => e.webUrl).nonNulls.nonEmpty.toList(),
+      sources: values.map((e) => e.source?.value).nonNulls.nonEmpty.toList(),
+    );
+    for (final manga in values) {
+      final match = mangaResults.firstWhereOrNull(
+        (e) => [
+          e.title == manga.title,
+          e.webUrl == manga.webUrl,
+          e.source == manga.source?.value,
+        ].every((isTrue) => isTrue),
+      );
+      if (match != null) {
+        toUpdateMangas.add(manga.copyWith(id: match.id));
+      } else {
+        toInsertMangas.add(manga);
+      }
+    }
+
+    logBox.log(
+      'Filtering Insert & Update Manga',
+      extra: {
+        'existing record found': mangaResults.length,
+        'inserted count': toInsertMangas.length,
+        'updated count': toUpdateMangas.length,
+        'total data': values.length,
+      },
+      name: 'Sync Process',
+    );
+
+    // TODO: Insert Manga
+
+    // TODO: Update Manga
+
     return values;
   }
 }
