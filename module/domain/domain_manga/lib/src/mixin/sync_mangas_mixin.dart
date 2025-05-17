@@ -9,7 +9,7 @@ mixin SyncMangasMixin {
   Future<List<Manga>> sync({
     required MangaTagServiceFirebase mangaTagServiceFirebase,
     required MangaServiceFirebase mangaServiceFirebase,
-    required SyncMangasDao syncMangasDao,
+    required MangaDao mangaDao,
     required List<Manga> values,
     required LogBox logBox,
   }) async {
@@ -18,7 +18,7 @@ mixin SyncMangasMixin {
     var toUpdateTags = <MangaTagTablesCompanion>{};
     var toInsertTags = <MangaTagTablesCompanion>{};
 
-    final tagResults = await syncMangasDao.searchTags(
+    final tagResults = await mangaDao.searchTags(
       ids: tags.map((e) => e.id).nonNulls.nonEmpty.toList(),
       names: tags.map((e) => e.name).nonNulls.nonEmpty.toList(),
     );
@@ -32,8 +32,8 @@ mixin SyncMangasMixin {
     }
 
     final updatedTags = [
-      for (final tag in toUpdateTags) ...await syncMangasDao.updateTag(tag),
-      for (final tag in toInsertTags) await syncMangasDao.insertTag(tag),
+      for (final tag in toUpdateTags) ...await mangaDao.updateTag(tag),
+      for (final tag in toInsertTags) await mangaDao.insertTag(tag),
     ];
 
     logBox.log(
@@ -50,7 +50,7 @@ mixin SyncMangasMixin {
 
     var toUpdateMangas = <(MangaTablesCompanion, List<String>)>{};
     var toInsertMangas = <(MangaTablesCompanion, List<String>)>{};
-    final mangaResults = await syncMangasDao.searchMangas(
+    final mangaResults = await mangaDao.searchMangas(
       ids: values.map((e) => e.id).nonNulls.nonEmpty.toList(),
       titles: values.map((e) => e.title).nonNulls.nonEmpty.toList(),
       webUrls: values.map((e) => e.webUrl).nonNulls.nonEmpty.toList(),
@@ -81,13 +81,13 @@ mixin SyncMangasMixin {
 
     final updatedMangas = <(MangaDrift, List<String>)>[];
     for (final (manga, tags) in toUpdateMangas) {
-      final results = await syncMangasDao.updateManga(manga);
+      final results = await mangaDao.updateManga(manga);
       final tagIds = tags.map(
         (e) => updatedTags.firstWhereOrNull((tag) => tag.name == e)?.id,
       );
       for (final result in results) {
-        await syncMangasDao.unlinkAllTagFromManga(result.id);
-        await syncMangasDao.linkTagToManga(result.id, tagIds.nonNulls.nonEmpty);
+        await mangaDao.unlinkAllTagFromManga(result.id);
+        await mangaDao.linkTagToManga(result.id, tagIds.nonNulls.nonEmpty);
         updatedMangas.add((result, [...tagIds.nonNulls.nonEmpty]));
       }
     }
@@ -95,8 +95,8 @@ mixin SyncMangasMixin {
       final tagIds = tags.map(
         (e) => updatedTags.firstWhereOrNull((tag) => tag.name == e)?.id,
       );
-      final result = await syncMangasDao.insertManga(manga);
-      await syncMangasDao.linkTagToManga(result.id, tagIds.nonNulls.nonEmpty);
+      final result = await mangaDao.insertManga(manga);
+      await mangaDao.linkTagToManga(result.id, tagIds.nonNulls.nonEmpty);
       updatedMangas.add((result, [...tagIds.nonNulls.nonEmpty]));
     }
 

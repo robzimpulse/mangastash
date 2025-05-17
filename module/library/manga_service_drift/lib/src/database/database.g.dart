@@ -2955,7 +2955,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MangaTagTablesTable mangaTagTables = $MangaTagTablesTable(this);
   late final $MangaTagRelationshipTablesTable mangaTagRelationshipTables =
       $MangaTagRelationshipTablesTable(this);
-  late final SyncMangasDao syncMangasDao = SyncMangasDao(this as AppDatabase);
+  late final MangaDao mangaDao = MangaDao(this as AppDatabase);
   late final SyncChaptersDao syncChaptersDao =
       SyncChaptersDao(this as AppDatabase);
   @override

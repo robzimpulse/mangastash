@@ -18,18 +18,18 @@ class SearchMangaOnMangaClashUseCaseUseCase with SyncMangasMixin {
   final HeadlessWebviewManager _webview;
   final MangaTagServiceFirebase _mangaTagServiceFirebase;
   final MangaServiceFirebase _mangaServiceFirebase;
-  final SyncMangasDao _syncMangasDao;
+  final MangaDao _mangaDao;
   final LogBox _logBox;
 
   SearchMangaOnMangaClashUseCaseUseCase({
     required HeadlessWebviewManager webview,
     required MangaTagServiceFirebase mangaTagServiceFirebase,
     required MangaServiceFirebase mangaServiceFirebase,
-    required SyncMangasDao syncMangasDao,
+    required MangaDao mangaDao,
     required LogBox logBox,
   })  : _webview = webview,
         _mangaServiceFirebase = mangaServiceFirebase,
-        _syncMangasDao = syncMangasDao,
+        _mangaDao = mangaDao,
         _logBox = logBox,
         _mangaTagServiceFirebase = mangaTagServiceFirebase;
 
@@ -107,7 +107,7 @@ class SearchMangaOnMangaClashUseCaseUseCase with SyncMangasMixin {
 
     final data = await sync(
       logBox: _logBox,
-      syncMangasDao: _syncMangasDao,
+      mangaDao: _mangaDao,
       mangaTagServiceFirebase: _mangaTagServiceFirebase,
       mangaServiceFirebase: _mangaServiceFirebase,
       values: mangas,

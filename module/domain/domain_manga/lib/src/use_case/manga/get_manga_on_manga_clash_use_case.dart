@@ -10,19 +10,19 @@ import '../../mixin/sync_mangas_mixin.dart';
 class GetMangaOnMangaClashUseCase with SyncMangasMixin {
   final MangaTagServiceFirebase _mangaTagServiceFirebase;
   final MangaServiceFirebase _mangaServiceFirebase;
-  final SyncMangasDao _syncMangasDao;
+  final MangaDao _mangaDao;
   final HeadlessWebviewManager _webview;
   final LogBox _logBox;
 
   GetMangaOnMangaClashUseCase({
     required MangaTagServiceFirebase mangaTagServiceFirebase,
     required MangaServiceFirebase mangaServiceFirebase,
-    required SyncMangasDao syncMangasDao,
+    required MangaDao mangaDao,
     required HeadlessWebviewManager webview,
     required LogBox logBox,
   })  : _mangaServiceFirebase = mangaServiceFirebase,
         _mangaTagServiceFirebase = mangaTagServiceFirebase,
-        _syncMangasDao = syncMangasDao,
+        _mangaDao = mangaDao,
         _logBox = logBox,
         _webview = webview;
 
@@ -52,7 +52,7 @@ class GetMangaOnMangaClashUseCase with SyncMangasMixin {
 
     final process = sync(
       logBox: _logBox,
-      syncMangasDao: _syncMangasDao,
+      mangaDao: _mangaDao,
       mangaTagServiceFirebase: _mangaTagServiceFirebase,
       mangaServiceFirebase: _mangaServiceFirebase,
       values: [

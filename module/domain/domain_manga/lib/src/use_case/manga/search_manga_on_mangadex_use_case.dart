@@ -11,17 +11,17 @@ class SearchMangaOnMangaDexUseCase with SyncMangasMixin {
   final MangaRepository _mangaRepository;
   final MangaTagServiceFirebase _mangaTagServiceFirebase;
   final MangaServiceFirebase _mangaServiceFirebase;
-  final SyncMangasDao _syncMangasDao;
+  final MangaDao _mangaDao;
   final LogBox _logBox;
 
   const SearchMangaOnMangaDexUseCase({
     required MangaRepository mangaRepository,
     required MangaTagServiceFirebase mangaTagServiceFirebase,
     required MangaServiceFirebase mangaServiceFirebase,
-    required SyncMangasDao syncMangasDao,
+    required MangaDao mangaDao,
     required LogBox logBox,
   })  : _mangaRepository = mangaRepository,
-        _syncMangasDao = syncMangasDao,
+        _mangaDao = mangaDao,
         _logBox = logBox,
         _mangaServiceFirebase = mangaServiceFirebase,
         _mangaTagServiceFirebase = mangaTagServiceFirebase;
@@ -50,7 +50,7 @@ class SearchMangaOnMangaDexUseCase with SyncMangasMixin {
         Pagination(
           data: await sync(
             logBox: _logBox,
-            syncMangasDao: _syncMangasDao,
+            mangaDao: _mangaDao,
             mangaTagServiceFirebase: _mangaTagServiceFirebase,
             mangaServiceFirebase: _mangaServiceFirebase,
             values: mangas?.toList() ?? [],

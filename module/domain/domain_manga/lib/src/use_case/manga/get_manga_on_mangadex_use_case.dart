@@ -11,17 +11,17 @@ class GetMangaOnMangaDexUseCase with SyncMangasMixin {
   final MangaService _mangaService;
   final MangaTagServiceFirebase _mangaTagServiceFirebase;
   final MangaServiceFirebase _mangaServiceFirebase;
-  final SyncMangasDao _syncMangasDao;
+  final MangaDao _mangaDao;
   final LogBox _logBox;
 
   GetMangaOnMangaDexUseCase({
     required MangaTagServiceFirebase mangaTagServiceFirebase,
     required MangaServiceFirebase mangaServiceFirebase,
     required MangaService mangaService,
-    required SyncMangasDao syncMangasDao,
+    required MangaDao mangaDao,
     required LogBox logBox,
   })  : _mangaService = mangaService,
-        _syncMangasDao = syncMangasDao,
+        _mangaDao = mangaDao,
         _logBox = logBox,
         _mangaServiceFirebase = mangaServiceFirebase,
         _mangaTagServiceFirebase = mangaTagServiceFirebase;
@@ -43,7 +43,7 @@ class GetMangaOnMangaDexUseCase with SyncMangasMixin {
 
       final process = sync(
         logBox: _logBox,
-        syncMangasDao: _syncMangasDao,
+        mangaDao: _mangaDao,
         mangaTagServiceFirebase: _mangaTagServiceFirebase,
         mangaServiceFirebase: _mangaServiceFirebase,
         values: [

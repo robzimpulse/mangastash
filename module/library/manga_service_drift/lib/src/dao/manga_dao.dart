@@ -8,7 +8,7 @@ import '../tables/manga_tables.dart';
 import '../tables/manga_tag_relationship_tables.dart';
 import '../tables/manga_tag_tables.dart';
 
-part 'sync_mangas_dao.g.dart';
+part 'manga_dao.g.dart';
 
 @DriftAccessor(
   tables: [
@@ -17,9 +17,8 @@ part 'sync_mangas_dao.g.dart';
     MangaTagRelationshipTables,
   ],
 )
-class SyncMangasDao extends DatabaseAccessor<AppDatabase>
-    with _$SyncMangasDaoMixin {
-  SyncMangasDao(AppDatabase db) : super(db);
+class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
+  MangaDao(AppDatabase db) : super(db);
 
   Future<List<TagDrift>> searchTags({
     List<String> ids = const [],

@@ -73,7 +73,7 @@ class DomainMangaRegistrar extends Registrar {
     await measurement.execute(() async {
       locator.registerSingleton(DatabaseViewer());
       locator.registerSingleton(AppDatabase(logger: logger));
-      locator.registerFactory(() => SyncMangasDao(locator()));
+      locator.registerFactory(() => MangaDao(locator()));
       locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
       locator.registerFactory(
         () => MangaServiceFirebase(
@@ -146,7 +146,7 @@ class DomainMangaRegistrar extends Registrar {
           mangaRepository: locator(),
           mangaTagServiceFirebase: locator(),
           mangaServiceFirebase: locator(),
-          syncMangasDao: locator(),
+          mangaDao: locator(),
         ),
       );
       locator.registerFactory(
@@ -168,7 +168,7 @@ class DomainMangaRegistrar extends Registrar {
           webview: locator(),
           mangaTagServiceFirebase: locator(),
           mangaServiceFirebase: locator(),
-          syncMangasDao: locator(),
+          mangaDao: locator(),
         ),
       );
       locator.registerFactory(
@@ -203,7 +203,7 @@ class DomainMangaRegistrar extends Registrar {
           mangaService: locator(),
           mangaTagServiceFirebase: locator(),
           mangaServiceFirebase: locator(),
-          syncMangasDao: locator(),
+          mangaDao: locator(),
         ),
       );
       locator.registerFactory(
@@ -212,7 +212,7 @@ class DomainMangaRegistrar extends Registrar {
           webview: locator(),
           mangaServiceFirebase: locator(),
           mangaTagServiceFirebase: locator(),
-          syncMangasDao: locator(),
+          mangaDao: locator(),
         ),
       );
       locator.registerFactory(
@@ -221,7 +221,7 @@ class DomainMangaRegistrar extends Registrar {
           mangaServiceFirebase: locator(),
           webview: locator(),
           mangaTagServiceFirebase: locator(),
-          syncMangasDao: locator(),
+          mangaDao: locator(),
         ),
       );
       locator.registerFactory(
@@ -230,7 +230,7 @@ class DomainMangaRegistrar extends Registrar {
           webview: locator(),
           mangaTagServiceFirebase: locator(),
           mangaServiceFirebase: locator(),
-          syncMangasDao: locator(),
+          mangaDao: locator(),
         ),
       );
       locator.registerFactory(
