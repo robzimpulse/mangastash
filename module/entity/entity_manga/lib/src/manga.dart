@@ -193,7 +193,7 @@ class Manga extends Equatable with SimilarityMixin {
           .map((e) => e.attributes?.name)
           .nonNulls
           .join(' | '),
-      webUrl: data.id?.let((id) => 'https://mangadex.org/title/$id}'),
+      webUrl: data.id?.let((id) => 'https://mangadex.org/title/$id'),
     );
   }
 }
