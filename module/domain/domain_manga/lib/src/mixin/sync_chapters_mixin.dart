@@ -64,6 +64,9 @@ mixin SyncChaptersMixin {
       name: 'Sync Process',
     );
 
-    return values;
+    return [
+      for (final (chapter, images) in updated)
+        MangaChapter.fromDrift(chapter, images: images),
+    ];
   }
 }
