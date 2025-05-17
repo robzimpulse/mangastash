@@ -79,6 +79,13 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     return selector.get();
   }
 
+  Future<MangaDrift?> getManga(String id) {
+    final selector = select(mangaTables)
+      ..whereSamePrimaryKey(MangaTablesCompanion.insert(id: id));
+
+    return selector.getSingleOrNull();
+  }
+
   Future<List<MangaDrift>> updateManga(MangaTablesCompanion data) {
     final selector = update(mangaTables)..whereSamePrimaryKey(data);
 
