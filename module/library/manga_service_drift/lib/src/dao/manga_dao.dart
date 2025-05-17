@@ -20,25 +20,6 @@ part 'manga_dao.g.dart';
 class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
   MangaDao(AppDatabase db) : super(db);
 
-  Future<List<TagDrift>> searchTags({
-    List<String> ids = const [],
-    List<String> names = const [],
-  }) async {
-    final isAllEmpty = [...ids.nonEmpty, ...names.nonEmpty].isEmpty;
-
-    if (isAllEmpty) return [];
-
-    final selector = select(mangaTagTables)
-      ..where(
-        (f) => [
-          for (final e in ids.nonEmpty) f.id.equals(e),
-          for (final e in names.nonEmpty) f.name.equals(e),
-        ].reduce((a, b) => a | b),
-      );
-
-    return selector.get();
-  }
-
   Future<List<MangaDrift>> searchMangas({
     List<String> ids = const [],
     List<String> titles = const [],
@@ -116,6 +97,25 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
         ),
       ),
     );
+  }
+
+  Future<List<TagDrift>> searchTags({
+    List<String> ids = const [],
+    List<String> names = const [],
+  }) async {
+    final isAllEmpty = [...ids.nonEmpty, ...names.nonEmpty].isEmpty;
+
+    if (isAllEmpty) return [];
+
+    final selector = select(mangaTagTables)
+      ..where(
+            (f) => [
+          for (final e in ids.nonEmpty) f.id.equals(e),
+          for (final e in names.nonEmpty) f.name.equals(e),
+        ].reduce((a, b) => a | b),
+      );
+
+    return selector.get();
   }
 
   Future<List<TagDrift>> getTags(String mangaId) async {

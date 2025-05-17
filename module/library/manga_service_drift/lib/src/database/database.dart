@@ -6,8 +6,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 import 'package:text_similarity/text_similarity.dart';
 
+import '../dao/chapter_dao.dart';
 import '../dao/manga_dao.dart';
-import '../dao/sync_chapters_dao.dart';
 import '../interceptor/log_interceptor.dart';
 import '../tables/manga_chapter_image_tables.dart';
 import '../tables/manga_chapter_tables.dart';
@@ -30,7 +30,7 @@ part 'database.g.dart';
   ],
   daos: [
     MangaDao,
-    SyncChaptersDao,
+    ChapterDao,
   ],
   include: {
     'drift_file/virtual_manga_table.drift',

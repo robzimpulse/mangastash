@@ -2956,8 +2956,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MangaTagRelationshipTablesTable mangaTagRelationshipTables =
       $MangaTagRelationshipTablesTable(this);
   late final MangaDao mangaDao = MangaDao(this as AppDatabase);
-  late final SyncChaptersDao syncChaptersDao =
-      SyncChaptersDao(this as AppDatabase);
+  late final ChapterDao chapterDao = ChapterDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
