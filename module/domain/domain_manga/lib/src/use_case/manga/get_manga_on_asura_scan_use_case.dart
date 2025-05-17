@@ -27,21 +27,22 @@ class GetMangaOnAsuraScanUseCase with SyncMangasMixin {
         _webview = webview;
 
   Future<Result<Manga>> execute({required String mangaId}) async {
-    final result = await _mangaServiceFirebase.get(id: mangaId);
+    final result = await _mangaDao.getManga(mangaId);
     final url = result?.webUrl;
 
     if (result == null || url == null) {
       return Error(Exception('Data not found'));
     }
 
+    final tags = await _mangaDao.getTags(mangaId);
+
     final isValid = [
       result.author != null,
       result.description != null,
-      result.tagsId != null,
-      result.tagsId?.isNotEmpty == true,
+      tags.isNotEmpty,
     ].every((e) => e);
 
-    if (isValid) return Success(Manga.fromFirebaseService(result));
+    if (isValid) return Success(Manga.fromDrift(result, tags: tags));
 
     final document = await _webview.open(url);
 
@@ -97,13 +98,10 @@ class GetMangaOnAsuraScanUseCase with SyncMangasMixin {
       mangaTagServiceFirebase: _mangaTagServiceFirebase,
       mangaServiceFirebase: _mangaServiceFirebase,
       values: [
-        Manga.fromFirebaseService(
-          result.copyWith(
-            source: MangaSourceEnum.asurascan.value,
-            author: author,
-            description: description,
-          ),
-        ).copyWith(
+        Manga.fromDrift(result).copyWith(
+          source: MangaSourceEnum.asurascan,
+          author: author,
+          description: description,
           tags: genres?.map((e) => MangaTag(name: e)).toList(),
         ),
       ],

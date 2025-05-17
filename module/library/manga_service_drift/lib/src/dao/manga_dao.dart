@@ -118,6 +118,26 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     );
   }
 
+  Future<List<TagDrift>> getTags(String mangaId) async {
+    final selector = select(mangaTagRelationshipTables).join(
+      [
+        innerJoin(
+          mangaTagTables,
+          mangaTagTables.id.equalsExp(
+            mangaTagRelationshipTables.mangaId,
+          ),
+        ),
+      ],
+    );
+
+    final values = await selector.get();
+
+    return values
+        .map((e) => e.readTableOrNull(mangaTagTables))
+        .nonNulls
+        .toList();
+  }
+
   Future<List<TagDrift>> updateTag(MangaTagTablesCompanion data) {
     final selector = update(mangaTagTables)..whereSamePrimaryKey(data);
 

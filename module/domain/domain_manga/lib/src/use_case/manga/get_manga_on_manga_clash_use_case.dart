@@ -27,15 +27,17 @@ class GetMangaOnMangaClashUseCase with SyncMangasMixin {
         _webview = webview;
 
   Future<Result<Manga>> execute({required String mangaId}) async {
-    final result = await _mangaServiceFirebase.get(id: mangaId);
+    final result = await _mangaDao.getManga(mangaId);
     final url = result?.webUrl;
 
     if (result == null || url == null) {
       return Error(Exception('Data not found'));
     }
 
+    final tags = await _mangaDao.getTags(mangaId);
+
     if (result.description != null) {
-      return Success(Manga.fromFirebaseService(result));
+      return Success(Manga.fromDrift(result, tags: tags));
     }
 
     final document = await _webview.open(url);
@@ -56,11 +58,8 @@ class GetMangaOnMangaClashUseCase with SyncMangasMixin {
       mangaTagServiceFirebase: _mangaTagServiceFirebase,
       mangaServiceFirebase: _mangaServiceFirebase,
       values: [
-        Manga.fromFirebaseService(
-          result.copyWith(
-            description: description,
-            source: MangaSourceEnum.mangaclash.value,
-          ),
+        Manga.fromDrift(result, tags: tags).copyWith(
+          description: description,
         ),
       ],
     );

@@ -27,9 +27,12 @@ class GetMangaOnMangaDexUseCase with SyncMangasMixin {
         _mangaTagServiceFirebase = mangaTagServiceFirebase;
 
   Future<Result<Manga>> execute({required String mangaId}) async {
-    final result = await _mangaServiceFirebase.get(id: mangaId);
+    final result = await _mangaDao.getManga(mangaId);
+    final tags = await _mangaDao.getTags(mangaId);
 
-    if (result != null) return Success(Manga.fromFirebaseService(result));
+    if (result != null) {
+      return Success(Manga.fromDrift(result, tags: tags));
+    }
 
     try {
       final result = await _mangaService.detail(
@@ -39,7 +42,9 @@ class GetMangaOnMangaDexUseCase with SyncMangasMixin {
 
       final manga = result.data;
 
-      if (manga == null) return Error(Exception('Manga not found'));
+      if (manga == null) {
+        return Error(Exception('Manga not found'));
+      }
 
       final process = sync(
         logBox: _logBox,
