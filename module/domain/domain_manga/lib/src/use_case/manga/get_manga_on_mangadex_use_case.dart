@@ -9,8 +9,6 @@ import '../../mixin/sync_mangas_mixin.dart';
 
 class GetMangaOnMangaDexUseCase with SyncMangasMixin {
   final MangaService _mangaService;
-  final MangaTagServiceFirebase _mangaTagServiceFirebase;
-  final MangaServiceFirebase _mangaServiceFirebase;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
@@ -22,9 +20,7 @@ class GetMangaOnMangaDexUseCase with SyncMangasMixin {
     required LogBox logBox,
   })  : _mangaService = mangaService,
         _mangaDao = mangaDao,
-        _logBox = logBox,
-        _mangaServiceFirebase = mangaServiceFirebase,
-        _mangaTagServiceFirebase = mangaTagServiceFirebase;
+        _logBox = logBox;
 
   Future<Result<Manga>> execute({required String mangaId}) async {
     final result = await _mangaDao.getManga(mangaId);
@@ -49,8 +45,6 @@ class GetMangaOnMangaDexUseCase with SyncMangasMixin {
       final process = sync(
         logBox: _logBox,
         mangaDao: _mangaDao,
-        mangaTagServiceFirebase: _mangaTagServiceFirebase,
-        mangaServiceFirebase: _mangaServiceFirebase,
         values: [
           Manga.from(data: manga).copyWith(
             source: MangaSourceEnum.mangadex,

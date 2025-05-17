@@ -2,17 +2,13 @@ import 'package:collection/collection.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
-import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 mixin SyncChaptersMixin {
   Future<List<MangaChapter>> sync({
-    required MangaChapterServiceFirebase mangaChapterServiceFirebase,
     required ChapterDao chapterDao,
     required List<MangaChapter> values,
     required LogBox logBox,
   }) async {
-    // TODO: sync with firebase and local database
-
     final results = await chapterDao.searchChapters(
       ids: values.map((e) => e.id).nonNulls.toList(),
       mangaIds: values.map((e) => e.mangaId).nonNulls.toList(),

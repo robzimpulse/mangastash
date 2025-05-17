@@ -8,8 +8,6 @@ import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 
 class GetMangaOnAsuraScanUseCase with SyncMangasMixin {
-  final MangaTagServiceFirebase _mangaTagServiceFirebase;
-  final MangaServiceFirebase _mangaServiceFirebase;
   final MangaDao _mangaDao;
   final HeadlessWebviewManager _webview;
   final LogBox _logBox;
@@ -20,9 +18,7 @@ class GetMangaOnAsuraScanUseCase with SyncMangasMixin {
     required MangaDao mangaDao,
     required HeadlessWebviewManager webview,
     required LogBox logBox,
-  })  : _mangaServiceFirebase = mangaServiceFirebase,
-        _mangaTagServiceFirebase = mangaTagServiceFirebase,
-        _mangaDao = mangaDao,
+  })  : _mangaDao = mangaDao,
         _logBox = logBox,
         _webview = webview;
 
@@ -95,8 +91,6 @@ class GetMangaOnAsuraScanUseCase with SyncMangasMixin {
     final process = sync(
       logBox: _logBox,
       mangaDao: _mangaDao,
-      mangaTagServiceFirebase: _mangaTagServiceFirebase,
-      mangaServiceFirebase: _mangaServiceFirebase,
       values: [
         Manga.fromDrift(result).copyWith(
           source: MangaSourceEnum.asurascan,

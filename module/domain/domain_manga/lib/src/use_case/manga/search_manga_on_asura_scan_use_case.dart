@@ -16,8 +16,6 @@ import '../../mixin/sync_mangas_mixin.dart';
 
 class SearchMangaOnAsuraScanUseCase with SyncMangasMixin {
   final HeadlessWebviewManager _webview;
-  final MangaTagServiceFirebase _mangaTagServiceFirebase;
-  final MangaServiceFirebase _mangaServiceFirebase;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
@@ -28,10 +26,8 @@ class SearchMangaOnAsuraScanUseCase with SyncMangasMixin {
     required MangaDao mangaDao,
     required LogBox logBox,
   })  : _webview = webview,
-        _mangaServiceFirebase = mangaServiceFirebase,
         _mangaDao = mangaDao,
-        _logBox = logBox,
-        _mangaTagServiceFirebase = mangaTagServiceFirebase;
+        _logBox = logBox;
 
   Future<Result<Pagination<Manga>>> execute({
     required SearchMangaParameter parameter,
@@ -110,8 +106,6 @@ class SearchMangaOnAsuraScanUseCase with SyncMangasMixin {
     final data = await sync(
       logBox: _logBox,
       mangaDao: _mangaDao,
-      mangaTagServiceFirebase: _mangaTagServiceFirebase,
-      mangaServiceFirebase: _mangaServiceFirebase,
       values: mangas,
     );
 

@@ -5,28 +5,25 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
-import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 import '../../mixin/sync_chapters_mixin.dart';
 
 class GetChapterOnMangaDexUseCase with SyncChaptersMixin {
   final ChapterRepository _chapterRepository;
   final AtHomeRepository _atHomeRepository;
-  final MangaChapterServiceFirebase _mangaChapterServiceFirebase;
+
   final ChapterDao _chapterDao;
   final LogBox _logBox;
 
   const GetChapterOnMangaDexUseCase({
     required ChapterRepository chapterRepository,
     required AtHomeRepository atHomeRepository,
-    required MangaChapterServiceFirebase mangaChapterServiceFirebase,
     required ChapterDao chapterDao,
     required LogBox logBox,
   })  : _chapterRepository = chapterRepository,
         _atHomeRepository = atHomeRepository,
         _chapterDao = chapterDao,
-        _logBox = logBox,
-        _mangaChapterServiceFirebase = mangaChapterServiceFirebase;
+        _logBox = logBox;
 
   Future<Result<MangaChapter>> execute({
     required String chapterId,
@@ -54,7 +51,6 @@ class GetChapterOnMangaDexUseCase with SyncChaptersMixin {
       final atHome = response[1] as AtHomeResponse;
 
       final chapters = await sync(
-        mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
         chapterDao: _chapterDao,
         logBox: _logBox,
         values: [

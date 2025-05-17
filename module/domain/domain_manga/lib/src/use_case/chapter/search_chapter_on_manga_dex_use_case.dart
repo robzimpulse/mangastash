@@ -9,7 +9,6 @@ import '../../mixin/sync_chapters_mixin.dart';
 
 class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
   final ChapterRepository _chapterRepository;
-  final MangaChapterServiceFirebase _mangaChapterServiceFirebase;
   final ChapterDao _chapterDao;
   final LogBox _logBox;
 
@@ -20,8 +19,7 @@ class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
     required LogBox logBox,
   })  : _chapterRepository = chapterRepository,
         _chapterDao = chapterDao,
-        _logBox = logBox,
-        _mangaChapterServiceFirebase = mangaChapterServiceFirebase;
+        _logBox = logBox;
 
   Future<Result<Pagination<MangaChapter>>> execute({
     required String? mangaId,
@@ -42,7 +40,6 @@ class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
       return Success(
         Pagination(
           data: await sync(
-            mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
             chapterDao: _chapterDao,
             logBox: _logBox,
             values: data

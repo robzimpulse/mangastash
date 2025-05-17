@@ -3,28 +3,21 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
-import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 import '../../mixin/sync_mangas_mixin.dart';
 
 class SearchMangaOnMangaDexUseCase with SyncMangasMixin {
   final MangaRepository _mangaRepository;
-  final MangaTagServiceFirebase _mangaTagServiceFirebase;
-  final MangaServiceFirebase _mangaServiceFirebase;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   const SearchMangaOnMangaDexUseCase({
     required MangaRepository mangaRepository,
-    required MangaTagServiceFirebase mangaTagServiceFirebase,
-    required MangaServiceFirebase mangaServiceFirebase,
     required MangaDao mangaDao,
     required LogBox logBox,
   })  : _mangaRepository = mangaRepository,
         _mangaDao = mangaDao,
-        _logBox = logBox,
-        _mangaServiceFirebase = mangaServiceFirebase,
-        _mangaTagServiceFirebase = mangaTagServiceFirebase;
+        _logBox = logBox;
 
   Future<Result<Pagination<Manga>>> execute({
     required SearchMangaParameter parameter,
@@ -51,8 +44,6 @@ class SearchMangaOnMangaDexUseCase with SyncMangasMixin {
           data: await sync(
             logBox: _logBox,
             mangaDao: _mangaDao,
-            mangaTagServiceFirebase: _mangaTagServiceFirebase,
-            mangaServiceFirebase: _mangaServiceFirebase,
             values: mangas?.toList() ?? [],
           ),
           offset: result.offset?.toInt(),

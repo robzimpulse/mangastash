@@ -4,24 +4,20 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:html/dom.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
-import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_chapters_mixin.dart';
 
 class GetChapterOnAsuraScanUseCase with SyncChaptersMixin {
-  final MangaChapterServiceFirebase _mangaChapterServiceFirebase;
   final ChapterDao _chapterDao;
   final LogBox _logBox;
   final HeadlessWebviewManager _webview;
 
   GetChapterOnAsuraScanUseCase({
-    required MangaChapterServiceFirebase mangaChapterServiceFirebase,
     required HeadlessWebviewManager webview,
     required ChapterDao chapterDao,
     required LogBox logBox,
-  })  : _mangaChapterServiceFirebase = mangaChapterServiceFirebase,
-        _chapterDao = chapterDao,
+  })  : _chapterDao = chapterDao,
         _logBox = logBox,
         _webview = webview;
 
@@ -67,7 +63,6 @@ class GetChapterOnAsuraScanUseCase with SyncChaptersMixin {
     final images = List.of(tmp.map((e) => e.$2));
 
     final chapters = await sync(
-      mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
       chapterDao: _chapterDao,
       logBox: _logBox,
       values: [result.copyWith(images: images)],

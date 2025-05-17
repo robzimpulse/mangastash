@@ -145,8 +145,6 @@ class DomainMangaRegistrar extends Registrar {
         () => SearchMangaOnMangaDexUseCase(
           logBox: locator(),
           mangaRepository: locator(),
-          mangaTagServiceFirebase: locator(),
-          mangaServiceFirebase: locator(),
           mangaDao: locator(),
         ),
       );
@@ -160,8 +158,6 @@ class DomainMangaRegistrar extends Registrar {
       );
       locator.registerFactory(
         () => SearchChapterOnAsuraScanUseCase(
-          mangaServiceFirebase: locator(),
-          mangaChapterServiceFirebase: locator(),
           webview: locator(),
           chapterDao: locator(),
           logBox: locator(),
@@ -172,16 +168,12 @@ class DomainMangaRegistrar extends Registrar {
         () => SearchMangaOnMangaClashUseCaseUseCase(
           logBox: locator(),
           webview: locator(),
-          mangaTagServiceFirebase: locator(),
-          mangaServiceFirebase: locator(),
           mangaDao: locator(),
         ),
       );
       locator.registerFactory(
         () => SearchChapterOnMangaClashUseCase(
-          mangaServiceFirebase: locator(),
           webview: locator(),
-          mangaChapterServiceFirebase: locator(),
           chapterDao: locator(),
           logBox: locator(),
           mangaDao: locator(),
@@ -191,14 +183,12 @@ class DomainMangaRegistrar extends Registrar {
         () => GetChapterOnMangaDexUseCase(
           chapterRepository: locator(),
           atHomeRepository: locator(),
-          mangaChapterServiceFirebase: locator(),
           chapterDao: locator(),
           logBox: locator(),
         ),
       );
       locator.registerFactory(
         () => GetChapterOnMangaClashUseCase(
-          mangaChapterServiceFirebase: locator(),
           webview: locator(),
           chapterDao: locator(),
           logBox: locator(),
@@ -206,7 +196,6 @@ class DomainMangaRegistrar extends Registrar {
       );
       locator.registerFactory(
         () => GetChapterOnAsuraScanUseCase(
-          mangaChapterServiceFirebase: locator(),
           webview: locator(),
           chapterDao: locator(),
           logBox: locator(),
