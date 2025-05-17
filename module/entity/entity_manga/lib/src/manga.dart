@@ -3,7 +3,6 @@ import 'package:core_environment/core_environment.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
-import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:text_similarity/text_similarity.dart';
 
@@ -108,34 +107,6 @@ class Manga extends Equatable with SimilarityMixin {
       webUrl: webUrl,
       source: source?.value,
       tagsId: tags?.map((e) => e.id).nonNulls.toList(),
-    );
-  }
-
-  factory Manga.fromDriftService(MangaDrift manga) {
-    return Manga(
-      id: manga.id,
-      title: manga.title,
-      coverUrl: manga.coverUrl,
-      author: manga.author,
-      status: manga.status,
-      description: manga.description,
-      webUrl: manga.webUrl,
-      source: manga.source?.let((source) => MangaSourceEnum.fromValue(source)),
-      tags: manga.tags.map((e) => MangaTag.fromDriftService(e)).toList(),
-    );
-  }
-
-  MangaDrift toDriftService() {
-    return MangaDrift(
-      id: id,
-      title: title,
-      coverUrl: coverUrl,
-      author: author,
-      status: status,
-      description: description,
-      webUrl: webUrl,
-      source: source?.value,
-      tags: tags?.map((e) => e.toDriftService()).nonNulls.toList() ?? [],
     );
   }
 

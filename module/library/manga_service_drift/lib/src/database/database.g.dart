@@ -638,7 +638,7 @@ class SimilarMangaCompanion extends UpdateCompanion<SimilarMangaData> {
 }
 
 class $MangaChapterImageTablesTable extends MangaChapterImageTables
-    with TableInfo<$MangaChapterImageTablesTable, MangaChapterImageTable> {
+    with TableInfo<$MangaChapterImageTablesTable, ImageDrift> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -689,8 +689,7 @@ class $MangaChapterImageTablesTable extends MangaChapterImageTables
   String get actualTableName => $name;
   static const String $name = 'manga_chapter_image_tables';
   @override
-  VerificationContext validateIntegrity(
-      Insertable<MangaChapterImageTable> instance,
+  VerificationContext validateIntegrity(Insertable<ImageDrift> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -731,9 +730,9 @@ class $MangaChapterImageTablesTable extends MangaChapterImageTables
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  MangaChapterImageTable map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ImageDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return MangaChapterImageTable(
+    return ImageDrift(
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -755,15 +754,14 @@ class $MangaChapterImageTablesTable extends MangaChapterImageTables
   }
 }
 
-class MangaChapterImageTable extends DataClass
-    implements Insertable<MangaChapterImageTable> {
+class ImageDrift extends DataClass implements Insertable<ImageDrift> {
   final String createdAt;
   final String updatedAt;
   final int order;
   final String chapterId;
   final String webUrl;
   final String id;
-  const MangaChapterImageTable(
+  const ImageDrift(
       {required this.createdAt,
       required this.updatedAt,
       required this.order,
@@ -793,10 +791,10 @@ class MangaChapterImageTable extends DataClass
     );
   }
 
-  factory MangaChapterImageTable.fromJson(Map<String, dynamic> json,
+  factory ImageDrift.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return MangaChapterImageTable(
+    return ImageDrift(
       createdAt: serializer.fromJson<String>(json['createdAt']),
       updatedAt: serializer.fromJson<String>(json['updatedAt']),
       order: serializer.fromJson<int>(json['order']),
@@ -818,14 +816,14 @@ class MangaChapterImageTable extends DataClass
     };
   }
 
-  MangaChapterImageTable copyWith(
+  ImageDrift copyWith(
           {String? createdAt,
           String? updatedAt,
           int? order,
           String? chapterId,
           String? webUrl,
           String? id}) =>
-      MangaChapterImageTable(
+      ImageDrift(
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         order: order ?? this.order,
@@ -833,9 +831,8 @@ class MangaChapterImageTable extends DataClass
         webUrl: webUrl ?? this.webUrl,
         id: id ?? this.id,
       );
-  MangaChapterImageTable copyWithCompanion(
-      MangaChapterImageTablesCompanion data) {
-    return MangaChapterImageTable(
+  ImageDrift copyWithCompanion(MangaChapterImageTablesCompanion data) {
+    return ImageDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       order: data.order.present ? data.order.value : this.order,
@@ -847,7 +844,7 @@ class MangaChapterImageTable extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('MangaChapterImageTable(')
+    return (StringBuffer('ImageDrift(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('order: $order, ')
@@ -864,7 +861,7 @@ class MangaChapterImageTable extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is MangaChapterImageTable &&
+      (other is ImageDrift &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.order == this.order &&
@@ -873,8 +870,7 @@ class MangaChapterImageTable extends DataClass
           other.id == this.id);
 }
 
-class MangaChapterImageTablesCompanion
-    extends UpdateCompanion<MangaChapterImageTable> {
+class MangaChapterImageTablesCompanion extends UpdateCompanion<ImageDrift> {
   final Value<String> createdAt;
   final Value<String> updatedAt;
   final Value<int> order;
@@ -903,7 +899,7 @@ class MangaChapterImageTablesCompanion
         chapterId = Value(chapterId),
         webUrl = Value(webUrl),
         id = Value(id);
-  static Insertable<MangaChapterImageTable> custom({
+  static Insertable<ImageDrift> custom({
     Expression<String>? createdAt,
     Expression<String>? updatedAt,
     Expression<int>? order,
@@ -985,7 +981,7 @@ class MangaChapterImageTablesCompanion
 }
 
 class $MangaChapterTablesTable extends MangaChapterTables
-    with TableInfo<$MangaChapterTablesTable, MangaChapterTable> {
+    with TableInfo<$MangaChapterTablesTable, ChapterDrift> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1090,7 +1086,7 @@ class $MangaChapterTablesTable extends MangaChapterTables
   String get actualTableName => $name;
   static const String $name = 'manga_chapter_tables';
   @override
-  VerificationContext validateIntegrity(Insertable<MangaChapterTable> instance,
+  VerificationContext validateIntegrity(Insertable<ChapterDrift> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -1161,9 +1157,9 @@ class $MangaChapterTablesTable extends MangaChapterTables
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  MangaChapterTable map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ChapterDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return MangaChapterTable(
+    return ChapterDrift(
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -1199,8 +1195,7 @@ class $MangaChapterTablesTable extends MangaChapterTables
   }
 }
 
-class MangaChapterTable extends DataClass
-    implements Insertable<MangaChapterTable> {
+class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
   final String createdAt;
   final String updatedAt;
   final String id;
@@ -1218,7 +1213,7 @@ class MangaChapterTable extends DataClass
 
   /// must be in ISO8601 Format (yyyy-MM-ddTHH:mm:ss.mmmuuuZ)
   final String? publishAt;
-  const MangaChapterTable(
+  const ChapterDrift(
       {required this.createdAt,
       required this.updatedAt,
       required this.id,
@@ -1306,10 +1301,10 @@ class MangaChapterTable extends DataClass
     );
   }
 
-  factory MangaChapterTable.fromJson(Map<String, dynamic> json,
+  factory ChapterDrift.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return MangaChapterTable(
+    return ChapterDrift(
       createdAt: serializer.fromJson<String>(json['createdAt']),
       updatedAt: serializer.fromJson<String>(json['updatedAt']),
       id: serializer.fromJson<String>(json['id']),
@@ -1346,7 +1341,7 @@ class MangaChapterTable extends DataClass
     };
   }
 
-  MangaChapterTable copyWith(
+  ChapterDrift copyWith(
           {String? createdAt,
           String? updatedAt,
           String? id,
@@ -1360,7 +1355,7 @@ class MangaChapterTable extends DataClass
           Value<String?> webUrl = const Value.absent(),
           Value<String?> readableAt = const Value.absent(),
           Value<String?> publishAt = const Value.absent()}) =>
-      MangaChapterTable(
+      ChapterDrift(
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         id: id ?? this.id,
@@ -1379,8 +1374,8 @@ class MangaChapterTable extends DataClass
         readableAt: readableAt.present ? readableAt.value : this.readableAt,
         publishAt: publishAt.present ? publishAt.value : this.publishAt,
       );
-  MangaChapterTable copyWithCompanion(MangaChapterTablesCompanion data) {
-    return MangaChapterTable(
+  ChapterDrift copyWithCompanion(MangaChapterTablesCompanion data) {
+    return ChapterDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       id: data.id.present ? data.id.value : this.id,
@@ -1405,7 +1400,7 @@ class MangaChapterTable extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('MangaChapterTable(')
+    return (StringBuffer('ChapterDrift(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('id: $id, ')
@@ -1441,7 +1436,7 @@ class MangaChapterTable extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is MangaChapterTable &&
+      (other is ChapterDrift &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.id == this.id &&
@@ -1457,7 +1452,7 @@ class MangaChapterTable extends DataClass
           other.publishAt == this.publishAt);
 }
 
-class MangaChapterTablesCompanion extends UpdateCompanion<MangaChapterTable> {
+class MangaChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
   final Value<String> createdAt;
   final Value<String> updatedAt;
   final Value<String> id;
@@ -1504,7 +1499,7 @@ class MangaChapterTablesCompanion extends UpdateCompanion<MangaChapterTable> {
     this.publishAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id);
-  static Insertable<MangaChapterTable> custom({
+  static Insertable<ChapterDrift> custom({
     Expression<String>? createdAt,
     Expression<String>? updatedAt,
     Expression<String>? id,
@@ -1902,7 +1897,7 @@ class MangaLibraryTablesCompanion extends UpdateCompanion<MangaLibraryTable> {
 }
 
 class $MangaTablesTable extends MangaTables
-    with TableInfo<$MangaTablesTable, MangaTable> {
+    with TableInfo<$MangaTablesTable, MangaDrift> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1984,7 +1979,7 @@ class $MangaTablesTable extends MangaTables
   String get actualTableName => $name;
   static const String $name = 'manga_tables';
   @override
-  VerificationContext validateIntegrity(Insertable<MangaTable> instance,
+  VerificationContext validateIntegrity(Insertable<MangaDrift> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -2037,9 +2032,9 @@ class $MangaTablesTable extends MangaTables
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  MangaTable map(Map<String, dynamic> data, {String? tablePrefix}) {
+  MangaDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return MangaTable(
+    return MangaDrift(
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -2069,7 +2064,7 @@ class $MangaTablesTable extends MangaTables
   }
 }
 
-class MangaTable extends DataClass implements Insertable<MangaTable> {
+class MangaDrift extends DataClass implements Insertable<MangaDrift> {
   final String createdAt;
   final String updatedAt;
   final String id;
@@ -2080,7 +2075,7 @@ class MangaTable extends DataClass implements Insertable<MangaTable> {
   final String? description;
   final String? webUrl;
   final String? source;
-  const MangaTable(
+  const MangaDrift(
       {required this.createdAt,
       required this.updatedAt,
       required this.id,
@@ -2145,10 +2140,10 @@ class MangaTable extends DataClass implements Insertable<MangaTable> {
     );
   }
 
-  factory MangaTable.fromJson(Map<String, dynamic> json,
+  factory MangaDrift.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return MangaTable(
+    return MangaDrift(
       createdAt: serializer.fromJson<String>(json['createdAt']),
       updatedAt: serializer.fromJson<String>(json['updatedAt']),
       id: serializer.fromJson<String>(json['id']),
@@ -2178,7 +2173,7 @@ class MangaTable extends DataClass implements Insertable<MangaTable> {
     };
   }
 
-  MangaTable copyWith(
+  MangaDrift copyWith(
           {String? createdAt,
           String? updatedAt,
           String? id,
@@ -2189,7 +2184,7 @@ class MangaTable extends DataClass implements Insertable<MangaTable> {
           Value<String?> description = const Value.absent(),
           Value<String?> webUrl = const Value.absent(),
           Value<String?> source = const Value.absent()}) =>
-      MangaTable(
+      MangaDrift(
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         id: id ?? this.id,
@@ -2201,8 +2196,8 @@ class MangaTable extends DataClass implements Insertable<MangaTable> {
         webUrl: webUrl.present ? webUrl.value : this.webUrl,
         source: source.present ? source.value : this.source,
       );
-  MangaTable copyWithCompanion(MangaTablesCompanion data) {
-    return MangaTable(
+  MangaDrift copyWithCompanion(MangaTablesCompanion data) {
+    return MangaDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       id: data.id.present ? data.id.value : this.id,
@@ -2219,7 +2214,7 @@ class MangaTable extends DataClass implements Insertable<MangaTable> {
 
   @override
   String toString() {
-    return (StringBuffer('MangaTable(')
+    return (StringBuffer('MangaDrift(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('id: $id, ')
@@ -2240,7 +2235,7 @@ class MangaTable extends DataClass implements Insertable<MangaTable> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is MangaTable &&
+      (other is MangaDrift &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.id == this.id &&
@@ -2253,7 +2248,7 @@ class MangaTable extends DataClass implements Insertable<MangaTable> {
           other.source == this.source);
 }
 
-class MangaTablesCompanion extends UpdateCompanion<MangaTable> {
+class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
   final Value<String> createdAt;
   final Value<String> updatedAt;
   final Value<String> id;
@@ -2291,7 +2286,7 @@ class MangaTablesCompanion extends UpdateCompanion<MangaTable> {
     this.source = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id);
-  static Insertable<MangaTable> custom({
+  static Insertable<MangaDrift> custom({
     Expression<String>? createdAt,
     Expression<String>? updatedAt,
     Expression<String>? id,
@@ -2405,7 +2400,7 @@ class MangaTablesCompanion extends UpdateCompanion<MangaTable> {
 }
 
 class $MangaTagTablesTable extends MangaTagTables
-    with TableInfo<$MangaTagTablesTable, MangaTagTable> {
+    with TableInfo<$MangaTagTablesTable, TagDrift> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -2444,7 +2439,7 @@ class $MangaTagTablesTable extends MangaTagTables
   String get actualTableName => $name;
   static const String $name = 'manga_tag_tables';
   @override
-  VerificationContext validateIntegrity(Insertable<MangaTagTable> instance,
+  VerificationContext validateIntegrity(Insertable<TagDrift> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -2473,9 +2468,9 @@ class $MangaTagTablesTable extends MangaTagTables
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  MangaTagTable map(Map<String, dynamic> data, {String? tablePrefix}) {
+  TagDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return MangaTagTable(
+    return TagDrift(
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -2493,12 +2488,12 @@ class $MangaTagTablesTable extends MangaTagTables
   }
 }
 
-class MangaTagTable extends DataClass implements Insertable<MangaTagTable> {
+class TagDrift extends DataClass implements Insertable<TagDrift> {
   final String createdAt;
   final String updatedAt;
   final String id;
   final String name;
-  const MangaTagTable(
+  const TagDrift(
       {required this.createdAt,
       required this.updatedAt,
       required this.id,
@@ -2522,10 +2517,10 @@ class MangaTagTable extends DataClass implements Insertable<MangaTagTable> {
     );
   }
 
-  factory MangaTagTable.fromJson(Map<String, dynamic> json,
+  factory TagDrift.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return MangaTagTable(
+    return TagDrift(
       createdAt: serializer.fromJson<String>(json['createdAt']),
       updatedAt: serializer.fromJson<String>(json['updatedAt']),
       id: serializer.fromJson<String>(json['id']),
@@ -2543,16 +2538,16 @@ class MangaTagTable extends DataClass implements Insertable<MangaTagTable> {
     };
   }
 
-  MangaTagTable copyWith(
+  TagDrift copyWith(
           {String? createdAt, String? updatedAt, String? id, String? name}) =>
-      MangaTagTable(
+      TagDrift(
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         id: id ?? this.id,
         name: name ?? this.name,
       );
-  MangaTagTable copyWithCompanion(MangaTagTablesCompanion data) {
-    return MangaTagTable(
+  TagDrift copyWithCompanion(MangaTagTablesCompanion data) {
+    return TagDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       id: data.id.present ? data.id.value : this.id,
@@ -2562,7 +2557,7 @@ class MangaTagTable extends DataClass implements Insertable<MangaTagTable> {
 
   @override
   String toString() {
-    return (StringBuffer('MangaTagTable(')
+    return (StringBuffer('TagDrift(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('id: $id, ')
@@ -2576,14 +2571,14 @@ class MangaTagTable extends DataClass implements Insertable<MangaTagTable> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is MangaTagTable &&
+      (other is TagDrift &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.id == this.id &&
           other.name == this.name);
 }
 
-class MangaTagTablesCompanion extends UpdateCompanion<MangaTagTable> {
+class MangaTagTablesCompanion extends UpdateCompanion<TagDrift> {
   final Value<String> createdAt;
   final Value<String> updatedAt;
   final Value<String> id;
@@ -2604,7 +2599,7 @@ class MangaTagTablesCompanion extends UpdateCompanion<MangaTagTable> {
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         name = Value(name);
-  static Insertable<MangaTagTable> custom({
+  static Insertable<TagDrift> custom({
     Expression<String>? createdAt,
     Expression<String>? updatedAt,
     Expression<String>? id,
@@ -3421,18 +3416,17 @@ class $$MangaChapterImageTablesTableAnnotationComposer
 class $$MangaChapterImageTablesTableTableManager extends RootTableManager<
     _$AppDatabase,
     $MangaChapterImageTablesTable,
-    MangaChapterImageTable,
+    ImageDrift,
     $$MangaChapterImageTablesTableFilterComposer,
     $$MangaChapterImageTablesTableOrderingComposer,
     $$MangaChapterImageTablesTableAnnotationComposer,
     $$MangaChapterImageTablesTableCreateCompanionBuilder,
     $$MangaChapterImageTablesTableUpdateCompanionBuilder,
     (
-      MangaChapterImageTable,
-      BaseReferences<_$AppDatabase, $MangaChapterImageTablesTable,
-          MangaChapterImageTable>
+      ImageDrift,
+      BaseReferences<_$AppDatabase, $MangaChapterImageTablesTable, ImageDrift>
     ),
-    MangaChapterImageTable,
+    ImageDrift,
     PrefetchHooks Function()> {
   $$MangaChapterImageTablesTableTableManager(
       _$AppDatabase db, $MangaChapterImageTablesTable table)
@@ -3495,18 +3489,18 @@ typedef $$MangaChapterImageTablesTableProcessedTableManager
     = ProcessedTableManager<
         _$AppDatabase,
         $MangaChapterImageTablesTable,
-        MangaChapterImageTable,
+        ImageDrift,
         $$MangaChapterImageTablesTableFilterComposer,
         $$MangaChapterImageTablesTableOrderingComposer,
         $$MangaChapterImageTablesTableAnnotationComposer,
         $$MangaChapterImageTablesTableCreateCompanionBuilder,
         $$MangaChapterImageTablesTableUpdateCompanionBuilder,
         (
-          MangaChapterImageTable,
+          ImageDrift,
           BaseReferences<_$AppDatabase, $MangaChapterImageTablesTable,
-              MangaChapterImageTable>
+              ImageDrift>
         ),
-        MangaChapterImageTable,
+        ImageDrift,
         PrefetchHooks Function()>;
 typedef $$MangaChapterTablesTableCreateCompanionBuilder
     = MangaChapterTablesCompanion Function({
@@ -3697,17 +3691,17 @@ class $$MangaChapterTablesTableAnnotationComposer
 class $$MangaChapterTablesTableTableManager extends RootTableManager<
     _$AppDatabase,
     $MangaChapterTablesTable,
-    MangaChapterTable,
+    ChapterDrift,
     $$MangaChapterTablesTableFilterComposer,
     $$MangaChapterTablesTableOrderingComposer,
     $$MangaChapterTablesTableAnnotationComposer,
     $$MangaChapterTablesTableCreateCompanionBuilder,
     $$MangaChapterTablesTableUpdateCompanionBuilder,
     (
-      MangaChapterTable,
-      BaseReferences<_$AppDatabase, $MangaChapterTablesTable, MangaChapterTable>
+      ChapterDrift,
+      BaseReferences<_$AppDatabase, $MangaChapterTablesTable, ChapterDrift>
     ),
-    MangaChapterTable,
+    ChapterDrift,
     PrefetchHooks Function()> {
   $$MangaChapterTablesTableTableManager(
       _$AppDatabase db, $MangaChapterTablesTable table)
@@ -3795,17 +3789,17 @@ class $$MangaChapterTablesTableTableManager extends RootTableManager<
 typedef $$MangaChapterTablesTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
     $MangaChapterTablesTable,
-    MangaChapterTable,
+    ChapterDrift,
     $$MangaChapterTablesTableFilterComposer,
     $$MangaChapterTablesTableOrderingComposer,
     $$MangaChapterTablesTableAnnotationComposer,
     $$MangaChapterTablesTableCreateCompanionBuilder,
     $$MangaChapterTablesTableUpdateCompanionBuilder,
     (
-      MangaChapterTable,
-      BaseReferences<_$AppDatabase, $MangaChapterTablesTable, MangaChapterTable>
+      ChapterDrift,
+      BaseReferences<_$AppDatabase, $MangaChapterTablesTable, ChapterDrift>
     ),
-    MangaChapterTable,
+    ChapterDrift,
     PrefetchHooks Function()>;
 typedef $$MangaLibraryTablesTableCreateCompanionBuilder
     = MangaLibraryTablesCompanion Function({
@@ -4113,14 +4107,14 @@ class $$MangaTablesTableAnnotationComposer
 class $$MangaTablesTableTableManager extends RootTableManager<
     _$AppDatabase,
     $MangaTablesTable,
-    MangaTable,
+    MangaDrift,
     $$MangaTablesTableFilterComposer,
     $$MangaTablesTableOrderingComposer,
     $$MangaTablesTableAnnotationComposer,
     $$MangaTablesTableCreateCompanionBuilder,
     $$MangaTablesTableUpdateCompanionBuilder,
-    (MangaTable, BaseReferences<_$AppDatabase, $MangaTablesTable, MangaTable>),
-    MangaTable,
+    (MangaDrift, BaseReferences<_$AppDatabase, $MangaTablesTable, MangaDrift>),
+    MangaDrift,
     PrefetchHooks Function()> {
   $$MangaTablesTableTableManager(_$AppDatabase db, $MangaTablesTable table)
       : super(TableManagerState(
@@ -4194,14 +4188,14 @@ class $$MangaTablesTableTableManager extends RootTableManager<
 typedef $$MangaTablesTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
     $MangaTablesTable,
-    MangaTable,
+    MangaDrift,
     $$MangaTablesTableFilterComposer,
     $$MangaTablesTableOrderingComposer,
     $$MangaTablesTableAnnotationComposer,
     $$MangaTablesTableCreateCompanionBuilder,
     $$MangaTablesTableUpdateCompanionBuilder,
-    (MangaTable, BaseReferences<_$AppDatabase, $MangaTablesTable, MangaTable>),
-    MangaTable,
+    (MangaDrift, BaseReferences<_$AppDatabase, $MangaTablesTable, MangaDrift>),
+    MangaDrift,
     PrefetchHooks Function()>;
 typedef $$MangaTagTablesTableCreateCompanionBuilder = MangaTagTablesCompanion
     Function({
@@ -4289,17 +4283,14 @@ class $$MangaTagTablesTableAnnotationComposer
 class $$MangaTagTablesTableTableManager extends RootTableManager<
     _$AppDatabase,
     $MangaTagTablesTable,
-    MangaTagTable,
+    TagDrift,
     $$MangaTagTablesTableFilterComposer,
     $$MangaTagTablesTableOrderingComposer,
     $$MangaTagTablesTableAnnotationComposer,
     $$MangaTagTablesTableCreateCompanionBuilder,
     $$MangaTagTablesTableUpdateCompanionBuilder,
-    (
-      MangaTagTable,
-      BaseReferences<_$AppDatabase, $MangaTagTablesTable, MangaTagTable>
-    ),
-    MangaTagTable,
+    (TagDrift, BaseReferences<_$AppDatabase, $MangaTagTablesTable, TagDrift>),
+    TagDrift,
     PrefetchHooks Function()> {
   $$MangaTagTablesTableTableManager(
       _$AppDatabase db, $MangaTagTablesTable table)
@@ -4350,17 +4341,14 @@ class $$MangaTagTablesTableTableManager extends RootTableManager<
 typedef $$MangaTagTablesTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
     $MangaTagTablesTable,
-    MangaTagTable,
+    TagDrift,
     $$MangaTagTablesTableFilterComposer,
     $$MangaTagTablesTableOrderingComposer,
     $$MangaTagTablesTableAnnotationComposer,
     $$MangaTagTablesTableCreateCompanionBuilder,
     $$MangaTagTablesTableUpdateCompanionBuilder,
-    (
-      MangaTagTable,
-      BaseReferences<_$AppDatabase, $MangaTagTablesTable, MangaTagTable>
-    ),
-    MangaTagTable,
+    (TagDrift, BaseReferences<_$AppDatabase, $MangaTagTablesTable, TagDrift>),
+    TagDrift,
     PrefetchHooks Function()>;
 typedef $$MangaTagRelationshipTablesTableCreateCompanionBuilder
     = MangaTagRelationshipTablesCompanion Function({

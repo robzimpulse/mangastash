@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:text_similarity/text_similarity.dart';
 
@@ -29,14 +28,6 @@ class MangaTag extends Equatable with SimilarityMixin {
 
   MangaTagFirebase toFirebaseService() {
     return MangaTagFirebase(name: name, id: id);
-  }
-
-  factory MangaTag.fromDriftService(MangaTagDrift tag) {
-    return MangaTag(name: tag.name, id: tag.id);
-  }
-
-  MangaTagDrift toDriftService() {
-    return MangaTagDrift(name: name, id: id);
   }
 
   factory MangaTag.fromJson(Map<String, dynamic> json) {

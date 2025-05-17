@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import '../mixin/auto_timestamp_table.dart';
 
+@DataClassName('MangaDrift')
 class MangaTables extends Table with AutoTimestampTable {
   TextColumn get id => text().named('id')();
 
