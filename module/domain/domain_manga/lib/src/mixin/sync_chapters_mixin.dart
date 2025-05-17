@@ -32,7 +32,7 @@ mixin SyncChaptersMixin {
           e.webUrl == chapter.mangaId,
         ].every((isTrue) => isTrue),
       );
-      final data = chapter.copyWith(id: match?.id).toDrift;
+      final data = chapter.copyWith(id: chapter.id ?? match?.id).toDrift;
       match != null
           ? toUpdate.add((data, chapter.images ?? []))
           : toInsert.add((data, chapter.images ?? []));

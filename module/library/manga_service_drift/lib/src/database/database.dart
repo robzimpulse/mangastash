@@ -53,6 +53,12 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   int get schemaVersion => 1;
+
+  Future<void> clear() async {
+    for (final table in allTables) {
+      await delete(table).go();
+    }
+  }
 }
 
 Future<QueryExecutor> _openConnection({LoggerCallback? logger}) async {

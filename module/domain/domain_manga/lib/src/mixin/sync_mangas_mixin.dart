@@ -58,7 +58,7 @@ mixin SyncMangasMixin {
           e.source == manga.source?.value,
         ].every((isTrue) => isTrue),
       );
-      final data = manga.toDrift.copyWith(id: Value.absentIfNull(match?.id));
+      final data = manga.copyWith(id: manga.id ?? match?.id).toDrift;
       match != null
           ? toUpdateMangas.add((data, manga.tagsName))
           : toInsertMangas.add((data, manga.tagsName));

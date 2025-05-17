@@ -72,6 +72,18 @@ class AdvancedScreen extends StatelessWidget {
               child: Icon(Icons.storage),
             ),
           ),
+          ListTile(
+            title: const Text('Clear Database'),
+            onTap: () async {
+              await database.clear();
+              if (!context.mounted) return;
+              context.showSnackBar(message: 'Success Clear Database');
+            },
+            leading: const SizedBox(
+              height: double.infinity,
+              child: Icon(Icons.delete_forever),
+            ),
+          ),
         ],
       ),
     );
