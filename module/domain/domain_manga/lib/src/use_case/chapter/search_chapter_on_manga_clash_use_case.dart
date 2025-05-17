@@ -2,7 +2,9 @@ import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
+import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 import '../../exception/failed_parsing_html_exception.dart';
@@ -15,13 +17,19 @@ class SearchChapterOnMangaClashUseCase
   final MangaServiceFirebase _mangaServiceFirebase;
   final MangaChapterServiceFirebase _mangaChapterServiceFirebase;
   final HeadlessWebviewManager _webview;
+  final ChapterDao _chapterDao;
+  final LogBox _logBox;
 
   SearchChapterOnMangaClashUseCase({
     required MangaServiceFirebase mangaServiceFirebase,
     required MangaChapterServiceFirebase mangaChapterServiceFirebase,
     required HeadlessWebviewManager webview,
+    required ChapterDao chapterDao,
+    required LogBox logBox,
   })  : _mangaServiceFirebase = mangaServiceFirebase,
         _mangaChapterServiceFirebase = mangaChapterServiceFirebase,
+        _chapterDao = chapterDao,
+        _logBox = logBox,
         _webview = webview;
 
   Future<Result<Pagination<MangaChapter>>> execute({
@@ -83,6 +91,8 @@ class SearchChapterOnMangaClashUseCase
     final data = sortChapters(
       chapters: await sync(
         mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
+        chapterDao: _chapterDao,
+        logBox: _logBox,
         values: chapters,
       ),
       parameter: parameter,

@@ -74,6 +74,7 @@ class DomainMangaRegistrar extends Registrar {
       locator.registerSingleton(DatabaseViewer());
       locator.registerSingleton(AppDatabase(logger: logger));
       locator.registerFactory(() => MangaDao(locator()));
+      locator.registerFactory(() => ChapterDao(locator()));
       locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
       locator.registerFactory(
         () => MangaServiceFirebase(
@@ -153,6 +154,8 @@ class DomainMangaRegistrar extends Registrar {
         () => SearchChapterOnMangaDexUseCase(
           chapterRepository: locator(),
           mangaChapterServiceFirebase: locator(),
+          chapterDao: locator(),
+          logBox: locator(),
         ),
       );
       locator.registerFactory(
@@ -160,6 +163,8 @@ class DomainMangaRegistrar extends Registrar {
           mangaServiceFirebase: locator(),
           mangaChapterServiceFirebase: locator(),
           webview: locator(),
+          chapterDao: locator(),
+          logBox: locator(),
         ),
       );
       locator.registerFactory(
@@ -176,6 +181,8 @@ class DomainMangaRegistrar extends Registrar {
           mangaServiceFirebase: locator(),
           webview: locator(),
           mangaChapterServiceFirebase: locator(),
+          chapterDao: locator(),
+          logBox: locator(),
         ),
       );
       locator.registerFactory(
@@ -183,18 +190,24 @@ class DomainMangaRegistrar extends Registrar {
           chapterRepository: locator(),
           atHomeRepository: locator(),
           mangaChapterServiceFirebase: locator(),
+          chapterDao: locator(),
+          logBox: locator(),
         ),
       );
       locator.registerFactory(
         () => GetChapterOnMangaClashUseCase(
           mangaChapterServiceFirebase: locator(),
           webview: locator(),
+          chapterDao: locator(),
+          logBox: locator(),
         ),
       );
       locator.registerFactory(
         () => GetChapterOnAsuraScanUseCase(
           mangaChapterServiceFirebase: locator(),
           webview: locator(),
+          chapterDao: locator(),
+          logBox: locator(),
         ),
       );
       locator.registerFactory(

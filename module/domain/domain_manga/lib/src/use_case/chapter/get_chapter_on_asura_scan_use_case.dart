@@ -2,6 +2,8 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:html/dom.dart';
+import 'package:log_box/log_box.dart';
+import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 import '../../manager/headless_webview_manager.dart';
@@ -9,20 +11,31 @@ import '../../mixin/sync_chapters_mixin.dart';
 
 class GetChapterOnAsuraScanUseCase with SyncChaptersMixin {
   final MangaChapterServiceFirebase _mangaChapterServiceFirebase;
+  final ChapterDao _chapterDao;
+  final LogBox _logBox;
   final HeadlessWebviewManager _webview;
 
   GetChapterOnAsuraScanUseCase({
     required MangaChapterServiceFirebase mangaChapterServiceFirebase,
     required HeadlessWebviewManager webview,
+    required ChapterDao chapterDao,
+    required LogBox logBox,
   })  : _mangaChapterServiceFirebase = mangaChapterServiceFirebase,
+        _chapterDao = chapterDao,
+        _logBox = logBox,
         _webview = webview;
 
   Future<Result<MangaChapter>> execute({
     required String chapterId,
     required String mangaId,
   }) async {
-    final raw = await _mangaChapterServiceFirebase.get(id: chapterId);
-    final result = raw?.let((e) => MangaChapter.fromFirebaseService(e));
+    final raw = await _chapterDao.getChapter(chapterId);
+    final result = await raw?.let(
+      (e) async => MangaChapter.fromDrift(
+        e,
+        images: await _chapterDao.getImages(chapterId),
+      ),
+    );
     final url = result?.webUrl;
 
     if (result == null || url == null) {
@@ -55,6 +68,8 @@ class GetChapterOnAsuraScanUseCase with SyncChaptersMixin {
 
     final chapters = await sync(
       mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
+      chapterDao: _chapterDao,
+      logBox: _logBox,
       values: [result.copyWith(images: images)],
     );
 

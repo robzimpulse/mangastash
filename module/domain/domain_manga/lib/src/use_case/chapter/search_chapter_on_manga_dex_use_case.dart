@@ -1,6 +1,8 @@
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
+import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 import '../../mixin/sync_chapters_mixin.dart';
@@ -8,11 +10,17 @@ import '../../mixin/sync_chapters_mixin.dart';
 class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
   final ChapterRepository _chapterRepository;
   final MangaChapterServiceFirebase _mangaChapterServiceFirebase;
+  final ChapterDao _chapterDao;
+  final LogBox _logBox;
 
   const SearchChapterOnMangaDexUseCase({
     required ChapterRepository chapterRepository,
     required MangaChapterServiceFirebase mangaChapterServiceFirebase,
+    required ChapterDao chapterDao,
+    required LogBox logBox,
   })  : _chapterRepository = chapterRepository,
+        _chapterDao = chapterDao,
+        _logBox = logBox,
         _mangaChapterServiceFirebase = mangaChapterServiceFirebase;
 
   Future<Result<Pagination<MangaChapter>>> execute({
@@ -35,6 +43,8 @@ class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
         Pagination(
           data: await sync(
             mangaChapterServiceFirebase: _mangaChapterServiceFirebase,
+            chapterDao: _chapterDao,
+            logBox: _logBox,
             values: data
                 .map(
                   (e) => MangaChapter.from(data: e).copyWith(

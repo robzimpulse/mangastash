@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 
 import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
+import '../extension/value_or_null_extension.dart';
 import '../tables/manga_chapter_image_tables.dart';
 import '../tables/manga_chapter_tables.dart';
 
@@ -37,6 +38,32 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
       ..where((f) => f.mangaId.equals(mangaId));
 
     return selector.get();
+  }
+
+  Future<ChapterDrift?> getChapter(String chapterId) {
+    final selector = select(mangaChapterTables)
+      ..where((f) => f.id.equals(chapterId));
+
+    return selector.getSingleOrNull();
+  }
+
+  Future<ChapterDrift> insertChapter(MangaChapterTablesCompanion data) {
+    return transaction(
+      () => into(mangaChapterTables).insertReturning(
+        data.copyWith(
+          id: Value(data.id.valueOrNull ?? const Uuid().v4().toString()),
+          createdAt: Value(DateTime.now().toIso8601String()),
+          updatedAt: Value(DateTime.now().toIso8601String()),
+        ),
+        onConflict: DoUpdate(
+          (old) => data.copyWith(
+            id: Value(const Uuid().v4().toString()),
+            createdAt: Value(DateTime.now().toIso8601String()),
+            updatedAt: Value(DateTime.now().toIso8601String()),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<List<ChapterDrift>> updateChapter(MangaChapterTablesCompanion data) {
