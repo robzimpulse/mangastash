@@ -73,30 +73,6 @@ class DomainMangaRegistrar extends Registrar {
       locator.registerFactory(() => ChapterDao(locator()));
       locator.registerFactory(() => LibraryDao(locator()));
       locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
-      locator.registerFactory(
-        () => MangaServiceFirebase(
-          app: locator(),
-          logger: logger,
-        ),
-      );
-      locator.registerFactory(
-        () => MangaTagServiceFirebase(
-          app: locator(),
-          logger: logger,
-        ),
-      );
-      locator.registerFactory(
-        () => MangaChapterServiceFirebase(
-          app: locator(),
-          logger: logger,
-        ),
-      );
-      locator.registerFactory(
-        () => MangaLibraryServiceFirebase(
-          app: locator(),
-          logger: logger,
-        ),
-      );
 
       locator.registerSingleton(
         HeadlessWebviewManager(log: log, cacheManager: locator()),
@@ -148,7 +124,6 @@ class DomainMangaRegistrar extends Registrar {
       locator.registerFactory(
         () => SearchChapterOnMangaDexUseCase(
           chapterRepository: locator(),
-          mangaChapterServiceFirebase: locator(),
           chapterDao: locator(),
           logBox: locator(),
         ),

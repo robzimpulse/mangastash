@@ -3,7 +3,6 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
-import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 import '../../mixin/sync_chapters_mixin.dart';
 
@@ -14,7 +13,6 @@ class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
 
   const SearchChapterOnMangaDexUseCase({
     required ChapterRepository chapterRepository,
-    required MangaChapterServiceFirebase mangaChapterServiceFirebase,
     required ChapterDao chapterDao,
     required LogBox logBox,
   })  : _chapterRepository = chapterRepository,
