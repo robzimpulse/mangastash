@@ -19,7 +19,7 @@ part 'library_dao.g.dart';
 class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
   LibraryDao(AppDatabase db) : super(db);
 
-  Stream<Iterable<MangaDrift>> listenLibrary() {
+  Stream<List<MangaDrift>> listenLibrary() {
     final selector = select(mangaLibraryTables).join(
       [
         innerJoin(
@@ -31,9 +31,29 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
 
     final stream = selector.watch();
 
-    // TODO: populate manga tag
     return stream.map(
-      (rows) => rows.map((row) => row.readTableOrNull(mangaTables)).nonNulls,
+      (rows) => [...rows.map((row) => row.readTable(mangaTables)).nonNulls],
     );
+  }
+
+  Future<void> add(String mangaId) async {
+    await into(mangaLibraryTables).insert(
+      MangaLibraryTablesCompanion.insert(mangaId: mangaId),
+    );
+  }
+
+  Future<List<MangaDrift>> get() async {
+    final selector = select(mangaLibraryTables).join(
+      [
+        innerJoin(
+          mangaTables,
+          mangaTables.id.equalsExp(mangaLibraryTables.mangaId),
+        ),
+      ],
+    );
+
+    final results = await selector.get();
+
+    return results.map((e) => e.readTable(mangaTables)).toList();
   }
 }

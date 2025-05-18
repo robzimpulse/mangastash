@@ -5,6 +5,7 @@ import 'package:manga_service_drift/manga_service_drift.dart';
 
 void main() {
   late AppDatabase db;
+  late LibraryDao libraryDao;
   late MangaDao mangaDao;
 
   setUp(() {
@@ -16,6 +17,7 @@ void main() {
         closeStreamsSynchronously: true,
       ),
     );
+    libraryDao = LibraryDao(db);
     mangaDao = MangaDao(db);
   });
 
@@ -49,7 +51,8 @@ void main() {
         await mangaDao.insertTag(tag);
       }
 
-      for (final manga in mangas) {
+      for (final (index, manga) in mangas.indexed) {
+        if (index.isEven) await libraryDao.add(manga.id.value);
         await mangaDao.insertManga(manga);
         await mangaDao.unlinkAllTagFromManga(manga.id.value);
         await mangaDao.linkTagToManga(
@@ -59,11 +62,9 @@ void main() {
       }
     });
 
-    test('Get Manga', () async {
-      final result = await mangaDao.getManga('manga_0');
-      expect(result != null, isTrue);
-      expect(result?.$1.id, 'manga_0');
-      expect(result?.$2.length, 10);
+    test('Get Library', () async {
+      final result = await libraryDao.get();
+      expect(result.isNotEmpty, isTrue);
     });
   });
 }
