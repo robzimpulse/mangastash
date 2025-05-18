@@ -22,23 +22,6 @@ part 'manga_dao.g.dart';
 class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
   MangaDao(AppDatabase db) : super(db);
 
-  Stream<Iterable<MangaDrift>> listenLibrary() {
-    final selector = select(mangaLibraryTables).join(
-      [
-        innerJoin(
-          mangaTables,
-          mangaTables.id.equalsExp(mangaLibraryTables.mangaId),
-        ),
-      ],
-    );
-
-    final stream = selector.watch();
-
-    return stream.map(
-      (rows) => rows.map((row) => row.readTableOrNull(mangaTables)).nonNulls,
-    );
-  }
-
   Future<List<MangaDrift>> searchMangas({
     List<String> ids = const [],
     List<String> titles = const [],
