@@ -3,7 +3,6 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
-import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 import '../../mixin/sync_mangas_mixin.dart';
 
@@ -13,8 +12,6 @@ class GetMangaOnMangaDexUseCase with SyncMangasMixin {
   final LogBox _logBox;
 
   GetMangaOnMangaDexUseCase({
-    required MangaTagServiceFirebase mangaTagServiceFirebase,
-    required MangaServiceFirebase mangaServiceFirebase,
     required MangaService mangaService,
     required MangaDao mangaDao,
     required LogBox logBox,

@@ -8,7 +8,6 @@ import 'package:html/dom.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
-import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 import '../../exception/failed_parsing_html_exception.dart';
 import '../../manager/headless_webview_manager.dart';
@@ -21,8 +20,6 @@ class SearchMangaOnAsuraScanUseCase with SyncMangasMixin {
 
   SearchMangaOnAsuraScanUseCase({
     required HeadlessWebviewManager webview,
-    required MangaTagServiceFirebase mangaTagServiceFirebase,
-    required MangaServiceFirebase mangaServiceFirebase,
     required MangaDao mangaDao,
     required LogBox logBox,
   })  : _webview = webview,

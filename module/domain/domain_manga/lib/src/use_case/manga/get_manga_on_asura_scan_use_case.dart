@@ -2,7 +2,6 @@ import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
-import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
@@ -13,8 +12,6 @@ class GetMangaOnAsuraScanUseCase with SyncMangasMixin {
   final LogBox _logBox;
 
   GetMangaOnAsuraScanUseCase({
-    required MangaTagServiceFirebase mangaTagServiceFirebase,
-    required MangaServiceFirebase mangaServiceFirebase,
     required MangaDao mangaDao,
     required HeadlessWebviewManager webview,
     required LogBox logBox,
