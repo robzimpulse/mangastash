@@ -1,9 +1,7 @@
 import 'dart:ui';
 
 import 'package:collection/collection.dart';
-import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
-import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -177,14 +175,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     BuildContext context,
     MangaDetailScreenState state,
   ) async {
-    final status = state.authState?.status;
-    if (status != AuthStatus.loggedIn) {
-      final result = await context.push<AuthState>(AuthRoutePath.login);
-      if (result == null || !context.mounted) return;
-      _cubit(context).addToLibrary(userUid: result.user?.uid);
-      return;
-    }
-
     _cubit(context).addToLibrary(userUid: state.authState?.user?.uid);
   }
 

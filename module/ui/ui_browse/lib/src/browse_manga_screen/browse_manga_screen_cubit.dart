@@ -29,7 +29,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     );
   }
 
-  void _updateLibraryState(List<String> libraryState) {
+  void _updateLibraryState(List<Manga> libraryState) {
     emit(state.copyWith(libraries: libraryState));
   }
 

@@ -4,6 +4,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
+import 'package:collection/collection.dart';
 
 import 'browse_manga_screen_cubit.dart';
 import 'browse_manga_screen_state.dart';
@@ -359,7 +360,8 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             onLongPress: () => context.showSnackBar(
               message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
             ),
-            isOnLibrary: state.libraries.contains(e.id) == true,
+            isOnLibrary:
+                state.libraries.firstWhereOrNull((l) => e.id == l.id) != null,
           ),
         );
 

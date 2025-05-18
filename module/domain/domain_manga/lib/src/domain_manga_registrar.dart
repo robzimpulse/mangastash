@@ -75,6 +75,7 @@ class DomainMangaRegistrar extends Registrar {
       locator.registerSingleton(AppDatabase(logger: logger));
       locator.registerFactory(() => MangaDao(locator()));
       locator.registerFactory(() => ChapterDao(locator()));
+      locator.registerFactory(() => LibraryDao(locator()));
       locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
       locator.registerFactory(
         () => MangaServiceFirebase(
@@ -259,12 +260,12 @@ class DomainMangaRegistrar extends Registrar {
       );
       locator.registerFactory(
         () => AddToLibraryUseCase(
-          mangaLibraryServiceFirebase: locator(),
+          libraryDao: locator(),
         ),
       );
       locator.registerFactory(
         () => RemoveFromLibraryUseCase(
-          mangaLibraryServiceFirebase: locator(),
+          libraryDao: locator(),
         ),
       );
       locator.registerFactory(
@@ -277,9 +278,8 @@ class DomainMangaRegistrar extends Registrar {
 
       locator.registerSingleton(
         LibraryManager(
-          mangaLibraryServiceFirebase: locator(),
+          libraryDao: locator(),
           listenAuthUseCase: locator(),
-          mangaServiceFirebase: locator(),
         ),
       );
       locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();

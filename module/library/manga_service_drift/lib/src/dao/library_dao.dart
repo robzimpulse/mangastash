@@ -21,7 +21,7 @@ part 'library_dao.g.dart';
 class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
   LibraryDao(AppDatabase db) : super(db);
 
-  Stream<List<(MangaDrift, List<TagDrift>)>> listenLibrary() {
+  Stream<List<(MangaDrift, List<TagDrift>)>> get stream {
     final selector = select(mangaLibraryTables).join(
       [
         innerJoin(
@@ -80,6 +80,11 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
     await into(mangaLibraryTables).insert(
       MangaLibraryTablesCompanion.insert(mangaId: mangaId),
     );
+  }
+
+  Future<void> remove(String mangaId) async {
+    await (delete(mangaLibraryTables)..where((f) => f.mangaId.equals(mangaId)))
+        .go();
   }
 
   Future<List<(MangaDrift, List<TagDrift>)>> get() async {

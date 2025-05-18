@@ -58,7 +58,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     emit(state.copyWith(authState: authState));
   }
 
-  void _updateMangaLibrary(List<String> library) {
+  void _updateMangaLibrary(List<Manga> library) {
     emit(state.copyWith(libraries: library));
   }
 
@@ -204,13 +204,13 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
   Future<void> addToLibrary({String? userUid}) async {
     final manga = state.manga;
-    final userId = userUid ?? state.authState?.user?.uid;
-    if (manga == null || userId == null) return;
+
+    if (manga == null) return;
 
     if (state.isOnLibrary) {
-      await _removeFromLibraryUseCase.execute(manga: manga, userId: userId);
+      await _removeFromLibraryUseCase.execute(manga: manga);
     } else {
-      await _addToLibraryUseCase.execute(manga: manga, userId: userId);
+      await _addToLibraryUseCase.execute(manga: manga);
     }
   }
 

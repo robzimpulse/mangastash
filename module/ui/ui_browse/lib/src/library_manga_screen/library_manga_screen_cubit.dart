@@ -7,15 +7,11 @@ import 'library_manga_screen_state.dart';
 
 class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     with AutoSubscriptionMixin {
-  final GetMangaFromLibraryUseCase _getMangaFromLibraryUseCase;
-
   LibraryMangaScreenCubit({
     required LibraryMangaScreenState initialState,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
     required ListenMangaSourceUseCase listenMangaSourceUseCase,
-    required GetMangaFromLibraryUseCase getMangaFromLibraryUseCase,
-  })  : _getMangaFromLibraryUseCase = getMangaFromLibraryUseCase,
-        super(initialState) {
+  }) : super(initialState) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
           .distinct()
@@ -28,19 +24,15 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     );
   }
 
-  void _updateLibraryState(List<String> libraryState) async {
-    emit(
-      state.copyWith(
-        mangas: await _getMangaFromLibraryUseCase.libraryState,
-      ),
-    );
+  void _updateLibraryState(List<Manga> libraryState) async {
+    emit(state.copyWith(mangas: libraryState));
   }
 
   void _updateSourceState(Map<String, MangaSource> sources) {
     emit(
       state.copyWith(
         sources: {
-          for (final source in sources.values) source.name : source,
+          for (final source in sources.values) source.name: source,
         },
       ),
     );

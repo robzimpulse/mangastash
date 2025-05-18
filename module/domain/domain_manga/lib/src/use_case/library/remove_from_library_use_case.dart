@@ -1,28 +1,24 @@
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:manga_service_firebase/manga_service_firebase.dart';
+import 'package:manga_service_drift/manga_service_drift.dart';
 
 class RemoveFromLibraryUseCase {
-  final MangaLibraryServiceFirebase _mangaLibraryServiceFirebase;
+  final LibraryDao _libraryDao;
 
   RemoveFromLibraryUseCase({
-    required MangaLibraryServiceFirebase mangaLibraryServiceFirebase,
-  }) : _mangaLibraryServiceFirebase = mangaLibraryServiceFirebase;
+    required LibraryDao libraryDao,
+  }) : _libraryDao = libraryDao;
 
-  Future<Result<bool>> execute({
-    required Manga manga,
-    required String userId,
-  }) async {
+  Future<Result<bool>> execute({required Manga manga}) async {
     final mangaId = manga.id;
-    if (mangaId == null) return Error(Exception('Manga id is null'));
+
+    if (mangaId == null) {
+      return Error(Exception('Manga id is null'));
+    }
 
     try {
-      return Success(
-        await _mangaLibraryServiceFirebase.remove(
-          mangaId: mangaId,
-          userId: userId,
-        ),
-      );
+      _libraryDao.remove(mangaId);
+      return Success(true);
     } catch (e) {
       return Error(e);
     }
