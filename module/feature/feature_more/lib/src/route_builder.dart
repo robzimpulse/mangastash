@@ -1,4 +1,3 @@
-import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
 import 'package:service_locator/service_locator.dart';
@@ -26,7 +25,6 @@ class MoreRouteBuilder extends BaseRouteBuilder {
           onTapHelp: () => context.showSnackBar(
             message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
           ),
-          onTapLogin: () => context.push(AuthRoutePath.login),
         ),
       ),
     );

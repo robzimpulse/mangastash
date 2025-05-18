@@ -1,4 +1,3 @@
-import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -14,7 +13,6 @@ class MoreScreen extends StatelessWidget {
   final VoidCallback? onTapDownloadQueue;
   final VoidCallback? onTapAbout;
   final VoidCallback? onTapHelp;
-  final VoidCallback? onTapLogin;
 
   const MoreScreen({
     super.key,
@@ -24,7 +22,6 @@ class MoreScreen extends StatelessWidget {
     this.onTapDownloadQueue,
     this.onTapAbout,
     this.onTapHelp,
-    this.onTapLogin,
   });
 
   static Widget create({
@@ -35,12 +32,9 @@ class MoreScreen extends StatelessWidget {
     VoidCallback? onTapDownloadQueue,
     VoidCallback? onTapAbout,
     VoidCallback? onTapHelp,
-    VoidCallback? onTapLogin,
   }) {
     return BlocProvider(
       create: (context) => MoreScreenCubit(
-        listenAuthUseCase: locator(),
-        logoutUseCase: locator(),
         listenDownloadProgressUseCase: locator(),
       ),
       child: MoreScreen(
@@ -49,12 +43,9 @@ class MoreScreen extends StatelessWidget {
         onTapBackupRestore: onTapBackupRestore,
         onTapDownloadQueue: onTapDownloadQueue,
         onTapAbout: onTapAbout,
-        onTapLogin: onTapLogin,
       ),
     );
   }
-
-  MoreScreenCubit _cubit(BuildContext context) => context.read();
 
   BlocBuilder _builder({
     required BlocWidgetBuilder<MoreScreenState> builder,
@@ -74,10 +65,24 @@ class MoreScreen extends StatelessWidget {
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: Text(
-                'Manga Stash',
-                maxLines: 1,
-                style: Theme.of(context).textTheme.headlineLarge,
+              child: Column(
+                children: [
+                  Text(
+                    'Manga Stash',
+                    maxLines: 1,
+                    style: Theme.of(context).textTheme.headlineLarge,
+                  ),
+                  FutureBuilder(
+                    future: PackageInfo.fromPlatform(),
+                    builder: (context, snapshot) => Text(
+                      [
+                        snapshot.data?.version,
+                        '(${snapshot.data?.buildNumber})',
+                      ].join(' '),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -166,30 +171,6 @@ class MoreScreen extends StatelessWidget {
                   leading: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.help_outline),
-                  ),
-                ),
-                _builder(
-                  buildWhen: (prev, curr) => prev.authState != curr.authState,
-                  builder: (context, state) => Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: OutlinedButton(
-                      onPressed: state.authState?.status == AuthStatus.loggedOut
-                          ? onTapLogin
-                          : () => _cubit(context).logout(),
-                      child: state.authState?.status == AuthStatus.loggedOut
-                          ? const Text('Login')
-                          : const Text('Logout'),
-                    ),
-                  ),
-                ),
-                FutureBuilder(
-                  future: PackageInfo.fromPlatform(),
-                  builder: (context, snapshot) => Text(
-                    [
-                      snapshot.data?.version,
-                      '(${snapshot.data?.buildNumber})',
-                    ].join(' '),
-                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
