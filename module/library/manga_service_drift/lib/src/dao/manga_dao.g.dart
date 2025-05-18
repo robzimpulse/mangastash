@@ -8,4 +8,6 @@ mixin _$MangaDaoMixin on DatabaseAccessor<AppDatabase> {
   $MangaTagTablesTable get mangaTagTables => attachedDatabase.mangaTagTables;
   $MangaTagRelationshipTablesTable get mangaTagRelationshipTables =>
       attachedDatabase.mangaTagRelationshipTables;
+  $MangaLibraryTablesTable get mangaLibraryTables =>
+      attachedDatabase.mangaLibraryTables;
 }
