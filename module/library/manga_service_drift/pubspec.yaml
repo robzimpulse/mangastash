@@ -20,9 +20,7 @@ dependencies:
   path: ^1.9.0
   equatable: ^2.0.5
   drift_db_viewer: ^2.1.0
-
-  text_similarity:
-    path: ../../library/text_similarity
+  collection: ^1.16.0
 
 dev_dependencies:
   flutter_test:

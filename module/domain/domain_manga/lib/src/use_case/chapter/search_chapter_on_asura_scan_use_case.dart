@@ -35,7 +35,8 @@ class SearchChapterOnAsuraScanUseCase
   }) async {
     if (mangaId == null) return Error(Exception('Manga ID Empty'));
 
-    final result = await _mangaDao.getManga(mangaId);
+    final raw = await _mangaDao.getManga(mangaId);
+    final result = raw?.let((raw) => Manga.fromDrift(raw.$1, tags: raw.$2));
     final url = result?.webUrl;
 
     if (result == null || url == null) {

@@ -42,13 +42,10 @@ class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
           data: await sync(
             chapterDao: _chapterDao,
             logBox: _logBox,
-            values: data
-                .map(
-                  (e) => MangaChapter.from(data: e).copyWith(
-                    mangaId: mangaId,
-                  ),
-                )
-                .toList(),
+            values: [
+              for (final manga in data)
+                MangaChapter.from(data: manga).copyWith(mangaId: mangaId),
+            ],
           ),
           offset: result.offset?.toInt(),
           limit: result.limit?.toInt() ?? 0,

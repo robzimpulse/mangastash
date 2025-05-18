@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
@@ -20,22 +21,21 @@ class GetMangaOnAsuraScanUseCase with SyncMangasMixin {
         _webview = webview;
 
   Future<Result<Manga>> execute({required String mangaId}) async {
-    final result = await _mangaDao.getManga(mangaId);
+    final raw = await _mangaDao.getManga(mangaId);
+    final result = raw?.let((raw) => Manga.fromDrift(raw.$1, tags: raw.$2));
     final url = result?.webUrl;
 
     if (result == null || url == null) {
       return Error(Exception('Data not found'));
     }
 
-    final tags = await _mangaDao.getTags(mangaId);
-
     final isValid = [
       result.author != null,
       result.description != null,
-      tags.isNotEmpty,
+      result.tags?.isNotEmpty == true,
     ].every((e) => e);
 
-    if (isValid) return Success(Manga.fromDrift(result, tags: tags));
+    if (isValid) return Success(result);
 
     final document = await _webview.open(url);
 
@@ -89,7 +89,7 @@ class GetMangaOnAsuraScanUseCase with SyncMangasMixin {
       logBox: _logBox,
       mangaDao: _mangaDao,
       values: [
-        Manga.fromDrift(result).copyWith(
+        result.copyWith(
           source: MangaSourceEnum.asurascan,
           author: author,
           description: description,

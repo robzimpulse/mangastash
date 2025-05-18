@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
@@ -20,11 +21,11 @@ class GetMangaOnMangaDexUseCase with SyncMangasMixin {
         _logBox = logBox;
 
   Future<Result<Manga>> execute({required String mangaId}) async {
-    final result = await _mangaDao.getManga(mangaId);
-    final tags = await _mangaDao.getTags(mangaId);
+    final raw = await _mangaDao.getManga(mangaId);
+    final result = raw?.let((raw) => Manga.fromDrift(raw.$1, tags: raw.$2));
 
     if (result != null) {
-      return Success(Manga.fromDrift(result, tags: tags));
+      return Success(result);
     }
 
     try {
@@ -39,7 +40,7 @@ class GetMangaOnMangaDexUseCase with SyncMangasMixin {
         return Error(Exception('Manga not found'));
       }
 
-      final process = sync(
+      final process = await sync(
         logBox: _logBox,
         mangaDao: _mangaDao,
         values: [
@@ -49,7 +50,7 @@ class GetMangaOnMangaDexUseCase with SyncMangasMixin {
         ],
       );
 
-      final data = (await process).firstOrNull;
+      final data = process.firstOrNull;
 
       if (data == null) {
         return Error(Exception('Error syncing manga'));

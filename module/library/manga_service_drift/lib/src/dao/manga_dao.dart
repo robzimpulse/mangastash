@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
@@ -63,11 +64,31 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     return selector.get();
   }
 
-  Future<MangaDrift?> getManga(String id) {
-    final selector = select(mangaTables)
-      ..whereSamePrimaryKey(MangaTablesCompanion.insert(id: id));
+  Future<(MangaDrift, List<TagDrift>)?> getManga(String mangaId) async {
+    final joins = select(mangaTagRelationshipTables).join(
+      [
+        innerJoin(
+          mangaTagTables,
+          mangaTagTables.id.equalsExp(mangaTagRelationshipTables.tagId),
+        ),
+        innerJoin(
+          mangaTables,
+          mangaTables.id.equalsExp(mangaTagRelationshipTables.mangaId),
+        ),
+      ],
+    )..where(mangaTables.id.equals(mangaId));
 
-    return selector.getSingleOrNull();
+    final results = await joins.get();
+
+    final group = results.groupListsBy((e) => e.readTable(mangaTables));
+    final data = group.entries.map(
+      (e) => (
+        e.key,
+        e.value.map((e) => e.readTable(mangaTagTables)).toList(),
+      ),
+    );
+
+    return data.firstOrNull;
   }
 
   Future<List<MangaDrift>> updateManga(MangaTablesCompanion data) {
@@ -122,18 +143,6 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
       );
 
     return selector.get();
-  }
-
-  Future<List<TagDrift>> getTags(String mangaId) async {
-    final selector = select(mangaTagRelationshipTables)
-      ..where((f) => f.mangaId.equals(mangaId));
-
-    final tagIds = await selector.get();
-
-    final result = select(mangaTagTables)
-      ..where((f) => f.id.isIn(tagIds.map((e) => e.tagId)));
-
-    return result.get();
   }
 
   Future<List<TagDrift>> updateTag(MangaTagTablesCompanion data) {
