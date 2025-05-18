@@ -32,10 +32,18 @@ class Manga extends Equatable with SimilarityMixin {
   final MangaSourceEnum? source;
 
   @JsonKey(includeToJson: false, includeFromJson: false)
-  late final List<String> tagsName;
+  List<String> get tagsName => [...?tags?.map((e) => e.name).nonNulls];
 
   @JsonKey(includeToJson: false, includeFromJson: false)
-  late final Map<String, MangaTag> mapTagsByName;
+  Map<String, MangaTag> get mapTagsByName {
+    final Map<String, MangaTag> result = {};
+    for (final tag in tags ?? <MangaTag>[]) {
+      final name = tag.name;
+      if (name == null) continue;
+      result.update(name, (old) => tag, ifAbsent: () => tag);
+    }
+    return result;
+  }
 
   Manga({
     this.id,
@@ -47,20 +55,7 @@ class Manga extends Equatable with SimilarityMixin {
     this.tags,
     this.webUrl,
     this.source,
-  }) {
-    final Map<String, MangaTag> mapTagsByName = {};
-    final List<String> tagsName = [];
-
-    for (final tag in tags ?? <MangaTag>[]) {
-      final name = tag.name;
-      if (name == null) continue;
-      mapTagsByName[name] = tag;
-      tagsName.add(name);
-    }
-
-    this.mapTagsByName = mapTagsByName;
-    this.tagsName = tagsName;
-  }
+  });
 
   @override
   List<Object?> get props {

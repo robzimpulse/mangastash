@@ -101,7 +101,7 @@ mixin SyncMangasMixin {
       for (final (value, tagIds) in updatedMangas)
         Manga.fromDrift(
           value,
-          tags: updatedTags.where((e) => tagIds.contains(e)).toList(),
+          tags: updatedTags.where((e) => tagIds.contains(e.id)).toList(),
         ),
     ];
   }

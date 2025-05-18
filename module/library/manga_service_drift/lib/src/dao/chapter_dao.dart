@@ -46,8 +46,8 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
     final selector = select(mangaChapterTables)
       ..where(
         (f) => [
-          for (final e in ids.nonEmpty.distinct) f.id.equals(e),
-          for (final e in mangaIds.nonEmpty.distinct) f.mangaId.equals(e),
+          f.id.isIn(ids.nonEmpty.distinct),
+          f.mangaId.isIn(mangaIds.nonEmpty.distinct),
           for (final e in mangaTitles.nonEmpty.distinct)
             f.mangaTitle.like('%$e%'),
           for (final e in titles.nonEmpty.distinct) f.title.like('%$e%'),

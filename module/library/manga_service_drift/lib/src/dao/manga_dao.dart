@@ -46,7 +46,7 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     final selector = select(mangaTables)
       ..where(
         (f) => [
-          for (final e in ids.nonEmpty.distinct) f.id.equals(e),
+          f.id.isIn(ids.nonEmpty.distinct),
           for (final e in titles.nonEmpty.distinct) f.title.like('%$e%'),
           for (final e in coverUrls.nonEmpty.distinct) f.coverUrl.like('%$e%'),
           for (final e in authors.nonEmpty.distinct) f.author.like('%$e%'),
@@ -114,8 +114,8 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     final selector = select(mangaTagTables)
       ..where(
         (f) => [
-          for (final e in ids.nonEmpty.distinct) f.id.equals(e),
-          for (final e in names.nonEmpty.distinct) f.name.equals(e),
+          f.id.isIn(ids.nonEmpty.distinct),
+          f.name.isIn(names.nonEmpty.distinct),
         ].reduce((a, b) => a | b),
       );
 
@@ -123,23 +123,15 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
   }
 
   Future<List<TagDrift>> getTags(String mangaId) async {
-    final selector = select(mangaTagRelationshipTables).join(
-      [
-        innerJoin(
-          mangaTagTables,
-          mangaTagTables.id.equalsExp(
-            mangaTagRelationshipTables.mangaId,
-          ),
-        ),
-      ],
-    );
+    final selector = select(mangaTagRelationshipTables)
+      ..where((f) => f.mangaId.equals(mangaId));
 
-    final values = await selector.get();
+    final tagIds = await selector.get();
 
-    return values
-        .map((e) => e.readTableOrNull(mangaTagTables))
-        .nonNulls
-        .toList();
+    final result = select(mangaTagTables)
+      ..where((f) => f.id.isIn(tagIds.map((e) => e.tagId)));
+
+    return result.get();
   }
 
   Future<List<TagDrift>> updateTag(MangaTagTablesCompanion data) {
