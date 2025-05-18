@@ -28,8 +28,9 @@ mixin SyncChaptersMixin {
     for (final chapter in values) {
       final match = results.firstWhereOrNull(
         (e) => [
-          e.title == chapter.mangaTitle,
-          e.webUrl == chapter.mangaId,
+          e.mangaTitle == chapter.mangaTitle,
+          e.mangaId == chapter.mangaId,
+          e.webUrl == chapter.webUrl,
         ].every((isTrue) => isTrue),
       );
       final data = chapter.copyWith(id: chapter.id ?? match?.id).toDrift;
