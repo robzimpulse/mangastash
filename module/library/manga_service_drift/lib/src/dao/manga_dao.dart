@@ -80,6 +80,13 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
 
     final results = await joins.get();
 
+    if (results.isEmpty) {
+      final selector = select(mangaTables)..where((f) => f.id.equals(mangaId));
+      final result = await selector.getSingleOrNull();
+      if (result != null) return (result, <TagDrift>[]);
+      return null;
+    }
+
     final group = results.groupListsBy((e) => e.readTable(mangaTables));
     final data = group.entries.map(
       (e) => (
