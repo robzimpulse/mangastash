@@ -30,7 +30,14 @@ class ItemColumn extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(name!, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Flexible(
+              child: Text(
+                name ?? 'Unknown',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
             Visibility(
               visible: showCopyButton,
               child: IconButton(

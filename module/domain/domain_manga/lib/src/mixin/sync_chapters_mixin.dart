@@ -64,6 +64,27 @@ mixin SyncChaptersMixin {
       name: 'Sync Process',
     );
 
+    {
+      final anomaly = <String, String>{};
+      final before = {for (final e in values) e.webUrl: e.id};
+      final after = {for (final (e, _) in updated) e.webUrl: e.id};
+      for (final key in {...before.keys, ...after.keys}.nonNulls) {
+        if (before[key] == null) continue;
+        if (before[key] == after[key]) continue;
+        anomaly[key] = '${before[key]} -> ${after[key]}';
+      }
+      if (anomaly.isNotEmpty) {
+        logBox.log(
+          'Anomaly Chapter',
+          extra: {
+            'changed record': anomaly.length,
+            ...anomaly,
+          },
+          name: 'Sync Process',
+        );
+      }
+    }
+
     return [
       for (final (chapter, images) in updated)
         MangaChapter.fromDrift(chapter, images: images),
