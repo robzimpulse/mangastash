@@ -21,6 +21,7 @@ dependencies:
   equatable: ^2.0.5
   drift_db_viewer: ^2.1.0
   collection: ^1.16.0
+  rxdart: ^0.27.7
 
 dev_dependencies:
   flutter_test:

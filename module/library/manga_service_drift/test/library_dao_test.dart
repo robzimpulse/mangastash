@@ -47,18 +47,18 @@ void main() {
         ),
       );
 
-      for (final tag in tags) {
-        await mangaDao.insertTag(tag);
-      }
+      // for (final tag in tags) {
+      //   await mangaDao.insertTag(tag);
+      // }
 
       for (final (index, manga) in mangas.indexed) {
         if (index.isEven) await libraryDao.add(manga.id.value);
         await mangaDao.insertManga(manga);
-        await mangaDao.unlinkAllTagFromManga(manga.id.value);
-        await mangaDao.linkTagToManga(
-          manga.id.value,
-          tags.map((e) => e.id.value),
-        );
+        // await mangaDao.unlinkAllTagFromManga(manga.id.value);
+        // await mangaDao.linkTagToManga(
+        //   manga.id.value,
+        //   tags.map((e) => e.id.value),
+        // );
       }
     });
 

@@ -65,7 +65,7 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
   }
 
   Future<(MangaDrift, List<TagDrift>)?> getManga(String mangaId) async {
-    final joins = select(mangaTagRelationshipTables).join(
+    final selector = select(mangaTagRelationshipTables).join(
       [
         innerJoin(
           mangaTagTables,
@@ -78,7 +78,7 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
       ],
     )..where(mangaTables.id.equals(mangaId));
 
-    final results = await joins.get();
+    final results = await selector.get();
 
     if (results.isEmpty) {
       final selector = select(mangaTables)..where((f) => f.id.equals(mangaId));
