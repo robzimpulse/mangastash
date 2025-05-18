@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../manga_service_firebase.dart';
+import '../model/manga_firebase.dart';
+import '../util/typedef.dart';
 
 class MangaDetailServiceFirebase {
   final CollectionReference<Map<String, dynamic>> _ref;

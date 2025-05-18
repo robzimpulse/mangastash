@@ -3,7 +3,6 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
-import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:text_similarity/text_similarity.dart';
 
 part 'manga_chapter.g.dart';
@@ -75,40 +74,6 @@ class MangaChapter extends Equatable with SimilarityMixin {
 
   @override
   List<Object?> get similarProp => props;
-
-  factory MangaChapter.fromFirebaseService(MangaChapterFirebase chapter) {
-    return MangaChapter(
-      id: chapter.id,
-      mangaId: chapter.mangaId,
-      mangaTitle: chapter.mangaTitle,
-      title: chapter.title,
-      volume: chapter.volume,
-      chapter: chapter.chapter,
-      readableAt: chapter.readableAt,
-      publishAt: chapter.publishAt,
-      images: chapter.images,
-      translatedLanguage: chapter.translatedLanguage,
-      scanlationGroup: chapter.scanlationGroup,
-      webUrl: chapter.webUrl,
-    );
-  }
-
-  MangaChapterFirebase toFirebaseService() {
-    return MangaChapterFirebase(
-      id: id,
-      mangaId: mangaId,
-      mangaTitle: mangaTitle,
-      title: title,
-      volume: volume,
-      chapter: chapter,
-      readableAt: readableAt,
-      publishAt: publishAt,
-      images: images,
-      translatedLanguage: translatedLanguage,
-      scanlationGroup: scanlationGroup,
-      webUrl: webUrl,
-    );
-  }
 
   factory MangaChapter.fromDrift(
     ChapterDrift chapter, {
