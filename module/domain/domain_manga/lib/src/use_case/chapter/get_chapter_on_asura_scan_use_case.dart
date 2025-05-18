@@ -1,12 +1,12 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:html/dom.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_chapters_mixin.dart';
+import '../../parser/asura_scan_chapter_image_html_parser.dart';
 
 class GetChapterOnAsuraScanUseCase with SyncChaptersMixin {
   final ChapterDao _chapterDao;
@@ -46,26 +46,14 @@ class GetChapterOnAsuraScanUseCase with SyncChaptersMixin {
       return Error(Exception('Error parsing html'));
     }
 
-    final List<(int, String)> data = [];
-    final element = document.querySelector(
-      'div.py-8.-mx-5.flex.flex-col.items-center.justify-center',
-    );
-    for (final image in element?.querySelectorAll('img') ?? <Element>[]) {
-      final id = image.attributes['alt']?.split(' ').lastOrNull;
-      if (id == null) continue;
-      final url = image.attributes['src'];
-      final index = int.tryParse(id);
-      if (index == null || url == null) continue;
-      data.add((index, url.trim()));
-    }
-
-    final tmp = List.of(data)..sort((a, b) => a.$1.compareTo(b.$1));
-    final images = List.of(tmp.map((e) => e.$2));
-
     final chapters = await sync(
       chapterDao: _chapterDao,
       logBox: _logBox,
-      values: [result.copyWith(images: images)],
+      values: [
+        result.copyWith(
+          images: AsuraScanChapterImageHtmlParser(root: document).images,
+        ),
+      ],
     );
 
     final value = chapters.firstOrNull;
