@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -10,6 +9,7 @@ import '../../exception/failed_parsing_html_exception.dart';
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sort_chapters_mixin.dart';
 import '../../mixin/sync_chapters_mixin.dart';
+import '../../parser/manga_clash_chapter_list_html_parser.dart';
 
 class SearchChapterOnMangaClashUseCase
     with SyncChaptersMixin, SortChaptersMixin {
@@ -48,48 +48,14 @@ class SearchChapterOnMangaClashUseCase
       return Error(FailedParsingHtmlException(url));
     }
 
-    final List<MangaChapter> chapters = [];
-
-    for (final element in document.querySelectorAll('li.wp-manga-chapter')) {
-      final url = element.querySelector('a')?.attributes['href'];
-      final title = element.querySelector('a')?.text.split('-').lastOrNull;
-      final text = element.querySelector('a')?.text.split(' ').map(
-        (text) {
-          final value = double.tryParse(text);
-
-          if (value != null) {
-            final fraction = value - value.truncate();
-            if (fraction > 0.0) return value;
-          }
-
-          return int.tryParse(text);
-        },
-      );
-      final releaseDate = element
-          .querySelector('.chapter-release-date')
-          ?.text
-          .trim()
-          .asDateTime
-          ?.toIso8601String();
-      final chapter = text?.nonNulls.firstOrNull;
-
-      chapters.add(
-        MangaChapter(
-          mangaId: mangaId,
-          mangaTitle: result.title,
-          title: title?.trim(),
-          chapter: chapter != null ? '$chapter' : null,
-          readableAt: releaseDate,
-          webUrl: url,
-        ),
-      );
-    }
-
     final data = sortChapters(
       chapters: await sync(
         chapterDao: _chapterDao,
         logBox: _logBox,
-        values: chapters,
+        values: MangaClashChapterListHtmlParser(root: document)
+            .chapters
+            .map((e) => e.copyWith(mangaId: mangaId, mangaTitle: result.title))
+            .toList(),
       ),
       parameter: parameter,
     );
