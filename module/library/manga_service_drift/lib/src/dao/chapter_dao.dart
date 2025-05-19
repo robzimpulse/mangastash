@@ -113,7 +113,7 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
   Future<List<ImageDrift>> getImages(String chapterId) {
     final selector = select(mangaChapterImageTables)
       ..where((f) => f.chapterId.equals(chapterId))
-      ..orderBy([(f) => OrderingTerm(expression: f.id)]);
+      ..orderBy([(f) => OrderingTerm(expression: f.order)]);
 
     return selector.get();
   }
