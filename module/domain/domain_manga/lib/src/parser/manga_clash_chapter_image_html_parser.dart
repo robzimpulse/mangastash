@@ -1,12 +1,11 @@
 import 'package:collection/collection.dart';
-import 'package:html/dom.dart';
 
-class MangaClashChapterImageHtmlParser {
+import 'base/chapter_image_html_parser.dart';
 
-  final Document root;
+class MangaClashChapterImageHtmlParser extends ChapterImageHtmlParser {
+  MangaClashChapterImageHtmlParser({required super.root});
 
-  MangaClashChapterImageHtmlParser({required this.root});
-
+  @override
   List<String> get images {
     final region = root.querySelector('.reading-content');
     final containers = region?.querySelectorAll('img') ?? [];

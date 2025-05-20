@@ -1,12 +1,12 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:html/dom.dart';
 
-class MangaClashChapterListHtmlParser {
-  final Document root;
+import 'base/chapter_list_html_parser.dart';
 
-  MangaClashChapterListHtmlParser({required this.root});
+class MangaClashChapterListHtmlParser extends ChapterListHtmlParser {
+  MangaClashChapterListHtmlParser({required super.root});
 
+  @override
   List<MangaChapter> get chapters {
     final List<MangaChapter> data = [];
 

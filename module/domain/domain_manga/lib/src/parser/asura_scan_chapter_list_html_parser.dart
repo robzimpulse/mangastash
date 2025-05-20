@@ -2,11 +2,12 @@ import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:html/dom.dart';
 
-class AsuraScanChapterListHtmlParser {
-  final Document root;
+import 'base/chapter_list_html_parser.dart';
 
-  AsuraScanChapterListHtmlParser({required this.root});
+class AsuraScanChapterListHtmlParser extends ChapterListHtmlParser {
+  AsuraScanChapterListHtmlParser({required super.root});
 
+  @override
   List<MangaChapter> get chapters {
     final region = root.querySelector(
       [
