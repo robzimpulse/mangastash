@@ -36,9 +36,10 @@ class MangaClashMangaListHtmlParser extends MangaListHtmlParser {
           title: title,
           coverUrl: coverUrl,
           webUrl: webUrl,
-          source: MangaSourceEnum.mangaclash,
           status: toBeginningOfSentenceCase(status),
-          tags: genres?.map((e) => MangaTag(name: toBeginningOfSentenceCase(e))).toList(),
+          tags: genres
+              ?.map((e) => MangaTag(name: toBeginningOfSentenceCase(e)))
+              .toList(),
         ),
       );
     }

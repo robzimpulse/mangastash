@@ -33,18 +33,12 @@ class SearchMangaOnMangaDexUseCase with SyncMangasMixin {
         ),
       );
 
-      final mangas = result.data?.map(
-        (e) => Manga.from(data: e).copyWith(
-          source: MangaSourceEnum.mangadex,
-        ),
-      );
-
       return Success(
         Pagination(
           data: await sync(
             logBox: _logBox,
             mangaDao: _mangaDao,
-            values: mangas?.toList() ?? [],
+            values: result.data?.map((e) => Manga.from(data: e)).toList() ?? [],
           ),
           offset: result.offset?.toInt(),
           limit: result.limit?.toInt() ?? 0,
