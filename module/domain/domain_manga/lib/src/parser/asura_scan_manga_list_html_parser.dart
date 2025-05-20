@@ -24,7 +24,7 @@ class AsuraScanMangaListHtmlParser extends MangaListHtmlParser {
   }
 
   @override
-  bool get haveNextPage {
+  bool? get haveNextPage {
     final queries = [
       'a',
       'flex',
@@ -40,6 +40,9 @@ class AsuraScanMangaListHtmlParser extends MangaListHtmlParser {
 
     return region?.attributes['style'] == 'pointer-events:auto';
   }
+
+  @override
+  int? get total => null;
 
   AsuraScanMangaListHtmlParser({required super.root});
 }

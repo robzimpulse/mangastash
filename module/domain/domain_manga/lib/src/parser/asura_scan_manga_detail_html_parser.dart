@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 
 import 'base/manga_detail_html_parser.dart';
@@ -34,7 +35,9 @@ class AsuraScanMangaDetailHtmlParser extends MangaDetailHtmlParser {
     return Manga(
       author: author,
       description: description,
-      tags: genres?.map((e) => MangaTag(name: e)).toList(),
+      tags: genres
+          ?.map((e) => MangaTag(name: toBeginningOfSentenceCase(e)))
+          .toList(),
     );
   }
 }

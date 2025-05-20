@@ -6,6 +6,7 @@ import 'package:manga_service_drift/manga_service_drift.dart';
 
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
+import '../../parser/manga_clash_manga_detail_html_parser.dart';
 
 class GetMangaOnMangaClashUseCase with SyncMangasMixin {
   final MangaDao _mangaDao;
@@ -39,16 +40,12 @@ class GetMangaOnMangaClashUseCase with SyncMangasMixin {
       return Error(Exception('Error parsing html'));
     }
 
-    final description = document
-        .querySelector('div.description-summary')
-        ?.querySelectorAll('p')
-        .map((e) => e.text.trim())
-        .join('\n\n');
+    final manga = MangaClashMangaDetailHtmlParser(root: document);
 
     final process = await sync(
       logBox: _logBox,
       mangaDao: _mangaDao,
-      values: [result.copyWith(description: description)],
+      values: [manga.manga.merge(result)],
     );
 
     final data = process.firstOrNull;

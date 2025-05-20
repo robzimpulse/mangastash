@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:core_environment/core_environment.dart'
-    show toBeginningOfSentenceCase;
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
@@ -12,6 +10,7 @@ import 'package:manga_service_drift/manga_service_drift.dart';
 import '../../exception/failed_parsing_html_exception.dart';
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
+import '../../parser/manga_clash_manga_list_html_parser.dart';
 
 class SearchMangaOnMangaClashUseCaseUseCase with SyncMangasMixin {
   final HeadlessWebviewManager _webview;
@@ -52,56 +51,12 @@ class SearchMangaOnMangaClashUseCaseUseCase with SyncMangasMixin {
       return Error(FailedParsingHtmlException(url));
     }
 
-    final List<Manga> mangas = [];
-    for (final element in document.querySelectorAll('.c-tabs-item__content')) {
-      final title = element.querySelector('div.post-title')?.text.trim();
-      final webUrl = element
-          .querySelector('div.post-title')
-          ?.querySelector('a')
-          ?.attributes['href']
-          ?.trim();
-      final coverUrl = element
-          .querySelector('.tab-thumb')
-          ?.querySelector('img')
-          ?.attributes['data-src']
-          ?.trim();
-      final genres = element
-          .querySelector('div.post-content_item.mg_genres')
-          ?.querySelector('div.summary-content')
-          ?.text
-          .split(',')
-          .map((e) => toBeginningOfSentenceCase(e.trim()));
-      final status = element
-          .querySelector('div.post-content_item.mg_status')
-          ?.querySelector('div.summary-content')
-          ?.text
-          .trim();
-
-      mangas.add(
-        Manga(
-          title: title,
-          coverUrl: coverUrl,
-          webUrl: webUrl,
-          source: MangaSourceEnum.mangaclash,
-          status: toBeginningOfSentenceCase(status),
-          tags: genres?.map((e) => MangaTag(name: e)).toList(),
-        ),
-      );
-    }
-
-    final total = document
-        .querySelector('.wp-pagenavi')
-        ?.querySelector('.pages')
-        ?.text
-        .split(' ')
-        .map((e) => int.tryParse(e))
-        .nonNulls
-        .last;
+    final mangas = MangaClashMangaListHtmlParser(root: document);
 
     final data = await sync(
       logBox: _logBox,
       mangaDao: _mangaDao,
-      values: mangas,
+      values: mangas.mangas,
     );
 
     return Success(
@@ -109,7 +64,7 @@ class SearchMangaOnMangaClashUseCaseUseCase with SyncMangasMixin {
         data: data,
         page: page,
         limit: data.length,
-        total: total ?? data.length,
+        total: mangas.total ?? data.length,
         sourceUrl: url,
       ),
     );
