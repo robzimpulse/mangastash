@@ -1,10 +1,7 @@
 import 'dart:math';
 
-import 'package:core_environment/core_environment.dart'
-    show toBeginningOfSentenceCase;
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:html/dom.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
@@ -12,6 +9,7 @@ import 'package:manga_service_drift/manga_service_drift.dart';
 import '../../exception/failed_parsing_html_exception.dart';
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
+import '../../parser/asura_scan_manga_list_html_parser.dart';
 
 class SearchMangaOnAsuraScanUseCase with SyncMangasMixin {
   final HeadlessWebviewManager _webview;
@@ -51,59 +49,12 @@ class SearchMangaOnAsuraScanUseCase with SyncMangasMixin {
       return Error(FailedParsingHtmlException(url));
     }
 
-    final contentMangas = document
-        .querySelector(
-          [
-            'div',
-            'grid',
-            'grid-cols-2',
-            'gap-3',
-            'p-4',
-          ].join('.'),
-        )
-        ?.querySelectorAll('a');
-
-    final List<Manga> mangas = [];
-    for (final element in contentMangas ?? <Element>[]) {
-      final webUrl = [
-        'https://asuracomic.net',
-        element.attributes['href'],
-      ].join('/');
-      final status =
-          element.querySelector('span.status.bg-blue-700')?.text.trim();
-      final coverUrl =
-          element.querySelector('img.rounded-md')?.attributes['src'];
-      final title = element.querySelector('span.block.font-bold')?.text.trim();
-      mangas.add(
-        Manga(
-          title: title,
-          coverUrl: coverUrl,
-          webUrl: webUrl,
-          source: MangaSourceEnum.asurascan,
-          status: toBeginningOfSentenceCase(status),
-        ),
-      );
-    }
-
-    final contentPagination = document.querySelector(
-      [
-        'a',
-        'flex',
-        'items-center',
-        'bg-themecolor',
-        'text-white',
-        'px-8',
-        'text-center',
-        'cursor-pointer',
-      ].join('.'),
-    );
-    final haveNextPage =
-        contentPagination?.attributes['style'] == 'pointer-events:auto';
+    final mangas = AsuraScanMangaListHtmlParser(root: document);
 
     final data = await sync(
       logBox: _logBox,
       mangaDao: _mangaDao,
-      values: mangas,
+      values: mangas.mangas,
     );
 
     return Success(
@@ -112,7 +63,7 @@ class SearchMangaOnAsuraScanUseCase with SyncMangasMixin {
         page: page,
         limit: data.length,
         total: data.length,
-        hasNextPage: haveNextPage,
+        hasNextPage: mangas.haveNextPage,
         sourceUrl: url,
       ),
     );

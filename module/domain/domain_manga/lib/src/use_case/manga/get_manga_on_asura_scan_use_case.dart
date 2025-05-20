@@ -6,6 +6,7 @@ import 'package:manga_service_drift/manga_service_drift.dart';
 
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
+import '../../parser/asura_scan_manga_detail_html_parser.dart';
 
 class GetMangaOnAsuraScanUseCase with SyncMangasMixin {
   final MangaDao _mangaDao;
@@ -43,58 +44,13 @@ class GetMangaOnAsuraScanUseCase with SyncMangasMixin {
       return Error(Exception('Error parsing html'));
     }
 
-    final content = document.querySelector(
-      [
-        'div',
-        'float-left',
-        'relative',
-        'z-0',
-      ].join('.'),
-    );
-
-    final description =
-        content?.querySelector('span.font-medium.text-sm')?.text.trim();
-
-    final metas = content
-        ?.querySelector(
-          [
-            'div.grid',
-            'grid-cols-1',
-            'gap-5',
-            'mt-8',
-          ].join('.'),
-        )
-        ?.children
-        .map(
-      (e) {
-        final first = e.querySelector('h3.font-medium.text-sm');
-        return MapEntry(
-          first?.text.trim(),
-          first?.nextElementSibling?.text.trim(),
-        );
-      },
-    );
-
-    final metadata = Map.fromEntries(metas ?? <MapEntry<String?, String>>[]);
-
-    final author = metadata['Author'];
-
-    final genres = content
-        ?.querySelector('div.space-y-1.pt-4')
-        ?.querySelector('div.flex.flex-row.flex-wrap.gap-3')
-        ?.children
-        .map((e) => e.text.trim());
+    final manga = AsuraScanMangaDetailHtmlParser(root: document);
 
     final process = sync(
       logBox: _logBox,
       mangaDao: _mangaDao,
       values: [
-        result.copyWith(
-          source: MangaSourceEnum.asurascan,
-          author: author,
-          description: description,
-          tags: genres?.map((e) => MangaTag(name: e)).toList(),
-        ),
+        manga.manga.merge(result).copyWith(source: MangaSourceEnum.asurascan),
       ],
     );
 
