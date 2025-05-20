@@ -1,26 +1,33 @@
+import 'dart:math';
+
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
+import 'package:manga_service_drift/manga_service_drift.dart';
 
-import 'search_manga_on_asura_scan_use_case.dart';
-import 'search_manga_on_manga_clash_use_case.dart';
+import '../../exception/failed_parsing_html_exception.dart';
+import '../../extension/search_url_mixin.dart';
+import '../../manager/headless_webview_manager.dart';
+import '../../mixin/sync_mangas_mixin.dart';
+import '../../parser/base/manga_list_html_parser.dart';
 import 'search_manga_on_mangadex_use_case.dart';
 
-class SearchMangaUseCase {
+class SearchMangaUseCase with SyncMangasMixin {
   final SearchMangaOnMangaDexUseCase _searchMangaOnMangaDexUseCase;
-  final SearchMangaOnMangaClashUseCaseUseCase
-      _searchMangaOnMangaClashUseCaseUseCase;
-  final SearchMangaOnAsuraScanUseCase _searchMangaOnAsuraScanUseCase;
+  final HeadlessWebviewManager _webview;
+  final MangaDao _mangaDao;
+  final LogBox _logBox;
 
   const SearchMangaUseCase({
     required SearchMangaOnMangaDexUseCase searchMangaOnMangaDexUseCase,
-    required SearchMangaOnMangaClashUseCaseUseCase
-        searchMangaOnMangaClashUseCaseUseCase,
-    required SearchMangaOnAsuraScanUseCase searchMangaOnAsuraScanUseCase,
+    required HeadlessWebviewManager webview,
+    required MangaDao mangaDao,
+    required LogBox logBox,
   })  : _searchMangaOnMangaDexUseCase = searchMangaOnMangaDexUseCase,
-        _searchMangaOnMangaClashUseCaseUseCase =
-            searchMangaOnMangaClashUseCaseUseCase,
-        _searchMangaOnAsuraScanUseCase = searchMangaOnAsuraScanUseCase;
+        _mangaDao = mangaDao,
+        _webview = webview,
+        _logBox = logBox;
 
   Future<Result<Pagination<Manga>>> execute({
     required MangaSourceEnum? source,
@@ -28,19 +35,44 @@ class SearchMangaUseCase {
   }) async {
     if (source == null) return Error(Exception('Empty Source'));
 
-    final result = await switch (source) {
-      MangaSourceEnum.mangadex => _searchMangaOnMangaDexUseCase.execute(
-          parameter: parameter,
-        ),
-      MangaSourceEnum.asurascan => _searchMangaOnAsuraScanUseCase.execute(
-          parameter: parameter,
-        ),
-      MangaSourceEnum.mangaclash =>
-        _searchMangaOnMangaClashUseCaseUseCase.execute(
-          parameter: parameter,
-        ),
+    if (source == MangaSourceEnum.mangadex) {
+      return _searchMangaOnMangaDexUseCase.execute(parameter: parameter);
+    }
+
+    final page = max(1, parameter.page ?? 0);
+
+    final url = switch (source) {
+      MangaSourceEnum.mangadex => '',
+      MangaSourceEnum.asurascan => parameter.asurascan,
+      MangaSourceEnum.mangaclash => parameter.mangaclash,
     };
 
-    return result;
+    final document = await _webview.open(url);
+
+    if (document == null) {
+      return Error(FailedParsingHtmlException(url));
+    }
+
+    final parser = MangaListHtmlParser.forSource(
+      root: document,
+      source: source,
+    );
+
+    final data = await sync(
+      mangaDao: _mangaDao,
+      values: parser.mangas,
+      logBox: _logBox,
+    );
+
+    return Success(
+      Pagination(
+        data: data,
+        page: page,
+        limit: parser.mangas.length,
+        total: parser.total,
+        hasNextPage: parser.haveNextPage,
+        sourceUrl: url,
+      ),
+    );
   }
 }
