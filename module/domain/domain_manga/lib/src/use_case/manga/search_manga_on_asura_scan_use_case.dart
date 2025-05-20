@@ -7,6 +7,7 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 
 import '../../exception/failed_parsing_html_exception.dart';
+import '../../extension/search_url_mixin.dart';
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../parser/asura_scan_manga_list_html_parser.dart';
@@ -28,20 +29,7 @@ class SearchMangaOnAsuraScanUseCase with SyncMangasMixin {
     required SearchMangaParameter parameter,
   }) async {
     final page = max(1, parameter.page ?? 0);
-    final url = [
-      [
-        'https://asuracomic.net',
-        'series',
-      ].join('/'),
-      {
-        'name': parameter.title ?? '',
-        'page': page,
-        if (parameter.orders?.containsKey(SearchOrders.rating) == true)
-          'order': 'rating',
-        if (parameter.orders?.containsKey(SearchOrders.updatedAt) == true)
-          'order': 'update',
-      }.entries.map((e) => '${e.key}=${e.value}').join('&'),
-    ].join('?');
+    final url = parameter.asurascan;
 
     final document = await _webview.open(url);
 
