@@ -25,7 +25,7 @@ class CachedNetworkImageWidget extends StatelessWidget {
 
   final Widget Function(
     BuildContext context,
-    double progress,
+    double? progress,
   )? progressBuilder;
 
   final ImageErrorWidgetBuilder? errorBuilder;
@@ -65,7 +65,7 @@ class CachedNetworkImageWidget extends StatelessWidget {
                 const fallback = SizedBox.shrink();
 
                 if (data == null) {
-                  return progressBuilder?.call(context, 0.0) ?? fallback;
+                  return progressBuilder?.call(context, null) ?? fallback;
                 }
 
                 if (data is FileInfo) {
@@ -79,7 +79,7 @@ class CachedNetworkImageWidget extends StatelessWidget {
                 }
 
                 if (data is DownloadProgress) {
-                  final progress = data.progress ?? 0;
+                  final progress = data.progress;
                   return progressBuilder?.call(context, progress) ?? fallback;
                 }
 
