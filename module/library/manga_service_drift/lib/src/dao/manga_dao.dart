@@ -23,6 +23,112 @@ part 'manga_dao.g.dart';
 class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
   MangaDao(AppDatabase db) : super(db);
 
+  Future<Map<MangaDrift, List<TagDrift>>> sync(
+    Map<MangaTablesCompanion, List<MangaTagTablesCompanion>> values,
+  ) async {
+    final tags = values.values.expand((e) => e);
+    final mangas = values.keys;
+
+    final existingMangas = await searchMangas(
+      ids: mangas.map((e) => e.id.valueOrNull).nonNulls.toList(),
+      titles: mangas.map((e) => e.title.valueOrNull).nonNulls.toList(),
+      webUrls: mangas.map((e) => e.webUrl.valueOrNull).nonNulls.toList(),
+      sources: mangas.map((e) => e.source.valueOrNull).nonNulls.toList(),
+    );
+
+    final existingTags = await searchTags(
+      ids: tags.map((e) => e.id.valueOrNull).nonNulls.toList(),
+      names: tags.map((e) => e.name.valueOrNull).nonNulls.toList(),
+    );
+
+    return transaction(() async {
+      final results = <MangaDrift, List<TagDrift>>{};
+      for (final entry in values.entries) {
+        final mangaId = entry.key.id.valueOrNull;
+
+        if (mangaId != null) {
+          await unlinkAllTagFromManga(mangaId);
+        }
+
+        final matchManga = existingMangas.firstWhereOrNull(
+          (e) => [
+            if (mangaId != null) ...[
+              e.id == mangaId,
+            ] else ...[
+              e.title == entry.key.title.valueOrNull,
+              e.webUrl == entry.key.webUrl.valueOrNull,
+              e.source == entry.key.source.valueOrNull,
+            ],
+          ].every((isTrue) => isTrue),
+        );
+
+        final updatesManga = matchManga != null
+            ? await updateManga(entry.key.copyWith(id: Value(matchManga.id)))
+            : [await insertManga(entry.key)];
+
+        if (updatesManga.length > 1) {
+          throw Exception(
+            'Multiple mangas updated on title ${entry.key.title}',
+          );
+        }
+
+        final updatedManga = updatesManga.firstOrNull;
+
+        if (updatedManga == null) {
+          throw Exception(
+            'No mangas updated on title ${entry.key.title}',
+          );
+        }
+
+        results.update(updatedManga, (old) => [], ifAbsent: () => []);
+
+        for (final tag in entry.value) {
+          final tagId = tag.id.valueOrNull;
+          final matchTag = existingTags.firstWhereOrNull(
+            (e) => [
+              if (tagId != null) ...[
+                e.id == tagId,
+              ] else ...[
+                e.name == tag.name.valueOrNull,
+              ],
+            ].every((isTrue) => isTrue),
+          );
+
+          final updatesTag = matchTag != null
+              ? await updateTag(tag.copyWith(id: Value(matchTag.id)))
+              : [await insertTag(tag)];
+
+          if (updatesTag.length > 1) {
+            throw Exception(
+              'Multiple tag updated on tag name ${tag.name.valueOrNull}',
+            );
+          }
+
+          final updatedTag = updatesTag.firstOrNull;
+          final updatedTagId = updatedTag?.id;
+
+          if (updatedTag == null) {
+            throw Exception(
+              'No manga updated on tag ${tag.name.valueOrNull}',
+            );
+          }
+
+          if (mangaId != null && updatedTagId != null) {
+            await linkTagToManga(mangaId, [updatedTagId]);
+          }
+
+          results.update(
+            updatedManga,
+            (old) => [...old, updatedTag],
+            ifAbsent: () => [updatedTag],
+          );
+        }
+      }
+
+      return results;
+    });
+  }
+
   Future<List<MangaDrift>> searchMangas({
     List<String> ids = const [],
     List<String> titles = const [],
@@ -61,41 +167,44 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
         ].reduce((a, b) => a | b),
       );
 
-    return selector.get();
+    return transaction(() => selector.get());
   }
 
   Future<(MangaDrift, List<TagDrift>)?> getManga(String mangaId) async {
-    final selector = select(mangaTagRelationshipTables).join(
-      [
-        innerJoin(
-          mangaTagTables,
-          mangaTagTables.id.equalsExp(mangaTagRelationshipTables.tagId),
+    return transaction(() async {
+      final selector = select(mangaTagRelationshipTables).join(
+        [
+          innerJoin(
+            mangaTagTables,
+            mangaTagTables.id.equalsExp(mangaTagRelationshipTables.tagId),
+          ),
+          innerJoin(
+            mangaTables,
+            mangaTables.id.equalsExp(mangaTagRelationshipTables.mangaId),
+          ),
+        ],
+      )..where(mangaTables.id.equals(mangaId));
+
+      final results = await selector.get();
+
+      if (results.isEmpty) {
+        final selector = select(mangaTables)
+          ..where((f) => f.id.equals(mangaId));
+        final result = await selector.getSingleOrNull();
+        if (result != null) return (result, <TagDrift>[]);
+        return null;
+      }
+
+      final group = results.groupListsBy((e) => e.readTable(mangaTables));
+      final data = group.entries.map(
+        (e) => (
+          e.key,
+          e.value.map((e) => e.readTable(mangaTagTables)).toList(),
         ),
-        innerJoin(
-          mangaTables,
-          mangaTables.id.equalsExp(mangaTagRelationshipTables.mangaId),
-        ),
-      ],
-    )..where(mangaTables.id.equals(mangaId));
+      );
 
-    final results = await selector.get();
-
-    if (results.isEmpty) {
-      final selector = select(mangaTables)..where((f) => f.id.equals(mangaId));
-      final result = await selector.getSingleOrNull();
-      if (result != null) return (result, <TagDrift>[]);
-      return null;
-    }
-
-    final group = results.groupListsBy((e) => e.readTable(mangaTables));
-    final data = group.entries.map(
-      (e) => (
-        e.key,
-        e.value.map((e) => e.readTable(mangaTagTables)).toList(),
-      ),
-    );
-
-    return data.firstOrNull;
+      return data.firstOrNull;
+    });
   }
 
   Future<List<MangaDrift>> updateManga(MangaTablesCompanion data) {
@@ -149,7 +258,7 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
         ].reduce((a, b) => a | b),
       );
 
-    return selector.get();
+    return transaction(() => selector.get());
   }
 
   Future<List<TagDrift>> updateTag(MangaTagTablesCompanion data) {
