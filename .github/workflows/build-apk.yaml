@@ -44,3 +44,20 @@ jobs:
         with:
           name: release
           path: build/app/outputs/apk/release/app-release.apk
+
+      - name: Send debug APK to telegram
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_GROUP_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: |
+            Here is the debug APK for ${{ github.event_name }}
+            Runner OS: ${{ runner.os }}
+            Event: ${{ github.event_name }}
+            Job ID: ${{ github.job }}
+            Triggered by: ${{ github.actor }}
+            Branch or TAG: ${{ github.ref }}
+            Base ref: ${{ github.base_ref }}
+            Head ref: ${{ github.head_ref }}
+            Commit SHA: ${{ github.sha }}
+          document: build/app/outputs/apk/release/app-release.apk
