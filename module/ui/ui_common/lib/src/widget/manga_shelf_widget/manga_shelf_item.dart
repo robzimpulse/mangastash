@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:flutter/material.dart';
 
+import '../cached_network_image_widget.dart';
 import 'manga_shelf_item_layout.dart';
 
 class MangaShelfItem extends StatelessWidget {
@@ -56,23 +56,21 @@ class MangaShelfItem extends StatelessWidget {
   Widget _list(BuildContext context) {
     return Row(
       children: [
-        CachedNetworkImage(
+        CachedNetworkImageWidget(
           cacheManager: cacheManager,
           imageUrl: coverUrl,
           width: 50,
           height: 50,
-          errorWidget: (context, url, error) => const Icon(Icons.error),
-          progressIndicatorBuilder: (context, url, progress) {
-            return Center(
-              child: SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  value: progress.progress,
-                ),
+          errorBuilder: (context, error, _) => const Icon(Icons.error),
+          progressBuilder: (context, _, progress) => Center(
+            child: SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                value: progress?.progress,
               ),
-            );
-          },
+            ),
+          ),
         ),
         Expanded(
           child: Padding(
@@ -90,20 +88,18 @@ class MangaShelfItem extends StatelessWidget {
                 : Colors.black.withOpacity(0.5),
             child: Padding(
               padding: const EdgeInsets.all(4),
-              child: CachedNetworkImage(
+              child: CachedNetworkImageWidget(
                 cacheManager: cacheManager,
                 imageUrl: sourceIconUrl ?? '',
                 fit: BoxFit.contain,
-                errorWidget: (context, _, error) => const Center(
+                errorBuilder: (context, error, _) => const Center(
                   child: Icon(Icons.error),
                 ),
-                progressIndicatorBuilder: (context, _, progress) {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      value: progress.progress,
-                    ),
-                  );
-                },
+                progressBuilder: (context, _, progress) => Center(
+                  child: CircularProgressIndicator(
+                    value: progress?.progress,
+                  ),
+                ),
               ),
             ),
           ),
@@ -121,15 +117,15 @@ class MangaShelfItem extends StatelessWidget {
             decoration: BoxDecoration(
               border: Border.all(color: Theme.of(context).dividerColor),
             ),
-            child: CachedNetworkImage(
+            child: CachedNetworkImageWidget(
               cacheManager: cacheManager,
               fit: BoxFit.fill,
               imageUrl: coverUrl,
-              errorWidget: (context, url, error) => const Center(
+              errorBuilder: (context, error, _) => const Center(
                 child: Icon(Icons.error),
               ),
-              progressIndicatorBuilder: (context, url, progress) => Center(
-                child: CircularProgressIndicator(value: progress.progress),
+              progressBuilder: (context, _, progress) => Center(
+                child: CircularProgressIndicator(value: progress?.progress),
               ),
             ),
           ),
@@ -168,20 +164,18 @@ class MangaShelfItem extends StatelessWidget {
                   : Colors.black.withOpacity(0.5),
               child: Padding(
                 padding: const EdgeInsets.all(4),
-                child: CachedNetworkImage(
+                child: CachedNetworkImageWidget(
                   cacheManager: cacheManager,
                   imageUrl: sourceIconUrl ?? '',
                   fit: BoxFit.contain,
-                  errorWidget: (context, _, error) => const Center(
+                  errorBuilder: (context, error, _) => const Center(
                     child: Icon(Icons.error),
                   ),
-                  progressIndicatorBuilder: (context, _, progress) {
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: progress.progress,
-                      ),
-                    );
-                  },
+                  progressBuilder: (context, _, progress) => Center(
+                    child: CircularProgressIndicator(
+                      value: progress?.progress,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -214,15 +208,15 @@ class MangaShelfItem extends StatelessWidget {
         Expanded(
           child: Stack(
             children: [
-              CachedNetworkImage(
+              CachedNetworkImageWidget(
                 cacheManager: cacheManager,
                 fit: BoxFit.fill,
                 imageUrl: coverUrl,
-                errorWidget: (context, url, error) => const Center(
+                errorBuilder: (context, error, _) => const Center(
                   child: Icon(Icons.error),
                 ),
-                progressIndicatorBuilder: (context, url, progress) => Center(
-                  child: CircularProgressIndicator(value: progress.progress),
+                progressBuilder: (context, _, progress) => Center(
+                  child: CircularProgressIndicator(value: progress?.progress),
                 ),
               ),
               if (sourceIconUrl != null) ...[
@@ -235,20 +229,18 @@ class MangaShelfItem extends StatelessWidget {
                     color: Colors.black.withOpacity(0.5),
                     child: Padding(
                       padding: const EdgeInsets.all(4),
-                      child: CachedNetworkImage(
+                      child: CachedNetworkImageWidget(
                         cacheManager: cacheManager,
                         imageUrl: sourceIconUrl ?? '',
                         fit: BoxFit.contain,
-                        errorWidget: (context, _, error) => const Center(
+                        errorBuilder: (context, error, _) => const Center(
                           child: Icon(Icons.error),
                         ),
-                        progressIndicatorBuilder: (context, _, progress) {
-                          return Center(
-                            child: CircularProgressIndicator(
-                              value: progress.progress,
-                            ),
-                          );
-                        },
+                        progressBuilder: (context, _, progress) => Center(
+                          child: CircularProgressIndicator(
+                            value: progress?.progress,
+                          ),
+                        ),
                       ),
                     ),
                   ),

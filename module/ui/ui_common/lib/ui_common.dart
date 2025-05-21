@@ -1,7 +1,6 @@
 library ui_common;
 
 export 'package:autoscale_tabbarview/autoscale_tabbarview.dart';
-export 'package:cached_network_image/cached_network_image.dart';
 export 'package:expandable/expandable.dart';
 export 'package:expansion_tile_group/expansion_tile_group.dart';
 export 'package:flutter/material.dart';
@@ -21,6 +20,7 @@ export 'src/route_bottom_sheet/language_picker_bottom_sheet.dart';
 export 'src/scaffold_screen.dart';
 export 'src/util/debounce.dart';
 export 'src/widget/adaptive_physic_list_view.dart';
+export 'src/widget/cached_network_image_widget.dart';
 export 'src/widget/flexible_app_bar_builder.dart';
 export 'src/widget/icon_with_text_widget.dart';
 export 'src/widget/manga_chapter_tile_widget.dart';

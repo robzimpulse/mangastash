@@ -1,10 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:intersperse/intersperse.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
+import 'cached_network_image_widget.dart';
 import 'shimmer_loading_widget.dart';
 
 class MangaDetailWidget extends StatelessWidget {
@@ -64,23 +64,21 @@ class MangaDetailWidget extends StatelessWidget {
               isLoading: isLoading,
               width: 100,
               height: 150,
-              child: CachedNetworkImage(
+              child: CachedNetworkImageWidget(
                 cacheManager: cacheManager,
                 imageUrl: coverUrl ?? '',
                 width: 100,
                 height: 150,
-                errorWidget: (context, url, error) => const Icon(Icons.error),
-                progressIndicatorBuilder: (context, url, progress) {
-                  return Center(
-                    child: SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        value: progress.progress,
-                      ),
+                errorBuilder: (context, error, _) => const Icon(Icons.error),
+                progressBuilder: (context, _, progress) => Center(
+                  child: SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      value: progress?.progress,
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 8),

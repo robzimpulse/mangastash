@@ -145,10 +145,10 @@ class MangaReaderScreen extends StatelessWidget {
         }
 
         return ListView.builder(
-          itemBuilder: (context, index) => CachedNetworkImage(
+          itemBuilder: (context, index) => CachedNetworkImageWidget(
             cacheManager: cacheManager,
             imageUrl: images[index],
-            errorWidget: (context, url, error) => ConstrainedBox(
+            errorBuilder: (context, error, _) => ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 300),
               child: Center(
                 child: Row(
@@ -160,7 +160,7 @@ class MangaReaderScreen extends StatelessWidget {
                 ),
               ),
             ),
-            progressIndicatorBuilder: (context, url, progress) {
+            progressBuilder: (context, _, progress) {
               return ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 300),
                 child: Center(
@@ -168,7 +168,7 @@ class MangaReaderScreen extends StatelessWidget {
                     width: 16,
                     height: 16,
                     child: CircularProgressIndicator(
-                      value: progress.progress,
+                      value: progress?.progress,
                     ),
                   ),
                 ),

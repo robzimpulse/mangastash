@@ -225,22 +225,20 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         fit: StackFit.expand,
         children: [
           Positioned.fill(
-            child: CachedNetworkImage(
+            child: CachedNetworkImageWidget(
               fit: BoxFit.cover,
               cacheManager: widget.cacheManager,
               imageUrl: state.manga?.coverUrl ?? '',
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-              progressIndicatorBuilder: (context, url, progress) {
-                return Center(
-                  child: SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      value: progress.progress,
-                    ),
+              errorBuilder: (context, error, _) => const Icon(Icons.error),
+              progressBuilder: (context, _, progress) => Center(
+                child: SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    value: progress?.progress,
                   ),
-                );
-              },
+                ),
+              ),
             ),
           ),
           Positioned.fill(

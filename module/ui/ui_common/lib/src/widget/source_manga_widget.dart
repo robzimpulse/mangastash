@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:flutter/material.dart';
 
+import 'cached_network_image_widget.dart';
 import 'shimmer_loading_widget.dart';
 
 class SourceMangaWidget extends StatelessWidget {
@@ -44,23 +44,21 @@ class SourceMangaWidget extends StatelessWidget {
         child: ShimmerLoading.circular(
           isLoading: isLoading,
           size: 16,
-          child: CachedNetworkImage(
+          child: CachedNetworkImageWidget(
             cacheManager: cacheManager,
             imageUrl: iconUrl,
             width: 16,
             height: 16,
-            errorWidget: (context, url, error) => const Icon(Icons.error),
-            progressIndicatorBuilder: (context, url, progress) {
-              return Center(
-                child: SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    value: progress.progress,
-                  ),
+            errorBuilder: (context, error, _) => const Icon(Icons.error),
+            progressBuilder: (context, _, progress) => Center(
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  value: progress?.progress,
                 ),
-              );
-            },
+              ),
+            ),
           ),
         ),
       ),

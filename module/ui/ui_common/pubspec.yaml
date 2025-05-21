@@ -10,7 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cached_network_image: ^3.3.0
   expandable: ^5.0.1
   responsive_framework: ^1.0.0
   intersperse: ^2.0.0
