@@ -113,8 +113,8 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
             );
           }
 
-          if (mangaId != null && updatedTagId != null) {
-            await linkTagToManga(mangaId, [updatedTagId]);
+          if (updatedTagId != null) {
+            await linkTagToManga(updatedManga.id, [updatedTagId]);
           }
 
           results.update(
