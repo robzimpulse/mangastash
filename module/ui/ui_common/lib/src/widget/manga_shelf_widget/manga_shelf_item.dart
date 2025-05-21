@@ -62,13 +62,9 @@ class MangaShelfItem extends StatelessWidget {
           width: 50,
           height: 50,
           errorBuilder: (context, error, _) => const Icon(Icons.error),
-          progressBuilder: (context, _, progress) => Center(
-            child: SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(
-                value: progress?.progress,
-              ),
+          progressBuilder: (context, progress) => Center(
+            child: CircularProgressIndicator(
+              value: progress,
             ),
           ),
         ),
@@ -95,9 +91,9 @@ class MangaShelfItem extends StatelessWidget {
                 errorBuilder: (context, error, _) => const Center(
                   child: Icon(Icons.error),
                 ),
-                progressBuilder: (context, _, progress) => Center(
+                progressBuilder: (context, progress) => Center(
                   child: CircularProgressIndicator(
-                    value: progress?.progress,
+                    value: progress,
                   ),
                 ),
               ),
@@ -124,8 +120,8 @@ class MangaShelfItem extends StatelessWidget {
               errorBuilder: (context, error, _) => const Center(
                 child: Icon(Icons.error),
               ),
-              progressBuilder: (context, _, progress) => Center(
-                child: CircularProgressIndicator(value: progress?.progress),
+              progressBuilder: (context, progress) => Center(
+                child: CircularProgressIndicator(value: progress),
               ),
             ),
           ),
@@ -171,9 +167,9 @@ class MangaShelfItem extends StatelessWidget {
                   errorBuilder: (context, error, _) => const Center(
                     child: Icon(Icons.error),
                   ),
-                  progressBuilder: (context, _, progress) => Center(
+                  progressBuilder: (context, progress) => Center(
                     child: CircularProgressIndicator(
-                      value: progress?.progress,
+                      value: progress,
                     ),
                   ),
                 ),
@@ -215,8 +211,8 @@ class MangaShelfItem extends StatelessWidget {
                 errorBuilder: (context, error, _) => const Center(
                   child: Icon(Icons.error),
                 ),
-                progressBuilder: (context, _, progress) => Center(
-                  child: CircularProgressIndicator(value: progress?.progress),
+                progressBuilder: (context, progress) => Center(
+                  child: CircularProgressIndicator(value: progress),
                 ),
               ),
               if (sourceIconUrl != null) ...[
@@ -236,9 +232,9 @@ class MangaShelfItem extends StatelessWidget {
                         errorBuilder: (context, error, _) => const Center(
                           child: Icon(Icons.error),
                         ),
-                        progressBuilder: (context, _, progress) => Center(
+                        progressBuilder: (context, progress) => Center(
                           child: CircularProgressIndicator(
-                            value: progress?.progress,
+                            value: progress,
                           ),
                         ),
                       ),

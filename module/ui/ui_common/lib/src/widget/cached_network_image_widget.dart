@@ -23,7 +23,10 @@ class CachedNetworkImageWidget extends StatelessWidget {
 
   final Map<String, String>? headers;
 
-  final ImageLoadingBuilder? progressBuilder;
+  final Widget Function(
+    BuildContext context,
+    double progress,
+  )? progressBuilder;
 
   final ImageErrorWidgetBuilder? errorBuilder;
 
@@ -33,14 +36,22 @@ class CachedNetworkImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.network(
-      imageUrl,
-      fit: fit,
-      headers: headers,
-      loadingBuilder: progressBuilder,
-      errorBuilder: errorBuilder,
+    return SizedBox(
       width: width,
       height: height,
+      child: Image.network(
+        imageUrl,
+        fit: fit,
+        headers: headers,
+        loadingBuilder: (context, child, event) {
+          final progress = event?.progress;
+          if (progress == null) return child;
+          return progressBuilder?.call(context, progress) ?? child;
+        },
+        errorBuilder: errorBuilder,
+        width: width,
+        height: height,
+      ),
     );
   }
 }

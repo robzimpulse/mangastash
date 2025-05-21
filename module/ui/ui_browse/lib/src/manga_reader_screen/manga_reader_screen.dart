@@ -160,20 +160,18 @@ class MangaReaderScreen extends StatelessWidget {
                 ),
               ),
             ),
-            progressBuilder: (context, _, progress) {
-              return ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 300),
-                child: Center(
-                  child: SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      value: progress?.progress,
-                    ),
+            progressBuilder: (context, progress) => ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 300),
+              child: Center(
+                child: SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    value: progress,
                   ),
                 ),
-              );
-            },
+              ),
+            ),
           ),
           itemCount: images.length,
         );
