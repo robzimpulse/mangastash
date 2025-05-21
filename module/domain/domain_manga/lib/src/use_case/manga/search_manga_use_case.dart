@@ -60,13 +60,13 @@ class SearchMangaUseCase with SyncMangasMixin {
 
     final data = await sync(
       mangaDao: _mangaDao,
-      values: parser.mangas,
+      values: parser.mangas.map((e) => e.copyWith(source: source)).toList(),
       logBox: _logBox,
     );
 
     return Success(
       Pagination(
-        data: data.map((e) => e.copyWith(source: source)).toList(),
+        data: data,
         page: page,
         limit: parser.mangas.length,
         total: parser.total,
