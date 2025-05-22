@@ -46,7 +46,7 @@ jobs:
           path: build/app/outputs/apk/release/app-release.apk
 
       - name: Send debug APK to telegram
-        uses: appleboy/telegram-action@v1.0.0
+        uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_GROUP_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
