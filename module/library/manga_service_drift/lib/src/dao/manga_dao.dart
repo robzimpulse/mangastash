@@ -172,11 +172,11 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     return transaction(() async {
       final selector = select(mangaTagRelationshipTables).join(
         [
-          innerJoin(
+          leftOuterJoin(
             mangaTagTables,
             mangaTagTables.id.equalsExp(mangaTagRelationshipTables.tagId),
           ),
-          innerJoin(
+          leftOuterJoin(
             mangaTables,
             mangaTables.id.equalsExp(mangaTagRelationshipTables.mangaId),
           ),

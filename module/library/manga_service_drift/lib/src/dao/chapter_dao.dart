@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
@@ -64,93 +65,169 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
     return selector.get();
   }
 
-  Future<List<ChapterDrift>> getChapters(String mangaId) {
-    final selector = select(mangaChapterTables)
-      ..where((f) => f.mangaId.equals(mangaId));
-
-    return selector.get();
-  }
-
-  Future<ChapterDrift?> getChapter(String chapterId) {
-    final selector = select(mangaChapterTables)
-      ..where((f) => f.id.equals(chapterId));
-
-    return selector.getSingleOrNull();
-  }
-
-  Future<ChapterDrift> insertChapter(MangaChapterTablesCompanion data) {
-    return transaction(
-      () => into(mangaChapterTables).insertReturning(
-        data.copyWith(
-          id: Value(data.id.valueOrNull ?? const Uuid().v4().toString()),
-          createdAt: Value(DateTime.now().toIso8601String()),
-          updatedAt: Value(DateTime.now().toIso8601String()),
-        ),
-        onConflict: DoUpdate(
-          (old) => data.copyWith(
-            id: Value(const Uuid().v4().toString()),
-            createdAt: Value(DateTime.now().toIso8601String()),
-            updatedAt: Value(DateTime.now().toIso8601String()),
+  Future<Map<ChapterDrift, List<ImageDrift>>> getChapters({
+    required String mangaId,
+  }) async {
+    return transaction(() async {
+      final selector = select(mangaChapterTables).join(
+        [
+          leftOuterJoin(
+            mangaChapterImageTables,
+            mangaChapterImageTables.chapterId.equalsExp(mangaChapterTables.id),
           ),
+        ],
+      )..where(mangaChapterTables.mangaId.equals(mangaId));
+
+      final results = await selector.get();
+
+      if (results.isEmpty) {
+        final selector = select(mangaChapterTables)
+          ..where((f) => f.mangaId.equals(mangaId));
+        final results = await selector.get();
+        return {for (final e in results) e: <ImageDrift>[]};
+      }
+
+      final groups = results.groupListsBy(
+        (e) => e.readTable(mangaChapterTables),
+      );
+
+      return groups.map(
+        (key, images) => MapEntry(
+          key,
+          images.map((e) => e.readTable(mangaChapterImageTables)).toList(),
         ),
-      ),
-    );
+      );
+    });
   }
 
-  Future<List<ChapterDrift>> updateChapter(MangaChapterTablesCompanion data) {
-    final selector = update(mangaChapterTables)..whereSamePrimaryKey(data);
+  Future<(ChapterDrift, List<ImageDrift>)?> getChapter({
+    required String chapterId,
+  }) async {
+    return transaction(() async {
+      final selector = select(mangaChapterTables).join(
+        [
+          leftOuterJoin(
+            mangaChapterImageTables,
+            mangaChapterImageTables.chapterId.equalsExp(mangaChapterTables.id),
+          ),
+        ],
+      )..where(mangaChapterTables.id.equals(chapterId));
 
-    return transaction(
-      () => selector.writeReturning(
-        data.copyWith(
-          id: const Value.absent(),
-          updatedAt: Value(DateTime.now().toIso8601String()),
+      final results = await selector.get();
+
+      if (results.isEmpty) {
+        final selector = select(mangaChapterTables)
+          ..where((f) => f.id.equals(chapterId));
+        final result = await selector.getSingleOrNull();
+        if (result == null) return null;
+        return (result, <ImageDrift>[]);
+      }
+
+      final group = results.groupListsBy(
+        (e) => e.readTable(mangaChapterTables),
+      );
+
+      final data = group.entries.map(
+        (e) => (
+          e.key,
+          e.value
+              .map((e) => e.readTable(mangaChapterImageTables))
+              .sortedBy<num>((e) => e.order)
+              .toList(),
         ),
-      ),
-    );
+      );
+
+      return data.firstOrNull;
+    });
   }
 
-  Future<List<ImageDrift>> getImages(String chapterId) {
-    final selector = select(mangaChapterImageTables)
-      ..where((f) => f.chapterId.equals(chapterId))
-      ..orderBy([(f) => OrderingTerm(expression: f.order)]);
-
-    return selector.get();
-  }
-
-  Future<List<ImageDrift>> setImages(String chapterId, List<String> images) {
-    final selector = delete(mangaChapterImageTables)
-      ..where((f) => f.chapterId.equals(chapterId));
-
-    return transaction(
-      () async {
-        await selector.go();
-
-        final datas = <ImageDrift>[];
-        for (final (index, image) in images.indexed) {
-          final data = MangaChapterImageTablesCompanion(
-            webUrl: Value(image),
-            chapterId: Value(chapterId),
-            order: Value(index),
-          );
-          final result = await into(mangaChapterImageTables).insertReturning(
-            data.copyWith(
-              id: Value(const Uuid().v4().toString()),
-              createdAt: Value(DateTime.now().toIso8601String()),
-              updatedAt: Value(DateTime.now().toIso8601String()),
-            ),
-            onConflict: DoUpdate(
-              (old) => data.copyWith(
-                id: Value(const Uuid().v4().toString()),
-                createdAt: Value(DateTime.now().toIso8601String()),
-                updatedAt: Value(DateTime.now().toIso8601String()),
-              ),
-            ),
-          );
-          datas.add(result);
-        }
-        return datas;
-      },
-    );
-  }
+  // Future<List<ChapterDrift>> getChapters(String mangaId) {
+  //   final selector = select(mangaChapterTables)
+  //     ..where((f) => f.mangaId.equals(mangaId));
+  //
+  //   return selector.get();
+  // }
+  //
+  // Future<ChapterDrift?> getChapter(String chapterId) {
+  //   final selector = select(mangaChapterTables)
+  //     ..where((f) => f.id.equals(chapterId));
+  //
+  //   return selector.getSingleOrNull();
+  // }
+  //
+  // Future<ChapterDrift> insertChapter(MangaChapterTablesCompanion data) {
+  //   return transaction(
+  //     () => into(mangaChapterTables).insertReturning(
+  //       data.copyWith(
+  //         id: Value(data.id.valueOrNull ?? const Uuid().v4().toString()),
+  //         createdAt: Value(DateTime.now().toIso8601String()),
+  //         updatedAt: Value(DateTime.now().toIso8601String()),
+  //       ),
+  //       onConflict: DoUpdate(
+  //         (old) => data.copyWith(
+  //           id: Value(const Uuid().v4().toString()),
+  //           createdAt: Value(DateTime.now().toIso8601String()),
+  //           updatedAt: Value(DateTime.now().toIso8601String()),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+  //
+  // Future<List<ChapterDrift>> updateChapter(MangaChapterTablesCompanion data) {
+  //   final selector = update(mangaChapterTables)..whereSamePrimaryKey(data);
+  //
+  //   return transaction(
+  //     () => selector.writeReturning(
+  //       data.copyWith(
+  //         id: const Value.absent(),
+  //         updatedAt: Value(DateTime.now().toIso8601String()),
+  //       ),
+  //     ),
+  //   );
+  // }
+  //
+  // Future<List<ImageDrift>> getImages(String chapterId) {
+  //   final selector = select(mangaChapterImageTables)
+  //     ..where((f) => f.chapterId.equals(chapterId))
+  //     ..orderBy([(f) => OrderingTerm(expression: f.order)]);
+  //
+  //   return selector.get();
+  // }
+  //
+  // Future<List<ImageDrift>> setImages(String chapterId, List<String> images) {
+  //   final selector = delete(mangaChapterImageTables)
+  //     ..where((f) => f.chapterId.equals(chapterId));
+  //
+  //   return transaction(
+  //     () async {
+  //       await selector.go();
+  //
+  //       final datas = <ImageDrift>[];
+  //       for (final (index, image) in images.indexed) {
+  //         final data = MangaChapterImageTablesCompanion(
+  //           webUrl: Value(image),
+  //           chapterId: Value(chapterId),
+  //           order: Value(index),
+  //         );
+  //         final result = await into(mangaChapterImageTables).insertReturning(
+  //           data.copyWith(
+  //             id: Value(const Uuid().v4().toString()),
+  //             createdAt: Value(DateTime.now().toIso8601String()),
+  //             updatedAt: Value(DateTime.now().toIso8601String()),
+  //           ),
+  //           onConflict: DoUpdate(
+  //             (old) => data.copyWith(
+  //               id: Value(const Uuid().v4().toString()),
+  //               createdAt: Value(DateTime.now().toIso8601String()),
+  //               updatedAt: Value(DateTime.now().toIso8601String()),
+  //             ),
+  //           ),
+  //         );
+  //         datas.add(result);
+  //       }
+  //       return datas;
+  //     },
+  //   );
+  // }
 }

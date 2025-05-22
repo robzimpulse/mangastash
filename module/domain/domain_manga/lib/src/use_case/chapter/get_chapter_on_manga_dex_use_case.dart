@@ -29,12 +29,9 @@ class GetChapterOnMangaDexUseCase with SyncChaptersMixin {
     required String chapterId,
     required String mangaId,
   }) async {
-    final raw = await _chapterDao.getChapter(chapterId);
+    final raw = await _chapterDao.getChapter(chapterId: chapterId);
     final result = await raw?.let(
-      (e) async => MangaChapter.fromDrift(
-        e,
-        images: await _chapterDao.getImages(chapterId),
-      ),
+      (e) async => MangaChapter.fromDrift(e.$1, images: e.$2),
     );
 
     if (result != null && result.images?.isNotEmpty == true) {
