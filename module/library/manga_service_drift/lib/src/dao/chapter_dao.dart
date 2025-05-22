@@ -19,6 +19,73 @@ part 'chapter_dao.g.dart';
 class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
   ChapterDao(AppDatabase db) : super(db);
 
+  Future<Map<ChapterDrift, List<ImageDrift>>> sync(
+    Map<MangaChapterTablesCompanion, List<String>> values,
+  ) async {
+    final chapters = values.keys;
+
+    final existing = await searchChapters(
+      ids: [...chapters.map((e) => e.id.valueOrNull).nonNulls],
+      mangaIds: [...chapters.map((e) => e.mangaId.valueOrNull).nonNulls],
+      mangaTitles: [...chapters.map((e) => e.mangaTitle.valueOrNull).nonNulls],
+      titles: [...chapters.map((e) => e.title.valueOrNull).nonNulls],
+      volumes: [...chapters.map((e) => e.volume.valueOrNull).nonNulls],
+      chapters: [...chapters.map((e) => e.chapter.valueOrNull).nonNulls],
+      translatedLanguages: [
+        ...chapters.map((e) => e.translatedLanguage.valueOrNull).nonNulls,
+      ],
+      scanlationGroups: [
+        ...chapters.map((e) => e.scanlationGroup.valueOrNull).nonNulls,
+      ],
+      webUrls: [...chapters.map((e) => e.webUrl.valueOrNull).nonNulls],
+    );
+
+    return transaction(() async {
+      final results = <ChapterDrift, List<ImageDrift>>{};
+      for (final entry in values.entries) {
+        final chapterId = entry.key.id.valueOrNull;
+
+        final matchChapter = existing.firstWhereOrNull(
+          (e) => [
+            if (chapterId != null) ...[
+              e.id == chapterId,
+            ] else ...[
+              e.mangaTitle == entry.key.mangaTitle.valueOrNull,
+              e.mangaId == entry.key.mangaId.valueOrNull,
+              e.webUrl == entry.key.webUrl.valueOrNull,
+            ],
+          ].every((isTrue) => isTrue),
+        );
+
+        final updatesChapter = matchChapter != null
+            ? await updateChapter(
+                entry.key.copyWith(id: Value(matchChapter.id)),
+              )
+            : [await insertChapter(entry.key)];
+
+        if (updatesChapter.length > 1) {
+          throw Exception(
+            'Multiple chapter updated on title ${entry.key.mangaTitle}',
+          );
+        }
+
+        final updatedChapter = updatesChapter.firstOrNull;
+
+        if (updatedChapter == null) {
+          throw Exception(
+            'No Chapter updated on title ${entry.key.mangaTitle}',
+          );
+        }
+
+        final images = await setImages(updatedChapter.id, entry.value);
+
+        results.update(updatedChapter, (old) => images, ifAbsent: () => images);
+      }
+
+      return results;
+    });
+  }
+
   Future<List<ChapterDrift>> searchChapters({
     List<String> ids = const [],
     List<String> mangaIds = const [],
@@ -131,7 +198,8 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
         (e) => (
           e.key,
           e.value
-              .map((e) => e.readTable(mangaChapterImageTables))
+              .map((e) => e.readTableOrNull(mangaChapterImageTables))
+              .nonNulls
               .sortedBy<num>((e) => e.order)
               .toList(),
         ),
@@ -154,38 +222,39 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
   //
   //   return selector.getSingleOrNull();
   // }
-  //
-  // Future<ChapterDrift> insertChapter(MangaChapterTablesCompanion data) {
-  //   return transaction(
-  //     () => into(mangaChapterTables).insertReturning(
-  //       data.copyWith(
-  //         id: Value(data.id.valueOrNull ?? const Uuid().v4().toString()),
-  //         createdAt: Value(DateTime.now().toIso8601String()),
-  //         updatedAt: Value(DateTime.now().toIso8601String()),
-  //       ),
-  //       onConflict: DoUpdate(
-  //         (old) => data.copyWith(
-  //           id: Value(const Uuid().v4().toString()),
-  //           createdAt: Value(DateTime.now().toIso8601String()),
-  //           updatedAt: Value(DateTime.now().toIso8601String()),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-  //
-  // Future<List<ChapterDrift>> updateChapter(MangaChapterTablesCompanion data) {
-  //   final selector = update(mangaChapterTables)..whereSamePrimaryKey(data);
-  //
-  //   return transaction(
-  //     () => selector.writeReturning(
-  //       data.copyWith(
-  //         id: const Value.absent(),
-  //         updatedAt: Value(DateTime.now().toIso8601String()),
-  //       ),
-  //     ),
-  //   );
-  // }
+
+  Future<ChapterDrift> insertChapter(MangaChapterTablesCompanion data) {
+    return transaction(
+      () => into(mangaChapterTables).insertReturning(
+        data.copyWith(
+          id: Value(data.id.valueOrNull ?? const Uuid().v4().toString()),
+          createdAt: Value(DateTime.now().toIso8601String()),
+          updatedAt: Value(DateTime.now().toIso8601String()),
+        ),
+        onConflict: DoUpdate(
+          (old) => data.copyWith(
+            id: Value(const Uuid().v4().toString()),
+            createdAt: Value(DateTime.now().toIso8601String()),
+            updatedAt: Value(DateTime.now().toIso8601String()),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<List<ChapterDrift>> updateChapter(MangaChapterTablesCompanion data) {
+    final selector = update(mangaChapterTables)..whereSamePrimaryKey(data);
+
+    return transaction(
+      () => selector.writeReturning(
+        data.copyWith(
+          id: const Value.absent(),
+          updatedAt: Value(DateTime.now().toIso8601String()),
+        ),
+      ),
+    );
+  }
+
   //
   // Future<List<ImageDrift>> getImages(String chapterId) {
   //   final selector = select(mangaChapterImageTables)
@@ -195,39 +264,39 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
   //   return selector.get();
   // }
   //
-  // Future<List<ImageDrift>> setImages(String chapterId, List<String> images) {
-  //   final selector = delete(mangaChapterImageTables)
-  //     ..where((f) => f.chapterId.equals(chapterId));
-  //
-  //   return transaction(
-  //     () async {
-  //       await selector.go();
-  //
-  //       final datas = <ImageDrift>[];
-  //       for (final (index, image) in images.indexed) {
-  //         final data = MangaChapterImageTablesCompanion(
-  //           webUrl: Value(image),
-  //           chapterId: Value(chapterId),
-  //           order: Value(index),
-  //         );
-  //         final result = await into(mangaChapterImageTables).insertReturning(
-  //           data.copyWith(
-  //             id: Value(const Uuid().v4().toString()),
-  //             createdAt: Value(DateTime.now().toIso8601String()),
-  //             updatedAt: Value(DateTime.now().toIso8601String()),
-  //           ),
-  //           onConflict: DoUpdate(
-  //             (old) => data.copyWith(
-  //               id: Value(const Uuid().v4().toString()),
-  //               createdAt: Value(DateTime.now().toIso8601String()),
-  //               updatedAt: Value(DateTime.now().toIso8601String()),
-  //             ),
-  //           ),
-  //         );
-  //         datas.add(result);
-  //       }
-  //       return datas;
-  //     },
-  //   );
-  // }
+  Future<List<ImageDrift>> setImages(String chapterId, List<String> images) {
+    final selector = delete(mangaChapterImageTables)
+      ..where((f) => f.chapterId.equals(chapterId));
+
+    return transaction(
+      () async {
+        await selector.go();
+
+        final datas = <ImageDrift>[];
+        for (final (index, image) in images.indexed) {
+          final data = MangaChapterImageTablesCompanion(
+            webUrl: Value(image),
+            chapterId: Value(chapterId),
+            order: Value(index),
+          );
+          final result = await into(mangaChapterImageTables).insertReturning(
+            data.copyWith(
+              id: Value(const Uuid().v4().toString()),
+              createdAt: Value(DateTime.now().toIso8601String()),
+              updatedAt: Value(DateTime.now().toIso8601String()),
+            ),
+            onConflict: DoUpdate(
+              (old) => data.copyWith(
+                id: Value(const Uuid().v4().toString()),
+                createdAt: Value(DateTime.now().toIso8601String()),
+                updatedAt: Value(DateTime.now().toIso8601String()),
+              ),
+            ),
+          );
+          datas.add(result);
+        }
+        return datas;
+      },
+    );
+  }
 }

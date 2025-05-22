@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
@@ -9,8 +8,27 @@ mixin SyncChaptersMixin {
     required List<MangaChapter> values,
     required LogBox logBox,
   }) async {
+    final before = {
+      for (final chapter in values) chapter.toDrift: (chapter.images ?? []),
+    };
 
-    return values;
+    final results = await chapterDao.sync(before);
+
+    final after = [
+      for (final result in results.entries)
+        MangaChapter.fromDrift(result.key, images: result.value),
+    ];
+
+    logBox.log(
+      'Insert & Update Chapter',
+      extra: {
+        'before': before.length,
+        'after': after.length,
+      },
+      name: 'Sync Process',
+    );
+
+    return after;
     // final results = await chapterDao.searchChapters(
     //   ids: values.map((e) => e.id).nonNulls.toList(),
     //   mangaIds: values.map((e) => e.mangaId).nonNulls.toList(),
