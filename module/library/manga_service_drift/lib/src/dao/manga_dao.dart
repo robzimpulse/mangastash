@@ -105,7 +105,6 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
           }
 
           final updatedTag = updatesTag.firstOrNull;
-          final updatedTagId = updatedTag?.id;
 
           if (updatedTag == null) {
             throw Exception(
@@ -113,15 +112,16 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
             );
           }
 
-          if (updatedTagId != null) {
-            await linkTagToManga(updatedManga.id, [updatedTagId]);
-          }
-
           results.update(
             updatedManga,
             (old) => [...old, updatedTag],
             ifAbsent: () => [updatedTag],
           );
+        }
+
+        final tagIds = results[updatedManga]?.map((e) => e.id);
+        if (tagIds != null) {
+          await linkTagToManga(updatedManga.id, tagIds);
         }
       }
 
