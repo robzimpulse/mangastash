@@ -38,9 +38,13 @@ class SearchMangaOnMangaDexUseCase with SyncMangasMixin {
           data: await sync(
             logBox: _logBox,
             mangaDao: _mangaDao,
-            values: result.data?.map((e) => Manga.from(data: e).copyWith(
-            source: MangaSourceEnum.mangadex,
-          )).toList() ?? [],
+            values: [
+              ...?result.data?.map(
+                (e) => Manga.from(data: e).copyWith(
+                  source: MangaSourceEnum.mangadex,
+                ),
+              ),
+            ],
           ),
           offset: result.offset?.toInt(),
           limit: result.limit?.toInt() ?? 0,
