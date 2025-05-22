@@ -129,6 +129,19 @@ class DownloadChapterUseCase with GenerateTaskIdMixin, UserAgentMixin {
       for (final task in tasks) {
         if (recordKeyedByTaskId[task.taskId] != null) continue;
         await _fileDownloader.enqueue(task);
+        _log.log(
+          '[$info] Success enqueue task',
+          extra: {
+            'id': task.taskId,
+            'url': task.url,
+            'base_directory': task.baseDirectory.toString(),
+            'directory': task.directory,
+            'filename': task.filename,
+            'group': task.group,
+            'headers': task.headers.toString(),
+          },
+          name: runtimeType.toString(),
+        );
       }
     }
 

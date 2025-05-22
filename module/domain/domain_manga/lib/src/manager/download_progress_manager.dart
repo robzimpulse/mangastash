@@ -175,6 +175,14 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
     );
 
     _progress.add(progress);
+
+    _log.log(
+      'Updating Progress',
+      extra: {
+        'data': progress.toString(),
+      },
+      name: runtimeType.toString(),
+    );
   }
 
   @override
