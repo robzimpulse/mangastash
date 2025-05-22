@@ -1,0 +1,25 @@
+name: Upload Artifact and Extract URL
+
+on:
+  push:
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Create sample file
+      run: echo "Hello Artifact!" > example.txt
+
+    - name: Upload artifact
+      id: upload_artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: my-artifact
+        path: example.txt
+
+    - name: Extract Artifact URL
+      run: |
+        echo "Artifact URL is: ${{ steps.upload_artifact.outputs.artifact-url }}"

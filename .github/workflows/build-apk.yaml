@@ -57,7 +57,5 @@ jobs:
             Job ID: ${{ github.job }}
             Triggered by: ${{ github.actor }}
             Branch or TAG: ${{ github.ref }}
-            Base ref: ${{ github.base_ref }}
-            Head ref: ${{ github.head_ref }}
             Commit SHA: ${{ github.sha }}
             Artifact URL is: ${{ steps.upload_artifact.outputs.artifact-url }}
