@@ -20,11 +20,17 @@ mixin SyncMangasMixin {
         Manga.fromDrift(result.key, tags: result.value),
     ];
 
+    final idsBefore = {...before.keys.map((e) => e.id.valueOrNull).nonNulls};
+    final idsAfter = {...after.map((e) => e.id).nonNulls};
+    final idsDifference = idsBefore.intersection(idsAfter);
+
     logBox.log(
       'Insert & Update Manga',
       extra: {
-        'before': before.length,
-        'after': after.length,
+        'before count': before.length,
+        'after count': after.length,
+        'inconsistent key count': idsDifference.length,
+        'inconsistent key': '$idsDifference'
       },
       name: 'Sync Process',
     );
