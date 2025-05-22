@@ -46,10 +46,6 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
       for (final entry in values.entries) {
         final mangaId = entry.key.id.valueOrNull;
 
-        if (mangaId != null) {
-          await unlinkAllTagFromManga(mangaId);
-        }
-
         final matchManga = existingMangas.firstWhereOrNull(
           (e) => [
             if (mangaId != null) ...[
@@ -118,6 +114,8 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
             ifAbsent: () => [updatedTag],
           );
         }
+
+        await unlinkAllTagFromManga(updatedManga.id);
 
         final tagIds = results[updatedManga]?.map((e) => e.id);
         if (tagIds != null) {
