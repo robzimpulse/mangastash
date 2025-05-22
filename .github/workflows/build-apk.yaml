@@ -60,4 +60,4 @@ jobs:
             Base ref: ${{ github.base_ref }}
             Head ref: ${{ github.head_ref }}
             Commit SHA: ${{ github.sha }}
-          document: build/app/outputs/apk/release/app-release.apk
+            Artifact URL is: ${{ steps.upload_artifact.outputs.artifact-url }}
