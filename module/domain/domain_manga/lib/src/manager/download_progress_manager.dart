@@ -62,9 +62,7 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
         _progress = BehaviorSubject.seeded(progress) {
     _streamSubscription = _fileDownloader.updates.distinct().listen(_onUpdate);
     for (final record in completeRecords) {
-      final task = record.task;
-      if (task is! DownloadTask) continue;
-      _moveFileToSharedStorage(task: task);
+      _moveFileToSharedStorage(status: record.status, task: record.task);
     }
   }
 
@@ -73,8 +71,12 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
   }
 
   Future<void> _moveFileToSharedStorage({
-    required DownloadTask task,
+    required TaskStatus status,
+    required Task task,
   }) async {
+    if (task is! DownloadTask) return;
+    if (status != TaskStatus.complete) return;
+
     String? path = await _fileDownloader.pathInSharedStorage(
       task.filename,
       SharedStorage.downloads,
@@ -115,9 +117,7 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
 
   void _moveFile(TaskUpdate event) {
     if (event is! TaskStatusUpdate) return;
-    final task = event.task;
-    if (task is! DownloadTask) return;
-    _moveFileToSharedStorage(task: task);
+    _moveFileToSharedStorage(status: event.status, task: event.task);
   }
 
   void _updateTasks(TaskUpdate event) {
@@ -179,7 +179,7 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
     _log.log(
       'Updating Progress',
       extra: {
-        'data': progress.toString(),
+        'data': event.toString(),
       },
       name: runtimeType.toString(),
     );
