@@ -2306,6 +2306,318 @@ class MangaTagRelationshipTablesCompanion
   }
 }
 
+class $FetchChapterJobTablesTable extends FetchChapterJobTables
+    with TableInfo<$FetchChapterJobTablesTable, FetchChapterJobDrift> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FetchChapterJobTablesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => DateTime.timestamp().toIso8601String());
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => DateTime.timestamp().toIso8601String());
+  static const VerificationMeta _mangaIdMeta =
+      const VerificationMeta('mangaId');
+  @override
+  late final GeneratedColumn<String> mangaId = GeneratedColumn<String>(
+      'manga_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _chapterIdMeta =
+      const VerificationMeta('chapterId');
+  @override
+  late final GeneratedColumn<String> chapterId = GeneratedColumn<String>(
+      'chapter_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+      'source', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [createdAt, updatedAt, mangaId, chapterId, source];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'fetch_chapter_job_tables';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<FetchChapterJobDrift> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
+    if (data.containsKey('manga_id')) {
+      context.handle(_mangaIdMeta,
+          mangaId.isAcceptableOrUnknown(data['manga_id']!, _mangaIdMeta));
+    } else if (isInserting) {
+      context.missing(_mangaIdMeta);
+    }
+    if (data.containsKey('chapter_id')) {
+      context.handle(_chapterIdMeta,
+          chapterId.isAcceptableOrUnknown(data['chapter_id']!, _chapterIdMeta));
+    } else if (isInserting) {
+      context.missing(_chapterIdMeta);
+    }
+    if (data.containsKey('source')) {
+      context.handle(_sourceMeta,
+          source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
+    } else if (isInserting) {
+      context.missing(_sourceMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {mangaId, chapterId, source};
+  @override
+  FetchChapterJobDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FetchChapterJobDrift(
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}updated_at'])!,
+      mangaId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}manga_id'])!,
+      chapterId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}chapter_id'])!,
+      source: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}source'])!,
+    );
+  }
+
+  @override
+  $FetchChapterJobTablesTable createAlias(String alias) {
+    return $FetchChapterJobTablesTable(attachedDatabase, alias);
+  }
+}
+
+class FetchChapterJobDrift extends DataClass
+    implements Insertable<FetchChapterJobDrift> {
+  final String createdAt;
+  final String updatedAt;
+  final String mangaId;
+  final String chapterId;
+  final String source;
+  const FetchChapterJobDrift(
+      {required this.createdAt,
+      required this.updatedAt,
+      required this.mangaId,
+      required this.chapterId,
+      required this.source});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    map['manga_id'] = Variable<String>(mangaId);
+    map['chapter_id'] = Variable<String>(chapterId);
+    map['source'] = Variable<String>(source);
+    return map;
+  }
+
+  FetchChapterJobTablesCompanion toCompanion(bool nullToAbsent) {
+    return FetchChapterJobTablesCompanion(
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      mangaId: Value(mangaId),
+      chapterId: Value(chapterId),
+      source: Value(source),
+    );
+  }
+
+  factory FetchChapterJobDrift.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FetchChapterJobDrift(
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      mangaId: serializer.fromJson<String>(json['mangaId']),
+      chapterId: serializer.fromJson<String>(json['chapterId']),
+      source: serializer.fromJson<String>(json['source']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+      'mangaId': serializer.toJson<String>(mangaId),
+      'chapterId': serializer.toJson<String>(chapterId),
+      'source': serializer.toJson<String>(source),
+    };
+  }
+
+  FetchChapterJobDrift copyWith(
+          {String? createdAt,
+          String? updatedAt,
+          String? mangaId,
+          String? chapterId,
+          String? source}) =>
+      FetchChapterJobDrift(
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        mangaId: mangaId ?? this.mangaId,
+        chapterId: chapterId ?? this.chapterId,
+        source: source ?? this.source,
+      );
+  FetchChapterJobDrift copyWithCompanion(FetchChapterJobTablesCompanion data) {
+    return FetchChapterJobDrift(
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      mangaId: data.mangaId.present ? data.mangaId.value : this.mangaId,
+      chapterId: data.chapterId.present ? data.chapterId.value : this.chapterId,
+      source: data.source.present ? data.source.value : this.source,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FetchChapterJobDrift(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('mangaId: $mangaId, ')
+          ..write('chapterId: $chapterId, ')
+          ..write('source: $source')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(createdAt, updatedAt, mangaId, chapterId, source);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FetchChapterJobDrift &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.mangaId == this.mangaId &&
+          other.chapterId == this.chapterId &&
+          other.source == this.source);
+}
+
+class FetchChapterJobTablesCompanion
+    extends UpdateCompanion<FetchChapterJobDrift> {
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<String> mangaId;
+  final Value<String> chapterId;
+  final Value<String> source;
+  final Value<int> rowid;
+  const FetchChapterJobTablesCompanion({
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.mangaId = const Value.absent(),
+    this.chapterId = const Value.absent(),
+    this.source = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FetchChapterJobTablesCompanion.insert({
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    required String mangaId,
+    required String chapterId,
+    required String source,
+    this.rowid = const Value.absent(),
+  })  : mangaId = Value(mangaId),
+        chapterId = Value(chapterId),
+        source = Value(source);
+  static Insertable<FetchChapterJobDrift> custom({
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<String>? mangaId,
+    Expression<String>? chapterId,
+    Expression<String>? source,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (mangaId != null) 'manga_id': mangaId,
+      if (chapterId != null) 'chapter_id': chapterId,
+      if (source != null) 'source': source,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FetchChapterJobTablesCompanion copyWith(
+      {Value<String>? createdAt,
+      Value<String>? updatedAt,
+      Value<String>? mangaId,
+      Value<String>? chapterId,
+      Value<String>? source,
+      Value<int>? rowid}) {
+    return FetchChapterJobTablesCompanion(
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      mangaId: mangaId ?? this.mangaId,
+      chapterId: chapterId ?? this.chapterId,
+      source: source ?? this.source,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (mangaId.present) {
+      map['manga_id'] = Variable<String>(mangaId.value);
+    }
+    if (chapterId.present) {
+      map['chapter_id'] = Variable<String>(chapterId.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FetchChapterJobTablesCompanion(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('mangaId: $mangaId, ')
+          ..write('chapterId: $chapterId, ')
+          ..write('source: $source, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2319,9 +2631,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MangaTagTablesTable mangaTagTables = $MangaTagTablesTable(this);
   late final $MangaTagRelationshipTablesTable mangaTagRelationshipTables =
       $MangaTagRelationshipTablesTable(this);
+  late final $FetchChapterJobTablesTable fetchChapterJobTables =
+      $FetchChapterJobTablesTable(this);
   late final MangaDao mangaDao = MangaDao(this as AppDatabase);
   late final ChapterDao chapterDao = ChapterDao(this as AppDatabase);
   late final LibraryDao libraryDao = LibraryDao(this as AppDatabase);
+  late final FetchChapterJobDao fetchChapterJobDao =
+      FetchChapterJobDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2332,7 +2648,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         mangaLibraryTables,
         mangaTables,
         mangaTagTables,
-        mangaTagRelationshipTables
+        mangaTagRelationshipTables,
+        fetchChapterJobTables
       ];
 }
 
@@ -3543,6 +3860,186 @@ typedef $$MangaTagRelationshipTablesTableProcessedTableManager
         ),
         MangaTagRelationshipTable,
         PrefetchHooks Function()>;
+typedef $$FetchChapterJobTablesTableCreateCompanionBuilder
+    = FetchChapterJobTablesCompanion Function({
+  Value<String> createdAt,
+  Value<String> updatedAt,
+  required String mangaId,
+  required String chapterId,
+  required String source,
+  Value<int> rowid,
+});
+typedef $$FetchChapterJobTablesTableUpdateCompanionBuilder
+    = FetchChapterJobTablesCompanion Function({
+  Value<String> createdAt,
+  Value<String> updatedAt,
+  Value<String> mangaId,
+  Value<String> chapterId,
+  Value<String> source,
+  Value<int> rowid,
+});
+
+class $$FetchChapterJobTablesTableFilterComposer
+    extends Composer<_$AppDatabase, $FetchChapterJobTablesTable> {
+  $$FetchChapterJobTablesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get mangaId => $composableBuilder(
+      column: $table.mangaId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get chapterId => $composableBuilder(
+      column: $table.chapterId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnFilters(column));
+}
+
+class $$FetchChapterJobTablesTableOrderingComposer
+    extends Composer<_$AppDatabase, $FetchChapterJobTablesTable> {
+  $$FetchChapterJobTablesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get mangaId => $composableBuilder(
+      column: $table.mangaId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get chapterId => $composableBuilder(
+      column: $table.chapterId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnOrderings(column));
+}
+
+class $$FetchChapterJobTablesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FetchChapterJobTablesTable> {
+  $$FetchChapterJobTablesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get mangaId =>
+      $composableBuilder(column: $table.mangaId, builder: (column) => column);
+
+  GeneratedColumn<String> get chapterId =>
+      $composableBuilder(column: $table.chapterId, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+}
+
+class $$FetchChapterJobTablesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $FetchChapterJobTablesTable,
+    FetchChapterJobDrift,
+    $$FetchChapterJobTablesTableFilterComposer,
+    $$FetchChapterJobTablesTableOrderingComposer,
+    $$FetchChapterJobTablesTableAnnotationComposer,
+    $$FetchChapterJobTablesTableCreateCompanionBuilder,
+    $$FetchChapterJobTablesTableUpdateCompanionBuilder,
+    (
+      FetchChapterJobDrift,
+      BaseReferences<_$AppDatabase, $FetchChapterJobTablesTable,
+          FetchChapterJobDrift>
+    ),
+    FetchChapterJobDrift,
+    PrefetchHooks Function()> {
+  $$FetchChapterJobTablesTableTableManager(
+      _$AppDatabase db, $FetchChapterJobTablesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FetchChapterJobTablesTableFilterComposer(
+                  $db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FetchChapterJobTablesTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FetchChapterJobTablesTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> createdAt = const Value.absent(),
+            Value<String> updatedAt = const Value.absent(),
+            Value<String> mangaId = const Value.absent(),
+            Value<String> chapterId = const Value.absent(),
+            Value<String> source = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              FetchChapterJobTablesCompanion(
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            mangaId: mangaId,
+            chapterId: chapterId,
+            source: source,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            Value<String> createdAt = const Value.absent(),
+            Value<String> updatedAt = const Value.absent(),
+            required String mangaId,
+            required String chapterId,
+            required String source,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              FetchChapterJobTablesCompanion.insert(
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            mangaId: mangaId,
+            chapterId: chapterId,
+            source: source,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$FetchChapterJobTablesTableProcessedTableManager
+    = ProcessedTableManager<
+        _$AppDatabase,
+        $FetchChapterJobTablesTable,
+        FetchChapterJobDrift,
+        $$FetchChapterJobTablesTableFilterComposer,
+        $$FetchChapterJobTablesTableOrderingComposer,
+        $$FetchChapterJobTablesTableAnnotationComposer,
+        $$FetchChapterJobTablesTableCreateCompanionBuilder,
+        $$FetchChapterJobTablesTableUpdateCompanionBuilder,
+        (
+          FetchChapterJobDrift,
+          BaseReferences<_$AppDatabase, $FetchChapterJobTablesTable,
+              FetchChapterJobDrift>
+        ),
+        FetchChapterJobDrift,
+        PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3562,4 +4059,6 @@ class $AppDatabaseManager {
       get mangaTagRelationshipTables =>
           $$MangaTagRelationshipTablesTableTableManager(
               _db, _db.mangaTagRelationshipTables);
+  $$FetchChapterJobTablesTableTableManager get fetchChapterJobTables =>
+      $$FetchChapterJobTablesTableTableManager(_db, _db.fetchChapterJobTables);
 }

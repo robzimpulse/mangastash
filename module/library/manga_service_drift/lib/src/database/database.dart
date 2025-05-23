@@ -6,9 +6,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 
 import '../dao/chapter_dao.dart';
+import '../dao/fetch_chapter_job_dao.dart';
 import '../dao/library_dao.dart';
 import '../dao/manga_dao.dart';
 import '../interceptor/log_interceptor.dart';
+import '../tables/fetch_chapter_job_tables.dart';
 import '../tables/manga_chapter_image_tables.dart';
 import '../tables/manga_chapter_tables.dart';
 import '../tables/manga_library_tables.dart';
@@ -27,11 +29,13 @@ part 'database.g.dart';
     MangaTables,
     MangaTagTables,
     MangaTagRelationshipTables,
+    FetchChapterJobTables,
   ],
   daos: [
     MangaDao,
     ChapterDao,
     LibraryDao,
+    FetchChapterJobDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {

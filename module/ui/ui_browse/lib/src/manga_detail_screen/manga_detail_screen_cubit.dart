@@ -204,9 +204,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
   Future<void> addToLibrary({String? userUid}) async {
     final manga = state.manga;
-
     if (manga == null) return;
-
     if (state.isOnLibrary) {
       await _removeFromLibraryUseCase.execute(manga: manga);
     } else {
@@ -220,9 +218,12 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   }
 
   Future<void> downloadAllChapter() async {
-    for (final chapter in state.processedChapters.values) {
-      await downloadChapter(chapter: chapter);
-    }
+    await Future.wait(
+      [
+        for (final chapter in state.processedChapters.values)
+          downloadChapter(chapter: chapter),
+      ],
+    );
   }
 
   void recrawl({required String url}) async {

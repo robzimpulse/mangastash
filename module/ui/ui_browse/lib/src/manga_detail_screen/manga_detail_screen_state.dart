@@ -77,15 +77,11 @@ class MangaDetailScreenState extends Equatable {
             final oldDate = value.publishAt?.asDateTime;
             final newDate = data.publishAt?.asDateTime;
 
-            if (oldDate == null) {
-              return data;
+            if (oldDate != null && newDate != null) {
+              return newDate.isBefore(oldDate) ? value : data;
             }
 
-            if (newDate == null) {
-              return value;
-            }
-
-            return newDate.isBefore(oldDate) ? value : data;
+            return data;
           },
           ifAbsent: () => data,
         );
