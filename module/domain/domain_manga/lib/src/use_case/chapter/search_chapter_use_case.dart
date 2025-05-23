@@ -1,23 +1,33 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:log_box/log_box.dart';
 
 import '../../../domain_manga.dart';
-import 'search_chapter_on_asura_scan_use_case.dart';
-import 'search_chapter_on_manga_clash_use_case.dart';
+import '../../manager/headless_webview_manager.dart';
+import '../../mixin/sort_chapters_mixin.dart';
+import '../../mixin/sync_chapters_mixin.dart';
+import '../../parser/base/chapter_list_html_parser.dart';
 import 'search_chapter_on_manga_dex_use_case.dart';
 
-class SearchChapterUseCase {
+class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
   final SearchChapterOnMangaDexUseCase _searchChapterOnMangaDexUseCase;
-  final SearchChapterOnMangaClashUseCase _searchChapterOnMangaClashUseCase;
-  final SearchChapterOnAsuraScanUseCase _searchChapterOnAsuraScanUseCase;
+  final HeadlessWebviewManager _webview;
+  final ChapterDao _chapterDao;
+  final MangaDao _mangaDao;
+  final LogBox _logBox;
 
   const SearchChapterUseCase({
     required SearchChapterOnMangaDexUseCase searchChapterOnMangaDexUseCase,
-    required SearchChapterOnMangaClashUseCase searchChapterOnMangaClashUseCase,
-    required SearchChapterOnAsuraScanUseCase searchChapterOnAsuraScanUseCase,
+    required HeadlessWebviewManager webview,
+    required ChapterDao chapterDao,
+    required MangaDao mangaDao,
+    required LogBox logBox,
   })  : _searchChapterOnMangaDexUseCase = searchChapterOnMangaDexUseCase,
-        _searchChapterOnMangaClashUseCase = searchChapterOnMangaClashUseCase,
-        _searchChapterOnAsuraScanUseCase = searchChapterOnAsuraScanUseCase;
+        _chapterDao = chapterDao,
+        _mangaDao = mangaDao,
+        _logBox = logBox,
+        _webview = webview;
 
   Future<Result<Pagination<MangaChapter>>> execute({
     required MangaSourceEnum? source,
@@ -26,19 +36,54 @@ class SearchChapterUseCase {
   }) async {
     if (source == null) return Error(Exception('Empty Source'));
 
-    return switch (source) {
-      MangaSourceEnum.mangadex => _searchChapterOnMangaDexUseCase.execute(
-          mangaId: mangaId,
-          parameter: parameter,
-        ),
-      MangaSourceEnum.asurascan => _searchChapterOnAsuraScanUseCase.execute(
-          mangaId: mangaId,
-          parameter: parameter,
-        ),
-      MangaSourceEnum.mangaclash => _searchChapterOnMangaClashUseCase.execute(
-          mangaId: mangaId,
-          parameter: parameter,
-        ),
-    };
+    if (source == MangaSourceEnum.mangadex) {
+      return _searchChapterOnMangaDexUseCase.execute(
+        parameter: parameter,
+        mangaId: mangaId,
+      );
+    }
+
+    if (mangaId == null) return Error(Exception('Empty Manga ID'));
+
+    final raw = await _mangaDao.getManga(mangaId);
+    final result = raw?.let((raw) => Manga.fromDrift(raw.$1, tags: raw.$2));
+    final url = result?.webUrl;
+
+    if (result == null || url == null) {
+      return Error(Exception('Data not found'));
+    }
+
+    final document = await _webview.open(url);
+
+    if (document == null) {
+      return Error(FailedParsingHtmlException(url));
+    }
+
+    final parser = ChapterListHtmlParser.forSource(
+      root: document,
+      source: source,
+    );
+
+    final data = sortChapters(
+      chapters: await sync(
+        chapterDao: _chapterDao,
+        logBox: _logBox,
+        values: parser.chapters
+            .map((e) => e.copyWith(mangaId: mangaId, mangaTitle: result.title))
+            .toList(),
+      ),
+      parameter: parameter,
+    );
+
+    return Success(
+      Pagination(
+        data: data,
+        page: 1,
+        limit: data.length,
+        total: data.length,
+        hasNextPage: false,
+        sourceUrl: url,
+      ),
+    );
   }
 }
