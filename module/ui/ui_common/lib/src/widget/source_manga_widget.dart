@@ -51,8 +51,12 @@ class SourceMangaWidget extends StatelessWidget {
             height: 16,
             errorBuilder: (context, error, _) => const Icon(Icons.error),
             progressBuilder: (context, progress) => Center(
-              child: CircularProgressIndicator(
-                value: progress,
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  value: progress,
+                ),
               ),
             ),
           ),
