@@ -1,1 +1,0 @@
-CREATE VIRTUAL TABLE similar_tag USING fts5(id, name);

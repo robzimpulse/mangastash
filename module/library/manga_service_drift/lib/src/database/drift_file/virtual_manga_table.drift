@@ -1,1 +1,0 @@
-CREATE VIRTUAL TABLE similar_manga USING fts5(id, title, cover_url, author, status, description, web_url, source);
