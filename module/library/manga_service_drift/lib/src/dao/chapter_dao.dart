@@ -154,16 +154,22 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
         return {for (final e in results) e: <ImageDrift>[]};
       }
 
-      final groups = results.groupListsBy(
-        (e) => e.readTable(mangaChapterTables),
-      );
+      final groups = results
+          .groupListsBy((e) => e.readTableOrNull(mangaChapterTables))
+          .map(
+            (key, images) => MapEntry(
+              key,
+              images
+                  .map((e) => e.readTableOrNull(mangaChapterImageTables))
+                  .nonNulls
+                  .toList(),
+            ),
+          );
 
-      return groups.map(
-        (key, images) => MapEntry(
-          key,
-          images.map((e) => e.readTable(mangaChapterImageTables)).toList(),
-        ),
-      );
+      return {
+        for (final key in groups.keys.nonNulls)
+          key: groups[key] ?? <ImageDrift>[],
+      };
     });
   }
 
@@ -190,38 +196,27 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
         return (result, <ImageDrift>[]);
       }
 
-      final group = results.groupListsBy(
-        (e) => e.readTable(mangaChapterTables),
-      );
+      final groups = results
+          .groupListsBy((e) => e.readTableOrNull(mangaChapterTables))
+          .map(
+            (key, value) => MapEntry(
+              key,
+              value
+                  .map((e) => e.readTableOrNull(mangaChapterImageTables))
+                  .nonNulls
+                  .sortedBy<num>((e) => e.order)
+                  .toList(),
+            ),
+          );
 
-      final data = group.entries.map(
-        (e) => (
-          e.key,
-          e.value
-              .map((e) => e.readTableOrNull(mangaChapterImageTables))
-              .nonNulls
-              .sortedBy<num>((e) => e.order)
-              .toList(),
-        ),
-      );
+      final data = [
+        for (final key in groups.keys.nonNulls)
+          (key, groups[key] ?? <ImageDrift>[]),
+      ];
 
       return data.firstOrNull;
     });
   }
-
-  // Future<List<ChapterDrift>> getChapters(String mangaId) {
-  //   final selector = select(mangaChapterTables)
-  //     ..where((f) => f.mangaId.equals(mangaId));
-  //
-  //   return selector.get();
-  // }
-  //
-  // Future<ChapterDrift?> getChapter(String chapterId) {
-  //   final selector = select(mangaChapterTables)
-  //     ..where((f) => f.id.equals(chapterId));
-  //
-  //   return selector.getSingleOrNull();
-  // }
 
   Future<ChapterDrift> insertChapter(MangaChapterTablesCompanion data) {
     return transaction(
@@ -255,15 +250,6 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
     );
   }
 
-  //
-  // Future<List<ImageDrift>> getImages(String chapterId) {
-  //   final selector = select(mangaChapterImageTables)
-  //     ..where((f) => f.chapterId.equals(chapterId))
-  //     ..orderBy([(f) => OrderingTerm(expression: f.order)]);
-  //
-  //   return selector.get();
-  // }
-  //
   Future<List<ImageDrift>> setImages(String chapterId, List<String> images) {
     final selector = delete(mangaChapterImageTables)
       ..where((f) => f.chapterId.equals(chapterId));

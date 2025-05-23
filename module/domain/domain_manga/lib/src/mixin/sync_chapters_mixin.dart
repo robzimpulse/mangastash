@@ -29,7 +29,7 @@ mixin SyncChaptersMixin {
         'before count': before.length,
         'after count': after.length,
         'inconsistent key count': idsDifference.length,
-        'inconsistent key': '$idsDifference'
+        'inconsistent key': '$idsDifference',
       },
       name: 'Sync Process',
     );

@@ -60,18 +60,24 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
 
     return data.map(
       (rows) {
-        final group = rows.groupListsBy((e) => e.readTable(mangaTables));
-        final data = group.entries.map(
-          (e) => (
-            e.key,
-            e.value
-                .map((e) => e.readTableOrNull(mangaTagTables))
-                .nonNulls
-                .toList(),
-          ),
-        );
+        final groups = rows
+            .groupListsBy(
+              (e) => e.readTableOrNull(mangaTables),
+            )
+            .map(
+              (key, value) => MapEntry(
+                key,
+                value
+                    .map((e) => e.readTableOrNull(mangaTagTables))
+                    .nonNulls
+                    .toList(),
+              ),
+            );
 
-        return [...data];
+        return [
+          for (final key in groups.keys.nonNulls)
+            (key, groups[key] ?? <TagDrift>[]),
+        ];
       },
     );
   }
@@ -118,16 +124,21 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
 
     final results = await selector.get();
 
-    final group = (results.isEmpty ? await fallbackSelector.get() : results)
-        .groupListsBy((e) => e.readTable(mangaTables));
+    final groups = (results.isEmpty ? await fallbackSelector.get() : results)
+        .groupListsBy((e) => e.readTableOrNull(mangaTables))
+        .map(
+          (key, value) => MapEntry(
+            key,
+            value
+                .map((e) => e.readTableOrNull(mangaTagTables))
+                .nonNulls
+                .toList(),
+          ),
+        );
 
-    final data = group.entries.map(
-      (e) => (
-        e.key,
-        e.value.map((e) => e.readTableOrNull(mangaTagTables)).nonNulls.toList(),
-      ),
-    );
-
-    return [...data];
+    return [
+      for (final key in groups.keys.nonNulls)
+        (key, groups[key] ?? <TagDrift>[]),
+    ];
   }
 }

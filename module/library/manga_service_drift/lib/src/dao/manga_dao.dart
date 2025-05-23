@@ -193,13 +193,24 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
         return null;
       }
 
-      final group = results.groupListsBy((e) => e.readTable(mangaTables));
-      final data = group.entries.map(
-        (e) => (
-          e.key,
-          e.value.map((e) => e.readTable(mangaTagTables)).toList(),
-        ),
-      );
+      final groups = results
+          .groupListsBy(
+            (e) => e.readTableOrNull(mangaTables),
+          )
+          .map(
+            (key, value) => MapEntry(
+              key,
+              value
+                  .map((e) => e.readTableOrNull(mangaTagTables))
+                  .nonNulls
+                  .toList(),
+            ),
+          );
+
+      final data = [
+        for (final key in groups.keys.nonNulls)
+          (key, groups[key] ?? <TagDrift>[]),
+      ];
 
       return data.firstOrNull;
     });
