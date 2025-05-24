@@ -78,6 +78,8 @@ class DomainMangaRegistrar extends Registrar {
           fileDownloader: locator(),
           log: log,
           cacheManager: locator(),
+          fetchChapterJobDao: locator(),
+          getChapterUseCase: () => locator(),
         ),
       );
       locator.alias<ListenDownloadProgressUseCase, DownloadProgressManager>();

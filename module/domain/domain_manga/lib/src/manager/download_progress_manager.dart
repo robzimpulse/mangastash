@@ -4,11 +4,15 @@ import 'dart:math';
 
 import 'package:background_downloader/background_downloader.dart';
 import 'package:collection/collection.dart';
+import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:log_box/log_box.dart';
+import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../use_case/chapter/get_chapter_use_case.dart';
 import '../use_case/chapter/listen_download_progress_use_case.dart';
 
 typedef Key = DownloadChapterKey;
@@ -18,15 +22,21 @@ typedef Progress = DownloadChapterProgress;
 class DownloadProgressManager implements ListenDownloadProgressUseCase {
   final BehaviorSubject<Map<Key, Update>> _progress;
   final BehaviorSubject<Map<String, Task>> _tasks;
+  final BehaviorSubject<List<FetchChapterJobDrift>> _jobs;
+  final FetchChapterJobDao _fetchChapterJobDao;
   final FileDownloader _fileDownloader;
   final BaseCacheManager _cacheManager;
+  final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final LogBox _log;
 
   late final StreamSubscription _streamSubscription;
+  late final StreamSubscription _streamSubscription2;
 
   static Future<DownloadProgressManager> create({
+    required FetchChapterJobDao fetchChapterJobDao,
     required FileDownloader fileDownloader,
     required BaseCacheManager cacheManager,
+    required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required LogBox log,
   }) async {
     final records = await fileDownloader.database.allRecords();
@@ -34,6 +44,8 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
     return DownloadProgressManager(
       fileDownloader: fileDownloader,
       cacheManager: cacheManager,
+      fetchChapterJobDao: fetchChapterJobDao,
+      getChapterUseCase: getChapterUseCase,
       log: log,
       tasks: Map.fromEntries(records.map((e) => MapEntry(e.taskId, e.task))),
       completeRecords: List.of(
@@ -52,15 +64,22 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
     required LogBox log,
     required Map<String, Task> tasks,
     required Map<Key, Update> progress,
+    required FetchChapterJobDao fetchChapterJobDao,
     required FileDownloader fileDownloader,
     required BaseCacheManager cacheManager,
     required List<TaskRecord> completeRecords,
+    required ValueGetter<GetChapterUseCase> getChapterUseCase,
   })  : _log = log,
         _cacheManager = cacheManager,
         _fileDownloader = fileDownloader,
         _tasks = BehaviorSubject.seeded(tasks),
+        _jobs = BehaviorSubject.seeded([]),
+        _fetchChapterJobDao = fetchChapterJobDao,
+        _getChapterUseCase = getChapterUseCase,
         _progress = BehaviorSubject.seeded(progress) {
     _streamSubscription = _fileDownloader.updates.distinct().listen(_onUpdate);
+    _streamSubscription2 = _jobs.distinct().listen(_onFetch);
+    _jobs.addStream(fetchChapterJobDao.listen());
     for (final record in completeRecords) {
       _moveFileToSharedStorage(status: record.status, task: record.task);
     }
@@ -68,6 +87,7 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
 
   Future<void> dispose() async {
     await _streamSubscription.cancel();
+    await _streamSubscription2.cancel();
   }
 
   Future<void> _moveFileToSharedStorage({
@@ -90,7 +110,11 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
     );
 
     _log.log(
-      'Move ${task.url} - $path to shared storage',
+      'Move image to shared storage',
+      extra: {
+        'url': task.url,
+        'path': path,
+      },
       name: runtimeType.toString(),
     );
 
@@ -104,9 +128,51 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
     );
 
     _log.log(
-      'Adding ${task.url} - $path to cache',
+      'Adding image to cache',
+      extra: {
+        'url': task.url,
+        'path': path,
+      },
       name: runtimeType.toString(),
     );
+  }
+
+  void _onFetch(List<FetchChapterJobDrift> jobs) async {
+    final job = jobs.firstOrNull;
+    if (job == null) return;
+
+    final result = await _getChapterUseCase().execute(
+      source: MangaSourceEnum.fromValue(job.source),
+      mangaId: job.mangaId,
+      chapterId: job.chapterId,
+    );
+
+    if (result is Success<MangaChapter>) {
+      _log.log(
+        'Success fetch chapter',
+        extra: {
+          'manga_id': job.mangaId,
+          'chapter_id': job.chapterId,
+          'source': job.source,
+          'data': result.data.toJson(),
+        },
+        name: runtimeType.toString(),
+      );
+      _fetchChapterJobDao.remove(job.toCompanion(true));
+    }
+
+    if (result is Error<MangaChapter>) {
+      _log.log(
+        'Failed fetch chapter',
+        extra: {
+          'manga_id': job.mangaId,
+          'chapter_id': job.chapterId,
+          'source': job.source,
+          'error': result.error.toString(),
+        },
+        name: runtimeType.toString(),
+      );
+    }
   }
 
   void _onUpdate(TaskUpdate event) {
