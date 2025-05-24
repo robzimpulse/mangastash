@@ -12,6 +12,7 @@ import 'package:log_box/log_box.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../mixin/generate_task_id_mixin.dart';
 import '../use_case/chapter/get_chapter_use_case.dart';
 import '../use_case/chapter/listen_download_progress_use_case.dart';
 
@@ -19,7 +20,9 @@ typedef Key = DownloadChapterKey;
 typedef Update = Map<String, double>;
 typedef Progress = DownloadChapterProgress;
 
-class DownloadProgressManager implements ListenDownloadProgressUseCase {
+class DownloadProgressManager
+    with GenerateTaskIdMixin, UserAgentMixin
+    implements ListenDownloadProgressUseCase {
   final BehaviorSubject<Map<Key, Update>> _progress;
   final BehaviorSubject<Map<String, Task>> _tasks;
   final BehaviorSubject<List<FetchChapterJobDrift>> _jobs;
@@ -159,6 +162,109 @@ class DownloadProgressManager implements ListenDownloadProgressUseCase {
         name: runtimeType.toString(),
       );
       _fetchChapterJobDao.remove(job.toCompanion(true));
+
+      final key = DownloadChapterKey.fromDrift(job);
+      final groupId = key.toJsonString();
+      final images = result.data.images ?? [];
+      final title = key.mangaTitle;
+      final chapter = key.chapterNumber;
+      final cover = key.mangaCoverUrl;
+      final extension = cover?.split('.').lastOrNull;
+      final info = '${key.mangaTitle} - chapter ${key.chapterNumber}';
+
+      _fileDownloader.configureNotificationForGroup(
+        groupId,
+        running: TaskNotification(
+          'Downloading $title chapter $chapter',
+          '{numFinished} out of {numTotal}',
+        ),
+        complete: TaskNotification(
+          "Finish Downloading $title chapter $chapter",
+          "Loaded {numTotal} files",
+        ),
+        error: const TaskNotification(
+          'Error',
+          '{numFailed}/{numTotal} failed',
+        ),
+        progressBar: false,
+        groupNotificationId: groupId,
+      );
+
+      final List<DownloadTask> tasks = [];
+      if (cover != null && extension != null && title != null) {
+        final filename = 'cover.$extension';
+
+        tasks.add(
+          DownloadTask(
+            taskId: generateTaskId(
+              url: cover,
+              directory: title,
+              filename: filename,
+              group: groupId,
+            ),
+            url: cover,
+            headers: {HttpHeaders.userAgentHeader: userAgent},
+            baseDirectory: BaseDirectory.applicationDocuments,
+            updates: Updates.statusAndProgress,
+            directory: title,
+            filename: filename,
+            retries: 3,
+            group: groupId,
+            creationTime: DateTime.now(),
+            requiresWiFi: true,
+            allowPause: true,
+          ),
+        );
+      }
+
+      for (final (index, url) in images.indexed) {
+        final extension = url.split('.').lastOrNull;
+
+        if (title == null || chapter == null || extension == null) continue;
+
+        final directory = '$title/$chapter';
+        final filename = '${index + 1}.$extension';
+
+        tasks.add(
+          DownloadTask(
+            taskId: generateTaskId(
+              url: url,
+              directory: directory,
+              filename: filename,
+              group: groupId,
+            ),
+            url: url,
+            headers: {HttpHeaders.userAgentHeader: userAgent},
+            baseDirectory: BaseDirectory.applicationDocuments,
+            updates: Updates.statusAndProgress,
+            directory: directory,
+            filename: filename,
+            retries: 3,
+            group: groupId,
+            creationTime: DateTime.now(),
+            allowPause: true,
+            requiresWiFi: true,
+          ),
+        );
+      }
+
+      for (final task in tasks) {
+        await _fileDownloader.enqueue(task);
+
+        _log.log(
+          '[$info] Success enqueue task',
+          extra: {
+            'id': task.taskId,
+            'url': task.url,
+            'base_directory': task.baseDirectory.toString(),
+            'directory': task.directory,
+            'filename': task.filename,
+            'group': task.group,
+            'headers': task.headers.toString(),
+          },
+          name: runtimeType.toString(),
+        );
+      }
     }
 
     if (result is Error<MangaChapter>) {

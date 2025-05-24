@@ -2332,22 +2332,48 @@ class $FetchChapterJobTablesTable extends FetchChapterJobTables
       const VerificationMeta('mangaId');
   @override
   late final GeneratedColumn<String> mangaId = GeneratedColumn<String>(
-      'manga_id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'manga_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _mangaTitleMeta =
+      const VerificationMeta('mangaTitle');
+  @override
+  late final GeneratedColumn<String> mangaTitle = GeneratedColumn<String>(
+      'manga_title', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _coverUrlMeta =
+      const VerificationMeta('coverUrl');
+  @override
+  late final GeneratedColumn<String> coverUrl = GeneratedColumn<String>(
+      'cover_url', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _chapterIdMeta =
       const VerificationMeta('chapterId');
   @override
   late final GeneratedColumn<String> chapterId = GeneratedColumn<String>(
-      'chapter_id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'chapter_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _chapterNumberMeta =
+      const VerificationMeta('chapterNumber');
+  @override
+  late final GeneratedColumn<int> chapterNumber = GeneratedColumn<int>(
+      'chapter_number', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _sourceMeta = const VerificationMeta('source');
   @override
   late final GeneratedColumn<String> source = GeneratedColumn<String>(
-      'source', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'source', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   @override
-  List<GeneratedColumn> get $columns =>
-      [createdAt, updatedAt, mangaId, chapterId, source];
+  List<GeneratedColumn> get $columns => [
+        createdAt,
+        updatedAt,
+        mangaId,
+        mangaTitle,
+        coverUrl,
+        chapterId,
+        chapterNumber,
+        source
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2370,26 +2396,37 @@ class $FetchChapterJobTablesTable extends FetchChapterJobTables
     if (data.containsKey('manga_id')) {
       context.handle(_mangaIdMeta,
           mangaId.isAcceptableOrUnknown(data['manga_id']!, _mangaIdMeta));
-    } else if (isInserting) {
-      context.missing(_mangaIdMeta);
+    }
+    if (data.containsKey('manga_title')) {
+      context.handle(
+          _mangaTitleMeta,
+          mangaTitle.isAcceptableOrUnknown(
+              data['manga_title']!, _mangaTitleMeta));
+    }
+    if (data.containsKey('cover_url')) {
+      context.handle(_coverUrlMeta,
+          coverUrl.isAcceptableOrUnknown(data['cover_url']!, _coverUrlMeta));
     }
     if (data.containsKey('chapter_id')) {
       context.handle(_chapterIdMeta,
           chapterId.isAcceptableOrUnknown(data['chapter_id']!, _chapterIdMeta));
-    } else if (isInserting) {
-      context.missing(_chapterIdMeta);
+    }
+    if (data.containsKey('chapter_number')) {
+      context.handle(
+          _chapterNumberMeta,
+          chapterNumber.isAcceptableOrUnknown(
+              data['chapter_number']!, _chapterNumberMeta));
     }
     if (data.containsKey('source')) {
       context.handle(_sourceMeta,
           source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
-    } else if (isInserting) {
-      context.missing(_sourceMeta);
     }
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {mangaId, chapterId, source};
+  Set<GeneratedColumn> get $primaryKey =>
+      {mangaId, mangaTitle, coverUrl, chapterId, chapterNumber, source};
   @override
   FetchChapterJobDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -2399,11 +2436,17 @@ class $FetchChapterJobTablesTable extends FetchChapterJobTables
       updatedAt: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}updated_at'])!,
       mangaId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}manga_id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}manga_id']),
+      mangaTitle: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}manga_title']),
+      coverUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}cover_url']),
       chapterId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}chapter_id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}chapter_id']),
+      chapterNumber: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}chapter_number']),
       source: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}source'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}source']),
     );
   }
 
@@ -2417,23 +2460,44 @@ class FetchChapterJobDrift extends DataClass
     implements Insertable<FetchChapterJobDrift> {
   final String createdAt;
   final String updatedAt;
-  final String mangaId;
-  final String chapterId;
-  final String source;
+  final String? mangaId;
+  final String? mangaTitle;
+  final String? coverUrl;
+  final String? chapterId;
+  final int? chapterNumber;
+  final String? source;
   const FetchChapterJobDrift(
       {required this.createdAt,
       required this.updatedAt,
-      required this.mangaId,
-      required this.chapterId,
-      required this.source});
+      this.mangaId,
+      this.mangaTitle,
+      this.coverUrl,
+      this.chapterId,
+      this.chapterNumber,
+      this.source});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['created_at'] = Variable<String>(createdAt);
     map['updated_at'] = Variable<String>(updatedAt);
-    map['manga_id'] = Variable<String>(mangaId);
-    map['chapter_id'] = Variable<String>(chapterId);
-    map['source'] = Variable<String>(source);
+    if (!nullToAbsent || mangaId != null) {
+      map['manga_id'] = Variable<String>(mangaId);
+    }
+    if (!nullToAbsent || mangaTitle != null) {
+      map['manga_title'] = Variable<String>(mangaTitle);
+    }
+    if (!nullToAbsent || coverUrl != null) {
+      map['cover_url'] = Variable<String>(coverUrl);
+    }
+    if (!nullToAbsent || chapterId != null) {
+      map['chapter_id'] = Variable<String>(chapterId);
+    }
+    if (!nullToAbsent || chapterNumber != null) {
+      map['chapter_number'] = Variable<int>(chapterNumber);
+    }
+    if (!nullToAbsent || source != null) {
+      map['source'] = Variable<String>(source);
+    }
     return map;
   }
 
@@ -2441,9 +2505,23 @@ class FetchChapterJobDrift extends DataClass
     return FetchChapterJobTablesCompanion(
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
-      mangaId: Value(mangaId),
-      chapterId: Value(chapterId),
-      source: Value(source),
+      mangaId: mangaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mangaId),
+      mangaTitle: mangaTitle == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mangaTitle),
+      coverUrl: coverUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(coverUrl),
+      chapterId: chapterId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(chapterId),
+      chapterNumber: chapterNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(chapterNumber),
+      source:
+          source == null && nullToAbsent ? const Value.absent() : Value(source),
     );
   }
 
@@ -2453,9 +2531,12 @@ class FetchChapterJobDrift extends DataClass
     return FetchChapterJobDrift(
       createdAt: serializer.fromJson<String>(json['createdAt']),
       updatedAt: serializer.fromJson<String>(json['updatedAt']),
-      mangaId: serializer.fromJson<String>(json['mangaId']),
-      chapterId: serializer.fromJson<String>(json['chapterId']),
-      source: serializer.fromJson<String>(json['source']),
+      mangaId: serializer.fromJson<String?>(json['mangaId']),
+      mangaTitle: serializer.fromJson<String?>(json['mangaTitle']),
+      coverUrl: serializer.fromJson<String?>(json['coverUrl']),
+      chapterId: serializer.fromJson<String?>(json['chapterId']),
+      chapterNumber: serializer.fromJson<int?>(json['chapterNumber']),
+      source: serializer.fromJson<String?>(json['source']),
     );
   }
   @override
@@ -2464,31 +2545,47 @@ class FetchChapterJobDrift extends DataClass
     return <String, dynamic>{
       'createdAt': serializer.toJson<String>(createdAt),
       'updatedAt': serializer.toJson<String>(updatedAt),
-      'mangaId': serializer.toJson<String>(mangaId),
-      'chapterId': serializer.toJson<String>(chapterId),
-      'source': serializer.toJson<String>(source),
+      'mangaId': serializer.toJson<String?>(mangaId),
+      'mangaTitle': serializer.toJson<String?>(mangaTitle),
+      'coverUrl': serializer.toJson<String?>(coverUrl),
+      'chapterId': serializer.toJson<String?>(chapterId),
+      'chapterNumber': serializer.toJson<int?>(chapterNumber),
+      'source': serializer.toJson<String?>(source),
     };
   }
 
   FetchChapterJobDrift copyWith(
           {String? createdAt,
           String? updatedAt,
-          String? mangaId,
-          String? chapterId,
-          String? source}) =>
+          Value<String?> mangaId = const Value.absent(),
+          Value<String?> mangaTitle = const Value.absent(),
+          Value<String?> coverUrl = const Value.absent(),
+          Value<String?> chapterId = const Value.absent(),
+          Value<int?> chapterNumber = const Value.absent(),
+          Value<String?> source = const Value.absent()}) =>
       FetchChapterJobDrift(
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
-        mangaId: mangaId ?? this.mangaId,
-        chapterId: chapterId ?? this.chapterId,
-        source: source ?? this.source,
+        mangaId: mangaId.present ? mangaId.value : this.mangaId,
+        mangaTitle: mangaTitle.present ? mangaTitle.value : this.mangaTitle,
+        coverUrl: coverUrl.present ? coverUrl.value : this.coverUrl,
+        chapterId: chapterId.present ? chapterId.value : this.chapterId,
+        chapterNumber:
+            chapterNumber.present ? chapterNumber.value : this.chapterNumber,
+        source: source.present ? source.value : this.source,
       );
   FetchChapterJobDrift copyWithCompanion(FetchChapterJobTablesCompanion data) {
     return FetchChapterJobDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       mangaId: data.mangaId.present ? data.mangaId.value : this.mangaId,
+      mangaTitle:
+          data.mangaTitle.present ? data.mangaTitle.value : this.mangaTitle,
+      coverUrl: data.coverUrl.present ? data.coverUrl.value : this.coverUrl,
       chapterId: data.chapterId.present ? data.chapterId.value : this.chapterId,
+      chapterNumber: data.chapterNumber.present
+          ? data.chapterNumber.value
+          : this.chapterNumber,
       source: data.source.present ? data.source.value : this.source,
     );
   }
@@ -2499,15 +2596,18 @@ class FetchChapterJobDrift extends DataClass
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('mangaId: $mangaId, ')
+          ..write('mangaTitle: $mangaTitle, ')
+          ..write('coverUrl: $coverUrl, ')
           ..write('chapterId: $chapterId, ')
+          ..write('chapterNumber: $chapterNumber, ')
           ..write('source: $source')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(createdAt, updatedAt, mangaId, chapterId, source);
+  int get hashCode => Object.hash(createdAt, updatedAt, mangaId, mangaTitle,
+      coverUrl, chapterId, chapterNumber, source);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2515,7 +2615,10 @@ class FetchChapterJobDrift extends DataClass
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.mangaId == this.mangaId &&
+          other.mangaTitle == this.mangaTitle &&
+          other.coverUrl == this.coverUrl &&
           other.chapterId == this.chapterId &&
+          other.chapterNumber == this.chapterNumber &&
           other.source == this.source);
 }
 
@@ -2523,33 +2626,43 @@ class FetchChapterJobTablesCompanion
     extends UpdateCompanion<FetchChapterJobDrift> {
   final Value<String> createdAt;
   final Value<String> updatedAt;
-  final Value<String> mangaId;
-  final Value<String> chapterId;
-  final Value<String> source;
+  final Value<String?> mangaId;
+  final Value<String?> mangaTitle;
+  final Value<String?> coverUrl;
+  final Value<String?> chapterId;
+  final Value<int?> chapterNumber;
+  final Value<String?> source;
   final Value<int> rowid;
   const FetchChapterJobTablesCompanion({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.mangaId = const Value.absent(),
+    this.mangaTitle = const Value.absent(),
+    this.coverUrl = const Value.absent(),
     this.chapterId = const Value.absent(),
+    this.chapterNumber = const Value.absent(),
     this.source = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   FetchChapterJobTablesCompanion.insert({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-    required String mangaId,
-    required String chapterId,
-    required String source,
+    this.mangaId = const Value.absent(),
+    this.mangaTitle = const Value.absent(),
+    this.coverUrl = const Value.absent(),
+    this.chapterId = const Value.absent(),
+    this.chapterNumber = const Value.absent(),
+    this.source = const Value.absent(),
     this.rowid = const Value.absent(),
-  })  : mangaId = Value(mangaId),
-        chapterId = Value(chapterId),
-        source = Value(source);
+  });
   static Insertable<FetchChapterJobDrift> custom({
     Expression<String>? createdAt,
     Expression<String>? updatedAt,
     Expression<String>? mangaId,
+    Expression<String>? mangaTitle,
+    Expression<String>? coverUrl,
     Expression<String>? chapterId,
+    Expression<int>? chapterNumber,
     Expression<String>? source,
     Expression<int>? rowid,
   }) {
@@ -2557,7 +2670,10 @@ class FetchChapterJobTablesCompanion
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (mangaId != null) 'manga_id': mangaId,
+      if (mangaTitle != null) 'manga_title': mangaTitle,
+      if (coverUrl != null) 'cover_url': coverUrl,
       if (chapterId != null) 'chapter_id': chapterId,
+      if (chapterNumber != null) 'chapter_number': chapterNumber,
       if (source != null) 'source': source,
       if (rowid != null) 'rowid': rowid,
     });
@@ -2566,15 +2682,21 @@ class FetchChapterJobTablesCompanion
   FetchChapterJobTablesCompanion copyWith(
       {Value<String>? createdAt,
       Value<String>? updatedAt,
-      Value<String>? mangaId,
-      Value<String>? chapterId,
-      Value<String>? source,
+      Value<String?>? mangaId,
+      Value<String?>? mangaTitle,
+      Value<String?>? coverUrl,
+      Value<String?>? chapterId,
+      Value<int?>? chapterNumber,
+      Value<String?>? source,
       Value<int>? rowid}) {
     return FetchChapterJobTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       mangaId: mangaId ?? this.mangaId,
+      mangaTitle: mangaTitle ?? this.mangaTitle,
+      coverUrl: coverUrl ?? this.coverUrl,
       chapterId: chapterId ?? this.chapterId,
+      chapterNumber: chapterNumber ?? this.chapterNumber,
       source: source ?? this.source,
       rowid: rowid ?? this.rowid,
     );
@@ -2592,8 +2714,17 @@ class FetchChapterJobTablesCompanion
     if (mangaId.present) {
       map['manga_id'] = Variable<String>(mangaId.value);
     }
+    if (mangaTitle.present) {
+      map['manga_title'] = Variable<String>(mangaTitle.value);
+    }
+    if (coverUrl.present) {
+      map['cover_url'] = Variable<String>(coverUrl.value);
+    }
     if (chapterId.present) {
       map['chapter_id'] = Variable<String>(chapterId.value);
+    }
+    if (chapterNumber.present) {
+      map['chapter_number'] = Variable<int>(chapterNumber.value);
     }
     if (source.present) {
       map['source'] = Variable<String>(source.value);
@@ -2610,7 +2741,10 @@ class FetchChapterJobTablesCompanion
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('mangaId: $mangaId, ')
+          ..write('mangaTitle: $mangaTitle, ')
+          ..write('coverUrl: $coverUrl, ')
           ..write('chapterId: $chapterId, ')
+          ..write('chapterNumber: $chapterNumber, ')
           ..write('source: $source, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -3864,18 +3998,24 @@ typedef $$FetchChapterJobTablesTableCreateCompanionBuilder
     = FetchChapterJobTablesCompanion Function({
   Value<String> createdAt,
   Value<String> updatedAt,
-  required String mangaId,
-  required String chapterId,
-  required String source,
+  Value<String?> mangaId,
+  Value<String?> mangaTitle,
+  Value<String?> coverUrl,
+  Value<String?> chapterId,
+  Value<int?> chapterNumber,
+  Value<String?> source,
   Value<int> rowid,
 });
 typedef $$FetchChapterJobTablesTableUpdateCompanionBuilder
     = FetchChapterJobTablesCompanion Function({
   Value<String> createdAt,
   Value<String> updatedAt,
-  Value<String> mangaId,
-  Value<String> chapterId,
-  Value<String> source,
+  Value<String?> mangaId,
+  Value<String?> mangaTitle,
+  Value<String?> coverUrl,
+  Value<String?> chapterId,
+  Value<int?> chapterNumber,
+  Value<String?> source,
   Value<int> rowid,
 });
 
@@ -3897,8 +4037,17 @@ class $$FetchChapterJobTablesTableFilterComposer
   ColumnFilters<String> get mangaId => $composableBuilder(
       column: $table.mangaId, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<String> get mangaTitle => $composableBuilder(
+      column: $table.mangaTitle, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get coverUrl => $composableBuilder(
+      column: $table.coverUrl, builder: (column) => ColumnFilters(column));
+
   ColumnFilters<String> get chapterId => $composableBuilder(
       column: $table.chapterId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get chapterNumber => $composableBuilder(
+      column: $table.chapterNumber, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get source => $composableBuilder(
       column: $table.source, builder: (column) => ColumnFilters(column));
@@ -3922,8 +4071,18 @@ class $$FetchChapterJobTablesTableOrderingComposer
   ColumnOrderings<String> get mangaId => $composableBuilder(
       column: $table.mangaId, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get mangaTitle => $composableBuilder(
+      column: $table.mangaTitle, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get coverUrl => $composableBuilder(
+      column: $table.coverUrl, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get chapterId => $composableBuilder(
       column: $table.chapterId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get chapterNumber => $composableBuilder(
+      column: $table.chapterNumber,
+      builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get source => $composableBuilder(
       column: $table.source, builder: (column) => ColumnOrderings(column));
@@ -3947,8 +4106,17 @@ class $$FetchChapterJobTablesTableAnnotationComposer
   GeneratedColumn<String> get mangaId =>
       $composableBuilder(column: $table.mangaId, builder: (column) => column);
 
+  GeneratedColumn<String> get mangaTitle => $composableBuilder(
+      column: $table.mangaTitle, builder: (column) => column);
+
+  GeneratedColumn<String> get coverUrl =>
+      $composableBuilder(column: $table.coverUrl, builder: (column) => column);
+
   GeneratedColumn<String> get chapterId =>
       $composableBuilder(column: $table.chapterId, builder: (column) => column);
+
+  GeneratedColumn<int> get chapterNumber => $composableBuilder(
+      column: $table.chapterNumber, builder: (column) => column);
 
   GeneratedColumn<String> get source =>
       $composableBuilder(column: $table.source, builder: (column) => column);
@@ -3987,32 +4155,44 @@ class $$FetchChapterJobTablesTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<String> createdAt = const Value.absent(),
             Value<String> updatedAt = const Value.absent(),
-            Value<String> mangaId = const Value.absent(),
-            Value<String> chapterId = const Value.absent(),
-            Value<String> source = const Value.absent(),
+            Value<String?> mangaId = const Value.absent(),
+            Value<String?> mangaTitle = const Value.absent(),
+            Value<String?> coverUrl = const Value.absent(),
+            Value<String?> chapterId = const Value.absent(),
+            Value<int?> chapterNumber = const Value.absent(),
+            Value<String?> source = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               FetchChapterJobTablesCompanion(
             createdAt: createdAt,
             updatedAt: updatedAt,
             mangaId: mangaId,
+            mangaTitle: mangaTitle,
+            coverUrl: coverUrl,
             chapterId: chapterId,
+            chapterNumber: chapterNumber,
             source: source,
             rowid: rowid,
           ),
           createCompanionCallback: ({
             Value<String> createdAt = const Value.absent(),
             Value<String> updatedAt = const Value.absent(),
-            required String mangaId,
-            required String chapterId,
-            required String source,
+            Value<String?> mangaId = const Value.absent(),
+            Value<String?> mangaTitle = const Value.absent(),
+            Value<String?> coverUrl = const Value.absent(),
+            Value<String?> chapterId = const Value.absent(),
+            Value<int?> chapterNumber = const Value.absent(),
+            Value<String?> source = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               FetchChapterJobTablesCompanion.insert(
             createdAt: createdAt,
             updatedAt: updatedAt,
             mangaId: mangaId,
+            mangaTitle: mangaTitle,
+            coverUrl: coverUrl,
             chapterId: chapterId,
+            chapterNumber: chapterNumber,
             source: source,
             rowid: rowid,
           ),
