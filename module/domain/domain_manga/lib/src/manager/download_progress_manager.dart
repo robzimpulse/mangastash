@@ -34,6 +34,7 @@ class DownloadProgressManager
 
   late final StreamSubscription _streamSubscription;
   late final StreamSubscription _streamSubscription2;
+  bool _isFetchingChapter = false;
 
   static Future<DownloadProgressManager> create({
     required FetchChapterJobDao fetchChapterJobDao,
@@ -142,13 +143,17 @@ class DownloadProgressManager
 
   void _onFetch(List<FetchChapterJobDrift> jobs) async {
     final job = jobs.firstOrNull;
-    if (job == null) return;
+    if (job == null || _isFetchingChapter) return;
+
+    _isFetchingChapter = true;
 
     final result = await _getChapterUseCase().execute(
       source: MangaSourceEnum.fromValue(job.source),
       mangaId: job.mangaId,
       chapterId: job.chapterId,
     );
+
+    _isFetchingChapter = false;
 
     if (result is Success<MangaChapter>) {
       _log.log(
