@@ -2340,11 +2340,11 @@ class $FetchChapterJobTablesTable extends FetchChapterJobTables
   late final GeneratedColumn<String> mangaTitle = GeneratedColumn<String>(
       'manga_title', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _coverUrlMeta =
-      const VerificationMeta('coverUrl');
+  static const VerificationMeta _mangaCoverUrlMeta =
+      const VerificationMeta('mangaCoverUrl');
   @override
-  late final GeneratedColumn<String> coverUrl = GeneratedColumn<String>(
-      'cover_url', aliasedName, true,
+  late final GeneratedColumn<String> mangaCoverUrl = GeneratedColumn<String>(
+      'manga_cover_url', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _chapterIdMeta =
       const VerificationMeta('chapterId');
@@ -2369,7 +2369,7 @@ class $FetchChapterJobTablesTable extends FetchChapterJobTables
         updatedAt,
         mangaId,
         mangaTitle,
-        coverUrl,
+        mangaCoverUrl,
         chapterId,
         chapterNumber,
         source
@@ -2403,9 +2403,11 @@ class $FetchChapterJobTablesTable extends FetchChapterJobTables
           mangaTitle.isAcceptableOrUnknown(
               data['manga_title']!, _mangaTitleMeta));
     }
-    if (data.containsKey('cover_url')) {
-      context.handle(_coverUrlMeta,
-          coverUrl.isAcceptableOrUnknown(data['cover_url']!, _coverUrlMeta));
+    if (data.containsKey('manga_cover_url')) {
+      context.handle(
+          _mangaCoverUrlMeta,
+          mangaCoverUrl.isAcceptableOrUnknown(
+              data['manga_cover_url']!, _mangaCoverUrlMeta));
     }
     if (data.containsKey('chapter_id')) {
       context.handle(_chapterIdMeta,
@@ -2426,7 +2428,7 @@ class $FetchChapterJobTablesTable extends FetchChapterJobTables
 
   @override
   Set<GeneratedColumn> get $primaryKey =>
-      {mangaId, mangaTitle, coverUrl, chapterId, chapterNumber, source};
+      {mangaId, mangaTitle, mangaCoverUrl, chapterId, chapterNumber, source};
   @override
   FetchChapterJobDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -2439,8 +2441,8 @@ class $FetchChapterJobTablesTable extends FetchChapterJobTables
           .read(DriftSqlType.string, data['${effectivePrefix}manga_id']),
       mangaTitle: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}manga_title']),
-      coverUrl: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}cover_url']),
+      mangaCoverUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}manga_cover_url']),
       chapterId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}chapter_id']),
       chapterNumber: attachedDatabase.typeMapping
@@ -2462,7 +2464,7 @@ class FetchChapterJobDrift extends DataClass
   final String updatedAt;
   final String? mangaId;
   final String? mangaTitle;
-  final String? coverUrl;
+  final String? mangaCoverUrl;
   final String? chapterId;
   final int? chapterNumber;
   final String? source;
@@ -2471,7 +2473,7 @@ class FetchChapterJobDrift extends DataClass
       required this.updatedAt,
       this.mangaId,
       this.mangaTitle,
-      this.coverUrl,
+      this.mangaCoverUrl,
       this.chapterId,
       this.chapterNumber,
       this.source});
@@ -2486,8 +2488,8 @@ class FetchChapterJobDrift extends DataClass
     if (!nullToAbsent || mangaTitle != null) {
       map['manga_title'] = Variable<String>(mangaTitle);
     }
-    if (!nullToAbsent || coverUrl != null) {
-      map['cover_url'] = Variable<String>(coverUrl);
+    if (!nullToAbsent || mangaCoverUrl != null) {
+      map['manga_cover_url'] = Variable<String>(mangaCoverUrl);
     }
     if (!nullToAbsent || chapterId != null) {
       map['chapter_id'] = Variable<String>(chapterId);
@@ -2511,9 +2513,9 @@ class FetchChapterJobDrift extends DataClass
       mangaTitle: mangaTitle == null && nullToAbsent
           ? const Value.absent()
           : Value(mangaTitle),
-      coverUrl: coverUrl == null && nullToAbsent
+      mangaCoverUrl: mangaCoverUrl == null && nullToAbsent
           ? const Value.absent()
-          : Value(coverUrl),
+          : Value(mangaCoverUrl),
       chapterId: chapterId == null && nullToAbsent
           ? const Value.absent()
           : Value(chapterId),
@@ -2533,7 +2535,7 @@ class FetchChapterJobDrift extends DataClass
       updatedAt: serializer.fromJson<String>(json['updatedAt']),
       mangaId: serializer.fromJson<String?>(json['mangaId']),
       mangaTitle: serializer.fromJson<String?>(json['mangaTitle']),
-      coverUrl: serializer.fromJson<String?>(json['coverUrl']),
+      mangaCoverUrl: serializer.fromJson<String?>(json['mangaCoverUrl']),
       chapterId: serializer.fromJson<String?>(json['chapterId']),
       chapterNumber: serializer.fromJson<int?>(json['chapterNumber']),
       source: serializer.fromJson<String?>(json['source']),
@@ -2547,7 +2549,7 @@ class FetchChapterJobDrift extends DataClass
       'updatedAt': serializer.toJson<String>(updatedAt),
       'mangaId': serializer.toJson<String?>(mangaId),
       'mangaTitle': serializer.toJson<String?>(mangaTitle),
-      'coverUrl': serializer.toJson<String?>(coverUrl),
+      'mangaCoverUrl': serializer.toJson<String?>(mangaCoverUrl),
       'chapterId': serializer.toJson<String?>(chapterId),
       'chapterNumber': serializer.toJson<int?>(chapterNumber),
       'source': serializer.toJson<String?>(source),
@@ -2559,7 +2561,7 @@ class FetchChapterJobDrift extends DataClass
           String? updatedAt,
           Value<String?> mangaId = const Value.absent(),
           Value<String?> mangaTitle = const Value.absent(),
-          Value<String?> coverUrl = const Value.absent(),
+          Value<String?> mangaCoverUrl = const Value.absent(),
           Value<String?> chapterId = const Value.absent(),
           Value<int?> chapterNumber = const Value.absent(),
           Value<String?> source = const Value.absent()}) =>
@@ -2568,7 +2570,8 @@ class FetchChapterJobDrift extends DataClass
         updatedAt: updatedAt ?? this.updatedAt,
         mangaId: mangaId.present ? mangaId.value : this.mangaId,
         mangaTitle: mangaTitle.present ? mangaTitle.value : this.mangaTitle,
-        coverUrl: coverUrl.present ? coverUrl.value : this.coverUrl,
+        mangaCoverUrl:
+            mangaCoverUrl.present ? mangaCoverUrl.value : this.mangaCoverUrl,
         chapterId: chapterId.present ? chapterId.value : this.chapterId,
         chapterNumber:
             chapterNumber.present ? chapterNumber.value : this.chapterNumber,
@@ -2581,7 +2584,9 @@ class FetchChapterJobDrift extends DataClass
       mangaId: data.mangaId.present ? data.mangaId.value : this.mangaId,
       mangaTitle:
           data.mangaTitle.present ? data.mangaTitle.value : this.mangaTitle,
-      coverUrl: data.coverUrl.present ? data.coverUrl.value : this.coverUrl,
+      mangaCoverUrl: data.mangaCoverUrl.present
+          ? data.mangaCoverUrl.value
+          : this.mangaCoverUrl,
       chapterId: data.chapterId.present ? data.chapterId.value : this.chapterId,
       chapterNumber: data.chapterNumber.present
           ? data.chapterNumber.value
@@ -2597,7 +2602,7 @@ class FetchChapterJobDrift extends DataClass
           ..write('updatedAt: $updatedAt, ')
           ..write('mangaId: $mangaId, ')
           ..write('mangaTitle: $mangaTitle, ')
-          ..write('coverUrl: $coverUrl, ')
+          ..write('mangaCoverUrl: $mangaCoverUrl, ')
           ..write('chapterId: $chapterId, ')
           ..write('chapterNumber: $chapterNumber, ')
           ..write('source: $source')
@@ -2607,7 +2612,7 @@ class FetchChapterJobDrift extends DataClass
 
   @override
   int get hashCode => Object.hash(createdAt, updatedAt, mangaId, mangaTitle,
-      coverUrl, chapterId, chapterNumber, source);
+      mangaCoverUrl, chapterId, chapterNumber, source);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2616,7 +2621,7 @@ class FetchChapterJobDrift extends DataClass
           other.updatedAt == this.updatedAt &&
           other.mangaId == this.mangaId &&
           other.mangaTitle == this.mangaTitle &&
-          other.coverUrl == this.coverUrl &&
+          other.mangaCoverUrl == this.mangaCoverUrl &&
           other.chapterId == this.chapterId &&
           other.chapterNumber == this.chapterNumber &&
           other.source == this.source);
@@ -2628,7 +2633,7 @@ class FetchChapterJobTablesCompanion
   final Value<String> updatedAt;
   final Value<String?> mangaId;
   final Value<String?> mangaTitle;
-  final Value<String?> coverUrl;
+  final Value<String?> mangaCoverUrl;
   final Value<String?> chapterId;
   final Value<int?> chapterNumber;
   final Value<String?> source;
@@ -2638,7 +2643,7 @@ class FetchChapterJobTablesCompanion
     this.updatedAt = const Value.absent(),
     this.mangaId = const Value.absent(),
     this.mangaTitle = const Value.absent(),
-    this.coverUrl = const Value.absent(),
+    this.mangaCoverUrl = const Value.absent(),
     this.chapterId = const Value.absent(),
     this.chapterNumber = const Value.absent(),
     this.source = const Value.absent(),
@@ -2649,7 +2654,7 @@ class FetchChapterJobTablesCompanion
     this.updatedAt = const Value.absent(),
     this.mangaId = const Value.absent(),
     this.mangaTitle = const Value.absent(),
-    this.coverUrl = const Value.absent(),
+    this.mangaCoverUrl = const Value.absent(),
     this.chapterId = const Value.absent(),
     this.chapterNumber = const Value.absent(),
     this.source = const Value.absent(),
@@ -2660,7 +2665,7 @@ class FetchChapterJobTablesCompanion
     Expression<String>? updatedAt,
     Expression<String>? mangaId,
     Expression<String>? mangaTitle,
-    Expression<String>? coverUrl,
+    Expression<String>? mangaCoverUrl,
     Expression<String>? chapterId,
     Expression<int>? chapterNumber,
     Expression<String>? source,
@@ -2671,7 +2676,7 @@ class FetchChapterJobTablesCompanion
       if (updatedAt != null) 'updated_at': updatedAt,
       if (mangaId != null) 'manga_id': mangaId,
       if (mangaTitle != null) 'manga_title': mangaTitle,
-      if (coverUrl != null) 'cover_url': coverUrl,
+      if (mangaCoverUrl != null) 'manga_cover_url': mangaCoverUrl,
       if (chapterId != null) 'chapter_id': chapterId,
       if (chapterNumber != null) 'chapter_number': chapterNumber,
       if (source != null) 'source': source,
@@ -2684,7 +2689,7 @@ class FetchChapterJobTablesCompanion
       Value<String>? updatedAt,
       Value<String?>? mangaId,
       Value<String?>? mangaTitle,
-      Value<String?>? coverUrl,
+      Value<String?>? mangaCoverUrl,
       Value<String?>? chapterId,
       Value<int?>? chapterNumber,
       Value<String?>? source,
@@ -2694,7 +2699,7 @@ class FetchChapterJobTablesCompanion
       updatedAt: updatedAt ?? this.updatedAt,
       mangaId: mangaId ?? this.mangaId,
       mangaTitle: mangaTitle ?? this.mangaTitle,
-      coverUrl: coverUrl ?? this.coverUrl,
+      mangaCoverUrl: mangaCoverUrl ?? this.mangaCoverUrl,
       chapterId: chapterId ?? this.chapterId,
       chapterNumber: chapterNumber ?? this.chapterNumber,
       source: source ?? this.source,
@@ -2717,8 +2722,8 @@ class FetchChapterJobTablesCompanion
     if (mangaTitle.present) {
       map['manga_title'] = Variable<String>(mangaTitle.value);
     }
-    if (coverUrl.present) {
-      map['cover_url'] = Variable<String>(coverUrl.value);
+    if (mangaCoverUrl.present) {
+      map['manga_cover_url'] = Variable<String>(mangaCoverUrl.value);
     }
     if (chapterId.present) {
       map['chapter_id'] = Variable<String>(chapterId.value);
@@ -2742,7 +2747,7 @@ class FetchChapterJobTablesCompanion
           ..write('updatedAt: $updatedAt, ')
           ..write('mangaId: $mangaId, ')
           ..write('mangaTitle: $mangaTitle, ')
-          ..write('coverUrl: $coverUrl, ')
+          ..write('mangaCoverUrl: $mangaCoverUrl, ')
           ..write('chapterId: $chapterId, ')
           ..write('chapterNumber: $chapterNumber, ')
           ..write('source: $source, ')
@@ -4000,7 +4005,7 @@ typedef $$FetchChapterJobTablesTableCreateCompanionBuilder
   Value<String> updatedAt,
   Value<String?> mangaId,
   Value<String?> mangaTitle,
-  Value<String?> coverUrl,
+  Value<String?> mangaCoverUrl,
   Value<String?> chapterId,
   Value<int?> chapterNumber,
   Value<String?> source,
@@ -4012,7 +4017,7 @@ typedef $$FetchChapterJobTablesTableUpdateCompanionBuilder
   Value<String> updatedAt,
   Value<String?> mangaId,
   Value<String?> mangaTitle,
-  Value<String?> coverUrl,
+  Value<String?> mangaCoverUrl,
   Value<String?> chapterId,
   Value<int?> chapterNumber,
   Value<String?> source,
@@ -4040,8 +4045,8 @@ class $$FetchChapterJobTablesTableFilterComposer
   ColumnFilters<String> get mangaTitle => $composableBuilder(
       column: $table.mangaTitle, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get coverUrl => $composableBuilder(
-      column: $table.coverUrl, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get mangaCoverUrl => $composableBuilder(
+      column: $table.mangaCoverUrl, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get chapterId => $composableBuilder(
       column: $table.chapterId, builder: (column) => ColumnFilters(column));
@@ -4074,8 +4079,9 @@ class $$FetchChapterJobTablesTableOrderingComposer
   ColumnOrderings<String> get mangaTitle => $composableBuilder(
       column: $table.mangaTitle, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get coverUrl => $composableBuilder(
-      column: $table.coverUrl, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get mangaCoverUrl => $composableBuilder(
+      column: $table.mangaCoverUrl,
+      builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get chapterId => $composableBuilder(
       column: $table.chapterId, builder: (column) => ColumnOrderings(column));
@@ -4109,8 +4115,8 @@ class $$FetchChapterJobTablesTableAnnotationComposer
   GeneratedColumn<String> get mangaTitle => $composableBuilder(
       column: $table.mangaTitle, builder: (column) => column);
 
-  GeneratedColumn<String> get coverUrl =>
-      $composableBuilder(column: $table.coverUrl, builder: (column) => column);
+  GeneratedColumn<String> get mangaCoverUrl => $composableBuilder(
+      column: $table.mangaCoverUrl, builder: (column) => column);
 
   GeneratedColumn<String> get chapterId =>
       $composableBuilder(column: $table.chapterId, builder: (column) => column);
@@ -4157,7 +4163,7 @@ class $$FetchChapterJobTablesTableTableManager extends RootTableManager<
             Value<String> updatedAt = const Value.absent(),
             Value<String?> mangaId = const Value.absent(),
             Value<String?> mangaTitle = const Value.absent(),
-            Value<String?> coverUrl = const Value.absent(),
+            Value<String?> mangaCoverUrl = const Value.absent(),
             Value<String?> chapterId = const Value.absent(),
             Value<int?> chapterNumber = const Value.absent(),
             Value<String?> source = const Value.absent(),
@@ -4168,7 +4174,7 @@ class $$FetchChapterJobTablesTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
             mangaId: mangaId,
             mangaTitle: mangaTitle,
-            coverUrl: coverUrl,
+            mangaCoverUrl: mangaCoverUrl,
             chapterId: chapterId,
             chapterNumber: chapterNumber,
             source: source,
@@ -4179,7 +4185,7 @@ class $$FetchChapterJobTablesTableTableManager extends RootTableManager<
             Value<String> updatedAt = const Value.absent(),
             Value<String?> mangaId = const Value.absent(),
             Value<String?> mangaTitle = const Value.absent(),
-            Value<String?> coverUrl = const Value.absent(),
+            Value<String?> mangaCoverUrl = const Value.absent(),
             Value<String?> chapterId = const Value.absent(),
             Value<int?> chapterNumber = const Value.absent(),
             Value<String?> source = const Value.absent(),
@@ -4190,7 +4196,7 @@ class $$FetchChapterJobTablesTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
             mangaId: mangaId,
             mangaTitle: mangaTitle,
-            coverUrl: coverUrl,
+            mangaCoverUrl: mangaCoverUrl,
             chapterId: chapterId,
             chapterNumber: chapterNumber,
             source: source,

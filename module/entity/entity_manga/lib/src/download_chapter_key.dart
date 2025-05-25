@@ -52,6 +52,7 @@ class DownloadChapterKey extends Equatable {
       mangaId: manga?.id,
       mangaSource: manga?.source,
       mangaTitle: manga?.title,
+      mangaCoverUrl: manga?.coverUrl,
       chapterId: chapter?.id,
       chapterNumber: chapter?.numChapter,
     );
@@ -72,6 +73,7 @@ class DownloadChapterKey extends Equatable {
       mangaId: key.mangaId,
       mangaSource: key.source?.let((e) => MangaSourceEnum.fromValue(e)),
       mangaTitle: key.mangaTitle,
+      mangaCoverUrl: key.mangaCoverUrl,
       chapterId: key.chapterId,
       chapterNumber: key.chapterNumber,
     );
@@ -84,6 +86,7 @@ class DownloadChapterKey extends Equatable {
       chapterId: Value.absentIfNull(chapterId),
       source: Value.absentIfNull(mangaSource?.value),
       chapterNumber: Value.absentIfNull(chapterNumber?.toInt()),
+      mangaCoverUrl: Value.absentIfNull(mangaCoverUrl),
     );
   }
 }

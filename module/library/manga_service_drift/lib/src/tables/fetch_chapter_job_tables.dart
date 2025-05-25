@@ -8,7 +8,7 @@ class FetchChapterJobTables extends Table with AutoTimestampTable {
 
   TextColumn get mangaTitle => text().named('manga_title').nullable()();
 
-  TextColumn get coverUrl => text().named('cover_url').nullable()();
+  TextColumn get mangaCoverUrl => text().named('manga_cover_url').nullable()();
 
   TextColumn get chapterId => text().named('chapter_id').nullable()();
 
@@ -20,7 +20,7 @@ class FetchChapterJobTables extends Table with AutoTimestampTable {
   Set<Column<Object>>? get primaryKey => {
         mangaId,
         mangaTitle,
-        coverUrl,
+    mangaCoverUrl,
         chapterId,
         chapterNumber,
         source,
