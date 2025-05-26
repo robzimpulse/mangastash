@@ -2794,13 +2794,26 @@ class $JobTablesTable extends JobTables
       GeneratedColumn<String>('type', aliasedName, false,
               type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<JobType>($JobTablesTable.$convertertype);
-  static const VerificationMeta _urlMeta = const VerificationMeta('url');
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
   @override
-  late final GeneratedColumn<String> url = GeneratedColumn<String>(
-      'url', aliasedName, false,
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+      'source', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _chapterIdMeta =
+      const VerificationMeta('chapterId');
   @override
-  List<GeneratedColumn> get $columns => [createdAt, updatedAt, id, type, url];
+  late final GeneratedColumn<String> chapterId = GeneratedColumn<String>(
+      'chapter_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _mangaIdMeta =
+      const VerificationMeta('mangaId');
+  @override
+  late final GeneratedColumn<String> mangaId = GeneratedColumn<String>(
+      'manga_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [createdAt, updatedAt, id, type, source, chapterId, mangaId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2823,11 +2836,19 @@ class $JobTablesTable extends JobTables
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     context.handle(_typeMeta, const VerificationResult.success());
-    if (data.containsKey('url')) {
-      context.handle(
-          _urlMeta, url.isAcceptableOrUnknown(data['url']!, _urlMeta));
+    if (data.containsKey('source')) {
+      context.handle(_sourceMeta,
+          source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
     } else if (isInserting) {
-      context.missing(_urlMeta);
+      context.missing(_sourceMeta);
+    }
+    if (data.containsKey('chapter_id')) {
+      context.handle(_chapterIdMeta,
+          chapterId.isAcceptableOrUnknown(data['chapter_id']!, _chapterIdMeta));
+    }
+    if (data.containsKey('manga_id')) {
+      context.handle(_mangaIdMeta,
+          mangaId.isAcceptableOrUnknown(data['manga_id']!, _mangaIdMeta));
     }
     return context;
   }
@@ -2846,8 +2867,12 @@ class $JobTablesTable extends JobTables
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       type: $JobTablesTable.$convertertype.fromSql(attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}type'])!),
-      url: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}url'])!,
+      source: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}source'])!,
+      chapterId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}chapter_id']),
+      mangaId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}manga_id']),
     );
   }
 
@@ -2865,13 +2890,17 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
   final String updatedAt;
   final int id;
   final JobType type;
-  final String url;
+  final String source;
+  final String? chapterId;
+  final String? mangaId;
   const JobDrift(
       {required this.createdAt,
       required this.updatedAt,
       required this.id,
       required this.type,
-      required this.url});
+      required this.source,
+      this.chapterId,
+      this.mangaId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2882,7 +2911,13 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
       map['type'] =
           Variable<String>($JobTablesTable.$convertertype.toSql(type));
     }
-    map['url'] = Variable<String>(url);
+    map['source'] = Variable<String>(source);
+    if (!nullToAbsent || chapterId != null) {
+      map['chapter_id'] = Variable<String>(chapterId);
+    }
+    if (!nullToAbsent || mangaId != null) {
+      map['manga_id'] = Variable<String>(mangaId);
+    }
     return map;
   }
 
@@ -2892,7 +2927,13 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
       updatedAt: Value(updatedAt),
       id: Value(id),
       type: Value(type),
-      url: Value(url),
+      source: Value(source),
+      chapterId: chapterId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(chapterId),
+      mangaId: mangaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mangaId),
     );
   }
 
@@ -2905,7 +2946,9 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
       id: serializer.fromJson<int>(json['id']),
       type: $JobTablesTable.$convertertype
           .fromJson(serializer.fromJson<String>(json['type'])),
-      url: serializer.fromJson<String>(json['url']),
+      source: serializer.fromJson<String>(json['source']),
+      chapterId: serializer.fromJson<String?>(json['chapterId']),
+      mangaId: serializer.fromJson<String?>(json['mangaId']),
     );
   }
   @override
@@ -2917,7 +2960,9 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
       'id': serializer.toJson<int>(id),
       'type': serializer
           .toJson<String>($JobTablesTable.$convertertype.toJson(type)),
-      'url': serializer.toJson<String>(url),
+      'source': serializer.toJson<String>(source),
+      'chapterId': serializer.toJson<String?>(chapterId),
+      'mangaId': serializer.toJson<String?>(mangaId),
     };
   }
 
@@ -2926,13 +2971,17 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
           String? updatedAt,
           int? id,
           JobType? type,
-          String? url}) =>
+          String? source,
+          Value<String?> chapterId = const Value.absent(),
+          Value<String?> mangaId = const Value.absent()}) =>
       JobDrift(
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         id: id ?? this.id,
         type: type ?? this.type,
-        url: url ?? this.url,
+        source: source ?? this.source,
+        chapterId: chapterId.present ? chapterId.value : this.chapterId,
+        mangaId: mangaId.present ? mangaId.value : this.mangaId,
       );
   JobDrift copyWithCompanion(JobTablesCompanion data) {
     return JobDrift(
@@ -2940,7 +2989,9 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       id: data.id.present ? data.id.value : this.id,
       type: data.type.present ? data.type.value : this.type,
-      url: data.url.present ? data.url.value : this.url,
+      source: data.source.present ? data.source.value : this.source,
+      chapterId: data.chapterId.present ? data.chapterId.value : this.chapterId,
+      mangaId: data.mangaId.present ? data.mangaId.value : this.mangaId,
     );
   }
 
@@ -2951,13 +3002,16 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
           ..write('updatedAt: $updatedAt, ')
           ..write('id: $id, ')
           ..write('type: $type, ')
-          ..write('url: $url')
+          ..write('source: $source, ')
+          ..write('chapterId: $chapterId, ')
+          ..write('mangaId: $mangaId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(createdAt, updatedAt, id, type, url);
+  int get hashCode =>
+      Object.hash(createdAt, updatedAt, id, type, source, chapterId, mangaId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2966,7 +3020,9 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
           other.updatedAt == this.updatedAt &&
           other.id == this.id &&
           other.type == this.type &&
-          other.url == this.url);
+          other.source == this.source &&
+          other.chapterId == this.chapterId &&
+          other.mangaId == this.mangaId);
 }
 
 class JobTablesCompanion extends UpdateCompanion<JobDrift> {
@@ -2974,35 +3030,45 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
   final Value<String> updatedAt;
   final Value<int> id;
   final Value<JobType> type;
-  final Value<String> url;
+  final Value<String> source;
+  final Value<String?> chapterId;
+  final Value<String?> mangaId;
   const JobTablesCompanion({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.id = const Value.absent(),
     this.type = const Value.absent(),
-    this.url = const Value.absent(),
+    this.source = const Value.absent(),
+    this.chapterId = const Value.absent(),
+    this.mangaId = const Value.absent(),
   });
   JobTablesCompanion.insert({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.id = const Value.absent(),
     required JobType type,
-    required String url,
+    required String source,
+    this.chapterId = const Value.absent(),
+    this.mangaId = const Value.absent(),
   })  : type = Value(type),
-        url = Value(url);
+        source = Value(source);
   static Insertable<JobDrift> custom({
     Expression<String>? createdAt,
     Expression<String>? updatedAt,
     Expression<int>? id,
     Expression<String>? type,
-    Expression<String>? url,
+    Expression<String>? source,
+    Expression<String>? chapterId,
+    Expression<String>? mangaId,
   }) {
     return RawValuesInsertable({
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (id != null) 'id': id,
       if (type != null) 'type': type,
-      if (url != null) 'url': url,
+      if (source != null) 'source': source,
+      if (chapterId != null) 'chapter_id': chapterId,
+      if (mangaId != null) 'manga_id': mangaId,
     });
   }
 
@@ -3011,13 +3077,17 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
       Value<String>? updatedAt,
       Value<int>? id,
       Value<JobType>? type,
-      Value<String>? url}) {
+      Value<String>? source,
+      Value<String?>? chapterId,
+      Value<String?>? mangaId}) {
     return JobTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       id: id ?? this.id,
       type: type ?? this.type,
-      url: url ?? this.url,
+      source: source ?? this.source,
+      chapterId: chapterId ?? this.chapterId,
+      mangaId: mangaId ?? this.mangaId,
     );
   }
 
@@ -3037,8 +3107,14 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
       map['type'] =
           Variable<String>($JobTablesTable.$convertertype.toSql(type.value));
     }
-    if (url.present) {
-      map['url'] = Variable<String>(url.value);
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (chapterId.present) {
+      map['chapter_id'] = Variable<String>(chapterId.value);
+    }
+    if (mangaId.present) {
+      map['manga_id'] = Variable<String>(mangaId.value);
     }
     return map;
   }
@@ -3050,7 +3126,9 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
           ..write('updatedAt: $updatedAt, ')
           ..write('id: $id, ')
           ..write('type: $type, ')
-          ..write('url: $url')
+          ..write('source: $source, ')
+          ..write('chapterId: $chapterId, ')
+          ..write('mangaId: $mangaId')
           ..write(')'))
         .toString();
   }
@@ -4533,14 +4611,18 @@ typedef $$JobTablesTableCreateCompanionBuilder = JobTablesCompanion Function({
   Value<String> updatedAt,
   Value<int> id,
   required JobType type,
-  required String url,
+  required String source,
+  Value<String?> chapterId,
+  Value<String?> mangaId,
 });
 typedef $$JobTablesTableUpdateCompanionBuilder = JobTablesCompanion Function({
   Value<String> createdAt,
   Value<String> updatedAt,
   Value<int> id,
   Value<JobType> type,
-  Value<String> url,
+  Value<String> source,
+  Value<String?> chapterId,
+  Value<String?> mangaId,
 });
 
 class $$JobTablesTableFilterComposer
@@ -4566,8 +4648,14 @@ class $$JobTablesTableFilterComposer
           column: $table.type,
           builder: (column) => ColumnWithTypeConverterFilters(column));
 
-  ColumnFilters<String> get url => $composableBuilder(
-      column: $table.url, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get chapterId => $composableBuilder(
+      column: $table.chapterId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get mangaId => $composableBuilder(
+      column: $table.mangaId, builder: (column) => ColumnFilters(column));
 }
 
 class $$JobTablesTableOrderingComposer
@@ -4591,8 +4679,14 @@ class $$JobTablesTableOrderingComposer
   ColumnOrderings<String> get type => $composableBuilder(
       column: $table.type, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get url => $composableBuilder(
-      column: $table.url, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get chapterId => $composableBuilder(
+      column: $table.chapterId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get mangaId => $composableBuilder(
+      column: $table.mangaId, builder: (column) => ColumnOrderings(column));
 }
 
 class $$JobTablesTableAnnotationComposer
@@ -4616,8 +4710,14 @@ class $$JobTablesTableAnnotationComposer
   GeneratedColumnWithTypeConverter<JobType, String> get type =>
       $composableBuilder(column: $table.type, builder: (column) => column);
 
-  GeneratedColumn<String> get url =>
-      $composableBuilder(column: $table.url, builder: (column) => column);
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<String> get chapterId =>
+      $composableBuilder(column: $table.chapterId, builder: (column) => column);
+
+  GeneratedColumn<String> get mangaId =>
+      $composableBuilder(column: $table.mangaId, builder: (column) => column);
 }
 
 class $$JobTablesTableTableManager extends RootTableManager<
@@ -4647,28 +4747,36 @@ class $$JobTablesTableTableManager extends RootTableManager<
             Value<String> updatedAt = const Value.absent(),
             Value<int> id = const Value.absent(),
             Value<JobType> type = const Value.absent(),
-            Value<String> url = const Value.absent(),
+            Value<String> source = const Value.absent(),
+            Value<String?> chapterId = const Value.absent(),
+            Value<String?> mangaId = const Value.absent(),
           }) =>
               JobTablesCompanion(
             createdAt: createdAt,
             updatedAt: updatedAt,
             id: id,
             type: type,
-            url: url,
+            source: source,
+            chapterId: chapterId,
+            mangaId: mangaId,
           ),
           createCompanionCallback: ({
             Value<String> createdAt = const Value.absent(),
             Value<String> updatedAt = const Value.absent(),
             Value<int> id = const Value.absent(),
             required JobType type,
-            required String url,
+            required String source,
+            Value<String?> chapterId = const Value.absent(),
+            Value<String?> mangaId = const Value.absent(),
           }) =>
               JobTablesCompanion.insert(
             createdAt: createdAt,
             updatedAt: updatedAt,
             id: id,
             type: type,
-            url: url,
+            source: source,
+            chapterId: chapterId,
+            mangaId: mangaId,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

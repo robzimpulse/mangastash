@@ -8,9 +8,13 @@ class JobTables extends Table with AutoTimestampTable {
 
   TextColumn get type => textEnum<JobType>().named('type')();
 
-  TextColumn get url => text().named('url')();
+  TextColumn get source => text().named('source')();
+
+  TextColumn get chapterId => text().named('chapter_id').nullable()();
+
+  TextColumn get mangaId => text().named('manga_id').nullable()();
 }
 
 enum JobType {
-  manga, chapter, image;
+  manga, chapter;
 }
