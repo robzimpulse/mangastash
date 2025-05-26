@@ -2757,6 +2757,305 @@ class FetchChapterJobTablesCompanion
   }
 }
 
+class $JobTablesTable extends JobTables
+    with TableInfo<$JobTablesTable, JobDrift> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $JobTablesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => DateTime.timestamp().toIso8601String());
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => DateTime.timestamp().toIso8601String());
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumnWithTypeConverter<JobType, String> type =
+      GeneratedColumn<String>('type', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<JobType>($JobTablesTable.$convertertype);
+  static const VerificationMeta _urlMeta = const VerificationMeta('url');
+  @override
+  late final GeneratedColumn<String> url = GeneratedColumn<String>(
+      'url', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [createdAt, updatedAt, id, type, url];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'job_tables';
+  @override
+  VerificationContext validateIntegrity(Insertable<JobDrift> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    context.handle(_typeMeta, const VerificationResult.success());
+    if (data.containsKey('url')) {
+      context.handle(
+          _urlMeta, url.isAcceptableOrUnknown(data['url']!, _urlMeta));
+    } else if (isInserting) {
+      context.missing(_urlMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  JobDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return JobDrift(
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}updated_at'])!,
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      type: $JobTablesTable.$convertertype.fromSql(attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}type'])!),
+      url: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}url'])!,
+    );
+  }
+
+  @override
+  $JobTablesTable createAlias(String alias) {
+    return $JobTablesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<JobType, String, String> $convertertype =
+      const EnumNameConverter<JobType>(JobType.values);
+}
+
+class JobDrift extends DataClass implements Insertable<JobDrift> {
+  final String createdAt;
+  final String updatedAt;
+  final int id;
+  final JobType type;
+  final String url;
+  const JobDrift(
+      {required this.createdAt,
+      required this.updatedAt,
+      required this.id,
+      required this.type,
+      required this.url});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    map['id'] = Variable<int>(id);
+    {
+      map['type'] =
+          Variable<String>($JobTablesTable.$convertertype.toSql(type));
+    }
+    map['url'] = Variable<String>(url);
+    return map;
+  }
+
+  JobTablesCompanion toCompanion(bool nullToAbsent) {
+    return JobTablesCompanion(
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      id: Value(id),
+      type: Value(type),
+      url: Value(url),
+    );
+  }
+
+  factory JobDrift.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return JobDrift(
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      id: serializer.fromJson<int>(json['id']),
+      type: $JobTablesTable.$convertertype
+          .fromJson(serializer.fromJson<String>(json['type'])),
+      url: serializer.fromJson<String>(json['url']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+      'id': serializer.toJson<int>(id),
+      'type': serializer
+          .toJson<String>($JobTablesTable.$convertertype.toJson(type)),
+      'url': serializer.toJson<String>(url),
+    };
+  }
+
+  JobDrift copyWith(
+          {String? createdAt,
+          String? updatedAt,
+          int? id,
+          JobType? type,
+          String? url}) =>
+      JobDrift(
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        id: id ?? this.id,
+        type: type ?? this.type,
+        url: url ?? this.url,
+      );
+  JobDrift copyWithCompanion(JobTablesCompanion data) {
+    return JobDrift(
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      id: data.id.present ? data.id.value : this.id,
+      type: data.type.present ? data.type.value : this.type,
+      url: data.url.present ? data.url.value : this.url,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JobDrift(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('id: $id, ')
+          ..write('type: $type, ')
+          ..write('url: $url')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(createdAt, updatedAt, id, type, url);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is JobDrift &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.id == this.id &&
+          other.type == this.type &&
+          other.url == this.url);
+}
+
+class JobTablesCompanion extends UpdateCompanion<JobDrift> {
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<int> id;
+  final Value<JobType> type;
+  final Value<String> url;
+  const JobTablesCompanion({
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.id = const Value.absent(),
+    this.type = const Value.absent(),
+    this.url = const Value.absent(),
+  });
+  JobTablesCompanion.insert({
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.id = const Value.absent(),
+    required JobType type,
+    required String url,
+  })  : type = Value(type),
+        url = Value(url);
+  static Insertable<JobDrift> custom({
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<int>? id,
+    Expression<String>? type,
+    Expression<String>? url,
+  }) {
+    return RawValuesInsertable({
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (id != null) 'id': id,
+      if (type != null) 'type': type,
+      if (url != null) 'url': url,
+    });
+  }
+
+  JobTablesCompanion copyWith(
+      {Value<String>? createdAt,
+      Value<String>? updatedAt,
+      Value<int>? id,
+      Value<JobType>? type,
+      Value<String>? url}) {
+    return JobTablesCompanion(
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      id: id ?? this.id,
+      type: type ?? this.type,
+      url: url ?? this.url,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (type.present) {
+      map['type'] =
+          Variable<String>($JobTablesTable.$convertertype.toSql(type.value));
+    }
+    if (url.present) {
+      map['url'] = Variable<String>(url.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JobTablesCompanion(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('id: $id, ')
+          ..write('type: $type, ')
+          ..write('url: $url')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2772,11 +3071,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $MangaTagRelationshipTablesTable(this);
   late final $FetchChapterJobTablesTable fetchChapterJobTables =
       $FetchChapterJobTablesTable(this);
+  late final $JobTablesTable jobTables = $JobTablesTable(this);
   late final MangaDao mangaDao = MangaDao(this as AppDatabase);
   late final ChapterDao chapterDao = ChapterDao(this as AppDatabase);
   late final LibraryDao libraryDao = LibraryDao(this as AppDatabase);
   late final FetchChapterJobDao fetchChapterJobDao =
       FetchChapterJobDao(this as AppDatabase);
+  late final JobDao jobDao = JobDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2788,7 +3089,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         mangaTables,
         mangaTagTables,
         mangaTagRelationshipTables,
-        fetchChapterJobTables
+        fetchChapterJobTables,
+        jobTables
       ];
 }
 
@@ -4226,6 +4528,167 @@ typedef $$FetchChapterJobTablesTableProcessedTableManager
         ),
         FetchChapterJobDrift,
         PrefetchHooks Function()>;
+typedef $$JobTablesTableCreateCompanionBuilder = JobTablesCompanion Function({
+  Value<String> createdAt,
+  Value<String> updatedAt,
+  Value<int> id,
+  required JobType type,
+  required String url,
+});
+typedef $$JobTablesTableUpdateCompanionBuilder = JobTablesCompanion Function({
+  Value<String> createdAt,
+  Value<String> updatedAt,
+  Value<int> id,
+  Value<JobType> type,
+  Value<String> url,
+});
+
+class $$JobTablesTableFilterComposer
+    extends Composer<_$AppDatabase, $JobTablesTable> {
+  $$JobTablesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<JobType, JobType, String> get type =>
+      $composableBuilder(
+          column: $table.type,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<String> get url => $composableBuilder(
+      column: $table.url, builder: (column) => ColumnFilters(column));
+}
+
+class $$JobTablesTableOrderingComposer
+    extends Composer<_$AppDatabase, $JobTablesTable> {
+  $$JobTablesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get type => $composableBuilder(
+      column: $table.type, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get url => $composableBuilder(
+      column: $table.url, builder: (column) => ColumnOrderings(column));
+}
+
+class $$JobTablesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $JobTablesTable> {
+  $$JobTablesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<JobType, String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<String> get url =>
+      $composableBuilder(column: $table.url, builder: (column) => column);
+}
+
+class $$JobTablesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $JobTablesTable,
+    JobDrift,
+    $$JobTablesTableFilterComposer,
+    $$JobTablesTableOrderingComposer,
+    $$JobTablesTableAnnotationComposer,
+    $$JobTablesTableCreateCompanionBuilder,
+    $$JobTablesTableUpdateCompanionBuilder,
+    (JobDrift, BaseReferences<_$AppDatabase, $JobTablesTable, JobDrift>),
+    JobDrift,
+    PrefetchHooks Function()> {
+  $$JobTablesTableTableManager(_$AppDatabase db, $JobTablesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$JobTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$JobTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$JobTablesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> createdAt = const Value.absent(),
+            Value<String> updatedAt = const Value.absent(),
+            Value<int> id = const Value.absent(),
+            Value<JobType> type = const Value.absent(),
+            Value<String> url = const Value.absent(),
+          }) =>
+              JobTablesCompanion(
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            id: id,
+            type: type,
+            url: url,
+          ),
+          createCompanionCallback: ({
+            Value<String> createdAt = const Value.absent(),
+            Value<String> updatedAt = const Value.absent(),
+            Value<int> id = const Value.absent(),
+            required JobType type,
+            required String url,
+          }) =>
+              JobTablesCompanion.insert(
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            id: id,
+            type: type,
+            url: url,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$JobTablesTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $JobTablesTable,
+    JobDrift,
+    $$JobTablesTableFilterComposer,
+    $$JobTablesTableOrderingComposer,
+    $$JobTablesTableAnnotationComposer,
+    $$JobTablesTableCreateCompanionBuilder,
+    $$JobTablesTableUpdateCompanionBuilder,
+    (JobDrift, BaseReferences<_$AppDatabase, $JobTablesTable, JobDrift>),
+    JobDrift,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4247,4 +4710,6 @@ class $AppDatabaseManager {
               _db, _db.mangaTagRelationshipTables);
   $$FetchChapterJobTablesTableTableManager get fetchChapterJobTables =>
       $$FetchChapterJobTablesTableTableManager(_db, _db.fetchChapterJobTables);
+  $$JobTablesTableTableManager get jobTables =>
+      $$JobTablesTableTableManager(_db, _db.jobTables);
 }

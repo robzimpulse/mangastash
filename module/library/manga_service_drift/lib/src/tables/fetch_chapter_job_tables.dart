@@ -20,7 +20,7 @@ class FetchChapterJobTables extends Table with AutoTimestampTable {
   Set<Column<Object>>? get primaryKey => {
         mangaId,
         mangaTitle,
-    mangaCoverUrl,
+        mangaCoverUrl,
         chapterId,
         chapterNumber,
         source,
