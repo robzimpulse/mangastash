@@ -7,6 +7,7 @@ import 'package:service_locator/service_locator.dart';
 import 'manager/download_progress_manager.dart';
 import 'manager/file_download_manager.dart';
 import 'manager/headless_webview_manager.dart';
+import 'manager/job_manager.dart';
 import 'manager/library_manager.dart';
 import 'manager/manga_source_manager.dart';
 import 'use_case/chapter/crawl_url_use_case.dart';
@@ -14,6 +15,7 @@ import 'use_case/chapter/download_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
 import 'use_case/chapter/listen_download_progress_use_case.dart';
+import 'use_case/chapter/prefetch_chapter_use_case.dart';
 import 'use_case/chapter/search_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
 import 'use_case/library/add_to_library_use_case.dart';
@@ -22,6 +24,7 @@ import 'use_case/library/listen_manga_from_library_use_case.dart';
 import 'use_case/library/remove_from_library_use_case.dart';
 import 'use_case/manga/get_manga_on_mangadex_use_case.dart';
 import 'use_case/manga/get_manga_use_case.dart';
+import 'use_case/manga/prefetch_manga_use_case.dart';
 import 'use_case/manga/search_manga_on_mangadex_use_case.dart';
 import 'use_case/manga/search_manga_use_case.dart';
 import 'use_case/manga_source/get_manga_source_use_case.dart';
@@ -60,12 +63,28 @@ class DomainMangaRegistrar extends Registrar {
 
     await measurement.execute(() async {
       locator.registerSingleton(DatabaseViewer());
-      locator.registerSingleton(AppDatabase(logger: logger));
+      locator.registerSingleton(
+        AppDatabase(logger: logger),
+        dispose: (e) => e.close(),
+      );
       locator.registerFactory(() => MangaDao(locator()));
       locator.registerFactory(() => ChapterDao(locator()));
       locator.registerFactory(() => LibraryDao(locator()));
       locator.registerFactory(() => FetchChapterJobDao(locator()));
+      locator.registerFactory(() => JobDao(locator()));
       locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
+
+      locator.registerSingleton(
+        JobManager(
+          log: log,
+          getChapterUseCase: () => locator(),
+          getMangaUseCase: () => locator(),
+          jobDao: locator(),
+        ),
+        dispose: (e) => e.dispose(),
+      );
+      locator.alias<PrefetchMangaUseCase, JobManager>();
+      locator.alias<PrefetchChapterUseCase, JobManager>();
 
       locator.registerSingleton(
         HeadlessWebviewManager(log: log, cacheManager: locator()),

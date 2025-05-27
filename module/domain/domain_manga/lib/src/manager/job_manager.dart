@@ -9,9 +9,11 @@ import 'package:manga_service_drift/src/tables/job_tables.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../use_case/chapter/get_chapter_use_case.dart';
+import '../use_case/chapter/prefetch_chapter_use_case.dart';
 import '../use_case/manga/get_manga_use_case.dart';
+import '../use_case/manga/prefetch_manga_use_case.dart';
 
-class JobManager {
+class JobManager implements PrefetchMangaUseCase, PrefetchChapterUseCase {
   final BehaviorSubject<List<JobDrift>> _jobs = BehaviorSubject.seeded([]);
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
@@ -90,17 +92,9 @@ class JobManager {
   }
 
   Future<void> _fetchManga(JobDrift job) async {
-    final mangaId = job.mangaId;
-
-    if (mangaId == null) {
-      _isFetching = false;
-      _jobDao.remove(job.toCompanion(true));
-      return;
-    }
-
     final result = await _getMangaUseCase().execute(
       source: MangaSourceEnum.fromValue(job.source),
-      mangaId: mangaId,
+      mangaId: job.mangaId,
     );
 
     _isFetching = false;
@@ -132,5 +126,35 @@ class JobManager {
       );
     }
     _isFetching = false;
+  }
+
+  @override
+  void prefetchChapter({
+    required String mangaId,
+    required String chapterId,
+    required MangaSourceEnum source,
+  }) {
+    _jobDao.add(
+      JobTablesCompanion.insert(
+        type: JobType.chapter,
+        source: source.value,
+        mangaId: mangaId,
+        chapterId: Value(chapterId),
+      ),
+    );
+  }
+
+  @override
+  void prefetchManga({
+    required String mangaId,
+    required MangaSourceEnum source,
+  }) {
+    _jobDao.add(
+      JobTablesCompanion.insert(
+        type: JobType.manga,
+        source: source.value,
+        mangaId: mangaId,
+      ),
+    );
   }
 }

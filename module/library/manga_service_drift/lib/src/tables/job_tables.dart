@@ -12,7 +12,7 @@ class JobTables extends Table with AutoTimestampTable {
 
   TextColumn get chapterId => text().named('chapter_id').nullable()();
 
-  TextColumn get mangaId => text().named('manga_id').nullable()();
+  TextColumn get mangaId => text().named('manga_id')();
 }
 
 enum JobType {
