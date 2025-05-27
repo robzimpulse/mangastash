@@ -22,7 +22,8 @@ mixin SyncMangasMixin {
 
     final idsBefore = {...before.keys.map((e) => e.id.valueOrNull).nonNulls};
     final idsAfter = {...after.map((e) => e.id).nonNulls};
-    final idsDifference = idsBefore.intersection(idsAfter);
+    final idsDifference = idsBefore.union(idsAfter)
+      ..removeAll(idsBefore.intersection(idsAfter));
 
     logBox.log(
       'Insert & Update Manga',
