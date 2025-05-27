@@ -118,6 +118,7 @@ class DownloadProgressManager
       extra: {
         'url': task.url,
         'path': path,
+        'task': task.toJson(),
       },
       name: runtimeType.toString(),
     );
@@ -136,6 +137,7 @@ class DownloadProgressManager
       extra: {
         'url': task.url,
         'path': path,
+        'task': task.toJson(),
       },
       name: runtimeType.toString(),
     );
@@ -168,108 +170,108 @@ class DownloadProgressManager
       );
       _fetchChapterJobDao.remove(job.toCompanion(true));
 
-      // final key = DownloadChapterKey.fromDrift(job);
-      // final groupId = key.toJsonString();
-      // final images = result.data.images ?? [];
-      // final title = key.mangaTitle;
-      // final chapter = key.chapterNumber;
-      // final cover = key.mangaCoverUrl;
-      // final extension = cover?.split('.').lastOrNull;
-      // final info = '${key.mangaTitle} - chapter ${key.chapterNumber}';
-      //
-      // _fileDownloader.configureNotificationForGroup(
-      //   groupId,
-      //   running: TaskNotification(
-      //     'Downloading $title chapter $chapter',
-      //     '{numFinished} out of {numTotal}',
-      //   ),
-      //   complete: TaskNotification(
-      //     "Finish Downloading $title chapter $chapter",
-      //     "Loaded {numTotal} files",
-      //   ),
-      //   error: const TaskNotification(
-      //     'Error',
-      //     '{numFailed}/{numTotal} failed',
-      //   ),
-      //   progressBar: false,
-      //   groupNotificationId: groupId,
-      // );
-      //
-      // final List<DownloadTask> tasks = [];
-      // if (cover != null && extension != null && title != null) {
-      //   final filename = 'cover.$extension';
-      //
-      //   tasks.add(
-      //     DownloadTask(
-      //       taskId: generateTaskId(
-      //         url: cover,
-      //         directory: title,
-      //         filename: filename,
-      //         group: groupId,
-      //       ),
-      //       url: cover,
-      //       headers: {HttpHeaders.userAgentHeader: userAgent},
-      //       baseDirectory: BaseDirectory.applicationDocuments,
-      //       updates: Updates.statusAndProgress,
-      //       directory: title,
-      //       filename: filename,
-      //       retries: 3,
-      //       group: groupId,
-      //       creationTime: DateTime.now(),
-      //       requiresWiFi: true,
-      //       allowPause: true,
-      //     ),
-      //   );
-      // }
-      //
-      // for (final (index, url) in images.indexed) {
-      //   final extension = url.split('.').lastOrNull;
-      //
-      //   if (title == null || chapter == null || extension == null) continue;
-      //
-      //   final directory = '$title/$chapter';
-      //   final filename = '${index + 1}.$extension';
-      //
-      //   tasks.add(
-      //     DownloadTask(
-      //       taskId: generateTaskId(
-      //         url: url,
-      //         directory: directory,
-      //         filename: filename,
-      //         group: groupId,
-      //       ),
-      //       url: url,
-      //       headers: {HttpHeaders.userAgentHeader: userAgent},
-      //       baseDirectory: BaseDirectory.applicationDocuments,
-      //       updates: Updates.statusAndProgress,
-      //       directory: directory,
-      //       filename: filename,
-      //       retries: 3,
-      //       group: groupId,
-      //       creationTime: DateTime.now(),
-      //       allowPause: true,
-      //       requiresWiFi: true,
-      //     ),
-      //   );
-      // }
-      //
-      // for (final task in tasks) {
-      //   await _fileDownloader.enqueue(task);
-      //
-      //   _log.log(
-      //     '[$info] Success enqueue task',
-      //     extra: {
-      //       'id': task.taskId,
-      //       'url': task.url,
-      //       'base_directory': task.baseDirectory.toString(),
-      //       'directory': task.directory,
-      //       'filename': task.filename,
-      //       'group': task.group,
-      //       'headers': task.headers.toString(),
-      //     },
-      //     name: runtimeType.toString(),
-      //   );
-      // }
+      final key = DownloadChapterKey.fromDrift(job);
+      final groupId = key.toJsonString();
+      final images = result.data.images ?? [];
+      final title = key.mangaTitle;
+      final chapter = key.chapterNumber;
+      final cover = key.mangaCoverUrl;
+      final extension = cover?.split('.').lastOrNull;
+      final info = '${key.mangaTitle} - chapter ${key.chapterNumber}';
+
+      _fileDownloader.configureNotificationForGroup(
+        groupId,
+        running: TaskNotification(
+          'Downloading $title chapter $chapter',
+          '{numFinished} out of {numTotal}',
+        ),
+        complete: TaskNotification(
+          "Finish Downloading $title chapter $chapter",
+          "Loaded {numTotal} files",
+        ),
+        error: const TaskNotification(
+          'Error',
+          '{numFailed}/{numTotal} failed',
+        ),
+        progressBar: false,
+        groupNotificationId: groupId,
+      );
+
+      final List<DownloadTask> tasks = [];
+      if (cover != null && extension != null && title != null) {
+        final filename = 'cover.$extension';
+
+        tasks.add(
+          DownloadTask(
+            taskId: generateTaskId(
+              url: cover,
+              directory: title,
+              filename: filename,
+              group: groupId,
+            ),
+            url: cover,
+            headers: {HttpHeaders.userAgentHeader: userAgent},
+            baseDirectory: BaseDirectory.applicationDocuments,
+            updates: Updates.statusAndProgress,
+            directory: title,
+            filename: filename,
+            retries: 3,
+            group: groupId,
+            creationTime: DateTime.now(),
+            requiresWiFi: true,
+            allowPause: true,
+          ),
+        );
+      }
+
+      for (final (index, url) in images.indexed) {
+        final extension = url.split('.').lastOrNull;
+
+        if (title == null || chapter == null || extension == null) continue;
+
+        final directory = '$title/$chapter';
+        final filename = '${index + 1}.$extension';
+
+        tasks.add(
+          DownloadTask(
+            taskId: generateTaskId(
+              url: url,
+              directory: directory,
+              filename: filename,
+              group: groupId,
+            ),
+            url: url,
+            headers: {HttpHeaders.userAgentHeader: userAgent},
+            baseDirectory: BaseDirectory.applicationDocuments,
+            updates: Updates.statusAndProgress,
+            directory: directory,
+            filename: filename,
+            retries: 3,
+            group: groupId,
+            creationTime: DateTime.now(),
+            allowPause: true,
+            requiresWiFi: true,
+          ),
+        );
+      }
+
+      for (final task in tasks) {
+        await _fileDownloader.enqueue(task);
+
+        _log.log(
+          '[$info] Success enqueue task',
+          extra: {
+            'id': task.taskId,
+            'url': task.url,
+            'base_directory': task.baseDirectory.toString(),
+            'directory': task.directory,
+            'filename': task.filename,
+            'group': task.group,
+            'headers': task.headers.toString(),
+          },
+          name: runtimeType.toString(),
+        );
+      }
     }
 
     if (result is Error<MangaChapter>) {
