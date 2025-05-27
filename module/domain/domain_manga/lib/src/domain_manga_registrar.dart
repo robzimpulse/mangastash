@@ -172,6 +172,7 @@ class DomainMangaRegistrar extends Registrar {
           webview: locator(),
           mangaDao: locator(),
           chapterDao: locator(),
+          prefetchChapterUseCase: locator(),
         ),
       );
       locator.registerFactory(
