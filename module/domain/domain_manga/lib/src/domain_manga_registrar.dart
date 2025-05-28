@@ -15,6 +15,7 @@ import 'use_case/chapter/download_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
 import 'use_case/chapter/listen_download_progress_use_case.dart';
+import 'use_case/chapter/listen_prefetch_chapter_use_case.dart';
 import 'use_case/chapter/prefetch_chapter_use_case.dart';
 import 'use_case/chapter/search_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
@@ -24,6 +25,7 @@ import 'use_case/library/listen_manga_from_library_use_case.dart';
 import 'use_case/library/remove_from_library_use_case.dart';
 import 'use_case/manga/get_manga_on_mangadex_use_case.dart';
 import 'use_case/manga/get_manga_use_case.dart';
+import 'use_case/manga/listen_prefetch_manga_use_case.dart';
 import 'use_case/manga/prefetch_manga_use_case.dart';
 import 'use_case/manga/search_manga_on_mangadex_use_case.dart';
 import 'use_case/manga/search_manga_use_case.dart';
@@ -85,6 +87,8 @@ class DomainMangaRegistrar extends Registrar {
       );
       locator.alias<PrefetchMangaUseCase, PrefetchJobManager>();
       locator.alias<PrefetchChapterUseCase, PrefetchJobManager>();
+      locator.alias<ListenPrefetchMangaUseCase, PrefetchJobManager>();
+      locator.alias<ListenPrefetchChapterUseCase, PrefetchJobManager>();
 
       locator.registerSingleton(
         HeadlessWebviewManager(log: log, cacheManager: locator()),
