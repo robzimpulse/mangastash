@@ -13,6 +13,7 @@ class MangaShelfItem extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.isOnLibrary = false,
+    this.isPrefetching = false,
     this.cacheManager,
     this.sourceIconUrl,
   });
@@ -22,6 +23,8 @@ class MangaShelfItem extends StatelessWidget {
   final String coverUrl;
 
   final bool isOnLibrary;
+
+  final bool isPrefetching;
 
   final MangaShelfItemLayout layout;
 
@@ -74,6 +77,12 @@ class MangaShelfItem extends StatelessWidget {
             child: Text(title),
           ),
         ),
+        if (isPrefetching)
+          const SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(),
+          ),
         if (isOnLibrary) const Icon(Icons.bookmark),
         if (sourceIconUrl != null) ...[
           Container(
@@ -193,6 +202,16 @@ class MangaShelfItem extends StatelessWidget {
               ),
             ),
           ),
+        if (isPrefetching)
+          const Positioned.fill(
+            child: Center(
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -276,6 +295,16 @@ class MangaShelfItem extends StatelessWidget {
               title,
               maxLines: 2,
               textAlign: TextAlign.center,
+            ),
+          ),
+        if (isPrefetching)
+          const Positioned.fill(
+            child: Center(
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(),
+              ),
             ),
           ),
       ],

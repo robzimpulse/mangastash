@@ -28,6 +28,8 @@ class LibraryMangaScreen extends StatefulWidget {
         initialState: LibraryMangaScreenState(),
         listenMangaFromLibraryUseCase: locator(),
         listenMangaSourceUseCase: locator(),
+        listenPrefetchMangaUseCase: locator(),
+        prefetchMangaUseCase: locator(),
       ),
       child: LibraryMangaScreen(
         cacheManager: locator(),
@@ -89,6 +91,7 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
       appBar: AppBar(
         title: _title(context: context),
         actions: [
+          _layoutRefresh(context: context),
           _layoutSearch(context: context),
           _layoutIcon(context: context),
         ],
@@ -136,6 +139,13 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
                 ),
               ),
             ),
+    );
+  }
+
+  Widget _layoutRefresh({required BuildContext context}) {
+    return IconButton(
+      icon: const Icon(Icons.refresh),
+      onPressed: () => _cubit(context).prefetch(),
     );
   }
 
@@ -217,6 +227,7 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
             title: e.title ?? '',
             coverUrl: e.coverUrl ?? '',
             sourceIconUrl: state.sources[e.source]?.iconUrl,
+            isPrefetching: state.prefetchedMangaIds.contains(e.id),
             layout: state.layout,
             onTap: () => widget.onTapManga?.call(e),
             onLongPress: () => context.showSnackBar(

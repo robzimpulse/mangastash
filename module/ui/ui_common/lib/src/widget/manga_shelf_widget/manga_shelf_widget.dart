@@ -3,11 +3,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../controller/paging_scroll_controller.dart';
-import 'manga_shelf_item.dart';
 
 class MangaShelfWidget extends StatelessWidget {
   final PagingScrollController controller;
-  final List<MangaShelfItem> children;
   final bool hasNextPage;
   final Widget loadingIndicator;
   final Widget contentSliverWidget;
@@ -17,7 +15,6 @@ class MangaShelfWidget extends StatelessWidget {
     super.key,
     this.padding = const EdgeInsets.all(0),
     required this.controller,
-    required this.children,
     required this.hasNextPage,
     required this.loadingIndicator,
     required this.contentSliverWidget,
@@ -27,7 +24,7 @@ class MangaShelfWidget extends StatelessWidget {
     super.key,
     this.padding = const EdgeInsets.all(0),
     required this.controller,
-    required this.children,
+    required List<Widget> children,
     required this.hasNextPage,
     required this.loadingIndicator,
     Widget? separator,
@@ -46,7 +43,7 @@ class MangaShelfWidget extends StatelessWidget {
   MangaShelfWidget.compactGrid({
     super.key,
     required this.controller,
-    required this.children,
+    required List<Widget> children,
     required this.hasNextPage,
     required this.loadingIndicator,
     required int crossAxisCount,
@@ -73,7 +70,7 @@ class MangaShelfWidget extends StatelessWidget {
   MangaShelfWidget.comfortableGrid({
     super.key,
     required this.controller,
-    required this.children,
+    required List<Widget> children,
     required this.hasNextPage,
     required this.loadingIndicator,
     required int crossAxisCount,

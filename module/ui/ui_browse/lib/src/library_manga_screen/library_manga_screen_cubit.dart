@@ -7,11 +7,16 @@ import 'library_manga_screen_state.dart';
 
 class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     with AutoSubscriptionMixin {
+
+  final PrefetchMangaUseCase _prefetchMangaUseCase;
+
   LibraryMangaScreenCubit({
     required LibraryMangaScreenState initialState,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
     required ListenMangaSourceUseCase listenMangaSourceUseCase,
-  }) : super(initialState) {
+    required ListenPrefetchMangaUseCase listenPrefetchMangaUseCase,
+    required PrefetchMangaUseCase prefetchMangaUseCase,
+  }) : _prefetchMangaUseCase = prefetchMangaUseCase, super(initialState) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
           .distinct()
@@ -21,6 +26,11 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
       listenMangaSourceUseCase.mangaSourceStateStream
           .distinct()
           .listen(_updateSourceState),
+    );
+    addSubscription(
+      listenPrefetchMangaUseCase.prefetchedMangaIdStream
+          .distinct()
+          .listen(_updatePrefetchState),
     );
   }
 
@@ -36,6 +46,19 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
         },
       ),
     );
+  }
+
+  void _updatePrefetchState(List<String> prefetchedMangaIds) {
+    emit(state.copyWith(prefetchedMangaIds: prefetchedMangaIds));
+  }
+
+  void prefetch() {
+    for (final manga in state.mangas) {
+      final id = manga.id;
+      final source = manga.source;
+      if (id == null || source == null) continue;
+      _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
+    }
   }
 
   void update({

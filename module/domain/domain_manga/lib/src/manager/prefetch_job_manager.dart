@@ -166,7 +166,7 @@ class PrefetchJobManager
   }
 
   @override
-  Stream<List<String>> get listenPrefetchedChapter {
+  Stream<List<String>> get prefetchedChapterIdStream {
     return _jobs.map(
       (event) => [
         ...event
@@ -178,7 +178,7 @@ class PrefetchJobManager
   }
 
   @override
-  Stream<List<String>> get listenPrefetchedManga {
+  Stream<List<String>> get prefetchedMangaIdStream {
     return _jobs.map(
       (event) => [
         ...event.where((e) => e.type == JobType.manga).map((e) => e.mangaId),
