@@ -101,21 +101,47 @@ class DownloadProgressManager
     if (task is! DownloadTask) return;
     if (status != TaskStatus.complete) return;
 
+    final moveSharedStoragePath = await _fileDownloader.moveToSharedStorage(
+      task,
+      SharedStorage.downloads,
+      directory: 'Mangastash/${task.directory}',
+    );
+
+    final pathInSharedStorage = await _fileDownloader.pathInSharedStorage(
+      task.filename,
+      SharedStorage.downloads,
+      directory: 'Mangastash/${task.directory}',
+    );
+
+    final path = moveSharedStoragePath ?? pathInSharedStorage;
+
     _log.log(
       'Move image to shared storage',
       extra: {
         'url': task.url,
-        'pathInSharedStorage': await _fileDownloader.pathInSharedStorage(
-          task.filename,
-          SharedStorage.downloads,
-          directory: 'Mangastash/${task.directory}',
-        ),
-        'moveToSharedStorage': await _fileDownloader.moveToSharedStorage(
-          task,
-          SharedStorage.downloads,
-          directory: 'Mangastash/${task.directory}',
-        ),
+        'moveSharedStoragePath': moveSharedStoragePath,
+        'pathInSharedStorage': pathInSharedStorage,
+        'path': path,
         'task': task.toJson().toString(),
+      },
+      name: runtimeType.toString(),
+    );
+
+    if (path == null) return;
+
+    await _cacheManager.removeFile(task.url);
+
+    await _cacheManager.putFile(
+      task.url,
+      await File(path).readAsBytes(),
+    );
+
+    _log.log(
+      'Adding image to cache',
+      extra: {
+        'url': task.url,
+        'path': path,
+        'task': task.toJson(),
       },
       name: runtimeType.toString(),
     );
