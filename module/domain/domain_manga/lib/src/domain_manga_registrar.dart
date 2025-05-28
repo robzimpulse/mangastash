@@ -7,9 +7,9 @@ import 'package:service_locator/service_locator.dart';
 import 'manager/download_progress_manager.dart';
 import 'manager/file_download_manager.dart';
 import 'manager/headless_webview_manager.dart';
-import 'manager/job_manager.dart';
 import 'manager/library_manager.dart';
 import 'manager/manga_source_manager.dart';
+import 'manager/prefetch_job_manager.dart';
 import 'use_case/chapter/crawl_url_use_case.dart';
 import 'use_case/chapter/download_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
@@ -75,7 +75,7 @@ class DomainMangaRegistrar extends Registrar {
       locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
 
       locator.registerSingleton(
-        JobManager(
+        PrefetchJobManager(
           log: log,
           getChapterUseCase: () => locator(),
           getMangaUseCase: () => locator(),
@@ -83,8 +83,8 @@ class DomainMangaRegistrar extends Registrar {
         ),
         dispose: (e) => e.dispose(),
       );
-      locator.alias<PrefetchMangaUseCase, JobManager>();
-      locator.alias<PrefetchChapterUseCase, JobManager>();
+      locator.alias<PrefetchMangaUseCase, PrefetchJobManager>();
+      locator.alias<PrefetchChapterUseCase, PrefetchJobManager>();
 
       locator.registerSingleton(
         HeadlessWebviewManager(log: log, cacheManager: locator()),

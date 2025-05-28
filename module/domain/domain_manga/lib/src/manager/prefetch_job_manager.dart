@@ -13,7 +13,7 @@ import '../use_case/chapter/prefetch_chapter_use_case.dart';
 import '../use_case/manga/get_manga_use_case.dart';
 import '../use_case/manga/prefetch_manga_use_case.dart';
 
-class JobManager implements PrefetchMangaUseCase, PrefetchChapterUseCase {
+class PrefetchJobManager implements PrefetchMangaUseCase, PrefetchChapterUseCase {
   final BehaviorSubject<List<PrefetchJobDrift>> _jobs = BehaviorSubject.seeded([]);
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
@@ -25,7 +25,7 @@ class JobManager implements PrefetchMangaUseCase, PrefetchChapterUseCase {
   late final StreamSubscription _streamSubscription;
 
   // TODO: add how to enqueue a job to populate manga / chapter data in background
-  JobManager({
+  PrefetchJobManager({
     required LogBox log,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required ValueGetter<GetMangaUseCase> getMangaUseCase,
