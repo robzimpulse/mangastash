@@ -2,8 +2,8 @@ import 'package:drift/drift.dart';
 
 import '../mixin/auto_timestamp_table.dart';
 
-@DataClassName('FetchChapterJobDrift')
-class FetchChapterJobTables extends Table with AutoTimestampTable {
+@DataClassName('DownloadJobDrift')
+class DownloadJobTables extends Table with AutoTimestampTable {
   TextColumn get mangaId => text().named('manga_id').nullable()();
 
   TextColumn get mangaTitle => text().named('manga_title').nullable()();

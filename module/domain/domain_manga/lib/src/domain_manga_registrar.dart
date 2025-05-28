@@ -70,8 +70,8 @@ class DomainMangaRegistrar extends Registrar {
       locator.registerFactory(() => MangaDao(locator()));
       locator.registerFactory(() => ChapterDao(locator()));
       locator.registerFactory(() => LibraryDao(locator()));
-      locator.registerFactory(() => FetchChapterJobDao(locator()));
-      locator.registerFactory(() => JobDao(locator()));
+      locator.registerFactory(() => DownloadJobDao(locator()));
+      locator.registerFactory(() => PrefetchJobDao(locator()));
       locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
 
       locator.registerSingleton(
@@ -79,7 +79,7 @@ class DomainMangaRegistrar extends Registrar {
           log: log,
           getChapterUseCase: () => locator(),
           getMangaUseCase: () => locator(),
-          jobDao: locator(),
+          prefetchJobDao: locator(),
         ),
         dispose: (e) => e.dispose(),
       );
@@ -97,7 +97,7 @@ class DomainMangaRegistrar extends Registrar {
           fileDownloader: locator(),
           log: log,
           cacheManager: locator(),
-          fetchChapterJobDao: locator(),
+          downloadJobDao: locator(),
           getChapterUseCase: () => locator(),
         ),
       );
@@ -204,7 +204,7 @@ class DomainMangaRegistrar extends Registrar {
       locator.registerFactory(
         () => DownloadChapterUseCase(
           log: log,
-          fetchChapterJobDao: locator(),
+          downloadJobDao: locator(),
         ),
       );
 

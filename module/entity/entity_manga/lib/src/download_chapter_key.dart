@@ -5,8 +5,9 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 
-import '../entity_manga.dart';
+import 'enum/manga_source_enum.dart';
 import 'manga.dart';
+import 'manga_chapter.dart';
 
 part 'download_chapter_key.g.dart';
 
@@ -68,10 +69,10 @@ class DownloadChapterKey extends Equatable {
     }
   }
 
-  factory DownloadChapterKey.fromDrift(FetchChapterJobDrift key) {
+  factory DownloadChapterKey.fromDrift(DownloadJobDrift key) {
     return DownloadChapterKey(
       mangaId: key.mangaId,
-      mangaSource: key.source?.let((e) => MangaSourceEnum.fromValue(e)),
+      mangaSource: key.source.let((e) => MangaSourceEnum.fromValue(e)),
       mangaTitle: key.mangaTitle,
       mangaCoverUrl: key.mangaCoverUrl,
       chapterId: key.chapterId,
@@ -79,8 +80,8 @@ class DownloadChapterKey extends Equatable {
     );
   }
 
-  FetchChapterJobTablesCompanion get toDrift {
-    return FetchChapterJobTablesCompanion(
+  DownloadJobTablesCompanion get toDrift {
+    return DownloadJobTablesCompanion(
       mangaId: Value.absentIfNull(mangaId),
       mangaTitle: Value.absentIfNull(mangaTitle),
       chapterId: Value.absentIfNull(chapterId),

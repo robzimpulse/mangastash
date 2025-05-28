@@ -25,8 +25,8 @@ class DownloadProgressManager
     implements ListenDownloadProgressUseCase {
   final BehaviorSubject<Map<Key, Update>> _progress;
   final BehaviorSubject<Map<String, Task>> _tasks;
-  final BehaviorSubject<List<FetchChapterJobDrift>> _jobs;
-  final FetchChapterJobDao _fetchChapterJobDao;
+  final BehaviorSubject<List<DownloadJobDrift>> _jobs;
+  final DownloadJobDao _downloadJobDao;
   final FileDownloader _fileDownloader;
   final BaseCacheManager _cacheManager;
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
@@ -37,7 +37,7 @@ class DownloadProgressManager
   bool _isFetchingChapter = false;
 
   static Future<DownloadProgressManager> create({
-    required FetchChapterJobDao fetchChapterJobDao,
+    required DownloadJobDao downloadJobDao,
     required FileDownloader fileDownloader,
     required BaseCacheManager cacheManager,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
@@ -48,7 +48,7 @@ class DownloadProgressManager
     return DownloadProgressManager(
       fileDownloader: fileDownloader,
       cacheManager: cacheManager,
-      fetchChapterJobDao: fetchChapterJobDao,
+      downloadJobDao: downloadJobDao,
       getChapterUseCase: getChapterUseCase,
       log: log,
       tasks: Map.fromEntries(records.map((e) => MapEntry(e.taskId, e.task))),
@@ -68,7 +68,7 @@ class DownloadProgressManager
     required LogBox log,
     required Map<String, Task> tasks,
     required Map<Key, Update> progress,
-    required FetchChapterJobDao fetchChapterJobDao,
+    required DownloadJobDao downloadJobDao,
     required FileDownloader fileDownloader,
     required BaseCacheManager cacheManager,
     required List<TaskRecord> completeRecords,
@@ -78,12 +78,12 @@ class DownloadProgressManager
         _fileDownloader = fileDownloader,
         _tasks = BehaviorSubject.seeded(tasks),
         _jobs = BehaviorSubject.seeded([]),
-        _fetchChapterJobDao = fetchChapterJobDao,
+        _downloadJobDao = downloadJobDao,
         _getChapterUseCase = getChapterUseCase,
         _progress = BehaviorSubject.seeded(progress) {
     _streamSubscription = _fileDownloader.updates.distinct().listen(_onUpdate);
     _streamSubscription2 = _jobs.distinct().listen(_onFetch);
-    _jobs.addStream(fetchChapterJobDao.listen());
+    _jobs.addStream(downloadJobDao.listen());
     for (final record in completeRecords) {
       _moveFileToSharedStorage(status: record.status, task: record.task);
     }
@@ -147,7 +147,7 @@ class DownloadProgressManager
     );
   }
 
-  void _onFetch(List<FetchChapterJobDrift> jobs) async {
+  void _onFetch(List<DownloadJobDrift> jobs) async {
     final job = jobs.firstOrNull;
     if (job == null || _isFetchingChapter) return;
 
@@ -172,7 +172,7 @@ class DownloadProgressManager
         },
         name: runtimeType.toString(),
       );
-      _fetchChapterJobDao.remove(job.toCompanion(true));
+      _downloadJobDao.remove(job.toCompanion(true));
 
       final key = DownloadChapterKey.fromDrift(job);
       final groupId = key.toJsonString();

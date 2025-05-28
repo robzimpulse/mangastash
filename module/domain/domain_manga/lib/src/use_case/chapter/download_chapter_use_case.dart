@@ -7,13 +7,13 @@ import '../../mixin/generate_task_id_mixin.dart';
 
 class DownloadChapterUseCase with GenerateTaskIdMixin, UserAgentMixin {
   final LogBox _log;
-  final FetchChapterJobDao _fetchChapterJobDao;
+  final DownloadJobDao _downloadJobDao;
 
   DownloadChapterUseCase({
     required LogBox log,
-    required FetchChapterJobDao fetchChapterJobDao,
+    required DownloadJobDao downloadJobDao,
   })  : _log = log,
-        _fetchChapterJobDao = fetchChapterJobDao;
+        _downloadJobDao = downloadJobDao;
 
   Future<void> execute({required DownloadChapterKey key}) async {
     final info = '${key.mangaTitle} - chapter ${key.chapterNumber}';
@@ -23,6 +23,6 @@ class DownloadChapterUseCase with GenerateTaskIdMixin, UserAgentMixin {
       name: runtimeType.toString(),
     );
 
-    await _fetchChapterJobDao.add(key.toDrift);
+    await _downloadJobDao.add(key.toDrift);
   }
 }
