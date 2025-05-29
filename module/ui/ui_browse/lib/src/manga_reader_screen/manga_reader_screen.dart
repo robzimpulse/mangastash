@@ -71,10 +71,9 @@ class MangaReaderScreen extends StatelessWidget {
             child: _content(),
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _prevButton(),
-              _nextButton(),
+              Flexible(child: _prevButton()),
+              Flexible(child: _nextButton()),
             ],
           ),
         ],
@@ -144,36 +143,38 @@ class MangaReaderScreen extends StatelessWidget {
           return const Center(child: Text('Images Empty'));
         }
 
-        return ListView.builder(
-          itemBuilder: (context, index) => CachedNetworkImageWidget(
-            cacheManager: cacheManager,
-            imageUrl: images[index],
-            errorBuilder: (context, error, _) => ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 300),
-              child: Center(
-                child: Row(
-                  children: [
-                    const Icon(Icons.error),
-                    const SizedBox(width: 8),
-                    Expanded(child: Text(error.toString())),
-                  ],
+        return ListView(
+          children: [
+            for (final image in images)
+              CachedNetworkImageWidget(
+                cacheManager: cacheManager,
+                imageUrl: image,
+                errorBuilder: (context, error, _) => ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 300),
+                  child: Center(
+                    child: Row(
+                      children: [
+                        const Icon(Icons.error),
+                        const SizedBox(width: 8),
+                        Expanded(child: Text(error.toString())),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            progressBuilder: (context, progress) => ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 300),
-              child: Center(
-                child: SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    value: progress,
+                progressBuilder: (context, progress) => ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 300),
+                  child: Center(
+                    child: SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        value: progress,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-          itemCount: images.length,
+          ],
         );
       },
     );
