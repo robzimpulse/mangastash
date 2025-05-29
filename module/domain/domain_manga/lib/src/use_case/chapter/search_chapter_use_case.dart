@@ -10,12 +10,10 @@ import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sort_chapters_mixin.dart';
 import '../../mixin/sync_chapters_mixin.dart';
 import '../../parser/base/chapter_list_html_parser.dart';
-import 'prefetch_chapter_use_case.dart';
 import 'search_chapter_on_manga_dex_use_case.dart';
 
 class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
   final SearchChapterOnMangaDexUseCase _searchChapterOnMangaDexUseCase;
-  final PrefetchChapterUseCase _prefetchChapterUseCase;
   final HeadlessWebviewManager _webview;
   final ChapterDao _chapterDao;
   final MangaDao _mangaDao;
@@ -23,13 +21,11 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
 
   const SearchChapterUseCase({
     required SearchChapterOnMangaDexUseCase searchChapterOnMangaDexUseCase,
-    required PrefetchChapterUseCase prefetchChapterUseCase,
     required HeadlessWebviewManager webview,
     required ChapterDao chapterDao,
     required MangaDao mangaDao,
     required LogBox logBox,
   })  : _searchChapterOnMangaDexUseCase = searchChapterOnMangaDexUseCase,
-        _prefetchChapterUseCase = prefetchChapterUseCase,
         _chapterDao = chapterDao,
         _mangaDao = mangaDao,
         _logBox = logBox,
@@ -80,16 +76,6 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
       ),
       parameter: parameter,
     );
-
-    for (final chapter in data) {
-      chapter.id?.let(
-        (id) => _prefetchChapterUseCase.prefetchChapter(
-          mangaId: mangaId,
-          chapterId: id,
-          source: source,
-        ),
-      );
-    }
 
     return Success(
       Pagination(
