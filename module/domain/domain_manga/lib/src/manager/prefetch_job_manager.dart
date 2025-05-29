@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/foundation.dart';
@@ -166,14 +167,17 @@ class PrefetchJobManager
   }
 
   @override
-  Stream<List<String>> get prefetchedChapterIdStream {
+  Stream<Map<String, List<String>>> get prefetchedChapterIdStream {
     return _jobs.map(
-      (event) => [
-        ...event
-            .where((e) => e.type == JobType.manga)
-            .map((e) => e.chapterId)
-            .nonNulls,
-      ],
+      (event) => event
+          .where((e) => e.type == JobType.manga)
+          .groupListsBy((e) => e.mangaId)
+          .map(
+            (key, value) => MapEntry(
+              key,
+              value.map((e) => e.chapterId).nonNulls.toList(),
+            ),
+          ),
     );
   }
 

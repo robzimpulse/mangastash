@@ -1,5 +1,6 @@
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:ui_common/ui_common.dart';
 
@@ -7,7 +8,6 @@ import 'library_manga_screen_state.dart';
 
 class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     with AutoSubscriptionMixin {
-
   final PrefetchMangaUseCase _prefetchMangaUseCase;
 
   LibraryMangaScreenCubit({
@@ -15,8 +15,10 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
     required ListenMangaSourceUseCase listenMangaSourceUseCase,
     required ListenPrefetchMangaUseCase listenPrefetchMangaUseCase,
+    required ListenPrefetchChapterUseCase listenPrefetchChapterUseCase,
     required PrefetchMangaUseCase prefetchMangaUseCase,
-  }) : _prefetchMangaUseCase = prefetchMangaUseCase, super(initialState) {
+  })  : _prefetchMangaUseCase = prefetchMangaUseCase,
+        super(initialState) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
           .distinct()
@@ -27,10 +29,13 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
           .distinct()
           .listen(_updateSourceState),
     );
+
     addSubscription(
-      listenPrefetchMangaUseCase.prefetchedMangaIdStream
-          .distinct()
-          .listen(_updatePrefetchState),
+      CombineLatestStream.combine2(
+        listenPrefetchMangaUseCase.prefetchedMangaIdStream.distinct(),
+        listenPrefetchChapterUseCase.prefetchedChapterIdStream,
+        (a, b) => {...a, ...b.keys}.toList(),
+      ).distinct().listen(_updatePrefetchState),
     );
   }
 

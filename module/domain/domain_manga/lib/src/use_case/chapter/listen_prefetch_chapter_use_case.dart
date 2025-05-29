@@ -1,3 +1,3 @@
 abstract class ListenPrefetchChapterUseCase {
-  Stream<List<String>> get prefetchedChapterIdStream;
+  Stream<Map<String, List<String>>> get prefetchedChapterIdStream;
 }
