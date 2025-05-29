@@ -1,6 +1,7 @@
 import 'package:core_auth/core_auth.dart';
 import 'package:core_route/core_route.dart';
 import 'package:feature_browse/feature_browse.dart';
+import 'package:feature_common/feature_common.dart';
 import 'package:feature_history/feature_history.dart';
 import 'package:feature_library/feature_library.dart';
 import 'package:feature_more/feature_more.dart';
@@ -27,26 +28,15 @@ class MainRouteBuilder extends BaseRouteBuilder {
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: MainPath.confirmation,
-        name: MainPath.confirmation,
-        pageBuilder: (context, state) => ConfirmationRouteBottomSheet(
-          locator: locator,
-          title: state.uri.queryParameters[MainPath.confirmationTitle],
-          content:
-              state.uri.queryParameters[MainPath.confirmationContent] ?? '',
-          positiveButtonText: state
-              .uri.queryParameters[MainPath.confirmationPositiveButtonText],
-          negativeButtonText: state
-              .uri.queryParameters[MainPath.confirmationNegativeButtonText],
-        ),
-      ),
-      GoRoute(
-        parentNavigatorKey: rootNavigatorKey,
         path: MainPath.notFound,
         name: MainPath.notFound,
         builder: (context, state) => ErrorScreen(
           text: state.extra as String? ?? '',
         ),
+      ),
+      ...CommonRouteBuilder().routes(
+        locator: locator,
+        rootNavigatorKey: rootNavigatorKey,
       ),
       ...LibraryRouteBuilder().routes(
         locator: locator,
@@ -87,12 +77,12 @@ class MainRouteBuilder extends BaseRouteBuilder {
           initialLocation: index == shell.currentIndex,
         ),
         onTapClosedApps: () => context.pushNamed<bool>(
-          MainPath.confirmation,
+          CommonRoutePath.confirmation,
           queryParameters: {
-            MainPath.confirmationTitle: 'Exit',
-            MainPath.confirmationContent: 'Are you sure want to quit?',
-            MainPath.confirmationNegativeButtonText: 'No',
-            MainPath.confirmationPositiveButtonText: 'Yes',
+            CommonRoutePath.confirmationTitle: 'Exit',
+            CommonRoutePath.confirmationContent: 'Are you sure want to quit?',
+            CommonRoutePath.confirmationNegativeButtonText: 'No',
+            CommonRoutePath.confirmationPositiveButtonText: 'Yes',
           },
         ),
         child: shell,

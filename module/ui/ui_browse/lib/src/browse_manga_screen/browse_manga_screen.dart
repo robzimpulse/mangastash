@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -136,6 +137,48 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     }
 
     await widget.crawlUrlUseCase.execute(url: url);
+  }
+
+  void _onTapMenu({
+    required BuildContext context,
+    required Manga manga,
+    required bool isOnLibrary,
+  }) async {
+    final result = await context.showBottomSheet<MangaMenu>(
+      builder: (context) => MenuBottomSheet(
+        title: 'Action',
+        content: [
+          ListTile(
+            title: Text('${isOnLibrary ? 'Remove from' : 'Add to'} Library'),
+            leading: Icon(
+              isOnLibrary ? Icons.favorite_border : Icons.favorite,
+            ),
+            onTap: () => context.pop(MangaMenu.library),
+          ),
+          ListTile(
+            title: const Text('Prefetch'),
+            leading: const Icon(Icons.cached),
+            onTap: () => context.pop(MangaMenu.prefetch),
+          ),
+          ListTile(
+            title: const Text('Download'),
+            leading: const Icon(Icons.download),
+            onTap: () => context.pop(MangaMenu.download),
+          ),
+        ],
+      ),
+    );
+
+    if (result == null || !context.mounted) return;
+
+    switch (result) {
+      case MangaMenu.download:
+        context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+      case MangaMenu.library:
+        _cubit(context).addToLibrary(manga: manga);
+      case MangaMenu.prefetch:
+        context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+    }
   }
 
   Widget _layoutIcon({required BuildContext context}) {
@@ -352,6 +395,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
           );
         }
 
+        final lib = state.libraries;
         final children = state.mangas.map(
           (e) => MangaShelfItem(
             cacheManager: widget.cacheManager,
@@ -359,11 +403,12 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             coverUrl: e.coverUrl ?? '',
             layout: state.layout,
             onTap: () => widget.onTapManga?.call(e, state.parameter),
-            onLongPress: () => context.showSnackBar(
-              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+            onLongPress: () => _onTapMenu(
+              context: context,
+              manga: e,
+              isOnLibrary: lib.firstWhereOrNull((l) => e.id == l.id) != null,
             ),
-            isOnLibrary:
-                state.libraries.firstWhereOrNull((l) => e.id == l.id) != null,
+            isOnLibrary: lib.firstWhereOrNull((l) => e.id == l.id) != null,
           ),
         );
 

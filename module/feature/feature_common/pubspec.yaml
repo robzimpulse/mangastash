@@ -1,0 +1,34 @@
+name: feature_common
+description: "A new Flutter project."
+publish_to: none
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.7.12"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # library
+  service_locator:
+    path: ../../library/service_locator
+
+  # core
+  core_route:
+    path: ../../core/core_route
+  core_network:
+    path: ../../core/core_network
+  core_environment:
+    path: ../../core/core_environment
+  core_auth:
+    path: ../../core/core_auth
+
+  # ui
+  ui_common:
+    path: ../../ui/ui_common
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0

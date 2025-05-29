@@ -1,0 +1,1 @@
+enum MangaMenu { download, library, prefetch; }

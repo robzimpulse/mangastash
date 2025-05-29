@@ -61,6 +61,8 @@ dependencies:
     path: module/feature/feature_more
   feature_updates:
     path: module/feature/feature_updates
+  feature_common:
+    path: module/feature/feature_common
 
 dev_dependencies:
   flutter_test:

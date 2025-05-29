@@ -1,3 +1,4 @@
+import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -98,6 +99,48 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
       ),
       body: _content(context),
     );
+  }
+
+  void _onTapMenu({
+    required BuildContext context,
+    required Manga manga,
+    required bool isOnLibrary,
+  }) async {
+    final result = await context.showBottomSheet<MangaMenu>(
+      builder: (context) => MenuBottomSheet(
+        title: 'Action',
+        content: [
+          ListTile(
+            title: Text('${isOnLibrary ? 'Remove from' : 'Add to'} Library'),
+            leading: Icon(
+              isOnLibrary ? Icons.favorite_border : Icons.favorite,
+            ),
+            onTap: () => context.pop(MangaMenu.library),
+          ),
+          ListTile(
+            title: const Text('Prefetch'),
+            leading: const Icon(Icons.cached),
+            onTap: () => context.pop(MangaMenu.prefetch),
+          ),
+          ListTile(
+            title: const Text('Download'),
+            leading: const Icon(Icons.download),
+            onTap: () => context.pop(MangaMenu.download),
+          ),
+        ],
+      ),
+    );
+
+    if (result == null || !context.mounted) return;
+
+    switch (result) {
+      case MangaMenu.download:
+        context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+      case MangaMenu.library:
+        context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+      case MangaMenu.prefetch:
+        context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+    }
   }
 
   ResponsiveBreakpointsData _breakpoints(BuildContext context) {
@@ -231,8 +274,10 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
             isPrefetching: state.prefetchedMangaIds.contains(e.id),
             layout: state.layout,
             onTap: () => widget.onTapManga?.call(e),
-            onLongPress: () => context.showSnackBar(
-              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+            onLongPress: () => _onTapMenu(
+              context: context,
+              manga: e,
+              isOnLibrary: true,
             ),
           ),
         );
