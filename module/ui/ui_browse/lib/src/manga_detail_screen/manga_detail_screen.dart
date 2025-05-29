@@ -58,6 +58,7 @@ class MangaDetailScreen extends StatefulWidget {
         listenDownloadProgressUseCase: locator(),
         crawlUrlUseCase: locator(),
         listenLocaleUseCase: locator(),
+        listenPrefetchUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         cacheManager: locator(),
@@ -475,22 +476,22 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   Widget _chapterItem({required DownloadChapterKey key, MangaChapter? value}) {
     if (value == null) return const SizedBox.shrink();
     return _builder(
-      buildWhen: (prev, curr) => prev.progress?[key] != curr.progress?[key],
+      buildWhen: (prev, curr) => [
+        prev.progress?[key] != curr.progress?[key],
+        prev.prefetched != curr.prefetched,
+      ].contains(true),
       builder: (context, state) => MangaChapterTileWidget(
-        padding: const EdgeInsets.symmetric(
-          vertical: 8,
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         onTap: () => widget.onTapChapter?.call(value.id, state.chapterIds),
         onTapDownload: () => _onTapDownloadChapter(context, value),
         onLongPress: () => _onTapMenuChapter(context, value),
-        title: [
-          'Chapter ${value.chapter}',
-          value.title,
-        ].nonNulls.join(' - '),
+        title: ['Chapter ${value.chapter}', value.title].nonNulls.join(' - '),
         language: Language.fromCode(value.translatedLanguage),
         uploadedAt: value.readableAt?.asDateTime,
         groups: value.scanlationGroup,
         downloadProgress: state.progress?[key]?.progress.toDouble() ?? 0.0,
+        isPrefetching:
+            state.prefetched[key.mangaId]?.contains(value.id) ?? false,
       ),
     );
   }

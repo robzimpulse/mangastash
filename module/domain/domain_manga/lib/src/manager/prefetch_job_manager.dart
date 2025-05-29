@@ -58,6 +58,10 @@ class PrefetchJobManager
       case JobType.chapter:
         await _fetchChapter(job);
     }
+
+    _isFetching = false;
+
+    _prefetchJobDao.remove(job.toCompanion(true));
   }
 
   Future<void> _fetchChapter(PrefetchJobDrift job) async {
@@ -66,8 +70,6 @@ class PrefetchJobManager
       mangaId: job.mangaId,
       chapterId: job.chapterId,
     );
-
-    _isFetching = false;
 
     if (result is Success<MangaChapter>) {
       _log.log(
@@ -80,7 +82,6 @@ class PrefetchJobManager
         },
         name: runtimeType.toString(),
       );
-      _prefetchJobDao.remove(job.toCompanion(true));
     }
 
     if (result is Error<MangaChapter>) {
@@ -103,8 +104,6 @@ class PrefetchJobManager
       mangaId: job.mangaId,
     );
 
-    _isFetching = false;
-
     if (result is Success<Manga>) {
       _log.log(
         'Success fetch manga',
@@ -116,7 +115,6 @@ class PrefetchJobManager
         },
         name: runtimeType.toString(),
       );
-      _prefetchJobDao.remove(job.toCompanion(true));
     }
 
     if (result is Error<Manga>) {
@@ -131,7 +129,6 @@ class PrefetchJobManager
         name: runtimeType.toString(),
       );
     }
-    _isFetching = false;
   }
 
   @override
@@ -165,16 +162,15 @@ class PrefetchJobManager
   }
 
   @override
-  Stream<Map<String, List<String>>> get prefetchedStream {
-    return _jobs.map(
-      (event) => event
-          .groupListsBy((e) => e.mangaId)
-          .map(
-            (key, value) => MapEntry(
-              key,
-              value.map((e) => e.chapterId).nonNulls.toList(),
-            ),
-          ),
+  Stream<Map<String, Set<String>>> get prefetchedStream {
+    final stream = _jobs.map((e) => e.groupListsBy((e) => e.mangaId));
+    return stream.map(
+      (e) => e.map(
+        (key, value) => MapEntry(
+          key,
+          value.map((e) => e.chapterId).nonNulls.toSet(),
+        ),
+      ),
     );
   }
 }

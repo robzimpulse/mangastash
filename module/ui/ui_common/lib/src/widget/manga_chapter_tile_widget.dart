@@ -16,6 +16,7 @@ class MangaChapterTileWidget extends StatelessWidget {
     this.downloadProgress = 0,
     this.uploadedAt,
     this.groups,
+    this.isPrefetching = false,
   });
 
   final VoidCallback? onTap;
@@ -27,6 +28,7 @@ class MangaChapterTileWidget extends StatelessWidget {
   final Language? language;
   final double downloadProgress;
   final DateTime? uploadedAt;
+  final bool isPrefetching;
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +66,15 @@ class MangaChapterTileWidget extends StatelessWidget {
                 ].intersperse(const SizedBox(height: 4)).toList(),
               ),
             ),
+            if (isPrefetching)
+              const Padding(
+                padding: EdgeInsets.all(12.0),
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(),
+                ),
+              ),
             if (downloadProgress == 1)
               const Padding(
                 padding: EdgeInsets.all(12.0),
