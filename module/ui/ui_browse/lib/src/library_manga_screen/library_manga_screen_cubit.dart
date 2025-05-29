@@ -33,8 +33,8 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     addSubscription(
       CombineLatestStream.combine2(
         listenPrefetchMangaUseCase.prefetchedMangaIdStream.distinct(),
-        listenPrefetchChapterUseCase.prefetchedChapterIdStream,
-        (a, b) => {...a, ...b.keys}.toList(),
+        listenPrefetchChapterUseCase.prefetchedChapterIdStream.distinct(),
+        (a, b) => [...{...a, ...b.keys}],
       ).distinct().listen(_updatePrefetchState),
     );
   }

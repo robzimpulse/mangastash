@@ -199,6 +199,7 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
         prev.filteredMangas != curr.filteredMangas,
         prev.sources != curr.sources,
         prev.layout != curr.layout,
+        prev.prefetchedMangaIds != curr.prefetchedMangaIds,
       ].contains(true),
       builder: (context, state) {
         if (state.isLoading) {
