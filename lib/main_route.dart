@@ -27,16 +27,17 @@ class MainRouteBuilder extends BaseRouteBuilder {
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: MainPath.exit,
-        name: MainPath.exit,
+        path: MainPath.confirmation,
+        name: MainPath.confirmation,
         pageBuilder: (context, state) => ConfirmationRouteBottomSheet(
           locator: locator,
-          title: state.uri.queryParameters[MainPath.exitTitle],
-          content: state.uri.queryParameters[MainPath.exitContent] ?? '',
-          positiveButtonText:
-              state.uri.queryParameters[MainPath.exitPositiveButtonText],
-          negativeButtonText:
-              state.uri.queryParameters[MainPath.exitNegativeButtonText],
+          title: state.uri.queryParameters[MainPath.confirmationTitle],
+          content:
+              state.uri.queryParameters[MainPath.confirmationContent] ?? '',
+          positiveButtonText: state
+              .uri.queryParameters[MainPath.confirmationPositiveButtonText],
+          negativeButtonText: state
+              .uri.queryParameters[MainPath.confirmationNegativeButtonText],
         ),
       ),
       GoRoute(
@@ -86,12 +87,12 @@ class MainRouteBuilder extends BaseRouteBuilder {
           initialLocation: index == shell.currentIndex,
         ),
         onTapClosedApps: () => context.pushNamed<bool>(
-          MainPath.exit,
+          MainPath.confirmation,
           queryParameters: {
-            MainPath.exitTitle: 'Exit',
-            MainPath.exitContent: 'Are you sure want to quit?',
-            MainPath.exitNegativeButtonText: 'No',
-            MainPath.exitPositiveButtonText: 'Yes',
+            MainPath.confirmationTitle: 'Exit',
+            MainPath.confirmationContent: 'Are you sure want to quit?',
+            MainPath.confirmationNegativeButtonText: 'No',
+            MainPath.confirmationPositiveButtonText: 'Yes',
           },
         ),
         child: shell,
