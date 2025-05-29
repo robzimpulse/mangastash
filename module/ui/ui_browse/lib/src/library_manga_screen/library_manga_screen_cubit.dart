@@ -8,14 +8,17 @@ import 'library_manga_screen_state.dart';
 class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     with AutoSubscriptionMixin {
   final PrefetchMangaUseCase _prefetchMangaUseCase;
+  final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
 
   LibraryMangaScreenCubit({
     required LibraryMangaScreenState initialState,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
     required ListenMangaSourceUseCase listenMangaSourceUseCase,
     required PrefetchMangaUseCase prefetchMangaUseCase,
+    required RemoveFromLibraryUseCase removeFromLibraryUseCase,
     required ListenPrefetchUseCase listenPrefetchMangaUseCase,
   })  : _prefetchMangaUseCase = prefetchMangaUseCase,
+        _removeFromLibraryUseCase = removeFromLibraryUseCase,
         super(initialState) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
@@ -53,13 +56,17 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     emit(state.copyWith(prefetchedMangaIds: [...prefetchedMangaIds.keys]));
   }
 
-  void prefetch() {
-    for (final manga in state.mangas) {
+  void prefetch({required List<Manga> mangas}) {
+    for (final manga in mangas) {
       final id = manga.id;
       final source = manga.source;
       if (id == null || source == null) continue;
       _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
     }
+  }
+
+  void remove({required Manga manga}) {
+    _removeFromLibraryUseCase.execute(manga: manga);
   }
 
   void update({

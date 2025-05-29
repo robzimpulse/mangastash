@@ -25,11 +25,23 @@ class CommonRouteBuilder extends BaseRouteBuilder {
           locator: locator,
           title: state.uri.queryParameters[CommonRoutePath.confirmationTitle],
           content:
-          state.uri.queryParameters[CommonRoutePath.confirmationContent] ?? '',
-          positiveButtonText: state
-              .uri.queryParameters[CommonRoutePath.confirmationPositiveButtonText],
-          negativeButtonText: state
-              .uri.queryParameters[CommonRoutePath.confirmationNegativeButtonText],
+              state.uri.queryParameters[CommonRoutePath.confirmationContent] ??
+                  '',
+          positiveButtonText: state.uri
+              .queryParameters[CommonRoutePath.confirmationPositiveButtonText],
+          negativeButtonText: state.uri
+              .queryParameters[CommonRoutePath.confirmationNegativeButtonText],
+        ),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: CommonRoutePath.menu,
+        name: CommonRoutePath.menu,
+        pageBuilder: (context, state) => MenuRouteBottomSheet(
+          locator: locator,
+          isOnLibrary:
+              state.uri.queryParameters[CommonRoutePath.menuIsOnLibrary] ==
+                  'true',
         ),
       ),
     ];

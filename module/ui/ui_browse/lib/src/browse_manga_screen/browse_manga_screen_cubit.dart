@@ -12,6 +12,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   final SearchMangaUseCase _searchMangaUseCase;
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
   final AddToLibraryUseCase _addToLibraryUseCase;
+  final PrefetchMangaUseCase _prefetchMangaUseCase;
 
   BrowseMangaScreenCubit({
     required BrowseMangaScreenState initialState,
@@ -21,9 +22,12 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     required RemoveFromLibraryUseCase removeFromLibraryUseCase,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
     required ListenLocaleUseCase listenLocaleUseCase,
+    required PrefetchMangaUseCase prefetchMangaUseCase,
+    required ListenPrefetchUseCase listenPrefetchMangaUseCase,
   })  : _searchMangaUseCase = searchMangaUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
+        _prefetchMangaUseCase = prefetchMangaUseCase,
         super(initialState) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
@@ -32,6 +36,11 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     );
     addSubscription(
       listenLocaleUseCase.localeDataStream.distinct().listen(_updateLocale),
+    );
+    addSubscription(
+      listenPrefetchMangaUseCase.prefetchedStream
+          .distinct()
+          .listen(_updatePrefetchState),
     );
   }
 
@@ -52,6 +61,10 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
         ),
       ),
     );
+  }
+
+  void _updatePrefetchState(Map<String, Set<String>> prefetchedMangaIds) {
+    emit(state.copyWith(prefetchedMangaIds: [...prefetchedMangaIds.keys]));
   }
 
   Future<void> init({
@@ -138,5 +151,12 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     } else {
       await _addToLibraryUseCase.execute(manga: manga);
     }
+  }
+
+  void prefetch({required Manga manga}) {
+    final id = manga.id;
+    final source = manga.source;
+    if (id == null || source == null) return;
+    _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
   }
 }

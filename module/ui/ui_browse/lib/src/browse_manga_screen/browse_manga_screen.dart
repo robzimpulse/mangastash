@@ -3,6 +3,7 @@ import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:feature_common/feature_common.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -51,6 +52,8 @@ class BrowseMangaScreen extends StatefulWidget {
         listenLocaleUseCase: locator(),
         addToLibraryUseCase: locator(),
         removeFromLibraryUseCase: locator(),
+        prefetchMangaUseCase: locator(),
+        listenPrefetchMangaUseCase: locator(),
       )..init(),
       child: BrowseMangaScreen(
         crawlUrlUseCase: locator(),
@@ -144,29 +147,11 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     required Manga manga,
     required bool isOnLibrary,
   }) async {
-    final result = await context.showBottomSheet<MangaMenu>(
-      builder: (context) => MenuBottomSheet(
-        title: 'Action',
-        content: [
-          ListTile(
-            title: Text('${isOnLibrary ? 'Remove from' : 'Add to'} Library'),
-            leading: Icon(
-              isOnLibrary ? Icons.favorite_border : Icons.favorite,
-            ),
-            onTap: () => context.pop(MangaMenu.library),
-          ),
-          ListTile(
-            title: const Text('Prefetch'),
-            leading: const Icon(Icons.cached),
-            onTap: () => context.pop(MangaMenu.prefetch),
-          ),
-          ListTile(
-            title: const Text('Download'),
-            leading: const Icon(Icons.download),
-            onTap: () => context.pop(MangaMenu.download),
-          ),
-        ],
-      ),
+    final result = await context.pushNamed<MangaMenu>(
+      CommonRoutePath.menu,
+      queryParameters: {
+        CommonRoutePath.menuIsOnLibrary: isOnLibrary ? 'true' : 'false',
+      },
     );
 
     if (result == null || !context.mounted) return;
@@ -177,7 +162,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
       case MangaMenu.library:
         _cubit(context).addToLibrary(manga: manga);
       case MangaMenu.prefetch:
-        context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+        _cubit(context).prefetch(manga: manga);
     }
   }
 
@@ -373,6 +358,16 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
 
   Widget _content(BuildContext context) {
     return _builder(
+      buildWhen: (prev, curr) => [
+        prev.isLoading != curr.isLoading,
+        prev.error != curr.error,
+        prev.mangas != curr.mangas,
+        prev.libraries != curr.libraries,
+        prev.layout != curr.layout,
+        prev.parameter != curr.parameter,
+        prev.prefetchedMangaIds != curr.prefetchedMangaIds,
+        prev.hasNextPage != curr.hasNextPage,
+      ].contains(true),
       builder: (context, state) {
         if (state.isLoading) {
           return const Center(
@@ -409,6 +404,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               isOnLibrary: lib.firstWhereOrNull((l) => e.id == l.id) != null,
             ),
             isOnLibrary: lib.firstWhereOrNull((l) => e.id == l.id) != null,
+            isPrefetching: state.prefetchedMangaIds.contains(e.id),
           ),
         );
 

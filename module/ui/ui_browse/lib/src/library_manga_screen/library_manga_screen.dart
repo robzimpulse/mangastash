@@ -1,6 +1,7 @@
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:feature_common/feature_common.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -31,6 +32,7 @@ class LibraryMangaScreen extends StatefulWidget {
         listenMangaSourceUseCase: locator(),
         prefetchMangaUseCase: locator(),
         listenPrefetchMangaUseCase: locator(),
+        removeFromLibraryUseCase: locator(),
       ),
       child: LibraryMangaScreen(
         cacheManager: locator(),
@@ -92,8 +94,8 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
       appBar: AppBar(
         title: _title(context: context),
         actions: [
-          _layoutRefresh(context: context),
           _layoutSearch(context: context),
+          _layoutRefresh(context: context),
           _layoutIcon(context: context),
         ],
       ),
@@ -106,29 +108,11 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
     required Manga manga,
     required bool isOnLibrary,
   }) async {
-    final result = await context.showBottomSheet<MangaMenu>(
-      builder: (context) => MenuBottomSheet(
-        title: 'Action',
-        content: [
-          ListTile(
-            title: Text('${isOnLibrary ? 'Remove from' : 'Add to'} Library'),
-            leading: Icon(
-              isOnLibrary ? Icons.favorite_border : Icons.favorite,
-            ),
-            onTap: () => context.pop(MangaMenu.library),
-          ),
-          ListTile(
-            title: const Text('Prefetch'),
-            leading: const Icon(Icons.cached),
-            onTap: () => context.pop(MangaMenu.prefetch),
-          ),
-          ListTile(
-            title: const Text('Download'),
-            leading: const Icon(Icons.download),
-            onTap: () => context.pop(MangaMenu.download),
-          ),
-        ],
-      ),
+    final result = await context.pushNamed<MangaMenu>(
+      CommonRoutePath.menu,
+      queryParameters: {
+        CommonRoutePath.menuIsOnLibrary: isOnLibrary ? 'true' : 'false',
+      },
     );
 
     if (result == null || !context.mounted) return;
@@ -137,9 +121,9 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
       case MangaMenu.download:
         context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
       case MangaMenu.library:
-        context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+        _cubit(context).remove(manga: manga);
       case MangaMenu.prefetch:
-        context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+        _cubit(context).prefetch(mangas: [manga]);
     }
   }
 
@@ -186,9 +170,20 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
   }
 
   Widget _layoutRefresh({required BuildContext context}) {
-    return IconButton(
-      icon: const Icon(Icons.refresh),
-      onPressed: () => _cubit(context).prefetch(),
+    return _builder(
+      buildWhen: (prev, curr) => prev.filteredMangas != curr.filteredMangas,
+      builder: (context, state) {
+        if (state.filteredMangas.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: () => _cubit(context).prefetch(
+            mangas: state.filteredMangas,
+          ),
+        );
+      },
     );
   }
 
