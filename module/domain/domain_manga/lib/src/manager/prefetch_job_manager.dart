@@ -1,16 +1,19 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/foundation.dart';
 import 'package:log_box/log_box.dart';
+import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_drift/src/tables/prefetch_job_tables.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../use_case/chapter/get_chapter_use_case.dart';
 import '../use_case/chapter/prefetch_chapter_use_case.dart';
+import '../use_case/chapter/search_chapter_use_case.dart';
 import '../use_case/library/listen_prefetch_use_case.dart';
 import '../use_case/manga/get_manga_use_case.dart';
 import '../use_case/manga/prefetch_manga_use_case.dart';
@@ -24,6 +27,7 @@ class PrefetchJobManager
       BehaviorSubject.seeded([]);
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
+  final ValueGetter<SearchChapterUseCase> _searchChapterUseCase;
   final PrefetchJobDao _prefetchJobDao;
   final LogBox _log;
 
@@ -35,10 +39,12 @@ class PrefetchJobManager
     required LogBox log,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required ValueGetter<GetMangaUseCase> getMangaUseCase,
+    required ValueGetter<SearchChapterUseCase> searchChapterUseCase,
     required PrefetchJobDao prefetchJobDao,
   })  : _log = log,
         _getMangaUseCase = getMangaUseCase,
         _getChapterUseCase = getChapterUseCase,
+        _searchChapterUseCase = searchChapterUseCase,
         _prefetchJobDao = prefetchJobDao {
     _streamSubscription = _jobs.distinct().listen(_onData);
     _jobs.addStream(prefetchJobDao.listen());
@@ -115,11 +121,76 @@ class PrefetchJobManager
         },
         name: runtimeType.toString(),
       );
+
+      await _fetchAllChapter(job);
     }
 
     if (result is Error<Manga>) {
       _log.log(
         'Failed fetch manga',
+        extra: {
+          'manga_id': job.mangaId,
+          'chapter_id': job.chapterId,
+          'source': job.source,
+          'error': result.error.toString(),
+        },
+        name: runtimeType.toString(),
+      );
+    }
+  }
+
+  Future<void> _fetchAllChapter(
+    PrefetchJobDrift job, {
+    SearchChapterParameter parameter = const SearchChapterParameter(
+      offset: 0,
+      page: 1,
+      limit: 100,
+    ),
+  }) async {
+    final result = await _searchChapterUseCase().execute(
+      source: MangaSourceEnum.fromValue(job.source),
+      mangaId: job.mangaId,
+      parameter: parameter,
+    );
+
+    if (result is Success<Pagination<MangaChapter>>) {
+      _log.log(
+        'Success fetch manga chapters',
+        extra: {
+          'manga_id': job.mangaId,
+          'chapter_id': job.chapterId,
+          'source': job.source,
+          'parameter': parameter,
+          'data': result.data.toJson((e) => e.toJson()),
+        },
+        name: runtimeType.toString(),
+      );
+
+      for (final chapter in result.data.data ?? <MangaChapter>[]) {
+        chapter.id?.let(
+          (id) => prefetchChapter(
+            mangaId: job.mangaId,
+            chapterId: id,
+            source: MangaSourceEnum.fromValue(job.source),
+          ),
+        );
+      }
+
+      if (result.data.hasNextPage == true) {
+        await _fetchAllChapter(
+          job,
+          parameter: SearchChapterParameter(
+            offset: (parameter.offset ?? 0) + (parameter.limit ?? 0),
+            page: (parameter.page ?? 1) + 1,
+            limit: 100,
+          ),
+        );
+      }
+    }
+
+    if (result is Error<Pagination<MangaChapter>>) {
+      _log.log(
+        'Failed fetch manga chapters',
         extra: {
           'manga_id': job.mangaId,
           'chapter_id': job.chapterId,

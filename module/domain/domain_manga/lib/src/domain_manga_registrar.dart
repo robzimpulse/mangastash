@@ -81,6 +81,7 @@ class DomainMangaRegistrar extends Registrar {
           getChapterUseCase: () => locator(),
           getMangaUseCase: () => locator(),
           prefetchJobDao: locator(),
+          searchChapterUseCase: () => locator(),
         ),
         dispose: (e) => e.dispose(),
       );
