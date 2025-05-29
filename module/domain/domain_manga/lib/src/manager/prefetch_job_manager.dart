@@ -10,18 +10,16 @@ import 'package:manga_service_drift/src/tables/prefetch_job_tables.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../use_case/chapter/get_chapter_use_case.dart';
-import '../use_case/chapter/listen_prefetch_chapter_use_case.dart';
 import '../use_case/chapter/prefetch_chapter_use_case.dart';
+import '../use_case/library/listen_prefetch_use_case.dart';
 import '../use_case/manga/get_manga_use_case.dart';
-import '../use_case/manga/listen_prefetch_manga_use_case.dart';
 import '../use_case/manga/prefetch_manga_use_case.dart';
 
 class PrefetchJobManager
     implements
         PrefetchMangaUseCase,
         PrefetchChapterUseCase,
-        ListenPrefetchChapterUseCase,
-        ListenPrefetchMangaUseCase {
+        ListenPrefetchUseCase {
   final BehaviorSubject<List<PrefetchJobDrift>> _jobs =
       BehaviorSubject.seeded([]);
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
@@ -167,10 +165,9 @@ class PrefetchJobManager
   }
 
   @override
-  Stream<Map<String, List<String>>> get prefetchedChapterIdStream {
+  Stream<Map<String, List<String>>> get prefetchedStream {
     return _jobs.map(
       (event) => event
-          .where((e) => e.type == JobType.manga)
           .groupListsBy((e) => e.mangaId)
           .map(
             (key, value) => MapEntry(
@@ -178,15 +175,6 @@ class PrefetchJobManager
               value.map((e) => e.chapterId).nonNulls.toList(),
             ),
           ),
-    );
-  }
-
-  @override
-  Stream<List<String>> get prefetchedMangaIdStream {
-    return _jobs.map(
-      (event) => [
-        ...event.where((e) => e.type == JobType.manga).map((e) => e.mangaId),
-      ],
     );
   }
 }

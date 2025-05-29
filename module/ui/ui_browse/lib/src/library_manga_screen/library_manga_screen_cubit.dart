@@ -1,6 +1,5 @@
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:ui_common/ui_common.dart';
 
@@ -14,9 +13,8 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     required LibraryMangaScreenState initialState,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
     required ListenMangaSourceUseCase listenMangaSourceUseCase,
-    required ListenPrefetchMangaUseCase listenPrefetchMangaUseCase,
-    required ListenPrefetchChapterUseCase listenPrefetchChapterUseCase,
     required PrefetchMangaUseCase prefetchMangaUseCase,
+    required ListenPrefetchUseCase listenPrefetchMangaUseCase,
   })  : _prefetchMangaUseCase = prefetchMangaUseCase,
         super(initialState) {
     addSubscription(
@@ -31,11 +29,9 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     );
 
     addSubscription(
-      CombineLatestStream.combine2(
-        listenPrefetchMangaUseCase.prefetchedMangaIdStream.distinct(),
-        listenPrefetchChapterUseCase.prefetchedChapterIdStream.distinct(),
-        (a, b) => [...{...a, ...b.keys}],
-      ).distinct().listen(_updatePrefetchState),
+      listenPrefetchMangaUseCase.prefetchedStream
+          .distinct()
+          .listen(_updatePrefetchState),
     );
   }
 
@@ -53,8 +49,8 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     );
   }
 
-  void _updatePrefetchState(List<String> prefetchedMangaIds) {
-    emit(state.copyWith(prefetchedMangaIds: prefetchedMangaIds));
+  void _updatePrefetchState(Map<String, List<String>> prefetchedMangaIds) {
+    emit(state.copyWith(prefetchedMangaIds: [...prefetchedMangaIds.keys]));
   }
 
   void prefetch() {
