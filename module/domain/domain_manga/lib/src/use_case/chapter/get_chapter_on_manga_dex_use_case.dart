@@ -59,12 +59,6 @@ class GetChapterOnMangaDexUseCase with SyncChaptersMixin {
             images: atHome.images,
             translatedLanguage: chapter.data?.attributes?.translatedLanguage,
             mangaId: mangaId,
-            mangaTitle: chapter.data?.relationships
-                ?.whereType<Relationship<MangaDataAttributes>>()
-                .firstOrNull
-                ?.attributes
-                ?.title
-                ?.en,
           ),
         ],
       );

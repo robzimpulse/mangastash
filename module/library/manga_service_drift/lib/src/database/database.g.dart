@@ -379,12 +379,6 @@ class $MangaChapterTablesTable extends MangaChapterTables
   late final GeneratedColumn<String> mangaId = GeneratedColumn<String>(
       'manga_id', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _mangaTitleMeta =
-      const VerificationMeta('mangaTitle');
-  @override
-  late final GeneratedColumn<String> mangaTitle = GeneratedColumn<String>(
-      'manga_title', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
@@ -436,7 +430,6 @@ class $MangaChapterTablesTable extends MangaChapterTables
         updatedAt,
         id,
         mangaId,
-        mangaTitle,
         title,
         volume,
         chapter,
@@ -472,12 +465,6 @@ class $MangaChapterTablesTable extends MangaChapterTables
     if (data.containsKey('manga_id')) {
       context.handle(_mangaIdMeta,
           mangaId.isAcceptableOrUnknown(data['manga_id']!, _mangaIdMeta));
-    }
-    if (data.containsKey('manga_title')) {
-      context.handle(
-          _mangaTitleMeta,
-          mangaTitle.isAcceptableOrUnknown(
-              data['manga_title']!, _mangaTitleMeta));
     }
     if (data.containsKey('title')) {
       context.handle(
@@ -534,8 +521,6 @@ class $MangaChapterTablesTable extends MangaChapterTables
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       mangaId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}manga_id']),
-      mangaTitle: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}manga_title']),
       title: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}title']),
       volume: attachedDatabase.typeMapping
@@ -566,7 +551,6 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
   final String updatedAt;
   final String id;
   final String? mangaId;
-  final String? mangaTitle;
   final String? title;
   final String? volume;
   final String? chapter;
@@ -584,7 +568,6 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       required this.updatedAt,
       required this.id,
       this.mangaId,
-      this.mangaTitle,
       this.title,
       this.volume,
       this.chapter,
@@ -601,9 +584,6 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
     map['id'] = Variable<String>(id);
     if (!nullToAbsent || mangaId != null) {
       map['manga_id'] = Variable<String>(mangaId);
-    }
-    if (!nullToAbsent || mangaTitle != null) {
-      map['manga_title'] = Variable<String>(mangaTitle);
     }
     if (!nullToAbsent || title != null) {
       map['title'] = Variable<String>(title);
@@ -640,9 +620,6 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       mangaId: mangaId == null && nullToAbsent
           ? const Value.absent()
           : Value(mangaId),
-      mangaTitle: mangaTitle == null && nullToAbsent
-          ? const Value.absent()
-          : Value(mangaTitle),
       title:
           title == null && nullToAbsent ? const Value.absent() : Value(title),
       volume:
@@ -675,7 +652,6 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       updatedAt: serializer.fromJson<String>(json['updatedAt']),
       id: serializer.fromJson<String>(json['id']),
       mangaId: serializer.fromJson<String?>(json['mangaId']),
-      mangaTitle: serializer.fromJson<String?>(json['mangaTitle']),
       title: serializer.fromJson<String?>(json['title']),
       volume: serializer.fromJson<String?>(json['volume']),
       chapter: serializer.fromJson<String?>(json['chapter']),
@@ -695,7 +671,6 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       'updatedAt': serializer.toJson<String>(updatedAt),
       'id': serializer.toJson<String>(id),
       'mangaId': serializer.toJson<String?>(mangaId),
-      'mangaTitle': serializer.toJson<String?>(mangaTitle),
       'title': serializer.toJson<String?>(title),
       'volume': serializer.toJson<String?>(volume),
       'chapter': serializer.toJson<String?>(chapter),
@@ -712,7 +687,6 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
           String? updatedAt,
           String? id,
           Value<String?> mangaId = const Value.absent(),
-          Value<String?> mangaTitle = const Value.absent(),
           Value<String?> title = const Value.absent(),
           Value<String?> volume = const Value.absent(),
           Value<String?> chapter = const Value.absent(),
@@ -726,7 +700,6 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
         updatedAt: updatedAt ?? this.updatedAt,
         id: id ?? this.id,
         mangaId: mangaId.present ? mangaId.value : this.mangaId,
-        mangaTitle: mangaTitle.present ? mangaTitle.value : this.mangaTitle,
         title: title.present ? title.value : this.title,
         volume: volume.present ? volume.value : this.volume,
         chapter: chapter.present ? chapter.value : this.chapter,
@@ -746,8 +719,6 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       id: data.id.present ? data.id.value : this.id,
       mangaId: data.mangaId.present ? data.mangaId.value : this.mangaId,
-      mangaTitle:
-          data.mangaTitle.present ? data.mangaTitle.value : this.mangaTitle,
       title: data.title.present ? data.title.value : this.title,
       volume: data.volume.present ? data.volume.value : this.volume,
       chapter: data.chapter.present ? data.chapter.value : this.chapter,
@@ -771,7 +742,6 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
           ..write('updatedAt: $updatedAt, ')
           ..write('id: $id, ')
           ..write('mangaId: $mangaId, ')
-          ..write('mangaTitle: $mangaTitle, ')
           ..write('title: $title, ')
           ..write('volume: $volume, ')
           ..write('chapter: $chapter, ')
@@ -790,7 +760,6 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       updatedAt,
       id,
       mangaId,
-      mangaTitle,
       title,
       volume,
       chapter,
@@ -807,7 +776,6 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
           other.updatedAt == this.updatedAt &&
           other.id == this.id &&
           other.mangaId == this.mangaId &&
-          other.mangaTitle == this.mangaTitle &&
           other.title == this.title &&
           other.volume == this.volume &&
           other.chapter == this.chapter &&
@@ -823,7 +791,6 @@ class MangaChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
   final Value<String> updatedAt;
   final Value<String> id;
   final Value<String?> mangaId;
-  final Value<String?> mangaTitle;
   final Value<String?> title;
   final Value<String?> volume;
   final Value<String?> chapter;
@@ -838,7 +805,6 @@ class MangaChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
     this.updatedAt = const Value.absent(),
     this.id = const Value.absent(),
     this.mangaId = const Value.absent(),
-    this.mangaTitle = const Value.absent(),
     this.title = const Value.absent(),
     this.volume = const Value.absent(),
     this.chapter = const Value.absent(),
@@ -854,7 +820,6 @@ class MangaChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
     this.updatedAt = const Value.absent(),
     required String id,
     this.mangaId = const Value.absent(),
-    this.mangaTitle = const Value.absent(),
     this.title = const Value.absent(),
     this.volume = const Value.absent(),
     this.chapter = const Value.absent(),
@@ -870,7 +835,6 @@ class MangaChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
     Expression<String>? updatedAt,
     Expression<String>? id,
     Expression<String>? mangaId,
-    Expression<String>? mangaTitle,
     Expression<String>? title,
     Expression<String>? volume,
     Expression<String>? chapter,
@@ -886,7 +850,6 @@ class MangaChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
       if (updatedAt != null) 'updated_at': updatedAt,
       if (id != null) 'id': id,
       if (mangaId != null) 'manga_id': mangaId,
-      if (mangaTitle != null) 'manga_title': mangaTitle,
       if (title != null) 'title': title,
       if (volume != null) 'volume': volume,
       if (chapter != null) 'chapter': chapter,
@@ -904,7 +867,6 @@ class MangaChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
       Value<String>? updatedAt,
       Value<String>? id,
       Value<String?>? mangaId,
-      Value<String?>? mangaTitle,
       Value<String?>? title,
       Value<String?>? volume,
       Value<String?>? chapter,
@@ -919,7 +881,6 @@ class MangaChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
       updatedAt: updatedAt ?? this.updatedAt,
       id: id ?? this.id,
       mangaId: mangaId ?? this.mangaId,
-      mangaTitle: mangaTitle ?? this.mangaTitle,
       title: title ?? this.title,
       volume: volume ?? this.volume,
       chapter: chapter ?? this.chapter,
@@ -946,9 +907,6 @@ class MangaChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
     }
     if (mangaId.present) {
       map['manga_id'] = Variable<String>(mangaId.value);
-    }
-    if (mangaTitle.present) {
-      map['manga_title'] = Variable<String>(mangaTitle.value);
     }
     if (title.present) {
       map['title'] = Variable<String>(title.value);
@@ -987,7 +945,6 @@ class MangaChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
           ..write('updatedAt: $updatedAt, ')
           ..write('id: $id, ')
           ..write('mangaId: $mangaId, ')
-          ..write('mangaTitle: $mangaTitle, ')
           ..write('title: $title, ')
           ..write('volume: $volume, ')
           ..write('chapter: $chapter, ')
@@ -3373,7 +3330,6 @@ typedef $$MangaChapterTablesTableCreateCompanionBuilder
   Value<String> updatedAt,
   required String id,
   Value<String?> mangaId,
-  Value<String?> mangaTitle,
   Value<String?> title,
   Value<String?> volume,
   Value<String?> chapter,
@@ -3390,7 +3346,6 @@ typedef $$MangaChapterTablesTableUpdateCompanionBuilder
   Value<String> updatedAt,
   Value<String> id,
   Value<String?> mangaId,
-  Value<String?> mangaTitle,
   Value<String?> title,
   Value<String?> volume,
   Value<String?> chapter,
@@ -3422,9 +3377,6 @@ class $$MangaChapterTablesTableFilterComposer
 
   ColumnFilters<String> get mangaId => $composableBuilder(
       column: $table.mangaId, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get mangaTitle => $composableBuilder(
-      column: $table.mangaTitle, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get title => $composableBuilder(
       column: $table.title, builder: (column) => ColumnFilters(column));
@@ -3474,9 +3426,6 @@ class $$MangaChapterTablesTableOrderingComposer
   ColumnOrderings<String> get mangaId => $composableBuilder(
       column: $table.mangaId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get mangaTitle => $composableBuilder(
-      column: $table.mangaTitle, builder: (column) => ColumnOrderings(column));
-
   ColumnOrderings<String> get title => $composableBuilder(
       column: $table.title, builder: (column) => ColumnOrderings(column));
 
@@ -3524,9 +3473,6 @@ class $$MangaChapterTablesTableAnnotationComposer
 
   GeneratedColumn<String> get mangaId =>
       $composableBuilder(column: $table.mangaId, builder: (column) => column);
-
-  GeneratedColumn<String> get mangaTitle => $composableBuilder(
-      column: $table.mangaTitle, builder: (column) => column);
 
   GeneratedColumn<String> get title =>
       $composableBuilder(column: $table.title, builder: (column) => column);
@@ -3585,7 +3531,6 @@ class $$MangaChapterTablesTableTableManager extends RootTableManager<
             Value<String> updatedAt = const Value.absent(),
             Value<String> id = const Value.absent(),
             Value<String?> mangaId = const Value.absent(),
-            Value<String?> mangaTitle = const Value.absent(),
             Value<String?> title = const Value.absent(),
             Value<String?> volume = const Value.absent(),
             Value<String?> chapter = const Value.absent(),
@@ -3601,7 +3546,6 @@ class $$MangaChapterTablesTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
             id: id,
             mangaId: mangaId,
-            mangaTitle: mangaTitle,
             title: title,
             volume: volume,
             chapter: chapter,
@@ -3617,7 +3561,6 @@ class $$MangaChapterTablesTableTableManager extends RootTableManager<
             Value<String> updatedAt = const Value.absent(),
             required String id,
             Value<String?> mangaId = const Value.absent(),
-            Value<String?> mangaTitle = const Value.absent(),
             Value<String?> title = const Value.absent(),
             Value<String?> volume = const Value.absent(),
             Value<String?> chapter = const Value.absent(),
@@ -3633,7 +3576,6 @@ class $$MangaChapterTablesTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
             id: id,
             mangaId: mangaId,
-            mangaTitle: mangaTitle,
             title: title,
             volume: volume,
             chapter: chapter,

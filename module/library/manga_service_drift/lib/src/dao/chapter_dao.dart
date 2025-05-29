@@ -27,7 +27,6 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
     final existing = await searchChapters(
       ids: [...chapters.map((e) => e.id.valueOrNull).nonNulls],
       mangaIds: [...chapters.map((e) => e.mangaId.valueOrNull).nonNulls],
-      mangaTitles: [...chapters.map((e) => e.mangaTitle.valueOrNull).nonNulls],
       titles: [...chapters.map((e) => e.title.valueOrNull).nonNulls],
       volumes: [...chapters.map((e) => e.volume.valueOrNull).nonNulls],
       chapters: [...chapters.map((e) => e.chapter.valueOrNull).nonNulls],
@@ -50,7 +49,6 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
             if (chapterId != null) ...[
               e.id == chapterId,
             ] else ...[
-              e.mangaTitle == entry.key.mangaTitle.valueOrNull,
               e.mangaId == entry.key.mangaId.valueOrNull,
               e.webUrl == entry.key.webUrl.valueOrNull,
             ],
@@ -65,7 +63,7 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
 
         if (updatesChapter.length > 1) {
           throw Exception(
-            'Multiple chapter updated on title ${entry.key.mangaTitle}',
+            'Multiple chapter updated on title ${entry.key.mangaId}',
           );
         }
 
@@ -73,7 +71,7 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
 
         if (updatedChapter == null) {
           throw Exception(
-            'No Chapter updated on title ${entry.key.mangaTitle}',
+            'No Chapter updated on title ${entry.key.mangaId}',
           );
         }
 
@@ -116,8 +114,6 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
         (f) => [
           f.id.isIn(ids.nonEmpty.distinct),
           f.mangaId.isIn(mangaIds.nonEmpty.distinct),
-          for (final e in mangaTitles.nonEmpty.distinct)
-            f.mangaTitle.like('%$e%'),
           for (final e in titles.nonEmpty.distinct) f.title.like('%$e%'),
           for (final e in volumes.nonEmpty.distinct) f.volume.like('%$e%'),
           for (final e in chapters.nonEmpty.distinct) f.chapter.like('%$e%'),

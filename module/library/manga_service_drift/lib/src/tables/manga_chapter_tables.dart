@@ -8,8 +8,6 @@ class MangaChapterTables extends Table with AutoTimestampTable {
 
   TextColumn get mangaId => text().named('manga_id').nullable()();
 
-  TextColumn get mangaTitle => text().named('manga_title').nullable()();
-
   TextColumn get title => text().named('title').nullable()();
 
   TextColumn get volume => text().named('volume').nullable()();

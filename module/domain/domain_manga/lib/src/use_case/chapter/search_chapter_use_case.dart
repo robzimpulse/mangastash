@@ -70,9 +70,7 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
       chapters: await sync(
         chapterDao: _chapterDao,
         logBox: _logBox,
-        values: parser.chapters
-            .map((e) => e.copyWith(mangaId: mangaId, mangaTitle: result.title))
-            .toList(),
+        values: [...parser.chapters.map((e) => e.copyWith(mangaId: mangaId))],
       ),
       parameter: parameter,
     );
