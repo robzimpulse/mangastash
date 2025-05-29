@@ -10,14 +10,20 @@ import 'browse_manga_screen_state.dart';
 class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     with AutoSubscriptionMixin {
   final SearchMangaUseCase _searchMangaUseCase;
+  final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
+  final AddToLibraryUseCase _addToLibraryUseCase;
 
   BrowseMangaScreenCubit({
     required BrowseMangaScreenState initialState,
     required GetMangaSourceUseCase getMangaSourceUseCase,
     required SearchMangaUseCase searchMangaUseCase,
+    required AddToLibraryUseCase addToLibraryUseCase,
+    required RemoveFromLibraryUseCase removeFromLibraryUseCase,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
     required ListenLocaleUseCase listenLocaleUseCase,
   })  : _searchMangaUseCase = searchMangaUseCase,
+        _addToLibraryUseCase = addToLibraryUseCase,
+        _removeFromLibraryUseCase = removeFromLibraryUseCase,
         super(initialState) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
@@ -124,5 +130,13 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
         parameter: parameter,
       ),
     );
+  }
+
+  Future<void> addToLibrary({required Manga manga}) async {
+    if (state.libraries.contains(manga)) {
+      await _removeFromLibraryUseCase.execute(manga: manga);
+    } else {
+      await _addToLibraryUseCase.execute(manga: manga);
+    }
   }
 }

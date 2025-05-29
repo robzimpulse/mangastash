@@ -48,6 +48,8 @@ class BrowseMangaScreen extends StatefulWidget {
         searchMangaUseCase: locator(),
         listenMangaFromLibraryUseCase: locator(),
         listenLocaleUseCase: locator(),
+        addToLibraryUseCase: locator(),
+        removeFromLibraryUseCase: locator(),
       )..init(),
       child: BrowseMangaScreen(
         crawlUrlUseCase: locator(),
@@ -357,9 +359,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             coverUrl: e.coverUrl ?? '',
             layout: state.layout,
             onTap: () => widget.onTapManga?.call(e, state.parameter),
-            onLongPress: () => context.showSnackBar(
-              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-            ),
+            onLongPress: () => _cubit(context).addToLibrary(manga: e),
             isOnLibrary:
                 state.libraries.firstWhereOrNull((l) => e.id == l.id) != null,
           ),

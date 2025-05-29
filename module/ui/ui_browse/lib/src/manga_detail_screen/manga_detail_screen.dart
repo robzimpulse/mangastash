@@ -96,9 +96,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   MangaDetailScreenCubit _cubit(BuildContext context) => context.read();
 
-  void _onTapWebsite(BuildContext context, MangaDetailScreenState state) async {
-    final url = state.manga?.webUrl;
-
+  void _onTapWebsite(BuildContext context, {String? url}) async {
     if (url == null || url.isEmpty) {
       context.showSnackBar(message: 'Could not launch source url');
       return;
@@ -170,13 +168,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   void _onTapShare(BuildContext context) {
     // TODO: implement this
     context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
-  }
-
-  void _onTapAddToLibrary(
-    BuildContext context,
-    MangaDetailScreenState state,
-  ) async {
-    _cubit(context).addToLibrary(userUid: state.authState?.user?.uid);
   }
 
   @override
@@ -401,8 +392,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           tags: state.manga?.tagsName,
           horizontalPadding: 12,
           isOnLibrary: state.isOnLibrary,
-          onTapAddToLibrary: () => _onTapAddToLibrary(context, state),
-          onTapWebsite: () => _onTapWebsite(context, state),
+          onTapAddToLibrary: () => _cubit(context).addToLibrary(),
+          onTapWebsite: () => _onTapWebsite(context, url: state.manga?.webUrl),
           onTapTag: (name) => _onTapTag(
             context,
             tag: state.manga?.mapTagsByName[name],

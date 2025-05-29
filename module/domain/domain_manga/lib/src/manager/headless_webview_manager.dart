@@ -67,7 +67,7 @@ class HeadlessWebviewManager {
       uri.toString(),
       utf8.encode(html),
       fileExtension: 'html',
-      maxAge: const Duration(minutes: 5),
+      maxAge: const Duration(minutes: 30),
     );
 
     return html;

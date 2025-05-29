@@ -210,7 +210,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     emit(state.copyWith(isPagingNextPage: false));
   }
 
-  Future<void> addToLibrary({String? userUid}) async {
+  Future<void> addToLibrary() async {
     final manga = state.manga;
     if (manga == null) return;
     if (state.isOnLibrary) {
