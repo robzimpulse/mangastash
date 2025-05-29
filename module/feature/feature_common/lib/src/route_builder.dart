@@ -7,7 +7,7 @@ import 'route_path.dart';
 class CommonRouteBuilder extends BaseRouteBuilder {
   @override
   RouteBase root({required ServiceLocator locator}) {
-    // TODO: implement root
+    // intended empty since this routes should not be used
     throw UnimplementedError();
   }
 
