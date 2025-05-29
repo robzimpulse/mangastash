@@ -72,8 +72,8 @@ class MangaReaderScreen extends StatelessWidget {
           ),
           Row(
             children: [
-              Flexible(child: _prevButton()),
-              Flexible(child: _nextButton()),
+              Expanded(child: _prevButton()),
+              Expanded(child: _nextButton()),
             ],
           ),
         ],
@@ -192,6 +192,7 @@ class MangaReaderScreen extends StatelessWidget {
           return const SizedBox.shrink();
         }
         return IconButton(
+          alignment: Alignment.centerLeft,
           onPressed: () => onTapShortcut?.call(state.previousChapterId),
           icon: const Icon(Icons.navigate_before),
         );
@@ -207,6 +208,7 @@ class MangaReaderScreen extends StatelessWidget {
           return const SizedBox.shrink();
         }
         return IconButton(
+          alignment: Alignment.centerRight,
           onPressed: () => onTapShortcut?.call(state.nextChapterId),
           icon: const Icon(Icons.navigate_next),
         );

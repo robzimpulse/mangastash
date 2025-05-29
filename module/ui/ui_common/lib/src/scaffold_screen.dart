@@ -18,6 +18,12 @@ class ScaffoldScreen extends StatelessWidget {
 
   final bool bottomSafeArea;
 
+  final Widget? floatingActionButton;
+
+  final FloatingActionButtonLocation? floatingActionButtonLocation;
+
+  final FloatingActionButtonAnimator? floatingActionButtonAnimator;
+
   const ScaffoldScreen({
     super.key,
     this.canPop = true,
@@ -26,6 +32,9 @@ class ScaffoldScreen extends StatelessWidget {
     this.bottomNavigationBar,
     this.backgroundColor,
     this.bottomSafeArea = true,
+    this.floatingActionButton,
+    this.floatingActionButtonLocation,
+    this.floatingActionButtonAnimator,
     required this.body,
   });
 
@@ -41,6 +50,9 @@ class ScaffoldScreen extends StatelessWidget {
         onPopInvokedWithResult: (success, _) => onPopInvoked?.call(success),
         child: ShimmerAreaWidget(
           child: Scaffold(
+            floatingActionButton: floatingActionButton,
+            floatingActionButtonLocation: floatingActionButtonLocation,
+            floatingActionButtonAnimator: floatingActionButtonAnimator,
             backgroundColor: backgroundColor,
             appBar: appBar,
             bottomNavigationBar: bottomNavigationBar,
