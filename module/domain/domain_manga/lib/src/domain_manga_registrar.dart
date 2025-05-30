@@ -1,3 +1,4 @@
+import 'package:domain_manga/src/use_case/manga/download_manga_use_case.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
@@ -91,6 +92,7 @@ class DomainMangaRegistrar extends Registrar {
       locator.alias<PrefetchChapterUseCase, JobManager>();
       locator.alias<ListenPrefetchUseCase, JobManager>();
       locator.alias<DownloadChapterUseCase, JobManager>();
+      locator.alias<DownloadMangaUseCase, JobManager>();
 
       locator.registerSingleton(
         HeadlessWebviewManager(log: log, cacheManager: locator()),

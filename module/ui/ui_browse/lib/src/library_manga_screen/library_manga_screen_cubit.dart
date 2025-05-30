@@ -9,6 +9,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     with AutoSubscriptionMixin {
   final PrefetchMangaUseCase _prefetchMangaUseCase;
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
+  final DownloadMangaUseCase _downloadMangaUseCase;
 
   LibraryMangaScreenCubit({
     required LibraryMangaScreenState initialState,
@@ -17,8 +18,10 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     required PrefetchMangaUseCase prefetchMangaUseCase,
     required RemoveFromLibraryUseCase removeFromLibraryUseCase,
     required ListenPrefetchUseCase listenPrefetchMangaUseCase,
+    required DownloadMangaUseCase downloadMangaUseCase,
   })  : _prefetchMangaUseCase = prefetchMangaUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
+        _downloadMangaUseCase = downloadMangaUseCase,
         super(initialState) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
@@ -67,6 +70,13 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
 
   void remove({required Manga manga}) {
     _removeFromLibraryUseCase.execute(manga: manga);
+  }
+
+  void download({required Manga manga}) {
+    final id = manga.id;
+    final source = manga.source;
+    if (id == null || source == null) return;
+    _downloadMangaUseCase.downloadManga(mangaId: id, source: source);
   }
 
   void update({

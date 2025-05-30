@@ -18,6 +18,7 @@ export 'src/use_case/library/get_manga_from_library_use_case.dart';
 export 'src/use_case/library/listen_manga_from_library_use_case.dart';
 export 'src/use_case/library/listen_prefetch_use_case.dart';
 export 'src/use_case/library/remove_from_library_use_case.dart';
+export 'src/use_case/manga/download_manga_use_case.dart';
 export 'src/use_case/manga/get_manga_use_case.dart';
 export 'src/use_case/manga/prefetch_manga_use_case.dart';
 export 'src/use_case/manga/search_manga_use_case.dart';

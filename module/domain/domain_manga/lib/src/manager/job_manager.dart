@@ -18,6 +18,7 @@ import '../use_case/chapter/get_chapter_use_case.dart';
 import '../use_case/chapter/prefetch_chapter_use_case.dart';
 import '../use_case/chapter/search_chapter_use_case.dart';
 import '../use_case/library/listen_prefetch_use_case.dart';
+import '../use_case/manga/download_manga_use_case.dart';
 import '../use_case/manga/get_manga_use_case.dart';
 import '../use_case/manga/prefetch_manga_use_case.dart';
 
@@ -27,6 +28,7 @@ class JobManager
         PrefetchMangaUseCase,
         PrefetchChapterUseCase,
         DownloadChapterUseCase,
+        DownloadMangaUseCase,
         ListenPrefetchUseCase {
   final BehaviorSubject<List<JobDetail>> _jobs = BehaviorSubject.seeded([]);
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
@@ -308,6 +310,7 @@ class JobManager
     final mangaId = job.manga?.id;
     final chapterId = job.chapter?.id;
 
+    // TODO: download manga without chapter id
     if (mangaId == null || chapterId == null) {
       _log.log(
         'Failed execute job ${job.id} - ${job.type}',
@@ -517,6 +520,20 @@ class JobManager
         source: Value(source.value),
         mangaId: Value(mangaId),
         chapterId: Value(chapterId),
+      ),
+    );
+  }
+
+  @override
+  void downloadManga({
+    required String mangaId,
+    required MangaSourceEnum source,
+  }) {
+    _jobDao.add(
+      JobTablesCompanion.insert(
+        type: JobTypeEnum.download,
+        source: Value(source.value),
+        mangaId: Value(mangaId),
       ),
     );
   }
