@@ -17,6 +17,7 @@ import '../tables/library_tables.dart';
 import '../tables/manga_tables.dart';
 import '../tables/relationship_tables.dart';
 import '../tables/tag_tables.dart';
+import '../util/job_type_enum.dart';
 import '../util/typedef.dart';
 
 part 'database.g.dart';
