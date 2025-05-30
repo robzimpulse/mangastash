@@ -3,16 +3,16 @@ import 'package:drift/drift.dart';
 import '../database/database.dart';
 import '../tables/job_tables.dart';
 
-part 'prefetch_job_dao.g.dart';
+part 'job_dao.g.dart';
 
 @DriftAccessor(
   tables: [
     JobTables,
   ],
 )
-class PrefetchJobDao extends DatabaseAccessor<AppDatabase>
-    with _$PrefetchJobDaoMixin {
-  PrefetchJobDao(AppDatabase db) : super(db);
+class JobDao extends DatabaseAccessor<AppDatabase>
+    with _$JobDaoMixin {
+  JobDao(AppDatabase db) : super(db);
 
   Stream<List<JobDrift>> listen() {
     return select(jobTables).watch();

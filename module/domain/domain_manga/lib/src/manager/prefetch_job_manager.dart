@@ -26,7 +26,7 @@ class PrefetchJobManager
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
   final ValueGetter<SearchChapterUseCase> _searchChapterUseCase;
-  final PrefetchJobDao _prefetchJobDao;
+  final JobDao _jobDao;
   final LogBox _log;
 
   bool _isFetching = false;
@@ -38,14 +38,14 @@ class PrefetchJobManager
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required ValueGetter<GetMangaUseCase> getMangaUseCase,
     required ValueGetter<SearchChapterUseCase> searchChapterUseCase,
-    required PrefetchJobDao prefetchJobDao,
+    required JobDao jobDao,
   })  : _log = log,
         _getMangaUseCase = getMangaUseCase,
         _getChapterUseCase = getChapterUseCase,
         _searchChapterUseCase = searchChapterUseCase,
-        _prefetchJobDao = prefetchJobDao {
+        _jobDao = jobDao {
     _streamSubscription = _jobs.distinct().listen(_onData);
-    _jobs.addStream(prefetchJobDao.listen());
+    _jobs.addStream(jobDao.listen());
   }
 
   Future<void> dispose() => _streamSubscription.cancel();
@@ -65,7 +65,7 @@ class PrefetchJobManager
 
     _isFetching = false;
 
-    _prefetchJobDao.remove(job.toCompanion(true));
+    _jobDao.remove(job.toCompanion(true));
   }
 
   Future<void> _fetchChapter(JobDrift job) async {
@@ -206,7 +206,7 @@ class PrefetchJobManager
     required String chapterId,
     required MangaSourceEnum source,
   }) {
-    _prefetchJobDao.add(
+    _jobDao.add(
       JobTablesCompanion.insert(
         type: JobTypeEnum.chapter,
         source: source.value,
@@ -221,7 +221,7 @@ class PrefetchJobManager
     required String mangaId,
     required MangaSourceEnum source,
   }) {
-    _prefetchJobDao.add(
+    _jobDao.add(
       JobTablesCompanion.insert(
         type: JobTypeEnum.manga,
         source: source.value,

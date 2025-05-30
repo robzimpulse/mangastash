@@ -3100,8 +3100,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final LibraryDao libraryDao = LibraryDao(this as AppDatabase);
   late final DownloadJobDao downloadJobDao =
       DownloadJobDao(this as AppDatabase);
-  late final PrefetchJobDao prefetchJobDao =
-      PrefetchJobDao(this as AppDatabase);
+  late final JobDao jobDao = JobDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();

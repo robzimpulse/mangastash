@@ -7,9 +7,9 @@ import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 
 import '../dao/chapter_dao.dart';
 import '../dao/download_job_dao.dart';
+import '../dao/job_dao.dart';
 import '../dao/library_dao.dart';
 import '../dao/manga_dao.dart';
-import '../dao/prefetch_job_dao.dart';
 import '../interceptor/log_interceptor.dart';
 import '../tables/chapter_tables.dart';
 import '../tables/download_job_tables.dart';
@@ -39,7 +39,7 @@ part 'database.g.dart';
     ChapterDao,
     LibraryDao,
     DownloadJobDao,
-    PrefetchJobDao,
+    JobDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
