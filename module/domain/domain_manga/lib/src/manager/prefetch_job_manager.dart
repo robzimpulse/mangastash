@@ -8,7 +8,6 @@ import 'package:flutter/foundation.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
-import 'package:manga_service_drift/src/tables/prefetch_job_tables.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../use_case/chapter/get_chapter_use_case.dart';
@@ -23,8 +22,7 @@ class PrefetchJobManager
         PrefetchMangaUseCase,
         PrefetchChapterUseCase,
         ListenPrefetchUseCase {
-  final BehaviorSubject<List<PrefetchJobDrift>> _jobs =
-      BehaviorSubject.seeded([]);
+  final BehaviorSubject<List<JobDrift>> _jobs = BehaviorSubject.seeded([]);
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
   final ValueGetter<SearchChapterUseCase> _searchChapterUseCase;
@@ -52,16 +50,16 @@ class PrefetchJobManager
 
   Future<void> dispose() => _streamSubscription.cancel();
 
-  void _onData(List<PrefetchJobDrift> jobs) async {
+  void _onData(List<JobDrift> jobs) async {
     final job = jobs.firstOrNull;
     if (job == null || _isFetching) return;
 
     _isFetching = true;
 
     switch (job.type) {
-      case JobType.manga:
+      case JobTypeEnum.manga:
         await _fetchManga(job);
-      case JobType.chapter:
+      case JobTypeEnum.chapter:
         await _fetchChapter(job);
     }
 
@@ -70,7 +68,7 @@ class PrefetchJobManager
     _prefetchJobDao.remove(job.toCompanion(true));
   }
 
-  Future<void> _fetchChapter(PrefetchJobDrift job) async {
+  Future<void> _fetchChapter(JobDrift job) async {
     final result = await _getChapterUseCase().execute(
       source: MangaSourceEnum.fromValue(job.source),
       mangaId: job.mangaId,
@@ -104,7 +102,7 @@ class PrefetchJobManager
     }
   }
 
-  Future<void> _fetchManga(PrefetchJobDrift job) async {
+  Future<void> _fetchManga(JobDrift job) async {
     final result = await _getMangaUseCase().execute(
       source: MangaSourceEnum.fromValue(job.source),
       mangaId: job.mangaId,
@@ -140,7 +138,7 @@ class PrefetchJobManager
   }
 
   Future<void> _fetchAllChapter(
-    PrefetchJobDrift job, {
+    JobDrift job, {
     SearchChapterParameter parameter = const SearchChapterParameter(
       offset: 0,
       page: 1,
@@ -209,8 +207,8 @@ class PrefetchJobManager
     required MangaSourceEnum source,
   }) {
     _prefetchJobDao.add(
-      PrefetchJobTablesCompanion.insert(
-        type: JobType.chapter,
+      JobTablesCompanion.insert(
+        type: JobTypeEnum.chapter,
         source: source.value,
         mangaId: mangaId,
         chapterId: Value(chapterId),
@@ -224,8 +222,8 @@ class PrefetchJobManager
     required MangaSourceEnum source,
   }) {
     _prefetchJobDao.add(
-      PrefetchJobTablesCompanion.insert(
-        type: JobType.manga,
+      JobTablesCompanion.insert(
+        type: JobTypeEnum.manga,
         source: source.value,
         mangaId: mangaId,
       ),

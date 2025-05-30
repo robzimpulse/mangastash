@@ -3,12 +3,12 @@
 part of 'database.dart';
 
 // ignore_for_file: type=lint
-class $MangaChapterImageTablesTable extends MangaChapterImageTables
-    with TableInfo<$MangaChapterImageTablesTable, ImageDrift> {
+class $ImageTablesTable extends ImageTables
+    with TableInfo<$ImageTablesTable, ImageDrift> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $MangaChapterImageTablesTable(this.attachedDatabase, [this._alias]);
+  $ImageTablesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -53,7 +53,7 @@ class $MangaChapterImageTablesTable extends MangaChapterImageTables
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'manga_chapter_image_tables';
+  static const String $name = 'image_tables';
   @override
   VerificationContext validateIntegrity(Insertable<ImageDrift> instance,
       {bool isInserting = false}) {
@@ -115,8 +115,8 @@ class $MangaChapterImageTablesTable extends MangaChapterImageTables
   }
 
   @override
-  $MangaChapterImageTablesTable createAlias(String alias) {
-    return $MangaChapterImageTablesTable(attachedDatabase, alias);
+  $ImageTablesTable createAlias(String alias) {
+    return $ImageTablesTable(attachedDatabase, alias);
   }
 }
 
@@ -146,8 +146,8 @@ class ImageDrift extends DataClass implements Insertable<ImageDrift> {
     return map;
   }
 
-  MangaChapterImageTablesCompanion toCompanion(bool nullToAbsent) {
-    return MangaChapterImageTablesCompanion(
+  ImageTablesCompanion toCompanion(bool nullToAbsent) {
+    return ImageTablesCompanion(
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       order: Value(order),
@@ -197,7 +197,7 @@ class ImageDrift extends DataClass implements Insertable<ImageDrift> {
         webUrl: webUrl ?? this.webUrl,
         id: id ?? this.id,
       );
-  ImageDrift copyWithCompanion(MangaChapterImageTablesCompanion data) {
+  ImageDrift copyWithCompanion(ImageTablesCompanion data) {
     return ImageDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -236,7 +236,7 @@ class ImageDrift extends DataClass implements Insertable<ImageDrift> {
           other.id == this.id);
 }
 
-class MangaChapterImageTablesCompanion extends UpdateCompanion<ImageDrift> {
+class ImageTablesCompanion extends UpdateCompanion<ImageDrift> {
   final Value<String> createdAt;
   final Value<String> updatedAt;
   final Value<int> order;
@@ -244,7 +244,7 @@ class MangaChapterImageTablesCompanion extends UpdateCompanion<ImageDrift> {
   final Value<String> webUrl;
   final Value<String> id;
   final Value<int> rowid;
-  const MangaChapterImageTablesCompanion({
+  const ImageTablesCompanion({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.order = const Value.absent(),
@@ -253,7 +253,7 @@ class MangaChapterImageTablesCompanion extends UpdateCompanion<ImageDrift> {
     this.id = const Value.absent(),
     this.rowid = const Value.absent(),
   });
-  MangaChapterImageTablesCompanion.insert({
+  ImageTablesCompanion.insert({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     required int order,
@@ -285,7 +285,7 @@ class MangaChapterImageTablesCompanion extends UpdateCompanion<ImageDrift> {
     });
   }
 
-  MangaChapterImageTablesCompanion copyWith(
+  ImageTablesCompanion copyWith(
       {Value<String>? createdAt,
       Value<String>? updatedAt,
       Value<int>? order,
@@ -293,7 +293,7 @@ class MangaChapterImageTablesCompanion extends UpdateCompanion<ImageDrift> {
       Value<String>? webUrl,
       Value<String>? id,
       Value<int>? rowid}) {
-    return MangaChapterImageTablesCompanion(
+    return ImageTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       order: order ?? this.order,
@@ -333,7 +333,7 @@ class MangaChapterImageTablesCompanion extends UpdateCompanion<ImageDrift> {
 
   @override
   String toString() {
-    return (StringBuffer('MangaChapterImageTablesCompanion(')
+    return (StringBuffer('ImageTablesCompanion(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('order: $order, ')
@@ -346,12 +346,12 @@ class MangaChapterImageTablesCompanion extends UpdateCompanion<ImageDrift> {
   }
 }
 
-class $MangaChapterTablesTable extends MangaChapterTables
-    with TableInfo<$MangaChapterTablesTable, ChapterDrift> {
+class $ChapterTablesTable extends ChapterTables
+    with TableInfo<$ChapterTablesTable, ChapterDrift> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $MangaChapterTablesTable(this.attachedDatabase, [this._alias]);
+  $ChapterTablesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -443,7 +443,7 @@ class $MangaChapterTablesTable extends MangaChapterTables
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'manga_chapter_tables';
+  static const String $name = 'chapter_tables';
   @override
   VerificationContext validateIntegrity(Insertable<ChapterDrift> instance,
       {bool isInserting = false}) {
@@ -541,8 +541,8 @@ class $MangaChapterTablesTable extends MangaChapterTables
   }
 
   @override
-  $MangaChapterTablesTable createAlias(String alias) {
-    return $MangaChapterTablesTable(attachedDatabase, alias);
+  $ChapterTablesTable createAlias(String alias) {
+    return $ChapterTablesTable(attachedDatabase, alias);
   }
 }
 
@@ -612,8 +612,8 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
     return map;
   }
 
-  MangaChapterTablesCompanion toCompanion(bool nullToAbsent) {
-    return MangaChapterTablesCompanion(
+  ChapterTablesCompanion toCompanion(bool nullToAbsent) {
+    return ChapterTablesCompanion(
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       id: Value(id),
@@ -713,7 +713,7 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
         readableAt: readableAt.present ? readableAt.value : this.readableAt,
         publishAt: publishAt.present ? publishAt.value : this.publishAt,
       );
-  ChapterDrift copyWithCompanion(MangaChapterTablesCompanion data) {
+  ChapterDrift copyWithCompanion(ChapterTablesCompanion data) {
     return ChapterDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -786,7 +786,7 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
           other.publishAt == this.publishAt);
 }
 
-class MangaChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
+class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
   final Value<String> createdAt;
   final Value<String> updatedAt;
   final Value<String> id;
@@ -800,7 +800,7 @@ class MangaChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
   final Value<String?> readableAt;
   final Value<String?> publishAt;
   final Value<int> rowid;
-  const MangaChapterTablesCompanion({
+  const ChapterTablesCompanion({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.id = const Value.absent(),
@@ -815,7 +815,7 @@ class MangaChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
     this.publishAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
-  MangaChapterTablesCompanion.insert({
+  ChapterTablesCompanion.insert({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     required String id,
@@ -862,7 +862,7 @@ class MangaChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
     });
   }
 
-  MangaChapterTablesCompanion copyWith(
+  ChapterTablesCompanion copyWith(
       {Value<String>? createdAt,
       Value<String>? updatedAt,
       Value<String>? id,
@@ -876,7 +876,7 @@ class MangaChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
       Value<String?>? readableAt,
       Value<String?>? publishAt,
       Value<int>? rowid}) {
-    return MangaChapterTablesCompanion(
+    return ChapterTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       id: id ?? this.id,
@@ -940,7 +940,7 @@ class MangaChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
 
   @override
   String toString() {
-    return (StringBuffer('MangaChapterTablesCompanion(')
+    return (StringBuffer('ChapterTablesCompanion(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('id: $id, ')
@@ -959,12 +959,12 @@ class MangaChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
   }
 }
 
-class $MangaLibraryTablesTable extends MangaLibraryTables
-    with TableInfo<$MangaLibraryTablesTable, MangaLibraryTable> {
+class $LibraryTablesTable extends LibraryTables
+    with TableInfo<$LibraryTablesTable, LibraryDrift> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $MangaLibraryTablesTable(this.attachedDatabase, [this._alias]);
+  $LibraryTablesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -1002,9 +1002,9 @@ class $MangaLibraryTablesTable extends MangaLibraryTables
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'manga_library_tables';
+  static const String $name = 'library_tables';
   @override
-  VerificationContext validateIntegrity(Insertable<MangaLibraryTable> instance,
+  VerificationContext validateIntegrity(Insertable<LibraryDrift> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -1031,9 +1031,9 @@ class $MangaLibraryTablesTable extends MangaLibraryTables
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  MangaLibraryTable map(Map<String, dynamic> data, {String? tablePrefix}) {
+  LibraryDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return MangaLibraryTable(
+    return LibraryDrift(
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -1046,18 +1046,17 @@ class $MangaLibraryTablesTable extends MangaLibraryTables
   }
 
   @override
-  $MangaLibraryTablesTable createAlias(String alias) {
-    return $MangaLibraryTablesTable(attachedDatabase, alias);
+  $LibraryTablesTable createAlias(String alias) {
+    return $LibraryTablesTable(attachedDatabase, alias);
   }
 }
 
-class MangaLibraryTable extends DataClass
-    implements Insertable<MangaLibraryTable> {
+class LibraryDrift extends DataClass implements Insertable<LibraryDrift> {
   final String createdAt;
   final String updatedAt;
   final BigInt id;
   final String mangaId;
-  const MangaLibraryTable(
+  const LibraryDrift(
       {required this.createdAt,
       required this.updatedAt,
       required this.id,
@@ -1072,8 +1071,8 @@ class MangaLibraryTable extends DataClass
     return map;
   }
 
-  MangaLibraryTablesCompanion toCompanion(bool nullToAbsent) {
-    return MangaLibraryTablesCompanion(
+  LibraryTablesCompanion toCompanion(bool nullToAbsent) {
+    return LibraryTablesCompanion(
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       id: Value(id),
@@ -1081,10 +1080,10 @@ class MangaLibraryTable extends DataClass
     );
   }
 
-  factory MangaLibraryTable.fromJson(Map<String, dynamic> json,
+  factory LibraryDrift.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return MangaLibraryTable(
+    return LibraryDrift(
       createdAt: serializer.fromJson<String>(json['createdAt']),
       updatedAt: serializer.fromJson<String>(json['updatedAt']),
       id: serializer.fromJson<BigInt>(json['id']),
@@ -1102,19 +1101,19 @@ class MangaLibraryTable extends DataClass
     };
   }
 
-  MangaLibraryTable copyWith(
+  LibraryDrift copyWith(
           {String? createdAt,
           String? updatedAt,
           BigInt? id,
           String? mangaId}) =>
-      MangaLibraryTable(
+      LibraryDrift(
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         id: id ?? this.id,
         mangaId: mangaId ?? this.mangaId,
       );
-  MangaLibraryTable copyWithCompanion(MangaLibraryTablesCompanion data) {
-    return MangaLibraryTable(
+  LibraryDrift copyWithCompanion(LibraryTablesCompanion data) {
+    return LibraryDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       id: data.id.present ? data.id.value : this.id,
@@ -1124,7 +1123,7 @@ class MangaLibraryTable extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('MangaLibraryTable(')
+    return (StringBuffer('LibraryDrift(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('id: $id, ')
@@ -1138,31 +1137,31 @@ class MangaLibraryTable extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is MangaLibraryTable &&
+      (other is LibraryDrift &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.id == this.id &&
           other.mangaId == this.mangaId);
 }
 
-class MangaLibraryTablesCompanion extends UpdateCompanion<MangaLibraryTable> {
+class LibraryTablesCompanion extends UpdateCompanion<LibraryDrift> {
   final Value<String> createdAt;
   final Value<String> updatedAt;
   final Value<BigInt> id;
   final Value<String> mangaId;
-  const MangaLibraryTablesCompanion({
+  const LibraryTablesCompanion({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.id = const Value.absent(),
     this.mangaId = const Value.absent(),
   });
-  MangaLibraryTablesCompanion.insert({
+  LibraryTablesCompanion.insert({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.id = const Value.absent(),
     required String mangaId,
   }) : mangaId = Value(mangaId);
-  static Insertable<MangaLibraryTable> custom({
+  static Insertable<LibraryDrift> custom({
     Expression<String>? createdAt,
     Expression<String>? updatedAt,
     Expression<BigInt>? id,
@@ -1176,12 +1175,12 @@ class MangaLibraryTablesCompanion extends UpdateCompanion<MangaLibraryTable> {
     });
   }
 
-  MangaLibraryTablesCompanion copyWith(
+  LibraryTablesCompanion copyWith(
       {Value<String>? createdAt,
       Value<String>? updatedAt,
       Value<BigInt>? id,
       Value<String>? mangaId}) {
-    return MangaLibraryTablesCompanion(
+    return LibraryTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       id: id ?? this.id,
@@ -1209,7 +1208,7 @@ class MangaLibraryTablesCompanion extends UpdateCompanion<MangaLibraryTable> {
 
   @override
   String toString() {
-    return (StringBuffer('MangaLibraryTablesCompanion(')
+    return (StringBuffer('LibraryTablesCompanion(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('id: $id, ')
@@ -1722,12 +1721,12 @@ class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
   }
 }
 
-class $MangaTagTablesTable extends MangaTagTables
-    with TableInfo<$MangaTagTablesTable, TagDrift> {
+class $TagTablesTable extends TagTables
+    with TableInfo<$TagTablesTable, TagDrift> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $MangaTagTablesTable(this.attachedDatabase, [this._alias]);
+  $TagTablesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -1760,7 +1759,7 @@ class $MangaTagTablesTable extends MangaTagTables
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'manga_tag_tables';
+  static const String $name = 'tag_tables';
   @override
   VerificationContext validateIntegrity(Insertable<TagDrift> instance,
       {bool isInserting = false}) {
@@ -1806,8 +1805,8 @@ class $MangaTagTablesTable extends MangaTagTables
   }
 
   @override
-  $MangaTagTablesTable createAlias(String alias) {
-    return $MangaTagTablesTable(attachedDatabase, alias);
+  $TagTablesTable createAlias(String alias) {
+    return $TagTablesTable(attachedDatabase, alias);
   }
 }
 
@@ -1831,8 +1830,8 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
     return map;
   }
 
-  MangaTagTablesCompanion toCompanion(bool nullToAbsent) {
-    return MangaTagTablesCompanion(
+  TagTablesCompanion toCompanion(bool nullToAbsent) {
+    return TagTablesCompanion(
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       id: Value(id),
@@ -1869,7 +1868,7 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
         id: id ?? this.id,
         name: name ?? this.name,
       );
-  TagDrift copyWithCompanion(MangaTagTablesCompanion data) {
+  TagDrift copyWithCompanion(TagTablesCompanion data) {
     return TagDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -1901,20 +1900,20 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
           other.name == this.name);
 }
 
-class MangaTagTablesCompanion extends UpdateCompanion<TagDrift> {
+class TagTablesCompanion extends UpdateCompanion<TagDrift> {
   final Value<String> createdAt;
   final Value<String> updatedAt;
   final Value<String> id;
   final Value<String> name;
   final Value<int> rowid;
-  const MangaTagTablesCompanion({
+  const TagTablesCompanion({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.rowid = const Value.absent(),
   });
-  MangaTagTablesCompanion.insert({
+  TagTablesCompanion.insert({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     required String id,
@@ -1938,13 +1937,13 @@ class MangaTagTablesCompanion extends UpdateCompanion<TagDrift> {
     });
   }
 
-  MangaTagTablesCompanion copyWith(
+  TagTablesCompanion copyWith(
       {Value<String>? createdAt,
       Value<String>? updatedAt,
       Value<String>? id,
       Value<String>? name,
       Value<int>? rowid}) {
-    return MangaTagTablesCompanion(
+    return TagTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       id: id ?? this.id,
@@ -1976,7 +1975,7 @@ class MangaTagTablesCompanion extends UpdateCompanion<TagDrift> {
 
   @override
   String toString() {
-    return (StringBuffer('MangaTagTablesCompanion(')
+    return (StringBuffer('TagTablesCompanion(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('id: $id, ')
@@ -1987,13 +1986,12 @@ class MangaTagTablesCompanion extends UpdateCompanion<TagDrift> {
   }
 }
 
-class $MangaTagRelationshipTablesTable extends MangaTagRelationshipTables
-    with
-        TableInfo<$MangaTagRelationshipTablesTable, MangaTagRelationshipTable> {
+class $RelationshipTablesTable extends RelationshipTables
+    with TableInfo<$RelationshipTablesTable, RelationshipTable> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $MangaTagRelationshipTablesTable(this.attachedDatabase, [this._alias]);
+  $RelationshipTablesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -2027,10 +2025,9 @@ class $MangaTagRelationshipTablesTable extends MangaTagRelationshipTables
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'manga_tag_relationship_tables';
+  static const String $name = 'relationship_tables';
   @override
-  VerificationContext validateIntegrity(
-      Insertable<MangaTagRelationshipTable> instance,
+  VerificationContext validateIntegrity(Insertable<RelationshipTable> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -2060,10 +2057,9 @@ class $MangaTagRelationshipTablesTable extends MangaTagRelationshipTables
   @override
   Set<GeneratedColumn> get $primaryKey => {tagId, mangaId};
   @override
-  MangaTagRelationshipTable map(Map<String, dynamic> data,
-      {String? tablePrefix}) {
+  RelationshipTable map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return MangaTagRelationshipTable(
+    return RelationshipTable(
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -2076,18 +2072,18 @@ class $MangaTagRelationshipTablesTable extends MangaTagRelationshipTables
   }
 
   @override
-  $MangaTagRelationshipTablesTable createAlias(String alias) {
-    return $MangaTagRelationshipTablesTable(attachedDatabase, alias);
+  $RelationshipTablesTable createAlias(String alias) {
+    return $RelationshipTablesTable(attachedDatabase, alias);
   }
 }
 
-class MangaTagRelationshipTable extends DataClass
-    implements Insertable<MangaTagRelationshipTable> {
+class RelationshipTable extends DataClass
+    implements Insertable<RelationshipTable> {
   final String createdAt;
   final String updatedAt;
   final String tagId;
   final String mangaId;
-  const MangaTagRelationshipTable(
+  const RelationshipTable(
       {required this.createdAt,
       required this.updatedAt,
       required this.tagId,
@@ -2102,8 +2098,8 @@ class MangaTagRelationshipTable extends DataClass
     return map;
   }
 
-  MangaTagRelationshipTablesCompanion toCompanion(bool nullToAbsent) {
-    return MangaTagRelationshipTablesCompanion(
+  RelationshipTablesCompanion toCompanion(bool nullToAbsent) {
+    return RelationshipTablesCompanion(
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       tagId: Value(tagId),
@@ -2111,10 +2107,10 @@ class MangaTagRelationshipTable extends DataClass
     );
   }
 
-  factory MangaTagRelationshipTable.fromJson(Map<String, dynamic> json,
+  factory RelationshipTable.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return MangaTagRelationshipTable(
+    return RelationshipTable(
       createdAt: serializer.fromJson<String>(json['createdAt']),
       updatedAt: serializer.fromJson<String>(json['updatedAt']),
       tagId: serializer.fromJson<String>(json['tagId']),
@@ -2132,20 +2128,19 @@ class MangaTagRelationshipTable extends DataClass
     };
   }
 
-  MangaTagRelationshipTable copyWith(
+  RelationshipTable copyWith(
           {String? createdAt,
           String? updatedAt,
           String? tagId,
           String? mangaId}) =>
-      MangaTagRelationshipTable(
+      RelationshipTable(
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         tagId: tagId ?? this.tagId,
         mangaId: mangaId ?? this.mangaId,
       );
-  MangaTagRelationshipTable copyWithCompanion(
-      MangaTagRelationshipTablesCompanion data) {
-    return MangaTagRelationshipTable(
+  RelationshipTable copyWithCompanion(RelationshipTablesCompanion data) {
+    return RelationshipTable(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       tagId: data.tagId.present ? data.tagId.value : this.tagId,
@@ -2155,7 +2150,7 @@ class MangaTagRelationshipTable extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('MangaTagRelationshipTable(')
+    return (StringBuffer('RelationshipTable(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('tagId: $tagId, ')
@@ -2169,28 +2164,27 @@ class MangaTagRelationshipTable extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is MangaTagRelationshipTable &&
+      (other is RelationshipTable &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.tagId == this.tagId &&
           other.mangaId == this.mangaId);
 }
 
-class MangaTagRelationshipTablesCompanion
-    extends UpdateCompanion<MangaTagRelationshipTable> {
+class RelationshipTablesCompanion extends UpdateCompanion<RelationshipTable> {
   final Value<String> createdAt;
   final Value<String> updatedAt;
   final Value<String> tagId;
   final Value<String> mangaId;
   final Value<int> rowid;
-  const MangaTagRelationshipTablesCompanion({
+  const RelationshipTablesCompanion({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.tagId = const Value.absent(),
     this.mangaId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
-  MangaTagRelationshipTablesCompanion.insert({
+  RelationshipTablesCompanion.insert({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     required String tagId,
@@ -2198,7 +2192,7 @@ class MangaTagRelationshipTablesCompanion
     this.rowid = const Value.absent(),
   })  : tagId = Value(tagId),
         mangaId = Value(mangaId);
-  static Insertable<MangaTagRelationshipTable> custom({
+  static Insertable<RelationshipTable> custom({
     Expression<String>? createdAt,
     Expression<String>? updatedAt,
     Expression<String>? tagId,
@@ -2214,13 +2208,13 @@ class MangaTagRelationshipTablesCompanion
     });
   }
 
-  MangaTagRelationshipTablesCompanion copyWith(
+  RelationshipTablesCompanion copyWith(
       {Value<String>? createdAt,
       Value<String>? updatedAt,
       Value<String>? tagId,
       Value<String>? mangaId,
       Value<int>? rowid}) {
-    return MangaTagRelationshipTablesCompanion(
+    return RelationshipTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       tagId: tagId ?? this.tagId,
@@ -2252,7 +2246,7 @@ class MangaTagRelationshipTablesCompanion
 
   @override
   String toString() {
-    return (StringBuffer('MangaTagRelationshipTablesCompanion(')
+    return (StringBuffer('RelationshipTablesCompanion(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('tagId: $tagId, ')
@@ -2712,12 +2706,12 @@ class DownloadJobTablesCompanion extends UpdateCompanion<DownloadJobDrift> {
   }
 }
 
-class $PrefetchJobTablesTable extends PrefetchJobTables
-    with TableInfo<$PrefetchJobTablesTable, PrefetchJobDrift> {
+class $JobTablesTable extends JobTables
+    with TableInfo<$JobTablesTable, JobDrift> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $PrefetchJobTablesTable(this.attachedDatabase, [this._alias]);
+  $JobTablesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -2745,10 +2739,10 @@ class $PrefetchJobTablesTable extends PrefetchJobTables
           GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
   static const VerificationMeta _typeMeta = const VerificationMeta('type');
   @override
-  late final GeneratedColumnWithTypeConverter<JobType, String> type =
+  late final GeneratedColumnWithTypeConverter<JobTypeEnum, String> type =
       GeneratedColumn<String>('type', aliasedName, false,
               type: DriftSqlType.string, requiredDuringInsert: true)
-          .withConverter<JobType>($PrefetchJobTablesTable.$convertertype);
+          .withConverter<JobTypeEnum>($JobTablesTable.$convertertype);
   static const VerificationMeta _sourceMeta = const VerificationMeta('source');
   @override
   late final GeneratedColumn<String> source = GeneratedColumn<String>(
@@ -2773,9 +2767,9 @@ class $PrefetchJobTablesTable extends PrefetchJobTables
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'prefetch_job_tables';
+  static const String $name = 'job_tables';
   @override
-  VerificationContext validateIntegrity(Insertable<PrefetchJobDrift> instance,
+  VerificationContext validateIntegrity(Insertable<JobDrift> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -2813,17 +2807,16 @@ class $PrefetchJobTablesTable extends PrefetchJobTables
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  PrefetchJobDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
+  JobDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return PrefetchJobDrift(
+    return JobDrift(
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}updated_at'])!,
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      type: $PrefetchJobTablesTable.$convertertype.fromSql(attachedDatabase
-          .typeMapping
+      type: $JobTablesTable.$convertertype.fromSql(attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}type'])!),
       source: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}source'])!,
@@ -2835,24 +2828,23 @@ class $PrefetchJobTablesTable extends PrefetchJobTables
   }
 
   @override
-  $PrefetchJobTablesTable createAlias(String alias) {
-    return $PrefetchJobTablesTable(attachedDatabase, alias);
+  $JobTablesTable createAlias(String alias) {
+    return $JobTablesTable(attachedDatabase, alias);
   }
 
-  static JsonTypeConverter2<JobType, String, String> $convertertype =
-      const EnumNameConverter<JobType>(JobType.values);
+  static JsonTypeConverter2<JobTypeEnum, String, String> $convertertype =
+      const EnumNameConverter<JobTypeEnum>(JobTypeEnum.values);
 }
 
-class PrefetchJobDrift extends DataClass
-    implements Insertable<PrefetchJobDrift> {
+class JobDrift extends DataClass implements Insertable<JobDrift> {
   final String createdAt;
   final String updatedAt;
   final int id;
-  final JobType type;
+  final JobTypeEnum type;
   final String source;
   final String? chapterId;
   final String mangaId;
-  const PrefetchJobDrift(
+  const JobDrift(
       {required this.createdAt,
       required this.updatedAt,
       required this.id,
@@ -2868,7 +2860,7 @@ class PrefetchJobDrift extends DataClass
     map['id'] = Variable<int>(id);
     {
       map['type'] =
-          Variable<String>($PrefetchJobTablesTable.$convertertype.toSql(type));
+          Variable<String>($JobTablesTable.$convertertype.toSql(type));
     }
     map['source'] = Variable<String>(source);
     if (!nullToAbsent || chapterId != null) {
@@ -2878,8 +2870,8 @@ class PrefetchJobDrift extends DataClass
     return map;
   }
 
-  PrefetchJobTablesCompanion toCompanion(bool nullToAbsent) {
-    return PrefetchJobTablesCompanion(
+  JobTablesCompanion toCompanion(bool nullToAbsent) {
+    return JobTablesCompanion(
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       id: Value(id),
@@ -2892,14 +2884,14 @@ class PrefetchJobDrift extends DataClass
     );
   }
 
-  factory PrefetchJobDrift.fromJson(Map<String, dynamic> json,
+  factory JobDrift.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return PrefetchJobDrift(
+    return JobDrift(
       createdAt: serializer.fromJson<String>(json['createdAt']),
       updatedAt: serializer.fromJson<String>(json['updatedAt']),
       id: serializer.fromJson<int>(json['id']),
-      type: $PrefetchJobTablesTable.$convertertype
+      type: $JobTablesTable.$convertertype
           .fromJson(serializer.fromJson<String>(json['type'])),
       source: serializer.fromJson<String>(json['source']),
       chapterId: serializer.fromJson<String?>(json['chapterId']),
@@ -2914,22 +2906,22 @@ class PrefetchJobDrift extends DataClass
       'updatedAt': serializer.toJson<String>(updatedAt),
       'id': serializer.toJson<int>(id),
       'type': serializer
-          .toJson<String>($PrefetchJobTablesTable.$convertertype.toJson(type)),
+          .toJson<String>($JobTablesTable.$convertertype.toJson(type)),
       'source': serializer.toJson<String>(source),
       'chapterId': serializer.toJson<String?>(chapterId),
       'mangaId': serializer.toJson<String>(mangaId),
     };
   }
 
-  PrefetchJobDrift copyWith(
+  JobDrift copyWith(
           {String? createdAt,
           String? updatedAt,
           int? id,
-          JobType? type,
+          JobTypeEnum? type,
           String? source,
           Value<String?> chapterId = const Value.absent(),
           String? mangaId}) =>
-      PrefetchJobDrift(
+      JobDrift(
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         id: id ?? this.id,
@@ -2938,8 +2930,8 @@ class PrefetchJobDrift extends DataClass
         chapterId: chapterId.present ? chapterId.value : this.chapterId,
         mangaId: mangaId ?? this.mangaId,
       );
-  PrefetchJobDrift copyWithCompanion(PrefetchJobTablesCompanion data) {
-    return PrefetchJobDrift(
+  JobDrift copyWithCompanion(JobTablesCompanion data) {
+    return JobDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       id: data.id.present ? data.id.value : this.id,
@@ -2952,7 +2944,7 @@ class PrefetchJobDrift extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('PrefetchJobDrift(')
+    return (StringBuffer('JobDrift(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('id: $id, ')
@@ -2970,7 +2962,7 @@ class PrefetchJobDrift extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is PrefetchJobDrift &&
+      (other is JobDrift &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.id == this.id &&
@@ -2980,15 +2972,15 @@ class PrefetchJobDrift extends DataClass
           other.mangaId == this.mangaId);
 }
 
-class PrefetchJobTablesCompanion extends UpdateCompanion<PrefetchJobDrift> {
+class JobTablesCompanion extends UpdateCompanion<JobDrift> {
   final Value<String> createdAt;
   final Value<String> updatedAt;
   final Value<int> id;
-  final Value<JobType> type;
+  final Value<JobTypeEnum> type;
   final Value<String> source;
   final Value<String?> chapterId;
   final Value<String> mangaId;
-  const PrefetchJobTablesCompanion({
+  const JobTablesCompanion({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.id = const Value.absent(),
@@ -2997,18 +2989,18 @@ class PrefetchJobTablesCompanion extends UpdateCompanion<PrefetchJobDrift> {
     this.chapterId = const Value.absent(),
     this.mangaId = const Value.absent(),
   });
-  PrefetchJobTablesCompanion.insert({
+  JobTablesCompanion.insert({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.id = const Value.absent(),
-    required JobType type,
+    required JobTypeEnum type,
     required String source,
     this.chapterId = const Value.absent(),
     required String mangaId,
   })  : type = Value(type),
         source = Value(source),
         mangaId = Value(mangaId);
-  static Insertable<PrefetchJobDrift> custom({
+  static Insertable<JobDrift> custom({
     Expression<String>? createdAt,
     Expression<String>? updatedAt,
     Expression<int>? id,
@@ -3028,15 +3020,15 @@ class PrefetchJobTablesCompanion extends UpdateCompanion<PrefetchJobDrift> {
     });
   }
 
-  PrefetchJobTablesCompanion copyWith(
+  JobTablesCompanion copyWith(
       {Value<String>? createdAt,
       Value<String>? updatedAt,
       Value<int>? id,
-      Value<JobType>? type,
+      Value<JobTypeEnum>? type,
       Value<String>? source,
       Value<String?>? chapterId,
       Value<String>? mangaId}) {
-    return PrefetchJobTablesCompanion(
+    return JobTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       id: id ?? this.id,
@@ -3060,8 +3052,8 @@ class PrefetchJobTablesCompanion extends UpdateCompanion<PrefetchJobDrift> {
       map['id'] = Variable<int>(id.value);
     }
     if (type.present) {
-      map['type'] = Variable<String>(
-          $PrefetchJobTablesTable.$convertertype.toSql(type.value));
+      map['type'] =
+          Variable<String>($JobTablesTable.$convertertype.toSql(type.value));
     }
     if (source.present) {
       map['source'] = Variable<String>(source.value);
@@ -3077,7 +3069,7 @@ class PrefetchJobTablesCompanion extends UpdateCompanion<PrefetchJobDrift> {
 
   @override
   String toString() {
-    return (StringBuffer('PrefetchJobTablesCompanion(')
+    return (StringBuffer('JobTablesCompanion(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('id: $id, ')
@@ -3093,20 +3085,16 @@ class PrefetchJobTablesCompanion extends UpdateCompanion<PrefetchJobDrift> {
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
-  late final $MangaChapterImageTablesTable mangaChapterImageTables =
-      $MangaChapterImageTablesTable(this);
-  late final $MangaChapterTablesTable mangaChapterTables =
-      $MangaChapterTablesTable(this);
-  late final $MangaLibraryTablesTable mangaLibraryTables =
-      $MangaLibraryTablesTable(this);
+  late final $ImageTablesTable imageTables = $ImageTablesTable(this);
+  late final $ChapterTablesTable chapterTables = $ChapterTablesTable(this);
+  late final $LibraryTablesTable libraryTables = $LibraryTablesTable(this);
   late final $MangaTablesTable mangaTables = $MangaTablesTable(this);
-  late final $MangaTagTablesTable mangaTagTables = $MangaTagTablesTable(this);
-  late final $MangaTagRelationshipTablesTable mangaTagRelationshipTables =
-      $MangaTagRelationshipTablesTable(this);
+  late final $TagTablesTable tagTables = $TagTablesTable(this);
+  late final $RelationshipTablesTable relationshipTables =
+      $RelationshipTablesTable(this);
   late final $DownloadJobTablesTable downloadJobTables =
       $DownloadJobTablesTable(this);
-  late final $PrefetchJobTablesTable prefetchJobTables =
-      $PrefetchJobTablesTable(this);
+  late final $JobTablesTable jobTables = $JobTablesTable(this);
   late final MangaDao mangaDao = MangaDao(this as AppDatabase);
   late final ChapterDao chapterDao = ChapterDao(this as AppDatabase);
   late final LibraryDao libraryDao = LibraryDao(this as AppDatabase);
@@ -3119,19 +3107,19 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
-        mangaChapterImageTables,
-        mangaChapterTables,
-        mangaLibraryTables,
+        imageTables,
+        chapterTables,
+        libraryTables,
         mangaTables,
-        mangaTagTables,
-        mangaTagRelationshipTables,
+        tagTables,
+        relationshipTables,
         downloadJobTables,
-        prefetchJobTables
+        jobTables
       ];
 }
 
-typedef $$MangaChapterImageTablesTableCreateCompanionBuilder
-    = MangaChapterImageTablesCompanion Function({
+typedef $$ImageTablesTableCreateCompanionBuilder = ImageTablesCompanion
+    Function({
   Value<String> createdAt,
   Value<String> updatedAt,
   required int order,
@@ -3140,8 +3128,8 @@ typedef $$MangaChapterImageTablesTableCreateCompanionBuilder
   required String id,
   Value<int> rowid,
 });
-typedef $$MangaChapterImageTablesTableUpdateCompanionBuilder
-    = MangaChapterImageTablesCompanion Function({
+typedef $$ImageTablesTableUpdateCompanionBuilder = ImageTablesCompanion
+    Function({
   Value<String> createdAt,
   Value<String> updatedAt,
   Value<int> order,
@@ -3151,9 +3139,9 @@ typedef $$MangaChapterImageTablesTableUpdateCompanionBuilder
   Value<int> rowid,
 });
 
-class $$MangaChapterImageTablesTableFilterComposer
-    extends Composer<_$AppDatabase, $MangaChapterImageTablesTable> {
-  $$MangaChapterImageTablesTableFilterComposer({
+class $$ImageTablesTableFilterComposer
+    extends Composer<_$AppDatabase, $ImageTablesTable> {
+  $$ImageTablesTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3179,9 +3167,9 @@ class $$MangaChapterImageTablesTableFilterComposer
       column: $table.id, builder: (column) => ColumnFilters(column));
 }
 
-class $$MangaChapterImageTablesTableOrderingComposer
-    extends Composer<_$AppDatabase, $MangaChapterImageTablesTable> {
-  $$MangaChapterImageTablesTableOrderingComposer({
+class $$ImageTablesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ImageTablesTable> {
+  $$ImageTablesTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3207,9 +3195,9 @@ class $$MangaChapterImageTablesTableOrderingComposer
       column: $table.id, builder: (column) => ColumnOrderings(column));
 }
 
-class $$MangaChapterImageTablesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $MangaChapterImageTablesTable> {
-  $$MangaChapterImageTablesTableAnnotationComposer({
+class $$ImageTablesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ImageTablesTable> {
+  $$ImageTablesTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3235,35 +3223,28 @@ class $$MangaChapterImageTablesTableAnnotationComposer
       $composableBuilder(column: $table.id, builder: (column) => column);
 }
 
-class $$MangaChapterImageTablesTableTableManager extends RootTableManager<
+class $$ImageTablesTableTableManager extends RootTableManager<
     _$AppDatabase,
-    $MangaChapterImageTablesTable,
+    $ImageTablesTable,
     ImageDrift,
-    $$MangaChapterImageTablesTableFilterComposer,
-    $$MangaChapterImageTablesTableOrderingComposer,
-    $$MangaChapterImageTablesTableAnnotationComposer,
-    $$MangaChapterImageTablesTableCreateCompanionBuilder,
-    $$MangaChapterImageTablesTableUpdateCompanionBuilder,
-    (
-      ImageDrift,
-      BaseReferences<_$AppDatabase, $MangaChapterImageTablesTable, ImageDrift>
-    ),
+    $$ImageTablesTableFilterComposer,
+    $$ImageTablesTableOrderingComposer,
+    $$ImageTablesTableAnnotationComposer,
+    $$ImageTablesTableCreateCompanionBuilder,
+    $$ImageTablesTableUpdateCompanionBuilder,
+    (ImageDrift, BaseReferences<_$AppDatabase, $ImageTablesTable, ImageDrift>),
     ImageDrift,
     PrefetchHooks Function()> {
-  $$MangaChapterImageTablesTableTableManager(
-      _$AppDatabase db, $MangaChapterImageTablesTable table)
+  $$ImageTablesTableTableManager(_$AppDatabase db, $ImageTablesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$MangaChapterImageTablesTableFilterComposer(
-                  $db: db, $table: table),
+              $$ImageTablesTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$MangaChapterImageTablesTableOrderingComposer(
-                  $db: db, $table: table),
+              $$ImageTablesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$MangaChapterImageTablesTableAnnotationComposer(
-                  $db: db, $table: table),
+              $$ImageTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> createdAt = const Value.absent(),
             Value<String> updatedAt = const Value.absent(),
@@ -3273,7 +3254,7 @@ class $$MangaChapterImageTablesTableTableManager extends RootTableManager<
             Value<String> id = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
-              MangaChapterImageTablesCompanion(
+              ImageTablesCompanion(
             createdAt: createdAt,
             updatedAt: updatedAt,
             order: order,
@@ -3291,7 +3272,7 @@ class $$MangaChapterImageTablesTableTableManager extends RootTableManager<
             required String id,
             Value<int> rowid = const Value.absent(),
           }) =>
-              MangaChapterImageTablesCompanion.insert(
+              ImageTablesCompanion.insert(
             createdAt: createdAt,
             updatedAt: updatedAt,
             order: order,
@@ -3307,25 +3288,20 @@ class $$MangaChapterImageTablesTableTableManager extends RootTableManager<
         ));
 }
 
-typedef $$MangaChapterImageTablesTableProcessedTableManager
-    = ProcessedTableManager<
-        _$AppDatabase,
-        $MangaChapterImageTablesTable,
-        ImageDrift,
-        $$MangaChapterImageTablesTableFilterComposer,
-        $$MangaChapterImageTablesTableOrderingComposer,
-        $$MangaChapterImageTablesTableAnnotationComposer,
-        $$MangaChapterImageTablesTableCreateCompanionBuilder,
-        $$MangaChapterImageTablesTableUpdateCompanionBuilder,
-        (
-          ImageDrift,
-          BaseReferences<_$AppDatabase, $MangaChapterImageTablesTable,
-              ImageDrift>
-        ),
-        ImageDrift,
-        PrefetchHooks Function()>;
-typedef $$MangaChapterTablesTableCreateCompanionBuilder
-    = MangaChapterTablesCompanion Function({
+typedef $$ImageTablesTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ImageTablesTable,
+    ImageDrift,
+    $$ImageTablesTableFilterComposer,
+    $$ImageTablesTableOrderingComposer,
+    $$ImageTablesTableAnnotationComposer,
+    $$ImageTablesTableCreateCompanionBuilder,
+    $$ImageTablesTableUpdateCompanionBuilder,
+    (ImageDrift, BaseReferences<_$AppDatabase, $ImageTablesTable, ImageDrift>),
+    ImageDrift,
+    PrefetchHooks Function()>;
+typedef $$ChapterTablesTableCreateCompanionBuilder = ChapterTablesCompanion
+    Function({
   Value<String> createdAt,
   Value<String> updatedAt,
   required String id,
@@ -3340,8 +3316,8 @@ typedef $$MangaChapterTablesTableCreateCompanionBuilder
   Value<String?> publishAt,
   Value<int> rowid,
 });
-typedef $$MangaChapterTablesTableUpdateCompanionBuilder
-    = MangaChapterTablesCompanion Function({
+typedef $$ChapterTablesTableUpdateCompanionBuilder = ChapterTablesCompanion
+    Function({
   Value<String> createdAt,
   Value<String> updatedAt,
   Value<String> id,
@@ -3357,9 +3333,9 @@ typedef $$MangaChapterTablesTableUpdateCompanionBuilder
   Value<int> rowid,
 });
 
-class $$MangaChapterTablesTableFilterComposer
-    extends Composer<_$AppDatabase, $MangaChapterTablesTable> {
-  $$MangaChapterTablesTableFilterComposer({
+class $$ChapterTablesTableFilterComposer
+    extends Composer<_$AppDatabase, $ChapterTablesTable> {
+  $$ChapterTablesTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3405,9 +3381,9 @@ class $$MangaChapterTablesTableFilterComposer
       column: $table.publishAt, builder: (column) => ColumnFilters(column));
 }
 
-class $$MangaChapterTablesTableOrderingComposer
-    extends Composer<_$AppDatabase, $MangaChapterTablesTable> {
-  $$MangaChapterTablesTableOrderingComposer({
+class $$ChapterTablesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ChapterTablesTable> {
+  $$ChapterTablesTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3453,9 +3429,9 @@ class $$MangaChapterTablesTableOrderingComposer
       column: $table.publishAt, builder: (column) => ColumnOrderings(column));
 }
 
-class $$MangaChapterTablesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $MangaChapterTablesTable> {
-  $$MangaChapterTablesTableAnnotationComposer({
+class $$ChapterTablesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ChapterTablesTable> {
+  $$ChapterTablesTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3499,33 +3475,31 @@ class $$MangaChapterTablesTableAnnotationComposer
       $composableBuilder(column: $table.publishAt, builder: (column) => column);
 }
 
-class $$MangaChapterTablesTableTableManager extends RootTableManager<
+class $$ChapterTablesTableTableManager extends RootTableManager<
     _$AppDatabase,
-    $MangaChapterTablesTable,
+    $ChapterTablesTable,
     ChapterDrift,
-    $$MangaChapterTablesTableFilterComposer,
-    $$MangaChapterTablesTableOrderingComposer,
-    $$MangaChapterTablesTableAnnotationComposer,
-    $$MangaChapterTablesTableCreateCompanionBuilder,
-    $$MangaChapterTablesTableUpdateCompanionBuilder,
+    $$ChapterTablesTableFilterComposer,
+    $$ChapterTablesTableOrderingComposer,
+    $$ChapterTablesTableAnnotationComposer,
+    $$ChapterTablesTableCreateCompanionBuilder,
+    $$ChapterTablesTableUpdateCompanionBuilder,
     (
       ChapterDrift,
-      BaseReferences<_$AppDatabase, $MangaChapterTablesTable, ChapterDrift>
+      BaseReferences<_$AppDatabase, $ChapterTablesTable, ChapterDrift>
     ),
     ChapterDrift,
     PrefetchHooks Function()> {
-  $$MangaChapterTablesTableTableManager(
-      _$AppDatabase db, $MangaChapterTablesTable table)
+  $$ChapterTablesTableTableManager(_$AppDatabase db, $ChapterTablesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$MangaChapterTablesTableFilterComposer($db: db, $table: table),
+              $$ChapterTablesTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$MangaChapterTablesTableOrderingComposer($db: db, $table: table),
+              $$ChapterTablesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$MangaChapterTablesTableAnnotationComposer(
-                  $db: db, $table: table),
+              $$ChapterTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> createdAt = const Value.absent(),
             Value<String> updatedAt = const Value.absent(),
@@ -3541,7 +3515,7 @@ class $$MangaChapterTablesTableTableManager extends RootTableManager<
             Value<String?> publishAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
-              MangaChapterTablesCompanion(
+              ChapterTablesCompanion(
             createdAt: createdAt,
             updatedAt: updatedAt,
             id: id,
@@ -3571,7 +3545,7 @@ class $$MangaChapterTablesTableTableManager extends RootTableManager<
             Value<String?> publishAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
-              MangaChapterTablesCompanion.insert(
+              ChapterTablesCompanion.insert(
             createdAt: createdAt,
             updatedAt: updatedAt,
             id: id,
@@ -3593,39 +3567,39 @@ class $$MangaChapterTablesTableTableManager extends RootTableManager<
         ));
 }
 
-typedef $$MangaChapterTablesTableProcessedTableManager = ProcessedTableManager<
+typedef $$ChapterTablesTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
-    $MangaChapterTablesTable,
+    $ChapterTablesTable,
     ChapterDrift,
-    $$MangaChapterTablesTableFilterComposer,
-    $$MangaChapterTablesTableOrderingComposer,
-    $$MangaChapterTablesTableAnnotationComposer,
-    $$MangaChapterTablesTableCreateCompanionBuilder,
-    $$MangaChapterTablesTableUpdateCompanionBuilder,
+    $$ChapterTablesTableFilterComposer,
+    $$ChapterTablesTableOrderingComposer,
+    $$ChapterTablesTableAnnotationComposer,
+    $$ChapterTablesTableCreateCompanionBuilder,
+    $$ChapterTablesTableUpdateCompanionBuilder,
     (
       ChapterDrift,
-      BaseReferences<_$AppDatabase, $MangaChapterTablesTable, ChapterDrift>
+      BaseReferences<_$AppDatabase, $ChapterTablesTable, ChapterDrift>
     ),
     ChapterDrift,
     PrefetchHooks Function()>;
-typedef $$MangaLibraryTablesTableCreateCompanionBuilder
-    = MangaLibraryTablesCompanion Function({
+typedef $$LibraryTablesTableCreateCompanionBuilder = LibraryTablesCompanion
+    Function({
   Value<String> createdAt,
   Value<String> updatedAt,
   Value<BigInt> id,
   required String mangaId,
 });
-typedef $$MangaLibraryTablesTableUpdateCompanionBuilder
-    = MangaLibraryTablesCompanion Function({
+typedef $$LibraryTablesTableUpdateCompanionBuilder = LibraryTablesCompanion
+    Function({
   Value<String> createdAt,
   Value<String> updatedAt,
   Value<BigInt> id,
   Value<String> mangaId,
 });
 
-class $$MangaLibraryTablesTableFilterComposer
-    extends Composer<_$AppDatabase, $MangaLibraryTablesTable> {
-  $$MangaLibraryTablesTableFilterComposer({
+class $$LibraryTablesTableFilterComposer
+    extends Composer<_$AppDatabase, $LibraryTablesTable> {
+  $$LibraryTablesTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3645,9 +3619,9 @@ class $$MangaLibraryTablesTableFilterComposer
       column: $table.mangaId, builder: (column) => ColumnFilters(column));
 }
 
-class $$MangaLibraryTablesTableOrderingComposer
-    extends Composer<_$AppDatabase, $MangaLibraryTablesTable> {
-  $$MangaLibraryTablesTableOrderingComposer({
+class $$LibraryTablesTableOrderingComposer
+    extends Composer<_$AppDatabase, $LibraryTablesTable> {
+  $$LibraryTablesTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3667,9 +3641,9 @@ class $$MangaLibraryTablesTableOrderingComposer
       column: $table.mangaId, builder: (column) => ColumnOrderings(column));
 }
 
-class $$MangaLibraryTablesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $MangaLibraryTablesTable> {
-  $$MangaLibraryTablesTableAnnotationComposer({
+class $$LibraryTablesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LibraryTablesTable> {
+  $$LibraryTablesTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3689,40 +3663,38 @@ class $$MangaLibraryTablesTableAnnotationComposer
       $composableBuilder(column: $table.mangaId, builder: (column) => column);
 }
 
-class $$MangaLibraryTablesTableTableManager extends RootTableManager<
+class $$LibraryTablesTableTableManager extends RootTableManager<
     _$AppDatabase,
-    $MangaLibraryTablesTable,
-    MangaLibraryTable,
-    $$MangaLibraryTablesTableFilterComposer,
-    $$MangaLibraryTablesTableOrderingComposer,
-    $$MangaLibraryTablesTableAnnotationComposer,
-    $$MangaLibraryTablesTableCreateCompanionBuilder,
-    $$MangaLibraryTablesTableUpdateCompanionBuilder,
+    $LibraryTablesTable,
+    LibraryDrift,
+    $$LibraryTablesTableFilterComposer,
+    $$LibraryTablesTableOrderingComposer,
+    $$LibraryTablesTableAnnotationComposer,
+    $$LibraryTablesTableCreateCompanionBuilder,
+    $$LibraryTablesTableUpdateCompanionBuilder,
     (
-      MangaLibraryTable,
-      BaseReferences<_$AppDatabase, $MangaLibraryTablesTable, MangaLibraryTable>
+      LibraryDrift,
+      BaseReferences<_$AppDatabase, $LibraryTablesTable, LibraryDrift>
     ),
-    MangaLibraryTable,
+    LibraryDrift,
     PrefetchHooks Function()> {
-  $$MangaLibraryTablesTableTableManager(
-      _$AppDatabase db, $MangaLibraryTablesTable table)
+  $$LibraryTablesTableTableManager(_$AppDatabase db, $LibraryTablesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$MangaLibraryTablesTableFilterComposer($db: db, $table: table),
+              $$LibraryTablesTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$MangaLibraryTablesTableOrderingComposer($db: db, $table: table),
+              $$LibraryTablesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$MangaLibraryTablesTableAnnotationComposer(
-                  $db: db, $table: table),
+              $$LibraryTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> createdAt = const Value.absent(),
             Value<String> updatedAt = const Value.absent(),
             Value<BigInt> id = const Value.absent(),
             Value<String> mangaId = const Value.absent(),
           }) =>
-              MangaLibraryTablesCompanion(
+              LibraryTablesCompanion(
             createdAt: createdAt,
             updatedAt: updatedAt,
             id: id,
@@ -3734,7 +3706,7 @@ class $$MangaLibraryTablesTableTableManager extends RootTableManager<
             Value<BigInt> id = const Value.absent(),
             required String mangaId,
           }) =>
-              MangaLibraryTablesCompanion.insert(
+              LibraryTablesCompanion.insert(
             createdAt: createdAt,
             updatedAt: updatedAt,
             id: id,
@@ -3747,20 +3719,20 @@ class $$MangaLibraryTablesTableTableManager extends RootTableManager<
         ));
 }
 
-typedef $$MangaLibraryTablesTableProcessedTableManager = ProcessedTableManager<
+typedef $$LibraryTablesTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
-    $MangaLibraryTablesTable,
-    MangaLibraryTable,
-    $$MangaLibraryTablesTableFilterComposer,
-    $$MangaLibraryTablesTableOrderingComposer,
-    $$MangaLibraryTablesTableAnnotationComposer,
-    $$MangaLibraryTablesTableCreateCompanionBuilder,
-    $$MangaLibraryTablesTableUpdateCompanionBuilder,
+    $LibraryTablesTable,
+    LibraryDrift,
+    $$LibraryTablesTableFilterComposer,
+    $$LibraryTablesTableOrderingComposer,
+    $$LibraryTablesTableAnnotationComposer,
+    $$LibraryTablesTableCreateCompanionBuilder,
+    $$LibraryTablesTableUpdateCompanionBuilder,
     (
-      MangaLibraryTable,
-      BaseReferences<_$AppDatabase, $MangaLibraryTablesTable, MangaLibraryTable>
+      LibraryDrift,
+      BaseReferences<_$AppDatabase, $LibraryTablesTable, LibraryDrift>
     ),
-    MangaLibraryTable,
+    LibraryDrift,
     PrefetchHooks Function()>;
 typedef $$MangaTablesTableCreateCompanionBuilder = MangaTablesCompanion
     Function({
@@ -4004,16 +3976,14 @@ typedef $$MangaTablesTableProcessedTableManager = ProcessedTableManager<
     (MangaDrift, BaseReferences<_$AppDatabase, $MangaTablesTable, MangaDrift>),
     MangaDrift,
     PrefetchHooks Function()>;
-typedef $$MangaTagTablesTableCreateCompanionBuilder = MangaTagTablesCompanion
-    Function({
+typedef $$TagTablesTableCreateCompanionBuilder = TagTablesCompanion Function({
   Value<String> createdAt,
   Value<String> updatedAt,
   required String id,
   required String name,
   Value<int> rowid,
 });
-typedef $$MangaTagTablesTableUpdateCompanionBuilder = MangaTagTablesCompanion
-    Function({
+typedef $$TagTablesTableUpdateCompanionBuilder = TagTablesCompanion Function({
   Value<String> createdAt,
   Value<String> updatedAt,
   Value<String> id,
@@ -4021,9 +3991,9 @@ typedef $$MangaTagTablesTableUpdateCompanionBuilder = MangaTagTablesCompanion
   Value<int> rowid,
 });
 
-class $$MangaTagTablesTableFilterComposer
-    extends Composer<_$AppDatabase, $MangaTagTablesTable> {
-  $$MangaTagTablesTableFilterComposer({
+class $$TagTablesTableFilterComposer
+    extends Composer<_$AppDatabase, $TagTablesTable> {
+  $$TagTablesTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -4043,9 +4013,9 @@ class $$MangaTagTablesTableFilterComposer
       column: $table.name, builder: (column) => ColumnFilters(column));
 }
 
-class $$MangaTagTablesTableOrderingComposer
-    extends Composer<_$AppDatabase, $MangaTagTablesTable> {
-  $$MangaTagTablesTableOrderingComposer({
+class $$TagTablesTableOrderingComposer
+    extends Composer<_$AppDatabase, $TagTablesTable> {
+  $$TagTablesTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -4065,9 +4035,9 @@ class $$MangaTagTablesTableOrderingComposer
       column: $table.name, builder: (column) => ColumnOrderings(column));
 }
 
-class $$MangaTagTablesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $MangaTagTablesTable> {
-  $$MangaTagTablesTableAnnotationComposer({
+class $$TagTablesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TagTablesTable> {
+  $$TagTablesTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -4087,29 +4057,28 @@ class $$MangaTagTablesTableAnnotationComposer
       $composableBuilder(column: $table.name, builder: (column) => column);
 }
 
-class $$MangaTagTablesTableTableManager extends RootTableManager<
+class $$TagTablesTableTableManager extends RootTableManager<
     _$AppDatabase,
-    $MangaTagTablesTable,
+    $TagTablesTable,
     TagDrift,
-    $$MangaTagTablesTableFilterComposer,
-    $$MangaTagTablesTableOrderingComposer,
-    $$MangaTagTablesTableAnnotationComposer,
-    $$MangaTagTablesTableCreateCompanionBuilder,
-    $$MangaTagTablesTableUpdateCompanionBuilder,
-    (TagDrift, BaseReferences<_$AppDatabase, $MangaTagTablesTable, TagDrift>),
+    $$TagTablesTableFilterComposer,
+    $$TagTablesTableOrderingComposer,
+    $$TagTablesTableAnnotationComposer,
+    $$TagTablesTableCreateCompanionBuilder,
+    $$TagTablesTableUpdateCompanionBuilder,
+    (TagDrift, BaseReferences<_$AppDatabase, $TagTablesTable, TagDrift>),
     TagDrift,
     PrefetchHooks Function()> {
-  $$MangaTagTablesTableTableManager(
-      _$AppDatabase db, $MangaTagTablesTable table)
+  $$TagTablesTableTableManager(_$AppDatabase db, $TagTablesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$MangaTagTablesTableFilterComposer($db: db, $table: table),
+              $$TagTablesTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$MangaTagTablesTableOrderingComposer($db: db, $table: table),
+              $$TagTablesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$MangaTagTablesTableAnnotationComposer($db: db, $table: table),
+              $$TagTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> createdAt = const Value.absent(),
             Value<String> updatedAt = const Value.absent(),
@@ -4117,7 +4086,7 @@ class $$MangaTagTablesTableTableManager extends RootTableManager<
             Value<String> name = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
-              MangaTagTablesCompanion(
+              TagTablesCompanion(
             createdAt: createdAt,
             updatedAt: updatedAt,
             id: id,
@@ -4131,7 +4100,7 @@ class $$MangaTagTablesTableTableManager extends RootTableManager<
             required String name,
             Value<int> rowid = const Value.absent(),
           }) =>
-              MangaTagTablesCompanion.insert(
+              TagTablesCompanion.insert(
             createdAt: createdAt,
             updatedAt: updatedAt,
             id: id,
@@ -4145,28 +4114,28 @@ class $$MangaTagTablesTableTableManager extends RootTableManager<
         ));
 }
 
-typedef $$MangaTagTablesTableProcessedTableManager = ProcessedTableManager<
+typedef $$TagTablesTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
-    $MangaTagTablesTable,
+    $TagTablesTable,
     TagDrift,
-    $$MangaTagTablesTableFilterComposer,
-    $$MangaTagTablesTableOrderingComposer,
-    $$MangaTagTablesTableAnnotationComposer,
-    $$MangaTagTablesTableCreateCompanionBuilder,
-    $$MangaTagTablesTableUpdateCompanionBuilder,
-    (TagDrift, BaseReferences<_$AppDatabase, $MangaTagTablesTable, TagDrift>),
+    $$TagTablesTableFilterComposer,
+    $$TagTablesTableOrderingComposer,
+    $$TagTablesTableAnnotationComposer,
+    $$TagTablesTableCreateCompanionBuilder,
+    $$TagTablesTableUpdateCompanionBuilder,
+    (TagDrift, BaseReferences<_$AppDatabase, $TagTablesTable, TagDrift>),
     TagDrift,
     PrefetchHooks Function()>;
-typedef $$MangaTagRelationshipTablesTableCreateCompanionBuilder
-    = MangaTagRelationshipTablesCompanion Function({
+typedef $$RelationshipTablesTableCreateCompanionBuilder
+    = RelationshipTablesCompanion Function({
   Value<String> createdAt,
   Value<String> updatedAt,
   required String tagId,
   required String mangaId,
   Value<int> rowid,
 });
-typedef $$MangaTagRelationshipTablesTableUpdateCompanionBuilder
-    = MangaTagRelationshipTablesCompanion Function({
+typedef $$RelationshipTablesTableUpdateCompanionBuilder
+    = RelationshipTablesCompanion Function({
   Value<String> createdAt,
   Value<String> updatedAt,
   Value<String> tagId,
@@ -4174,9 +4143,9 @@ typedef $$MangaTagRelationshipTablesTableUpdateCompanionBuilder
   Value<int> rowid,
 });
 
-class $$MangaTagRelationshipTablesTableFilterComposer
-    extends Composer<_$AppDatabase, $MangaTagRelationshipTablesTable> {
-  $$MangaTagRelationshipTablesTableFilterComposer({
+class $$RelationshipTablesTableFilterComposer
+    extends Composer<_$AppDatabase, $RelationshipTablesTable> {
+  $$RelationshipTablesTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -4196,9 +4165,9 @@ class $$MangaTagRelationshipTablesTableFilterComposer
       column: $table.mangaId, builder: (column) => ColumnFilters(column));
 }
 
-class $$MangaTagRelationshipTablesTableOrderingComposer
-    extends Composer<_$AppDatabase, $MangaTagRelationshipTablesTable> {
-  $$MangaTagRelationshipTablesTableOrderingComposer({
+class $$RelationshipTablesTableOrderingComposer
+    extends Composer<_$AppDatabase, $RelationshipTablesTable> {
+  $$RelationshipTablesTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -4218,9 +4187,9 @@ class $$MangaTagRelationshipTablesTableOrderingComposer
       column: $table.mangaId, builder: (column) => ColumnOrderings(column));
 }
 
-class $$MangaTagRelationshipTablesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $MangaTagRelationshipTablesTable> {
-  $$MangaTagRelationshipTablesTableAnnotationComposer({
+class $$RelationshipTablesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RelationshipTablesTable> {
+  $$RelationshipTablesTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -4240,35 +4209,32 @@ class $$MangaTagRelationshipTablesTableAnnotationComposer
       $composableBuilder(column: $table.mangaId, builder: (column) => column);
 }
 
-class $$MangaTagRelationshipTablesTableTableManager extends RootTableManager<
+class $$RelationshipTablesTableTableManager extends RootTableManager<
     _$AppDatabase,
-    $MangaTagRelationshipTablesTable,
-    MangaTagRelationshipTable,
-    $$MangaTagRelationshipTablesTableFilterComposer,
-    $$MangaTagRelationshipTablesTableOrderingComposer,
-    $$MangaTagRelationshipTablesTableAnnotationComposer,
-    $$MangaTagRelationshipTablesTableCreateCompanionBuilder,
-    $$MangaTagRelationshipTablesTableUpdateCompanionBuilder,
+    $RelationshipTablesTable,
+    RelationshipTable,
+    $$RelationshipTablesTableFilterComposer,
+    $$RelationshipTablesTableOrderingComposer,
+    $$RelationshipTablesTableAnnotationComposer,
+    $$RelationshipTablesTableCreateCompanionBuilder,
+    $$RelationshipTablesTableUpdateCompanionBuilder,
     (
-      MangaTagRelationshipTable,
-      BaseReferences<_$AppDatabase, $MangaTagRelationshipTablesTable,
-          MangaTagRelationshipTable>
+      RelationshipTable,
+      BaseReferences<_$AppDatabase, $RelationshipTablesTable, RelationshipTable>
     ),
-    MangaTagRelationshipTable,
+    RelationshipTable,
     PrefetchHooks Function()> {
-  $$MangaTagRelationshipTablesTableTableManager(
-      _$AppDatabase db, $MangaTagRelationshipTablesTable table)
+  $$RelationshipTablesTableTableManager(
+      _$AppDatabase db, $RelationshipTablesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$MangaTagRelationshipTablesTableFilterComposer(
-                  $db: db, $table: table),
+              $$RelationshipTablesTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$MangaTagRelationshipTablesTableOrderingComposer(
-                  $db: db, $table: table),
+              $$RelationshipTablesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$MangaTagRelationshipTablesTableAnnotationComposer(
+              $$RelationshipTablesTableAnnotationComposer(
                   $db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> createdAt = const Value.absent(),
@@ -4277,7 +4243,7 @@ class $$MangaTagRelationshipTablesTableTableManager extends RootTableManager<
             Value<String> mangaId = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
-              MangaTagRelationshipTablesCompanion(
+              RelationshipTablesCompanion(
             createdAt: createdAt,
             updatedAt: updatedAt,
             tagId: tagId,
@@ -4291,7 +4257,7 @@ class $$MangaTagRelationshipTablesTableTableManager extends RootTableManager<
             required String mangaId,
             Value<int> rowid = const Value.absent(),
           }) =>
-              MangaTagRelationshipTablesCompanion.insert(
+              RelationshipTablesCompanion.insert(
             createdAt: createdAt,
             updatedAt: updatedAt,
             tagId: tagId,
@@ -4305,23 +4271,21 @@ class $$MangaTagRelationshipTablesTableTableManager extends RootTableManager<
         ));
 }
 
-typedef $$MangaTagRelationshipTablesTableProcessedTableManager
-    = ProcessedTableManager<
-        _$AppDatabase,
-        $MangaTagRelationshipTablesTable,
-        MangaTagRelationshipTable,
-        $$MangaTagRelationshipTablesTableFilterComposer,
-        $$MangaTagRelationshipTablesTableOrderingComposer,
-        $$MangaTagRelationshipTablesTableAnnotationComposer,
-        $$MangaTagRelationshipTablesTableCreateCompanionBuilder,
-        $$MangaTagRelationshipTablesTableUpdateCompanionBuilder,
-        (
-          MangaTagRelationshipTable,
-          BaseReferences<_$AppDatabase, $MangaTagRelationshipTablesTable,
-              MangaTagRelationshipTable>
-        ),
-        MangaTagRelationshipTable,
-        PrefetchHooks Function()>;
+typedef $$RelationshipTablesTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $RelationshipTablesTable,
+    RelationshipTable,
+    $$RelationshipTablesTableFilterComposer,
+    $$RelationshipTablesTableOrderingComposer,
+    $$RelationshipTablesTableAnnotationComposer,
+    $$RelationshipTablesTableCreateCompanionBuilder,
+    $$RelationshipTablesTableUpdateCompanionBuilder,
+    (
+      RelationshipTable,
+      BaseReferences<_$AppDatabase, $RelationshipTablesTable, RelationshipTable>
+    ),
+    RelationshipTable,
+    PrefetchHooks Function()>;
 typedef $$DownloadJobTablesTableCreateCompanionBuilder
     = DownloadJobTablesCompanion Function({
   Value<String> createdAt,
@@ -4544,30 +4508,28 @@ typedef $$DownloadJobTablesTableProcessedTableManager = ProcessedTableManager<
     ),
     DownloadJobDrift,
     PrefetchHooks Function()>;
-typedef $$PrefetchJobTablesTableCreateCompanionBuilder
-    = PrefetchJobTablesCompanion Function({
+typedef $$JobTablesTableCreateCompanionBuilder = JobTablesCompanion Function({
   Value<String> createdAt,
   Value<String> updatedAt,
   Value<int> id,
-  required JobType type,
+  required JobTypeEnum type,
   required String source,
   Value<String?> chapterId,
   required String mangaId,
 });
-typedef $$PrefetchJobTablesTableUpdateCompanionBuilder
-    = PrefetchJobTablesCompanion Function({
+typedef $$JobTablesTableUpdateCompanionBuilder = JobTablesCompanion Function({
   Value<String> createdAt,
   Value<String> updatedAt,
   Value<int> id,
-  Value<JobType> type,
+  Value<JobTypeEnum> type,
   Value<String> source,
   Value<String?> chapterId,
   Value<String> mangaId,
 });
 
-class $$PrefetchJobTablesTableFilterComposer
-    extends Composer<_$AppDatabase, $PrefetchJobTablesTable> {
-  $$PrefetchJobTablesTableFilterComposer({
+class $$JobTablesTableFilterComposer
+    extends Composer<_$AppDatabase, $JobTablesTable> {
+  $$JobTablesTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -4583,7 +4545,7 @@ class $$PrefetchJobTablesTableFilterComposer
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnWithTypeConverterFilters<JobType, JobType, String> get type =>
+  ColumnWithTypeConverterFilters<JobTypeEnum, JobTypeEnum, String> get type =>
       $composableBuilder(
           column: $table.type,
           builder: (column) => ColumnWithTypeConverterFilters(column));
@@ -4598,9 +4560,9 @@ class $$PrefetchJobTablesTableFilterComposer
       column: $table.mangaId, builder: (column) => ColumnFilters(column));
 }
 
-class $$PrefetchJobTablesTableOrderingComposer
-    extends Composer<_$AppDatabase, $PrefetchJobTablesTable> {
-  $$PrefetchJobTablesTableOrderingComposer({
+class $$JobTablesTableOrderingComposer
+    extends Composer<_$AppDatabase, $JobTablesTable> {
+  $$JobTablesTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -4629,9 +4591,9 @@ class $$PrefetchJobTablesTableOrderingComposer
       column: $table.mangaId, builder: (column) => ColumnOrderings(column));
 }
 
-class $$PrefetchJobTablesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $PrefetchJobTablesTable> {
-  $$PrefetchJobTablesTableAnnotationComposer({
+class $$JobTablesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $JobTablesTable> {
+  $$JobTablesTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -4647,7 +4609,7 @@ class $$PrefetchJobTablesTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<JobType, String> get type =>
+  GeneratedColumnWithTypeConverter<JobTypeEnum, String> get type =>
       $composableBuilder(column: $table.type, builder: (column) => column);
 
   GeneratedColumn<String> get source =>
@@ -4660,43 +4622,38 @@ class $$PrefetchJobTablesTableAnnotationComposer
       $composableBuilder(column: $table.mangaId, builder: (column) => column);
 }
 
-class $$PrefetchJobTablesTableTableManager extends RootTableManager<
+class $$JobTablesTableTableManager extends RootTableManager<
     _$AppDatabase,
-    $PrefetchJobTablesTable,
-    PrefetchJobDrift,
-    $$PrefetchJobTablesTableFilterComposer,
-    $$PrefetchJobTablesTableOrderingComposer,
-    $$PrefetchJobTablesTableAnnotationComposer,
-    $$PrefetchJobTablesTableCreateCompanionBuilder,
-    $$PrefetchJobTablesTableUpdateCompanionBuilder,
-    (
-      PrefetchJobDrift,
-      BaseReferences<_$AppDatabase, $PrefetchJobTablesTable, PrefetchJobDrift>
-    ),
-    PrefetchJobDrift,
+    $JobTablesTable,
+    JobDrift,
+    $$JobTablesTableFilterComposer,
+    $$JobTablesTableOrderingComposer,
+    $$JobTablesTableAnnotationComposer,
+    $$JobTablesTableCreateCompanionBuilder,
+    $$JobTablesTableUpdateCompanionBuilder,
+    (JobDrift, BaseReferences<_$AppDatabase, $JobTablesTable, JobDrift>),
+    JobDrift,
     PrefetchHooks Function()> {
-  $$PrefetchJobTablesTableTableManager(
-      _$AppDatabase db, $PrefetchJobTablesTable table)
+  $$JobTablesTableTableManager(_$AppDatabase db, $JobTablesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$PrefetchJobTablesTableFilterComposer($db: db, $table: table),
+              $$JobTablesTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$PrefetchJobTablesTableOrderingComposer($db: db, $table: table),
+              $$JobTablesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$PrefetchJobTablesTableAnnotationComposer(
-                  $db: db, $table: table),
+              $$JobTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> createdAt = const Value.absent(),
             Value<String> updatedAt = const Value.absent(),
             Value<int> id = const Value.absent(),
-            Value<JobType> type = const Value.absent(),
+            Value<JobTypeEnum> type = const Value.absent(),
             Value<String> source = const Value.absent(),
             Value<String?> chapterId = const Value.absent(),
             Value<String> mangaId = const Value.absent(),
           }) =>
-              PrefetchJobTablesCompanion(
+              JobTablesCompanion(
             createdAt: createdAt,
             updatedAt: updatedAt,
             id: id,
@@ -4709,12 +4666,12 @@ class $$PrefetchJobTablesTableTableManager extends RootTableManager<
             Value<String> createdAt = const Value.absent(),
             Value<String> updatedAt = const Value.absent(),
             Value<int> id = const Value.absent(),
-            required JobType type,
+            required JobTypeEnum type,
             required String source,
             Value<String?> chapterId = const Value.absent(),
             required String mangaId,
           }) =>
-              PrefetchJobTablesCompanion.insert(
+              JobTablesCompanion.insert(
             createdAt: createdAt,
             updatedAt: updatedAt,
             id: id,
@@ -4730,42 +4687,36 @@ class $$PrefetchJobTablesTableTableManager extends RootTableManager<
         ));
 }
 
-typedef $$PrefetchJobTablesTableProcessedTableManager = ProcessedTableManager<
+typedef $$JobTablesTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
-    $PrefetchJobTablesTable,
-    PrefetchJobDrift,
-    $$PrefetchJobTablesTableFilterComposer,
-    $$PrefetchJobTablesTableOrderingComposer,
-    $$PrefetchJobTablesTableAnnotationComposer,
-    $$PrefetchJobTablesTableCreateCompanionBuilder,
-    $$PrefetchJobTablesTableUpdateCompanionBuilder,
-    (
-      PrefetchJobDrift,
-      BaseReferences<_$AppDatabase, $PrefetchJobTablesTable, PrefetchJobDrift>
-    ),
-    PrefetchJobDrift,
+    $JobTablesTable,
+    JobDrift,
+    $$JobTablesTableFilterComposer,
+    $$JobTablesTableOrderingComposer,
+    $$JobTablesTableAnnotationComposer,
+    $$JobTablesTableCreateCompanionBuilder,
+    $$JobTablesTableUpdateCompanionBuilder,
+    (JobDrift, BaseReferences<_$AppDatabase, $JobTablesTable, JobDrift>),
+    JobDrift,
     PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
-  $$MangaChapterImageTablesTableTableManager get mangaChapterImageTables =>
-      $$MangaChapterImageTablesTableTableManager(
-          _db, _db.mangaChapterImageTables);
-  $$MangaChapterTablesTableTableManager get mangaChapterTables =>
-      $$MangaChapterTablesTableTableManager(_db, _db.mangaChapterTables);
-  $$MangaLibraryTablesTableTableManager get mangaLibraryTables =>
-      $$MangaLibraryTablesTableTableManager(_db, _db.mangaLibraryTables);
+  $$ImageTablesTableTableManager get imageTables =>
+      $$ImageTablesTableTableManager(_db, _db.imageTables);
+  $$ChapterTablesTableTableManager get chapterTables =>
+      $$ChapterTablesTableTableManager(_db, _db.chapterTables);
+  $$LibraryTablesTableTableManager get libraryTables =>
+      $$LibraryTablesTableTableManager(_db, _db.libraryTables);
   $$MangaTablesTableTableManager get mangaTables =>
       $$MangaTablesTableTableManager(_db, _db.mangaTables);
-  $$MangaTagTablesTableTableManager get mangaTagTables =>
-      $$MangaTagTablesTableTableManager(_db, _db.mangaTagTables);
-  $$MangaTagRelationshipTablesTableTableManager
-      get mangaTagRelationshipTables =>
-          $$MangaTagRelationshipTablesTableTableManager(
-              _db, _db.mangaTagRelationshipTables);
+  $$TagTablesTableTableManager get tagTables =>
+      $$TagTablesTableTableManager(_db, _db.tagTables);
+  $$RelationshipTablesTableTableManager get relationshipTables =>
+      $$RelationshipTablesTableTableManager(_db, _db.relationshipTables);
   $$DownloadJobTablesTableTableManager get downloadJobTables =>
       $$DownloadJobTablesTableTableManager(_db, _db.downloadJobTables);
-  $$PrefetchJobTablesTableTableManager get prefetchJobTables =>
-      $$PrefetchJobTablesTableTableManager(_db, _db.prefetchJobTables);
+  $$JobTablesTableTableManager get jobTables =>
+      $$JobTablesTableTableManager(_db, _db.jobTables);
 }

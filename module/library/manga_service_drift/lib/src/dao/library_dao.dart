@@ -3,49 +3,49 @@ import 'package:drift/drift.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../database/database.dart';
-import '../tables/manga_library_tables.dart';
+import '../tables/library_tables.dart';
 import '../tables/manga_tables.dart';
-import '../tables/manga_tag_relationship_tables.dart';
-import '../tables/manga_tag_tables.dart';
+import '../tables/relationship_tables.dart';
+import '../tables/tag_tables.dart';
 
 part 'library_dao.g.dart';
 
 @DriftAccessor(
   tables: [
     MangaTables,
-    MangaTagTables,
-    MangaTagRelationshipTables,
-    MangaLibraryTables,
+    TagTables,
+    RelationshipTables,
+    LibraryTables,
   ],
 )
 class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
   LibraryDao(AppDatabase db) : super(db);
 
   Stream<List<(MangaDrift, List<TagDrift>)>> get stream {
-    final selector = select(mangaLibraryTables).join(
+    final selector = select(libraryTables).join(
       [
         innerJoin(
-          mangaTagRelationshipTables,
-          mangaTagRelationshipTables.mangaId.equalsExp(
-            mangaLibraryTables.mangaId,
+          relationshipTables,
+          relationshipTables.mangaId.equalsExp(
+            libraryTables.mangaId,
           ),
         ),
         innerJoin(
           mangaTables,
-          mangaTables.id.equalsExp(mangaTagRelationshipTables.mangaId),
+          mangaTables.id.equalsExp(relationshipTables.mangaId),
         ),
         innerJoin(
-          mangaTagTables,
-          mangaTagTables.id.equalsExp(mangaTagRelationshipTables.tagId),
+          tagTables,
+          tagTables.id.equalsExp(relationshipTables.tagId),
         ),
       ],
     );
 
-    final fallbackSelector = select(mangaLibraryTables).join(
+    final fallbackSelector = select(libraryTables).join(
       [
         innerJoin(
           mangaTables,
-          mangaTables.id.equalsExp(mangaLibraryTables.mangaId),
+          mangaTables.id.equalsExp(libraryTables.mangaId),
         ),
       ],
     );
@@ -68,7 +68,7 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
               (key, value) => MapEntry(
                 key,
                 value
-                    .map((e) => e.readTableOrNull(mangaTagTables))
+                    .map((e) => e.readTableOrNull(tagTables))
                     .nonNulls
                     .toList(),
               ),
@@ -83,41 +83,41 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
   }
 
   Future<void> add(String mangaId) async {
-    await into(mangaLibraryTables).insert(
-      MangaLibraryTablesCompanion.insert(mangaId: mangaId),
+    await into(libraryTables).insert(
+      LibraryTablesCompanion.insert(mangaId: mangaId),
     );
   }
 
   Future<void> remove(String mangaId) async {
-    await (delete(mangaLibraryTables)..where((f) => f.mangaId.equals(mangaId)))
+    await (delete(libraryTables)..where((f) => f.mangaId.equals(mangaId)))
         .go();
   }
 
   Future<List<(MangaDrift, List<TagDrift>)>> get() async {
-    final selector = select(mangaLibraryTables).join(
+    final selector = select(libraryTables).join(
       [
         innerJoin(
-          mangaTagRelationshipTables,
-          mangaTagRelationshipTables.mangaId.equalsExp(
-            mangaLibraryTables.mangaId,
+          relationshipTables,
+          relationshipTables.mangaId.equalsExp(
+            libraryTables.mangaId,
           ),
         ),
         innerJoin(
           mangaTables,
-          mangaTables.id.equalsExp(mangaTagRelationshipTables.mangaId),
+          mangaTables.id.equalsExp(relationshipTables.mangaId),
         ),
         innerJoin(
-          mangaTagTables,
-          mangaTagTables.id.equalsExp(mangaTagRelationshipTables.tagId),
+          tagTables,
+          tagTables.id.equalsExp(relationshipTables.tagId),
         ),
       ],
     );
 
-    final fallbackSelector = select(mangaLibraryTables).join(
+    final fallbackSelector = select(libraryTables).join(
       [
         innerJoin(
           mangaTables,
-          mangaTables.id.equalsExp(mangaLibraryTables.mangaId),
+          mangaTables.id.equalsExp(libraryTables.mangaId),
         ),
       ],
     );
@@ -130,7 +130,7 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
           (key, value) => MapEntry(
             key,
             value
-                .map((e) => e.readTableOrNull(mangaTagTables))
+                .map((e) => e.readTableOrNull(tagTables))
                 .nonNulls
                 .toList(),
           ),

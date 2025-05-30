@@ -3,7 +3,7 @@ import 'package:drift/drift.dart';
 import '../mixin/auto_timestamp_table.dart';
 
 @DataClassName('ImageDrift')
-class MangaChapterImageTables extends Table with AutoTimestampTable {
+class ImageTables extends Table with AutoTimestampTable {
   IntColumn get order => integer().named('order')();
 
   TextColumn get chapterId => text().named('chapter_id')();

@@ -39,7 +39,7 @@ void main() {
 
       final tags = List.generate(
         10,
-        (index) => MangaTagTablesCompanion(
+        (index) => TagTablesCompanion(
           id: Value('tag_$index'),
           name: Value('name_$index'),
         ),

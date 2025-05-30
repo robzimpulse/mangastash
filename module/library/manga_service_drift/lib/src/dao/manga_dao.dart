@@ -5,26 +5,26 @@ import 'package:uuid/uuid.dart';
 import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
 import '../extension/value_or_null_extension.dart';
-import '../tables/manga_library_tables.dart';
+import '../tables/library_tables.dart';
 import '../tables/manga_tables.dart';
-import '../tables/manga_tag_relationship_tables.dart';
-import '../tables/manga_tag_tables.dart';
+import '../tables/relationship_tables.dart';
+import '../tables/tag_tables.dart';
 
 part 'manga_dao.g.dart';
 
 @DriftAccessor(
   tables: [
     MangaTables,
-    MangaTagTables,
-    MangaTagRelationshipTables,
-    MangaLibraryTables,
+    TagTables,
+    RelationshipTables,
+    LibraryTables,
   ],
 )
 class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
   MangaDao(AppDatabase db) : super(db);
 
   Future<Map<MangaDrift, List<TagDrift>>> sync(
-    Map<MangaTablesCompanion, List<MangaTagTablesCompanion>> values,
+    Map<MangaTablesCompanion, List<TagTablesCompanion>> values,
   ) async {
     final tags = values.values.expand((e) => e);
     final mangas = values.keys;
@@ -170,15 +170,15 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
 
   Future<(MangaDrift, List<TagDrift>)?> getManga(String mangaId) async {
     return transaction(() async {
-      final selector = select(mangaTagRelationshipTables).join(
+      final selector = select(relationshipTables).join(
         [
           leftOuterJoin(
-            mangaTagTables,
-            mangaTagTables.id.equalsExp(mangaTagRelationshipTables.tagId),
+            tagTables,
+            tagTables.id.equalsExp(relationshipTables.tagId),
           ),
           leftOuterJoin(
             mangaTables,
-            mangaTables.id.equalsExp(mangaTagRelationshipTables.mangaId),
+            mangaTables.id.equalsExp(relationshipTables.mangaId),
           ),
         ],
       )..where(mangaTables.id.equals(mangaId));
@@ -200,10 +200,7 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
           .map(
             (key, value) => MapEntry(
               key,
-              value
-                  .map((e) => e.readTableOrNull(mangaTagTables))
-                  .nonNulls
-                  .toList(),
+              value.map((e) => e.readTableOrNull(tagTables)).nonNulls.toList(),
             ),
           );
 
@@ -259,7 +256,7 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
 
     if (isAllEmpty) return [];
 
-    final selector = select(mangaTagTables)
+    final selector = select(tagTables)
       ..where(
         (f) => [
           f.id.isIn(ids.nonEmpty.distinct),
@@ -270,8 +267,8 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     return transaction(() => selector.get());
   }
 
-  Future<List<TagDrift>> updateTag(MangaTagTablesCompanion data) {
-    final selector = update(mangaTagTables)..whereSamePrimaryKey(data);
+  Future<List<TagDrift>> updateTag(TagTablesCompanion data) {
+    final selector = update(tagTables)..whereSamePrimaryKey(data);
 
     return transaction(
       () => selector.writeReturning(
@@ -280,9 +277,9 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     );
   }
 
-  Future<TagDrift> insertTag(MangaTagTablesCompanion data) {
+  Future<TagDrift> insertTag(TagTablesCompanion data) {
     return transaction(
-      () => into(mangaTagTables).insertReturning(
+      () => into(tagTables).insertReturning(
         data.copyWith(
           id: Value(data.id.valueOrNull ?? const Uuid().v4().toString()),
           createdAt: Value(DateTime.now().toIso8601String()),
@@ -300,7 +297,7 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
   }
 
   Future<void> unlinkAllTagFromManga(String mangaId) {
-    final selector = delete(mangaTagRelationshipTables)
+    final selector = delete(relationshipTables)
       ..where((f) => f.mangaId.equals(mangaId));
 
     return transaction(() => selector.go());
@@ -310,8 +307,8 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     return transaction(
       () async {
         for (final tagId in tagIds) {
-          await into(mangaTagRelationshipTables).insert(
-            MangaTagRelationshipTablesCompanion.insert(
+          await into(relationshipTables).insert(
+            RelationshipTablesCompanion.insert(
               tagId: tagId,
               mangaId: mangaId,
             ),

@@ -1,25 +1,25 @@
 import 'package:drift/drift.dart';
 
 import '../database/database.dart';
-import '../tables/prefetch_job_tables.dart';
+import '../tables/job_tables.dart';
 
 part 'prefetch_job_dao.g.dart';
 
 @DriftAccessor(
   tables: [
-    PrefetchJobTables,
+    JobTables,
   ],
 )
 class PrefetchJobDao extends DatabaseAccessor<AppDatabase>
     with _$PrefetchJobDaoMixin {
   PrefetchJobDao(AppDatabase db) : super(db);
 
-  Stream<List<PrefetchJobDrift>> listen() {
-    return select(prefetchJobTables).watch();
+  Stream<List<JobDrift>> listen() {
+    return select(jobTables).watch();
   }
 
-  Future<void> add(PrefetchJobTablesCompanion value) async {
-    await into(prefetchJobTables).insert(
+  Future<void> add(JobTablesCompanion value) async {
+    await into(jobTables).insert(
       value.copyWith(
         createdAt: Value(DateTime.now().toIso8601String()),
         updatedAt: Value(DateTime.now().toIso8601String()),
@@ -28,7 +28,7 @@ class PrefetchJobDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  Future<void> remove(PrefetchJobTablesCompanion value) async {
-    await (delete(prefetchJobTables)..whereSamePrimaryKey(value)).go();
+  Future<void> remove(JobTablesCompanion value) async {
+    await (delete(jobTables)..whereSamePrimaryKey(value)).go();
   }
 }

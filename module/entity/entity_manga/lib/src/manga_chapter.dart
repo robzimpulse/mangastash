@@ -90,8 +90,8 @@ class MangaChapter extends Equatable with SimilarityMixin {
     );
   }
 
-  MangaChapterTablesCompanion get toDrift {
-    return MangaChapterTablesCompanion(
+  ChapterTablesCompanion get toDrift {
+    return ChapterTablesCompanion(
       id: Value.absentIfNull(id),
       mangaId: Value.absentIfNull(mangaId),
       title: Value.absentIfNull(title),

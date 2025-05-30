@@ -11,28 +11,28 @@ import '../dao/library_dao.dart';
 import '../dao/manga_dao.dart';
 import '../dao/prefetch_job_dao.dart';
 import '../interceptor/log_interceptor.dart';
+import '../tables/chapter_tables.dart';
 import '../tables/download_job_tables.dart';
-import '../tables/manga_chapter_image_tables.dart';
-import '../tables/manga_chapter_tables.dart';
-import '../tables/manga_library_tables.dart';
+import '../tables/image_tables.dart';
+import '../tables/job_tables.dart';
+import '../tables/library_tables.dart';
 import '../tables/manga_tables.dart';
-import '../tables/manga_tag_relationship_tables.dart';
-import '../tables/manga_tag_tables.dart';
-import '../tables/prefetch_job_tables.dart';
+import '../tables/relationship_tables.dart';
+import '../tables/tag_tables.dart';
 import '../util/typedef.dart';
 
 part 'database.g.dart';
 
 @DriftDatabase(
   tables: [
-    MangaChapterImageTables,
-    MangaChapterTables,
-    MangaLibraryTables,
+    ImageTables,
+    ChapterTables,
+    LibraryTables,
     MangaTables,
-    MangaTagTables,
-    MangaTagRelationshipTables,
+    TagTables,
+    RelationshipTables,
     DownloadJobTables,
-    PrefetchJobTables,
+    JobTables,
   ],
   daos: [
     MangaDao,

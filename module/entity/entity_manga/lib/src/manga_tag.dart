@@ -26,8 +26,8 @@ class MangaTag extends Equatable with SimilarityMixin {
     return MangaTag(name: tag.name, id: tag.id);
   }
 
-  MangaTagTablesCompanion get toDrift {
-    return MangaTagTablesCompanion(
+  TagTablesCompanion get toDrift {
+    return TagTablesCompanion(
       name: Value.absentIfNull(name),
       id: Value.absentIfNull(id),
     );

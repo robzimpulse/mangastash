@@ -5,9 +5,8 @@ part of 'manga_dao.dart';
 // ignore_for_file: type=lint
 mixin _$MangaDaoMixin on DatabaseAccessor<AppDatabase> {
   $MangaTablesTable get mangaTables => attachedDatabase.mangaTables;
-  $MangaTagTablesTable get mangaTagTables => attachedDatabase.mangaTagTables;
-  $MangaTagRelationshipTablesTable get mangaTagRelationshipTables =>
-      attachedDatabase.mangaTagRelationshipTables;
-  $MangaLibraryTablesTable get mangaLibraryTables =>
-      attachedDatabase.mangaLibraryTables;
+  $TagTablesTable get tagTables => attachedDatabase.tagTables;
+  $RelationshipTablesTable get relationshipTables =>
+      attachedDatabase.relationshipTables;
+  $LibraryTablesTable get libraryTables => attachedDatabase.libraryTables;
 }

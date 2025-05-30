@@ -5,22 +5,22 @@ import 'package:uuid/uuid.dart';
 import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
 import '../extension/value_or_null_extension.dart';
-import '../tables/manga_chapter_image_tables.dart';
-import '../tables/manga_chapter_tables.dart';
+import '../tables/chapter_tables.dart';
+import '../tables/image_tables.dart';
 
 part 'chapter_dao.g.dart';
 
 @DriftAccessor(
   tables: [
-    MangaChapterTables,
-    MangaChapterImageTables,
+    ChapterTables,
+    ImageTables,
   ],
 )
 class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
   ChapterDao(AppDatabase db) : super(db);
 
   Future<Map<ChapterDrift, List<ImageDrift>>> sync(
-    Map<MangaChapterTablesCompanion, List<String>> values,
+    Map<ChapterTablesCompanion, List<String>> values,
   ) async {
     final chapters = values.keys;
 
@@ -109,7 +109,7 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
 
     if (isAllEmpty) return [];
 
-    final selector = select(mangaChapterTables)
+    final selector = select(chapterTables)
       ..where(
         (f) => [
           f.id.isIn(ids.nonEmpty.distinct),
@@ -132,31 +132,31 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
     required String mangaId,
   }) async {
     return transaction(() async {
-      final selector = select(mangaChapterTables).join(
+      final selector = select(chapterTables).join(
         [
           leftOuterJoin(
-            mangaChapterImageTables,
-            mangaChapterImageTables.chapterId.equalsExp(mangaChapterTables.id),
+            imageTables,
+            imageTables.chapterId.equalsExp(chapterTables.id),
           ),
         ],
-      )..where(mangaChapterTables.mangaId.equals(mangaId));
+      )..where(chapterTables.mangaId.equals(mangaId));
 
       final results = await selector.get();
 
       if (results.isEmpty) {
-        final selector = select(mangaChapterTables)
+        final selector = select(chapterTables)
           ..where((f) => f.mangaId.equals(mangaId));
         final results = await selector.get();
         return {for (final e in results) e: <ImageDrift>[]};
       }
 
       final groups = results
-          .groupListsBy((e) => e.readTableOrNull(mangaChapterTables))
+          .groupListsBy((e) => e.readTableOrNull(chapterTables))
           .map(
             (key, images) => MapEntry(
               key,
               images
-                  .map((e) => e.readTableOrNull(mangaChapterImageTables))
+                  .map((e) => e.readTableOrNull(imageTables))
                   .nonNulls
                   .toList(),
             ),
@@ -173,19 +173,19 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
     required String chapterId,
   }) async {
     return transaction(() async {
-      final selector = select(mangaChapterTables).join(
+      final selector = select(chapterTables).join(
         [
           leftOuterJoin(
-            mangaChapterImageTables,
-            mangaChapterImageTables.chapterId.equalsExp(mangaChapterTables.id),
+            imageTables,
+            imageTables.chapterId.equalsExp(chapterTables.id),
           ),
         ],
-      )..where(mangaChapterTables.id.equals(chapterId));
+      )..where(chapterTables.id.equals(chapterId));
 
       final results = await selector.get();
 
       if (results.isEmpty) {
-        final selector = select(mangaChapterTables)
+        final selector = select(chapterTables)
           ..where((f) => f.id.equals(chapterId));
         final result = await selector.getSingleOrNull();
         if (result == null) return null;
@@ -193,12 +193,12 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
       }
 
       final groups = results
-          .groupListsBy((e) => e.readTableOrNull(mangaChapterTables))
+          .groupListsBy((e) => e.readTableOrNull(chapterTables))
           .map(
             (key, value) => MapEntry(
               key,
               value
-                  .map((e) => e.readTableOrNull(mangaChapterImageTables))
+                  .map((e) => e.readTableOrNull(imageTables))
                   .nonNulls
                   .sortedBy<num>((e) => e.order)
                   .toList(),
@@ -214,9 +214,9 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
     });
   }
 
-  Future<ChapterDrift> insertChapter(MangaChapterTablesCompanion data) {
+  Future<ChapterDrift> insertChapter(ChapterTablesCompanion data) {
     return transaction(
-      () => into(mangaChapterTables).insertReturning(
+      () => into(chapterTables).insertReturning(
         data.copyWith(
           id: Value(data.id.valueOrNull ?? const Uuid().v4().toString()),
           createdAt: Value(DateTime.now().toIso8601String()),
@@ -233,8 +233,8 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
     );
   }
 
-  Future<List<ChapterDrift>> updateChapter(MangaChapterTablesCompanion data) {
-    final selector = update(mangaChapterTables)..whereSamePrimaryKey(data);
+  Future<List<ChapterDrift>> updateChapter(ChapterTablesCompanion data) {
+    final selector = update(chapterTables)..whereSamePrimaryKey(data);
 
     return transaction(
       () => selector.writeReturning(
@@ -247,7 +247,7 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
   }
 
   Future<List<ImageDrift>> setImages(String chapterId, List<String> images) {
-    final selector = delete(mangaChapterImageTables)
+    final selector = delete(imageTables)
       ..where((f) => f.chapterId.equals(chapterId));
 
     return transaction(
@@ -256,12 +256,12 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
 
         final datas = <ImageDrift>[];
         for (final (index, image) in images.indexed) {
-          final data = MangaChapterImageTablesCompanion(
+          final data = ImageTablesCompanion(
             webUrl: Value(image),
             chapterId: Value(chapterId),
             order: Value(index),
           );
-          final result = await into(mangaChapterImageTables).insertReturning(
+          final result = await into(imageTables).insertReturning(
             data.copyWith(
               id: Value(const Uuid().v4().toString()),
               createdAt: Value(DateTime.now().toIso8601String()),

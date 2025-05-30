@@ -10,3 +10,4 @@ export 'src/dao/prefetch_job_dao.dart';
 export 'src/database/database.dart';
 export 'src/extension/value_or_null_extension.dart';
 export 'src/util/database_viewer.dart';
+export 'src/util/job_type_enum.dart';
