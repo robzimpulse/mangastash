@@ -220,18 +220,22 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
   }
 
-  Future<void> downloadChapter({required MangaChapter chapter}) async {
-    final key = DownloadChapterKey.create(manga: state.manga, chapter: chapter);
-    await _downloadChapterUseCase.execute(key: key);
+  void downloadChapter({required MangaChapter chapter}) {
+    final mangaId = state.manga?.id;
+    final chapterId = chapter.id;
+    final source = state.manga?.source;
+    if (mangaId == null || chapterId == null || source == null) return;
+    _downloadChapterUseCase.downloadChapter(
+      mangaId: mangaId,
+      chapterId: chapterId,
+      source: source,
+    );
   }
 
-  Future<void> downloadAllChapter() async {
-    await Future.wait(
-      [
-        for (final chapter in state.processedChapters.values)
-          downloadChapter(chapter: chapter),
-      ],
-    );
+  void downloadAllChapter() {
+    for (final chapter in state.processedChapters.values) {
+      downloadChapter(chapter: chapter);
+    }
   }
 
   void recrawl({required String url}) async {

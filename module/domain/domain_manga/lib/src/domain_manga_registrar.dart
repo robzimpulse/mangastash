@@ -71,23 +71,24 @@ class DomainMangaRegistrar extends Registrar {
       locator.registerFactory(() => MangaDao(locator()));
       locator.registerFactory(() => ChapterDao(locator()));
       locator.registerFactory(() => LibraryDao(locator()));
-      locator.registerFactory(() => DownloadJobDao(locator()));
       locator.registerFactory(() => JobDao(locator()));
       locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
 
       locator.registerSingleton(
-        PrefetchJobManager(
+        JobManager(
           log: log,
+          jobDao: locator(),
           getChapterUseCase: () => locator(),
           getMangaUseCase: () => locator(),
-          jobDao: locator(),
           searchChapterUseCase: () => locator(),
+          fileDownloader: locator(),
         ),
         dispose: (e) => e.dispose(),
       );
-      locator.alias<PrefetchMangaUseCase, PrefetchJobManager>();
-      locator.alias<PrefetchChapterUseCase, PrefetchJobManager>();
-      locator.alias<ListenPrefetchUseCase, PrefetchJobManager>();
+      locator.alias<PrefetchMangaUseCase, JobManager>();
+      locator.alias<PrefetchChapterUseCase, JobManager>();
+      locator.alias<ListenPrefetchUseCase, JobManager>();
+      locator.alias<DownloadChapterUseCase, JobManager>();
 
       locator.registerSingleton(
         HeadlessWebviewManager(log: log, cacheManager: locator()),
@@ -98,10 +99,8 @@ class DomainMangaRegistrar extends Registrar {
       locator.registerSingleton(
         await DownloadProgressManager.create(
           fileDownloader: locator(),
-          log: log,
           cacheManager: locator(),
-          downloadJobDao: locator(),
-          getChapterUseCase: () => locator(),
+          log: log,
         ),
       );
       locator.alias<ListenDownloadProgressUseCase, DownloadProgressManager>();
@@ -201,12 +200,6 @@ class DomainMangaRegistrar extends Registrar {
       locator.registerFactory(
         () => RemoveFromLibraryUseCase(
           libraryDao: locator(),
-        ),
-      );
-      locator.registerFactory(
-        () => DownloadChapterUseCase(
-          log: log,
-          downloadJobDao: locator(),
         ),
       );
 

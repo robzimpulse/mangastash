@@ -7,13 +7,10 @@ import 'package:collection/collection.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:log_box/log_box.dart';
-import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../mixin/generate_task_id_mixin.dart';
-import '../use_case/chapter/get_chapter_use_case.dart';
 import '../use_case/chapter/listen_download_progress_use_case.dart';
 
 typedef Key = DownloadChapterKey;
@@ -25,22 +22,15 @@ class DownloadProgressManager
     implements ListenDownloadProgressUseCase {
   final BehaviorSubject<Map<Key, Update>> _progress;
   final BehaviorSubject<Map<String, Task>> _tasks;
-  final BehaviorSubject<List<DownloadJobDrift>> _jobs;
-  final DownloadJobDao _downloadJobDao;
   final FileDownloader _fileDownloader;
   final BaseCacheManager _cacheManager;
-  final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final LogBox _log;
 
   late final StreamSubscription _streamSubscription;
-  late final StreamSubscription _streamSubscription2;
-  bool _isFetchingChapter = false;
 
   static Future<DownloadProgressManager> create({
-    required DownloadJobDao downloadJobDao,
     required FileDownloader fileDownloader,
     required BaseCacheManager cacheManager,
-    required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required LogBox log,
   }) async {
     final records = await fileDownloader.database.allRecords();
@@ -48,8 +38,6 @@ class DownloadProgressManager
     return DownloadProgressManager(
       fileDownloader: fileDownloader,
       cacheManager: cacheManager,
-      downloadJobDao: downloadJobDao,
-      getChapterUseCase: getChapterUseCase,
       log: log,
       tasks: Map.fromEntries(records.map((e) => MapEntry(e.taskId, e.task))),
       completeRecords: List.of(
@@ -68,31 +56,21 @@ class DownloadProgressManager
     required LogBox log,
     required Map<String, Task> tasks,
     required Map<Key, Update> progress,
-    required DownloadJobDao downloadJobDao,
     required FileDownloader fileDownloader,
     required BaseCacheManager cacheManager,
     required List<TaskRecord> completeRecords,
-    required ValueGetter<GetChapterUseCase> getChapterUseCase,
   })  : _log = log,
         _cacheManager = cacheManager,
         _fileDownloader = fileDownloader,
         _tasks = BehaviorSubject.seeded(tasks),
-        _jobs = BehaviorSubject.seeded([]),
-        _downloadJobDao = downloadJobDao,
-        _getChapterUseCase = getChapterUseCase,
         _progress = BehaviorSubject.seeded(progress) {
     _streamSubscription = _fileDownloader.updates.distinct().listen(_onUpdate);
-    _streamSubscription2 = _jobs.distinct().listen(_onFetch);
-    _jobs.addStream(downloadJobDao.listen());
     for (final record in completeRecords) {
       _moveFileToSharedStorage(status: record.status, task: record.task);
     }
   }
 
-  Future<void> dispose() async {
-    await _streamSubscription.cancel();
-    await _streamSubscription2.cancel();
-  }
+  Future<void> dispose() => _streamSubscription.cancel();
 
   Future<void> _moveFileToSharedStorage({
     required TaskStatus status,
@@ -145,151 +123,6 @@ class DownloadProgressManager
       },
       name: runtimeType.toString(),
     );
-  }
-
-  void _onFetch(List<DownloadJobDrift> jobs) async {
-    final job = jobs.firstOrNull;
-    if (job == null || _isFetchingChapter) return;
-
-    _isFetchingChapter = true;
-
-    final result = await _getChapterUseCase().execute(
-      source: MangaSourceEnum.fromValue(job.source),
-      mangaId: job.mangaId,
-      chapterId: job.chapterId,
-    );
-
-    _isFetchingChapter = false;
-
-    if (result is Success<MangaChapter>) {
-      _log.log(
-        'Success fetch chapter',
-        extra: {
-          'manga_id': job.mangaId,
-          'chapter_id': job.chapterId,
-          'source': job.source,
-          'data': result.data.toJson(),
-        },
-        name: runtimeType.toString(),
-      );
-      _downloadJobDao.remove(job.toCompanion(true));
-
-      final key = DownloadChapterKey.fromDrift(job);
-      final groupId = key.toJsonString();
-      final images = result.data.images ?? [];
-      final title = key.mangaTitle;
-      final chapter = key.chapterNumber;
-      final cover = key.mangaCoverUrl;
-      final extension = cover?.split('.').lastOrNull;
-      final info = '${key.mangaTitle} - chapter ${key.chapterNumber}';
-
-      _fileDownloader.configureNotificationForGroup(
-        groupId,
-        running: TaskNotification(
-          'Downloading $title chapter $chapter',
-          '{numFinished} out of {numTotal}',
-        ),
-        complete: TaskNotification(
-          "Finish Downloading $title chapter $chapter",
-          "Loaded {numTotal} files",
-        ),
-        error: const TaskNotification(
-          'Error',
-          '{numFailed}/{numTotal} failed',
-        ),
-        progressBar: false,
-        groupNotificationId: groupId,
-      );
-
-      final List<DownloadTask> tasks = [];
-      if (cover != null && extension != null && title != null) {
-        final filename = 'cover.$extension';
-
-        tasks.add(
-          DownloadTask(
-            taskId: generateTaskId(
-              url: cover,
-              directory: title,
-              filename: filename,
-              group: groupId,
-            ),
-            url: cover,
-            headers: {HttpHeaders.userAgentHeader: userAgent},
-            baseDirectory: BaseDirectory.applicationDocuments,
-            updates: Updates.statusAndProgress,
-            directory: title,
-            filename: filename,
-            retries: 3,
-            group: groupId,
-            creationTime: DateTime.now(),
-            requiresWiFi: true,
-            allowPause: true,
-          ),
-        );
-      }
-
-      for (final (index, url) in images.indexed) {
-        final extension = url.split('.').lastOrNull;
-
-        if (title == null || chapter == null || extension == null) continue;
-
-        final directory = '$title/$chapter';
-        final filename = '${index + 1}.$extension';
-
-        tasks.add(
-          DownloadTask(
-            taskId: generateTaskId(
-              url: url,
-              directory: directory,
-              filename: filename,
-              group: groupId,
-            ),
-            url: url,
-            headers: {HttpHeaders.userAgentHeader: userAgent},
-            baseDirectory: BaseDirectory.applicationDocuments,
-            updates: Updates.statusAndProgress,
-            directory: directory,
-            filename: filename,
-            retries: 3,
-            group: groupId,
-            creationTime: DateTime.now(),
-            allowPause: true,
-            requiresWiFi: true,
-          ),
-        );
-      }
-
-      for (final task in tasks) {
-        await _fileDownloader.enqueue(task);
-
-        _log.log(
-          '[$info] Success enqueue task',
-          extra: {
-            'id': task.taskId,
-            'url': task.url,
-            'base_directory': task.baseDirectory.toString(),
-            'directory': task.directory,
-            'filename': task.filename,
-            'group': task.group,
-            'headers': task.headers.toString(),
-          },
-          name: runtimeType.toString(),
-        );
-      }
-    }
-
-    if (result is Error<MangaChapter>) {
-      _log.log(
-        'Failed fetch chapter',
-        extra: {
-          'manga_id': job.mangaId,
-          'chapter_id': job.chapterId,
-          'source': job.source,
-          'error': result.error.toString(),
-        },
-        name: runtimeType.toString(),
-      );
-    }
   }
 
   void _onUpdate(TaskUpdate event) {

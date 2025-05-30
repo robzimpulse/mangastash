@@ -2257,455 +2257,6 @@ class RelationshipTablesCompanion extends UpdateCompanion<RelationshipTable> {
   }
 }
 
-class $DownloadJobTablesTable extends DownloadJobTables
-    with TableInfo<$DownloadJobTablesTable, DownloadJobDrift> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $DownloadJobTablesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
-  @override
-  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
-      'created_at', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
-  static const VerificationMeta _updatedAtMeta =
-      const VerificationMeta('updatedAt');
-  @override
-  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
-      'updated_at', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
-  static const VerificationMeta _mangaIdMeta =
-      const VerificationMeta('mangaId');
-  @override
-  late final GeneratedColumn<String> mangaId = GeneratedColumn<String>(
-      'manga_id', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _mangaTitleMeta =
-      const VerificationMeta('mangaTitle');
-  @override
-  late final GeneratedColumn<String> mangaTitle = GeneratedColumn<String>(
-      'manga_title', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _mangaCoverUrlMeta =
-      const VerificationMeta('mangaCoverUrl');
-  @override
-  late final GeneratedColumn<String> mangaCoverUrl = GeneratedColumn<String>(
-      'manga_cover_url', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _chapterIdMeta =
-      const VerificationMeta('chapterId');
-  @override
-  late final GeneratedColumn<String> chapterId = GeneratedColumn<String>(
-      'chapter_id', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _chapterNumberMeta =
-      const VerificationMeta('chapterNumber');
-  @override
-  late final GeneratedColumn<int> chapterNumber = GeneratedColumn<int>(
-      'chapter_number', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
-  @override
-  late final GeneratedColumn<String> source = GeneratedColumn<String>(
-      'source', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  @override
-  List<GeneratedColumn> get $columns => [
-        createdAt,
-        updatedAt,
-        mangaId,
-        mangaTitle,
-        mangaCoverUrl,
-        chapterId,
-        chapterNumber,
-        source
-      ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'download_job_tables';
-  @override
-  VerificationContext validateIntegrity(Insertable<DownloadJobDrift> instance,
-      {bool isInserting = false}) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
-    }
-    if (data.containsKey('updated_at')) {
-      context.handle(_updatedAtMeta,
-          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
-    }
-    if (data.containsKey('manga_id')) {
-      context.handle(_mangaIdMeta,
-          mangaId.isAcceptableOrUnknown(data['manga_id']!, _mangaIdMeta));
-    }
-    if (data.containsKey('manga_title')) {
-      context.handle(
-          _mangaTitleMeta,
-          mangaTitle.isAcceptableOrUnknown(
-              data['manga_title']!, _mangaTitleMeta));
-    }
-    if (data.containsKey('manga_cover_url')) {
-      context.handle(
-          _mangaCoverUrlMeta,
-          mangaCoverUrl.isAcceptableOrUnknown(
-              data['manga_cover_url']!, _mangaCoverUrlMeta));
-    }
-    if (data.containsKey('chapter_id')) {
-      context.handle(_chapterIdMeta,
-          chapterId.isAcceptableOrUnknown(data['chapter_id']!, _chapterIdMeta));
-    }
-    if (data.containsKey('chapter_number')) {
-      context.handle(
-          _chapterNumberMeta,
-          chapterNumber.isAcceptableOrUnknown(
-              data['chapter_number']!, _chapterNumberMeta));
-    }
-    if (data.containsKey('source')) {
-      context.handle(_sourceMeta,
-          source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey =>
-      {mangaId, mangaTitle, mangaCoverUrl, chapterId, chapterNumber, source};
-  @override
-  DownloadJobDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return DownloadJobDrift(
-      createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
-      updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}updated_at'])!,
-      mangaId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}manga_id']),
-      mangaTitle: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}manga_title']),
-      mangaCoverUrl: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}manga_cover_url']),
-      chapterId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}chapter_id']),
-      chapterNumber: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}chapter_number']),
-      source: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}source']),
-    );
-  }
-
-  @override
-  $DownloadJobTablesTable createAlias(String alias) {
-    return $DownloadJobTablesTable(attachedDatabase, alias);
-  }
-}
-
-class DownloadJobDrift extends DataClass
-    implements Insertable<DownloadJobDrift> {
-  final String createdAt;
-  final String updatedAt;
-  final String? mangaId;
-  final String? mangaTitle;
-  final String? mangaCoverUrl;
-  final String? chapterId;
-  final int? chapterNumber;
-  final String? source;
-  const DownloadJobDrift(
-      {required this.createdAt,
-      required this.updatedAt,
-      this.mangaId,
-      this.mangaTitle,
-      this.mangaCoverUrl,
-      this.chapterId,
-      this.chapterNumber,
-      this.source});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['created_at'] = Variable<String>(createdAt);
-    map['updated_at'] = Variable<String>(updatedAt);
-    if (!nullToAbsent || mangaId != null) {
-      map['manga_id'] = Variable<String>(mangaId);
-    }
-    if (!nullToAbsent || mangaTitle != null) {
-      map['manga_title'] = Variable<String>(mangaTitle);
-    }
-    if (!nullToAbsent || mangaCoverUrl != null) {
-      map['manga_cover_url'] = Variable<String>(mangaCoverUrl);
-    }
-    if (!nullToAbsent || chapterId != null) {
-      map['chapter_id'] = Variable<String>(chapterId);
-    }
-    if (!nullToAbsent || chapterNumber != null) {
-      map['chapter_number'] = Variable<int>(chapterNumber);
-    }
-    if (!nullToAbsent || source != null) {
-      map['source'] = Variable<String>(source);
-    }
-    return map;
-  }
-
-  DownloadJobTablesCompanion toCompanion(bool nullToAbsent) {
-    return DownloadJobTablesCompanion(
-      createdAt: Value(createdAt),
-      updatedAt: Value(updatedAt),
-      mangaId: mangaId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(mangaId),
-      mangaTitle: mangaTitle == null && nullToAbsent
-          ? const Value.absent()
-          : Value(mangaTitle),
-      mangaCoverUrl: mangaCoverUrl == null && nullToAbsent
-          ? const Value.absent()
-          : Value(mangaCoverUrl),
-      chapterId: chapterId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(chapterId),
-      chapterNumber: chapterNumber == null && nullToAbsent
-          ? const Value.absent()
-          : Value(chapterNumber),
-      source:
-          source == null && nullToAbsent ? const Value.absent() : Value(source),
-    );
-  }
-
-  factory DownloadJobDrift.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return DownloadJobDrift(
-      createdAt: serializer.fromJson<String>(json['createdAt']),
-      updatedAt: serializer.fromJson<String>(json['updatedAt']),
-      mangaId: serializer.fromJson<String?>(json['mangaId']),
-      mangaTitle: serializer.fromJson<String?>(json['mangaTitle']),
-      mangaCoverUrl: serializer.fromJson<String?>(json['mangaCoverUrl']),
-      chapterId: serializer.fromJson<String?>(json['chapterId']),
-      chapterNumber: serializer.fromJson<int?>(json['chapterNumber']),
-      source: serializer.fromJson<String?>(json['source']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'createdAt': serializer.toJson<String>(createdAt),
-      'updatedAt': serializer.toJson<String>(updatedAt),
-      'mangaId': serializer.toJson<String?>(mangaId),
-      'mangaTitle': serializer.toJson<String?>(mangaTitle),
-      'mangaCoverUrl': serializer.toJson<String?>(mangaCoverUrl),
-      'chapterId': serializer.toJson<String?>(chapterId),
-      'chapterNumber': serializer.toJson<int?>(chapterNumber),
-      'source': serializer.toJson<String?>(source),
-    };
-  }
-
-  DownloadJobDrift copyWith(
-          {String? createdAt,
-          String? updatedAt,
-          Value<String?> mangaId = const Value.absent(),
-          Value<String?> mangaTitle = const Value.absent(),
-          Value<String?> mangaCoverUrl = const Value.absent(),
-          Value<String?> chapterId = const Value.absent(),
-          Value<int?> chapterNumber = const Value.absent(),
-          Value<String?> source = const Value.absent()}) =>
-      DownloadJobDrift(
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        mangaId: mangaId.present ? mangaId.value : this.mangaId,
-        mangaTitle: mangaTitle.present ? mangaTitle.value : this.mangaTitle,
-        mangaCoverUrl:
-            mangaCoverUrl.present ? mangaCoverUrl.value : this.mangaCoverUrl,
-        chapterId: chapterId.present ? chapterId.value : this.chapterId,
-        chapterNumber:
-            chapterNumber.present ? chapterNumber.value : this.chapterNumber,
-        source: source.present ? source.value : this.source,
-      );
-  DownloadJobDrift copyWithCompanion(DownloadJobTablesCompanion data) {
-    return DownloadJobDrift(
-      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
-      mangaId: data.mangaId.present ? data.mangaId.value : this.mangaId,
-      mangaTitle:
-          data.mangaTitle.present ? data.mangaTitle.value : this.mangaTitle,
-      mangaCoverUrl: data.mangaCoverUrl.present
-          ? data.mangaCoverUrl.value
-          : this.mangaCoverUrl,
-      chapterId: data.chapterId.present ? data.chapterId.value : this.chapterId,
-      chapterNumber: data.chapterNumber.present
-          ? data.chapterNumber.value
-          : this.chapterNumber,
-      source: data.source.present ? data.source.value : this.source,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('DownloadJobDrift(')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt, ')
-          ..write('mangaId: $mangaId, ')
-          ..write('mangaTitle: $mangaTitle, ')
-          ..write('mangaCoverUrl: $mangaCoverUrl, ')
-          ..write('chapterId: $chapterId, ')
-          ..write('chapterNumber: $chapterNumber, ')
-          ..write('source: $source')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(createdAt, updatedAt, mangaId, mangaTitle,
-      mangaCoverUrl, chapterId, chapterNumber, source);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is DownloadJobDrift &&
-          other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt &&
-          other.mangaId == this.mangaId &&
-          other.mangaTitle == this.mangaTitle &&
-          other.mangaCoverUrl == this.mangaCoverUrl &&
-          other.chapterId == this.chapterId &&
-          other.chapterNumber == this.chapterNumber &&
-          other.source == this.source);
-}
-
-class DownloadJobTablesCompanion extends UpdateCompanion<DownloadJobDrift> {
-  final Value<String> createdAt;
-  final Value<String> updatedAt;
-  final Value<String?> mangaId;
-  final Value<String?> mangaTitle;
-  final Value<String?> mangaCoverUrl;
-  final Value<String?> chapterId;
-  final Value<int?> chapterNumber;
-  final Value<String?> source;
-  final Value<int> rowid;
-  const DownloadJobTablesCompanion({
-    this.createdAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
-    this.mangaId = const Value.absent(),
-    this.mangaTitle = const Value.absent(),
-    this.mangaCoverUrl = const Value.absent(),
-    this.chapterId = const Value.absent(),
-    this.chapterNumber = const Value.absent(),
-    this.source = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  DownloadJobTablesCompanion.insert({
-    this.createdAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
-    this.mangaId = const Value.absent(),
-    this.mangaTitle = const Value.absent(),
-    this.mangaCoverUrl = const Value.absent(),
-    this.chapterId = const Value.absent(),
-    this.chapterNumber = const Value.absent(),
-    this.source = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  static Insertable<DownloadJobDrift> custom({
-    Expression<String>? createdAt,
-    Expression<String>? updatedAt,
-    Expression<String>? mangaId,
-    Expression<String>? mangaTitle,
-    Expression<String>? mangaCoverUrl,
-    Expression<String>? chapterId,
-    Expression<int>? chapterNumber,
-    Expression<String>? source,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (createdAt != null) 'created_at': createdAt,
-      if (updatedAt != null) 'updated_at': updatedAt,
-      if (mangaId != null) 'manga_id': mangaId,
-      if (mangaTitle != null) 'manga_title': mangaTitle,
-      if (mangaCoverUrl != null) 'manga_cover_url': mangaCoverUrl,
-      if (chapterId != null) 'chapter_id': chapterId,
-      if (chapterNumber != null) 'chapter_number': chapterNumber,
-      if (source != null) 'source': source,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  DownloadJobTablesCompanion copyWith(
-      {Value<String>? createdAt,
-      Value<String>? updatedAt,
-      Value<String?>? mangaId,
-      Value<String?>? mangaTitle,
-      Value<String?>? mangaCoverUrl,
-      Value<String?>? chapterId,
-      Value<int?>? chapterNumber,
-      Value<String?>? source,
-      Value<int>? rowid}) {
-    return DownloadJobTablesCompanion(
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      mangaId: mangaId ?? this.mangaId,
-      mangaTitle: mangaTitle ?? this.mangaTitle,
-      mangaCoverUrl: mangaCoverUrl ?? this.mangaCoverUrl,
-      chapterId: chapterId ?? this.chapterId,
-      chapterNumber: chapterNumber ?? this.chapterNumber,
-      source: source ?? this.source,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (createdAt.present) {
-      map['created_at'] = Variable<String>(createdAt.value);
-    }
-    if (updatedAt.present) {
-      map['updated_at'] = Variable<String>(updatedAt.value);
-    }
-    if (mangaId.present) {
-      map['manga_id'] = Variable<String>(mangaId.value);
-    }
-    if (mangaTitle.present) {
-      map['manga_title'] = Variable<String>(mangaTitle.value);
-    }
-    if (mangaCoverUrl.present) {
-      map['manga_cover_url'] = Variable<String>(mangaCoverUrl.value);
-    }
-    if (chapterId.present) {
-      map['chapter_id'] = Variable<String>(chapterId.value);
-    }
-    if (chapterNumber.present) {
-      map['chapter_number'] = Variable<int>(chapterNumber.value);
-    }
-    if (source.present) {
-      map['source'] = Variable<String>(source.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('DownloadJobTablesCompanion(')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt, ')
-          ..write('mangaId: $mangaId, ')
-          ..write('mangaTitle: $mangaTitle, ')
-          ..write('mangaCoverUrl: $mangaCoverUrl, ')
-          ..write('chapterId: $chapterId, ')
-          ..write('chapterNumber: $chapterNumber, ')
-          ..write('source: $source, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
 class $JobTablesTable extends JobTables
     with TableInfo<$JobTablesTable, JobDrift> {
   @override
@@ -2746,8 +2297,8 @@ class $JobTablesTable extends JobTables
   static const VerificationMeta _sourceMeta = const VerificationMeta('source');
   @override
   late final GeneratedColumn<String> source = GeneratedColumn<String>(
-      'source', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'source', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _chapterIdMeta =
       const VerificationMeta('chapterId');
   @override
@@ -2758,11 +2309,17 @@ class $JobTablesTable extends JobTables
       const VerificationMeta('mangaId');
   @override
   late final GeneratedColumn<String> mangaId = GeneratedColumn<String>(
-      'manga_id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      'manga_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _imageIdMeta =
+      const VerificationMeta('imageId');
+  @override
+  late final GeneratedColumn<String> imageId = GeneratedColumn<String>(
+      'image_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns =>
-      [createdAt, updatedAt, id, type, source, chapterId, mangaId];
+      [createdAt, updatedAt, id, type, source, chapterId, mangaId, imageId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2788,8 +2345,6 @@ class $JobTablesTable extends JobTables
     if (data.containsKey('source')) {
       context.handle(_sourceMeta,
           source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
-    } else if (isInserting) {
-      context.missing(_sourceMeta);
     }
     if (data.containsKey('chapter_id')) {
       context.handle(_chapterIdMeta,
@@ -2798,8 +2353,10 @@ class $JobTablesTable extends JobTables
     if (data.containsKey('manga_id')) {
       context.handle(_mangaIdMeta,
           mangaId.isAcceptableOrUnknown(data['manga_id']!, _mangaIdMeta));
-    } else if (isInserting) {
-      context.missing(_mangaIdMeta);
+    }
+    if (data.containsKey('image_id')) {
+      context.handle(_imageIdMeta,
+          imageId.isAcceptableOrUnknown(data['image_id']!, _imageIdMeta));
     }
     return context;
   }
@@ -2819,11 +2376,13 @@ class $JobTablesTable extends JobTables
       type: $JobTablesTable.$convertertype.fromSql(attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}type'])!),
       source: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}source'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}source']),
       chapterId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}chapter_id']),
       mangaId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}manga_id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}manga_id']),
+      imageId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}image_id']),
     );
   }
 
@@ -2841,17 +2400,19 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
   final String updatedAt;
   final int id;
   final JobTypeEnum type;
-  final String source;
+  final String? source;
   final String? chapterId;
-  final String mangaId;
+  final String? mangaId;
+  final String? imageId;
   const JobDrift(
       {required this.createdAt,
       required this.updatedAt,
       required this.id,
       required this.type,
-      required this.source,
+      this.source,
       this.chapterId,
-      required this.mangaId});
+      this.mangaId,
+      this.imageId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2862,11 +2423,18 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
       map['type'] =
           Variable<String>($JobTablesTable.$convertertype.toSql(type));
     }
-    map['source'] = Variable<String>(source);
+    if (!nullToAbsent || source != null) {
+      map['source'] = Variable<String>(source);
+    }
     if (!nullToAbsent || chapterId != null) {
       map['chapter_id'] = Variable<String>(chapterId);
     }
-    map['manga_id'] = Variable<String>(mangaId);
+    if (!nullToAbsent || mangaId != null) {
+      map['manga_id'] = Variable<String>(mangaId);
+    }
+    if (!nullToAbsent || imageId != null) {
+      map['image_id'] = Variable<String>(imageId);
+    }
     return map;
   }
 
@@ -2876,11 +2444,17 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
       updatedAt: Value(updatedAt),
       id: Value(id),
       type: Value(type),
-      source: Value(source),
+      source:
+          source == null && nullToAbsent ? const Value.absent() : Value(source),
       chapterId: chapterId == null && nullToAbsent
           ? const Value.absent()
           : Value(chapterId),
-      mangaId: Value(mangaId),
+      mangaId: mangaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mangaId),
+      imageId: imageId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(imageId),
     );
   }
 
@@ -2893,9 +2467,10 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
       id: serializer.fromJson<int>(json['id']),
       type: $JobTablesTable.$convertertype
           .fromJson(serializer.fromJson<String>(json['type'])),
-      source: serializer.fromJson<String>(json['source']),
+      source: serializer.fromJson<String?>(json['source']),
       chapterId: serializer.fromJson<String?>(json['chapterId']),
-      mangaId: serializer.fromJson<String>(json['mangaId']),
+      mangaId: serializer.fromJson<String?>(json['mangaId']),
+      imageId: serializer.fromJson<String?>(json['imageId']),
     );
   }
   @override
@@ -2907,9 +2482,10 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
       'id': serializer.toJson<int>(id),
       'type': serializer
           .toJson<String>($JobTablesTable.$convertertype.toJson(type)),
-      'source': serializer.toJson<String>(source),
+      'source': serializer.toJson<String?>(source),
       'chapterId': serializer.toJson<String?>(chapterId),
-      'mangaId': serializer.toJson<String>(mangaId),
+      'mangaId': serializer.toJson<String?>(mangaId),
+      'imageId': serializer.toJson<String?>(imageId),
     };
   }
 
@@ -2918,17 +2494,19 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
           String? updatedAt,
           int? id,
           JobTypeEnum? type,
-          String? source,
+          Value<String?> source = const Value.absent(),
           Value<String?> chapterId = const Value.absent(),
-          String? mangaId}) =>
+          Value<String?> mangaId = const Value.absent(),
+          Value<String?> imageId = const Value.absent()}) =>
       JobDrift(
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         id: id ?? this.id,
         type: type ?? this.type,
-        source: source ?? this.source,
+        source: source.present ? source.value : this.source,
         chapterId: chapterId.present ? chapterId.value : this.chapterId,
-        mangaId: mangaId ?? this.mangaId,
+        mangaId: mangaId.present ? mangaId.value : this.mangaId,
+        imageId: imageId.present ? imageId.value : this.imageId,
       );
   JobDrift copyWithCompanion(JobTablesCompanion data) {
     return JobDrift(
@@ -2939,6 +2517,7 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
       source: data.source.present ? data.source.value : this.source,
       chapterId: data.chapterId.present ? data.chapterId.value : this.chapterId,
       mangaId: data.mangaId.present ? data.mangaId.value : this.mangaId,
+      imageId: data.imageId.present ? data.imageId.value : this.imageId,
     );
   }
 
@@ -2951,14 +2530,15 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
           ..write('type: $type, ')
           ..write('source: $source, ')
           ..write('chapterId: $chapterId, ')
-          ..write('mangaId: $mangaId')
+          ..write('mangaId: $mangaId, ')
+          ..write('imageId: $imageId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(createdAt, updatedAt, id, type, source, chapterId, mangaId);
+  int get hashCode => Object.hash(
+      createdAt, updatedAt, id, type, source, chapterId, mangaId, imageId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2969,7 +2549,8 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
           other.type == this.type &&
           other.source == this.source &&
           other.chapterId == this.chapterId &&
-          other.mangaId == this.mangaId);
+          other.mangaId == this.mangaId &&
+          other.imageId == this.imageId);
 }
 
 class JobTablesCompanion extends UpdateCompanion<JobDrift> {
@@ -2977,9 +2558,10 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
   final Value<String> updatedAt;
   final Value<int> id;
   final Value<JobTypeEnum> type;
-  final Value<String> source;
+  final Value<String?> source;
   final Value<String?> chapterId;
-  final Value<String> mangaId;
+  final Value<String?> mangaId;
+  final Value<String?> imageId;
   const JobTablesCompanion({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -2988,18 +2570,18 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
     this.source = const Value.absent(),
     this.chapterId = const Value.absent(),
     this.mangaId = const Value.absent(),
+    this.imageId = const Value.absent(),
   });
   JobTablesCompanion.insert({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.id = const Value.absent(),
     required JobTypeEnum type,
-    required String source,
+    this.source = const Value.absent(),
     this.chapterId = const Value.absent(),
-    required String mangaId,
-  })  : type = Value(type),
-        source = Value(source),
-        mangaId = Value(mangaId);
+    this.mangaId = const Value.absent(),
+    this.imageId = const Value.absent(),
+  }) : type = Value(type);
   static Insertable<JobDrift> custom({
     Expression<String>? createdAt,
     Expression<String>? updatedAt,
@@ -3008,6 +2590,7 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
     Expression<String>? source,
     Expression<String>? chapterId,
     Expression<String>? mangaId,
+    Expression<String>? imageId,
   }) {
     return RawValuesInsertable({
       if (createdAt != null) 'created_at': createdAt,
@@ -3017,6 +2600,7 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
       if (source != null) 'source': source,
       if (chapterId != null) 'chapter_id': chapterId,
       if (mangaId != null) 'manga_id': mangaId,
+      if (imageId != null) 'image_id': imageId,
     });
   }
 
@@ -3025,9 +2609,10 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
       Value<String>? updatedAt,
       Value<int>? id,
       Value<JobTypeEnum>? type,
-      Value<String>? source,
+      Value<String?>? source,
       Value<String?>? chapterId,
-      Value<String>? mangaId}) {
+      Value<String?>? mangaId,
+      Value<String?>? imageId}) {
     return JobTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -3036,6 +2621,7 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
       source: source ?? this.source,
       chapterId: chapterId ?? this.chapterId,
       mangaId: mangaId ?? this.mangaId,
+      imageId: imageId ?? this.imageId,
     );
   }
 
@@ -3064,6 +2650,9 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
     if (mangaId.present) {
       map['manga_id'] = Variable<String>(mangaId.value);
     }
+    if (imageId.present) {
+      map['image_id'] = Variable<String>(imageId.value);
+    }
     return map;
   }
 
@@ -3076,7 +2665,8 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
           ..write('type: $type, ')
           ..write('source: $source, ')
           ..write('chapterId: $chapterId, ')
-          ..write('mangaId: $mangaId')
+          ..write('mangaId: $mangaId, ')
+          ..write('imageId: $imageId')
           ..write(')'))
         .toString();
   }
@@ -3092,14 +2682,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $TagTablesTable tagTables = $TagTablesTable(this);
   late final $RelationshipTablesTable relationshipTables =
       $RelationshipTablesTable(this);
-  late final $DownloadJobTablesTable downloadJobTables =
-      $DownloadJobTablesTable(this);
   late final $JobTablesTable jobTables = $JobTablesTable(this);
   late final MangaDao mangaDao = MangaDao(this as AppDatabase);
   late final ChapterDao chapterDao = ChapterDao(this as AppDatabase);
   late final LibraryDao libraryDao = LibraryDao(this as AppDatabase);
-  late final DownloadJobDao downloadJobDao =
-      DownloadJobDao(this as AppDatabase);
   late final JobDao jobDao = JobDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -3112,7 +2698,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         mangaTables,
         tagTables,
         relationshipTables,
-        downloadJobTables,
         jobTables
       ];
 }
@@ -4285,245 +3870,25 @@ typedef $$RelationshipTablesTableProcessedTableManager = ProcessedTableManager<
     ),
     RelationshipTable,
     PrefetchHooks Function()>;
-typedef $$DownloadJobTablesTableCreateCompanionBuilder
-    = DownloadJobTablesCompanion Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
-  Value<String?> mangaId,
-  Value<String?> mangaTitle,
-  Value<String?> mangaCoverUrl,
-  Value<String?> chapterId,
-  Value<int?> chapterNumber,
-  Value<String?> source,
-  Value<int> rowid,
-});
-typedef $$DownloadJobTablesTableUpdateCompanionBuilder
-    = DownloadJobTablesCompanion Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
-  Value<String?> mangaId,
-  Value<String?> mangaTitle,
-  Value<String?> mangaCoverUrl,
-  Value<String?> chapterId,
-  Value<int?> chapterNumber,
-  Value<String?> source,
-  Value<int> rowid,
-});
-
-class $$DownloadJobTablesTableFilterComposer
-    extends Composer<_$AppDatabase, $DownloadJobTablesTable> {
-  $$DownloadJobTablesTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<String> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get mangaId => $composableBuilder(
-      column: $table.mangaId, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get mangaTitle => $composableBuilder(
-      column: $table.mangaTitle, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get mangaCoverUrl => $composableBuilder(
-      column: $table.mangaCoverUrl, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get chapterId => $composableBuilder(
-      column: $table.chapterId, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<int> get chapterNumber => $composableBuilder(
-      column: $table.chapterNumber, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get source => $composableBuilder(
-      column: $table.source, builder: (column) => ColumnFilters(column));
-}
-
-class $$DownloadJobTablesTableOrderingComposer
-    extends Composer<_$AppDatabase, $DownloadJobTablesTable> {
-  $$DownloadJobTablesTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<String> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get mangaId => $composableBuilder(
-      column: $table.mangaId, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get mangaTitle => $composableBuilder(
-      column: $table.mangaTitle, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get mangaCoverUrl => $composableBuilder(
-      column: $table.mangaCoverUrl,
-      builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get chapterId => $composableBuilder(
-      column: $table.chapterId, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<int> get chapterNumber => $composableBuilder(
-      column: $table.chapterNumber,
-      builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get source => $composableBuilder(
-      column: $table.source, builder: (column) => ColumnOrderings(column));
-}
-
-class $$DownloadJobTablesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $DownloadJobTablesTable> {
-  $$DownloadJobTablesTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<String> get createdAt =>
-      $composableBuilder(column: $table.createdAt, builder: (column) => column);
-
-  GeneratedColumn<String> get updatedAt =>
-      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
-
-  GeneratedColumn<String> get mangaId =>
-      $composableBuilder(column: $table.mangaId, builder: (column) => column);
-
-  GeneratedColumn<String> get mangaTitle => $composableBuilder(
-      column: $table.mangaTitle, builder: (column) => column);
-
-  GeneratedColumn<String> get mangaCoverUrl => $composableBuilder(
-      column: $table.mangaCoverUrl, builder: (column) => column);
-
-  GeneratedColumn<String> get chapterId =>
-      $composableBuilder(column: $table.chapterId, builder: (column) => column);
-
-  GeneratedColumn<int> get chapterNumber => $composableBuilder(
-      column: $table.chapterNumber, builder: (column) => column);
-
-  GeneratedColumn<String> get source =>
-      $composableBuilder(column: $table.source, builder: (column) => column);
-}
-
-class $$DownloadJobTablesTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $DownloadJobTablesTable,
-    DownloadJobDrift,
-    $$DownloadJobTablesTableFilterComposer,
-    $$DownloadJobTablesTableOrderingComposer,
-    $$DownloadJobTablesTableAnnotationComposer,
-    $$DownloadJobTablesTableCreateCompanionBuilder,
-    $$DownloadJobTablesTableUpdateCompanionBuilder,
-    (
-      DownloadJobDrift,
-      BaseReferences<_$AppDatabase, $DownloadJobTablesTable, DownloadJobDrift>
-    ),
-    DownloadJobDrift,
-    PrefetchHooks Function()> {
-  $$DownloadJobTablesTableTableManager(
-      _$AppDatabase db, $DownloadJobTablesTable table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$DownloadJobTablesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$DownloadJobTablesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$DownloadJobTablesTableAnnotationComposer(
-                  $db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
-            Value<String?> mangaId = const Value.absent(),
-            Value<String?> mangaTitle = const Value.absent(),
-            Value<String?> mangaCoverUrl = const Value.absent(),
-            Value<String?> chapterId = const Value.absent(),
-            Value<int?> chapterNumber = const Value.absent(),
-            Value<String?> source = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              DownloadJobTablesCompanion(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            mangaId: mangaId,
-            mangaTitle: mangaTitle,
-            mangaCoverUrl: mangaCoverUrl,
-            chapterId: chapterId,
-            chapterNumber: chapterNumber,
-            source: source,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
-            Value<String?> mangaId = const Value.absent(),
-            Value<String?> mangaTitle = const Value.absent(),
-            Value<String?> mangaCoverUrl = const Value.absent(),
-            Value<String?> chapterId = const Value.absent(),
-            Value<int?> chapterNumber = const Value.absent(),
-            Value<String?> source = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              DownloadJobTablesCompanion.insert(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            mangaId: mangaId,
-            mangaTitle: mangaTitle,
-            mangaCoverUrl: mangaCoverUrl,
-            chapterId: chapterId,
-            chapterNumber: chapterNumber,
-            source: source,
-            rowid: rowid,
-          ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
-          prefetchHooksCallback: null,
-        ));
-}
-
-typedef $$DownloadJobTablesTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $DownloadJobTablesTable,
-    DownloadJobDrift,
-    $$DownloadJobTablesTableFilterComposer,
-    $$DownloadJobTablesTableOrderingComposer,
-    $$DownloadJobTablesTableAnnotationComposer,
-    $$DownloadJobTablesTableCreateCompanionBuilder,
-    $$DownloadJobTablesTableUpdateCompanionBuilder,
-    (
-      DownloadJobDrift,
-      BaseReferences<_$AppDatabase, $DownloadJobTablesTable, DownloadJobDrift>
-    ),
-    DownloadJobDrift,
-    PrefetchHooks Function()>;
 typedef $$JobTablesTableCreateCompanionBuilder = JobTablesCompanion Function({
   Value<String> createdAt,
   Value<String> updatedAt,
   Value<int> id,
   required JobTypeEnum type,
-  required String source,
+  Value<String?> source,
   Value<String?> chapterId,
-  required String mangaId,
+  Value<String?> mangaId,
+  Value<String?> imageId,
 });
 typedef $$JobTablesTableUpdateCompanionBuilder = JobTablesCompanion Function({
   Value<String> createdAt,
   Value<String> updatedAt,
   Value<int> id,
   Value<JobTypeEnum> type,
-  Value<String> source,
+  Value<String?> source,
   Value<String?> chapterId,
-  Value<String> mangaId,
+  Value<String?> mangaId,
+  Value<String?> imageId,
 });
 
 class $$JobTablesTableFilterComposer
@@ -4557,6 +3922,9 @@ class $$JobTablesTableFilterComposer
 
   ColumnFilters<String> get mangaId => $composableBuilder(
       column: $table.mangaId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get imageId => $composableBuilder(
+      column: $table.imageId, builder: (column) => ColumnFilters(column));
 }
 
 class $$JobTablesTableOrderingComposer
@@ -4588,6 +3956,9 @@ class $$JobTablesTableOrderingComposer
 
   ColumnOrderings<String> get mangaId => $composableBuilder(
       column: $table.mangaId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get imageId => $composableBuilder(
+      column: $table.imageId, builder: (column) => ColumnOrderings(column));
 }
 
 class $$JobTablesTableAnnotationComposer
@@ -4619,6 +3990,9 @@ class $$JobTablesTableAnnotationComposer
 
   GeneratedColumn<String> get mangaId =>
       $composableBuilder(column: $table.mangaId, builder: (column) => column);
+
+  GeneratedColumn<String> get imageId =>
+      $composableBuilder(column: $table.imageId, builder: (column) => column);
 }
 
 class $$JobTablesTableTableManager extends RootTableManager<
@@ -4648,9 +4022,10 @@ class $$JobTablesTableTableManager extends RootTableManager<
             Value<String> updatedAt = const Value.absent(),
             Value<int> id = const Value.absent(),
             Value<JobTypeEnum> type = const Value.absent(),
-            Value<String> source = const Value.absent(),
+            Value<String?> source = const Value.absent(),
             Value<String?> chapterId = const Value.absent(),
-            Value<String> mangaId = const Value.absent(),
+            Value<String?> mangaId = const Value.absent(),
+            Value<String?> imageId = const Value.absent(),
           }) =>
               JobTablesCompanion(
             createdAt: createdAt,
@@ -4660,15 +4035,17 @@ class $$JobTablesTableTableManager extends RootTableManager<
             source: source,
             chapterId: chapterId,
             mangaId: mangaId,
+            imageId: imageId,
           ),
           createCompanionCallback: ({
             Value<String> createdAt = const Value.absent(),
             Value<String> updatedAt = const Value.absent(),
             Value<int> id = const Value.absent(),
             required JobTypeEnum type,
-            required String source,
+            Value<String?> source = const Value.absent(),
             Value<String?> chapterId = const Value.absent(),
-            required String mangaId,
+            Value<String?> mangaId = const Value.absent(),
+            Value<String?> imageId = const Value.absent(),
           }) =>
               JobTablesCompanion.insert(
             createdAt: createdAt,
@@ -4678,6 +4055,7 @@ class $$JobTablesTableTableManager extends RootTableManager<
             source: source,
             chapterId: chapterId,
             mangaId: mangaId,
+            imageId: imageId,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -4714,8 +4092,6 @@ class $AppDatabaseManager {
       $$TagTablesTableTableManager(_db, _db.tagTables);
   $$RelationshipTablesTableTableManager get relationshipTables =>
       $$RelationshipTablesTableTableManager(_db, _db.relationshipTables);
-  $$DownloadJobTablesTableTableManager get downloadJobTables =>
-      $$DownloadJobTablesTableTableManager(_db, _db.downloadJobTables);
   $$JobTablesTableTableManager get jobTables =>
       $$JobTablesTableTableManager(_db, _db.jobTables);
 }
