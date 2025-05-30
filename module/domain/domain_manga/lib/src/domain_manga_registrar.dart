@@ -74,6 +74,8 @@ class DomainMangaRegistrar extends Registrar {
       locator.registerFactory(() => JobDao(locator()));
       locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
 
+      locator.registerSingleton(await FileDownloadManager.create(log: log));
+
       locator.registerSingleton(
         JobManager(
           log: log,
@@ -95,7 +97,6 @@ class DomainMangaRegistrar extends Registrar {
         dispose: (e) => e.dispose(),
       );
 
-      locator.registerSingleton(await FileDownloadManager.create(log: log));
       locator.registerSingleton(
         await DownloadProgressManager.create(
           fileDownloader: locator(),
