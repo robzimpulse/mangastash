@@ -1,4 +1,3 @@
-import 'package:domain_manga/src/use_case/manga/download_manga_use_case.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
@@ -24,6 +23,7 @@ import 'use_case/library/get_manga_from_library_use_case.dart';
 import 'use_case/library/listen_manga_from_library_use_case.dart';
 import 'use_case/library/listen_prefetch_use_case.dart';
 import 'use_case/library/remove_from_library_use_case.dart';
+import 'use_case/manga/download_manga_use_case.dart';
 import 'use_case/manga/get_manga_on_mangadex_use_case.dart';
 import 'use_case/manga/get_manga_use_case.dart';
 import 'use_case/manga/prefetch_manga_use_case.dart';
@@ -81,6 +81,7 @@ class DomainMangaRegistrar extends Registrar {
         JobManager(
           log: log,
           jobDao: locator(),
+          cacheManager: locator(),
           getChapterUseCase: () => locator(),
           getMangaUseCase: () => locator(),
           searchChapterUseCase: () => locator(),

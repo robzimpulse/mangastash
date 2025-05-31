@@ -85,8 +85,9 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
     );
   }
 
-  Future<ImageDrift?> getImageId(String url) {
-    final selector = select(imageTables)..where((f) => f.webUrl.equals(url));
-    return transaction(() => selector.getSingleOrNull());
+  Future<List<ImageDrift>> getImageIds(List<String> urls) async {
+    if (urls.isEmpty) return [];
+    final selector = select(imageTables)..where((f) => f.webUrl.isIn(urls));
+    return transaction(() => selector.get());
   }
 }

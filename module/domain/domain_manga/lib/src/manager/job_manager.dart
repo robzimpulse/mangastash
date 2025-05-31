@@ -5,6 +5,7 @@ import 'package:background_downloader/background_downloader.dart';
 import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/foundation.dart';
 import 'package:log_box/log_box.dart';
@@ -35,6 +36,7 @@ class JobManager
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
   final ValueGetter<SearchChapterUseCase> _searchChapterUseCase;
   final FileDownloader _fileDownloader;
+  final BaseCacheManager _cacheManager;
   final JobDao _jobDao;
   final LogBox _log;
 
@@ -45,6 +47,7 @@ class JobManager
   JobManager({
     required LogBox log,
     required JobDao jobDao,
+    required BaseCacheManager cacheManager,
     required FileDownloader fileDownloader,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required ValueGetter<GetMangaUseCase> getMangaUseCase,
@@ -52,6 +55,7 @@ class JobManager
   })  : _log = log,
         _jobDao = jobDao,
         _fileDownloader = fileDownloader,
+        _cacheManager = cacheManager,
         _getMangaUseCase = getMangaUseCase,
         _getChapterUseCase = getChapterUseCase,
         _searchChapterUseCase = searchChapterUseCase {
@@ -72,6 +76,8 @@ class JobManager
         await _fetchManga(job);
       case JobTypeEnum.chapter:
         await _fetchChapter(job);
+      case JobTypeEnum.image:
+        await _fetchImage(job);
       case JobTypeEnum.downloadChapter:
         await _downloadChapter(job);
     }
@@ -208,6 +214,18 @@ class JobManager
         },
         name: runtimeType.toString(),
       );
+
+      final images = await _jobDao.getImageIds(result.data.images ?? []);
+      for (final image in images) {
+        await _jobDao.add(
+          JobTablesCompanion.insert(
+            mangaId: Value(mangaId),
+            chapterId: Value(chapterId),
+            imageId: Value(image.id),
+            type: JobTypeEnum.image,
+          ),
+        );
+      }
     }
   }
 
@@ -475,6 +493,51 @@ class JobManager
         );
       }
     }
+  }
+
+  Future<void> _fetchImage(JobDetail job) async {
+    final url = job.image?.webUrl;
+    if (url == null) {
+      _log.log(
+        'Failed execute job ${job.id} - ${job.type}',
+        extra: {
+          'id': job.id,
+          'type': job.type,
+          'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
+          'chapter': job.chapter?.let(
+            (e) => MangaChapter.fromDrift(e).toJson(),
+          ),
+          'image': job.image?.webUrl,
+          'error': 'No Image URL',
+        },
+        name: runtimeType.toString(),
+      );
+      return;
+    }
+
+    final existing = (await _cacheManager.getFileFromCache(url))?.file;
+
+    final path = existing.or(
+      await _cacheManager.getSingleFile(
+        url,
+        headers: {HttpHeaders.userAgentHeader: userAgent},
+      ),
+    );
+
+    _log.log(
+      'Success execute job ${job.id} - ${job.type}',
+      extra: {
+        'id': job.id,
+        'type': job.type,
+        'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
+        'chapter': job.chapter?.let(
+          (e) => MangaChapter.fromDrift(e).toJson(),
+        ),
+        'image': job.image?.webUrl,
+        'data': path.uri.toString(),
+      },
+      name: runtimeType.toString(),
+    );
   }
 
   @override

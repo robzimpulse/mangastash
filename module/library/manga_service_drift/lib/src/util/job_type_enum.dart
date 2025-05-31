@@ -1,3 +1,3 @@
 enum JobTypeEnum {
-  manga, chapter, downloadChapter;
+  manga, chapter, image, downloadChapter;
 }
