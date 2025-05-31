@@ -170,39 +170,30 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
 
   Future<(MangaDrift, List<TagDrift>)?> getManga(String mangaId) async {
     return transaction(() async {
-      final selector = select(relationshipTables).join(
+      final selector = select(mangaTables).join(
         [
           leftOuterJoin(
-            tagTables,
-            tagTables.id.equalsExp(relationshipTables.tagId),
+            relationshipTables,
+            relationshipTables.mangaId.equalsExp(
+              mangaTables.id,
+            ),
           ),
           leftOuterJoin(
-            mangaTables,
-            mangaTables.id.equalsExp(relationshipTables.mangaId),
+            tagTables,
+            relationshipTables.tagId.equalsExp(tagTables.id),
           ),
         ],
-      )..where(mangaTables.id.equals(mangaId));
+      );
 
       final results = await selector.get();
 
-      if (results.isEmpty) {
-        final selector = select(mangaTables)
-          ..where((f) => f.id.equals(mangaId));
-        final result = await selector.getSingleOrNull();
-        if (result != null) return (result, <TagDrift>[]);
-        return null;
-      }
-
-      final groups = results
-          .groupListsBy(
-            (e) => e.readTableOrNull(mangaTables),
-          )
-          .map(
-            (key, value) => MapEntry(
-              key,
-              value.map((e) => e.readTableOrNull(tagTables)).nonNulls.toList(),
-            ),
-          );
+      final groups =
+          results.groupListsBy((e) => e.readTableOrNull(mangaTables)).map(
+                (key, value) => MapEntry(
+                  key,
+                  [...value.map((e) => e.readTableOrNull(tagTables)).nonNulls],
+                ),
+              );
 
       final data = [
         for (final key in groups.keys.nonNulls)

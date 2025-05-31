@@ -8,6 +8,28 @@ void main() {
   late LibraryDao libraryDao;
   late MangaDao mangaDao;
 
+  final mangas = List.generate(
+    10,
+    (index) => MangaTablesCompanion(
+      id: Value('manga_$index'),
+      title: Value('title_$index'),
+      coverUrl: Value('cover_url_$index'),
+      status: Value('status_$index'),
+      author: Value('value_$index'),
+      description: Value('description_$index'),
+      webUrl: Value('web_url_$index'),
+      source: Value('source_$index'),
+    ),
+  );
+
+  final tags = List.generate(
+    10,
+    (index) => TagTablesCompanion(
+      id: Value('tag_$index'),
+      name: Value('name_$index'),
+    ),
+  );
+
   setUp(() {
     db = AppDatabase(
       executor: DatabaseConnection(
@@ -21,62 +43,38 @@ void main() {
 
   tearDown(() => db.close());
 
-  group('Manga Dao Test', () {
-    final mangas = List.generate(
-      10,
-      (index) => MangaTablesCompanion(
-        id: Value('manga_$index'),
-        title: Value('title_$index'),
-        coverUrl: Value('cover_url_$index'),
-        status: Value('status_$index'),
-        author: Value('value_$index'),
-        description: Value('description_$index'),
-        webUrl: Value('web_url_$index'),
-        source: Value('source_$index'),
-      ),
-    );
-
-    final tags = List.generate(
-      10,
-      (index) => TagTablesCompanion(
-        id: Value('tag_$index'),
-        name: Value('name_$index'),
-      ),
-    );
-
+  group('Library Dao Test', () {
     tearDown(() => db.clear());
 
-    test('Get Library With Non Empty Tags', () async {
+    setUp(() async {
       for (final tag in tags) {
         await mangaDao.insertTag(tag);
       }
 
       for (final (index, manga) in mangas.indexed) {
-        if (index.isEven) await libraryDao.add(manga.id.value);
         await mangaDao.insertManga(manga);
-        await mangaDao.unlinkAllTagFromManga(manga.id.value);
-        await mangaDao.linkTagToManga(
-          manga.id.value,
-          tags.map((e) => e.id.value),
-        );
+        if (index.isEven) await libraryDao.add(manga.id.value);
       }
-
-      final result = await libraryDao.get();
-      expect(result.isNotEmpty, isTrue);
     });
 
-    test('Get Library With Empty Tags', () async {
-      for (final tag in tags) {
-        await mangaDao.insertTag(tag);
-      }
+    group('Get Library', () {
+      test('With Non Empty Tags', () async {
+        for (final manga in mangas) {
+          await mangaDao.unlinkAllTagFromManga(manga.id.value);
+          await mangaDao.linkTagToManga(
+            manga.id.value,
+            tags.map((e) => e.id.value),
+          );
+        }
 
-      for (final (index, manga) in mangas.indexed) {
-        if (index.isEven) await libraryDao.add(manga.id.value);
-        await mangaDao.insertManga(manga);
-      }
+        final result = await libraryDao.get();
+        expect(result.isNotEmpty, isTrue);
+      });
 
-      final result = await libraryDao.get();
-      expect(result.isNotEmpty, isTrue);
+      test('With Empty Tags', () async {
+        final result = await libraryDao.get();
+        expect(result.isNotEmpty, isTrue);
+      });
     });
   });
 }
