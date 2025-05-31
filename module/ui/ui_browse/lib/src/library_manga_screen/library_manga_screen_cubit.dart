@@ -8,6 +8,7 @@ import 'library_manga_screen_state.dart';
 class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     with AutoSubscriptionMixin {
   final PrefetchMangaUseCase _prefetchMangaUseCase;
+  final PrefetchChapterUseCase _prefetchChapterUseCase;
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
   final DownloadMangaUseCase _downloadMangaUseCase;
 
@@ -19,9 +20,11 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     required RemoveFromLibraryUseCase removeFromLibraryUseCase,
     required ListenPrefetchUseCase listenPrefetchMangaUseCase,
     required DownloadMangaUseCase downloadMangaUseCase,
+    required PrefetchChapterUseCase prefetchChapterUseCase,
   })  : _prefetchMangaUseCase = prefetchMangaUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         _downloadMangaUseCase = downloadMangaUseCase,
+        _prefetchChapterUseCase = prefetchChapterUseCase,
         super(initialState) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
@@ -65,6 +68,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
       final source = manga.source;
       if (id == null || source == null) continue;
       _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
+      _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);
     }
   }
 

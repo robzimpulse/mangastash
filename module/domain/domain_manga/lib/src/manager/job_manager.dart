@@ -149,14 +149,6 @@ class JobManager
         },
         name: runtimeType.toString(),
       );
-
-      _jobDao.add(
-        JobTablesCompanion.insert(
-          type: JobTypeEnum.chapters,
-          source: Value.absentIfNull(job.manga?.source),
-          mangaId: Value(mangaId),
-        ),
-      );
     }
   }
 
@@ -306,18 +298,6 @@ class JobManager
         },
         name: runtimeType.toString(),
       );
-
-      for (final chapter in result.data.data ?? <MangaChapter>[]) {
-        chapter.id?.let(
-          (id) => source?.let(
-            (source) => prefetchChapter(
-              mangaId: mangaId,
-              chapterId: id,
-              source: source,
-            ),
-          ),
-        );
-      }
 
       if (result.data.hasNextPage == true) {
         await _fetchAllChapter(
@@ -545,6 +525,20 @@ class JobManager
         'data': path.uri.toString(),
       },
       name: runtimeType.toString(),
+    );
+  }
+
+  @override
+  void prefetchChapters({
+    required String mangaId,
+    required MangaSourceEnum source,
+  }) {
+    _jobDao.add(
+      JobTablesCompanion.insert(
+        type: JobTypeEnum.chapters,
+        source: Value(mangaId),
+        mangaId: Value(mangaId),
+      ),
     );
   }
 

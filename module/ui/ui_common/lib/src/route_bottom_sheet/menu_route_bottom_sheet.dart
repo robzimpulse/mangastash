@@ -26,7 +26,7 @@ class MenuRouteBottomSheet extends BottomSheetRoute {
               ),
               ListTile(
                 title: const Text('Prefetch'),
-                leading: const Icon(Icons.cached),
+                leading: const Icon(Icons.cloud_download),
                 onTap: () => context.pop(MangaMenu.prefetch),
               ),
               ListTile(

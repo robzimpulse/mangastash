@@ -13,6 +13,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
   final AddToLibraryUseCase _addToLibraryUseCase;
   final PrefetchMangaUseCase _prefetchMangaUseCase;
+  final PrefetchChapterUseCase _prefetchChapterUseCase;
   final DownloadMangaUseCase _downloadMangaUseCase;
 
   BrowseMangaScreenCubit({
@@ -26,11 +27,13 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     required PrefetchMangaUseCase prefetchMangaUseCase,
     required ListenPrefetchUseCase listenPrefetchMangaUseCase,
     required DownloadMangaUseCase downloadMangaUseCase,
+    required PrefetchChapterUseCase prefetchChapterUseCase,
   })  : _searchMangaUseCase = searchMangaUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         _prefetchMangaUseCase = prefetchMangaUseCase,
         _downloadMangaUseCase = downloadMangaUseCase,
+        _prefetchChapterUseCase = prefetchChapterUseCase,
         super(initialState) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
@@ -161,6 +164,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     final source = manga.source;
     if (id == null || source == null) return;
     _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
+    _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);
   }
 
   void download({required Manga manga}) {
