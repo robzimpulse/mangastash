@@ -463,7 +463,31 @@ class JobManager
         );
       }
 
+      final records = await _fileDownloader.database.recordsForIds(
+        tasks.map((e) => e.taskId),
+      );
+
       for (final task in tasks) {
+        final existing = records.firstWhereOrNull(
+          (e) => e.taskId == task.taskId,
+        );
+        if (existing != null) {
+          _log.log(
+            '[$info] Skip enqueue task',
+            extra: {
+              'id': task.taskId,
+              'url': task.url,
+              'base_directory': task.baseDirectory.toString(),
+              'directory': task.directory,
+              'filename': task.filename,
+              'group': task.group,
+              'headers': task.headers.toString(),
+            },
+            name: runtimeType.toString(),
+          );
+          continue;
+        }
+
         await _fileDownloader.enqueue(task);
 
         _log.log(
