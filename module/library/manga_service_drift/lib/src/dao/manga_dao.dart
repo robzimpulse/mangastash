@@ -183,7 +183,7 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
             relationshipTables.tagId.equalsExp(tagTables.id),
           ),
         ],
-      );
+      )..where(mangaTables.id.equals(mangaId));
 
       final results = await selector.get();
 

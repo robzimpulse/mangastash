@@ -18,6 +18,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   final AddToLibraryUseCase _addToLibraryUseCase;
   final DownloadChapterUseCase _downloadChapterUseCase;
   final CrawlUrlUseCase _crawlUrlUseCase;
+  final PrefetchChapterUseCase _prefetchChapterUseCase;
 
   MangaDetailScreenCubit({
     required MangaDetailScreenState initialState,
@@ -32,12 +33,14 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required CrawlUrlUseCase crawlUrlUseCase,
     required ListenLocaleUseCase listenLocaleUseCase,
     required ListenPrefetchUseCase listenPrefetchUseCase,
+    required PrefetchChapterUseCase prefetchChapterUseCase,
   })  : _getMangaUseCase = getMangaUseCase,
         _searchChapterUseCase = searchChapterUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         _downloadChapterUseCase = downloadChapterUseCase,
         _crawlUrlUseCase = crawlUrlUseCase,
+        _prefetchChapterUseCase = prefetchChapterUseCase,
         super(initialState) {
     addSubscription(
       listenAuth.authStateStream.distinct().listen(_updateAuthState),
@@ -217,6 +220,20 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       await _removeFromLibraryUseCase.execute(manga: manga);
     } else {
       await _addToLibraryUseCase.execute(manga: manga);
+    }
+  }
+
+  Future<void> prefetch() async {
+    final mangaId = state.manga?.id;
+    final source = state.manga?.source;
+    final chapterIds = state.processedChapters.values.map((e) => e.id);
+    if (mangaId == null || source == null) return;
+    for (final chapterId in chapterIds.nonNulls) {
+      _prefetchChapterUseCase.prefetchChapter(
+        mangaId: mangaId,
+        source: source,
+        chapterId: chapterId,
+      );
     }
   }
 

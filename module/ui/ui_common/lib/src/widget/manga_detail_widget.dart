@@ -16,12 +16,14 @@ class MangaDetailWidget extends StatelessWidget {
     this.status,
     this.description,
     this.onTapAddToLibrary,
+    this.onTapPrefetch,
     this.onTapWebsite,
     this.tags,
     this.onTapTag,
     this.horizontalPadding = 8,
     this.separator = const SizedBox(height: 8),
-    this.isLoading = false,
+    this.isLoadingManga = false,
+    this.isLoadingChapters = false,
     this.isOnLibrary = false,
     this.cacheManager,
   });
@@ -38,6 +40,8 @@ class MangaDetailWidget extends StatelessWidget {
 
   final List<String>? tags;
 
+  final void Function()? onTapPrefetch;
+
   final void Function()? onTapAddToLibrary;
 
   final void Function()? onTapWebsite;
@@ -48,7 +52,9 @@ class MangaDetailWidget extends StatelessWidget {
 
   final Widget separator;
 
-  final bool isLoading;
+  final bool isLoadingManga;
+
+  final bool isLoadingChapters;
 
   final bool isOnLibrary;
 
@@ -61,7 +67,7 @@ class MangaDetailWidget extends StatelessWidget {
         child: Row(
           children: [
             ShimmerLoading.box(
-              isLoading: isLoading,
+              isLoading: isLoadingManga,
               width: 100,
               height: 150,
               child: CachedNetworkImageWidget(
@@ -84,7 +90,7 @@ class MangaDetailWidget extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: ShimmerLoading.multiline(
-                isLoading: isLoading,
+                isLoading: isLoadingManga,
                 width: double.infinity,
                 height: 15,
                 lines: 3,
@@ -122,14 +128,14 @@ class MangaDetailWidget extends StatelessWidget {
       sliver: SliverToBoxAdapter(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
+          children: <Widget>[
             InkWell(
               onTap: onTapAddToLibrary,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ShimmerLoading.box(
-                    isLoading: isLoading,
+                    isLoading: isLoadingManga,
                     width: 50,
                     height: 50,
                     child: Icon(
@@ -138,30 +144,51 @@ class MangaDetailWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   ShimmerLoading.multiline(
-                    isLoading: isLoading,
+                    isLoading: isLoadingManga,
                     lines: 1,
                     width: 50,
                     height: 15,
-                    child: const Text('Add to Library'),
+                    child: const Text('Library'),
                   ),
                 ],
               ),
             ),
-            const SizedBox.shrink(),
+            InkWell(
+              onTap: onTapPrefetch,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ShimmerLoading.box(
+                    isLoading: isLoadingManga && isLoadingChapters,
+                    width: 50,
+                    height: 50,
+                    child: const Icon(Icons.cloud_download),
+                  ),
+                  const SizedBox(height: 2),
+                  ShimmerLoading.multiline(
+                    isLoading: isLoadingManga && isLoadingChapters,
+                    lines: 1,
+                    width: 50,
+                    height: 15,
+                    child: const Text('Prefetch'),
+                  ),
+                ],
+              ),
+            ),
             InkWell(
               onTap: onTapWebsite,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ShimmerLoading.box(
-                    isLoading: isLoading,
+                    isLoading: isLoadingManga,
                     width: 50,
                     height: 50,
                     child: const Icon(Icons.web),
                   ),
                   const SizedBox(height: 2),
                   ShimmerLoading.multiline(
-                    isLoading: isLoading,
+                    isLoading: isLoadingManga,
                     lines: 1,
                     width: 50,
                     height: 15,
@@ -170,7 +197,7 @@ class MangaDetailWidget extends StatelessWidget {
                 ],
               ),
             ),
-          ],
+          ].intersperse(const SizedBox.shrink()).toList(),
         ),
       ),
     );
@@ -183,7 +210,7 @@ class MangaDetailWidget extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       sliver: SliverToBoxAdapter(
         child: ShimmerLoading.multiline(
-          isLoading: isLoading,
+          isLoading: isLoadingManga,
           width: double.infinity,
           height: 15,
           lines: 3,
@@ -235,7 +262,7 @@ class MangaDetailWidget extends StatelessWidget {
             ...List.generate(
               10,
               (index) => ShimmerLoading.box(
-                isLoading: isLoading,
+                isLoading: isLoadingManga,
                 width: 80,
                 height: 30,
               ),
@@ -283,7 +310,7 @@ class MangaDetailWidget extends StatelessWidget {
       _header(context),
       _buttons(context),
       _description(context),
-      isLoading ? _loadingTags(context) : _loadedTags(context),
+      isLoadingManga ? _loadingTags(context) : _loadedTags(context),
     ].whereType<Widget>().intersperse(_separator(context));
 
     return MultiSliver(children: [_separator(context), ...widgets]);

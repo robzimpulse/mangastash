@@ -59,6 +59,7 @@ class MangaDetailScreen extends StatefulWidget {
         crawlUrlUseCase: locator(),
         listenLocaleUseCase: locator(),
         listenPrefetchUseCase: locator(),
+        prefetchChapterUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         cacheManager: locator(),
@@ -392,12 +393,14 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           horizontalPadding: 12,
           isOnLibrary: state.isOnLibrary,
           onTapAddToLibrary: () => _cubit(context).addToLibrary(),
+          onTapPrefetch: () => _cubit(context).prefetch(),
           onTapWebsite: () => _onTapWebsite(context, url: state.manga?.webUrl),
           onTapTag: (name) => _onTapTag(
             context,
             tag: state.manga?.mapTagsByName[name],
           ),
-          isLoading: state.isLoadingManga,
+          isLoadingManga: state.isLoadingManga,
+          isLoadingChapters: state.isLoadingChapters,
         );
       },
     );
