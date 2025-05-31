@@ -54,6 +54,7 @@ class BrowseMangaScreen extends StatefulWidget {
         removeFromLibraryUseCase: locator(),
         prefetchMangaUseCase: locator(),
         listenPrefetchMangaUseCase: locator(),
+        downloadMangaUseCase: locator(),
       )..init(),
       child: BrowseMangaScreen(
         crawlUrlUseCase: locator(),
@@ -158,7 +159,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
 
     switch (result) {
       case MangaMenu.download:
-        context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+        _cubit(context).download(manga: manga);
       case MangaMenu.library:
         _cubit(context).addToLibrary(manga: manga);
       case MangaMenu.prefetch:
