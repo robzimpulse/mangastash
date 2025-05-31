@@ -68,16 +68,25 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
   }
 
   Future<void> add(JobTablesCompanion value) async {
-    await into(jobTables).insert(
-      value.copyWith(
-        createdAt: Value(DateTime.now().toIso8601String()),
-        updatedAt: Value(DateTime.now().toIso8601String()),
+    await transaction(
+      () => into(jobTables).insert(
+        value.copyWith(
+          createdAt: Value(DateTime.now().toIso8601String()),
+          updatedAt: Value(DateTime.now().toIso8601String()),
+        ),
+        mode: InsertMode.insertOrIgnore,
       ),
-      mode: InsertMode.insertOrIgnore,
     );
   }
 
   Future<void> remove(int id) async {
-    await (delete(jobTables)..where((f) => f.id.equals(id))).go();
+    await transaction(
+      () => (delete(jobTables)..where((f) => f.id.equals(id))).go(),
+    );
+  }
+
+  Future<ImageDrift?> getImageId(String url) {
+    final selector = select(imageTables)..where((f) => f.webUrl.equals(url));
+    return transaction(() => selector.getSingleOrNull());
   }
 }
