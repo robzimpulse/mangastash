@@ -33,7 +33,7 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
         ),
         leftOuterJoin(
           imageTables,
-          imageTables.chapterId.equalsExp(jobTables.imageId),
+          imageTables.id.equalsExp(jobTables.imageId),
         ),
       ],
     );
