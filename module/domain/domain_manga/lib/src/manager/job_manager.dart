@@ -74,6 +74,8 @@ class JobManager
     switch (job.type) {
       case JobTypeEnum.manga:
         await _fetchManga(job);
+      case JobTypeEnum.chapters:
+        await _fetchAllChapter(job);
       case JobTypeEnum.chapter:
         await _fetchChapter(job);
       case JobTypeEnum.image:
@@ -148,7 +150,13 @@ class JobManager
         name: runtimeType.toString(),
       );
 
-      await _fetchAllChapter(job);
+      _jobDao.add(
+        JobTablesCompanion.insert(
+          type: JobTypeEnum.chapters,
+          source: Value.absentIfNull(job.manga?.source),
+          mangaId: Value(mangaId),
+        ),
+      );
     }
   }
 
