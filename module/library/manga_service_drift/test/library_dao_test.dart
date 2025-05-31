@@ -24,29 +24,31 @@ void main() {
   tearDown(() => db.close());
 
   group('Manga Dao Test', () {
-    setUp(() async {
-      final mangas = List.generate(
-        10,
-        (index) => MangaTablesCompanion(
-          id: Value('manga_$index'),
-          title: Value('title_$index'),
-          coverUrl: Value('cover_url_$index'),
-          status: Value('status_$index'),
-          author: Value('value_$index'),
-          description: Value('description_$index'),
-          webUrl: Value('web_url_$index'),
-          source: Value('source_$index'),
-        ),
-      );
+    final mangas = List.generate(
+      10,
+      (index) => MangaTablesCompanion(
+        id: Value('manga_$index'),
+        title: Value('title_$index'),
+        coverUrl: Value('cover_url_$index'),
+        status: Value('status_$index'),
+        author: Value('value_$index'),
+        description: Value('description_$index'),
+        webUrl: Value('web_url_$index'),
+        source: Value('source_$index'),
+      ),
+    );
 
-      final tags = List.generate(
-        10,
-        (index) => TagTablesCompanion(
-          id: Value('tag_$index'),
-          name: Value('name_$index'),
-        ),
-      );
+    final tags = List.generate(
+      10,
+      (index) => TagTablesCompanion(
+        id: Value('tag_$index'),
+        name: Value('name_$index'),
+      ),
+    );
 
+    tearDown(() => db.clear());
+
+    test('Get Library With Non Empty Tags', () async {
       for (final tag in tags) {
         await mangaDao.insertTag(tag);
       }
@@ -60,9 +62,21 @@ void main() {
           tags.map((e) => e.id.value),
         );
       }
+
+      final result = await libraryDao.get();
+      expect(result.isNotEmpty, isTrue);
     });
 
-    test('Get Library', () async {
+    test('Get Library With Empty Tags', () async {
+      for (final tag in tags) {
+        await mangaDao.insertTag(tag);
+      }
+
+      for (final (index, manga) in mangas.indexed) {
+        if (index.isEven) await libraryDao.add(manga.id.value);
+        await mangaDao.insertManga(manga);
+      }
+
       final result = await libraryDao.get();
       expect(result.isNotEmpty, isTrue);
     });

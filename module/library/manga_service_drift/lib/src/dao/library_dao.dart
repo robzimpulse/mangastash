@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
-import 'package:rxdart/rxdart.dart';
 
 import '../database/database.dart';
 import '../tables/library_tables.dart';
@@ -21,13 +20,17 @@ part 'library_dao.g.dart';
 class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
   LibraryDao(AppDatabase db) : super(db);
 
-  Stream<List<(MangaDrift, List<TagDrift>)>> get stream {
+  JoinedSelectStatement<HasResultSet, dynamic> get aggregate {
     final order = [
       OrderingTerm(expression: mangaTables.title, mode: OrderingMode.asc),
     ];
 
-    final selector = select(libraryTables).join(
+    return select(libraryTables).join(
       [
+        leftOuterJoin(
+          mangaTables,
+          mangaTables.id.equalsExp(libraryTables.mangaId),
+        ),
         leftOuterJoin(
           relationshipTables,
           relationshipTables.mangaId.equalsExp(
@@ -35,34 +38,17 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
           ),
         ),
         leftOuterJoin(
-          mangaTables,
-          mangaTables.id.equalsExp(relationshipTables.mangaId),
-        ),
-        leftOuterJoin(
           tagTables,
           tagTables.id.equalsExp(relationshipTables.tagId),
         ),
       ],
     )..orderBy(order);
+  }
 
-    final fallbackSelector = select(libraryTables).join(
-      [
-        leftOuterJoin(
-          mangaTables,
-          mangaTables.id.equalsExp(libraryTables.mangaId),
-        ),
-      ],
-    )..orderBy(order);
+  Stream<List<(MangaDrift, List<TagDrift>)>> get stream {
+    final stream = aggregate.watch();
 
-    final stream = selector.watch();
-
-    final data = SwitchLatestStream(
-      stream.map(
-        (e) => e.isNotEmpty ? Stream.value(e) : fallbackSelector.watch(),
-      ),
-    );
-
-    return data.map(
+    return stream.map(
       (rows) {
         final groups = rows
             .groupListsBy(
@@ -90,53 +76,23 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
   }
 
   Future<void> remove(String mangaId) async {
-    await (delete(libraryTables)..where((f) => f.mangaId.equals(mangaId)))
-        .go();
+    await (delete(libraryTables)..where((f) => f.mangaId.equals(mangaId))).go();
   }
 
   Future<List<(MangaDrift, List<TagDrift>)>> get() async {
-    final selector = select(libraryTables).join(
-      [
-        leftOuterJoin(
-          relationshipTables,
-          relationshipTables.mangaId.equalsExp(
-            libraryTables.mangaId,
-          ),
-        ),
-        leftOuterJoin(
-          mangaTables,
-          mangaTables.id.equalsExp(relationshipTables.mangaId),
-        ),
-        leftOuterJoin(
-          tagTables,
-          tagTables.id.equalsExp(relationshipTables.tagId),
-        ),
-      ],
+    final results = await aggregate.get();
+
+    final groups = results.groupListsBy((e) => e.readTableOrNull(mangaTables));
+
+    final data = groups.map(
+      (key, value) => MapEntry(
+        key,
+        [...value.map((e) => e.readTableOrNull(tagTables)).nonNulls],
+      ),
     );
-
-    final fallbackSelector = select(libraryTables).join(
-      [
-        leftOuterJoin(
-          mangaTables,
-          mangaTables.id.equalsExp(libraryTables.mangaId),
-        ),
-      ],
-    );
-
-    final results = await selector.get();
-
-    final groups = (results.isEmpty ? await fallbackSelector.get() : results)
-        .groupListsBy((e) => e.readTableOrNull(mangaTables))
-        .map(
-          (key, value) => MapEntry(
-            key,
-            [...value.map((e) => e.readTableOrNull(tagTables)).nonNulls],
-          ),
-        );
 
     return [
-      for (final key in groups.keys.nonNulls)
-        (key, groups[key] ?? <TagDrift>[]),
+      for (final key in data.keys.nonNulls) (key, data[key] ?? <TagDrift>[]),
     ];
   }
 }
