@@ -24,17 +24,17 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
   Stream<List<(MangaDrift, List<TagDrift>)>> get stream {
     final selector = select(libraryTables).join(
       [
-        innerJoin(
+        leftOuterJoin(
           relationshipTables,
           relationshipTables.mangaId.equalsExp(
             libraryTables.mangaId,
           ),
         ),
-        innerJoin(
+        leftOuterJoin(
           mangaTables,
           mangaTables.id.equalsExp(relationshipTables.mangaId),
         ),
-        innerJoin(
+        leftOuterJoin(
           tagTables,
           tagTables.id.equalsExp(relationshipTables.tagId),
         ),
@@ -43,7 +43,7 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
 
     final fallbackSelector = select(libraryTables).join(
       [
-        innerJoin(
+        leftOuterJoin(
           mangaTables,
           mangaTables.id.equalsExp(libraryTables.mangaId),
         ),
@@ -96,17 +96,17 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
   Future<List<(MangaDrift, List<TagDrift>)>> get() async {
     final selector = select(libraryTables).join(
       [
-        innerJoin(
+        leftOuterJoin(
           relationshipTables,
           relationshipTables.mangaId.equalsExp(
             libraryTables.mangaId,
           ),
         ),
-        innerJoin(
+        leftOuterJoin(
           mangaTables,
           mangaTables.id.equalsExp(relationshipTables.mangaId),
         ),
-        innerJoin(
+        leftOuterJoin(
           tagTables,
           tagTables.id.equalsExp(relationshipTables.tagId),
         ),
@@ -115,7 +115,7 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
 
     final fallbackSelector = select(libraryTables).join(
       [
-        innerJoin(
+        leftOuterJoin(
           mangaTables,
           mangaTables.id.equalsExp(libraryTables.mangaId),
         ),
