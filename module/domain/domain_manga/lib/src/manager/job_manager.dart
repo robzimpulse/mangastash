@@ -84,9 +84,8 @@ class JobManager
         await _downloadChapter(job);
     }
 
+    await _jobDao.remove(job.id);
     _isFetching = false;
-
-    _jobDao.remove(job.id);
   }
 
   Future<void> _fetchManga(JobDetail job) async {
@@ -283,22 +282,6 @@ class JobManager
     }
 
     if (result is Success<Pagination<MangaChapter>>) {
-      _log.log(
-        'Success execute job ${job.id} - ${job.type}',
-        extra: {
-          'id': job.id,
-          'type': job.type,
-          'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let(
-            (e) => MangaChapter.fromDrift(e).toJson(),
-          ),
-          'image': job.image?.webUrl,
-          'parameter': parameter,
-          'data': result.data.toJson((e) => e.toJson()),
-        },
-        name: runtimeType.toString(),
-      );
-
       if (result.data.hasNextPage == true) {
         await _fetchAllChapter(
           job,
@@ -307,6 +290,22 @@ class JobManager
             page: (parameter.page ?? 1) + 1,
             limit: 100,
           ),
+        );
+      } else {
+        _log.log(
+          'Success execute job ${job.id} - ${job.type}',
+          extra: {
+            'id': job.id,
+            'type': job.type,
+            'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
+            'chapter': job.chapter?.let(
+              (e) => MangaChapter.fromDrift(e).toJson(),
+            ),
+            'image': job.image?.webUrl,
+            'parameter': parameter,
+            'data': result.data.toJson((e) => e.toJson()),
+          },
+          name: runtimeType.toString(),
         );
       }
     }
