@@ -187,17 +187,20 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
 
       final results = await selector.get();
 
-      final groups =
-          results.groupListsBy((e) => e.readTableOrNull(mangaTables)).map(
-                (key, value) => MapEntry(
-                  key,
-                  [...value.map((e) => e.readTableOrNull(tagTables)).nonNulls],
-                ),
-              );
+      final groups = results.groupListsBy(
+        (e) => e.readTableOrNull(mangaTables),
+      );
 
       final data = [
         for (final key in groups.keys.nonNulls)
-          (key, groups[key] ?? <TagDrift>[]),
+          (
+            key,
+            [
+              ...?groups[key]
+                  ?.map((e) => e.readTableOrNull(tagTables))
+                  .nonNulls,
+            ],
+          ),
       ];
 
       return data.firstOrNull;
