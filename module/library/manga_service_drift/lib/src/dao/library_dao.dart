@@ -22,6 +22,10 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
   LibraryDao(AppDatabase db) : super(db);
 
   Stream<List<(MangaDrift, List<TagDrift>)>> get stream {
+    final order = [
+      OrderingTerm(expression: mangaTables.title, mode: OrderingMode.asc),
+    ];
+
     final selector = select(libraryTables).join(
       [
         leftOuterJoin(
@@ -39,7 +43,7 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
           tagTables.id.equalsExp(relationshipTables.tagId),
         ),
       ],
-    );
+    )..orderBy(order);
 
     final fallbackSelector = select(libraryTables).join(
       [
@@ -48,7 +52,7 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
           mangaTables.id.equalsExp(libraryTables.mangaId),
         ),
       ],
-    );
+    )..orderBy(order);
 
     final stream = selector.watch();
 
@@ -67,10 +71,7 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
             .map(
               (key, value) => MapEntry(
                 key,
-                value
-                    .map((e) => e.readTableOrNull(tagTables))
-                    .nonNulls
-                    .toList(),
+                [...value.map((e) => e.readTableOrNull(tagTables)).nonNulls],
               ),
             );
 
@@ -129,10 +130,7 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
         .map(
           (key, value) => MapEntry(
             key,
-            value
-                .map((e) => e.readTableOrNull(tagTables))
-                .nonNulls
-                .toList(),
+            [...value.map((e) => e.readTableOrNull(tagTables)).nonNulls],
           ),
         );
 
