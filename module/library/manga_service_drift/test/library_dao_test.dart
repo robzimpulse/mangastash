@@ -11,9 +11,7 @@ void main() {
   setUp(() {
     db = AppDatabase(
       executor: DatabaseConnection(
-        NativeDatabase.memory(
-          logStatements: true,
-        ),
+        NativeDatabase.memory(),
         closeStreamsSynchronously: true,
       ),
     );

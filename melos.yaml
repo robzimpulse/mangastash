@@ -21,3 +21,5 @@ scripts:
   upgrade:
     description: Upgrade dependencies for all packages.
     run: melos exec -- "flutter pub upgrade"
+  unit_test:
+    run: melos exec -c 3 --flutter --fail-fast -- flutter test --no-pub
