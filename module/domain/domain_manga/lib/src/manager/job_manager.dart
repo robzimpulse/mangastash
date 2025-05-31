@@ -72,8 +72,8 @@ class JobManager
         await _fetchManga(job);
       case JobTypeEnum.chapter:
         await _fetchChapter(job);
-      case JobTypeEnum.download:
-        await _enqueueDownload(job);
+      case JobTypeEnum.downloadChapter:
+        await _downloadChapter(job);
     }
 
     _isFetching = false;
@@ -306,11 +306,10 @@ class JobManager
     }
   }
 
-  Future<void> _enqueueDownload(JobDetail job) async {
+  Future<void> _downloadChapter(JobDetail job) async {
     final mangaId = job.manga?.id;
     final chapterId = job.chapter?.id;
 
-    // TODO: download manga without chapter id
     if (mangaId == null || chapterId == null) {
       _log.log(
         'Failed execute job ${job.id} - ${job.type}',
@@ -516,7 +515,7 @@ class JobManager
   }) {
     _jobDao.add(
       JobTablesCompanion.insert(
-        type: JobTypeEnum.download,
+        type: JobTypeEnum.downloadChapter,
         source: Value(source.value),
         mangaId: Value(mangaId),
         chapterId: Value(chapterId),
@@ -529,13 +528,14 @@ class JobManager
     required String mangaId,
     required MangaSourceEnum source,
   }) {
-    _jobDao.add(
-      JobTablesCompanion.insert(
-        type: JobTypeEnum.download,
-        source: Value(source.value),
-        mangaId: Value(mangaId),
-      ),
-    );
+    // TODO: download manga without chapter id
+    // _jobDao.add(
+    //   JobTablesCompanion.insert(
+    //     type: JobTypeEnum.download,
+    //     source: Value(source.value),
+    //     mangaId: Value(mangaId),
+    //   ),
+    // );
   }
 
   @override
