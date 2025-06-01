@@ -34,6 +34,7 @@ class LibraryMangaScreen extends StatefulWidget {
         listenPrefetchMangaUseCase: locator(),
         removeFromLibraryUseCase: locator(),
         downloadMangaUseCase: locator(),
+        prefetchChapterUseCase: locator(),
       ),
       child: LibraryMangaScreen(
         cacheManager: locator(),
@@ -172,16 +173,16 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
 
   Widget _layoutRefresh({required BuildContext context}) {
     return _builder(
-      buildWhen: (prev, curr) => prev.filteredMangas != curr.filteredMangas,
+      buildWhen: (prev, curr) => prev.mangas != curr.mangas,
       builder: (context, state) {
-        if (state.filteredMangas.isEmpty) {
+        if (state.mangas.isEmpty) {
           return const SizedBox.shrink();
         }
 
         return IconButton(
           icon: const Icon(Icons.cloud_download),
           onPressed: () => _cubit(context).prefetch(
-            mangas: state.filteredMangas,
+            mangas: state.mangas,
           ),
         );
       },
