@@ -626,12 +626,12 @@ class JobManager
   }
 
   @override
-  Stream<List<String>> get chapterIdsStream {
-    return _jobs.map((data) => [...data.map((e) => e.manga?.id).nonNulls]);
+  Stream<Set<String>> get chapterIdsStream {
+    return _jobs.map((data) => {...data.map((e) => e.manga?.id).nonNulls});
   }
 
   @override
-  Stream<List<String>> get mangaIdsStream {
-    return _jobs.map((data) => [...data.map((e) => e.chapter?.id).nonNulls]);
+  Stream<Set<String>> get mangaIdsStream {
+    return _jobs.map((data) => {...data.map((e) => e.chapter?.id).nonNulls});
   }
 }

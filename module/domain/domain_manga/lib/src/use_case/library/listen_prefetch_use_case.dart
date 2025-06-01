@@ -1,6 +1,6 @@
 abstract class ListenPrefetchUseCase {
 
-  Stream<List<String>> get chapterIdsStream;
+  Stream<Set<String>> get chapterIdsStream;
 
-  Stream<List<String>> get mangaIdsStream;
+  Stream<Set<String>> get mangaIdsStream;
 }

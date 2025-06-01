@@ -69,7 +69,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     emit(state.copyWith(libraries: library));
   }
 
-  void _updatePrefetch(List<String> prefetchedChapterId) {
+  void _updatePrefetch(Set<String> prefetchedChapterId) {
     emit(state.copyWith(prefetchedChapterId: prefetchedChapterId));
   }
 

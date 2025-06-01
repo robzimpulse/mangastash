@@ -55,7 +55,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     );
   }
 
-  void _updatePrefetchState(List<String> prefetchedMangaIds) {
+  void _updatePrefetchState(Set<String> prefetchedMangaIds) {
     emit(state.copyWith(prefetchedMangaIds: prefetchedMangaIds));
   }
 
