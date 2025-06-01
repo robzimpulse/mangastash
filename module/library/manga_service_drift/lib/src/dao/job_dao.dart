@@ -1,11 +1,13 @@
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 
-import '../../manga_service_drift.dart';
+import '../database/database.dart';
+import '../model/job_model.dart';
 import '../tables/chapter_tables.dart';
 import '../tables/image_tables.dart';
 import '../tables/job_tables.dart';
 import '../tables/manga_tables.dart';
+import '../util/job_type_enum.dart';
 
 part 'job_dao.g.dart';
 
@@ -35,8 +37,8 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
     );
   }
 
-  List<JobDetail> _parse(List<TypedResult> rows) {
-    final data = <JobDetail>[];
+  List<JobModel> _parse(List<TypedResult> rows) {
+    final data = <JobModel>[];
 
     for (final row in rows) {
       final id = row.read(jobTables.id);
@@ -45,7 +47,7 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
       );
       if (id != null && type != null) {
         data.add(
-          JobDetail(
+          JobModel(
             id: id,
             type: type,
             manga: row.readTableOrNull(mangaTables),
@@ -59,7 +61,7 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
     return data;
   }
 
-  Stream<List<JobDetail>> get stream {
+  Stream<List<JobModel>> get stream {
     return _aggregate.watch().map((e) => _parse(e));
   }
 

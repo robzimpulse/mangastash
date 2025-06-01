@@ -3,15 +3,15 @@ import 'package:equatable/equatable.dart';
 import '../database/database.dart';
 import '../util/job_type_enum.dart';
 
-class JobDetail extends Equatable {
+class JobModel extends Equatable {
   final int id;
   final JobTypeEnum type;
+  final String? image;
 
   final MangaDrift? manga;
   final ChapterDrift? chapter;
-  final String? image;
 
-  const JobDetail({
+  const JobModel({
     required this.id,
     required this.type,
     this.manga,

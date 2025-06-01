@@ -31,7 +31,7 @@ class JobManager
         DownloadChapterUseCase,
         DownloadMangaUseCase,
         ListenPrefetchUseCase {
-  final BehaviorSubject<List<JobDetail>> _jobs = BehaviorSubject.seeded([]);
+  final BehaviorSubject<List<JobModel>> _jobs = BehaviorSubject.seeded([]);
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
   final ValueGetter<SearchChapterUseCase> _searchChapterUseCase;
@@ -65,7 +65,7 @@ class JobManager
 
   Future<void> dispose() => _streamSubscription.cancel();
 
-  void _onData(List<JobDetail> jobs) async {
+  void _onData(List<JobModel> jobs) async {
     final job = jobs.firstOrNull;
     if (job == null || _isFetching) return;
 
@@ -88,7 +88,7 @@ class JobManager
     _isFetching = false;
   }
 
-  Future<void> _fetchManga(JobDetail job) async {
+  Future<void> _fetchManga(JobModel job) async {
     final mangaId = job.manga?.id;
 
     if (mangaId == null) {
@@ -151,7 +151,7 @@ class JobManager
     }
   }
 
-  Future<void> _fetchChapter(JobDetail job) async {
+  Future<void> _fetchChapter(JobModel job) async {
     final mangaId = job.manga?.id;
     final chapterId = job.chapter?.id;
 
@@ -228,7 +228,7 @@ class JobManager
   }
 
   Future<void> _fetchAllChapter(
-    JobDetail job, {
+    JobModel job, {
     SearchChapterParameter parameter = const SearchChapterParameter(
       offset: 0,
       page: 1,
@@ -310,7 +310,7 @@ class JobManager
     }
   }
 
-  Future<void> _downloadChapter(JobDetail job) async {
+  Future<void> _downloadChapter(JobModel job) async {
     final mangaId = job.manga?.id;
     final chapterId = job.chapter?.id;
 
@@ -505,7 +505,7 @@ class JobManager
     }
   }
 
-  Future<void> _fetchImage(JobDetail job) async {
+  Future<void> _fetchImage(JobModel job) async {
     final url = job.image;
     if (url == null) {
       _log.log(
