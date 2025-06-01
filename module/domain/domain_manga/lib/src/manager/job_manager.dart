@@ -101,7 +101,7 @@ class JobManager
           'chapter': job.chapter?.let(
             (e) => MangaChapter.fromDrift(e).toJson(),
           ),
-          'image': job.image?.webUrl,
+          'image': job.image,
           'error': 'No Manga ID',
         },
         name: runtimeType.toString(),
@@ -126,7 +126,7 @@ class JobManager
           'chapter': job.chapter?.let(
             (e) => MangaChapter.fromDrift(e).toJson(),
           ),
-          'image': job.image?.webUrl,
+          'image': job.image,
           'error': result.error.toString(),
         },
         name: runtimeType.toString(),
@@ -143,7 +143,7 @@ class JobManager
           'chapter': job.chapter?.let(
             (e) => MangaChapter.fromDrift(e).toJson(),
           ),
-          'image': job.image?.webUrl,
+          'image': job.image,
           'data': result.data.toJson(),
         },
         name: runtimeType.toString(),
@@ -165,7 +165,7 @@ class JobManager
           'chapter': job.chapter?.let(
             (e) => MangaChapter.fromDrift(e).toJson(),
           ),
-          'image': job.image?.webUrl,
+          'image': job.image,
           'error': 'No Manga ID or Chapter ID',
         },
         name: runtimeType.toString(),
@@ -191,7 +191,7 @@ class JobManager
           'chapter': job.chapter?.let(
             (e) => MangaChapter.fromDrift(e).toJson(),
           ),
-          'image': job.image?.webUrl,
+          'image': job.image,
           'error': result.error.toString(),
         },
         name: runtimeType.toString(),
@@ -208,19 +208,18 @@ class JobManager
           'chapter': job.chapter?.let(
             (e) => MangaChapter.fromDrift(e).toJson(),
           ),
-          'image': job.image?.webUrl,
+          'image': job.image,
           'data': result.data.toJson(),
         },
         name: runtimeType.toString(),
       );
 
-      final images = await _jobDao.getImageIds(result.data.images ?? []);
-      for (final image in images) {
+      for (final image in result.data.images ?? <String>[]) {
         await _jobDao.add(
           JobTablesCompanion.insert(
             mangaId: Value(mangaId),
             chapterId: Value(chapterId),
-            imageId: Value(image.id),
+            imageUrl: Value(image),
             type: JobTypeEnum.image,
           ),
         );
@@ -248,7 +247,7 @@ class JobManager
           'chapter': job.chapter?.let(
             (e) => MangaChapter.fromDrift(e).toJson(),
           ),
-          'image': job.image?.webUrl,
+          'image': job.image,
           'error': 'No Manga ID',
         },
         name: runtimeType.toString(),
@@ -274,7 +273,7 @@ class JobManager
           'chapter': job.chapter?.let(
             (e) => MangaChapter.fromDrift(e).toJson(),
           ),
-          'image': job.image?.webUrl,
+          'image': job.image,
           'error': result.error.toString(),
         },
         name: runtimeType.toString(),
@@ -301,7 +300,7 @@ class JobManager
             'chapter': job.chapter?.let(
               (e) => MangaChapter.fromDrift(e).toJson(),
             ),
-            'image': job.image?.webUrl,
+            'image': job.image,
             'parameter': parameter,
             'data': result.data.toJson((e) => e.toJson()),
           },
@@ -325,7 +324,7 @@ class JobManager
           'chapter': job.chapter?.let(
             (e) => MangaChapter.fromDrift(e).toJson(),
           ),
-          'image': job.image?.webUrl,
+          'image': job.image,
           'error': 'No Manga ID or Chapter ID',
         },
         name: runtimeType.toString(),
@@ -351,7 +350,7 @@ class JobManager
           'chapter': job.chapter?.let(
             (e) => MangaChapter.fromDrift(e).toJson(),
           ),
-          'image': job.image?.webUrl,
+          'image': job.image,
           'error': result.error.toString(),
         },
         name: runtimeType.toString(),
@@ -368,7 +367,7 @@ class JobManager
           'chapter': job.chapter?.let(
             (e) => MangaChapter.fromDrift(e).toJson(),
           ),
-          'image': job.image?.webUrl,
+          'image': job.image,
           'data': result.data.toJson(),
         },
         name: runtimeType.toString(),
@@ -507,7 +506,7 @@ class JobManager
   }
 
   Future<void> _fetchImage(JobDetail job) async {
-    final url = job.image?.webUrl;
+    final url = job.image;
     if (url == null) {
       _log.log(
         'Failed execute job ${job.id} - ${job.type}',
@@ -518,7 +517,7 @@ class JobManager
           'chapter': job.chapter?.let(
             (e) => MangaChapter.fromDrift(e).toJson(),
           ),
-          'image': job.image?.webUrl,
+          'image': job.image,
           'error': 'No Image URL',
         },
         name: runtimeType.toString(),
@@ -544,7 +543,7 @@ class JobManager
         'chapter': job.chapter?.let(
           (e) => MangaChapter.fromDrift(e).toJson(),
         ),
-        'image': job.image?.webUrl,
+        'image': job.image,
         'data': path.uri.toString(),
       },
       name: runtimeType.toString(),

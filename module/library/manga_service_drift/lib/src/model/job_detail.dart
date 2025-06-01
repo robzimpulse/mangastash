@@ -9,7 +9,7 @@ class JobDetail extends Equatable {
 
   final MangaDrift? manga;
   final ChapterDrift? chapter;
-  final ImageDrift? image;
+  final String? image;
 
   const JobDetail({
     required this.id,

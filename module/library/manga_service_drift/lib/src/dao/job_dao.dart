@@ -31,10 +31,6 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
           chapterTables,
           chapterTables.id.equalsExp(jobTables.chapterId),
         ),
-        leftOuterJoin(
-          imageTables,
-          imageTables.id.equalsExp(jobTables.imageId),
-        ),
       ],
     );
 
@@ -55,7 +51,7 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
                 type: type,
                 manga: event.readTableOrNull(mangaTables),
                 chapter: event.readTableOrNull(chapterTables),
-                image: event.readTableOrNull(imageTables),
+                image: event.read(jobTables.imageUrl),
               ),
             );
           }
@@ -83,11 +79,5 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
     await transaction(
       () => (delete(jobTables)..where((f) => f.id.equals(id))).go(),
     );
-  }
-
-  Future<List<ImageDrift>> getImageIds(List<String> urls) async {
-    if (urls.isEmpty) return [];
-    final selector = select(imageTables)..where((f) => f.webUrl.isIn(urls));
-    return transaction(() => selector.get());
   }
 }
