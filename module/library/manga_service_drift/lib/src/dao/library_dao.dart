@@ -62,14 +62,17 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
     return _aggregate.watch().map((rows) => _parse(rows));
   }
 
-  Future<void> add(String mangaId) async {
-    await into(libraryTables).insert(
-      LibraryTablesCompanion.insert(mangaId: mangaId),
+  Future<void> add(String mangaId) {
+    return transaction(
+      () => into(libraryTables).insert(
+        LibraryTablesCompanion.insert(mangaId: mangaId),
+      ),
     );
   }
 
-  Future<void> remove(String mangaId) async {
-    await (delete(libraryTables)..where((f) => f.mangaId.equals(mangaId))).go();
+  Future<void> remove(String mangaId) {
+    final s = delete(libraryTables)..where((f) => f.mangaId.equals(mangaId));
+    return transaction(() => s.go());
   }
 
   Future<List<(MangaDrift, List<TagDrift>)>> get() {
