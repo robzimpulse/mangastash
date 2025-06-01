@@ -471,7 +471,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     return _builder(
       buildWhen: (prev, curr) => [
         prev.progress?[key] != curr.progress?[key],
-        prev.prefetched != curr.prefetched,
+        prev.prefetchedChapterId != curr.prefetchedChapterId,
       ].contains(true),
       builder: (context, state) => MangaChapterTileWidget(
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -483,8 +483,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         uploadedAt: value.readableAt?.asDateTime,
         groups: value.scanlationGroup,
         downloadProgress: state.progress?[key]?.progress.toDouble() ?? 0.0,
-        isPrefetching:
-            state.prefetched[key.mangaId]?.contains(value.id) ?? false,
+        isPrefetching: state.prefetchedChapterId.contains(value.id),
       ),
     );
   }

@@ -57,7 +57,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       listenLocaleUseCase.localeDataStream.distinct().listen(_updateLocale),
     );
     addSubscription(
-      listenPrefetchUseCase.prefetchedStream.distinct().listen(_updatePrefetch),
+      listenPrefetchUseCase.chapterIdsStream.distinct().listen(_updatePrefetch),
     );
   }
 
@@ -69,8 +69,8 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     emit(state.copyWith(libraries: library));
   }
 
-  void _updatePrefetch(Map<String, Set<String>> prefetched) {
-    emit(state.copyWith(prefetched: prefetched));
+  void _updatePrefetch(List<String> prefetchedChapterId) {
+    emit(state.copyWith(prefetchedChapterId: prefetchedChapterId));
   }
 
   void updateMangaConfig(MangaChapterConfig config) async {

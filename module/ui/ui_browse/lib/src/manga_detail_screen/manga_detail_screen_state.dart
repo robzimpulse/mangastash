@@ -31,7 +31,7 @@ class MangaDetailScreenState extends Equatable {
   final AuthState? authState;
   final List<Manga> libraries;
   final Map<DownloadChapterKey, DownloadChapterProgress>? progress;
-  final Map<String, Set<String>> prefetched;
+  final List<String> prefetchedChapterId;
 
   final MangaChapterConfig config;
   final SearchChapterParameter parameter;
@@ -57,7 +57,7 @@ class MangaDetailScreenState extends Equatable {
     this.config = const MangaChapterConfig(),
     this.authState,
     this.libraries = const [],
-    this.prefetched = const {},
+    this.prefetchedChapterId = const [],
     this.progress,
     this.parameter = const SearchChapterParameter(),
     this.hasNextPage = false,
@@ -184,7 +184,7 @@ class MangaDetailScreenState extends Equatable {
         hasNextPage,
         isPagingNextPage,
         sourceUrl,
-    prefetched,
+        prefetchedChapterId,
       ];
 
   MangaDetailScreenState copyWith({
@@ -200,7 +200,7 @@ class MangaDetailScreenState extends Equatable {
     MangaChapterConfig? config,
     AuthState? authState,
     List<Manga>? libraries,
-    Map<String, Set<String>>? prefetched,
+    List<String>? prefetchedChapterId,
     Map<DownloadChapterKey, DownloadChapterProgress>? progress,
     SearchChapterParameter? parameter,
     bool? hasNextPage,
@@ -225,7 +225,7 @@ class MangaDetailScreenState extends Equatable {
       hasNextPage: hasNextPage ?? this.hasNextPage,
       isPagingNextPage: isPagingNextPage ?? this.isPagingNextPage,
       sourceUrl: sourceUrl != null ? sourceUrl() : this.sourceUrl,
-      prefetched: prefetched ?? this.prefetched,
+      prefetchedChapterId: prefetchedChapterId ?? this.prefetchedChapterId,
     );
   }
 }

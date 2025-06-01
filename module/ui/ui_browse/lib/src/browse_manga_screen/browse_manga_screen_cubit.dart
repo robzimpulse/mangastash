@@ -44,7 +44,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
       listenLocaleUseCase.localeDataStream.distinct().listen(_updateLocale),
     );
     addSubscription(
-      listenPrefetchMangaUseCase.prefetchedStream
+      listenPrefetchMangaUseCase.mangaIdsStream
           .distinct()
           .listen(_updatePrefetchState),
     );
@@ -69,8 +69,8 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     );
   }
 
-  void _updatePrefetchState(Map<String, Set<String>> prefetchedMangaIds) {
-    emit(state.copyWith(prefetchedMangaIds: [...prefetchedMangaIds.keys]));
+  void _updatePrefetchState(List<String> prefetchedMangaIds) {
+    emit(state.copyWith(prefetchedMangaIds: prefetchedMangaIds));
   }
 
   Future<void> init({

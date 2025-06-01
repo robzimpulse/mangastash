@@ -626,23 +626,12 @@ class JobManager
   }
 
   @override
-  Stream<Map<String, Set<String>>> get prefetchedStream {
-    final stream = _jobs.map((e) => e.groupListsBy((e) => e.manga?.id));
-    return stream.map(
-      (e) {
-        final data = <String, Set<String>>{};
-        for (final entry in e.entries) {
-          final value = entry.value.map((e) => e.chapter?.id).nonNulls;
-          entry.key?.let(
-            (key) => data.update(
-              key,
-              (old) => {...value},
-              ifAbsent: () => {...value},
-            ),
-          );
-        }
-        return data;
-      },
-    );
+  Stream<List<String>> get chapterIdsStream {
+    return _jobs.map((data) => [...data.map((e) => e.manga?.id).nonNulls]);
+  }
+
+  @override
+  Stream<List<String>> get mangaIdsStream {
+    return _jobs.map((data) => [...data.map((e) => e.chapter?.id).nonNulls]);
   }
 }

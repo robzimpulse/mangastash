@@ -35,7 +35,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     );
 
     addSubscription(
-      listenPrefetchMangaUseCase.prefetchedStream
+      listenPrefetchMangaUseCase.mangaIdsStream
           .distinct()
           .listen(_updatePrefetchState),
     );
@@ -55,8 +55,8 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     );
   }
 
-  void _updatePrefetchState(Map<String, Set<String>> prefetchedMangaIds) {
-    emit(state.copyWith(prefetchedMangaIds: [...prefetchedMangaIds.keys]));
+  void _updatePrefetchState(List<String> prefetchedMangaIds) {
+    emit(state.copyWith(prefetchedMangaIds: prefetchedMangaIds));
   }
 
   void prefetch({required List<Manga> mangas}) {
