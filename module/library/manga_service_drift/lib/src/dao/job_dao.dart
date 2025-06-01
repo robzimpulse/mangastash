@@ -76,8 +76,7 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
   }
 
   Future<void> remove(int id) async {
-    await transaction(
-      () => (delete(jobTables)..where((f) => f.id.equals(id))).go(),
-    );
+    final s = delete(jobTables)..where((f) => f.id.equals(id));
+    await transaction(() => s.go());
   }
 }
