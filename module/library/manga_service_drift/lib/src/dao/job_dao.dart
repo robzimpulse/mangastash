@@ -20,8 +20,8 @@ part 'job_dao.g.dart';
 class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
   JobDao(AppDatabase db) : super(db);
 
-  Stream<List<JobDetail>> listen() {
-    final selector = select(jobTables).join(
+  JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
+    return select(jobTables).join(
       [
         leftOuterJoin(
           mangaTables,
@@ -33,34 +33,34 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
         ),
       ],
     );
+  }
 
-    final stream = selector.watch();
+  List<JobDetail> _parse(List<TypedResult> rows) {
+    final data = <JobDetail>[];
 
-    return stream.map(
-      (events) {
-        final data = <JobDetail>[];
-        for (final event in events) {
-          final id = event.read(jobTables.id);
-          final type = JobTypeEnum.values.firstWhereOrNull(
-            (e) => e.name == event.read(jobTables.type),
-          );
-          if (id != null && type != null) {
-            data.add(
-              JobDetail(
-                id: id,
-                type: type,
-                manga: event.readTableOrNull(mangaTables),
-                chapter: event.readTableOrNull(chapterTables),
-                image: event.read(jobTables.imageUrl),
-              ),
-            );
-          }
-        }
-        return data;
-      },
-    );
+    for (final row in rows) {
+      final id = row.read(jobTables.id);
+      final type = JobTypeEnum.values.firstWhereOrNull(
+        (e) => e.name == row.read(jobTables.type),
+      );
+      if (id != null && type != null) {
+        data.add(
+          JobDetail(
+            id: id,
+            type: type,
+            manga: row.readTableOrNull(mangaTables),
+            chapter: row.readTableOrNull(chapterTables),
+            image: row.read(jobTables.imageUrl),
+          ),
+        );
+      }
+    }
 
-    // return select(jobTables).watch();
+    return data;
+  }
+
+  Stream<List<JobDetail>> get stream {
+    return _aggregate.watch().map((e) => _parse(e));
   }
 
   Future<void> add(JobTablesCompanion value) async {

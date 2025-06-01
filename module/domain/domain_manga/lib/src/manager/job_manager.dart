@@ -60,7 +60,7 @@ class JobManager
         _getChapterUseCase = getChapterUseCase,
         _searchChapterUseCase = searchChapterUseCase {
     _streamSubscription = _jobs.distinct().listen(_onData);
-    _jobs.addStream(jobDao.listen());
+    _jobs.addStream(jobDao.stream);
   }
 
   Future<void> dispose() => _streamSubscription.cancel();
