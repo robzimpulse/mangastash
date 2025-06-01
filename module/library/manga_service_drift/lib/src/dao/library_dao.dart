@@ -20,7 +20,7 @@ part 'library_dao.g.dart';
 class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
   LibraryDao(AppDatabase db) : super(db);
 
-  JoinedSelectStatement<HasResultSet, dynamic> get aggregate {
+  JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
     final order = [
       OrderingTerm(expression: mangaTables.title, mode: OrderingMode.asc),
     ];
@@ -45,28 +45,21 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
     )..orderBy(order);
   }
 
+  List<(MangaDrift, List<TagDrift>)> _parse(List<TypedResult> rows) {
+    final groups = rows.groupListsBy((e) => e.readTableOrNull(mangaTables));
+    return [
+      for (final key in groups.keys.nonNulls)
+        (
+          key,
+          [
+            ...?groups[key]?.map((e) => e.readTableOrNull(tagTables)).nonNulls,
+          ],
+        ),
+    ];
+  }
+
   Stream<List<(MangaDrift, List<TagDrift>)>> get stream {
-    final stream = aggregate.watch();
-
-    return stream.map(
-      (rows) {
-        final groups = rows
-            .groupListsBy(
-              (e) => e.readTableOrNull(mangaTables),
-            )
-            .map(
-              (key, value) => MapEntry(
-                key,
-                [...value.map((e) => e.readTableOrNull(tagTables)).nonNulls],
-              ),
-            );
-
-        return [
-          for (final key in groups.keys.nonNulls)
-            (key, groups[key] ?? <TagDrift>[]),
-        ];
-      },
-    );
+    return _aggregate.watch().map((rows) => _parse(rows));
   }
 
   Future<void> add(String mangaId) async {
@@ -79,20 +72,7 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
     await (delete(libraryTables)..where((f) => f.mangaId.equals(mangaId))).go();
   }
 
-  Future<List<(MangaDrift, List<TagDrift>)>> get() async {
-    final results = await aggregate.get();
-
-    final groups = results.groupListsBy((e) => e.readTableOrNull(mangaTables));
-
-    final data = groups.map(
-      (key, value) => MapEntry(
-        key,
-        [...value.map((e) => e.readTableOrNull(tagTables)).nonNulls],
-      ),
-    );
-
-    return [
-      for (final key in data.keys.nonNulls) (key, data[key] ?? <TagDrift>[]),
-    ];
+  Future<List<(MangaDrift, List<TagDrift>)>> get() {
+    return _aggregate.get().then((rows) => _parse(rows));
   }
 }
