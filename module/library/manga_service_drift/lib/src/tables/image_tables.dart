@@ -14,4 +14,12 @@ class ImageTables extends Table with AutoTimestampTable {
 
   @override
   Set<Column<Object>>? get primaryKey => {id};
+
+  @override
+  List<Set<Column<Object>>>? get uniqueKeys => [
+        {chapterId, webUrl, order},
+        {chapterId, webUrl},
+        {webUrl, order},
+        {chapterId, order},
+      ];
 }

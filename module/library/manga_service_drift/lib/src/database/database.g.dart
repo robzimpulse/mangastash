@@ -96,6 +96,13 @@ class $ImageTablesTable extends ImageTables
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+        {chapterId, webUrl, order},
+        {chapterId, webUrl},
+        {webUrl, order},
+        {chapterId, order},
+      ];
+  @override
   ImageDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ImageDrift(
@@ -509,6 +516,10 @@ class $ChapterTablesTable extends ChapterTables
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+        {mangaId, webUrl},
+      ];
   @override
   ChapterDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -2685,6 +2696,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $JobTablesTable jobTables = $JobTablesTable(this);
   late final MangaDao mangaDao = MangaDao(this as AppDatabase);
   late final ChapterDao chapterDao = ChapterDao(this as AppDatabase);
+  late final ChapterV2Dao chapterV2Dao = ChapterV2Dao(this as AppDatabase);
+  late final ImageDao imageDao = ImageDao(this as AppDatabase);
   late final LibraryDao libraryDao = LibraryDao(this as AppDatabase);
   late final JobDao jobDao = JobDao(this as AppDatabase);
   @override

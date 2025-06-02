@@ -150,17 +150,16 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
         return {for (final e in results) e: <ImageDrift>[]};
       }
 
-      final groups = results
-          .groupListsBy((e) => e.readTableOrNull(chapterTables))
-          .map(
-            (key, images) => MapEntry(
-              key,
-              images
-                  .map((e) => e.readTableOrNull(imageTables))
-                  .nonNulls
-                  .toList(),
-            ),
-          );
+      final groups =
+          results.groupListsBy((e) => e.readTableOrNull(chapterTables)).map(
+                (key, images) => MapEntry(
+                  key,
+                  images
+                      .map((e) => e.readTableOrNull(imageTables))
+                      .nonNulls
+                      .toList(),
+                ),
+              );
 
       return {
         for (final key in groups.keys.nonNulls)
@@ -192,18 +191,17 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
         return (result, <ImageDrift>[]);
       }
 
-      final groups = results
-          .groupListsBy((e) => e.readTableOrNull(chapterTables))
-          .map(
-            (key, value) => MapEntry(
-              key,
-              value
-                  .map((e) => e.readTableOrNull(imageTables))
-                  .nonNulls
-                  .sortedBy<num>((e) => e.order)
-                  .toList(),
-            ),
-          );
+      final groups =
+          results.groupListsBy((e) => e.readTableOrNull(chapterTables)).map(
+                (key, value) => MapEntry(
+                  key,
+                  value
+                      .map((e) => e.readTableOrNull(imageTables))
+                      .nonNulls
+                      .sortedBy<num>((e) => e.order)
+                      .toList(),
+                ),
+              );
 
       final data = [
         for (final key in groups.keys.nonNulls)
