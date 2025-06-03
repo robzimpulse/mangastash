@@ -39,12 +39,33 @@ void main() {
     tearDown(() async => await db.clear());
 
     group('Add Image', () {
-      test('Normal', () async {
+      test('On New Chapter', () async {
+        final newImages = List.generate(
+          100,
+          (index) => ImageTablesCompanion(
+            webUrl: Value('web_url_new_$index'),
+            chapterId: const Value('chapter_id_new'),
+            order: Value(index),
+          ),
+        );
+
+        for (final image in newImages) {
+          await dao.add(value: image);
+        }
+
+        expect(
+          (await dao.all).length,
+          equals(images.length + newImages.length),
+        );
+      });
+
+      test('On Existing Chapter', () async {
         await dao.add(
           value: const ImageTablesCompanion(
-            webUrl: Value('web_url_new'),
-            chapterId: Value('chapter_id_new'),
-            order: Value(0),
+            id: Value('image_100'),
+            webUrl: Value('web_url_100'),
+            chapterId: Value('chapter_id'),
+            order: Value(100),
           ),
         );
 
