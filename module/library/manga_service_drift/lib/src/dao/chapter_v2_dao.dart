@@ -56,13 +56,9 @@ class ChapterV2Dao extends DatabaseAccessor<AppDatabase>
     return data;
   }
 
-  Stream<List<ChapterModel>> get stream {
-    return _aggregate.watch().map((e) => _parse(e));
-  }
+  Stream<List<ChapterModel>> get stream => _aggregate.watch().map(_parse);
 
-  Future<List<ChapterModel>> get all {
-    return _aggregate.get().then((e) => _parse(e));
-  }
+  Future<List<ChapterModel>> get all => _aggregate.get().then(_parse);
 
   Future<List<ChapterModel>> search({
     List<String> ids = const [],
@@ -86,15 +82,40 @@ class ChapterV2Dao extends DatabaseAccessor<AppDatabase>
       ),
       chapterTables.scanlationGroup.isIn(scanlationGroups.nonEmpty.distinct),
       chapterTables.webUrl.isIn(webUrls.nonEmpty.distinct),
-    ].fold<Expression<bool>>(const Constant(true), (a, b) => a | b);
+    ].fold<Expression<bool>>(const Constant(false), (a, b) => a | b);
 
     final selector = _aggregate..where(filter);
 
     return transaction(() => selector.get().then((e) => _parse(e)));
   }
 
-  Future<List<ChapterModel>> remove({required List<String> ids}) {
-    final a = delete(chapterTables)..where((f) => f.id.isIn(ids));
+  Future<List<ChapterModel>> remove({
+    List<String> ids = const [],
+    List<String> mangaIds = const [],
+    List<String> mangaTitles = const [],
+    List<String> titles = const [],
+    List<String> volumes = const [],
+    List<String> chapters = const [],
+    List<String> translatedLanguages = const [],
+    List<String> scanlationGroups = const [],
+    List<String> webUrls = const [],
+  }) {
+    Expression<bool> filter($ChapterTablesTable f) {
+      return [
+        f.id.isIn(ids.nonEmpty.distinct),
+        f.mangaId.isIn(mangaIds.nonEmpty.distinct),
+        f.title.isIn(titles.nonEmpty.distinct),
+        f.volume.isIn(volumes.nonEmpty.distinct),
+        f.chapter.isIn(chapters.nonEmpty.distinct),
+        f.translatedLanguage.isIn(
+          translatedLanguages.nonEmpty.distinct,
+        ),
+        f.scanlationGroup.isIn(scanlationGroups.nonEmpty.distinct),
+        f.webUrl.isIn(webUrls.nonEmpty.distinct),
+      ].fold(const Constant(false), (a, b) => a | b);
+    }
+
+    final a = delete(chapterTables)..where(filter);
     return transaction(() async {
       final chapters = await a.goAndReturn();
       final images = await _imageDao.remove(chapterIds: ids);
@@ -113,7 +134,7 @@ class ChapterV2Dao extends DatabaseAccessor<AppDatabase>
     List<String> images = const [],
   }) {
     return transaction(() async {
-      /// update or insert chapter
+      /// if conflict, update chapter otherwise insert chapter
       final chapter = await into(chapterTables).insertReturning(
         value.copyWith(
           id: Value(value.id.valueOrNull ?? const Uuid().v4().toString()),
@@ -129,7 +150,9 @@ class ChapterV2Dao extends DatabaseAccessor<AppDatabase>
 
       /// update existing data with new data until all new data updated
       final List<ImageDrift> updated = [];
-      List<ImageDrift> existing = await _imageDao.getBy(chapterId: chapter.id);
+      List<ImageDrift> existing = await _imageDao.search(
+        chapterIds: [chapter.id],
+      );
       for (final (index, image) in images.indexed) {
         final data = existing.isEmpty
             ? const ImageTablesCompanion()

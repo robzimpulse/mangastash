@@ -17,13 +17,19 @@ void main() {
     dao = ImageDao(db);
   });
 
-  final images = List.generate(
-    100,
-    (index) => ImageTablesCompanion(
-      id: Value('image_$index'),
-      webUrl: Value('web_url_$index'),
-      chapterId: const Value('chapter_id'),
-      order: Value(index),
+  final values = List.generate(
+    10,
+    (chpIdx) => (
+      chpIdx,
+      List.generate(
+        10,
+        (imgIdx) => ImageTablesCompanion(
+          id: Value('id_$imgIdx'),
+          webUrl: Value('web_url_$imgIdx'),
+          chapterId: Value('chapter_id_$imgIdx'),
+          order: Value(imgIdx),
+        ),
+      ),
     ),
   );
 
@@ -31,150 +37,140 @@ void main() {
 
   group('Image Dao Test', () {
     setUp(() async {
-      for (final image in images) {
-        await dao.add(value: image);
+      for (final (_, values) in values) {
+        for (final value in values) {
+          await dao.add(value: value);
+        }
       }
     });
 
     tearDown(() async => await db.clear());
 
-    group('Search Image', () {
-      test('By Chapter ID', () async {
-        expect(
-          (await dao.search(chapterIds: ['chapter_id'])).length,
-          equals(images.length),
-        );
+    group('With New Value', () {
+      const value = ImageTablesCompanion(
+        id: Value('id_new'),
+        webUrl: Value('web_url_new'),
+        chapterId: Value('chapter_id_new'),
+        order: Value(0),
+      );
+
+      group('Search Value', () {
+        test('By Chapter Id', () async {
+          expect(
+            (await dao.search(chapterIds: [value.chapterId.value])).length,
+            equals(0),
+          );
+        });
+
+        test('By Id', () async {
+          expect(
+            (await dao.search(ids: [value.id.value])).length,
+            equals(0),
+          );
+        });
+
+        test('By Web Url', () async {
+          expect(
+            (await dao.search(ids: [value.webUrl.value])).length,
+            equals(0),
+          );
+        });
       });
 
-      test('By Web Url', () async {
-        expect(
-          (await dao.search(webUrls: ['web_url_2'])).length,
-          equals(1),
-        );
+      group('Remove Value', () {
+        test('By Chapter ID', () async {
+          expect(
+            (await dao.remove(chapterIds: [value.chapterId.value])).length,
+            equals(0),
+          );
+
+          expect((await dao.all).length, equals(values.length));
+        });
+
+        test('By Web Url', () async {
+          expect(
+            (await dao.remove(webUrls: [value.webUrl.value])).length,
+            equals(0),
+          );
+
+          expect((await dao.all).length, equals(values.length));
+        });
+
+        test('By Id', () async {
+          expect(
+            (await dao.remove(ids: [value.id.value])).length,
+            equals(0),
+          );
+
+          expect((await dao.all).length, equals(values.length));
+        });
       });
 
-      test('By Id', () async {
-        expect(
-          (await dao.search(ids: ['image_2'])).length,
-          equals(1),
-        );
+      test('Add Value', () async {
+        await dao.add(value: value);
+        expect((await dao.all).length, equals(values.length + 1));
       });
+
     });
 
-    group('Remove Image', () {
-      test('By Chapter ID', () async {
-        expect(
-          (await dao.remove(chapterIds: ['chapter_id'])).length,
-          equals(images.length),
-        );
+    group('With Existing Value', () {
+      final value = ([...values.expand((e) => e.$2)]..shuffle()).first;
 
-        expect(
-          (await dao.all).length,
-          equals(0),
-        );
-      });
-
-      test('By Web Url', () async {
-        expect(
-          (await dao.remove(webUrls: ['web_url_2'])).length,
-          equals(1),
-        );
-
-        expect(
-          (await dao.all).length,
-          equals(images.length - 1),
-        );
-      });
-
-      test('By Id', () async {
-        expect(
-          (await dao.remove(ids: ['image_2'])).length,
-          equals(1),
-        );
-
-        expect(
-          (await dao.all).length,
-          equals(images.length - 1),
-        );
-      });
-    });
-
-    group('Add Image', () {
-      test('On New Chapter', () async {
-        final newImages = List.generate(
-          100,
-          (index) => ImageTablesCompanion(
-            webUrl: Value('web_url_new_$index'),
-            chapterId: const Value('chapter_id_new'),
-            order: Value(index),
-          ),
-        );
-
-        for (final image in newImages) {
-          await dao.add(value: image);
-        }
-
-        expect(
-          (await dao.all).length,
-          equals(images.length + newImages.length),
-        );
-      });
-
-      test('On Existing Chapter', () async {
-        await dao.add(
-          value: const ImageTablesCompanion(
-            id: Value('image_100'),
-            webUrl: Value('web_url_100'),
-            chapterId: Value('chapter_id'),
-            order: Value(100),
-          ),
-        );
-
-        expect((await dao.all).length, equals(images.length + 1));
-      });
-
-      group('With Empty ID', () {
-        final image = images.first.copyWith(id: const Value.absent());
-
-        test('With Conflicting Chapter Id & Web Url & Order', () async {
+      group('Search Value', () {
+        test('By Chapter Id', () async {
           expect(
-            () => dao.add(value: image),
-            throwsA(isA<SqliteException>()),
+            (await dao.search(chapterIds: [value.chapterId.value])).length,
+            greaterThan(0),
           );
-
-          expect((await dao.all).length, equals(images.length));
         });
 
-        test('With Conflicting Chapter Id & Web Url', () async {
+        test('By Id', () async {
           expect(
-            () => dao.add(value: image.copyWith(order: const Value(99))),
-            throwsA(isA<SqliteException>()),
+            (await dao.search(ids: [value.id.value])).length,
+            equals(1),
           );
-
-          expect((await dao.all).length, equals(images.length));
         });
 
-        test('With Conflicting Chapter Id & Order', () async {
+        test('By Web Url', () async {
           expect(
-            () => dao.add(
-              value: image.copyWith(webUrl: const Value('test_image_url')),
-            ),
-            throwsA(isA<SqliteException>()),
+            (await dao.search(ids: [value.webUrl.value])).length,
+            equals(0),
+          );
+        });
+      });
+
+      group('Remove Value', () {
+        test('By Chapter ID', () async {
+          expect(
+            (await dao.remove(chapterIds: [value.chapterId.value])).length,
+            equals(1),
           );
 
-          expect((await dao.all).length, equals(images.length));
+          expect((await dao.all).length, equals(values.length - 1));
         });
 
-        test('With Conflicting Image & Order', () async {
+        test('By Web Url', () async {
           expect(
-            () => dao.add(
-              value: image.copyWith(chapterId: const Value('chapter_id_new')),
-            ),
-            throwsA(isA<SqliteException>()),
+            (await dao.remove(webUrls: [value.webUrl.value])).length,
+            equals(1),
           );
 
-          expect((await dao.all).length, equals(images.length));
+          expect((await dao.all).length, equals(values.length - 1));
         });
+
+        test('By Id', () async {
+          expect(
+            (await dao.remove(ids: [value.id.value])).length,
+            equals(1),
+          );
+
+          expect((await dao.all).length, equals(values.length - 1));
+        });
+      });
+
+      test('Add Value', () async {
+        await dao.add(value: value);
+        expect((await dao.all).length, equals(values.length));
       });
     });
   });

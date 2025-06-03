@@ -1801,6 +1801,10 @@ class $TagTablesTable extends TagTables
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+        {id, name},
+      ];
+  @override
   TagDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TagDrift(
@@ -2696,10 +2700,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $JobTablesTable jobTables = $JobTablesTable(this);
   late final MangaDao mangaDao = MangaDao(this as AppDatabase);
   late final ChapterDao chapterDao = ChapterDao(this as AppDatabase);
-  late final ChapterV2Dao chapterV2Dao = ChapterV2Dao(this as AppDatabase);
-  late final ImageDao imageDao = ImageDao(this as AppDatabase);
   late final LibraryDao libraryDao = LibraryDao(this as AppDatabase);
   late final JobDao jobDao = JobDao(this as AppDatabase);
+  late final ImageDao imageDao = ImageDao(this as AppDatabase);
+  late final TagDao tagDao = TagDao(this as AppDatabase);
+  late final ChapterV2Dao chapterV2Dao = ChapterV2Dao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
