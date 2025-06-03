@@ -6,6 +6,7 @@ import 'package:manga_service_drift/manga_service_drift.dart';
 void main() {
   late AppDatabase db;
   late ChapterV2Dao dao;
+  late ImageDao imageDao;
 
   setUp(() {
     db = AppDatabase(
@@ -15,6 +16,7 @@ void main() {
       ),
     );
     dao = ChapterV2Dao(db);
+    imageDao = ImageDao(db);
   });
 
   final chapters = List.generate(
@@ -39,7 +41,7 @@ void main() {
         await dao.add(
           value: chapter,
           images: List.generate(
-            100,
+            10,
             (index) => 'chapter_${chapter.id}_image_$index',
           ),
         );
@@ -55,12 +57,13 @@ void main() {
             webUrl: Value('web_url_${chapters.length + 1}'),
           ),
           images: List.generate(
-            100,
+            10,
             (index) => 'chapter_id_${chapters.length + 1}_image_$index',
           ),
         );
 
         expect((await dao.all).length, equals(chapters.length + 1));
+        expect((await imageDao.all).length, equals((chapters.length + 1) * 10));
       });
 
       test('With Conflicting Manga ID and Web Url', () async {

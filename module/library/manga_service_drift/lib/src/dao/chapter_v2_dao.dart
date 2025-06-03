@@ -75,8 +75,7 @@ class ChapterV2Dao extends DatabaseAccessor<AppDatabase>
     List<String> scanlationGroups = const [],
     List<String> webUrls = const [],
   }) {
-
-    final  filter = [
+    final filter = [
       chapterTables.id.isIn(ids.nonEmpty.distinct),
       chapterTables.mangaId.isIn(mangaIds.nonEmpty.distinct),
       chapterTables.title.isIn(titles.nonEmpty.distinct),
@@ -99,6 +98,7 @@ class ChapterV2Dao extends DatabaseAccessor<AppDatabase>
     List<String> images = const [],
   }) {
     return transaction(() async {
+      /// update or insert chapter
       final chapter = await into(chapterTables).insertReturning(
         value.copyWith(
           id: Value(value.id.valueOrNull ?? const Uuid().v4().toString()),
@@ -112,16 +112,31 @@ class ChapterV2Dao extends DatabaseAccessor<AppDatabase>
         ),
       );
 
+      /// update existing data with new data until all new data updated
+      final List<ImageDrift> updated = [];
+      List<ImageDrift> existing = await _imageDao.getBy(chapterId: chapter.id);
+      for (final (index, image) in images.indexed) {
+        final data = existing.isEmpty
+            ? const ImageTablesCompanion()
+            : existing.removeAt(0).toCompanion(true);
+
+        updated.add(
+          await _imageDao.add(
+            value: data.copyWith(
+              chapterId: Value(chapter.id),
+              webUrl: Value(image),
+              order: Value(index),
+            ),
+          ),
+        );
+      }
+
+      /// remove all existing data that not updated
+      await _imageDao.remove(ids: [...existing.map((e) => e.id)]);
+
       return ChapterModel(
         chapter: chapter,
-        images: [
-          for (final (index, image) in images.indexed)
-            await _imageDao.add(
-              chapterId: chapter.id,
-              image: image,
-              index: index,
-            ),
-        ],
+        images: updated,
       );
     });
   }

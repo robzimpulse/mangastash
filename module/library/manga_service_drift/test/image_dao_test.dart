@@ -22,7 +22,7 @@ void main() {
     (index) => ImageTablesCompanion(
       id: Value('image_$index'),
       webUrl: Value('web_url_$index'),
-      chapterId: Value('chapter_id_$index'),
+      chapterId: const Value('chapter_id'),
       order: Value(index),
     ),
   );
@@ -32,11 +32,7 @@ void main() {
   group('Image Dao Test', () {
     setUp(() async {
       for (final image in images) {
-        await dao.add(
-          chapterId: 'chapter_id',
-          image: image.webUrl.value,
-          index: image.order.value,
-        );
+        await dao.add(value: image);
       }
     });
 
@@ -45,72 +41,58 @@ void main() {
     group('Add Image', () {
       test('Normal', () async {
         await dao.add(
-          chapterId: 'chapter_id_new',
-          image: 'web_url_new',
-          index: 0,
+          value: const ImageTablesCompanion(
+            webUrl: Value('web_url_new'),
+            chapterId: Value('chapter_id_new'),
+            order: Value(0),
+          ),
         );
 
         expect((await dao.all).length, equals(images.length + 1));
       });
 
-      test('With Conflicting Chapter Id & Web Url & Order', () async {
-        final image = images.first;
+      group('With Empty ID', () {
+        final image = images.first.copyWith(id: const Value.absent());
 
-        expect(
-          () => dao.add(
-            chapterId: 'chapter_id',
-            image: image.webUrl.value,
-            index: image.order.value,
-          ),
-          throwsA(isA<SqliteException>()),
-        );
+        test('With Conflicting Chapter Id & Web Url & Order', () async {
+          expect(
+            () => dao.add(value: image),
+            throwsA(isA<SqliteException>()),
+          );
 
-        expect((await dao.all).length, equals(images.length));
-      });
+          expect((await dao.all).length, equals(images.length));
+        });
 
-      test('With Conflicting Chapter Id & Web Url', () async {
-        final image = images.first;
+        test('With Conflicting Chapter Id & Web Url', () async {
+          expect(
+            () => dao.add(value: image.copyWith(order: const Value(99))),
+            throwsA(isA<SqliteException>()),
+          );
 
-        expect(
-          () => dao.add(
-            chapterId: 'chapter_id',
-            image: image.webUrl.value,
-            index: 99,
-          ),
-          throwsA(isA<SqliteException>()),
-        );
+          expect((await dao.all).length, equals(images.length));
+        });
 
-        expect((await dao.all).length, equals(images.length));
-      });
+        test('With Conflicting Chapter Id & Order', () async {
+          expect(
+            () => dao.add(
+              value: image.copyWith(webUrl: const Value('test_image_url')),
+            ),
+            throwsA(isA<SqliteException>()),
+          );
 
-      test('With Conflicting Chapter Id & Order', () async {
-        final image = images.first;
+          expect((await dao.all).length, equals(images.length));
+        });
 
-        expect(
-          () => dao.add(
-            chapterId: 'chapter_id',
-            image: 'test_image_url',
-            index: image.order.value,
-          ),
-          throwsA(isA<SqliteException>()),
-        );
+        test('With Conflicting Image & Order', () async {
+          expect(
+            () => dao.add(
+              value: image.copyWith(chapterId: const Value('chapter_id_new')),
+            ),
+            throwsA(isA<SqliteException>()),
+          );
 
-        expect((await dao.all).length, equals(images.length));
-      });
-
-      test('With Conflicting Image & Order', () async {
-        final image = images.first;
-
-        expect(
-          () => dao.add(
-            chapterId: 'chapter_id_new',
-            image: image.webUrl.value,
-            index: image.order.value,
-          ),
-          throwsA(isA<SqliteException>()),
-        );
-
-        expect((await dao.all).length, equals(images.length));
+          expect((await dao.all).length, equals(images.length));
+        });
       });
     });
   });
