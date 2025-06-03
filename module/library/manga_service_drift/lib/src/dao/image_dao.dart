@@ -28,23 +28,39 @@ class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
 
   Future<List<ImageDrift>> get all => _selector.get();
 
-  Future<List<ImageDrift>> getBy({String? chapterId}) {
-    final selector = _selector;
-
-    if (chapterId != null) {
-      selector.where((f) => f.chapterId.equals(chapterId));
+  Future<List<ImageDrift>> search({
+    List<String> ids = const [],
+    List<String> webUrls = const [],
+    List<String> chapterIds = const [],
+  }) {
+    Expression<bool> filter($ImageTablesTable f) {
+      return [
+        f.id.isIn(ids.nonEmpty.distinct),
+        f.webUrl.isIn(webUrls.nonEmpty.distinct),
+        f.chapterId.isIn(chapterIds.nonEmpty.distinct),
+      ].fold(const Constant(false), (a, b) => a | b);
     }
+
+    final selector = _selector..where(filter);
 
     return transaction(() => selector.get());
   }
 
   Future<List<ImageDrift>> remove({
     List<String> ids = const [],
+    List<String> webUrls = const [],
     List<String> chapterIds = const [],
   }) {
-    if ([...ids, ...chapterIds].nonEmpty.isEmpty) return Future.value([]);
-    final selector = delete(imageTables)
-      ..where((f) => f.id.isIn(ids) | f.chapterId.isIn(chapterIds));
+    Expression<bool> filter($ImageTablesTable  f) {
+      return [
+        f.id.isIn(ids.nonEmpty.distinct),
+        f.webUrl.isIn(webUrls.nonEmpty.distinct),
+        f.chapterId.isIn(chapterIds.nonEmpty.distinct),
+      ].fold(const Constant(false), (a, b) => a | b);
+    }
+
+    final selector = delete(imageTables)..where(filter);
+
     return transaction(() => selector.goAndReturn());
   }
 

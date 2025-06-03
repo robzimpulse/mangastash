@@ -38,6 +38,67 @@ void main() {
 
     tearDown(() async => await db.clear());
 
+    group('Search Image', () {
+      test('By Chapter ID', () async {
+        expect(
+          (await dao.search(chapterIds: ['chapter_id'])).length,
+          equals(images.length),
+        );
+      });
+
+      test('By Web Url', () async {
+        expect(
+          (await dao.search(webUrls: ['web_url_2'])).length,
+          equals(1),
+        );
+      });
+
+      test('By Id', () async {
+        expect(
+          (await dao.search(ids: ['image_2'])).length,
+          equals(1),
+        );
+      });
+    });
+
+    group('Remove Image', () {
+      test('By Chapter ID', () async {
+        expect(
+          (await dao.remove(chapterIds: ['chapter_id'])).length,
+          equals(images.length),
+        );
+
+        expect(
+          (await dao.all).length,
+          equals(0),
+        );
+      });
+
+      test('By Web Url', () async {
+        expect(
+          (await dao.remove(webUrls: ['web_url_2'])).length,
+          equals(1),
+        );
+
+        expect(
+          (await dao.all).length,
+          equals(images.length - 1),
+        );
+      });
+
+      test('By Id', () async {
+        expect(
+          (await dao.remove(ids: ['image_2'])).length,
+          equals(1),
+        );
+
+        expect(
+          (await dao.all).length,
+          equals(images.length - 1),
+        );
+      });
+    });
+
     group('Add Image', () {
       test('On New Chapter', () async {
         final newImages = List.generate(
