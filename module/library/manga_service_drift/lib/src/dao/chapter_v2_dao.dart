@@ -93,6 +93,21 @@ class ChapterV2Dao extends DatabaseAccessor<AppDatabase>
     return transaction(() => selector.get().then((e) => _parse(e)));
   }
 
+  Future<List<ChapterModel>> remove({required List<String> ids}) {
+    final a = delete(chapterTables)..where((f) => f.id.isIn(ids));
+    return transaction(() async {
+      final chapters = await a.goAndReturn();
+      final images = await _imageDao.remove(chapterIds: ids);
+      return [
+        for (final chapter in chapters)
+          ChapterModel(
+            chapter: chapter,
+            images: [...images.where((e) => e.chapterId == chapter.id)],
+          ),
+      ];
+    });
+  }
+
   Future<ChapterModel> add({
     required ChapterTablesCompanion value,
     List<String> images = const [],

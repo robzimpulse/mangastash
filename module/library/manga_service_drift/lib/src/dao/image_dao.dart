@@ -2,8 +2,10 @@ import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 import '../database/database.dart';
+import '../extension/non_empty_string_list_extension.dart';
 import '../extension/value_or_null_extension.dart';
 import '../tables/image_tables.dart';
+import 'chapter_dao.dart';
 
 part 'image_dao.g.dart';
 
@@ -36,11 +38,14 @@ class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
     return transaction(() => selector.get());
   }
 
-  Future<int> remove({required List<String> ids}) {
-    if (ids.isEmpty) return Future.value(0);
-    return transaction(
-      () => (delete(imageTables)..where((f) => f.id.isIn(ids))).go(),
-    );
+  Future<List<ImageDrift>> remove({
+    List<String> ids = const [],
+    List<String> chapterIds = const [],
+  }) {
+    if ([...ids, ...chapterIds].nonEmpty.isEmpty) return Future.value([]);
+    final selector = delete(imageTables)
+      ..where((f) => f.id.isIn(ids) | f.chapterId.isIn(chapterIds));
+    return transaction(() => selector.goAndReturn());
   }
 
   Future<ImageDrift> add({required ImageTablesCompanion value}) {
