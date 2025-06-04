@@ -31,7 +31,7 @@ mixin SyncChaptersMixin {
         continue;
       }
 
-      if (after.id != before.id) {
+      if (before.id != null && after.id != before.id) {
         changed.add((before, after));
       }
 
@@ -43,10 +43,8 @@ mixin SyncChaptersMixin {
       extra: {
         'before count': values.length,
         'after count': success.length,
-        'inconsistent key count': changed.length,
-        'inconsistent key': {
-          for (final (before, after) in changed) before.id: after.id,
-        },
+        'failed count': failed.length,
+        'changed id count': changed.length,
       },
       name: 'Sync Process',
     );

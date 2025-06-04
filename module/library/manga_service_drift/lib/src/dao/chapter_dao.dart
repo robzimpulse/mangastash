@@ -140,6 +140,7 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
           createdAt: Value(DateTime.now().toIso8601String()),
           updatedAt: Value(DateTime.now().toIso8601String()),
         ),
+        mode: InsertMode.insertOrReplace,
         onConflict: DoUpdate(
           (old) => value.copyWith(
             updatedAt: Value(DateTime.now().toIso8601String()),

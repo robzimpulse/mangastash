@@ -87,6 +87,7 @@ class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
           createdAt: Value(DateTime.now().toIso8601String()),
           updatedAt: Value(DateTime.now().toIso8601String()),
         ),
+        mode: InsertMode.insertOrReplace,
         onConflict: DoUpdate(
           (old) => value.copyWith(
             id: const Value.absent(),

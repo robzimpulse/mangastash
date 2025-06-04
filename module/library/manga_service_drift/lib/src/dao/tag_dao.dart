@@ -75,6 +75,7 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
           createdAt: Value(DateTime.now().toIso8601String()),
           updatedAt: Value(DateTime.now().toIso8601String()),
         ),
+        mode: InsertMode.insertOrReplace,
         onConflict: DoUpdate(
           (old) => value.copyWith(
             id: const Value.absent(),
