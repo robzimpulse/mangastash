@@ -1,12 +1,12 @@
 import 'package:equatable/equatable.dart';
 
-import '../../manga_service_drift.dart';
+import '../database/database.dart';
 
-class LibraryModel extends Equatable {
+class MangaModel extends Equatable {
   final MangaDrift? manga;
   final List<TagDrift> tags;
 
-  const LibraryModel({
+  const MangaModel({
     this.manga,
     this.tags = const [],
   });

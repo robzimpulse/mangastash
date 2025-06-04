@@ -47,8 +47,10 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
 
     if (mangaId == null) return Error(Exception('Empty Manga ID'));
 
-    final raw = await _mangaDao.getManga(mangaId);
-    final result = raw?.let((raw) => Manga.fromDrift(raw.$1, tags: raw.$2));
+    final raw = await _mangaDao.search(ids: [mangaId]);
+    final result = raw.firstOrNull?.let(
+      (e) => e.manga?.let((d) => Manga.fromDrift(d, tags: e.tags)),
+    );
     final url = result?.webUrl;
 
     if (result == null || url == null) {

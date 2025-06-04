@@ -21,8 +21,10 @@ class GetMangaOnMangaDexUseCase with SyncMangasMixin {
         _logBox = logBox;
 
   Future<Result<Manga>> execute({required String mangaId}) async {
-    final raw = await _mangaDao.getManga(mangaId);
-    final result = raw?.let((raw) => Manga.fromDrift(raw.$1, tags: raw.$2));
+    final raw = await _mangaDao.search(ids: [mangaId]);
+    final result = raw.firstOrNull?.let(
+      (e) => e.manga?.let((d) => Manga.fromDrift(d, tags: e.tags)),
+    );
 
     if (result != null) {
       return Success(result);

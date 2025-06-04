@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
 import '../extension/value_or_null_extension.dart';
+import '../tables/relationship_tables.dart';
 import '../tables/tag_tables.dart';
 
 part 'tag_dao.g.dart';
@@ -11,6 +12,7 @@ part 'tag_dao.g.dart';
 @DriftAccessor(
   tables: [
     TagTables,
+    RelationshipTables,
   ],
 )
 class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
@@ -84,5 +86,47 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
         ),
       ),
     );
+  }
+
+  Future<void> attach({required String mangaId, required String tagId}) {
+    return transaction(
+      () => into(relationshipTables).insert(
+        RelationshipTablesCompanion(
+          mangaId: Value(mangaId),
+          tagId: Value(tagId),
+        ),
+        mode: InsertMode.insertOrIgnore,
+      ),
+    );
+  }
+
+  Future<void> detach({
+    List<String> mangaIds = const [],
+    List<String> tagIds = const [],
+  }) {
+    final selector = delete(relationshipTables)
+      ..where(
+        (f) => [
+          f.mangaId.isIn(mangaIds.nonEmpty.distinct),
+          f.tagId.isIn(tagIds.nonEmpty.distinct),
+        ].fold(const Constant(false), (a, b) => a | b),
+      );
+
+    return transaction(() => selector.go());
+  }
+
+  Future<List<RelationshipTable>> relationship({
+    List<String> mangaIds = const [],
+    List<String> tagIds = const [],
+  }) {
+    final selector = select(relationshipTables)
+      ..where(
+        (f) => [
+          f.mangaId.isIn(mangaIds.nonEmpty.distinct),
+          f.tagId.isIn(tagIds.nonEmpty.distinct),
+        ].fold(const Constant(false), (a, b) => a | b),
+      );
+
+    return transaction(() => selector.get());
   }
 }

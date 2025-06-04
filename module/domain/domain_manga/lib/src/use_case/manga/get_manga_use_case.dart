@@ -33,9 +33,11 @@ class GetMangaUseCase with SyncMangasMixin {
       return Error(Exception('Empty Source'));
     }
 
-    final raw = await _mangaDao.getManga(mangaId);
+    final raw = await _mangaDao.search(ids: [mangaId]);
 
-    final result = raw?.let((raw) => Manga.fromDrift(raw.$1, tags: raw.$2));
+    final result = raw.firstOrNull?.let(
+      (e) => e.manga?.let((d) => Manga.fromDrift(d, tags: e.tags)),
+    );
 
     final url = result?.webUrl;
 
