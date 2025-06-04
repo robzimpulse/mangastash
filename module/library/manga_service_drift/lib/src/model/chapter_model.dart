@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 
 import '../database/database.dart';
 
-class ChapterModel extends Equatable{
+class ChapterModel extends Equatable {
   final ChapterDrift? chapter;
   final List<ImageDrift> images;
 

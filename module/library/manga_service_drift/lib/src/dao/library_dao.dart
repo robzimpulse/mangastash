@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 
 import '../database/database.dart';
+import '../model/library_model.dart';
 import '../tables/library_tables.dart';
 import '../tables/manga_tables.dart';
 import '../tables/relationship_tables.dart';
@@ -45,20 +46,20 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
     )..orderBy(order);
   }
 
-  List<(MangaDrift, List<TagDrift>)> _parse(List<TypedResult> rows) {
+  List<LibraryModel> _parse(List<TypedResult> rows) {
     final groups = rows.groupListsBy((e) => e.readTableOrNull(mangaTables));
     return [
       for (final key in groups.keys.nonNulls)
-        (
-          key,
-          [
+        LibraryModel(
+          manga: key,
+          tags: [
             ...?groups[key]?.map((e) => e.readTableOrNull(tagTables)).nonNulls,
           ],
         ),
     ];
   }
 
-  Stream<List<(MangaDrift, List<TagDrift>)>> get stream {
+  Stream<List<LibraryModel>> get stream {
     return _aggregate.watch().map((rows) => _parse(rows));
   }
 
@@ -75,7 +76,7 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
     return transaction(() => s.go());
   }
 
-  Future<List<(MangaDrift, List<TagDrift>)>> get() {
+  Future<List<LibraryModel>> get() {
     return _aggregate.get().then((rows) => _parse(rows));
   }
 }

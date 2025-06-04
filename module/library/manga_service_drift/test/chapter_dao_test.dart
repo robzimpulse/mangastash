@@ -68,6 +68,7 @@ void main() {
       test('Add Value', () async {
         await dao.add(value: chapter.$1, images: chapter.$2);
         expect((await dao.all).length, equals(chapters.length + 1));
+        expect((await imageDao.all).length, equals((chapters.length + 1) * 10));
       });
 
       group('Search Value', () {
@@ -130,6 +131,7 @@ void main() {
       test('Add Value', () async {
         await dao.add(value: chapter.$1, images: chapter.$2);
         expect((await dao.all).length, equals(chapters.length));
+        expect((await imageDao.all).length, equals((chapters.length) * 10));
       });
 
       group('Search Value', () {
