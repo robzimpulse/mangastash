@@ -5,7 +5,6 @@ import 'package:uuid/uuid.dart';
 import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
 import '../extension/value_or_null_extension.dart';
-import '../tables/library_tables.dart';
 import '../tables/manga_tables.dart';
 import '../tables/relationship_tables.dart';
 import '../tables/tag_tables.dart';
@@ -17,7 +16,6 @@ part 'manga_dao.g.dart';
     MangaTables,
     TagTables,
     RelationshipTables,
-    LibraryTables,
   ],
 )
 class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
