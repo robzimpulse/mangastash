@@ -5,7 +5,7 @@ import 'package:manga_service_drift/manga_service_drift.dart';
 
 void main() {
   late AppDatabase db;
-  late ChapterV2Dao dao;
+  late ChapterDao dao;
   late ImageDao imageDao;
 
   setUp(() {
@@ -15,7 +15,7 @@ void main() {
         closeStreamsSynchronously: true,
       ),
     );
-    dao = ChapterV2Dao(db);
+    dao = ChapterDao(db);
     imageDao = ImageDao(db);
   });
 

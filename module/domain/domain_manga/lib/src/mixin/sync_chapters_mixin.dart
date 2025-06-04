@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
@@ -8,33 +9,48 @@ mixin SyncChaptersMixin {
     required List<MangaChapter> values,
     required LogBox logBox,
   }) async {
-    final before = {
-      for (final chapter in values) chapter.toDrift: (chapter.images ?? []),
-    };
+    final success = <MangaChapter>[];
+    final failed = <MangaChapter>[];
+    final changed = <(MangaChapter, MangaChapter)>[];
 
-    final results = await chapterDao.sync(before);
+    for (final before in values) {
+      final result = await chapterDao.add(
+        value: before.toDrift,
+        images: [...?before.images],
+      );
 
-    final after = [
-      for (final result in results.entries)
-        MangaChapter.fromDrift(result.key, images: result.value),
-    ];
+      final after = result.chapter?.let(
+        (e) => MangaChapter.fromDrift(
+          e,
+          images: result.images,
+        ),
+      );
 
-    final idsBefore = {...before.keys.map((e) => e.id.valueOrNull).nonNulls};
-    final idsAfter = {...after.map((e) => e.id).nonNulls};
-    final idsDifference = idsBefore.union(idsAfter)
-      ..removeAll(idsBefore.intersection(idsAfter));
+      if (after == null) {
+        failed.add(before);
+        continue;
+      }
+
+      if (after.id != before.id) {
+        changed.add((before, after));
+      }
+
+      success.add(after);
+    }
 
     logBox.log(
       'Insert & Update Chapter',
       extra: {
-        'before count': before.length,
-        'after count': after.length,
-        'inconsistent key count': idsDifference.length,
-        'inconsistent key': '$idsDifference',
+        'before count': values.length,
+        'after count': success.length,
+        'inconsistent key count': changed.length,
+        'inconsistent key': {
+          for (final (before, after) in changed) before.id: after.id,
+        },
       },
       name: 'Sync Process',
     );
 
-    return after;
+    return success;
   }
 }

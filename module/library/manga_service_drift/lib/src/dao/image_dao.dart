@@ -5,7 +5,6 @@ import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
 import '../extension/value_or_null_extension.dart';
 import '../tables/image_tables.dart';
-import 'chapter_dao.dart';
 
 part 'image_dao.g.dart';
 

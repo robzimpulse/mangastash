@@ -6,7 +6,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 
 import '../dao/chapter_dao.dart';
-import '../dao/chapter_v2_dao.dart';
 import '../dao/image_dao.dart';
 import '../dao/job_dao.dart';
 import '../dao/library_dao.dart';
@@ -38,12 +37,10 @@ part 'database.g.dart';
   daos: [
     MangaDao,
     ChapterDao,
-
     LibraryDao,
     JobDao,
     ImageDao,
     TagDao,
-    ChapterV2Dao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
