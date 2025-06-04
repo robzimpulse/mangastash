@@ -47,55 +47,142 @@ void main() {
 
     tearDown(() async => await db.clear());
 
-    group('Add Chapter', () {
-      group('With New Manga', () {
-        final chapter = ChapterTablesCompanion(
-          webUrl: Value('web_url_${chapters.length + 1}'),
-        );
+    group('With New Value', () {
+      final chapter = (
+        const ChapterTablesCompanion(
+          id: Value('id_new'),
+          title: Value('title_new'),
+          mangaId: Value('manga_id_new'),
+          volume: Value('volume_new'),
+          chapter: Value('chapter_new'),
+          translatedLanguage: Value('translated_language_nee'),
+          scanlationGroup: Value('scanlation_group_nre'),
+          webUrl: Value('web_url_new'),
+        ),
+        List.generate(
+          10,
+          (imgIdx) => 'chapter_id_new_image_url_$imgIdx',
+        ),
+      );
 
-        test('With New Image', () async {
-          final images = List.generate(
-            10,
-            (index) => 'chapter_id_${chapters.length + 1}_image_url_$index',
-          );
+      test('Add Value', () async {
+        await dao.add(value: chapter.$1, images: chapter.$2);
+        expect((await dao.all).length, equals(chapters.length + 1));
+      });
 
-          await dao.add(value: chapter, images: images);
-
-          expect((await dao.all).length, equals(chapters.length + 1));
+      group('Search Value', () {
+        test('By Id', () async {
           expect(
-            (await imageDao.all).length,
-            equals((chapters.length + 1) * 10),
+            (await dao.search(ids: [chapter.$1.id.value])).length,
+            equals(0),
           );
         });
-
-        test('With Old Image', () async {
-          final images = chapters.first.$2;
-
-          expect(
-            () => dao.add(value: chapter, images: images),
-            throwsA(isA<SqliteException>()),
+        test('By Manga Id', () async {
+          final result = await dao.search(
+            mangaIds: [chapter.$1.mangaId.value!],
           );
-
-          expect((await dao.all).length, equals(chapters.length));
-          expect((await imageDao.all).length, equals((chapters.length) * 10));
+          expect(result.length, equals(0));
+        });
+        test('By Title', () async {
+          expect(
+            (await dao.search(titles: [chapter.$1.title.value!])).length,
+            equals(0),
+          );
+        });
+        test('By Volume', () async {
+          expect(
+            (await dao.search(volumes: [chapter.$1.volume.value!])).length,
+            equals(0),
+          );
+        });
+        test('By Chapter', () async {
+          expect(
+            (await dao.search(chapters: [chapter.$1.chapter.value!])).length,
+            equals(0),
+          );
+        });
+        test('By Translated Language', () async {
+          final result = await dao.search(
+            translatedLanguages: [chapter.$1.translatedLanguage.value!],
+          );
+          expect(result.length, equals(0));
+        });
+        test('By Scanlation Group', () async {
+          final result = await dao.search(
+            scanlationGroups: [chapter.$1.scanlationGroup.value!],
+          );
+          expect(result.length, equals(0));
+        });
+        test('By Web Url', () async {
+          expect(
+            (await dao.search(webUrls: [chapter.$1.webUrl.value!])).length,
+            equals(0),
+          );
         });
       });
 
-      test('With Conflicting Manga ID and Web Url', () async {
-        expect(
-          () => dao.add(
-            value: const ChapterTablesCompanion(
-              mangaId: Value('manga_id_1'),
-              webUrl: Value('web_url_1'),
-            ),
-            images: List.generate(
-              100,
-              (index) => 'chapter_id_1_image_url_$index',
-            ),
-          ),
-          throwsA(isA<SqliteException>()),
-        );
+
+    });
+
+    group('With Old Value', () {
+      final chapter = ([...chapters]..shuffle()).first;
+
+      test('Add Value', () async {
+        await dao.add(value: chapter.$1, images: chapter.$2);
+        expect((await dao.all).length, equals(chapters.length));
       });
+
+      group('Search Value', () {
+        test('By Id', () async {
+          expect(
+            (await dao.search(ids: [chapter.$1.id.value])).length,
+            equals(1),
+          );
+        });
+        test('By Manga Id', () async {
+          final result = await dao.search(
+            mangaIds: [chapter.$1.mangaId.value!],
+          );
+          expect(result.length, equals(chapters.length));
+        });
+        test('By Title', () async {
+          expect(
+            (await dao.search(titles: [chapter.$1.title.value!])).length,
+            equals(1),
+          );
+        });
+        test('By Volume', () async {
+          expect(
+            (await dao.search(volumes: [chapter.$1.volume.value!])).length,
+            equals(1),
+          );
+        });
+        test('By Chapter', () async {
+          expect(
+            (await dao.search(chapters: [chapter.$1.chapter.value!])).length,
+            equals(1),
+          );
+        });
+        test('By Translated Language', () async {
+          final result = await dao.search(
+            translatedLanguages: [chapter.$1.translatedLanguage.value!],
+          );
+          expect(result.length, equals(1));
+        });
+        test('By Scanlation Group', () async {
+          final result = await dao.search(
+            scanlationGroups: [chapter.$1.scanlationGroup.value!],
+          );
+          expect(result.length, equals(1));
+        });
+        test('By Web Url', () async {
+          expect(
+            (await dao.search(webUrls: [chapter.$1.webUrl.value!])).length,
+            equals(1),
+          );
+        });
+      });
+
     });
   });
 }
