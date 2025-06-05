@@ -164,11 +164,14 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
             webUrl: value.webUrl.valueOrNull?.let((e) => Constant(e)),
             readableAt: value.readableAt.valueOrNull?.let((e) => Constant(e)),
             publishAt: value.publishAt.valueOrNull?.let((e) => Constant(e)),
-            lastReadAt: value.lastReadAt.valueOrNull?.let(
-              (e) => CaseWhenExpression(
-                cases: [CaseWhen(old.lastReadAt.isNull(), then: Constant(e))],
-                orElse: old.lastReadAt,
-              ),
+            lastReadAt: CaseWhenExpression(
+              cases: [
+                CaseWhen(
+                  old.lastReadAt.isNull(),
+                  then: Constant(value.lastReadAt.valueOrNull),
+                ),
+              ],
+              orElse: old.lastReadAt,
             ),
           ),
         ),
