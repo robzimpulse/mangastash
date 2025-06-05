@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
 
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
@@ -79,7 +80,11 @@ Future<QueryExecutor> _openConnection({LoggerCallback? logger}) async {
   return driftDatabase(
     name: 'mangastash-local',
     native: DriftNativeOptions(
-      databaseDirectory: () => getApplicationDocumentsDirectory(),
+      databaseDirectory: () {
+        final path = getApplicationDocumentsDirectory();
+        logger?.call('Database location: $path',name: 'AppDatabase');
+        return path;
+      },
     ),
     web: DriftWebOptions(
       sqlite3Wasm: Uri.parse('sqlite3.wasm'),
