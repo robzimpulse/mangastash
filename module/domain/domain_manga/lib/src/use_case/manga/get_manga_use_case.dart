@@ -33,6 +33,10 @@ class GetMangaUseCase with SyncMangasMixin {
       return Error(Exception('Empty Source'));
     }
 
+    if (source == MangaSourceEnum.mangadex) {
+      return _getMangaOnMangaDexUseCase.execute(mangaId: mangaId);
+    }
+
     final raw = await _mangaDao.search(ids: [mangaId]);
 
     final result = raw.firstOrNull?.let(
@@ -53,10 +57,6 @@ class GetMangaUseCase with SyncMangasMixin {
 
     if (isValid) {
       return Success(result);
-    }
-
-    if (source == MangaSourceEnum.mangadex) {
-      return _getMangaOnMangaDexUseCase.execute(mangaId: mangaId);
     }
 
     final document = await _webview.open(url);
