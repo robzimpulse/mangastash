@@ -2,6 +2,7 @@ library manga_service_drift;
 
 export 'package:drift/src/runtime/data_class.dart';
 
+export 'src/dao/cache_dao.dart';
 export 'src/dao/chapter_dao.dart';
 export 'src/dao/image_dao.dart';
 export 'src/dao/job_dao.dart';

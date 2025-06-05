@@ -5,6 +5,7 @@ import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 
+import '../dao/cache_dao.dart';
 import '../dao/chapter_dao.dart';
 import '../dao/image_dao.dart';
 import '../dao/job_dao.dart';
@@ -12,6 +13,7 @@ import '../dao/library_dao.dart';
 import '../dao/manga_dao.dart';
 import '../dao/tag_dao.dart';
 import '../interceptor/log_interceptor.dart';
+import '../tables/cache_tables.dart';
 import '../tables/chapter_tables.dart';
 import '../tables/image_tables.dart';
 import '../tables/job_tables.dart';
@@ -33,6 +35,7 @@ part 'database.g.dart';
     TagTables,
     RelationshipTables,
     JobTables,
+    CacheTables,
   ],
   daos: [
     MangaDao,
@@ -41,6 +44,7 @@ part 'database.g.dart';
     JobDao,
     ImageDao,
     TagDao,
+    CacheDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {

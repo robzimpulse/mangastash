@@ -2690,6 +2690,499 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
   }
 }
 
+class $CacheTablesTable extends CacheTables
+    with TableInfo<$CacheTablesTable, CacheDrift> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CacheTablesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => DateTime.timestamp().toIso8601String());
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => DateTime.timestamp().toIso8601String());
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _urlMeta = const VerificationMeta('url');
+  @override
+  late final GeneratedColumn<String> url = GeneratedColumn<String>(
+      'url', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _keyMeta = const VerificationMeta('key');
+  @override
+  late final GeneratedColumn<String> key = GeneratedColumn<String>(
+      'key', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _relativePathMeta =
+      const VerificationMeta('relativePath');
+  @override
+  late final GeneratedColumn<String> relativePath = GeneratedColumn<String>(
+      'relativePath', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _eTagMeta = const VerificationMeta('eTag');
+  @override
+  late final GeneratedColumn<String> eTag = GeneratedColumn<String>(
+      'e_tag', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _validTillMeta =
+      const VerificationMeta('validTill');
+  @override
+  late final GeneratedColumn<DateTime> validTill = GeneratedColumn<DateTime>(
+      'valid_till', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _touchedMeta =
+      const VerificationMeta('touched');
+  @override
+  late final GeneratedColumn<DateTime> touched = GeneratedColumn<DateTime>(
+      'touched', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _lengthMeta = const VerificationMeta('length');
+  @override
+  late final GeneratedColumn<int> length = GeneratedColumn<int>(
+      'length', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        createdAt,
+        updatedAt,
+        id,
+        url,
+        key,
+        relativePath,
+        eTag,
+        validTill,
+        touched,
+        length
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cache_tables';
+  @override
+  VerificationContext validateIntegrity(Insertable<CacheDrift> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('url')) {
+      context.handle(
+          _urlMeta, url.isAcceptableOrUnknown(data['url']!, _urlMeta));
+    } else if (isInserting) {
+      context.missing(_urlMeta);
+    }
+    if (data.containsKey('key')) {
+      context.handle(
+          _keyMeta, key.isAcceptableOrUnknown(data['key']!, _keyMeta));
+    } else if (isInserting) {
+      context.missing(_keyMeta);
+    }
+    if (data.containsKey('relativePath')) {
+      context.handle(
+          _relativePathMeta,
+          relativePath.isAcceptableOrUnknown(
+              data['relativePath']!, _relativePathMeta));
+    } else if (isInserting) {
+      context.missing(_relativePathMeta);
+    }
+    if (data.containsKey('e_tag')) {
+      context.handle(
+          _eTagMeta, eTag.isAcceptableOrUnknown(data['e_tag']!, _eTagMeta));
+    }
+    if (data.containsKey('valid_till')) {
+      context.handle(_validTillMeta,
+          validTill.isAcceptableOrUnknown(data['valid_till']!, _validTillMeta));
+    } else if (isInserting) {
+      context.missing(_validTillMeta);
+    }
+    if (data.containsKey('touched')) {
+      context.handle(_touchedMeta,
+          touched.isAcceptableOrUnknown(data['touched']!, _touchedMeta));
+    }
+    if (data.containsKey('length')) {
+      context.handle(_lengthMeta,
+          length.isAcceptableOrUnknown(data['length']!, _lengthMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CacheDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CacheDrift(
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}updated_at'])!,
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      url: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}url'])!,
+      key: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}key'])!,
+      relativePath: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}relativePath'])!,
+      eTag: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}e_tag']),
+      validTill: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}valid_till'])!,
+      touched: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}touched']),
+      length: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}length']),
+    );
+  }
+
+  @override
+  $CacheTablesTable createAlias(String alias) {
+    return $CacheTablesTable(attachedDatabase, alias);
+  }
+}
+
+class CacheDrift extends DataClass implements Insertable<CacheDrift> {
+  final String createdAt;
+  final String updatedAt;
+  final int id;
+  final String url;
+  final String key;
+  final String relativePath;
+  final String? eTag;
+  final DateTime validTill;
+  final DateTime? touched;
+  final int? length;
+  const CacheDrift(
+      {required this.createdAt,
+      required this.updatedAt,
+      required this.id,
+      required this.url,
+      required this.key,
+      required this.relativePath,
+      this.eTag,
+      required this.validTill,
+      this.touched,
+      this.length});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    map['id'] = Variable<int>(id);
+    map['url'] = Variable<String>(url);
+    map['key'] = Variable<String>(key);
+    map['relativePath'] = Variable<String>(relativePath);
+    if (!nullToAbsent || eTag != null) {
+      map['e_tag'] = Variable<String>(eTag);
+    }
+    map['valid_till'] = Variable<DateTime>(validTill);
+    if (!nullToAbsent || touched != null) {
+      map['touched'] = Variable<DateTime>(touched);
+    }
+    if (!nullToAbsent || length != null) {
+      map['length'] = Variable<int>(length);
+    }
+    return map;
+  }
+
+  CacheTablesCompanion toCompanion(bool nullToAbsent) {
+    return CacheTablesCompanion(
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      id: Value(id),
+      url: Value(url),
+      key: Value(key),
+      relativePath: Value(relativePath),
+      eTag: eTag == null && nullToAbsent ? const Value.absent() : Value(eTag),
+      validTill: Value(validTill),
+      touched: touched == null && nullToAbsent
+          ? const Value.absent()
+          : Value(touched),
+      length:
+          length == null && nullToAbsent ? const Value.absent() : Value(length),
+    );
+  }
+
+  factory CacheDrift.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CacheDrift(
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      id: serializer.fromJson<int>(json['id']),
+      url: serializer.fromJson<String>(json['url']),
+      key: serializer.fromJson<String>(json['key']),
+      relativePath: serializer.fromJson<String>(json['relativePath']),
+      eTag: serializer.fromJson<String?>(json['eTag']),
+      validTill: serializer.fromJson<DateTime>(json['validTill']),
+      touched: serializer.fromJson<DateTime?>(json['touched']),
+      length: serializer.fromJson<int?>(json['length']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+      'id': serializer.toJson<int>(id),
+      'url': serializer.toJson<String>(url),
+      'key': serializer.toJson<String>(key),
+      'relativePath': serializer.toJson<String>(relativePath),
+      'eTag': serializer.toJson<String?>(eTag),
+      'validTill': serializer.toJson<DateTime>(validTill),
+      'touched': serializer.toJson<DateTime?>(touched),
+      'length': serializer.toJson<int?>(length),
+    };
+  }
+
+  CacheDrift copyWith(
+          {String? createdAt,
+          String? updatedAt,
+          int? id,
+          String? url,
+          String? key,
+          String? relativePath,
+          Value<String?> eTag = const Value.absent(),
+          DateTime? validTill,
+          Value<DateTime?> touched = const Value.absent(),
+          Value<int?> length = const Value.absent()}) =>
+      CacheDrift(
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        id: id ?? this.id,
+        url: url ?? this.url,
+        key: key ?? this.key,
+        relativePath: relativePath ?? this.relativePath,
+        eTag: eTag.present ? eTag.value : this.eTag,
+        validTill: validTill ?? this.validTill,
+        touched: touched.present ? touched.value : this.touched,
+        length: length.present ? length.value : this.length,
+      );
+  CacheDrift copyWithCompanion(CacheTablesCompanion data) {
+    return CacheDrift(
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      id: data.id.present ? data.id.value : this.id,
+      url: data.url.present ? data.url.value : this.url,
+      key: data.key.present ? data.key.value : this.key,
+      relativePath: data.relativePath.present
+          ? data.relativePath.value
+          : this.relativePath,
+      eTag: data.eTag.present ? data.eTag.value : this.eTag,
+      validTill: data.validTill.present ? data.validTill.value : this.validTill,
+      touched: data.touched.present ? data.touched.value : this.touched,
+      length: data.length.present ? data.length.value : this.length,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CacheDrift(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('id: $id, ')
+          ..write('url: $url, ')
+          ..write('key: $key, ')
+          ..write('relativePath: $relativePath, ')
+          ..write('eTag: $eTag, ')
+          ..write('validTill: $validTill, ')
+          ..write('touched: $touched, ')
+          ..write('length: $length')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(createdAt, updatedAt, id, url, key,
+      relativePath, eTag, validTill, touched, length);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CacheDrift &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.id == this.id &&
+          other.url == this.url &&
+          other.key == this.key &&
+          other.relativePath == this.relativePath &&
+          other.eTag == this.eTag &&
+          other.validTill == this.validTill &&
+          other.touched == this.touched &&
+          other.length == this.length);
+}
+
+class CacheTablesCompanion extends UpdateCompanion<CacheDrift> {
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<int> id;
+  final Value<String> url;
+  final Value<String> key;
+  final Value<String> relativePath;
+  final Value<String?> eTag;
+  final Value<DateTime> validTill;
+  final Value<DateTime?> touched;
+  final Value<int?> length;
+  const CacheTablesCompanion({
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.id = const Value.absent(),
+    this.url = const Value.absent(),
+    this.key = const Value.absent(),
+    this.relativePath = const Value.absent(),
+    this.eTag = const Value.absent(),
+    this.validTill = const Value.absent(),
+    this.touched = const Value.absent(),
+    this.length = const Value.absent(),
+  });
+  CacheTablesCompanion.insert({
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.id = const Value.absent(),
+    required String url,
+    required String key,
+    required String relativePath,
+    this.eTag = const Value.absent(),
+    required DateTime validTill,
+    this.touched = const Value.absent(),
+    this.length = const Value.absent(),
+  })  : url = Value(url),
+        key = Value(key),
+        relativePath = Value(relativePath),
+        validTill = Value(validTill);
+  static Insertable<CacheDrift> custom({
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<int>? id,
+    Expression<String>? url,
+    Expression<String>? key,
+    Expression<String>? relativePath,
+    Expression<String>? eTag,
+    Expression<DateTime>? validTill,
+    Expression<DateTime>? touched,
+    Expression<int>? length,
+  }) {
+    return RawValuesInsertable({
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (id != null) 'id': id,
+      if (url != null) 'url': url,
+      if (key != null) 'key': key,
+      if (relativePath != null) 'relativePath': relativePath,
+      if (eTag != null) 'e_tag': eTag,
+      if (validTill != null) 'valid_till': validTill,
+      if (touched != null) 'touched': touched,
+      if (length != null) 'length': length,
+    });
+  }
+
+  CacheTablesCompanion copyWith(
+      {Value<String>? createdAt,
+      Value<String>? updatedAt,
+      Value<int>? id,
+      Value<String>? url,
+      Value<String>? key,
+      Value<String>? relativePath,
+      Value<String?>? eTag,
+      Value<DateTime>? validTill,
+      Value<DateTime?>? touched,
+      Value<int?>? length}) {
+    return CacheTablesCompanion(
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      id: id ?? this.id,
+      url: url ?? this.url,
+      key: key ?? this.key,
+      relativePath: relativePath ?? this.relativePath,
+      eTag: eTag ?? this.eTag,
+      validTill: validTill ?? this.validTill,
+      touched: touched ?? this.touched,
+      length: length ?? this.length,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (createdAt.present) {
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (url.present) {
+      map['url'] = Variable<String>(url.value);
+    }
+    if (key.present) {
+      map['key'] = Variable<String>(key.value);
+    }
+    if (relativePath.present) {
+      map['relativePath'] = Variable<String>(relativePath.value);
+    }
+    if (eTag.present) {
+      map['e_tag'] = Variable<String>(eTag.value);
+    }
+    if (validTill.present) {
+      map['valid_till'] = Variable<DateTime>(validTill.value);
+    }
+    if (touched.present) {
+      map['touched'] = Variable<DateTime>(touched.value);
+    }
+    if (length.present) {
+      map['length'] = Variable<int>(length.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CacheTablesCompanion(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('id: $id, ')
+          ..write('url: $url, ')
+          ..write('key: $key, ')
+          ..write('relativePath: $relativePath, ')
+          ..write('eTag: $eTag, ')
+          ..write('validTill: $validTill, ')
+          ..write('touched: $touched, ')
+          ..write('length: $length')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2701,12 +3194,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $RelationshipTablesTable relationshipTables =
       $RelationshipTablesTable(this);
   late final $JobTablesTable jobTables = $JobTablesTable(this);
+  late final $CacheTablesTable cacheTables = $CacheTablesTable(this);
   late final MangaDao mangaDao = MangaDao(this as AppDatabase);
   late final ChapterDao chapterDao = ChapterDao(this as AppDatabase);
   late final LibraryDao libraryDao = LibraryDao(this as AppDatabase);
   late final JobDao jobDao = JobDao(this as AppDatabase);
   late final ImageDao imageDao = ImageDao(this as AppDatabase);
   late final TagDao tagDao = TagDao(this as AppDatabase);
+  late final CacheDao cacheDao = CacheDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2718,7 +3213,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         mangaTables,
         tagTables,
         relationshipTables,
-        jobTables
+        jobTables,
+        cacheTables
       ];
 }
 
@@ -4096,6 +4592,243 @@ typedef $$JobTablesTableProcessedTableManager = ProcessedTableManager<
     (JobDrift, BaseReferences<_$AppDatabase, $JobTablesTable, JobDrift>),
     JobDrift,
     PrefetchHooks Function()>;
+typedef $$CacheTablesTableCreateCompanionBuilder = CacheTablesCompanion
+    Function({
+  Value<String> createdAt,
+  Value<String> updatedAt,
+  Value<int> id,
+  required String url,
+  required String key,
+  required String relativePath,
+  Value<String?> eTag,
+  required DateTime validTill,
+  Value<DateTime?> touched,
+  Value<int?> length,
+});
+typedef $$CacheTablesTableUpdateCompanionBuilder = CacheTablesCompanion
+    Function({
+  Value<String> createdAt,
+  Value<String> updatedAt,
+  Value<int> id,
+  Value<String> url,
+  Value<String> key,
+  Value<String> relativePath,
+  Value<String?> eTag,
+  Value<DateTime> validTill,
+  Value<DateTime?> touched,
+  Value<int?> length,
+});
+
+class $$CacheTablesTableFilterComposer
+    extends Composer<_$AppDatabase, $CacheTablesTable> {
+  $$CacheTablesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get url => $composableBuilder(
+      column: $table.url, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get key => $composableBuilder(
+      column: $table.key, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get relativePath => $composableBuilder(
+      column: $table.relativePath, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get eTag => $composableBuilder(
+      column: $table.eTag, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get validTill => $composableBuilder(
+      column: $table.validTill, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get touched => $composableBuilder(
+      column: $table.touched, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get length => $composableBuilder(
+      column: $table.length, builder: (column) => ColumnFilters(column));
+}
+
+class $$CacheTablesTableOrderingComposer
+    extends Composer<_$AppDatabase, $CacheTablesTable> {
+  $$CacheTablesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get url => $composableBuilder(
+      column: $table.url, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get key => $composableBuilder(
+      column: $table.key, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get relativePath => $composableBuilder(
+      column: $table.relativePath,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get eTag => $composableBuilder(
+      column: $table.eTag, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get validTill => $composableBuilder(
+      column: $table.validTill, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get touched => $composableBuilder(
+      column: $table.touched, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get length => $composableBuilder(
+      column: $table.length, builder: (column) => ColumnOrderings(column));
+}
+
+class $$CacheTablesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CacheTablesTable> {
+  $$CacheTablesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get url =>
+      $composableBuilder(column: $table.url, builder: (column) => column);
+
+  GeneratedColumn<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => column);
+
+  GeneratedColumn<String> get relativePath => $composableBuilder(
+      column: $table.relativePath, builder: (column) => column);
+
+  GeneratedColumn<String> get eTag =>
+      $composableBuilder(column: $table.eTag, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get validTill =>
+      $composableBuilder(column: $table.validTill, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get touched =>
+      $composableBuilder(column: $table.touched, builder: (column) => column);
+
+  GeneratedColumn<int> get length =>
+      $composableBuilder(column: $table.length, builder: (column) => column);
+}
+
+class $$CacheTablesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $CacheTablesTable,
+    CacheDrift,
+    $$CacheTablesTableFilterComposer,
+    $$CacheTablesTableOrderingComposer,
+    $$CacheTablesTableAnnotationComposer,
+    $$CacheTablesTableCreateCompanionBuilder,
+    $$CacheTablesTableUpdateCompanionBuilder,
+    (CacheDrift, BaseReferences<_$AppDatabase, $CacheTablesTable, CacheDrift>),
+    CacheDrift,
+    PrefetchHooks Function()> {
+  $$CacheTablesTableTableManager(_$AppDatabase db, $CacheTablesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CacheTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CacheTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CacheTablesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> createdAt = const Value.absent(),
+            Value<String> updatedAt = const Value.absent(),
+            Value<int> id = const Value.absent(),
+            Value<String> url = const Value.absent(),
+            Value<String> key = const Value.absent(),
+            Value<String> relativePath = const Value.absent(),
+            Value<String?> eTag = const Value.absent(),
+            Value<DateTime> validTill = const Value.absent(),
+            Value<DateTime?> touched = const Value.absent(),
+            Value<int?> length = const Value.absent(),
+          }) =>
+              CacheTablesCompanion(
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            id: id,
+            url: url,
+            key: key,
+            relativePath: relativePath,
+            eTag: eTag,
+            validTill: validTill,
+            touched: touched,
+            length: length,
+          ),
+          createCompanionCallback: ({
+            Value<String> createdAt = const Value.absent(),
+            Value<String> updatedAt = const Value.absent(),
+            Value<int> id = const Value.absent(),
+            required String url,
+            required String key,
+            required String relativePath,
+            Value<String?> eTag = const Value.absent(),
+            required DateTime validTill,
+            Value<DateTime?> touched = const Value.absent(),
+            Value<int?> length = const Value.absent(),
+          }) =>
+              CacheTablesCompanion.insert(
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            id: id,
+            url: url,
+            key: key,
+            relativePath: relativePath,
+            eTag: eTag,
+            validTill: validTill,
+            touched: touched,
+            length: length,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$CacheTablesTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $CacheTablesTable,
+    CacheDrift,
+    $$CacheTablesTableFilterComposer,
+    $$CacheTablesTableOrderingComposer,
+    $$CacheTablesTableAnnotationComposer,
+    $$CacheTablesTableCreateCompanionBuilder,
+    $$CacheTablesTableUpdateCompanionBuilder,
+    (CacheDrift, BaseReferences<_$AppDatabase, $CacheTablesTable, CacheDrift>),
+    CacheDrift,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4114,4 +4847,6 @@ class $AppDatabaseManager {
       $$RelationshipTablesTableTableManager(_db, _db.relationshipTables);
   $$JobTablesTableTableManager get jobTables =>
       $$JobTablesTableTableManager(_db, _db.jobTables);
+  $$CacheTablesTableTableManager get cacheTables =>
+      $$CacheTablesTableTableManager(_db, _db.cacheTables);
 }

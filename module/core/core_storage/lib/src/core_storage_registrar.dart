@@ -53,6 +53,7 @@ class CoreStorageRegistrar extends Registrar {
       locator.registerFactory(() => ChapterDao(locator()));
       locator.registerFactory(() => LibraryDao(locator()));
       locator.registerFactory(() => JobDao(locator()));
+      locator.registerFactory(() => CacheDao(locator()));
 
       locator.registerSingleton(await SharedPreferencesStorage.create());
       locator.alias<Storage, SharedPreferencesStorage>();
@@ -65,7 +66,7 @@ class CoreStorageRegistrar extends Registrar {
       locator.alias<SetBackupPathUseCase, PathManager>();
 
       locator.registerSingleton(
-        CustomCacheManager(dio: locator()),
+        CustomCacheManager(dio: locator(), dao: () => locator()),
         dispose: (e) => e.dispose(),
       );
       locator.alias<BaseCacheManager, CustomCacheManager>();
