@@ -58,7 +58,7 @@ class AppDatabase extends _$AppDatabase {
   }) : super(
           LazyDatabase(
             () async => (executor ?? await _openConnection(logger: logger))
-              ..interceptWith(LogInterceptor(logger: logger)),
+                .interceptWith(LogInterceptor(logger: logger)),
           ),
         );
 
@@ -82,7 +82,7 @@ Future<QueryExecutor> _openConnection({LoggerCallback? logger}) async {
     native: DriftNativeOptions(
       databaseDirectory: () => getApplicationDocumentsDirectory().then(
         (value) {
-          logger?.call('Database location: $value',name: 'AppDatabase');
+          logger?.call('Database location: $value', name: 'AppDatabase');
           return value;
         },
       ),
