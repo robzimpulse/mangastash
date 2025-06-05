@@ -75,7 +75,7 @@ class GetChapterUseCase with SyncChaptersMixin {
       values: [
         result.copyWith(
           images: parser.images,
-          lastReadAt: DateTime.timestamp(),
+          lastReadAt: reader ? DateTime.timestamp() : null,
         ),
       ],
     );

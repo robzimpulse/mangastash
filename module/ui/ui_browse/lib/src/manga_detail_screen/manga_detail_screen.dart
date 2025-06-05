@@ -447,15 +447,16 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   (context, index) {
                     final int itemIndex = index ~/ 2;
                     final valueIndex = chapters.elementAtOrNull(itemIndex);
-                    final value = state.processedChapters[valueIndex];
-                    final key = DownloadChapterKey.create(
-                      manga: state.manga,
-                      chapter: value,
-                    );
 
                     return index.isOdd
                         ? _separator()
-                        : _chapterItem(key: key, value: value);
+                        : _chapterItem(
+                            key: DownloadChapterKey.create(
+                              manga: state.manga,
+                              chapter: state.processedChapters[valueIndex],
+                            ),
+                            chapterId: valueIndex,
+                          );
                   },
                 ),
               ),
@@ -466,25 +467,30 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
-  Widget _chapterItem({required DownloadChapterKey key, MangaChapter? value}) {
-    if (value == null) return const SizedBox.shrink();
+  Widget _chapterItem({required DownloadChapterKey key, num? chapterId}) {
     return _builder(
       buildWhen: (prev, curr) => [
         prev.progress?[key] != curr.progress?[key],
         prev.prefetchedChapterId != curr.prefetchedChapterId,
+        prev.processedChapters[chapterId] != curr.processedChapters[chapterId],
       ].contains(true),
-      builder: (context, state) => MangaChapterTileWidget(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        onTap: () => widget.onTapChapter?.call(value.id, state.chapterIds),
-        onTapDownload: () => _onTapDownloadChapter(context, value),
-        onLongPress: () => _onTapMenuChapter(context, value),
-        title: ['Chapter ${value.chapter}', value.title].nonNulls.join(' - '),
-        language: Language.fromCode(value.translatedLanguage),
-        uploadedAt: value.readableAt,
-        groups: value.scanlationGroup,
-        downloadProgress: state.progress?[key]?.progress.toDouble() ?? 0.0,
-        isPrefetching: state.prefetchedChapterId.contains(value.id),
-      ),
+      builder: (context, state) {
+        final value = state.processedChapters[chapterId];
+        if (value == null) return const SizedBox.shrink();
+        return MangaChapterTileWidget(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          onTap: () => widget.onTapChapter?.call(value.id, state.chapterIds),
+          onTapDownload: () => _onTapDownloadChapter(context, value),
+          onLongPress: () => _onTapMenuChapter(context, value),
+          title: ['Chapter ${value.chapter}', value.title].nonNulls.join(' - '),
+          language: Language.fromCode(value.translatedLanguage),
+          uploadedAt: value.readableAt,
+          groups: value.scanlationGroup,
+          downloadProgress: state.progress?[key]?.progress.toDouble() ?? 0.0,
+          isPrefetching: state.prefetchedChapterId.contains(chapterId),
+          lastReadAt: value.lastReadAt,
+        );
+      },
     );
   }
 
