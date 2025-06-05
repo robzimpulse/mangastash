@@ -1,7 +1,7 @@
 import 'package:core_environment/core_environment.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
-import 'package:manga_service_drift/manga_service_drift.dart';
 
 mixin SyncChaptersMixin {
   Future<List<MangaChapter>> sync({

@@ -1,6 +1,5 @@
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
-import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:service_locator/service_locator.dart';
 
@@ -39,40 +38,7 @@ class DomainMangaRegistrar extends Registrar {
     final LogBox log = locator();
     final MeasureProcessUseCase measurement = locator();
 
-    void logger(
-      message, {
-      error,
-      extra,
-      level,
-      name,
-      sequenceNumber,
-      stackTrace,
-      time,
-      zone,
-    }) {
-      return log.log(
-        message,
-        name: name ?? runtimeType.toString(),
-        sequenceNumber: sequenceNumber,
-        level: level ?? 0,
-        zone: zone,
-        error: error,
-        stackTrace: stackTrace,
-        time: time,
-        extra: extra,
-      );
-    }
-
     await measurement.execute(() async {
-      locator.registerSingleton(DatabaseViewer());
-      locator.registerSingleton(
-        AppDatabase(logger: logger),
-        dispose: (e) => e.close(),
-      );
-      locator.registerFactory(() => MangaDao(locator()));
-      locator.registerFactory(() => ChapterDao(locator()));
-      locator.registerFactory(() => LibraryDao(locator()));
-      locator.registerFactory(() => JobDao(locator()));
       locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
 
       locator.registerSingleton(await FileDownloadManager.create(log: log));

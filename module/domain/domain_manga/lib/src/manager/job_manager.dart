@@ -10,7 +10,6 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/foundation.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
-import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../mixin/generate_task_id_mixin.dart';

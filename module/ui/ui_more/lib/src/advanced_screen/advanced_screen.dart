@@ -1,5 +1,5 @@
+import 'package:core_storage/core_storage.dart';
 import 'package:dio_inspector/dio_inspector.dart';
-import 'package:domain_manga/domain_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';

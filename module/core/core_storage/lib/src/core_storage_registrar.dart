@@ -1,5 +1,6 @@
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:log_box/log_box.dart';
+import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager/custom_cache_manager/custom_cache_manager.dart';
@@ -18,7 +19,41 @@ class CoreStorageRegistrar extends Registrar {
     final LogBox log = locator();
     final MeasureProcessUseCase measurement = locator();
 
+    void logger(
+      message, {
+      error,
+      extra,
+      level,
+      name,
+      sequenceNumber,
+      stackTrace,
+      time,
+      zone,
+    }) {
+      return log.log(
+        message,
+        name: name ?? runtimeType.toString(),
+        sequenceNumber: sequenceNumber,
+        level: level ?? 0,
+        zone: zone,
+        error: error,
+        stackTrace: stackTrace,
+        time: time,
+        extra: extra,
+      );
+    }
+
     await measurement.execute(() async {
+      locator.registerSingleton(
+        AppDatabase(logger: logger),
+        dispose: (e) => e.close(),
+      );
+      locator.registerSingleton(DatabaseViewer());
+      locator.registerFactory(() => MangaDao(locator()));
+      locator.registerFactory(() => ChapterDao(locator()));
+      locator.registerFactory(() => LibraryDao(locator()));
+      locator.registerFactory(() => JobDao(locator()));
+
       locator.registerSingleton(await SharedPreferencesStorage.create());
       locator.alias<Storage, SharedPreferencesStorage>();
 
