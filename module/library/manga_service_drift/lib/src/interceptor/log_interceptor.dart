@@ -9,24 +9,37 @@ class LogInterceptor extends QueryInterceptor {
 
   LogInterceptor({LoggerCallback? logger}) : _logger = logger;
 
-  Future<T> _run<T>(
-    String description,
-    FutureOr<T> Function() operation,
-  ) async {
+  Future<T> _run<T>({
+    required String description,
+    String? statement,
+    List<Object?>? args,
+    required FutureOr<T> Function() operation,
+  }) async {
     final stopwatch = Stopwatch()..start();
-    _logger?.call('Running $description');
 
     try {
       final result = await operation();
       _logger?.call(
-        ' => succeeded after ${stopwatch.elapsedMilliseconds}ms',
-        name: 'SQL Statement',
+        '$description success [$statement]',
+        extra: {
+          'statement': statement,
+          'args': args,
+          'result': result,
+          'duration': stopwatch.elapsedMilliseconds,
+        },
+        name: runtimeType.toString(),
       );
       return result;
     } on Object catch (e) {
       _logger?.call(
-        ' => failed after ${stopwatch.elapsedMilliseconds}ms ($e)',
-        name: 'SQL Statement',
+        '$description failed [$statement]',
+        extra: {
+          'statement': statement,
+          'args': args,
+          'result': e,
+          'duration': stopwatch.elapsedMilliseconds,
+        },
+        name: runtimeType.toString(),
       );
       rethrow;
     }
@@ -34,21 +47,18 @@ class LogInterceptor extends QueryInterceptor {
 
   @override
   TransactionExecutor beginTransaction(QueryExecutor parent) {
-    _logger?.call(
-      'begin',
-      name: 'SQL Statement',
-    );
+    _logger?.call('Begin', name: runtimeType.toString());
     return super.beginTransaction(parent);
   }
 
   @override
   Future<void> commitTransaction(TransactionExecutor inner) {
-    return _run('commit', () => inner.send());
+    return _run(description: 'Commit', operation: () => inner.send());
   }
 
   @override
   Future<void> rollbackTransaction(TransactionExecutor inner) {
-    return _run('rollback', () => inner.rollback());
+    return _run(description: 'Rollback', operation: () => inner.rollback());
   }
 
   @override
@@ -57,8 +67,9 @@ class LogInterceptor extends QueryInterceptor {
     BatchedStatements statements,
   ) {
     return _run(
-      'batch with $statements',
-      () => executor.runBatched(statements),
+      description: 'Batch',
+      statement: statements.toString(),
+      operation: () => executor.runBatched(statements),
     );
   }
 
@@ -69,8 +80,10 @@ class LogInterceptor extends QueryInterceptor {
     List<Object?> args,
   ) {
     return _run(
-      '$statement with $args',
-      () => executor.runInsert(statement, args),
+      description: 'Insert',
+      statement: statement,
+      args: args,
+      operation: () => executor.runInsert(statement, args),
     );
   }
 
@@ -81,8 +94,10 @@ class LogInterceptor extends QueryInterceptor {
     List<Object?> args,
   ) {
     return _run(
-      '$statement with $args',
-      () => executor.runUpdate(statement, args),
+      description: 'Update',
+      statement: statement,
+      args: args,
+      operation: () => executor.runUpdate(statement, args),
     );
   }
 
@@ -93,8 +108,10 @@ class LogInterceptor extends QueryInterceptor {
     List<Object?> args,
   ) {
     return _run(
-      '$statement with $args',
-      () => executor.runDelete(statement, args),
+      description: 'Delete',
+      statement: statement,
+      args: args,
+      operation: () => executor.runDelete(statement, args),
     );
   }
 
@@ -105,8 +122,10 @@ class LogInterceptor extends QueryInterceptor {
     List<Object?> args,
   ) {
     return _run(
-      '$statement with $args',
-      () => executor.runCustom(statement, args),
+      description: 'Custom',
+      statement: statement,
+      args: args,
+      operation: () => executor.runCustom(statement, args),
     );
   }
 
@@ -117,8 +136,10 @@ class LogInterceptor extends QueryInterceptor {
     List<Object?> args,
   ) {
     return _run(
-      '$statement with $args',
-      () => executor.runSelect(statement, args),
+      description: 'Select',
+      statement: statement,
+      args: args,
+      operation: () => executor.runSelect(statement, args),
     );
   }
 }
