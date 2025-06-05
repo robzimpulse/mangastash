@@ -18,17 +18,26 @@ class LogInterceptor extends QueryInterceptor {
 
     try {
       final result = await operation();
-      _logger?.call(' => succeeded after ${stopwatch.elapsedMilliseconds}ms');
+      _logger?.call(
+        ' => succeeded after ${stopwatch.elapsedMilliseconds}ms',
+        name: 'SQL Statement',
+      );
       return result;
     } on Object catch (e) {
-      _logger?.call(' => failed after ${stopwatch.elapsedMilliseconds}ms ($e)');
+      _logger?.call(
+        ' => failed after ${stopwatch.elapsedMilliseconds}ms ($e)',
+        name: 'SQL Statement',
+      );
       rethrow;
     }
   }
 
   @override
   TransactionExecutor beginTransaction(QueryExecutor parent) {
-    _logger?.call('begin');
+    _logger?.call(
+      'begin',
+      name: 'SQL Statement',
+    );
     return super.beginTransaction(parent);
   }
 

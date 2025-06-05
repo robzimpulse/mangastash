@@ -3,6 +3,8 @@ import 'package:drift/drift.dart';
 
 import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
+import '../extension/nullable_generic.dart';
+import '../extension/value_or_null_extension.dart';
 import '../model/chapter_model.dart';
 import '../tables/chapter_tables.dart';
 import '../tables/image_tables.dart';
@@ -145,7 +147,30 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
         value,
         mode: InsertMode.insertOrReplace,
         onConflict: DoUpdate(
-          (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
+          (old) => ChapterTablesCompanion.custom(
+            createdAt: value.createdAt.valueOrNull?.let((e) => Constant(e)),
+            updatedAt: Constant(DateTime.timestamp()),
+            id: value.id.valueOrNull?.let((e) => Constant(e)),
+            mangaId: value.mangaId.valueOrNull?.let((e) => Constant(e)),
+            title: value.title.valueOrNull?.let((e) => Constant(e)),
+            volume: value.volume.valueOrNull?.let((e) => Constant(e)),
+            chapter: value.chapter.valueOrNull?.let((e) => Constant(e)),
+            translatedLanguage: value.translatedLanguage.valueOrNull?.let(
+              (e) => Constant(e),
+            ),
+            scanlationGroup: value.scanlationGroup.valueOrNull?.let(
+              (e) => Constant(e),
+            ),
+            webUrl: value.webUrl.valueOrNull?.let((e) => Constant(e)),
+            readableAt: value.readableAt.valueOrNull?.let((e) => Constant(e)),
+            publishAt: value.publishAt.valueOrNull?.let((e) => Constant(e)),
+            lastReadAt: value.lastReadAt.valueOrNull?.let(
+              (e) => CaseWhenExpression(
+                cases: [CaseWhen(old.lastReadAt.isNull(), then: Constant(e))],
+                orElse: old.lastReadAt,
+              ),
+            ),
+          ),
         ),
       );
 
