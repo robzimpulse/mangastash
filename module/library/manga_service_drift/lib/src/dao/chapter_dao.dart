@@ -55,6 +55,16 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
 
   Stream<List<ChapterModel>> get stream => _aggregate.watch().map(_parse);
 
+  Stream<Map<String, List<ChapterModel>>> get unread {
+    final selector = _aggregate..where(chapterTables.lastReadAt.isNull());
+    return selector.watch().map((e) {
+      final groups = _parse(e).groupListsBy((e) => e.chapter?.mangaId);
+      return {
+        for (final key in groups.keys.nonNulls) key: [...?groups[key]],
+      };
+    });
+  }
+
   Future<List<ChapterModel>> get all => _aggregate.get().then(_parse);
 
   Future<List<ChapterModel>> search({
