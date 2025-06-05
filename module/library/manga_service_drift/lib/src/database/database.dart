@@ -80,8 +80,8 @@ Future<QueryExecutor> _openConnection({LoggerCallback? logger}) async {
   return driftDatabase(
     name: 'mangastash-local',
     native: DriftNativeOptions(
-      databaseDirectory: () {
-        final path = getApplicationDocumentsDirectory();
+      databaseDirectory: () async {
+        final path = await getApplicationDocumentsDirectory();
         logger?.call('Database location: $path',name: 'AppDatabase');
         return path;
       },
