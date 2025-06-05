@@ -29,6 +29,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
       chapterId: state.chapterId,
       source: state.sourceEnum,
       mangaId: state.mangaId,
+      reader: true,
     );
 
     if (response is Success<MangaChapter>) {

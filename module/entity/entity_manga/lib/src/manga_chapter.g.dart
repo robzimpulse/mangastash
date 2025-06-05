@@ -12,8 +12,12 @@ MangaChapter _$MangaChapterFromJson(Map<String, dynamic> json) => MangaChapter(
       title: json['title'] as String?,
       volume: json['volume'] as String?,
       chapter: json['chapter'] as String?,
-      readableAt: json['readable_at'] as String?,
-      publishAt: json['publish_at'] as String?,
+      readableAt: json['readable_at'] == null
+          ? null
+          : DateTime.parse(json['readable_at'] as String),
+      publishAt: json['publish_at'] == null
+          ? null
+          : DateTime.parse(json['publish_at'] as String),
       images:
           (json['images'] as List<dynamic>?)?.map((e) => e as String).toList(),
       translatedLanguage: json['translated_language'] as String?,
@@ -28,8 +32,8 @@ Map<String, dynamic> _$MangaChapterToJson(MangaChapter instance) =>
       'title': instance.title,
       'volume': instance.volume,
       'chapter': instance.chapter,
-      'readable_at': instance.readableAt,
-      'publish_at': instance.publishAt,
+      'readable_at': instance.readableAt?.toIso8601String(),
+      'publish_at': instance.publishAt?.toIso8601String(),
       'images': instance.images,
       'translated_language': instance.translatedLanguage,
       'scanlation_group': instance.scanlationGroup,

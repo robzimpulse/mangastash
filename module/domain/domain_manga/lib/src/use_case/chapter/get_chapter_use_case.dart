@@ -29,6 +29,7 @@ class GetChapterUseCase with SyncChaptersMixin {
     required MangaSourceEnum? source,
     required String? mangaId,
     required String? chapterId,
+    bool reader = false,
   }) async {
     if (source == null) return Error(Exception('Empty Source'));
     if (mangaId == null) return Error(Exception('Empty Manga Id'));
@@ -71,7 +72,12 @@ class GetChapterUseCase with SyncChaptersMixin {
     final chapters = await sync(
       chapterDao: _chapterDao,
       logBox: _logBox,
-      values: [result.copyWith(images: parser.images)],
+      values: [
+        result.copyWith(
+          images: parser.images,
+          lastReadAt: DateTime.timestamp(),
+        ),
+      ],
     );
 
     final value = chapters.firstOrNull;

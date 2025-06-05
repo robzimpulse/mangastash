@@ -25,6 +25,9 @@ class ChapterTables extends Table with AutoTimestampTable, AutoTextIdTable {
 
   DateTimeColumn get publishAt => dateTime().named('publish_at').nullable()();
 
+  DateTimeColumn get lastReadAt =>
+      dateTime().named('last_read_at').nullable()();
+
   @override
   Set<Column<Object>>? get primaryKey => {id};
 

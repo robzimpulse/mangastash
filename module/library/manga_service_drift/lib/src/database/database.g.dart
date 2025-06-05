@@ -432,6 +432,12 @@ class $ChapterTablesTable extends ChapterTables
   late final GeneratedColumn<DateTime> publishAt = GeneratedColumn<DateTime>(
       'publish_at', aliasedName, true,
       type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _lastReadAtMeta =
+      const VerificationMeta('lastReadAt');
+  @override
+  late final GeneratedColumn<DateTime> lastReadAt = GeneratedColumn<DateTime>(
+      'last_read_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         createdAt,
@@ -445,7 +451,8 @@ class $ChapterTablesTable extends ChapterTables
         scanlationGroup,
         webUrl,
         readableAt,
-        publishAt
+        publishAt,
+        lastReadAt
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -510,6 +517,12 @@ class $ChapterTablesTable extends ChapterTables
       context.handle(_publishAtMeta,
           publishAt.isAcceptableOrUnknown(data['publish_at']!, _publishAtMeta));
     }
+    if (data.containsKey('last_read_at')) {
+      context.handle(
+          _lastReadAtMeta,
+          lastReadAt.isAcceptableOrUnknown(
+              data['last_read_at']!, _lastReadAtMeta));
+    }
     return context;
   }
 
@@ -550,6 +563,8 @@ class $ChapterTablesTable extends ChapterTables
           .read(DriftSqlType.dateTime, data['${effectivePrefix}readable_at']),
       publishAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}publish_at']),
+      lastReadAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}last_read_at']),
     );
   }
 
@@ -572,6 +587,7 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
   final String? webUrl;
   final DateTime? readableAt;
   final DateTime? publishAt;
+  final DateTime? lastReadAt;
   const ChapterDrift(
       {required this.createdAt,
       required this.updatedAt,
@@ -584,7 +600,8 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       this.scanlationGroup,
       this.webUrl,
       this.readableAt,
-      this.publishAt});
+      this.publishAt,
+      this.lastReadAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -618,6 +635,9 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
     if (!nullToAbsent || publishAt != null) {
       map['publish_at'] = Variable<DateTime>(publishAt);
     }
+    if (!nullToAbsent || lastReadAt != null) {
+      map['last_read_at'] = Variable<DateTime>(lastReadAt);
+    }
     return map;
   }
 
@@ -650,6 +670,9 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       publishAt: publishAt == null && nullToAbsent
           ? const Value.absent()
           : Value(publishAt),
+      lastReadAt: lastReadAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastReadAt),
     );
   }
 
@@ -670,6 +693,7 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       webUrl: serializer.fromJson<String?>(json['webUrl']),
       readableAt: serializer.fromJson<DateTime?>(json['readableAt']),
       publishAt: serializer.fromJson<DateTime?>(json['publishAt']),
+      lastReadAt: serializer.fromJson<DateTime?>(json['lastReadAt']),
     );
   }
   @override
@@ -688,6 +712,7 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       'webUrl': serializer.toJson<String?>(webUrl),
       'readableAt': serializer.toJson<DateTime?>(readableAt),
       'publishAt': serializer.toJson<DateTime?>(publishAt),
+      'lastReadAt': serializer.toJson<DateTime?>(lastReadAt),
     };
   }
 
@@ -703,7 +728,8 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
           Value<String?> scanlationGroup = const Value.absent(),
           Value<String?> webUrl = const Value.absent(),
           Value<DateTime?> readableAt = const Value.absent(),
-          Value<DateTime?> publishAt = const Value.absent()}) =>
+          Value<DateTime?> publishAt = const Value.absent(),
+          Value<DateTime?> lastReadAt = const Value.absent()}) =>
       ChapterDrift(
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
@@ -721,6 +747,7 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
         webUrl: webUrl.present ? webUrl.value : this.webUrl,
         readableAt: readableAt.present ? readableAt.value : this.readableAt,
         publishAt: publishAt.present ? publishAt.value : this.publishAt,
+        lastReadAt: lastReadAt.present ? lastReadAt.value : this.lastReadAt,
       );
   ChapterDrift copyWithCompanion(ChapterTablesCompanion data) {
     return ChapterDrift(
@@ -741,6 +768,8 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       readableAt:
           data.readableAt.present ? data.readableAt.value : this.readableAt,
       publishAt: data.publishAt.present ? data.publishAt.value : this.publishAt,
+      lastReadAt:
+          data.lastReadAt.present ? data.lastReadAt.value : this.lastReadAt,
     );
   }
 
@@ -758,7 +787,8 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
           ..write('scanlationGroup: $scanlationGroup, ')
           ..write('webUrl: $webUrl, ')
           ..write('readableAt: $readableAt, ')
-          ..write('publishAt: $publishAt')
+          ..write('publishAt: $publishAt, ')
+          ..write('lastReadAt: $lastReadAt')
           ..write(')'))
         .toString();
   }
@@ -776,7 +806,8 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       scanlationGroup,
       webUrl,
       readableAt,
-      publishAt);
+      publishAt,
+      lastReadAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -792,7 +823,8 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
           other.scanlationGroup == this.scanlationGroup &&
           other.webUrl == this.webUrl &&
           other.readableAt == this.readableAt &&
-          other.publishAt == this.publishAt);
+          other.publishAt == this.publishAt &&
+          other.lastReadAt == this.lastReadAt);
 }
 
 class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
@@ -808,6 +840,7 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
   final Value<String?> webUrl;
   final Value<DateTime?> readableAt;
   final Value<DateTime?> publishAt;
+  final Value<DateTime?> lastReadAt;
   final Value<int> rowid;
   const ChapterTablesCompanion({
     this.createdAt = const Value.absent(),
@@ -822,6 +855,7 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
     this.webUrl = const Value.absent(),
     this.readableAt = const Value.absent(),
     this.publishAt = const Value.absent(),
+    this.lastReadAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ChapterTablesCompanion.insert({
@@ -837,6 +871,7 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
     this.webUrl = const Value.absent(),
     this.readableAt = const Value.absent(),
     this.publishAt = const Value.absent(),
+    this.lastReadAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   static Insertable<ChapterDrift> custom({
@@ -852,6 +887,7 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
     Expression<String>? webUrl,
     Expression<DateTime>? readableAt,
     Expression<DateTime>? publishAt,
+    Expression<DateTime>? lastReadAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -867,6 +903,7 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
       if (webUrl != null) 'webUrl': webUrl,
       if (readableAt != null) 'readable_at': readableAt,
       if (publishAt != null) 'publish_at': publishAt,
+      if (lastReadAt != null) 'last_read_at': lastReadAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -884,6 +921,7 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
       Value<String?>? webUrl,
       Value<DateTime?>? readableAt,
       Value<DateTime?>? publishAt,
+      Value<DateTime?>? lastReadAt,
       Value<int>? rowid}) {
     return ChapterTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
@@ -898,6 +936,7 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
       webUrl: webUrl ?? this.webUrl,
       readableAt: readableAt ?? this.readableAt,
       publishAt: publishAt ?? this.publishAt,
+      lastReadAt: lastReadAt ?? this.lastReadAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -941,6 +980,9 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
     if (publishAt.present) {
       map['publish_at'] = Variable<DateTime>(publishAt.value);
     }
+    if (lastReadAt.present) {
+      map['last_read_at'] = Variable<DateTime>(lastReadAt.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -962,6 +1004,7 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
           ..write('webUrl: $webUrl, ')
           ..write('readableAt: $readableAt, ')
           ..write('publishAt: $publishAt, ')
+          ..write('lastReadAt: $lastReadAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3384,6 +3427,7 @@ typedef $$ChapterTablesTableCreateCompanionBuilder = ChapterTablesCompanion
   Value<String?> webUrl,
   Value<DateTime?> readableAt,
   Value<DateTime?> publishAt,
+  Value<DateTime?> lastReadAt,
   Value<int> rowid,
 });
 typedef $$ChapterTablesTableUpdateCompanionBuilder = ChapterTablesCompanion
@@ -3400,6 +3444,7 @@ typedef $$ChapterTablesTableUpdateCompanionBuilder = ChapterTablesCompanion
   Value<String?> webUrl,
   Value<DateTime?> readableAt,
   Value<DateTime?> publishAt,
+  Value<DateTime?> lastReadAt,
   Value<int> rowid,
 });
 
@@ -3449,6 +3494,9 @@ class $$ChapterTablesTableFilterComposer
 
   ColumnFilters<DateTime> get publishAt => $composableBuilder(
       column: $table.publishAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get lastReadAt => $composableBuilder(
+      column: $table.lastReadAt, builder: (column) => ColumnFilters(column));
 }
 
 class $$ChapterTablesTableOrderingComposer
@@ -3497,6 +3545,9 @@ class $$ChapterTablesTableOrderingComposer
 
   ColumnOrderings<DateTime> get publishAt => $composableBuilder(
       column: $table.publishAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get lastReadAt => $composableBuilder(
+      column: $table.lastReadAt, builder: (column) => ColumnOrderings(column));
 }
 
 class $$ChapterTablesTableAnnotationComposer
@@ -3543,6 +3594,9 @@ class $$ChapterTablesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get publishAt =>
       $composableBuilder(column: $table.publishAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastReadAt => $composableBuilder(
+      column: $table.lastReadAt, builder: (column) => column);
 }
 
 class $$ChapterTablesTableTableManager extends RootTableManager<
@@ -3583,6 +3637,7 @@ class $$ChapterTablesTableTableManager extends RootTableManager<
             Value<String?> webUrl = const Value.absent(),
             Value<DateTime?> readableAt = const Value.absent(),
             Value<DateTime?> publishAt = const Value.absent(),
+            Value<DateTime?> lastReadAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               ChapterTablesCompanion(
@@ -3598,6 +3653,7 @@ class $$ChapterTablesTableTableManager extends RootTableManager<
             webUrl: webUrl,
             readableAt: readableAt,
             publishAt: publishAt,
+            lastReadAt: lastReadAt,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -3613,6 +3669,7 @@ class $$ChapterTablesTableTableManager extends RootTableManager<
             Value<String?> webUrl = const Value.absent(),
             Value<DateTime?> readableAt = const Value.absent(),
             Value<DateTime?> publishAt = const Value.absent(),
+            Value<DateTime?> lastReadAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               ChapterTablesCompanion.insert(
@@ -3628,6 +3685,7 @@ class $$ChapterTablesTableTableManager extends RootTableManager<
             webUrl: webUrl,
             readableAt: readableAt,
             publishAt: publishAt,
+            lastReadAt: lastReadAt,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

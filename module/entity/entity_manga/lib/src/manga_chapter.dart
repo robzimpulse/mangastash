@@ -24,6 +24,8 @@ class MangaChapter extends Equatable with SimilarityMixin {
 
   final DateTime? publishAt;
 
+  final DateTime? lastReadAt;
+
   final List<String>? images;
 
   final String? translatedLanguage;
@@ -50,6 +52,7 @@ class MangaChapter extends Equatable with SimilarityMixin {
     this.translatedLanguage,
     this.scanlationGroup,
     this.webUrl,
+    this.lastReadAt,
   });
 
   @override
@@ -65,6 +68,7 @@ class MangaChapter extends Equatable with SimilarityMixin {
         translatedLanguage,
         scanlationGroup,
         webUrl,
+        lastReadAt,
       ];
 
   @override
@@ -86,6 +90,7 @@ class MangaChapter extends Equatable with SimilarityMixin {
       translatedLanguage: chapter.translatedLanguage,
       scanlationGroup: chapter.scanlationGroup,
       webUrl: chapter.webUrl,
+      lastReadAt: chapter.lastReadAt,
     );
   }
 
@@ -101,6 +106,7 @@ class MangaChapter extends Equatable with SimilarityMixin {
       translatedLanguage: Value.absentIfNull(translatedLanguage),
       scanlationGroup: Value.absentIfNull(scanlationGroup),
       webUrl: Value.absentIfNull(webUrl),
+      lastReadAt: Value.absentIfNull(lastReadAt),
     );
   }
 
@@ -118,6 +124,7 @@ class MangaChapter extends Equatable with SimilarityMixin {
     String? chapter,
     DateTime? readableAt,
     DateTime? publishAt,
+    DateTime? lastReadAt,
     String? translatedLanguage,
     String? scanlationGroup,
     List<String>? images,
@@ -135,6 +142,7 @@ class MangaChapter extends Equatable with SimilarityMixin {
       translatedLanguage: translatedLanguage ?? this.translatedLanguage,
       scanlationGroup: scanlationGroup ?? this.scanlationGroup,
       webUrl: webUrl ?? this.webUrl,
+      lastReadAt: lastReadAt ?? this.lastReadAt,
     );
   }
 
