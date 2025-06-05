@@ -1,10 +1,10 @@
 import 'package:drift/drift.dart';
 
+import '../mixin/auto_id.dart';
 import '../mixin/auto_timestamp_table.dart';
 
 @DataClassName('TagDrift')
-class TagTables extends Table with AutoTimestampTable {
-  TextColumn get id => text().named('id')();
+class TagTables extends Table with AutoTimestampTable, AutoTextIdTable {
 
   TextColumn get name => text().named('name')();
 

@@ -1,10 +1,8 @@
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
-import 'package:uuid/uuid.dart';
 
 import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
-import '../extension/value_or_null_extension.dart';
 import '../model/chapter_model.dart';
 import '../tables/chapter_tables.dart';
 import '../tables/image_tables.dart';
@@ -134,16 +132,10 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
     return transaction(() async {
       /// if conflict, update chapter otherwise insert chapter
       final chapter = await into(chapterTables).insertReturning(
-        value.copyWith(
-          id: Value(value.id.valueOrNull ?? const Uuid().v4().toString()),
-          createdAt: Value(DateTime.now().toIso8601String()),
-          updatedAt: Value(DateTime.now().toIso8601String()),
-        ),
+        value,
         mode: InsertMode.insertOrReplace,
         onConflict: DoUpdate(
-          (old) => value.copyWith(
-            updatedAt: Value(DateTime.now().toIso8601String()),
-          ),
+          (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
         ),
       );
 

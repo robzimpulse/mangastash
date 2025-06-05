@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
@@ -14,16 +13,16 @@ mixin SortChaptersMixin {
     return switch ((option, direction)) {
       (ChapterOrders.readableAt, OrderDirections.descending) => chapters.sorted(
           (a, b) {
-            final aDate = a.readableAt?.asDateTime;
-            final bDate = b.readableAt?.asDateTime;
+            final aDate = a.readableAt;
+            final bDate = b.readableAt;
             if (aDate == null || bDate == null) return 0;
             return -aDate.compareTo(bDate);
           },
         ),
       (ChapterOrders.readableAt, OrderDirections.ascending) => chapters.sorted(
           (a, b) {
-            final aDate = a.readableAt?.asDateTime;
-            final bDate = b.readableAt?.asDateTime;
+            final aDate = a.readableAt;
+            final bDate = b.readableAt;
             if (aDate == null || bDate == null) return 0;
             return aDate.compareTo(bDate);
           },

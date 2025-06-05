@@ -480,7 +480,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         onLongPress: () => _onTapMenuChapter(context, value),
         title: ['Chapter ${value.chapter}', value.title].nonNulls.join(' - '),
         language: Language.fromCode(value.translatedLanguage),
-        uploadedAt: value.readableAt?.asDateTime,
+        uploadedAt: value.readableAt,
         groups: value.scanlationGroup,
         downloadProgress: state.progress?[key]?.progress.toDouble() ?? 0.0,
         isPrefetching: state.prefetchedChapterId.contains(value.id),

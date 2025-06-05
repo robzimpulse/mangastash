@@ -68,10 +68,7 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
   Future<void> add(JobTablesCompanion value) async {
     await transaction(
       () => into(jobTables).insert(
-        value.copyWith(
-          createdAt: Value(DateTime.now().toIso8601String()),
-          updatedAt: Value(DateTime.now().toIso8601String()),
-        ),
+        value,
         mode: InsertMode.insertOrIgnore,
       ),
     );

@@ -1,11 +1,10 @@
 import 'package:drift/drift.dart';
 
+import '../mixin/auto_id.dart';
 import '../mixin/auto_timestamp_table.dart';
 
 @DataClassName('MangaDrift')
-class MangaTables extends Table with AutoTimestampTable {
-  TextColumn get id => text().named('id')();
-
+class MangaTables extends Table with AutoTimestampTable, AutoTextIdTable {
   TextColumn get title => text().named('title').nullable()();
 
   TextColumn get coverUrl => text().named('cover_url').nullable()();

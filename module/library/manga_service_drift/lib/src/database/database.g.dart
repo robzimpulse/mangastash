@@ -12,19 +12,26 @@ class $ImageTablesTable extends ImageTables
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
-  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, false,
-      type: DriftSqlType.string,
+      type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
+      clientDefault: () => DateTime.timestamp());
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
-  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
       'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      clientDefault: () => DateTime.timestamp());
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
+      clientDefault: () => const Uuid().v4());
   static const VerificationMeta _orderMeta = const VerificationMeta('order');
   @override
   late final GeneratedColumn<int> order = GeneratedColumn<int>(
@@ -41,14 +48,9 @@ class $ImageTablesTable extends ImageTables
   late final GeneratedColumn<String> webUrl = GeneratedColumn<String>(
       'web_url', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [createdAt, updatedAt, order, chapterId, webUrl, id];
+      [createdAt, updatedAt, id, order, chapterId, webUrl];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -66,6 +68,9 @@ class $ImageTablesTable extends ImageTables
     if (data.containsKey('updated_at')) {
       context.handle(_updatedAtMeta,
           updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('order')) {
       context.handle(
@@ -85,11 +90,6 @@ class $ImageTablesTable extends ImageTables
     } else if (isInserting) {
       context.missing(_webUrlMeta);
     }
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
-    }
     return context;
   }
 
@@ -107,17 +107,17 @@ class $ImageTablesTable extends ImageTables
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ImageDrift(
       createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}updated_at'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       order: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}order'])!,
       chapterId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}chapter_id'])!,
       webUrl: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}web_url'])!,
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
     );
   }
 
@@ -128,28 +128,28 @@ class $ImageTablesTable extends ImageTables
 }
 
 class ImageDrift extends DataClass implements Insertable<ImageDrift> {
-  final String createdAt;
-  final String updatedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String id;
   final int order;
   final String chapterId;
   final String webUrl;
-  final String id;
   const ImageDrift(
       {required this.createdAt,
       required this.updatedAt,
+      required this.id,
       required this.order,
       required this.chapterId,
-      required this.webUrl,
-      required this.id});
+      required this.webUrl});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['created_at'] = Variable<String>(createdAt);
-    map['updated_at'] = Variable<String>(updatedAt);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['id'] = Variable<String>(id);
     map['order'] = Variable<int>(order);
     map['chapter_id'] = Variable<String>(chapterId);
     map['web_url'] = Variable<String>(webUrl);
-    map['id'] = Variable<String>(id);
     return map;
   }
 
@@ -157,10 +157,10 @@ class ImageDrift extends DataClass implements Insertable<ImageDrift> {
     return ImageTablesCompanion(
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      id: Value(id),
       order: Value(order),
       chapterId: Value(chapterId),
       webUrl: Value(webUrl),
-      id: Value(id),
     );
   }
 
@@ -168,50 +168,50 @@ class ImageDrift extends DataClass implements Insertable<ImageDrift> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ImageDrift(
-      createdAt: serializer.fromJson<String>(json['createdAt']),
-      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      id: serializer.fromJson<String>(json['id']),
       order: serializer.fromJson<int>(json['order']),
       chapterId: serializer.fromJson<String>(json['chapterId']),
       webUrl: serializer.fromJson<String>(json['webUrl']),
-      id: serializer.fromJson<String>(json['id']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'createdAt': serializer.toJson<String>(createdAt),
-      'updatedAt': serializer.toJson<String>(updatedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'id': serializer.toJson<String>(id),
       'order': serializer.toJson<int>(order),
       'chapterId': serializer.toJson<String>(chapterId),
       'webUrl': serializer.toJson<String>(webUrl),
-      'id': serializer.toJson<String>(id),
     };
   }
 
   ImageDrift copyWith(
-          {String? createdAt,
-          String? updatedAt,
+          {DateTime? createdAt,
+          DateTime? updatedAt,
+          String? id,
           int? order,
           String? chapterId,
-          String? webUrl,
-          String? id}) =>
+          String? webUrl}) =>
       ImageDrift(
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
+        id: id ?? this.id,
         order: order ?? this.order,
         chapterId: chapterId ?? this.chapterId,
         webUrl: webUrl ?? this.webUrl,
-        id: id ?? this.id,
       );
   ImageDrift copyWithCompanion(ImageTablesCompanion data) {
     return ImageDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      id: data.id.present ? data.id.value : this.id,
       order: data.order.present ? data.order.value : this.order,
       chapterId: data.chapterId.present ? data.chapterId.value : this.chapterId,
       webUrl: data.webUrl.present ? data.webUrl.value : this.webUrl,
-      id: data.id.present ? data.id.value : this.id,
     );
   }
 
@@ -220,93 +220,92 @@ class ImageDrift extends DataClass implements Insertable<ImageDrift> {
     return (StringBuffer('ImageDrift(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
+          ..write('id: $id, ')
           ..write('order: $order, ')
           ..write('chapterId: $chapterId, ')
-          ..write('webUrl: $webUrl, ')
-          ..write('id: $id')
+          ..write('webUrl: $webUrl')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      Object.hash(createdAt, updatedAt, order, chapterId, webUrl, id);
+      Object.hash(createdAt, updatedAt, id, order, chapterId, webUrl);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is ImageDrift &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
+          other.id == this.id &&
           other.order == this.order &&
           other.chapterId == this.chapterId &&
-          other.webUrl == this.webUrl &&
-          other.id == this.id);
+          other.webUrl == this.webUrl);
 }
 
 class ImageTablesCompanion extends UpdateCompanion<ImageDrift> {
-  final Value<String> createdAt;
-  final Value<String> updatedAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<String> id;
   final Value<int> order;
   final Value<String> chapterId;
   final Value<String> webUrl;
-  final Value<String> id;
   final Value<int> rowid;
   const ImageTablesCompanion({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.id = const Value.absent(),
     this.order = const Value.absent(),
     this.chapterId = const Value.absent(),
     this.webUrl = const Value.absent(),
-    this.id = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ImageTablesCompanion.insert({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.id = const Value.absent(),
     required int order,
     required String chapterId,
     required String webUrl,
-    required String id,
     this.rowid = const Value.absent(),
   })  : order = Value(order),
         chapterId = Value(chapterId),
-        webUrl = Value(webUrl),
-        id = Value(id);
+        webUrl = Value(webUrl);
   static Insertable<ImageDrift> custom({
-    Expression<String>? createdAt,
-    Expression<String>? updatedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<String>? id,
     Expression<int>? order,
     Expression<String>? chapterId,
     Expression<String>? webUrl,
-    Expression<String>? id,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (id != null) 'id': id,
       if (order != null) 'order': order,
       if (chapterId != null) 'chapter_id': chapterId,
       if (webUrl != null) 'web_url': webUrl,
-      if (id != null) 'id': id,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
   ImageTablesCompanion copyWith(
-      {Value<String>? createdAt,
-      Value<String>? updatedAt,
+      {Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<String>? id,
       Value<int>? order,
       Value<String>? chapterId,
       Value<String>? webUrl,
-      Value<String>? id,
       Value<int>? rowid}) {
     return ImageTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      id: id ?? this.id,
       order: order ?? this.order,
       chapterId: chapterId ?? this.chapterId,
       webUrl: webUrl ?? this.webUrl,
-      id: id ?? this.id,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -315,10 +314,13 @@ class ImageTablesCompanion extends UpdateCompanion<ImageDrift> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (createdAt.present) {
-      map['created_at'] = Variable<String>(createdAt.value);
+      map['created_at'] = Variable<DateTime>(createdAt.value);
     }
     if (updatedAt.present) {
-      map['updated_at'] = Variable<String>(updatedAt.value);
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
     }
     if (order.present) {
       map['order'] = Variable<int>(order.value);
@@ -328,9 +330,6 @@ class ImageTablesCompanion extends UpdateCompanion<ImageDrift> {
     }
     if (webUrl.present) {
       map['web_url'] = Variable<String>(webUrl.value);
-    }
-    if (id.present) {
-      map['id'] = Variable<String>(id.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -343,10 +342,10 @@ class ImageTablesCompanion extends UpdateCompanion<ImageDrift> {
     return (StringBuffer('ImageTablesCompanion(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
+          ..write('id: $id, ')
           ..write('order: $order, ')
           ..write('chapterId: $chapterId, ')
           ..write('webUrl: $webUrl, ')
-          ..write('id: $id, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -362,24 +361,26 @@ class $ChapterTablesTable extends ChapterTables
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
-  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, false,
-      type: DriftSqlType.string,
+      type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
+      clientDefault: () => DateTime.timestamp());
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
-  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
       'updated_at', aliasedName, false,
-      type: DriftSqlType.string,
+      type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
+      clientDefault: () => DateTime.timestamp());
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => const Uuid().v4());
   static const VerificationMeta _mangaIdMeta =
       const VerificationMeta('mangaId');
   @override
@@ -422,15 +423,15 @@ class $ChapterTablesTable extends ChapterTables
   static const VerificationMeta _readableAtMeta =
       const VerificationMeta('readableAt');
   @override
-  late final GeneratedColumn<String> readableAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> readableAt = GeneratedColumn<DateTime>(
       'readable_at', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   static const VerificationMeta _publishAtMeta =
       const VerificationMeta('publishAt');
   @override
-  late final GeneratedColumn<String> publishAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> publishAt = GeneratedColumn<DateTime>(
       'publish_at', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         createdAt,
@@ -466,8 +467,6 @@ class $ChapterTablesTable extends ChapterTables
     }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
     }
     if (data.containsKey('manga_id')) {
       context.handle(_mangaIdMeta,
@@ -528,9 +527,9 @@ class $ChapterTablesTable extends ChapterTables
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ChapterDrift(
       createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}updated_at'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       mangaId: attachedDatabase.typeMapping
@@ -548,9 +547,9 @@ class $ChapterTablesTable extends ChapterTables
       webUrl: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}webUrl']),
       readableAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}readable_at']),
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}readable_at']),
       publishAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}publish_at']),
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}publish_at']),
     );
   }
 
@@ -561,8 +560,8 @@ class $ChapterTablesTable extends ChapterTables
 }
 
 class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
-  final String createdAt;
-  final String updatedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
   final String id;
   final String? mangaId;
   final String? title;
@@ -571,12 +570,8 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
   final String? translatedLanguage;
   final String? scanlationGroup;
   final String? webUrl;
-
-  /// must be in ISO8601 Format (yyyy-MM-ddTHH:mm:ss.mmmuuuZ)
-  final String? readableAt;
-
-  /// must be in ISO8601 Format (yyyy-MM-ddTHH:mm:ss.mmmuuuZ)
-  final String? publishAt;
+  final DateTime? readableAt;
+  final DateTime? publishAt;
   const ChapterDrift(
       {required this.createdAt,
       required this.updatedAt,
@@ -593,8 +588,8 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['created_at'] = Variable<String>(createdAt);
-    map['updated_at'] = Variable<String>(updatedAt);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     map['id'] = Variable<String>(id);
     if (!nullToAbsent || mangaId != null) {
       map['manga_id'] = Variable<String>(mangaId);
@@ -618,10 +613,10 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       map['webUrl'] = Variable<String>(webUrl);
     }
     if (!nullToAbsent || readableAt != null) {
-      map['readable_at'] = Variable<String>(readableAt);
+      map['readable_at'] = Variable<DateTime>(readableAt);
     }
     if (!nullToAbsent || publishAt != null) {
-      map['publish_at'] = Variable<String>(publishAt);
+      map['publish_at'] = Variable<DateTime>(publishAt);
     }
     return map;
   }
@@ -662,8 +657,8 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ChapterDrift(
-      createdAt: serializer.fromJson<String>(json['createdAt']),
-      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       id: serializer.fromJson<String>(json['id']),
       mangaId: serializer.fromJson<String?>(json['mangaId']),
       title: serializer.fromJson<String?>(json['title']),
@@ -673,16 +668,16 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
           serializer.fromJson<String?>(json['translatedLanguage']),
       scanlationGroup: serializer.fromJson<String?>(json['scanlationGroup']),
       webUrl: serializer.fromJson<String?>(json['webUrl']),
-      readableAt: serializer.fromJson<String?>(json['readableAt']),
-      publishAt: serializer.fromJson<String?>(json['publishAt']),
+      readableAt: serializer.fromJson<DateTime?>(json['readableAt']),
+      publishAt: serializer.fromJson<DateTime?>(json['publishAt']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'createdAt': serializer.toJson<String>(createdAt),
-      'updatedAt': serializer.toJson<String>(updatedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'id': serializer.toJson<String>(id),
       'mangaId': serializer.toJson<String?>(mangaId),
       'title': serializer.toJson<String?>(title),
@@ -691,14 +686,14 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       'translatedLanguage': serializer.toJson<String?>(translatedLanguage),
       'scanlationGroup': serializer.toJson<String?>(scanlationGroup),
       'webUrl': serializer.toJson<String?>(webUrl),
-      'readableAt': serializer.toJson<String?>(readableAt),
-      'publishAt': serializer.toJson<String?>(publishAt),
+      'readableAt': serializer.toJson<DateTime?>(readableAt),
+      'publishAt': serializer.toJson<DateTime?>(publishAt),
     };
   }
 
   ChapterDrift copyWith(
-          {String? createdAt,
-          String? updatedAt,
+          {DateTime? createdAt,
+          DateTime? updatedAt,
           String? id,
           Value<String?> mangaId = const Value.absent(),
           Value<String?> title = const Value.absent(),
@@ -707,8 +702,8 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
           Value<String?> translatedLanguage = const Value.absent(),
           Value<String?> scanlationGroup = const Value.absent(),
           Value<String?> webUrl = const Value.absent(),
-          Value<String?> readableAt = const Value.absent(),
-          Value<String?> publishAt = const Value.absent()}) =>
+          Value<DateTime?> readableAt = const Value.absent(),
+          Value<DateTime?> publishAt = const Value.absent()}) =>
       ChapterDrift(
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
@@ -801,8 +796,8 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
 }
 
 class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
-  final Value<String> createdAt;
-  final Value<String> updatedAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
   final Value<String> id;
   final Value<String?> mangaId;
   final Value<String?> title;
@@ -811,8 +806,8 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
   final Value<String?> translatedLanguage;
   final Value<String?> scanlationGroup;
   final Value<String?> webUrl;
-  final Value<String?> readableAt;
-  final Value<String?> publishAt;
+  final Value<DateTime?> readableAt;
+  final Value<DateTime?> publishAt;
   final Value<int> rowid;
   const ChapterTablesCompanion({
     this.createdAt = const Value.absent(),
@@ -832,7 +827,7 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
   ChapterTablesCompanion.insert({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-    required String id,
+    this.id = const Value.absent(),
     this.mangaId = const Value.absent(),
     this.title = const Value.absent(),
     this.volume = const Value.absent(),
@@ -843,10 +838,10 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
     this.readableAt = const Value.absent(),
     this.publishAt = const Value.absent(),
     this.rowid = const Value.absent(),
-  }) : id = Value(id);
+  });
   static Insertable<ChapterDrift> custom({
-    Expression<String>? createdAt,
-    Expression<String>? updatedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
     Expression<String>? id,
     Expression<String>? mangaId,
     Expression<String>? title,
@@ -855,8 +850,8 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
     Expression<String>? translatedLanguage,
     Expression<String>? scanlationGroup,
     Expression<String>? webUrl,
-    Expression<String>? readableAt,
-    Expression<String>? publishAt,
+    Expression<DateTime>? readableAt,
+    Expression<DateTime>? publishAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -877,8 +872,8 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
   }
 
   ChapterTablesCompanion copyWith(
-      {Value<String>? createdAt,
-      Value<String>? updatedAt,
+      {Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
       Value<String>? id,
       Value<String?>? mangaId,
       Value<String?>? title,
@@ -887,8 +882,8 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
       Value<String?>? translatedLanguage,
       Value<String?>? scanlationGroup,
       Value<String?>? webUrl,
-      Value<String?>? readableAt,
-      Value<String?>? publishAt,
+      Value<DateTime?>? readableAt,
+      Value<DateTime?>? publishAt,
       Value<int>? rowid}) {
     return ChapterTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
@@ -911,10 +906,10 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (createdAt.present) {
-      map['created_at'] = Variable<String>(createdAt.value);
+      map['created_at'] = Variable<DateTime>(createdAt.value);
     }
     if (updatedAt.present) {
-      map['updated_at'] = Variable<String>(updatedAt.value);
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
     if (id.present) {
       map['id'] = Variable<String>(id.value);
@@ -941,10 +936,10 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
       map['webUrl'] = Variable<String>(webUrl.value);
     }
     if (readableAt.present) {
-      map['readable_at'] = Variable<String>(readableAt.value);
+      map['readable_at'] = Variable<DateTime>(readableAt.value);
     }
     if (publishAt.present) {
-      map['publish_at'] = Variable<String>(publishAt.value);
+      map['publish_at'] = Variable<DateTime>(publishAt.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -982,28 +977,19 @@ class $LibraryTablesTable extends LibraryTables
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
-  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, false,
-      type: DriftSqlType.string,
+      type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
+      clientDefault: () => DateTime.timestamp());
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
-  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
       'updated_at', aliasedName, false,
-      type: DriftSqlType.string,
+      type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<BigInt> id = GeneratedColumn<BigInt>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.bigInt,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+      clientDefault: () => DateTime.timestamp());
   static const VerificationMeta _mangaIdMeta =
       const VerificationMeta('mangaId');
   @override
@@ -1011,7 +997,7 @@ class $LibraryTablesTable extends LibraryTables
       'manga_id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns => [createdAt, updatedAt, id, mangaId];
+  List<GeneratedColumn> get $columns => [createdAt, updatedAt, mangaId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1030,9 +1016,6 @@ class $LibraryTablesTable extends LibraryTables
       context.handle(_updatedAtMeta,
           updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
     }
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
     if (data.containsKey('manga_id')) {
       context.handle(_mangaIdMeta,
           mangaId.isAcceptableOrUnknown(data['manga_id']!, _mangaIdMeta));
@@ -1043,17 +1026,15 @@ class $LibraryTablesTable extends LibraryTables
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id};
+  Set<GeneratedColumn> get $primaryKey => {mangaId};
   @override
   LibraryDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return LibraryDrift(
       createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}updated_at'])!,
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.bigInt, data['${effectivePrefix}id'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
       mangaId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}manga_id'])!,
     );
@@ -1066,21 +1047,18 @@ class $LibraryTablesTable extends LibraryTables
 }
 
 class LibraryDrift extends DataClass implements Insertable<LibraryDrift> {
-  final String createdAt;
-  final String updatedAt;
-  final BigInt id;
+  final DateTime createdAt;
+  final DateTime updatedAt;
   final String mangaId;
   const LibraryDrift(
       {required this.createdAt,
       required this.updatedAt,
-      required this.id,
       required this.mangaId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['created_at'] = Variable<String>(createdAt);
-    map['updated_at'] = Variable<String>(updatedAt);
-    map['id'] = Variable<BigInt>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     map['manga_id'] = Variable<String>(mangaId);
     return map;
   }
@@ -1089,7 +1067,6 @@ class LibraryDrift extends DataClass implements Insertable<LibraryDrift> {
     return LibraryTablesCompanion(
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
-      id: Value(id),
       mangaId: Value(mangaId),
     );
   }
@@ -1098,9 +1075,8 @@ class LibraryDrift extends DataClass implements Insertable<LibraryDrift> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return LibraryDrift(
-      createdAt: serializer.fromJson<String>(json['createdAt']),
-      updatedAt: serializer.fromJson<String>(json['updatedAt']),
-      id: serializer.fromJson<BigInt>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       mangaId: serializer.fromJson<String>(json['mangaId']),
     );
   }
@@ -1108,29 +1084,23 @@ class LibraryDrift extends DataClass implements Insertable<LibraryDrift> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'createdAt': serializer.toJson<String>(createdAt),
-      'updatedAt': serializer.toJson<String>(updatedAt),
-      'id': serializer.toJson<BigInt>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'mangaId': serializer.toJson<String>(mangaId),
     };
   }
 
   LibraryDrift copyWith(
-          {String? createdAt,
-          String? updatedAt,
-          BigInt? id,
-          String? mangaId}) =>
+          {DateTime? createdAt, DateTime? updatedAt, String? mangaId}) =>
       LibraryDrift(
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
-        id: id ?? this.id,
         mangaId: mangaId ?? this.mangaId,
       );
   LibraryDrift copyWithCompanion(LibraryTablesCompanion data) {
     return LibraryDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
-      id: data.id.present ? data.id.value : this.id,
       mangaId: data.mangaId.present ? data.mangaId.value : this.mangaId,
     );
   }
@@ -1140,65 +1110,63 @@ class LibraryDrift extends DataClass implements Insertable<LibraryDrift> {
     return (StringBuffer('LibraryDrift(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
-          ..write('id: $id, ')
           ..write('mangaId: $mangaId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(createdAt, updatedAt, id, mangaId);
+  int get hashCode => Object.hash(createdAt, updatedAt, mangaId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is LibraryDrift &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
-          other.id == this.id &&
           other.mangaId == this.mangaId);
 }
 
 class LibraryTablesCompanion extends UpdateCompanion<LibraryDrift> {
-  final Value<String> createdAt;
-  final Value<String> updatedAt;
-  final Value<BigInt> id;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
   final Value<String> mangaId;
+  final Value<int> rowid;
   const LibraryTablesCompanion({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-    this.id = const Value.absent(),
     this.mangaId = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   LibraryTablesCompanion.insert({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-    this.id = const Value.absent(),
     required String mangaId,
+    this.rowid = const Value.absent(),
   }) : mangaId = Value(mangaId);
   static Insertable<LibraryDrift> custom({
-    Expression<String>? createdAt,
-    Expression<String>? updatedAt,
-    Expression<BigInt>? id,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
     Expression<String>? mangaId,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
-      if (id != null) 'id': id,
       if (mangaId != null) 'manga_id': mangaId,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   LibraryTablesCompanion copyWith(
-      {Value<String>? createdAt,
-      Value<String>? updatedAt,
-      Value<BigInt>? id,
-      Value<String>? mangaId}) {
+      {Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<String>? mangaId,
+      Value<int>? rowid}) {
     return LibraryTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      id: id ?? this.id,
       mangaId: mangaId ?? this.mangaId,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1206,16 +1174,16 @@ class LibraryTablesCompanion extends UpdateCompanion<LibraryDrift> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (createdAt.present) {
-      map['created_at'] = Variable<String>(createdAt.value);
+      map['created_at'] = Variable<DateTime>(createdAt.value);
     }
     if (updatedAt.present) {
-      map['updated_at'] = Variable<String>(updatedAt.value);
-    }
-    if (id.present) {
-      map['id'] = Variable<BigInt>(id.value);
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
     if (mangaId.present) {
       map['manga_id'] = Variable<String>(mangaId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
     }
     return map;
   }
@@ -1225,8 +1193,8 @@ class LibraryTablesCompanion extends UpdateCompanion<LibraryDrift> {
     return (StringBuffer('LibraryTablesCompanion(')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
-          ..write('id: $id, ')
-          ..write('mangaId: $mangaId')
+          ..write('mangaId: $mangaId, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -1241,24 +1209,26 @@ class $MangaTablesTable extends MangaTables
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
-  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, false,
-      type: DriftSqlType.string,
+      type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
+      clientDefault: () => DateTime.timestamp());
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
-  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
       'updated_at', aliasedName, false,
-      type: DriftSqlType.string,
+      type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
+      clientDefault: () => DateTime.timestamp());
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => const Uuid().v4());
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
@@ -1329,8 +1299,6 @@ class $MangaTablesTable extends MangaTables
     }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
     }
     if (data.containsKey('title')) {
       context.handle(
@@ -1372,9 +1340,9 @@ class $MangaTablesTable extends MangaTables
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return MangaDrift(
       createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}updated_at'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       title: attachedDatabase.typeMapping
@@ -1401,8 +1369,8 @@ class $MangaTablesTable extends MangaTables
 }
 
 class MangaDrift extends DataClass implements Insertable<MangaDrift> {
-  final String createdAt;
-  final String updatedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
   final String id;
   final String? title;
   final String? coverUrl;
@@ -1425,8 +1393,8 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['created_at'] = Variable<String>(createdAt);
-    map['updated_at'] = Variable<String>(updatedAt);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     map['id'] = Variable<String>(id);
     if (!nullToAbsent || title != null) {
       map['title'] = Variable<String>(title);
@@ -1480,8 +1448,8 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return MangaDrift(
-      createdAt: serializer.fromJson<String>(json['createdAt']),
-      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       id: serializer.fromJson<String>(json['id']),
       title: serializer.fromJson<String?>(json['title']),
       coverUrl: serializer.fromJson<String?>(json['coverUrl']),
@@ -1496,8 +1464,8 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'createdAt': serializer.toJson<String>(createdAt),
-      'updatedAt': serializer.toJson<String>(updatedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'id': serializer.toJson<String>(id),
       'title': serializer.toJson<String?>(title),
       'coverUrl': serializer.toJson<String?>(coverUrl),
@@ -1510,8 +1478,8 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
   }
 
   MangaDrift copyWith(
-          {String? createdAt,
-          String? updatedAt,
+          {DateTime? createdAt,
+          DateTime? updatedAt,
           String? id,
           Value<String?> title = const Value.absent(),
           Value<String?> coverUrl = const Value.absent(),
@@ -1585,8 +1553,8 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
 }
 
 class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
-  final Value<String> createdAt;
-  final Value<String> updatedAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
   final Value<String> id;
   final Value<String?> title;
   final Value<String?> coverUrl;
@@ -1612,7 +1580,7 @@ class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
   MangaTablesCompanion.insert({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-    required String id,
+    this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.coverUrl = const Value.absent(),
     this.author = const Value.absent(),
@@ -1621,10 +1589,10 @@ class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
     this.webUrl = const Value.absent(),
     this.source = const Value.absent(),
     this.rowid = const Value.absent(),
-  }) : id = Value(id);
+  });
   static Insertable<MangaDrift> custom({
-    Expression<String>? createdAt,
-    Expression<String>? updatedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
     Expression<String>? id,
     Expression<String>? title,
     Expression<String>? coverUrl,
@@ -1651,8 +1619,8 @@ class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
   }
 
   MangaTablesCompanion copyWith(
-      {Value<String>? createdAt,
-      Value<String>? updatedAt,
+      {Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
       Value<String>? id,
       Value<String?>? title,
       Value<String?>? coverUrl,
@@ -1681,10 +1649,10 @@ class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (createdAt.present) {
-      map['created_at'] = Variable<String>(createdAt.value);
+      map['created_at'] = Variable<DateTime>(createdAt.value);
     }
     if (updatedAt.present) {
-      map['updated_at'] = Variable<String>(updatedAt.value);
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
     if (id.present) {
       map['id'] = Variable<String>(id.value);
@@ -1744,24 +1712,26 @@ class $TagTablesTable extends TagTables
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
-  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, false,
-      type: DriftSqlType.string,
+      type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
+      clientDefault: () => DateTime.timestamp());
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
-  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
       'updated_at', aliasedName, false,
-      type: DriftSqlType.string,
+      type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
+      clientDefault: () => DateTime.timestamp());
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => const Uuid().v4());
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -1789,8 +1759,6 @@ class $TagTablesTable extends TagTables
     }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -1812,9 +1780,9 @@ class $TagTablesTable extends TagTables
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TagDrift(
       createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}updated_at'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
@@ -1829,8 +1797,8 @@ class $TagTablesTable extends TagTables
 }
 
 class TagDrift extends DataClass implements Insertable<TagDrift> {
-  final String createdAt;
-  final String updatedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
   final String id;
   final String name;
   const TagDrift(
@@ -1841,8 +1809,8 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['created_at'] = Variable<String>(createdAt);
-    map['updated_at'] = Variable<String>(updatedAt);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
     return map;
@@ -1861,8 +1829,8 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return TagDrift(
-      createdAt: serializer.fromJson<String>(json['createdAt']),
-      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
     );
@@ -1871,15 +1839,18 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'createdAt': serializer.toJson<String>(createdAt),
-      'updatedAt': serializer.toJson<String>(updatedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
     };
   }
 
   TagDrift copyWith(
-          {String? createdAt, String? updatedAt, String? id, String? name}) =>
+          {DateTime? createdAt,
+          DateTime? updatedAt,
+          String? id,
+          String? name}) =>
       TagDrift(
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
@@ -1919,8 +1890,8 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
 }
 
 class TagTablesCompanion extends UpdateCompanion<TagDrift> {
-  final Value<String> createdAt;
-  final Value<String> updatedAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
   final Value<String> id;
   final Value<String> name;
   final Value<int> rowid;
@@ -1934,14 +1905,13 @@ class TagTablesCompanion extends UpdateCompanion<TagDrift> {
   TagTablesCompanion.insert({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-    required String id,
+    this.id = const Value.absent(),
     required String name,
     this.rowid = const Value.absent(),
-  })  : id = Value(id),
-        name = Value(name);
+  }) : name = Value(name);
   static Insertable<TagDrift> custom({
-    Expression<String>? createdAt,
-    Expression<String>? updatedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
     Expression<String>? id,
     Expression<String>? name,
     Expression<int>? rowid,
@@ -1956,8 +1926,8 @@ class TagTablesCompanion extends UpdateCompanion<TagDrift> {
   }
 
   TagTablesCompanion copyWith(
-      {Value<String>? createdAt,
-      Value<String>? updatedAt,
+      {Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
       Value<String>? id,
       Value<String>? name,
       Value<int>? rowid}) {
@@ -1974,10 +1944,10 @@ class TagTablesCompanion extends UpdateCompanion<TagDrift> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (createdAt.present) {
-      map['created_at'] = Variable<String>(createdAt.value);
+      map['created_at'] = Variable<DateTime>(createdAt.value);
     }
     if (updatedAt.present) {
-      map['updated_at'] = Variable<String>(updatedAt.value);
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
     if (id.present) {
       map['id'] = Variable<String>(id.value);
@@ -2013,19 +1983,19 @@ class $RelationshipTablesTable extends RelationshipTables
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
-  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, false,
-      type: DriftSqlType.string,
+      type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
+      clientDefault: () => DateTime.timestamp());
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
-  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
       'updated_at', aliasedName, false,
-      type: DriftSqlType.string,
+      type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
+      clientDefault: () => DateTime.timestamp());
   static const VerificationMeta _tagIdMeta = const VerificationMeta('tagId');
   @override
   late final GeneratedColumn<String> tagId = GeneratedColumn<String>(
@@ -2079,9 +2049,9 @@ class $RelationshipTablesTable extends RelationshipTables
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return RelationshipTable(
       createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}updated_at'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
       tagId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}tag_id'])!,
       mangaId: attachedDatabase.typeMapping
@@ -2097,8 +2067,8 @@ class $RelationshipTablesTable extends RelationshipTables
 
 class RelationshipTable extends DataClass
     implements Insertable<RelationshipTable> {
-  final String createdAt;
-  final String updatedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
   final String tagId;
   final String mangaId;
   const RelationshipTable(
@@ -2109,8 +2079,8 @@ class RelationshipTable extends DataClass
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['created_at'] = Variable<String>(createdAt);
-    map['updated_at'] = Variable<String>(updatedAt);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     map['tag_id'] = Variable<String>(tagId);
     map['manga_id'] = Variable<String>(mangaId);
     return map;
@@ -2129,8 +2099,8 @@ class RelationshipTable extends DataClass
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return RelationshipTable(
-      createdAt: serializer.fromJson<String>(json['createdAt']),
-      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       tagId: serializer.fromJson<String>(json['tagId']),
       mangaId: serializer.fromJson<String>(json['mangaId']),
     );
@@ -2139,16 +2109,16 @@ class RelationshipTable extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'createdAt': serializer.toJson<String>(createdAt),
-      'updatedAt': serializer.toJson<String>(updatedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'tagId': serializer.toJson<String>(tagId),
       'mangaId': serializer.toJson<String>(mangaId),
     };
   }
 
   RelationshipTable copyWith(
-          {String? createdAt,
-          String? updatedAt,
+          {DateTime? createdAt,
+          DateTime? updatedAt,
           String? tagId,
           String? mangaId}) =>
       RelationshipTable(
@@ -2190,8 +2160,8 @@ class RelationshipTable extends DataClass
 }
 
 class RelationshipTablesCompanion extends UpdateCompanion<RelationshipTable> {
-  final Value<String> createdAt;
-  final Value<String> updatedAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
   final Value<String> tagId;
   final Value<String> mangaId;
   final Value<int> rowid;
@@ -2211,8 +2181,8 @@ class RelationshipTablesCompanion extends UpdateCompanion<RelationshipTable> {
   })  : tagId = Value(tagId),
         mangaId = Value(mangaId);
   static Insertable<RelationshipTable> custom({
-    Expression<String>? createdAt,
-    Expression<String>? updatedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
     Expression<String>? tagId,
     Expression<String>? mangaId,
     Expression<int>? rowid,
@@ -2227,8 +2197,8 @@ class RelationshipTablesCompanion extends UpdateCompanion<RelationshipTable> {
   }
 
   RelationshipTablesCompanion copyWith(
-      {Value<String>? createdAt,
-      Value<String>? updatedAt,
+      {Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
       Value<String>? tagId,
       Value<String>? mangaId,
       Value<int>? rowid}) {
@@ -2245,10 +2215,10 @@ class RelationshipTablesCompanion extends UpdateCompanion<RelationshipTable> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (createdAt.present) {
-      map['created_at'] = Variable<String>(createdAt.value);
+      map['created_at'] = Variable<DateTime>(createdAt.value);
     }
     if (updatedAt.present) {
-      map['updated_at'] = Variable<String>(updatedAt.value);
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
     if (tagId.present) {
       map['tag_id'] = Variable<String>(tagId.value);
@@ -2284,19 +2254,19 @@ class $JobTablesTable extends JobTables
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
-  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, false,
-      type: DriftSqlType.string,
+      type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
+      clientDefault: () => DateTime.timestamp());
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
-  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
       'updated_at', aliasedName, false,
-      type: DriftSqlType.string,
+      type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
+      clientDefault: () => DateTime.timestamp());
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -2386,9 +2356,9 @@ class $JobTablesTable extends JobTables
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return JobDrift(
       createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}updated_at'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       type: $JobTablesTable.$convertertype.fromSql(attachedDatabase.typeMapping
@@ -2414,8 +2384,8 @@ class $JobTablesTable extends JobTables
 }
 
 class JobDrift extends DataClass implements Insertable<JobDrift> {
-  final String createdAt;
-  final String updatedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
   final int id;
   final JobTypeEnum type;
   final String? source;
@@ -2434,8 +2404,8 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['created_at'] = Variable<String>(createdAt);
-    map['updated_at'] = Variable<String>(updatedAt);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     map['id'] = Variable<int>(id);
     {
       map['type'] =
@@ -2480,8 +2450,8 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return JobDrift(
-      createdAt: serializer.fromJson<String>(json['createdAt']),
-      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       id: serializer.fromJson<int>(json['id']),
       type: $JobTablesTable.$convertertype
           .fromJson(serializer.fromJson<String>(json['type'])),
@@ -2495,8 +2465,8 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'createdAt': serializer.toJson<String>(createdAt),
-      'updatedAt': serializer.toJson<String>(updatedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'id': serializer.toJson<int>(id),
       'type': serializer
           .toJson<String>($JobTablesTable.$convertertype.toJson(type)),
@@ -2508,8 +2478,8 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
   }
 
   JobDrift copyWith(
-          {String? createdAt,
-          String? updatedAt,
+          {DateTime? createdAt,
+          DateTime? updatedAt,
           int? id,
           JobTypeEnum? type,
           Value<String?> source = const Value.absent(),
@@ -2572,8 +2542,8 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
 }
 
 class JobTablesCompanion extends UpdateCompanion<JobDrift> {
-  final Value<String> createdAt;
-  final Value<String> updatedAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
   final Value<int> id;
   final Value<JobTypeEnum> type;
   final Value<String?> source;
@@ -2601,8 +2571,8 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
     this.imageUrl = const Value.absent(),
   }) : type = Value(type);
   static Insertable<JobDrift> custom({
-    Expression<String>? createdAt,
-    Expression<String>? updatedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
     Expression<int>? id,
     Expression<String>? type,
     Expression<String>? source,
@@ -2623,8 +2593,8 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
   }
 
   JobTablesCompanion copyWith(
-      {Value<String>? createdAt,
-      Value<String>? updatedAt,
+      {Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
       Value<int>? id,
       Value<JobTypeEnum>? type,
       Value<String?>? source,
@@ -2647,10 +2617,10 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (createdAt.present) {
-      map['created_at'] = Variable<String>(createdAt.value);
+      map['created_at'] = Variable<DateTime>(createdAt.value);
     }
     if (updatedAt.present) {
-      map['updated_at'] = Variable<String>(updatedAt.value);
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
     if (id.present) {
       map['id'] = Variable<int>(id.value);
@@ -2699,19 +2669,19 @@ class $CacheTablesTable extends CacheTables
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
-  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, false,
-      type: DriftSqlType.string,
+      type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
+      clientDefault: () => DateTime.timestamp());
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
-  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
       'updated_at', aliasedName, false,
-      type: DriftSqlType.string,
+      type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp().toIso8601String());
+      clientDefault: () => DateTime.timestamp());
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -2841,9 +2811,9 @@ class $CacheTablesTable extends CacheTables
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return CacheDrift(
       createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}created_at'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}updated_at'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       url: attachedDatabase.typeMapping
@@ -2870,8 +2840,8 @@ class $CacheTablesTable extends CacheTables
 }
 
 class CacheDrift extends DataClass implements Insertable<CacheDrift> {
-  final String createdAt;
-  final String updatedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
   final int id;
   final String url;
   final String key;
@@ -2894,8 +2864,8 @@ class CacheDrift extends DataClass implements Insertable<CacheDrift> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['created_at'] = Variable<String>(createdAt);
-    map['updated_at'] = Variable<String>(updatedAt);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     map['id'] = Variable<int>(id);
     map['url'] = Variable<String>(url);
     map['key'] = Variable<String>(key);
@@ -2935,8 +2905,8 @@ class CacheDrift extends DataClass implements Insertable<CacheDrift> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return CacheDrift(
-      createdAt: serializer.fromJson<String>(json['createdAt']),
-      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       id: serializer.fromJson<int>(json['id']),
       url: serializer.fromJson<String>(json['url']),
       key: serializer.fromJson<String>(json['key']),
@@ -2951,8 +2921,8 @@ class CacheDrift extends DataClass implements Insertable<CacheDrift> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'createdAt': serializer.toJson<String>(createdAt),
-      'updatedAt': serializer.toJson<String>(updatedAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'id': serializer.toJson<int>(id),
       'url': serializer.toJson<String>(url),
       'key': serializer.toJson<String>(key),
@@ -2965,8 +2935,8 @@ class CacheDrift extends DataClass implements Insertable<CacheDrift> {
   }
 
   CacheDrift copyWith(
-          {String? createdAt,
-          String? updatedAt,
+          {DateTime? createdAt,
+          DateTime? updatedAt,
           int? id,
           String? url,
           String? key,
@@ -3041,8 +3011,8 @@ class CacheDrift extends DataClass implements Insertable<CacheDrift> {
 }
 
 class CacheTablesCompanion extends UpdateCompanion<CacheDrift> {
-  final Value<String> createdAt;
-  final Value<String> updatedAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
   final Value<int> id;
   final Value<String> url;
   final Value<String> key;
@@ -3079,8 +3049,8 @@ class CacheTablesCompanion extends UpdateCompanion<CacheDrift> {
         relativePath = Value(relativePath),
         validTill = Value(validTill);
   static Insertable<CacheDrift> custom({
-    Expression<String>? createdAt,
-    Expression<String>? updatedAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
     Expression<int>? id,
     Expression<String>? url,
     Expression<String>? key,
@@ -3105,8 +3075,8 @@ class CacheTablesCompanion extends UpdateCompanion<CacheDrift> {
   }
 
   CacheTablesCompanion copyWith(
-      {Value<String>? createdAt,
-      Value<String>? updatedAt,
+      {Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
       Value<int>? id,
       Value<String>? url,
       Value<String>? key,
@@ -3133,10 +3103,10 @@ class CacheTablesCompanion extends UpdateCompanion<CacheDrift> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (createdAt.present) {
-      map['created_at'] = Variable<String>(createdAt.value);
+      map['created_at'] = Variable<DateTime>(createdAt.value);
     }
     if (updatedAt.present) {
-      map['updated_at'] = Variable<String>(updatedAt.value);
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
     if (id.present) {
       map['id'] = Variable<int>(id.value);
@@ -3220,22 +3190,22 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 
 typedef $$ImageTablesTableCreateCompanionBuilder = ImageTablesCompanion
     Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<String> id,
   required int order,
   required String chapterId,
   required String webUrl,
-  required String id,
   Value<int> rowid,
 });
 typedef $$ImageTablesTableUpdateCompanionBuilder = ImageTablesCompanion
     Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<String> id,
   Value<int> order,
   Value<String> chapterId,
   Value<String> webUrl,
-  Value<String> id,
   Value<int> rowid,
 });
 
@@ -3248,11 +3218,14 @@ class $$ImageTablesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get createdAt => $composableBuilder(
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get updatedAt => $composableBuilder(
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get order => $composableBuilder(
       column: $table.order, builder: (column) => ColumnFilters(column));
@@ -3262,9 +3235,6 @@ class $$ImageTablesTableFilterComposer
 
   ColumnFilters<String> get webUrl => $composableBuilder(
       column: $table.webUrl, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
 }
 
 class $$ImageTablesTableOrderingComposer
@@ -3276,11 +3246,14 @@ class $$ImageTablesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get createdAt => $composableBuilder(
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get updatedAt => $composableBuilder(
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<int> get order => $composableBuilder(
       column: $table.order, builder: (column) => ColumnOrderings(column));
@@ -3290,9 +3263,6 @@ class $$ImageTablesTableOrderingComposer
 
   ColumnOrderings<String> get webUrl => $composableBuilder(
       column: $table.webUrl, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
 }
 
 class $$ImageTablesTableAnnotationComposer
@@ -3304,11 +3274,14 @@ class $$ImageTablesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get createdAt =>
+  GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  GeneratedColumn<String> get updatedAt =>
+  GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<int> get order =>
       $composableBuilder(column: $table.order, builder: (column) => column);
@@ -3318,9 +3291,6 @@ class $$ImageTablesTableAnnotationComposer
 
   GeneratedColumn<String> get webUrl =>
       $composableBuilder(column: $table.webUrl, builder: (column) => column);
-
-  GeneratedColumn<String> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
 }
 
 class $$ImageTablesTableTableManager extends RootTableManager<
@@ -3346,39 +3316,39 @@ class $$ImageTablesTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$ImageTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<String> id = const Value.absent(),
             Value<int> order = const Value.absent(),
             Value<String> chapterId = const Value.absent(),
             Value<String> webUrl = const Value.absent(),
-            Value<String> id = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               ImageTablesCompanion(
             createdAt: createdAt,
             updatedAt: updatedAt,
+            id: id,
             order: order,
             chapterId: chapterId,
             webUrl: webUrl,
-            id: id,
             rowid: rowid,
           ),
           createCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<String> id = const Value.absent(),
             required int order,
             required String chapterId,
             required String webUrl,
-            required String id,
             Value<int> rowid = const Value.absent(),
           }) =>
               ImageTablesCompanion.insert(
             createdAt: createdAt,
             updatedAt: updatedAt,
+            id: id,
             order: order,
             chapterId: chapterId,
             webUrl: webUrl,
-            id: id,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
@@ -3402,24 +3372,8 @@ typedef $$ImageTablesTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function()>;
 typedef $$ChapterTablesTableCreateCompanionBuilder = ChapterTablesCompanion
     Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
-  required String id,
-  Value<String?> mangaId,
-  Value<String?> title,
-  Value<String?> volume,
-  Value<String?> chapter,
-  Value<String?> translatedLanguage,
-  Value<String?> scanlationGroup,
-  Value<String?> webUrl,
-  Value<String?> readableAt,
-  Value<String?> publishAt,
-  Value<int> rowid,
-});
-typedef $$ChapterTablesTableUpdateCompanionBuilder = ChapterTablesCompanion
-    Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
   Value<String> id,
   Value<String?> mangaId,
   Value<String?> title,
@@ -3428,8 +3382,24 @@ typedef $$ChapterTablesTableUpdateCompanionBuilder = ChapterTablesCompanion
   Value<String?> translatedLanguage,
   Value<String?> scanlationGroup,
   Value<String?> webUrl,
-  Value<String?> readableAt,
-  Value<String?> publishAt,
+  Value<DateTime?> readableAt,
+  Value<DateTime?> publishAt,
+  Value<int> rowid,
+});
+typedef $$ChapterTablesTableUpdateCompanionBuilder = ChapterTablesCompanion
+    Function({
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<String> id,
+  Value<String?> mangaId,
+  Value<String?> title,
+  Value<String?> volume,
+  Value<String?> chapter,
+  Value<String?> translatedLanguage,
+  Value<String?> scanlationGroup,
+  Value<String?> webUrl,
+  Value<DateTime?> readableAt,
+  Value<DateTime?> publishAt,
   Value<int> rowid,
 });
 
@@ -3442,10 +3412,10 @@ class $$ChapterTablesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get createdAt => $composableBuilder(
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get updatedAt => $composableBuilder(
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get id => $composableBuilder(
@@ -3474,10 +3444,10 @@ class $$ChapterTablesTableFilterComposer
   ColumnFilters<String> get webUrl => $composableBuilder(
       column: $table.webUrl, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get readableAt => $composableBuilder(
+  ColumnFilters<DateTime> get readableAt => $composableBuilder(
       column: $table.readableAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get publishAt => $composableBuilder(
+  ColumnFilters<DateTime> get publishAt => $composableBuilder(
       column: $table.publishAt, builder: (column) => ColumnFilters(column));
 }
 
@@ -3490,10 +3460,10 @@ class $$ChapterTablesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get createdAt => $composableBuilder(
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get updatedAt => $composableBuilder(
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get id => $composableBuilder(
@@ -3522,10 +3492,10 @@ class $$ChapterTablesTableOrderingComposer
   ColumnOrderings<String> get webUrl => $composableBuilder(
       column: $table.webUrl, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get readableAt => $composableBuilder(
+  ColumnOrderings<DateTime> get readableAt => $composableBuilder(
       column: $table.readableAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get publishAt => $composableBuilder(
+  ColumnOrderings<DateTime> get publishAt => $composableBuilder(
       column: $table.publishAt, builder: (column) => ColumnOrderings(column));
 }
 
@@ -3538,10 +3508,10 @@ class $$ChapterTablesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get createdAt =>
+  GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  GeneratedColumn<String> get updatedAt =>
+  GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
   GeneratedColumn<String> get id =>
@@ -3568,10 +3538,10 @@ class $$ChapterTablesTableAnnotationComposer
   GeneratedColumn<String> get webUrl =>
       $composableBuilder(column: $table.webUrl, builder: (column) => column);
 
-  GeneratedColumn<String> get readableAt => $composableBuilder(
+  GeneratedColumn<DateTime> get readableAt => $composableBuilder(
       column: $table.readableAt, builder: (column) => column);
 
-  GeneratedColumn<String> get publishAt =>
+  GeneratedColumn<DateTime> get publishAt =>
       $composableBuilder(column: $table.publishAt, builder: (column) => column);
 }
 
@@ -3601,8 +3571,8 @@ class $$ChapterTablesTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$ChapterTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
             Value<String> id = const Value.absent(),
             Value<String?> mangaId = const Value.absent(),
             Value<String?> title = const Value.absent(),
@@ -3611,8 +3581,8 @@ class $$ChapterTablesTableTableManager extends RootTableManager<
             Value<String?> translatedLanguage = const Value.absent(),
             Value<String?> scanlationGroup = const Value.absent(),
             Value<String?> webUrl = const Value.absent(),
-            Value<String?> readableAt = const Value.absent(),
-            Value<String?> publishAt = const Value.absent(),
+            Value<DateTime?> readableAt = const Value.absent(),
+            Value<DateTime?> publishAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               ChapterTablesCompanion(
@@ -3631,9 +3601,9 @@ class $$ChapterTablesTableTableManager extends RootTableManager<
             rowid: rowid,
           ),
           createCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
-            required String id,
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<String> id = const Value.absent(),
             Value<String?> mangaId = const Value.absent(),
             Value<String?> title = const Value.absent(),
             Value<String?> volume = const Value.absent(),
@@ -3641,8 +3611,8 @@ class $$ChapterTablesTableTableManager extends RootTableManager<
             Value<String?> translatedLanguage = const Value.absent(),
             Value<String?> scanlationGroup = const Value.absent(),
             Value<String?> webUrl = const Value.absent(),
-            Value<String?> readableAt = const Value.absent(),
-            Value<String?> publishAt = const Value.absent(),
+            Value<DateTime?> readableAt = const Value.absent(),
+            Value<DateTime?> publishAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               ChapterTablesCompanion.insert(
@@ -3684,17 +3654,17 @@ typedef $$ChapterTablesTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function()>;
 typedef $$LibraryTablesTableCreateCompanionBuilder = LibraryTablesCompanion
     Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
-  Value<BigInt> id,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
   required String mangaId,
+  Value<int> rowid,
 });
 typedef $$LibraryTablesTableUpdateCompanionBuilder = LibraryTablesCompanion
     Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
-  Value<BigInt> id,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
   Value<String> mangaId,
+  Value<int> rowid,
 });
 
 class $$LibraryTablesTableFilterComposer
@@ -3706,14 +3676,11 @@ class $$LibraryTablesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get createdAt => $composableBuilder(
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get updatedAt => $composableBuilder(
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<BigInt> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get mangaId => $composableBuilder(
       column: $table.mangaId, builder: (column) => ColumnFilters(column));
@@ -3728,14 +3695,11 @@ class $$LibraryTablesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get createdAt => $composableBuilder(
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get updatedAt => $composableBuilder(
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<BigInt> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get mangaId => $composableBuilder(
       column: $table.mangaId, builder: (column) => ColumnOrderings(column));
@@ -3750,14 +3714,11 @@ class $$LibraryTablesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get createdAt =>
+  GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  GeneratedColumn<String> get updatedAt =>
+  GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
-
-  GeneratedColumn<BigInt> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get mangaId =>
       $composableBuilder(column: $table.mangaId, builder: (column) => column);
@@ -3789,28 +3750,28 @@ class $$LibraryTablesTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$LibraryTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
-            Value<BigInt> id = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
             Value<String> mangaId = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
           }) =>
               LibraryTablesCompanion(
             createdAt: createdAt,
             updatedAt: updatedAt,
-            id: id,
             mangaId: mangaId,
+            rowid: rowid,
           ),
           createCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
-            Value<BigInt> id = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
             required String mangaId,
+            Value<int> rowid = const Value.absent(),
           }) =>
               LibraryTablesCompanion.insert(
             createdAt: createdAt,
             updatedAt: updatedAt,
-            id: id,
             mangaId: mangaId,
+            rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -3836,9 +3797,9 @@ typedef $$LibraryTablesTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function()>;
 typedef $$MangaTablesTableCreateCompanionBuilder = MangaTablesCompanion
     Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
-  required String id,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<String> id,
   Value<String?> title,
   Value<String?> coverUrl,
   Value<String?> author,
@@ -3850,8 +3811,8 @@ typedef $$MangaTablesTableCreateCompanionBuilder = MangaTablesCompanion
 });
 typedef $$MangaTablesTableUpdateCompanionBuilder = MangaTablesCompanion
     Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
   Value<String> id,
   Value<String?> title,
   Value<String?> coverUrl,
@@ -3872,10 +3833,10 @@ class $$MangaTablesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get createdAt => $composableBuilder(
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get updatedAt => $composableBuilder(
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get id => $composableBuilder(
@@ -3912,10 +3873,10 @@ class $$MangaTablesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get createdAt => $composableBuilder(
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get updatedAt => $composableBuilder(
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get id => $composableBuilder(
@@ -3952,10 +3913,10 @@ class $$MangaTablesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get createdAt =>
+  GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  GeneratedColumn<String> get updatedAt =>
+  GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
   GeneratedColumn<String> get id =>
@@ -4006,8 +3967,8 @@ class $$MangaTablesTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$MangaTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
             Value<String> id = const Value.absent(),
             Value<String?> title = const Value.absent(),
             Value<String?> coverUrl = const Value.absent(),
@@ -4032,9 +3993,9 @@ class $$MangaTablesTableTableManager extends RootTableManager<
             rowid: rowid,
           ),
           createCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
-            required String id,
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<String> id = const Value.absent(),
             Value<String?> title = const Value.absent(),
             Value<String?> coverUrl = const Value.absent(),
             Value<String?> author = const Value.absent(),
@@ -4077,15 +4038,15 @@ typedef $$MangaTablesTableProcessedTableManager = ProcessedTableManager<
     MangaDrift,
     PrefetchHooks Function()>;
 typedef $$TagTablesTableCreateCompanionBuilder = TagTablesCompanion Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
-  required String id,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<String> id,
   required String name,
   Value<int> rowid,
 });
 typedef $$TagTablesTableUpdateCompanionBuilder = TagTablesCompanion Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
   Value<String> id,
   Value<String> name,
   Value<int> rowid,
@@ -4100,10 +4061,10 @@ class $$TagTablesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get createdAt => $composableBuilder(
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get updatedAt => $composableBuilder(
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get id => $composableBuilder(
@@ -4122,10 +4083,10 @@ class $$TagTablesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get createdAt => $composableBuilder(
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get updatedAt => $composableBuilder(
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get id => $composableBuilder(
@@ -4144,10 +4105,10 @@ class $$TagTablesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get createdAt =>
+  GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  GeneratedColumn<String> get updatedAt =>
+  GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
   GeneratedColumn<String> get id =>
@@ -4180,8 +4141,8 @@ class $$TagTablesTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$TagTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
             Value<String> id = const Value.absent(),
             Value<String> name = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -4194,9 +4155,9 @@ class $$TagTablesTableTableManager extends RootTableManager<
             rowid: rowid,
           ),
           createCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
-            required String id,
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<String> id = const Value.absent(),
             required String name,
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -4228,16 +4189,16 @@ typedef $$TagTablesTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function()>;
 typedef $$RelationshipTablesTableCreateCompanionBuilder
     = RelationshipTablesCompanion Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
   required String tagId,
   required String mangaId,
   Value<int> rowid,
 });
 typedef $$RelationshipTablesTableUpdateCompanionBuilder
     = RelationshipTablesCompanion Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
   Value<String> tagId,
   Value<String> mangaId,
   Value<int> rowid,
@@ -4252,10 +4213,10 @@ class $$RelationshipTablesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get createdAt => $composableBuilder(
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get updatedAt => $composableBuilder(
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get tagId => $composableBuilder(
@@ -4274,10 +4235,10 @@ class $$RelationshipTablesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get createdAt => $composableBuilder(
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get updatedAt => $composableBuilder(
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get tagId => $composableBuilder(
@@ -4296,10 +4257,10 @@ class $$RelationshipTablesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get createdAt =>
+  GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  GeneratedColumn<String> get updatedAt =>
+  GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
   GeneratedColumn<String> get tagId =>
@@ -4337,8 +4298,8 @@ class $$RelationshipTablesTableTableManager extends RootTableManager<
               $$RelationshipTablesTableAnnotationComposer(
                   $db: db, $table: table),
           updateCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
             Value<String> tagId = const Value.absent(),
             Value<String> mangaId = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -4351,8 +4312,8 @@ class $$RelationshipTablesTableTableManager extends RootTableManager<
             rowid: rowid,
           ),
           createCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
             required String tagId,
             required String mangaId,
             Value<int> rowid = const Value.absent(),
@@ -4387,8 +4348,8 @@ typedef $$RelationshipTablesTableProcessedTableManager = ProcessedTableManager<
     RelationshipTable,
     PrefetchHooks Function()>;
 typedef $$JobTablesTableCreateCompanionBuilder = JobTablesCompanion Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
   Value<int> id,
   required JobTypeEnum type,
   Value<String?> source,
@@ -4397,8 +4358,8 @@ typedef $$JobTablesTableCreateCompanionBuilder = JobTablesCompanion Function({
   Value<String?> imageUrl,
 });
 typedef $$JobTablesTableUpdateCompanionBuilder = JobTablesCompanion Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
   Value<int> id,
   Value<JobTypeEnum> type,
   Value<String?> source,
@@ -4416,10 +4377,10 @@ class $$JobTablesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get createdAt => $composableBuilder(
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get updatedAt => $composableBuilder(
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get id => $composableBuilder(
@@ -4452,10 +4413,10 @@ class $$JobTablesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get createdAt => $composableBuilder(
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get updatedAt => $composableBuilder(
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<int> get id => $composableBuilder(
@@ -4486,10 +4447,10 @@ class $$JobTablesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get createdAt =>
+  GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  GeneratedColumn<String> get updatedAt =>
+  GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
   GeneratedColumn<int> get id =>
@@ -4534,8 +4495,8 @@ class $$JobTablesTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$JobTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
             Value<int> id = const Value.absent(),
             Value<JobTypeEnum> type = const Value.absent(),
             Value<String?> source = const Value.absent(),
@@ -4554,8 +4515,8 @@ class $$JobTablesTableTableManager extends RootTableManager<
             imageUrl: imageUrl,
           ),
           createCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
             Value<int> id = const Value.absent(),
             required JobTypeEnum type,
             Value<String?> source = const Value.absent(),
@@ -4594,8 +4555,8 @@ typedef $$JobTablesTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function()>;
 typedef $$CacheTablesTableCreateCompanionBuilder = CacheTablesCompanion
     Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
   Value<int> id,
   required String url,
   required String key,
@@ -4607,8 +4568,8 @@ typedef $$CacheTablesTableCreateCompanionBuilder = CacheTablesCompanion
 });
 typedef $$CacheTablesTableUpdateCompanionBuilder = CacheTablesCompanion
     Function({
-  Value<String> createdAt,
-  Value<String> updatedAt,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
   Value<int> id,
   Value<String> url,
   Value<String> key,
@@ -4628,10 +4589,10 @@ class $$CacheTablesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get createdAt => $composableBuilder(
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get updatedAt => $composableBuilder(
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get id => $composableBuilder(
@@ -4668,10 +4629,10 @@ class $$CacheTablesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get createdAt => $composableBuilder(
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get updatedAt => $composableBuilder(
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<int> get id => $composableBuilder(
@@ -4709,10 +4670,10 @@ class $$CacheTablesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get createdAt =>
+  GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  GeneratedColumn<String> get updatedAt =>
+  GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
   GeneratedColumn<int> get id =>
@@ -4763,8 +4724,8 @@ class $$CacheTablesTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$CacheTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
             Value<int> id = const Value.absent(),
             Value<String> url = const Value.absent(),
             Value<String> key = const Value.absent(),
@@ -4787,8 +4748,8 @@ class $$CacheTablesTableTableManager extends RootTableManager<
             length: length,
           ),
           createCompanionCallback: ({
-            Value<String> createdAt = const Value.absent(),
-            Value<String> updatedAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
             Value<int> id = const Value.absent(),
             required String url,
             required String key,

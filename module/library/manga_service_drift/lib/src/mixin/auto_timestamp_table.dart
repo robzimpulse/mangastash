@@ -1,10 +1,10 @@
 import 'package:drift/drift.dart';
 
 mixin AutoTimestampTable on Table {
-  TextColumn get createdAt => text()
+  DateTimeColumn get createdAt => dateTime()
       .named('created_at')
-      .clientDefault(() => DateTime.timestamp().toIso8601String())();
-  TextColumn get updatedAt => text()
+      .clientDefault(() => DateTime.timestamp())();
+  DateTimeColumn get updatedAt => dateTime()
       .named('updated_at')
-      .clientDefault(() => DateTime.timestamp().toIso8601String())();
+      .clientDefault(() => DateTime.timestamp())();
 }

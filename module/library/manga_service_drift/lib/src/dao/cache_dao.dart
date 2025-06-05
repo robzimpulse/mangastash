@@ -73,14 +73,9 @@ class CacheDao extends DatabaseAccessor<AppDatabase> with _$CacheDaoMixin {
   Future<CacheDrift> add({required CacheTablesCompanion value}) {
     return transaction(
       () => into(cacheTables).insertReturning(
-        value.copyWith(
-          createdAt: Value(DateTime.now().toIso8601String()),
-          updatedAt: Value(DateTime.now().toIso8601String()),
-        ),
+        value,
         onConflict: DoUpdate(
-          (old) => value.copyWith(
-            updatedAt: Value(DateTime.now().toIso8601String()),
-          ),
+          (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
         ),
       ),
     );

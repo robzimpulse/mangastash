@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
@@ -19,11 +20,9 @@ class MangaChapter extends Equatable with SimilarityMixin {
 
   final String? chapter;
 
-  /// must be in ISO8601 Format (yyyy-MM-ddTHH:mm:ss.mmmuuuZ)
-  final String? readableAt;
+  final DateTime? readableAt;
 
-  /// must be in ISO8601 Format (yyyy-MM-ddTHH:mm:ss.mmmuuuZ)
-  final String? publishAt;
+  final DateTime? publishAt;
 
   final List<String>? images;
 
@@ -117,8 +116,8 @@ class MangaChapter extends Equatable with SimilarityMixin {
     String? title,
     String? volume,
     String? chapter,
-    String? readableAt,
-    String? publishAt,
+    DateTime? readableAt,
+    DateTime? publishAt,
     String? translatedLanguage,
     String? scanlationGroup,
     List<String>? images,
@@ -149,8 +148,8 @@ class MangaChapter extends Equatable with SimilarityMixin {
       title: data.attributes?.title,
       chapter: data.attributes?.chapter,
       volume: data.attributes?.volume,
-      readableAt: data.attributes?.readableAt,
-      publishAt: data.attributes?.publishAt,
+      readableAt: data.attributes?.readableAt?.asDateTime,
+      publishAt: data.attributes?.publishAt?.asDateTime,
       scanlationGroup: scanlation is Relationship<ScanlationGroupDataAttributes>
           ? scanlation.attributes?.name
           : null,

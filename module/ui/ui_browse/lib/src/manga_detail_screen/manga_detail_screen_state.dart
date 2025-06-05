@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:core_auth/core_auth.dart';
-import 'package:core_environment/core_environment.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
@@ -76,8 +75,8 @@ class MangaDetailScreenState extends Equatable {
         processedChapters.update(
           chapter,
           (value) {
-            final oldDate = value.publishAt?.asDateTime;
-            final newDate = data.publishAt?.asDateTime;
+            final oldDate = value.publishAt;
+            final newDate = data.publishAt;
 
             if (oldDate != null && newDate != null) {
               return newDate.isBefore(oldDate) ? value : data;

@@ -1,12 +1,11 @@
 import 'package:drift/drift.dart';
 
+import '../mixin/auto_id.dart';
 import '../mixin/auto_timestamp_table.dart';
 import '../util/job_type_enum.dart';
 
 @DataClassName('JobDrift')
-class JobTables extends Table with AutoTimestampTable {
-  IntColumn get id => integer().autoIncrement().named('id')();
-
+class JobTables extends Table with AutoTimestampTable, AutoIntegerIdTable {
   TextColumn get type => textEnum<JobTypeEnum>().named('type')();
 
   TextColumn get source => text().named('source').nullable()();

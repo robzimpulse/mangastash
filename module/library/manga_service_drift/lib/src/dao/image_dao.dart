@@ -1,9 +1,7 @@
 import 'package:drift/drift.dart';
-import 'package:uuid/uuid.dart';
 
 import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
-import '../extension/value_or_null_extension.dart';
 import '../tables/image_tables.dart';
 
 part 'image_dao.g.dart';
@@ -82,17 +80,10 @@ class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
   Future<ImageDrift> add({required ImageTablesCompanion value}) {
     return transaction(
       () => into(imageTables).insertReturning(
-        value.copyWith(
-          id: Value(value.id.valueOrNull ?? const Uuid().v4().toString()),
-          createdAt: Value(DateTime.now().toIso8601String()),
-          updatedAt: Value(DateTime.now().toIso8601String()),
-        ),
+        value,
         mode: InsertMode.insertOrReplace,
         onConflict: DoUpdate(
-          (old) => value.copyWith(
-            id: const Value.absent(),
-            updatedAt: Value(DateTime.now().toIso8601String()),
-          ),
+          (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
         ),
       ),
     );

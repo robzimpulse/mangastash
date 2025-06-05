@@ -37,7 +37,7 @@ class MangaClashChapterListHtmlParser extends ChapterListHtmlParser {
         MangaChapter(
           title: title?.trim(),
           chapter: chapter != null ? '$chapter' : null,
-          readableAt: releaseDate,
+          readableAt: releaseDate?.asDateTime,
           webUrl: url,
         ),
       );
