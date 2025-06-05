@@ -80,11 +80,12 @@ Future<QueryExecutor> _openConnection({LoggerCallback? logger}) async {
   return driftDatabase(
     name: 'mangastash-local',
     native: DriftNativeOptions(
-      databaseDirectory: () async {
-        final path = await getApplicationDocumentsDirectory();
-        logger?.call('Database location: $path',name: 'AppDatabase');
-        return path;
-      },
+      databaseDirectory: () => getApplicationDocumentsDirectory().then(
+        (value) {
+          logger?.call('Database location: $value',name: 'AppDatabase');
+          return value;
+        },
+      ),
     ),
     web: DriftWebOptions(
       sqlite3Wasm: Uri.parse('sqlite3.wasm'),
