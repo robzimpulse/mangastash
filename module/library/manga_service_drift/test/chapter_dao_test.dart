@@ -31,6 +31,7 @@ void main() {
         translatedLanguage: Value('translated_language_$chpIdx'),
         scanlationGroup: Value('scanlation_group_$chpIdx'),
         webUrl: Value('web_url_$chpIdx'),
+        lastReadAt: Value(DateTime.timestamp()),
       ),
       List.generate(10, (imgIdx) => 'chapter_id_${chpIdx}_image_url_$imgIdx'),
     ),
@@ -47,17 +48,64 @@ void main() {
 
     tearDown(() async => await db.clear());
 
+    group('Specific Cases', () {
+      test('Update Last Read At', () async {
+        final chapter = (
+          const ChapterTablesCompanion(
+            id: Value('id_new'),
+            title: Value('title_new'),
+            mangaId: Value('manga_id_new'),
+            volume: Value('volume_new'),
+            chapter: Value('chapter_new'),
+            translatedLanguage: Value('translated_language_nee'),
+            scanlationGroup: Value('scanlation_group_nre'),
+            webUrl: Value('web_url_new'),
+          ),
+          List.generate(
+            10,
+            (imgIdx) => 'chapter_id_new_image_url_$imgIdx',
+          ),
+        );
+
+        final chapterUpdated = (
+          chapter.$1.copyWith(
+            lastReadAt: Value(DateTime.timestamp()),
+          ),
+          chapter.$2
+        );
+
+        await dao.add(value: chapter.$1, images: chapter.$2);
+        expect((await dao.all).length, equals(chapters.length + 1));
+
+        final a = await dao.search(ids: [chapter.$1.id.value]);
+        expect(a.first.chapter?.lastReadAt == null, isTrue);
+
+        await dao.add(value: chapterUpdated.$1, images: chapterUpdated.$2);
+        expect((await dao.all).length, equals(chapters.length + 1));
+
+        final b = await dao.search(ids: [chapter.$1.id.value]);
+        expect(b.first.chapter?.lastReadAt == null, isFalse);
+
+        await dao.add(value: chapter.$1, images: chapter.$2);
+        expect((await dao.all).length, equals(chapters.length + 1));
+
+        final c = await dao.search(ids: [chapter.$1.id.value]);
+        expect(c.first.chapter?.lastReadAt == null, isFalse);
+      });
+    });
+
     group('With New Value', () {
       final chapter = (
-        const ChapterTablesCompanion(
-          id: Value('id_new'),
-          title: Value('title_new'),
-          mangaId: Value('manga_id_new'),
-          volume: Value('volume_new'),
-          chapter: Value('chapter_new'),
-          translatedLanguage: Value('translated_language_nee'),
-          scanlationGroup: Value('scanlation_group_nre'),
-          webUrl: Value('web_url_new'),
+        ChapterTablesCompanion(
+          id: const Value('id_new'),
+          title: const Value('title_new'),
+          mangaId: const Value('manga_id_new'),
+          volume: const Value('volume_new'),
+          chapter: const Value('chapter_new'),
+          translatedLanguage: const Value('translated_language_nee'),
+          scanlationGroup: const Value('scanlation_group_nre'),
+          webUrl: const Value('web_url_new'),
+          lastReadAt: Value(DateTime.timestamp()),
         ),
         List.generate(
           10,
@@ -121,8 +169,6 @@ void main() {
           );
         });
       });
-
-
     });
 
     group('With Old Value', () {
@@ -184,7 +230,6 @@ void main() {
           );
         });
       });
-
     });
   });
 }
