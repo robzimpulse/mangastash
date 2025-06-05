@@ -114,19 +114,4 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
 
     return transaction(() => selector.go());
   }
-
-  Future<List<RelationshipTable>> relationship({
-    List<String> mangaIds = const [],
-    List<String> tagIds = const [],
-  }) {
-    final selector = select(relationshipTables)
-      ..where(
-        (f) => [
-          f.mangaId.isIn(mangaIds.nonEmpty.distinct),
-          f.tagId.isIn(tagIds.nonEmpty.distinct),
-        ].fold(const Constant(false), (a, b) => a | b),
-      );
-
-    return transaction(() => selector.get());
-  }
 }

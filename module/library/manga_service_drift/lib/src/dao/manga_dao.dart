@@ -74,6 +74,7 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     List<String> descriptions = const [],
     List<String> webUrls = const [],
     List<String> sources = const [],
+    List<String> tags = const [],
   }) {
     final filter = [
       mangaTables.id.isIn(ids.nonEmpty.distinct),
@@ -84,6 +85,7 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
       mangaTables.description.isIn(descriptions.nonEmpty.distinct),
       mangaTables.webUrl.isIn(webUrls.nonEmpty.distinct),
       mangaTables.source.isIn(sources.nonEmpty.distinct),
+      tagTables.name.isIn(tags.nonEmpty.distinct),
     ].fold<Expression<bool>>(const Constant(false), (a, b) => a | b);
 
     final selector = _aggregate..where(filter);
@@ -114,20 +116,30 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
       ].fold(const Constant(false), (a, b) => a | b);
     }
 
-    final a = delete(mangaTables)..where(filter);
+    final selector = delete(mangaTables)..where(filter);
     return transaction(() async {
-      final results = await a.goAndReturn();
+      final olds = await search(
+        ids: ids,
+        titles: titles,
+        coverUrls: coverUrls,
+        authors: authors,
+        statuses: statuses,
+        descriptions: descriptions,
+        webUrls: webUrls,
+        sources: sources,
+      );
 
-      // TODO: detach tags that linked to this manga
-      // await _tagDao.detach(mangaIds: [...results.map((e) => e.id)]);
-      return [
-        for (final result in results)
-          MangaModel(
-            manga: result,
-            // TODO: get tags that are related to this manga before unlinked
-            // images: [...images.where((e) => e.chapterId == chapter.id)],
-          ),
-      ];
+      final results = await selector.goAndReturn();
+
+      await _tagDao.detach(mangaIds: [...results.map((e) => e.id)]);
+
+      final data = <MangaModel>[];
+      for (final result in results) {
+        final old = olds.firstWhereOrNull((e) => e.manga?.id == result.id);
+        data.add(MangaModel(manga: result, tags: [...?old?.tags]));
+      }
+
+      return data;
     });
   }
 
