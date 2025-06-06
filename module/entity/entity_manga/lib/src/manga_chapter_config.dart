@@ -5,6 +5,7 @@ import 'enum/manga_chapter_display_enum.dart';
 import 'enum/manga_chapter_sort_option_enum.dart';
 import 'enum/manga_chapter_sort_order_enum.dart';
 
+// TODO: rename to `ChapterConfig`
 class MangaChapterConfig extends Equatable {
   const MangaChapterConfig({
     this.downloaded,

@@ -6,6 +6,7 @@ import 'enum/manga_source_enum.dart';
 
 part 'manga_source.g.dart';
 
+// TODO: rename to `Source`
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class MangaSource extends Equatable {
   final String? iconUrl;

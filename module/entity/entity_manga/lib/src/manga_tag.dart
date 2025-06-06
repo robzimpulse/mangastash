@@ -5,6 +5,7 @@ import 'package:text_similarity/text_similarity.dart';
 
 part 'manga_tag.g.dart';
 
+// TODO: rename to `Tag`
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class MangaTag extends Equatable with SimilarityMixin {
   final String? name;
