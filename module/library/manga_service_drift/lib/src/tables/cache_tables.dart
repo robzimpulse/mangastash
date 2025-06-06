@@ -18,7 +18,4 @@ class CacheTables extends Table with AutoTimestampTable, AutoIntegerIdTable {
   DateTimeColumn get touched => dateTime().named('touched').nullable()();
 
   IntColumn get length => integer().named('length').nullable()();
-
-  @override
-  Set<Column<Object>>? get primaryKey => {id};
 }
