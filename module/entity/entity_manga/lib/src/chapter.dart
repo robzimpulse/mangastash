@@ -34,13 +34,7 @@ class Chapter extends Equatable with SimilarityMixin {
 
   final String? webUrl;
 
-  @JsonKey(includeToJson: false, includeFromJson: false)
-  late final num? numVolume = num.tryParse(volume ?? '');
-
-  @JsonKey(includeToJson: false, includeFromJson: false)
-  late final num? numChapter = num.tryParse(chapter ?? '');
-
-  Chapter({
+  const Chapter({
     this.id,
     this.mangaId,
     this.title,

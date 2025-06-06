@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:core_auth/core_auth.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
@@ -69,7 +70,7 @@ class MangaDetailScreenState extends Equatable {
     final List<String> chapterIds = [];
 
     for (final data in chapters ?? <Chapter>[]) {
-      final chapter = data.numChapter;
+      final chapter = data.chapter?.let<num?>((e) => num.tryParse(e));
 
       if (chapter != null) {
         processedChapters.update(

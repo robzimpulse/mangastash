@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:core_environment/core_environment.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -53,7 +54,7 @@ class DownloadChapterKey extends Equatable {
       mangaTitle: manga?.title,
       mangaCoverUrl: manga?.coverUrl,
       chapterId: chapter?.id,
-      chapterNumber: chapter?.numChapter,
+      chapterNumber: chapter?.chapter?.let<num?>((e) => num.tryParse(e)),
     );
   }
 
