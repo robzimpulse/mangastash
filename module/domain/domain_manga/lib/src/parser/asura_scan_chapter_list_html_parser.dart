@@ -8,7 +8,7 @@ class AsuraScanChapterListHtmlParser extends ChapterListHtmlParser {
   AsuraScanChapterListHtmlParser({required super.root});
 
   @override
-  List<MangaChapter> get chapters {
+  List<Chapter> get chapters {
     final region = root.querySelector(
       [
         'div',
@@ -23,7 +23,7 @@ class AsuraScanChapterListHtmlParser extends ChapterListHtmlParser {
       ].join('.'),
     );
 
-    final List<MangaChapter> data = [];
+    final List<Chapter> data = [];
     for (final element in region?.children ?? <Element>[]) {
       final url = element.querySelector('a')?.attributes['href'];
 
@@ -66,7 +66,7 @@ class AsuraScanChapterListHtmlParser extends ChapterListHtmlParser {
           ?.toIso8601String();
 
       data.add(
-        MangaChapter(
+        Chapter(
           title: title?.isNotEmpty == true ? title : null,
           chapter: '${chapter ?? url?.split('/').lastOrNull}',
           readableAt: releaseDate?.asDateTime,

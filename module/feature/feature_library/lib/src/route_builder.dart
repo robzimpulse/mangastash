@@ -4,7 +4,6 @@ import 'package:feature_browse/feature_browse.dart';
 import 'package:flutter/widgets.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_browse/ui_browse.dart';
-import 'package:ui_common/ui_common.dart';
 
 import 'route_path.dart';
 

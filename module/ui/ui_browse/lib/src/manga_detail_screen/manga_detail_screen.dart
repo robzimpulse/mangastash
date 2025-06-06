@@ -148,7 +148,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   void _onTapDownloadChapter(
     BuildContext context,
-    MangaChapter? chapter,
+      Chapter? chapter,
   ) async {
     await [
       Permission.storage,
@@ -160,7 +160,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     _cubit(context).downloadChapter(chapter: chapter);
   }
 
-  void _onTapMenuChapter(BuildContext context, MangaChapter? chapter) {
+  void _onTapMenuChapter(BuildContext context, Chapter? chapter) {
     // TODO: implement this
     context.showSnackBar(message: '🚧🚧🚧 Under Construction $chapter 🚧🚧🚧');
   }

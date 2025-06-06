@@ -25,7 +25,7 @@ class GetChapterUseCase with SyncChaptersMixin {
         _logBox = logBox,
         _webview = webview;
 
-  Future<Result<MangaChapter>> execute({
+  Future<Result<Chapter>> execute({
     required MangaSourceEnum? source,
     required String? mangaId,
     required String? chapterId,
@@ -44,9 +44,7 @@ class GetChapterUseCase with SyncChaptersMixin {
 
     final raw = await _chapterDao.search(ids: [chapterId]);
     final result = raw.firstOrNull.let(
-      (e) => e.chapter?.let(
-        (d) => MangaChapter.fromDrift(d, images: e.images),
-      ),
+      (e) => e.chapter?.let((d) => Chapter.fromDrift(d, images: e.images)),
     );
     final url = result?.webUrl;
 

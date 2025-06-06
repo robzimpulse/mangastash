@@ -7,8 +7,8 @@ class MangaClashChapterListHtmlParser extends ChapterListHtmlParser {
   MangaClashChapterListHtmlParser({required super.root});
 
   @override
-  List<MangaChapter> get chapters {
-    final List<MangaChapter> data = [];
+  List<Chapter> get chapters {
+    final List<Chapter> data = [];
 
     for (final element in root.querySelectorAll('li.wp-manga-chapter')) {
       final url = element.querySelector('a')?.attributes['href'];
@@ -34,7 +34,7 @@ class MangaClashChapterListHtmlParser extends ChapterListHtmlParser {
       final chapter = text?.nonNulls.firstOrNull;
 
       data.add(
-        MangaChapter(
+        Chapter(
           title: title?.trim(),
           chapter: chapter != null ? '$chapter' : null,
           readableAt: releaseDate?.asDateTime,

@@ -30,7 +30,7 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
         _logBox = logBox,
         _webview = webview;
 
-  Future<Result<Pagination<MangaChapter>>> execute({
+  Future<Result<Pagination<Chapter>>> execute({
     required MangaSourceEnum? source,
     required String? mangaId,
     required SearchChapterParameter parameter,

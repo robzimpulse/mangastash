@@ -6,7 +6,7 @@ import '../manga_clash_chapter_list_html_parser.dart';
 import 'base_html_parser.dart';
 
 abstract class ChapterListHtmlParser extends BaseHtmlParser {
-  List<MangaChapter> get chapters;
+  List<Chapter> get chapters;
   ChapterListHtmlParser({required super.root});
 
   factory ChapterListHtmlParser.forSource({

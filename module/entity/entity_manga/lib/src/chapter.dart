@@ -6,10 +6,10 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:text_similarity/text_similarity.dart';
 
-part 'manga_chapter.g.dart';
+part 'chapter.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class MangaChapter extends Equatable with SimilarityMixin {
+class Chapter extends Equatable with SimilarityMixin {
   final String? id;
 
   final String? mangaId;
@@ -40,7 +40,7 @@ class MangaChapter extends Equatable with SimilarityMixin {
   @JsonKey(includeToJson: false, includeFromJson: false)
   late final num? numChapter = num.tryParse(chapter ?? '');
 
-  MangaChapter({
+  Chapter({
     this.id,
     this.mangaId,
     this.title,
@@ -74,11 +74,11 @@ class MangaChapter extends Equatable with SimilarityMixin {
   @override
   List<Object?> get similarProp => props;
 
-  factory MangaChapter.fromDrift(
+  factory Chapter.fromDrift(
     ChapterDrift chapter, {
     List<ImageDrift> images = const [],
   }) {
-    return MangaChapter(
+    return Chapter(
       id: chapter.id,
       mangaId: chapter.mangaId,
       title: chapter.title,
@@ -110,13 +110,13 @@ class MangaChapter extends Equatable with SimilarityMixin {
     );
   }
 
-  factory MangaChapter.fromJson(Map<String, dynamic> json) {
-    return _$MangaChapterFromJson(json);
+  factory Chapter.fromJson(Map<String, dynamic> json) {
+    return _$ChapterFromJson(json);
   }
 
-  Map<String, dynamic> toJson() => _$MangaChapterToJson(this);
+  Map<String, dynamic> toJson() => _$ChapterToJson(this);
 
-  MangaChapter merge({MangaChapter? other}) {
+  Chapter merge({Chapter? other}) {
     return copyWith(
       id: other?.id ?? id,
       mangaId: other?.mangaId ?? mangaId,
@@ -133,7 +133,7 @@ class MangaChapter extends Equatable with SimilarityMixin {
     );
   }
 
-  MangaChapter copyWith({
+  Chapter copyWith({
     String? id,
     String? mangaId,
     String? title,
@@ -147,7 +147,7 @@ class MangaChapter extends Equatable with SimilarityMixin {
     List<String>? images,
     String? webUrl,
   }) {
-    return MangaChapter(
+    return Chapter(
       id: id ?? this.id,
       mangaId: mangaId ?? this.mangaId,
       title: title ?? this.title,
@@ -163,12 +163,12 @@ class MangaChapter extends Equatable with SimilarityMixin {
     );
   }
 
-  factory MangaChapter.from({required ChapterData data}) {
+  factory Chapter.from({required ChapterData data}) {
     final scanlation = data.relationships?.firstWhereOrNull(
       (e) => e.type == Include.scanlationGroup.rawValue,
     );
 
-    return MangaChapter(
+    return Chapter(
       id: data.id,
       title: data.attributes?.title,
       chapter: data.attributes?.chapter,

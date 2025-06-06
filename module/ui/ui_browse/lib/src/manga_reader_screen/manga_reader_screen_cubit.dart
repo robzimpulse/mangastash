@@ -32,11 +32,11 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
       reader: true,
     );
 
-    if (response is Success<MangaChapter>) {
+    if (response is Success<Chapter>) {
       emit(state.copyWith(chapter: response.data));
     }
 
-    if (response is Error<MangaChapter>) {
+    if (response is Error<Chapter>) {
       emit(state.copyWith(error: () => response.error));
     }
 

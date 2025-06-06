@@ -25,15 +25,13 @@ class GetChapterOnMangaDexUseCase with SyncChaptersMixin {
         _chapterDao = chapterDao,
         _logBox = logBox;
 
-  Future<Result<MangaChapter>> execute({
+  Future<Result<Chapter>> execute({
     required String chapterId,
     required String mangaId,
   }) async {
     final raw = await _chapterDao.search(ids: [chapterId]);
     final result = raw.firstOrNull.let(
-      (e) => e.chapter?.let(
-        (d) => MangaChapter.fromDrift(d, images: e.images),
-      ),
+      (e) => e.chapter?.let((d) => Chapter.fromDrift(d, images: e.images)),
     );
 
     if (result != null && result.images?.isNotEmpty == true) {
@@ -53,7 +51,7 @@ class GetChapterOnMangaDexUseCase with SyncChaptersMixin {
         chapterDao: _chapterDao,
         logBox: _logBox,
         values: [
-          MangaChapter(
+          Chapter(
             id: chapter.data?.id,
             title: chapter.data?.attributes?.title,
             chapter: chapter.data?.attributes?.chapter,

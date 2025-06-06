@@ -19,7 +19,7 @@ class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
         _chapterDao = chapterDao,
         _logBox = logBox;
 
-  Future<Result<Pagination<MangaChapter>>> execute({
+  Future<Result<Pagination<Chapter>>> execute({
     required String? mangaId,
     required SearchChapterParameter parameter,
   }) async {
@@ -42,7 +42,7 @@ class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
             logBox: _logBox,
             values: [
               for (final e in data)
-                MangaChapter.from(data: e).copyWith(mangaId: mangaId),
+                Chapter.from(data: e).copyWith(mangaId: mangaId),
             ],
           ),
           offset: result.offset?.toInt(),

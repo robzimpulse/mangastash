@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import 'chapter.dart';
 import 'enum/manga_source_enum.dart';
 import 'manga.dart';
-import 'manga_chapter.dart';
 
 part 'download_chapter_key.g.dart';
 
@@ -46,7 +46,7 @@ class DownloadChapterKey extends Equatable {
 
   String toJsonString() => json.encode(toJson());
 
-  factory DownloadChapterKey.create({Manga? manga, MangaChapter? chapter}) {
+  factory DownloadChapterKey.create({Manga? manga, Chapter? chapter}) {
     return DownloadChapterKey(
       mangaId: manga?.id,
       mangaSource: manga?.source,

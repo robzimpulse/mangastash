@@ -25,7 +25,7 @@ class MangaDetailScreenState extends Equatable {
   final Exception? errorChapters;
   final String? mangaId;
   final Manga? manga;
-  final List<MangaChapter>? chapters;
+  final List<Chapter>? chapters;
   final MangaSourceEnum? sourceEnum;
   final AuthState? authState;
   final List<Manga> libraries;
@@ -40,7 +40,7 @@ class MangaDetailScreenState extends Equatable {
 
   late final List<String> chapterIds;
   late final Set<num> chaptersKey;
-  late final Map<num, MangaChapter> processedChapters;
+  late final Map<num, Chapter> processedChapters;
   late final int totalChapter;
   late final bool isOnLibrary;
 
@@ -65,10 +65,10 @@ class MangaDetailScreenState extends Equatable {
   }) {
     isOnLibrary = libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
 
-    final Map<num, MangaChapter> processedChapters = {};
+    final Map<num, Chapter> processedChapters = {};
     final List<String> chapterIds = [];
 
-    for (final data in chapters ?? <MangaChapter>[]) {
+    for (final data in chapters ?? <Chapter>[]) {
       final chapter = data.numChapter;
 
       if (chapter != null) {
@@ -193,7 +193,7 @@ class MangaDetailScreenState extends Equatable {
     ValueGetter<Exception?>? errorManga,
     String? mangaId,
     Manga? manga,
-    List<MangaChapter>? chapters,
+    List<Chapter>? chapters,
     String? sourceId,
     MangaSourceEnum? sourceEnum,
     MangaChapterConfig? config,

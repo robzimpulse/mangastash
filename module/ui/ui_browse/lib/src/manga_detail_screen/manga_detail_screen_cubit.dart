@@ -173,7 +173,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       parameter: state.parameter,
     );
 
-    if (result is Success<Pagination<MangaChapter>>) {
+    if (result is Success<Pagination<Chapter>>) {
       final offset = result.data.offset ?? 0;
       final page = result.data.page ?? 0;
       final limit = result.data.limit ?? 0;
@@ -198,7 +198,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       );
     }
 
-    if (result is Error<Pagination<MangaChapter>>) {
+    if (result is Error<Pagination<Chapter>>) {
       emit(state.copyWith(errorChapters: () => result.error));
     }
 
@@ -237,7 +237,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
   }
 
-  void downloadChapter({required MangaChapter chapter}) {
+  void downloadChapter({required Chapter chapter}) {
     final mangaId = state.manga?.id;
     final chapterId = chapter.id;
     final source = state.manga?.source;

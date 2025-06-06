@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'manga_chapter.dart';
+part of 'chapter.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-MangaChapter _$MangaChapterFromJson(Map<String, dynamic> json) => MangaChapter(
+Chapter _$ChapterFromJson(Map<String, dynamic> json) => Chapter(
       id: json['id'] as String?,
       mangaId: json['manga_id'] as String?,
       title: json['title'] as String?,
@@ -28,8 +28,7 @@ MangaChapter _$MangaChapterFromJson(Map<String, dynamic> json) => MangaChapter(
           : DateTime.parse(json['last_read_at'] as String),
     );
 
-Map<String, dynamic> _$MangaChapterToJson(MangaChapter instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$ChapterToJson(Chapter instance) => <String, dynamic>{
       'id': instance.id,
       'manga_id': instance.mangaId,
       'title': instance.title,

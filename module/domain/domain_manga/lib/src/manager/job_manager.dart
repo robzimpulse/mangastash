@@ -97,9 +97,7 @@ class JobManager
           'id': job.id,
           'type': job.type,
           'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let(
-            (e) => MangaChapter.fromDrift(e).toJson(),
-          ),
+          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
           'image': job.image,
           'error': 'No Manga ID',
         },
@@ -122,9 +120,7 @@ class JobManager
           'id': job.id,
           'type': job.type,
           'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let(
-            (e) => MangaChapter.fromDrift(e).toJson(),
-          ),
+          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
           'image': job.image,
           'error': result.error.toString(),
         },
@@ -139,9 +135,7 @@ class JobManager
           'id': job.id,
           'type': job.type,
           'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let(
-            (e) => MangaChapter.fromDrift(e).toJson(),
-          ),
+          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
           'image': job.image,
           'data': result.data.toJson(),
         },
@@ -161,9 +155,7 @@ class JobManager
           'id': job.id,
           'type': job.type,
           'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let(
-            (e) => MangaChapter.fromDrift(e).toJson(),
-          ),
+          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
           'image': job.image,
           'error': 'No Manga ID or Chapter ID',
         },
@@ -180,16 +172,14 @@ class JobManager
       chapterId: chapterId,
     );
 
-    if (result is Error<MangaChapter>) {
+    if (result is Error<Chapter>) {
       _log.log(
         'Failed execute job ${job.id} - ${job.type}',
         extra: {
           'id': job.id,
           'type': job.type,
           'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let(
-            (e) => MangaChapter.fromDrift(e).toJson(),
-          ),
+          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
           'image': job.image,
           'error': result.error.toString(),
         },
@@ -197,16 +187,14 @@ class JobManager
       );
     }
 
-    if (result is Success<MangaChapter>) {
+    if (result is Success<Chapter>) {
       _log.log(
         'Success execute job ${job.id} - ${job.type}',
         extra: {
           'id': job.id,
           'type': job.type,
           'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let(
-            (e) => MangaChapter.fromDrift(e).toJson(),
-          ),
+          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
           'image': job.image,
           'data': result.data.toJson(),
         },
@@ -243,9 +231,7 @@ class JobManager
           'id': job.id,
           'type': job.type,
           'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let(
-            (e) => MangaChapter.fromDrift(e).toJson(),
-          ),
+          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
           'image': job.image,
           'error': 'No Manga ID',
         },
@@ -262,16 +248,14 @@ class JobManager
       parameter: parameter,
     );
 
-    if (result is Error<Pagination<MangaChapter>>) {
+    if (result is Error<Pagination<Chapter>>) {
       _log.log(
         'Failed execute job ${job.id} - ${job.type}',
         extra: {
           'id': job.id,
           'type': job.type,
           'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let(
-            (e) => MangaChapter.fromDrift(e).toJson(),
-          ),
+          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
           'image': job.image,
           'error': result.error.toString(),
         },
@@ -279,7 +263,7 @@ class JobManager
       );
     }
 
-    if (result is Success<Pagination<MangaChapter>>) {
+    if (result is Success<Pagination<Chapter>>) {
       if (result.data.hasNextPage == true) {
         await _fetchAllChapter(
           job,
@@ -296,9 +280,7 @@ class JobManager
             'id': job.id,
             'type': job.type,
             'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-            'chapter': job.chapter?.let(
-              (e) => MangaChapter.fromDrift(e).toJson(),
-            ),
+            'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
             'image': job.image,
             'parameter': parameter,
             'data': result.data.toJson((e) => e.toJson()),
@@ -320,9 +302,7 @@ class JobManager
           'id': job.id,
           'type': job.type,
           'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let(
-            (e) => MangaChapter.fromDrift(e).toJson(),
-          ),
+          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
           'image': job.image,
           'error': 'No Manga ID or Chapter ID',
         },
@@ -339,16 +319,14 @@ class JobManager
       chapterId: chapterId,
     );
 
-    if (result is Error<MangaChapter>) {
+    if (result is Error<Chapter>) {
       _log.log(
         'Failed execute job ${job.id} - ${job.type}',
         extra: {
           'id': job.id,
           'type': job.type,
           'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let(
-            (e) => MangaChapter.fromDrift(e).toJson(),
-          ),
+          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
           'image': job.image,
           'error': result.error.toString(),
         },
@@ -356,16 +334,14 @@ class JobManager
       );
     }
 
-    if (result is Success<MangaChapter>) {
+    if (result is Success<Chapter>) {
       _log.log(
         'Success execute job ${job.id} - ${job.type}',
         extra: {
           'id': job.id,
           'type': job.type,
           'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let(
-            (e) => MangaChapter.fromDrift(e).toJson(),
-          ),
+          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
           'image': job.image,
           'data': result.data.toJson(),
         },
@@ -374,7 +350,7 @@ class JobManager
 
       final key = DownloadChapterKey.create(
         manga: job.manga?.let((e) => Manga.fromDrift(e)),
-        chapter: job.chapter?.let((e) => MangaChapter.fromDrift(e)),
+        chapter: job.chapter?.let((e) => Chapter.fromDrift(e)),
       );
       final groupId = key.toJsonString();
       final images = result.data.images ?? [];
@@ -513,9 +489,7 @@ class JobManager
           'id': job.id,
           'type': job.type,
           'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let(
-            (e) => MangaChapter.fromDrift(e).toJson(),
-          ),
+          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
           'image': job.image,
           'error': 'No Image URL',
         },
@@ -539,9 +513,7 @@ class JobManager
         'id': job.id,
         'type': job.type,
         'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-        'chapter': job.chapter?.let(
-          (e) => MangaChapter.fromDrift(e).toJson(),
-        ),
+        'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
         'image': job.image,
         'data': path.uri.toString(),
       },

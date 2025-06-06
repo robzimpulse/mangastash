@@ -5,14 +5,14 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 
 mixin SyncChaptersMixin {
-  Future<List<MangaChapter>> sync({
+  Future<List<Chapter>> sync({
     required ChapterDao chapterDao,
-    required List<MangaChapter> values,
+    required List<Chapter> values,
     required LogBox logBox,
   }) async {
-    final success = <MangaChapter>[];
-    final failed = <MangaChapter>[];
-    final changed = <(MangaChapter, MangaChapter)>[];
+    final success = <Chapter>[];
+    final failed = <Chapter>[];
+    final changed = <(Chapter, Chapter)>[];
 
     final chapters = await chapterDao.search(
       mangaIds: [...values.map((e) => e.mangaId).nonNulls],
@@ -33,7 +33,7 @@ mixin SyncChaptersMixin {
 
       final existing = (byId ?? byWebUrl).let(
         (e) => e.chapter?.let(
-          (chapter) => MangaChapter.fromDrift(
+          (chapter) => Chapter.fromDrift(
             chapter,
             images: e.images,
           ),
@@ -46,7 +46,7 @@ mixin SyncChaptersMixin {
       );
 
       final after = result.chapter?.let(
-        (e) => MangaChapter.fromDrift(
+        (e) => Chapter.fromDrift(
           e,
           images: result.images,
         ),

@@ -3,8 +3,8 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 mixin SortChaptersMixin {
-  List<MangaChapter> sortChapters({
-    required List<MangaChapter> chapters,
+  List<Chapter> sortChapters({
+    required List<Chapter> chapters,
     required SearchChapterParameter parameter,
   }) {
     final option = parameter.orders?.keys.firstOrNull;

@@ -21,7 +21,7 @@ class MangaReaderScreenState extends Equatable {
 
   final Exception? error;
 
-  final MangaChapter? chapter;
+  final Chapter? chapter;
 
   final String? mangaId;
 
@@ -52,7 +52,7 @@ class MangaReaderScreenState extends Equatable {
     String? mangaId,
     String? chapterId,
     bool? isLoading,
-    MangaChapter? chapter,
+    Chapter? chapter,
     Exception? Function()? error,
     MangaSourceEnum? sourceEnum,
     List<String?>? chapterIds,
