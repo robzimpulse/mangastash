@@ -9,7 +9,7 @@ import 'package:text_similarity/text_similarity.dart';
 part 'chapter.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class Chapter extends Equatable with SimilarityMixin {
+class Chapter extends Equatable {
   final String? id;
 
   final String? mangaId;
@@ -64,9 +64,6 @@ class Chapter extends Equatable with SimilarityMixin {
         webUrl,
         lastReadAt,
       ];
-
-  @override
-  List<Object?> get similarProp => props;
 
   factory Chapter.fromDrift(
     ChapterDrift chapter, {
