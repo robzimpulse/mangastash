@@ -11,7 +11,7 @@ import '../entity_manga.dart';
 part 'manga.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class Manga extends Equatable with SimilarityMixin {
+class Manga extends Equatable {
   final String? id;
 
   final String? title;
@@ -56,9 +56,6 @@ class Manga extends Equatable with SimilarityMixin {
       source?.value,
     ];
   }
-
-  @override
-  List<Object?> get similarProp => [id, webUrl, source, title];
 
   static Manga? fromDatabase(MangaModel? model) {
     return model?.manga?.let(
