@@ -30,7 +30,7 @@ class JobManager
         DownloadChapterUseCase,
         DownloadMangaUseCase,
         ListenPrefetchUseCase {
-  final BehaviorSubject<List<JobModel>> _jobs = BehaviorSubject.seeded([]);
+  final _jobs = BehaviorSubject<List<JobModel>>.seeded([]);
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
   final ValueGetter<SearchChapterUseCase> _searchChapterUseCase;
