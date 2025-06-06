@@ -30,21 +30,7 @@ class Manga extends Equatable with SimilarityMixin {
 
   final MangaSourceEnum? source;
 
-  @JsonKey(includeToJson: false, includeFromJson: false)
-  List<String> get tagsName => [...?tags?.map((e) => e.name).nonNulls];
-
-  @JsonKey(includeToJson: false, includeFromJson: false)
-  Map<String, MangaTag> get mapTagsByName {
-    final Map<String, MangaTag> result = {};
-    for (final tag in tags ?? <MangaTag>[]) {
-      final name = tag.name;
-      if (name == null) continue;
-      result.update(name, (old) => tag, ifAbsent: () => tag);
-    }
-    return result;
-  }
-
-  Manga({
+  const Manga({
     this.id,
     this.title,
     this.coverUrl,

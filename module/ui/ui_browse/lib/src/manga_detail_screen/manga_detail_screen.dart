@@ -148,7 +148,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   void _onTapDownloadChapter(
     BuildContext context,
-      Chapter? chapter,
+    Chapter? chapter,
   ) async {
     await [
       Permission.storage,
@@ -389,7 +389,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           author: state.manga?.author,
           status: state.manga?.status,
           description: state.manga?.description,
-          tags: state.manga?.tagsName,
+          tags: [...?state.manga?.tags?.map((e) => e.name).nonNulls],
           horizontalPadding: 12,
           isOnLibrary: state.isOnLibrary,
           onTapAddToLibrary: () => _cubit(context).addToLibrary(),
@@ -397,7 +397,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           onTapWebsite: () => _onTapWebsite(context, url: state.manga?.webUrl),
           onTapTag: (name) => _onTapTag(
             context,
-            tag: state.manga?.mapTagsByName[name],
+            tag: state.manga?.tags?.firstWhereOrNull((e) => e.name == name),
           ),
           isLoadingManga: state.isLoadingManga,
           isLoadingChapters: state.isLoadingChapters,

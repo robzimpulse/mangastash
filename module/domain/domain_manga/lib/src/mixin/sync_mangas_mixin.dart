@@ -15,7 +15,7 @@ mixin SyncMangasMixin {
     for (final before in values) {
       final result = await mangaDao.add(
         value: before.toDrift,
-        tags: before.tagsName,
+        tags: [...?before.tags?.map((e) => e.name).nonNulls],
       );
 
       final after = Manga.fromDatabase(result);

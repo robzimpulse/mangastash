@@ -18,7 +18,7 @@ class MangaDetailWidget extends StatelessWidget {
     this.onTapAddToLibrary,
     this.onTapPrefetch,
     this.onTapWebsite,
-    this.tags,
+    this.tags = const [],
     this.onTapTag,
     this.horizontalPadding = 8,
     this.separator = const SizedBox(height: 8),
@@ -38,7 +38,7 @@ class MangaDetailWidget extends StatelessWidget {
 
   final String? description;
 
-  final List<String>? tags;
+  final List<String> tags;
 
   final void Function()? onTapPrefetch;
 
@@ -274,9 +274,7 @@ class MangaDetailWidget extends StatelessWidget {
   }
 
   Widget? _loadedTags(BuildContext context) {
-    final data = tags;
-    if (data == null) return null;
-    if (data.isEmpty) return null;
+    if (tags.isEmpty) return null;
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       sliver: SliverToBoxAdapter(
@@ -284,7 +282,7 @@ class MangaDetailWidget extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: [
-            for (final item in data)
+            for (final item in tags)
               ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 30),
                 child: OutlinedButton(
