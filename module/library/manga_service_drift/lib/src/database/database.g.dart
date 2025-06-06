@@ -3215,6 +3215,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final ImageDao imageDao = ImageDao(this as AppDatabase);
   late final TagDao tagDao = TagDao(this as AppDatabase);
   late final CacheDao cacheDao = CacheDao(this as AppDatabase);
+  late final StatusDao statusDao = StatusDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();

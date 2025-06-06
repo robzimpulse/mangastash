@@ -12,6 +12,7 @@ import '../dao/image_dao.dart';
 import '../dao/job_dao.dart';
 import '../dao/library_dao.dart';
 import '../dao/manga_dao.dart';
+import '../dao/status_dao.dart';
 import '../dao/tag_dao.dart';
 import '../interceptor/log_interceptor.dart';
 import '../tables/cache_tables.dart';
@@ -46,6 +47,7 @@ part 'database.g.dart';
     ImageDao,
     TagDao,
     CacheDao,
+    StatusDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
