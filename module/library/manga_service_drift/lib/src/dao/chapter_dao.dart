@@ -3,8 +3,6 @@ import 'package:drift/drift.dart';
 
 import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
-import '../extension/nullable_generic.dart';
-import '../extension/value_or_null_extension.dart';
 import '../model/chapter_model.dart';
 import '../tables/chapter_tables.dart';
 import '../tables/image_tables.dart';
