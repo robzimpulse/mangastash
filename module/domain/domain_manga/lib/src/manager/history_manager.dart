@@ -1,13 +1,18 @@
 import 'package:core_storage/core_storage.dart';
+import 'package:entity_manga/src/history.dart';
 import 'package:rxdart/rxdart.dart';
 
-class HistoryManager {
-  final _stateSubject = BehaviorSubject<List<HistoryModel>>.seeded([]);
+import '../use_case/library/listen_read_history_use_case.dart';
 
-  HistoryManager({required HistoryDao libraryDao}) {
-    _stateSubject.addStream(libraryDao.history);
+class HistoryManager implements ListenReadHistoryUseCase {
+  final _stateSubject = BehaviorSubject<List<History>>.seeded([]);
+
+  HistoryManager({required HistoryDao historyDao}) {
+    _stateSubject.addStream(
+      historyDao.history.map((e) => [...e.map((e) => History.fromDrift(e))]),
+    );
   }
 
-  // TODO: expose history entity
-
+  @override
+  Stream<List<History>> get readHistoryStream => _stateSubject.stream;
 }

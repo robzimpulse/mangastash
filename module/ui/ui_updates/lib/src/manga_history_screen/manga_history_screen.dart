@@ -13,9 +13,22 @@ class MangaHistoryScreen extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (context) => MangaHistoryScreenCubit(
-        initialState: MangaHistoryScreenState(),
+        initialState: const MangaHistoryScreenState(),
+        listenReadHistoryUseCase: locator(),
       )..init(),
       child: const MangaHistoryScreen(),
+    );
+  }
+
+  MangaHistoryScreenCubit _cubit(BuildContext context) => context.read();
+
+  BlocBuilder _builder({
+    required BlocWidgetBuilder<MangaHistoryScreenState> builder,
+    BlocBuilderCondition<MangaHistoryScreenState>? buildWhen,
+  }) {
+    return BlocBuilder<MangaHistoryScreenCubit, MangaHistoryScreenState>(
+      buildWhen: buildWhen,
+      builder: builder,
     );
   }
 
@@ -26,8 +39,13 @@ class MangaHistoryScreen extends StatelessWidget {
         centerTitle: false,
         title: const Text('Histories'),
       ),
-      body: const Center(
-        child: Text('🚧🚧🚧 Under Construction 🚧🚧🚧'),
+      body: _builder(
+        builder: (context, state) => ListView.builder(
+          itemBuilder: (context, index) => ListTile(
+            title: Text(state.histories[index].manga?.title ?? ''),
+          ),
+          itemCount: state.histories.length,
+        ),
       ),
     );
   }

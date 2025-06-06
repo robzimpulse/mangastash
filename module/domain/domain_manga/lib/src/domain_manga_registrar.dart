@@ -6,6 +6,7 @@ import 'package:service_locator/service_locator.dart';
 import 'manager/download_progress_manager.dart';
 import 'manager/file_download_manager.dart';
 import 'manager/headless_webview_manager.dart';
+import 'manager/history_manager.dart';
 import 'manager/job_manager.dart';
 import 'manager/library_manager.dart';
 import 'manager/manga_source_manager.dart';
@@ -21,6 +22,7 @@ import 'use_case/library/add_to_library_use_case.dart';
 import 'use_case/library/get_manga_from_library_use_case.dart';
 import 'use_case/library/listen_manga_from_library_use_case.dart';
 import 'use_case/library/listen_prefetch_use_case.dart';
+import 'use_case/library/listen_read_history_use_case.dart';
 import 'use_case/library/remove_from_library_use_case.dart';
 import 'use_case/manga/download_manga_use_case.dart';
 import 'use_case/manga/get_manga_on_mangadex_use_case.dart';
@@ -60,6 +62,9 @@ class DomainMangaRegistrar extends Registrar {
       locator.alias<ListenPrefetchUseCase, JobManager>();
       locator.alias<DownloadChapterUseCase, JobManager>();
       locator.alias<DownloadMangaUseCase, JobManager>();
+
+      locator.registerSingleton(HistoryManager(historyDao: locator()));
+      locator.alias<ListenReadHistoryUseCase, HistoryManager>();
 
       locator.registerSingleton(
         HeadlessWebviewManager(log: log, cacheManager: locator()),
