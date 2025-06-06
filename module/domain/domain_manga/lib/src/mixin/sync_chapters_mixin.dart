@@ -20,7 +20,9 @@ mixin SyncChaptersMixin {
 
     for (final before in values) {
       final byId = before.id?.let(
-        (id) => chapters.firstWhereOrNull((e) => e.chapter?.id == id),
+        (id) => chapters.firstWhereOrNull(
+          (e) => e.chapter?.id == id,
+        ),
       );
 
       final byWebUrl = before.webUrl?.let(
