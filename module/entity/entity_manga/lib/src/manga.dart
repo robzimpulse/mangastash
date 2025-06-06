@@ -74,6 +74,12 @@ class Manga extends Equatable with SimilarityMixin {
   @override
   List<Object?> get similarProp => [id, webUrl, source, title];
 
+  static Manga? fromDatabase(MangaModel? model) {
+    return model?.manga?.let(
+      (manga) => Manga.fromDrift(manga, tags: model.tags),
+    );
+  }
+
   factory Manga.fromDrift(MangaDrift manga, {List<TagDrift> tags = const []}) {
     return Manga(
       id: manga.id,

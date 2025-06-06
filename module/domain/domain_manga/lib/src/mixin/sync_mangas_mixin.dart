@@ -1,4 +1,3 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
@@ -19,12 +18,7 @@ mixin SyncMangasMixin {
         tags: before.tagsName,
       );
 
-      final after = result.manga?.let(
-        (e) => Manga.fromDrift(
-          e,
-          tags: result.tags,
-        ),
-      );
+      final after = Manga.fromDatabase(result);
 
       if (after == null) {
         failed.add(before);

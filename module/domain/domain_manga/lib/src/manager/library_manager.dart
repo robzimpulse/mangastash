@@ -1,5 +1,4 @@
 import 'package:core_auth/core_auth.dart';
-import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:rxdart/rxdart.dart';
@@ -17,11 +16,7 @@ class LibraryManager
   }) {
     _stateSubject.addStream(
       libraryDao.stream.map(
-        (values) => [
-          ...values
-              .map((e) => e.manga?.let((d) => Manga.fromDrift(d, tags: e.tags)))
-              .nonNulls,
-        ],
+        (values) => [...values.map(Manga.fromDatabase).nonNulls],
       ),
     );
   }

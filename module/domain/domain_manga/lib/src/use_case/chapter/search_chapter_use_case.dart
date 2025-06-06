@@ -1,4 +1,3 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -48,9 +47,8 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
     if (mangaId == null) return Error(Exception('Empty Manga ID'));
 
     final raw = await _mangaDao.search(ids: [mangaId]);
-    final result = raw.firstOrNull?.let(
-      (e) => e.manga?.let((d) => Manga.fromDrift(d, tags: e.tags)),
-    );
+    final result = Manga.fromDatabase(raw.firstOrNull);
+
     final url = result?.webUrl;
 
     if (result == null || url == null) {
