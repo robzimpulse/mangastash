@@ -2086,7 +2086,13 @@ class $RelationshipTablesTable extends RelationshipTables
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {tagId, mangaId};
+  Set<GeneratedColumn> get $primaryKey => const {};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+        {tagId, mangaId},
+        {tagId},
+        {mangaId},
+      ];
   @override
   RelationshipTable map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';

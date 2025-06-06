@@ -8,5 +8,9 @@ class RelationshipTables extends Table with AutoTimestampTable {
   TextColumn get mangaId => text().named('manga_id')();
 
   @override
-  Set<Column<Object>>? get primaryKey => {tagId, mangaId};
+  List<Set<Column<Object>>>? get uniqueKeys => [
+        {tagId, mangaId},
+        {tagId},
+        {mangaId},
+      ];
 }
