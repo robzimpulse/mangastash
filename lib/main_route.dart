@@ -7,7 +7,6 @@ import 'package:feature_library/feature_library.dart';
 import 'package:feature_more/feature_more.dart';
 import 'package:feature_updates/feature_updates.dart';
 import 'package:service_locator/service_locator.dart';
-import 'package:ui_common/ui_common.dart';
 
 import 'main_path.dart';
 import 'screen/error_screen.dart';

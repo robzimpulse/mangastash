@@ -37,9 +37,11 @@ dependencies:
   core_auth:
     path: ../../core/core_auth
 
+  # feature
+  feature_common:
+    path: ../../feature/feature_common
+
   # ui
-  ui_common:
-    path: ../../ui/ui_common
   ui_browse:
     path: ../../ui/ui_browse
 

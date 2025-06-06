@@ -27,6 +27,10 @@ dependencies:
   ui_updates:
     path: ../../ui/ui_updates
 
+  # feature:
+  feature_common:
+    path: ../feature_common
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

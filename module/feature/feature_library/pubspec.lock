@@ -390,7 +390,7 @@ packages:
     source: path
     version: "0.0.1"
   feature_common:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "../feature_common"
       relative: true
@@ -1313,7 +1313,7 @@ packages:
     source: path
     version: "0.0.1"
   ui_common:
-    dependency: "direct main"
+    dependency: transitive
     description:
       path: "../../ui/ui_common"
       relative: true

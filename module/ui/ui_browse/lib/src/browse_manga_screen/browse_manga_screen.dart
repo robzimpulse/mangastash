@@ -6,7 +6,6 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:feature_common/feature_common.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
-import 'package:ui_common/ui_common.dart';
 
 import 'browse_manga_screen_cubit.dart';
 import 'browse_manga_screen_state.dart';
