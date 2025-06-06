@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -13,9 +14,32 @@ mixin SyncChaptersMixin {
     final failed = <MangaChapter>[];
     final changed = <(MangaChapter, MangaChapter)>[];
 
+    final chapters = await chapterDao.search(
+      mangaIds: [...values.map((e) => e.mangaId).nonNulls],
+    );
+
     for (final before in values) {
+      final byId = before.id?.let(
+        (id) => chapters.firstWhereOrNull((e) => e.chapter?.id == id),
+      );
+
+      final byWebUrl = before.webUrl?.let(
+        (url) => chapters.firstWhereOrNull(
+          (e) => e.chapter?.webUrl == url,
+        ),
+      );
+
+      final existing = (byId ?? byWebUrl).let(
+        (e) => e.chapter?.let(
+          (chapter) => MangaChapter.fromDrift(
+            chapter,
+            images: e.images,
+          ),
+        ),
+      );
+
       final result = await chapterDao.add(
-        value: before.toDrift,
+        value: before.merge(other: existing).toDrift,
         images: [...?before.images],
       );
 
@@ -41,6 +65,7 @@ mixin SyncChaptersMixin {
     logBox.log(
       'Insert & Update Chapter',
       extra: {
+        'existing count': chapters.length,
         'before count': values.length,
         'after count': success.length,
         'failed count': failed.length,

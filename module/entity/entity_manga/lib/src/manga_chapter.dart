@@ -116,6 +116,23 @@ class MangaChapter extends Equatable with SimilarityMixin {
 
   Map<String, dynamic> toJson() => _$MangaChapterToJson(this);
 
+  MangaChapter merge({MangaChapter? other}) {
+    return copyWith(
+      id: other?.id ?? id,
+      mangaId: other?.mangaId ?? mangaId,
+      title: other?.title ?? title,
+      volume: other?.volume ?? volume,
+      chapter: other?.chapter ?? chapter,
+      readableAt: other?.readableAt ?? readableAt,
+      publishAt: other?.publishAt ?? publishAt,
+      images: other?.images ?? images,
+      translatedLanguage: other?.translatedLanguage ?? translatedLanguage,
+      scanlationGroup: other?.scanlationGroup ?? scanlationGroup,
+      webUrl: other?.webUrl ?? webUrl,
+      lastReadAt: other?.lastReadAt ?? lastReadAt,
+    );
+  }
+
   MangaChapter copyWith({
     String? id,
     String? mangaId,
