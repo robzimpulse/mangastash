@@ -16,6 +16,7 @@ class MangaShelfItem extends StatelessWidget {
     this.isPrefetching = false,
     this.cacheManager,
     this.sourceIconUrl,
+    this.padding = const EdgeInsets.all(0),
   });
 
   final String title;
@@ -36,12 +37,20 @@ class MangaShelfItem extends StatelessWidget {
 
   final String? sourceIconUrl;
 
+  final EdgeInsetsGeometry padding;
+
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      onLongPress: onLongPress,
-      child: _content(context),
+    return Material(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: InkWell(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        child: Padding(
+          padding: padding,
+          child: _content(context),
+        ),
+      ),
     );
   }
 

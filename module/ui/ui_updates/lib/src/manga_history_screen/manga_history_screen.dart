@@ -20,12 +20,12 @@ class MangaHistoryScreen extends StatelessWidget {
 
   final ValueSetter<Manga?>? onTapManga;
 
-  final ValueSetter<Chapter>? onTapChapter;
+  final Function(Manga, Chapter)? onTapChapter;
 
   static Widget create({
     required ServiceLocator locator,
     ValueSetter<Manga?>? onTapManga,
-    ValueSetter<Chapter>? onTapChapter
+    Function(Manga, Chapter)? onTapChapter,
   }) {
     return BlocProvider(
       create: (context) => MangaHistoryScreenCubit(
@@ -52,28 +52,29 @@ class MangaHistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _manga({required BuildContext context, required Manga value}) {
-    return Container(
+  Widget _manga({required BuildContext context, required Manga manga}) {
+    return MangaShelfItem(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: MangaShelfItem(
-        title: value.title ?? '',
-        coverUrl: value.coverUrl ?? '',
-        layout: MangaShelfItemLayout.list,
-        cacheManager: cacheManager,
-        onTap: () => onTapManga?.call(value),
-      ),
+      title: manga.title ?? '',
+      coverUrl: manga.coverUrl ?? '',
+      layout: MangaShelfItemLayout.list,
+      cacheManager: cacheManager,
+      onTap: () => onTapManga?.call(manga),
     );
   }
 
-  Widget _chapter({required BuildContext context, required Chapter value}) {
+  Widget _chapter({
+    required BuildContext context,
+    required Manga manga,
+    required Chapter chapter,
+  }) {
     return MangaChapterTileWidget(
       padding: const EdgeInsets.all(8),
-      title: ['Chapter ${value.chapter}', value.title].nonNulls.join(' - '),
-      language: Language.fromCode(value.translatedLanguage),
-      uploadedAt: value.lastReadAt,
-      groups: value.scanlationGroup,
-      onTap: () => onTapChapter?.call(value),
+      title: ['Chapter ${chapter.chapter}', chapter.title].nonNulls.join(' - '),
+      language: Language.fromCode(chapter.translatedLanguage),
+      uploadedAt: chapter.lastReadAt,
+      groups: chapter.scanlationGroup,
+      onTap: () => onTapChapter?.call(manga, chapter),
     );
   }
 
@@ -92,11 +93,15 @@ class MangaHistoryScreen extends StatelessWidget {
                 pushPinnedChildren: true,
                 children: [
                   SliverPinnedHeader(
-                    child: _manga(context: context, value: history.key),
+                    child: _manga(context: context, manga: history.key),
                   ),
                   for (final item in history.value)
                     SliverToBoxAdapter(
-                      child: _chapter(context: context, value: item),
+                      child: _chapter(
+                        context: context,
+                        manga: history.key,
+                        chapter: item,
+                      ),
                     ),
                 ],
               ),

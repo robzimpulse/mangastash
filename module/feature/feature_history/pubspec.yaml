@@ -27,7 +27,13 @@ dependencies:
   ui_updates:
     path: ../../ui/ui_updates
 
+  # entity
+  entity_manga:
+    path: ../../entity/entity_manga
+
   # feature:
+  feature_browse:
+    path: ../feature_browse
   feature_common:
     path: ../feature_common
 

@@ -1,4 +1,6 @@
 import 'package:core_route/core_route.dart';
+import 'package:entity_manga/entity_manga.dart';
+import 'package:feature_browse/feature_browse.dart';
 import 'package:flutter/widgets.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_updates/ui_updates.dart';
@@ -14,7 +16,23 @@ class HistoryRouteBuilder extends BaseRouteBuilder {
       path: HistoryRoutePath.history,
       name: HistoryRoutePath.history,
       pageBuilder: (context, state) => NoTransitionPage(
-        child: MangaHistoryScreen.create(locator: locator),
+        child: MangaHistoryScreen.create(
+          locator: locator,
+          onTapChapter: (manga, chapter) => context.pushNamed(
+            BrowseRoutePath.chapterDetail,
+            pathParameters: {
+              'source': manga.source?.value ?? '',
+              'mangaId': manga.id ?? '',
+              'chapterId': chapter.id ?? '',
+            },
+          ),
+          onTapManga: (manga) => context.push(
+            BrowseRoutePath.mangaDetail
+                .replaceAll(':source', '${manga?.source?.value}')
+                .replaceAll(':mangaId', '${manga?.id}'),
+            extra: MangaDetailExtra(manga: manga, param: null),
+          ),
+        ),
       ),
     );
   }
