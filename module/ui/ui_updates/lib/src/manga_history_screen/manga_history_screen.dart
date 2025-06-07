@@ -9,12 +9,23 @@ import 'manga_history_screen_cubit.dart';
 import 'manga_history_screen_state.dart';
 
 class MangaHistoryScreen extends StatelessWidget {
-  const MangaHistoryScreen({super.key, required this.cacheManager});
+  const MangaHistoryScreen({
+    super.key,
+    required this.cacheManager,
+    this.onTapManga,
+    this.onTapChapter,
+  });
 
   final BaseCacheManager cacheManager;
 
+  final ValueSetter<Manga?>? onTapManga;
+
+  final ValueSetter<Chapter>? onTapChapter;
+
   static Widget create({
     required ServiceLocator locator,
+    ValueSetter<Manga?>? onTapManga,
+    ValueSetter<Chapter>? onTapChapter
   }) {
     return BlocProvider(
       create: (context) => MangaHistoryScreenCubit(
@@ -23,6 +34,8 @@ class MangaHistoryScreen extends StatelessWidget {
       )..init(),
       child: MangaHistoryScreen(
         cacheManager: locator(),
+        onTapChapter: onTapChapter,
+        onTapManga: onTapManga,
       ),
     );
   }
@@ -48,6 +61,7 @@ class MangaHistoryScreen extends StatelessWidget {
         coverUrl: value.coverUrl ?? '',
         layout: MangaShelfItemLayout.list,
         cacheManager: cacheManager,
+        onTap: () => onTapManga?.call(value),
       ),
     );
   }
@@ -59,6 +73,7 @@ class MangaHistoryScreen extends StatelessWidget {
       language: Language.fromCode(value.translatedLanguage),
       uploadedAt: value.lastReadAt,
       groups: value.scanlationGroup,
+      onTap: () => onTapChapter?.call(value),
     );
   }
 
