@@ -15,7 +15,8 @@ mixin SyncChaptersMixin {
     final changed = <(Chapter, Chapter)>[];
 
     final chapters = await chapterDao.search(
-      mangaIds: [...values.map((e) => e.mangaId).nonNulls],
+      ids: [...values.map((e) => e.id).nonNulls],
+      webUrls: [...values.map((e) => e.webUrl).nonNulls],
     );
 
     for (final before in values) {
@@ -31,18 +32,11 @@ mixin SyncChaptersMixin {
         ),
       );
 
-      final existing = (byId ?? byWebUrl).let(
-        (e) => e.chapter?.let(
-          (chapter) => Chapter.fromDrift(
-            chapter,
-            images: e.images,
-          ),
-        ),
-      );
+      final existing = Chapter.fromDatabase(byId ?? byWebUrl);
 
       final result = await chapterDao.add(
         value: before.merge(other: existing).toDrift,
-        images: [...?before.images],
+        images: [...?before.merge(other: existing).images],
       );
 
       final after = result.chapter?.let(
