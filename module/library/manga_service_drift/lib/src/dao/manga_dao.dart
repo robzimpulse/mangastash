@@ -173,7 +173,7 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
 
       // reattach tag with new value
       for (final tag in updated) {
-        await _tagDao.attach(mangaId: result.id, tagId: value.id);
+        await _tagDao.attach(mangaId: result.id, tagId: tag.id);
       }
 
       return MangaModel(manga: result, tags: updated);
