@@ -108,18 +108,18 @@ class Chapter extends Equatable {
 
   Chapter merge({Chapter? other}) {
     return copyWith(
-      id: other?.id ?? id,
-      mangaId: other?.mangaId ?? mangaId,
-      title: other?.title ?? title,
-      volume: other?.volume ?? volume,
-      chapter: other?.chapter ?? chapter,
-      readableAt: other?.readableAt ?? readableAt,
-      publishAt: other?.publishAt ?? publishAt,
-      images: other?.images ?? images,
-      translatedLanguage: other?.translatedLanguage ?? translatedLanguage,
-      scanlationGroup: other?.scanlationGroup ?? scanlationGroup,
-      webUrl: other?.webUrl ?? webUrl,
-      lastReadAt: other?.lastReadAt ?? lastReadAt,
+      id: id ?? other?.id,
+      mangaId: mangaId ?? other?.mangaId,
+      title: title ?? other?.title,
+      volume: volume ?? other?.volume,
+      chapter: chapter ?? other?.chapter,
+      readableAt: readableAt ?? other?.readableAt,
+      publishAt: publishAt ?? other?.publishAt,
+      images: images?.isNotEmpty == true ? images : other?.images,
+      translatedLanguage: translatedLanguage ?? other?.translatedLanguage,
+      scanlationGroup: scanlationGroup ?? other?.scanlationGroup,
+      webUrl: webUrl ?? other?.webUrl,
+      lastReadAt: lastReadAt ?? other?.lastReadAt,
     );
   }
 

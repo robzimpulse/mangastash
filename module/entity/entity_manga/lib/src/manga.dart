@@ -148,17 +148,17 @@ class Manga extends Equatable {
     );
   }
 
-  Manga merge(Manga other) {
+  Manga merge({Manga? other}) {
     return copyWith(
-      id: id ?? other.id,
-      title: title ?? other.title,
-      coverUrl: coverUrl ?? other.coverUrl,
-      author: author ?? other.author,
-      status: status ?? other.status,
-      description: description ?? other.description,
-      tags: tags ?? other.tags,
-      webUrl: webUrl ?? other.webUrl,
-      source: source ?? other.source,
+      id: id ?? other?.id,
+      title: title ?? other?.title,
+      coverUrl: coverUrl ?? other?.coverUrl,
+      author: author ?? other?.author,
+      status: status ?? other?.status,
+      description: description ?? other?.description,
+      tags: tags?.isNotEmpty == true ? tags : other?.tags,
+      webUrl: webUrl ?? other?.webUrl,
+      source: source ?? other?.source,
     );
   }
 }
