@@ -37,5 +37,6 @@ class ChapterTables extends Table with AutoTimestampTable, AutoTextIdTable {
         {mangaId, title},
         {mangaId, webUrl},
         {webUrl, title},
+        {webUrl},
       ];
 }

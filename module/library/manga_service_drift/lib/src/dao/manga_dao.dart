@@ -164,6 +164,9 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
         final manga = (byId ?? byWebUrl);
 
         final value = entry.key.copyWith(
+          id: Value.absentIfNull(
+            entry.key.id.valueOrNull ?? manga?.manga?.id,
+          ),
           title: Value.absentIfNull(
             entry.key.title.valueOrNull ?? manga?.manga?.title,
           ),

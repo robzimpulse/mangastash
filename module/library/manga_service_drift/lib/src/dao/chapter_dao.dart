@@ -3,6 +3,8 @@ import 'package:drift/drift.dart';
 
 import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
+import '../extension/nullable_generic.dart';
+import '../extension/value_or_null_extension.dart';
 import '../model/chapter_model.dart';
 import '../tables/chapter_tables.dart';
 import '../tables/image_tables.dart';
@@ -122,6 +124,103 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
             images: [...images.where((e) => e.chapterId == chapter.id)],
           ),
       ];
+    });
+  }
+
+  Future<List<ChapterModel>> adds({
+    required Map<ChapterTablesCompanion, List<String>> values,
+  }) {
+    return transaction(() async {
+      final data = <ChapterModel>[];
+
+      final chapters = await search(
+        ids: [...values.keys.map((e) => e.id.valueOrNull).nonNulls],
+        webUrls: [...values.keys.map((e) => e.webUrl.valueOrNull).nonNulls],
+      );
+
+      for (final entry in values.entries) {
+        final byId = entry.key.id.valueOrNull.let(
+          (id) => chapters.firstWhereOrNull(
+            (e) => e.chapter?.id == id,
+          ),
+        );
+
+        final byWebUrl = entry.key.webUrl.valueOrNull.let(
+          (url) => chapters.firstWhereOrNull(
+            (e) => e.chapter?.webUrl == url,
+          ),
+        );
+
+        final chapter = (byId ?? byWebUrl);
+
+        final value = entry.key.copyWith(
+          title: Value.absentIfNull(
+            entry.key.title.valueOrNull ?? chapter?.chapter?.title,
+          ),
+          mangaId: Value.absentIfNull(
+            entry.key.mangaId.valueOrNull ?? chapter?.chapter?.id,
+          ),
+          volume: Value.absentIfNull(
+            entry.key.volume.valueOrNull ?? chapter?.chapter?.volume,
+          ),
+          chapter: Value.absentIfNull(
+            entry.key.chapter.valueOrNull ?? chapter?.chapter?.chapter,
+          ),
+          translatedLanguage: Value.absentIfNull(
+            entry.key.translatedLanguage.valueOrNull ??
+                chapter?.chapter?.translatedLanguage,
+          ),
+          scanlationGroup: Value.absentIfNull(
+            entry.key.scanlationGroup.valueOrNull ??
+                chapter?.chapter?.scanlationGroup,
+          ),
+          webUrl: Value.absentIfNull(
+            entry.key.webUrl.valueOrNull ?? chapter?.chapter?.webUrl,
+          ),
+          readableAt: Value.absentIfNull(
+            entry.key.readableAt.valueOrNull ?? chapter?.chapter?.readableAt,
+          ),
+          publishAt: Value.absentIfNull(
+            entry.key.publishAt.valueOrNull ?? chapter?.chapter?.publishAt,
+          ),
+          lastReadAt: Value.absentIfNull(
+            entry.key.lastReadAt.valueOrNull ?? chapter?.chapter?.lastReadAt,
+          ),
+        );
+
+        final result = await into(chapterTables).insertReturning(
+          value,
+          mode: InsertMode.insertOrReplace,
+          onConflict: DoUpdate(
+            (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
+          ),
+        );
+
+        final List<ImageDrift> images = [];
+        await _imageDao.remove(chapterIds: [result.id]);
+        List<ImageDrift> existing = await _imageDao.search(
+          chapterIds: [result.id],
+        );
+        for (final (index, image) in entry.value.indexed) {
+          final data = existing.isEmpty
+              ? const ImageTablesCompanion()
+              : existing.removeAt(0).toCompanion(true);
+
+          images.add(
+            await _imageDao.add(
+              value: data.copyWith(
+                chapterId: Value(result.id),
+                webUrl: Value(image),
+                order: Value(index),
+              ),
+            ),
+          );
+        }
+
+        data.add(ChapterModel(chapter: result, images: images));
+      }
+
+      return data;
     });
   }
 

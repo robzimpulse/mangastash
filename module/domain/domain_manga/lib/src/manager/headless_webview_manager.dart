@@ -61,7 +61,7 @@ class HeadlessWebviewManager {
 
     final html = await signal
         .then((_) => webview.webViewController?.getHtml())
-        .timeout(const Duration(seconds: 10));
+        .timeout(const Duration(seconds: 10), onTimeout: () async => null);
 
     await webview.dispose();
     if (html == null) return null;

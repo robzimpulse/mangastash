@@ -534,6 +534,7 @@ class $ChapterTablesTable extends ChapterTables
         {mangaId, title},
         {mangaId, webUrl},
         {webUrl, title},
+        {webUrl},
       ];
   @override
   ChapterDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
@@ -1381,6 +1382,7 @@ class $MangaTablesTable extends MangaTables
   @override
   List<Set<GeneratedColumn>> get uniqueKeys => [
         {webUrl, source},
+        {webUrl},
       ];
   @override
   MangaDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
