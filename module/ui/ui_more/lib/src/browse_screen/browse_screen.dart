@@ -1,5 +1,9 @@
+import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
+
+import 'browse_screen_cubit.dart';
+import 'browse_screen_state.dart';
 
 class BrowseScreen extends StatelessWidget {
   const BrowseScreen({
@@ -12,6 +16,18 @@ class BrowseScreen extends StatelessWidget {
     return const BrowseScreen();
   }
 
+  BrowseScreenCubit _cubit(BuildContext context) => context.read();
+
+  BlocBuilder _builder({
+    required BlocWidgetBuilder<BrowseScreenState> builder,
+    BlocBuilderCondition<BrowseScreenState>? buildWhen,
+  }) {
+    return BlocBuilder<BrowseScreenCubit, BrowseScreenState>(
+      buildWhen: buildWhen,
+      builder: builder,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
@@ -19,7 +35,16 @@ class BrowseScreen extends StatelessWidget {
         title: const Text('Browse Screen'),
       ),
       body: AdaptivePhysicListView(
-        children: const [],
+        children: [
+          ListTile(
+            title: const Text('Search Manga Options'),
+            subtitle: const Text('Global Filter for Browsing Manga'),
+            leading: const Icon(Icons.filter_list),
+            onTap: () => context.showSnackBar(
+              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+            ),
+          ),
+        ],
       ),
     );
   }
