@@ -46,7 +46,7 @@ class HeadlessWebviewManager {
       },
     );
 
-    await Future.wait(
+    final signal = Future.wait(
       [
         webview.run(),
         onLoadStartCompleter.future,
@@ -59,7 +59,13 @@ class HeadlessWebviewManager {
       ],
     );
 
-    final html = await webview.webViewController?.getHtml();
+    final html = await signal
+        .then((_) => webview.webViewController?.getHtml())
+        .timeout(
+          const Duration(seconds: 10),
+          onTimeout: () => webview.webViewController?.getHtml(),
+        );
+
     await webview.dispose();
     if (html == null) return null;
 
