@@ -18,7 +18,7 @@ class AsuraScanMangaListHtmlParser extends MangaListHtmlParser {
         title: title,
         coverUrl: coverUrl,
         webUrl: webUrl,
-        status: toBeginningOfSentenceCase(status),
+        status: toBeginningOfSentenceCase(status?.toLowerCase()),
       );
     }).toList();
   }
