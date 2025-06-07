@@ -1,4 +1,6 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -37,6 +39,29 @@ class MangaHistoryScreen extends StatelessWidget {
     );
   }
 
+  Widget _manga({required BuildContext context, required Manga value}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: MangaShelfItem(
+        title: value.title ?? '',
+        coverUrl: value.coverUrl ?? '',
+        layout: MangaShelfItemLayout.list,
+        cacheManager: cacheManager,
+      ),
+    );
+  }
+
+  Widget _chapter({required BuildContext context, required Chapter value}) {
+    return MangaChapterTileWidget(
+      padding: const EdgeInsets.all(8),
+      title: ['Chapter ${value.chapter}', value.title].nonNulls.join(' - '),
+      language: Language.fromCode(value.translatedLanguage),
+      uploadedAt: value.lastReadAt,
+      groups: value.scanlationGroup,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
@@ -49,24 +74,14 @@ class MangaHistoryScreen extends StatelessWidget {
           slivers: [
             for (final history in state.histories.entries)
               MultiSliver(
+                pushPinnedChildren: true,
                 children: [
                   SliverPinnedHeader(
-                    child: Container(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      child: MangaShelfItem(
-                        title: history.key.title ?? '',
-                        coverUrl: history.key.coverUrl ?? '',
-                        layout: MangaShelfItemLayout.list,
-                        cacheManager: cacheManager,
-                      ),
-                    ),
+                    child: _manga(context: context, value: history.key),
                   ),
                   for (final item in history.value)
                     SliverToBoxAdapter(
-                      child: ListTile(
-                        title: Text(item.title ?? ''),
-                        subtitle: Text(item.chapter ?? ''),
-                      ),
+                      child: _chapter(context: context, value: item),
                     ),
                 ],
               ),

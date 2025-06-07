@@ -87,10 +87,11 @@ class MangaChapterTileWidget extends StatelessWidget {
               else if (downloadProgress == 0 ||
                   downloadProgress.isNaN ||
                   downloadProgress.isInfinite)
-                IconButton(
-                  onPressed: onTapDownload,
-                  icon: const Icon(Icons.download, size: 20),
-                )
+                if (onTapDownload != null)
+                  IconButton(
+                    onPressed: onTapDownload,
+                    icon: const Icon(Icons.download, size: 20),
+                  )
               else
                 Padding(
                   padding: const EdgeInsets.all(12.0),
