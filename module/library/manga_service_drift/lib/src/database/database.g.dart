@@ -1379,6 +1379,10 @@ class $MangaTablesTable extends MangaTables
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+        {webUrl, source},
+      ];
+  @override
   MangaDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return MangaDrift(

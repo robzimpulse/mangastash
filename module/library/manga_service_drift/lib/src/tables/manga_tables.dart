@@ -21,4 +21,9 @@ class MangaTables extends Table with AutoTimestampTable, AutoTextIdTable {
 
   @override
   Set<Column<Object>>? get primaryKey => {id};
+
+  @override
+  List<Set<Column<Object>>>? get uniqueKeys => [
+        {webUrl, source}
+      ];
 }

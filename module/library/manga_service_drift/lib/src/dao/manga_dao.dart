@@ -3,6 +3,8 @@ import 'package:drift/drift.dart';
 
 import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
+import '../extension/nullable_generic.dart';
+import '../extension/value_or_null_extension.dart';
 import '../model/manga_model.dart';
 import '../tables/manga_tables.dart';
 import '../tables/relationship_tables.dart';
@@ -140,35 +142,78 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     });
   }
 
-  Future<MangaModel> add({
-    required MangaTablesCompanion value,
-    List<String> tags = const [],
+  Future<List<MangaModel>> adds({
+    required Map<MangaTablesCompanion, List<String>> values,
   }) {
     return transaction(() async {
-      /// if conflict, update chapter otherwise insert chapter
-      final result = await into(mangaTables).insertReturning(
-        value,
-        mode: InsertMode.insertOrReplace,
-        onConflict: DoUpdate(
-          (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
-        ),
+      final mangas = await search(
+        ids: [...values.keys.map((e) => e.id.valueOrNull).nonNulls],
+        webUrls: [...values.keys.map((e) => e.webUrl.valueOrNull).nonNulls],
       );
 
-      /// update existing data with new data until all new data updated
-      final updated = [
-        for (final tag in tags)
-          await _tagDao.add(value: TagTablesCompanion.insert(name: tag)),
-      ];
+      final data = <MangaModel>[];
 
-      /// detach all existing tag on manga
-      await _tagDao.detach(mangaId: result.id);
+      for (final entry in values.entries) {
+        final byId = entry.key.id.valueOrNull?.let(
+          (id) => mangas.firstWhereOrNull((e) => e.manga?.id == id),
+        );
+        final byWebUrl = entry.key.webUrl.valueOrNull?.let(
+          (webUrl) => mangas.firstWhereOrNull((e) => e.manga?.webUrl == webUrl),
+        );
 
-      /// reattach tag to the new manga
-      for (final tag in updated) {
-        await _tagDao.attach(mangaId: result.id, tagId: tag.id);
+        final manga = (byId ?? byWebUrl);
+
+        final value = entry.key.copyWith(
+          title: Value.absentIfNull(
+            entry.key.title.valueOrNull ?? manga?.manga?.title,
+          ),
+          coverUrl: Value.absentIfNull(
+            entry.key.coverUrl.valueOrNull ?? manga?.manga?.coverUrl,
+          ),
+          author: Value.absentIfNull(
+            entry.key.author.valueOrNull ?? manga?.manga?.author,
+          ),
+          status: Value.absentIfNull(
+            entry.key.status.valueOrNull ?? manga?.manga?.status,
+          ),
+          description: Value.absentIfNull(
+            entry.key.description.valueOrNull ?? manga?.manga?.description,
+          ),
+          webUrl: Value.absentIfNull(
+            entry.key.webUrl.valueOrNull ?? manga?.manga?.webUrl,
+          ),
+          source: Value.absentIfNull(
+            entry.key.source.valueOrNull ?? manga?.manga?.source,
+          ),
+        );
+
+        final result = await into(mangaTables).insertReturning(
+          value,
+          mode: InsertMode.insertOrReplace,
+          onConflict: DoUpdate(
+            (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
+          ),
+        );
+
+        final names = {
+          ...entry.value,
+          ...?manga?.tags.map((e) => e.name).nonNulls,
+        };
+
+        final tags = <TagDrift>[];
+        await _tagDao.detach(mangaId: result.id);
+        for (final name in names) {
+          final tag = await _tagDao.add(
+            value: TagTablesCompanion.insert(name: name),
+          );
+          await _tagDao.attach(mangaId: result.id, tagId: tag.id);
+          tags.add(tag);
+        }
+
+        data.add(MangaModel(manga: result, tags: tags));
       }
 
-      return MangaModel(manga: result, tags: updated);
+      return data;
     });
   }
 }
