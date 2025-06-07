@@ -64,6 +64,12 @@ class Chapter extends Equatable {
         lastReadAt,
       ];
 
+  static Chapter? fromDatabase(ChapterModel? model) {
+    return model?.chapter?.let(
+      (chapter) => Chapter.fromDrift(chapter, images: model.images),
+    );
+  }
+
   factory Chapter.fromDrift(
     ChapterDrift chapter, {
     List<ImageDrift> images = const [],
