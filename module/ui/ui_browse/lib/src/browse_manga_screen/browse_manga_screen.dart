@@ -15,9 +15,9 @@ class BrowseMangaScreen extends StatefulWidget {
     super.key,
     required this.crawlUrlUseCase,
     required this.getMangaSourceUseCase,
+    required this.cacheManager,
     this.onTapManga,
     this.onTapFilter,
-    this.cacheManager,
   });
 
   final CrawlUrlUseCase crawlUrlUseCase;
@@ -28,7 +28,7 @@ class BrowseMangaScreen extends StatefulWidget {
     SearchMangaParameter? value,
   )? onTapFilter;
 
-  final BaseCacheManager? cacheManager;
+  final BaseCacheManager cacheManager;
 
   final GetMangaSourceUseCase getMangaSourceUseCase;
 

@@ -12,14 +12,14 @@ class BrowseSourceScreen extends StatelessWidget {
     super.key,
     this.onTapSearchManga,
     this.onTapSource,
-    this.cacheManager,
+    required this.cacheManager,
   });
 
   final VoidCallback? onTapSearchManga;
 
   final ValueSetter<MangaSource>? onTapSource;
 
-  final BaseCacheManager? cacheManager;
+  final BaseCacheManager cacheManager;
 
   static Widget create({
     required ServiceLocator locator,

@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -16,7 +17,17 @@ class MangaHistoryScreenCubit extends Cubit<MangaHistoryScreenState>
   }
 
   void _onUpdate(List<History> histories) {
-    emit(state.copyWith(histories: histories));
+
+    final group = histories.groupListsBy((e) => e.manga);
+
+    emit(
+      state.copyWith(
+        histories: {
+          for (final key in group.keys.nonNulls)
+            key: [...?group[key]?.map((e) => e.chapter).nonNulls],
+        },
+      ),
+    );
   }
 
   void init() {}

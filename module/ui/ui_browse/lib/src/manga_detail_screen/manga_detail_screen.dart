@@ -17,7 +17,7 @@ class MangaDetailScreen extends StatefulWidget {
     super.key,
     this.onTapChapter,
     this.onTapSort,
-    this.cacheManager,
+    required this.cacheManager,
     required this.crawlUrlUseCase,
   });
 
@@ -27,7 +27,7 @@ class MangaDetailScreen extends StatefulWidget {
 
   final CrawlUrlUseCase crawlUrlUseCase;
 
-  final BaseCacheManager? cacheManager;
+  final BaseCacheManager cacheManager;
 
   static Widget create({
     required ServiceLocator locator,

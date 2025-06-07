@@ -11,13 +11,13 @@ import 'library_manga_screen_state.dart';
 class LibraryMangaScreen extends StatefulWidget {
   const LibraryMangaScreen({
     super.key,
+    required this.cacheManager,
     this.onTapManga,
-    this.cacheManager,
   });
 
   final ValueSetter<Manga?>? onTapManga;
 
-  final BaseCacheManager? cacheManager;
+  final BaseCacheManager cacheManager;
 
   static Widget create({
     required ServiceLocator locator,
