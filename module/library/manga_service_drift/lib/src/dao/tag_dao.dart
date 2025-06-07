@@ -70,7 +70,10 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
   Future<TagDrift> add({required TagTablesCompanion value}) {
     return transaction(
       () => into(tagTables).insertReturning(
-        value,
+        value.copyWith(
+          createdAt: Value(DateTime.timestamp()),
+          updatedAt: Value(DateTime.timestamp()),
+        ),
         mode: InsertMode.insertOrReplace,
         onConflict: DoUpdate(
           (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
@@ -80,27 +83,35 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
   }
 
   Future<void> attach({required String mangaId, required String tagId}) {
+    final value = RelationshipTablesCompanion(
+      mangaId: Value(mangaId),
+      tagId: Value(tagId),
+    );
     return transaction(
       () => into(relationshipTables).insert(
-        RelationshipTablesCompanion(
-          mangaId: Value(mangaId),
-          tagId: Value(tagId),
+        value.copyWith(
+          createdAt: Value(DateTime.timestamp()),
+          updatedAt: Value(DateTime.timestamp()),
         ),
-        mode: InsertMode.insertOrIgnore,
+        mode: InsertMode.insertOrReplace,
+        onConflict: DoUpdate(
+          target: [relationshipTables.mangaId, relationshipTables.tagId],
+          (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
+        ),
       ),
     );
   }
 
   Future<void> detach({
-    List<String> mangaIds = const [],
-    List<String> tagIds = const [],
-  }) {
+    required String mangaId,
+    String? tagId,
+  }) async {
     final selector = delete(relationshipTables)
       ..where(
         (f) => [
-          f.mangaId.isIn(mangaIds.nonEmpty.distinct),
-          f.tagId.isIn(tagIds.nonEmpty.distinct),
-        ].fold(const Constant(false), (a, b) => a | b),
+          f.mangaId.equals(mangaId),
+          if (tagId != null) f.tagId.equals(tagId),
+        ].reduce((a, b) => a & b),
       );
 
     return transaction(() => selector.go());
