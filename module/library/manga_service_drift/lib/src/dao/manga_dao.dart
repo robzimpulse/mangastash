@@ -129,10 +129,9 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
 
       final results = await selector.goAndReturn();
 
-      await _tagDao.detach(mangaIds: [...results.map((e) => e.id)]);
-
       final data = <MangaModel>[];
       for (final result in results) {
+        await _tagDao.detach(mangaId: result.id);
         final old = olds.firstWhereOrNull((e) => e.manga?.id == result.id);
         data.add(MangaModel(manga: result, tags: [...?old?.tags]));
       }
@@ -169,7 +168,9 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
       }
 
       /// detach all existing data that not added
-      await _tagDao.detach(mangaIds: [result.id]);
+      for (final tag in existing) {
+        await _tagDao.detach(mangaId: result.id, tagId: tag.id);
+      }
 
       return MangaModel(manga: result, tags: updated);
     });
