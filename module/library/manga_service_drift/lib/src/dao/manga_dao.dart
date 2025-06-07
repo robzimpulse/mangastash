@@ -158,19 +158,22 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
       final List<TagDrift> updated = [];
       List<TagDrift> existing = await _tagDao.search(names: tags);
       for (final tag in tags) {
-        // TODO: existing data for each tags should be filtered by name
         final data = existing.isEmpty
             ? const TagTablesCompanion()
             : existing.removeAt(0).toCompanion(true);
 
         final value = await _tagDao.add(value: data.copyWith(name: Value(tag)));
-        await _tagDao.attach(mangaId: result.id, tagId: value.id);
         updated.add(value);
       }
 
       /// detach all existing data that not added
       for (final tag in existing) {
         await _tagDao.detach(mangaId: result.id, tagId: tag.id);
+      }
+
+      // reattach tag with new value
+      for (final tag in updated) {
+        await _tagDao.attach(mangaId: result.id, tagId: value.id);
       }
 
       return MangaModel(manga: result, tags: updated);
