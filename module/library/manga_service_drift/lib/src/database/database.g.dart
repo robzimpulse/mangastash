@@ -2090,8 +2090,6 @@ class $RelationshipTablesTable extends RelationshipTables
   @override
   List<Set<GeneratedColumn>> get uniqueKeys => [
         {tagId, mangaId},
-        {tagId},
-        {mangaId},
       ];
   @override
   RelationshipTable map(Map<String, dynamic> data, {String? tablePrefix}) {
