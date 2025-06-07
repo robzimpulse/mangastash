@@ -184,7 +184,11 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
             entry.key.publishAt.valueOrNull ?? chapter?.chapter?.publishAt,
           ),
           lastReadAt: Value.absentIfNull(
-            entry.key.lastReadAt.valueOrNull ?? chapter?.chapter?.lastReadAt,
+            entry.key.lastReadAt.valueOrNull?.let<DateTime?>(
+              (latest) => chapter?.chapter?.lastReadAt?.let<DateTime?>(
+                (old) => latest.isAfter(old) ? latest : old,
+              ).or(latest),
+            ),
           ),
         );
 
