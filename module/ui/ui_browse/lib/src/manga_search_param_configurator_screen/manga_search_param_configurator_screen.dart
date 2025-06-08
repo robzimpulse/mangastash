@@ -88,9 +88,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
 
   Widget _status() {
     return _builder(
-      buildWhen: (prev, curr) => [
-        prev.modified?.status != curr.modified?.status,
-      ].contains(true),
+      buildWhen: (prev, curr) => prev.modified != curr.modified,
       builder: (context, state) => ExpansionTile(
         title: const Text('Status'),
         children: [
@@ -101,11 +99,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
               onChanged: (value) {
                 if (value == null) return;
                 final values = [...?state.modified?.status];
-                if (value) {
-                  values.add(key);
-                } else {
-                  values.remove(key);
-                }
+                value ? values.add(key) : values.remove(key);
                 _cubit(context).update(
                   modified: state.modified?.copyWith(status: values),
                 );
@@ -119,9 +113,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
 
   Widget _contentRating() {
     return _builder(
-      buildWhen: (prev, curr) => [
-        prev.modified?.contentRating != curr.modified?.contentRating,
-      ].contains(true),
+      buildWhen: (prev, curr) => prev.modified != curr.modified,
       builder: (context, state) => ExpansionTile(
         title: const Text('Content Rating'),
         children: [
@@ -132,11 +124,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
               onChanged: (value) {
                 if (value == null) return;
                 final values = [...?state.modified?.contentRating];
-                if (value) {
-                  values.add(key);
-                } else {
-                  values.remove(key);
-                }
+                value ? values.add(key) : values.remove(key);
                 _cubit(context).update(
                   modified: state.modified?.copyWith(
                     contentRating: values,
@@ -152,15 +140,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
 
   Widget _originalLanguage() {
     return _builder(
-      buildWhen: (prev, curr) {
-        final a = prev.modified;
-        final b = curr.modified;
-
-        return [
-          a?.originalLanguage != b?.originalLanguage,
-          a?.excludedOriginalLanguages != b?.excludedOriginalLanguages,
-        ].contains(true);
-      },
+      buildWhen: (prev, curr) => prev.modified != curr.modified,
       builder: (context, state) => ExpansionTile(
         title: const Text('Original Language'),
         children: [
@@ -204,36 +184,28 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
 
   Widget _availableTranslatedLanguage() {
     return _builder(
-      buildWhen: (prev, curr) => [
-        prev.modified?.availableTranslatedLanguage !=
-            curr.modified?.availableTranslatedLanguage,
-      ].contains(true),
+      buildWhen: (prev, curr) => prev.modified != curr.modified,
       builder: (context, state) => ExpansionTile(
         title: const Text('Available Translated Language'),
         children: [
           ...LanguageCodes.values.map(
-            (key) => CheckboxListTile(
-              title: Text(key.label),
-              value:
-                  state.modified?.availableTranslatedLanguage?.contains(key) ==
-                      true,
-              onChanged: (value) {
-                if (value == null) return;
-                final values = [
-                  ...?state.modified?.availableTranslatedLanguage,
-                ];
-                if (value) {
-                  values.add(key);
-                } else {
-                  values.remove(key);
-                }
-                _cubit(context).update(
-                  modified: state.modified?.copyWith(
-                    availableTranslatedLanguage: values,
-                  ),
-                );
-              },
-            ),
+            (key) {
+              final param = state.modified?.availableTranslatedLanguage;
+              return CheckboxListTile(
+                title: Text(key.label),
+                value: param?.contains(key) == true,
+                onChanged: (value) {
+                  if (value == null) return;
+                  final values = [...?param];
+                  value ? values.add(key) : values.remove(key);
+                  _cubit(context).update(
+                    modified: state.modified?.copyWith(
+                      availableTranslatedLanguage: values,
+                    ),
+                  );
+                },
+              );
+            },
           ),
         ],
       ),
@@ -242,33 +214,28 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
 
   Widget _publicationDemographic() {
     return _builder(
-      buildWhen: (prev, curr) => [
-        prev.modified?.publicationDemographic !=
-            curr.modified?.publicationDemographic,
-      ].contains(true),
+      buildWhen: (prev, curr) => prev.modified != curr.modified,
       builder: (context, state) => ExpansionTile(
         title: const Text('Publication Demographic'),
         children: [
           ...PublicDemographic.values.map(
-            (key) => CheckboxListTile(
-              title: Text(key.label),
-              value:
-                  state.modified?.publicationDemographic?.contains(key) == true,
-              onChanged: (value) {
-                if (value == null) return;
-                final values = [...?state.modified?.publicationDemographic];
-                if (value) {
-                  values.add(key);
-                } else {
-                  values.remove(key);
-                }
-                _cubit(context).update(
-                  modified: state.modified?.copyWith(
-                    publicationDemographic: values,
-                  ),
-                );
-              },
-            ),
+            (key) {
+              final param = state.modified?.publicationDemographic;
+              return CheckboxListTile(
+                title: Text(key.label),
+                value: param?.contains(key) == true,
+                onChanged: (value) {
+                  if (value == null) return;
+                  final values = [...?param];
+                  value ? values.add(key) : values.remove(key);
+                  _cubit(context).update(
+                    modified: state.modified?.copyWith(
+                      publicationDemographic: values,
+                    ),
+                  );
+                },
+              );
+            },
           ),
         ],
       ),
