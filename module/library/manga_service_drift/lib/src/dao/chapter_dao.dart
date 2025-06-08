@@ -153,7 +153,7 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
 
         final chapter = (byId ?? byWebUrl);
 
-        final latest = entry.key.lastReadAt.valueOrNull?.let(
+        final latestLastReadAt = entry.key.lastReadAt.valueOrNull?.let(
           (latest) => chapter?.chapter?.lastReadAt
               ?.let<DateTime>((old) => latest.isAfter(old) ? latest : old)
               .or(latest),
@@ -190,9 +190,7 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
             entry.key.publishAt.valueOrNull ?? chapter?.chapter?.publishAt,
           ),
           lastReadAt: Value.absentIfNull(
-            latest ??
-                entry.key.lastReadAt.valueOrNull ??
-                chapter?.chapter?.lastReadAt,
+            latestLastReadAt ?? chapter?.chapter?.lastReadAt,
           ),
         );
 
