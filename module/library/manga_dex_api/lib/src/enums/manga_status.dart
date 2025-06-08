@@ -1,7 +1,8 @@
 enum MangaStatus {
   ongoing('ongoing'),
   completed('completed'),
-  haitus('haitus'),
+  // TODO: rename haitus to hiatus
+  haitus('hiatus'),
   cancelled('cancelled');
 
   final String rawValue;
