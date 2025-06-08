@@ -625,7 +625,7 @@ packages:
     source: hosted
     version: "0.1.2-main.4"
   manga_dex_api:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "../../library/manga_dex_api"
       relative: true

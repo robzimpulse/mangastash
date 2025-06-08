@@ -18,8 +18,8 @@ class BrowseScreenCubit extends Cubit<BrowseScreenState> {
           ),
         );
 
-  void update({required SearchMangaParameter modified}) {
-    emit(state.copyWith(parameter: modified));
-    _updateSearchParameterUseCase.updateSearchParameter(parameter: modified);
+  void update({required SearchMangaParameter parameter}) {
+    emit(state.copyWith(parameter: parameter));
+    _updateSearchParameterUseCase.updateSearchParameter(parameter: parameter);
   }
 }

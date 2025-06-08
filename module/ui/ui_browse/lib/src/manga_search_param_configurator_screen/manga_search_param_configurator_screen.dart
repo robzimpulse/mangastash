@@ -1,4 +1,3 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -75,170 +74,17 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
             ),
           ),
         ),
-        ...[
-          _status(),
-          _contentRating(),
-          _originalLanguage(),
-          _availableTranslatedLanguage(),
-          _publicationDemographic(),
-        ].map((e) => SliverToBoxAdapter(child: e)),
+        SliverToBoxAdapter(
+          child: _builder(
+            builder: (context, state) => MangaParameterWidget(
+              parameter: state.modified ?? const SearchMangaParameter(),
+              onChanged: (parameter) => _cubit(context).update(
+                modified: parameter,
+              ),
+            ),
+          ),
+        ),
       ],
-    );
-  }
-
-  Widget _status() {
-    return _builder(
-      buildWhen: (prev, curr) => prev.modified != curr.modified,
-      builder: (context, state) => ExpansionTile(
-        title: const Text('Status'),
-        children: [
-          ...MangaStatus.values.map(
-            (key) => CheckboxListTile(
-              title: Text(key.label),
-              value: state.modified?.status?.contains(key) == true,
-              onChanged: (value) {
-                if (value == null) return;
-                final values = [...?state.modified?.status];
-                value ? values.add(key) : values.remove(key);
-                _cubit(context).update(
-                  modified: state.modified?.copyWith(status: values),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _contentRating() {
-    return _builder(
-      buildWhen: (prev, curr) => prev.modified != curr.modified,
-      builder: (context, state) => ExpansionTile(
-        title: const Text('Content Rating'),
-        children: [
-          ...ContentRating.values.map(
-            (key) => CheckboxListTile(
-              title: Text(key.label),
-              value: state.modified?.contentRating?.contains(key) == true,
-              onChanged: (value) {
-                if (value == null) return;
-                final values = [...?state.modified?.contentRating];
-                value ? values.add(key) : values.remove(key);
-                _cubit(context).update(
-                  modified: state.modified?.copyWith(
-                    contentRating: values,
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _originalLanguage() {
-    return _builder(
-      buildWhen: (prev, curr) => prev.modified != curr.modified,
-      builder: (context, state) => ExpansionTile(
-        title: const Text('Original Language'),
-        children: [
-          ...LanguageCodes.values.map(
-            (key) {
-              final data = state.modified;
-              final included = data?.originalLanguage;
-              final excluded = data?.excludedOriginalLanguages;
-
-              return CheckboxListTile(
-                title: Text(key.label),
-                tristate: true,
-                value: (included?.contains(key) ?? false)
-                    ? true
-                    : (excluded?.contains(key) ?? false)
-                        ? null
-                        : false,
-                onChanged: (value) {
-                  final originalLanguage = (value == true)
-                      ? ([...?included, key])
-                      : ([...?included]..remove(key));
-
-                  final excludedOriginalLanguages = (value == null)
-                      ? ([...?excluded, key])
-                      : ([...?excluded]..remove(key));
-
-                  _cubit(context).update(
-                    modified: data?.copyWith(
-                      originalLanguage: originalLanguage,
-                      excludedOriginalLanguages: excludedOriginalLanguages,
-                    ),
-                  );
-                },
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _availableTranslatedLanguage() {
-    return _builder(
-      buildWhen: (prev, curr) => prev.modified != curr.modified,
-      builder: (context, state) => ExpansionTile(
-        title: const Text('Available Translated Language'),
-        children: [
-          ...LanguageCodes.values.map(
-            (key) {
-              final param = state.modified?.availableTranslatedLanguage;
-              return CheckboxListTile(
-                title: Text(key.label),
-                value: param?.contains(key) == true,
-                onChanged: (value) {
-                  if (value == null) return;
-                  final values = [...?param];
-                  value ? values.add(key) : values.remove(key);
-                  _cubit(context).update(
-                    modified: state.modified?.copyWith(
-                      availableTranslatedLanguage: values,
-                    ),
-                  );
-                },
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _publicationDemographic() {
-    return _builder(
-      buildWhen: (prev, curr) => prev.modified != curr.modified,
-      builder: (context, state) => ExpansionTile(
-        title: const Text('Publication Demographic'),
-        children: [
-          ...PublicDemographic.values.map(
-            (key) {
-              final param = state.modified?.publicationDemographic;
-              return CheckboxListTile(
-                title: Text(key.label),
-                value: param?.contains(key) == true,
-                onChanged: (value) {
-                  if (value == null) return;
-                  final values = [...?param];
-                  value ? values.add(key) : values.remove(key);
-                  _cubit(context).update(
-                    modified: state.modified?.copyWith(
-                      publicationDemographic: values,
-                    ),
-                  );
-                },
-              );
-            },
-          ),
-        ],
-      ),
     );
   }
 }

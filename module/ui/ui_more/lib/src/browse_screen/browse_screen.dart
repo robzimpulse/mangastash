@@ -1,5 +1,3 @@
-import 'package:core_environment/core_environment.dart';
-import 'package:domain_manga/domain_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -38,152 +36,21 @@ class BrowseScreen extends StatelessWidget {
   }
 
   Widget _buildSearchMangaOption({required BuildContext context}) {
-    return _builder(
-      buildWhen: (prev, curr) {
-        final old = prev.parameter;
-        final newest = curr.parameter;
-        return [
-          old.availableTranslatedLanguage != newest.availableTranslatedLanguage,
-          old.excludedOriginalLanguages != newest.excludedOriginalLanguages,
-          old.publicationDemographic != newest.publicationDemographic,
-          old.originalLanguage != newest.originalLanguage,
-          old.contentRating != newest.contentRating,
-          old.status != newest.status,
-        ].contains(true);
-      },
-      builder: (context, state) => ExpansionTile(
-        title: const Text('Search Manga Options'),
-        subtitle: const Text('Global Filter for Browsing Manga'),
-        leading: const Icon(Icons.filter_list),
-        children: [
-          ExpansionTile(
-            title: const Text('Status'),
-            children: [
-              ...MangaStatus.values.map(
-                (key) => CheckboxListTile(
-                  title: Text(key.label),
-                  value: state.parameter.status?.contains(key) == true,
-                  onChanged: (value) {
-                    if (value == null) return;
-                    final values = [...?state.parameter.status];
-                    value ? values.add(key) : values.remove(key);
-                    _cubit(context).update(
-                      modified: state.parameter.copyWith(status: values),
-                    );
-                  },
-                ),
-              ),
-            ],
+    return ExpansionTile(
+      title: const Text('Search Manga Options'),
+      subtitle: const Text('Global Filter for Browsing Manga'),
+      leading: const Icon(Icons.filter_list),
+      children: [
+        _builder(
+          buildWhen: (prev, curr) => prev.parameter != curr.parameter,
+          builder: (context, state) => MangaParameterWidget(
+            parameter: state.parameter,
+            onChanged: (parameter) => _cubit(context).update(
+              parameter: parameter,
+            ),
           ),
-          ExpansionTile(
-            title: const Text('Content Rating'),
-            children: [
-              ...ContentRating.values.map(
-                (key) => CheckboxListTile(
-                  title: Text(key.label),
-                  value: state.parameter.contentRating?.contains(key) == true,
-                  onChanged: (value) {
-                    if (value == null) return;
-                    final values = [...?state.parameter.contentRating];
-                    value ? values.add(key) : values.remove(key);
-                    _cubit(context).update(
-                      modified: state.parameter.copyWith(
-                        contentRating: values,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-          ExpansionTile(
-            title: const Text('Original Language'),
-            children: [
-              ...LanguageCodes.values.map(
-                (key) {
-                  final data = state.parameter;
-                  final included = data.originalLanguage;
-                  final excluded = data.excludedOriginalLanguages;
-
-                  return CheckboxListTile(
-                    title: Text(key.label),
-                    tristate: true,
-                    value: (included?.contains(key) ?? false)
-                        ? true
-                        : (excluded?.contains(key) ?? false)
-                            ? null
-                            : false,
-                    onChanged: (value) {
-                      final originalLanguage = (value == true)
-                          ? ([...?included, key])
-                          : ([...?included]..remove(key));
-
-                      final excludedOriginalLanguages = (value == null)
-                          ? ([...?excluded, key])
-                          : ([...?excluded]..remove(key));
-
-                      _cubit(context).update(
-                        modified: data.copyWith(
-                          originalLanguage: originalLanguage,
-                          excludedOriginalLanguages: excludedOriginalLanguages,
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
-          ExpansionTile(
-            title: const Text('Available Translated Language'),
-            children: [
-              ...LanguageCodes.values.map(
-                (key) {
-                  final param = state.parameter.availableTranslatedLanguage;
-                  return CheckboxListTile(
-                    title: Text(key.label),
-                    value: param?.contains(key) == true,
-                    onChanged: (value) {
-                      if (value == null) return;
-                      final values = [...?param];
-                      value ? values.add(key) : values.remove(key);
-                      _cubit(context).update(
-                        modified: state.parameter.copyWith(
-                          availableTranslatedLanguage: values,
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
-          ExpansionTile(
-            title: const Text('Publication Demographic'),
-            children: [
-              ...PublicDemographic.values.map(
-                (key) {
-                  final param = state.parameter.publicationDemographic;
-                  return CheckboxListTile(
-                    title: Text(key.label),
-                    value: param?.contains(key) == true,
-                    onChanged: (value) {
-                      if (value == null) return;
-                      final values = [...?param];
-                      value ? values.add(key) : values.remove(key);
-                      _cubit(context).update(
-                        modified: state.parameter.copyWith(
-                          publicationDemographic: values,
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
