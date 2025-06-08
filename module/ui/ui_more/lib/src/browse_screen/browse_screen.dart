@@ -18,6 +18,8 @@ class BrowseScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => BrowseScreenCubit(
         initialState: const BrowseScreenState(),
+        updateSearchParameterUseCase: locator(),
+        listenSearchParameterUseCase: locator(),
       ),
       child: const BrowseScreen(),
     );

@@ -1,15 +1,27 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
+import '../appearance_screen/appearance_screen_cubit.dart';
 import 'browse_screen_state.dart';
 
 class BrowseScreenCubit extends Cubit<BrowseScreenState> {
+  final UpdateSearchParameterUseCase _updateSearchParameterUseCase;
+
   BrowseScreenCubit({
+    required UpdateSearchParameterUseCase updateSearchParameterUseCase,
+    required ListenSearchParameterUseCase listenSearchParameterUseCase,
     BrowseScreenState initialState = const BrowseScreenState(),
-  }) : super(initialState);
+  })  : _updateSearchParameterUseCase = updateSearchParameterUseCase,
+        super(
+          initialState.copyWith(
+            parameter:
+                listenSearchParameterUseCase.searchParameterState.valueOrNull,
+          ),
+        );
 
-  void update({SearchMangaParameter? modified}) {
+  void update({required SearchMangaParameter modified}) {
     emit(state.copyWith(parameter: modified));
+    _updateSearchParameterUseCase.updateSearchParameter(parameter: modified);
   }
-
 }
