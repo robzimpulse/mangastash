@@ -109,10 +109,7 @@ class DownloadProgressManager
 
     await _cacheManager.removeFile(task.url);
 
-    await _cacheManager.putFile(
-      task.url,
-      await File(path).readAsBytes(),
-    );
+    await _cacheManager.putFile(task.url, await File(path).readAsBytes());
 
     _log.log(
       'Adding image to cache',
