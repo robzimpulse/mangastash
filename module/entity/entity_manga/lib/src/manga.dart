@@ -130,7 +130,7 @@ class Manga extends Equatable {
       id: data.id,
       title: data.attributes?.title?.en,
       description: data.attributes?.description?.en,
-      coverUrl: filename?.let<String?>(
+      coverUrl: filename?.let(
         (filename) => data.id?.let(
           (id) => 'https://uploads.mangadex.org/covers/$id/$filename',
         ),

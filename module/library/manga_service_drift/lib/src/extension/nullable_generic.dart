@@ -3,7 +3,7 @@ extension NullableGeneric<T> on T? {
 
   T? orNull(T? replace) => this ?? replace;
 
-  R? let<R>(R Function(T) applicator) {
+  R? let<R>(R? Function(T) applicator) {
     final self = this;
     return self != null ? applicator(self) : null;
   }

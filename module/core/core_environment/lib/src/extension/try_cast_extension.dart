@@ -5,7 +5,9 @@ extension DistinctList<X> on List<X> {
 extension NullableGeneric<T> on T? {
   T or(T replace) => this ?? replace;
 
-  R? let<R>(R Function(T) applicator) {
+  T? orNull(T? replace) => this ?? replace;
+
+  R? let<R>(R? Function(T) applicator) {
     final self = this;
     return self != null ? applicator(self) : null;
   }

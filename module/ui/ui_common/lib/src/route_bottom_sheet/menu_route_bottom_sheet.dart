@@ -15,7 +15,7 @@ class MenuRouteBottomSheet extends BottomSheetRoute {
   }) : super(
           child: (context, controller) => MenuBottomSheet(
             content: [
-              isOnLibrary?.let<Widget>(
+              isOnLibrary?.let(
                 (value) => ListTile(
                   title: Text('${value ? 'Remove from' : 'Add to'} Library'),
                   leading: Icon(

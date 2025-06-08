@@ -54,7 +54,7 @@ class DownloadChapterKey extends Equatable {
       mangaTitle: manga?.title,
       mangaCoverUrl: manga?.coverUrl,
       chapterId: chapter?.id,
-      chapterNumber: chapter?.chapter?.let<num?>((e) => num.tryParse(e)),
+      chapterNumber: chapter?.chapter?.let((e) => num.tryParse(e)),
     );
   }
 

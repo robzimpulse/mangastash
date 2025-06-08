@@ -70,7 +70,7 @@ class MangaDetailScreenState extends Equatable {
     final List<String> chapterIds = [];
 
     for (final data in chapters ?? <Chapter>[]) {
-      final chapter = data.chapter?.let<num?>((e) => num.tryParse(e));
+      final chapter = data.chapter?.let((e) => num.tryParse(e));
 
       if (chapter != null) {
         processedChapters.update(
