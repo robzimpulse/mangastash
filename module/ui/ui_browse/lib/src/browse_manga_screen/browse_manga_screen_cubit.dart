@@ -23,25 +23,27 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     required AddToLibraryUseCase addToLibraryUseCase,
     required RemoveFromLibraryUseCase removeFromLibraryUseCase,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
-    required ListenLocaleUseCase listenLocaleUseCase,
     required PrefetchMangaUseCase prefetchMangaUseCase,
     required ListenPrefetchUseCase listenPrefetchMangaUseCase,
     required DownloadMangaUseCase downloadMangaUseCase,
     required PrefetchChapterUseCase prefetchChapterUseCase,
+    required ListenSearchParameterUseCase listenSearchParameterUseCase,
   })  : _searchMangaUseCase = searchMangaUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         _prefetchMangaUseCase = prefetchMangaUseCase,
         _downloadMangaUseCase = downloadMangaUseCase,
         _prefetchChapterUseCase = prefetchChapterUseCase,
-        super(initialState) {
+        super(
+          initialState.copyWith(
+            parameter:
+                listenSearchParameterUseCase.searchParameterState.valueOrNull,
+          ),
+        ) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
           .distinct()
           .listen(_updateLibraryState),
-    );
-    addSubscription(
-      listenLocaleUseCase.localeDataStream.distinct().listen(_updateLocale),
     );
     addSubscription(
       listenPrefetchMangaUseCase.mangaIdsStream
@@ -52,21 +54,6 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
   void _updateLibraryState(List<Manga> libraryState) {
     emit(state.copyWith(libraries: libraryState));
-  }
-
-  void _updateLocale(Locale? locale) {
-    final codes = Language.fromCode(locale?.languageCode).languageCodes;
-
-    emit(
-      state.copyWith(
-        parameter: state.parameter.copyWith(
-          availableTranslatedLanguage: {
-            ...?state.parameter.availableTranslatedLanguage,
-            ...codes,
-          }.toList(),
-        ),
-      ),
-    );
   }
 
   void _updatePrefetchState(Set<String> prefetchedMangaIds) {

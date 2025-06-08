@@ -48,7 +48,10 @@ class DomainMangaRegistrar extends Registrar {
 
       locator.registerSingleton(await FileDownloadManager.create(log: log));
 
-      locator.registerSingleton(SearchParameterManager());
+      locator.registerSingleton(
+        SearchParameterManager(listenLocaleUseCase: locator()),
+        dispose: (e) => e.dispose(),
+      );
       locator.alias<ListenSearchParameterUseCase, SearchParameterManager>();
       locator.alias<UpdateSearchParameterUseCase, SearchParameterManager>();
 
