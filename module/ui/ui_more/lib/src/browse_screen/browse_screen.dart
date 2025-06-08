@@ -38,16 +38,25 @@ class BrowseScreen extends StatelessWidget {
   }
 
   Widget _buildSearchMangaOption({required BuildContext context}) {
-    return ExpansionTile(
-      title: const Text('Search Manga Options'),
-      subtitle: const Text('Global Filter for Browsing Manga'),
-      leading: const Icon(Icons.filter_list),
-      children: [
-        _builder(
-          buildWhen: (prev, curr) => [
-            prev.parameter.status != curr.parameter.status,
-          ].contains(true),
-          builder: (context, state) => ExpansionTile(
+    return _builder(
+      buildWhen: (prev, curr) {
+        final old = prev.parameter;
+        final newest = curr.parameter;
+        return [
+          old.availableTranslatedLanguage != newest.availableTranslatedLanguage,
+          old.excludedOriginalLanguages != newest.excludedOriginalLanguages,
+          old.publicationDemographic != newest.publicationDemographic,
+          old.originalLanguage != newest.originalLanguage,
+          old.contentRating != newest.contentRating,
+          old.status != newest.status,
+        ].contains(true);
+      },
+      builder: (context, state) => ExpansionTile(
+        title: const Text('Search Manga Options'),
+        subtitle: const Text('Global Filter for Browsing Manga'),
+        leading: const Icon(Icons.filter_list),
+        children: [
+          ExpansionTile(
             title: const Text('Status'),
             children: [
               ...MangaStatus.values.map(
@@ -66,12 +75,7 @@ class BrowseScreen extends StatelessWidget {
               ),
             ],
           ),
-        ),
-        _builder(
-          buildWhen: (prev, curr) => [
-            prev.parameter.contentRating != curr.parameter.contentRating,
-          ].contains(true),
-          builder: (context, state) => ExpansionTile(
+          ExpansionTile(
             title: const Text('Content Rating'),
             children: [
               ...ContentRating.values.map(
@@ -92,17 +96,7 @@ class BrowseScreen extends StatelessWidget {
               ),
             ],
           ),
-        ),
-        _builder(
-          buildWhen: (prev, curr) {
-            final old = prev.parameter;
-            final newest = curr.parameter;
-            return [
-              old.originalLanguage != newest.originalLanguage,
-              old.excludedOriginalLanguages != newest.excludedOriginalLanguages,
-            ].contains(true);
-          },
-          builder: (context, state) => ExpansionTile(
+          ExpansionTile(
             title: const Text('Original Language'),
             children: [
               ...LanguageCodes.values.map(
@@ -140,20 +134,13 @@ class BrowseScreen extends StatelessWidget {
               ),
             ],
           ),
-        ),
-        _builder(
-          buildWhen: (prev, curr) {
-            final old = prev.parameter.availableTranslatedLanguage;
-            final current = curr.parameter.availableTranslatedLanguage;
-            return old != current;
-          },
-          builder: (context, state) {
-            final param = state.parameter.availableTranslatedLanguage;
-            return ExpansionTile(
-              title: const Text('Available Translated Language'),
-              children: [
-                ...LanguageCodes.values.map(
-                  (key) => CheckboxListTile(
+          ExpansionTile(
+            title: const Text('Available Translated Language'),
+            children: [
+              ...LanguageCodes.values.map(
+                (key) {
+                  final param = state.parameter.availableTranslatedLanguage;
+                  return CheckboxListTile(
                     title: Text(key.label),
                     value: param?.contains(key) == true,
                     onChanged: (value) {
@@ -166,25 +153,18 @@ class BrowseScreen extends StatelessWidget {
                         ),
                       );
                     },
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-        _builder(
-          buildWhen: (prev, curr) {
-            final old = prev.parameter.publicationDemographic;
-            final current = curr.parameter.publicationDemographic;
-            return old != current;
-          },
-          builder: (context, state) {
-            final param = state.parameter.publicationDemographic;
-            return ExpansionTile(
-              title: const Text('Publication Demographic'),
-              children: [
-                ...PublicDemographic.values.map(
-                  (key) => CheckboxListTile(
+                  );
+                },
+              ),
+            ],
+          ),
+          ExpansionTile(
+            title: const Text('Publication Demographic'),
+            children: [
+              ...PublicDemographic.values.map(
+                (key) {
+                  final param = state.parameter.publicationDemographic;
+                  return CheckboxListTile(
                     title: Text(key.label),
                     value: param?.contains(key) == true,
                     onChanged: (value) {
@@ -197,13 +177,13 @@ class BrowseScreen extends StatelessWidget {
                         ),
                       );
                     },
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      ],
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
