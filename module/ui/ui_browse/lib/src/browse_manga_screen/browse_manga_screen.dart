@@ -38,12 +38,12 @@ class BrowseMangaScreen extends StatefulWidget {
     Future<SearchMangaParameter?>? Function(
       SearchMangaParameter? value,
     )? onTapFilter,
-    MangaSourceEnum? source,
+    String? source,
   }) {
     return BlocProvider(
       create: (context) => BrowseMangaScreenCubit(
         initialState: BrowseMangaScreenState(
-          source: source,
+          source: Source.fromValue(source),
         ),
         getMangaSourceUseCase: locator(),
         searchMangaUseCase: locator(),
@@ -126,14 +126,9 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
 
   void _onTapOpenInBrowser({
     required BuildContext context,
-    MangaSourceEnum? source,
+    Source? source,
   }) async {
-    if (source == null) {
-      context.showSnackBar(message: 'Could not launch source url');
-      return;
-    }
-
-    final url = widget.getMangaSourceUseCase.get(source)?.url;
+    final url = source?.url;
 
     if (url == null || url.isEmpty) {
       context.showSnackBar(message: 'Could not launch source url');
@@ -337,7 +332,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         prev.isSearchActive != curr.isSearchActive,
       ].contains(true),
       builder: (context, state) => !state.isSearchActive
-          ? Text(state.source?.value ?? '')
+          ? Text(state.source?.name ?? '')
           : Container(
               alignment: Alignment.centerLeft,
               child: TextField(

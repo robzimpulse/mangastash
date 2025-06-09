@@ -84,7 +84,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
   Future<void> _fetchManga() async {
     final result = await _searchMangaUseCase.execute(
-      source: state.source,
+      source: state.source?.name?.let((e) => MangaSourceEnum.fromValue(e)),
       parameter: state.parameter,
     );
 
