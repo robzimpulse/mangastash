@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -49,18 +48,10 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
   void prefetch({required List<Manga> mangas}) {
     for (final manga in mangas) {
       final id = manga.id;
-      final source = state.sources.firstWhereOrNull(
-        (e) => e.name == manga.source?.value,
-      );
+      final source = manga.source;
       if (id == null || source == null) continue;
-      _prefetchMangaUseCase.prefetchManga(
-        mangaId: id,
-        source: MangaSourceEnum.fromValue(source.name),
-      );
-      _prefetchChapterUseCase.prefetchChapters(
-        mangaId: id,
-        source: MangaSourceEnum.fromValue(source.name),
-      );
+      _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
+      _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);
     }
   }
 
@@ -70,14 +61,9 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
 
   void download({required Manga manga}) {
     final id = manga.id;
-    final source = state.sources.firstWhereOrNull(
-      (e) => e.name == manga.source?.value,
-    );
+    final source = manga.source;
     if (id == null || source == null) return;
-    _downloadMangaUseCase.downloadManga(
-      mangaId: id,
-      source: MangaSourceEnum.fromValue(source.name),
-    );
+    _downloadMangaUseCase.downloadManga(mangaId: id, source: source);
   }
 
   void update({

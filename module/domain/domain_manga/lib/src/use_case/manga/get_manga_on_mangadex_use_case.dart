@@ -45,7 +45,7 @@ class GetMangaOnMangaDexUseCase with SyncMangasMixin {
         mangaDao: _mangaDao,
         values: [
           Manga.from(data: manga).copyWith(
-            source: MangaSourceEnum.mangadex,
+            source: Source.mangadex().name,
           ),
         ],
       );

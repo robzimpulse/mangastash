@@ -11,12 +11,16 @@ abstract class ChapterListHtmlParser extends BaseHtmlParser {
 
   factory ChapterListHtmlParser.forSource({
     required Document root,
-    required MangaSourceEnum source,
+    required String source,
   }) {
-    return switch (source) {
-      MangaSourceEnum.mangadex => throw UnimplementedError(),
-      MangaSourceEnum.asurascan => AsuraScanChapterListHtmlParser(root: root),
-      MangaSourceEnum.mangaclash => MangaClashChapterListHtmlParser(root: root),
-    };
+    if (Source.asurascan().name == source) {
+      return AsuraScanChapterListHtmlParser(root: root);
+    }
+
+    if (Source.mangaclash().name == source) {
+      return MangaClashChapterListHtmlParser(root: root);
+    }
+
+    throw UnimplementedError();
   }
 }

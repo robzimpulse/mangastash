@@ -18,7 +18,6 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
   BrowseMangaScreenCubit({
     required BrowseMangaScreenState initialState,
-    required GetMangaSourceUseCase getMangaSourceUseCase,
     required SearchMangaUseCase searchMangaUseCase,
     required AddToLibraryUseCase addToLibraryUseCase,
     required RemoveFromLibraryUseCase removeFromLibraryUseCase,
@@ -84,7 +83,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
   Future<void> _fetchManga() async {
     final result = await _searchMangaUseCase.execute(
-      source: state.source?.name?.let((e) => MangaSourceEnum.fromValue(e)),
+      source: state.source?.name,
       parameter: state.parameter,
     );
 

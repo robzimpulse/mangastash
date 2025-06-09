@@ -11,12 +11,16 @@ abstract class MangaDetailHtmlParser extends BaseHtmlParser {
 
   factory MangaDetailHtmlParser.forSource({
     required Document root,
-    required MangaSourceEnum source,
+    required String source,
   }) {
-    return switch (source) {
-      MangaSourceEnum.mangadex => throw UnimplementedError(),
-      MangaSourceEnum.asurascan => AsuraScanMangaDetailHtmlParser(root: root),
-      MangaSourceEnum.mangaclash => MangaClashMangaDetailHtmlParser(root: root),
-    };
+    if (Source.asurascan().name == source) {
+      return AsuraScanMangaDetailHtmlParser(root: root);
+    }
+
+    if (Source.mangaclash().name == source) {
+      return MangaClashMangaDetailHtmlParser(root: root);
+    }
+
+    throw UnimplementedError();
   }
 }

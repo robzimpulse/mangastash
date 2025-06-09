@@ -31,13 +31,13 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
         _webview = webview;
 
   Future<Result<Pagination<Chapter>>> execute({
-    required MangaSourceEnum? source,
+    required String? source,
     required String? mangaId,
     required SearchChapterParameter parameter,
   }) async {
     if (source == null) return Error(Exception('Empty Source'));
 
-    if (source == MangaSourceEnum.mangadex) {
+    if (source == Source.mangadex().name) {
       return _searchChapterOnMangaDexUseCase.execute(
         parameter: parameter,
         mangaId: mangaId,

@@ -26,7 +26,7 @@ class GetChapterUseCase with SyncChaptersMixin {
         _webview = webview;
 
   Future<Result<Chapter>> execute({
-    required MangaSourceEnum? source,
+    required String? source,
     required String? mangaId,
     required String? chapterId,
   }) async {
@@ -34,7 +34,7 @@ class GetChapterUseCase with SyncChaptersMixin {
     if (mangaId == null) return Error(Exception('Empty Manga Id'));
     if (chapterId == null) return Error(Exception('Empty Chapter Id'));
 
-    if (source == MangaSourceEnum.mangadex) {
+    if (source == Source.mangadex().name) {
       return _getChapterOnMangaDexUseCase.execute(
         chapterId: chapterId,
         mangaId: mangaId,

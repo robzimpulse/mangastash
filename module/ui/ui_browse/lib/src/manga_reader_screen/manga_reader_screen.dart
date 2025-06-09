@@ -36,7 +36,6 @@ class MangaReaderScreen extends StatelessWidget {
           chapterIds: chapterIds ?? [],
         ),
         getChapterUseCase: locator(),
-        getMangaSourceUseCase: locator(),
         crawlUrlUseCase: locator(),
         updateChapterLastReadAtUseCase: locator(),
       )..init(),

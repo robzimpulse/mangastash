@@ -142,7 +142,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     final result = await _getMangaUseCase.execute(
       mangaId: id,
-      source: state.source?.name?.let((e) => MangaSourceEnum.fromValue(e)),
+      source: state.source?.name,
     );
 
     if (result is Success<Manga>) {
@@ -169,7 +169,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     final result = await _searchChapterUseCase.execute(
       mangaId: id,
-      source: state.source?.name?.let((e) => MangaSourceEnum.fromValue(e)),
+      source: state.source?.name,
       parameter: state.parameter,
     );
 

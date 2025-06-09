@@ -27,7 +27,7 @@ class Manga extends Equatable {
 
   final String? webUrl;
 
-  final MangaSourceEnum? source;
+  final String? source;
 
   const Manga({
     this.id,
@@ -52,7 +52,7 @@ class Manga extends Equatable {
       description,
       tags,
       webUrl,
-      source?.value,
+      source,
     ];
   }
 
@@ -71,7 +71,7 @@ class Manga extends Equatable {
       status: manga.status,
       description: manga.description,
       webUrl: manga.webUrl,
-      source: manga.source?.let((source) => MangaSourceEnum.fromValue(source)),
+      source: manga.source,
       tags: tags.map((e) => Tag.fromDrift(e)).toList(),
     );
   }
@@ -85,7 +85,7 @@ class Manga extends Equatable {
       status: Value.absentIfNull(status),
       description: Value.absentIfNull(description),
       webUrl: Value.absentIfNull(webUrl),
-      source: Value.absentIfNull(source?.value),
+      source: Value.absentIfNull(source),
     );
   }
 
@@ -104,7 +104,7 @@ class Manga extends Equatable {
     String? description,
     List<Tag>? tags,
     String? webUrl,
-    MangaSourceEnum? source,
+    String? source,
   }) {
     return Manga(
       id: id ?? this.id,

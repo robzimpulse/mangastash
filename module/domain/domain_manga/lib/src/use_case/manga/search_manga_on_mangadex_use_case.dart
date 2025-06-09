@@ -41,7 +41,7 @@ class SearchMangaOnMangaDexUseCase with SyncMangasMixin {
             values: [
               ...?result.data?.map(
                 (e) => Manga.from(data: e).copyWith(
-                  source: MangaSourceEnum.mangadex,
+                  source: Source.mangadex().name,
                 ),
               ),
             ],

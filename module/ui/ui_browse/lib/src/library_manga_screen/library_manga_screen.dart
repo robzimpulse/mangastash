@@ -266,7 +266,7 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
             title: e.title ?? '',
             coverUrl: e.coverUrl ?? '',
             sourceIconUrl: state.sources
-                .firstWhereOrNull((f) => f.name == e.source?.value)
+                .firstWhereOrNull((f) => f.name == e.source)
                 ?.icon,
             isPrefetching: state.prefetchedMangaIds.contains(e.id),
             layout: state.layout,

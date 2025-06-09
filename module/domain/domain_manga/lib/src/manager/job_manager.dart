@@ -106,10 +106,8 @@ class JobManager
       return;
     }
 
-    final source = job.manga?.source?.let((e) => MangaSourceEnum.fromValue(e));
-
     final result = await _getMangaUseCase().execute(
-      source: source,
+      source: job.manga?.source,
       mangaId: mangaId,
     );
 
@@ -164,10 +162,8 @@ class JobManager
       return;
     }
 
-    final source = job.manga?.source?.let((e) => MangaSourceEnum.fromValue(e));
-
     final result = await _getChapterUseCase().execute(
-      source: source,
+      source: job.manga?.source,
       mangaId: mangaId,
       chapterId: chapterId,
     );
@@ -240,10 +236,8 @@ class JobManager
       return;
     }
 
-    final source = job.manga?.source?.let((e) => MangaSourceEnum.fromValue(e));
-
     final result = await _searchChapterUseCase().execute(
-      source: source,
+      source: job.manga?.source,
       mangaId: mangaId,
       parameter: parameter,
     );
@@ -311,10 +305,8 @@ class JobManager
       return;
     }
 
-    final source = job.manga?.source?.let((e) => MangaSourceEnum.fromValue(e));
-
     final result = await _getChapterUseCase().execute(
-      source: source,
+      source: job.manga?.source,
       mangaId: mangaId,
       chapterId: chapterId,
     );
@@ -522,7 +514,7 @@ class JobManager
   @override
   void prefetchChapters({
     required String mangaId,
-    required MangaSourceEnum source,
+    required String source,
   }) {
     _jobDao.add(
       JobTablesCompanion.insert(
@@ -537,12 +529,12 @@ class JobManager
   void prefetchChapter({
     required String mangaId,
     required String chapterId,
-    required MangaSourceEnum source,
+    required String source,
   }) {
     _jobDao.add(
       JobTablesCompanion.insert(
         type: JobTypeEnum.chapter,
-        source: Value(source.value),
+        source: Value(source),
         mangaId: Value(mangaId),
         chapterId: Value(chapterId),
       ),
@@ -552,12 +544,12 @@ class JobManager
   @override
   void prefetchManga({
     required String mangaId,
-    required MangaSourceEnum source,
+    required String source,
   }) {
     _jobDao.add(
       JobTablesCompanion.insert(
         type: JobTypeEnum.manga,
-        source: Value(source.value),
+        source: Value(source),
         mangaId: Value(mangaId),
       ),
     );
@@ -567,12 +559,12 @@ class JobManager
   void downloadChapter({
     required String mangaId,
     required String chapterId,
-    required MangaSourceEnum source,
+    required String source,
   }) {
     _jobDao.add(
       JobTablesCompanion.insert(
         type: JobTypeEnum.downloadChapter,
-        source: Value(source.value),
+        source: Value(source),
         mangaId: Value(mangaId),
         chapterId: Value(chapterId),
       ),
@@ -582,7 +574,7 @@ class JobManager
   @override
   void downloadManga({
     required String mangaId,
-    required MangaSourceEnum source,
+    required String source,
   }) {
     // TODO: download manga without chapter id
     // _jobDao.add(

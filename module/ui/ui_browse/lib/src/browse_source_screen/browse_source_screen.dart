@@ -27,9 +27,7 @@ class BrowseSourceScreen extends StatelessWidget {
     ValueSetter<Source>? onTapSource,
   }) {
     return BlocProvider(
-      create: (context) => BrowseSourceScreenCubit(
-        listenMangaSourceUseCase: locator(),
-      ),
+      create: (context) => BrowseSourceScreenCubit(),
       child: BrowseSourceScreen(
         onTapSearchManga: onTapSearchManga,
         onTapSource: onTapSource,

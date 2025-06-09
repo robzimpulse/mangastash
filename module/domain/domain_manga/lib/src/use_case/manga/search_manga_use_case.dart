@@ -30,22 +30,23 @@ class SearchMangaUseCase with SyncMangasMixin {
         _logBox = logBox;
 
   Future<Result<Pagination<Manga>>> execute({
-    required MangaSourceEnum? source,
+    required String? source,
     required SearchMangaParameter parameter,
   }) async {
     if (source == null) return Error(Exception('Empty Source'));
 
-    if (source == MangaSourceEnum.mangadex) {
+    if (source == Source.mangadex().name) {
       return _searchMangaOnMangaDexUseCase.execute(parameter: parameter);
     }
 
     final page = max(1, parameter.page ?? 0);
 
-    final url = switch (source) {
-      MangaSourceEnum.mangadex => '',
-      MangaSourceEnum.asurascan => parameter.asurascan,
-      MangaSourceEnum.mangaclash => parameter.mangaclash,
-    };
+    String url = '';
+    if (source == Source.asurascan().name) {
+      url = parameter.asurascan;
+    } else if (source == Source.mangaclash().name) {
+      url = parameter.mangaclash;
+    }
 
     final document = await _webview.open(url);
 

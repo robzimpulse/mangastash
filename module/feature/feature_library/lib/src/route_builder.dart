@@ -20,7 +20,7 @@ class LibraryRouteBuilder extends BaseRouteBuilder {
           locator: locator,
           onTapManga: (manga) => context.push(
             BrowseRoutePath.mangaDetail
-                .replaceAll(':source', '${manga?.source?.value}')
+                .replaceAll(':source', '${manga?.source}')
                 .replaceAll(':mangaId', '${manga?.id}'),
             extra: MangaDetailExtra(manga: manga, param: null),
           ),

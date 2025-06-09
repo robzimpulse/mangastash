@@ -11,12 +11,16 @@ abstract class ChapterImageHtmlParser extends BaseHtmlParser {
 
   factory ChapterImageHtmlParser.forSource({
     required Document root,
-    required MangaSourceEnum source,
+    required String source,
   }) {
-    return switch (source) {
-      MangaSourceEnum.mangadex => throw UnimplementedError(),
-      MangaSourceEnum.asurascan => AsuraScanChapterImageHtmlParser(root: root),
-      MangaSourceEnum.mangaclash => MangaClashChapterImageHtmlParser(root: root),
-    };
+    if (Source.asurascan().name == source) {
+      return AsuraScanChapterImageHtmlParser(root: root);
+    }
+
+    if (Source.mangaclash().name == source) {
+      return MangaClashChapterImageHtmlParser(root: root);
+    }
+
+    throw UnimplementedError();
   }
 }

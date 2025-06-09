@@ -38,6 +38,6 @@ class MangaSourceManager
       _stateSubject.stream;
 
   @override
-  Source? get(MangaSourceEnum source) =>
-      mangaSourceState.values.firstWhereOrNull((e) => e.name == source.value);
+  Source? get(String name) =>
+      mangaSourceState.values.firstWhereOrNull((e) => e.name == name);
 }

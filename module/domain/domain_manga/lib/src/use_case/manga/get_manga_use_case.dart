@@ -25,14 +25,14 @@ class GetMangaUseCase with SyncMangasMixin {
         _webview = webview;
 
   Future<Result<Manga>> execute({
-    required MangaSourceEnum? source,
+    required String? source,
     required String mangaId,
   }) async {
     if (source == null) {
       return Error(Exception('Empty Source'));
     }
 
-    if (source == MangaSourceEnum.mangadex) {
+    if (source == Source.mangadex().name) {
       return _getMangaOnMangaDexUseCase.execute(mangaId: mangaId);
     }
 

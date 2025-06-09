@@ -5,7 +5,6 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import 'chapter.dart';
-import 'enum/manga_source_enum.dart';
 import 'manga.dart';
 
 part 'download_chapter_key.g.dart';
@@ -18,7 +17,7 @@ class DownloadChapterKey extends Equatable {
 
   final String? chapterId;
   final num? chapterNumber;
-  final MangaSourceEnum? mangaSource;
+  final String? mangaSource;
 
   const DownloadChapterKey({
     this.mangaId,

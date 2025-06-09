@@ -14,7 +14,6 @@ class BrowseMangaScreen extends StatefulWidget {
   const BrowseMangaScreen({
     super.key,
     required this.crawlUrlUseCase,
-    required this.getMangaSourceUseCase,
     required this.cacheManager,
     this.onTapManga,
     this.onTapFilter,
@@ -30,8 +29,6 @@ class BrowseMangaScreen extends StatefulWidget {
 
   final BaseCacheManager cacheManager;
 
-  final GetMangaSourceUseCase getMangaSourceUseCase;
-
   static Widget create({
     required ServiceLocator locator,
     Function(Manga, SearchMangaParameter)? onTapManga,
@@ -45,7 +42,6 @@ class BrowseMangaScreen extends StatefulWidget {
         initialState: BrowseMangaScreenState(
           source: Source.fromValue(source),
         ),
-        getMangaSourceUseCase: locator(),
         searchMangaUseCase: locator(),
         listenMangaFromLibraryUseCase: locator(),
         addToLibraryUseCase: locator(),
@@ -59,7 +55,6 @@ class BrowseMangaScreen extends StatefulWidget {
       child: BrowseMangaScreen(
         crawlUrlUseCase: locator(),
         cacheManager: locator(),
-        getMangaSourceUseCase: locator(),
         onTapManga: onTapManga,
         onTapFilter: onTapFilter,
       ),
