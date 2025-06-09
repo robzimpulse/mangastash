@@ -27,12 +27,12 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
 
   @override
   Future<void> close() async {
-    await super.close();
     await state.chapter?.let(
       (chapter) async => await _updateChapterLastReadAtUseCase.execute(
         chapter: chapter,
       ),
     );
+    await super.close();
   }
 
   Future<void> init() => _fetchChapter();
