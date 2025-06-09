@@ -99,7 +99,7 @@ class MangaShelfItem extends StatelessWidget {
             height: 24,
             color: isOnLibrary
                 ? Colors.transparent
-                : Colors.black.withOpacity(0.5),
+                : Colors.black.withValues(alpha: 0.5),
             child: Padding(
               padding: const EdgeInsets.all(4),
               child: CachedNetworkImageWidget(
@@ -147,7 +147,7 @@ class MangaShelfItem extends StatelessWidget {
         if (isOnLibrary) ...[
           Positioned.fill(
             child: Container(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
             ),
           ),
           Positioned(
@@ -175,7 +175,7 @@ class MangaShelfItem extends StatelessWidget {
               height: 24,
               color: isOnLibrary
                   ? Colors.transparent
-                  : Colors.black.withOpacity(0.5),
+                  : Colors.black.withValues(alpha: 0.5),
               child: Padding(
                 padding: const EdgeInsets.all(4),
                 child: CachedNetworkImageWidget(
@@ -202,7 +202,9 @@ class MangaShelfItem extends StatelessWidget {
             right: 0,
             child: Container(
               width: double.infinity,
-              color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.7),
+              color: Theme.of(context)
+                  .scaffoldBackgroundColor
+                  .withValues(alpha: 0.7),
               padding: const EdgeInsets.all(4.0),
               child: Text(
                 title,
@@ -250,7 +252,7 @@ class MangaShelfItem extends StatelessWidget {
                   child: Container(
                     width: 24,
                     height: 24,
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     child: Padding(
                       padding: const EdgeInsets.all(4),
                       child: CachedNetworkImageWidget(
@@ -273,7 +275,7 @@ class MangaShelfItem extends StatelessWidget {
               if (isOnLibrary) ...[
                 Positioned.fill(
                   child: Container(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                   ),
                 ),
                 Positioned(
@@ -298,7 +300,9 @@ class MangaShelfItem extends StatelessWidget {
         if (title.isNotEmpty == true)
           Container(
             width: double.infinity,
-            color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.7),
+            color: Theme.of(context)
+                .scaffoldBackgroundColor
+                .withValues(alpha: 0.7),
             padding: const EdgeInsets.all(4.0),
             child: Text(
               title,

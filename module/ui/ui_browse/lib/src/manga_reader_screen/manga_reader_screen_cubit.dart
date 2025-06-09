@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -11,14 +12,28 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
 
   final CrawlUrlUseCase _crawlUrlUseCase;
 
+  final UpdateChapterLastReadAtUseCase _updateChapterLastReadAtUseCase;
+
   MangaReaderScreenCubit({
     required GetChapterUseCase getChapterUseCase,
     required GetMangaSourceUseCase getMangaSourceUseCase,
     required CrawlUrlUseCase crawlUrlUseCase,
     required MangaReaderScreenState initialState,
+    required UpdateChapterLastReadAtUseCase updateChapterLastReadAtUseCase,
   })  : _getChapterUseCase = getChapterUseCase,
         _crawlUrlUseCase = crawlUrlUseCase,
+        _updateChapterLastReadAtUseCase = updateChapterLastReadAtUseCase,
         super(initialState);
+
+  @override
+  Future<void> close() async {
+    await super.close();
+    await state.chapter?.let(
+      (chapter) async => await _updateChapterLastReadAtUseCase.execute(
+        chapter: chapter,
+      ),
+    );
+  }
 
   Future<void> init() => _fetchChapter();
 
@@ -29,7 +44,6 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
       chapterId: state.chapterId,
       source: state.sourceEnum,
       mangaId: state.mangaId,
-      reader: true,
     );
 
     if (response is Success<Chapter>) {

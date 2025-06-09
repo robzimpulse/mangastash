@@ -12,6 +12,7 @@ export 'src/use_case/chapter/get_chapter_use_case.dart';
 export 'src/use_case/chapter/listen_download_progress_use_case.dart';
 export 'src/use_case/chapter/prefetch_chapter_use_case.dart';
 export 'src/use_case/chapter/search_chapter_use_case.dart';
+export 'src/use_case/chapter/update_chapter_last_read_at_use_case.dart';
 export 'src/use_case/library/add_to_library_use_case.dart';
 export 'src/use_case/library/get_manga_from_library_use_case.dart';
 export 'src/use_case/library/listen_manga_from_library_use_case.dart';

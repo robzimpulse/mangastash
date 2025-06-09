@@ -19,6 +19,7 @@ import 'use_case/chapter/listen_download_progress_use_case.dart';
 import 'use_case/chapter/prefetch_chapter_use_case.dart';
 import 'use_case/chapter/search_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
+import 'use_case/chapter/update_chapter_last_read_at_use_case.dart';
 import 'use_case/library/add_to_library_use_case.dart';
 import 'use_case/library/get_manga_from_library_use_case.dart';
 import 'use_case/library/listen_manga_from_library_use_case.dart';
@@ -111,7 +112,7 @@ class DomainMangaRegistrar extends Registrar {
 
       locator.registerFactory(
         () => CrawlUrlUseCase(
-          logBox: log,
+          logBox: locator(),
           cacheManager: locator(),
         ),
       );
@@ -185,6 +186,12 @@ class DomainMangaRegistrar extends Registrar {
       locator.registerFactory(
         () => RemoveFromLibraryUseCase(
           libraryDao: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => UpdateChapterLastReadAtUseCase(
+          chapterDao: locator(),
+          logBox: locator(),
         ),
       );
 
