@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
+@Deprecated('This will be deprecated')
 enum MangaSourceEnum {
   @JsonValue("Manga Dex")
   mangadex('Manga Dex'),

@@ -1,21 +1,17 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 
 class MangaReaderScreenState extends Equatable {
-  MangaReaderScreenState({
+  const MangaReaderScreenState({
     this.isLoading = false,
     this.chapter,
     this.error,
     this.mangaId,
     this.chapterId,
-    this.sourceEnum,
-    this.chapterIds,
-  }) {
-    final ids = chapterIds ?? [];
-    final index = ids.indexOf(chapterId);
-    previousChapterId = index <= 0 ? null : ids.elementAtOrNull(index - 1);
-    nextChapterId = index < 0 ? null : ids.elementAtOrNull(index + 1);
-  }
+    this.source,
+    this.chapterIds = const [],
+  });
 
   final bool isLoading;
 
@@ -27,13 +23,23 @@ class MangaReaderScreenState extends Equatable {
 
   final String? chapterId;
 
-  final MangaSourceEnum? sourceEnum;
+  final Source? source;
 
-  final List<String?>? chapterIds;
+  final List<String> chapterIds;
 
-  late final String? previousChapterId;
+  int? get index => chapterId?.let((id) => chapterIds.indexOf(id));
 
-  late final String? nextChapterId;
+  String? get previousChapterId {
+    return index?.let(
+      (index) => index <= 0 ? null : chapterIds.elementAtOrNull(index - 1),
+    );
+  }
+
+  String? get nextChapterId {
+    return index?.let(
+      (index) => index < 0 ? null : chapterIds.elementAtOrNull(index + 1),
+    );
+  }
 
   @override
   List<Object?> get props {
@@ -43,7 +49,7 @@ class MangaReaderScreenState extends Equatable {
       isLoading,
       chapter,
       error,
-      sourceEnum,
+      source,
       chapterIds,
     ];
   }
@@ -54,8 +60,8 @@ class MangaReaderScreenState extends Equatable {
     bool? isLoading,
     Chapter? chapter,
     Exception? Function()? error,
-    MangaSourceEnum? sourceEnum,
-    List<String?>? chapterIds,
+    Source? source,
+    List<String>? chapterIds,
   }) {
     return MangaReaderScreenState(
       mangaId: mangaId ?? this.mangaId,
@@ -63,7 +69,7 @@ class MangaReaderScreenState extends Equatable {
       isLoading: isLoading ?? this.isLoading,
       chapter: chapter ?? this.chapter,
       error: error != null ? error() : this.error,
-      sourceEnum: sourceEnum ?? this.sourceEnum,
+      source: source ?? this.source,
       chapterIds: chapterIds ?? this.chapterIds,
     );
   }

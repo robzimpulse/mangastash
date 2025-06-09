@@ -21,7 +21,7 @@ class MangaReaderScreen extends StatelessWidget {
 
   static Widget create({
     required ServiceLocator locator,
-    required MangaSourceEnum? source,
+    required String? source,
     required String? mangaId,
     required String? chapterId,
     List<String>? chapterIds,
@@ -32,8 +32,8 @@ class MangaReaderScreen extends StatelessWidget {
         initialState: MangaReaderScreenState(
           mangaId: mangaId,
           chapterId: chapterId,
-          sourceEnum: source,
-          chapterIds: chapterIds,
+          source: Source.fromValue(source),
+          chapterIds: chapterIds ?? [],
         ),
         getChapterUseCase: locator(),
         getMangaSourceUseCase: locator(),

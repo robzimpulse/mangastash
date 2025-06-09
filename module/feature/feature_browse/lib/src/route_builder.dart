@@ -91,7 +91,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         name: BrowseRoutePath.chapterDetail,
         builder: (context, state) => MangaReaderScreen.create(
           locator: locator,
-          source: MangaSourceEnum.fromValue(state.pathParameters['source']),
+          source: state.pathParameters['source'],
           mangaId: state.pathParameters['mangaId'],
           chapterId: state.pathParameters['chapterId'],
           chapterIds: state.uri.queryParameters['chapterIds']?.split('|'),

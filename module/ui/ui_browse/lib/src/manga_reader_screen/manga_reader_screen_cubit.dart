@@ -42,7 +42,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
 
     final response = await _getChapterUseCase.execute(
       chapterId: state.chapterId,
-      source: state.sourceEnum,
+      source: state.source?.name?.let((e) => MangaSourceEnum.fromValue(e)),
       mangaId: state.mangaId,
     );
 
