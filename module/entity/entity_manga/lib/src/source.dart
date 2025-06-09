@@ -2,34 +2,24 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 
-import 'enum/manga_source_enum.dart';
-
 part 'source.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class Source extends Equatable {
-  final String? iconUrl;
+  final String? icon;
 
-  final MangaSourceEnum? name;
+  final String? name;
 
   final String? url;
 
-  final String? id;
-
   const Source({
-    this.iconUrl,
+    this.icon,
     this.name,
     this.url,
-    this.id,
   });
 
   @override
-  List<Object?> get props => [
-        iconUrl,
-        name,
-        url,
-        id,
-      ];
+  List<Object?> get props => [icon, name, url];
 
   factory Source.fromJson(Map<String, dynamic> json) {
     return _$SourceFromJson(json);
@@ -38,34 +28,67 @@ class Source extends Equatable {
   Map<String, dynamic> toJson() => _$SourceToJson(this);
 
   Source copyWith({
-    String? iconUrl,
-    MangaSourceEnum? name,
+    String? icon,
+    String? name,
     String? url,
-    String? id,
   }) {
     return Source(
-      iconUrl: iconUrl ?? this.iconUrl,
+      icon: icon ?? this.icon,
       name: name ?? this.name,
       url: url ?? this.url,
-      id: id ?? this.id,
     );
   }
 
   factory Source.fromFirebaseService(MangaSourceFirebase source) {
     return Source(
-      iconUrl: source.iconUrl,
-      name: source.name != null ? MangaSourceEnum.fromValue(source.name) : null,
-      id: source.id,
+      icon: source.iconUrl,
+      name: source.name,
       url: source.url,
     );
   }
 
   MangaSourceFirebase toFirebaseService() {
     return MangaSourceFirebase(
-      iconUrl: iconUrl,
-      name: name?.value,
-      id: id,
+      iconUrl: icon,
+      name: name,
       url: url,
+    );
+  }
+
+  static List<Source> values = [
+    Source.mangadex(),
+    Source.mangaclash(),
+    Source.asurascan(),
+  ];
+
+  static Source fromValue(String? value) {
+    return values.firstWhere(
+      (e) => e.name == value,
+      orElse: () => Source.mangadex(),
+    );
+  }
+
+  factory Source.mangadex() {
+    return const Source(
+      name: 'Manga Dex',
+      icon: 'https://www.mangadex.org/favicon.ico',
+      url: 'https://www.mangadex.org',
+    );
+  }
+
+  factory Source.mangaclash() {
+    return const Source(
+      icon: 'https://toonclash.com/wp-content/uploads/2020/03/cropped-22.jpg',
+      name: 'Manga Clash',
+      url: 'https://toonclash.com',
+    );
+  }
+
+  factory Source.asurascan() {
+    return const Source(
+      name: 'Asura Scans',
+      url: 'https://asuracomic.net',
+      icon: 'https://asuracomic.net/images/logo.webp',
     );
   }
 }

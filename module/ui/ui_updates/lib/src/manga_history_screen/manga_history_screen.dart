@@ -29,7 +29,6 @@ class MangaHistoryScreen extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (context) => MangaHistoryScreenCubit(
-        initialState: const MangaHistoryScreenState(),
         listenReadHistoryUseCase: locator(),
       )..init(),
       child: MangaHistoryScreen(

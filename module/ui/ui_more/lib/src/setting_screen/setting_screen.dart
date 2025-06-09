@@ -49,9 +49,7 @@ class SettingScreen extends StatelessWidget {
     VoidCallback? onTapAboutMenu,
   }) {
     return BlocProvider(
-      create: (context) => SettingScreenCubit(
-        initialState: const SettingScreenState(),
-      ),
+      create: (context) => SettingScreenCubit(),
       child: SettingScreen(
         onTapAdvancedMenu: onTapAdvancedMenu,
         onTapAppearanceMenu: onTapAppearanceMenu,

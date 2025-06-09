@@ -15,7 +15,6 @@ class AppearanceScreen extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (_) => AppearanceScreenCubit(
-        initialState: const AppearanceScreenState(),
         updateThemeUseCase: locator(),
         listenThemeUseCase: locator(),
       ),

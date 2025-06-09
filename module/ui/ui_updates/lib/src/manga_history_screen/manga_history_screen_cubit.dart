@@ -9,7 +9,7 @@ class MangaHistoryScreenCubit extends Cubit<MangaHistoryScreenState>
     with AutoSubscriptionMixin {
   MangaHistoryScreenCubit({
     required ListenReadHistoryUseCase listenReadHistoryUseCase,
-    required MangaHistoryScreenState initialState,
+    MangaHistoryScreenState initialState = const MangaHistoryScreenState(),
   }) : super(initialState) {
     addSubscription(
       listenReadHistoryUseCase.readHistoryStream.distinct().listen(_onUpdate),

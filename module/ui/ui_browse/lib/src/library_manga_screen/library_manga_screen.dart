@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -26,9 +27,7 @@ class LibraryMangaScreen extends StatefulWidget {
   }) {
     return BlocProvider(
       create: (context) => LibraryMangaScreenCubit(
-        initialState: LibraryMangaScreenState(),
         listenMangaFromLibraryUseCase: locator(),
-        listenMangaSourceUseCase: locator(),
         prefetchMangaUseCase: locator(),
         listenPrefetchMangaUseCase: locator(),
         removeFromLibraryUseCase: locator(),
@@ -266,7 +265,9 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
             cacheManager: widget.cacheManager,
             title: e.title ?? '',
             coverUrl: e.coverUrl ?? '',
-            sourceIconUrl: state.sources[e.source]?.iconUrl,
+            sourceIconUrl: state.sources
+                .firstWhereOrNull((f) => f.name == e.source?.value)
+                ?.icon,
             isPrefetching: state.prefetchedMangaIds.contains(e.id),
             layout: state.layout,
             onTap: () => widget.onTapManga?.call(e),

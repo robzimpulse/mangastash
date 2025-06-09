@@ -12,9 +12,7 @@ class MangaUpdatesScreen extends StatelessWidget {
     required ServiceLocator locator,
   }) {
     return BlocProvider(
-      create: (context) => MangaUpdatesScreenCubit(
-        initialState: MangaUpdatesScreenState(),
-      )..init(),
+      create: (context) => MangaUpdatesScreenCubit()..init(),
       child: const MangaUpdatesScreen(),
     );
   }

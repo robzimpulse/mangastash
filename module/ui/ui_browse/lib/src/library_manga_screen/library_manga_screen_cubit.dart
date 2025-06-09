@@ -13,9 +13,8 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
   final DownloadMangaUseCase _downloadMangaUseCase;
 
   LibraryMangaScreenCubit({
-    required LibraryMangaScreenState initialState,
+    LibraryMangaScreenState initialState = const LibraryMangaScreenState(),
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
-    required ListenMangaSourceUseCase listenMangaSourceUseCase,
     required PrefetchMangaUseCase prefetchMangaUseCase,
     required RemoveFromLibraryUseCase removeFromLibraryUseCase,
     required ListenPrefetchUseCase listenPrefetchMangaUseCase,
@@ -25,18 +24,12 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         _downloadMangaUseCase = downloadMangaUseCase,
         _prefetchChapterUseCase = prefetchChapterUseCase,
-        super(initialState) {
+        super(initialState.copyWith(sources: Source.values)) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
           .distinct()
           .listen(_updateLibraryState),
     );
-    addSubscription(
-      listenMangaSourceUseCase.mangaSourceStateStream
-          .distinct()
-          .listen(_updateSourceState),
-    );
-
     addSubscription(
       listenPrefetchMangaUseCase.mangaIdsStream
           .distinct()
@@ -46,16 +39,6 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
 
   void _updateLibraryState(List<Manga> libraryState) async {
     emit(state.copyWith(mangas: libraryState));
-  }
-
-  void _updateSourceState(Map<String, Source> sources) {
-    emit(
-      state.copyWith(
-        sources: {
-          for (final source in sources.values) source.name: source,
-        },
-      ),
-    );
   }
 
   void _updatePrefetchState(Set<String> prefetchedMangaIds) {

@@ -4,7 +4,7 @@ import 'manga_updates_screen_state.dart';
 
 class MangaUpdatesScreenCubit extends Cubit<MangaUpdatesScreenState> {
   MangaUpdatesScreenCubit({
-    required MangaUpdatesScreenState initialState,
+    MangaUpdatesScreenState initialState = const MangaUpdatesScreenState(),
   }) : super(initialState);
 
   void init() {}

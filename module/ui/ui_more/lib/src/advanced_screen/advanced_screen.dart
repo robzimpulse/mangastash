@@ -26,9 +26,7 @@ class AdvancedScreen extends StatelessWidget {
     required ServiceLocator locator,
   }) {
     return BlocProvider(
-      create: (_) => AdvancedScreenCubit(
-        initialState: const AdvancedScreenState(),
-      ),
+      create: (_) => AdvancedScreenCubit(),
       child: AdvancedScreen(
         inspector: locator(),
         logBox: locator(),

@@ -23,7 +23,6 @@ class GeneralScreen extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (_) => GeneralScreenCubit(
-        initialState: const GeneralScreenState(),
         updateLocaleUseCase: locator(),
         listenLocaleUseCase: locator(),
       ),
