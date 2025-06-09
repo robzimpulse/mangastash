@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../adapter/timezone_adapter.dart'
@@ -24,7 +24,7 @@ class DateManager implements ListenCurrentTimezoneUseCase {
   ValueStream<String> get timezoneDataStream => _currentTimeZoneData.stream;
 
   void _update(Timer t) async {
-    final String tz = await FlutterNativeTimezone.getLocalTimezone();
+    final String tz = await FlutterTimezone.getLocalTimezone();
     _currentTimeZoneData.add(tz);
   }
 }
