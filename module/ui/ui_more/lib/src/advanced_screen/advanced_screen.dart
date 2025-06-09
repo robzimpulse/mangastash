@@ -6,7 +6,6 @@ import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
 import 'advanced_screen_cubit.dart';
-import 'advanced_screen_state.dart';
 
 class AdvancedScreen extends StatelessWidget {
   final DioInspector inspector;

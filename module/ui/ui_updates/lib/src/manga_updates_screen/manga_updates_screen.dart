@@ -3,7 +3,6 @@ import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
 import 'manga_updates_screen_cubit.dart';
-import 'manga_updates_screen_state.dart';
 
 class MangaUpdatesScreen extends StatelessWidget {
   const MangaUpdatesScreen({super.key});

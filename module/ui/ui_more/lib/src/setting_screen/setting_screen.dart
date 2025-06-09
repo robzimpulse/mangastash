@@ -3,7 +3,6 @@ import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
 import 'setting_screen_cubit.dart';
-import 'setting_screen_state.dart';
 
 class SettingScreen extends StatelessWidget {
   final VoidCallback? onTapAdvancedMenu;
