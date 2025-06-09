@@ -2,7 +2,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 
 class BrowseSourceScreenState extends Equatable {
-  final List<MangaSource> sources;
+  final List<Source> sources;
 
   const BrowseSourceScreenState({
     this.sources = const [],
@@ -12,7 +12,7 @@ class BrowseSourceScreenState extends Equatable {
   List<Object?> get props => [sources];
 
   BrowseSourceScreenState copyWith({
-    List<MangaSource>? sources,
+    List<Source>? sources,
   }) {
     return BrowseSourceScreenState(
       sources: sources ?? this.sources,

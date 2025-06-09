@@ -1,20 +1,19 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'manga_source.dart';
+part of 'source.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-MangaSource _$MangaSourceFromJson(Map<String, dynamic> json) => MangaSource(
+Source _$SourceFromJson(Map<String, dynamic> json) => Source(
       iconUrl: json['icon_url'] as String?,
       name: $enumDecodeNullable(_$MangaSourceEnumEnumMap, json['name']),
       url: json['url'] as String?,
       id: json['id'] as String?,
     );
 
-Map<String, dynamic> _$MangaSourceToJson(MangaSource instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$SourceToJson(Source instance) => <String, dynamic>{
       'icon_url': instance.iconUrl,
       'name': _$MangaSourceEnumEnumMap[instance.name],
       'url': instance.url,

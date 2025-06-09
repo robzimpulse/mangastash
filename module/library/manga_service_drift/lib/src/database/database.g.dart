@@ -2329,7 +2329,6 @@ class $JobTablesTable extends JobTables
       requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _typeMeta = const VerificationMeta('type');
   @override
   late final GeneratedColumnWithTypeConverter<JobTypeEnum, String> type =
       GeneratedColumn<String>('type', aliasedName, false,
@@ -2382,7 +2381,6 @@ class $JobTablesTable extends JobTables
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
-    context.handle(_typeMeta, const VerificationResult.success());
     if (data.containsKey('source')) {
       context.handle(_sourceMeta,
           source.isAcceptableOrUnknown(data['source']!, _sourceMeta));

@@ -4,11 +4,10 @@ import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 import 'enum/manga_source_enum.dart';
 
-part 'manga_source.g.dart';
+part 'source.g.dart';
 
-// TODO: rename to `Source`
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class MangaSource extends Equatable {
+class Source extends Equatable {
   final String? iconUrl;
 
   final MangaSourceEnum? name;
@@ -17,7 +16,7 @@ class MangaSource extends Equatable {
 
   final String? id;
 
-  const MangaSource({
+  const Source({
     this.iconUrl,
     this.name,
     this.url,
@@ -32,19 +31,19 @@ class MangaSource extends Equatable {
         id,
       ];
 
-  factory MangaSource.fromJson(Map<String, dynamic> json) {
-    return _$MangaSourceFromJson(json);
+  factory Source.fromJson(Map<String, dynamic> json) {
+    return _$SourceFromJson(json);
   }
 
-  Map<String, dynamic> toJson() => _$MangaSourceToJson(this);
+  Map<String, dynamic> toJson() => _$SourceToJson(this);
 
-  MangaSource copyWith({
+  Source copyWith({
     String? iconUrl,
     MangaSourceEnum? name,
     String? url,
     String? id,
   }) {
-    return MangaSource(
+    return Source(
       iconUrl: iconUrl ?? this.iconUrl,
       name: name ?? this.name,
       url: url ?? this.url,
@@ -52,8 +51,8 @@ class MangaSource extends Equatable {
     );
   }
 
-  factory MangaSource.fromFirebaseService(MangaSourceFirebase source) {
-    return MangaSource(
+  factory Source.fromFirebaseService(MangaSourceFirebase source) {
+    return Source(
       iconUrl: source.iconUrl,
       name: source.name != null ? MangaSourceEnum.fromValue(source.name) : null,
       id: source.id,
