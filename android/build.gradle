@@ -6,7 +6,8 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.4'
+        //noinspection AndroidGradlePluginVersion
+        classpath 'com.android.tools.build:gradle:8.6'
         // START: FlutterFire Configuration
         classpath 'com.google.gms:google-services:4.4.2'
         // END: FlutterFire Configuration
