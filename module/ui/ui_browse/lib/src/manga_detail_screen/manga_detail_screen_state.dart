@@ -27,7 +27,7 @@ class MangaDetailScreenState extends Equatable {
   final String? mangaId;
   final Manga? manga;
   final List<Chapter>? chapters;
-  final MangaSourceEnum? sourceEnum;
+  final Source? source;
   final AuthState? authState;
   final List<Manga> libraries;
   final Map<DownloadChapterKey, DownloadChapterProgress>? progress;
@@ -53,7 +53,7 @@ class MangaDetailScreenState extends Equatable {
     this.mangaId,
     this.manga,
     this.chapters,
-    this.sourceEnum,
+    this.source,
     this.config = const MangaChapterConfig(),
     this.authState,
     this.libraries = const [],
@@ -175,7 +175,7 @@ class MangaDetailScreenState extends Equatable {
         mangaId,
         manga,
         chapters,
-        sourceEnum,
+        source,
         config,
         authState,
         libraries,
@@ -196,7 +196,7 @@ class MangaDetailScreenState extends Equatable {
     Manga? manga,
     List<Chapter>? chapters,
     String? sourceId,
-    MangaSourceEnum? sourceEnum,
+    Source? source,
     MangaChapterConfig? config,
     AuthState? authState,
     List<Manga>? libraries,
@@ -217,7 +217,7 @@ class MangaDetailScreenState extends Equatable {
       mangaId: mangaId ?? this.mangaId,
       manga: manga ?? this.manga,
       chapters: chapters ?? this.chapters,
-      sourceEnum: sourceEnum ?? this.sourceEnum,
+      source: source ?? this.source,
       authState: authState ?? this.authState,
       libraries: libraries ?? this.libraries,
       progress: progress ?? this.progress,

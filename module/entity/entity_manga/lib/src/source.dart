@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
@@ -61,10 +62,9 @@ class Source extends Equatable {
     Source.asurascan(),
   ];
 
-  static Source fromValue(String? value) {
-    return values.firstWhere(
+  static Source? fromValue(String? value) {
+    return values.firstWhereOrNull(
       (e) => e.name == value,
-      orElse: () => Source.mangadex(),
     );
   }
 

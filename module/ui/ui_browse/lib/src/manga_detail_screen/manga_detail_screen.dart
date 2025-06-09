@@ -31,7 +31,7 @@ class MangaDetailScreen extends StatefulWidget {
 
   static Widget create({
     required ServiceLocator locator,
-    MangaSourceEnum? sourceEnum,
+    String? source,
     String? mangaId,
     Manga? manga,
     SearchParameter? param,
@@ -43,7 +43,7 @@ class MangaDetailScreen extends StatefulWidget {
         initialState: MangaDetailScreenState(
           manga: manga,
           mangaId: mangaId,
-          sourceEnum: sourceEnum,
+          source: Source.fromValue(source),
           parameter: SearchChapterParameter.from(
             param ?? const SearchParameter(),
           ),
