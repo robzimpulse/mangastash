@@ -37,7 +37,7 @@ class AsuraScanMangaDetailHtmlParser extends MangaDetailHtmlParser {
       description: description,
       tags: genres
           ?.map(
-            (e) => MangaTag(
+            (e) => Tag(
               name: toBeginningOfSentenceCase(
                 e.toLowerCase(),
               ),

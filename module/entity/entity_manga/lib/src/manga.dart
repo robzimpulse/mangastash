@@ -23,7 +23,7 @@ class Manga extends Equatable {
 
   final String? description;
 
-  final List<MangaTag>? tags;
+  final List<Tag>? tags;
 
   final String? webUrl;
 
@@ -72,7 +72,7 @@ class Manga extends Equatable {
       description: manga.description,
       webUrl: manga.webUrl,
       source: manga.source?.let((source) => MangaSourceEnum.fromValue(source)),
-      tags: tags.map((e) => MangaTag.fromDrift(e)).toList(),
+      tags: tags.map((e) => Tag.fromDrift(e)).toList(),
     );
   }
 
@@ -102,7 +102,7 @@ class Manga extends Equatable {
     String? author,
     String? status,
     String? description,
-    List<MangaTag>? tags,
+    List<Tag>? tags,
     String? webUrl,
     MangaSourceEnum? source,
   }) {
@@ -137,7 +137,7 @@ class Manga extends Equatable {
       ),
       status: data.attributes?.status,
       tags: data.attributes?.tags
-          ?.map((e) => MangaTag(name: e.attributes?.name?.en, id: e.id))
+          ?.map((e) => Tag(name: e.attributes?.name?.en, id: e.id))
           .toList(),
       author: data.relationships
           ?.whereType<Relationship<AuthorDataAttributes>>()

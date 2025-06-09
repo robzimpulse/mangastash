@@ -14,7 +14,7 @@ Manga _$MangaFromJson(Map<String, dynamic> json) => Manga(
       status: json['status'] as String?,
       description: json['description'] as String?,
       tags: (json['tags'] as List<dynamic>?)
-          ?.map((e) => MangaTag.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
       webUrl: json['web_url'] as String?,
       source: $enumDecodeNullable(_$MangaSourceEnumEnumMap, json['source']),

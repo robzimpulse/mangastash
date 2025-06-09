@@ -39,7 +39,7 @@ class MangaClashMangaListHtmlParser extends MangaListHtmlParser {
           status: toBeginningOfSentenceCase(status),
           tags: genres
               ?.map(
-                (e) => MangaTag(
+                (e) => Tag(
                   name: toBeginningOfSentenceCase(e.toLowerCase()),
                 ),
               )

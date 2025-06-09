@@ -3,16 +3,15 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:text_similarity/text_similarity.dart';
 
-part 'manga_tag.g.dart';
+part 'tag.g.dart';
 
-// TODO: rename to `Tag`
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
-class MangaTag extends Equatable with SimilarityMixin {
+class Tag extends Equatable with SimilarityMixin {
   final String? name;
 
   final String? id;
 
-  const MangaTag({
+  const Tag({
     this.name,
     this.id,
   });
@@ -23,8 +22,8 @@ class MangaTag extends Equatable with SimilarityMixin {
   @override
   List<Object?> get similarProp => props;
 
-  factory MangaTag.fromDrift(TagDrift tag) {
-    return MangaTag(name: tag.name, id: tag.id);
+  factory Tag.fromDrift(TagDrift tag) {
+    return Tag(name: tag.name, id: tag.id);
   }
 
   TagTablesCompanion get toDrift {
@@ -34,13 +33,13 @@ class MangaTag extends Equatable with SimilarityMixin {
     );
   }
 
-  factory MangaTag.fromJson(Map<String, dynamic> json) {
-    return _$MangaTagFromJson(json);
+  factory Tag.fromJson(Map<String, dynamic> json) {
+    return _$TagFromJson(json);
   }
 
-  Map<String, dynamic> toJson() => _$MangaTagToJson(this);
+  Map<String, dynamic> toJson() => _$TagToJson(this);
 
-  MangaTag copyWith({String? name, String? id}) {
-    return MangaTag(name: name ?? this.name, id: id ?? this.id);
+  Tag copyWith({String? name, String? id}) {
+    return Tag(name: name ?? this.name, id: id ?? this.id);
   }
 }

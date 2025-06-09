@@ -106,7 +106,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     await widget.crawlUrlUseCase.execute(url: url);
   }
 
-  void _onTapTag(BuildContext context, {MangaTag? tag}) {
+  void _onTapTag(BuildContext context, {Tag? tag}) {
     // TODO: implement this
     return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
