@@ -73,6 +73,7 @@ class SearchMangaUseCase with SyncMangasMixin {
         total: parser.total,
         hasNextPage: parser.haveNextPage,
         sourceUrl: url,
+        // TODO: add metadata (all available tags / order / filter)
       ),
     );
   }

@@ -137,7 +137,7 @@ class Manga extends Equatable {
       ),
       status: data.attributes?.status,
       tags: data.attributes?.tags
-          ?.map((e) => Tag(name: e.attributes?.name?.en, id: e.id))
+          ?.map((e) => Tag.from(data: e))
           .toList(),
       author: data.relationships
           ?.whereType<Relationship<AuthorDataAttributes>>()

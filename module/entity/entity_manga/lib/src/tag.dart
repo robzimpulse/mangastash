@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:text_similarity/text_similarity.dart';
 
@@ -41,5 +42,12 @@ class Tag extends Equatable with SimilarityMixin {
 
   Tag copyWith({String? name, String? id}) {
     return Tag(name: name ?? this.name, id: id ?? this.id);
+  }
+
+  factory Tag.from({required TagData data}) {
+    return Tag(
+      id: data.id,
+      name: data.attributes?.name?.en,
+    );
   }
 }
