@@ -59,6 +59,7 @@ class MangaDetailScreen extends StatefulWidget {
         listenLocaleUseCase: locator(),
         listenPrefetchUseCase: locator(),
         prefetchChapterUseCase: locator(),
+        listenReadHistoryUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         cacheManager: locator(),
@@ -472,9 +473,11 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         prev.progress?[key] != curr.progress?[key],
         prev.prefetchedChapterId != curr.prefetchedChapterId,
         prev.processedChapters[chapterId] != curr.processedChapters[chapterId],
+        prev.histories[chapterId] != curr.histories[chapterId],
       ].contains(true),
       builder: (context, state) {
         final value = state.processedChapters[chapterId];
+        final history = state.histories[chapterId];
         if (value == null) return const SizedBox.shrink();
         return MangaChapterTileWidget(
           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -487,7 +490,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           groups: value.scanlationGroup,
           downloadProgress: state.progress?[key]?.progress.toDouble() ?? 0.0,
           isPrefetching: state.prefetchedChapterId.contains(chapterId),
-          lastReadAt: value.lastReadAt,
+          lastReadAt: value.lastReadAt ?? history?.lastReadAt,
         );
       },
     );

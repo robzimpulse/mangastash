@@ -32,6 +32,7 @@ class MangaDetailScreenState extends Equatable {
   final List<Manga> libraries;
   final Map<DownloadChapterKey, DownloadChapterProgress>? progress;
   final Set<String> prefetchedChapterId;
+  final Map<num, Chapter> histories;
 
   final MangaChapterConfig config;
   final SearchChapterParameter parameter;
@@ -63,6 +64,7 @@ class MangaDetailScreenState extends Equatable {
     this.hasNextPage = false,
     this.isPagingNextPage = false,
     this.sourceUrl,
+    this.histories = const {},
   }) {
     isOnLibrary = libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
 
@@ -185,6 +187,7 @@ class MangaDetailScreenState extends Equatable {
         isPagingNextPage,
         sourceUrl,
         prefetchedChapterId,
+        histories,
       ];
 
   MangaDetailScreenState copyWith({
@@ -206,6 +209,7 @@ class MangaDetailScreenState extends Equatable {
     bool? hasNextPage,
     bool? isPagingNextPage,
     ValueGetter<String?>? sourceUrl,
+    Map<num, Chapter>? histories,
   }) {
     return MangaDetailScreenState(
       config: config ?? this.config,
@@ -226,6 +230,7 @@ class MangaDetailScreenState extends Equatable {
       isPagingNextPage: isPagingNextPage ?? this.isPagingNextPage,
       sourceUrl: sourceUrl != null ? sourceUrl() : this.sourceUrl,
       prefetchedChapterId: prefetchedChapterId ?? this.prefetchedChapterId,
+      histories: histories ?? this.histories,
     );
   }
 }

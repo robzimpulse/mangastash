@@ -34,6 +34,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required ListenLocaleUseCase listenLocaleUseCase,
     required ListenPrefetchUseCase listenPrefetchUseCase,
     required PrefetchChapterUseCase prefetchChapterUseCase,
+    required ListenReadHistoryUseCase listenReadHistoryUseCase,
   })  : _getMangaUseCase = getMangaUseCase,
         _searchChapterUseCase = searchChapterUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
@@ -59,6 +60,11 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     addSubscription(
       listenPrefetchUseCase.chapterIdsStream.distinct().listen(_updatePrefetch),
     );
+    addSubscription(
+      listenReadHistoryUseCase.readHistoryStream
+          .distinct()
+          .listen(_updateHistories),
+    );
   }
 
   void _updateAuthState(AuthState? authState) {
@@ -71,6 +77,19 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
   void _updatePrefetch(Set<String> prefetchedChapterId) {
     emit(state.copyWith(prefetchedChapterId: prefetchedChapterId));
+  }
+
+  void _updateHistories(List<History> histories) {
+    final Map<num, Chapter> map = {};
+
+    for (final history in histories) {
+      final key = history.chapter?.chapter?.let((e) => num.tryParse(e));
+      final value = history.chapter;
+      if (key == null || value == null) continue;
+      map[key] = value;
+    }
+
+    emit(state.copyWith(histories: map));
   }
 
   void updateMangaConfig(MangaChapterConfig config) async {
