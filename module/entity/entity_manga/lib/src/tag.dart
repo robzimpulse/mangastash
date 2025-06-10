@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
-import 'package:text_similarity/text_similarity.dart';
 
 part 'tag.g.dart';
 

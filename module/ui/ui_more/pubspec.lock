@@ -1252,13 +1252,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.3"
-  text_similarity:
-    dependency: transitive
-    description:
-      path: "../../library/text_similarity"
-      relative: true
-    source: path
-    version: "0.0.1"
   timeago:
     dependency: transitive
     description:
