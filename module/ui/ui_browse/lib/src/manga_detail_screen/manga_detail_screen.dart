@@ -190,7 +190,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   leading: BackButton(
                     color: Theme.of(context).appBarTheme.iconTheme?.color,
                   ),
-                  // title: Container(color: Colors.red),
                   title: _title(progress: progress),
                   actions: [
                     _downloadButton(),
