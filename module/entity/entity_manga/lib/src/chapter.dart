@@ -33,6 +33,10 @@ class Chapter extends Equatable {
 
   final String? webUrl;
 
+  final DateTime? createdAt;
+
+  final DateTime? updatedAt;
+
   const Chapter({
     this.id,
     this.mangaId,
@@ -46,6 +50,8 @@ class Chapter extends Equatable {
     this.scanlationGroup,
     this.webUrl,
     this.lastReadAt,
+    this.createdAt,
+    this.updatedAt,
   });
 
   @override
@@ -62,6 +68,8 @@ class Chapter extends Equatable {
         scanlationGroup,
         webUrl,
         lastReadAt,
+        createdAt,
+        updatedAt,
       ];
 
   static Chapter? fromDatabase(ChapterModel? model) {
@@ -87,6 +95,8 @@ class Chapter extends Equatable {
       scanlationGroup: chapter.scanlationGroup,
       webUrl: chapter.webUrl,
       lastReadAt: chapter.lastReadAt,
+      createdAt: chapter.createdAt,
+      updatedAt: chapter.updatedAt,
     );
   }
 
@@ -103,6 +113,8 @@ class Chapter extends Equatable {
       scanlationGroup: Value.absentIfNull(scanlationGroup),
       webUrl: Value.absentIfNull(webUrl),
       lastReadAt: Value.absentIfNull(lastReadAt),
+      createdAt: Value.absentIfNull(createdAt),
+      updatedAt: Value.absentIfNull(updatedAt),
     );
   }
 
@@ -126,6 +138,8 @@ class Chapter extends Equatable {
       scanlationGroup: scanlationGroup ?? other?.scanlationGroup,
       webUrl: webUrl ?? other?.webUrl,
       lastReadAt: lastReadAt ?? other?.lastReadAt,
+      createdAt: createdAt ?? other?.createdAt,
+      updatedAt: updatedAt ?? other?.updatedAt,
     );
   }
 
@@ -142,6 +156,8 @@ class Chapter extends Equatable {
     String? scanlationGroup,
     List<String>? images,
     String? webUrl,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return Chapter(
       id: id ?? this.id,
@@ -156,6 +172,8 @@ class Chapter extends Equatable {
       scanlationGroup: scanlationGroup ?? this.scanlationGroup,
       webUrl: webUrl ?? this.webUrl,
       lastReadAt: lastReadAt ?? this.lastReadAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 

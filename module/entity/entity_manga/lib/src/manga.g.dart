@@ -18,6 +18,12 @@ Manga _$MangaFromJson(Map<String, dynamic> json) => Manga(
           .toList(),
       webUrl: json['web_url'] as String?,
       source: json['source'] as String?,
+      createdAt: json['created_at'] == null
+          ? null
+          : DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] == null
+          ? null
+          : DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$MangaToJson(Manga instance) => <String, dynamic>{
@@ -30,4 +36,6 @@ Map<String, dynamic> _$MangaToJson(Manga instance) => <String, dynamic>{
       'tags': instance.tags?.map((e) => e.toJson()).toList(),
       'web_url': instance.webUrl,
       'source': instance.source,
+      'created_at': instance.createdAt?.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
     };

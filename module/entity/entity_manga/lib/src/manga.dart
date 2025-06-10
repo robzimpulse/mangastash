@@ -29,6 +29,10 @@ class Manga extends Equatable {
 
   final String? source;
 
+  final DateTime? createdAt;
+
+  final DateTime? updatedAt;
+
   const Manga({
     this.id,
     this.title,
@@ -39,6 +43,8 @@ class Manga extends Equatable {
     this.tags,
     this.webUrl,
     this.source,
+    this.createdAt,
+    this.updatedAt,
   });
 
   @override
@@ -53,6 +59,8 @@ class Manga extends Equatable {
       tags,
       webUrl,
       source,
+      createdAt,
+      updatedAt,
     ];
   }
 
@@ -73,6 +81,8 @@ class Manga extends Equatable {
       webUrl: manga.webUrl,
       source: manga.source,
       tags: tags.map((e) => Tag.fromDrift(e)).toList(),
+      createdAt: manga.createdAt,
+      updatedAt: manga.updatedAt,
     );
   }
 
@@ -86,6 +96,8 @@ class Manga extends Equatable {
       description: Value.absentIfNull(description),
       webUrl: Value.absentIfNull(webUrl),
       source: Value.absentIfNull(source),
+      createdAt: Value.absentIfNull(createdAt),
+      updatedAt: Value.absentIfNull(updatedAt),
     );
   }
 
@@ -105,6 +117,8 @@ class Manga extends Equatable {
     List<Tag>? tags,
     String? webUrl,
     String? source,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return Manga(
       id: id ?? this.id,
@@ -116,6 +130,8 @@ class Manga extends Equatable {
       tags: tags ?? this.tags,
       webUrl: webUrl ?? this.webUrl,
       source: source ?? this.source,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -159,6 +175,8 @@ class Manga extends Equatable {
       tags: tags?.isNotEmpty == true ? tags : other?.tags,
       webUrl: webUrl ?? other?.webUrl,
       source: source ?? other?.source,
+      createdAt: createdAt ?? other?.createdAt,
+      updatedAt: updatedAt ?? other?.updatedAt,
     );
   }
 }
