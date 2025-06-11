@@ -1,3 +1,4 @@
+import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -53,6 +54,31 @@ class BrowseScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildSourceOption({required BuildContext context}) {
+    return _builder(
+      buildWhen: (prev, curr) => prev.sources != curr.sources,
+      builder: (context, state) => ExpansionTile(
+        title: const Text('Source Options'),
+        subtitle: const Text('Available Sources for Manga'),
+        leading: const Icon(Icons.source),
+        children: [
+          ...Source.values.map(
+            (source) => CheckboxListTile(
+              title: Text(source.name ?? ''),
+              value: state.sources.contains(source) == true,
+              onChanged: (value) {
+                if (value == null) return;
+                final values = [...state.sources];
+                value ? values.add(source) : values.remove(source);
+                _cubit(context).update(sources: values);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
@@ -62,6 +88,7 @@ class BrowseScreen extends StatelessWidget {
       body: AdaptivePhysicListView(
         children: [
           _buildSearchMangaOption(context: context),
+          _buildSourceOption(context: context),
         ],
       ),
     );
