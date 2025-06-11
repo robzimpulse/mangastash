@@ -25,6 +25,7 @@ class BrowseScreenCubit extends Cubit<BrowseScreenState> {
     List<Source>? sources,
   }) {
     emit(state.copyWith(parameter: parameter, sources: sources));
+    // TODO: update available sources
     parameter?.let(
       (e) => _updateSearchParameterUseCase.updateSearchParameter(parameter: e),
     );
