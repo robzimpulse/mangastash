@@ -91,7 +91,7 @@ class CustomCacheInfoRepository implements CacheInfoRepository {
   }) async {
     final data = await _dao().add(
       value: _convertToCompanion(cacheObject).copyWith(
-        touched: setTouchedToNow ? Value(DateTime.now()) : null,
+        touched: setTouchedToNow ? Value(DateTime.timestamp()) : null,
       ),
     );
     return _convertToObject(data);
@@ -104,7 +104,7 @@ class CustomCacheInfoRepository implements CacheInfoRepository {
   }) async {
     final results = await _dao().modify(
       value: _convertToCompanion(cacheObject).copyWith(
-        touched: setTouchedToNow ? Value(DateTime.now()) : null,
+        touched: setTouchedToNow ? Value(DateTime.timestamp()) : null,
       ),
     );
     return results.length;
