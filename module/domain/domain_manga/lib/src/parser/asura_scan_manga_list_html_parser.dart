@@ -41,8 +41,5 @@ class AsuraScanMangaListHtmlParser extends MangaListHtmlParser {
     return region?.attributes['style'] == 'pointer-events:auto';
   }
 
-  @override
-  int? get total => null;
-
   AsuraScanMangaListHtmlParser({required super.root});
 }

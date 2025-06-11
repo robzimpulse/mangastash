@@ -51,17 +51,17 @@ class MangaClashMangaListHtmlParser extends MangaListHtmlParser {
   }
 
   @override
-  bool? get haveNextPage => null;
+  bool? get haveNextPage {
+    final values = root
+        .querySelector('.wp-pagenavi')
+        ?.querySelector('.pages')
+        ?.text
+        .split(' ')
+        .map((e) => int.tryParse(e))
+        .nonNulls;
 
-  @override
-  int? get total => root
-      .querySelector('.wp-pagenavi')
-      ?.querySelector('.pages')
-      ?.text
-      .split(' ')
-      .map((e) => int.tryParse(e))
-      .nonNulls
-      .last;
+    return values?.firstOrNull != values?.lastOrNull;
+  }
 
   MangaClashMangaListHtmlParser({required super.root});
 }
