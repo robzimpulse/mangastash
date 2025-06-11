@@ -1,3 +1,5 @@
+import 'package:json_annotation/json_annotation.dart';
+
 import '../../enums/content_rating.dart';
 import '../../enums/includes.dart';
 import '../../enums/language_codes.dart';
@@ -7,6 +9,9 @@ import '../../enums/publication_demographic.dart';
 import '../../enums/tag_modes.dart';
 import '../common/search_parameter.dart';
 
+part 'search_manga_parameter.g.dart';
+
+@JsonSerializable()
 class SearchMangaParameter extends SearchParameter {
   const SearchMangaParameter({
     super.limit,
@@ -123,4 +128,10 @@ class SearchMangaParameter extends SearchParameter {
       orders: orders ?? this.orders,
     );
   }
+
+  factory SearchMangaParameter.fromJson(Map<String, dynamic> json) {
+    return _$SearchMangaParameterFromJson(json);
+  }
+
+  Map<String, dynamic> toJson() => _$SearchMangaParameterToJson(this);
 }
