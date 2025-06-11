@@ -25,9 +25,8 @@ class GlobalOptionsManager
   static const String _mangaParameterKey = 'manga_parameter';
   static const String _sourcesKey = 'sources';
 
-  GlobalOptionsManager({
-    required Storage storage,
-  })  : _storage = storage,
+  GlobalOptionsManager({required Storage storage})
+      : _storage = storage,
         _sources = BehaviorSubject.seeded(
           storage
               .getStringList(_sourcesKey)
