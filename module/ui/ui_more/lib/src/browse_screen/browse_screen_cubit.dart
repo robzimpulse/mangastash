@@ -33,6 +33,8 @@ class BrowseScreenCubit extends Cubit<BrowseScreenState> {
     parameter?.let(
       (e) => _updateSearchParameterUseCase.updateSearchParameter(parameter: e),
     );
-    sources?.let((sources) => _updateSourcesUseCase.updateSources(sources));
+    sources?.let(
+      (sources) => _updateSourcesUseCase.updateSources(sources: sources),
+    );
   }
 }

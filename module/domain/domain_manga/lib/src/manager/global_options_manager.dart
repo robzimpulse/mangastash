@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:core_environment/core_environment.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/src/model/manga/search_manga_parameter.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../extension/language_code_converter.dart';
 import '../use_case/manga/listen_search_parameter_use_case.dart';
 import '../use_case/manga/update_search_parameter_use_case.dart';
 import '../use_case/source/listen_sources_use_case.dart';
@@ -18,33 +17,31 @@ class GlobalOptionsManager
         UpdateSearchParameterUseCase,
         ListenSourcesUseCase,
         UpdateSourcesUseCase {
-  final _searchMangaParameter = BehaviorSubject<SearchMangaParameter>.seeded(
-    const SearchMangaParameter(),
-  );
-  final _sources = BehaviorSubject<List<Source>>.seeded(const []);
+  final BehaviorSubject<SearchMangaParameter> _searchMangaParameter;
+  final BehaviorSubject<List<Source>> _sources;
 
-  late final StreamSubscription _streamSubscription;
+  final Storage _storage;
 
-  GlobalOptionsManager({required ListenLocaleUseCase listenLocaleUseCase}) {
-    _streamSubscription =
-        listenLocaleUseCase.localeDataStream.distinct().listen(_updateLocale);
-  }
+  static const String _mangaParameterKey = 'manga_parameter';
+  static const String _sourcesKey = 'sources';
 
-  Future<void> dispose() => _streamSubscription.cancel();
-
-  void _updateLocale(Locale? locale) {
-    final codes = Language.fromCode(locale?.languageCode).languageCodes;
-    _searchMangaParameter.valueOrNull?.let(
-      (state) => _searchMangaParameter.add(
-        state.copyWith(
-          availableTranslatedLanguage: {
-            ...?state.availableTranslatedLanguage,
-            ...codes,
-          }.toList(),
+  GlobalOptionsManager({
+    required Storage storage,
+  })  : _storage = storage,
+        _sources = BehaviorSubject.seeded(
+          storage
+              .getStringList(_sourcesKey)
+              .let((e) => [...e.map(Source.fromJsonString).nonNulls])
+              .or([]),
         ),
-      ),
-    );
-  }
+        _searchMangaParameter = BehaviorSubject.seeded(
+          storage
+              .getString(_mangaParameterKey)
+              .let(SearchMangaParameter.fromJsonString)
+              .or(const SearchMangaParameter()),
+        );
+
+  Future<void> dispose() async {}
 
   @override
   ValueStream<SearchMangaParameter> get searchParameterState =>
@@ -53,13 +50,18 @@ class GlobalOptionsManager
   @override
   void updateSearchParameter({required SearchMangaParameter parameter}) {
     _searchMangaParameter.add(parameter);
+    _storage.setString(_mangaParameterKey, parameter.toJsonString());
   }
 
   @override
   ValueStream<List<Source>> get sourceStateStream => _sources.stream;
 
   @override
-  void updateSources(List<Source> sources) {
+  void updateSources({required List<Source> sources}) {
     _sources.add(sources);
+    _storage.setStringList(
+      _sourcesKey,
+      [...sources.map((e) => e.toJsonString())],
+    );
   }
 }

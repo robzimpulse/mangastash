@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -27,6 +29,18 @@ class Source extends Equatable {
   }
 
   Map<String, dynamic> toJson() => _$SourceToJson(this);
+
+  String toJsonString() => json.encode(toJson());
+
+  static Source? fromJsonString(String json) {
+    try {
+      return Source.fromJson(
+        jsonDecode(json) as Map<String, dynamic>,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
 
   Source copyWith({
     String? icon,

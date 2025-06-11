@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:json_annotation/json_annotation.dart';
 
 import '../../enums/content_rating.dart';
@@ -134,4 +136,16 @@ class SearchMangaParameter extends SearchParameter {
   }
 
   Map<String, dynamic> toJson() => _$SearchMangaParameterToJson(this);
+
+  String toJsonString() => json.encode(toJson());
+
+  static SearchMangaParameter? fromJsonString(String json) {
+    try {
+      return SearchMangaParameter.fromJson(
+        jsonDecode(json) as Map<String, dynamic>,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
 }
