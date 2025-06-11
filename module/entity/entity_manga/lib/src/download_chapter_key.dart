@@ -57,7 +57,7 @@ class DownloadChapterKey extends Equatable {
     );
   }
 
-  factory DownloadChapterKey.fromJsonString(String json) {
+  static DownloadChapterKey? fromJsonString(String json) {
     try {
       return DownloadChapterKey.fromJson(
         jsonDecode(json) as Map<String, dynamic>,

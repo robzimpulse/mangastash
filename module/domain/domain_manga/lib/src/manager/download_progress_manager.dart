@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:background_downloader/background_downloader.dart';
 import 'package:collection/collection.dart';
+// import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -34,7 +35,12 @@ class DownloadProgressManager
     required LogBox log,
   }) async {
     final records = await fileDownloader.database.allRecords();
-
+    final progress = records.groupFoldBy<Key?, Update>(
+      (record) => Key.fromJsonString(record.group),
+      (result, current) => (result != null)
+          ? (Map.of(result)..[current.taskId] = current.progress)
+          : {current.taskId: current.progress},
+    );
     return DownloadProgressManager(
       fileDownloader: fileDownloader,
       cacheManager: cacheManager,
@@ -43,11 +49,19 @@ class DownloadProgressManager
       completeRecords: List.of(
         records.where((record) => record.status.isFinalState),
       ),
-      progress: records.groupFoldBy<Key, Update>(
-        (record) => Key.fromJsonString(record.group),
-        (result, current) => (result != null)
-            ? (Map.of(result)..[current.taskId] = current.progress)
-            : {current.taskId: current.progress},
+      progress: Map.fromEntries(
+        progress.entries
+            .map(
+              (entry) {
+                final key = entry.key;
+                if (key == null) return null;
+                return MapEntry(
+                  key,
+                  entry.value,
+                );
+              },
+            )
+            .nonNulls,
       ),
     );
   }
@@ -147,9 +161,10 @@ class DownloadProgressManager
 
   void _updateProgress(TaskUpdate event) {
     final progress = Map.of(_progress.valueOrNull ?? <Key, Update>{});
-
+    final key = Key.fromJsonString(event.task.group);
+    if (key == null) return;
     progress.update(
-      Key.fromJsonString(event.task.group),
+      key,
       (old) {
         final data = Map.of(old);
         data.update(
