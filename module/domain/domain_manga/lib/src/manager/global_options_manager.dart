@@ -9,7 +9,7 @@ import '../extension/language_code_converter.dart';
 import '../use_case/manga/listen_search_parameter_use_case.dart';
 import '../use_case/manga/update_search_parameter_use_case.dart';
 
-class SearchParameterManager
+class GlobalOptionsManager
     implements ListenSearchParameterUseCase, UpdateSearchParameterUseCase {
   final _stateSubject = BehaviorSubject<SearchMangaParameter>.seeded(
     const SearchMangaParameter(),
@@ -17,7 +17,7 @@ class SearchParameterManager
 
   late final StreamSubscription _streamSubscription;
 
-  SearchParameterManager({required ListenLocaleUseCase listenLocaleUseCase}) {
+  GlobalOptionsManager({required ListenLocaleUseCase listenLocaleUseCase}) {
     _streamSubscription =
         listenLocaleUseCase.localeDataStream.distinct().listen(_updateLocale);
   }

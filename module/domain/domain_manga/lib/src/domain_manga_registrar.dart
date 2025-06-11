@@ -5,12 +5,12 @@ import 'package:service_locator/service_locator.dart';
 
 import 'manager/download_progress_manager.dart';
 import 'manager/file_download_manager.dart';
+import 'manager/global_options_manager.dart';
 import 'manager/headless_webview_manager.dart';
 import 'manager/history_manager.dart';
 import 'manager/job_manager.dart';
 import 'manager/library_manager.dart';
 import 'manager/manga_source_manager.dart';
-import 'manager/search_parameter_manager.dart';
 import 'use_case/chapter/crawl_url_use_case.dart';
 import 'use_case/chapter/download_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
@@ -50,11 +50,11 @@ class DomainMangaRegistrar extends Registrar {
       locator.registerSingleton(await FileDownloadManager.create(log: log));
 
       locator.registerSingleton(
-        SearchParameterManager(listenLocaleUseCase: locator()),
+        GlobalOptionsManager(listenLocaleUseCase: locator()),
         dispose: (e) => e.dispose(),
       );
-      locator.alias<ListenSearchParameterUseCase, SearchParameterManager>();
-      locator.alias<UpdateSearchParameterUseCase, SearchParameterManager>();
+      locator.alias<ListenSearchParameterUseCase, GlobalOptionsManager>();
+      locator.alias<UpdateSearchParameterUseCase, GlobalOptionsManager>();
 
       locator.registerSingleton(
         JobManager(
