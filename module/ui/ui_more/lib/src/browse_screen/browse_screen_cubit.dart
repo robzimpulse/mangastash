@@ -7,16 +7,21 @@ import 'browse_screen_state.dart';
 
 class BrowseScreenCubit extends Cubit<BrowseScreenState> {
   final UpdateSearchParameterUseCase _updateSearchParameterUseCase;
+  final UpdateSourcesUseCase _updateSourcesUseCase;
 
   BrowseScreenCubit({
     required UpdateSearchParameterUseCase updateSearchParameterUseCase,
+    required UpdateSourcesUseCase updateSourcesUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
+    required ListenSourcesUseCase listenSourcesUseCase,
     BrowseScreenState initialState = const BrowseScreenState(),
   })  : _updateSearchParameterUseCase = updateSearchParameterUseCase,
+        _updateSourcesUseCase = updateSourcesUseCase,
         super(
           initialState.copyWith(
             parameter:
                 listenSearchParameterUseCase.searchParameterState.valueOrNull,
+            sources: listenSourcesUseCase.sourceStateStream.valueOrNull,
           ),
         );
 
@@ -25,9 +30,9 @@ class BrowseScreenCubit extends Cubit<BrowseScreenState> {
     List<Source>? sources,
   }) {
     emit(state.copyWith(parameter: parameter, sources: sources));
-    // TODO: update available sources
     parameter?.let(
       (e) => _updateSearchParameterUseCase.updateSearchParameter(parameter: e),
     );
+    sources?.let((sources) => _updateSourcesUseCase.updateSources(sources));
   }
 }

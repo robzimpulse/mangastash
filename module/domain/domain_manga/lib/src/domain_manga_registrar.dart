@@ -10,7 +10,6 @@ import 'manager/headless_webview_manager.dart';
 import 'manager/history_manager.dart';
 import 'manager/job_manager.dart';
 import 'manager/library_manager.dart';
-import 'manager/manga_source_manager.dart';
 import 'use_case/chapter/crawl_url_use_case.dart';
 import 'use_case/chapter/download_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
@@ -34,9 +33,8 @@ import 'use_case/manga/prefetch_manga_use_case.dart';
 import 'use_case/manga/search_manga_on_mangadex_use_case.dart';
 import 'use_case/manga/search_manga_use_case.dart';
 import 'use_case/manga/update_search_parameter_use_case.dart';
-import 'use_case/manga_source/get_manga_source_use_case.dart';
-import 'use_case/manga_source/get_manga_sources_use_case.dart';
-import 'use_case/manga_source/listen_manga_source_use_case.dart';
+import 'use_case/source/listen_sources_use_case.dart';
+import 'use_case/source/update_sources_use_case.dart';
 
 class DomainMangaRegistrar extends Registrar {
   @override
@@ -55,6 +53,8 @@ class DomainMangaRegistrar extends Registrar {
       );
       locator.alias<ListenSearchParameterUseCase, GlobalOptionsManager>();
       locator.alias<UpdateSearchParameterUseCase, GlobalOptionsManager>();
+      locator.alias<ListenSourcesUseCase, GlobalOptionsManager>();
+      locator.alias<UpdateSourcesUseCase, GlobalOptionsManager>();
 
       locator.registerSingleton(
         JobManager(
@@ -204,14 +204,14 @@ class DomainMangaRegistrar extends Registrar {
       locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
       locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
 
-      locator.registerSingleton(
-        MangaSourceManager(
-          mangaSourceServiceFirebase: locator(),
-        ),
-      );
-      locator.alias<GetMangaSourcesUseCase, MangaSourceManager>();
-      locator.alias<ListenMangaSourceUseCase, MangaSourceManager>();
-      locator.alias<GetMangaSourceUseCase, MangaSourceManager>();
+      // locator.registerSingleton(
+      //   MangaSourceManager(
+      //     mangaSourceServiceFirebase: locator(),
+      //   ),
+      // );
+      // locator.alias<GetMangaSourcesUseCase, MangaSourceManager>();
+      // locator.alias<ListenMangaSourceUseCase, MangaSourceManager>();
+      // locator.alias<GetMangaSourceUseCase, MangaSourceManager>();
     });
 
     log.log(

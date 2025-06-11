@@ -25,3 +25,5 @@ export 'src/use_case/manga/listen_search_parameter_use_case.dart';
 export 'src/use_case/manga/prefetch_manga_use_case.dart';
 export 'src/use_case/manga/search_manga_use_case.dart';
 export 'src/use_case/manga/update_search_parameter_use_case.dart';
+export 'src/use_case/source/listen_sources_use_case.dart';
+export 'src/use_case/source/update_sources_use_case.dart';
