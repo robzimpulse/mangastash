@@ -128,21 +128,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         _cubit(context).downloadAllChapter();
         context.showSnackBar(message: 'Downloading All Chapter');
         break;
-      // case DownloadOption.next:
-      // // TODO: Handle this case.
-      // case DownloadOption.next5:
-      // // TODO: Handle this case.
-      // case DownloadOption.next10:
-      // // TODO: Handle this case.
-      // case DownloadOption.custom:
-      // // TODO: Handle this case.
-      // case DownloadOption.unread:
-      // // TODO: Handle this case.
-      default:
-        // TODO: implement this
-        context.showSnackBar(
-          message: '🚧🚧🚧 Under Construction $option 🚧🚧🚧',
-        );
+      case DownloadOption.unread:
+        _cubit(context).downloadUnreadChapter();
+        context.showSnackBar(message: 'Downloading Unread Chapter');
+        break;
     }
   }
 

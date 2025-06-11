@@ -274,6 +274,14 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
   }
 
+  void downloadUnreadChapter() {
+    for (final chapter in state.processedChapters.values) {
+      final key = chapter.chapter?.let((e) => num.tryParse(e));
+      if (state.histories.containsKey(key)) continue;
+      downloadChapter(chapter: chapter);
+    }
+  }
+
   void recrawl({required String url}) async {
     await _crawlUrlUseCase.execute(url: url);
     await init();

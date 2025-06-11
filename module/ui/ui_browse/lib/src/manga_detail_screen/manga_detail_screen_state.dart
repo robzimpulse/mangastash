@@ -7,10 +7,6 @@ import 'package:equatable/equatable.dart';
 import 'package:ui_common/ui_common.dart';
 
 enum DownloadOption {
-  next('Next Chapter'),
-  next5('Next 5 Chapter'),
-  next10('Next 10 Chapter'),
-  custom('Custom'),
   unread('Unread'),
   all('All');
 
