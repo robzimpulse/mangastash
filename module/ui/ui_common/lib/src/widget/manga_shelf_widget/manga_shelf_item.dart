@@ -69,6 +69,7 @@ class MangaShelfItem extends StatelessWidget {
     return Row(
       children: [
         CachedNetworkImageWidget(
+          fit: BoxFit.cover,
           cacheManager: cacheManager,
           imageUrl: coverUrl,
           width: 50,

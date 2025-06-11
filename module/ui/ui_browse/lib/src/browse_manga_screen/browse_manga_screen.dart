@@ -431,7 +431,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             );
           case MangaShelfItemLayout.list:
             return MangaShelfWidget.list(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               controller: _scrollController,
               hasNextPage: state.hasNextPage,
               loadingIndicator: indicator,
