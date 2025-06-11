@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
@@ -31,7 +30,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required DownloadChapterUseCase downloadChapterUseCase,
     required ListenDownloadProgressUseCase listenDownloadProgressUseCase,
     required CrawlUrlUseCase crawlUrlUseCase,
-    required ListenLocaleUseCase listenLocaleUseCase,
     required ListenPrefetchUseCase listenPrefetchUseCase,
     required PrefetchChapterUseCase prefetchChapterUseCase,
     required ListenReadHistoryUseCase listenReadHistoryUseCase,
@@ -53,9 +51,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     );
     addSubscription(
       listenDownloadProgressUseCase.all.distinct().listen(_updateMangaProgress),
-    );
-    addSubscription(
-      listenLocaleUseCase.localeDataStream.distinct().listen(_updateLocale),
     );
     addSubscription(
       listenPrefetchUseCase.chapterIdsStream.distinct().listen(_updatePrefetch),
@@ -101,21 +96,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     Map<DownloadChapterKey, DownloadChapterProgress> progress,
   ) {
     emit(state.copyWith(progress: progress));
-  }
-
-  void _updateLocale(Locale? locale) {
-    final codes = Language.fromCode(locale?.languageCode).languageCodes;
-
-    emit(
-      state.copyWith(
-        parameter: state.parameter.copyWith(
-          translatedLanguage: {
-            ...?state.parameter.translatedLanguage,
-            ...codes,
-          }.toList(),
-        ),
-      ),
-    );
   }
 
   Future<void> init() async {

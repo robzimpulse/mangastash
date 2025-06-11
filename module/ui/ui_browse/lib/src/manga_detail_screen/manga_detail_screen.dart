@@ -56,7 +56,6 @@ class MangaDetailScreen extends StatefulWidget {
         downloadChapterUseCase: locator(),
         listenDownloadProgressUseCase: locator(),
         crawlUrlUseCase: locator(),
-        listenLocaleUseCase: locator(),
         listenPrefetchUseCase: locator(),
         prefetchChapterUseCase: locator(),
         listenReadHistoryUseCase: locator(),
