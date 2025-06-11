@@ -78,7 +78,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
               'chapterIds': chapterIds?.join('|'),
             },
           ),
-          onTapSort: (config) => context.push<MangaChapterConfig>(
+          onTapSort: (config) => context.push<ChapterConfig>(
             BrowseRoutePath.chapterConfig,
             extra: config,
           ),

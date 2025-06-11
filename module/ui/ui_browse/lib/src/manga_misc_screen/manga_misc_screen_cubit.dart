@@ -14,9 +14,9 @@ class MangaMiscScreenCubit extends Cubit<MangaMiscScreenState>
     ValueGetter<bool?>? downloaded,
     ValueGetter<bool?>? unread,
     ValueGetter<bool?>? bookmarked,
-    MangaChapterDisplayEnum? display,
-    MangaChapterSortOptionEnum? sortOption,
-    MangaChapterSortOrderEnum? sortOrder,
+    ChapterDisplayEnum? display,
+    ChapterSortOptionEnum? sortOption,
+    ChapterSortOrderEnum? sortOrder,
   }) {
     emit(
       state.copyWith(

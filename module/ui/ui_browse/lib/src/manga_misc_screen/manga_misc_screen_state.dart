@@ -3,14 +3,14 @@ import 'package:equatable/equatable.dart';
 
 class MangaMiscScreenState extends Equatable {
 
-  final MangaChapterConfig? config;
+  final ChapterConfig? config;
 
   const MangaMiscScreenState({
     this.config,
   });
 
   MangaMiscScreenState copyWith({
-    MangaChapterConfig? config,
+    ChapterConfig? config,
   }) {
     return MangaMiscScreenState(
       config: config ?? this.config,

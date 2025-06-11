@@ -23,7 +23,7 @@ class MangaDetailScreen extends StatefulWidget {
 
   final Function(String?, List<String>?)? onTapChapter;
 
-  final Future<MangaChapterConfig?> Function(MangaChapterConfig?)? onTapSort;
+  final Future<ChapterConfig?> Function(ChapterConfig?)? onTapSort;
 
   final CrawlUrlUseCase crawlUrlUseCase;
 
@@ -35,7 +35,7 @@ class MangaDetailScreen extends StatefulWidget {
     String? mangaId,
     MangaDetailExtra? extra,
     Function(String?, List<String>?)? onTapChapter,
-    Future<MangaChapterConfig?> Function(MangaChapterConfig?)? onTapSort,
+    Future<ChapterConfig?> Function(ChapterConfig?)? onTapSort,
   }) {
     return BlocProvider(
       create: (context) => MangaDetailScreenCubit(

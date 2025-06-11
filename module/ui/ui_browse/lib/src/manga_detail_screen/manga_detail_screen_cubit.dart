@@ -92,7 +92,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     emit(state.copyWith(histories: map));
   }
 
-  void updateMangaConfig(MangaChapterConfig config) async {
+  void updateMangaConfig(ChapterConfig config) async {
     emit(state.copyWith(config: config));
     await init();
   }
@@ -120,13 +120,13 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
   Future<void> init() async {
     final option = switch (state.config.sortOption) {
-      MangaChapterSortOptionEnum.chapterNumber => ChapterOrders.chapter,
-      MangaChapterSortOptionEnum.uploadDate => ChapterOrders.readableAt,
+      ChapterSortOptionEnum.chapterNumber => ChapterOrders.chapter,
+      ChapterSortOptionEnum.uploadDate => ChapterOrders.readableAt,
     };
 
     final direction = switch (state.config.sortOrder) {
-      MangaChapterSortOrderEnum.asc => OrderDirections.ascending,
-      MangaChapterSortOrderEnum.desc => OrderDirections.descending,
+      ChapterSortOrderEnum.asc => OrderDirections.ascending,
+      ChapterSortOrderEnum.desc => OrderDirections.descending,
     };
 
     emit(

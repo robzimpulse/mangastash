@@ -14,13 +14,13 @@ class MangaMiscScreen extends StatefulWidget {
 
   static Widget create({
     required ServiceLocator locator,
-    MangaChapterConfig? config,
+    ChapterConfig? config,
     ScrollController? controller,
   }) {
     return BlocProvider(
       create: (context) => MangaMiscScreenCubit(
         initialState: MangaMiscScreenState(
-          config: config ?? const MangaChapterConfig(),
+          config: config ?? const ChapterConfig(),
         ),
       ),
       child: MangaMiscScreen(
@@ -153,7 +153,7 @@ class _MangaMiscScreenState extends State<MangaMiscScreen> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        for (final options in MangaChapterSortOptionEnum.values)
+        for (final options in ChapterSortOptionEnum.values)
           _builder(
             buildWhen: (prev, curr) => [
               prev.config?.sortOption != curr.config?.sortOption,
@@ -161,7 +161,7 @@ class _MangaMiscScreenState extends State<MangaMiscScreen> {
             ].contains(true),
             builder: (context, state) => ListTile(
               leading: (state.config?.sortOption == options)
-                  ? (state.config?.sortOrder == MangaChapterSortOrderEnum.desc)
+                  ? (state.config?.sortOrder == ChapterSortOrderEnum.desc)
                       ? const Icon(Icons.arrow_downward)
                       : const Icon(Icons.arrow_upward)
                   : SizedBox.fromSize(
@@ -174,9 +174,9 @@ class _MangaMiscScreenState extends State<MangaMiscScreen> {
               onTap: () => _cubit(context).update(
                 sortOption: options,
                 sortOrder: (state.config?.sortOption == options)
-                    ? (state.config?.sortOrder == MangaChapterSortOrderEnum.asc)
-                        ? MangaChapterSortOrderEnum.desc
-                        : MangaChapterSortOrderEnum.asc
+                    ? (state.config?.sortOrder == ChapterSortOrderEnum.asc)
+                        ? ChapterSortOrderEnum.desc
+                        : ChapterSortOrderEnum.asc
                     : null,
               ),
             ),
@@ -189,12 +189,12 @@ class _MangaMiscScreenState extends State<MangaMiscScreen> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        for (final display in MangaChapterDisplayEnum.values)
+        for (final display in ChapterDisplayEnum.values)
           _builder(
             buildWhen: (prev, curr) => [
               prev.config?.display != curr.config?.display,
             ].contains(true),
-            builder: (context, state) => RadioListTile<MangaChapterDisplayEnum>(
+            builder: (context, state) => RadioListTile<ChapterDisplayEnum>(
               title: Text(display.value),
               value: display,
               groupValue: state.config?.display,

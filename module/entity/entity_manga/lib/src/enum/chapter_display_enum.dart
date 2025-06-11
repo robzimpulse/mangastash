@@ -1,8 +1,8 @@
-enum MangaChapterDisplayEnum {
+enum ChapterDisplayEnum {
   title('Source Title'),
   chapter('Chapter Number');
 
   final String value;
 
-  const MangaChapterDisplayEnum(this.value);
+  const ChapterDisplayEnum(this.value);
 }
