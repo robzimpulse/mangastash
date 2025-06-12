@@ -84,11 +84,7 @@ class PickerBottomSheet extends StatelessWidget {
                     ),
                   )
                   .intersperse(const Divider(height: 1, thickness: 1))
-                  .map(
-                    (e) => SliverToBoxAdapter(
-                      child: e,
-                    ),
-                  ),
+                  .map((e) => SliverToBoxAdapter(child: e)),
             ],
           ),
         ),
