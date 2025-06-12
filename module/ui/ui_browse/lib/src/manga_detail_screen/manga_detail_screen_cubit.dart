@@ -76,8 +76,8 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
   void _updateHistories(List<History> histories) {
     final Map<num, Chapter> map = {};
-
-    for (final history in histories) {
+    final chapters = histories.where((e) => e.manga?.id == state.mangaId);
+    for (final history in chapters) {
       final key = history.chapter?.chapter?.let((e) => num.tryParse(e));
       final value = history.chapter;
       if (key == null || value == null) continue;
