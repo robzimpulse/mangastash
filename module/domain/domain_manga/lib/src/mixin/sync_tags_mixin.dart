@@ -2,22 +2,20 @@ import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 
-mixin SyncChaptersMixin {
-  Future<List<Chapter>> sync({
-    required ChapterDao dao,
-    required List<Chapter> values,
+mixin SyncTagsMixin {
+  Future<List<Tag>> sync({
+    required TagDao dao,
+    required List<Tag> values,
     required LogBox logBox,
   }) async {
-    final results = await dao.adds(
-      values: {
-        for (final value in values) value.toDrift: [...?value.images],
-      },
-    );
 
-    final data = [...results.map((e) => Chapter.fromDatabase(e)).nonNulls];
+    final data = [
+      for (final value in values)
+        Tag.fromDrift(await dao.add(value: value.toDrift)),
+    ];
 
     logBox.log(
-      'Insert & Update Chapter',
+      'Insert & Update Tag',
       extra: {
         'before count': values.length,
         'after count': data.length,

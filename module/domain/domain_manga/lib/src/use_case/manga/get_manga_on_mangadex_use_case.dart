@@ -42,7 +42,7 @@ class GetMangaOnMangaDexUseCase with SyncMangasMixin {
 
       final process = await sync(
         logBox: _logBox,
-        mangaDao: _mangaDao,
+        dao: _mangaDao,
         values: [
           Manga.from(data: manga).copyWith(
             source: Source.mangadex().name,

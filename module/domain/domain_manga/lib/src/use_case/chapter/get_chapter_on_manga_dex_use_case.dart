@@ -48,7 +48,7 @@ class GetChapterOnMangaDexUseCase with SyncChaptersMixin {
       final atHome = response[1] as AtHomeResponse;
 
       final chapters = await sync(
-        chapterDao: _chapterDao,
+        dao: _chapterDao,
         logBox: _logBox,
         values: [
           Chapter(

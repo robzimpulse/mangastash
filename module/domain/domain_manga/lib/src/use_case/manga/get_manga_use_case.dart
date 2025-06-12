@@ -69,7 +69,7 @@ class GetMangaUseCase with SyncMangasMixin {
 
     final results = await sync(
       logBox: _logBox,
-      mangaDao: _mangaDao,
+      dao: _mangaDao,
       values: [parser.manga.copyWith(source: source, webUrl: url)],
     );
 

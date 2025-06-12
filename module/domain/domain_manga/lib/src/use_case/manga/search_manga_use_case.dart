@@ -60,7 +60,7 @@ class SearchMangaUseCase with SyncMangasMixin {
     );
 
     final data = await sync(
-      mangaDao: _mangaDao,
+      dao: _mangaDao,
       values: [...parser.mangas.map((e) => e.copyWith(source: source))],
       logBox: _logBox,
     );

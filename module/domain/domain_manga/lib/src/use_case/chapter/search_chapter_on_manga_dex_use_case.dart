@@ -38,7 +38,7 @@ class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
       return Success(
         Pagination(
           data: await sync(
-            chapterDao: _chapterDao,
+            dao: _chapterDao,
             logBox: _logBox,
             values: [
               for (final e in data)

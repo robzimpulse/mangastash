@@ -37,7 +37,7 @@ class SearchMangaOnMangaDexUseCase with SyncMangasMixin {
         Pagination(
           data: await sync(
             logBox: _logBox,
-            mangaDao: _mangaDao,
+            dao: _mangaDao,
             values: [
               ...?result.data?.map(
                 (e) => Manga.from(data: e).copyWith(

@@ -16,7 +16,7 @@ class UpdateChapterLastReadAtUseCase with SyncChaptersMixin {
 
   Future<void> execute({required Chapter chapter}) async {
     await sync(
-      chapterDao: _chapterDao,
+      dao: _chapterDao,
       logBox: _logBox,
       values: [chapter.copyWith(lastReadAt: DateTime.timestamp())],
     );

@@ -4,12 +4,12 @@ import 'package:log_box/log_box.dart';
 
 mixin SyncMangasMixin {
   Future<List<Manga>> sync({
-    required MangaDao mangaDao,
+    required MangaDao dao,
     required List<Manga> values,
     required LogBox logBox,
   }) async {
 
-    final results = await mangaDao.adds(
+    final results = await dao.adds(
       values: {
         for (final value in values)
           value.toDrift: [...?value.tags?.map((e) => e.name).nonNulls],
