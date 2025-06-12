@@ -9,10 +9,9 @@ mixin SyncTagsMixin {
     required LogBox logBox,
   }) async {
 
-    final data = [
-      for (final value in values)
-        Tag.fromDrift(await dao.add(value: value.toDrift)),
-    ];
+    final results = await dao.adds(values: [...values.map((e) => e.toDrift)]);
+
+    final data = [...results.map((e) => Tag.fromDrift(e)).nonNulls];
 
     logBox.log(
       'Insert & Update Tag',

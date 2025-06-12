@@ -1,7 +1,10 @@
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 
+import '../../manga_service_drift.dart';
 import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
+import '../extension/nullable_generic.dart';
 import '../tables/relationship_tables.dart';
 import '../tables/tag_tables.dart';
 
@@ -65,6 +68,49 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
         ),
       );
     return transaction(() => selector.goAndReturn());
+  }
+
+  Future<List<TagDrift>> adds({required List<TagTablesCompanion> values}) {
+    return transaction(() async {
+      final tags = await search(
+        ids: [...values.map((e) => e.id.valueOrNull).nonNulls],
+        names: [...values.map((e) => e.name.valueOrNull).nonNulls],
+      );
+
+      final data = <TagDrift>[];
+
+      for (final entry in values) {
+        final byId = entry.id.valueOrNull?.let(
+          (id) => tags.firstWhereOrNull((e) => e.id == id),
+        );
+        final byName = entry.name.valueOrNull?.let(
+          (name) => tags.firstWhereOrNull((e) => e.name == name),
+        );
+
+        final tag = (byId ?? byName);
+
+        final value = entry.copyWith(
+          id: Value.absentIfNull(
+            entry.id.valueOrNull ?? tag?.id,
+          ),
+          name: Value.absentIfNull(
+            entry.name.valueOrNull ?? tag?.name,
+          ),
+        );
+
+        final result = await into(tagTables).insertReturning(
+          value,
+          mode: InsertMode.insertOrReplace,
+          onConflict: DoUpdate(
+            (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
+          ),
+        );
+
+        data.add(result);
+      }
+
+      return data;
+    });
   }
 
   Future<TagDrift> add({required TagTablesCompanion value}) {
