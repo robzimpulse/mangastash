@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 
 import '../../manga_service_drift.dart';
-import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
 import '../extension/nullable_generic.dart';
 import '../tables/relationship_tables.dart';

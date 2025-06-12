@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:core_storage/core_storage.dart';
 import 'package:dio_inspector/dio_inspector.dart';
 import 'package:log_box/log_box.dart';
@@ -12,6 +14,7 @@ class AdvancedScreen extends StatelessWidget {
   final LogBox logBox;
   final DatabaseViewer viewer;
   final AppDatabase database;
+  final BaseCacheManager cacheManager;
 
   const AdvancedScreen({
     super.key,
@@ -19,6 +22,7 @@ class AdvancedScreen extends StatelessWidget {
     required this.logBox,
     required this.viewer,
     required this.database,
+    required this.cacheManager,
   });
 
   static Widget create({
@@ -31,6 +35,7 @@ class AdvancedScreen extends StatelessWidget {
         logBox: locator(),
         database: locator(),
         viewer: locator(),
+        cacheManager: locator(),
       ),
     );
   }
@@ -55,7 +60,17 @@ class AdvancedScreen extends StatelessWidget {
           ),
           ListTile(
             title: const Text('Log Inspector'),
-            onTap: () => logBox.navigateToLogBox(),
+            onTap: () => logBox.navigateToLogBox(
+              onTapSnapshot: (url, html) {
+                if (url == null || html == null) return;
+                cacheManager.putFile(
+                  url,
+                  utf8.encode(html),
+                  fileExtension: 'html',
+                  maxAge: const Duration(minutes: 30),
+                );
+              },
+            ),
             leading: const SizedBox(
               height: double.infinity,
               child: Icon(Icons.wrap_text),

@@ -10,9 +10,11 @@ import '../detail/detail_screen.dart';
 import 'widget/item_log_widget.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key, required this.storage});
+  const DashboardScreen({super.key, required this.storage, this.onTapSnapshot});
 
   final LogStorage storage;
+
+  final Function(String? url, String? html)? onTapSnapshot;
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -66,11 +68,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     var data = value;
 
     if (isSearch) {
-      data = [
-        ...data.where(
-              (e) => e.message.toLowerCase().contains(query.toLowerCase()),
-        ),
-      ];
+      data = data
+          .where((e) => e.message.toLowerCase().contains(query.toLowerCase()))
+          .toList();
     }
 
     if (isHtml) {
@@ -181,7 +181,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required BuildContext context,
     required List<LogModel> filteredActivities,
   }) {
-
     if (filteredActivities.isEmpty) {
       return const Center(child: Text('No Data'));
     }
@@ -203,6 +202,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               MaterialPageRoute(
                 builder: (context) => DetailScreen(
                   data: entry.value[index],
+                  onTapSnapshot: widget.onTapSnapshot,
                 ),
               ),
             ),

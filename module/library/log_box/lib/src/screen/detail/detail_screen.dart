@@ -8,7 +8,9 @@ import 'widget/item_column.dart';
 class DetailScreen extends StatelessWidget {
   final LogModel data;
 
-  const DetailScreen({super.key, required this.data});
+  final Function(String? url, String? html)? onTapSnapshot;
+
+  const DetailScreen({super.key, required this.data, this.onTapSnapshot});
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +50,7 @@ class DetailScreen extends StatelessWidget {
                 builder: (context) => WebviewScreen(
                   html: data.html,
                   uri: data.uri,
+                  onTapSnapshot: onTapSnapshot,
                 ),
               ),
             ),

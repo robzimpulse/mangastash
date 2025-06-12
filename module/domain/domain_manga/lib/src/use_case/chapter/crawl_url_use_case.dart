@@ -32,7 +32,7 @@ class CrawlUrlUseCase {
         url ?? uri.toString(),
         utf8.encode(html ?? ''),
         fileExtension: 'html',
-        maxAge: const Duration(minutes: 5),
+        maxAge: const Duration(minutes: 30),
       ),
     );
   }

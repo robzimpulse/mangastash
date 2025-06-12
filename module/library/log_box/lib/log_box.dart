@@ -84,7 +84,10 @@ class LogBox {
     );
   }
 
-  void navigateToLogBox({ThemeData? theme}) {
+  void navigateToLogBox({
+    ThemeData? theme,
+    Function(String? url, String? html)? onTapSnapshot,
+  }) {
     navigatorObserver.navigator?.push(
       MaterialPageRoute<dynamic>(
         builder: (context) => Theme(
