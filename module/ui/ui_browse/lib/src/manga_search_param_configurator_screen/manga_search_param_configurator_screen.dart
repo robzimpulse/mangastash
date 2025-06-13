@@ -81,6 +81,8 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
               onChanged: (parameter) => _cubit(context).update(
                 modified: parameter,
               ),
+              // TODO: add available tags for specific source
+              availableTags: const {},
             ),
           ),
         ),

@@ -1,4 +1,3 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 extension SearchUrlMixin on SearchMangaParameter {
@@ -29,12 +28,10 @@ extension SearchUrlMixin on SearchMangaParameter {
         for (final tag in includedTags ?? <String>[])
           MapEntry('genre[]', tag.toLowerCase().replaceAll(' ', '-')),
         if (includedTags?.isNotEmpty == true)
-          includedTagsMode?.let(
-            (value) => switch (value) {
-              TagsMode.or => const MapEntry('op', ''),
-              TagsMode.and => const MapEntry('op', '1'),
-            },
-          ),
+          switch (includedTagsMode) {
+            TagsMode.or => const MapEntry('op', ''),
+            TagsMode.and => const MapEntry('op', '1'),
+          },
       ].nonNulls.map((e) => '${e.key}=${e.value}').join('&'),
     ].join('?');
   }

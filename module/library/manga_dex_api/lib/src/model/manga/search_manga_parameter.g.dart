@@ -38,12 +38,14 @@ SearchMangaParameter _$SearchMangaParameterFromJson(
           ?.map((e) => e as String)
           .toList(),
       includedTagsMode:
-          $enumDecodeNullable(_$TagsModeEnumMap, json['includedTagsMode']),
+          $enumDecodeNullable(_$TagsModeEnumMap, json['includedTagsMode']) ??
+              TagsMode.or,
       excludedTags: (json['excludedTags'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
       excludedTagsMode:
-          $enumDecodeNullable(_$TagsModeEnumMap, json['excludedTagsMode']),
+          $enumDecodeNullable(_$TagsModeEnumMap, json['excludedTagsMode']) ??
+              TagsMode.or,
       status: (json['status'] as List<dynamic>?)
           ?.map((e) => $enumDecode(_$MangaStatusEnumMap, e))
           .toList(),
@@ -85,9 +87,9 @@ Map<String, dynamic> _$SearchMangaParameterToJson(
       'artists': instance.artists,
       'year': instance.year,
       'includedTags': instance.includedTags,
-      'includedTagsMode': _$TagsModeEnumMap[instance.includedTagsMode],
+      'includedTagsMode': _$TagsModeEnumMap[instance.includedTagsMode]!,
       'excludedTags': instance.excludedTags,
-      'excludedTagsMode': _$TagsModeEnumMap[instance.excludedTagsMode],
+      'excludedTagsMode': _$TagsModeEnumMap[instance.excludedTagsMode]!,
       'status': instance.status?.map((e) => _$MangaStatusEnumMap[e]!).toList(),
       'availableTranslatedLanguage': instance.availableTranslatedLanguage
           ?.map((e) => _$LanguageCodesEnumMap[e]!)

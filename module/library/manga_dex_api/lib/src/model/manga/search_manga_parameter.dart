@@ -31,9 +31,9 @@ class SearchMangaParameter extends SearchParameter {
     this.artists,
     this.year,
     this.includedTags,
-    this.includedTagsMode,
+    this.includedTagsMode = TagsMode.or,
     this.excludedTags,
-    this.excludedTagsMode,
+    this.excludedTagsMode = TagsMode.or,
     this.status,
     this.availableTranslatedLanguage,
     this.publicationDemographic,
@@ -46,9 +46,9 @@ class SearchMangaParameter extends SearchParameter {
   final List<String>? artists;
   final int? year;
   final List<String>? includedTags;
-  final TagsMode? includedTagsMode;
+  final TagsMode includedTagsMode;
   final List<String>? excludedTags;
-  final TagsMode? excludedTagsMode;
+  final TagsMode excludedTagsMode;
   final List<MangaStatus>? status;
   final List<LanguageCodes>? availableTranslatedLanguage;
   final List<PublicDemographic>? publicationDemographic;

@@ -61,14 +61,8 @@ class BrowseMangaScreenState extends Equatable {
       parameter.authors?.isNotEmpty == true,
       parameter.artists?.isNotEmpty == true,
       parameter.year != null,
-      [
-        parameter.includedTags?.isNotEmpty == true,
-        parameter.includedTagsMode != null,
-      ].every((e) => e),
-      [
-        parameter.excludedTags?.isNotEmpty == true,
-        parameter.excludedTagsMode != null,
-      ].every((e) => e),
+      parameter.includedTags?.isNotEmpty == true,
+      parameter.excludedTags?.isNotEmpty == true,
       parameter.status?.isNotEmpty == true,
       parameter.availableTranslatedLanguage?.isNotEmpty == true,
       parameter.publicationDemographic?.isNotEmpty == true,

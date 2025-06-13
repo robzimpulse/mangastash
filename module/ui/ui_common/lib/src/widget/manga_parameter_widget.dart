@@ -6,12 +6,19 @@ class MangaParameterWidget extends StatelessWidget {
   const MangaParameterWidget({
     super.key,
     required this.parameter,
+    this.availableTags = const {},
     this.onChanged,
   });
 
   final SearchMangaParameter parameter;
 
+  final Set<String> availableTags;
+
   final ValueSetter<SearchMangaParameter>? onChanged;
+
+  List<String> get includedTags => [...?parameter.includedTags];
+
+  List<String> get excludedTags => [...?parameter.excludedTags];
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +140,81 @@ class MangaParameterWidget extends StatelessWidget {
             ),
           ],
         ),
+        if (availableTags.isNotEmpty)
+          ExpansionTile(
+            title: const Text('Tags'),
+            children: [
+              SwitchListTile(
+                title: const Text('Included Tags Mode'),
+                subtitle: Text(parameter.includedTagsMode.label),
+                value: parameter.includedTagsMode == TagsMode.or,
+                onChanged: (value) => onChanged?.call(
+                  parameter.copyWith(
+                    includedTagsMode: value ? TagsMode.or : TagsMode.and,
+                  ),
+                ),
+              ),
+              SwitchListTile(
+                title: const Text('Excluded Tags Mode'),
+                subtitle: Text(parameter.excludedTagsMode.label),
+                value: parameter.excludedTagsMode == TagsMode.or,
+                onChanged: (value) => onChanged?.call(
+                  parameter.copyWith(
+                    excludedTagsMode: value ? TagsMode.or : TagsMode.and,
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 8,
+                      children: [
+                        for (final tag in availableTags)
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Checkbox(
+                                tristate: true,
+                                value: includedTags.contains(tag)
+                                    ? true
+                                    : excludedTags.contains(tag)
+                                        ? null
+                                        : false,
+                                onChanged: (value) {
+                                  final include = [...includedTags];
+                                  final exclude = [...excludedTags];
+
+                                  if (value == true) {
+                                    include.add(tag);
+                                    exclude.remove(tag);
+                                  } else if (value == false) {
+                                    include.remove(tag);
+                                    exclude.remove(tag);
+                                  } else {
+                                    include.remove(tag);
+                                    exclude.add(tag);
+                                  }
+
+                                  onChanged?.call(
+                                    parameter.copyWith(
+                                      includedTags: include,
+                                      excludedTags: exclude,
+                                    ),
+                                  );
+                                },
+                              ),
+                              Text(tag),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
       ],
     );
   }

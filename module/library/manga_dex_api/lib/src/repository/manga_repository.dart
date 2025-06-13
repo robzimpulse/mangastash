@@ -23,9 +23,9 @@ class MangaRepository {
       artists: parameter.artists,
       year: parameter.year,
       includedTags: parameter.includedTags,
-      includedTagsMode: parameter.includedTagsMode?.rawValue,
+      includedTagsMode: parameter.includedTagsMode.rawValue,
       excludedTags: parameter.excludedTags,
-      excludedTagsMode: parameter.excludedTagsMode?.rawValue,
+      excludedTagsMode: parameter.excludedTagsMode.rawValue,
       status: parameter.status?.map((e) => e.rawValue).toList(),
       originalLanguage:
           parameter.originalLanguage?.map((e) => e.rawValue).toList(),
