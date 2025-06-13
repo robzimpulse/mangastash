@@ -43,8 +43,10 @@ class _WebviewScreenState extends State<WebviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // TODO: move this inside block webview
       endDrawer: Drawer(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(0),
+        ),
         child: messages.isEmpty
             ? const Center(child: Text('No messages'))
             : ListView.separated(
