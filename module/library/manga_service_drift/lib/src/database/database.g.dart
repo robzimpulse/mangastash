@@ -1786,8 +1786,14 @@ class $TagTablesTable extends TagTables
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
   @override
-  List<GeneratedColumn> get $columns => [createdAt, updatedAt, id, name];
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+      'source', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [createdAt, updatedAt, id, name, source];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1815,6 +1821,10 @@ class $TagTablesTable extends TagTables
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('source')) {
+      context.handle(_sourceMeta,
+          source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
+    }
     return context;
   }
 
@@ -1822,7 +1832,7 @@ class $TagTablesTable extends TagTables
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   List<Set<GeneratedColumn>> get uniqueKeys => [
-        {id, name},
+        {id, name, source},
       ];
   @override
   TagDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
@@ -1836,6 +1846,8 @@ class $TagTablesTable extends TagTables
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      source: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}source']),
     );
   }
 
@@ -1850,11 +1862,13 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
   final DateTime updatedAt;
   final String id;
   final String name;
+  final String? source;
   const TagDrift(
       {required this.createdAt,
       required this.updatedAt,
       required this.id,
-      required this.name});
+      required this.name,
+      this.source});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1862,6 +1876,9 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
     map['updated_at'] = Variable<DateTime>(updatedAt);
     map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
+    if (!nullToAbsent || source != null) {
+      map['source'] = Variable<String>(source);
+    }
     return map;
   }
 
@@ -1871,6 +1888,8 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
       updatedAt: Value(updatedAt),
       id: Value(id),
       name: Value(name),
+      source:
+          source == null && nullToAbsent ? const Value.absent() : Value(source),
     );
   }
 
@@ -1882,6 +1901,7 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
+      source: serializer.fromJson<String?>(json['source']),
     );
   }
   @override
@@ -1892,6 +1912,7 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
+      'source': serializer.toJson<String?>(source),
     };
   }
 
@@ -1899,12 +1920,14 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
           {DateTime? createdAt,
           DateTime? updatedAt,
           String? id,
-          String? name}) =>
+          String? name,
+          Value<String?> source = const Value.absent()}) =>
       TagDrift(
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         id: id ?? this.id,
         name: name ?? this.name,
+        source: source.present ? source.value : this.source,
       );
   TagDrift copyWithCompanion(TagTablesCompanion data) {
     return TagDrift(
@@ -1912,6 +1935,7 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
+      source: data.source.present ? data.source.value : this.source,
     );
   }
 
@@ -1921,13 +1945,14 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('id: $id, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('source: $source')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(createdAt, updatedAt, id, name);
+  int get hashCode => Object.hash(createdAt, updatedAt, id, name, source);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1935,7 +1960,8 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.id == this.id &&
-          other.name == this.name);
+          other.name == this.name &&
+          other.source == this.source);
 }
 
 class TagTablesCompanion extends UpdateCompanion<TagDrift> {
@@ -1943,12 +1969,14 @@ class TagTablesCompanion extends UpdateCompanion<TagDrift> {
   final Value<DateTime> updatedAt;
   final Value<String> id;
   final Value<String> name;
+  final Value<String?> source;
   final Value<int> rowid;
   const TagTablesCompanion({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.id = const Value.absent(),
     this.name = const Value.absent(),
+    this.source = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   TagTablesCompanion.insert({
@@ -1956,6 +1984,7 @@ class TagTablesCompanion extends UpdateCompanion<TagDrift> {
     this.updatedAt = const Value.absent(),
     this.id = const Value.absent(),
     required String name,
+    this.source = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : name = Value(name);
   static Insertable<TagDrift> custom({
@@ -1963,6 +1992,7 @@ class TagTablesCompanion extends UpdateCompanion<TagDrift> {
     Expression<DateTime>? updatedAt,
     Expression<String>? id,
     Expression<String>? name,
+    Expression<String>? source,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1970,6 +2000,7 @@ class TagTablesCompanion extends UpdateCompanion<TagDrift> {
       if (updatedAt != null) 'updated_at': updatedAt,
       if (id != null) 'id': id,
       if (name != null) 'name': name,
+      if (source != null) 'source': source,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1979,12 +2010,14 @@ class TagTablesCompanion extends UpdateCompanion<TagDrift> {
       Value<DateTime>? updatedAt,
       Value<String>? id,
       Value<String>? name,
+      Value<String?>? source,
       Value<int>? rowid}) {
     return TagTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       id: id ?? this.id,
       name: name ?? this.name,
+      source: source ?? this.source,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2004,6 +2037,9 @@ class TagTablesCompanion extends UpdateCompanion<TagDrift> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2017,6 +2053,7 @@ class TagTablesCompanion extends UpdateCompanion<TagDrift> {
           ..write('updatedAt: $updatedAt, ')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('source: $source, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -4109,6 +4146,7 @@ typedef $$TagTablesTableCreateCompanionBuilder = TagTablesCompanion Function({
   Value<DateTime> updatedAt,
   Value<String> id,
   required String name,
+  Value<String?> source,
   Value<int> rowid,
 });
 typedef $$TagTablesTableUpdateCompanionBuilder = TagTablesCompanion Function({
@@ -4116,6 +4154,7 @@ typedef $$TagTablesTableUpdateCompanionBuilder = TagTablesCompanion Function({
   Value<DateTime> updatedAt,
   Value<String> id,
   Value<String> name,
+  Value<String?> source,
   Value<int> rowid,
 });
 
@@ -4139,6 +4178,9 @@ class $$TagTablesTableFilterComposer
 
   ColumnFilters<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnFilters(column));
 }
 
 class $$TagTablesTableOrderingComposer
@@ -4161,6 +4203,9 @@ class $$TagTablesTableOrderingComposer
 
   ColumnOrderings<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnOrderings(column));
 }
 
 class $$TagTablesTableAnnotationComposer
@@ -4183,6 +4228,9 @@ class $$TagTablesTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
 }
 
 class $$TagTablesTableTableManager extends RootTableManager<
@@ -4212,6 +4260,7 @@ class $$TagTablesTableTableManager extends RootTableManager<
             Value<DateTime> updatedAt = const Value.absent(),
             Value<String> id = const Value.absent(),
             Value<String> name = const Value.absent(),
+            Value<String?> source = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               TagTablesCompanion(
@@ -4219,6 +4268,7 @@ class $$TagTablesTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
             id: id,
             name: name,
+            source: source,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -4226,6 +4276,7 @@ class $$TagTablesTableTableManager extends RootTableManager<
             Value<DateTime> updatedAt = const Value.absent(),
             Value<String> id = const Value.absent(),
             required String name,
+            Value<String?> source = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               TagTablesCompanion.insert(
@@ -4233,6 +4284,7 @@ class $$TagTablesTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
             id: id,
             name: name,
+            source: source,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

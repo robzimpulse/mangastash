@@ -207,7 +207,10 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
         await _tagDao.detach(mangaId: result.id);
         for (final name in names) {
           final tag = await _tagDao.add(
-            value: TagTablesCompanion.insert(name: name),
+            value: TagTablesCompanion.insert(
+              name: name,
+              source: Value.absentIfNull(result.source),
+            ),
           );
           await _tagDao.attach(mangaId: result.id, tagId: tag.id);
           tags.add(tag);
@@ -237,7 +240,12 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
       /// update existing data with new data until all new data updated
       final updated = [
         for (final tag in tags)
-          await _tagDao.add(value: TagTablesCompanion.insert(name: tag)),
+          await _tagDao.add(
+            value: TagTablesCompanion.insert(
+              name: tag,
+              source: Value.absentIfNull(result.source),
+            ),
+          ),
       ];
 
       /// detach all existing tag on manga

@@ -30,10 +30,12 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
     required $TagTablesTable f,
     List<String> ids = const [],
     List<String> names = const [],
+    List<String> sources = const [],
   }) {
     return [
       f.id.isIn(ids.nonEmpty.distinct),
       f.name.isIn(names.nonEmpty.distinct),
+      f.source.isIn(sources.nonEmpty.distinct),
     ].fold(const Constant(false), (a, b) => a | b);
   }
 
@@ -42,6 +44,7 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
   Future<List<TagDrift>> search({
     List<String> ids = const [],
     List<String> names = const [],
+    List<String> sources = const [],
   }) {
     final selector = _selector
       ..where(
@@ -49,6 +52,7 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
           f: f,
           ids: ids,
           names: names,
+          sources: sources,
         ),
       );
     return transaction(() => selector.get());
@@ -57,6 +61,7 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
   Future<List<TagDrift>> remove({
     List<String> ids = const [],
     List<String> names = const [],
+    List<String> sources = const [],
   }) {
     final selector = _deleter
       ..where(
@@ -64,6 +69,7 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
           f: f,
           ids: ids,
           names: names,
+          sources: sources,
         ),
       );
     return transaction(() => selector.goAndReturn());
@@ -74,6 +80,7 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
       final tags = await search(
         ids: [...values.map((e) => e.id.valueOrNull).nonNulls],
         names: [...values.map((e) => e.name.valueOrNull).nonNulls],
+        sources: [...values.map((e) => e.source.valueOrNull).nonNulls],
       );
 
       final data = <TagDrift>[];
