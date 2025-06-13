@@ -25,6 +25,7 @@ class BrowseMangaScreen extends StatefulWidget {
 
   final Future<SearchMangaParameter?>? Function(
     SearchMangaParameter? value,
+    List<Tag> availableTags,
   )? onTapFilter;
 
   final BaseCacheManager cacheManager;
@@ -34,6 +35,7 @@ class BrowseMangaScreen extends StatefulWidget {
     Function(Manga, SearchMangaParameter)? onTapManga,
     Future<SearchMangaParameter?>? Function(
       SearchMangaParameter? value,
+      List<Tag> availableTags,
     )? onTapFilter,
     String? source,
   }) {
@@ -305,7 +307,11 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               icon: Icon(Icons.filter_list, color: color),
               label: Text('Filter', style: labelStyle?.copyWith(color: color)),
               onPressed: () async {
-                final result = await widget.onTapFilter?.call(state.parameter);
+                final result = await widget.onTapFilter?.call(
+                  state.parameter,
+                  // TODO: change tags source from all tags
+                  [...state.mangas.expand((e) => [...?e.tags])],
+                );
                 if (context.mounted && result != null) {
                   _cubit(context).update(parameter: result);
                   _cubit(context).init();

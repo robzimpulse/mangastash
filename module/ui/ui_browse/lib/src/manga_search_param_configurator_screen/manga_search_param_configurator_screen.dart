@@ -1,5 +1,6 @@
 import 'package:core_route/core_route.dart';
 import 'package:domain_manga/domain_manga.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -18,6 +19,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
   static Widget create({
     required ServiceLocator locator,
     SearchMangaParameter? param,
+    List<Tag> tags = const [],
     ScrollController? scrollController,
   }) {
     return BlocProvider(
@@ -25,6 +27,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
         initialState: MangaSearchParamConfiguratorScreenState(
           original: param,
           modified: param,
+          tags: tags,
         ),
       ),
       child: MangaSearchParamConfiguratorScreen(
@@ -81,8 +84,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
               onChanged: (parameter) => _cubit(context).update(
                 modified: parameter,
               ),
-              // TODO: add available tags for specific source
-              availableTags: const {},
+              availableTags: {...state.tags},
             ),
           ),
         ),

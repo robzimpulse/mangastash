@@ -25,7 +25,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
           onTapSource: (source) => context.push(
             BrowseRoutePath.browseManga.replaceAll(
               ':source',
-              source.name?? '',
+              source.name ?? '',
             ),
           ),
         ),
@@ -52,9 +52,12 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
                 .replaceAll(':mangaId', manga.id ?? ''),
             extra: MangaDetailExtra(manga: manga, param: param),
           ),
-          onTapFilter: (param) => context.push(
-            BrowseRoutePath.searchParamConfig,
-            extra: param,
+          onTapFilter: (param, tags) => context.push(
+            BrowseRoutePath.searchParam,
+            extra: SearchParameterExtra(
+              tags: tags,
+              parameter: param,
+            ),
           ),
         ),
       ),
@@ -118,12 +121,12 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: BrowseRoutePath.searchParamConfig,
-        name: BrowseRoutePath.searchParamConfig,
+        path: BrowseRoutePath.searchParam,
+        name: BrowseRoutePath.searchParam,
         pageBuilder: (context, state) {
           return MangaSearchParamConfiguratorBottomSheet(
             locator: locator,
-            parameter: state.extra.castOrNull(),
+            extra: state.extra.castOrNull(),
           );
         },
       ),

@@ -1,4 +1,5 @@
 import 'package:core_environment/core_environment.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
@@ -12,7 +13,7 @@ class MangaParameterWidget extends StatelessWidget {
 
   final SearchMangaParameter parameter;
 
-  final Set<String> availableTags;
+  final Set<Tag> availableTags;
 
   final ValueSetter<SearchMangaParameter>? onChanged;
 
@@ -177,25 +178,27 @@ class MangaParameterWidget extends StatelessWidget {
                             children: [
                               Checkbox(
                                 tristate: true,
-                                value: includedTags.contains(tag)
+                                value: includedTags.contains(tag.id)
                                     ? true
-                                    : excludedTags.contains(tag)
+                                    : excludedTags.contains(tag.id)
                                         ? null
                                         : false,
                                 onChanged: (value) {
                                   final include = [...includedTags];
                                   final exclude = [...excludedTags];
 
-                                  if (value == true) {
-                                    include.add(tag);
-                                    exclude.remove(tag);
-                                  } else if (value == false) {
-                                    include.remove(tag);
-                                    exclude.remove(tag);
-                                  } else {
-                                    include.remove(tag);
-                                    exclude.add(tag);
-                                  }
+                                  tag.id?.let((id) {
+                                    if (value == true) {
+                                      include.add(id);
+                                      exclude.remove(id);
+                                    } else if (value == false) {
+                                      include.remove(id);
+                                      exclude.remove(id);
+                                    } else {
+                                      include.remove(id);
+                                      exclude.add(id);
+                                    }
+                                  });
 
                                   onChanged?.call(
                                     parameter.copyWith(
@@ -205,7 +208,7 @@ class MangaParameterWidget extends StatelessWidget {
                                   );
                                 },
                               ),
-                              Text(tag),
+                              Text(tag.name ?? ''),
                             ],
                           ),
                       ],
