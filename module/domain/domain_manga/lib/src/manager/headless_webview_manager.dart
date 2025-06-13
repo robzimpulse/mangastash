@@ -54,16 +54,16 @@ class HeadlessWebviewManager {
           [
             onLoadStopCompleter.future,
             onLoadErrorCompleter.future,
+            Future.delayed(const Duration(seconds: 15)),
           ],
         ),
       ],
     );
 
-    final html = await signal
-        .then((_) => webview.webViewController?.getHtml())
-        .timeout(const Duration(seconds: 10), onTimeout: () async => null);
+    final html = await webview.webViewController?.getHtml();
 
     await webview.dispose();
+
     if (html == null) return null;
 
     await _cacheManager.putFile(
