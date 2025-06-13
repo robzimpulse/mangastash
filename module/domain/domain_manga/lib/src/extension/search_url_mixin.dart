@@ -30,7 +30,7 @@ extension SearchUrlMixin on SearchMangaParameter {
           MapEntry('genre[]', tag.toLowerCase().replaceAll(' ', '-')),
         if (includedTags?.isNotEmpty == true)
           includedTagsMode?.let(
-                (value) => switch (value) {
+            (value) => switch (value) {
               TagsMode.or => const MapEntry('op', ''),
               TagsMode.and => const MapEntry('op', '1'),
             },
@@ -45,13 +45,14 @@ extension SearchUrlMixin on SearchMangaParameter {
         'https://asuracomic.net',
         'series',
       ].join('/'),
-      {
-        'name': title ?? '',
-        'page': page,
-        if (orders?.containsKey(SearchOrders.rating) == true) 'order': 'rating',
+      [
+        MapEntry('name', title ?? ''),
+        MapEntry('page', page),
+        if (orders?.containsKey(SearchOrders.rating) == true)
+          const MapEntry('order', 'rating'),
         if (orders?.containsKey(SearchOrders.updatedAt) == true)
-          'order': 'update',
-      }.entries.map((e) => '${e.key}=${e.value}').join('&'),
+          const MapEntry('order', 'update'),
+      ].map((e) => '${e.key}=${e.value}').join('&'),
     ].join('?');
   }
 }
