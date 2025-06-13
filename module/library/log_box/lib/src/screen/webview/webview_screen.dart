@@ -108,6 +108,7 @@ class _WebviewScreenState extends State<WebviewScreen> {
           initialSettings: InAppWebViewSettings(
             isInspectable: true,
             javaScriptEnabled: true,
+            supportZoom: false,
           ),
           onContentSizeChanged: (_, curr, prev) => _log(
             'onContentSizeChanged: $curr - $prev',
