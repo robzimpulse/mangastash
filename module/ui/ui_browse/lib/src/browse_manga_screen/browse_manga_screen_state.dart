@@ -24,6 +24,8 @@ class BrowseMangaScreenState extends Equatable {
 
   final SearchMangaParameter parameter;
 
+  final List<Tag> tags;
+
   late final bool isFavoriteActive;
 
   late final bool isUpdatedActive;
@@ -44,6 +46,7 @@ class BrowseMangaScreenState extends Equatable {
     this.libraries = const [],
     this.parameter = const SearchMangaParameter(),
     this.prefetchedMangaIds = const {},
+    this.tags = const [],
   }) {
     isFavoriteActive =
         parameter.orders?.containsKey(SearchOrders.rating) == true;
@@ -84,6 +87,7 @@ class BrowseMangaScreenState extends Equatable {
       isSearchActive,
       libraries,
       prefetchedMangaIds,
+      tags,
     ];
   }
 
@@ -99,6 +103,7 @@ class BrowseMangaScreenState extends Equatable {
     List<Manga>? libraries,
     SearchMangaParameter? parameter,
     Set<String>? prefetchedMangaIds,
+    List<Tag>? tags,
   }) {
     return BrowseMangaScreenState(
       isLoading: isLoading ?? this.isLoading,
@@ -112,6 +117,7 @@ class BrowseMangaScreenState extends Equatable {
       source: source ?? this.source,
       parameter: parameter ?? this.parameter,
       prefetchedMangaIds: prefetchedMangaIds ?? this.prefetchedMangaIds,
+      tags: tags ?? this.tags,
     );
   }
 }

@@ -15,6 +15,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   final PrefetchMangaUseCase _prefetchMangaUseCase;
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final DownloadMangaUseCase _downloadMangaUseCase;
+  final GetTagsUseCase _getTagsUseCase;
 
   BrowseMangaScreenCubit({
     required BrowseMangaScreenState initialState,
@@ -27,12 +28,14 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     required DownloadMangaUseCase downloadMangaUseCase,
     required PrefetchChapterUseCase prefetchChapterUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
+    required GetTagsUseCase getTagsUseCase,
   })  : _searchMangaUseCase = searchMangaUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         _prefetchMangaUseCase = prefetchMangaUseCase,
         _downloadMangaUseCase = downloadMangaUseCase,
         _prefetchChapterUseCase = prefetchChapterUseCase,
+        _getTagsUseCase = getTagsUseCase,
         super(
           initialState.copyWith(
             parameter:
@@ -77,8 +80,25 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
       ),
     );
 
-    await _fetchManga();
+    await Future.wait([_fetchManga(), _fetchTags()]);
+
     emit(state.copyWith(isLoading: false));
+  }
+
+  Future<void> _fetchTags() async {
+    final source = state.source?.name;
+
+    if (source == null) return;
+
+    final result = await _getTagsUseCase.execute(source: source);
+
+    if (result is Success<List<Tag>>) {
+      emit(state.copyWith(tags: result.data));
+    }
+
+    if (result is Error<List<Tag>>) {
+      emit(state.copyWith(error: () => result.error));
+    }
   }
 
   Future<void> _fetchManga() async {

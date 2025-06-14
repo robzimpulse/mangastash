@@ -27,7 +27,11 @@ extension ServiceLocatorX on ServiceLocator {
     dynamic param2,
   }) {
     if (isRegistered<T>()) {
-      return get<T>(instanceName: instanceName, param1: param1, param2: param2);
+      return get<T>(
+        instanceName: instanceName,
+        param1: param1,
+        param2: param2,
+      );
     }
     return null;
   }
@@ -39,8 +43,11 @@ extension ServiceLocatorX on ServiceLocator {
     dynamic param2,
   }) {
     final locator = this;
-    return () =>
-        locator(instanceName: instanceName, param1: param1, param2: param2);
+    return () => locator(
+          instanceName: instanceName,
+          param1: param1,
+          param2: param2,
+        );
   }
 
   /// Returns the instance of a registered type wrapped in a FactoryAsync<T>.

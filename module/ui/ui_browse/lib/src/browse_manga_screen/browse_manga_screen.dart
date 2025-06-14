@@ -53,6 +53,7 @@ class BrowseMangaScreen extends StatefulWidget {
         downloadMangaUseCase: locator(),
         prefetchChapterUseCase: locator(),
         listenSearchParameterUseCase: locator(),
+        getTagsUseCase: locator(),
       )..init(),
       child: BrowseMangaScreen(
         crawlUrlUseCase: locator(),
@@ -309,8 +310,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               onPressed: () async {
                 final result = await widget.onTapFilter?.call(
                   state.parameter,
-                  // TODO: change tags source from all tags
-                  [...state.mangas.expand((e) => [...?e.tags])],
+                  state.tags,
                 );
                 if (context.mounted && result != null) {
                   _cubit(context).update(parameter: result);
