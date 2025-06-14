@@ -3,7 +3,6 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:service_locator/service_locator.dart';
 
-import '../domain_manga.dart';
 import 'manager/download_progress_manager.dart';
 import 'manager/file_download_manager.dart';
 import 'manager/global_options_manager.dart';
@@ -37,6 +36,7 @@ import 'use_case/prefetch/prefetch_manga_use_case.dart';
 import 'use_case/source/listen_sources_use_case.dart';
 import 'use_case/source/update_sources_use_case.dart';
 import 'use_case/tags/get_tags_on_mangadex_use_case.dart';
+import 'use_case/tags/get_tags_use_case.dart';
 
 class DomainMangaRegistrar extends Registrar {
   @override
