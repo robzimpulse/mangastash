@@ -14,13 +14,13 @@ import 'package:rxdart/rxdart.dart';
 
 import '../mixin/generate_task_id_mixin.dart';
 import '../use_case/chapter/get_chapter_use_case.dart';
-import '../use_case/chapter/prefetch_chapter_use_case.dart';
 import '../use_case/chapter/search_chapter_use_case.dart';
 import '../use_case/download/download_chapter_use_case.dart';
 import '../use_case/download/download_manga_use_case.dart';
-import '../use_case/library/listen_prefetch_use_case.dart';
 import '../use_case/manga/get_manga_use_case.dart';
-import '../use_case/manga/prefetch_manga_use_case.dart';
+import '../use_case/prefetch/listen_prefetch_use_case.dart';
+import '../use_case/prefetch/prefetch_chapter_use_case.dart';
+import '../use_case/prefetch/prefetch_manga_use_case.dart';
 
 class JobManager
     with GenerateTaskIdMixin, UserAgentMixin
