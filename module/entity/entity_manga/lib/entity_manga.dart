@@ -13,6 +13,6 @@ export 'src/extra/search_parameter_extra.dart';
 export 'src/history.dart';
 export 'src/manga.dart';
 export 'src/manga_chapter_config.dart';
-export 'src/manga_detail_extra.dart';
+export 'src/extra/manga_detail_extra.dart';
 export 'src/source.dart';
 export 'src/tag.dart';
