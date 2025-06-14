@@ -6,8 +6,8 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/src/model/manga/search_manga_parameter.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../use_case/manga/listen_search_parameter_use_case.dart';
-import '../use_case/manga/update_search_parameter_use_case.dart';
+import '../use_case/parameter/listen_search_parameter_use_case.dart';
+import '../use_case/parameter/update_search_parameter_use_case.dart';
 import '../use_case/source/listen_sources_use_case.dart';
 import '../use_case/source/update_sources_use_case.dart';
 
