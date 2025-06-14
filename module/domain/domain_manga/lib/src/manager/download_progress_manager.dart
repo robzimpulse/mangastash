@@ -4,7 +4,6 @@ import 'dart:math';
 
 import 'package:background_downloader/background_downloader.dart';
 import 'package:collection/collection.dart';
-// import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';

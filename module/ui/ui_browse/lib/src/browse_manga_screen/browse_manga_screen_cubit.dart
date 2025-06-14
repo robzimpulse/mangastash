@@ -14,7 +14,6 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   final AddToLibraryUseCase _addToLibraryUseCase;
   final PrefetchMangaUseCase _prefetchMangaUseCase;
   final PrefetchChapterUseCase _prefetchChapterUseCase;
-  final DownloadMangaUseCase _downloadMangaUseCase;
   final GetTagsUseCase _getTagsUseCase;
 
   BrowseMangaScreenCubit({
@@ -25,7 +24,6 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
     required PrefetchMangaUseCase prefetchMangaUseCase,
     required ListenPrefetchUseCase listenPrefetchMangaUseCase,
-    required DownloadMangaUseCase downloadMangaUseCase,
     required PrefetchChapterUseCase prefetchChapterUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required GetTagsUseCase getTagsUseCase,
@@ -33,7 +31,6 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
         _addToLibraryUseCase = addToLibraryUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         _prefetchMangaUseCase = prefetchMangaUseCase,
-        _downloadMangaUseCase = downloadMangaUseCase,
         _prefetchChapterUseCase = prefetchChapterUseCase,
         _getTagsUseCase = getTagsUseCase,
         super(
@@ -181,6 +178,6 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     final id = manga.id;
     final source = manga.source;
     if (id == null || source == null) return;
-    _downloadMangaUseCase.downloadManga(mangaId: id, source: source);
+    // TODO: add download manga
   }
 }

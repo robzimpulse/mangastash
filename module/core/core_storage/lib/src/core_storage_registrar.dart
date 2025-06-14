@@ -55,6 +55,7 @@ class CoreStorageRegistrar extends Registrar {
       locator.registerFactory(() => JobDao(locator()));
       locator.registerFactory(() => CacheDao(locator()));
       locator.registerFactory(() => HistoryDao(locator()));
+      locator.registerFactory(() => TagDao(locator()));
 
       locator.registerSingleton(await SharedPreferencesStorage.create());
       locator.alias<Storage, SharedPreferencesStorage>();

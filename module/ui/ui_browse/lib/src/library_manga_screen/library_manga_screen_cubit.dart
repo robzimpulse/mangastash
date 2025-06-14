@@ -10,7 +10,6 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
   final PrefetchMangaUseCase _prefetchMangaUseCase;
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
-  final DownloadMangaUseCase _downloadMangaUseCase;
 
   LibraryMangaScreenCubit({
     LibraryMangaScreenState initialState = const LibraryMangaScreenState(),
@@ -18,11 +17,9 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     required PrefetchMangaUseCase prefetchMangaUseCase,
     required RemoveFromLibraryUseCase removeFromLibraryUseCase,
     required ListenPrefetchUseCase listenPrefetchMangaUseCase,
-    required DownloadMangaUseCase downloadMangaUseCase,
     required PrefetchChapterUseCase prefetchChapterUseCase,
   })  : _prefetchMangaUseCase = prefetchMangaUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
-        _downloadMangaUseCase = downloadMangaUseCase,
         _prefetchChapterUseCase = prefetchChapterUseCase,
         super(initialState.copyWith(sources: Source.values)) {
     addSubscription(
@@ -63,7 +60,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     final id = manga.id;
     final source = manga.source;
     if (id == null || source == null) return;
-    _downloadMangaUseCase.downloadManga(mangaId: id, source: source);
+    // TODO: add download manga
   }
 
   void update({

@@ -50,7 +50,6 @@ class BrowseMangaScreen extends StatefulWidget {
         removeFromLibraryUseCase: locator(),
         prefetchMangaUseCase: locator(),
         listenPrefetchMangaUseCase: locator(),
-        downloadMangaUseCase: locator(),
         prefetchChapterUseCase: locator(),
         listenSearchParameterUseCase: locator(),
         getTagsUseCase: locator(),
