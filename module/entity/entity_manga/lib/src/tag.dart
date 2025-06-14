@@ -7,28 +7,32 @@ part 'tag.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class Tag extends Equatable {
+  final String? id;
+
   final String? name;
 
-  final String? id;
+  final String? source;
 
   final DateTime? createdAt;
 
   final DateTime? updatedAt;
 
   const Tag({
-    this.name,
     this.id,
+    this.name,
+    this.source,
     this.createdAt,
     this.updatedAt,
   });
 
   @override
-  List<Object?> get props => [name, id, createdAt, updatedAt];
+  List<Object?> get props => [id, name, source, createdAt, updatedAt];
 
   factory Tag.fromDrift(TagDrift tag) {
     return Tag(
-      name: tag.name,
       id: tag.id,
+      name: tag.name,
+      source: tag.source,
       createdAt: tag.createdAt,
       updatedAt: tag.updatedAt,
     );
@@ -36,8 +40,9 @@ class Tag extends Equatable {
 
   TagTablesCompanion get toDrift {
     return TagTablesCompanion(
-      name: Value.absentIfNull(name),
       id: Value.absentIfNull(id),
+      name: Value.absentIfNull(name),
+      source: Value.absentIfNull(source),
       createdAt: Value.absentIfNull(createdAt),
       updatedAt: Value.absentIfNull(updatedAt),
     );
@@ -50,16 +55,18 @@ class Tag extends Equatable {
   Map<String, dynamic> toJson() => _$TagToJson(this);
 
   Tag copyWith({
-    String? name,
     String? id,
+    String? name,
+    String? source,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
     return Tag(
-      name: name ?? this.name,
       id: id ?? this.id,
-      createdAt: createdAt,
-      updatedAt: updatedAt,
+      name: name ?? this.name,
+      source: source ?? this.source,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 

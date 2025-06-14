@@ -35,6 +35,7 @@ import 'use_case/prefetch/prefetch_chapter_use_case.dart';
 import 'use_case/prefetch/prefetch_manga_use_case.dart';
 import 'use_case/source/listen_sources_use_case.dart';
 import 'use_case/source/update_sources_use_case.dart';
+import 'use_case/tags/get_tags_on_mangadex_use_case.dart';
 
 class DomainMangaRegistrar extends Registrar {
   @override
@@ -203,6 +204,14 @@ class DomainMangaRegistrar extends Registrar {
       );
       locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
       locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
+
+      locator.registerFactory(
+        () => GetTagsOnMangadexUseCase(
+          mangaService: locator(),
+          tagDao: locator(),
+          logBox: locator(),
+        ),
+      );
 
       // locator.registerSingleton(
       //   MangaSourceManager(
