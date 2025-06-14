@@ -12,7 +12,7 @@ import 'package:log_box/log_box.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../mixin/generate_task_id_mixin.dart';
-import '../use_case/chapter/listen_download_progress_use_case.dart';
+import '../use_case/download/listen_download_progress_use_case.dart';
 
 typedef Key = DownloadChapterKey;
 typedef Update = Map<String, double>;
