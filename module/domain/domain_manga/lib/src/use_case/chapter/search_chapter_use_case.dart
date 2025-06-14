@@ -31,20 +31,16 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
         _webview = webview;
 
   Future<Result<Pagination<Chapter>>> execute({
-    required String? source,
-    required String? mangaId,
+    required String source,
+    required String mangaId,
     required SearchChapterParameter parameter,
   }) async {
-    if (source == null) return Error(Exception('Empty Source'));
-
     if (source == Source.mangadex().name) {
       return _searchChapterOnMangaDexUseCase.execute(
         parameter: parameter,
         mangaId: mangaId,
       );
     }
-
-    if (mangaId == null) return Error(Exception('Empty Manga ID'));
 
     final raw = await _mangaDao.search(ids: [mangaId]);
     final result = Manga.fromDatabase(raw.firstOrNull);

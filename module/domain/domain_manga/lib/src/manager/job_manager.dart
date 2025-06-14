@@ -89,8 +89,9 @@ class JobManager
 
   Future<void> _fetchManga(JobModel job) async {
     final mangaId = job.manga?.id;
+    final source = job.manga?.source;
 
-    if (mangaId == null) {
+    if (mangaId == null || source == null) {
       _log.log(
         'Failed execute job ${job.id} - ${job.type}',
         extra: {
@@ -107,7 +108,7 @@ class JobManager
     }
 
     final result = await _getMangaUseCase().execute(
-      source: job.manga?.source,
+      source: source,
       mangaId: mangaId,
     );
 
@@ -145,8 +146,9 @@ class JobManager
   Future<void> _fetchChapter(JobModel job) async {
     final mangaId = job.manga?.id;
     final chapterId = job.chapter?.id;
+    final source = job.manga?.source;
 
-    if (mangaId == null || chapterId == null) {
+    if (mangaId == null || chapterId == null || source == null) {
       _log.log(
         'Failed execute job ${job.id} - ${job.type}',
         extra: {
@@ -155,7 +157,7 @@ class JobManager
           'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
           'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
           'image': job.image,
-          'error': 'No Manga ID or Chapter ID',
+          'error': 'No Manga ID or Chapter ID or Source',
         },
         name: runtimeType.toString(),
       );
@@ -163,7 +165,7 @@ class JobManager
     }
 
     final result = await _getChapterUseCase().execute(
-      source: job.manga?.source,
+      source: source,
       mangaId: mangaId,
       chapterId: chapterId,
     );
@@ -219,8 +221,9 @@ class JobManager
     ),
   }) async {
     final mangaId = job.manga?.id;
+    final source = job.manga?.source;
 
-    if (mangaId == null) {
+    if (mangaId == null || source == null) {
       _log.log(
         'Failed execute job ${job.id} - ${job.type}',
         extra: {
@@ -229,7 +232,7 @@ class JobManager
           'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
           'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
           'image': job.image,
-          'error': 'No Manga ID',
+          'error': 'No Manga ID or Source',
         },
         name: runtimeType.toString(),
       );
@@ -237,7 +240,7 @@ class JobManager
     }
 
     final result = await _searchChapterUseCase().execute(
-      source: job.manga?.source,
+      source: source,
       mangaId: mangaId,
       parameter: parameter,
     );
@@ -288,8 +291,9 @@ class JobManager
   Future<void> _downloadChapter(JobModel job) async {
     final mangaId = job.manga?.id;
     final chapterId = job.chapter?.id;
+    final source = job.manga?.source;
 
-    if (mangaId == null || chapterId == null) {
+    if (mangaId == null || chapterId == null || source == null) {
       _log.log(
         'Failed execute job ${job.id} - ${job.type}',
         extra: {
@@ -298,7 +302,7 @@ class JobManager
           'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
           'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
           'image': job.image,
-          'error': 'No Manga ID or Chapter ID',
+          'error': 'No Manga ID or Chapter ID or Source',
         },
         name: runtimeType.toString(),
       );
@@ -306,7 +310,7 @@ class JobManager
     }
 
     final result = await _getChapterUseCase().execute(
-      source: job.manga?.source,
+      source: source,
       mangaId: mangaId,
       chapterId: chapterId,
     );

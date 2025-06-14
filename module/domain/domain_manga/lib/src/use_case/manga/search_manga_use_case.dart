@@ -30,11 +30,9 @@ class SearchMangaUseCase with SyncMangasMixin {
         _logBox = logBox;
 
   Future<Result<Pagination<Manga>>> execute({
-    required String? source,
+    required String source,
     required SearchMangaParameter parameter,
   }) async {
-    if (source == null) return Error(Exception('Empty Source'));
-
     if (source == Source.mangadex().name) {
       return _searchMangaOnMangaDexUseCase.execute(parameter: parameter);
     }

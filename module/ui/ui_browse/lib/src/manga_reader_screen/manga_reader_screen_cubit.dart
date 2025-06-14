@@ -37,12 +37,25 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
   Future<void> init() => _fetchChapter();
 
   Future<void> _fetchChapter() async {
+    final chapterId = state.chapterId;
+    final mangaId = state.mangaId;
+    final source = state.source?.name;
+
+    if (chapterId == null || mangaId == null || source == null) {
+      emit(
+        state.copyWith(
+          error: () => Exception('Empty chapter id or manga id or source'),
+        ),
+      );
+      return;
+    }
+
     emit(state.copyWith(isLoading: true));
 
     final response = await _getChapterUseCase.execute(
-      chapterId: state.chapterId,
-      source: state.source?.name,
-      mangaId: state.mangaId,
+      chapterId: chapterId,
+      mangaId: mangaId,
+      source: source,
     );
 
     if (response is Success<Chapter>) {

@@ -20,11 +20,9 @@ class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
         _logBox = logBox;
 
   Future<Result<Pagination<Chapter>>> execute({
-    required String? mangaId,
+    required String mangaId,
     required SearchChapterParameter parameter,
   }) async {
-    if (mangaId == null) return Error(Exception('Manga ID Empty'));
-
     try {
       final result = await _chapterRepository.feed(
         mangaId: mangaId,
