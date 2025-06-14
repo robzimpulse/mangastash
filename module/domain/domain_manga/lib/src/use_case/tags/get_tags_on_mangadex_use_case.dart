@@ -6,12 +6,12 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../mixin/sync_tags_mixin.dart';
 
-class GetTagsOnMangadexUseCase with SyncTagsMixin {
+class GetTagsOnMangaDexUseCase with SyncTagsMixin {
   final MangaService _mangaService;
   final TagDao _tagDao;
   final LogBox _logBox;
 
-  GetTagsOnMangadexUseCase({
+  GetTagsOnMangaDexUseCase({
     required MangaService mangaService,
     required TagDao tagDao,
     required LogBox logBox,

@@ -3,6 +3,7 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:service_locator/service_locator.dart';
 
+import '../domain_manga.dart';
 import 'manager/download_progress_manager.dart';
 import 'manager/file_download_manager.dart';
 import 'manager/global_options_manager.dart';
@@ -206,21 +207,21 @@ class DomainMangaRegistrar extends Registrar {
       locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
 
       locator.registerFactory(
-        () => GetTagsOnMangadexUseCase(
+        () => GetTagsOnMangaDexUseCase(
           mangaService: locator(),
           tagDao: locator(),
           logBox: locator(),
         ),
       );
 
-      // locator.registerSingleton(
-      //   MangaSourceManager(
-      //     mangaSourceServiceFirebase: locator(),
-      //   ),
-      // );
-      // locator.alias<GetMangaSourcesUseCase, MangaSourceManager>();
-      // locator.alias<ListenMangaSourceUseCase, MangaSourceManager>();
-      // locator.alias<GetMangaSourceUseCase, MangaSourceManager>();
+      locator.registerFactory(
+        () => GetTagsUseCase(
+          getTagsOnMangaDexUseCase: locator(),
+          webview: locator(),
+          tagDao: locator(),
+          logBox: locator(),
+        ),
+      );
     });
 
     log.log(
