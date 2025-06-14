@@ -1,6 +1,6 @@
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-import 'manga.dart';
+import '../manga.dart';
 
 class MangaDetailExtra {
 
