@@ -1,7 +1,6 @@
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:html/parser.dart';
 import 'package:log_box/log_box.dart';
 
 import '../../../domain_manga.dart';

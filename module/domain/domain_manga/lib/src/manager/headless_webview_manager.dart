@@ -36,7 +36,7 @@ class HeadlessWebviewManager {
     List<String> scripts = const [],
   }) async {
     final cache = await _cacheManager.getFileFromCache(uri.toString());
-    if (cache != null) return await cache.file.readAsString();
+    final data = await cache?.file.readAsString();
 
     final onLoadStartCompleter = Completer();
     final onLoadStopCompleter = Completer();
@@ -47,9 +47,34 @@ class HeadlessWebviewManager {
         url: uri,
         headers: {HttpHeaders.userAgentHeader: UserAgentMixin.staticUserAgent},
       ),
+      initialData: data != null && data.isNotEmpty
+          ? InAppWebViewInitialData(data: data)
+          : null,
+      initialSettings: InAppWebViewSettings(
+        isInspectable: true,
+        javaScriptEnabled: true,
+        supportZoom: false,
+      ),
       onLoadStart: (_, __) => onLoadStartCompleter.safeComplete(),
       onLoadStop: (_, __) => onLoadStopCompleter.safeComplete(),
       onReceivedError: (_, __, ___) => onLoadErrorCompleter.safeComplete(),
+      onNavigationResponse: (_, __) async => NavigationResponseAction.ALLOW,
+      shouldOverrideUrlLoading: (_, action) async {
+        final destination = action.request.url;
+
+        if (destination == null) {
+          return NavigationActionPolicy.CANCEL;
+        }
+
+        final isSame = [
+          destination.scheme == uri.scheme,
+          destination.host == uri.host,
+        ].every((e) => e);
+
+        return isSame
+            ? NavigationActionPolicy.ALLOW
+            : NavigationActionPolicy.CANCEL;
+      },
     );
 
     await Future.wait(
@@ -68,7 +93,10 @@ class HeadlessWebviewManager {
 
     for (final script in scripts) {
       if (script.isEmpty) continue;
-      await webview.webViewController?.evaluateJavascript(source: script);
+      await Future.delayed(
+        const Duration(milliseconds: 500),
+        () => webview.webViewController?.evaluateJavascript(source: script),
+      );
     }
 
     final html = await webview.webViewController?.getHtml();
