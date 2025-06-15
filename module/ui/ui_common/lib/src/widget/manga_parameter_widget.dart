@@ -4,6 +4,8 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
+import 'checkbox_with_text_widget.dart';
+
 class MangaParameterWidget extends StatelessWidget {
   const MangaParameterWidget({
     super.key,
@@ -178,43 +180,46 @@ class MangaParameterWidget extends StatelessWidget {
                       children: [
                         for (final (index, tag) in pair.indexed)
                           TableCell(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Checkbox(
-                                  tristate: true,
-                                  value: includedTags.contains(tag.id)
-                                      ? true
-                                      : excludedTags.contains(tag.id)
-                                          ? null
-                                          : false,
-                                  onChanged: (value) {
-                                    final include = [...includedTags];
-                                    final exclude = [...excludedTags];
+                            child: CheckboxWithTextWidget(
+                              tristate: true,
+                              reversed: index.isEven,
+                              value: includedTags.contains(tag.id)
+                                  ? true
+                                  : excludedTags.contains(tag.id)
+                                      ? null
+                                      : false,
+                              onChanged: (value) {
+                                final include = [...includedTags];
+                                final exclude = [...excludedTags];
 
-                                    tag.id?.let((id) {
-                                      if (value == true) {
-                                        include.add(id);
-                                        exclude.remove(id);
-                                      } else if (value == false) {
-                                        include.remove(id);
-                                        exclude.remove(id);
-                                      } else {
-                                        include.remove(id);
-                                        exclude.add(id);
-                                      }
-                                    });
+                                tag.id?.let((id) {
+                                  if (value == true) {
+                                    include.add(id);
+                                    exclude.remove(id);
+                                  } else if (value == false) {
+                                    include.remove(id);
+                                    exclude.remove(id);
+                                  } else {
+                                    include.remove(id);
+                                    exclude.add(id);
+                                  }
+                                });
 
-                                    onChanged?.call(
-                                      parameter.copyWith(
-                                        includedTags: include,
-                                        excludedTags: exclude,
-                                      ),
-                                    );
-                                  },
+                                onChanged?.call(
+                                  parameter.copyWith(
+                                    includedTags: include,
+                                    excludedTags: exclude,
+                                  ),
+                                );
+                              },
+                              text: Expanded(
+                                child: Text(
+                                  tag.name ?? '',
+                                  textAlign: index.isEven
+                                      ? TextAlign.end
+                                      : TextAlign.start,
                                 ),
-                                Text(tag.name ?? ''),
-                              ],
+                              ),
                             ),
                           ),
                       ],
