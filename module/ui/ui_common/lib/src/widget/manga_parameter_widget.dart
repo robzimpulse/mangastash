@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
@@ -165,55 +166,59 @@ class MangaParameterWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              Row(
+              Table(
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                columnWidths: const {
+                  0: FlexColumnWidth(),
+                  1: FlexColumnWidth(),
+                },
                 children: [
-                  Expanded(
-                    child: Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 8,
+                  for (final pair in availableTags.slices(2))
+                    TableRow(
                       children: [
-                        for (final tag in availableTags)
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Checkbox(
-                                tristate: true,
-                                value: includedTags.contains(tag.id)
-                                    ? true
-                                    : excludedTags.contains(tag.id)
-                                        ? null
-                                        : false,
-                                onChanged: (value) {
-                                  final include = [...includedTags];
-                                  final exclude = [...excludedTags];
+                        for (final (index, tag) in pair.indexed)
+                          TableCell(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Checkbox(
+                                  tristate: true,
+                                  value: includedTags.contains(tag.id)
+                                      ? true
+                                      : excludedTags.contains(tag.id)
+                                          ? null
+                                          : false,
+                                  onChanged: (value) {
+                                    final include = [...includedTags];
+                                    final exclude = [...excludedTags];
 
-                                  tag.id?.let((id) {
-                                    if (value == true) {
-                                      include.add(id);
-                                      exclude.remove(id);
-                                    } else if (value == false) {
-                                      include.remove(id);
-                                      exclude.remove(id);
-                                    } else {
-                                      include.remove(id);
-                                      exclude.add(id);
-                                    }
-                                  });
+                                    tag.id?.let((id) {
+                                      if (value == true) {
+                                        include.add(id);
+                                        exclude.remove(id);
+                                      } else if (value == false) {
+                                        include.remove(id);
+                                        exclude.remove(id);
+                                      } else {
+                                        include.remove(id);
+                                        exclude.add(id);
+                                      }
+                                    });
 
-                                  onChanged?.call(
-                                    parameter.copyWith(
-                                      includedTags: include,
-                                      excludedTags: exclude,
-                                    ),
-                                  );
-                                },
-                              ),
-                              Text(tag.name ?? ''),
-                            ],
+                                    onChanged?.call(
+                                      parameter.copyWith(
+                                        includedTags: include,
+                                        excludedTags: exclude,
+                                      ),
+                                    );
+                                  },
+                                ),
+                                Text(tag.name ?? ''),
+                              ],
+                            ),
                           ),
                       ],
                     ),
-                  ),
                 ],
               ),
             ],
