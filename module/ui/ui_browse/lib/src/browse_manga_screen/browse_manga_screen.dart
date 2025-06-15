@@ -297,6 +297,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             buildWhen: (prev, curr) => [
               prev.parameter != curr.parameter,
               prev.isFilterActive != curr.isFilterActive,
+              prev.tags != curr.tags,
             ].contains(true),
             builder: (context, state) => OutlinedButton.icon(
               style: buttonStyle?.copyWith(
