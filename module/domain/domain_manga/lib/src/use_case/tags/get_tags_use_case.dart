@@ -41,7 +41,25 @@ class GetTagsUseCase with SyncTagsMixin {
       url = parameter.mangaclash;
     }
 
-    final document = await _webview.open(url);
+    final document = await _webview.open(
+      url,
+      actions: [
+        if (source == Source.asurascan().name)
+          'document.querySelectorAll(\'${[
+            'button',
+            'inline-flex',
+            'items-center',
+            'whitespace-nowrap',
+            'px-4',
+            'py-2',
+            'w-full',
+            'justify-center',
+            'font-normal',
+            'align-middle',
+            'border-solid',
+          ].join('.')}\')[0].click()',
+      ],
+    );
 
     if (document == null) {
       return Error(FailedParsingHtmlException(url));
