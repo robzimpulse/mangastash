@@ -178,7 +178,7 @@ class MangaParameterWidget extends StatelessWidget {
                   for (final pair in availableTags.slices(2))
                     TableRow(
                       children: [
-                        for (final (index, tag) in pair.indexed)
+                        for (final (index, tag) in pair.indexed) ...[
                           TableCell(
                             child: CheckboxWithTextWidget(
                               tristate: true,
@@ -186,8 +186,8 @@ class MangaParameterWidget extends StatelessWidget {
                               value: includedTags.contains(tag.id)
                                   ? true
                                   : excludedTags.contains(tag.id)
-                                      ? null
-                                      : false,
+                                  ? null
+                                  : false,
                               onChanged: (value) {
                                 final include = [...includedTags];
                                 final exclude = [...excludedTags];
@@ -222,6 +222,9 @@ class MangaParameterWidget extends StatelessWidget {
                               ),
                             ),
                           ),
+                          if (pair.length < 2)
+                            const TableCell(child: SizedBox()),
+                        ],
                       ],
                     ),
                 ],
