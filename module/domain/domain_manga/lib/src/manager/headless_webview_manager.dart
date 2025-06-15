@@ -93,10 +93,8 @@ class HeadlessWebviewManager {
 
     for (final script in scripts) {
       if (script.isEmpty) continue;
-      await Future.delayed(
-        const Duration(milliseconds: 500),
-        () => webview.webViewController?.evaluateJavascript(source: script),
-      );
+      await Future.delayed(const Duration(seconds: 1));
+      await webview.webViewController?.evaluateJavascript(source: script);
     }
 
     final html = await webview.webViewController?.getHtml();
