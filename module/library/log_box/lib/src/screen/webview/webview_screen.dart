@@ -68,6 +68,32 @@ class _WebviewScreenState extends State<WebviewScreen> {
         ),
         actions: [
           IconButton(
+            onPressed: () async {
+              final controller = TextEditingController();
+
+              await showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Run JavaScript'),
+                  content: TextField(controller: controller),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Close'),
+                    ),
+                  ],
+                ),
+              );
+
+              final script = controller.text;
+
+              if (script.isEmpty) return;
+
+              webViewController?.evaluateJavascript(source: script);
+            },
+            icon: const Icon(Icons.javascript),
+          ),
+          IconButton(
             onPressed: () => webViewController?.loadUrl(
               urlRequest: URLRequest(
                 url: WebUri.uri(widget.uri),
