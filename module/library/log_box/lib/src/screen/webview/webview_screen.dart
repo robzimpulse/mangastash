@@ -8,12 +8,15 @@ class WebviewScreen extends StatefulWidget {
     super.key,
     required this.html,
     required this.uri,
+    this.scripts = const [],
     this.onTapSnapshot,
   });
 
   final String html;
 
   final Uri uri;
+
+  final List<String> scripts;
 
   final Function(String? url, String? html)? onTapSnapshot;
 
@@ -141,7 +144,19 @@ class _WebviewScreenState extends State<WebviewScreen> {
           ),
           onLoadStart: (_, url) => _log('onLoadStart: $url'),
           onLoadStop: (_, url) => _log('onLoadStart: $url'),
-          onProgressChanged: (_, progress) => _log('onProgress: $progress'),
+          onProgressChanged: (controller, progress) async {
+            _log('onProgress: $progress');
+
+            if (progress < 100) return;
+
+            for (final script in widget.scripts) {
+              _log('Running Script: $script');
+              final result = await controller.evaluateJavascript(
+                source: script,
+              );
+              _log('Result: $result');
+            }
+          },
           onReceivedError: (_, request, error) => _log(
             'onReceivedError: ${request.url} - ${error.description}',
           ),

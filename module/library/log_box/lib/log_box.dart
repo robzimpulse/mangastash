@@ -25,6 +25,7 @@ class LogBox {
   void logHtml(
     Uri uri,
     String html, {
+    List<String> scripts = const [],
     DateTime? time,
     int? sequenceNumber,
     int level = 0,
@@ -37,6 +38,7 @@ class LogBox {
       log: LogHtmlModel(
         uri: uri,
         html: html,
+        scripts: scripts,
         time: time ?? DateTime.now(),
         sequenceNumber: sequenceNumber,
         level: level,

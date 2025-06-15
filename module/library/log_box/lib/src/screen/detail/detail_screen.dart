@@ -50,6 +50,7 @@ class DetailScreen extends StatelessWidget {
                 builder: (context) => WebviewScreen(
                   html: data.html,
                   uri: data.uri,
+                  scripts: data.scripts,
                   onTapSnapshot: onTapSnapshot,
                 ),
               ),

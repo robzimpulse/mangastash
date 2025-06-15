@@ -43,9 +43,9 @@ class GetTagsUseCase with SyncTagsMixin {
 
     final document = await _webview.open(
       url,
-      actions: [
+      scripts: [
         if (source == Source.asurascan().name)
-          'document.querySelectorAll(\'${[
+          'window.document.querySelectorAll(\'${[
             'button',
             'inline-flex',
             'items-center',

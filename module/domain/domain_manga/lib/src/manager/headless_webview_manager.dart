@@ -23,15 +23,18 @@ class HeadlessWebviewManager {
   })  : _log = log,
         _cacheManager = cacheManager;
 
-  Future<Document?> open(String url, {List<String> actions = const []}) async {
+  Future<Document?> open(String url, {List<String> scripts = const []}) async {
     final uri = WebUri(url);
-    final html = await _queue.add(() => _fetch(uri: uri, actions: actions));
+    final html = await _queue.add(() => _fetch(uri: uri, scripts: scripts));
     if (html == null) return null;
-    _log.logHtml(uri, html, name: 'HeadlessWebviewManager');
+    _log.logHtml(uri, html, scripts: scripts, name: 'HeadlessWebviewManager');
     return parse(html);
   }
 
-  Future<String?> _fetch({required WebUri uri, List<String> actions = const [],}) async {
+  Future<String?> _fetch({
+    required WebUri uri,
+    List<String> scripts = const [],
+  }) async {
     final cache = await _cacheManager.getFileFromCache(uri.toString());
     if (cache != null) return await cache.file.readAsString();
 
@@ -63,9 +66,9 @@ class HeadlessWebviewManager {
       ],
     );
 
-    for (final action in actions) {
-      if (action.isEmpty) continue;
-      await webview.webViewController?.evaluateJavascript(source: action);
+    for (final script in scripts) {
+      if (script.isEmpty) continue;
+      await webview.webViewController?.evaluateJavascript(source: script);
     }
 
     final html = await webview.webViewController?.getHtml();

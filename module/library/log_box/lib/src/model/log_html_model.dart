@@ -5,9 +5,12 @@ class LogHtmlModel extends LogModel {
 
   final Uri uri;
 
-  const LogHtmlModel({
+  final List<String> scripts;
+
+  LogHtmlModel({
     required this.html,
     required this.uri,
+    this.scripts = const [],
     super.time,
     super.sequenceNumber,
     super.level,
@@ -15,8 +18,8 @@ class LogHtmlModel extends LogModel {
     super.zone,
     super.error,
     super.stackTrace,
-  }) : super(message: 'Url: $uri');
+  }) : super(message: 'Url: $uri', extra: {'scripts': scripts});
 
   @override
-  List<Object?> get props => [...super.props, html, uri];
+  List<Object?> get props => [...super.props, html, uri, scripts];
 }
