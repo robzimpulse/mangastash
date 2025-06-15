@@ -26,7 +26,7 @@ extension SearchUrlMixin on SearchMangaParameter {
             },
           ),
         for (final tag in includedTags ?? <String>[])
-          MapEntry('genre[]', tag.toLowerCase().replaceAll(' ', '-')),
+          MapEntry('genre[]', tag),
         if (includedTags?.isNotEmpty == true)
           switch (includedTagsMode) {
             TagsMode.or => const MapEntry('op', ''),
@@ -49,6 +49,8 @@ extension SearchUrlMixin on SearchMangaParameter {
           const MapEntry('order', 'rating'),
         if (orders?.containsKey(SearchOrders.updatedAt) == true)
           const MapEntry('order', 'update'),
+        if (includedTags?.isNotEmpty == true)
+          MapEntry('genres', [...?includedTags].join(','))
       ].map((e) => '${e.key}=${e.value}').join('&'),
     ].join('?');
   }
