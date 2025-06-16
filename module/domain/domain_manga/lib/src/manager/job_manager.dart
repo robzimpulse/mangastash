@@ -599,4 +599,7 @@ class JobManager
   Stream<Set<String>> get mangaIdsStream {
     return _jobs.map((data) => {...data.map((e) => e.manga?.id).nonNulls});
   }
+
+  @override
+  Stream<List<JobModel>> get jobsStream => _jobs.stream;
 }

@@ -50,7 +50,7 @@ extension SearchUrlMixin on SearchMangaParameter {
         if (orders?.containsKey(SearchOrders.updatedAt) == true)
           const MapEntry('order', 'update'),
         if (includedTags?.isNotEmpty == true)
-          MapEntry('genres', [...?includedTags].join(','))
+          MapEntry('genres', [...?includedTags].join(',')),
       ].map((e) => '${e.key}=${e.value}').join('&'),
     ].join('?');
   }
