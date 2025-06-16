@@ -9,7 +9,7 @@ class MangaChapterTileWidget extends StatelessWidget {
     super.key,
     this.onTap,
     this.onTapDownload,
-    this.onLongPress,
+    this.onTapMarkAsRead,
     this.padding,
     this.title,
     this.language,
@@ -22,7 +22,7 @@ class MangaChapterTileWidget extends StatelessWidget {
 
   final VoidCallback? onTap;
   final VoidCallback? onTapDownload;
-  final VoidCallback? onLongPress;
+  final VoidCallback? onTapMarkAsRead;
   final EdgeInsetsGeometry? padding;
   final String? title;
   final String? groups;
@@ -37,7 +37,6 @@ class MangaChapterTileWidget extends StatelessWidget {
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
       child: InkWell(
-        onLongPress: onLongPress,
         onTap: onTap,
         child: Opacity(
           opacity: lastReadAt != null ? 0.5 : 1,
@@ -72,6 +71,11 @@ class MangaChapterTileWidget extends StatelessWidget {
                     ].intersperse(const SizedBox(height: 4)).toList(),
                   ),
                 ),
+                if (onTapMarkAsRead != null && lastReadAt == null)
+                  IconButton(
+                    onPressed: onTapMarkAsRead,
+                    icon: const Icon(Icons.check, size: 20),
+                  ),
                 if (isPrefetching)
                   const Padding(
                     padding: EdgeInsets.all(12.0),

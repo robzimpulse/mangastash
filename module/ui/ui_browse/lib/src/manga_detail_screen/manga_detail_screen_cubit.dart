@@ -18,6 +18,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   final DownloadChapterUseCase _downloadChapterUseCase;
   final CrawlUrlUseCase _crawlUrlUseCase;
   final PrefetchChapterUseCase _prefetchChapterUseCase;
+  final UpdateChapterLastReadAtUseCase _updateChapterLastReadAtUseCase;
 
   MangaDetailScreenCubit({
     required MangaDetailScreenState initialState,
@@ -33,6 +34,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required ListenPrefetchUseCase listenPrefetchUseCase,
     required PrefetchChapterUseCase prefetchChapterUseCase,
     required ListenReadHistoryUseCase listenReadHistoryUseCase,
+    required UpdateChapterLastReadAtUseCase updateChapterLastReadAtUseCase,
   })  : _getMangaUseCase = getMangaUseCase,
         _searchChapterUseCase = searchChapterUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
@@ -40,6 +42,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
         _downloadChapterUseCase = downloadChapterUseCase,
         _crawlUrlUseCase = crawlUrlUseCase,
         _prefetchChapterUseCase = prefetchChapterUseCase,
+        _updateChapterLastReadAtUseCase = updateChapterLastReadAtUseCase,
         super(initialState) {
     addSubscription(
       listenAuth.authStateStream.distinct().listen(_updateAuthState),
@@ -96,6 +99,10 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     Map<DownloadChapterKey, DownloadChapterProgress> progress,
   ) {
     emit(state.copyWith(progress: progress));
+  }
+
+  void updateLastRead(Chapter chapter) {
+    _updateChapterLastReadAtUseCase.execute(chapter: chapter);
   }
 
   Future<void> init() async {

@@ -58,7 +58,7 @@ class MangaDetailScreen extends StatefulWidget {
         crawlUrlUseCase: locator(),
         listenPrefetchUseCase: locator(),
         prefetchChapterUseCase: locator(),
-        listenReadHistoryUseCase: locator(),
+        listenReadHistoryUseCase: locator(), updateChapterLastReadAtUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         cacheManager: locator(),
@@ -136,7 +136,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   void _onTapDownloadChapter(
     BuildContext context,
-    Chapter? chapter,
+    Chapter chapter,
   ) async {
     await [
       Permission.storage,
@@ -144,13 +144,12 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       Permission.notification,
     ].request();
 
-    if (!context.mounted || chapter == null) return;
+    if (!context.mounted) return;
     _cubit(context).downloadChapter(chapter: chapter);
   }
 
-  void _onTapMenuChapter(BuildContext context, Chapter? chapter) {
-    // TODO: implement this
-    context.showSnackBar(message: '🚧🚧🚧 Under Construction $chapter 🚧🚧🚧');
+  void _onTapMarkAsRead(BuildContext context, Chapter chapter) {
+    _cubit(context).updateLastRead(chapter);
   }
 
   void _onTapShare(BuildContext context) {
@@ -470,7 +469,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           padding: const EdgeInsets.symmetric(vertical: 8),
           onTap: () => widget.onTapChapter?.call(value.id, state.chapterIds),
           onTapDownload: () => _onTapDownloadChapter(context, value),
-          onLongPress: () => _onTapMenuChapter(context, value),
+          onTapMarkAsRead: () => _onTapMarkAsRead(context, value),
           title: ['Chapter ${value.chapter}', value.title].nonNulls.join(' - '),
           language: Language.fromCode(value.translatedLanguage),
           uploadedAt: value.readableAt,
