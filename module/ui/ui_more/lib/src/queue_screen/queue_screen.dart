@@ -1,3 +1,5 @@
+import 'package:core_environment/core_environment.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -17,6 +19,7 @@ class QueueScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => QueueScreenCubit(
         listenDownloadProgressUseCase: locator(),
+        listenPrefetchUseCase: locator(),
       ),
       child: const QueueScreen(),
     );
@@ -32,7 +35,21 @@ class QueueScreen extends StatelessWidget {
     );
   }
 
-  Widget _item({
+  Widget _jobItem({required JobModel job}) {
+    return ListTile(
+      title: Text('${job.id} - ${job.type.label}'),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Manga: ${job.manga?.title}'),
+          Text('Chapter: ${job.chapter?.title}'),
+          Text('Image: ${job.image}'),
+        ],
+      ),
+    );
+  }
+
+  Widget _downloadItem({
     required DownloadChapterKey key,
     required DownloadChapterProgress progress,
     required Map<String, String> filenames,
@@ -80,24 +97,70 @@ class QueueScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Queues'),
       ),
-      body: _builder(
-        buildWhen: (prev, curr) => [
-          prev.progress != curr.progress,
-          prev.filenames != curr.filenames,
-        ].contains(true),
-        builder: (context, state) => CustomScrollView(
-          slivers: List.of(
-            state.progress.entries.map(
-              (e) => SliverToBoxAdapter(
-                child: _item(
-                  key: e.key,
-                  progress: e.value,
-                  filenames: state.filenames,
+      body: Row(
+        children: [
+          Flexible(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Downloads',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                 ),
-              ),
+                Expanded(
+                  child: _builder(
+                    buildWhen: (prev, curr) => [
+                      prev.progress != curr.progress,
+                      prev.filenames != curr.filenames,
+                    ].contains(true),
+                    builder: (context, state) => CustomScrollView(
+                      slivers: List.of(
+                        state.progress.entries.map(
+                          (e) => SliverToBoxAdapter(
+                            child: _downloadItem(
+                              key: e.key,
+                              progress: e.value,
+                              filenames: state.filenames,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
+          Flexible(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Prefetches',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                ),
+                Expanded(
+                  child: _builder(
+                    buildWhen: (prev, curr) => prev.jobs != curr.jobs,
+                    builder: (context, state) => CustomScrollView(
+                      slivers: List.of(
+                        state.jobs.map(
+                          (e) => SliverToBoxAdapter(
+                            child: _jobItem(job: e),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

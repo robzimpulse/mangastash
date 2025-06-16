@@ -8,6 +8,7 @@ class QueueScreenCubit extends Cubit<QueueScreenState>
     with AutoSubscriptionMixin {
   QueueScreenCubit({
     required ListenDownloadProgressUseCase listenDownloadProgressUseCase,
+    required ListenPrefetchUseCase listenPrefetchUseCase,
     QueueScreenState initialState = const QueueScreenState(),
   }) : super(initialState) {
     addSubscription(
@@ -21,6 +22,12 @@ class QueueScreenCubit extends Cubit<QueueScreenState>
           .distinct()
           .throttleTime(const Duration(milliseconds: 200))
           .listen((filenames) => emit(state.copyWith(filenames: filenames))),
+    );
+    addSubscription(
+      listenPrefetchUseCase.jobsStream
+          .distinct()
+          .throttleTime(const Duration(milliseconds: 200))
+          .listen((jobs) => emit(state.copyWith(jobs: jobs))),
     );
   }
 }
