@@ -9,7 +9,7 @@ export 'src/download_screen/download_screen.dart';
 export 'src/general_screen/general_screen.dart';
 export 'src/library screen/library_screen.dart';
 export 'src/more_screen/more_screen.dart';
-export 'src/queue_screen/download_queue_screen.dart';
+export 'src/queue_screen/queue_screen.dart';
 export 'src/reader_screen/reader_screen.dart';
 export 'src/security_screen/security_screen.dart';
 export 'src/setting_screen/setting_screen.dart';

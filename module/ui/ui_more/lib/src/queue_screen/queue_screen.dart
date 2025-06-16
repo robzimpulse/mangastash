@@ -3,11 +3,11 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import 'download_queue_screen_cubit.dart';
-import 'download_queue_screen_state.dart';
+import 'queue_screen_cubit.dart';
+import 'queue_screen_state.dart';
 
-class DownloadQueueScreen extends StatelessWidget {
-  const DownloadQueueScreen({
+class QueueScreen extends StatelessWidget {
+  const QueueScreen({
     super.key,
   });
 
@@ -15,18 +15,18 @@ class DownloadQueueScreen extends StatelessWidget {
     required ServiceLocator locator,
   }) {
     return BlocProvider(
-      create: (context) => DownloadQueueScreenCubit(
+      create: (context) => QueueScreenCubit(
         listenDownloadProgressUseCase: locator(),
       ),
-      child: const DownloadQueueScreen(),
+      child: const QueueScreen(),
     );
   }
 
   BlocBuilder _builder({
-    required BlocWidgetBuilder<DownloadQueueScreenState> builder,
-    BlocBuilderCondition<DownloadQueueScreenState>? buildWhen,
+    required BlocWidgetBuilder<QueueScreenState> builder,
+    BlocBuilderCondition<QueueScreenState>? buildWhen,
   }) {
-    return BlocBuilder<DownloadQueueScreenCubit, DownloadQueueScreenState>(
+    return BlocBuilder<QueueScreenCubit, QueueScreenState>(
       buildWhen: buildWhen,
       builder: builder,
     );
@@ -78,7 +78,7 @@ class DownloadQueueScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScaffoldScreen(
       appBar: AppBar(
-        title: const Text('Download Queue'),
+        title: const Text('Queues'),
       ),
       body: _builder(
         buildWhen: (prev, curr) => [

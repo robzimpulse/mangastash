@@ -80,7 +80,7 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         parentNavigatorKey: rootNavigatorKey,
         path: MoreRoutePath.downloadQueue,
         name: MoreRoutePath.downloadQueue,
-        builder: (context, state) => DownloadQueueScreen.create(
+        builder: (context, state) => QueueScreen.create(
           locator: locator,
         ),
       ),
