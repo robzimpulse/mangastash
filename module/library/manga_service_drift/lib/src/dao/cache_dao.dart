@@ -70,9 +70,9 @@ class CacheDao extends DatabaseAccessor<AppDatabase> with _$CacheDaoMixin {
     return transaction(() => selector.goAndReturn());
   }
 
-  Future<CacheDrift> add({required CacheTablesCompanion value}) {
+  Future<int> add({required CacheTablesCompanion value}) {
     return transaction(
-      () => into(cacheTables).insertReturning(
+      () => into(cacheTables).insert(
         value,
         onConflict: DoUpdate(
           (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
@@ -81,8 +81,8 @@ class CacheDao extends DatabaseAccessor<AppDatabase> with _$CacheDaoMixin {
     );
   }
 
-  Future<List<CacheDrift>> modify({required CacheTablesCompanion value}) {
+  Future<int> modify({required CacheTablesCompanion value}) {
     final selector = _updater..whereSamePrimaryKey(value);
-    return transaction(() => selector.writeReturning(value));
+    return transaction(() => selector.write(value));
   }
 }
