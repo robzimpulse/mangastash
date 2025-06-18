@@ -53,4 +53,19 @@ class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
 
     return selector.watch().map(_parse);
   }
+
+  Stream<List<HistoryModel>> get unread {
+    final order = [
+      OrderingTerm(
+        expression: chapterTables.lastReadAt,
+        mode: OrderingMode.desc,
+      ),
+    ];
+
+    final selector = _aggregate
+      ..where(chapterTables.lastReadAt.isNull())
+      ..orderBy(order);
+
+    return selector.watch().map(_parse);
+  }
 }

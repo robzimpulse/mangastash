@@ -19,6 +19,7 @@ import 'use_case/download/download_chapter_use_case.dart';
 import 'use_case/download/download_manga_use_case.dart';
 import 'use_case/download/listen_download_progress_use_case.dart';
 import 'use_case/history/listen_read_history_use_case.dart';
+import 'use_case/history/listen_unread_history_use_case.dart';
 import 'use_case/history/update_chapter_last_read_at_use_case.dart';
 import 'use_case/library/add_to_library_use_case.dart';
 import 'use_case/library/get_manga_from_library_use_case.dart';
@@ -78,6 +79,7 @@ class DomainMangaRegistrar extends Registrar {
 
       locator.registerSingleton(HistoryManager(historyDao: locator()));
       locator.alias<ListenReadHistoryUseCase, HistoryManager>();
+      locator.alias<ListenUnreadHistoryUseCase, HistoryManager>();
 
       locator.registerSingleton(
         HeadlessWebviewManager(log: log, cacheManager: locator()),

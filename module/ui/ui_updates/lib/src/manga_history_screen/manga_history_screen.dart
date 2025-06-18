@@ -40,8 +40,6 @@ class MangaHistoryScreen extends StatelessWidget {
     );
   }
 
-  MangaHistoryScreenCubit _cubit(BuildContext context) => context.read();
-
   BlocBuilder _builder({
     required BlocWidgetBuilder<MangaHistoryScreenState> builder,
     BlocBuilderCondition<MangaHistoryScreenState>? buildWhen,
@@ -74,7 +72,7 @@ class MangaHistoryScreen extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       title: ['Chapter ${chapter.chapter}', chapter.title].nonNulls.join(' - '),
       language: Language.fromCode(chapter.translatedLanguage),
-      uploadedAt: chapter.lastReadAt,
+      uploadedAt: chapter.createdAt,
       groups: chapter.scanlationGroup,
       onTap: () => onTapChapter?.call(manga, chapter),
     );

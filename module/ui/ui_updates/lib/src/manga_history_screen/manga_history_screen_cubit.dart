@@ -17,9 +17,7 @@ class MangaHistoryScreenCubit extends Cubit<MangaHistoryScreenState>
   }
 
   void _onUpdate(List<History> histories) {
-
     final group = histories.groupListsBy((e) => e.manga);
-
     emit(
       state.copyWith(
         histories: {
