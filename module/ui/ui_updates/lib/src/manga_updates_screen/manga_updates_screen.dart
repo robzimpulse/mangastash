@@ -89,22 +89,23 @@ class MangaUpdatesScreen extends StatelessWidget {
         builder: (context, state) => CustomScrollView(
           slivers: [
             for (final history in state.updates.entries)
-              MultiSliver(
-                pushPinnedChildren: true,
-                children: [
-                  SliverPinnedHeader(
-                    child: _manga(context: context, manga: history.key),
-                  ),
-                  for (final item in history.value)
-                    SliverToBoxAdapter(
-                      child: _chapter(
-                        context: context,
-                        manga: history.key,
-                        chapter: item,
-                      ),
+              if (history.value.isNotEmpty)
+                MultiSliver(
+                  pushPinnedChildren: true,
+                  children: [
+                    SliverPinnedHeader(
+                      child: _manga(context: context, manga: history.key),
                     ),
-                ],
-              ),
+                    for (final item in history.value)
+                      SliverToBoxAdapter(
+                        child: _chapter(
+                          context: context,
+                          manga: history.key,
+                          chapter: item,
+                        ),
+                      ),
+                  ],
+                ),
           ],
         ),
       ),
