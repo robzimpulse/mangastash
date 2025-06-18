@@ -465,7 +465,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         final value = state.processedChapters[chapterId];
         final history = state.histories[chapterId];
         if (value == null) return const SizedBox.shrink();
-        return MangaChapterTileWidget(
+        return ChapterTile(
           padding: const EdgeInsets.symmetric(vertical: 8),
           onTap: () => widget.onTapChapter?.call(value.id, state.chapterIds),
           onTapDownload: () => _onTapDownloadChapter(context, value),
