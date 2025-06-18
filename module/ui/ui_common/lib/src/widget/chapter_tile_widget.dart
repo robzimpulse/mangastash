@@ -4,8 +4,8 @@ import 'package:intersperse/intersperse.dart';
 
 import 'icon_with_text_widget.dart';
 
-class ChapterTile extends StatelessWidget {
-  const ChapterTile({
+class ChapterTileWidget extends StatelessWidget {
+  const ChapterTileWidget({
     super.key,
     this.onTap,
     this.onTapDownload,
