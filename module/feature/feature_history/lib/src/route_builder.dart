@@ -21,15 +21,18 @@ class HistoryRouteBuilder extends BaseRouteBuilder {
           onTapChapter: (manga, chapter) => context.pushNamed(
             BrowseRoutePath.chapterDetail,
             pathParameters: {
-              'source': manga.source ?? '',
-              'mangaId': manga.id ?? '',
-              'chapterId': chapter.id ?? '',
+              BrowseRoutePath.sourceQuery: manga.source ?? '',
+              BrowseRoutePath.mangaIdQuery: manga.id ?? '',
+              BrowseRoutePath.chapterIdQuery: chapter.id ?? '',
             },
           ),
           onTapManga: (manga) => context.push(
             BrowseRoutePath.mangaDetail
-                .replaceAll(':source', '${manga?.source}')
-                .replaceAll(':mangaId', '${manga?.id}'),
+                .replaceAll(
+                  ':${BrowseRoutePath.sourceQuery}',
+                  '${manga?.source}',
+                )
+                .replaceAll(':${BrowseRoutePath.mangaIdQuery}', '${manga?.id}'),
             extra: MangaDetailExtra(manga: manga, param: null),
           ),
         ),

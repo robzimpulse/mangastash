@@ -68,14 +68,16 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         builder: (context, state) => MangaDetailScreen.create(
           locator: locator,
           extra: state.extra.castOrNull(),
-          source: state.pathParameters['source'],
-          mangaId: state.pathParameters['mangaId'],
+          source: state.pathParameters[BrowseRoutePath.sourceQuery],
+          mangaId: state.pathParameters[BrowseRoutePath.mangaIdQuery],
           onTapChapter: (chapterId, chapterIds) => context.pushNamed(
             BrowseRoutePath.chapterDetail,
             pathParameters: {
-              'source': state.pathParameters['source'] ?? '',
-              'mangaId': state.pathParameters['mangaId'] ?? '',
-              'chapterId': chapterId ?? '',
+              BrowseRoutePath.sourceQuery:
+                  state.pathParameters[BrowseRoutePath.sourceQuery] ?? '',
+              BrowseRoutePath.mangaIdQuery:
+                  state.pathParameters[BrowseRoutePath.mangaIdQuery] ?? '',
+              BrowseRoutePath.chapterIdQuery: chapterId ?? '',
             },
             queryParameters: {
               'chapterIds': chapterIds?.join('|'),
@@ -93,16 +95,18 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         name: BrowseRoutePath.chapterDetail,
         builder: (context, state) => MangaReaderScreen.create(
           locator: locator,
-          source: state.pathParameters['source'],
-          mangaId: state.pathParameters['mangaId'],
-          chapterId: state.pathParameters['chapterId'],
+          source: state.pathParameters[BrowseRoutePath.sourceQuery],
+          mangaId: state.pathParameters[BrowseRoutePath.mangaIdQuery],
+          chapterId: state.pathParameters[BrowseRoutePath.chapterIdQuery],
           chapterIds: state.uri.queryParameters['chapterIds']?.split('|'),
           onTapShortcut: (chapterId) => context.pushReplacementNamed(
             BrowseRoutePath.chapterDetail,
             pathParameters: {
-              'source': state.pathParameters['source'] ?? '',
-              'mangaId': state.pathParameters['mangaId'] ?? '',
-              'chapterId': chapterId ?? '',
+              BrowseRoutePath.sourceQuery:
+                  state.pathParameters[BrowseRoutePath.sourceQuery] ?? '',
+              BrowseRoutePath.mangaIdQuery:
+                  state.pathParameters[BrowseRoutePath.mangaIdQuery] ?? '',
+              BrowseRoutePath.chapterIdQuery: chapterId ?? '',
             },
             queryParameters: {
               'chapterIds': state.uri.queryParameters['chapterIds'],
