@@ -49,7 +49,6 @@ class SearchMangaOnMangaDexUseCase with SyncMangasMixin {
           offset: result.offset?.toInt(),
           limit: result.limit?.toInt() ?? 0,
           total: result.total?.toInt() ?? 0,
-          // TODO: add metadata (all available tags / order / filter)
         ),
       );
     } catch (e) {

@@ -1,8 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import 'metadata.dart';
-
 part 'pagination.g.dart';
 
 @JsonSerializable(
@@ -17,7 +15,6 @@ class Pagination<T extends Equatable> extends Equatable {
   final int? offset;
   final int? total;
   final bool? hasNextPage;
-  final Metadata? metadata;
   final String? sourceUrl;
 
   const Pagination({
@@ -28,7 +25,6 @@ class Pagination<T extends Equatable> extends Equatable {
     this.total,
     this.hasNextPage,
     this.sourceUrl,
-    this.metadata,
   });
 
   @override
@@ -40,7 +36,6 @@ class Pagination<T extends Equatable> extends Equatable {
         data,
         hasNextPage,
         sourceUrl,
-        metadata,
       ];
 
   factory Pagination.fromJson(
@@ -63,7 +58,6 @@ class Pagination<T extends Equatable> extends Equatable {
     int? total,
     bool? hasNextPage,
     String? sourceUrl,
-    Metadata? metadata,
   }) {
     return Pagination(
       data: data ?? this.data,
@@ -73,7 +67,6 @@ class Pagination<T extends Equatable> extends Equatable {
       total: total ?? this.total,
       hasNextPage: hasNextPage ?? this.hasNextPage,
       sourceUrl: sourceUrl ?? this.sourceUrl,
-      metadata: metadata ?? this.metadata,
     );
   }
 }
