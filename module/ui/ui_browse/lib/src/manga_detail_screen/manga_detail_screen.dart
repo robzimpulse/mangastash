@@ -248,23 +248,27 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   Widget _downloadButton() {
     return _builder(
       buildWhen: (prev, curr) => prev.chapters != curr.chapters,
-      builder: (context, state) => state.chapters?.isNotEmpty == true
-          ? PopupMenuButton<DownloadOption>(
-              icon: Icon(
-                Icons.download,
-                color: Theme.of(context).appBarTheme.iconTheme?.color,
+      builder: (context, state) {
+        if (state.chapters?.isNotEmpty == true) {
+          return const SizedBox.shrink();
+        }
+
+        return PopupMenuButton<DownloadOption>(
+          icon: Icon(
+            Icons.download,
+            color: Theme.of(context).appBarTheme.iconTheme?.color,
+          ),
+          onSelected: (value) => _onTapDownload(context, value),
+          itemBuilder: (context) => [
+            ...DownloadOption.values.map(
+              (e) => PopupMenuItem<DownloadOption>(
+                value: e,
+                child: Text(e.value),
               ),
-              onSelected: (value) => _onTapDownload(context, value),
-              itemBuilder: (context) => [
-                ...DownloadOption.values.map(
-                  (e) => PopupMenuItem<DownloadOption>(
-                    value: e,
-                    child: Text(e.value),
-                  ),
-                ),
-              ],
-            )
-          : const SizedBox.shrink(),
+            ),
+          ],
+        );
+      },
     );
   }
 
