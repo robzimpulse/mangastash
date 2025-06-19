@@ -18,10 +18,12 @@ class LibraryRouteBuilder extends BaseRouteBuilder {
       pageBuilder: (context, state) => NoTransitionPage(
         child: LibraryMangaScreen.create(
           locator: locator,
-          onTapManga: (manga) => context.push(
-            BrowseRoutePath.mangaDetail
-                .replaceAll(':source', '${manga?.source}')
-                .replaceAll(':mangaId', '${manga?.id}'),
+          onTapManga: (manga) => context.pushNamed(
+            BrowseRoutePath.mangaDetail,
+            pathParameters: {
+              BrowseRoutePath.sourceQuery: manga?.source ?? '',
+              BrowseRoutePath.mangaIdQuery: manga?.id ?? '',
+            },
             extra: MangaDetailExtra(manga: manga, param: null),
           ),
         ),
