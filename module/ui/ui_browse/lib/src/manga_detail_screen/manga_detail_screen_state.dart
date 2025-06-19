@@ -38,7 +38,10 @@ class MangaDetailScreenState extends Equatable {
 
   late final Set<num> chaptersKey;
   late final Map<num, Chapter> processedChapters;
-  late final int totalChapter;
+
+  int get totalChapter {
+    return chapters?.length ?? 0;
+  }
 
   bool get isOnLibrary {
     return libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
@@ -94,7 +97,6 @@ class MangaDetailScreenState extends Equatable {
 
     this.processedChapters = processedChapters;
     chaptersKey = {...processedChapters.keys.sorted((a, b) => b.compareTo(a))};
-    totalChapter = processedChapters.length;
 
     for (final key in reversedChaptersKey) {
       final id = processedChapters[key]?.id;
