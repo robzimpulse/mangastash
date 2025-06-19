@@ -18,14 +18,11 @@ class MangaDetailScreen extends StatefulWidget {
     this.onTapChapter,
     this.onTapSort,
     required this.cacheManager,
-    required this.crawlUrlUseCase,
   });
 
   final ValueSetter<Chapter>? onTapChapter;
 
   final AsyncValueUpdater<ChapterConfig?>? onTapSort;
-
-  final CrawlUrlUseCase crawlUrlUseCase;
 
   final BaseCacheManager cacheManager;
 
@@ -65,7 +62,6 @@ class MangaDetailScreen extends StatefulWidget {
         cacheManager: locator(),
         onTapChapter: onTapChapter,
         onTapSort: onTapSort,
-        crawlUrlUseCase: locator(),
       ),
     );
   }
@@ -103,7 +99,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       return;
     }
 
-    await widget.crawlUrlUseCase.execute(url: url);
+    _cubit(context).recrawl(url: url);
   }
 
   void _onTapTag(BuildContext context, {Tag? tag}) {
