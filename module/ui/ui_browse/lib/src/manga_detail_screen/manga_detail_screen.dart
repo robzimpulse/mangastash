@@ -249,7 +249,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     return _builder(
       buildWhen: (prev, curr) => prev.chapters != curr.chapters,
       builder: (context, state) {
-        if (state.chapters?.isNotEmpty == true) {
+        if (state.chapters.isNotEmpty) {
           return const SizedBox.shrink();
         }
 
@@ -398,15 +398,13 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       buildWhen: (prev, curr) => [
         prev.errorChapters != curr.errorChapters,
         prev.isLoadingChapters != curr.isLoadingChapters,
-        prev.chaptersKey != curr.chaptersKey,
+        prev.chapters != curr.chapters,
       ].contains(true),
       builder: (context, state) {
         final error = state.errorChapters;
         if (error != null) return _errorChapter(context: context, error: error);
         if (state.isLoadingChapters) return _loadingChapter();
-
-        final chapters = state.chaptersKey;
-        if (chapters.isEmpty) return _emptyChapter();
+        if (state.chapters.isEmpty) return _emptyChapter();
 
         return MultiSliver(
           children: [
@@ -416,7 +414,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 child: Row(
                   children: [
                     Text(
-                      '${state.totalChapter} Chapters',
+                      '${state.chapters.length} Chapters',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ],
@@ -425,27 +423,24 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             ),
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  childCount: (chapters.length * 2) - 1,
-                  semanticIndexCallback: (Widget _, int index) {
-                    return index.isEven ? index ~/ 2 : null;
-                  },
-                  (context, index) {
-                    final int itemIndex = index ~/ 2;
-                    final valueIndex = chapters.elementAtOrNull(itemIndex);
-
-                    return index.isOdd
-                        ? _separator()
-                        : _chapterItem(
+              sliver: MultiSliver(
+                children: [
+                  ...state.chapters
+                      .map(
+                        (e) => SliverToBoxAdapter(
+                          child: _chapterItem(
                             key: DownloadChapterKey.create(
                               manga: state.manga,
-                              chapter: state.processedChapters[valueIndex],
+                              chapter: e,
                             ),
-                            chapterId: valueIndex,
-                          );
-                  },
-                ),
+                            chapter: e,
+                          ),
+                        ),
+                      )
+                      .intersperse(
+                        SliverToBoxAdapter(child: _separator()),
+                      ),
+                ],
               ),
             ),
           ],
@@ -454,32 +449,34 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
-  Widget _chapterItem({required DownloadChapterKey key, num? chapterId}) {
+  Widget _chapterItem({
+    required DownloadChapterKey key,
+    required Chapter chapter,
+  }) {
     return _builder(
       buildWhen: (prev, curr) => [
-        prev.progress?[key] != curr.progress?[key],
+        prev.progress != curr.progress,
         prev.prefetchedChapterId != curr.prefetchedChapterId,
-        prev.processedChapters[chapterId] != curr.processedChapters[chapterId],
-        prev.histories[chapterId] != curr.histories[chapterId],
+        prev.histories != curr.histories,
       ].contains(true),
-      builder: (context, state) {
-        final value = state.processedChapters[chapterId];
-        final history = state.histories[chapterId];
-        if (value == null) return const SizedBox.shrink();
-        return ChapterTileWidget(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          onTap: () => widget.onTapChapter?.call(value),
-          onTapDownload: () => _onTapDownloadChapter(context, value),
-          onTapMarkAsRead: () => _onTapMarkAsRead(context, value),
-          title: ['Chapter ${value.chapter}', value.title].nonNulls.join(' - '),
-          language: Language.fromCode(value.translatedLanguage),
-          uploadedAt: value.readableAt,
-          groups: value.scanlationGroup,
-          downloadProgress: state.progress?[key]?.progress.toDouble() ?? 0.0,
-          isPrefetching: state.prefetchedChapterId.contains(chapterId),
-          lastReadAt: value.lastReadAt ?? history?.lastReadAt,
-        );
-      },
+      builder: (context, state) => ChapterTileWidget(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        onTap: () => widget.onTapChapter?.call(chapter),
+        onTapDownload: () => _onTapDownloadChapter(context, chapter),
+        onTapMarkAsRead: () => _onTapMarkAsRead(context, chapter),
+        title: [
+          'Chapter ${chapter.chapter}',
+          chapter.title,
+        ].nonNulls.join(' - '),
+        language: Language.fromCode(chapter.translatedLanguage),
+        uploadedAt: chapter.readableAt,
+        groups: chapter.scanlationGroup,
+        downloadProgress: state.progress?[key]?.progress.toDouble() ?? 0.0,
+        isPrefetching: state.prefetchedChapterId.contains(chapter.id),
+        lastReadAt: chapter.lastReadAt.orNull(
+          state.histories[chapter.id]?.lastReadAt,
+        ),
+      ),
     );
   }
 

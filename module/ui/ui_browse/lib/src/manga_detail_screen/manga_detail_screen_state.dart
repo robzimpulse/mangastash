@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:core_auth/core_auth.dart';
-import 'package:core_environment/core_environment.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
@@ -22,13 +21,13 @@ class MangaDetailScreenState extends Equatable {
   final Exception? errorChapters;
   final String? mangaId;
   final Manga? manga;
-  final List<Chapter>? chapters;
+  final List<Chapter> chapters;
   final Source? source;
   final AuthState? authState;
   final List<Manga> libraries;
   final Map<DownloadChapterKey, DownloadChapterProgress>? progress;
   final Set<String> prefetchedChapterId;
-  final Map<num, Chapter> histories;
+  final Map<String, Chapter> histories;
 
   final ChapterConfig config;
   final SearchChapterParameter parameter;
@@ -36,25 +35,25 @@ class MangaDetailScreenState extends Equatable {
   final bool isPagingNextPage;
   final String? sourceUrl;
 
-  late final Set<num> chaptersKey;
-  late final Map<num, Chapter> processedChapters;
+  // late final Set<num> chaptersKey;
+  // late final Map<num, Chapter> processedChapters;
 
-  int get totalChapter {
-    return chapters?.length ?? 0;
-  }
+  // int get totalChapter {
+  //   return chapters?.length ?? 0;
+  // }
 
   bool get isOnLibrary {
     return libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
   }
 
-  MangaDetailScreenState({
+  const MangaDetailScreenState({
     this.isLoadingManga = false,
     this.isLoadingChapters = false,
     this.errorManga,
     this.errorChapters,
     this.mangaId,
     this.manga,
-    this.chapters,
+    this.chapters = const [],
     this.source,
     this.config = const ChapterConfig(),
     this.authState,
@@ -66,42 +65,43 @@ class MangaDetailScreenState extends Equatable {
     this.isPagingNextPage = false,
     this.sourceUrl,
     this.histories = const {},
-  }) {
-    final Map<num, Chapter> processedChapters = {};
-    final List<String> chapterIds = [];
-
-    for (final data in chapters ?? <Chapter>[]) {
-      final chapter = data.chapter?.let((e) => num.tryParse(e));
-
-      if (chapter != null) {
-        processedChapters.update(
-          chapter,
-          (value) {
-            final oldDate = value.publishAt;
-            final newDate = data.publishAt;
-
-            if (oldDate != null && newDate != null) {
-              return newDate.isBefore(oldDate) ? value : data;
-            }
-
-            return data;
-          },
-          ifAbsent: () => data,
-        );
-      }
-    }
-
-    final reversedChaptersKey = {
-      ...processedChapters.keys.sorted((a, b) => a.compareTo(b)),
-    };
-
-    this.processedChapters = processedChapters;
-    chaptersKey = {...processedChapters.keys.sorted((a, b) => b.compareTo(a))};
-
-    for (final key in reversedChaptersKey) {
-      final id = processedChapters[key]?.id;
-      if (id != null) chapterIds.add(id);
-    }
+  });
+  // {
+  //   final Map<num, Chapter> processedChapters = {};
+  //   final List<String> chapterIds = [];
+  //
+  //   for (final data in chapters ?? <Chapter>[]) {
+  //     final chapter = data.chapter?.let((e) => num.tryParse(e));
+  //
+  //     if (chapter != null) {
+  //       processedChapters.update(
+  //         chapter,
+  //         (value) {
+  //           final oldDate = value.publishAt;
+  //           final newDate = data.publishAt;
+  //
+  //           if (oldDate != null && newDate != null) {
+  //             return newDate.isBefore(oldDate) ? value : data;
+  //           }
+  //
+  //           return data;
+  //         },
+  //         ifAbsent: () => data,
+  //       );
+  //     }
+  //   }
+  //
+  //   final reversedChaptersKey = {
+  //     ...processedChapters.keys.sorted((a, b) => a.compareTo(b)),
+  //   };
+  //
+  //   this.processedChapters = processedChapters;
+  //   chaptersKey = {...processedChapters.keys.sorted((a, b) => b.compareTo(a))};
+  //
+  //   for (final key in reversedChaptersKey) {
+  //     final id = processedChapters[key]?.id;
+  //     if (id != null) chapterIds.add(id);
+  //   }
 
     // TODO: perform sorting
 
@@ -162,7 +162,7 @@ class MangaDetailScreenState extends Equatable {
     //       break;
     //   }
     // }
-  }
+  // }
 
   @override
   List<Object?> get props => [
@@ -205,7 +205,7 @@ class MangaDetailScreenState extends Equatable {
     bool? hasNextPage,
     bool? isPagingNextPage,
     ValueGetter<String?>? sourceUrl,
-    Map<num, Chapter>? histories,
+    Map<String, Chapter>? histories,
   }) {
     return MangaDetailScreenState(
       config: config ?? this.config,

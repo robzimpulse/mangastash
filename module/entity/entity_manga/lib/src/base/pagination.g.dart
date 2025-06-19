@@ -18,9 +18,6 @@ Pagination<T> _$PaginationFromJson<T extends Equatable>(
       total: (json['total'] as num?)?.toInt(),
       hasNextPage: json['has_next_page'] as bool?,
       sourceUrl: json['source_url'] as String?,
-      metadata: json['metadata'] == null
-          ? null
-          : Metadata.fromJson(json['metadata'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$PaginationToJson<T extends Equatable>(
@@ -34,6 +31,5 @@ Map<String, dynamic> _$PaginationToJson<T extends Equatable>(
       'offset': instance.offset,
       'total': instance.total,
       'has_next_page': instance.hasNextPage,
-      'metadata': instance.metadata?.toJson(),
       'source_url': instance.sourceUrl,
     };

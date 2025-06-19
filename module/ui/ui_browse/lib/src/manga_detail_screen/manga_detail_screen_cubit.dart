@@ -78,15 +78,14 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   }
 
   void _updateHistories(List<History> histories) {
-    final Map<num, Chapter> map = {};
-    final chapters = histories.where((e) => e.manga?.id == state.mangaId);
-    for (final history in chapters) {
-      final key = history.chapter?.chapter?.let((e) => num.tryParse(e));
+    final Map<String, Chapter> map = {};
+    final data = histories.where((e) => e.manga?.id == state.mangaId);
+    for (final history in data) {
       final value = history.chapter;
+      final key = value?.id;
       if (key == null || value == null) continue;
       map[key] = value;
     }
-
     emit(state.copyWith(histories: map));
   }
 
@@ -170,7 +169,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     emit(
       state.copyWith(
-        isLoadingChapters: !(state.chapters?.isNotEmpty == true),
+        isLoadingChapters: true,
         errorChapters: () => null,
       ),
     );
@@ -189,7 +188,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       final chapters = result.data.data ?? [];
       final hasNextPage = result.data.hasNextPage;
 
-      final allChapters = [...?state.chapters, ...chapters].distinct();
+      final allChapters = [...state.chapters, ...chapters].distinct();
 
       emit(
         state.copyWith(
@@ -234,7 +233,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   Future<void> prefetch() async {
     final mangaId = state.manga?.id;
     final source = state.manga?.source;
-    final chapterIds = state.processedChapters.values.map((e) => e.id);
+    final chapterIds = state.chapters.map((e) => e.id);
     if (mangaId == null || source == null) return;
     for (final chapterId in chapterIds.nonNulls) {
       _prefetchChapterUseCase.prefetchChapter(
@@ -258,15 +257,14 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   }
 
   void downloadAllChapter() {
-    for (final chapter in state.processedChapters.values) {
+    for (final chapter in state.chapters) {
       downloadChapter(chapter: chapter);
     }
   }
 
   void downloadUnreadChapter() {
-    for (final chapter in state.processedChapters.values) {
-      final key = chapter.chapter?.let((e) => num.tryParse(e));
-      if (state.histories.containsKey(key)) continue;
+    for (final chapter in state.chapters) {
+      if (state.histories.containsKey(chapter.id)) continue;
       downloadChapter(chapter: chapter);
     }
   }
