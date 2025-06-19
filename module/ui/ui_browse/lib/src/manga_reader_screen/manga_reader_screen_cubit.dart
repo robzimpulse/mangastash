@@ -34,7 +34,21 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     await super.close();
   }
 
-  Future<void> init() => _fetchChapter();
+  Future<void> init() async {
+    await Future.wait([
+      _fetchChapter(),
+      _fetchPreviousChapter(),
+      _fetchNextChapter(),
+    ]);
+  }
+
+  Future<void> _fetchPreviousChapter() async {
+    // TODO: implement get previous chapter id
+  }
+
+  Future<void> _fetchNextChapter() async {
+    // TODO: implement get next chapter id
+  }
 
   Future<void> _fetchChapter() async {
     final chapterId = state.chapterId;

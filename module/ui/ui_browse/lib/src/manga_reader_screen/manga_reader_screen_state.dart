@@ -1,4 +1,3 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 
@@ -10,7 +9,8 @@ class MangaReaderScreenState extends Equatable {
     this.mangaId,
     this.chapterId,
     this.source,
-    this.chapterIds = const [],
+    this.previousChapterId,
+    this.nextChapterId,
   });
 
   final bool isLoading;
@@ -25,21 +25,9 @@ class MangaReaderScreenState extends Equatable {
 
   final Source? source;
 
-  final List<String> chapterIds;
+  final String? previousChapterId;
 
-  int? get index => chapterId?.let((id) => chapterIds.indexOf(id));
-
-  String? get previousChapterId {
-    return index?.let(
-      (index) => index <= 0 ? null : chapterIds.elementAtOrNull(index - 1),
-    );
-  }
-
-  String? get nextChapterId {
-    return index?.let(
-      (index) => index < 0 ? null : chapterIds.elementAtOrNull(index + 1),
-    );
-  }
+  final String? nextChapterId;
 
   @override
   List<Object?> get props {
@@ -50,7 +38,8 @@ class MangaReaderScreenState extends Equatable {
       chapter,
       error,
       source,
-      chapterIds,
+      previousChapterId,
+      nextChapterId,
     ];
   }
 
@@ -61,7 +50,8 @@ class MangaReaderScreenState extends Equatable {
     Chapter? chapter,
     Exception? Function()? error,
     Source? source,
-    List<String>? chapterIds,
+    String? previousChapterId,
+    String? nextChapterId,
   }) {
     return MangaReaderScreenState(
       mangaId: mangaId ?? this.mangaId,
@@ -70,7 +60,8 @@ class MangaReaderScreenState extends Equatable {
       chapter: chapter ?? this.chapter,
       error: error != null ? error() : this.error,
       source: source ?? this.source,
-      chapterIds: chapterIds ?? this.chapterIds,
+      nextChapterId: nextChapterId ?? this.nextChapterId,
+      previousChapterId: previousChapterId ?? this.previousChapterId,
     );
   }
 }

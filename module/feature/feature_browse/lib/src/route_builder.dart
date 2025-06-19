@@ -45,11 +45,12 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         name: BrowseRoutePath.browseManga,
         builder: (context, state) => BrowseMangaScreen.create(
           locator: locator,
-          source: state.pathParameters['source'],
+          source: state.pathParameters[BrowseRoutePath.sourceQuery],
           onTapManga: (manga, param) => context.pushNamed(
             BrowseRoutePath.mangaDetail,
             pathParameters: {
-              BrowseRoutePath.sourceQuery: state.pathParameters['source'] ?? '',
+              BrowseRoutePath.sourceQuery:
+                  state.pathParameters[BrowseRoutePath.sourceQuery] ?? '',
               BrowseRoutePath.mangaIdQuery: manga.id ?? '',
             },
             extra: MangaDetailExtra(manga: manga, param: param),
@@ -72,17 +73,14 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
           extra: state.extra.castOrNull(),
           source: state.pathParameters[BrowseRoutePath.sourceQuery],
           mangaId: state.pathParameters[BrowseRoutePath.mangaIdQuery],
-          onTapChapter: (chapterId, chapterIds) => context.pushNamed(
+          onTapChapter: (chapter) => context.pushNamed(
             BrowseRoutePath.chapterDetail,
             pathParameters: {
               BrowseRoutePath.sourceQuery:
                   state.pathParameters[BrowseRoutePath.sourceQuery] ?? '',
               BrowseRoutePath.mangaIdQuery:
                   state.pathParameters[BrowseRoutePath.mangaIdQuery] ?? '',
-              BrowseRoutePath.chapterIdQuery: chapterId ?? '',
-            },
-            queryParameters: {
-              'chapterIds': chapterIds?.join('|'),
+              BrowseRoutePath.chapterIdQuery: chapter.id ?? '',
             },
           ),
           onTapSort: (config) => context.push<ChapterConfig>(
@@ -100,7 +98,6 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
           source: state.pathParameters[BrowseRoutePath.sourceQuery],
           mangaId: state.pathParameters[BrowseRoutePath.mangaIdQuery],
           chapterId: state.pathParameters[BrowseRoutePath.chapterIdQuery],
-          chapterIds: state.uri.queryParameters['chapterIds']?.split('|'),
           onTapShortcut: (chapterId) => context.pushReplacementNamed(
             BrowseRoutePath.chapterDetail,
             pathParameters: {
@@ -109,9 +106,6 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
               BrowseRoutePath.mangaIdQuery:
                   state.pathParameters[BrowseRoutePath.mangaIdQuery] ?? '',
               BrowseRoutePath.chapterIdQuery: chapterId ?? '',
-            },
-            queryParameters: {
-              'chapterIds': state.uri.queryParameters['chapterIds'],
             },
           ),
         ),

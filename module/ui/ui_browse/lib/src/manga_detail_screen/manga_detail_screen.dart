@@ -21,9 +21,9 @@ class MangaDetailScreen extends StatefulWidget {
     required this.crawlUrlUseCase,
   });
 
-  final Function(String?, List<String>?)? onTapChapter;
+  final ValueSetter<Chapter>? onTapChapter;
 
-  final Future<ChapterConfig?> Function(ChapterConfig?)? onTapSort;
+  final AsyncValueUpdater<ChapterConfig?>? onTapSort;
 
   final CrawlUrlUseCase crawlUrlUseCase;
 
@@ -34,8 +34,8 @@ class MangaDetailScreen extends StatefulWidget {
     String? source,
     String? mangaId,
     MangaDetailExtra? extra,
-    Function(String?, List<String>?)? onTapChapter,
-    Future<ChapterConfig?> Function(ChapterConfig?)? onTapSort,
+    ValueSetter<Chapter>? onTapChapter,
+    AsyncValueUpdater<ChapterConfig?>? onTapSort,
   }) {
     return BlocProvider(
       create: (context) => MangaDetailScreenCubit(
@@ -58,7 +58,8 @@ class MangaDetailScreen extends StatefulWidget {
         crawlUrlUseCase: locator(),
         listenPrefetchUseCase: locator(),
         prefetchChapterUseCase: locator(),
-        listenReadHistoryUseCase: locator(), updateChapterLastReadAtUseCase: locator(),
+        listenReadHistoryUseCase: locator(),
+        updateChapterLastReadAtUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         cacheManager: locator(),
@@ -467,7 +468,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         if (value == null) return const SizedBox.shrink();
         return ChapterTileWidget(
           padding: const EdgeInsets.symmetric(vertical: 8),
-          onTap: () => widget.onTapChapter?.call(value.id, state.chapterIds),
+          onTap: () => widget.onTapChapter?.call(value),
           onTapDownload: () => _onTapDownloadChapter(context, value),
           onTapMarkAsRead: () => _onTapMarkAsRead(context, value),
           title: ['Chapter ${value.chapter}', value.title].nonNulls.join(' - '),

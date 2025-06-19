@@ -24,7 +24,6 @@ class MangaReaderScreen extends StatelessWidget {
     required String? source,
     required String? mangaId,
     required String? chapterId,
-    List<String>? chapterIds,
     void Function(String?)? onTapShortcut,
   }) {
     return BlocProvider(
@@ -33,7 +32,6 @@ class MangaReaderScreen extends StatelessWidget {
           mangaId: mangaId,
           chapterId: chapterId,
           source: Source.fromValue(source),
-          chapterIds: chapterIds ?? [],
         ),
         getChapterUseCase: locator(),
         crawlUrlUseCase: locator(),
