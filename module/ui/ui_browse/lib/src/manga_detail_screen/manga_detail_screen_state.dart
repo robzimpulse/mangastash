@@ -36,11 +36,13 @@ class MangaDetailScreenState extends Equatable {
   final bool isPagingNextPage;
   final String? sourceUrl;
 
-  late final List<String> chapterIds;
   late final Set<num> chaptersKey;
   late final Map<num, Chapter> processedChapters;
   late final int totalChapter;
-  late final bool isOnLibrary;
+
+  bool get isOnLibrary {
+    return libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
+  }
 
   MangaDetailScreenState({
     this.isLoadingManga = false,
@@ -62,8 +64,6 @@ class MangaDetailScreenState extends Equatable {
     this.sourceUrl,
     this.histories = const {},
   }) {
-    isOnLibrary = libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
-
     final Map<num, Chapter> processedChapters = {};
     final List<String> chapterIds = [];
 
@@ -100,8 +100,6 @@ class MangaDetailScreenState extends Equatable {
       final id = processedChapters[key]?.id;
       if (id != null) chapterIds.add(id);
     }
-
-    this.chapterIds = chapterIds;
 
     // TODO: perform sorting
 
