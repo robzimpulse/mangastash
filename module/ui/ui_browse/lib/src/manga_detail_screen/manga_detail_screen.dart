@@ -249,7 +249,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     return _builder(
       buildWhen: (prev, curr) => prev.chapters != curr.chapters,
       builder: (context, state) {
-        if (state.chapters.isNotEmpty) {
+        if (state.chapters.isEmpty) {
           return const SizedBox.shrink();
         }
 
