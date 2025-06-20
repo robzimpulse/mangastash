@@ -6,6 +6,7 @@ export 'package:manga_service_firebase/manga_service_firebase.dart';
 export 'src/domain_manga_registrar.dart';
 export 'src/exception/failed_parsing_html_exception.dart';
 export 'src/extension/language_code_converter.dart';
+export 'src/extension/search_url_mixin.dart';
 export 'src/use_case/chapter/get_chapter_use_case.dart';
 export 'src/use_case/chapter/search_chapter_use_case.dart';
 export 'src/use_case/crawl_url_use_case.dart';

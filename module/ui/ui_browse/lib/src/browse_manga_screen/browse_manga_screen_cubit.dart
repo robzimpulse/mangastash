@@ -15,6 +15,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   final PrefetchMangaUseCase _prefetchMangaUseCase;
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final GetTagsUseCase _getTagsUseCase;
+  final CrawlUrlUseCase _crawlUrlUseCase;
 
   BrowseMangaScreenCubit({
     required BrowseMangaScreenState initialState,
@@ -27,12 +28,14 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     required PrefetchChapterUseCase prefetchChapterUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required GetTagsUseCase getTagsUseCase,
+    required CrawlUrlUseCase crawlUrlUseCase,
   })  : _searchMangaUseCase = searchMangaUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         _prefetchMangaUseCase = prefetchMangaUseCase,
         _prefetchChapterUseCase = prefetchChapterUseCase,
         _getTagsUseCase = getTagsUseCase,
+        _crawlUrlUseCase = crawlUrlUseCase,
         super(
           initialState.copyWith(
             parameter:
@@ -179,5 +182,18 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     final source = manga.source;
     if (id == null || source == null) return;
     // TODO: add download manga
+  }
+
+  void recrawl() async {
+    final parameter = state.parameter;
+    final source = state.source?.name;
+    final url = source == Source.mangaclash().name
+        ? parameter.mangaclash
+        : source == Source.asurascan().name
+            ? parameter.asurascan
+            : null;
+    if (url == null) return;
+    await _crawlUrlUseCase.execute(url: url);
+    await init();
   }
 }

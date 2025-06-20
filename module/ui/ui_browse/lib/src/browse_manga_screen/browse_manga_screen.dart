@@ -13,13 +13,10 @@ import 'browse_manga_screen_state.dart';
 class BrowseMangaScreen extends StatefulWidget {
   const BrowseMangaScreen({
     super.key,
-    required this.crawlUrlUseCase,
     required this.cacheManager,
     this.onTapManga,
     this.onTapFilter,
   });
-
-  final CrawlUrlUseCase crawlUrlUseCase;
 
   final Function(Manga, SearchMangaParameter)? onTapManga;
 
@@ -53,9 +50,9 @@ class BrowseMangaScreen extends StatefulWidget {
         prefetchChapterUseCase: locator(),
         listenSearchParameterUseCase: locator(),
         getTagsUseCase: locator(),
+        crawlUrlUseCase: locator(),
       )..init(),
       child: BrowseMangaScreen(
-        crawlUrlUseCase: locator(),
         cacheManager: locator(),
         onTapManga: onTapManga,
         onTapFilter: onTapFilter,
@@ -121,19 +118,19 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     );
   }
 
-  void _onTapOpenInBrowser({
-    required BuildContext context,
-    Source? source,
-  }) async {
-    final url = source?.url;
-
-    if (url == null || url.isEmpty) {
-      context.showSnackBar(message: 'Could not launch source url');
-      return;
-    }
-
-    await widget.crawlUrlUseCase.execute(url: url);
-  }
+  // void _onTapOpenInBrowser({
+  //   required BuildContext context,
+  //   Source? source,
+  // }) async {
+  //   final url = source?.url;
+  //
+  //   if (url == null || url.isEmpty) {
+  //     context.showSnackBar(message: 'Could not launch source url');
+  //     return;
+  //   }
+  //
+  //   await widget.crawlUrlUseCase.execute(url: url);
+  // }
 
   void _onTapMenu({
     required BuildContext context,
@@ -189,15 +186,9 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
   }
 
   Widget _layoutSource({required BuildContext context}) {
-    return _builder(
-      buildWhen: (prev, curr) => prev.source != curr.source,
-      builder: (context, state) => IconButton(
-        icon: const Icon(Icons.open_in_browser),
-        onPressed: () => _onTapOpenInBrowser(
-          context: context,
-          source: state.source,
-        ),
-      ),
+    return IconButton(
+      icon: const Icon(Icons.open_in_browser),
+      onPressed: () => _cubit(context).recrawl(),
     );
   }
 
