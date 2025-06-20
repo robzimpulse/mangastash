@@ -18,6 +18,7 @@ dependencies:
   collection: ^1.16.0
   expansion_tile_group: ^2.1.0
   autoscale_tabbarview: ^1.0.2
+  share_plus: ^11.0.0
 
   # entity
   entity_manga:

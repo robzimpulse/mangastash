@@ -149,11 +149,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     _cubit(context).updateLastRead(chapter);
   }
 
-  void _onTapShare(BuildContext context) {
-    // TODO: implement this
-    context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
-  }
-
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
@@ -290,12 +285,21 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   Widget _shareButton({required BuildContext context}) {
-    return IconButton(
-      icon: Icon(
-        Icons.share,
-        color: Theme.of(context).appBarTheme.iconTheme?.color,
-      ),
-      onPressed: () => _onTapShare(context),
+    return _builder(
+      buildWhen: (prev, curr) => prev.manga != curr.manga,
+      builder: (context, state) {
+        final uri = state.manga?.webUrl?.let((url) => Uri.tryParse(url));
+
+        if (uri == null) return const SizedBox.shrink();
+
+        return IconButton(
+          icon: Icon(
+            Icons.share,
+            color: Theme.of(context).appBarTheme.iconTheme?.color,
+          ),
+          onPressed: () => SharePlus.instance.share(ShareParams(uri: uri)),
+        );
+      },
     );
   }
 

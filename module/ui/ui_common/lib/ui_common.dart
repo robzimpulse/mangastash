@@ -6,6 +6,7 @@ export 'package:expansion_tile_group/expansion_tile_group.dart';
 export 'package:flutter/material.dart';
 export 'package:intersperse/intersperse.dart';
 export 'package:responsive_framework/responsive_framework.dart';
+export 'package:share_plus/share_plus.dart';
 export 'package:sliver_tools/sliver_tools.dart';
 
 export 'src/controller/paging_scroll_controller.dart';
