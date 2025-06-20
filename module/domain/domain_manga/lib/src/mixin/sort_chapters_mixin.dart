@@ -32,7 +32,7 @@ mixin SortChaptersMixin {
             final aChapter = int.tryParse(a.chapter ?? '');
             final bChapter = int.tryParse(b.chapter ?? '');
             if (aChapter == null || bChapter == null) return 0;
-            return aChapter.compareTo(bChapter);
+            return -aChapter.compareTo(bChapter);
           },
         ),
       (ChapterOrders.chapter, OrderDirections.ascending) => chapters.sorted(
@@ -40,7 +40,7 @@ mixin SortChaptersMixin {
             final aChapter = int.tryParse(a.chapter ?? '');
             final bChapter = int.tryParse(b.chapter ?? '');
             if (aChapter == null || bChapter == null) return 0;
-            return -aChapter.compareTo(bChapter);
+            return aChapter.compareTo(bChapter);
           },
         ),
       (_, _) => chapters,

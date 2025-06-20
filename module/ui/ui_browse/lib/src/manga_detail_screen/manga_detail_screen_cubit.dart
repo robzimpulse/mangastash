@@ -118,7 +118,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
           limit: 20,
           orders: {option: direction},
         ),
-        chapters: null,
+        chapters: [],
         isLoadingManga: true,
         isLoadingChapters: true,
         errorChapters: () => null,
