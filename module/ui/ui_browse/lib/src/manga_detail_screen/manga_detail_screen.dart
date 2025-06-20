@@ -283,7 +283,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         onPressed: () async {
           final result = await widget.onTapSort?.call(state.config);
           if (!context.mounted || result == null) return;
-          _cubit(context).updateMangaConfig(result);
+          _cubit(context).init(config: result);
         },
       ),
     );

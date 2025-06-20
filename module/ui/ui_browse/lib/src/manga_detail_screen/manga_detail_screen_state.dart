@@ -35,13 +35,6 @@ class MangaDetailScreenState extends Equatable {
   final bool isPagingNextPage;
   final String? sourceUrl;
 
-  // late final Set<num> chaptersKey;
-  // late final Map<num, Chapter> processedChapters;
-
-  // int get totalChapter {
-  //   return chapters?.length ?? 0;
-  // }
-
   bool get isOnLibrary {
     return libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
   }
@@ -66,103 +59,6 @@ class MangaDetailScreenState extends Equatable {
     this.sourceUrl,
     this.histories = const {},
   });
-  // {
-  //   final Map<num, Chapter> processedChapters = {};
-  //   final List<String> chapterIds = [];
-  //
-  //   for (final data in chapters ?? <Chapter>[]) {
-  //     final chapter = data.chapter?.let((e) => num.tryParse(e));
-  //
-  //     if (chapter != null) {
-  //       processedChapters.update(
-  //         chapter,
-  //         (value) {
-  //           final oldDate = value.publishAt;
-  //           final newDate = data.publishAt;
-  //
-  //           if (oldDate != null && newDate != null) {
-  //             return newDate.isBefore(oldDate) ? value : data;
-  //           }
-  //
-  //           return data;
-  //         },
-  //         ifAbsent: () => data,
-  //       );
-  //     }
-  //   }
-  //
-  //   final reversedChaptersKey = {
-  //     ...processedChapters.keys.sorted((a, b) => a.compareTo(b)),
-  //   };
-  //
-  //   this.processedChapters = processedChapters;
-  //   chaptersKey = {...processedChapters.keys.sorted((a, b) => b.compareTo(a))};
-  //
-  //   for (final key in reversedChaptersKey) {
-  //     final id = processedChapters[key]?.id;
-  //     if (id != null) chapterIds.add(id);
-  //   }
-
-    // TODO: perform sorting
-
-    // final sortOrder = config?.sortOrder;
-    // final sortOption = config?.sortOption;
-    // List<MangaChapter>? processedChapters;
-
-    // if (sortOrder != null && sortOption != null) {
-    //   switch (sortOption) {
-    //     case MangaChapterSortOptionEnum.chapterNumber:
-    //       switch (sortOrder) {
-    //         case MangaChapterSortOrderEnum.asc:
-    //           processedChapters = chapters?.sorted(
-    //             (a, b) {
-    //               final aChapter = int.tryParse(a.chapter ?? '');
-    //               final bChapter = int.tryParse(b.chapter ?? '');
-    //               if (aChapter == null || bChapter == null) return 0;
-    //               return -aChapter.compareTo(bChapter);
-    //             },
-    //           );
-    //           break;
-    //         case MangaChapterSortOrderEnum.desc:
-    //           processedChapters = chapters?.sorted(
-    //             (a, b) {
-    //               final aChapter = int.tryParse(a.chapter ?? '');
-    //               final bChapter = int.tryParse(b.chapter ?? '');
-    //               if (aChapter == null || bChapter == null) return 0;
-    //               return aChapter.compareTo(bChapter);
-    //             },
-    //           );
-    //           break;
-    //       }
-    //
-    //       break;
-    //     case MangaChapterSortOptionEnum.uploadDate:
-    //       switch (sortOrder) {
-    //         case MangaChapterSortOrderEnum.asc:
-    //           processedChapters = chapters?.sorted(
-    //             (a, b) {
-    //               final aDate = a.readableAt?.asDateTime;
-    //               final bDate = b.readableAt?.asDateTime;
-    //               if (aDate == null || bDate == null) return 0;
-    //               return aDate.compareTo(bDate);
-    //             },
-    //           );
-    //           break;
-    //         case MangaChapterSortOrderEnum.desc:
-    //           processedChapters = chapters?.sorted(
-    //             (a, b) {
-    //               final aDate = a.readableAt?.asDateTime;
-    //               final bDate = b.readableAt?.asDateTime;
-    //               if (aDate == null || bDate == null) return 0;
-    //               return -aDate.compareTo(bDate);
-    //             },
-    //           );
-    //           break;
-    //       }
-    //       break;
-    //   }
-    // }
-  // }
 
   @override
   List<Object?> get props => [
