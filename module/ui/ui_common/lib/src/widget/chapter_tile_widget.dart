@@ -18,10 +18,12 @@ class ChapterTileWidget extends StatelessWidget {
     this.isPrefetching = false,
     this.lastReadAt,
     this.opacity = 1,
+    this.onTapLongPress,
   });
 
   final VoidCallback? onTap;
   final VoidCallback? onTapDownload;
+  final VoidCallback? onTapLongPress;
   final EdgeInsetsGeometry? padding;
   final String? title;
   final String? groups;
@@ -38,6 +40,7 @@ class ChapterTileWidget extends StatelessWidget {
       color: Theme.of(context).scaffoldBackgroundColor,
       child: InkWell(
         onTap: onTap,
+        onLongPress: onTapLongPress,
         child: Opacity(
           opacity: opacity,
           child: Padding(
