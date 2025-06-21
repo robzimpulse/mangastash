@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:core_auth/core_auth.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
@@ -37,6 +38,27 @@ class MangaDetailScreenState extends Equatable {
 
   bool get isOnLibrary {
     return libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
+  }
+
+  List<Chapter> get filtered {
+    return [
+      ...chapters.where(
+        (data) {
+          final chapter = histories[data.id].or(data);
+
+          final shouldAdd = [
+            if (config.unread == true)
+              chapter.lastReadAt == null
+            else if (config.unread == null)
+              chapter.lastReadAt != null
+            else
+              true,
+          ];
+
+          return shouldAdd.contains(true);
+        },
+      ),
+    ];
   }
 
   const MangaDetailScreenState({

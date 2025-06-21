@@ -394,13 +394,13 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       buildWhen: (prev, curr) => [
         prev.errorChapters != curr.errorChapters,
         prev.isLoadingChapters != curr.isLoadingChapters,
-        prev.chapters != curr.chapters,
+        prev.filtered != curr.filtered,
       ].contains(true),
       builder: (context, state) {
         final error = state.errorChapters;
         if (error != null) return _errorChapter(context: context, error: error);
         if (state.isLoadingChapters) return _loadingChapter();
-        if (state.chapters.isEmpty) return _emptyChapter();
+        if (state.filtered.isEmpty) return _emptyChapter();
 
         return MultiSliver(
           children: [
@@ -410,7 +410,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 child: Row(
                   children: [
                     Text(
-                      '${state.chapters.length} Chapters',
+                      '${state.filtered.length} Chapters',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ],
@@ -421,7 +421,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 12),
               sliver: MultiSliver(
                 children: [
-                  ...state.chapters
+                  ...state.filtered
                       .map(
                         (e) => SliverToBoxAdapter(
                           child: _chapterItem(
@@ -433,9 +433,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                           ),
                         ),
                       )
-                      .intersperse(
-                        SliverToBoxAdapter(child: _separator()),
-                      ),
+                      .intersperse(SliverToBoxAdapter(child: _separator())),
                 ],
               ),
             ),
@@ -455,24 +453,27 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         prev.prefetchedChapterId != curr.prefetchedChapterId,
         prev.histories != curr.histories,
       ].contains(true),
-      builder: (context, state) => ChapterTileWidget(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        onTap: () => widget.onTapChapter?.call(chapter),
-        onTapDownload: () => _onTapDownloadChapter(context, chapter),
-        opacity: chapter.lastReadAt != null ? 0.5 : 1,
-        title: [
-          'Chapter ${chapter.chapter}',
-          chapter.title,
-        ].nonNulls.join(' - '),
-        language: Language.fromCode(chapter.translatedLanguage),
-        uploadedAt: chapter.readableAt,
-        groups: chapter.scanlationGroup,
-        downloadProgress: state.progress?[key]?.progress.toDouble() ?? 0.0,
-        isPrefetching: state.prefetchedChapterId.contains(chapter.id),
-        lastReadAt: chapter.lastReadAt.orNull(
+      builder: (context, state) {
+        final lastReadAt = chapter.lastReadAt.orNull(
           state.histories[chapter.id]?.lastReadAt,
-        ),
-      ),
+        );
+        return ChapterTileWidget(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          onTap: () => widget.onTapChapter?.call(chapter),
+          onTapDownload: () => _onTapDownloadChapter(context, chapter),
+          opacity: lastReadAt != null ? 0.5 : 1,
+          title: [
+            'Chapter ${chapter.chapter}',
+            chapter.title,
+          ].nonNulls.join(' - '),
+          language: Language.fromCode(chapter.translatedLanguage),
+          uploadedAt: chapter.readableAt,
+          groups: chapter.scanlationGroup,
+          downloadProgress: state.progress?[key]?.progress.toDouble() ?? 0.0,
+          isPrefetching: state.prefetchedChapterId.contains(chapter.id),
+          lastReadAt: lastReadAt,
+        );
+      },
     );
   }
 
