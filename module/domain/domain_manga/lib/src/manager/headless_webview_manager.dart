@@ -15,7 +15,7 @@ class HeadlessWebviewManager {
   final LogBox _log;
   final BaseCacheManager _cacheManager;
 
-  final _queue = Queue(delay: const Duration(milliseconds: 200));
+  final _queue = Queue(delay: const Duration(milliseconds: 200), lifo: true);
 
   HeadlessWebviewManager({
     required LogBox log,
@@ -38,6 +38,8 @@ class HeadlessWebviewManager {
     final cache = await _cacheManager.getFileFromCache(uri.toString());
     final data = await cache?.file.readAsString();
 
+    if (data != null) return data;
+
     final onLoadStartCompleter = Completer();
     final onLoadStopCompleter = Completer();
     final onLoadErrorCompleter = Completer();
@@ -47,9 +49,6 @@ class HeadlessWebviewManager {
         url: uri,
         headers: {HttpHeaders.userAgentHeader: UserAgentMixin.staticUserAgent},
       ),
-      initialData: data != null && data.isNotEmpty
-          ? InAppWebViewInitialData(data: data)
-          : null,
       initialSettings: InAppWebViewSettings(
         isInspectable: true,
         javaScriptEnabled: true,
