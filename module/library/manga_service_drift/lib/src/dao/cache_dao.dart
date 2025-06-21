@@ -60,10 +60,6 @@ class CacheDao extends DatabaseAccessor<AppDatabase> with _$CacheDaoMixin {
   }
 
   Future<List<CacheDrift>> remove({List<int> ids = const []}) async {
-    if (ids.distinct.isEmpty) {
-      return [];
-    }
-
     final selector = _deleter..where((f) => f.id.isIn(ids.distinct));
 
     return transaction(() => selector.goAndReturn());
