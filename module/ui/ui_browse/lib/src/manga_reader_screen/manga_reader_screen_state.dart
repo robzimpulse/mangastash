@@ -1,3 +1,4 @@
+import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 
@@ -11,6 +12,7 @@ class MangaReaderScreenState extends Equatable {
     this.source,
     this.previousChapterId,
     this.nextChapterId,
+    this.parameter = const SearchChapterParameter(),
   });
 
   final bool isLoading;
@@ -29,6 +31,8 @@ class MangaReaderScreenState extends Equatable {
 
   final String? nextChapterId;
 
+  final SearchChapterParameter parameter;
+
   @override
   List<Object?> get props {
     return [
@@ -40,6 +44,7 @@ class MangaReaderScreenState extends Equatable {
       source,
       previousChapterId,
       nextChapterId,
+      parameter,
     ];
   }
 
@@ -52,6 +57,7 @@ class MangaReaderScreenState extends Equatable {
     Source? source,
     String? previousChapterId,
     String? nextChapterId,
+    SearchChapterParameter? parameter,
   }) {
     return MangaReaderScreenState(
       mangaId: mangaId ?? this.mangaId,
@@ -62,6 +68,7 @@ class MangaReaderScreenState extends Equatable {
       source: source ?? this.source,
       nextChapterId: nextChapterId ?? this.nextChapterId,
       previousChapterId: previousChapterId ?? this.previousChapterId,
+      parameter: parameter ?? this.parameter,
     );
   }
 }

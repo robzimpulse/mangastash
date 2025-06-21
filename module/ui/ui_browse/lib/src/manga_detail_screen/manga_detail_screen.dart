@@ -30,19 +30,14 @@ class MangaDetailScreen extends StatefulWidget {
     required ServiceLocator locator,
     String? source,
     String? mangaId,
-    MangaDetailExtra? extra,
     ValueSetter<Chapter>? onTapChapter,
     AsyncValueUpdater<ChapterConfig?>? onTapSort,
   }) {
     return BlocProvider(
       create: (context) => MangaDetailScreenCubit(
         initialState: MangaDetailScreenState(
-          manga: extra?.manga,
           mangaId: mangaId,
           source: Source.fromValue(source),
-          parameter: SearchChapterParameter.from(
-            extra?.param ?? const SearchParameter(),
-          ),
         ),
         getMangaUseCase: locator(),
         searchChapterUseCase: locator(),
@@ -57,6 +52,7 @@ class MangaDetailScreen extends StatefulWidget {
         prefetchChapterUseCase: locator(),
         listenReadHistoryUseCase: locator(),
         updateChapterLastReadAtUseCase: locator(),
+        listenSearchParameterUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         cacheManager: locator(),

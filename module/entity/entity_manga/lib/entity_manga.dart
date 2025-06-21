@@ -8,7 +8,6 @@ export 'src/enum/chapter_display_enum.dart';
 export 'src/enum/chapter_sort_option_enum.dart';
 export 'src/enum/chapter_sort_order_enum.dart';
 export 'src/enum/manga_menu_enum.dart';
-export 'src/extra/manga_detail_extra.dart';
 export 'src/extra/search_parameter_extra.dart';
 export 'src/history.dart';
 export 'src/manga.dart';

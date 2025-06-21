@@ -35,6 +35,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required PrefetchChapterUseCase prefetchChapterUseCase,
     required ListenReadHistoryUseCase listenReadHistoryUseCase,
     required UpdateChapterLastReadAtUseCase updateChapterLastReadAtUseCase,
+    required ListenSearchParameterUseCase listenSearchParameterUseCase,
   })  : _getMangaUseCase = getMangaUseCase,
         _searchChapterUseCase = searchChapterUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
@@ -43,7 +44,13 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
         _crawlUrlUseCase = crawlUrlUseCase,
         _prefetchChapterUseCase = prefetchChapterUseCase,
         _updateChapterLastReadAtUseCase = updateChapterLastReadAtUseCase,
-        super(initialState) {
+        super(
+          initialState.copyWith(
+            parameter: listenSearchParameterUseCase
+                .searchParameterState.valueOrNull
+                ?.let((e) => SearchChapterParameter.from(e)),
+          ),
+        ) {
     addSubscription(
       listenAuth.authStateStream.distinct().listen(_updateAuthState),
     );

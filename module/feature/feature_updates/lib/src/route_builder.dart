@@ -1,5 +1,4 @@
 import 'package:core_route/core_route.dart';
-import 'package:entity_manga/entity_manga.dart';
 import 'package:feature_browse/feature_browse.dart';
 import 'package:flutter/widgets.dart';
 import 'package:service_locator/service_locator.dart';
@@ -32,7 +31,6 @@ class UpdatesRouteBuilder extends BaseRouteBuilder {
               BrowseRoutePath.sourceQuery: manga?.source ?? '',
               BrowseRoutePath.mangaIdQuery: manga?.id ?? '',
             },
-            extra: MangaDetailExtra(manga: manga, param: null),
           ),
         ),
       ),

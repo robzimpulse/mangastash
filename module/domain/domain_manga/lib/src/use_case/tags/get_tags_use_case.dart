@@ -4,7 +4,6 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 
 import '../../../domain_manga.dart';
-import '../../extension/search_url_mixin.dart';
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_tags_mixin.dart';
 import '../../parser/base/tag_list_html_parser.dart';

@@ -157,6 +157,9 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
         final newLastReadAt = entry.key.lastReadAt.valueOrNull;
 
         final value = entry.key.copyWith(
+          id: Value.absentIfNull(
+            entry.key.id.valueOrNull ?? chapter?.chapter?.id,
+          ),
           title: Value.absentIfNull(
             entry.key.title.valueOrNull ?? chapter?.chapter?.title,
           ),

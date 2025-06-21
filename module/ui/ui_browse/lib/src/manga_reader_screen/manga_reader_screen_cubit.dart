@@ -10,6 +10,8 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     with AutoSubscriptionMixin {
   final GetChapterUseCase _getChapterUseCase;
 
+  final SearchChapterUseCase _searchChapterUseCase;
+
   final CrawlUrlUseCase _crawlUrlUseCase;
 
   final UpdateChapterLastReadAtUseCase _updateChapterLastReadAtUseCase;
@@ -19,10 +21,19 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     required CrawlUrlUseCase crawlUrlUseCase,
     required MangaReaderScreenState initialState,
     required UpdateChapterLastReadAtUseCase updateChapterLastReadAtUseCase,
+    required SearchChapterUseCase searchChapterUseCase,
+    required ListenSearchParameterUseCase listenSearchParameterUseCase,
   })  : _getChapterUseCase = getChapterUseCase,
         _crawlUrlUseCase = crawlUrlUseCase,
+        _searchChapterUseCase = searchChapterUseCase,
         _updateChapterLastReadAtUseCase = updateChapterLastReadAtUseCase,
-        super(initialState);
+        super(
+          initialState.copyWith(
+            parameter: listenSearchParameterUseCase
+                .searchParameterState.valueOrNull
+                ?.let((e) => SearchChapterParameter.from(e)),
+          ),
+        );
 
   @override
   Future<void> close() async {
@@ -37,17 +48,52 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
   Future<void> init() async {
     await Future.wait([
       _fetchChapter(),
-      _fetchPreviousChapter(),
-      _fetchNextChapter(),
+      _fetchPreviousAndNextChapter(),
     ]);
   }
 
-  Future<void> _fetchPreviousChapter() async {
-    // TODO: implement get previous chapter id
-  }
+  Future<void> _fetchPreviousAndNextChapter() async {
+    final mangaId = state.mangaId;
+    final source = state.source?.name;
 
-  Future<void> _fetchNextChapter() async {
-    // TODO: implement get next chapter id
+    if (mangaId == null || source == null) return;
+
+    final response = await _searchChapterUseCase.execute(
+      source: source,
+      mangaId: mangaId,
+      parameter: state.parameter.copyWith(
+        orders: {ChapterOrders.chapter: OrderDirections.ascending},
+      ),
+    );
+
+    if (response is Success<Pagination<Chapter>>) {
+      final chapters = response.data.data;
+
+      if (chapters != null && chapters.isNotEmpty) {
+        final index = chapters.indexWhere((e) => e.id == state.chapterId);
+
+        if (index >= 0) {
+          final prevChapter =
+              index > 0 ? chapters.elementAtOrNull(index - 1) : null;
+          final nextChapter = chapters.elementAtOrNull(index + 1);
+
+          emit(
+            state.copyWith(
+              previousChapterId: prevChapter?.id,
+              nextChapterId: nextChapter?.id,
+              parameter: state.parameter.copyWith(
+                page: (state.parameter.page ?? 1) + 1,
+                offset: (state.parameter.offset ?? 0) + chapters.length,
+              ),
+            ),
+          );
+
+          if (nextChapter == null && response.data.hasNextPage == true) {
+            await _fetchPreviousAndNextChapter();
+          }
+        }
+      }
+    }
   }
 
   Future<void> _fetchChapter() async {

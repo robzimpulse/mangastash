@@ -1,3 +1,4 @@
+import '../../../manga_dex_api.dart';
 import '../../enums/content_rating.dart';
 import '../../enums/includes.dart';
 import '../../enums/language_codes.dart';
@@ -99,7 +100,7 @@ class SearchChapterParameter extends SearchParameter {
     );
   }
 
-  factory SearchChapterParameter.from(SearchParameter param) {
+  factory SearchChapterParameter.from(SearchMangaParameter param) {
     return SearchChapterParameter(
       limit: param.limit,
       offset: param.offset,
@@ -111,6 +112,7 @@ class SearchChapterParameter extends SearchParameter {
       excludedOriginalLanguages: param.excludedOriginalLanguages,
       createdAtSince: param.createdAtSince,
       ids: param.ids,
+      translatedLanguage: param.availableTranslatedLanguage,
     );
   }
 }
