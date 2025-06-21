@@ -7,9 +7,9 @@ import 'enum/chapter_sort_order_enum.dart';
 
 class ChapterConfig extends Equatable {
   const ChapterConfig({
-    this.downloaded,
-    this.unread,
-    this.bookmarked,
+    this.downloaded = false,
+    this.unread = false,
+    this.bookmarked = false,
     this.display = ChapterDisplayEnum.title,
     this.sortOption = ChapterSortOptionEnum.chapterNumber,
     this.sortOrder = ChapterSortOrderEnum.asc,
