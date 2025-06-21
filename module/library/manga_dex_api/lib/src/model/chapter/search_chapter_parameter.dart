@@ -1,9 +1,9 @@
-import '../../../manga_dex_api.dart';
 import '../../enums/content_rating.dart';
 import '../../enums/includes.dart';
 import '../../enums/language_codes.dart';
 import '../../enums/order_enums.dart';
 import '../common/search_parameter.dart';
+import '../manga/search_manga_parameter.dart';
 
 class SearchChapterParameter extends SearchParameter {
   final List<String>? groups;

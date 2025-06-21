@@ -9,7 +9,6 @@ class ChapterTileWidget extends StatelessWidget {
     super.key,
     this.onTap,
     this.onTapDownload,
-    this.onTapMarkAsRead,
     this.padding,
     this.title,
     this.language,
@@ -18,11 +17,11 @@ class ChapterTileWidget extends StatelessWidget {
     this.groups,
     this.isPrefetching = false,
     this.lastReadAt,
+    this.opacity = 1,
   });
 
   final VoidCallback? onTap;
   final VoidCallback? onTapDownload;
-  final VoidCallback? onTapMarkAsRead;
   final EdgeInsetsGeometry? padding;
   final String? title;
   final String? groups;
@@ -31,6 +30,7 @@ class ChapterTileWidget extends StatelessWidget {
   final DateTime? uploadedAt;
   final DateTime? lastReadAt;
   final bool isPrefetching;
+  final double opacity;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +39,7 @@ class ChapterTileWidget extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Opacity(
-          opacity: lastReadAt != null ? 0.5 : 1,
+          opacity: opacity,
           child: Padding(
             padding: padding ?? EdgeInsets.zero,
             child: Row(
@@ -68,14 +68,13 @@ class ChapterTileWidget extends StatelessWidget {
                         icon: const Icon(Icons.access_time, size: 20),
                         text: Text(uploadedAt?.readableFormat ?? ' - '),
                       ),
+                      IconWithTextWidget(
+                        icon: const Icon(Icons.menu_book_outlined, size: 20),
+                        text: Text(lastReadAt?.readableFormat ?? '-'),
+                      ),
                     ].intersperse(const SizedBox(height: 4)).toList(),
                   ),
                 ),
-                if (onTapMarkAsRead != null && lastReadAt == null)
-                  IconButton(
-                    onPressed: onTapMarkAsRead,
-                    icon: const Icon(Icons.check, size: 20),
-                  ),
                 if (isPrefetching)
                   const Padding(
                     padding: EdgeInsets.all(12.0),

@@ -102,9 +102,10 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     emit(state.copyWith(progress: progress));
   }
 
-  void updateLastRead(Chapter chapter) {
-    _updateChapterLastReadAtUseCase.execute(chapter: chapter);
-  }
+  // TODO: perform set read for multiple chapter
+  // void updateLastRead(Chapter chapter) {
+  //   _updateChapterLastReadAtUseCase.execute(chapter: chapter);
+  // }
 
   Future<void> init({ChapterConfig? config}) async {
     final option = switch ((config ?? state.config).sortOption) {

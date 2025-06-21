@@ -73,6 +73,7 @@ class MangaHistoryScreen extends StatelessWidget {
       title: ['Chapter ${chapter.chapter}', chapter.title].nonNulls.join(' - '),
       language: Language.fromCode(chapter.translatedLanguage),
       uploadedAt: chapter.createdAt,
+      lastReadAt: chapter.lastReadAt,
       groups: chapter.scanlationGroup,
       onTap: () => onTapChapter?.call(manga, chapter),
     );

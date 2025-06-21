@@ -141,10 +141,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     _cubit(context).downloadChapter(chapter: chapter);
   }
 
-  void _onTapMarkAsRead(BuildContext context, Chapter chapter) {
-    _cubit(context).updateLastRead(chapter);
-  }
-
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
@@ -463,7 +459,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         padding: const EdgeInsets.symmetric(vertical: 8),
         onTap: () => widget.onTapChapter?.call(chapter),
         onTapDownload: () => _onTapDownloadChapter(context, chapter),
-        onTapMarkAsRead: () => _onTapMarkAsRead(context, chapter),
+        opacity: chapter.lastReadAt != null ? 0.5 : 1,
         title: [
           'Chapter ${chapter.chapter}',
           chapter.title,
