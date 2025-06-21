@@ -17,7 +17,6 @@ class CacheDao extends DatabaseAccessor<AppDatabase> with _$CacheDaoMixin {
   List<OrderingTerm Function($CacheTablesTable)> get _clauses {
     return [
       (o) => OrderingTerm(expression: o.touched, mode: OrderingMode.desc),
-      (o) => OrderingTerm(expression: o.createdAt, mode: OrderingMode.desc),
     ];
   }
 
@@ -61,11 +60,11 @@ class CacheDao extends DatabaseAccessor<AppDatabase> with _$CacheDaoMixin {
   }
 
   Future<List<CacheDrift>> remove({List<int> ids = const []}) async {
-    final selector = _deleter;
-
-    if (ids.distinct.isNotEmpty) {
-      selector.where((f) => f.id.isIn(ids.distinct));
+    if (ids.distinct.isEmpty) {
+      return [];
     }
+
+    final selector = _deleter..where((f) => f.id.isIn(ids.distinct));
 
     return transaction(() => selector.goAndReturn());
   }
