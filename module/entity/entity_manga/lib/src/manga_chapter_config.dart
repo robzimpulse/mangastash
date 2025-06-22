@@ -12,7 +12,7 @@ class ChapterConfig extends Equatable {
     this.bookmarked = false,
     this.display = ChapterDisplayEnum.title,
     this.sortOption = ChapterSortOptionEnum.chapterNumber,
-    this.sortOrder = ChapterSortOrderEnum.asc,
+    this.sortOrder = ChapterSortOrderEnum.desc,
   });
 
   final bool? downloaded;
