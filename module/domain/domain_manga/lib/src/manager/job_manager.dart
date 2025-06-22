@@ -265,8 +265,8 @@ class JobManager
         await _fetchAllChapter(
           job,
           parameter: SearchChapterParameter(
-            offset: (parameter.offset ?? 0) + (parameter.limit ?? 0),
-            page: (parameter.page ?? 1) + 1,
+            offset: parameter.offset + parameter.limit,
+            page: parameter.page + 1,
             limit: 100,
           ),
         );

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -37,8 +35,6 @@ class SearchMangaUseCase with SyncMangasMixin {
       return _searchMangaOnMangaDexUseCase.execute(parameter: parameter);
     }
 
-    final page = max(1, parameter.page ?? 0);
-
     String url = '';
     if (source == Source.asurascan().name) {
       url = parameter.asurascan;
@@ -66,7 +62,7 @@ class SearchMangaUseCase with SyncMangasMixin {
     return Success(
       Pagination(
         data: data,
-        page: page,
+        page: parameter.page,
         limit: parser.mangas.length,
         total: parser.mangas.length,
         hasNextPage: parser.haveNextPage,

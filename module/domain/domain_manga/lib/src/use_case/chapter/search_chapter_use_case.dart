@@ -7,12 +7,14 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../exception/failed_parsing_html_exception.dart';
 import '../../manager/headless_webview_manager.dart';
+import '../../mixin/filter_chapters_mixin.dart';
 import '../../mixin/sort_chapters_mixin.dart';
 import '../../mixin/sync_chapters_mixin.dart';
 import '../../parser/base/chapter_list_html_parser.dart';
 import 'search_chapter_on_manga_dex_use_case.dart';
 
-class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
+class SearchChapterUseCase
+    with SyncChaptersMixin, SortChaptersMixin, FilterChaptersMixin {
   final SearchChapterOnMangaDexUseCase _searchChapterOnMangaDexUseCase;
   final HeadlessWebviewManager _webview;
   final ChapterDao _chapterDao;
@@ -63,13 +65,18 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
       source: source,
     );
 
-    final data = await sync(
-      dao: _chapterDao,
-      logBox: _logBox,
-      values: sortChapters(
-        chapters: [...parser.chapters.map((e) => e.copyWith(mangaId: mangaId))],
-        parameter: parameter,
+    final data = sortChapters(
+      chapters: await sync(
+        dao: _chapterDao,
+        logBox: _logBox,
+        values: filterChapters(
+          chapters: [
+            ...parser.chapters.map((e) => e.copyWith(mangaId: mangaId)),
+          ],
+          parameter: parameter,
+        ),
       ),
+      parameter: parameter,
     );
 
     return Success(
