@@ -64,7 +64,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
   Future<void> init({
     String? title,
-    SearchOrders order = SearchOrders.relevance,
+    SearchOrders? order,
   }) async {
     emit(
       state.copyWith(
@@ -75,7 +75,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
           offset: 0,
           page: 0,
           limit: 20,
-          orders: {order: OrderDirections.descending},
+          orders: {order ?? SearchOrders.relevance: OrderDirections.descending},
         ),
       ),
     );
@@ -185,7 +185,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   }
 
   void recrawl() async {
-    final parameter = state.parameter;
+    final parameter = state.parameter.copyWith(page: 0);
     final source = state.source?.name;
     final url = source == Source.mangaclash().name
         ? parameter.mangaclash
@@ -194,6 +194,9 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
             : null;
     if (url == null) return;
     await _crawlUrlUseCase.execute(url: url);
-    await init();
+    await init(
+      title: state.parameter.title,
+      order: state.parameter.orders?.keys.firstOrNull,
+    );
   }
 }

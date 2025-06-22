@@ -118,20 +118,6 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     );
   }
 
-  // void _onTapOpenInBrowser({
-  //   required BuildContext context,
-  //   Source? source,
-  // }) async {
-  //   final url = source?.url;
-  //
-  //   if (url == null || url.isEmpty) {
-  //     context.showSnackBar(message: 'Could not launch source url');
-  //     return;
-  //   }
-  //
-  //   await widget.crawlUrlUseCase.execute(url: url);
-  // }
-
   void _onTapMenu({
     required BuildContext context,
     required Manga manga,
@@ -156,7 +142,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     }
   }
 
-  Widget _layoutIcon({required BuildContext context}) {
+  Widget _menuLayout({required BuildContext context}) {
     return PopupMenuButton<MangaShelfItemLayout>(
       icon: _builder(
         buildWhen: (prev, curr) => prev.layout != curr.layout,
@@ -185,14 +171,14 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     );
   }
 
-  Widget _layoutSource({required BuildContext context}) {
+  Widget _menuSource({required BuildContext context}) {
     return IconButton(
       icon: const Icon(Icons.open_in_browser),
       onPressed: () => _cubit(context).recrawl(),
     );
   }
 
-  Widget _layoutSearch({required BuildContext context}) {
+  Widget _menuSearch({required BuildContext context}) {
     return _builder(
       buildWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
       builder: (context, state) => IconButton(
@@ -210,9 +196,9 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
       appBar: AppBar(
         title: _title(context),
         actions: [
-          _layoutSearch(context: context),
-          _layoutIcon(context: context),
-          _layoutSource(context: context),
+          _menuSearch(context: context),
+          _menuLayout(context: context),
+          _menuSource(context: context),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(44),
