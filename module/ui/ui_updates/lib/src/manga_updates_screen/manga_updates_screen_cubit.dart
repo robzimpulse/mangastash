@@ -6,7 +6,7 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'manga_updates_screen_state.dart';
 
 class MangaUpdatesScreenCubit extends Cubit<MangaUpdatesScreenState>
-    with AutoSubscriptionMixin {
+    with AutoSubscriptionMixin, SortChaptersMixin {
   MangaUpdatesScreenCubit({
     required ListenUnreadHistoryUseCase listenUnreadHistoryUseCase,
     MangaUpdatesScreenState initialState = const MangaUpdatesScreenState(),
@@ -24,7 +24,12 @@ class MangaUpdatesScreenCubit extends Cubit<MangaUpdatesScreenState>
       state.copyWith(
         updates: {
           for (final key in group.keys.nonNulls)
-            key: [...?group[key]?.map((e) => e.chapter).nonNulls],
+            key: sortChapters(
+              chapters: [...?group[key]?.map((e) => e.chapter).nonNulls],
+              parameter: const SearchChapterParameter(
+                orders: {ChapterOrders.chapter: OrderDirections.descending},
+              ),
+            ),
         },
       ),
     );
