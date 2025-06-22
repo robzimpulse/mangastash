@@ -9,9 +9,9 @@ part of 'search_manga_parameter.dart';
 SearchMangaParameter _$SearchMangaParameterFromJson(
         Map<String, dynamic> json) =>
     SearchMangaParameter(
-      limit: (json['limit'] as num?)?.toInt(),
-      offset: (json['offset'] as num?)?.toInt(),
-      page: (json['page'] as num?)?.toInt(),
+      limit: (json['limit'] as num?)?.toInt() ?? 20,
+      offset: (json['offset'] as num?)?.toInt() ?? 0,
+      page: (json['page'] as num?)?.toInt() ?? 1,
       updatedAtSince: json['updatedAtSince'] as String?,
       includes: (json['includes'] as List<dynamic>?)
           ?.map((e) => $enumDecode(_$IncludeEnumMap, e))

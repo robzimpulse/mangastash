@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -62,22 +63,22 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
       source: source,
     );
 
-    final data = sortChapters(
-      chapters: await sync(
-        dao: _chapterDao,
-        logBox: _logBox,
-        values: [...parser.chapters.map((e) => e.copyWith(mangaId: mangaId))],
+    final data = await sync(
+      dao: _chapterDao,
+      logBox: _logBox,
+      values: sortChapters(
+        chapters: [...parser.chapters.map((e) => e.copyWith(mangaId: mangaId))],
+        parameter: parameter,
       ),
-      parameter: parameter,
     );
 
     return Success(
       Pagination(
         data: data,
-        page: 1,
-        limit: data.length,
-        total: data.length,
-        hasNextPage: false,
+        page: parameter.page,
+        limit: parameter.limit,
+        total: parser.chapters.length,
+        hasNextPage: parser.chapters.length > parameter.page * parameter.limit,
         sourceUrl: url,
       ),
     );

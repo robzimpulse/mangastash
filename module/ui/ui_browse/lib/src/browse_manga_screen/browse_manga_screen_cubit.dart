@@ -73,7 +73,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
         parameter: state.parameter.copyWith(
           title: title,
           offset: 0,
-          page: 0,
+          page: 1,
           limit: 20,
           orders: {order ?? SearchOrders.relevance: OrderDirections.descending},
         ),
@@ -185,7 +185,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   }
 
   void recrawl() async {
-    final parameter = state.parameter.copyWith(page: 0);
+    final parameter = state.parameter.copyWith(page: 1);
     final source = state.source?.name;
     final url = source == Source.mangaclash().name
         ? parameter.mangaclash

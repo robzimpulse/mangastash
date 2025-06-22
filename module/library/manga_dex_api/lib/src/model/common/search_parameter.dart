@@ -5,9 +5,9 @@ import '../../enums/includes.dart';
 import '../../enums/language_codes.dart';
 
 class SearchParameter extends Equatable {
-  final int? limit;
-  final int? offset;
-  final int? page;
+  final int limit;
+  final int offset;
+  final int page;
 
   final String? updatedAtSince;
   final List<Include>? includes;
@@ -18,9 +18,9 @@ class SearchParameter extends Equatable {
   final List<String>? ids;
 
   const SearchParameter({
-    this.limit,
-    this.offset,
-    this.page,
+    this.limit = 20,
+    this.offset = 0,
+    this.page = 1,
     this.updatedAtSince,
     this.includes,
     this.contentRating,

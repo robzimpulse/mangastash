@@ -122,7 +122,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       state.copyWith(
         parameter: state.parameter.copyWith(
           offset: 0,
-          page: 0,
+          page: 1,
           limit: 20,
           orders: {option: direction},
         ),
