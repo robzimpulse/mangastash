@@ -188,17 +188,16 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       final chapters = result.data.data ?? [];
       final hasNextPage = result.data.hasNextPage;
 
-      final allChapters = [...state.chapters, ...chapters].distinct();
-
       emit(
         state.copyWith(
-          chapters: allChapters,
-          hasNextPage: hasNextPage ?? allChapters.length < total,
+          chapters: [...state.chapters, ...chapters].distinct(),
+          hasNextPage: hasNextPage,
           parameter: state.parameter.copyWith(
             page: page + 1,
             offset: offset + limit,
             limit: limit,
           ),
+          totalChapter: total,
           errorChapters: () => null,
           sourceUrl: () => result.data.sourceUrl,
         ),

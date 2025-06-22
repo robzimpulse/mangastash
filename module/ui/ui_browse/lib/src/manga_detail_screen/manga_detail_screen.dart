@@ -269,6 +269,12 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         ),
         onPressed: () async {
           final result = await widget.onTapSort?.call(state.config);
+          if (!context.mounted) return;
+          await _scrollController.animateTo(
+            MediaQuery.of(context).size.height * 0.4,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.decelerate,
+          );
           if (!context.mounted || result == null) return;
           _cubit(context).init(config: result);
         },
@@ -395,6 +401,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         prev.errorChapters != curr.errorChapters,
         prev.isLoadingChapters != curr.isLoadingChapters,
         prev.filtered != curr.filtered,
+        prev.totalChapter != curr.totalChapter,
       ].contains(true),
       builder: (context, state) {
         final error = state.errorChapters;
@@ -410,7 +417,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 child: Row(
                   children: [
                     Text(
-                      '${state.filtered.length} Chapters',
+                      '${state.totalChapter} Chapters',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ],
