@@ -65,18 +65,18 @@ class SearchChapterUseCase
       source: source,
     );
 
-    final data = sortChapters(
-      chapters: await sync(
-        dao: _chapterDao,
-        logBox: _logBox,
-        values: filterChapters(
+    final data = await sync(
+      dao: _chapterDao,
+      logBox: _logBox,
+      values: filterChapters(
+        chapters: sortChapters(
           chapters: [
             ...parser.chapters.map((e) => e.copyWith(mangaId: mangaId)),
           ],
           parameter: parameter,
         ),
+        parameter: parameter,
       ),
-      parameter: parameter,
     );
 
     return Success(

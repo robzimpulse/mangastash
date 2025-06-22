@@ -9,6 +9,6 @@ mixin FilterChaptersMixin {
   }) {
     final pages = chapters.slices(parameter.limit);
     if (parameter.page > pages.length) return [];
-    return pages.elementAt(parameter.page);
+    return pages.elementAt(parameter.page - 1);
   }
 }
