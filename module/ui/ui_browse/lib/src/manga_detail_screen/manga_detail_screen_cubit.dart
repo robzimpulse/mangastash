@@ -136,7 +136,9 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     );
 
     await _fetchManga();
+    emit(state.copyWith(isLoadingChapters: true));
     await _fetchChapter();
+    emit(state.copyWith(isLoadingChapters: false));
   }
 
   Future<void> _fetchManga() async {
@@ -172,13 +174,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     final source = state.source?.name;
     if (id == null || id.isEmpty || source == null) return;
 
-    emit(
-      state.copyWith(
-        isLoadingChapters: true,
-        errorChapters: () => null,
-      ),
-    );
-
     final result = await _searchChapterUseCase.execute(
       mangaId: id,
       source: source,
@@ -213,8 +208,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     if (result is Error<Pagination<Chapter>>) {
       emit(state.copyWith(errorChapters: () => result.error));
     }
-
-    emit(state.copyWith(isLoadingChapters: false));
   }
 
   Future<void> next() async {
