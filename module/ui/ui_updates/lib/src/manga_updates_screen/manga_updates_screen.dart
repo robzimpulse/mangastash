@@ -25,6 +25,7 @@ class MangaUpdatesScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => MangaUpdatesScreenCubit(
         listenUnreadHistoryUseCase: locator(),
+        listenMangaFromLibraryUseCase: locator(),
       )..init(),
       child: MangaUpdatesScreen(
         cacheManager: locator(),
