@@ -73,17 +73,14 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
       final chapters = response.data.data ?? [];
       final hasNextPage = response.data.hasNextPage;
 
-      final index = chapters.indexWhere((e) => e.id == state.chapterId);
-
-      if (index >= 0) {
-        emit(
-          state.copyWith(
-            previousChapterId:
-                index > 0 ? chapters.elementAtOrNull(index - 1)?.id : null,
-            nextChapterId: chapters.elementAtOrNull(index + 1)?.id,
-          ),
-        );
-      }
+      emit(
+        state.copyWith(
+          chapterIds: [
+            ...state.chapterIds,
+            ...chapters.map((e) => e.id).nonNulls,
+          ],
+        ),
+      );
 
       if (hasNextPage == true && state.nextChapterId == null) {
         emit(

@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
@@ -10,9 +11,8 @@ class MangaReaderScreenState extends Equatable {
     this.mangaId,
     this.chapterId,
     this.source,
-    this.previousChapterId,
-    this.nextChapterId,
     this.parameter = const SearchChapterParameter(),
+    this.chapterIds = const [],
   });
 
   final bool isLoading;
@@ -27,11 +27,23 @@ class MangaReaderScreenState extends Equatable {
 
   final Source? source;
 
-  final String? previousChapterId;
-
-  final String? nextChapterId;
-
   final SearchChapterParameter parameter;
+
+  final List<String> chapterIds;
+
+  String? get previousChapterId {
+    return chapterId?.let((id) {
+     final index = chapterIds.indexOf(id);
+     return index > 0 ? chapterIds.elementAtOrNull(index - 1) : null;
+    });
+  }
+
+  String? get nextChapterId {
+    return chapterId?.let((id) {
+      final index = chapterIds.indexOf(id);
+      return index > 0 ? chapterIds.elementAtOrNull(index + 1) : null;
+    });
+  }
 
   @override
   List<Object?> get props {
@@ -42,9 +54,8 @@ class MangaReaderScreenState extends Equatable {
       chapter,
       error,
       source,
-      previousChapterId,
-      nextChapterId,
       parameter,
+      chapterIds,
     ];
   }
 
@@ -55,9 +66,8 @@ class MangaReaderScreenState extends Equatable {
     Chapter? chapter,
     Exception? Function()? error,
     Source? source,
-    String? previousChapterId,
-    String? nextChapterId,
     SearchChapterParameter? parameter,
+    List<String>? chapterIds,
   }) {
     return MangaReaderScreenState(
       mangaId: mangaId ?? this.mangaId,
@@ -66,9 +76,8 @@ class MangaReaderScreenState extends Equatable {
       chapter: chapter ?? this.chapter,
       error: error != null ? error() : this.error,
       source: source ?? this.source,
-      nextChapterId: nextChapterId ?? this.nextChapterId,
-      previousChapterId: previousChapterId ?? this.previousChapterId,
       parameter: parameter ?? this.parameter,
+      chapterIds: chapterIds ?? this.chapterIds,
     );
   }
 }
