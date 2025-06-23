@@ -41,7 +41,7 @@ class MangaReaderScreenState extends Equatable {
   String? get nextChapterId {
     return chapterId?.let((id) {
       final index = chapterIds.indexOf(id);
-      return index > 0 ? chapterIds.elementAtOrNull(index + 1) : null;
+      return index >= 0 ? chapterIds.elementAtOrNull(index + 1) : null;
     });
   }
 
