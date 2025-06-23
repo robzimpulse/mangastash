@@ -217,7 +217,7 @@ class JobManager
     SearchChapterParameter parameter = const SearchChapterParameter(
       offset: 0,
       page: 1,
-      limit: 100,
+      limit: 20,
     ),
   }) async {
     final mangaId = job.manga?.id;
@@ -267,7 +267,7 @@ class JobManager
           parameter: SearchChapterParameter(
             offset: parameter.offset + parameter.limit,
             page: parameter.page + 1,
-            limit: 100,
+            limit: parameter.limit,
           ),
         );
       } else {
