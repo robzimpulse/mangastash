@@ -456,9 +456,9 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }) {
     return _builder(
       buildWhen: (prev, curr) => [
-        prev.progress != curr.progress,
+        prev.progress?[key] != curr.progress?[key],
         prev.prefetchedChapterId != curr.prefetchedChapterId,
-        prev.histories != curr.histories,
+        prev.histories[chapter.id] != curr.histories[chapter.id],
       ].contains(true),
       builder: (context, state) {
         final lastReadAt = chapter.lastReadAt.orNull(
