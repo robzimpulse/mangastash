@@ -13,8 +13,8 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../mixin/generate_task_id_mixin.dart';
+import '../use_case/chapter/get_all_chapter_use_case.dart';
 import '../use_case/chapter/get_chapter_use_case.dart';
-import '../use_case/chapter/search_chapter_use_case.dart';
 import '../use_case/download/download_chapter_use_case.dart';
 import '../use_case/download/download_manga_use_case.dart';
 import '../use_case/manga/get_manga_use_case.dart';
@@ -33,7 +33,7 @@ class JobManager
   final _jobs = BehaviorSubject<List<JobModel>>.seeded([]);
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
-  final ValueGetter<SearchChapterUseCase> _searchChapterUseCase;
+  final ValueGetter<GetAllChapterUseCase> _getAllChapterUseCase;
   final FileDownloader _fileDownloader;
   final BaseCacheManager _cacheManager;
   final JobDao _jobDao;
@@ -50,14 +50,14 @@ class JobManager
     required FileDownloader fileDownloader,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required ValueGetter<GetMangaUseCase> getMangaUseCase,
-    required ValueGetter<SearchChapterUseCase> searchChapterUseCase,
+    required ValueGetter<GetAllChapterUseCase> getAllChapterUseCase,
   })  : _log = log,
         _jobDao = jobDao,
         _fileDownloader = fileDownloader,
         _cacheManager = cacheManager,
         _getMangaUseCase = getMangaUseCase,
         _getChapterUseCase = getChapterUseCase,
-        _searchChapterUseCase = searchChapterUseCase {
+        _getAllChapterUseCase = getAllChapterUseCase {
     _streamSubscription = _jobs.distinct().listen(_onData);
     _jobs.addStream(jobDao.stream);
   }
@@ -239,53 +239,24 @@ class JobManager
       return;
     }
 
-    final result = await _searchChapterUseCase().execute(
+    final result = await _getAllChapterUseCase().execute(
       source: source,
       mangaId: mangaId,
-      parameter: parameter,
     );
 
-    if (result is Error<Pagination<Chapter>>) {
-      _log.log(
-        'Failed execute job ${job.id} - ${job.type}',
-        extra: {
-          'id': job.id,
-          'type': job.type,
-          'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
-          'image': job.image,
-          'error': result.error.toString(),
-        },
-        name: runtimeType.toString(),
-      );
-    }
-
-    if (result is Success<Pagination<Chapter>>) {
-      if (result.data.hasNextPage == true) {
-        await _fetchAllChapter(
-          job,
-          parameter: SearchChapterParameter(
-            offset: parameter.offset + parameter.limit,
-            page: parameter.page + 1,
-            limit: parameter.limit,
-          ),
-        );
-      } else {
-        _log.log(
-          'Success execute job ${job.id} - ${job.type}',
-          extra: {
-            'id': job.id,
-            'type': job.type,
-            'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-            'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
-            'image': job.image,
-            'parameter': parameter,
-            'data': result.data.toJson((e) => e.toJson()),
-          },
-          name: runtimeType.toString(),
-        );
-      }
-    }
+    _log.log(
+      'Success execute job ${job.id} - ${job.type}',
+      extra: {
+        'id': job.id,
+        'type': job.type,
+        'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
+        'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
+        'image': job.image,
+        'parameter': parameter,
+        'data': result.map((e) => e.toJson()),
+      },
+      name: runtimeType.toString(),
+    );
   }
 
   Future<void> _downloadChapter(JobModel job) async {

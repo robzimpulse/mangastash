@@ -10,6 +10,7 @@ import 'manager/headless_webview_manager.dart';
 import 'manager/history_manager.dart';
 import 'manager/job_manager.dart';
 import 'manager/library_manager.dart';
+import 'use_case/chapter/get_all_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
 import 'use_case/chapter/search_chapter_on_manga_dex_use_case.dart';
@@ -66,7 +67,7 @@ class DomainMangaRegistrar extends Registrar {
           cacheManager: locator(),
           getChapterUseCase: () => locator(),
           getMangaUseCase: () => locator(),
-          searchChapterUseCase: () => locator(),
+          getAllChapterUseCase: () => locator(),
           fileDownloader: locator(),
         ),
         dispose: (e) => e.dispose(),
@@ -164,6 +165,11 @@ class DomainMangaRegistrar extends Registrar {
           webview: locator(),
           mangaDao: locator(),
           chapterDao: locator(),
+        ),
+      );
+      locator.registerFactory(
+        () => GetAllChapterUseCase(
+          searchChapterUseCase: () => locator(),
         ),
       );
       locator.registerFactory(
