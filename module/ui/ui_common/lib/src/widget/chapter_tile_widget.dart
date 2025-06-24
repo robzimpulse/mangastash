@@ -71,10 +71,11 @@ class ChapterTileWidget extends StatelessWidget {
                         icon: const Icon(Icons.access_time, size: 20),
                         text: Text(uploadedAt?.readableFormat ?? ' - '),
                       ),
-                      IconWithTextWidget(
-                        icon: const Icon(Icons.menu_book_outlined, size: 20),
-                        text: Text(lastReadAt?.readableFormat ?? '-'),
-                      ),
+                      if (lastReadAt != null)
+                        IconWithTextWidget(
+                          icon: const Icon(Icons.menu_book_outlined, size: 20),
+                          text: Text(lastReadAt?.readableFormat ?? '-'),
+                        ),
                     ].intersperse(const SizedBox(height: 4)).toList(),
                   ),
                 ),

@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:rxdart/rxdart.dart';
@@ -19,7 +20,12 @@ class MangaUpdatesScreenCubit extends Cubit<MangaUpdatesScreenState>
         listenMangaFromLibraryUseCase.libraryStateStream.distinct(),
         (histories, libraries) => [
           ...histories.where(
-            (e) => libraries.map((e) => e.id).contains(e.manga?.id),
+            (e) => [
+              libraries.map((e) => e.id).contains(e.manga?.id),
+              e.chapter?.readableAt?.let(
+                (d) => DateTime.now().difference(d) < const Duration(days: 7),
+              ),
+            ].nonNulls.every((e) => e),
           ),
         ],
       ).listen(_onUpdate),

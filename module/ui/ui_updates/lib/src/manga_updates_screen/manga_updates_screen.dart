@@ -73,7 +73,7 @@ class MangaUpdatesScreen extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       title: ['Chapter ${chapter.chapter}', chapter.title].nonNulls.join(' - '),
       language: Language.fromCode(chapter.translatedLanguage),
-      uploadedAt: chapter.lastReadAt,
+      uploadedAt: chapter.readableAt,
       groups: chapter.scanlationGroup,
       onTap: () => onTapChapter?.call(manga, chapter),
     );
