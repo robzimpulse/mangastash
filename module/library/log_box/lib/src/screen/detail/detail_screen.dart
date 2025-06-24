@@ -100,6 +100,7 @@ class DetailScreen extends StatelessWidget {
   }
 
   Widget _messageWidget() {
+    final data = this.data;
     final extras = data.extra?.entries ?? [];
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -110,6 +111,8 @@ class DetailScreen extends StatelessWidget {
             ItemColumn(name: 'Message', value: data.message),
             for (final group in extras)
               ItemColumn(name: group.key, value: group.value.toString()),
+            if (data is LogHtmlModel)
+              ItemColumn(name: 'Html', value: data.html),
           ],
         ),
       ),
