@@ -71,6 +71,7 @@ class AsuraScanChapterListHtmlParser extends ChapterListHtmlParser {
           chapter: '${chapter ?? url?.split('/').lastOrNull}',
           readableAt: releaseDate?.asDateTime,
           webUrl: ['https://asuracomic.net', 'series', url].join('/'),
+          scanlationGroup: Source.asurascan().name,
         ),
       );
     }
