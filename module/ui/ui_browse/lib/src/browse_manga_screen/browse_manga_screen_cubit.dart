@@ -64,18 +64,17 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
   Future<void> init({
     String? title,
-    SearchOrders? order,
+    SearchMangaParameter? parameter,
   }) async {
     emit(
       state.copyWith(
         isLoading: true,
         mangas: [],
-        parameter: state.parameter.copyWith(
+        parameter: (parameter ?? state.parameter).copyWith(
           title: title,
           offset: 0,
           page: 1,
           limit: 20,
-          orders: {order ?? SearchOrders.relevance: OrderDirections.descending},
         ),
       ),
     );
@@ -150,13 +149,11 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   void update({
     MangaShelfItemLayout? layout,
     bool? isSearchActive,
-    SearchMangaParameter? parameter,
   }) {
     emit(
       state.copyWith(
         layout: layout,
         isSearchActive: isSearchActive,
-        parameter: parameter,
       ),
     );
   }
@@ -194,9 +191,6 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
             : null;
     if (url == null) return;
     await _crawlUrlUseCase.execute(url: url);
-    await init(
-      title: state.parameter.title,
-      order: state.parameter.orders?.keys.firstOrNull,
-    );
+    await init(title: state.parameter.title);
   }
 }

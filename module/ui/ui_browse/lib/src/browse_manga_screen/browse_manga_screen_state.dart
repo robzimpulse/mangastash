@@ -26,35 +26,18 @@ class BrowseMangaScreenState extends Equatable {
 
   final List<Tag> tags;
 
-  late final bool isFavoriteActive;
-
-  late final bool isUpdatedActive;
-
-  late final bool isFilterActive;
-
   final Set<String> prefetchedMangaIds;
 
-  BrowseMangaScreenState({
-    this.isLoading = false,
-    this.hasNextPage = false,
-    this.isPagingNextPage = false,
-    this.isSearchActive = false,
-    this.error,
-    this.layout = MangaShelfItemLayout.compactGrid,
-    this.source,
-    this.mangas = const [],
-    this.libraries = const [],
-    this.parameter = const SearchMangaParameter(),
-    this.prefetchedMangaIds = const {},
-    this.tags = const [],
-  }) {
-    isFavoriteActive =
-        parameter.orders?.containsKey(SearchOrders.rating) == true;
+  bool get isFavoriteActive {
+    return parameter.orders?.containsKey(SearchOrders.rating) == true;
+  }
 
-    isUpdatedActive =
-        parameter.orders?.containsKey(SearchOrders.updatedAt) == true;
+  bool get isUpdatedActive {
+    return parameter.orders?.containsKey(SearchOrders.updatedAt) == true;
+  }
 
-    isFilterActive = [
+  bool get isFilterActive {
+    return [
       parameter.updatedAtSince?.isNotEmpty == true,
       parameter.includes?.isNotEmpty == true,
       parameter.contentRating?.isNotEmpty == true,
@@ -72,6 +55,21 @@ class BrowseMangaScreenState extends Equatable {
       parameter.group?.isNotEmpty == true,
     ].contains(true);
   }
+
+  const BrowseMangaScreenState({
+    this.isLoading = false,
+    this.hasNextPage = false,
+    this.isPagingNextPage = false,
+    this.isSearchActive = false,
+    this.error,
+    this.layout = MangaShelfItemLayout.compactGrid,
+    this.source,
+    this.mangas = const [],
+    this.libraries = const [],
+    this.parameter = const SearchMangaParameter(),
+    this.prefetchedMangaIds = const {},
+    this.tags = const [],
+  });
 
   @override
   List<Object?> get props {

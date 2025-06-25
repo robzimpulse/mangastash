@@ -237,6 +237,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
           _builder(
             buildWhen: (prev, curr) => [
               prev.isFavoriteActive != curr.isFavoriteActive,
+              prev.parameter != curr.parameter,
             ].contains(true),
             builder: (context, state) => IconButton.outlined(
               style: buttonStyle?.copyWith(
@@ -246,9 +247,18 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               ),
               icon: Icon(Icons.favorite, color: color),
               onPressed: () => _cubit(context).init(
-                order: state.isFavoriteActive
-                    ? SearchOrders.relevance
-                    : SearchOrders.rating,
+                parameter: state.parameter.copyWith(
+                  orders: Map.fromEntries(
+                    [
+                      MapEntry(
+                        state.isFavoriteActive
+                            ? SearchOrders.relevance
+                            : SearchOrders.rating,
+                        OrderDirections.descending,
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -264,9 +274,18 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               ),
               icon: Icon(Icons.update, color: color),
               onPressed: () => _cubit(context).init(
-                order: state.isUpdatedActive
-                    ? SearchOrders.relevance
-                    : SearchOrders.updatedAt,
+                parameter: state.parameter.copyWith(
+                  orders: Map.fromEntries(
+                    [
+                      MapEntry(
+                        state.isUpdatedActive
+                            ? SearchOrders.relevance
+                            : SearchOrders.updatedAt,
+                        OrderDirections.descending,
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -290,8 +309,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
                   state.tags,
                 );
                 if (context.mounted && result != null) {
-                  _cubit(context).update(parameter: result);
-                  _cubit(context).init();
+                  _cubit(context).init(parameter: result);
                 }
               },
             ),
