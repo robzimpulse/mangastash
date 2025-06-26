@@ -1,0 +1,59 @@
+name: Build Web
+
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+on: [push, workflow_dispatch]
+
+jobs:
+
+  build:
+    timeout-minutes: 30
+    runs-on: macos-latest
+    steps:
+      - name: "Git Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Install Flutter"
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.4'
+          cache: true
+
+      - name: "Install Melos"
+        run: flutter pub global activate melos 6.2.0
+
+      - name: "Bootstrap Workspace"
+        run: melos bootstrap --verbose
+
+      - name: "Install Dependency"
+        run: melos get --verbose
+
+      - name: "Build Application"
+        run: flutter build web
+
+      - name: 'Deploy to Firebase'
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MANGASTASH_4BF38 }}
+          channelId: live
+          projectId: mangastash-4bf38
+
+      - name: "Deploy to Github Page"
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web
+          force_orphan: true
+          user_name: 'robzimpulse'
+          user_email: 'kugelfang.killaruna@gmail.com'
+          commit_message: 'Publish to gh-pages'
+
+      - name: 'Save Artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: build/web
