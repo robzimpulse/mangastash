@@ -144,37 +144,35 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      body: PrimaryScrollController(
+      body: NestedScrollView(
         controller: _scrollController,
-        child: NestedScrollView(
-          headerSliverBuilder: (context, isInnerBoxScrolled) => [
-            SliverAppBar(
-              stretch: true,
-              pinned: true,
-              elevation: 0,
-              expandedHeight: MediaQuery.of(context).size.height * 0.4,
-              automaticallyImplyLeading: false,
-              flexibleSpace: FlexibleAppBarBuilder(
-                builder: (context, progress) => MangaDetailAppBarWidget(
-                  progress: progress,
-                  background: _appBarBackground(),
-                  leading: BackButton(
-                    color: Theme.of(context).appBarTheme.iconTheme?.color,
-                  ),
-                  title: _title(progress: progress),
-                  actions: [
-                    _downloadButton(),
-                    _filterButton(),
-                    _shareButton(context: context),
-                  ],
+        headerSliverBuilder: (context, isInnerBoxScrolled) => [
+          SliverAppBar(
+            stretch: true,
+            pinned: true,
+            elevation: 0,
+            expandedHeight: MediaQuery.of(context).size.height * 0.4,
+            automaticallyImplyLeading: false,
+            flexibleSpace: FlexibleAppBarBuilder(
+              builder: (context, progress) => MangaDetailAppBarWidget(
+                progress: progress,
+                background: _appBarBackground(),
+                leading: BackButton(
+                  color: Theme.of(context).appBarTheme.iconTheme?.color,
                 ),
+                title: _title(progress: progress),
+                actions: [
+                  _downloadButton(),
+                  _filterButton(),
+                  _shareButton(context: context),
+                ],
               ),
             ),
-          ],
-          body: RefreshIndicator(
-            onRefresh: () => _cubit(context).init(),
-            child: _content(),
           ),
+        ],
+        body: RefreshIndicator(
+          onRefresh: () => _cubit(context).init(),
+          child: _content(),
         ),
       ),
     );
