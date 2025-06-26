@@ -6,7 +6,7 @@ env:
 on: [push, workflow_dispatch]
 
 jobs:
-  build:
+  setup:
     timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
@@ -36,9 +36,19 @@ jobs:
       - name: "Install Dependency"
         run: melos get --verbose
 
+  build-apk:
+    needs: setup
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
       - name: "Build Application"
         run: flutter build apk
 
+  post-build-apk:
+    needs: build-apk
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
       - name: 'Save Artifact'
         id: upload_artifact
         uses: actions/upload-artifact@v4
@@ -60,3 +70,40 @@ jobs:
             Branch or TAG: ${{ github.ref }}
             Commit SHA: ${{ github.sha }}
             Artifact URL is: ${{ steps.upload_artifact.outputs.artifact-url }}
+
+  build-web:
+    needs: setup
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Build Application"
+        run: flutter build web
+
+  post-build-web:
+    needs: build-web
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Deploy to Firebase'
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MANGASTASH_4BF38 }}
+          channelId: live
+          projectId: mangastash-4bf38
+
+      - name: "Deploy to Github Page"
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web
+          force_orphan: true
+          user_name: 'robzimpulse'
+          user_email: 'kugelfang.killaruna@gmail.com'
+          commit_message: 'Publish to gh-pages'
+
+      - name: 'Save Artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: build/web
