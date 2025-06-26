@@ -1,9 +1,6 @@
-import 'dart:io';
-
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 import 'package:uuid/uuid.dart';
 
 import '../dao/cache_dao.dart';
@@ -25,6 +22,10 @@ import '../tables/relationship_tables.dart';
 import '../tables/tag_tables.dart';
 import '../util/job_type_enum.dart';
 import '../util/typedef.dart';
+
+import 'adapter/sql_workaround_adapter.dart'
+    if (dart.library.io) 'adapter/sql_workaround_native.dart'
+    if (dart.library.js) 'adapter/sql_workaround_web.dart';
 
 part 'database.g.dart';
 
@@ -75,9 +76,7 @@ class AppDatabase extends _$AppDatabase {
 }
 
 Future<QueryExecutor> _openConnection({LoggerCallback? logger}) async {
-  if (Platform.isAndroid) {
-    await applyWorkaroundToOpenSqlite3OnOldAndroidVersions();
-  }
+  await sqlWorkaround();
 
   return driftDatabase(
     name: 'mangastash-local',
