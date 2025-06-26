@@ -1,0 +1,3 @@
+void quit(int code) {
+
+}
