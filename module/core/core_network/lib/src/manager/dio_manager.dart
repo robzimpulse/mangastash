@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:dio_inspector/dio_inspector.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
@@ -13,7 +11,7 @@ class DioManager {
     final dio = Dio(
       BaseOptions(
         headers: {
-          HttpHeaders.userAgentHeader: UserAgentMixin.staticUserAgent,
+          'user-agent': UserAgentMixin.staticUserAgent,
         },
       ),
     );
