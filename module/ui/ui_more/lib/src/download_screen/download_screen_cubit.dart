@@ -1,33 +1,13 @@
-import 'dart:io';
-
-import 'package:core_storage/core_storage.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import 'download_screen_state.dart';
 
-class DownloadScreenCubit extends Cubit<DownloadScreenState>
-    with AutoSubscriptionMixin {
-  final SetDownloadPathUseCase _setDownloadPathUseCase;
-
+class DownloadScreenCubit extends Cubit<DownloadScreenState> {
   DownloadScreenCubit({
     DownloadScreenState initialState = const DownloadScreenState(),
-    required GetRootPathUseCase getRootPathUseCase,
-    required ListenDownloadPathUseCase listenDownloadPathUseCase,
-    required SetDownloadPathUseCase setDownloadPathUseCase,
-  })  : _setDownloadPathUseCase = setDownloadPathUseCase,
-        super(initialState.copyWith(rootPath: getRootPathUseCase.rootPath)) {
-    addSubscription(
-      listenDownloadPathUseCase.downloadPathStream
-          .distinct()
-          .listen(_updateDownloadPath),
-    );
-  }
+  }) : super(initialState);
 
-  void _updateDownloadPath(Directory path) {
-    emit(state.copyWith(downloadPath: path));
-  }
+  void init() {
 
-  void setDownloadPath(String path) {
-    _setDownloadPathUseCase.setDownloadPath(path);
   }
 }

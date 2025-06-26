@@ -15,11 +15,7 @@ class DownloadScreen extends StatelessWidget {
     required ServiceLocator locator,
   }) {
     return BlocProvider(
-      create: (context) => DownloadScreenCubit(
-        listenDownloadPathUseCase: locator(),
-        getRootPathUseCase: locator(),
-        setDownloadPathUseCase: locator(),
-      ),
+      create: (context) => DownloadScreenCubit()..init(),
       child: const DownloadScreen(),
     );
   }
@@ -42,35 +38,36 @@ class DownloadScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Download Screen'),
       ),
-      body: CustomScrollView(
+      body: const CustomScrollView(
         slivers: [
-          _builder(
-            builder: (context, state) => SliverToBoxAdapter(
-              child: ListTile(
-                title: const Text('Download Location'),
-                subtitle: Text(
-                  state.downloadPath?.path ?? 'Unsupported Platform',
-                ),
-                onTap: () async {
-                  final path = await FilesystemPicker.open(
-                    title: 'Save to folder',
-                    context: context,
-                    rootDirectory: state.rootPath,
-                    directory: state.downloadPath,
-                    fsType: FilesystemType.folder,
-                    pickText: 'Save file to this folder',
-                    contextActions: [
-                      FilesystemPickerNewFolderContextAction(),
-                    ],
-                  );
-
-                  if (!context.mounted || path == null) return;
-
-                  _cubit(context).setDownloadPath(path);
-                },
-              ),
-            ),
-          ),
+          // TODO: @robzimpulse - broken on web
+          // _builder(
+          //   builder: (context, state) => SliverToBoxAdapter(
+          //     child: ListTile(
+          //       title: const Text('Download Location'),
+          //       subtitle: Text(
+          //         state.downloadPath?.path ?? 'Unsupported Platform',
+          //       ),
+          //       onTap: () async {
+          //         final path = await FilesystemPicker.open(
+          //           title: 'Save to folder',
+          //           context: context,
+          //           rootDirectory: state.rootPath,
+          //           directory: state.downloadPath,
+          //           fsType: FilesystemType.folder,
+          //           pickText: 'Save file to this folder',
+          //           contextActions: [
+          //             FilesystemPickerNewFolderContextAction(),
+          //           ],
+          //         );
+          //
+          //         if (!context.mounted || path == null) return;
+          //
+          //         _cubit(context).setDownloadPath(path);
+          //       },
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

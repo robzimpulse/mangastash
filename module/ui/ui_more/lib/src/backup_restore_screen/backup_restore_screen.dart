@@ -1,5 +1,3 @@
-import 'package:core_environment/core_environment.dart';
-import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -16,11 +14,7 @@ class BackupRestoreScreen extends StatelessWidget {
     required ServiceLocator locator,
   }) {
     return BlocProvider(
-      create: (context) => BackupRestoreScreenCubit(
-        getRootPathUseCase: locator(),
-        listenBackupPathUseCase: locator(),
-        setBackupPathUseCase: locator(),
-      ),
+      create: (context) => BackupRestoreScreenCubit()..init(),
       child: const BackupRestoreScreen(),
     );
   }
@@ -43,48 +37,49 @@ class BackupRestoreScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Backup and Restore'),
       ),
-      body: CustomScrollView(
+      body: const CustomScrollView(
         slivers: [
-          _builder(
-            builder: (context, state) => SliverToBoxAdapter(
-              child: ListTile(
-                title: const Text('Backup Location'),
-                subtitle: Text(
-                  state.backupPath?.path ?? 'Unsupported Platform',
-                ),
-                onTap: () async {
-                  final path = await FilesystemPicker.open(
-                    title: 'Save to folder',
-                    context: context,
-                    rootDirectory: state.rootPath,
-                    directory: state.backupPath,
-                    fsType: FilesystemType.folder,
-                    pickText: 'Save file to this folder',
-                    contextActions: [
-                      FilesystemPickerNewFolderContextAction(),
-                    ],
-                    requestPermission: () async {
-                      await [
-                        Permission.manageExternalStorage,
-                        Permission.storage,
-                      ].request();
-
-                      final isGranted = await Future.wait([
-                        Permission.manageExternalStorage.isGranted,
-                        Permission.storage.isGranted,
-                      ]);
-
-                      return isGranted.any((e) => e);
-                    },
-                  );
-
-                  if (!context.mounted || path == null) return;
-
-                  _cubit(context).setBackupPath(path);
-                },
-              ),
-            ),
-          ),
+          // TODO: @robzimpulse - broken on web
+          // _builder(
+          //   builder: (context, state) => SliverToBoxAdapter(
+          //     child: ListTile(
+          //       title: const Text('Backup Location'),
+          //       subtitle: Text(
+          //         state.backupPath?.path ?? 'Unsupported Platform',
+          //       ),
+          //       onTap: () async {
+          //         final path = await FilesystemPicker.open(
+          //           title: 'Save to folder',
+          //           context: context,
+          //           rootDirectory: state.rootPath,
+          //           directory: state.backupPath,
+          //           fsType: FilesystemType.folder,
+          //           pickText: 'Save file to this folder',
+          //           contextActions: [
+          //             FilesystemPickerNewFolderContextAction(),
+          //           ],
+          //           requestPermission: () async {
+          //             await [
+          //               Permission.manageExternalStorage,
+          //               Permission.storage,
+          //             ].request();
+          //
+          //             final isGranted = await Future.wait([
+          //               Permission.manageExternalStorage.isGranted,
+          //               Permission.storage.isGranted,
+          //             ]);
+          //
+          //             return isGranted.any((e) => e);
+          //           },
+          //         );
+          //
+          //         if (!context.mounted || path == null) return;
+          //
+          //         _cubit(context).setBackupPath(path);
+          //       },
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

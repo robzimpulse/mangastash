@@ -1,24 +1,12 @@
-import 'dart:io';
-
 import 'package:equatable/equatable.dart';
 
 class DownloadScreenState extends Equatable {
-  final Directory? downloadPath;
-
-  final Directory? rootPath;
-
-  const DownloadScreenState({this.downloadPath, this.rootPath});
+  const DownloadScreenState();
 
   @override
-  List<Object?> get props => [downloadPath, rootPath];
+  List<Object?> get props => [];
 
-  DownloadScreenState copyWith({
-    Directory? downloadPath,
-    Directory? rootPath,
-  }) {
-    return DownloadScreenState(
-      downloadPath: downloadPath ?? this.downloadPath,
-      rootPath: rootPath ?? this.rootPath,
-    );
+  DownloadScreenState copyWith() {
+    return const DownloadScreenState();
   }
 }
