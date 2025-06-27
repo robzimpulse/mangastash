@@ -25,12 +25,8 @@ class MangaClashChapterListHtmlParser extends ChapterListHtmlParser {
           return int.tryParse(text);
         },
       );
-      final releaseDate = element
-          .querySelector('.chapter-release-date')
-          ?.text
-          .trim()
-          .asDateTime
-          ?.toIso8601String();
+      final releaseDate =
+          element.querySelector('.chapter-release-date')?.text.trim();
       final chapter = text?.nonNulls.firstOrNull;
 
       data.add(

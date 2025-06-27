@@ -61,9 +61,7 @@ class AsuraScanChapterListHtmlParser extends ChapterListHtmlParser {
           .replaceAll('st', '')
           .replaceAll('nd', '')
           .replaceAll('rd', '')
-          .replaceAll('th', '')
-          .asDateTime
-          ?.toIso8601String();
+          .replaceAll('th', '');
 
       data.add(
         Chapter(
