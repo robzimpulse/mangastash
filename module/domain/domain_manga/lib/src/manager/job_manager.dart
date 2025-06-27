@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:background_downloader/background_downloader.dart';
 import 'package:collection/collection.dart';
@@ -11,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:universal_io/io.dart';
 
 import '../mixin/generate_task_id_mixin.dart';
 import '../use_case/chapter/get_all_chapter_use_case.dart';

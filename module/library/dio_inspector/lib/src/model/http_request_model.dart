@@ -1,5 +1,5 @@
-import 'dart:io' show Cookie;
 import 'package:equatable/equatable.dart';
+import 'package:universal_io/io.dart';
 
 import 'form_data_field_model.dart';
 import 'form_data_file_model.dart';

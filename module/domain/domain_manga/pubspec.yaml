@@ -16,6 +16,7 @@ dependencies:
   flutter_inappwebview: ^6.1.0
   html: ^0.15.5
   queue: ^3.4.0
+  universal_io: ^2.2.2
 
   # core
   core_network:

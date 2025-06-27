@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:background_downloader/background_downloader.dart';
@@ -9,6 +8,7 @@ import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:universal_io/io.dart';
 
 import '../mixin/generate_task_id_mixin.dart';
 import '../use_case/download/listen_download_progress_use_case.dart';

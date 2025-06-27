@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
@@ -10,6 +9,7 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:log_box/log_box.dart';
 import 'package:queue/queue.dart';
+import 'package:universal_io/io.dart';
 
 class HeadlessWebviewManager {
   final LogBox _log;

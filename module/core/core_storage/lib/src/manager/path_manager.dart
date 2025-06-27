@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:universal_io/io.dart';
 
 import '../storage/shared_preferences_storage.dart';
 import '../use_case/get_root_path_use_case.dart';

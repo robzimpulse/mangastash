@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_cache_manager/src/web/mime_converter.dart';
-import 'package:http_parser/http_parser.dart';
+import 'package:universal_io/io.dart';
 
 class DioGetResponse implements FileServiceResponse {
   final DateTime _receivedTime = DateTime.now();
@@ -20,15 +20,14 @@ class DioGetResponse implements FileServiceResponse {
 
   @override
   String get fileExtension {
-    final contentTypeHeaders = _response.headers[Headers.contentTypeHeader];
-    final contentType = contentTypeHeaders?.firstOrNull;
-
-    if (contentType != null) {
-      final type = MediaType.parse(contentType);
-      return mimeTypes[type.mimeType] ?? '';
+    var fileExtension = '';
+    final contentTypeHeader =
+        _response.headers[Headers.contentTypeHeader]?.first;
+    if (contentTypeHeader != null) {
+      final contentType = ContentType.parse(contentTypeHeader);
+      fileExtension = mimeTypes[contentType.mimeType]!;
     }
-
-    return '';
+    return fileExtension;
   }
 
   @override

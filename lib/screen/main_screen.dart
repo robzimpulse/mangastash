@@ -1,9 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:ui_common/ui_common.dart';
-
-import 'adapter/quit_adapter.dart'
-    if (dart.library.io) 'adapter/quit_mobile.dart.dart'
-    if (dart.library.js) 'adapter/quit_web.dart.dart';
+import 'package:universal_io/io.dart';
 
 class MainScreen extends StatelessWidget {
   final Widget child;
@@ -32,7 +29,7 @@ class MainScreen extends StatelessWidget {
   void _onPopInvoked(BuildContext context, bool didPop) async {
     if (didPop) return;
     final result = await onTapClosedApps?.call();
-    if (context.mounted && result == true) quit(0);
+    if (context.mounted && result == true) exit(0);
   }
 
   @override
