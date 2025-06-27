@@ -163,48 +163,40 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
 
         final manga = (byId ?? byWebUrl);
 
-        MangaDrift? result;
+        final value = entry.key.copyWith(
+          id: Value.absentIfNull(
+            entry.key.id.valueOrNull ?? manga?.manga?.id,
+          ),
+          title: Value.absentIfNull(
+            entry.key.title.valueOrNull ?? manga?.manga?.title,
+          ),
+          coverUrl: Value.absentIfNull(
+            entry.key.coverUrl.valueOrNull ?? manga?.manga?.coverUrl,
+          ),
+          author: Value.absentIfNull(
+            entry.key.author.valueOrNull ?? manga?.manga?.author,
+          ),
+          status: Value.absentIfNull(
+            entry.key.status.valueOrNull ?? manga?.manga?.status,
+          ),
+          description: Value.absentIfNull(
+            entry.key.description.valueOrNull ?? manga?.manga?.description,
+          ),
+          webUrl: Value.absentIfNull(
+            entry.key.webUrl.valueOrNull ?? manga?.manga?.webUrl,
+          ),
+          source: Value.absentIfNull(
+            entry.key.source.valueOrNull ?? manga?.manga?.source,
+          ),
+        );
 
-        if (manga?.manga?.toCompanion(true) == entry.key) {
-          result = manga?.manga;
-        } else {
-          final value = entry.key.copyWith(
-            id: Value.absentIfNull(
-              entry.key.id.valueOrNull ?? manga?.manga?.id,
-            ),
-            title: Value.absentIfNull(
-              entry.key.title.valueOrNull ?? manga?.manga?.title,
-            ),
-            coverUrl: Value.absentIfNull(
-              entry.key.coverUrl.valueOrNull ?? manga?.manga?.coverUrl,
-            ),
-            author: Value.absentIfNull(
-              entry.key.author.valueOrNull ?? manga?.manga?.author,
-            ),
-            status: Value.absentIfNull(
-              entry.key.status.valueOrNull ?? manga?.manga?.status,
-            ),
-            description: Value.absentIfNull(
-              entry.key.description.valueOrNull ?? manga?.manga?.description,
-            ),
-            webUrl: Value.absentIfNull(
-              entry.key.webUrl.valueOrNull ?? manga?.manga?.webUrl,
-            ),
-            source: Value.absentIfNull(
-              entry.key.source.valueOrNull ?? manga?.manga?.source,
-            ),
-          );
-
-          result = await into(mangaTables).insertReturning(
-            value,
-            mode: InsertMode.insertOrReplace,
-            onConflict: DoUpdate(
-              (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
-            ),
-          );
-        }
-
-        if (result == null) continue;
+        final result = await into(mangaTables).insertReturning(
+          value,
+          mode: InsertMode.insertOrReplace,
+          onConflict: DoUpdate(
+            (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
+          ),
+        );
 
         final names = {
           ...entry.value,
