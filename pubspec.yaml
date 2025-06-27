@@ -33,8 +33,6 @@ dependencies:
     path: module/library/manga_service_drift
 
   # core
-  core_auth:
-    path: module/core/core_auth
   core_environment:
     path: module/core/core_environment
   core_network:

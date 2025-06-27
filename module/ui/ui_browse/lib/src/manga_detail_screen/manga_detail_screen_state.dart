@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -25,7 +24,6 @@ class MangaDetailScreenState extends Equatable {
   final List<Chapter> chapters;
   final int? totalChapter;
   final Source? source;
-  final AuthState? authState;
   final List<Manga> libraries;
   final Map<DownloadChapterKey, DownloadChapterProgress>? progress;
   final Set<String> prefetchedChapterId;
@@ -73,7 +71,6 @@ class MangaDetailScreenState extends Equatable {
     this.chapters = const [],
     this.source,
     this.config = const ChapterConfig(),
-    this.authState,
     this.libraries = const [],
     this.prefetchedChapterId = const {},
     this.progress,
@@ -95,7 +92,6 @@ class MangaDetailScreenState extends Equatable {
         chapters,
         source,
         config,
-        authState,
         libraries,
         progress,
         parameter,
@@ -118,7 +114,6 @@ class MangaDetailScreenState extends Equatable {
     String? sourceId,
     Source? source,
     ChapterConfig? config,
-    AuthState? authState,
     List<Manga>? libraries,
     Set<String>? prefetchedChapterId,
     Map<DownloadChapterKey, DownloadChapterProgress>? progress,
@@ -140,7 +135,6 @@ class MangaDetailScreenState extends Equatable {
       manga: manga ?? this.manga,
       chapters: chapters ?? this.chapters,
       source: source ?? this.source,
-      authState: authState ?? this.authState,
       libraries: libraries ?? this.libraries,
       progress: progress ?? this.progress,
       parameter: parameter ?? this.parameter,

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
@@ -26,7 +25,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required SearchChapterUseCase searchChapterUseCase,
     required AddToLibraryUseCase addToLibraryUseCase,
     required RemoveFromLibraryUseCase removeFromLibraryUseCase,
-    required ListenAuthUseCase listenAuth,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
     required DownloadChapterUseCase downloadChapterUseCase,
     required ListenDownloadProgressUseCase listenDownloadProgressUseCase,
@@ -52,9 +50,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
           ),
         ) {
     addSubscription(
-      listenAuth.authStateStream.distinct().listen(_updateAuthState),
-    );
-    addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
           .distinct()
           .listen(_updateMangaLibrary),
@@ -70,10 +65,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
           .distinct()
           .listen(_updateHistories),
     );
-  }
-
-  void _updateAuthState(AuthState? authState) {
-    emit(state.copyWith(authState: authState));
   }
 
   void _updateMangaLibrary(List<Manga> library) {

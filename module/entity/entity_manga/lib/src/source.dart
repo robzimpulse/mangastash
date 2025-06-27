@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:manga_service_firebase/manga_service_firebase.dart';
 
 part 'source.g.dart';
 
@@ -51,22 +50,6 @@ class Source extends Equatable {
       icon: icon ?? this.icon,
       name: name ?? this.name,
       url: url ?? this.url,
-    );
-  }
-
-  factory Source.fromFirebaseService(MangaSourceFirebase source) {
-    return Source(
-      icon: source.iconUrl,
-      name: source.name,
-      url: source.url,
-    );
-  }
-
-  MangaSourceFirebase toFirebaseService() {
-    return MangaSourceFirebase(
-      iconUrl: icon,
-      name: name,
-      url: url,
     );
   }
 

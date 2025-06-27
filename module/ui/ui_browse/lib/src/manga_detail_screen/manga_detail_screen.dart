@@ -22,7 +22,7 @@ class MangaDetailScreen extends StatefulWidget {
 
   final ValueSetter<Chapter>? onTapChapter;
 
-  final AsyncValueUpdater<ChapterConfig?>? onTapSort;
+  final Future<ChapterConfig?> Function(ChapterConfig? value)? onTapSort;
 
   final BaseCacheManager cacheManager;
 
@@ -31,7 +31,7 @@ class MangaDetailScreen extends StatefulWidget {
     String? source,
     String? mangaId,
     ValueSetter<Chapter>? onTapChapter,
-    AsyncValueUpdater<ChapterConfig?>? onTapSort,
+    Future<ChapterConfig?> Function(ChapterConfig? value)? onTapSort,
   }) {
     return BlocProvider(
       create: (context) => MangaDetailScreenCubit(
@@ -42,7 +42,6 @@ class MangaDetailScreen extends StatefulWidget {
         getMangaUseCase: locator(),
         searchChapterUseCase: locator(),
         addToLibraryUseCase: locator(),
-        listenAuth: locator(),
         removeFromLibraryUseCase: locator(),
         listenMangaFromLibraryUseCase: locator(),
         downloadChapterUseCase: locator(),

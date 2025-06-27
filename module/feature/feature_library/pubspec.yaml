@@ -24,8 +24,6 @@ dependencies:
   # core
   core_route:
     path: ../../core/core_route
-  core_auth:
-    path: ../../core/core_auth
 
   # feature
   feature_common:

@@ -1,4 +1,3 @@
-import 'package:core_auth/core_auth.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:rxdart/rxdart.dart';
@@ -10,10 +9,7 @@ class LibraryManager
     implements GetMangaFromLibraryUseCase, ListenMangaFromLibraryUseCase {
   final _stateSubject = BehaviorSubject<List<Manga>>.seeded([]);
 
-  LibraryManager({
-    required LibraryDao libraryDao,
-    required ListenAuthUseCase listenAuthUseCase,
-  }) {
+  LibraryManager({required LibraryDao libraryDao}) {
     _stateSubject.addStream(
       libraryDao.stream.map(
         (values) => [...values.map(Manga.fromDatabase).nonNulls],

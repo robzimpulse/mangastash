@@ -1,6 +1,5 @@
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
-import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager/download_progress_manager.dart';
@@ -47,8 +46,6 @@ class DomainMangaRegistrar extends Registrar {
     final MeasureProcessUseCase measurement = locator();
 
     await measurement.execute(() async {
-      locator.registerFactory(() => MangaSourceServiceFirebase(app: locator()));
-
       locator.registerSingleton(await FileDownloadManager.create(log: log));
 
       locator.registerSingleton(
@@ -205,12 +202,7 @@ class DomainMangaRegistrar extends Registrar {
         ),
       );
 
-      locator.registerSingleton(
-        LibraryManager(
-          libraryDao: locator(),
-          listenAuthUseCase: locator(),
-        ),
-      );
+      locator.registerSingleton(LibraryManager(libraryDao: locator()));
       locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
       locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
 

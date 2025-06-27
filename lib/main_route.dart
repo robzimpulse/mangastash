@@ -1,4 +1,3 @@
-import 'package:core_auth/core_auth.dart';
 import 'package:core_route/core_route.dart';
 import 'package:feature_browse/feature_browse.dart';
 import 'package:feature_common/feature_common.dart';
@@ -54,10 +53,6 @@ class MainRouteBuilder extends BaseRouteBuilder {
         rootNavigatorKey: rootNavigatorKey,
       ),
       ...MoreRouteBuilder().routes(
-        locator: locator,
-        rootNavigatorKey: rootNavigatorKey,
-      ),
-      ...AuthRouteBuilder().routes(
         locator: locator,
         rootNavigatorKey: rootNavigatorKey,
       ),

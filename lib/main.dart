@@ -1,4 +1,3 @@
-import 'package:core_auth/core_auth.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
@@ -10,7 +9,6 @@ import 'package:log_box/log_box.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import 'firebase_options.dart';
 import 'main_path.dart';
 import 'main_route.dart';
 import 'screen/apps_screen.dart';
@@ -60,17 +58,10 @@ class _MangaStashAppState extends State<MangaStashApp> {
   Future<void> initiateAppLocator() async {
     if (widget.testing) return;
 
-    widget.locator.registerSingleton(
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      ),
-    );
-
     widget.locator.registerSingleton(LogBox());
     widget.locator.registerFactory(() => MeasureProcessUseCase());
 
     // TODO: register module registrar here
-    await widget.locator.registerRegistrar(CoreAuthRegistrar());
     await widget.locator.registerRegistrar(CoreNetworkRegistrar());
     await widget.locator.registerRegistrar(CoreStorageRegistrar());
     await widget.locator.registerRegistrar(CoreEnvironmentRegistrar());

@@ -23,8 +23,6 @@ dependencies:
     path: ../../core/core_network
   core_environment:
     path: ../../core/core_environment
-  core_auth:
-    path: ../../core/core_auth
   core_storage:
     path: ../../core/core_storage
 
@@ -37,8 +35,6 @@ dependencies:
     path: ../../library/service_locator
   manga_dex_api:
     path: ../../library/manga_dex_api
-  manga_service_firebase:
-    path: ../../library/manga_service_firebase
   log_box:
     path: ../../library/log_box
 

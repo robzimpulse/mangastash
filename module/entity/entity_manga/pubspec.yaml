@@ -21,8 +21,6 @@ dependencies:
   # library
   manga_dex_api:
     path: ../../library/manga_dex_api
-  manga_service_firebase:
-    path: ../../library/manga_service_firebase
   manga_service_drift:
     path: ../../library/manga_service_drift
 

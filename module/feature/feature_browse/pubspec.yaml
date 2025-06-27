@@ -16,8 +16,6 @@ dependencies:
     path: ../../library/safe_bloc
   service_locator:
     path: ../../library/service_locator
-  manga_service_firebase:
-    path: ../../library/manga_service_firebase
 
   # entity
   entity_manga:
@@ -34,8 +32,6 @@ dependencies:
     path: ../../core/core_network
   core_environment:
     path: ../../core/core_environment
-  core_auth:
-    path: ../../core/core_auth
 
   # feature
   feature_common:
