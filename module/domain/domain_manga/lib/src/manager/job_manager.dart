@@ -34,7 +34,7 @@ class JobManager
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
   final ValueGetter<GetAllChapterUseCase> _getAllChapterUseCase;
-  final FileDownloader _fileDownloader;
+  final FileDownloader? _fileDownloader;
   final BaseCacheManager _cacheManager;
   final JobDao _jobDao;
   final LogBox _log;
@@ -47,7 +47,7 @@ class JobManager
     required LogBox log,
     required JobDao jobDao,
     required BaseCacheManager cacheManager,
-    required FileDownloader fileDownloader,
+    required FileDownloader? fileDownloader,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required ValueGetter<GetMangaUseCase> getMangaUseCase,
     required ValueGetter<GetAllChapterUseCase> getAllChapterUseCase,
@@ -327,7 +327,7 @@ class JobManager
       final extension = cover?.split('.').lastOrNull;
       final info = '${key.mangaTitle} - chapter ${key.chapterNumber}';
 
-      _fileDownloader.configureNotificationForGroup(
+      _fileDownloader?.configureNotificationForGroup(
         groupId,
         running: TaskNotification(
           'Downloading $title chapter $chapter',
@@ -401,12 +401,12 @@ class JobManager
         );
       }
 
-      final records = await _fileDownloader.database.recordsForIds(
+      final records = await _fileDownloader?.database.recordsForIds(
         tasks.map((e) => e.taskId),
       );
 
       for (final task in tasks) {
-        final existing = records.firstWhereOrNull(
+        final existing = records?.firstWhereOrNull(
           (e) => e.taskId == task.taskId,
         );
         if (existing != null) {
@@ -426,7 +426,7 @@ class JobManager
           continue;
         }
 
-        await _fileDownloader.enqueue(task);
+        await _fileDownloader?.enqueue(task);
 
         _log.log(
           '[$info] Success enqueue task',

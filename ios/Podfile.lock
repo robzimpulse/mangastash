@@ -1421,8 +1421,6 @@ PODS:
     - sqlite3/fts5
     - sqlite3/perf-threadsafe
     - sqlite3/rtree
-  - system_proxy (0.0.1):
-    - Flutter
 
 DEPENDENCIES:
   - background_downloader (from `.symlinks/plugins/background_downloader/ios`)
@@ -1439,7 +1437,6 @@ DEPENDENCIES:
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqflite (from `.symlinks/plugins/sqflite/darwin`)
   - sqlite3_flutter_libs (from `.symlinks/plugins/sqlite3_flutter_libs/darwin`)
-  - system_proxy (from `.symlinks/plugins/system_proxy/ios`)
 
 SPEC REPOS:
   trunk:
@@ -1494,8 +1491,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/sqflite/darwin"
   sqlite3_flutter_libs:
     :path: ".symlinks/plugins/sqlite3_flutter_libs/darwin"
-  system_proxy:
-    :path: ".symlinks/plugins/system_proxy/ios"
 
 SPEC CHECKSUMS:
   abseil: a05cc83bf02079535e17169a73c5be5ba47f714b
@@ -1533,7 +1528,6 @@ SPEC CHECKSUMS:
   sqflite: 673a0e54cc04b7d6dba8d24fb8095b31c3a99eec
   sqlite3: 3da10a59910c809fb584a93aa46a3f05b785e12e
   sqlite3_flutter_libs: 5f386339eccc9516a12ab10e4aa925cbef5f2dcf
-  system_proxy: bec1a5c5af67dd3e3ebf43979400a8756c04cc44
 
 PODFILE CHECKSUM: f52b8cf098e3d5296cef976450167e0d9b1815aa
 

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
@@ -46,7 +47,19 @@ class DomainMangaRegistrar extends Registrar {
     final MeasureProcessUseCase measurement = locator();
 
     await measurement.execute(() async {
-      locator.registerSingleton(await FileDownloadManager.create(log: log));
+
+      if (!kIsWeb) {
+        locator.registerSingleton(await FileDownloadManager.create(log: log));
+      }
+
+      locator.registerSingleton(
+        await DownloadProgressManager.create(
+          fileDownloader: locator.getOrNull(),
+          cacheManager: locator(),
+          log: log,
+        ),
+      );
+      locator.alias<ListenDownloadProgressUseCase, DownloadProgressManager>();
 
       locator.registerSingleton(
         GlobalOptionsManager(storage: locator()),
@@ -65,7 +78,7 @@ class DomainMangaRegistrar extends Registrar {
           getChapterUseCase: () => locator(),
           getMangaUseCase: () => locator(),
           getAllChapterUseCase: () => locator(),
-          fileDownloader: locator(),
+          fileDownloader: locator.getOrNull(),
         ),
         dispose: (e) => e.dispose(),
       );
@@ -83,15 +96,6 @@ class DomainMangaRegistrar extends Registrar {
         HeadlessWebviewManager(log: log, cacheManager: locator()),
         dispose: (e) => e.dispose(),
       );
-
-      locator.registerSingleton(
-        await DownloadProgressManager.create(
-          fileDownloader: locator(),
-          cacheManager: locator(),
-          log: log,
-        ),
-      );
-      locator.alias<ListenDownloadProgressUseCase, DownloadProgressManager>();
 
       // manga dex services
       locator.registerFactory(() => MangaService(locator()));

@@ -1,5 +1,6 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 class CachedNetworkImageWidget extends StatelessWidget {
@@ -34,6 +35,53 @@ class CachedNetworkImageWidget extends StatelessWidget {
 
   final double? height;
 
+  Widget _buildFrom(BuildContext context, {FileResponse? response}) {
+    const fallback = SizedBox.shrink();
+    final data = response;
+
+    if (data == null) {
+      return progressBuilder?.call(context, null) ?? fallback;
+    }
+
+    if (data is FileInfo) {
+      if (kIsWeb) {
+        return FutureBuilder(
+          future: data.file.readAsBytes(),
+          builder: (context, snapshot) {
+            final data = snapshot.data;
+
+            if (data == null) {
+              return progressBuilder?.call(context, null) ?? fallback;
+            }
+
+            return Image.memory(
+              data,
+              fit: fit,
+              width: width,
+              height: height,
+              errorBuilder: errorBuilder,
+            );
+          },
+        );
+      }
+
+      return Image.file(
+        data.file,
+        fit: fit,
+        width: width,
+        height: height,
+        errorBuilder: errorBuilder,
+      );
+    }
+
+    if (data is DownloadProgress) {
+      final progress = data.progress;
+      return progressBuilder?.call(context, progress) ?? fallback;
+    }
+
+    return fallback;
+  }
+
   @override
   Widget build(BuildContext context) {
     final cache = cacheManager;
@@ -60,31 +108,10 @@ class CachedNetworkImageWidget extends StatelessWidget {
                 headers: headers,
                 withProgress: true,
               ),
-              builder: (context, snapshot) {
-                final data = snapshot.data;
-                const fallback = SizedBox.shrink();
-
-                if (data == null) {
-                  return progressBuilder?.call(context, null) ?? fallback;
-                }
-
-                if (data is FileInfo) {
-                  return Image.file(
-                    data.file,
-                    fit: fit,
-                    width: width,
-                    height: height,
-                    errorBuilder: errorBuilder,
-                  );
-                }
-
-                if (data is DownloadProgress) {
-                  final progress = data.progress;
-                  return progressBuilder?.call(context, progress) ?? fallback;
-                }
-
-                return fallback;
-              },
+              builder: (context, snapshot) => _buildFrom(
+                context,
+                response: snapshot.data,
+              ),
             ),
     );
   }

@@ -22,19 +22,19 @@ class DownloadProgressManager
     implements ListenDownloadProgressUseCase {
   final BehaviorSubject<Map<Key, Update>> _progress;
   final BehaviorSubject<Map<String, Task>> _tasks;
-  final FileDownloader _fileDownloader;
+  final FileDownloader? _fileDownloader;
   final BaseCacheManager _cacheManager;
   final LogBox _log;
 
-  late final StreamSubscription _streamSubscription;
+  late final StreamSubscription? _streamSubscription;
 
   static Future<DownloadProgressManager> create({
-    required FileDownloader fileDownloader,
+    required FileDownloader? fileDownloader,
     required BaseCacheManager cacheManager,
     required LogBox log,
   }) async {
-    final records = await fileDownloader.database.allRecords();
-    final progress = records.groupFoldBy<Key?, Update>(
+    final records = await fileDownloader?.database.allRecords();
+    final progress = records?.groupFoldBy<Key?, Update>(
       (record) => Key.fromJsonString(record.group),
       (result, current) => (result != null)
           ? (Map.of(result)..[current.taskId] = current.progress)
@@ -44,23 +44,25 @@ class DownloadProgressManager
       fileDownloader: fileDownloader,
       cacheManager: cacheManager,
       log: log,
-      tasks: Map.fromEntries(records.map((e) => MapEntry(e.taskId, e.task))),
-      completeRecords: List.of(
-        records.where((record) => record.status.isFinalState),
+      tasks: Map.fromEntries(
+        [...?records?.map((e) => MapEntry(e.taskId, e.task))],
       ),
+      completeRecords: [
+        ...?records?.where((record) => record.status.isFinalState),
+      ],
       progress: Map.fromEntries(
-        progress.entries
-            .map(
-              (entry) {
-                final key = entry.key;
-                if (key == null) return null;
-                return MapEntry(
-                  key,
-                  entry.value,
-                );
-              },
-            )
-            .nonNulls,
+        [
+          ...?progress?.entries.map(
+            (entry) {
+              final key = entry.key;
+              if (key == null) return null;
+              return MapEntry(
+                key,
+                entry.value,
+              );
+            },
+          ).nonNulls,
+        ],
       ),
     );
   }
@@ -69,7 +71,7 @@ class DownloadProgressManager
     required LogBox log,
     required Map<String, Task> tasks,
     required Map<Key, Update> progress,
-    required FileDownloader fileDownloader,
+    required FileDownloader? fileDownloader,
     required BaseCacheManager cacheManager,
     required List<TaskRecord> completeRecords,
   })  : _log = log,
@@ -77,13 +79,15 @@ class DownloadProgressManager
         _fileDownloader = fileDownloader,
         _tasks = BehaviorSubject.seeded(tasks),
         _progress = BehaviorSubject.seeded(progress) {
-    _streamSubscription = _fileDownloader.updates.distinct().listen(_onUpdate);
+    _streamSubscription = _fileDownloader?.updates.distinct().listen(_onUpdate);
     for (final record in completeRecords) {
       _moveFileToSharedStorage(status: record.status, task: record.task);
     }
   }
 
-  Future<void> dispose() => _streamSubscription.cancel();
+  Future<void> dispose() async {
+    _streamSubscription?.cancel();
+  }
 
   Future<void> _moveFileToSharedStorage({
     required TaskStatus status,
@@ -92,13 +96,13 @@ class DownloadProgressManager
     if (task is! DownloadTask) return;
     if (status != TaskStatus.complete) return;
 
-    final moveSharedStoragePath = await _fileDownloader.moveToSharedStorage(
+    final moveSharedStoragePath = await _fileDownloader?.moveToSharedStorage(
       task,
       SharedStorage.downloads,
       directory: 'Mangastash/${task.directory}',
     );
 
-    final pathInSharedStorage = await _fileDownloader.pathInSharedStorage(
+    final pathInSharedStorage = await _fileDownloader?.pathInSharedStorage(
       task.filename,
       SharedStorage.downloads,
       directory: 'Mangastash/${task.directory}',
