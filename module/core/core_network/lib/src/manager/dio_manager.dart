@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_inspector/dio_inspector.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:log_box/log_box.dart';
+import 'package:universal_io/io.dart';
 
 import '../interceptor/dio_throttler_interceptor.dart';
 import '../mixin/user_agent_mixin.dart';
@@ -11,7 +12,7 @@ class DioManager {
     final dio = Dio(
       BaseOptions(
         headers: {
-          'user-agent': UserAgentMixin.staticUserAgent,
+          HttpHeaders.userAgentHeader: UserAgentMixin.staticUserAgent,
         },
       ),
     );
