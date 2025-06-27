@@ -22,6 +22,7 @@ dependencies:
   drift_db_viewer: ^2.1.0
   collection: ^1.16.0
   rxdart: ^0.27.7
+  universal_io: ^2.2.2
 
 dev_dependencies:
   flutter_test:

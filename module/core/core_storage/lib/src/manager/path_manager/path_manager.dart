@@ -1,13 +1,16 @@
-import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:universal_io/io.dart';
 
-import '../storage/shared_preferences_storage.dart';
-import '../use_case/get_root_path_use_case.dart';
-import '../use_case/listen_backup_path_use_case.dart';
-import '../use_case/listen_download_path_use_case.dart';
-import '../use_case/set_backup_path_use_case.dart';
-import '../use_case/set_download_path_use_case.dart';
+import '../../storage/shared_preferences_storage.dart';
+import '../../use_case/get_root_path_use_case.dart';
+import '../../use_case/listen_backup_path_use_case.dart';
+import '../../use_case/listen_download_path_use_case.dart';
+import '../../use_case/set_backup_path_use_case.dart';
+import '../../use_case/set_download_path_use_case.dart';
+
+import 'adapter/application_documents_directory_adapter.dart'
+    if (dart.library.io) 'adapter/application_documents_directory_native.dart'
+    if (dart.library.js) 'adapter/application_documents_directory_web.dart';
 
 class PathManager
     implements
@@ -45,7 +48,7 @@ class PathManager
     final root = Directory.fromUri(Uri.file(rootPath));
     final rootDirectory = (await root.exists() && Platform.isAndroid)
         ? root
-        : await getApplicationDocumentsDirectory();
+        : await applicationDocumentsDirectory();
 
     final defaultPath = Directory.fromUri(Uri.file('$rootPath/Mangastash'));
     final defaultDirectory = (await defaultPath.exists() && Platform.isAndroid)
