@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 
 import '../database/database.dart';
+import '../extension/companion_equality.dart';
 import '../extension/non_empty_string_list_extension.dart';
 import '../extension/nullable_generic.dart';
 import '../extension/value_or_null_extension.dart';
@@ -162,6 +163,14 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
         );
 
         final manga = (byId ?? byWebUrl);
+
+        if (manga != null) {
+          final companion = manga.manga?.toCompanion(true);
+          if (companion?.shouldUpdate(entry.key) == false) {
+            data.add(manga);
+            continue;
+          }
+        }
 
         final value = entry.key.copyWith(
           id: Value.absentIfNull(

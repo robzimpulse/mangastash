@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 
 import '../database/database.dart';
+import '../extension/companion_equality.dart';
 import '../extension/non_empty_string_list_extension.dart';
 import '../extension/nullable_generic.dart';
 import '../extension/value_or_null_extension.dart';
@@ -152,6 +153,14 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
         );
 
         final chapter = (byId ?? byWebUrl);
+
+        if (chapter != null) {
+          final companion = chapter.chapter?.toCompanion(true);
+          if (companion?.shouldUpdate(entry.key) == false) {
+            data.add(chapter);
+            continue;
+          }
+        }
 
         final oldLastReadAt = chapter?.chapter?.lastReadAt;
         final newLastReadAt = entry.key.lastReadAt.valueOrNull;
