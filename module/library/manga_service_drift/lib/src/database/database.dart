@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../dao/cache_dao.dart';
@@ -21,10 +22,6 @@ import '../tables/relationship_tables.dart';
 import '../tables/tag_tables.dart';
 import '../util/job_type_enum.dart';
 import '../util/typedef.dart';
-
-import 'adapter/application_documents_directory_adapter.dart'
-    if (dart.library.io) 'adapter/application_documents_directory_native.dart'
-    if (dart.library.js) 'adapter/application_documents_directory_web.dart';
 
 import 'adapter/sql_workaround_adapter.dart'
     if (dart.library.io) 'adapter/sql_workaround_native.dart'
@@ -84,7 +81,7 @@ Future<QueryExecutor> _openConnection({LoggerCallback? logger}) async {
   return driftDatabase(
     name: 'mangastash-local',
     native: DriftNativeOptions(
-      databaseDirectory: () => applicationDocumentsDirectory().then(
+      databaseDirectory: () => getApplicationDocumentsDirectory().then(
         (value) {
           logger?.call('Database location: $value', name: 'AppDatabase');
           return value;

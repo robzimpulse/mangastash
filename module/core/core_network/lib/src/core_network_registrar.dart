@@ -10,14 +10,13 @@ class CoreNetworkRegistrar extends Registrar {
     final LogBox log = locator();
     final MeasureProcessUseCase measurement = locator();
 
-    locator.registerSingleton(DioInspector());
+    await measurement.execute(() async {
+      locator.registerSingleton(DioInspector());
 
-    locator.registerSingleton(
-      DioManager.create(inspector: locator(), log: locator()),
-    );
-    // await measurement.execute(() async {
-    //
-    // });
+      locator.registerSingleton(
+        DioManager.create(inspector: locator(), log: locator()),
+      );
+    });
 
     log.log(
       'Finish Register ${runtimeType.toString()}',
