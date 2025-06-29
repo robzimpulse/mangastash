@@ -6,7 +6,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:log_box/log_box.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:universal_io/io.dart';
@@ -22,7 +22,7 @@ import '../use_case/prefetch/prefetch_chapter_use_case.dart';
 import '../use_case/prefetch/prefetch_manga_use_case.dart';
 
 class JobManager
-    with GenerateTaskIdMixin, UserAgentMixin
+    with GenerateTaskIdMixin, UserAgentMixin, WidgetsBindingObserver
     implements
         PrefetchMangaUseCase,
         PrefetchChapterUseCase,
@@ -59,9 +59,26 @@ class JobManager
         _getAllChapterUseCase = getAllChapterUseCase {
     _streamSubscription = _jobs.distinct().listen(_onData);
     _jobs.addStream(jobDao.stream);
+    WidgetsBinding.instance.addObserver(this);
   }
 
-  Future<void> dispose() => _streamSubscription.cancel();
+  Future<void> dispose() async {
+    WidgetsBinding.instance.removeObserver(this);
+    await _streamSubscription.cancel();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      _log.log(
+        'Resume executing jobs',
+        extra: {'state': _streamSubscription.isPaused},
+        name: runtimeType.toString(),
+      );
+      _streamSubscription.resume();
+    }
+  }
 
   void _onData(List<JobModel> jobs) async {
     final job = jobs.firstOrNull;
