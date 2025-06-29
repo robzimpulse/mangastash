@@ -212,14 +212,7 @@ class JobManager
     }
   }
 
-  Future<void> _fetchAllChapter(
-    JobModel job, {
-    SearchChapterParameter parameter = const SearchChapterParameter(
-      offset: 0,
-      page: 1,
-      limit: 20,
-    ),
-  }) async {
+  Future<void> _fetchAllChapter(JobModel job) async {
     final mangaId = job.manga?.id;
     final source = job.manga?.source;
 
@@ -252,7 +245,6 @@ class JobManager
         'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
         'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
         'image': job.image,
-        'parameter': parameter,
         'data': result.map((e) => e.toJson()),
       },
       name: runtimeType.toString(),

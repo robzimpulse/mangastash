@@ -17,6 +17,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   final DownloadChapterUseCase _downloadChapterUseCase;
   final CrawlUrlUseCase _crawlUrlUseCase;
   final PrefetchChapterUseCase _prefetchChapterUseCase;
+  final GetAllChapterUseCase _getAllChapterUseCase;
   final UpdateChapterLastReadAtUseCase _updateChapterLastReadAtUseCase;
 
   MangaDetailScreenCubit({
@@ -34,6 +35,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required ListenReadHistoryUseCase listenReadHistoryUseCase,
     required UpdateChapterLastReadAtUseCase updateChapterLastReadAtUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
+    required GetAllChapterUseCase getAllChapterUseCase,
   })  : _getMangaUseCase = getMangaUseCase,
         _searchChapterUseCase = searchChapterUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
@@ -42,6 +44,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
         _crawlUrlUseCase = crawlUrlUseCase,
         _prefetchChapterUseCase = prefetchChapterUseCase,
         _updateChapterLastReadAtUseCase = updateChapterLastReadAtUseCase,
+        _getAllChapterUseCase = getAllChapterUseCase,
         super(
           initialState.copyWith(
             parameter: listenSearchParameterUseCase
@@ -221,9 +224,12 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   Future<void> prefetch() async {
     final mangaId = state.manga?.id;
     final source = state.manga?.source;
-    final chapterIds = state.chapters.map((e) => e.id);
     if (mangaId == null || source == null) return;
-    for (final chapterId in chapterIds.nonNulls) {
+    final chapters = await _getAllChapterUseCase.execute(
+      source: source,
+      mangaId: mangaId,
+    );
+    for (final chapterId in chapters.map((e) => e.id).nonNulls) {
       _prefetchChapterUseCase.prefetchChapter(
         mangaId: mangaId,
         source: source,
