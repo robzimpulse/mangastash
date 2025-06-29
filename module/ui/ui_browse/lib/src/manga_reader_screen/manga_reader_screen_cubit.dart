@@ -10,7 +10,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     with AutoSubscriptionMixin {
   final GetChapterUseCase _getChapterUseCase;
 
-  final SearchChapterUseCase _searchChapterUseCase;
+  final GetAllChapterUseCase _getAllChapterUseCase;
 
   final CrawlUrlUseCase _crawlUrlUseCase;
 
@@ -21,11 +21,11 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     required CrawlUrlUseCase crawlUrlUseCase,
     required MangaReaderScreenState initialState,
     required UpdateChapterLastReadAtUseCase updateChapterLastReadAtUseCase,
-    required SearchChapterUseCase searchChapterUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
+    required GetAllChapterUseCase getAllChapterUseCase,
   })  : _getChapterUseCase = getChapterUseCase,
         _crawlUrlUseCase = crawlUrlUseCase,
-        _searchChapterUseCase = searchChapterUseCase,
+        _getAllChapterUseCase = getAllChapterUseCase,
         _updateChapterLastReadAtUseCase = updateChapterLastReadAtUseCase,
         super(
           initialState.copyWith(
@@ -58,42 +58,18 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
 
     if (mangaId == null || source == null) return;
 
-    final response = await _searchChapterUseCase.execute(
+    final response = await _getAllChapterUseCase.execute(
       source: source,
       mangaId: mangaId,
-      parameter: state.parameter.copyWith(
-        orders: {ChapterOrders.chapter: OrderDirections.ascending},
-      ),
+      parameter: state.parameter,
     );
 
-    if (response is Success<Pagination<Chapter>>) {
-      final offset = response.data.offset ?? 0;
-      final page = response.data.page ?? 0;
-      final limit = response.data.limit ?? 0;
-      final chapters = response.data.data ?? [];
-      final hasNextPage = response.data.hasNextPage;
-
+    if (response is Success<List<Chapter>>) {
       emit(
         state.copyWith(
-          chapterIds: [
-            ...state.chapterIds,
-            ...chapters.map((e) => e.id).nonNulls,
-          ],
+          chapterIds: [...response.map((e) => e.id).nonNulls],
         ),
       );
-
-      if (hasNextPage == true && state.nextChapterId == null) {
-        emit(
-          state.copyWith(
-            parameter: state.parameter.copyWith(
-              page: page + 1,
-              offset: offset + limit,
-              limit: limit,
-            ),
-          ),
-        );
-        await _fetchPreviousAndNextChapter();
-      }
     }
   }
 
