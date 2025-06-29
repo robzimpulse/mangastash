@@ -6,22 +6,14 @@ extension CompanionEquality<T> on UpdateCompanion<T> {
     final columns = toColumns(true);
     final otherColumns = other.toColumns(true);
 
-    bool result = false;
-
     for (final entry in otherColumns.entries) {
-      final value = columns[entry.key];
-      final otherValue = entry.value;
-
-      if (value is! Variable) continue;
-      if (otherValue is! Variable) continue;
-
-      if (otherValue.value != null || value.value != null) {
-        result = result && value.value != otherValue.value;
+      if (entry.key == 'created_at' || entry.key == 'updated_at') continue;
+      if (columns[entry.key] != entry.value) {
+        return true;
       }
     }
 
-
-    return result;
+    return false;
   }
 
 }
