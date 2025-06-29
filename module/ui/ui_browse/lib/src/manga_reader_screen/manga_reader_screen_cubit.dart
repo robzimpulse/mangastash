@@ -132,6 +132,6 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
 
   void recrawl({required String url}) async {
     await _crawlUrlUseCase.execute(url: url);
-    await init();
+    await _fetchChapter();
   }
 }

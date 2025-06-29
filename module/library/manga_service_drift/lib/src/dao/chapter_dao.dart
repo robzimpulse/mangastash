@@ -156,8 +156,14 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
 
         if (chapter != null) {
           final companion = chapter.chapter?.toCompanion(true);
-          if (companion?.shouldUpdate(entry.key) == false) {
-            data.add(chapter);
+          final id = chapter.chapter?.id;
+          if (companion?.shouldUpdate(entry.key) == false && id != null) {
+            data.add(
+              ChapterModel(
+                chapter: chapter.chapter,
+                images: await _imageDao.adds(id, values: entry.value),
+              ),
+            );
             continue;
           }
         }
@@ -215,28 +221,12 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
           ),
         );
 
-        final List<ImageDrift> images = [];
-        await _imageDao.remove(chapterIds: [result.id]);
-        List<ImageDrift> existing = await _imageDao.search(
-          chapterIds: [result.id],
+        data.add(
+          ChapterModel(
+            chapter: result,
+            images: await _imageDao.adds(result.id, values: entry.value),
+          ),
         );
-        for (final (index, image) in entry.value.indexed) {
-          final data = existing.isEmpty
-              ? const ImageTablesCompanion()
-              : existing.removeAt(0).toCompanion(true);
-
-          images.add(
-            await _imageDao.add(
-              value: data.copyWith(
-                chapterId: Value(result.id),
-                webUrl: Value(image),
-                order: Value(index),
-              ),
-            ),
-          );
-        }
-
-        data.add(ChapterModel(chapter: result, images: images));
       }
 
       return data;

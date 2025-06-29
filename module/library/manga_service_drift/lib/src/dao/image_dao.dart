@@ -88,4 +88,36 @@ class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
       ),
     );
   }
+
+  Future<List<ImageDrift>> adds(
+    String chapterId, {
+    List<String> values = const [],
+  }) {
+    if (values.isEmpty) return Future.value([]);
+
+    return transaction(() async {
+      List<ImageDrift> existing = await search(chapterIds: [chapterId]);
+      List<ImageDrift> results = [];
+
+      for (final (index, image) in values.indexed) {
+        final data = existing.isEmpty
+            ? const ImageTablesCompanion()
+            : existing.removeAt(0).toCompanion(true);
+
+        results.add(
+          await add(
+            value: data.copyWith(
+              chapterId: Value(chapterId),
+              webUrl: Value(image),
+              order: Value(index),
+            ),
+          ),
+        );
+      }
+
+      await remove(ids: [...existing.map((e) => e.id)]);
+
+      return results;
+    });
+  }
 }
