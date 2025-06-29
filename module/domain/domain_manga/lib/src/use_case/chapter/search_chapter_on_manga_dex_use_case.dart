@@ -32,6 +32,9 @@ class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
       );
 
       final data = result.data ?? [];
+      final offset = result.offset?.toInt() ?? 0;
+      final limit = result.limit?.toInt() ?? 0;
+      final total = result.total?.toInt() ?? 0;
 
       return Success(
         Pagination(
@@ -43,9 +46,10 @@ class SearchChapterOnMangaDexUseCase with SyncChaptersMixin {
                 Chapter.from(data: e).copyWith(mangaId: mangaId),
             ],
           ),
-          offset: result.offset?.toInt(),
-          limit: result.limit?.toInt() ?? 0,
-          total: result.total?.toInt() ?? 0,
+          offset: offset,
+          limit: limit,
+          total: total,
+          hasNextPage: offset + data.length < total,
         ),
       );
     } catch (e) {
