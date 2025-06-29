@@ -8,7 +8,6 @@ import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/foundation.dart';
 import 'package:log_box/log_box.dart';
-import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:universal_io/io.dart';
 
