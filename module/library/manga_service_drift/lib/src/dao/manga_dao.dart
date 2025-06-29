@@ -166,8 +166,27 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
 
         if (manga != null) {
           final companion = manga.manga?.toCompanion(true);
-          if (companion?.shouldUpdate(entry.key) == false) {
-            data.add(manga);
+          final id = manga.manga?.id;
+          final source = manga.manga?.source;
+          if (companion?.shouldUpdate(entry.key) == false &&
+              id != null &&
+              source != null) {
+            data.add(
+              MangaModel(
+                manga: manga.manga,
+                tags: await _tagDao.reattach(
+                  mangaId: id,
+                  source: source,
+                  values: [
+                    ...{
+                      ...entry.value,
+                      ...manga.tags.map((e) => e.name).nonNulls,
+                    },
+                  ],
+                ),
+              ),
+            );
+
             continue;
           }
         }
@@ -207,25 +226,21 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
           ),
         );
 
-        final names = {
-          ...entry.value,
-          ...?manga?.tags.map((e) => e.name).nonNulls,
-        };
-
-        final tags = <TagDrift>[];
-        await _tagDao.detach(mangaId: result.id);
-        for (final name in names) {
-          final tag = await _tagDao.add(
-            value: TagTablesCompanion.insert(
-              name: name,
-              source: Value.absentIfNull(result.source),
+        data.add(
+          MangaModel(
+            manga: result,
+            tags: await _tagDao.reattach(
+              mangaId: result.id,
+              source: result.source,
+              values: [
+                ...{
+                  ...entry.value,
+                  ...?manga?.tags.map((e) => e.name).nonNulls,
+                },
+              ],
             ),
-          );
-          await _tagDao.attach(mangaId: result.id, tagId: tag.id);
-          tags.add(tag);
-        }
-
-        data.add(MangaModel(manga: result, tags: tags));
+          ),
+        );
       }
 
       return data;

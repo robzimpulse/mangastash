@@ -134,6 +134,32 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
     );
   }
 
+  Future<List<TagDrift>> reattach({
+    required String mangaId,
+    String? source,
+    List<String> values = const [],
+  }) async {
+    if (values.isEmpty) return Future.value([]);
+
+    return transaction(() async {
+      await detach(mangaId: mangaId);
+
+      final tags = <TagDrift>[];
+      for (final name in values) {
+        final result = await add(
+          value: TagTablesCompanion.insert(
+            name: name,
+            source: Value.absentIfNull(source),
+          ),
+        );
+        await attach(mangaId: mangaId, tagId: result.id);
+        tags.add(result);
+      }
+
+      return tags;
+    });
+  }
+
   Future<void> attach({required String mangaId, required String tagId}) {
     final value = RelationshipTablesCompanion(
       mangaId: Value(mangaId),
