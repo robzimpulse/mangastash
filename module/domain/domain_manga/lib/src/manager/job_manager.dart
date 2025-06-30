@@ -8,6 +8,7 @@ import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/widgets.dart';
 import 'package:log_box/log_box.dart';
+import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:universal_io/io.dart';
 
@@ -17,6 +18,7 @@ import '../use_case/chapter/get_chapter_use_case.dart';
 import '../use_case/download/download_chapter_use_case.dart';
 import '../use_case/download/download_manga_use_case.dart';
 import '../use_case/manga/get_manga_use_case.dart';
+import '../use_case/parameter/listen_search_parameter_use_case.dart';
 import '../use_case/prefetch/listen_prefetch_use_case.dart';
 import '../use_case/prefetch/prefetch_chapter_use_case.dart';
 import '../use_case/prefetch/prefetch_manga_use_case.dart';
@@ -33,6 +35,7 @@ class JobManager
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
   final ValueGetter<GetAllChapterUseCase> _getAllChapterUseCase;
+  final ListenSearchParameterUseCase _listenSearchParameterUseCase;
   final FileDownloader? _fileDownloader;
   final BaseCacheManager _cacheManager;
   final JobDao _jobDao;
@@ -47,6 +50,7 @@ class JobManager
     required JobDao jobDao,
     required BaseCacheManager cacheManager,
     required FileDownloader? fileDownloader,
+    required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required ValueGetter<GetMangaUseCase> getMangaUseCase,
     required ValueGetter<GetAllChapterUseCase> getAllChapterUseCase,
@@ -56,7 +60,8 @@ class JobManager
         _cacheManager = cacheManager,
         _getMangaUseCase = getMangaUseCase,
         _getChapterUseCase = getChapterUseCase,
-        _getAllChapterUseCase = getAllChapterUseCase {
+        _getAllChapterUseCase = getAllChapterUseCase,
+        _listenSearchParameterUseCase = listenSearchParameterUseCase {
     _streamSubscription = _jobs.distinct().listen(_onData);
     _jobs.addStream(jobDao.stream);
     WidgetsBinding.instance.addObserver(this);
@@ -247,10 +252,13 @@ class JobManager
       );
       return;
     }
-
+    final parameter = _listenSearchParameterUseCase.searchParameterState;
     final result = await _getAllChapterUseCase().execute(
       source: source,
       mangaId: mangaId,
+      parameter: parameter.valueOrNull?.let(
+        (value) => SearchChapterParameter.from(value),
+      ),
     );
 
     _log.log(

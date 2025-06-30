@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -26,16 +27,20 @@ class GetAllChapterUseCase with SyncChaptersMixin {
     required String source,
     required String mangaId,
     List<Chapter> chapters = const [],
-    SearchChapterParameter parameter = const SearchChapterParameter(
-      offset: 0,
-      page: 1,
-      limit: 20,
-    ),
+    SearchChapterParameter? parameter,
   }) async {
+    final param = parameter.or(
+      const SearchChapterParameter(
+        offset: 0,
+        page: 1,
+        limit: 20,
+      ),
+    );
+
     final result = await _searchChapterUseCase().execute(
       source: source,
       mangaId: mangaId,
-      parameter: parameter,
+      parameter: param,
     );
 
     if (result is Success<Pagination<Chapter>>) {
@@ -44,10 +49,10 @@ class GetAllChapterUseCase with SyncChaptersMixin {
           source: source,
           mangaId: mangaId,
           chapters: [...chapters, ...?result.data.data],
-          parameter: SearchChapterParameter(
-            offset: parameter.offset + parameter.limit,
-            page: parameter.page + 1,
-            limit: parameter.limit,
+          parameter: param.copyWith(
+            offset: param.offset + param.limit,
+            page: param.page + 1,
+            limit: param.limit,
           ),
         );
       }

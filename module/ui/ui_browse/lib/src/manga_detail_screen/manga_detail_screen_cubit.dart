@@ -228,6 +228,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     final chapters = await _getAllChapterUseCase.execute(
       source: source,
       mangaId: mangaId,
+      parameter: state.parameter,
     );
     for (final chapterId in chapters.map((e) => e.id).nonNulls) {
       _prefetchChapterUseCase.prefetchChapter(

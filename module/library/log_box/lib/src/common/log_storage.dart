@@ -1,5 +1,4 @@
 import 'package:rxdart/rxdart.dart';
-import 'package:uuid/v4.dart';
 
 import '../model/log_model.dart';
 

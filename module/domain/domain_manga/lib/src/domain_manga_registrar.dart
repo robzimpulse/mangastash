@@ -78,6 +78,7 @@ class DomainMangaRegistrar extends Registrar {
           getMangaUseCase: () => locator(),
           getAllChapterUseCase: () => locator(),
           fileDownloader: locator.getOrNull(),
+          listenSearchParameterUseCase: locator(),
         ),
         dispose: (e) => e.dispose(),
       );

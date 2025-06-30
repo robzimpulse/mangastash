@@ -13,30 +13,6 @@ class CoreStorageRegistrar extends Registrar {
     final LogBox log = locator();
     final MeasureProcessUseCase measurement = locator();
 
-    void logger(
-      message, {
-      error,
-      extra,
-      level,
-      name,
-      sequenceNumber,
-      stackTrace,
-      time,
-      zone,
-    }) {
-      return log.log(
-        message,
-        name: name ?? runtimeType.toString(),
-        sequenceNumber: sequenceNumber,
-        level: level ?? 0,
-        zone: zone,
-        error: error,
-        stackTrace: stackTrace,
-        time: time,
-        extra: extra,
-      );
-    }
-
     await measurement.execute(() async {
       locator.registerSingleton(
         AppDatabase(),
