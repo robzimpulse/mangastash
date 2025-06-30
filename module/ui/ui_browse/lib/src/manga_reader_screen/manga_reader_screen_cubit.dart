@@ -64,13 +64,11 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
       parameter: state.parameter,
     );
 
-    if (response is Success<List<Chapter>>) {
-      emit(
-        state.copyWith(
-          chapterIds: [...response.map((e) => e.id).nonNulls],
-        ),
-      );
-    }
+    emit(
+      state.copyWith(
+        chapterIds: [...response.map((e) => e.id).nonNulls],
+      ),
+    );
   }
 
   Future<void> _fetchChapter() async {
