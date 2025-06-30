@@ -4,7 +4,6 @@ export 'package:drift/src/runtime/data_class.dart';
 
 export 'src/dao/cache_dao.dart';
 export 'src/dao/chapter_dao.dart';
-export 'src/dao/dio_cache_dao.dart';
 export 'src/dao/history_dao.dart';
 export 'src/dao/image_dao.dart';
 export 'src/dao/job_dao.dart';
@@ -18,4 +17,5 @@ export 'src/model/history_model.dart';
 export 'src/model/job_model.dart';
 export 'src/model/manga_model.dart';
 export 'src/util/database_viewer.dart';
+export 'src/util/dio_cache_store.dart';
 export 'src/util/job_type_enum.dart';
