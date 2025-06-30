@@ -39,7 +39,7 @@ class CoreStorageRegistrar extends Registrar {
 
     await measurement.execute(() async {
       locator.registerSingleton(
-        AppDatabase(logger: logger),
+        AppDatabase(),
         dispose: (e) => e.close(),
       );
       locator.registerSingleton(DatabaseViewer());
