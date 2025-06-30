@@ -61,7 +61,9 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     final response = await _getAllChapterUseCase.execute(
       source: source,
       mangaId: mangaId,
-      parameter: state.parameter,
+      parameter: state.parameter.copyWith(
+        orders: {ChapterOrders.chapter: OrderDirections.ascending},
+      ),
     );
 
     emit(

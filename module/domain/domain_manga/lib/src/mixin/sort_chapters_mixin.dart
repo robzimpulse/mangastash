@@ -29,16 +29,16 @@ mixin SortChaptersMixin {
         ),
       (ChapterOrders.chapter, OrderDirections.descending) => chapters.sorted(
           (a, b) {
-            final aChapter = int.tryParse(a.chapter ?? '');
-            final bChapter = int.tryParse(b.chapter ?? '');
+            final aChapter = double.tryParse(a.chapter ?? '');
+            final bChapter = double.tryParse(b.chapter ?? '');
             if (aChapter == null || bChapter == null) return 0;
             return -aChapter.compareTo(bChapter);
           },
         ),
       (ChapterOrders.chapter, OrderDirections.ascending) => chapters.sorted(
           (a, b) {
-            final aChapter = int.tryParse(a.chapter ?? '');
-            final bChapter = int.tryParse(b.chapter ?? '');
+            final aChapter = double.tryParse(a.chapter ?? '');
+            final bChapter = double.tryParse(b.chapter ?? '');
             if (aChapter == null || bChapter == null) return 0;
             return aChapter.compareTo(bChapter);
           },
