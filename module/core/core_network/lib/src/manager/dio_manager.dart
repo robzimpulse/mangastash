@@ -1,14 +1,20 @@
 import 'package:dio/dio.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:dio_inspector/dio_inspector.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:log_box/log_box.dart';
+import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:universal_io/io.dart';
 
 import '../interceptor/dio_throttler_interceptor.dart';
 import '../mixin/user_agent_mixin.dart';
 
 class DioManager {
-  static Dio create({required DioInspector inspector, required LogBox log}) {
+  static Dio create({
+    required DioInspector inspector,
+    required LogBox log,
+    required AppDatabase db,
+  }) {
     final dio = Dio(
       BaseOptions(
         headers: {
@@ -25,6 +31,12 @@ class DioManager {
           onThrottled: (req, scheduled) => log.log(
             'Delay request for ${req.uri} until $scheduled',
             name: 'DioManager',
+          ),
+        ),
+        DioCacheInterceptor(
+          options: CacheOptions(
+            store: DioCacheStore(db: db),
+            hitCacheOnNetworkFailure: true,
           ),
         ),
       ],

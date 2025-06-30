@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import 'dio_get_response.dart';
 
 class DioFileService extends FileService {
-  final Dio _dio;
+  final ValueGetter<Dio> _dio;
 
   DioFileService(this._dio);
 
@@ -19,7 +20,7 @@ class DioFileService extends FileService {
     );
 
     return DioGetResponse(
-      await _dio.get<ResponseBody>(
+      await _dio().get<ResponseBody>(
         url,
         options: options,
       ),

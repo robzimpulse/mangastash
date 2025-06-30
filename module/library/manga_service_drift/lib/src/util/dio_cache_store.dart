@@ -4,10 +4,10 @@ import 'package:http_cache_core/http_cache_core.dart';
 import '../dao/dio_cache_dao.dart';
 import '../database/database.dart';
 
-class DriftCacheStore extends CacheStore {
+class DioCacheStore extends CacheStore {
   final DioCacheDao _dioCacheDao;
 
-  DriftCacheStore({required AppDatabase db}) : _dioCacheDao = DioCacheDao(db) {
+  DioCacheStore({required AppDatabase db}) : _dioCacheDao = DioCacheDao(db) {
     clean(staleOnly: true);
   }
 

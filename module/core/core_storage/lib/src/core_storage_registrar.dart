@@ -63,7 +63,7 @@ class CoreStorageRegistrar extends Registrar {
       // locator.alias<SetBackupPathUseCase, PathManager>();
 
       locator.registerSingleton(
-        CustomCacheManager(dio: locator(), dao: () => locator()),
+        CustomCacheManager(dio: () => locator(), dao: () => locator()),
         dispose: (e) => e.dispose(),
       );
       locator.alias<BaseCacheManager, CustomCacheManager>();

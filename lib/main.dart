@@ -62,8 +62,8 @@ class _MangaStashAppState extends State<MangaStashApp> {
     widget.locator.registerFactory(() => MeasureProcessUseCase());
 
     // TODO: register module registrar here
-    await widget.locator.registerRegistrar(CoreNetworkRegistrar());
     await widget.locator.registerRegistrar(CoreStorageRegistrar());
+    await widget.locator.registerRegistrar(CoreNetworkRegistrar());
     await widget.locator.registerRegistrar(CoreEnvironmentRegistrar());
     await widget.locator.registerRegistrar(CoreRouteRegistrar());
     await widget.locator.registerRegistrar(DomainMangaRegistrar());

@@ -14,7 +14,7 @@ class CoreNetworkRegistrar extends Registrar {
       locator.registerSingleton(DioInspector());
 
       locator.registerSingleton(
-        DioManager.create(inspector: locator(), log: locator()),
+        DioManager.create(inspector: locator(), log: locator(), db: locator()),
         dispose: (e) => e.close(force: true),
       );
     });
