@@ -1,16 +1,26 @@
 import 'package:core_network/core_network.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/foundation.dart';
+import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
+import '../../mixin/sync_chapters_mixin.dart';
 import 'search_chapter_use_case.dart';
 
-class GetAllChapterUseCase {
+class GetAllChapterUseCase with SyncChaptersMixin {
   final ValueGetter<SearchChapterUseCase> _searchChapterUseCase;
+
+  final ChapterDao _chapterDao;
+  final LogBox _logBox;
 
   GetAllChapterUseCase({
     required ValueGetter<SearchChapterUseCase> searchChapterUseCase,
-  }) : _searchChapterUseCase = searchChapterUseCase;
+    required ChapterDao chapterDao,
+    required LogBox logBox,
+  })  : _searchChapterUseCase = searchChapterUseCase,
+        _chapterDao = chapterDao,
+        _logBox = logBox;
 
   Future<List<Chapter>> execute({
     required String source,
@@ -43,6 +53,6 @@ class GetAllChapterUseCase {
       }
     }
 
-    return chapters;
+    return await sync(dao: _chapterDao, values: chapters, logBox: _logBox);
   }
 }

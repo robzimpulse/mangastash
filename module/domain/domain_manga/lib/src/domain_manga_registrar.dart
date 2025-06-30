@@ -47,7 +47,6 @@ class DomainMangaRegistrar extends Registrar {
     final MeasureProcessUseCase measurement = locator();
 
     await measurement.execute(() async {
-
       if (!kIsWeb) {
         locator.registerSingleton(await FileDownloadManager.create(log: log));
       }
@@ -171,6 +170,8 @@ class DomainMangaRegistrar extends Registrar {
       locator.registerFactory(
         () => GetAllChapterUseCase(
           searchChapterUseCase: () => locator(),
+          logBox: locator(),
+          chapterDao: locator(),
         ),
       );
       locator.registerFactory(
