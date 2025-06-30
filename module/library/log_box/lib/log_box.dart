@@ -15,7 +15,7 @@ export 'src/use_case/measure_process_use_case.dart';
 
 class LogBox {
   static final LogBox _instance = LogBox._();
-  final LogStorage _storage = LogStorage();
+  final LogStorage _storage = LogStorage(capacity: 200);
   final navigatorObserver = NavigatorObserver();
 
   factory LogBox() => _instance;

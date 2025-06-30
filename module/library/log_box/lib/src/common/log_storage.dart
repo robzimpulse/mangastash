@@ -4,24 +4,19 @@ import 'package:uuid/v4.dart';
 import '../model/log_model.dart';
 
 class LogStorage {
-  final BehaviorSubject<Map<String, LogModel>> _logs;
+  final BehaviorSubject<List<LogModel>> _logs;
 
-  LogStorage() : _logs = BehaviorSubject.seeded({});
+  final int _capacity;
 
-  Stream<List<LogModel>> get activities {
-    return _logs.stream.map((e) => e.values.toList());
-  }
+  LogStorage({required int capacity})
+      : _logs = BehaviorSubject.seeded([]),
+        _capacity = capacity;
+
+  Stream<List<LogModel>> get activities => _logs.stream;
 
   void addLog({required LogModel log}) {
-    _logs.add(
-      Map.of(_logs.value)
-        ..update(
-          const UuidV4().generate(),
-          (_) => log,
-          ifAbsent: () => log,
-        ),
-    );
+    _logs.add([...[...?_logs.valueOrNull, log].take(_capacity)]);
   }
 
-  void clear() => _logs.add({});
+  void clear() => _logs.add([]);
 }
