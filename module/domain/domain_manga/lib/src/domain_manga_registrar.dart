@@ -11,7 +11,6 @@ import 'manager/history_manager.dart';
 import 'manager/job_manager.dart';
 import 'manager/library_manager.dart';
 import 'use_case/chapter/get_all_chapter_use_case.dart';
-import 'use_case/chapter/get_chapter_on_manga_dex_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
 import 'use_case/crawl_url_use_case.dart';
@@ -129,14 +128,6 @@ class DomainMangaRegistrar extends Registrar {
         ),
       );
       locator.registerFactory(
-        () => GetChapterOnMangaDexUseCase(
-          chapterRepository: locator(),
-          atHomeRepository: locator(),
-          chapterDao: locator(),
-          logBox: locator(),
-        ),
-      );
-      locator.registerFactory(
         () => GetMangaOnMangaDexUseCase(
           logBox: locator(),
           mangaService: locator(),
@@ -177,10 +168,11 @@ class DomainMangaRegistrar extends Registrar {
       );
       locator.registerFactory(
         () => GetChapterUseCase(
-          getChapterOnMangaDexUseCase: locator(),
           logBox: locator(),
           webview: locator(),
           chapterDao: locator(),
+          chapterRepository: locator(),
+          atHomeRepository: locator(),
         ),
       );
       locator.registerFactory(
