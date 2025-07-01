@@ -128,7 +128,6 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
           );
         },
       ),
-      //
     ];
   }
 }

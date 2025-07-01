@@ -63,6 +63,14 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     // TODO: add download manga
   }
 
+  void add({required String url}) {
+    final uri = Uri.tryParse(url);
+    final source = uri?.source;
+    if (uri != null && source != null) {
+      // TODO: get manga here
+    }
+  }
+
   void update({
     MangaShelfItemLayout? layout,
     bool? isSearchActive,

@@ -19,6 +19,7 @@ export 'src/route_bottom_sheet/confirmation_route_bottom_sheet.dart';
 export 'src/route_bottom_sheet/country_picker_bottom_sheet.dart';
 export 'src/route_bottom_sheet/language_picker_bottom_sheet.dart';
 export 'src/route_bottom_sheet/menu_route_bottom_sheet.dart';
+export 'src/route_popup_dialog/text_field_dialog.dart';
 export 'src/scaffold_screen.dart';
 export 'src/util/debounce.dart';
 export 'src/widget/adaptive_physic_list_view.dart';

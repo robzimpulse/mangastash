@@ -3,6 +3,7 @@ import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:feature_common/feature_common.dart';
+import 'package:flutter/foundation.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 
@@ -14,15 +15,19 @@ class LibraryMangaScreen extends StatefulWidget {
     super.key,
     required this.cacheManager,
     this.onTapManga,
+    this.onTapAddManga,
   });
 
   final ValueSetter<Manga?>? onTapManga;
+
+  final AsyncValueGetter<String?>? onTapAddManga;
 
   final BaseCacheManager cacheManager;
 
   static Widget create({
     required ServiceLocator locator,
     ValueSetter<Manga?>? onTapManga,
+    AsyncValueGetter<String?>? onTapAddManga,
     String? sourceId,
   }) {
     return BlocProvider(
@@ -36,6 +41,7 @@ class LibraryMangaScreen extends StatefulWidget {
       child: LibraryMangaScreen(
         cacheManager: locator(),
         onTapManga: onTapManga,
+        onTapAddManga: onTapAddManga,
       ),
     );
   }
@@ -202,10 +208,11 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
   Widget _layoutAdd({required BuildContext context}) {
     return IconButton(
       icon: const Icon(Icons.add),
-      // TODO: implement this
-      onPressed: () => context.showSnackBar(
-        message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-      ),
+      onPressed: () async {
+        final result = await widget.onTapAddManga?.call();
+        if (!context.mounted || result == null) return;
+        _cubit(context).add(url: result);
+      },
     );
   }
 

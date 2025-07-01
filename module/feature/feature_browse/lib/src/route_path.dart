@@ -6,6 +6,7 @@ class BrowseRoutePath {
       '/browse_manga/:$sourceQuery/:$mangaIdQuery/:$chapterIdQuery';
   static const chapterConfig = '/manga_chapter_config';
   static const searchParam = '/manga_search_param';
+  static const addManga = '/add_manga';
 
   static const sourceQuery = 'source';
   static const mangaIdQuery = 'mangaId';

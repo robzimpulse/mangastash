@@ -1,6 +1,6 @@
 import 'package:core_route/core_route.dart';
 import 'package:feature_browse/feature_browse.dart';
-import 'package:flutter/widgets.dart';
+import 'package:feature_common/feature_common.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_browse/ui_browse.dart';
 
@@ -24,6 +24,9 @@ class LibraryRouteBuilder extends BaseRouteBuilder {
               BrowseRoutePath.mangaIdQuery: manga?.id ?? '',
             },
           ),
+          onTapAddManga: () => context.pushNamed<String>(
+            BrowseRoutePath.addManga,
+          ),
         ),
       ),
     );
@@ -34,6 +37,17 @@ class LibraryRouteBuilder extends BaseRouteBuilder {
     required ServiceLocator locator,
     required GlobalKey<NavigatorState> rootNavigatorKey,
   }) {
-    return [];
+    return [
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: BrowseRoutePath.addManga,
+        name: BrowseRoutePath.addManga,
+        pageBuilder: (context, state) => TextFieldDialog(
+          locator: locator,
+          title: 'Add Manga',
+          onSubmitted: (text) => context.pop(text),
+        ),
+      ),
+    ];
   }
 }
