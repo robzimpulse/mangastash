@@ -1,10 +1,8 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:flutter/material.dart';
 import 'package:service_locator/service_locator.dart';
 
-import '../bottom_sheet/menu_bottom_sheet.dart';
+import '../widget/manga_menu_widget.dart';
 
 class MenuRouteBottomSheet extends BottomSheetRoute {
   MenuRouteBottomSheet({
@@ -13,28 +11,11 @@ class MenuRouteBottomSheet extends BottomSheetRoute {
     required ServiceLocator locator,
     bool? isOnLibrary,
   }) : super(
-          child: (context, controller) => MenuBottomSheet(
-            content: [
-              isOnLibrary?.let(
-                (value) => ListTile(
-                  title: Text('${value ? 'Remove from' : 'Add to'} Library'),
-                  leading: Icon(
-                    value ? Icons.favorite_border : Icons.favorite,
-                  ),
-                  onTap: () => context.pop(MangaMenu.library),
-                ),
-              ),
-              ListTile(
-                title: const Text('Prefetch'),
-                leading: const Icon(Icons.cloud_download),
-                onTap: () => context.pop(MangaMenu.prefetch),
-              ),
-              ListTile(
-                title: const Text('Download'),
-                leading: const Icon(Icons.download),
-                onTap: () => context.pop(MangaMenu.download),
-              ),
-            ].nonNulls.toList(),
+          child: (context, controller) => MangaMenuWidget(
+            isOnLibrary: isOnLibrary,
+            onTapLibrary: () => context.pop(MangaMenu.library),
+            onTapPrefetch: () => context.pop(MangaMenu.prefetch),
+            onTapDownload: () => context.pop(MangaMenu.download),
           ),
           draggable: true,
           elevation: 16,

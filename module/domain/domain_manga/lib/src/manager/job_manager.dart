@@ -258,7 +258,7 @@ class JobManager
       mangaId: mangaId,
       parameter: parameter.valueOrNull?.let(
         (value) => SearchChapterParameter.from(value).copyWith(
-          orders: {ChapterOrders.chapter: OrderDirections.ascending}
+          orders: {ChapterOrders.chapter: OrderDirections.ascending},
         ),
       ),
     );
