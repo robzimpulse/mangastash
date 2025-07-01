@@ -13,15 +13,18 @@ import '../../parser/base/manga_list_html_parser.dart';
 class SearchMangaUseCase with SyncMangasMixin {
   final MangaRepository _mangaRepository;
   final HeadlessWebviewManager _webview;
+  final BaseCacheManager _cacheManager;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   const SearchMangaUseCase({
     required MangaRepository mangaRepository,
     required HeadlessWebviewManager webview,
+    required BaseCacheManager cacheManager,
     required MangaDao mangaDao,
     required LogBox logBox,
   })  : _mangaRepository = mangaRepository,
+        _cacheManager = cacheManager,
         _mangaDao = mangaDao,
         _webview = webview,
         _logBox = logBox;

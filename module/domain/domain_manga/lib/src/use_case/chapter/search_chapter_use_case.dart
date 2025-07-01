@@ -16,6 +16,7 @@ class SearchChapterUseCase
     with SyncChaptersMixin, SortChaptersMixin, FilterChaptersMixin {
   final ChapterRepository _chapterRepository;
   final HeadlessWebviewManager _webview;
+  final BaseCacheManager _cacheManager;
   final ChapterDao _chapterDao;
   final MangaDao _mangaDao;
   final LogBox _logBox;
@@ -23,10 +24,12 @@ class SearchChapterUseCase
   const SearchChapterUseCase({
     required ChapterRepository chapterRepository,
     required HeadlessWebviewManager webview,
+    required BaseCacheManager cacheManager,
     required ChapterDao chapterDao,
     required MangaDao mangaDao,
     required LogBox logBox,
   })  : _chapterRepository = chapterRepository,
+        _cacheManager = cacheManager,
         _chapterDao = chapterDao,
         _mangaDao = mangaDao,
         _logBox = logBox,

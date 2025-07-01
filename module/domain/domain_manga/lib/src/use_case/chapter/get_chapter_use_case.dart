@@ -13,6 +13,7 @@ class GetChapterUseCase with SyncChaptersMixin {
   final ChapterRepository _chapterRepository;
   final AtHomeRepository _atHomeRepository;
   final HeadlessWebviewManager _webview;
+  final BaseCacheManager _cacheManager;
   final ChapterDao _chapterDao;
   final LogBox _logBox;
 
@@ -20,10 +21,12 @@ class GetChapterUseCase with SyncChaptersMixin {
     required ChapterRepository chapterRepository,
     required AtHomeRepository atHomeRepository,
     required HeadlessWebviewManager webview,
+    required BaseCacheManager cacheManager,
     required ChapterDao chapterDao,
     required LogBox logBox,
   })  : _chapterRepository = chapterRepository,
         _atHomeRepository = atHomeRepository,
+        _cacheManager = cacheManager,
         _chapterDao = chapterDao,
         _logBox = logBox,
         _webview = webview;
@@ -113,7 +116,6 @@ class GetChapterUseCase with SyncChaptersMixin {
       }
 
       return Success(result);
-
     } catch (e) {
       return Error(e);
     }
