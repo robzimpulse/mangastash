@@ -71,4 +71,21 @@ class Pagination<T extends Equatable> extends Equatable {
       sourceUrl: sourceUrl ?? this.sourceUrl,
     );
   }
+
+  String toJsonString(Object? Function(T value) toJsonT) =>
+      json.encode(toJson(toJsonT));
+
+  static Pagination<T>? fromJsonString<T extends Equatable>(
+    String value,
+    T Function(Object? json) fromJsonT,
+  ) {
+    try {
+      return Pagination.fromJson(
+        json.decode(value) as Map<String, dynamic>,
+        fromJsonT,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
 }

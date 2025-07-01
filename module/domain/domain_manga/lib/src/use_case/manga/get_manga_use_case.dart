@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -83,11 +86,20 @@ class GetMangaUseCase with SyncMangasMixin {
     required String source,
     required String mangaId,
   }) async {
+
+    final key = '$source-$mangaId';
+    final cache = await _cacheManager.getFileFromCache(key);
+    final file = await cache?.file.readAsString();
+    final data = file.let((e) => Manga.fromJsonString(e));
+
+    if (data != null) {
+      return Success(data);
+    }
+
     try {
       final raw = await _mangaDao.search(ids: [mangaId]);
       final manga = Manga.fromDatabase(raw.firstOrNull);
 
-      // TODO: add caching since parsing from html require a lot of resource
       final promise = source == Source.mangadex().name
           ? _mangadex(source: source, mangaId: mangaId)
           : _scrapping(manga: manga, source: source);
@@ -103,6 +115,14 @@ class GetMangaUseCase with SyncMangasMixin {
       if (result == null) {
         throw Exception('Data not found');
       }
+
+      await _cacheManager.putFile(
+        key,
+        key: key,
+        utf8.encode(result.toJsonString()),
+        fileExtension: 'json',
+        maxAge: const Duration(minutes: 30),
+      );
 
       return Success(result);
     } catch (e) {

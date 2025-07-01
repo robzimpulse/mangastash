@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -113,23 +116,44 @@ class SearchChapterUseCase
     required String mangaId,
     required SearchChapterParameter parameter,
   }) async {
+    final key = '$source-$mangaId-$parameter';
+    final cache = await _cacheManager.getFileFromCache(key);
+    final file = await cache?.file.readAsString();
+    final data = file.let(
+      (e) => Pagination.fromJsonString(
+        e,
+        (e) => Chapter.fromJson(e.castOrNull()),
+      ),
+    );
+
+    if (data != null) {
+      return Success(data);
+    }
+
     try {
-      // TODO: add caching since parsing from html require a lot of resource
       final promise = source == Source.mangadex().name
           ? _mangadex(source: source, mangaId: mangaId, parameter: parameter)
           : _scrapping(source: source, mangaId: mangaId, parameter: parameter);
 
       final data = await promise;
 
-      return Success(
-        data.copyWith(
-          data: await sync(
-            dao: _chapterDao,
-            values: [...?data.data],
-            logBox: _logBox,
-          ),
+      final result = data.copyWith(
+        data: await sync(
+          dao: _chapterDao,
+          values: [...?data.data],
+          logBox: _logBox,
         ),
       );
+
+      await _cacheManager.putFile(
+        key,
+        key: key,
+        utf8.encode(result.toJsonString((e) => e.toJson())),
+        fileExtension: 'json',
+        maxAge: const Duration(minutes: 30),
+      );
+
+      return Success(result);
     } catch (e) {
       return Error(e);
     }
