@@ -8,7 +8,7 @@ import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../exception/failed_parsing_html_exception.dart';
-import '../../extension/search_url_mixin.dart';
+import '../../extension/search_url_extension.dart';
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../parser/base/manga_list_html_parser.dart';

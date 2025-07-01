@@ -1,6 +1,6 @@
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-extension SearchUrlMixin on SearchMangaParameter {
+extension SearchUrlExtension on SearchMangaParameter {
   String get mangaclash {
     return [
       [
