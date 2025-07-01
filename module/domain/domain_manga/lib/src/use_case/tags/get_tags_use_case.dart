@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -81,19 +84,36 @@ class GetTagsUseCase with SyncTagsMixin {
   }
 
   Future<Result<List<Tag>>> execute({required String source}) async {
+
+    final cache = await _cacheManager.getFileFromCache(source);
+    final file = await cache?.file.readAsString();
+    final object = file.let((e) => json.decode(e))?.castOrNull<List<dynamic>>();
+    final data = [...?object?.map((e) => Tag.fromJson(e))];
+
+    if (data.isNotEmpty) {
+      return Success(data);
+    }
+
     try {
-      // TODO: add caching since parsing from html require a lot of resource
       final promise = source == Source.mangadex().name
           ? _mangadex(source: source)
           : _scrapping(source: source);
 
-      return Success(
-        await sync(
-          dao: _tagDao,
-          values: await promise,
-          logBox: _logBox,
-        ),
+      final data = await sync(
+        dao: _tagDao,
+        values: await promise,
+        logBox: _logBox,
       );
+
+      await _cacheManager.putFile(
+        source,
+        key: source,
+        utf8.encode(json.encode([...data.map((e) => e.toJson())])),
+        fileExtension: 'json',
+        maxAge: const Duration(minutes: 30),
+      );
+
+      return Success(data);
     } catch (e) {
       return Error(e);
     }
