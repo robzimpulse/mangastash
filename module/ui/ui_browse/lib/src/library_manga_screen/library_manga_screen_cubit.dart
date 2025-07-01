@@ -1,3 +1,4 @@
+import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -10,6 +11,8 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
   final PrefetchMangaUseCase _prefetchMangaUseCase;
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
+  final GetMangaFromUrlUseCase _getMangaFromUrlUseCase;
+  final AddToLibraryUseCase _addToLibraryUseCase;
 
   LibraryMangaScreenCubit({
     LibraryMangaScreenState initialState = const LibraryMangaScreenState(),
@@ -18,9 +21,13 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     required RemoveFromLibraryUseCase removeFromLibraryUseCase,
     required ListenPrefetchUseCase listenPrefetchMangaUseCase,
     required PrefetchChapterUseCase prefetchChapterUseCase,
+    required GetMangaFromUrlUseCase getMangaFromUrlUseCase,
+    required AddToLibraryUseCase addToLibraryUseCase,
   })  : _prefetchMangaUseCase = prefetchMangaUseCase,
+        _addToLibraryUseCase = addToLibraryUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         _prefetchChapterUseCase = prefetchChapterUseCase,
+        _getMangaFromUrlUseCase = getMangaFromUrlUseCase,
         super(initialState.copyWith(sources: Source.values)) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
@@ -63,11 +70,18 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     // TODO: add download manga
   }
 
-  void add({required String url}) {
+  void add({required String url}) async {
     final uri = Uri.tryParse(url);
-    final source = uri?.source;
+    final source = uri?.source?.name;
     if (uri != null && source != null) {
-      // TODO: get manga here
+      final result = await _getMangaFromUrlUseCase.execute(
+        source: source,
+        url: url,
+      );
+
+      if (result is Success<Manga>) {
+        _addToLibraryUseCase.execute(manga: result.data);
+      }
     }
   }
 

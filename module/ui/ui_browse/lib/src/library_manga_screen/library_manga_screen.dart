@@ -37,6 +37,8 @@ class LibraryMangaScreen extends StatefulWidget {
         listenPrefetchMangaUseCase: locator(),
         removeFromLibraryUseCase: locator(),
         prefetchChapterUseCase: locator(),
+        getMangaFromUrlUseCase: locator(),
+        addToLibraryUseCase: locator(),
       ),
       child: LibraryMangaScreen(
         cacheManager: locator(),
