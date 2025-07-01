@@ -9,32 +9,53 @@ import '../../extension/search_url_mixin.dart';
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../parser/base/manga_list_html_parser.dart';
-import 'search_manga_on_mangadex_use_case.dart';
 
 class SearchMangaUseCase with SyncMangasMixin {
-  final SearchMangaOnMangaDexUseCase _searchMangaOnMangaDexUseCase;
+  final MangaRepository _mangaRepository;
   final HeadlessWebviewManager _webview;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   const SearchMangaUseCase({
-    required SearchMangaOnMangaDexUseCase searchMangaOnMangaDexUseCase,
+    required MangaRepository mangaRepository,
     required HeadlessWebviewManager webview,
     required MangaDao mangaDao,
     required LogBox logBox,
-  })  : _searchMangaOnMangaDexUseCase = searchMangaOnMangaDexUseCase,
+  })  : _mangaRepository = mangaRepository,
         _mangaDao = mangaDao,
         _webview = webview,
         _logBox = logBox;
 
-  Future<Result<Pagination<Manga>>> execute({
+  Future<Pagination<Manga>> _mangadex({
     required String source,
     required SearchMangaParameter parameter,
   }) async {
-    if (source == Source.mangadex().name) {
-      return _searchMangaOnMangaDexUseCase.execute(parameter: parameter);
-    }
+    final result = await _mangaRepository.search(
+      parameter: parameter.copyWith(
+        includes: [
+          ...?parameter.includes,
+          Include.author,
+          Include.coverArt,
+        ],
+      ),
+    );
 
+    return Pagination(
+      data: [
+        ...?result.data?.map(
+          (e) => Manga.from(data: e).copyWith(source: source),
+        ),
+      ],
+      offset: result.offset?.toInt(),
+      limit: result.limit?.toInt() ?? 0,
+      total: result.total?.toInt() ?? 0,
+    );
+  }
+
+  Future<Pagination<Manga>> _scrapping({
+    required String source,
+    required SearchMangaParameter parameter,
+  }) async {
     String url = '';
     if (source == Source.asurascan().name) {
       url = parameter.asurascan;
@@ -45,7 +66,7 @@ class SearchMangaUseCase with SyncMangasMixin {
     final document = await _webview.open(url);
 
     if (document == null) {
-      return Error(FailedParsingHtmlException(url));
+      throw FailedParsingHtmlException(url);
     }
 
     final parser = MangaListHtmlParser.forSource(
@@ -53,21 +74,40 @@ class SearchMangaUseCase with SyncMangasMixin {
       source: source,
     );
 
-    final data = await sync(
-      dao: _mangaDao,
-      values: [...parser.mangas.map((e) => e.copyWith(source: source))],
-      logBox: _logBox,
+    return Pagination(
+      data: [...parser.mangas.map((e) => e.copyWith(source: source))],
+      page: parameter.page,
+      limit: parser.mangas.length,
+      total: parser.mangas.length,
+      hasNextPage: parser.haveNextPage,
+      sourceUrl: url,
     );
+  }
 
-    return Success(
-      Pagination(
-        data: data,
-        page: parameter.page,
-        limit: parser.mangas.length,
-        total: parser.mangas.length,
-        hasNextPage: parser.haveNextPage,
-        sourceUrl: url,
-      ),
-    );
+  Future<Result<Pagination<Manga>>> execute({
+    required String source,
+    required SearchMangaParameter parameter,
+  }) async {
+    try {
+      // TODO: add caching since parsing from html require a lot of resource
+      final promise = source == Source.mangadex().name
+          ? _mangadex(source: source, parameter: parameter)
+          : _scrapping(source: source, parameter: parameter);
+
+      final data = await promise;
+
+      return Success(
+        data.copyWith(
+          data: await sync(
+            dao: _mangaDao,
+            values: [...?data.data],
+            logBox: _logBox,
+          ),
+        ),
+      );
+
+    } catch (e) {
+      return Error(e);
+    }
   }
 }
