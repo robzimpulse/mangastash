@@ -95,6 +95,7 @@ class GetChapterUseCase with SyncChaptersMixin {
     }
 
     try {
+      // TODO: add caching since parsing from html require a lot of resource
       final promise = source == Source.mangadex().name
           ? _mangadex(source: source, mangaId: mangaId, chapterId: chapterId)
           : _scrapping(chapter: chapter, source: source);

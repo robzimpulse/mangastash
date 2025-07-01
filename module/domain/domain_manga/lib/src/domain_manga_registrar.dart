@@ -24,7 +24,6 @@ import 'use_case/library/add_to_library_use_case.dart';
 import 'use_case/library/get_manga_from_library_use_case.dart';
 import 'use_case/library/listen_manga_from_library_use_case.dart';
 import 'use_case/library/remove_from_library_use_case.dart';
-import 'use_case/manga/get_manga_on_mangadex_use_case.dart';
 import 'use_case/manga/get_manga_use_case.dart';
 import 'use_case/manga/search_manga_on_mangadex_use_case.dart';
 import 'use_case/manga/search_manga_use_case.dart';
@@ -128,13 +127,6 @@ class DomainMangaRegistrar extends Registrar {
         ),
       );
       locator.registerFactory(
-        () => GetMangaOnMangaDexUseCase(
-          logBox: locator(),
-          mangaService: locator(),
-          mangaDao: locator(),
-        ),
-      );
-      locator.registerFactory(
         () => SearchMangaUseCase(
           searchMangaOnMangaDexUseCase: locator(),
           logBox: locator(),
@@ -160,7 +152,7 @@ class DomainMangaRegistrar extends Registrar {
       );
       locator.registerFactory(
         () => GetMangaUseCase(
-          getMangaOnMangaDexUseCase: locator(),
+          mangaService: locator(),
           logBox: locator(),
           webview: locator(),
           mangaDao: locator(),
