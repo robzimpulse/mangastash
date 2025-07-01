@@ -187,30 +187,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     final groups = filteredActivities.groupListsBy((e) => e.name);
 
-    final tabs = groups.entries.mapIndexed(
-      (index, entry) => TabData(
-        index: index,
-        title: Tab(child: Text(entry.key ?? 'Unnamed')),
-        content: ListView.builder(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          physics: const BouncingScrollPhysics(),
-          itemCount: entry.value.length,
-          itemBuilder: (context, index) => ItemLogWidget(
-            data: entry.value[index],
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => DetailScreen(
-                  data: entry.value[index],
-                  onTapSnapshot: widget.onTapSnapshot,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-
     return Column(
       children: [
         Expanded(
@@ -221,7 +197,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
             tabAlignment: TabAlignment.center,
             onTabChanged: (index) {},
             onTabControllerUpdated: (controller) {},
-            dynamicTabs: tabs.toList(),
+            dynamicTabs: [
+              for (final (index, key) in groups.keys.nonNulls.indexed)
+                TabData(
+                  index: index,
+                  title: Tab(child: Text(key)),
+                  content: ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: groups[key]?.length,
+                    itemBuilder: (context, index) {
+                      final data = groups[key]?.elementAtOrNull(index);
+                      if (data == null) return null;
+                      return ItemLogWidget(
+                        data: data,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailScreen(
+                              data: data,
+                              onTapSnapshot: widget.onTapSnapshot,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+            ],
             onAddTabMoveTo: MoveToTab.idol,
           ),
         ),

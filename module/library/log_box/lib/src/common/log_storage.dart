@@ -14,7 +14,7 @@ class LogStorage {
   Stream<List<LogModel>> get activities => _logs.stream;
 
   void addLog({required LogModel log}) {
-    _logs.add([...[...?_logs.valueOrNull, log].take(_capacity)]);
+    _logs.add([...[log, ...?_logs.valueOrNull].take(_capacity)]);
   }
 
   void clear() => _logs.add([]);
