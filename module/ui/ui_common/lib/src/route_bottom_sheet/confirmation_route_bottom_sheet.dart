@@ -1,7 +1,7 @@
 import 'package:core_route/core_route.dart';
 import 'package:service_locator/service_locator.dart';
 
-import '../bottom_sheet/confirmation_bottom_sheet.dart';
+import '../widget/confirmation_widget.dart';
 
 class ConfirmationRouteBottomSheet extends BottomSheetRoute {
   ConfirmationRouteBottomSheet({
@@ -13,7 +13,7 @@ class ConfirmationRouteBottomSheet extends BottomSheetRoute {
     String? negativeButtonText,
     required String content,
   }) : super(
-          child: (context, controller) => ConfirmationBottomSheet(
+          child: (context, controller) => ConfirmationWidget(
             title: title,
             content: content,
             positiveButtonText: positiveButtonText,

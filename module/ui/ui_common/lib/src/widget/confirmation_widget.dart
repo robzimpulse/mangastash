@@ -1,14 +1,16 @@
-import 'package:core_route/core_route.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:flutter/material.dart';
 import 'package:intersperse/intersperse.dart';
 
-class ConfirmationBottomSheet extends StatelessWidget {
-  const ConfirmationBottomSheet({
+class ConfirmationWidget extends StatelessWidget {
+  const ConfirmationWidget({
     super.key,
     this.title,
     required this.content,
     this.positiveButtonText,
     this.negativeButtonText,
+    this.onTapPositiveButton,
+    this.onTapNegativeButton,
   });
 
   final String? title;
@@ -17,14 +19,17 @@ class ConfirmationBottomSheet extends StatelessWidget {
   final String? positiveButtonText;
   final String? negativeButtonText;
 
+  final VoidCallback? onTapPositiveButton;
+  final VoidCallback? onTapNegativeButton;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        if (title != null)
-          Padding(
+      children: <Widget?>[
+        title?.let(
+          (text) => Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             child: Text(
               title ?? '',
@@ -32,6 +37,7 @@ class ConfirmationBottomSheet extends StatelessWidget {
               textAlign: TextAlign.start,
             ),
           ),
+        ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Text(content),
@@ -39,25 +45,27 @@ class ConfirmationBottomSheet extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Row(
-            children: <Widget>[
-              if (negativeButtonText != null)
-                Expanded(
+            children: <Widget?>[
+              negativeButtonText?.let(
+                (text) => Expanded(
                   child: OutlinedButton(
-                    onPressed: () => context.pop(false),
+                    onPressed: onTapNegativeButton,
                     child: Text(negativeButtonText ?? ''),
                   ),
                 ),
-              if (positiveButtonText != null)
-                Expanded(
+              ),
+              positiveButtonText?.let(
+                (text) => Expanded(
                   child: OutlinedButton(
-                    onPressed: () => context.pop(true),
+                    onPressed: onTapPositiveButton,
                     child: Text(positiveButtonText ?? ''),
                   ),
                 ),
-            ].intersperse(const SizedBox(width: 16)).toList(),
+              ),
+            ].nonNulls.intersperse(const SizedBox(width: 16)).toList(),
           ),
         ),
-      ].intersperse(const Divider(height: 1, thickness: 1)).toList(),
+      ].nonNulls.intersperse(const Divider(height: 1, thickness: 1)).toList(),
     );
   }
 }
