@@ -45,6 +45,8 @@ class GetAllChapterUseCase {
           ),
         );
       }
+
+      return [...chapters, ...?result.data.data];
     }
 
     return chapters;
