@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:json_annotation/json_annotation.dart';
+
 import '../../enums/content_rating.dart';
 import '../../enums/includes.dart';
 import '../../enums/language_codes.dart';
@@ -5,6 +9,9 @@ import '../../enums/order_enums.dart';
 import '../common/search_parameter.dart';
 import '../manga/search_manga_parameter.dart';
 
+part 'search_chapter_parameter.g.dart';
+
+@JsonSerializable()
 class SearchChapterParameter extends SearchParameter {
   final List<String>? groups;
   final String? uploader;
@@ -114,5 +121,23 @@ class SearchChapterParameter extends SearchParameter {
       ids: param.ids,
       translatedLanguage: param.availableTranslatedLanguage,
     );
+  }
+
+  factory SearchChapterParameter.fromJson(Map<String, dynamic> json) {
+    return _$SearchChapterParameterFromJson(json);
+  }
+
+  Map<String, dynamic> toJson() => _$SearchChapterParameterToJson(this);
+
+  String toJsonString() => json.encode(toJson());
+
+  static SearchChapterParameter? fromJsonString(String value) {
+    try {
+      return SearchChapterParameter.fromJson(
+        json.decode(value) as Map<String, dynamic>,
+      );
+    } catch (e) {
+      return null;
+    }
   }
 }

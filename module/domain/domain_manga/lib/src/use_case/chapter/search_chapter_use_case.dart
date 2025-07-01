@@ -116,7 +116,7 @@ class SearchChapterUseCase
     required String mangaId,
     required SearchChapterParameter parameter,
   }) async {
-    final key = '$source-$mangaId-$parameter';
+    final key = '$source-$mangaId-${parameter.toJsonString()}';
     final cache = await _cacheManager.getFileFromCache(key);
     final file = await cache?.file.readAsString();
     final data = file.let(

@@ -94,7 +94,7 @@ class SearchMangaUseCase with SyncMangasMixin {
     required String source,
     required SearchMangaParameter parameter,
   }) async {
-    final key = '$source-$parameter';
+    final key = '$source-${parameter.toJsonString()}';
     final cache = await _cacheManager.getFileFromCache(key);
     final file = await cache?.file.readAsString();
     final data = file.let(
