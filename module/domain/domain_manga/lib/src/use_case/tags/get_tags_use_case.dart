@@ -7,31 +7,37 @@ import '../../../domain_manga.dart';
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_tags_mixin.dart';
 import '../../parser/base/tag_list_html_parser.dart';
-import 'get_tags_on_mangadex_use_case.dart';
 
 class GetTagsUseCase with SyncTagsMixin {
-  final GetTagsOnMangaDexUseCase _getTagsOnMangaDexUseCase;
   final HeadlessWebviewManager _webview;
+  final MangaService _mangaService;
   final TagDao _tagDao;
   final LogBox _logBox;
 
   const GetTagsUseCase({
-    required GetTagsOnMangaDexUseCase getTagsOnMangaDexUseCase,
     required HeadlessWebviewManager webview,
+    required MangaService mangaService,
     required TagDao tagDao,
     required LogBox logBox,
-  })  : _getTagsOnMangaDexUseCase = getTagsOnMangaDexUseCase,
+  })  : _mangaService = mangaService,
         _tagDao = tagDao,
         _webview = webview,
         _logBox = logBox;
 
-  Future<Result<List<Tag>>> execute({required String source}) async {
-    if (source == Source.mangadex().name) {
-      return _getTagsOnMangaDexUseCase.execute();
+  Future<List<Tag>> _mangadex({required String source}) async {
+    final result = await _mangaService.tags();
+
+    final tags = result.data;
+
+    if (tags == null) {
+      throw Exception('Tag not found');
     }
 
-    const parameter = SearchMangaParameter(page: 1);
+    return [...tags.map((e) => Tag.from(data: e).copyWith(source: source))];
+  }
 
+  Future<List<Tag>> _scrapping({required String source}) async {
+    const parameter = SearchMangaParameter(page: 1);
     String url = '';
     if (source == Source.asurascan().name) {
       url = parameter.asurascan;
@@ -60,7 +66,7 @@ class GetTagsUseCase with SyncTagsMixin {
     );
 
     if (document == null) {
-      return Error(FailedParsingHtmlException(url));
+      throw FailedParsingHtmlException(url);
     }
 
     final parser = TagListHtmlParser.forSource(
@@ -68,12 +74,25 @@ class GetTagsUseCase with SyncTagsMixin {
       source: source,
     );
 
-    final data = await sync(
-      dao: _tagDao,
-      values: [...parser.tags.map((e) => e.copyWith(source: source))],
-      logBox: _logBox,
-    );
+    return [...parser.tags.map((e) => e.copyWith(source: source))];
+  }
 
-    return Success(data);
+  Future<Result<List<Tag>>> execute({required String source}) async {
+    try {
+      // TODO: add caching since parsing from html require a lot of resource
+      final promise = source == Source.mangadex().name
+          ? _mangadex(source: source)
+          : _scrapping(source: source);
+
+      return Success(
+        await sync(
+          dao: _tagDao,
+          values: await promise,
+          logBox: _logBox,
+        ),
+      );
+    } catch (e) {
+      return Error(e);
+    }
   }
 }

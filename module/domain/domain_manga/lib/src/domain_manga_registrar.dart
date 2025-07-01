@@ -33,7 +33,6 @@ import 'use_case/prefetch/prefetch_chapter_use_case.dart';
 import 'use_case/prefetch/prefetch_manga_use_case.dart';
 import 'use_case/source/listen_sources_use_case.dart';
 import 'use_case/source/update_sources_use_case.dart';
-import 'use_case/tags/get_tags_on_mangadex_use_case.dart';
 import 'use_case/tags/get_tags_use_case.dart';
 
 class DomainMangaRegistrar extends Registrar {
@@ -175,27 +174,18 @@ class DomainMangaRegistrar extends Registrar {
           logBox: locator(),
         ),
       );
-
-      locator.registerSingleton(LibraryManager(libraryDao: locator()));
-      locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
-      locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
-
-      locator.registerFactory(
-        () => GetTagsOnMangaDexUseCase(
-          mangaService: locator(),
-          tagDao: locator(),
-          logBox: locator(),
-        ),
-      );
-
       locator.registerFactory(
         () => GetTagsUseCase(
-          getTagsOnMangaDexUseCase: locator(),
+          mangaService: locator(),
           webview: locator(),
           tagDao: locator(),
           logBox: locator(),
         ),
       );
+
+      locator.registerSingleton(LibraryManager(libraryDao: locator()));
+      locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
+      locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
     });
 
     log.log(
