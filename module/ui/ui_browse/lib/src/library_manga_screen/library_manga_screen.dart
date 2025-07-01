@@ -94,6 +94,7 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
         title: _title(context: context),
         actions: [
           _layoutSearch(context: context),
+          _layoutAdd(context: context),
           _layoutRefresh(context: context),
           _layoutIcon(context: context),
         ],
@@ -189,14 +190,22 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
   Widget _layoutSearch({required BuildContext context}) {
     return _builder(
       buildWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
-      builder: (context, state) {
-        return IconButton(
-          icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
-          onPressed: () => _cubit(context).update(
-            isSearchActive: !state.isSearchActive,
-          ),
-        );
-      },
+      builder: (context, state) => IconButton(
+        icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
+        onPressed: () => _cubit(context).update(
+          isSearchActive: !state.isSearchActive,
+        ),
+      ),
+    );
+  }
+
+  Widget _layoutAdd({required BuildContext context}) {
+    return IconButton(
+      icon: const Icon(Icons.add),
+      // TODO: implement this
+      onPressed: () => context.showSnackBar(
+        message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+      ),
     );
   }
 
@@ -264,9 +273,8 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
             cacheManager: widget.cacheManager,
             title: e.title ?? '',
             coverUrl: e.coverUrl ?? '',
-            sourceIconUrl: state.sources
-                .firstWhereOrNull((f) => f.name == e.source)
-                ?.icon,
+            sourceIconUrl:
+                state.sources.firstWhereOrNull((f) => f.name == e.source)?.icon,
             isPrefetching: state.prefetchedMangaIds.contains(e.id),
             layout: state.layout,
             onTap: () => widget.onTapManga?.call(e),
