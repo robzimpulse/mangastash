@@ -13,6 +13,28 @@ class MangaClashMangaDetailHtmlParser extends MangaDetailHtmlParser {
         .map((e) => e.text.trim())
         .join('\n\n');
 
-    return Manga(description: description);
+    final title = root.querySelector('div.post-title')?.text.trim();
+
+    final authors = root.querySelector('div.author-content')?.text.trim();
+
+    final coverUrl = root
+        .querySelector('div.summary_image')
+        ?.querySelector('img')
+        ?.attributes['src'];
+
+    final tags =
+        root.querySelector('div.genres-content')?.text.trim().split(',');
+
+    return Manga(
+      title: title,
+      author: authors,
+      coverUrl: coverUrl,
+      description: description,
+      tags: [
+        ...?tags?.map(
+          (e) => Tag(name: e.trim(), source: Source.mangaclash().name),
+        ),
+      ],
+    );
   }
 }

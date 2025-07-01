@@ -37,6 +37,8 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
     }
 
     final isValid = [
+      manga.title != null,
+      manga.coverUrl != null,
       manga.author != null,
       manga.description != null,
       manga.tags?.isNotEmpty == true,

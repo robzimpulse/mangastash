@@ -80,6 +80,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
       );
 
       if (result is Success<Manga>) {
+        if (state.mangas.map((e) => e.id).contains(result.data.id)) return;
         _addToLibraryUseCase.execute(manga: result.data);
       }
     }
