@@ -31,10 +31,10 @@ class Source extends Equatable {
 
   String toJsonString() => json.encode(toJson());
 
-  static Source? fromJsonString(String json) {
+  static Source? fromJsonString(String value) {
     try {
       return Source.fromJson(
-        jsonDecode(json) as Map<String, dynamic>,
+        json.decode(value) as Map<String, dynamic>,
       );
     } catch (e) {
       return null;

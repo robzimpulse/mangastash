@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
@@ -88,6 +90,15 @@ class GetChapterUseCase with SyncChaptersMixin {
     required String mangaId,
     required String chapterId,
   }) async {
+    final key = '$source-$mangaId-$chapterId';
+    final cache = await _cacheManager.getFileFromCache(key);
+    final file = await cache?.file.readAsString();
+    final data = file.let((e) => Chapter.fromJsonString(e));
+
+    if (data != null) {
+      return Success(data);
+    }
+
     final raw = await _chapterDao.search(ids: [chapterId]);
     final chapter = raw.firstOrNull.let(
       (e) => e.chapter?.let((d) => Chapter.fromDrift(d, images: e.images)),
@@ -114,6 +125,14 @@ class GetChapterUseCase with SyncChaptersMixin {
       if (result == null) {
         throw Exception('Data not found');
       }
+
+      await _cacheManager.putFile(
+        key,
+        key: key,
+        utf8.encode(result.toJsonString()),
+        fileExtension: 'json',
+        maxAge: const Duration(minutes: 30),
+      );
 
       return Success(result);
     } catch (e) {

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
@@ -75,5 +77,17 @@ class Tag extends Equatable {
       id: data.id,
       name: data.attributes?.name?.en,
     );
+  }
+
+  String toJsonString() => json.encode(toJson());
+
+  static Tag? fromJsonString(String value) {
+    try {
+      return Tag.fromJson(
+        json.decode(value) as Map<String, dynamic>,
+      );
+    } catch (e) {
+      return null;
+    }
   }
 }

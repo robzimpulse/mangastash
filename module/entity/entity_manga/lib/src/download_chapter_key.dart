@@ -44,8 +44,6 @@ class DownloadChapterKey extends Equatable {
 
   Map<String, dynamic> toJson() => _$DownloadChapterKeyToJson(this);
 
-  String toJsonString() => json.encode(toJson());
-
   factory DownloadChapterKey.create({Manga? manga, Chapter? chapter}) {
     return DownloadChapterKey(
       mangaId: manga?.id,
@@ -57,10 +55,12 @@ class DownloadChapterKey extends Equatable {
     );
   }
 
-  static DownloadChapterKey? fromJsonString(String json) {
+  String toJsonString() => json.encode(toJson());
+
+  static DownloadChapterKey? fromJsonString(String value) {
     try {
       return DownloadChapterKey.fromJson(
-        jsonDecode(json) as Map<String, dynamic>,
+        json.decode(value) as Map<String, dynamic>,
       );
     } catch (e) {
       return const DownloadChapterKey();

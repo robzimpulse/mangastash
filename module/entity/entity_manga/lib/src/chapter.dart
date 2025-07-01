@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:equatable/equatable.dart';
@@ -193,5 +195,17 @@ class Chapter extends Equatable {
           ? scanlation.attributes?.name
           : null,
     );
+  }
+
+  String toJsonString() => json.encode(toJson());
+
+  static Chapter? fromJsonString(String value) {
+    try {
+      return Chapter.fromJson(
+        json.decode(value) as Map<String, dynamic>,
+      );
+    } catch (e) {
+      return null;
+    }
   }
 }

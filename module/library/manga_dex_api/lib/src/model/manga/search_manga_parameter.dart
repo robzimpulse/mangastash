@@ -139,10 +139,10 @@ class SearchMangaParameter extends SearchParameter {
 
   String toJsonString() => json.encode(toJson());
 
-  static SearchMangaParameter? fromJsonString(String json) {
+  static SearchMangaParameter? fromJsonString(String value) {
     try {
       return SearchMangaParameter.fromJson(
-        jsonDecode(json) as Map<String, dynamic>,
+        json.decode(value) as Map<String, dynamic>,
       );
     } catch (e) {
       return null;

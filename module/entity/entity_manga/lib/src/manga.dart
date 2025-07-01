@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:equatable/equatable.dart';
@@ -178,5 +180,17 @@ class Manga extends Equatable {
       createdAt: createdAt ?? other?.createdAt,
       updatedAt: updatedAt ?? other?.updatedAt,
     );
+  }
+
+  String toJsonString() => json.encode(toJson());
+
+  static Manga? fromJsonString(String value) {
+    try {
+      return Manga.fromJson(
+        json.decode(value) as Map<String, dynamic>,
+      );
+    } catch (e) {
+      return null;
+    }
   }
 }
