@@ -84,6 +84,7 @@ class GetMangaUseCase with SyncMangasMixin {
       final raw = await _mangaDao.search(ids: [mangaId]);
       final manga = Manga.fromDatabase(raw.firstOrNull);
 
+      // TODO: add caching since parsing from html require a lot of resource
       final promise = source == Source.mangadex().name
           ? _mangadex(source: source, mangaId: mangaId)
           : _scrapping(manga: manga, source: source);
