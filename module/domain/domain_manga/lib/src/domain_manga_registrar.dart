@@ -1,10 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
-import 'manager/download_progress_manager.dart';
-import 'manager/file_download_manager.dart';
 import 'manager/global_options_manager.dart';
 import 'manager/headless_webview_manager.dart';
 import 'manager/history_manager.dart';
@@ -14,9 +11,6 @@ import 'use_case/chapter/get_all_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
 import 'use_case/crawl_url_use_case.dart';
-import 'use_case/download/download_chapter_use_case.dart';
-import 'use_case/download/download_manga_use_case.dart';
-import 'use_case/download/listen_download_progress_use_case.dart';
 import 'use_case/history/listen_read_history_use_case.dart';
 import 'use_case/history/listen_unread_history_use_case.dart';
 import 'use_case/history/update_chapter_last_read_at_use_case.dart';
@@ -43,18 +37,6 @@ class DomainMangaRegistrar extends Registrar {
     final MeasureProcessUseCase measurement = locator();
 
     await measurement.execute(() async {
-      if (!kIsWeb) {
-        locator.registerSingleton(await FileDownloadManager.create(log: log));
-      }
-
-      locator.registerSingleton(
-        await DownloadProgressManager.create(
-          fileDownloader: locator.getOrNull(),
-          cacheManager: locator(),
-          log: log,
-        ),
-      );
-      locator.alias<ListenDownloadProgressUseCase, DownloadProgressManager>();
 
       locator.registerSingleton(
         GlobalOptionsManager(storage: locator()),
@@ -73,7 +55,6 @@ class DomainMangaRegistrar extends Registrar {
           getChapterUseCase: () => locator(),
           getMangaUseCase: () => locator(),
           getAllChapterUseCase: () => locator(),
-          fileDownloader: locator.getOrNull(),
           listenSearchParameterUseCase: locator(),
         ),
         dispose: (e) => e.dispose(),
@@ -81,8 +62,6 @@ class DomainMangaRegistrar extends Registrar {
       locator.alias<PrefetchMangaUseCase, JobManager>();
       locator.alias<PrefetchChapterUseCase, JobManager>();
       locator.alias<ListenPrefetchUseCase, JobManager>();
-      locator.alias<DownloadChapterUseCase, JobManager>();
-      locator.alias<DownloadMangaUseCase, JobManager>();
 
       locator.registerSingleton(HistoryManager(historyDao: locator()));
       locator.alias<ListenReadHistoryUseCase, HistoryManager>();

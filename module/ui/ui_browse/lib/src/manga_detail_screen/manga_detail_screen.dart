@@ -44,8 +44,6 @@ class MangaDetailScreen extends StatefulWidget {
         addToLibraryUseCase: locator(),
         removeFromLibraryUseCase: locator(),
         listenMangaFromLibraryUseCase: locator(),
-        downloadChapterUseCase: locator(),
-        listenDownloadProgressUseCase: locator(),
         crawlUrlUseCase: locator(),
         listenPrefetchUseCase: locator(),
         prefetchChapterUseCase: locator(),
@@ -105,38 +103,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     BuildContext context,
     DownloadOption option,
   ) async {
-    await [
-      Permission.storage,
-      Permission.manageExternalStorage,
-      Permission.notification,
-    ].request();
-
-    if (!context.mounted) return;
-
-    switch (option) {
-      case DownloadOption.all:
-        _cubit(context).downloadAllChapter();
-        context.showSnackBar(message: 'Downloading All Chapter');
-        break;
-      case DownloadOption.unread:
-        _cubit(context).downloadUnreadChapter();
-        context.showSnackBar(message: 'Downloading Unread Chapter');
-        break;
-    }
-  }
-
-  void _onTapDownloadChapter(
-    BuildContext context,
-    Chapter chapter,
-  ) async {
-    await [
-      Permission.storage,
-      Permission.manageExternalStorage,
-      Permission.notification,
-    ].request();
-
-    if (!context.mounted) return;
-    _cubit(context).downloadChapter(chapter: chapter);
+    return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
 
   @override
@@ -428,18 +395,9 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               sliver: MultiSliver(
                 children: [
                   ...state.filtered
-                      .map(
-                        (e) => SliverToBoxAdapter(
-                          child: _chapterItem(
-                            key: DownloadChapterKey.create(
-                              manga: state.manga,
-                              chapter: e,
-                            ),
-                            chapter: e,
-                          ),
-                        ),
-                      )
-                      .intersperse(SliverToBoxAdapter(child: _separator())),
+                      .map((e) => _chapterItem(chapter: e))
+                      .intersperse(_separator())
+                      .map((e) => SliverToBoxAdapter(child: e)),
                 ],
               ),
             ),
@@ -449,13 +407,9 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
-  Widget _chapterItem({
-    required DownloadChapterKey key,
-    required Chapter chapter,
-  }) {
+  Widget _chapterItem({required Chapter chapter}) {
     return _builder(
       buildWhen: (prev, curr) => [
-        prev.progress?[key] != curr.progress?[key],
         prev.prefetchedChapterId != curr.prefetchedChapterId,
         prev.histories[chapter.id] != curr.histories[chapter.id],
       ].contains(true),
@@ -466,7 +420,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         return ChapterTileWidget(
           padding: const EdgeInsets.symmetric(vertical: 8),
           onTap: () => widget.onTapChapter?.call(chapter),
-          onTapDownload: () => _onTapDownloadChapter(context, chapter),
           opacity: lastReadAt != null ? 0.5 : 1,
           title: [
             'Chapter ${chapter.chapter}',
@@ -475,7 +428,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           language: Language.fromCode(chapter.translatedLanguage),
           uploadedAt: chapter.readableAt,
           groups: chapter.scanlationGroup,
-          downloadProgress: state.progress?[key]?.progress.toDouble() ?? 0.0,
           isPrefetching: state.prefetchedChapterId.contains(chapter.id),
           lastReadAt: lastReadAt,
         );

@@ -1,29 +1,18 @@
-import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 class MoreScreenState extends Equatable {
+  final int jobCount;
 
-  final int? totalActiveDownload;
-
-  final int? totalActiveJob;
-
-  int get totalActiveQueue {
-    return [totalActiveJob, totalActiveDownload].nonNulls.sum;
-  }
-
-  const MoreScreenState({this.totalActiveDownload, this.totalActiveJob});
+  const MoreScreenState({this.jobCount = 0});
 
   @override
-  List<Object?> get props => [totalActiveDownload, totalActiveJob];
+  List<Object?> get props => [jobCount];
 
   MoreScreenState copyWith({
-    int? totalActiveDownload,
-    int? totalActiveJob,
+    int? jobCount,
   }) {
     return MoreScreenState(
-      totalActiveDownload: totalActiveDownload ?? this.totalActiveDownload,
-      totalActiveJob: totalActiveJob ?? this.totalActiveJob,
+      jobCount: jobCount ?? this.jobCount,
     );
   }
-
 }

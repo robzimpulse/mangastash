@@ -25,7 +25,6 @@ class MangaDetailScreenState extends Equatable {
   final int? totalChapter;
   final Source? source;
   final List<Manga> libraries;
-  final Map<DownloadChapterKey, DownloadChapterProgress>? progress;
   final Set<String> prefetchedChapterId;
   final Map<String, Chapter> histories;
 
@@ -73,7 +72,6 @@ class MangaDetailScreenState extends Equatable {
     this.config = const ChapterConfig(),
     this.libraries = const [],
     this.prefetchedChapterId = const {},
-    this.progress,
     this.parameter = const SearchChapterParameter(),
     this.hasNextPage = false,
     this.isPagingNextPage = false,
@@ -93,7 +91,6 @@ class MangaDetailScreenState extends Equatable {
         source,
         config,
         libraries,
-        progress,
         parameter,
         hasNextPage,
         isPagingNextPage,
@@ -116,7 +113,6 @@ class MangaDetailScreenState extends Equatable {
     ChapterConfig? config,
     List<Manga>? libraries,
     Set<String>? prefetchedChapterId,
-    Map<DownloadChapterKey, DownloadChapterProgress>? progress,
     SearchChapterParameter? parameter,
     bool? hasNextPage,
     bool? isPagingNextPage,
@@ -136,7 +132,6 @@ class MangaDetailScreenState extends Equatable {
       chapters: chapters ?? this.chapters,
       source: source ?? this.source,
       libraries: libraries ?? this.libraries,
-      progress: progress ?? this.progress,
       parameter: parameter ?? this.parameter,
       hasNextPage: hasNextPage ?? this.hasNextPage,
       isPagingNextPage: isPagingNextPage ?? this.isPagingNextPage,

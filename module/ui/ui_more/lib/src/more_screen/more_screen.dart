@@ -35,7 +35,6 @@ class MoreScreen extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (context) => MoreScreenCubit(
-        listenDownloadProgressUseCase: locator(),
         listenPrefetchUseCase: locator(),
       ),
       child: MoreScreen(
@@ -120,12 +119,10 @@ class MoreScreen extends StatelessWidget {
                 ),
                 const Divider(height: 1, thickness: 1),
                 _builder(
-                  buildWhen: (prev, curr) {
-                    return prev.totalActiveQueue != curr.totalActiveQueue;
-                  },
+                  buildWhen: (prev, curr) => prev.jobCount != curr.jobCount,
                   builder: (context, state) => ListTile(
                     title: const Text('Job Queue'),
-                    subtitle: Text('${state.totalActiveQueue} remaining'),
+                    subtitle: Text('${state.jobCount} remaining'),
                     onTap: onTapDownloadQueue,
                     leading: const SizedBox(
                       height: double.infinity,

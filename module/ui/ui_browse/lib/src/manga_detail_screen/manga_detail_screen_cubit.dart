@@ -14,7 +14,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   final SearchChapterUseCase _searchChapterUseCase;
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
   final AddToLibraryUseCase _addToLibraryUseCase;
-  final DownloadChapterUseCase _downloadChapterUseCase;
   final CrawlUrlUseCase _crawlUrlUseCase;
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final GetAllChapterUseCase _getAllChapterUseCase;
@@ -27,8 +26,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required AddToLibraryUseCase addToLibraryUseCase,
     required RemoveFromLibraryUseCase removeFromLibraryUseCase,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
-    required DownloadChapterUseCase downloadChapterUseCase,
-    required ListenDownloadProgressUseCase listenDownloadProgressUseCase,
     required CrawlUrlUseCase crawlUrlUseCase,
     required ListenPrefetchUseCase listenPrefetchUseCase,
     required PrefetchChapterUseCase prefetchChapterUseCase,
@@ -40,7 +37,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
         _searchChapterUseCase = searchChapterUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
-        _downloadChapterUseCase = downloadChapterUseCase,
         _crawlUrlUseCase = crawlUrlUseCase,
         _prefetchChapterUseCase = prefetchChapterUseCase,
         _updateChapterLastReadAtUseCase = updateChapterLastReadAtUseCase,
@@ -56,9 +52,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       listenMangaFromLibraryUseCase.libraryStateStream
           .distinct()
           .listen(_updateMangaLibrary),
-    );
-    addSubscription(
-      listenDownloadProgressUseCase.all.distinct().listen(_updateMangaProgress),
     );
     addSubscription(
       listenPrefetchUseCase.chapterIdsStream.distinct().listen(_updatePrefetch),
@@ -88,12 +81,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       map[key] = value;
     }
     emit(state.copyWith(histories: map));
-  }
-
-  void _updateMangaProgress(
-    Map<DownloadChapterKey, DownloadChapterProgress> progress,
-  ) {
-    emit(state.copyWith(progress: progress));
   }
 
   // TODO: perform set read for multiple chapter
@@ -241,51 +228,8 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
   }
 
-  void downloadChapter({required Chapter chapter}) {
-    final mangaId = state.manga?.id;
-    final chapterId = chapter.id;
-    final source = state.manga?.source;
-    if (mangaId == null || chapterId == null || source == null) return;
-    _downloadChapterUseCase.downloadChapter(
-      mangaId: mangaId,
-      chapterId: chapterId,
-      source: source,
-    );
-  }
-
-  void downloadAllChapter() {
-    for (final chapter in state.chapters) {
-      downloadChapter(chapter: chapter);
-    }
-  }
-
-  void downloadUnreadChapter() {
-    for (final chapter in state.chapters) {
-      if (state.histories.containsKey(chapter.id)) continue;
-      downloadChapter(chapter: chapter);
-    }
-  }
-
   void recrawl({required String url}) async {
     await _crawlUrlUseCase.execute(url: url);
     await init();
   }
-
-  // void _updateDownloadChapterProgress(List<(String?, int, double)> progress) {
-  //   final downloadProgress = Map.of(
-  //     state.downloadProgress ?? <String?, double>{},
-  //   );
-  //
-  //   for (final data in progress) {
-  //     final chapterId = data.$1;
-  //     final totalProgress = data.$3;
-  //     downloadProgress.update(
-  //       chapterId,
-  //       (value) => totalProgress,
-  //       ifAbsent: () => 0.0,
-  //     );
-  //   }
-  //
-  //   emit(state.copyWith(downloadProgress: downloadProgress));
-  // }
 }

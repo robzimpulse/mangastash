@@ -8,11 +8,9 @@ class ChapterTileWidget extends StatelessWidget {
   const ChapterTileWidget({
     super.key,
     this.onTap,
-    this.onTapDownload,
     this.padding,
     this.title,
     this.language,
-    this.downloadProgress = 0,
     this.uploadedAt,
     this.groups,
     this.isPrefetching = false,
@@ -22,13 +20,11 @@ class ChapterTileWidget extends StatelessWidget {
   });
 
   final VoidCallback? onTap;
-  final VoidCallback? onTapDownload;
   final VoidCallback? onTapLongPress;
   final EdgeInsetsGeometry? padding;
   final String? title;
   final String? groups;
   final Language? language;
-  final double downloadProgress;
   final DateTime? uploadedAt;
   final DateTime? lastReadAt;
   final bool isPrefetching;
@@ -86,30 +82,6 @@ class ChapterTileWidget extends StatelessWidget {
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(),
-                    ),
-                  ),
-                if (downloadProgress == 1)
-                  const Padding(
-                    padding: EdgeInsets.all(12.0),
-                    child: Icon(Icons.download_done, size: 20),
-                  )
-                else if (downloadProgress == 0 ||
-                    downloadProgress.isNaN ||
-                    downloadProgress.isInfinite)
-                  if (onTapDownload != null)
-                    IconButton(
-                      onPressed: onTapDownload,
-                      icon: const Icon(Icons.download, size: 20),
-                    )
-                else
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        value: downloadProgress,
-                      ),
                     ),
                   ),
               ],
