@@ -65,9 +65,7 @@ class BrowseMangaScreen extends StatefulWidget {
 }
 
 class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
-  late final PagingScrollController _scrollController = PagingScrollController(
-    onLoadNextPage: (context) => _cubit(context).next(),
-  );
+  final ScrollController _scrollController = ScrollController();
 
   final TextEditingController _searchController = TextEditingController();
 
@@ -213,9 +211,12 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
           ),
         ),
       ),
-      body: RefreshIndicator(
-        onRefresh: () => _cubit(context).init(),
-        child: _content(context),
+      body: NextPageNotificationWidget(
+        onLoadNextPage: () => _cubit(context).next(),
+        child: RefreshIndicator(
+          onRefresh: () => _cubit(context).init(),
+          child: _content(context),
+        ),
       ),
     );
   }

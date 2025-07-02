@@ -2,10 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../controller/paging_scroll_controller.dart';
-
 class MangaShelfWidget extends StatelessWidget {
-  final PagingScrollController controller;
+  final ScrollController controller;
   final bool hasNextPage;
   final Widget loadingIndicator;
   final Widget contentSliverWidget;
@@ -96,23 +94,15 @@ class MangaShelfWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return NotificationListener<ScrollNotification>(
-      onNotification: (scrollNotification) {
-        return controller.onScrollNotification(
-          context,
-          scrollNotification,
-        );
-      },
-      child: CustomScrollView(
-        controller: controller,
-        slivers: [
-          SliverPadding(
-            padding: padding,
-            sliver: contentSliverWidget,
-          ),
-          if (hasNextPage) _loadingIndicator(),
-        ],
-      ),
+    return CustomScrollView(
+      controller: controller,
+      slivers: [
+        SliverPadding(
+          padding: padding,
+          sliver: contentSliverWidget,
+        ),
+        if (hasNextPage) _loadingIndicator(),
+      ],
     );
   }
 

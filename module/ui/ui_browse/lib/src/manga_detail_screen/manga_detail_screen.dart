@@ -67,9 +67,7 @@ class MangaDetailScreen extends StatefulWidget {
 }
 
 class _MangaDetailScreenState extends State<MangaDetailScreen> {
-  late final PagingScrollController _scrollController = PagingScrollController(
-    onLoadNextPage: (context) => _cubit(context).next(),
-  );
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void dispose() {
@@ -172,7 +170,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         ],
         body: RefreshIndicator(
           onRefresh: () => _cubit(context).init(),
-          child: _content(),
+          child: NextPageNotificationWidget(
+            onLoadNextPage: () => _cubit(context).next(),
+            child: _content(),
+          ),
         ),
       ),
     );
@@ -581,32 +582,24 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   Widget _content() {
-    return NotificationListener<ScrollNotification>(
-      onNotification: (scrollNotification) {
-        return _scrollController.onScrollNotification(
-          context,
-          scrollNotification,
-        );
-      },
-      child: CustomScrollView(
-        slivers: [
-          _manga(),
-          _chapters(),
-          SliverToBoxAdapter(
-            child: _builder(
-              buildWhen: (prev, curr) => prev.hasNextPage != curr.hasNextPage,
-              builder: (context, state) => state.hasNextPage
-                  ? const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
+    return CustomScrollView(
+      slivers: [
+        _manga(),
+        _chapters(),
+        SliverToBoxAdapter(
+          child: _builder(
+            buildWhen: (prev, curr) => prev.hasNextPage != curr.hasNextPage,
+            builder: (context, state) => state.hasNextPage
+                ? const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                : const SizedBox.shrink(),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

@@ -53,9 +53,7 @@ class LibraryMangaScreen extends StatefulWidget {
 }
 
 class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
-  final _scrollController = PagingScrollController(
-    onLoadNextPage: (context) {},
-  );
+  final _scrollController = ScrollController();
 
   final TextEditingController _searchController = TextEditingController();
 

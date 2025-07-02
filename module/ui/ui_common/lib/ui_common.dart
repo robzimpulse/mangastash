@@ -9,7 +9,6 @@ export 'package:responsive_framework/responsive_framework.dart';
 export 'package:share_plus/share_plus.dart';
 export 'package:sliver_tools/sliver_tools.dart';
 
-export 'src/controller/paging_scroll_controller.dart';
 export 'src/extension/bottom_sheet_extension.dart';
 export 'src/extension/expansion_tile_extension.dart';
 export 'src/extension/snackbar_extension.dart';
@@ -33,6 +32,7 @@ export 'src/widget/manga_parameter_widget.dart';
 export 'src/widget/manga_shelf_widget/manga_shelf_item.dart';
 export 'src/widget/manga_shelf_widget/manga_shelf_item_layout.dart';
 export 'src/widget/manga_shelf_widget/manga_shelf_widget.dart';
+export 'src/widget/next_page_notification_widget.dart';
 export 'src/widget/shimmer_loading_widget.dart';
 export 'src/widget/size_notifier_widget.dart';
 export 'src/widget/source_manga_widget.dart';

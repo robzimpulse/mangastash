@@ -45,7 +45,7 @@ class GetAllChapterUseCase {
             page: param.page + 1,
             limit: param.limit,
           ),
-          useCache: useCache
+          useCache: useCache,
         );
       }
 
