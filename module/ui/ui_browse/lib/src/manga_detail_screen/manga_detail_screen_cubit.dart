@@ -101,7 +101,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   //   _updateChapterLastReadAtUseCase.execute(chapter: chapter);
   // }
 
-  Future<void> init({ChapterConfig? config}) async {
+  Future<void> init({ChapterConfig? config, bool useCache = true}) async {
     final option = switch ((config ?? state.config).sortOption) {
       ChapterSortOptionEnum.chapterNumber => ChapterOrders.chapter,
       ChapterSortOptionEnum.uploadDate => ChapterOrders.readableAt,
@@ -129,13 +129,13 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       ),
     );
 
-    await _fetchManga();
+    await _fetchManga(useCache: useCache);
     emit(state.copyWith(isLoadingChapters: true));
-    await _fetchChapter();
+    await _fetchChapter(useCache: useCache);
     emit(state.copyWith(isLoadingChapters: false));
   }
 
-  Future<void> _fetchManga() async {
+  Future<void> _fetchManga({bool useCache = true}) async {
     final id = state.manga?.id ?? state.mangaId;
     final source = state.source?.name;
     if (id == null || id.isEmpty || source == null) return;
@@ -150,6 +150,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     final result = await _getMangaUseCase.execute(
       mangaId: id,
       source: source,
+      useCache: useCache,
     );
 
     if (result is Success<Manga>) {
@@ -163,7 +164,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     emit(state.copyWith(isLoadingManga: false));
   }
 
-  Future<void> _fetchChapter() async {
+  Future<void> _fetchChapter({bool useCache = true}) async {
     final id = state.manga?.id ?? state.mangaId;
     final source = state.source?.name;
     if (id == null || id.isEmpty || source == null) return;
@@ -172,6 +173,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       mangaId: id,
       source: source,
       parameter: state.parameter,
+      useCache: useCache,
     );
 
     if (result is Success<Pagination<Chapter>>) {
@@ -203,11 +205,11 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
   }
 
-  Future<void> next() async {
+  Future<void> next({bool useCache = true}) async {
     if (state.isLoadingChapters) return;
     if (!state.hasNextPage || state.isPagingNextPage) return;
     emit(state.copyWith(isPagingNextPage: true));
-    await _fetchChapter();
+    await _fetchChapter(useCache: useCache);
     emit(state.copyWith(isPagingNextPage: false));
   }
 

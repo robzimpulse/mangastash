@@ -214,7 +214,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
       body: NextPageNotificationWidget(
         onLoadNextPage: () => _cubit(context).next(),
         child: RefreshIndicator(
-          onRefresh: () => _cubit(context).init(),
+          onRefresh: () => _cubit(context).init(useCache: false),
           child: _content(context),
         ),
       ),

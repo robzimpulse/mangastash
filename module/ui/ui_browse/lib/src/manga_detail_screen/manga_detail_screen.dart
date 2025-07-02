@@ -168,10 +168,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             ),
           ),
         ],
-        body: RefreshIndicator(
-          onRefresh: () => _cubit(context).init(),
-          child: NextPageNotificationWidget(
-            onLoadNextPage: () => _cubit(context).next(),
+        body: NextPageNotificationWidget(
+          onLoadNextPage: () => _cubit(context).next(),
+          child: RefreshIndicator(
+            onRefresh: () => _cubit(context).init(useCache: false),
             child: _content(),
           ),
         ),

@@ -65,6 +65,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   Future<void> init({
     String? title,
     SearchMangaParameter? parameter,
+    bool useCache = true,
   }) async {
     emit(
       state.copyWith(
@@ -79,17 +80,23 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
       ),
     );
 
-    await Future.wait([_fetchManga(), _fetchTags()]);
+    await Future.wait([
+      _fetchManga(useCache: useCache),
+      _fetchTags(useCache: useCache),
+    ]);
 
     emit(state.copyWith(isLoading: false));
   }
 
-  Future<void> _fetchTags() async {
+  Future<void> _fetchTags({bool useCache = true}) async {
     final source = state.source?.name;
 
     if (source == null) return;
 
-    final result = await _getTagsUseCase.execute(source: source);
+    final result = await _getTagsUseCase.execute(
+      source: source,
+      useCache: useCache,
+    );
 
     if (result is Success<List<Tag>>) {
       emit(state.copyWith(tags: result.data));
@@ -100,15 +107,13 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     }
   }
 
-  Future<void> _fetchManga() async {
+  Future<void> _fetchManga({bool useCache = true}) async {
     final source = state.source?.name;
 
     if (source == null) return;
 
     final result = await _searchMangaUseCase.execute(
-      source: source,
-      parameter: state.parameter,
-    );
+        source: source, parameter: state.parameter, useCache: useCache);
 
     if (result is Success<Pagination<Manga>>) {
       final offset = result.data.offset ?? 0;
@@ -139,10 +144,10 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     }
   }
 
-  Future<void> next() async {
+  Future<void> next({bool useCache = true}) async {
     if (!state.hasNextPage || state.isPagingNextPage) return;
     emit(state.copyWith(isPagingNextPage: true));
-    await _fetchManga();
+    await _fetchManga(useCache: useCache);
     emit(state.copyWith(isPagingNextPage: false));
   }
 
