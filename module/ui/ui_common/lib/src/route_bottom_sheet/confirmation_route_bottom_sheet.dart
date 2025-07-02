@@ -18,6 +18,8 @@ class ConfirmationRouteBottomSheet extends BottomSheetRoute {
             content: content,
             positiveButtonText: positiveButtonText,
             negativeButtonText: negativeButtonText,
+            onTapPositiveButton: () => context.pop(true),
+            onTapNegativeButton: () => context.pop(false),
           ),
           draggable: true,
           elevation: 16,
