@@ -8,6 +8,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
+import '../../exception/data_not_found_exception.dart';
 import '../../exception/failed_parsing_html_exception.dart';
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/filter_chapters_mixin.dart';
@@ -77,7 +78,7 @@ class SearchChapterUseCase
     final url = result?.webUrl;
 
     if (result == null || url == null) {
-      throw Exception('Data not found');
+      throw DataNotFoundException();
     }
 
     final document = await _webview.open(url);

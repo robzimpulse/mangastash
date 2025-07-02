@@ -3,6 +3,7 @@ library domain_manga;
 export 'package:manga_dex_api/manga_dex_api.dart';
 
 export 'src/domain_manga_registrar.dart';
+export 'src/exception/data_not_found_exception.dart';
 export 'src/exception/failed_parsing_html_exception.dart';
 export 'src/extension/language_code_converter.dart';
 export 'src/extension/search_url_extension.dart';

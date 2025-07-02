@@ -6,6 +6,8 @@ import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 
+import '../../../domain_manga.dart';
+import '../../exception/data_not_found_exception.dart';
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../parser/base/manga_detail_html_parser.dart';
@@ -33,7 +35,7 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
     final document = await _webview.open(url);
 
     if (document == null) {
-      throw Exception('Error parsing html');
+      throw FailedParsingHtmlException(url);
     }
 
     final parser = MangaDetailHtmlParser.forSource(
@@ -76,7 +78,7 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
       final result = results.firstOrNull;
 
       if (result == null) {
-        throw Exception('Data not found');
+        throw DataNotFoundException();
       }
 
       await _cacheManager.putFile(

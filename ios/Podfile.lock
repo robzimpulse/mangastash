@@ -1188,8 +1188,6 @@ PODS:
     - abseil/meta/type_traits
     - abseil/xcprivacy
   - abseil/xcprivacy (1.20240722.0)
-  - background_downloader (0.0.1):
-    - Flutter
   - BoringSSL-GRPC (0.0.37):
     - BoringSSL-GRPC/Implementation (= 0.0.37)
     - BoringSSL-GRPC/Interface (= 0.0.37)
@@ -1423,7 +1421,6 @@ PODS:
     - sqlite3/rtree
 
 DEPENDENCIES:
-  - background_downloader (from `.symlinks/plugins/background_downloader/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
@@ -1463,8 +1460,6 @@ SPEC REPOS:
     - sqlite3
 
 EXTERNAL SOURCES:
-  background_downloader:
-    :path: ".symlinks/plugins/background_downloader/ios"
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
   firebase_auth:
@@ -1494,7 +1489,6 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   abseil: a05cc83bf02079535e17169a73c5be5ba47f714b
-  background_downloader: 9f788ffc5de45acf87d6380e91ca0841066c18cf
   BoringSSL-GRPC: dded2a44897e45f28f08ae87a55ee4bcd19bc508
   cloud_firestore: aef3217af294cd35afda47e63112d306f4c9a2e2
   Firebase: 1fe1c0a7d9aaea32efe01fbea5f0ebd8d70e53a2

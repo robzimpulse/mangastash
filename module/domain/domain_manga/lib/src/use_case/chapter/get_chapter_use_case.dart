@@ -7,6 +7,8 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
+import '../../exception/data_not_found_exception.dart';
+import '../../exception/failed_parsing_html_exception.dart';
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_chapters_mixin.dart';
 import '../../parser/base/chapter_image_html_parser.dart';
@@ -64,7 +66,7 @@ class GetChapterUseCase with SyncChaptersMixin {
     final url = chapter?.webUrl;
 
     if (chapter == null || url == null) {
-      throw Exception('Data not found');
+      throw DataNotFoundException();
     }
 
     if (chapter.images?.isNotEmpty == true) {
@@ -74,7 +76,7 @@ class GetChapterUseCase with SyncChaptersMixin {
     final document = await _webview.open(url);
 
     if (document == null) {
-      throw Exception('Error parsing html');
+      throw FailedParsingHtmlException(url);
     }
 
     final parser = ChapterImageHtmlParser.forSource(
@@ -123,7 +125,7 @@ class GetChapterUseCase with SyncChaptersMixin {
       final result = results.firstOrNull;
 
       if (result == null) {
-        throw Exception('Data not found');
+        throw DataNotFoundException();
       }
 
       await _cacheManager.putFile(
