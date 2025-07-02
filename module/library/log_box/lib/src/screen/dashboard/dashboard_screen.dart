@@ -186,6 +186,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
 
     final groups = filteredActivities.groupListsBy((e) => e.name);
+    final keys = groups.keys.nonNulls.sortedBy((e) => e);
 
     return Column(
       children: [
@@ -198,7 +199,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             onTabChanged: (index) {},
             onTabControllerUpdated: (controller) {},
             dynamicTabs: [
-              for (final (index, key) in groups.keys.nonNulls.indexed)
+              for (final (index, key) in keys.indexed)
                 TabData(
                   index: index,
                   title: Tab(child: Text(key)),
