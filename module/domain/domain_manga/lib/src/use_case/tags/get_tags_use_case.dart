@@ -85,14 +85,16 @@ class GetTagsUseCase with SyncTagsMixin {
     return [...parser.tags.map((e) => e.copyWith(source: source))];
   }
 
-  Future<Result<List<Tag>>> execute({required String source}) async {
-
+  Future<Result<List<Tag>>> execute({
+    required String source,
+    bool useCache = true,
+  }) async {
     final cache = await _cacheManager.getFileFromCache(source);
     final file = await cache?.file.readAsString();
     final object = file.let((e) => json.decode(e))?.castOrNull<List<dynamic>>();
     final data = [...?object?.map((e) => Tag.fromJson(e))];
 
-    if (data.isNotEmpty) {
+    if (data.isNotEmpty && useCache) {
       return Success(data);
     }
 

@@ -28,26 +28,8 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
 
   Future<Manga> _scrapping({
     required String source,
-    required Manga? manga,
+    required String url,
   }) async {
-    final url = manga?.webUrl;
-
-    if (manga == null || url == null) {
-      throw Exception('Data not found');
-    }
-
-    final isValid = [
-      manga.title != null,
-      manga.coverUrl != null,
-      manga.author != null,
-      manga.description != null,
-      manga.tags?.isNotEmpty == true,
-    ].every((e) => e);
-
-    if (isValid) {
-      return manga;
-    }
-
     final document = await _webview.open(url);
 
     if (document == null) {
@@ -65,13 +47,14 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
   Future<Result<Manga>> execute({
     required String source,
     required String url,
+    bool useCache = true,
   }) async {
     final key = '$source-$url';
     final cache = await _cacheManager.getFileFromCache(key);
     final file = await cache?.file.readAsString();
     final data = file.let((e) => Manga.fromJsonString(e));
 
-    if (data != null) {
+    if (data != null && useCache) {
       return Success(data);
     }
 
@@ -84,7 +67,7 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
         values: [
           await _scrapping(
             source: source,
-            manga: manga.or(Manga(webUrl: url)),
+            url: (manga?.webUrl).or(url),
           ),
         ],
         logBox: _logBox,

@@ -93,6 +93,7 @@ class SearchMangaUseCase with SyncMangasMixin {
   Future<Result<Pagination<Manga>>> execute({
     required String source,
     required SearchMangaParameter parameter,
+    bool useCache = true,
   }) async {
     final key = '$source-${parameter.toJsonString()}';
     final cache = await _cacheManager.getFileFromCache(key);
@@ -104,7 +105,7 @@ class SearchMangaUseCase with SyncMangasMixin {
       ),
     );
 
-    if (data != null) {
+    if (data != null && useCache) {
       return Success(data);
     }
 

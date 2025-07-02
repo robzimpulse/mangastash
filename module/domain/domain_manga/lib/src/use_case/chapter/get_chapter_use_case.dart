@@ -89,13 +89,14 @@ class GetChapterUseCase with SyncChaptersMixin {
     required String source,
     required String mangaId,
     required String chapterId,
+    bool useCache = true,
   }) async {
     final key = '$source-$mangaId-$chapterId';
     final cache = await _cacheManager.getFileFromCache(key);
     final file = await cache?.file.readAsString();
     final data = file.let((e) => Chapter.fromJsonString(e));
 
-    if (data != null) {
+    if (data != null && useCache) {
       return Success(data);
     }
 

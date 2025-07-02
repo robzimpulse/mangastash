@@ -115,6 +115,7 @@ class SearchChapterUseCase
     required String source,
     required String mangaId,
     required SearchChapterParameter parameter,
+    bool useCache = true,
   }) async {
     final key = '$source-$mangaId-${parameter.toJsonString()}';
     final cache = await _cacheManager.getFileFromCache(key);
@@ -126,7 +127,7 @@ class SearchChapterUseCase
       ),
     );
 
-    if (data != null) {
+    if (data != null && useCache) {
       return Success(data);
     }
 
