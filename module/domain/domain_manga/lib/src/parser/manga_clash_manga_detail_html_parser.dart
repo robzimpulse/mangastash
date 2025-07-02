@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 
 import 'base/manga_detail_html_parser.dart';
@@ -32,7 +33,10 @@ class MangaClashMangaDetailHtmlParser extends MangaDetailHtmlParser {
       description: description,
       tags: [
         ...?tags?.map(
-          (e) => Tag(name: e.trim(), source: Source.mangaclash().name),
+          (e) => Tag(
+            name: toBeginningOfSentenceCase(e.trim()),
+            source: Source.mangaclash().name,
+          ),
         ),
       ],
     );

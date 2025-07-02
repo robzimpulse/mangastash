@@ -11,6 +11,8 @@ class AsuraScanMangaDetailHtmlParser extends MangaDetailHtmlParser {
     final query = ['div', 'float-left', 'relative', 'z-0'].join('.');
     final region = root.querySelector(query);
 
+    final title = region?.querySelector('span.text-xl.font-bold')?.text.trim();
+
     final description =
         region?.querySelector('span.font-medium.text-sm')?.text.trim();
 
@@ -32,18 +34,24 @@ class AsuraScanMangaDetailHtmlParser extends MangaDetailHtmlParser {
         ?.children
         .map((e) => e.text.trim());
 
+    final coverUrl = region
+        ?.querySelector('div.relative.col-span-full.space-y-3.px-6')
+        ?.querySelector('img')
+        ?.attributes['src'];
+
     return Manga(
+      title: title,
       author: author,
       description: description,
-      tags: genres
-          ?.map(
-            (e) => Tag(
-              name: toBeginningOfSentenceCase(
-                e.toLowerCase(),
-              ),
-            ),
-          )
-          .toList(),
+      coverUrl: coverUrl,
+      tags: [
+        ...?genres?.map(
+          (e) => Tag(
+            name: toBeginningOfSentenceCase(e.toLowerCase()),
+            source: Source.mangaclash().name,
+          ),
+        ),
+      ],
     );
   }
 }
