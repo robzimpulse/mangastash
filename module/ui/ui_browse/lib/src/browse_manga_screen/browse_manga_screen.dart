@@ -328,7 +328,9 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             ? _searchFocusNode.requestFocus()
             : _searchFocusNode.unfocus();
         _cubit(context).init(
-          parameter: state.parameter.copyWith(title: _searchController.text),
+          parameter: state.parameter.copyWith(
+            title: state.isSearchActive ? _searchController.text : '',
+          ),
         );
       },
       buildWhen: (prev, curr) => [
