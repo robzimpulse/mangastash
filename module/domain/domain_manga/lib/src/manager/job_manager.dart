@@ -248,6 +248,9 @@ class JobManager
       mangaId: mangaId,
       parameter: parameter.valueOrNull?.let(
         (value) => SearchChapterParameter.from(value).copyWith(
+          offset: 0,
+          page: 1,
+          limit: 20,
           orders: {ChapterOrders.chapter: OrderDirections.ascending},
         ),
       ),
