@@ -327,6 +327,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
       buildWhen: (prev, curr) => [
         prev.source != curr.source,
         prev.isSearchActive != curr.isSearchActive,
+        prev.parameter != curr.parameter,
       ].contains(true),
       builder: (context, state) => !state.isSearchActive
           ? Text(state.source?.name ?? '')
@@ -343,7 +344,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
                 ),
                 cursorColor: DefaultTextStyle.of(context).style.color,
                 style: DefaultTextStyle.of(context).style,
-                onSubmitted: (value) => _cubit(context).init(title: value),
+                onSubmitted: (value) => _cubit(context).init(title: value, parameter: state.parameter),
               ),
             ),
     );
