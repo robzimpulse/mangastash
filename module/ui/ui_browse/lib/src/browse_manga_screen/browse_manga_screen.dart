@@ -322,7 +322,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
 
   Widget _title(BuildContext context) {
     return _consumer(
-      listenWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,,
+      listenWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
       listener: (context, state) {
         if (state.isSearchActive) {
           _searchFocusNode.requestFocus();
