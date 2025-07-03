@@ -322,8 +322,18 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
 
   Widget _title(BuildContext context) {
     return _consumer(
-      listenWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
-      listener: (context, state) => _searchFocusNode.requestFocus(),
+      listenWhen: (prev, curr) => [
+        prev.isSearchActive != curr.isSearchActive,
+        prev.parameter != curr.parameter,
+      ].contains(true),
+      listener: (context, state) {
+        if (state.isSearchActive) {
+          _searchFocusNode.requestFocus();
+        } else {
+          _searchFocusNode.unfocus();
+          _cubit(context).init(parameter: state.parameter);
+        }
+      },
       buildWhen: (prev, curr) => [
         prev.source != curr.source,
         prev.isSearchActive != curr.isSearchActive,
@@ -344,7 +354,9 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
                 ),
                 cursorColor: DefaultTextStyle.of(context).style.color,
                 style: DefaultTextStyle.of(context).style,
-                onSubmitted: (value) => _cubit(context).init(title: value, parameter: state.parameter),
+                onSubmitted: (value) => _cubit(context).init(
+                  parameter: state.parameter.copyWith(title: value),
+                ),
               ),
             ),
     );

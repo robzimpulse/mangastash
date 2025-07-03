@@ -63,7 +63,6 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   }
 
   Future<void> init({
-    String? title,
     SearchMangaParameter? parameter,
     bool useCache = true,
   }) async {
@@ -72,7 +71,6 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
         isLoading: true,
         mangas: [],
         parameter: (parameter ?? state.parameter).copyWith(
-          title: title,
           offset: 0,
           page: 1,
           limit: 20,
@@ -199,6 +197,6 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
             : null;
     if (url == null) return;
     await _crawlUrlUseCase.execute(url: url);
-    await init(title: state.parameter.title);
+    await init(parameter: state.parameter);
   }
 }
