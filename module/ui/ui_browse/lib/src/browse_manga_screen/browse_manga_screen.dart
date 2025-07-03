@@ -324,12 +324,12 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     return _consumer(
       listenWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
       listener: (context, state) {
-        if (state.isSearchActive) {
-          _searchFocusNode.requestFocus();
-        } else {
-          _searchFocusNode.unfocus();
-          _cubit(context).init();
-        }
+        state.isSearchActive
+            ? _searchFocusNode.requestFocus()
+            : _searchFocusNode.unfocus();
+        _cubit(context).init(
+          parameter: state.parameter.copyWith(title: _searchController.text),
+        );
       },
       buildWhen: (prev, curr) => [
         prev.source != curr.source,
