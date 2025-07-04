@@ -59,18 +59,12 @@ class GetChapterUseCase with SyncChaptersMixin {
     );
   }
 
-  Future<Chapter> _scrapping({
-    required Chapter? chapter,
+  Future<List<String>> _scrapping({
+    required String? url,
     required String source,
   }) async {
-    final url = chapter?.webUrl;
-
-    if (chapter == null || url == null) {
+    if (url == null) {
       throw DataNotFoundException();
-    }
-
-    if (chapter.images?.isNotEmpty == true) {
-      return chapter;
     }
 
     final document = await _webview.open(url);
@@ -84,7 +78,7 @@ class GetChapterUseCase with SyncChaptersMixin {
       source: source,
     );
 
-    return chapter.copyWith(images: parser.images);
+    return parser.images;
   }
 
   Future<Result<Chapter>> execute({
@@ -107,18 +101,19 @@ class GetChapterUseCase with SyncChaptersMixin {
       (e) => e.chapter?.let((d) => Chapter.fromDrift(d, images: e.images)),
     );
 
-    if (chapter != null && chapter.images?.isNotEmpty == true) {
-      return Success(chapter);
-    }
-
     try {
-      final promise = source == Source.mangadex().name
-          ? _mangadex(source: source, mangaId: mangaId, chapterId: chapterId)
-          : _scrapping(chapter: chapter, source: source);
+      final data = source == Source.mangadex().name
+          ? await _mangadex(
+              source: source, mangaId: mangaId, chapterId: chapterId)
+          : chapter?.copyWith(
+              images: await _scrapping(url: chapter.webUrl, source: source),
+            );
 
       final results = await sync(
         dao: _chapterDao,
-        values: [await promise],
+        values: [
+          ...[data].nonNulls,
+        ],
         logBox: _logBox,
       );
 

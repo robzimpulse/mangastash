@@ -77,7 +77,7 @@ class SearchChapterUseCase
 
     final url = result?.webUrl;
 
-    if (result == null || url == null) {
+    if (url == null) {
       throw DataNotFoundException();
     }
 
