@@ -26,7 +26,7 @@ class TextFieldDialog extends PopupDialogRoute {
                     controller.dispose();
                     onSubmitted?.call(text);
                   },
-                  child: const Text('Close'),
+                  child: const Text('Submit'),
                 ),
               ],
             );
