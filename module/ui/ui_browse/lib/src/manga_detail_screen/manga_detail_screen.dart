@@ -125,7 +125,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 leading: BackButton(
                   color: Theme.of(context).appBarTheme.iconTheme?.color,
                 ),
-                title: _title(progress: progress),
+                title: _title(context: context, progress: progress),
                 actions: [
                   _downloadButton(),
                   _filterButton(),
@@ -267,7 +267,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
-  Widget _title({required double progress}) {
+  Widget _title({required BuildContext context, required double progress}) {
     final textStyle = Theme.of(context).textTheme.titleMedium;
 
     return _builder(
