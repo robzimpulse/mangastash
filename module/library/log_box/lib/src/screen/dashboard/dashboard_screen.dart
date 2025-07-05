@@ -137,17 +137,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: const Icon(Icons.delete),
           onPressed: () => widget.storage.clear(),
         ),
-        body: StreamBuilder(
-          stream: widget.storage.activities.map(_filter),
-          builder: (context, snapshot) {
-            final data = snapshot.data;
+        body: SafeArea(
+          child: StreamBuilder(
+            stream: widget.storage.activities.map(_filter),
+            builder: (context, snapshot) {
+              final data = snapshot.data;
 
-            if (data == null) {
-              return const CircularProgressIndicator();
-            }
+              if (data == null) {
+                return const CircularProgressIndicator();
+              }
 
-            return _body(context: context, filteredActivities: data);
-          },
+              return _body(context: context, filteredActivities: data);
+            },
+          ),
         ),
       ),
     );

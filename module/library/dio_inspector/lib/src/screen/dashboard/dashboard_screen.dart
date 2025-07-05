@@ -76,6 +76,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  List<HttpActivityModel> _filter(List<HttpActivityModel> values) {
+    final data = !isSearch
+        ? values
+        : [
+            ...values.where(
+              (activity) {
+                final text = activity.toString().toLowerCase();
+                return text.contains(query.toLowerCase());
+              },
+            ),
+          ];
+
+    return switch (currentSort) {
+      SortActivity.byTime => List.of(data)
+        ..sort(
+          (a, b) => b.createdTime.compareTo(a.createdTime),
+        ),
+      SortActivity.byMethod => List.of(data)
+        ..sort(
+          (a, b) => b.method.compareTo(a.method),
+        ),
+      SortActivity.byStatus => List.of(data)
+        ..sort(
+          (a, b) => a.response?.status?.compareTo(b.response?.status ?? 0) ?? 0,
+        ),
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -117,36 +145,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           onPressed: () => widget.storage.clear(),
         ),
         body: StreamBuilder(
-          stream: widget.storage.activities.map(
-            (value) {
-              final data = !isSearch
-                  ? value
-                  : value.where(
-                      (activity) {
-                        final text = activity.toString().toLowerCase();
-                        return text.contains(query.toLowerCase());
-                      },
-                    ).toList();
-
-              return switch (currentSort) {
-                SortActivity.byTime => List.of(data)
-                  ..sort(
-                    (a, b) => b.createdTime.compareTo(a.createdTime),
-                  ),
-                SortActivity.byMethod => List.of(data)
-                  ..sort(
-                    (a, b) => b.method.compareTo(a.method),
-                  ),
-                SortActivity.byStatus => List.of(data)
-                  ..sort(
-                    (a, b) =>
-                        a.response?.status
-                            ?.compareTo(b.response?.status ?? 0) ??
-                        0,
-                  ),
-              };
-            },
-          ),
+          stream: widget.storage.activities.map(_filter),
           builder: (context, snapshot) {
             final data = snapshot.data;
 

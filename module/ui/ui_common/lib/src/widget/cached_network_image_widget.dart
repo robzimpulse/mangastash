@@ -35,9 +35,17 @@ class CachedNetworkImageWidget extends StatelessWidget {
 
   final double? height;
 
-  Widget _buildFrom(BuildContext context, {FileResponse? response}) {
+  Widget _buildFrom(
+    BuildContext context, {
+    FileResponse? response,
+    Object? error,
+  }) {
     const fallback = SizedBox.shrink();
     final data = response;
+
+    if (error != null) {
+      return errorBuilder?.call(context, error, null) ?? fallback;
+    }
 
     if (data == null) {
       return progressBuilder?.call(context, null) ?? fallback;
@@ -49,6 +57,11 @@ class CachedNetworkImageWidget extends StatelessWidget {
           future: data.file.readAsBytes(),
           builder: (context, snapshot) {
             final data = snapshot.data;
+            final error = snapshot.error;
+
+            if (error != null) {
+              return errorBuilder?.call(context, error, null) ?? fallback;
+            }
 
             if (data == null) {
               return progressBuilder?.call(context, null) ?? fallback;
@@ -111,6 +124,7 @@ class CachedNetworkImageWidget extends StatelessWidget {
               builder: (context, snapshot) => _buildFrom(
                 context,
                 response: snapshot.data,
+                error: snapshot.error,
               ),
             ),
     );
