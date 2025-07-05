@@ -104,7 +104,10 @@ class GetChapterUseCase with SyncChaptersMixin {
     try {
       final data = source == Source.mangadex().name
           ? await _mangadex(
-              source: source, mangaId: mangaId, chapterId: chapterId)
+              source: source,
+              mangaId: mangaId,
+              chapterId: chapterId,
+            )
           : chapter?.copyWith(
               images: await _scrapping(url: chapter.webUrl, source: source),
             );
