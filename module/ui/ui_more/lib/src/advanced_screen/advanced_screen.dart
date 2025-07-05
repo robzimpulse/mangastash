@@ -85,9 +85,10 @@ class AdvancedScreen extends StatelessWidget {
             ),
             trailing: IconButton(
               onPressed: () async {
+                await cacheManager.emptyCache();
                 await database.clear();
                 if (!context.mounted) return;
-                context.showSnackBar(message: 'Success Clear Database');
+                context.showSnackBar(message: 'Success Clear Database & Cache');
               },
               icon: const Icon(Icons.delete_forever),
             ),
