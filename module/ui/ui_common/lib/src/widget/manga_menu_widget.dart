@@ -45,12 +45,12 @@ class MangaMenuWidget extends StatelessWidget {
         ListTile(
           title: const Text('Prefetch'),
           leading: const Icon(Icons.cloud_download),
-          onTap: () => onTapPrefetch,
+          onTap: onTapPrefetch,
         ),
         ListTile(
           title: const Text('Download'),
           leading: const Icon(Icons.download),
-          onTap: () => onTapDownload,
+          onTap: onTapDownload,
         ),
       ].nonNulls.intersperse(const Divider(height: 1, thickness: 1)).toList(),
     );
