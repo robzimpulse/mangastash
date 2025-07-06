@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'base/cached_network_image_widget.dart';
 import 'base/shimmer_loading_widget.dart';
 
-class SourceMangaWidget extends StatelessWidget {
-  const SourceMangaWidget({
+class SourceTileWidget extends StatelessWidget {
+  const SourceTileWidget({
     super.key,
     this.url = '',
     this.name = '',
@@ -15,7 +15,7 @@ class SourceMangaWidget extends StatelessWidget {
     this.cacheManager,
   });
 
-  const SourceMangaWidget.shimmer({
+  const SourceTileWidget.shimmer({
     super.key,
   })  : isLoading = true,
         url = '',

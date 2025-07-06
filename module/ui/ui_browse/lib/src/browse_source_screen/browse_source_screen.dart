@@ -57,7 +57,7 @@ class BrowseSourceScreen extends StatelessWidget {
             height: 1,
             thickness: 1,
           ),
-          itemBuilder: (context, index) => SourceMangaWidget(
+          itemBuilder: (context, index) => SourceTileWidget(
             cacheManager: cacheManager,
             iconUrl: state.sources[index].icon ?? '',
             url: state.sources[index].url ?? '',
