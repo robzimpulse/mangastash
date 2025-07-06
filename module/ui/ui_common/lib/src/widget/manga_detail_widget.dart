@@ -5,7 +5,7 @@ import 'package:intersperse/intersperse.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 import 'base/cached_network_image_widget.dart';
-import 'shimmer_loading_widget.dart';
+import 'base/shimmer_loading_widget.dart';
 
 class MangaDetailWidget extends StatelessWidget {
   const MangaDetailWidget({
