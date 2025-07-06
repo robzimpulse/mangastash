@@ -25,6 +25,7 @@ export 'src/widget/adaptive_physic_list_view.dart';
 export 'src/widget/cached_network_image_widget.dart';
 export 'src/widget/chapter_tile_widget.dart';
 export 'src/widget/flexible_app_bar_builder.dart';
+export 'src/widget/grid_widget.dart';
 export 'src/widget/icon_with_text_widget.dart';
 export 'src/widget/manga_detail_app_bar_widget.dart';
 export 'src/widget/manga_detail_widget.dart';
