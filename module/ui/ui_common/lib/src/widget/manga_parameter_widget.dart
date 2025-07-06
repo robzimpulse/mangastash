@@ -4,7 +4,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-import 'checkbox_with_text_widget.dart';
+import 'base/checkbox_with_text_widget.dart';
 
 class MangaParameterWidget extends StatelessWidget {
   const MangaParameterWidget({

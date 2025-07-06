@@ -1,7 +1,7 @@
 import 'package:core_storage/core_storage.dart';
 import 'package:flutter/material.dart';
 
-import '../cached_network_image_widget.dart';
+import '../base/cached_network_image_widget.dart';
 import 'manga_shelf_item_layout.dart';
 
 class MangaShelfItem extends StatelessWidget {

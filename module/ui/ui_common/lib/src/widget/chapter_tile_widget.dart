@@ -2,7 +2,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:flutter/material.dart';
 import 'package:intersperse/intersperse.dart';
 
-import 'icon_with_text_widget.dart';
+import 'base/icon_with_text_widget.dart';
 
 class ChapterTileWidget extends StatelessWidget {
   const ChapterTileWidget({

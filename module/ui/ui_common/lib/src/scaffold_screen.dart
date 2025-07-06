@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'widget/shimmer_area_widget.dart';
+import 'widget/base/shimmer_area_widget.dart';
 
 class ScaffoldScreen extends StatelessWidget {
   final Widget body;

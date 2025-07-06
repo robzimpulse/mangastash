@@ -2,7 +2,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
 import 'package:service_locator/service_locator.dart';
 
-import '../widget/picker_widget.dart';
+import '../widget/base/picker_widget.dart';
 
 class CountryPickerBottomSheet extends BottomSheetRoute {
   CountryPickerBottomSheet({
