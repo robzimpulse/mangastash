@@ -32,6 +32,7 @@ export 'src/widget/base/size_notifier_widget.dart';
 export 'src/widget/chapter_tile_widget.dart';
 export 'src/widget/manga_detail_app_bar_widget.dart';
 export 'src/widget/manga_detail_widget.dart';
+export 'src/widget/manga_item_widget.dart';
 export 'src/widget/manga_parameter_widget.dart';
 export 'src/widget/manga_shelf_widget/manga_shelf_item.dart';
 export 'src/widget/manga_shelf_widget/manga_shelf_item_layout.dart';
