@@ -221,14 +221,15 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
   }
 
   Widget _menus(BuildContext context) {
-    final color = Theme.of(context).appBarTheme.iconTheme?.color;
-    final labelStyle = Theme.of(context).textTheme.labelSmall;
-    final buttonStyle = Theme.of(context).outlinedButtonTheme.style?.copyWith(
-          visualDensity: VisualDensity.compact,
-          side: WidgetStatePropertyAll(
-            const BorderSide(width: 1).copyWith(color: color),
-          ),
-        );
+    final theme = Theme.of(context);
+    final color = theme.appBarTheme.iconTheme?.color;
+    final labelStyle = theme.textTheme.labelSmall;
+    final buttonStyle = theme.outlinedButtonTheme.style?.copyWith(
+      visualDensity: VisualDensity.compact,
+      side: WidgetStatePropertyAll(
+        const BorderSide(width: 1).copyWith(color: color),
+      ),
+    );
 
     return Center(
       child: Row(
