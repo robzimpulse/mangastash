@@ -118,6 +118,7 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     }
 
     final selector = delete(mangaTables)..where(filter);
+
     return transaction(() async {
       final olds = await search(
         ids: ids,
@@ -168,9 +169,8 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
           final companion = manga.manga?.toCompanion(true);
           final id = manga.manga?.id;
           final source = manga.manga?.source;
-          if (companion?.shouldUpdate(entry.key) == false &&
-              id != null &&
-              source != null) {
+          final shouldUpdate = companion?.shouldUpdate(entry.key) == false;
+          if (shouldUpdate && id != null && source != null) {
             data.add(
               MangaModel(
                 manga: manga.manga,
