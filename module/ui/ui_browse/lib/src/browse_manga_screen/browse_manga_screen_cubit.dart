@@ -55,7 +55,11 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   }
 
   void _updateLibraryState(List<Manga> libraryState) {
-    emit(state.copyWith(libraries: libraryState));
+    emit(
+      state.copyWith(
+        libraryMangaIds: {...libraryState.map((e) => e.id).nonNulls},
+      ),
+    );
   }
 
   void _updatePrefetchState(Set<String> prefetchedMangaIds) {
@@ -165,7 +169,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   }
 
   Future<void> addToLibrary({required Manga manga}) async {
-    if (state.libraries.contains(manga)) {
+    if (state.libraryMangaIds.contains(manga.id)) {
       await _removeFromLibraryUseCase.execute(manga: manga);
     } else {
       await _addToLibraryUseCase.execute(manga: manga);

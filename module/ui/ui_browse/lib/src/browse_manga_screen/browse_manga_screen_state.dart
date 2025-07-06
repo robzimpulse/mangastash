@@ -10,8 +10,6 @@ class BrowseMangaScreenState extends Equatable {
 
   final List<Manga> mangas;
 
-  final List<Manga> libraries;
-
   final MangaShelfItemLayout layout;
 
   final Source? source;
@@ -27,6 +25,8 @@ class BrowseMangaScreenState extends Equatable {
   final List<Tag> tags;
 
   final Set<String> prefetchedMangaIds;
+
+  final Set<String> libraryMangaIds;
 
   bool get isFavoriteActive {
     return parameter.orders?.containsKey(SearchOrders.rating) == true;
@@ -65,7 +65,7 @@ class BrowseMangaScreenState extends Equatable {
     this.layout = MangaShelfItemLayout.compactGrid,
     this.source,
     this.mangas = const [],
-    this.libraries = const [],
+    this.libraryMangaIds = const {},
     this.parameter = const SearchMangaParameter(),
     this.prefetchedMangaIds = const {},
     this.tags = const [],
@@ -83,7 +83,7 @@ class BrowseMangaScreenState extends Equatable {
       mangas,
       parameter,
       isSearchActive,
-      libraries,
+      libraryMangaIds,
       prefetchedMangaIds,
       tags,
     ];
@@ -98,7 +98,7 @@ class BrowseMangaScreenState extends Equatable {
     MangaShelfItemLayout? layout,
     Source? source,
     List<Manga>? mangas,
-    List<Manga>? libraries,
+    Set<String>? libraryMangaIds,
     SearchMangaParameter? parameter,
     Set<String>? prefetchedMangaIds,
     List<Tag>? tags,
@@ -109,7 +109,7 @@ class BrowseMangaScreenState extends Equatable {
       isPagingNextPage: isPagingNextPage ?? this.isPagingNextPage,
       isSearchActive: isSearchActive ?? this.isSearchActive,
       mangas: mangas ?? this.mangas,
-      libraries: libraries ?? this.libraries,
+      libraryMangaIds: libraryMangaIds ?? this.libraryMangaIds,
       error: error != null ? error() : this.error,
       layout: layout ?? this.layout,
       source: source ?? this.source,

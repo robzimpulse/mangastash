@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
@@ -368,7 +367,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         prev.isLoading != curr.isLoading,
         prev.error != curr.error,
         prev.mangas != curr.mangas,
-        prev.libraries != curr.libraries,
+        prev.libraryMangaIds != curr.libraryMangaIds,
         prev.layout != curr.layout,
         prev.parameter != curr.parameter,
         prev.prefetchedMangaIds != curr.prefetchedMangaIds,
@@ -396,7 +395,6 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
           );
         }
 
-        final lib = state.libraries;
         final children = state.mangas.map(
           (e) => MangaShelfItem(
             cacheManager: widget.cacheManager,
@@ -407,9 +405,9 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             onLongPress: () => _onTapMenu(
               context: context,
               manga: e,
-              isOnLibrary: lib.firstWhereOrNull((l) => e.id == l.id) != null,
+              isOnLibrary: state.libraryMangaIds.contains(e.id),
             ),
-            isOnLibrary: lib.firstWhereOrNull((l) => e.id == l.id) != null,
+            isOnLibrary: state.libraryMangaIds.contains(e.id),
             isPrefetching: state.prefetchedMangaIds.contains(e.id),
           ),
         );
