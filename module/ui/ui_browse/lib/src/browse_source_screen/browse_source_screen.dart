@@ -59,9 +59,9 @@ class BrowseSourceScreen extends StatelessWidget {
           ),
           itemBuilder: (context, index) => SourceTileWidget(
             cacheManager: cacheManager,
-            iconUrl: state.sources[index].icon ?? '',
-            url: state.sources[index].url ?? '',
-            name: state.sources[index].name ?? '',
+            iconUrl: state.sources[index].icon,
+            url: state.sources[index].url,
+            name: state.sources[index].name,
             onTap: () => onTapSource?.call(state.sources[index]),
           ),
           itemCount: state.sources.length,

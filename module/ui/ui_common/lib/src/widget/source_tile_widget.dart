@@ -7,28 +7,19 @@ import 'base/shimmer_loading_widget.dart';
 class SourceTileWidget extends StatelessWidget {
   const SourceTileWidget({
     super.key,
-    this.url = '',
-    this.name = '',
+    this.url,
+    this.name,
     this.onTap,
-    this.iconUrl = '',
+    this.iconUrl,
     this.isLoading = false,
     this.cacheManager,
   });
 
-  const SourceTileWidget.shimmer({
-    super.key,
-  })  : isLoading = true,
-        url = '',
-        iconUrl = '',
-        name = '',
-        onTap = null,
-        cacheManager = null;
+  final String? iconUrl;
 
-  final String iconUrl;
+  final String? url;
 
-  final String url;
-
-  final String name;
+  final String? name;
 
   final GestureTapCallback? onTap;
 
@@ -46,7 +37,7 @@ class SourceTileWidget extends StatelessWidget {
           size: 16,
           child: CachedNetworkImageWidget(
             cacheManager: cacheManager,
-            imageUrl: iconUrl,
+            imageUrl: iconUrl ?? '',
             width: 16,
             height: 16,
             errorBuilder: (context, error, _) => const Icon(Icons.error),
@@ -69,7 +60,7 @@ class SourceTileWidget extends StatelessWidget {
           width: 100,
           height: 12,
           lines: 1,
-          child: Text(name),
+          child: Text(name ?? ''),
         ),
       ),
       subtitle: Align(
@@ -79,7 +70,7 @@ class SourceTileWidget extends StatelessWidget {
           width: 200,
           height: 10,
           lines: 1,
-          child: Text(url),
+          child: Text(url ?? ''),
         ),
       ),
       onTap: onTap,
