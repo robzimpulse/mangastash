@@ -450,21 +450,20 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 ),
               ),
               if (state.isLoadingChapters)
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => index.isOdd
-                        ? const SizedBox(height: 4)
-                        : ShimmerLoading.multiline(
+                MultiSliver(
+                  children: [
+                    ...List.generate(20, (e) => e)
+                        .map<Widget>(
+                          (e) => ShimmerLoading.multiline(
                             isLoading: true,
                             width: double.infinity,
                             height: 15,
                             lines: 3,
                           ),
-                    childCount: (50 * 2) - 1,
-                    semanticIndexCallback: (Widget _, int index) {
-                      return index.isEven ? index ~/ 2 : null;
-                    },
-                  ),
+                        )
+                        .intersperse(const SizedBox(height: 4))
+                        .map((e) => SliverToBoxAdapter(child: e)),
+                  ],
                 )
               else if (state.filtered.isEmpty)
                 const SliverFillRemaining(
