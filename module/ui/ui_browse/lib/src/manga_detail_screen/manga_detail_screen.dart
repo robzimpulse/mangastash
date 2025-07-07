@@ -150,13 +150,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               ),
             ),
           ],
-          body: NextPageNotificationWidget(
-            onLoadNextPage: () => _cubit(context).next(),
-            child: RefreshIndicator(
-              onRefresh: () => _cubit(context).init(useCache: false),
-              child: _content(),
-            ),
-          ),
+          body: _content(),
         ),
       ),
     );
@@ -575,10 +569,16 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   Widget _content() {
     return TabBarView(
       children: [
-        CustomScrollView(
-          slivers: [
-            _chapters(),
-          ],
+        NextPageNotificationWidget(
+          onLoadNextPage: () => _cubit(context).next(),
+          child: RefreshIndicator(
+            onRefresh: () => _cubit(context).init(useCache: false),
+            child: CustomScrollView(
+              slivers: [
+                _chapters(),
+              ],
+            ),
+          ),
         ),
         const CustomScrollView(
           slivers: [
