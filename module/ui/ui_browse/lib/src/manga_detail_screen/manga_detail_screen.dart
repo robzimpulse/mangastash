@@ -321,6 +321,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   ),
                 ),
               ),
+              SizedBox(height: lerpDouble(8, 0, progress) ?? 8),
               ShimmerLoading.multiline(
                 isLoading: state.isLoadingManga,
                 width: lerpDouble(300, 100, progress) ?? 300,
