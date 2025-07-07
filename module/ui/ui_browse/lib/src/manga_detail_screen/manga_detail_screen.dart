@@ -217,10 +217,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         }
 
         return PopupMenuButton<DownloadOption>(
-          icon: Icon(
-            Icons.download,
-            color: Theme.of(context).appBarTheme.iconTheme?.color,
-          ),
+          icon: const Icon(Icons.download),
           onSelected: (value) => _onTapDownload(context, value),
           itemBuilder: (context) => [
             ...DownloadOption.values.map(
@@ -239,10 +236,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     return _builder(
       buildWhen: (prev, curr) => prev.config != curr.config,
       builder: (context, state) => IconButton(
-        icon: Icon(
-          Icons.filter_list,
-          color: Theme.of(context).appBarTheme.iconTheme?.color,
-        ),
+        icon: const Icon(Icons.filter_list),
         onPressed: () async {
           final result = await widget.onTapSort?.call(state.config);
           if (!context.mounted) return;
