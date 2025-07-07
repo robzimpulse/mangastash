@@ -136,12 +136,17 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   ),
                 ),
               ),
-              bottom: const TabBar(
-                tabs: [
-                  Tab(text: 'Chapter'),
-                  Tab(text: 'Description'),
-                  Tab(text: 'Similar'),
-                ],
+              bottom: DecoratedPreferredSizeWidget(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                ),
+                child: const TabBar(
+                  tabs: [
+                    Tab(text: 'Chapter'),
+                    Tab(text: 'Description'),
+                    Tab(text: 'Similar'),
+                  ],
+                ),
               ),
             ),
           ],

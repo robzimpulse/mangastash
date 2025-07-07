@@ -24,6 +24,7 @@ export 'src/scaffold_screen.dart';
 export 'src/util/debounce.dart';
 export 'src/widget/base/adaptive_physic_list_view.dart';
 export 'src/widget/base/cached_network_image_widget.dart';
+export 'src/widget/base/decorated_preferred_size_widget.dart';
 export 'src/widget/base/flexible_app_bar_builder.dart';
 export 'src/widget/base/grid_widget.dart';
 export 'src/widget/base/icon_with_text_widget.dart';
