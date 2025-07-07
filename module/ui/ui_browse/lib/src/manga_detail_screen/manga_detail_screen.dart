@@ -418,43 +418,110 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         prev.isLoadingChapters != curr.isLoadingChapters,
         prev.filtered != curr.filtered,
         prev.totalChapter != curr.totalChapter,
+        prev.hasNextPage != curr.hasNextPage,
       ].contains(true),
       builder: (context, state) {
         final error = state.errorChapters;
-        if (error != null) return _errorChapter(context: context, error: error);
-        if (state.isLoadingChapters) return _loadingChapter();
-        if (state.filtered.isEmpty) return _emptyChapter();
 
-        return MultiSliver(
-          children: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 12, right: 12, top: 12),
-                child: Row(
-                  children: [
-                    Text(
-                      '${state.totalChapter} Chapters',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const Spacer(),
-                    _downloadButton(),
-                    _filterButton(),
-                  ],
+        return SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          sliver: MultiSliver(
+            children: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Row(
+                    children: [
+                      ShimmerLoading.multiline(
+                        isLoading: state.isLoadingChapters,
+                        width: 50,
+                        height: 15,
+                        lines: 1,
+                        child: Text(
+                          '${state.totalChapter} Chapters',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ),
+                      const Spacer(),
+                      _downloadButton(),
+                      _filterButton(),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              sliver: MultiSliver(
-                children: [
-                  ...state.filtered
-                      .map((e) => _chapterItem(chapter: e))
-                      .intersperse(_separator())
-                      .map((e) => SliverToBoxAdapter(child: e)),
-                ],
-              ),
-            ),
-          ],
+              if (state.isLoadingChapters)
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => index.isOdd
+                        ? const SizedBox(height: 4)
+                        : ShimmerLoading.multiline(
+                            isLoading: true,
+                            width: double.infinity,
+                            height: 15,
+                            lines: 3,
+                          ),
+                    childCount: (50 * 2) - 1,
+                    semanticIndexCallback: (Widget _, int index) {
+                      return index.isEven ? index ~/ 2 : null;
+                    },
+                  ),
+                )
+              else if (state.filtered.isEmpty)
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Padding(
+                    padding: EdgeInsets.all(24),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('No Chapter', textAlign: TextAlign.center),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              else if (error != null)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Text(error.toString(), textAlign: TextAlign.center),
+                          if (error is FailedParsingHtmlException) ...[
+                            const SizedBox(height: 16),
+                            OutlinedButton(
+                              onPressed: () => _cubit(context).recrawl(
+                                url: error.url,
+                              ),
+                              child: const Text('Open Debug Browser'),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              else
+                MultiSliver(
+                  children: [
+                    ...state.filtered
+                        .map((e) => _chapterItem(chapter: e))
+                        .intersperse(_separator())
+                        .map((e) => SliverToBoxAdapter(child: e)),
+                    if (state.hasNextPage)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                  ],
+                ),
+            ],
+          ),
         );
       },
     );
@@ -488,122 +555,11 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
-  Widget _emptyChapter() {
-    return MultiSliver(
-      children: const [
-        SliverFillRemaining(
-          hasScrollBody: false,
-          child: Padding(
-            padding: EdgeInsets.all(24),
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'No Chapter',
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _loadingChapter() {
-    return MultiSliver(
-      children: [
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          sliver: SliverToBoxAdapter(
-            child: Row(
-              children: [
-                ShimmerLoading.multiline(
-                  isLoading: true,
-                  width: 50,
-                  height: 15,
-                  lines: 1,
-                ),
-              ],
-            ),
-          ),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) => index.isOdd
-                  ? const SizedBox(height: 4)
-                  : ShimmerLoading.multiline(
-                      isLoading: true,
-                      width: double.infinity,
-                      height: 15,
-                      lines: 3,
-                    ),
-              childCount: (50 * 2) - 1,
-              semanticIndexCallback: (Widget _, int index) {
-                return index.isEven ? index ~/ 2 : null;
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _errorChapter({
-    required BuildContext context,
-    required Exception error,
-  }) {
-    return MultiSliver(
-      children: [
-        SliverFillRemaining(
-          hasScrollBody: false,
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Center(
-              child: Column(
-                children: [
-                  Text(
-                    error.toString(),
-                    textAlign: TextAlign.center,
-                  ),
-                  if (error is FailedParsingHtmlException) ...[
-                    const SizedBox(height: 16),
-                    OutlinedButton(
-                      onPressed: () => _cubit(context).recrawl(url: error.url),
-                      child: const Text('Open Debug Browser'),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _content() {
     return CustomScrollView(
       slivers: [
         _manga(),
         _chapters(),
-        SliverToBoxAdapter(
-          child: _builder(
-            buildWhen: (prev, curr) => prev.hasNextPage != curr.hasNextPage,
-            builder: (context, state) => state.hasNextPage
-                ? const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  )
-                : const SizedBox.shrink(),
-          ),
-        ),
       ],
     );
   }
