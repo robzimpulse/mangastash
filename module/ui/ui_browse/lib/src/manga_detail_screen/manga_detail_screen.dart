@@ -127,8 +127,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 ),
                 title: _title(context: context, progress: progress),
                 actions: [
-                  _downloadButton(),
-                  _filterButton(),
                   _shareButton(context: context),
                 ],
               ),
@@ -438,6 +436,9 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                       '${state.totalChapter} Chapters',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
+                    const Spacer(),
+                    _downloadButton(),
+                    _filterButton(),
                   ],
                 ),
               ),
