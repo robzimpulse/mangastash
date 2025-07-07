@@ -109,35 +109,48 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      body: NestedScrollView(
-        controller: _scrollController,
-        headerSliverBuilder: (context, isInnerBoxScrolled) => [
-          SliverAppBar(
-            stretch: true,
-            pinned: true,
-            elevation: 0,
-            expandedHeight: MediaQuery.of(context).size.height * 0.4,
-            automaticallyImplyLeading: false,
-            flexibleSpace: FlexibleAppBarBuilder(
-              builder: (context, progress) => MangaDetailAppBarWidget(
-                progress: progress,
-                background: _appBarBackground(),
-                leading: BackButton(
-                  color: Theme.of(context).appBarTheme.iconTheme?.color,
+      body: DefaultTabController(
+        length: 3,
+        child: NestedScrollView(
+          controller: _scrollController,
+          headerSliverBuilder: (context, isInnerBoxScrolled) => [
+            SliverAppBar(
+              stretch: true,
+              pinned: true,
+              elevation: 0,
+              expandedHeight: MediaQuery.of(context).size.height * 0.4,
+              automaticallyImplyLeading: false,
+              flexibleSpace: FlexibleAppBarBuilder(
+                builder: (context, progress) => Padding(
+                  padding: const EdgeInsets.only(bottom: kTextTabBarHeight),
+                  child: MangaDetailAppBarWidget(
+                    progress: progress,
+                    background: _appBarBackground(),
+                    leading: BackButton(
+                      color: Theme.of(context).appBarTheme.iconTheme?.color,
+                    ),
+                    title: _title(context: context, progress: progress),
+                    actions: [
+                      _shareButton(context: context),
+                    ],
+                  ),
                 ),
-                title: _title(context: context, progress: progress),
-                actions: [
-                  _shareButton(context: context),
+              ),
+              bottom: const TabBar(
+                tabs: [
+                  Tab(text: 'Chapter'),
+                  Tab(text: 'Description'),
+                  Tab(text: 'Similar'),
                 ],
               ),
             ),
-          ),
-        ],
-        body: NextPageNotificationWidget(
-          onLoadNextPage: () => _cubit(context).next(),
-          child: RefreshIndicator(
-            onRefresh: () => _cubit(context).init(useCache: false),
-            child: _content(),
+          ],
+          body: NextPageNotificationWidget(
+            onLoadNextPage: () => _cubit(context).next(),
+            child: RefreshIndicator(
+              onRefresh: () => _cubit(context).init(useCache: false),
+              child: _content(),
+            ),
           ),
         ),
       ),
