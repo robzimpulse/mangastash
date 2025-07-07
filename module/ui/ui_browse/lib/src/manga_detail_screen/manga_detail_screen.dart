@@ -279,7 +279,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       builder: (context, state) => Container(
         alignment: Alignment.lerp(
           Alignment.bottomCenter,
-          Alignment.center,
+          Alignment.centerLeft,
           progress,
         ),
         child: Container(
