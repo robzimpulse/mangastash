@@ -13,6 +13,7 @@ export 'src/extension/bottom_sheet_extension.dart';
 export 'src/extension/expansion_tile_extension.dart';
 export 'src/extension/snackbar_extension.dart';
 export 'src/extension/string_casing_extension.dart';
+export 'src/extension/string_size_extension.dart';
 export 'src/extension/widget_extension.dart';
 export 'src/route_bottom_sheet/confirmation_route_bottom_sheet.dart';
 export 'src/route_bottom_sheet/country_picker_bottom_sheet.dart';

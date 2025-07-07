@@ -4,16 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:intersperse/intersperse.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
-import 'base/cached_network_image_widget.dart';
 import 'base/shimmer_loading_widget.dart';
 
 class MangaDetailWidget extends StatelessWidget {
   const MangaDetailWidget({
     super.key,
-    this.coverUrl,
-    this.title,
-    this.author,
-    this.status,
     this.description,
     this.onTapAddToLibrary,
     this.onTapPrefetch,
@@ -27,14 +22,6 @@ class MangaDetailWidget extends StatelessWidget {
     this.isOnLibrary = false,
     this.cacheManager,
   });
-
-  final String? coverUrl;
-
-  final String? title;
-
-  final String? author;
-
-  final String? status;
 
   final String? description;
 
@@ -59,68 +46,6 @@ class MangaDetailWidget extends StatelessWidget {
   final bool isOnLibrary;
 
   final BaseCacheManager? cacheManager;
-
-  Widget _header(BuildContext context) {
-    return SliverPadding(
-      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-      sliver: SliverToBoxAdapter(
-        child: Row(
-          children: [
-            ShimmerLoading.box(
-              isLoading: isLoadingManga,
-              width: 100,
-              height: 150,
-              child: CachedNetworkImageWidget(
-                cacheManager: cacheManager,
-                imageUrl: coverUrl ?? '',
-                width: 100,
-                height: 150,
-                errorBuilder: (context, error, _) => const Icon(Icons.error),
-                progressBuilder: (context, progress) => Center(
-                  child: SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      value: progress,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: ShimmerLoading.multiline(
-                isLoading: isLoadingManga,
-                width: double.infinity,
-                height: 15,
-                lines: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    if (title != null)
-                      Text(
-                        title ?? '',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    if (author != null)
-                      Text(
-                        author ?? '',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    if (status != null)
-                      Text(
-                        status ?? '',
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
-                  ].intersperse(const SizedBox(height: 4)).toList(),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buttons(BuildContext context) {
     return SliverPadding(
@@ -305,7 +230,6 @@ class MangaDetailWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final widgets = [
-      _header(context),
       _buttons(context),
       _description(context),
       isLoadingManga ? _loadingTags(context) : _loadedTags(context),

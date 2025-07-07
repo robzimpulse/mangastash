@@ -268,30 +268,85 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   Widget _title({required BuildContext context, required double progress}) {
-    final textStyle = Theme.of(context).textTheme.titleMedium;
+    final theme = Theme.of(context);
+    final textStyle = theme.textTheme.titleMedium;
 
     return _builder(
       buildWhen: (prev, curr) => [
         prev.isLoadingManga != curr.isLoadingManga,
         prev.manga?.title != curr.manga?.title,
       ].contains(true),
-      builder: (context, state) => ShimmerLoading.multiline(
-        isLoading: state.isLoadingManga,
-        width: 100,
-        height: 20,
-        lines: 1,
-        child: Text(
-          state.manga?.title ?? '',
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
-          style: textStyle?.copyWith(
-            color: Theme.of(context).appBarTheme.iconTheme?.color,
-            fontSize: lerpDouble(
-              Theme.of(context).textTheme.headlineMedium?.fontSize ?? 0,
-              Theme.of(context).textTheme.titleMedium?.fontSize ?? 0,
-              progress,
+      builder: (context, state) => Container(
+        alignment: Alignment.lerp(
+          Alignment.bottomCenter,
+          Alignment.center,
+          progress,
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.grey.withAlpha(
+              (lerpDouble(50, 0, progress) ?? 0.0).toInt(),
             ),
+            borderRadius: BorderRadius.all(
+              Radius.circular(lerpDouble(16, 0, progress) ?? 0),
+            ),
+          ),
+          padding: EdgeInsets.lerp(
+            const EdgeInsets.all(8),
+            EdgeInsets.zero,
+            progress,
+          ),
+          margin: EdgeInsets.only(bottom: lerpDouble(16, 0, progress) ?? 0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ShimmerLoading.multiline(
+                isLoading: state.isLoadingManga,
+                width: lerpDouble(300, 100, progress) ?? 300,
+                height: 20,
+                lines: 1,
+                child: Text(
+                  state.manga?.title ?? '',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: textStyle?.copyWith(
+                    color: Theme.of(context).appBarTheme.iconTheme?.color,
+                    fontSize: lerpDouble(
+                      Theme.of(context).textTheme.titleLarge?.fontSize ?? 0,
+                      Theme.of(context).textTheme.titleSmall?.fontSize ?? 0,
+                      progress,
+                    ),
+                  ),
+                ),
+              ),
+              ShimmerLoading.multiline(
+                isLoading: state.isLoadingManga,
+                width: lerpDouble(300, 100, progress) ?? 300,
+                height: lerpDouble(20, 0, progress) ?? 20,
+                lines: 1,
+                child: Text(
+                  [
+                    state.manga?.source,
+                    state.manga?.status,
+                    state.manga?.author,
+                  ].nonNulls.join(' - '),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: textStyle?.copyWith(
+                    color: theme.appBarTheme.iconTheme?.color,
+                    fontSize: lerpDouble(
+                      Theme.of(context).textTheme.labelSmall?.fontSize ?? 0,
+                      0,
+                      progress,
+                    ),
+                    // fontSize: theme.textTheme.labelSmall?.fontSize,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -339,10 +394,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
         return MangaDetailWidget(
           cacheManager: widget.cacheManager,
-          coverUrl: state.manga?.coverUrl,
-          title: state.manga?.title,
-          author: state.manga?.author,
-          status: state.manga?.status,
           description: state.manga?.description,
           tags: [...?state.manga?.tags?.map((e) => e.name).nonNulls],
           horizontalPadding: 12,
