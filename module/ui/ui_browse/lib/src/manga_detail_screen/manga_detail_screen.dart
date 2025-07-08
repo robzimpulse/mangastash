@@ -588,99 +588,111 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         ),
         CustomScrollView(
           slivers: [
-            SliverToBoxAdapter(
-              child: _builder(
-                buildWhen: (prev, curr) => [
-                  prev.manga != curr.manga,
-                  prev.isLoadingManga != curr.isLoadingManga,
-                ].contains(true),
-                builder: (context, state) => Column(
-                  children: [
-                    Text(
-                      'Tags',
-                      style: Theme.of(context).textTheme.titleMedium,
+            SliverPadding(
+              padding: const EdgeInsets.all(12),
+              sliver: MultiSliver(
+                children: [
+                  SliverToBoxAdapter(
+                    child: _builder(
+                      buildWhen: (prev, curr) => [
+                        prev.manga != curr.manga,
+                        prev.isLoadingManga != curr.isLoadingManga,
+                      ].contains(true),
+                      builder: (context, state) => Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Tags',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              for (final tag in [...?state.manga?.tags])
+                                ShimmerLoading.multiline(
+                                  isLoading: state.isLoadingManga,
+                                  width: 50,
+                                  height: 30,
+                                  lines: 1,
+                                  child: ConstrainedBox(
+                                    constraints: const BoxConstraints(maxHeight: 30),
+                                    child: OutlinedButton(
+                                      child: Text(tag.name ?? ''),
+                                      onPressed: () => _onTapTag(context, tag: tag),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        for (final tag in [...?state.manga?.tags])
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                  SliverToBoxAdapter(
+                    child: _builder(
+                      buildWhen: (prev, curr) => [
+                        prev.manga != curr.manga,
+                        prev.isLoadingManga != curr.isLoadingManga,
+                      ].contains(true),
+                      builder: (context, state) => Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Description',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: 8),
                           ShimmerLoading.multiline(
                             isLoading: state.isLoadingManga,
-                            width: 50,
-                            height: 30,
-                            lines: 1,
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxHeight: 30),
-                              child: OutlinedButton(
-                                child: Text(tag.name ?? ''),
-                                onPressed: () => _onTapTag(context, tag: tag),
+                            width: double.infinity,
+                            height: 15,
+                            lines: 3,
+                            child: ExpandableNotifier(
+                              child: ExpandablePanel(
+                                theme: const ExpandableThemeData(
+                                  tapBodyToExpand: true,
+                                  tapBodyToCollapse: true,
+                                ),
+                                collapsed: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            state.manga?.description ?? '',
+                                            maxLines: 3,
+                                          ),
+                                          const Icon(Icons.keyboard_arrow_down),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                expanded: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          Text(state.manga?.description ?? ''),
+                                          const Icon(Icons.keyboard_arrow_up),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: _builder(
-                buildWhen: (prev, curr) => [
-                  prev.manga != curr.manga,
-                  prev.isLoadingManga != curr.isLoadingManga,
-                ].contains(true),
-                builder: (context, state) => Column(
-                  children: [
-                    Text(
-                      'Description',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    ShimmerLoading.multiline(
-                      isLoading: state.isLoadingManga,
-                      width: double.infinity,
-                      height: 15,
-                      lines: 3,
-                      child: ExpandableNotifier(
-                        child: ExpandablePanel(
-                          theme: const ExpandableThemeData(
-                            tapBodyToExpand: true,
-                            tapBodyToCollapse: true,
-                          ),
-                          collapsed: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      state.manga?.description ?? '',
-                                      maxLines: 3,
-                                    ),
-                                    const Icon(Icons.keyboard_arrow_down),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          expanded: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    Text(state.manga?.description ?? ''),
-                                    const Icon(Icons.keyboard_arrow_up),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            )
+            ),
           ],
         ),
         const CustomScrollView(
