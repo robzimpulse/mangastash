@@ -85,15 +85,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   MangaDetailScreenCubit _cubit(BuildContext context) => context.read();
 
-  void _onTapWebsite(BuildContext context, {String? url}) async {
-    if (url == null || url.isEmpty) {
-      context.showSnackBar(message: 'Could not launch source url');
-      return;
-    }
-
-    _cubit(context).recrawl(url: url);
-  }
-
   void _onTapTag(BuildContext context, {Tag? tag}) {
     // TODO: implement this
     return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
@@ -131,6 +122,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                     ),
                     title: _title(context: context, progress: progress),
                     actions: [
+                      _websiteButton(context: context),
                       _shareButton(context: context),
                     ],
                   ),
@@ -150,7 +142,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               ),
             ),
           ],
-          body: _content(),
+          body: _content(context: context),
         ),
       ),
     );
@@ -268,6 +260,26 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           onPressed: () => SharePlus.instance.share(ShareParams(uri: uri)),
         );
       },
+    );
+  }
+
+  Widget _websiteButton({required BuildContext context}) {
+    return _builder(
+      buildWhen: (prev, curr) => prev.manga != curr.manga,
+      builder: (context, state) => IconButton(
+        icon: Icon(
+          Icons.web,
+          color: Theme.of(context).appBarTheme.iconTheme?.color,
+        ),
+        onPressed: () {
+          final url = state.manga?.webUrl;
+          if (url == null || url.isEmpty) {
+            context.showSnackBar(message: 'Could not launch source url');
+          } else {
+            _cubit(context).recrawl(url: url);
+          }
+        },
+      ),
     );
   }
 
@@ -560,7 +572,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
-  Widget _content() {
+  Widget _content({required BuildContext context}) {
     return TabBarView(
       children: [
         NextPageNotificationWidget(
@@ -574,25 +586,101 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             ),
           ),
         ),
-        const CustomScrollView(
+        CustomScrollView(
           slivers: [
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '🚧🚧🚧 Under Construction 🚧🚧🚧',
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
+            SliverToBoxAdapter(
+              child: _builder(
+                buildWhen: (prev, curr) => [
+                  prev.manga != curr.manga,
+                  prev.isLoadingManga != curr.isLoadingManga,
+                ].contains(true),
+                builder: (context, state) => Column(
+                  children: [
+                    Text(
+                      'Tags',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final tag in [...?state.manga?.tags])
+                          ShimmerLoading.multiline(
+                            isLoading: state.isLoadingManga,
+                            width: 50,
+                            height: 30,
+                            lines: 1,
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxHeight: 30),
+                              child: OutlinedButton(
+                                child: Text(tag.name ?? ''),
+                                onPressed: () => _onTapTag(context, tag: tag),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
+            SliverToBoxAdapter(
+              child: _builder(
+                buildWhen: (prev, curr) => [
+                  prev.manga != curr.manga,
+                  prev.isLoadingManga != curr.isLoadingManga,
+                ].contains(true),
+                builder: (context, state) => Column(
+                  children: [
+                    Text(
+                      'Description',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    ShimmerLoading.multiline(
+                      isLoading: state.isLoadingManga,
+                      width: double.infinity,
+                      height: 15,
+                      lines: 3,
+                      child: ExpandableNotifier(
+                        child: ExpandablePanel(
+                          theme: const ExpandableThemeData(
+                            tapBodyToExpand: true,
+                            tapBodyToCollapse: true,
+                          ),
+                          collapsed: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      state.manga?.description ?? '',
+                                      maxLines: 3,
+                                    ),
+                                    const Icon(Icons.keyboard_arrow_down),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          expanded: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    Text(state.manga?.description ?? ''),
+                                    const Icon(Icons.keyboard_arrow_up),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
           ],
         ),
         const CustomScrollView(
