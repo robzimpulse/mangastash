@@ -104,44 +104,47 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         child: NestedScrollView(
           controller: _scrollController,
           headerSliverBuilder: (context, isInnerBoxScrolled) => [
-            SliverAppBar(
-              stretch: true,
-              pinned: true,
-              elevation: 0,
-              expandedHeight: MediaQuery.of(context).size.height * 0.4,
-              automaticallyImplyLeading: false,
-              flexibleSpace: FlexibleAppBarBuilder(
-                builder: (context, progress) => Padding(
-                  padding: const EdgeInsets.only(bottom: kTextTabBarHeight),
-                  child: MangaDetailAppBarWidget(
-                    progress: progress,
-                    background: _appBarBackground(),
-                    leading: BackButton(
-                      color: Theme.of(context).appBarTheme.iconTheme?.color,
+            SliverOverlapAbsorber(
+              handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+              sliver: SliverAppBar(
+                stretch: true,
+                pinned: true,
+                elevation: 0,
+                expandedHeight: MediaQuery.of(context).size.height * 0.4,
+                automaticallyImplyLeading: false,
+                flexibleSpace: FlexibleAppBarBuilder(
+                  builder: (context, progress) => Padding(
+                    padding: const EdgeInsets.only(bottom: kTextTabBarHeight),
+                    child: MangaDetailAppBarWidget(
+                      progress: progress,
+                      background: _appBarBackground(),
+                      leading: BackButton(
+                        color: Theme.of(context).appBarTheme.iconTheme?.color,
+                      ),
+                      title: _title(context: context, progress: progress),
+                      actions: [
+                        _websiteButton(context: context),
+                        _shareButton(context: context),
+                      ],
                     ),
-                    title: _title(context: context, progress: progress),
-                    actions: [
-                      _websiteButton(context: context),
-                      _shareButton(context: context),
+                  ),
+                ),
+                bottom: DecoratedPreferredSizeWidget(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                  ),
+                  child: const TabBar(
+                    tabs: [
+                      Tab(text: 'Chapter'),
+                      Tab(text: 'Description'),
+                      Tab(text: 'Similar'),
                     ],
                   ),
                 ),
               ),
-              bottom: DecoratedPreferredSizeWidget(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                ),
-                child: const TabBar(
-                  tabs: [
-                    Tab(text: 'Chapter'),
-                    Tab(text: 'Description'),
-                    Tab(text: 'Similar'),
-                  ],
-                ),
-              ),
             ),
           ],
-          body: _content(context: context),
+          body: Builder(builder: (context) => _content(context: context)),
         ),
       ),
     );
@@ -574,6 +577,11 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             onRefresh: () => _cubit(context).init(useCache: false),
             child: CustomScrollView(
               slivers: [
+                SliverOverlapInjector(
+                  handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                    context,
+                  ),
+                ),
                 _chapters(),
               ],
             ),
@@ -585,6 +593,11 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               padding: const EdgeInsets.all(12),
               sliver: MultiSliver(
                 children: [
+                  SliverOverlapInjector(
+                    handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                      context,
+                    ),
+                  ),
                   SliverToBoxAdapter(
                     child: _builder(
                       buildWhen: (prev, curr) => [
@@ -734,9 +747,14 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             ),
           ],
         ),
-        const CustomScrollView(
+        CustomScrollView(
           slivers: [
-            SliverFillRemaining(
+            SliverOverlapInjector(
+              handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                context,
+              ),
+            ),
+            const SliverFillRemaining(
               hasScrollBody: false,
               child: Padding(
                 padding: EdgeInsets.all(24),
