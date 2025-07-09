@@ -569,19 +569,22 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   Widget _content({required BuildContext context}) {
+    final absorber = NestedScrollView.sliverOverlapAbsorberHandleFor(context);
+
     return TabBarView(
       children: [
         NextPageNotificationWidget(
           onLoadNextPage: () => _cubit(context).next(),
-          child: RefreshIndicator(
-            onRefresh: () => _cubit(context).init(useCache: false),
+          child: ListenableBuilder(
+            listenable: absorber,
+            builder: (context, child) => RefreshIndicator(
+              edgeOffset: absorber.layoutExtent ?? 0,
+              child: child ?? const SizedBox.shrink(),
+              onRefresh: () => _cubit(context).init(useCache: false),
+            ),
             child: CustomScrollView(
               slivers: [
-                SliverOverlapInjector(
-                  handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                    context,
-                  ),
-                ),
+                SliverOverlapInjector(handle: absorber),
                 _chapters(),
               ],
             ),
@@ -593,11 +596,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               padding: const EdgeInsets.all(12),
               sliver: MultiSliver(
                 children: [
-                  SliverOverlapInjector(
-                    handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                      context,
-                    ),
-                  ),
+                  SliverOverlapInjector(handle: absorber),
                   SliverToBoxAdapter(
                     child: _builder(
                       buildWhen: (prev, curr) => [
@@ -749,11 +748,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         ),
         CustomScrollView(
           slivers: [
-            SliverOverlapInjector(
-              handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                context,
-              ),
-            ),
+            SliverOverlapInjector(handle: absorber),
             const SliverFillRemaining(
               hasScrollBody: false,
               child: Padding(
