@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -140,7 +141,20 @@ class MangaReaderScreen extends StatelessWidget {
         }
 
         if (images.isEmpty) {
-          return const Center(child: Text('Images Empty'));
+          return Center(
+            child: Column(
+              children: [
+                const Text('Images Empty'),
+                const SizedBox(height: 16),
+                state.chapter?.webUrl?.let(
+                  (url) => OutlinedButton(
+                    onPressed: () => _cubit(context).recrawl(url: url),
+                    child: const Text('Open Debug Browser'),
+                  ),
+                ),
+              ].nonNulls.toList(),
+            ),
+          );
         }
 
         return SingleChildScrollView(

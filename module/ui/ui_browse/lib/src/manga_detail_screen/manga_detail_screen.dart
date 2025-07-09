@@ -231,12 +231,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         icon: const Icon(Icons.filter_list),
         onPressed: () async {
           final result = await widget.onTapSort?.call(state.config);
-          if (!context.mounted) return;
-          await _scrollController.animateTo(
-            MediaQuery.of(context).size.height * 0.4,
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.decelerate,
-          );
           if (!context.mounted || result == null) return;
           _cubit(context).init(config: result);
         },
@@ -603,7 +597,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                         children: [
                           Text(
                             'Tags',
-                            style: Theme.of(context).textTheme.titleLarge,
+                            style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const SizedBox(height: 8),
                           Wrap(
@@ -617,10 +611,15 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                                   height: 30,
                                   lines: 1,
                                   child: ConstrainedBox(
-                                    constraints: const BoxConstraints(maxHeight: 30),
+                                    constraints: const BoxConstraints(
+                                      maxHeight: 30,
+                                    ),
                                     child: OutlinedButton(
                                       child: Text(tag.name ?? ''),
-                                      onPressed: () => _onTapTag(context, tag: tag),
+                                      onPressed: () => _onTapTag(
+                                        context,
+                                        tag: tag,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -642,7 +641,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                         children: [
                           Text(
                             'Description',
-                            style: Theme.of(context).textTheme.titleLarge,
+                            style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const SizedBox(height: 8),
                           ShimmerLoading.multiline(
@@ -650,40 +649,12 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                             width: double.infinity,
                             height: 15,
                             lines: 3,
-                            child: ExpandableNotifier(
-                              child: ExpandablePanel(
-                                theme: const ExpandableThemeData(
-                                  tapBodyToExpand: true,
-                                  tapBodyToCollapse: true,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(state.manga?.description ?? ''),
                                 ),
-                                collapsed: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            state.manga?.description ?? '',
-                                            maxLines: 3,
-                                          ),
-                                          const Icon(Icons.keyboard_arrow_down),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                expanded: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          Text(state.manga?.description ?? ''),
-                                          const Icon(Icons.keyboard_arrow_up),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                              ],
                             ),
                           ),
                         ],

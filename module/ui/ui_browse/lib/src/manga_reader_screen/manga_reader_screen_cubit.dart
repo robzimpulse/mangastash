@@ -73,7 +73,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     );
   }
 
-  Future<void> _fetchChapter() async {
+  Future<void> _fetchChapter({bool useCache = true}) async {
     final chapterId = state.chapterId;
     final mangaId = state.mangaId;
     final source = state.source?.name;
@@ -93,6 +93,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
       chapterId: chapterId,
       mangaId: mangaId,
       source: source,
+      useCache: useCache
     );
 
     if (response is Success<Chapter>) {
@@ -108,6 +109,6 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
 
   void recrawl({required String url}) async {
     await _crawlUrlUseCase.execute(url: url);
-    await _fetchChapter();
+    await _fetchChapter(useCache: false);
   }
 }
