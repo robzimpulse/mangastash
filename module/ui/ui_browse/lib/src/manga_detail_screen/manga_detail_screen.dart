@@ -366,65 +366,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
-  // Widget _manga() {
-  //   return _builder(
-  //     buildWhen: (prev, curr) => [
-  //       prev.isLoadingManga != curr.isLoadingManga,
-  //       prev.isOnLibrary != curr.isOnLibrary,
-  //       prev.manga != curr.manga,
-  //       prev.errorManga != curr.errorManga,
-  //     ].contains(true),
-  //     builder: (context, state) {
-  //       final error = state.errorManga;
-  //
-  //       if (error != null) {
-  //         return SliverToBoxAdapter(
-  //           child: SizedBox(
-  //             height: 200,
-  //             child: Center(
-  //               child: Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   Text(
-  //                     error.toString(),
-  //                     textAlign: TextAlign.center,
-  //                   ),
-  //                   if (error is FailedParsingHtmlException) ...[
-  //                     const SizedBox(height: 16),
-  //                     OutlinedButton(
-  //                       onPressed: () => _cubit(context).recrawl(
-  //                         url: error.url,
-  //                       ),
-  //                       child: const Text('Open Debug Browser'),
-  //                     ),
-  //                   ],
-  //                 ],
-  //               ),
-  //             ),
-  //           ),
-  //         );
-  //       }
-  //
-  //       return MangaDetailWidget(
-  //         cacheManager: widget.cacheManager,
-  //         description: state.manga?.description,
-  //         tags: [...?state.manga?.tags?.map((e) => e.name).nonNulls],
-  //         horizontalPadding: 12,
-  //         isOnLibrary: state.isOnLibrary,
-  //         onTapAddToLibrary: () => _cubit(context).addToLibrary(),
-  //         onTapPrefetch: () => _cubit(context).prefetch(),
-  //         onTapWebsite: () => _onTapWebsite(context, url: state.manga?.webUrl),
-  //         onTapTag: (name) => _onTapTag(
-  //           context,
-  //           tag: state.manga?.tags?.firstWhereOrNull((e) => e.name == name),
-  //         ),
-  //         isLoadingManga: state.isLoadingManga,
-  //         isLoadingChapters: state.isLoadingChapters,
-  //       );
-  //     },
-  //   );
-  // }
-
   Widget _chapters() {
     return _builder(
       buildWhen: (prev, curr) => [
