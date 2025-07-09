@@ -17,14 +17,14 @@ class BrowseSourceScreen extends StatelessWidget {
 
   final VoidCallback? onTapSearchManga;
 
-  final ValueSetter<Source>? onTapSource;
+  final ValueSetter<SourceEnum>? onTapSource;
 
   final BaseCacheManager cacheManager;
 
   static Widget create({
     required ServiceLocator locator,
     VoidCallback? onTapSearchManga,
-    ValueSetter<Source>? onTapSource,
+    ValueSetter<SourceEnum>? onTapSource,
   }) {
     return BlocProvider(
       create: (context) => BrowseSourceScreenCubit(

@@ -12,7 +12,7 @@ class BrowseMangaScreenState extends Equatable {
 
   final MangaShelfItemLayout layout;
 
-  final Source? source;
+  final SourceEnum? source;
 
   final bool hasNextPage;
 
@@ -96,7 +96,7 @@ class BrowseMangaScreenState extends Equatable {
     bool? isSearchActive,
     ValueGetter<Exception?>? error,
     MangaShelfItemLayout? layout,
-    Source? source,
+    SourceEnum? source,
     List<Manga>? mangas,
     Set<String>? libraryMangaIds,
     SearchMangaParameter? parameter,

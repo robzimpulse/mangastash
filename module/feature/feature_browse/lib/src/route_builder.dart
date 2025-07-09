@@ -22,11 +22,9 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
           onTapSearchManga: () => context.showSnackBar(
             message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
           ),
-          onTapSource: (source) => context.push(
-            BrowseRoutePath.browseManga.replaceAll(
-              ':source',
-              source.name ?? '',
-            ),
+          onTapSource: (source) => context.pushNamed(
+            BrowseRoutePath.browseManga,
+            pathParameters: {'source': source.name},
           ),
         ),
       ),

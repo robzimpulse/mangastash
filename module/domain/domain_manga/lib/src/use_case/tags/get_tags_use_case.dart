@@ -33,7 +33,7 @@ class GetTagsUseCase with SyncTagsMixin {
         _webview = webview,
         _logBox = logBox;
 
-  Future<List<Tag>> _mangadex({required String source}) async {
+  Future<List<Tag>> _mangadex({required SourceEnum source}) async {
     final result = await _mangaService.tags();
 
     final tags = result.data;
@@ -42,22 +42,22 @@ class GetTagsUseCase with SyncTagsMixin {
       throw DataNotFoundException();
     }
 
-    return [...tags.map((e) => Tag.from(data: e).copyWith(source: source))];
+    return [...tags.map((e) => Tag.from(data: e).copyWith(source: source.name))];
   }
 
-  Future<List<Tag>> _scrapping({required String source}) async {
+  Future<List<Tag>> _scrapping({required SourceEnum source}) async {
     const parameter = SearchMangaParameter(page: 1);
     String url = '';
-    if (source == Source.asurascan().name) {
+    if (source == SourceEnum.asurascan) {
       url = parameter.asurascan;
-    } else if (source == Source.mangaclash().name) {
+    } else if (source == SourceEnum.mangaclash) {
       url = parameter.mangaclash;
     }
 
     final document = await _webview.open(
       url,
       scripts: [
-        if (source == Source.asurascan().name)
+        if (source == SourceEnum.asurascan)
           'window.document.querySelectorAll(\'${[
             'button',
             'inline-flex',
@@ -83,14 +83,14 @@ class GetTagsUseCase with SyncTagsMixin {
       source: source,
     );
 
-    return [...parser.tags.map((e) => e.copyWith(source: source))];
+    return [...parser.tags.map((e) => e.copyWith(source: source.name))];
   }
 
   Future<Result<List<Tag>>> execute({
-    required String source,
+    required SourceEnum source,
     bool useCache = true,
   }) async {
-    final cache = await _cacheManager.getFileFromCache(source);
+    final cache = await _cacheManager.getFileFromCache(source.name);
     final file = await cache?.file.readAsString();
     final object = file.let((e) => json.decode(e))?.castOrNull<List<dynamic>>();
     final data = [...?object?.map((e) => Tag.fromJson(e))];
@@ -100,7 +100,7 @@ class GetTagsUseCase with SyncTagsMixin {
     }
 
     try {
-      final promise = source == Source.mangadex().name
+      final promise = source == SourceEnum.mangadex
           ? _mangadex(source: source)
           : _scrapping(source: source);
 
@@ -111,8 +111,8 @@ class GetTagsUseCase with SyncTagsMixin {
       );
 
       await _cacheManager.putFile(
-        source,
-        key: source,
+        source.name,
+        key: source.name,
         utf8.encode(json.encode([...data.map((e) => e.toJson())])),
         fileExtension: 'json',
         maxAge: const Duration(minutes: 30),

@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -28,7 +29,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         _prefetchChapterUseCase = prefetchChapterUseCase,
         _getMangaFromUrlUseCase = getMangaFromUrlUseCase,
-        super(initialState.copyWith(sources: Source.values)) {
+        super(initialState.copyWith(sources: SourceEnum.values)) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
           .distinct()
@@ -52,7 +53,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
   void prefetch({required List<Manga> mangas}) {
     for (final manga in mangas) {
       final id = manga.id;
-      final source = manga.source;
+      final source = manga.source?.let((e) => SourceEnum.fromValue(name: e));
       if (id == null || source == null) continue;
       _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
       _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);
@@ -72,7 +73,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
 
   void add({required String url}) async {
     final uri = Uri.tryParse(url);
-    final source = uri?.source?.name;
+    final source = uri?.source;
     if (uri != null && source != null) {
       final result = await _getMangaFromUrlUseCase.execute(
         source: source,

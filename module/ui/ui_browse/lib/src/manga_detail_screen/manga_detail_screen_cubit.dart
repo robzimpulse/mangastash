@@ -124,7 +124,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
   Future<void> _fetchManga({bool useCache = true}) async {
     final id = state.manga?.id ?? state.mangaId;
-    final source = state.source?.name;
+    final source = state.source;
     if (id == null || id.isEmpty || source == null) return;
 
     emit(
@@ -153,7 +153,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
   Future<void> _fetchChapter({bool useCache = true}) async {
     final id = state.manga?.id ?? state.mangaId;
-    final source = state.source?.name;
+    final source = state.source;
     if (id == null || id.isEmpty || source == null) return;
 
     final result = await _searchChapterUseCase.execute(
@@ -212,7 +212,9 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
   Future<void> prefetch() async {
     final mangaId = state.manga?.id;
-    final source = state.manga?.source;
+    final source = state.manga?.source?.let(
+      (e) => SourceEnum.fromValue(name: e),
+    );
     if (mangaId == null || source == null) return;
     final chapters = await _getAllChapterUseCase.execute(
       source: source,

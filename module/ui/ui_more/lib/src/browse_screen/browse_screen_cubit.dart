@@ -27,7 +27,7 @@ class BrowseScreenCubit extends Cubit<BrowseScreenState> {
 
   void update({
     SearchMangaParameter? parameter,
-    List<Source>? sources,
+    List<SourceEnum>? sources,
   }) {
     emit(state.copyWith(parameter: parameter, sources: sources));
     parameter?.let(

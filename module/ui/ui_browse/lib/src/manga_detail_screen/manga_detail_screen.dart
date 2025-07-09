@@ -36,7 +36,7 @@ class MangaDetailScreen extends StatefulWidget {
       create: (context) => MangaDetailScreenCubit(
         initialState: MangaDetailScreenState(
           mangaId: mangaId,
-          source: Source.fromValue(source),
+          source: source?.let((e) => SourceEnum.fromValue(name: e)),
         ),
         getMangaUseCase: locator(),
         searchChapterUseCase: locator(),

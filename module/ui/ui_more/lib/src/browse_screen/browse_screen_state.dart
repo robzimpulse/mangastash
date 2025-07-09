@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 class BrowseScreenState extends Equatable {
   final SearchMangaParameter parameter;
 
-  final List<Source> sources;
+  final List<SourceEnum> sources;
 
   const BrowseScreenState({
     this.parameter = const SearchMangaParameter(),
@@ -17,7 +17,7 @@ class BrowseScreenState extends Equatable {
 
   BrowseScreenState copyWith({
     SearchMangaParameter? parameter,
-    List<Source>? sources,
+    List<SourceEnum>? sources,
   }) {
     return BrowseScreenState(
       parameter: parameter ?? this.parameter,

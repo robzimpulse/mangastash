@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -55,8 +54,9 @@ class MangaHistoryScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       title: manga.title ?? '',
       coverUrl: manga.coverUrl ?? '',
-      sourceIconUrl:
-          Source.values.firstWhereOrNull((e) => e.name == manga.source)?.icon,
+      sourceIconUrl: manga.source?.let(
+        (e) => SourceEnum.fromValue(name: e)?.icon,
+      ),
       layout: MangaShelfItemLayout.list,
       cacheManager: cacheManager,
       onTap: () => onTapManga?.call(manga),

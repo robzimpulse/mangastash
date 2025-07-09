@@ -100,7 +100,7 @@ class JobManager
 
   Future<void> _fetchManga(JobModel job) async {
     final mangaId = job.manga?.id;
-    final source = job.manga?.source;
+    final source = job.manga?.source?.let((e) => SourceEnum.fromValue(name: e));
 
     if (mangaId == null || source == null) {
       _log.log(
@@ -157,7 +157,7 @@ class JobManager
   Future<void> _fetchChapter(JobModel job) async {
     final mangaId = job.manga?.id;
     final chapterId = job.chapter?.id;
-    final source = job.manga?.source;
+    final source = job.manga?.source?.let((e) => SourceEnum.fromValue(name: e));
 
     if (mangaId == null || chapterId == null || source == null) {
       _log.log(
@@ -225,7 +225,7 @@ class JobManager
 
   Future<void> _fetchAllChapter(JobModel job) async {
     final mangaId = job.manga?.id;
-    final source = job.manga?.source;
+    final source = job.manga?.source?.let((e) => SourceEnum.fromValue(name: e));
 
     if (mangaId == null || source == null) {
       _log.log(
@@ -311,7 +311,7 @@ class JobManager
   @override
   void prefetchChapters({
     required String mangaId,
-    required String source,
+    required SourceEnum source,
   }) {
     _jobDao.add(
       JobTablesCompanion.insert(
@@ -326,12 +326,12 @@ class JobManager
   void prefetchChapter({
     required String mangaId,
     required String chapterId,
-    required String source,
+    required SourceEnum source,
   }) {
     _jobDao.add(
       JobTablesCompanion.insert(
         type: JobTypeEnum.chapter,
-        source: Value(source),
+        source: Value(source.name),
         mangaId: Value(mangaId),
         chapterId: Value(chapterId),
       ),
@@ -341,12 +341,12 @@ class JobManager
   @override
   void prefetchManga({
     required String mangaId,
-    required String source,
+    required SourceEnum source,
   }) {
     _jobDao.add(
       JobTablesCompanion.insert(
         type: JobTypeEnum.manga,
-        source: Value(source),
+        source: Value(source.name),
         mangaId: Value(mangaId),
       ),
     );

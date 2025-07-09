@@ -29,7 +29,7 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
         _webview = webview;
 
   Future<Manga> _scrapping({
-    required String source,
+    required SourceEnum source,
     required String url,
   }) async {
     final document = await _webview.open(url);
@@ -43,11 +43,11 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
       source: source,
     );
 
-    return parser.manga.copyWith(source: source, webUrl: url);
+    return parser.manga.copyWith(source: source.name, webUrl: url);
   }
 
   Future<Result<Manga>> execute({
-    required String source,
+    required SourceEnum source,
     required String url,
     bool useCache = true,
   }) async {
@@ -67,10 +67,7 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
       final results = await sync(
         dao: _mangaDao,
         values: [
-          await _scrapping(
-            source: source,
-            url: (manga?.webUrl).or(url),
-          ),
+          await _scrapping(source: source, url: (manga?.webUrl).or(url)),
         ],
         logBox: _logBox,
       );

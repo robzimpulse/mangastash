@@ -2,9 +2,9 @@ import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 
 extension SourceOfUri on Uri {
-  Source? get source {
-    for (final source in Source.values) {
-      if (source.url?.let(Uri.tryParse)?.host == host) {
+  SourceEnum? get source {
+    for (final source in SourceEnum.values) {
+      if (source.url.let(Uri.tryParse)?.host == host) {
         return source;
       }
     }

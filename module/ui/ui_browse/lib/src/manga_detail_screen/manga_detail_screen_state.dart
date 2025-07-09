@@ -23,7 +23,7 @@ class MangaDetailScreenState extends Equatable {
   final Manga? manga;
   final List<Chapter> chapters;
   final int? totalChapter;
-  final Source? source;
+  final SourceEnum? source;
   final List<Manga> libraries;
   final Set<String> prefetchedChapterId;
   final Map<String, Chapter> histories;
@@ -109,7 +109,7 @@ class MangaDetailScreenState extends Equatable {
     Manga? manga,
     List<Chapter>? chapters,
     String? sourceId,
-    Source? source,
+    SourceEnum? source,
     ChapterConfig? config,
     List<Manga>? libraries,
     Set<String>? prefetchedChapterId,

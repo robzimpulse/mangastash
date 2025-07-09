@@ -33,7 +33,7 @@ class GetMangaUseCase with SyncMangasMixin {
         _webview = webview;
 
   Future<Manga> _mangadex({
-    required String source,
+    required SourceEnum source,
     required String mangaId,
   }) async {
     final result = await _mangaService.detail(
@@ -47,11 +47,11 @@ class GetMangaUseCase with SyncMangasMixin {
       throw DataNotFoundException();
     }
 
-    return Manga.from(data: manga).copyWith(source: source);
+    return Manga.from(data: manga).copyWith(source: source.name);
   }
 
   Future<Manga> _scrapping({
-    required String source,
+    required SourceEnum source,
     required String? url,
   }) async {
     if (url == null) {
@@ -69,11 +69,11 @@ class GetMangaUseCase with SyncMangasMixin {
       source: source,
     );
 
-    return parser.manga.copyWith(source: source, webUrl: url);
+    return parser.manga.copyWith(source: source.name, webUrl: url);
   }
 
   Future<Result<Manga>> execute({
-    required String source,
+    required SourceEnum source,
     required String mangaId,
     bool useCache = true,
   }) async {
@@ -91,7 +91,7 @@ class GetMangaUseCase with SyncMangasMixin {
       final raw = await _mangaDao.search(ids: [mangaId]);
       final manga = Manga.fromDatabase(raw.firstOrNull);
 
-      final promise = source == Source.mangadex().name
+      final promise = source == SourceEnum.mangadex
           ? _mangadex(source: source, mangaId: mangaId)
           : _scrapping(url: manga?.webUrl, source: source);
 

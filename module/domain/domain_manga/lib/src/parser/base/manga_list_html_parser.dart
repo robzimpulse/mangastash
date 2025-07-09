@@ -12,13 +12,13 @@ abstract class MangaListHtmlParser extends BaseHtmlParser {
 
   factory MangaListHtmlParser.forSource({
     required Document root,
-    required String source,
+    required SourceEnum source,
   }) {
-    if (Source.asurascan().name == source) {
+    if (SourceEnum.asurascan == source) {
       return AsuraScanMangaListHtmlParser(root: root);
     }
 
-    if (Source.mangaclash().name == source) {
+    if (SourceEnum.mangaclash == source) {
       return MangaClashMangaListHtmlParser(root: root);
     }
 

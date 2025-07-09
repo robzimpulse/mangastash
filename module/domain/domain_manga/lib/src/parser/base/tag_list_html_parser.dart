@@ -12,13 +12,13 @@ abstract class TagListHtmlParser extends BaseHtmlParser {
 
   factory TagListHtmlParser.forSource({
     required Document root,
-    required String source,
+    required SourceEnum source,
   }) {
-    if (Source.asurascan().name == source) {
+    if (SourceEnum.asurascan == source) {
       return AsuraScanTagListHtmlParser(root: root);
     }
 
-    if (Source.mangaclash().name == source) {
+    if (SourceEnum.mangaclash == source) {
       return MangaClashTagListHtmlParser(root: root);
     }
 

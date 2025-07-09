@@ -40,7 +40,6 @@ class SearchChapterUseCase
         _webview = webview;
 
   Future<Pagination<Chapter>> _mangadex({
-    required String source,
     required String mangaId,
     required SearchChapterParameter parameter,
   }) async {
@@ -68,7 +67,7 @@ class SearchChapterUseCase
   }
 
   Future<Pagination<Chapter>> _scrapping({
-    required String source,
+    required SourceEnum source,
     required String mangaId,
     required SearchChapterParameter parameter,
   }) async {
@@ -113,7 +112,7 @@ class SearchChapterUseCase
   }
 
   Future<Result<Pagination<Chapter>>> execute({
-    required String source,
+    required SourceEnum source,
     required String mangaId,
     required SearchChapterParameter parameter,
     bool useCache = true,
@@ -133,8 +132,8 @@ class SearchChapterUseCase
     }
 
     try {
-      final promise = source == Source.mangadex().name
-          ? _mangadex(source: source, mangaId: mangaId, parameter: parameter)
+      final promise = source == SourceEnum.mangadex
+          ? _mangadex(mangaId: mangaId, parameter: parameter)
           : _scrapping(source: source, mangaId: mangaId, parameter: parameter);
 
       final data = await promise;

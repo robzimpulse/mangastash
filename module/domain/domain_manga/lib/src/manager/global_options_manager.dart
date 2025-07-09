@@ -18,7 +18,7 @@ class GlobalOptionsManager
         ListenSourcesUseCase,
         UpdateSourcesUseCase {
   final BehaviorSubject<SearchMangaParameter> _searchMangaParameter;
-  final BehaviorSubject<List<Source>> _sources;
+  final BehaviorSubject<List<SourceEnum>> _sources;
 
   final Storage _storage;
 
@@ -30,7 +30,11 @@ class GlobalOptionsManager
         _sources = BehaviorSubject.seeded(
           storage
               .getStringList(_sourcesKey)
-              .let((e) => [...e.map(Source.fromJsonString).nonNulls])
+              .let(
+                (e) => [
+                  ...e.map((e) => SourceEnum.fromValue(name: e)).nonNulls,
+                ],
+              )
               .or([]),
         ),
         _searchMangaParameter = BehaviorSubject.seeded(
@@ -53,14 +57,14 @@ class GlobalOptionsManager
   }
 
   @override
-  ValueStream<List<Source>> get sourceStateStream => _sources.stream;
+  ValueStream<List<SourceEnum>> get sourceStateStream => _sources.stream;
 
   @override
-  void updateSources({required List<Source> sources}) {
+  void updateSources({required List<SourceEnum> sources}) {
     _sources.add(sources);
     _storage.setStringList(
       _sourcesKey,
-      [...sources.map((e) => e.toJsonString())],
+      [...sources.map((e) => e.label)],
     );
   }
 }

@@ -33,7 +33,7 @@ class SearchMangaUseCase with SyncMangasMixin {
         _logBox = logBox;
 
   Future<Pagination<Manga>> _mangadex({
-    required String source,
+    required SourceEnum source,
     required SearchMangaParameter parameter,
   }) async {
     final result = await _mangaRepository.search(
@@ -49,7 +49,7 @@ class SearchMangaUseCase with SyncMangasMixin {
     return Pagination(
       data: [
         ...?result.data?.map(
-          (e) => Manga.from(data: e).copyWith(source: source),
+          (e) => Manga.from(data: e).copyWith(source: source.name),
         ),
       ],
       offset: result.offset?.toInt(),
@@ -59,13 +59,13 @@ class SearchMangaUseCase with SyncMangasMixin {
   }
 
   Future<Pagination<Manga>> _scrapping({
-    required String source,
+    required SourceEnum source,
     required SearchMangaParameter parameter,
   }) async {
     String url = '';
-    if (source == Source.asurascan().name) {
+    if (source == SourceEnum.asurascan) {
       url = parameter.asurascan;
-    } else if (source == Source.mangaclash().name) {
+    } else if (source == SourceEnum.mangaclash) {
       url = parameter.mangaclash;
     }
 
@@ -81,7 +81,7 @@ class SearchMangaUseCase with SyncMangasMixin {
     );
 
     return Pagination(
-      data: [...parser.mangas.map((e) => e.copyWith(source: source))],
+      data: [...parser.mangas.map((e) => e.copyWith(source: source.name))],
       page: parameter.page,
       limit: parser.mangas.length,
       total: parser.mangas.length,
@@ -91,7 +91,7 @@ class SearchMangaUseCase with SyncMangasMixin {
   }
 
   Future<Result<Pagination<Manga>>> execute({
-    required String source,
+    required SourceEnum source,
     required SearchMangaParameter parameter,
     bool useCache = true,
   }) async {
@@ -110,7 +110,7 @@ class SearchMangaUseCase with SyncMangasMixin {
     }
 
     try {
-      final promise = source == Source.mangadex().name
+      final promise = source == SourceEnum.mangadex
           ? _mangadex(source: source, parameter: parameter)
           : _scrapping(source: source, parameter: parameter);
 

@@ -11,13 +11,13 @@ abstract class ChapterImageHtmlParser extends BaseHtmlParser {
 
   factory ChapterImageHtmlParser.forSource({
     required Document root,
-    required String source,
+    required SourceEnum source,
   }) {
-    if (Source.asurascan().name == source) {
+    if (SourceEnum.asurascan == source) {
       return AsuraScanChapterImageHtmlParser(root: root);
     }
 
-    if (Source.mangaclash().name == source) {
+    if (SourceEnum.mangaclash == source) {
       return MangaClashChapterImageHtmlParser(root: root);
     }
 

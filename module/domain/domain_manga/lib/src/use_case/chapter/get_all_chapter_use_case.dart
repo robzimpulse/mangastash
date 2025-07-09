@@ -13,7 +13,7 @@ class GetAllChapterUseCase {
   }) : _searchChapterUseCase = searchChapterUseCase;
 
   Future<List<Chapter>> execute({
-    required String source,
+    required SourceEnum source,
     required String mangaId,
     List<Chapter> chapters = const [],
     SearchChapterParameter? parameter,

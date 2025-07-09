@@ -91,7 +91,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   }
 
   Future<void> _fetchTags({bool useCache = true}) async {
-    final source = state.source?.name;
+    final source = state.source;
 
     if (source == null) return;
 
@@ -110,7 +110,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   }
 
   Future<void> _fetchManga({bool useCache = true}) async {
-    final source = state.source?.name;
+    final source = state.source;
 
     if (source == null) return;
 
@@ -178,7 +178,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
   void prefetch({required Manga manga}) {
     final id = manga.id;
-    final source = manga.source;
+    final source = manga.source?.let((e) => SourceEnum.fromValue(name: e));
     if (id == null || source == null) return;
     _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
     _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);
@@ -193,10 +193,10 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
   void recrawl() async {
     final parameter = state.parameter.copyWith(page: 1);
-    final source = state.source?.name;
-    final url = source == Source.mangaclash().name
+    final source = state.source;
+    final url = source == SourceEnum.mangaclash
         ? parameter.mangaclash
-        : source == Source.asurascan().name
+        : source == SourceEnum.asurascan
             ? parameter.asurascan
             : null;
     if (url == null) return;

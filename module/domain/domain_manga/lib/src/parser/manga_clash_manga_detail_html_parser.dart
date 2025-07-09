@@ -35,7 +35,7 @@ class MangaClashMangaDetailHtmlParser extends MangaDetailHtmlParser {
         ...?tags?.map(
           (e) => Tag(
             name: toBeginningOfSentenceCase(e.trim()),
-            source: Source.mangaclash().name,
+            source: SourceEnum.mangaclash.name,
           ),
         ),
       ],

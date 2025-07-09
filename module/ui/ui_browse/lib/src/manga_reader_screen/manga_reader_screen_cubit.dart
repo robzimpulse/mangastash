@@ -54,7 +54,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
 
   Future<void> _fetchPreviousAndNextChapter() async {
     final mangaId = state.mangaId;
-    final source = state.source?.name;
+    final source = state.source;
 
     if (mangaId == null || source == null) return;
 
@@ -76,7 +76,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
   Future<void> _fetchChapter({bool useCache = true}) async {
     final chapterId = state.chapterId;
     final mangaId = state.mangaId;
-    final source = state.source?.name;
+    final source = state.source;
 
     if (chapterId == null || mangaId == null || source == null) {
       emit(

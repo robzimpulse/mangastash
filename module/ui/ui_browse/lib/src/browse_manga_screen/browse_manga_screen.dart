@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
@@ -38,7 +39,7 @@ class BrowseMangaScreen extends StatefulWidget {
     return BlocProvider(
       create: (context) => BrowseMangaScreenCubit(
         initialState: BrowseMangaScreenState(
-          source: Source.fromValue(source),
+          source: source?.let((e) => SourceEnum.fromValue(name: source)),
         ),
         searchMangaUseCase: locator(),
         listenMangaFromLibraryUseCase: locator(),

@@ -25,7 +25,7 @@ class MangaReaderScreenState extends Equatable {
 
   final String? chapterId;
 
-  final Source? source;
+  final SourceEnum? source;
 
   final SearchChapterParameter parameter;
 
@@ -65,7 +65,7 @@ class MangaReaderScreenState extends Equatable {
     bool? isLoading,
     Chapter? chapter,
     Exception? Function()? error,
-    Source? source,
+    SourceEnum? source,
     SearchChapterParameter? parameter,
     List<String>? chapterIds,
   }) {

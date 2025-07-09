@@ -64,9 +64,9 @@ class BrowseScreen extends StatelessWidget {
         subtitle: const Text('Available Sources for Manga'),
         leading: const Icon(Icons.source),
         children: [
-          ...Source.values.map(
+          ...SourceEnum.values.map(
             (source) => CheckboxListTile(
-              title: Text(source.name ?? ''),
+              title: Text(source.name),
               value: state.sources.contains(source) == true,
               onChanged: (value) {
                 if (value == null) return;

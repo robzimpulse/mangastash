@@ -15,7 +15,7 @@ class BrowseSourceScreenCubit extends Cubit<BrowseSourceScreenState>
     );
   }
 
-  void _updateSources(List<Source> sources) {
+  void _updateSources(List<SourceEnum> sources) {
     emit(state.copyWith(sources: sources));
   }
 }
