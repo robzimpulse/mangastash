@@ -206,9 +206,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     return _builder(
       buildWhen: (prev, curr) => prev.chapters != curr.chapters,
       builder: (context, state) {
-        if (state.chapters.isEmpty) {
-          return const SizedBox.shrink();
-        }
+        if (state.chapters.isEmpty) return const SizedBox.shrink();
 
         return PopupMenuButton<DownloadOption>(
           icon: const Icon(Icons.download),
@@ -228,15 +226,22 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   Widget _filterButton() {
     return _builder(
-      buildWhen: (prev, curr) => prev.config != curr.config,
-      builder: (context, state) => IconButton(
-        icon: const Icon(Icons.filter_list),
-        onPressed: () async {
-          final result = await widget.onTapSort?.call(state.config);
-          if (!context.mounted || result == null) return;
-          _cubit(context).init(config: result);
-        },
-      ),
+      buildWhen: (prev, curr) => [
+        prev.config != curr.config,
+        prev.chapters != curr.chapters,
+      ].contains(true),
+      builder: (context, state) {
+        if (state.chapters.isEmpty) return const SizedBox.shrink();
+
+        return IconButton(
+          icon: const Icon(Icons.filter_list),
+          onPressed: () async {
+            final result = await widget.onTapSort?.call(state.config);
+            if (!context.mounted || result == null) return;
+            _cubit(context).init(config: result);
+          },
+        );
+      },
     );
   }
 
@@ -262,20 +267,19 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   Widget _websiteButton({required BuildContext context}) {
     return _builder(
       buildWhen: (prev, curr) => prev.manga != curr.manga,
-      builder: (context, state) => IconButton(
-        icon: Icon(
-          Icons.web,
-          color: Theme.of(context).appBarTheme.iconTheme?.color,
-        ),
-        onPressed: () {
-          final url = state.manga?.webUrl;
-          if (url == null || url.isEmpty) {
-            context.showSnackBar(message: 'Could not launch source url');
-          } else {
-            _cubit(context).recrawl(url: url);
-          }
-        },
-      ),
+      builder: (context, state) {
+        final url = state.manga?.webUrl;
+
+        if (url == null) return const SizedBox.shrink();
+
+        return IconButton(
+          icon: Icon(
+            Icons.web,
+            color: Theme.of(context).appBarTheme.iconTheme?.color,
+          ),
+          onPressed: () => _cubit(context).recrawl(url: url),
+        );
+      },
     );
   }
 
@@ -626,11 +630,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                             runSpacing: 8,
                             children: [
                               for (final tag in [...?state.manga?.tags])
-                                ShimmerLoading.multiline(
+                                ShimmerLoading.box(
                                   isLoading: state.isLoadingManga,
                                   width: 50,
                                   height: 30,
-                                  lines: 1,
                                   child: ConstrainedBox(
                                     constraints: const BoxConstraints(
                                       maxHeight: 30,
