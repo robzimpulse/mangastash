@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
@@ -755,7 +754,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               ),
             ),
           ],
-        )
+        ),
       ],
     );
   }

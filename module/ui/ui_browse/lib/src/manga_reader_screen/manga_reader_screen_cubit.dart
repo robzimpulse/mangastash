@@ -93,7 +93,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
       chapterId: chapterId,
       mangaId: mangaId,
       source: source,
-      useCache: useCache
+      useCache: useCache,
     );
 
     if (response is Success<Chapter>) {
