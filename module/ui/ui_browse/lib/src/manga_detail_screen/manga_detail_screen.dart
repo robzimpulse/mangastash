@@ -591,6 +591,75 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                       buildWhen: (prev, curr) => [
                         prev.manga != curr.manga,
                         prev.isLoadingManga != curr.isLoadingManga,
+                        prev.isLoadingChapters != curr.isLoadingChapters,
+                        prev.isOnLibrary != curr.isOnLibrary,
+                      ].contains(true),
+                      builder: (context, state) => Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          InkWell(
+                            onTap: () => _cubit(context).addToLibrary(),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ShimmerLoading.box(
+                                  isLoading: state.isLoadingManga,
+                                  width: 50,
+                                  height: 50,
+                                  child: Icon(
+                                    state.isOnLibrary
+                                        ? Icons.favorite
+                                        : Icons.favorite_outline,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                ShimmerLoading.multiline(
+                                  isLoading: state.isLoadingManga,
+                                  lines: 1,
+                                  width: 50,
+                                  height: 15,
+                                  child: const Text('Library'),
+                                ),
+                              ],
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () => _cubit(context).prefetch(),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ShimmerLoading.box(
+                                  isLoading: [
+                                    state.isLoadingManga,
+                                    state.isLoadingChapters,
+                                  ].every((e) => e),
+                                  width: 50,
+                                  height: 50,
+                                  child: const Icon(Icons.cloud_download),
+                                ),
+                                const SizedBox(height: 2),
+                                ShimmerLoading.multiline(
+                                  isLoading: [
+                                    state.isLoadingManga,
+                                    state.isLoadingChapters,
+                                  ].every((e) => e),
+                                  lines: 1,
+                                  width: 50,
+                                  height: 15,
+                                  child: const Text('Prefetch'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ].intersperse(const SizedBox.shrink()).toList(),
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: _builder(
+                      buildWhen: (prev, curr) => [
+                        prev.manga != curr.manga,
+                        prev.isLoadingManga != curr.isLoadingManga,
                       ].contains(true),
                       builder: (context, state) => Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
