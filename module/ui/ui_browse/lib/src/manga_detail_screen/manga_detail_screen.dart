@@ -629,12 +629,16 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                             spacing: 8,
                             runSpacing: 8,
                             children: [
-                              for (final tag in [...?state.manga?.tags])
-                                ShimmerLoading.box(
-                                  isLoading: state.isLoadingManga,
-                                  width: 50,
-                                  height: 30,
-                                  child: ConstrainedBox(
+                              if (state.isLoadingManga) ...[
+                                for (final _ in List.generate(8, (e) => e))
+                                  ShimmerLoading.box(
+                                    isLoading: state.isLoadingManga,
+                                    width: 50,
+                                    height: 30,
+                                  ),
+                              ] else ...[
+                                for (final tag in [...?state.manga?.tags])
+                                  ConstrainedBox(
                                     constraints: const BoxConstraints(
                                       maxHeight: 30,
                                     ),
@@ -646,7 +650,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                                       ),
                                     ),
                                   ),
-                                ),
+                              ],
                             ],
                           ),
                         ],
