@@ -210,8 +210,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       ].contains(true),
       builder: (context, state) => ShimmerLoading.multiline(
         isLoading: state.isLoadingChapters,
-        width: 44,
-        height: 44,
+        width: 24,
+        height: 24,
         lines: 1,
         child: state.chapters.isEmpty
             ? const SizedBox.shrink()
@@ -240,8 +240,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       ].contains(true),
       builder: (context, state) => ShimmerLoading.multiline(
         isLoading: state.isLoadingChapters,
-        width: 44,
-        height: 44,
+        width: 24,
+        height: 24,
         lines: 1,
         child: state.chapters.isEmpty
             ? const SizedBox.shrink()
@@ -401,7 +401,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             children: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Row(
                     children: [
                       ShimmerLoading.multiline(
