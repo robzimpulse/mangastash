@@ -204,23 +204,30 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   Widget _downloadButton() {
     return _builder(
-      buildWhen: (prev, curr) => prev.chapters != curr.chapters,
-      builder: (context, state) {
-        if (state.chapters.isEmpty) return const SizedBox.shrink();
-
-        return PopupMenuButton<DownloadOption>(
-          icon: const Icon(Icons.download),
-          onSelected: (value) => _onTapDownload(context, value),
-          itemBuilder: (context) => [
-            ...DownloadOption.values.map(
-              (e) => PopupMenuItem<DownloadOption>(
-                value: e,
-                child: Text(e.value),
+      buildWhen: (prev, curr) => [
+        prev.chapters != curr.chapters,
+        prev.isLoadingChapters != curr.isLoadingChapters,
+      ].contains(true),
+      builder: (context, state) => ShimmerLoading.multiline(
+        isLoading: state.isLoadingChapters,
+        width: 44,
+        height: 44,
+        lines: 1,
+        child: state.chapters.isEmpty
+            ? const SizedBox.shrink()
+            : PopupMenuButton<DownloadOption>(
+                icon: const Icon(Icons.download),
+                onSelected: (value) => _onTapDownload(context, value),
+                itemBuilder: (context) => [
+                  ...DownloadOption.values.map(
+                    (e) => PopupMenuItem<DownloadOption>(
+                      value: e,
+                      child: Text(e.value),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        );
-      },
+      ),
     );
   }
 
@@ -229,19 +236,24 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       buildWhen: (prev, curr) => [
         prev.config != curr.config,
         prev.chapters != curr.chapters,
+        prev.isLoadingChapters != curr.isLoadingChapters,
       ].contains(true),
-      builder: (context, state) {
-        if (state.chapters.isEmpty) return const SizedBox.shrink();
-
-        return IconButton(
-          icon: const Icon(Icons.filter_list),
-          onPressed: () async {
-            final result = await widget.onTapSort?.call(state.config);
-            if (!context.mounted || result == null) return;
-            _cubit(context).init(config: result);
-          },
-        );
-      },
+      builder: (context, state) => ShimmerLoading.multiline(
+        isLoading: state.isLoadingChapters,
+        width: 44,
+        height: 44,
+        lines: 1,
+        child: state.chapters.isEmpty
+            ? const SizedBox.shrink()
+            : IconButton(
+                icon: const Icon(Icons.filter_list),
+                onPressed: () async {
+                  final result = await widget.onTapSort?.call(state.config);
+                  if (!context.mounted || result == null) return;
+                  _cubit(context).init(config: result);
+                },
+              ),
+      ),
     );
   }
 
