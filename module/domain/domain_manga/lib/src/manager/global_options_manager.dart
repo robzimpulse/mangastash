@@ -62,6 +62,6 @@ class GlobalOptionsManager
   @override
   void updateSources({required List<SourceEnum> sources}) {
     _sources.add(sources);
-    _storage.setStringList(_sourcesKey, [...sources.map((e) => e.label)]);
+    _storage.setStringList(_sourcesKey, [...sources.map((e) => e.name)]);
   }
 }
