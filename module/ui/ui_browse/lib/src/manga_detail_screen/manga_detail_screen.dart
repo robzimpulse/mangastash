@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
-import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -10,6 +9,8 @@ import 'package:ui_common/ui_common.dart';
 
 import 'manga_detail_screen_cubit.dart';
 import 'manga_detail_screen_state.dart';
+import 'widgets/chapter_description_widget.dart';
+import 'widgets/chapter_list_widget.dart';
 
 class MangaDetailScreen extends StatefulWidget {
   const MangaDetailScreen({
@@ -84,16 +85,19 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   MangaDetailScreenCubit _cubit(BuildContext context) => context.read();
 
-  void _onTapTag(BuildContext context, {Tag? tag}) {
-    // TODO: implement this
+  // void _onTapTag(BuildContext context, {Tag? tag}) {
+  //   // TODO: implement this
+  //   return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+  // }
+  //
+  void _onTapDownload(BuildContext context, DownloadOption option) async {
     return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
 
-  void _onTapDownload(
-    BuildContext context,
-    DownloadOption option,
-  ) async {
-    return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+  void _onTapFilter(BuildContext context, ChapterConfig config) async {
+    final result = await widget.onTapSort?.call(config);
+    if (!context.mounted || result == null) return;
+    _cubit(context).init(config: result);
   }
 
   @override
@@ -123,6 +127,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                       ),
                       title: _title(progress: progress),
                       actions: [
+                        _addToLibraryButton(context: context),
                         _websiteButton(context: context),
                         _shareButton(context: context),
                       ],
@@ -144,7 +149,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               ),
             ),
           ],
-          body: Builder(builder: (context) => _content(context: context)),
+          body: _content(),
         ),
       ),
     );
@@ -202,69 +207,12 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
-  Widget _downloadButton() {
-    return _builder(
-      buildWhen: (prev, curr) => [
-        prev.chapters != curr.chapters,
-        prev.isLoadingChapters != curr.isLoadingChapters,
-      ].contains(true),
-      builder: (context, state) => ShimmerLoading.multiline(
-        isLoading: state.isLoadingChapters,
-        width: 24,
-        height: 24,
-        lines: 1,
-        child: state.chapters.isEmpty
-            ? const SizedBox.shrink()
-            : PopupMenuButton<DownloadOption>(
-                icon: const Icon(Icons.download),
-                onSelected: (value) => _onTapDownload(context, value),
-                itemBuilder: (context) => [
-                  ...DownloadOption.values.map(
-                    (e) => PopupMenuItem<DownloadOption>(
-                      value: e,
-                      child: Text(e.value),
-                    ),
-                  ),
-                ],
-              ),
-      ),
-    );
-  }
-
-  Widget _filterButton() {
-    return _builder(
-      buildWhen: (prev, curr) => [
-        prev.config != curr.config,
-        prev.chapters != curr.chapters,
-        prev.isLoadingChapters != curr.isLoadingChapters,
-      ].contains(true),
-      builder: (context, state) => ShimmerLoading.multiline(
-        isLoading: state.isLoadingChapters,
-        width: 24,
-        height: 24,
-        lines: 1,
-        child: state.chapters.isEmpty
-            ? const SizedBox.shrink()
-            : IconButton(
-                icon: const Icon(Icons.filter_list),
-                onPressed: () async {
-                  final result = await widget.onTapSort?.call(state.config);
-                  if (!context.mounted || result == null) return;
-                  _cubit(context).init(config: result);
-                },
-              ),
-      ),
-    );
-  }
-
   Widget _shareButton({required BuildContext context}) {
     return _builder(
       buildWhen: (prev, curr) => prev.manga != curr.manga,
       builder: (context, state) {
         final uri = state.manga?.webUrl?.let((url) => Uri.tryParse(url));
-
         if (uri == null) return const SizedBox.shrink();
-
         return IconButton(
           icon: Icon(
             Icons.share,
@@ -281,15 +229,32 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       buildWhen: (prev, curr) => prev.manga != curr.manga,
       builder: (context, state) {
         final url = state.manga?.webUrl;
-
         if (url == null) return const SizedBox.shrink();
-
         return IconButton(
           icon: Icon(
             Icons.web,
             color: Theme.of(context).appBarTheme.iconTheme?.color,
           ),
           onPressed: () => _cubit(context).recrawl(url: url),
+        );
+      },
+    );
+  }
+
+  Widget _addToLibraryButton({required BuildContext context}) {
+    return _builder(
+      buildWhen: (prev, curr) => [
+        prev.manga != curr.manga,
+        prev.isOnLibrary != curr.isOnLibrary,
+      ].contains(true),
+      builder: (context, state) {
+        if (state.manga == null) return const SizedBox.shrink();
+        return IconButton(
+          icon: Icon(
+            state.isOnLibrary ? Icons.favorite : Icons.favorite_outline,
+            color: Theme.of(context).appBarTheme.iconTheme?.color,
+          ),
+          onPressed: () => _cubit(context).addToLibrary(),
         );
       },
     );
@@ -383,351 +348,54 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
-  Widget _chapters() {
-    return _builder(
-      buildWhen: (prev, curr) => [
-        prev.errorChapters != curr.errorChapters,
-        prev.isLoadingChapters != curr.isLoadingChapters,
-        prev.filtered != curr.filtered,
-        prev.totalChapter != curr.totalChapter,
-        prev.hasNextPage != curr.hasNextPage,
-      ].contains(true),
-      builder: (context, state) {
-        final error = state.errorChapters;
-
-        return SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          sliver: MultiSliver(
-            children: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Row(
-                    children: [
-                      ShimmerLoading.multiline(
-                        isLoading: state.isLoadingChapters,
-                        width: 50,
-                        height: 15,
-                        lines: 1,
-                        child: Text(
-                          '${state.totalChapter} Chapters',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ),
-                      const Spacer(),
-                      _downloadButton(),
-                      _filterButton(),
-                    ],
-                  ),
-                ),
-              ),
-              if (state.isLoadingChapters)
-                MultiSliver(
-                  children: [
-                    ...List.generate(20, (e) => e)
-                        .map<Widget>(
-                          (e) => ShimmerLoading.multiline(
-                            isLoading: true,
-                            width: double.infinity,
-                            height: 15,
-                            lines: 3,
-                          ),
-                        )
-                        .intersperse(const SizedBox(height: 4))
-                        .map((e) => SliverToBoxAdapter(child: e)),
-                  ],
-                )
-              else if (state.filtered.isEmpty)
-                const SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Padding(
-                    padding: EdgeInsets.all(24),
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('No Chapter', textAlign: TextAlign.center),
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-              else if (error != null)
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Text(error.toString(), textAlign: TextAlign.center),
-                          if (error is FailedParsingHtmlException) ...[
-                            const SizedBox(height: 16),
-                            OutlinedButton(
-                              onPressed: () => _cubit(context).recrawl(
-                                url: error.url,
-                              ),
-                              child: const Text('Open Debug Browser'),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-              else
-                MultiSliver(
-                  children: [
-                    ...state.filtered
-                        .map((e) => _chapterItem(chapter: e))
-                        .intersperse(const Divider(height: 1))
-                        .map((e) => SliverToBoxAdapter(child: e)),
-                    if (state.hasNextPage)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10),
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                  ],
-                ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _chapterItem({required Chapter chapter}) {
-    return _builder(
-      buildWhen: (prev, curr) => [
-        prev.prefetchedChapterId != curr.prefetchedChapterId,
-        prev.histories[chapter.id] != curr.histories[chapter.id],
-      ].contains(true),
-      builder: (context, state) {
-        final lastReadAt = chapter.lastReadAt.orNull(
-          state.histories[chapter.id]?.lastReadAt,
-        );
-        return ChapterTileWidget(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          onTap: () => widget.onTapChapter?.call(chapter),
-          opacity: lastReadAt != null ? 0.5 : 1,
-          title: [
-            'Chapter ${chapter.chapter}',
-            chapter.title,
-          ].nonNulls.join(' - '),
-          language: Language.fromCode(chapter.translatedLanguage),
-          uploadedAt: chapter.readableAt,
-          groups: chapter.scanlationGroup,
-          isPrefetching: state.prefetchedChapterId.contains(chapter.id),
-          lastReadAt: lastReadAt,
-        );
-      },
-    );
-  }
-
-  Widget _content({required BuildContext context}) {
-    final absorber = NestedScrollView.sliverOverlapAbsorberHandleFor(context);
-
+  Widget _content() {
+    // TODO: `ListenableBuilder` crash on `ChapterListWidget` when swipe tab bar view
     return TabBarView(
       children: [
-        NextPageNotificationWidget(
-          onLoadNextPage: () => _cubit(context).next(),
-          child: ListenableBuilder(
-            listenable: absorber,
-            builder: (context, child) => RefreshIndicator(
-              edgeOffset: absorber.layoutExtent ?? 0,
-              child: child ?? const SizedBox.shrink(),
-              onRefresh: () => _cubit(context).init(useCache: false),
-            ),
-            child: CustomScrollView(
-              slivers: [
-                SliverOverlapInjector(handle: absorber),
-                _chapters(),
-              ],
-            ),
+        _builder(
+          buildWhen: (prev, curr) => [
+            prev.errorChapters != curr.errorChapters,
+            prev.isLoadingChapters != curr.isLoadingChapters,
+            prev.filtered != curr.filtered,
+            prev.totalChapter != curr.totalChapter,
+            prev.hasNextPage != curr.hasNextPage,
+            prev.prefetchedChapterId != curr.prefetchedChapterId,
+            prev.config != curr.config,
+          ].contains(true),
+          builder: (context, state) => ChapterListWidget(
+            absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+            onLoadNextPage: () => _cubit(context).next(),
+            onRefresh: () => _cubit(context).init(useCache: false),
+            onTapRecrawl: (url) => _cubit(context).recrawl(url: url),
+            onTapChapter: (chapter) => widget.onTapChapter?.call(chapter),
+            onTapDownload: (option) => _onTapDownload(context, option),
+            onTapFilter: () => _onTapFilter(context, state.config),
+            onTapPrefetch: () => _cubit(context).prefetch(),
+            prefetchedChapterId: state.prefetchedChapterId,
+            error: state.errorChapters,
+            isLoading: state.isLoadingChapters,
+            hasNext: state.hasNextPage,
+            chapters: state.filtered,
+            total: state.totalChapter ?? 0,
           ),
         ),
-        CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.all(12),
-              sliver: MultiSliver(
-                children: [
-                  SliverOverlapInjector(handle: absorber),
-                  SliverToBoxAdapter(
-                    child: _builder(
-                      buildWhen: (prev, curr) => [
-                        prev.manga != curr.manga,
-                        prev.isLoadingManga != curr.isLoadingManga,
-                        prev.isLoadingChapters != curr.isLoadingChapters,
-                        prev.isOnLibrary != curr.isOnLibrary,
-                      ].contains(true),
-                      builder: (context, state) => Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          InkWell(
-                            onTap: () => _cubit(context).addToLibrary(),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                ShimmerLoading.box(
-                                  isLoading: state.isLoadingManga,
-                                  width: 50,
-                                  height: 50,
-                                  child: Icon(
-                                    state.isOnLibrary
-                                        ? Icons.favorite
-                                        : Icons.favorite_outline,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                ShimmerLoading.multiline(
-                                  isLoading: state.isLoadingManga,
-                                  lines: 1,
-                                  width: 50,
-                                  height: 15,
-                                  child: const Text('Library'),
-                                ),
-                              ],
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () => _cubit(context).prefetch(),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                ShimmerLoading.box(
-                                  isLoading: [
-                                    state.isLoadingManga,
-                                    state.isLoadingChapters,
-                                  ].every((e) => e),
-                                  width: 50,
-                                  height: 50,
-                                  child: const Icon(Icons.cloud_download),
-                                ),
-                                const SizedBox(height: 2),
-                                ShimmerLoading.multiline(
-                                  isLoading: [
-                                    state.isLoadingManga,
-                                    state.isLoadingChapters,
-                                  ].every((e) => e),
-                                  lines: 1,
-                                  width: 50,
-                                  height: 15,
-                                  child: const Text('Prefetch'),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ].intersperse(const SizedBox.shrink()).toList(),
-                      ),
-                    ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: _builder(
-                      buildWhen: (prev, curr) => [
-                        prev.manga != curr.manga,
-                        prev.isLoadingManga != curr.isLoadingManga,
-                      ].contains(true),
-                      builder: (context, state) => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Tags',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const SizedBox(height: 8),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: [
-                              if (state.isLoadingManga) ...[
-                                for (final _ in List.generate(8, (e) => e))
-                                  ShimmerLoading.box(
-                                    isLoading: state.isLoadingManga,
-                                    width: 50,
-                                    height: 30,
-                                  ),
-                              ] else ...[
-                                for (final tag in [...?state.manga?.tags])
-                                  ConstrainedBox(
-                                    constraints: const BoxConstraints(
-                                      maxHeight: 30,
-                                    ),
-                                    child: OutlinedButton(
-                                      child: Text(tag.name ?? ''),
-                                      onPressed: () => _onTapTag(
-                                        context,
-                                        tag: tag,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 16)),
-                  SliverToBoxAdapter(
-                    child: _builder(
-                      buildWhen: (prev, curr) => [
-                        prev.manga != curr.manga,
-                        prev.isLoadingManga != curr.isLoadingManga,
-                      ].contains(true),
-                      builder: (context, state) => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Description',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const SizedBox(height: 8),
-                          ShimmerLoading.multiline(
-                            isLoading: state.isLoadingManga,
-                            width: double.infinity,
-                            height: 15,
-                            lines: 3,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(state.manga?.description ?? ''),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        _builder(
+          buildWhen: (prev, curr) => [
+            prev.manga != curr.manga,
+            prev.isLoadingManga != curr.isLoadingManga,
+          ].contains(true),
+          builder: (context, state) => ChapterDescriptionWidget(
+            absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+            isLoading: true,
+            tags: [...?state.manga?.tags],
+            description: state.manga?.description,
+          ),
         ),
-        CustomScrollView(
-          slivers: [
-            SliverOverlapInjector(handle: absorber),
-            const SliverFillRemaining(
-              hasScrollBody: false,
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '🚧🚧🚧 Under Construction 🚧🚧🚧',
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
+        const Center(
+          child: Text(
+            '🚧🚧🚧 Under Construction 🚧🚧🚧',
+            textAlign: TextAlign.center,
+          ),
         ),
       ],
     );
