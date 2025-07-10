@@ -121,7 +121,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                       leading: BackButton(
                         color: Theme.of(context).appBarTheme.iconTheme?.color,
                       ),
-                      title: _title(context: context, progress: progress),
+                      title: _title(progress: progress),
                       actions: [
                         _websiteButton(context: context),
                         _shareButton(context: context),
@@ -295,90 +295,91 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
-  Widget _title({required BuildContext context, required double progress}) {
-    final theme = Theme.of(context);
-    final textStyle = theme.textTheme.titleMedium;
-
+  Widget _title({required double progress}) {
     return _builder(
       buildWhen: (prev, curr) => [
         prev.isLoadingManga != curr.isLoadingManga,
         prev.manga?.title != curr.manga?.title,
       ].contains(true),
-      builder: (context, state) => Container(
-        alignment: Alignment.lerp(
-          Alignment.bottomCenter,
-          Alignment.centerLeft,
-          progress,
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.grey.withAlpha(
-              (lerpDouble(50, 0, progress) ?? 0.0).toInt(),
-            ),
-            borderRadius: BorderRadius.all(
-              Radius.circular(lerpDouble(16, 0, progress) ?? 0),
-            ),
-          ),
-          padding: EdgeInsets.lerp(
-            const EdgeInsets.all(8),
-            EdgeInsets.zero,
+      builder: (context, state) {
+        final theme = Theme.of(context);
+
+        return Container(
+          alignment: Alignment.lerp(
+            Alignment.bottomCenter,
+            Alignment.centerLeft,
             progress,
           ),
-          margin: EdgeInsets.only(bottom: lerpDouble(16, 0, progress) ?? 0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ShimmerLoading.multiline(
-                isLoading: state.isLoadingManga,
-                width: lerpDouble(300, 100, progress) ?? 300,
-                height: 20,
-                lines: 1,
-                child: Text(
-                  state.manga?.title ?? '',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: textStyle?.copyWith(
-                    color: Theme.of(context).appBarTheme.iconTheme?.color,
-                    fontSize: lerpDouble(
-                      Theme.of(context).textTheme.titleLarge?.fontSize ?? 0,
-                      Theme.of(context).textTheme.titleSmall?.fontSize ?? 0,
-                      progress,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey.withAlpha(
+                (lerpDouble(50, 0, progress) ?? 0.0).toInt(),
+              ),
+              borderRadius: BorderRadius.all(
+                Radius.circular(lerpDouble(16, 0, progress) ?? 0),
+              ),
+            ),
+            padding: EdgeInsets.lerp(
+              const EdgeInsets.all(8),
+              EdgeInsets.zero,
+              progress,
+            ),
+            margin: EdgeInsets.only(bottom: lerpDouble(16, 0, progress) ?? 0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ShimmerLoading.multiline(
+                  isLoading: state.isLoadingManga,
+                  width: lerpDouble(300, 100, progress) ?? 300,
+                  height: 20,
+                  lines: 1,
+                  child: Text(
+                    state.manga?.title ?? '',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: theme.appBarTheme.iconTheme?.color,
+                      fontSize: lerpDouble(
+                        theme.textTheme.titleLarge?.fontSize ?? 0,
+                        theme.textTheme.titleSmall?.fontSize ?? 0,
+                        progress,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: lerpDouble(8, 0, progress) ?? 8),
-              ShimmerLoading.multiline(
-                isLoading: state.isLoadingManga,
-                width: lerpDouble(300, 100, progress) ?? 300,
-                height: lerpDouble(20, 0, progress) ?? 20,
-                lines: 1,
-                child: Text(
-                  [
-                    state.manga?.source,
-                    state.manga?.status,
-                    state.manga?.author,
-                  ].nonNulls.join(' - '),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: textStyle?.copyWith(
-                    color: theme.appBarTheme.iconTheme?.color,
-                    fontSize: lerpDouble(
-                      Theme.of(context).textTheme.labelSmall?.fontSize ?? 0,
-                      0,
-                      progress,
+                SizedBox(height: lerpDouble(8, 0, progress) ?? 8),
+                ShimmerLoading.multiline(
+                  isLoading: state.isLoadingManga,
+                  width: lerpDouble(300, 100, progress) ?? 300,
+                  height: lerpDouble(20, 0, progress) ?? 20,
+                  lines: 1,
+                  child: Text(
+                    [
+                      state.manga?.source,
+                      state.manga?.status,
+                      state.manga?.author,
+                    ].nonNulls.join(' - '),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: theme.appBarTheme.iconTheme?.color,
+                      fontSize: lerpDouble(
+                        theme.textTheme.labelSmall?.fontSize ?? 0,
+                        0,
+                        progress,
+                      ),
+                      // fontSize: theme.textTheme.labelSmall?.fontSize,
                     ),
-                    // fontSize: theme.textTheme.labelSmall?.fontSize,
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
