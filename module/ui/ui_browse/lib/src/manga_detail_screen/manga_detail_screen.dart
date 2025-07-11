@@ -386,7 +386,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           ].contains(true),
           builder: (context, state) => ChapterDescriptionWidget(
             absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-            isLoading: true,
+            isLoading: state.isLoadingManga,
             tags: [...?state.manga?.tags],
             description: state.manga?.description,
           ),
