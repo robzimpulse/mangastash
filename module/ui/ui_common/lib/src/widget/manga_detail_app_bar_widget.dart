@@ -10,6 +10,7 @@ class MangaDetailAppBarWidget extends StatelessWidget {
     this.actions,
     this.leading,
     this.title,
+    this.actionsDecoration,
   });
 
   final double progress;
@@ -21,6 +22,8 @@ class MangaDetailAppBarWidget extends StatelessWidget {
   final Widget? leading;
 
   final Widget? title;
+
+  final BoxDecoration? actionsDecoration;
 
   @override
   Widget build(BuildContext context) {
@@ -48,9 +51,12 @@ class MangaDetailAppBarWidget extends StatelessWidget {
             right: 0,
             top: 4,
             child: SafeArea(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: actions,
+              child: Container(
+                decoration: actionsDecoration,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: actions,
+                ),
               ),
             ),
           ),

@@ -11,6 +11,7 @@ import 'manga_detail_screen_cubit.dart';
 import 'manga_detail_screen_state.dart';
 import 'widgets/chapter_description_widget.dart';
 import 'widgets/chapter_list_widget.dart';
+import 'widgets/manga_grid_widget.dart';
 
 class MangaDetailScreen extends StatefulWidget {
   const MangaDetailScreen({
@@ -89,7 +90,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   //   // TODO: implement this
   //   return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   // }
-  //
+
   void _onTapDownload(BuildContext context, DownloadOption option) async {
     return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
@@ -122,10 +123,30 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                     child: MangaDetailAppBarWidget(
                       progress: progress,
                       background: _appBarBackground(),
-                      leading: BackButton(
-                        color: Theme.of(context).appBarTheme.iconTheme?.color,
+                      leading: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withAlpha(
+                            (lerpDouble(200, 0, progress) ?? 0.0).toInt(),
+                          ),
+                          borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(16),
+                            bottomRight: Radius.circular(16),
+                          ),
+                        ),
+                        child: BackButton(
+                          color: Theme.of(context).appBarTheme.iconTheme?.color,
+                        ),
                       ),
                       title: _title(progress: progress),
+                      actionsDecoration: BoxDecoration(
+                        color: Colors.grey.withAlpha(
+                          (lerpDouble(200, 0, progress) ?? 0.0).toInt(),
+                        ),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          bottomLeft: Radius.circular(16),
+                        ),
+                      ),
                       actions: [
                         _addToLibraryButton(context: context),
                         _websiteButton(context: context),
@@ -349,7 +370,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   Widget _content() {
-    // TODO: `ListenableBuilder` crash on `ChapterListWidget` when swipe tab bar view
     return TabBarView(
       children: [
         _builder(
@@ -391,10 +411,21 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             description: state.manga?.description,
           ),
         ),
-        const Center(
-          child: Text(
-            '🚧🚧🚧 Under Construction 🚧🚧🚧',
-            textAlign: TextAlign.center,
+        _builder(
+          buildWhen: (prev, curr) => [
+            prev.manga != curr.manga,
+            prev.isLoadingManga != curr.isLoadingManga,
+          ].contains(true),
+          builder: (context, state) => MangaGridWidget(
+            absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+            isLoading: state.isLoadingManga,
+            onRefresh: () async => context.showSnackBar(
+              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+            ),
+            onLoadNextPage: () => context.showSnackBar(
+              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+            ),
+            hasNext: false,
           ),
         ),
       ],

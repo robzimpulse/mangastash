@@ -115,8 +115,8 @@ class _ChapterListWidgetState extends State<ChapterListWidget> {
                       const Spacer(),
                       ShimmerLoading.multiline(
                         isLoading: widget.isLoading,
-                        width: 32,
-                        height: 32,
+                        width: 56,
+                        height: 24,
                         lines: 1,
                         child: PopupMenuButton<DownloadOption>(
                           icon: const Icon(Icons.download),
@@ -135,8 +135,8 @@ class _ChapterListWidgetState extends State<ChapterListWidget> {
                       if (widget.isLoading) const SizedBox(width: 4),
                       ShimmerLoading.multiline(
                         isLoading: widget.isLoading,
-                        width: 32,
-                        height: 32,
+                        width: 56,
+                        height: 24,
                         lines: 1,
                         child: IconButton(
                           icon: const Icon(Icons.cloud_download),
@@ -146,8 +146,8 @@ class _ChapterListWidgetState extends State<ChapterListWidget> {
                       if (widget.isLoading) const SizedBox(width: 4),
                       ShimmerLoading.multiline(
                         isLoading: widget.isLoading,
-                        width: 32,
-                        height: 32,
+                        width: 56,
+                        height: 24,
                         lines: 1,
                         child: IconButton(
                           icon: const Icon(Icons.filter_list),
@@ -192,7 +192,7 @@ class _ChapterListWidgetState extends State<ChapterListWidget> {
                       ),
                     ),
                   ),
-                )
+                ),
               ] else if (widget.chapters.isEmpty) ...[
                 const SliverFillRemaining(
                   hasScrollBody: false,
