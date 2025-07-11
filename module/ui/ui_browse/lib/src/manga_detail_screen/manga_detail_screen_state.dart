@@ -55,7 +55,7 @@ class MangaDetailScreenState extends Equatable {
 
           return shouldAdd.contains(true);
         },
-      ),
+      ).map((e) => e.copyWith(lastReadAt: histories[e.id]?.lastReadAt)),
     ];
   }
 
