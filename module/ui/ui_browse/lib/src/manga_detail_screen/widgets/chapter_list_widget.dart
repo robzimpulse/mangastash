@@ -5,7 +5,7 @@ import 'package:feature_common/feature_common.dart';
 
 import '../manga_detail_screen_state.dart';
 
-class ChapterListWidget extends StatelessWidget {
+class ChapterListWidget extends StatefulWidget {
   const ChapterListWidget({
     super.key,
     this.onLoadNextPage,
@@ -53,42 +53,75 @@ class ChapterListWidget extends StatelessWidget {
   final int total;
 
   @override
+  State<ChapterListWidget> createState() => _ChapterListWidgetState();
+}
+
+class _ChapterListWidgetState extends State<ChapterListWidget> {
+  final ValueNotifier<double> offset = ValueNotifier(0);
+
+  @override
+  void initState() {
+    super.initState();
+    offset.value = widget.absorber?.layoutExtent ?? 0;
+  }
+
+  @override
+  void didUpdateWidget(covariant ChapterListWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.absorber != widget.absorber) {
+      offset.value = widget.absorber?.layoutExtent ?? 0;
+    }
+  }
+
+  @override
+  void dispose() {
+    offset.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final absorber = this.absorber;
-    final onRefresh = this.onRefresh;
-    final error = this.error;
+    final onRefresh = widget.onRefresh;
+    final error = widget.error;
 
     Widget view = CustomScrollView(
       slivers: [
-        if (absorber != null) SliverOverlapInjector(handle: absorber),
+        SliverToBoxAdapter(
+          child: ValueListenableBuilder(
+            valueListenable: offset,
+            builder: (context, value, _) => SizedBox(height: value),
+          ),
+        ),
         SliverPadding(
           padding: const EdgeInsets.all(16),
           sliver: MultiSliver(
             children: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: isLoading ? 12 : 0),
+                  padding:
+                      EdgeInsets.symmetric(vertical: widget.isLoading ? 12 : 0),
                   child: Row(
                     children: [
                       ShimmerLoading.multiline(
-                        isLoading: isLoading,
+                        isLoading: widget.isLoading,
                         width: 50,
                         height: 15,
                         lines: 1,
                         child: Text(
-                          '$total Chapters',
+                          '${widget.total} Chapters',
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ),
                       const Spacer(),
                       ShimmerLoading.multiline(
-                        isLoading: isLoading,
+                        isLoading: widget.isLoading,
                         width: 32,
                         height: 32,
                         lines: 1,
                         child: PopupMenuButton<DownloadOption>(
                           icon: const Icon(Icons.download),
-                          onSelected: (value) => onTapDownload?.call(value),
+                          onSelected: (value) =>
+                              widget.onTapDownload?.call(value),
                           itemBuilder: (context) => [
                             ...DownloadOption.values.map(
                               (e) => PopupMenuItem<DownloadOption>(
@@ -99,33 +132,33 @@ class ChapterListWidget extends StatelessWidget {
                           ],
                         ),
                       ),
-                      if (isLoading) const SizedBox(width: 4),
+                      if (widget.isLoading) const SizedBox(width: 4),
                       ShimmerLoading.multiline(
-                        isLoading: isLoading,
+                        isLoading: widget.isLoading,
                         width: 32,
                         height: 32,
                         lines: 1,
                         child: IconButton(
                           icon: const Icon(Icons.cloud_download),
-                          onPressed: () => onTapPrefetch?.call(),
+                          onPressed: () => widget.onTapPrefetch?.call(),
                         ),
                       ),
-                      if (isLoading) const SizedBox(width: 4),
+                      if (widget.isLoading) const SizedBox(width: 4),
                       ShimmerLoading.multiline(
-                        isLoading: isLoading,
+                        isLoading: widget.isLoading,
                         width: 32,
                         height: 32,
                         lines: 1,
                         child: IconButton(
                           icon: const Icon(Icons.filter_list),
-                          onPressed: () => onTapFilter?.call(),
+                          onPressed: () => widget.onTapFilter?.call(),
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-              if (isLoading)
+              if (widget.isLoading)
                 SliverList.separated(
                   itemBuilder: (context, index) => ShimmerLoading.multiline(
                     isLoading: true,
@@ -150,7 +183,8 @@ class ChapterListWidget extends StatelessWidget {
                           if (error is FailedParsingHtmlException) ...[
                             const SizedBox(height: 16),
                             OutlinedButton(
-                              onPressed: () => onTapRecrawl?.call(error.url),
+                              onPressed: () =>
+                                  widget.onTapRecrawl?.call(error.url),
                               child: const Text('Open Debug Browser'),
                             ),
                           ],
@@ -159,7 +193,7 @@ class ChapterListWidget extends StatelessWidget {
                     ),
                   ),
                 )
-              ] else if (chapters.isEmpty) ...[
+              ] else if (widget.chapters.isEmpty) ...[
                 const SliverFillRemaining(
                   hasScrollBody: false,
                   child: Padding(
@@ -177,11 +211,11 @@ class ChapterListWidget extends StatelessWidget {
               ] else ...[
                 SliverList.separated(
                   itemBuilder: (context, index) {
-                    final chapter = chapters.elementAtOrNull(index);
+                    final chapter = widget.chapters.elementAtOrNull(index);
                     if (chapter == null) return null;
                     return ChapterTileWidget(
                       padding: const EdgeInsets.symmetric(vertical: 8),
-                      onTap: () => onTapChapter?.call(chapter),
+                      onTap: () => widget.onTapChapter?.call(chapter),
                       opacity: chapter.lastReadAt != null ? 0.5 : 1,
                       title: [
                         'Chapter ${chapter.chapter}',
@@ -190,16 +224,17 @@ class ChapterListWidget extends StatelessWidget {
                       language: Language.fromCode(chapter.translatedLanguage),
                       uploadedAt: chapter.readableAt,
                       groups: chapter.scanlationGroup,
-                      isPrefetching: prefetchedChapterId.contains(chapter.id),
+                      isPrefetching:
+                          widget.prefetchedChapterId.contains(chapter.id),
                       lastReadAt: chapter.lastReadAt,
                     );
                   },
                   separatorBuilder: (context, index) => const Divider(
                     height: 1,
                   ),
-                  itemCount: chapters.length,
+                  itemCount: widget.chapters.length,
                 ),
-                if (hasNext)
+                if (widget.hasNext)
                   const SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 10),
@@ -216,18 +251,19 @@ class ChapterListWidget extends StatelessWidget {
     );
 
     return NextPageNotificationWidget(
-      onLoadNextPage: onLoadNextPage,
-      child: (absorber != null && onRefresh != null)
-          ? ListenableBuilder(
-              listenable: absorber,
-              builder: (context, child) => RefreshIndicator(
-                onRefresh: onRefresh,
-                edgeOffset: absorber.layoutExtent ?? 0,
-                child: child ?? const SizedBox(),
-              ),
-              child: view,
-            )
-          : view,
+      onLoadNextPage: widget.onLoadNextPage,
+      child: ValueListenableBuilder(
+        valueListenable: offset,
+        builder: (context, value, child) {
+          if (onRefresh == null) return child ?? const SizedBox.shrink();
+          return RefreshIndicator(
+            onRefresh: onRefresh,
+            edgeOffset: value,
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
+        child: view,
+      ),
     );
   }
 }
