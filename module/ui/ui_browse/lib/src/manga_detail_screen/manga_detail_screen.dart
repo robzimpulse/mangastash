@@ -425,7 +425,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             onLoadNextPage: () => context.showSnackBar(
               message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
             ),
-            hasNext: false,
+            hasNextPage: false,
           ),
         ),
       ],

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:universal_io/io.dart';
 import 'package:intl/intl.dart';
+import 'package:universal_io/io.dart';
 
 import '../model/http_activity_model.dart';
 import 'helper.dart';
