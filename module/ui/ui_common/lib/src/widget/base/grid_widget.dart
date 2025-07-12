@@ -8,7 +8,6 @@ class GridWidget extends StatefulWidget {
     this.controller,
     this.absorber,
     this.hasNextPage = false,
-    this.isLoading = false,
     this.loadingIndicator = const Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Center(child: CircularProgressIndicator()),
@@ -22,7 +21,6 @@ class GridWidget extends StatefulWidget {
   });
 
   final SliverOverlapAbsorberHandle? absorber;
-  final bool isLoading;
   final RefreshCallback? onRefresh;
   final VoidCallback? onLoadNextPage;
   final ScrollController? controller;
