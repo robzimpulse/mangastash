@@ -116,6 +116,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               onPressed: _toggleSearch,
               icon: Icon(isSearch ? Icons.close : Icons.search),
             ),
+            IconButton(
+              onPressed: () => widget.storage.clear(),
+              icon: const Icon(Icons.delete),
+            ),
             PopupMenuButton(
               icon: const Icon(Icons.sort),
               itemBuilder: (context) {
@@ -139,22 +143,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
           title: _title(context),
         ),
-        floatingActionButton: FloatingActionButton(
-          shape: const CircleBorder(),
-          child: const Icon(Icons.delete),
-          onPressed: () => widget.storage.clear(),
-        ),
-        body: StreamBuilder(
-          stream: widget.storage.activities.map(_filter),
-          builder: (context, snapshot) {
-            final data = snapshot.data;
+        body: SafeArea(
+          child: StreamBuilder(
+            stream: widget.storage.activities.map(_filter),
+            builder: (context, snapshot) {
+              final data = snapshot.data;
 
-            if (data == null) {
-              return const CircularProgressIndicator();
-            }
+              if (data == null) {
+                return const CircularProgressIndicator();
+              }
 
-            return _body(context: context, filteredActivities: data);
-          },
+              return _body(context: context, filteredActivities: data);
+            },
+          ),
         ),
       ),
     );
@@ -266,9 +267,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Expanded(
           child: ListView.builder(
             physics: const BouncingScrollPhysics(),
-            itemCount: filteredActivities.length,
             itemBuilder: (context, index) {
-              var data = filteredActivities[index];
+              final data = filteredActivities.elementAtOrNull(index);
+              if (data == null) return null;
               return ItemResponseWidget(
                 data: data,
                 onTap: () => Navigator.push(

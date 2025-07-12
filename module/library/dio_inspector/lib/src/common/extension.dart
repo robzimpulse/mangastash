@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:universal_io/io.dart';
+import 'package:intl/intl.dart';
 
 import '../model/http_activity_model.dart';
 import 'helper.dart';
@@ -179,4 +180,8 @@ extension ActivityExtension on HttpActivityModel {
 
     return activityDetails.toString();
   }
+}
+
+extension TimeFormat on DateTime {
+  String get time => DateFormat('HH:MM:SS').format(this);
 }

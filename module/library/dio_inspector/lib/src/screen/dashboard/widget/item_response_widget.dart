@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../common/extension.dart';
 import '../../../common/helper.dart';
 import '../../../model/http_activity_model.dart';
 import 'dot_indicator_widget.dart';
@@ -37,7 +38,7 @@ class ItemResponseWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _buildRequestInfo(context),
-                _buildStatusCode(),
+                _buildStatusCode(context),
               ],
             ),
           ),
@@ -47,6 +48,7 @@ class ItemResponseWidget extends StatelessWidget {
   }
 
   Widget _buildRequestInfo(BuildContext context) {
+    final theme = Theme.of(context);
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.only(left: 8.0),
@@ -57,7 +59,7 @@ class ItemResponseWidget extends StatelessWidget {
               children: [
                 Text(
                   data.method,
-                  style: Theme.of(context).textTheme.labelLarge,
+                  style: theme.textTheme.labelLarge,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -65,22 +67,20 @@ class ItemResponseWidget extends StatelessWidget {
                     data.endpoint,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.labelLarge,
+                    style: theme.textTheme.labelLarge,
                   ),
                 ),
               ],
             ),
             Text(
               data.uri,
-              style: Theme.of(context).textTheme.labelMedium,
+              style: theme.textTheme.labelMedium,
             ),
             const Divider(color: Colors.grey),
             Row(
               children: [
                 Text(
-                  data.request?.time != null
-                      ? _formatTime(data.request!.time)
-                      : 'n/a',
+                  data.request?.time.time ?? 'n/a',
                   style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
                 const Spacer(),
@@ -103,18 +103,22 @@ class ItemResponseWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusCode() {
-    final int statusCode = data.response?.status ?? 0;
-    Color statusColor;
-    if (statusCode >= 200 && statusCode < 300) {
-      statusColor = Colors.green;
-    } else if (statusCode >= 300 && statusCode < 400) {
-      statusColor = Colors.blue;
-    } else if (statusCode >= 400 && statusCode < 500) {
-      statusColor = Colors.orange;
-    } else if (statusCode >= 500 && statusCode < 600) {
-      statusColor = Colors.red;
-    } else {
+  Widget _buildStatusCode(BuildContext context) {
+    final theme = Theme.of(context);
+
+    if (data.error != null) {
+      return Text(
+        'Error',
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: Colors.red,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    }
+
+    final code = data.response?.status;
+
+    if (code == null) {
       return const DotIndicatorWidget(
         dotColor: Colors.grey,
         dotSize: 8.0,
@@ -123,16 +127,23 @@ class ItemResponseWidget extends StatelessWidget {
     }
 
     return Text(
-      statusCode.toString(),
-      style: TextStyle(color: statusColor, fontWeight: FontWeight.bold),
+      '$code',
+      style: theme.textTheme.labelSmall?.copyWith(
+        color: _statusColor(code),
+        fontWeight: FontWeight.bold,
+      ),
     );
   }
 
-  String _formatTime(DateTime time) {
-    return '${_formatTimeUnit(time.hour)}:${_formatTimeUnit(time.minute)}:${_formatTimeUnit(time.second)}';
-  }
-
-  String _formatTimeUnit(int unit) {
-    return unit.toString().padLeft(2, '0');
+  Color _statusColor(int code) {
+    if (code >= 200 && code < 300) {
+      return Colors.green;
+    } else if (code >= 300 && code < 400) {
+      return Colors.blue;
+    } else if (code >= 400 && code < 500) {
+      return Colors.orange;
+    } else {
+      return Colors.red;
+    }
   }
 }

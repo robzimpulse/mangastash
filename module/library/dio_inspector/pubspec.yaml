@@ -15,6 +15,7 @@ dependencies:
   rxdart: ^0.27.7
   collection: ^1.16.0
   universal_io: ^2.2.2
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
