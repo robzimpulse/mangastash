@@ -41,9 +41,9 @@ void main() {
 
   group('Image Dao Test', () {
     setUp(() async {
-      for (final (chapter, images) in chapters) {
-        await dao.add(value: chapter, images: images);
-      }
+      await dao.adds(
+        values: {for (final (chapter, images) in chapters) chapter: images},
+      );
     });
 
     tearDown(() async => await db.clear());
@@ -74,19 +74,19 @@ void main() {
           chapter.$2
         );
 
-        await dao.add(value: chapter.$1, images: chapter.$2);
+        await dao.adds(values: {chapter.$1: chapter.$2});
         expect((await dao.all).length, equals(chapters.length + 1));
 
         final a = await dao.search(ids: [chapter.$1.id.value]);
         expect(a.first.chapter?.lastReadAt == null, isTrue);
 
-        await dao.add(value: chapterUpdated.$1, images: chapterUpdated.$2);
+        await dao.adds(values: {chapterUpdated.$1: chapterUpdated.$2});
         expect((await dao.all).length, equals(chapters.length + 1));
 
         final b = await dao.search(ids: [chapter.$1.id.value]);
         expect(b.first.chapter?.lastReadAt == null, isFalse);
 
-        await dao.add(value: chapter.$1, images: chapter.$2);
+        await dao.adds(values: {chapter.$1: chapter.$2});
         expect((await dao.all).length, equals(chapters.length + 1));
 
         final c = await dao.search(ids: [chapter.$1.id.value]);
@@ -114,7 +114,7 @@ void main() {
       );
 
       test('Add Value', () async {
-        await dao.add(value: chapter.$1, images: chapter.$2);
+        await dao.adds(values: {chapter.$1: chapter.$2});
         expect((await dao.all).length, equals(chapters.length + 1));
         expect((await imageDao.all).length, equals((chapters.length + 1) * 10));
       });
@@ -175,7 +175,7 @@ void main() {
       final chapter = ([...chapters]..shuffle()).first;
 
       test('Add Value', () async {
-        await dao.add(value: chapter.$1, images: chapter.$2);
+        await dao.adds(values: {chapter.$1: chapter.$2});
         expect((await dao.all).length, equals(chapters.length));
         expect((await imageDao.all).length, equals((chapters.length) * 10));
       });

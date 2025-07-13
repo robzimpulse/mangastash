@@ -32,7 +32,7 @@ class Tag extends Equatable {
 
   factory Tag.fromDrift(TagDrift tag) {
     return Tag(
-      id: tag.id,
+      id: tag.tagId,
       name: tag.name,
       source: tag.source,
       createdAt: tag.createdAt,
@@ -42,7 +42,7 @@ class Tag extends Equatable {
 
   TagTablesCompanion get toDrift {
     return TagTablesCompanion(
-      id: Value.absentIfNull(id),
+      tagId: Value.absentIfNull(id),
       name: Value.absentIfNull(name),
       source: Value.absentIfNull(source),
       createdAt: Value.absentIfNull(createdAt),

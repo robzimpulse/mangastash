@@ -43,7 +43,7 @@ class GetTagsUseCase with SyncTagsMixin {
     }
 
     return [
-      ...tags.map((e) => Tag.from(data: e).copyWith(source: source.name))
+      ...tags.map((e) => Tag.from(data: e).copyWith(source: source.name)),
     ];
   }
 

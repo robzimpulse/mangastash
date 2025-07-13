@@ -20,7 +20,7 @@ void main() {
   final values = List.generate(
     10,
     (index) => TagTablesCompanion(
-      id: Value('id_$index'),
+      id: Value(index),
       name: Value('name_$index'),
     ),
   );
@@ -29,16 +29,14 @@ void main() {
 
   group('Tag Dao Test', () {
     setUp(() async {
-      for (final value in values) {
-        await dao.add(value: value);
-      }
+      await dao.adds(values: values);
     });
 
     tearDown(() async => await db.clear());
 
     group('With New Value', () {
       const value = TagTablesCompanion(
-        id: Value('id_new'),
+        id: Value(11),
         name: Value('name_new'),
       );
 
@@ -85,10 +83,9 @@ void main() {
       });
 
       test('Add Value', () async {
-        await dao.add(value: value);
+        await dao.adds(values: [value]);
         expect((await dao.all).length, equals(values.length + 1));
       });
-
     });
 
     group('With Existing Value', () {
@@ -138,21 +135,22 @@ void main() {
 
       group('Add Value', () {
         test('With Conflicting Value', () async {
-          await dao.add(value: value);
+          await dao.adds(values: [value]);
           expect((await dao.all).length, equals(values.length));
         });
 
         test('With Conflicting Name', () async {
-          await dao.add(value: value.copyWith(id: const Value('id_new')));
+          await dao.adds(values: [value.copyWith(id: const Value(11))]);
           expect((await dao.all).length, equals(values.length + 1));
         });
 
         test('With Conflicting Id', () async {
-          await dao.add(value: value.copyWith(name: const Value('name_new')));
+          await dao.adds(
+            values: [value.copyWith(name: const Value('name_new'))],
+          );
           expect((await dao.all).length, equals(values.length));
         });
       });
     });
-
   });
 }

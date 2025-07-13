@@ -169,8 +169,8 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
           final companion = manga.manga?.toCompanion(true);
           final id = manga.manga?.id;
           final source = manga.manga?.source;
-          final shouldUpdate = companion?.shouldUpdate(entry.key) == false;
-          if (shouldUpdate && id != null && source != null) {
+          final shouldUpdate = companion?.shouldUpdate(entry.key) == true;
+          if (!shouldUpdate && id != null && source != null) {
             data.add(
               MangaModel(
                 manga: manga.manga,
@@ -244,43 +244,6 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
       }
 
       return data;
-    });
-  }
-
-  Future<MangaModel> add({
-    required MangaTablesCompanion value,
-    List<String> tags = const [],
-  }) {
-    return transaction(() async {
-      /// if conflict, update chapter otherwise insert chapter
-      final result = await into(mangaTables).insertReturning(
-        value,
-        mode: InsertMode.insertOrReplace,
-        onConflict: DoUpdate(
-          (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
-        ),
-      );
-
-      /// update existing data with new data until all new data updated
-      final updated = [
-        for (final tag in tags)
-          await _tagDao.add(
-            value: TagTablesCompanion.insert(
-              name: tag,
-              source: Value.absentIfNull(result.source),
-            ),
-          ),
-      ];
-
-      /// detach all existing tag on manga
-      await _tagDao.detach(mangaId: result.id);
-
-      /// reattach tag to the new manga
-      for (final tag in updated) {
-        await _tagDao.attach(mangaId: result.id, tagId: tag.id);
-      }
-
-      return MangaModel(manga: result, tags: updated);
     });
   }
 }

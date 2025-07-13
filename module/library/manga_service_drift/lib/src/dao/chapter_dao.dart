@@ -232,49 +232,4 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
       return data;
     });
   }
-
-  Future<ChapterModel> add({
-    required ChapterTablesCompanion value,
-    List<String> images = const [],
-  }) {
-    return transaction(() async {
-      /// if conflict, update chapter otherwise insert chapter
-      final chapter = await into(chapterTables).insertReturning(
-        value,
-        mode: InsertMode.insertOrReplace,
-        onConflict: DoUpdate(
-          (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
-        ),
-      );
-
-      /// update existing data with new data until all new data updated
-      final List<ImageDrift> updated = [];
-      List<ImageDrift> existing = await _imageDao.search(
-        chapterIds: [chapter.id],
-      );
-      for (final (index, image) in images.indexed) {
-        final data = existing.isEmpty
-            ? const ImageTablesCompanion()
-            : existing.removeAt(0).toCompanion(true);
-
-        updated.add(
-          await _imageDao.add(
-            value: data.copyWith(
-              chapterId: Value(chapter.id),
-              webUrl: Value(image),
-              order: Value(index),
-            ),
-          ),
-        );
-      }
-
-      /// remove all existing data that not updated
-      await _imageDao.remove(ids: [...existing.map((e) => e.id)]);
-
-      return ChapterModel(
-        chapter: chapter,
-        images: updated,
-      );
-    });
-  }
 }
