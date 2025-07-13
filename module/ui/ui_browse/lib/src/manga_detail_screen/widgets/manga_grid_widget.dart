@@ -81,7 +81,7 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
           padding: const EdgeInsets.all(16),
           sliver: MultiSliver(
             children: [
-              if (widget.isLoading) ...[
+              if (widget.isLoading)
                 SliverGrid.count(
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
@@ -100,8 +100,8 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
                       ),
                     ),
                   ),
-                ),
-              ] else if (error != null) ...[
+                )
+              else if (error != null)
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: Padding(
@@ -123,8 +123,8 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
                       ),
                     ),
                   ),
-                ),
-              ] else if (widget.mangas.isEmpty) ...[
+                )
+              else if (widget.mangas.isEmpty)
                 const SliverFillRemaining(
                   hasScrollBody: false,
                   child: Padding(
@@ -141,8 +141,8 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
                       ),
                     ),
                   ),
-                ),
-              ] else ...[
+                )
+              else ...[
                 SliverGrid.count(
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
