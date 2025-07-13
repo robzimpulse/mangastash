@@ -377,23 +377,41 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
       ].contains(true),
       builder: (context, state) {
         if (state.isLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
+          return const CustomScrollView(
+            slivers: [
+              SliverFillRemaining(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            ],
           );
         }
 
         if (state.error != null) {
-          return Center(
-            child: Text(
-              state.error.toString(),
-              textAlign: TextAlign.center,
-            ),
+          return CustomScrollView(
+            slivers: [
+              SliverFillRemaining(
+                child: Center(
+                  child: Text(
+                    state.error.toString(),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
           );
         }
 
         if (state.mangas.isEmpty) {
-          return const Center(
-            child: Text('Manga Empty'),
+          return const CustomScrollView(
+            slivers: [
+              SliverFillRemaining(
+                child: Center(
+                  child: Text('Manga Empty'),
+                ),
+              ),
+            ],
           );
         }
 
