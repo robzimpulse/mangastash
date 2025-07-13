@@ -18,11 +18,17 @@ class MangaDetailScreen extends StatefulWidget {
   const MangaDetailScreen({
     super.key,
     this.onTapChapter,
+    this.onTapManga,
+    this.onMangaMenu,
     this.onTapSort,
     required this.cacheManager,
   });
 
   final ValueSetter<Chapter>? onTapChapter;
+
+  final ValueSetter<Manga>? onTapManga;
+
+  final Future<MangaMenu?>? Function(Manga, bool)? onMangaMenu;
 
   final Future<ChapterConfig?> Function(ChapterConfig? value)? onTapSort;
 
@@ -33,6 +39,8 @@ class MangaDetailScreen extends StatefulWidget {
     String? source,
     String? mangaId,
     ValueSetter<Chapter>? onTapChapter,
+    ValueSetter<Manga>? onTapManga,
+    Future<MangaMenu?>? Function(Manga, bool)? onMangaMenu,
     Future<ChapterConfig?> Function(ChapterConfig? value)? onTapSort,
   }) {
     return BlocProvider(
@@ -58,6 +66,8 @@ class MangaDetailScreen extends StatefulWidget {
       child: MangaDetailScreen(
         cacheManager: locator(),
         onTapChapter: onTapChapter,
+        onTapManga: onTapManga,
+        onMangaMenu: onMangaMenu,
         onTapSort: onTapSort,
       ),
     );
@@ -101,6 +111,30 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     final result = await widget.onTapSort?.call(config);
     if (!context.mounted || result == null) return;
     _cubit(context).initChapter(config: result);
+  }
+
+  void _onLongPressManga(
+    BuildContext context,
+    Manga manga,
+    bool isOnLibrary,
+  ) async {
+    final result = await widget.onMangaMenu?.call(manga, isOnLibrary);
+    if (!context.mounted || result == null) return;
+    switch (result) {
+      case MangaMenu.download:
+      // TODO: download
+      // _cubit(context).download(manga: manga);
+      case MangaMenu.library:
+        _onTapAddToLibrary(context, manga);
+      case MangaMenu.prefetch:
+      // TODO: prefetch
+      // _cubit(context).prefetch(manga: manga);
+    }
+  }
+
+  void _onTapAddToLibrary(BuildContext context, Manga? manga) {
+    if (manga == null) return;
+    _cubit(context).addToLibrary(manga: manga);
   }
 
   @override
@@ -277,7 +311,11 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             state.isOnLibrary ? Icons.favorite : Icons.favorite_outline,
             color: Theme.of(context).appBarTheme.iconTheme?.color,
           ),
-          onPressed: () => _cubit(context).addToLibrary(),
+          onPressed: () {
+            final manga = state.manga;
+            if (manga == null) return;
+            _cubit(context).addToLibrary(manga: manga);
+          },
         );
       },
     );
@@ -422,6 +460,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             prev.isLoadingSimilarManga != curr.isLoadingSimilarManga,
             prev.hasNextPageSimilarManga != curr.hasNextPageSimilarManga,
             prev.prefetchedMangaId != curr.prefetchedMangaId,
+            prev.libraryMangaId != curr.libraryMangaId,
           ].contains(true),
           builder: (context, state) => MangaGridWidget(
             absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
@@ -429,12 +468,20 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             onLoadNextPage: () => _cubit(context).nextSimilarManga(
               useCache: false,
             ),
+            onTapManga: (manga) => widget.onTapManga?.call(manga),
+            onLongPressManga: (manga) => _onLongPressManga(
+              context,
+              manga,
+              state.libraryMangaId.contains(manga.id),
+            ),
             onTapRecrawl: (url) => _cubit(context).recrawl(url: url),
             error: state.errorSimilarManga,
             isLoading: state.isLoadingSimilarManga || state.isLoadingManga,
             hasNext: state.hasNextPageSimilarManga,
             mangas: state.similarManga,
             prefetchedMangaId: state.prefetchedMangaId,
+            cacheManager: widget.cacheManager,
+            libraryMangaId: state.libraryMangaId,
           ),
         ),
       ],

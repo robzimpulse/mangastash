@@ -1,3 +1,4 @@
+import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:ui_common/ui_common.dart';
@@ -7,7 +8,8 @@ class MangaGridWidget extends StatefulWidget {
     super.key,
     this.onLoadNextPage,
     this.onRefresh,
-    this.onTapChapter,
+    this.onTapManga,
+    this.onLongPressManga,
     this.onTapRecrawl,
     this.absorber,
     this.error,
@@ -15,13 +17,17 @@ class MangaGridWidget extends StatefulWidget {
     this.hasNext = false,
     this.mangas = const [],
     this.prefetchedMangaId = const {},
+    this.libraryMangaId = const {},
+    this.cacheManager,
   });
 
   final VoidCallback? onLoadNextPage;
 
   final RefreshCallback? onRefresh;
 
-  final ValueSetter<Manga>? onTapChapter;
+  final ValueSetter<Manga>? onTapManga;
+
+  final ValueSetter<Manga>? onLongPressManga;
 
   final ValueSetter<String>? onTapRecrawl;
 
@@ -36,6 +42,10 @@ class MangaGridWidget extends StatefulWidget {
   final List<Manga> mangas;
 
   final Set<String> prefetchedMangaId;
+
+  final Set<String> libraryMangaId;
+
+  final BaseCacheManager? cacheManager;
 
   @override
   State<MangaGridWidget> createState() => _MangaGridWidgetState();
@@ -150,8 +160,13 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
                   childAspectRatio: 100 / 140,
                   children: [
                     for (final manga in widget.mangas)
-                      // TODO: implement this
-                      const Center(child: Text('data')),
+                      MangaItemWidget(
+                        manga: manga,
+                        cacheManager: widget.cacheManager,
+                        onTap: () => widget.onTapManga?.call(manga),
+                        onLongPress: () => widget.onLongPressManga?.call(manga),
+                        isOnLibrary: widget.libraryMangaId.contains(manga.id),
+                      ),
                   ],
                 ),
                 if (widget.hasNext)

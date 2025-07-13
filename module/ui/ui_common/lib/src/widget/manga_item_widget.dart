@@ -11,11 +11,13 @@ class MangaItemWidget extends StatelessWidget {
     required this.manga,
     this.padding = const EdgeInsets.all(0),
     this.onTap,
+    this.isOnLibrary = false,
     this.onLongPress,
     this.cacheManager,
   });
 
   final Manga manga;
+  final bool isOnLibrary;
   final BaseCacheManager? cacheManager;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
@@ -54,6 +56,30 @@ class MangaItemWidget extends StatelessWidget {
                   ),
                 ),
               ),
+              if (isOnLibrary) ...[
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.black.withValues(alpha: 0.5),
+                  ),
+                ),
+                Positioned(
+                  top: 4,
+                  left: 4,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                    ),
+                    child: Text(
+                      'In Library',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
               Positioned(
                 bottom: 0,
                 left: 0,

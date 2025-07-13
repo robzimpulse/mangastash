@@ -83,6 +83,20 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
             BrowseRoutePath.chapterConfig,
             extra: config,
           ),
+          onTapManga: (manga) => context.pushNamed(
+            BrowseRoutePath.mangaDetail,
+            pathParameters: {
+              BrowseRoutePath.sourceQuery:
+                  state.pathParameters[BrowseRoutePath.sourceQuery] ?? '',
+              BrowseRoutePath.mangaIdQuery: manga.id ?? '',
+            },
+          ),
+          onMangaMenu: (manga, isOnLibrary) => context.pushNamed<MangaMenu>(
+            CommonRoutePath.menu,
+            queryParameters: {
+              CommonRoutePath.menuIsOnLibrary: isOnLibrary ? 'true' : 'false',
+            },
+          ),
         ),
       ),
       GoRoute(

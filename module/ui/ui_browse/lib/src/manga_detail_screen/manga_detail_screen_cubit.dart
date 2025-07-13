@@ -213,7 +213,9 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
       emit(
         state.copyWith(
-          similarManga: allMangas,
+          similarManga: [
+            ...allMangas,
+          ]..removeWhere((e) => e.id == state.mangaId),
           hasNextPageSimilarManga: hasNextPage ?? allMangas.length < total,
           similarMangaParameter: parameter.copyWith(
             page: page + 1,
@@ -289,10 +291,8 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     emit(state.copyWith(isPagingNextPageSimilarManga: false));
   }
 
-  Future<void> addToLibrary() async {
-    final manga = state.manga;
-    if (manga == null) return;
-    if (state.isOnLibrary) {
+  Future<void> addToLibrary({required Manga manga}) async {
+    if (state.libraryMangaId.contains(manga.id)) {
       await _removeFromLibraryUseCase.execute(manga: manga);
     } else {
       await _addToLibraryUseCase.execute(manga: manga);
