@@ -422,22 +422,13 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           builder: (context, state) => MangaGridWidget(
             absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
             onRefresh: () => _cubit(context).init(useCache: false),
-            onLoadNextPage: () => context.showSnackBar(
-              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+            onLoadNextPage: () => _cubit(context).initSimilarManga(
+              useCache: false,
             ),
-            hasNextPage: state.hasNextPageSimilarManga,
-            builder: (context, index) => LayoutBuilder(
-              builder: (context, constraint) => ConstrainedBox(
-                constraints: constraint,
-                // TODO: change to manga image
-                child: Container(
-                  color: Colors.grey,
-                  child: Center(
-                    child: Text('$index'),
-                  ),
-                ),
-              ),
-            ),
+            error: state.errorSimilarManga,
+            isLoading: state.isLoadingSimilarManga,
+            hasNext: state.hasNextPageSimilarManga,
+            mangas: state.similarManga,
           ),
         ),
       ],

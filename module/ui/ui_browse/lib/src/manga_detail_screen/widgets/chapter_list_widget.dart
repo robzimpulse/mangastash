@@ -98,8 +98,9 @@ class _ChapterListWidgetState extends State<ChapterListWidget> {
             children: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding:
-                      EdgeInsets.symmetric(vertical: widget.isLoading ? 12 : 0),
+                  padding: EdgeInsets.symmetric(
+                    vertical: widget.isLoading ? 12 : 0,
+                  ),
                   child: Row(
                     children: [
                       ShimmerLoading.multiline(
