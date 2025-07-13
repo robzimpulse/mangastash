@@ -155,17 +155,17 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
                     for (final manga in widget.mangas)
                       // TODO: implement this
                       const Center(child: Text('data')),
-                    if (widget.hasNext)
-                      const SliverToBoxAdapter(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          child: Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        ),
-                      ),
                   ],
                 ),
+                if (widget.hasNext)
+                  const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  ),
               ],
             ],
           ),

@@ -375,6 +375,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       children: [
         _builder(
           buildWhen: (prev, curr) => [
+            prev.isLoadingManga != curr.isLoadingManga,
             prev.errorChapters != curr.errorChapters,
             prev.isLoadingChapters != curr.isLoadingChapters,
             prev.filtered != curr.filtered,
@@ -394,7 +395,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             onTapPrefetch: () => _cubit(context).prefetch(),
             prefetchedChapterId: state.prefetchedChapterId,
             error: state.errorChapters,
-            isLoading: state.isLoadingChapters,
+            isLoading: state.isLoadingChapters || state.isLoadingManga,
             hasNext: state.hasNextPageChapter,
             chapters: state.filtered,
             total: state.totalChapter ?? 0,
@@ -414,6 +415,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         ),
         _builder(
           buildWhen: (prev, curr) => [
+            prev.isLoadingManga != curr.isLoadingManga,
             prev.similarManga != curr.similarManga,
             prev.errorSimilarManga != curr.errorSimilarManga,
             prev.isLoadingSimilarManga != curr.isLoadingSimilarManga,
@@ -426,7 +428,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               useCache: false,
             ),
             error: state.errorSimilarManga,
-            isLoading: state.isLoadingSimilarManga,
+            isLoading: state.isLoadingSimilarManga || state.isLoadingManga,
             hasNext: state.hasNextPageSimilarManga,
             mangas: state.similarManga,
           ),
