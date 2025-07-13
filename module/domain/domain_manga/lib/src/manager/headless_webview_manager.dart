@@ -23,22 +23,42 @@ class HeadlessWebviewManager {
   })  : _log = log,
         _cacheManager = cacheManager;
 
-  Future<Document?> open(String url, {List<String> scripts = const []}) async {
+  Future<Document?> open(
+    String url, {
+    List<String> scripts = const [],
+    bool useCache = true,
+  }) async {
     final uri = WebUri(url);
-    final html = await _queue.add(() => _fetch(uri: uri, scripts: scripts));
+    final html = await _queue.add(
+      () => _fetch(uri: uri, scripts: scripts, useCache: useCache),
+    );
     if (html == null) return null;
-    _log.logHtml(uri, html, scripts: scripts, name: 'HeadlessWebviewManager');
+    _log.logHtml(uri, html, scripts: scripts, name: runtimeType.toString());
     return parse(html);
   }
 
   Future<String?> _fetch({
     required WebUri uri,
     List<String> scripts = const [],
+    bool useCache = true,
   }) async {
+    _log.log(
+      'Start loading $uri',
+      extra: {'url': uri.toString()},
+      name: runtimeType.toString(),
+    );
+
     final cache = await _cacheManager.getFileFromCache(uri.toString());
     final data = await cache?.file.readAsString();
 
-    if (data != null) return data;
+    if (data != null && useCache) {
+      _log.log(
+        'Finish loading $uri',
+        extra: {'url': uri.toString(), 'cache': true},
+        name: runtimeType.toString(),
+      );
+      return data;
+    }
 
     final onLoadStartCompleter = Completer();
     final onLoadStopCompleter = Completer();
@@ -100,13 +120,27 @@ class HeadlessWebviewManager {
 
     await webview.dispose();
 
-    if (html == null) return null;
+    if (html == null) {
+      _log.log(
+        'Finish loading $uri',
+        extra: {'url': uri.toString(), 'cache': false},
+        error: Exception('Null Html String'),
+        name: runtimeType.toString(),
+      );
+      return null;
+    }
 
     await _cacheManager.putFile(
       uri.toString(),
       utf8.encode(html),
       fileExtension: 'html',
       maxAge: const Duration(minutes: 30),
+    );
+
+    _log.log(
+      'Finish loading $uri',
+      extra: {'url': uri.toString(), 'cache': false},
+      name: runtimeType.toString(),
     );
 
     return html;

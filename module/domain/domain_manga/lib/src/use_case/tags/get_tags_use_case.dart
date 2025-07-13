@@ -42,10 +42,15 @@ class GetTagsUseCase with SyncTagsMixin {
       throw DataNotFoundException();
     }
 
-    return [...tags.map((e) => Tag.from(data: e).copyWith(source: source.name))];
+    return [
+      ...tags.map((e) => Tag.from(data: e).copyWith(source: source.name))
+    ];
   }
 
-  Future<List<Tag>> _scrapping({required SourceEnum source}) async {
+  Future<List<Tag>> _scrapping({
+    required SourceEnum source,
+    bool useCache = true,
+  }) async {
     const parameter = SearchMangaParameter(page: 1);
     String url = '';
     if (source == SourceEnum.asurascan) {
@@ -102,7 +107,7 @@ class GetTagsUseCase with SyncTagsMixin {
     try {
       final promise = source == SourceEnum.mangadex
           ? _mangadex(source: source)
-          : _scrapping(source: source);
+          : _scrapping(source: source, useCache: useCache);
 
       final data = await sync(
         dao: _tagDao,

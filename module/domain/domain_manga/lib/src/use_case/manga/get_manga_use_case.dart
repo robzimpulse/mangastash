@@ -53,12 +53,13 @@ class GetMangaUseCase with SyncMangasMixin {
   Future<Manga> _scrapping({
     required SourceEnum source,
     required String? url,
+    bool useCache = true,
   }) async {
     if (url == null) {
       throw DataNotFoundException();
     }
 
-    final document = await _webview.open(url);
+    final document = await _webview.open(url, useCache: useCache);
 
     if (document == null) {
       throw FailedParsingHtmlException(url);
@@ -93,7 +94,7 @@ class GetMangaUseCase with SyncMangasMixin {
 
       final promise = source == SourceEnum.mangadex
           ? _mangadex(source: source, mangaId: mangaId)
-          : _scrapping(url: manga?.webUrl, source: source);
+          : _scrapping(url: manga?.webUrl, source: source, useCache: useCache);
 
       final results = await sync(
         dao: _mangaDao,

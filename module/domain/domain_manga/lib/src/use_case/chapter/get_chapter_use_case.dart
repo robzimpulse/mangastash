@@ -61,12 +61,13 @@ class GetChapterUseCase with SyncChaptersMixin {
   Future<List<String>> _scrapping({
     required String? url,
     required SourceEnum source,
+    bool useCache = true,
   }) async {
     if (url == null) {
       throw DataNotFoundException();
     }
 
-    final document = await _webview.open(url);
+    final document = await _webview.open(url, useCache: useCache);
 
     if (document == null) {
       throw FailedParsingHtmlException(url);
@@ -104,7 +105,11 @@ class GetChapterUseCase with SyncChaptersMixin {
       final data = source == SourceEnum.mangadex
           ? await _mangadex(mangaId: mangaId, chapterId: chapterId)
           : chapter?.copyWith(
-              images: await _scrapping(url: chapter.webUrl, source: source),
+              images: await _scrapping(
+                url: chapter.webUrl,
+                source: source,
+                useCache: useCache,
+              ),
             );
 
       final results = await sync(

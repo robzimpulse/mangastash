@@ -70,6 +70,7 @@ class SearchChapterUseCase
     required SourceEnum source,
     required String mangaId,
     required SearchChapterParameter parameter,
+    bool useCache = true,
   }) async {
     final raw = await _mangaDao.search(ids: [mangaId]);
     final result = Manga.fromDatabase(raw.firstOrNull);
@@ -80,7 +81,7 @@ class SearchChapterUseCase
       throw DataNotFoundException();
     }
 
-    final document = await _webview.open(url);
+    final document = await _webview.open(url, useCache: useCache);
 
     if (document == null) {
       throw FailedParsingHtmlException(url);
@@ -134,7 +135,12 @@ class SearchChapterUseCase
     try {
       final promise = source == SourceEnum.mangadex
           ? _mangadex(mangaId: mangaId, parameter: parameter)
-          : _scrapping(source: source, mangaId: mangaId, parameter: parameter);
+          : _scrapping(
+              source: source,
+              mangaId: mangaId,
+              parameter: parameter,
+              useCache: useCache,
+            );
 
       final data = await promise;
 

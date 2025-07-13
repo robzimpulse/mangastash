@@ -61,6 +61,7 @@ class SearchMangaUseCase with SyncMangasMixin {
   Future<Pagination<Manga>> _scrapping({
     required SourceEnum source,
     required SearchMangaParameter parameter,
+    bool useCache = true,
   }) async {
     String url = '';
     if (source == SourceEnum.asurascan) {
@@ -69,7 +70,7 @@ class SearchMangaUseCase with SyncMangasMixin {
       url = parameter.mangaclash;
     }
 
-    final document = await _webview.open(url);
+    final document = await _webview.open(url, useCache: useCache);
 
     if (document == null) {
       throw FailedParsingHtmlException(url);
@@ -112,7 +113,7 @@ class SearchMangaUseCase with SyncMangasMixin {
     try {
       final promise = source == SourceEnum.mangadex
           ? _mangadex(source: source, parameter: parameter)
-          : _scrapping(source: source, parameter: parameter);
+          : _scrapping(source: source, parameter: parameter, useCache: useCache,);
 
       final data = await promise;
 
