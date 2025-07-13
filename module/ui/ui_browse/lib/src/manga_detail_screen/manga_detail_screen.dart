@@ -420,6 +420,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             prev.errorSimilarManga != curr.errorSimilarManga,
             prev.isLoadingSimilarManga != curr.isLoadingSimilarManga,
             prev.hasNextPageSimilarManga != curr.hasNextPageSimilarManga,
+            prev.prefetchedMangaId != curr.prefetchedMangaId,
           ].contains(true),
           builder: (context, state) => MangaGridWidget(
             absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
@@ -427,10 +428,12 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             onLoadNextPage: () => _cubit(context).nextSimilarManga(
               useCache: false,
             ),
+            onTapRecrawl: (url) => _cubit(context).recrawl(url: url),
             error: state.errorSimilarManga,
             isLoading: state.isLoadingSimilarManga || state.isLoadingManga,
             hasNext: state.hasNextPageSimilarManga,
             mangas: state.similarManga,
+            prefetchedMangaId: state.prefetchedMangaId,
           ),
         ),
       ],

@@ -40,6 +40,7 @@ class MangaDetailScreenState extends Equatable {
 
   final Set<String> libraryMangaId;
   final Set<String> prefetchedChapterId;
+  final Set<String> prefetchedMangaId;
   final Map<String, Chapter> histories;
 
   bool get isOnLibrary => libraryMangaId.contains(mangaId);
@@ -78,6 +79,7 @@ class MangaDetailScreenState extends Equatable {
     this.config = const ChapterConfig(),
     this.libraryMangaId = const {},
     this.prefetchedChapterId = const {},
+    this.prefetchedMangaId = const {},
     this.chapterParameter = const SearchChapterParameter(),
     this.hasNextPageChapter = false,
     this.isPagingNextPageChapter = false,
@@ -109,6 +111,7 @@ class MangaDetailScreenState extends Equatable {
         isPagingNextPageChapter,
         sourceUrlChapter,
         prefetchedChapterId,
+        prefetchedMangaId,
         histories,
         totalChapter,
         errorSimilarManga,
@@ -133,6 +136,7 @@ class MangaDetailScreenState extends Equatable {
     ChapterConfig? config,
     Set<String>? libraryMangaId,
     Set<String>? prefetchedChapterId,
+    Set<String>? prefetchedMangaId,
     SearchChapterParameter? chapterParameter,
     bool? hasNextPageChapter,
     bool? isPagingNextPageChapter,
@@ -166,6 +170,7 @@ class MangaDetailScreenState extends Equatable {
       sourceUrlChapter:
           sourceUrlChapter != null ? sourceUrlChapter() : this.sourceUrlChapter,
       prefetchedChapterId: prefetchedChapterId ?? this.prefetchedChapterId,
+      prefetchedMangaId: prefetchedMangaId ?? this.prefetchedMangaId,
       histories: histories ?? this.histories,
       totalChapter: totalChapter ?? this.totalChapter,
       errorSimilarManga: errorSimilarManga != null

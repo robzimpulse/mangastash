@@ -6,7 +6,6 @@ class MangaGridWidget extends StatefulWidget {
   const MangaGridWidget({
     super.key,
     this.onLoadNextPage,
-    this.onTapPrefetch,
     this.onRefresh,
     this.onTapChapter,
     this.onTapRecrawl,
@@ -19,8 +18,6 @@ class MangaGridWidget extends StatefulWidget {
   });
 
   final VoidCallback? onLoadNextPage;
-
-  final VoidCallback? onTapPrefetch;
 
   final RefreshCallback? onRefresh;
 
