@@ -52,6 +52,7 @@ class MangaDetailScreen extends StatefulWidget {
         updateChapterLastReadAtUseCase: locator(),
         listenSearchParameterUseCase: locator(),
         getAllChapterUseCase: locator(),
+        searchMangaUseCase: locator(),
       )..init(),
       child: MangaDetailScreen(
         cacheManager: locator(),
@@ -98,7 +99,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   void _onTapFilter(BuildContext context, ChapterConfig config) async {
     final result = await widget.onTapSort?.call(config);
     if (!context.mounted || result == null) return;
-    _cubit(context).init(config: result);
+    _cubit(context).initChapter(config: result);
   }
 
   @override
@@ -378,13 +379,13 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             prev.isLoadingChapters != curr.isLoadingChapters,
             prev.filtered != curr.filtered,
             prev.totalChapter != curr.totalChapter,
-            prev.hasNextPage != curr.hasNextPage,
+            prev.hasNextPageChapter != curr.hasNextPageChapter,
             prev.prefetchedChapterId != curr.prefetchedChapterId,
             prev.config != curr.config,
           ].contains(true),
           builder: (context, state) => ChapterListWidget(
             absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-            onLoadNextPage: () => _cubit(context).next(),
+            onLoadNextPage: () => _cubit(context).nextChapter(),
             onRefresh: () => _cubit(context).init(useCache: false),
             onTapRecrawl: (url) => _cubit(context).recrawl(url: url),
             onTapChapter: (chapter) => widget.onTapChapter?.call(chapter),
@@ -394,7 +395,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             prefetchedChapterId: state.prefetchedChapterId,
             error: state.errorChapters,
             isLoading: state.isLoadingChapters,
-            hasNext: state.hasNextPage,
+            hasNext: state.hasNextPageChapter,
             chapters: state.filtered,
             total: state.totalChapter ?? 0,
           ),
@@ -413,18 +414,18 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         ),
         _builder(
           buildWhen: (prev, curr) => [
-            prev.manga != curr.manga,
-            prev.isLoadingManga != curr.isLoadingManga,
+            prev.similarManga != curr.similarManga,
+            prev.errorSimilarManga != curr.errorSimilarManga,
+            prev.isLoadingSimilarManga != curr.isLoadingSimilarManga,
+            prev.hasNextPageSimilarManga != curr.hasNextPageSimilarManga,
           ].contains(true),
           builder: (context, state) => MangaGridWidget(
             absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-            onRefresh: () async => context.showSnackBar(
-              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-            ),
+            onRefresh: () => _cubit(context).init(useCache: false),
             onLoadNextPage: () => context.showSnackBar(
               message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
             ),
-            hasNextPage: false,
+            hasNextPage: state.hasNextPageSimilarManga,
             builder: (context, index) => LayoutBuilder(
               builder: (context, constraint) => ConstrainedBox(
                 constraints: constraint,

@@ -16,27 +16,34 @@ enum DownloadOption {
 
 class MangaDetailScreenState extends Equatable {
   final bool isLoadingManga;
-  final bool isLoadingChapters;
   final Exception? errorManga;
-  final Exception? errorChapters;
   final String? mangaId;
   final Manga? manga;
+  final SourceEnum? source;
+
+  final bool isLoadingChapters;
+  final Exception? errorChapters;
   final List<Chapter> chapters;
   final int? totalChapter;
-  final SourceEnum? source;
-  final List<Manga> libraries;
+  final String? sourceUrlChapter;
+  final bool hasNextPageChapter;
+  final bool isPagingNextPageChapter;
+  final ChapterConfig config;
+  final SearchChapterParameter chapterParameter;
+
+  final bool isLoadingSimilarManga;
+  final Exception? errorSimilarManga;
+  final bool hasNextPageSimilarManga;
+  final bool isPagingNextPageSimilarManga;
+  final List<Manga> similarManga;
+  final String? sourceUrlSimilarManga;
+  final SearchMangaParameter? similarMangaParameter;
+
+  final Set<String> libraryMangaId;
   final Set<String> prefetchedChapterId;
   final Map<String, Chapter> histories;
 
-  final ChapterConfig config;
-  final SearchChapterParameter parameter;
-  final bool hasNextPage;
-  final bool isPagingNextPage;
-  final String? sourceUrl;
-
-  bool get isOnLibrary {
-    return libraries.firstWhereOrNull((e) => e.id == mangaId) != null;
-  }
+  bool get isOnLibrary => libraryMangaId.contains(mangaId);
 
   List<Chapter> get filtered {
     return [
@@ -70,13 +77,20 @@ class MangaDetailScreenState extends Equatable {
     this.chapters = const [],
     this.source,
     this.config = const ChapterConfig(),
-    this.libraries = const [],
+    this.libraryMangaId = const {},
     this.prefetchedChapterId = const {},
-    this.parameter = const SearchChapterParameter(),
-    this.hasNextPage = false,
-    this.isPagingNextPage = false,
-    this.sourceUrl,
+    this.chapterParameter = const SearchChapterParameter(),
+    this.hasNextPageChapter = false,
+    this.isPagingNextPageChapter = false,
+    this.sourceUrlChapter,
     this.histories = const {},
+    this.errorSimilarManga,
+    this.isLoadingSimilarManga = false,
+    this.hasNextPageSimilarManga = false,
+    this.isPagingNextPageSimilarManga = false,
+    this.similarManga = const [],
+    this.sourceUrlSimilarManga,
+    this.similarMangaParameter,
   });
 
   @override
@@ -90,14 +104,21 @@ class MangaDetailScreenState extends Equatable {
         chapters,
         source,
         config,
-        libraries,
-        parameter,
-        hasNextPage,
-        isPagingNextPage,
-        sourceUrl,
+        libraryMangaId,
+        chapterParameter,
+        hasNextPageChapter,
+        isPagingNextPageChapter,
+        sourceUrlChapter,
         prefetchedChapterId,
         histories,
         totalChapter,
+        errorSimilarManga,
+        isLoadingSimilarManga,
+        hasNextPageSimilarManga,
+        isPagingNextPageSimilarManga,
+        similarManga,
+        sourceUrlSimilarManga,
+        similarMangaParameter,
       ];
 
   MangaDetailScreenState copyWith({
@@ -111,14 +132,21 @@ class MangaDetailScreenState extends Equatable {
     String? sourceId,
     SourceEnum? source,
     ChapterConfig? config,
-    List<Manga>? libraries,
+    Set<String>? libraryMangaId,
     Set<String>? prefetchedChapterId,
-    SearchChapterParameter? parameter,
-    bool? hasNextPage,
-    bool? isPagingNextPage,
-    ValueGetter<String?>? sourceUrl,
+    SearchChapterParameter? chapterParameter,
+    bool? hasNextPageChapter,
+    bool? isPagingNextPageChapter,
+    ValueGetter<String?>? sourceUrlChapter,
     Map<String, Chapter>? histories,
     int? totalChapter,
+    ValueGetter<Exception?>? errorSimilarManga,
+    bool? isLoadingSimilarManga,
+    bool? hasNextPageSimilarManga,
+    bool? isPagingNextPageSimilarManga,
+    List<Manga>? similarManga,
+    ValueGetter<String?>? sourceUrlSimilarManga,
+    SearchMangaParameter? similarMangaParameter,
   }) {
     return MangaDetailScreenState(
       config: config ?? this.config,
@@ -131,14 +159,30 @@ class MangaDetailScreenState extends Equatable {
       manga: manga ?? this.manga,
       chapters: chapters ?? this.chapters,
       source: source ?? this.source,
-      libraries: libraries ?? this.libraries,
-      parameter: parameter ?? this.parameter,
-      hasNextPage: hasNextPage ?? this.hasNextPage,
-      isPagingNextPage: isPagingNextPage ?? this.isPagingNextPage,
-      sourceUrl: sourceUrl != null ? sourceUrl() : this.sourceUrl,
+      libraryMangaId: libraryMangaId ?? this.libraryMangaId,
+      chapterParameter: chapterParameter ?? this.chapterParameter,
+      hasNextPageChapter: hasNextPageChapter ?? this.hasNextPageChapter,
+      isPagingNextPageChapter:
+          isPagingNextPageChapter ?? this.isPagingNextPageChapter,
+      sourceUrlChapter:
+          sourceUrlChapter != null ? sourceUrlChapter() : this.sourceUrlChapter,
       prefetchedChapterId: prefetchedChapterId ?? this.prefetchedChapterId,
       histories: histories ?? this.histories,
       totalChapter: totalChapter ?? this.totalChapter,
+      errorSimilarManga: errorSimilarManga != null
+          ? errorSimilarManga()
+          : this.errorSimilarManga,
+      isLoadingSimilarManga: isLoadingManga ?? this.isLoadingSimilarManga,
+      hasNextPageSimilarManga:
+          hasNextPageSimilarManga ?? this.hasNextPageSimilarManga,
+      isPagingNextPageSimilarManga:
+          isPagingNextPageSimilarManga ?? this.isPagingNextPageSimilarManga,
+      similarManga: similarManga ?? this.similarManga,
+      similarMangaParameter:
+          similarMangaParameter ?? this.similarMangaParameter,
+      sourceUrlSimilarManga: sourceUrlSimilarManga != null
+          ? sourceUrlSimilarManga()
+          : this.sourceUrlSimilarManga,
     );
   }
 }
