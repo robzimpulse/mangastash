@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
+import 'package:ui_common/ui_common.dart';
 
 class MangaDetailAppBarWidget extends StatelessWidget {
   const MangaDetailAppBarWidget({
@@ -31,8 +31,6 @@ class MangaDetailAppBarWidget extends StatelessWidget {
     final actions = this.actions;
     final leading = this.leading;
     final title = this.title;
-
-    // TODO: fix `actions` animation
 
     return Stack(
       children: [

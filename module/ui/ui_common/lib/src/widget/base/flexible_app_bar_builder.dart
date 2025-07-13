@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class FlexibleAppBarBuilder extends StatelessWidget {
-
   final Widget Function(BuildContext, double progress) builder;
 
   const FlexibleAppBarBuilder({super.key, required this.builder});
@@ -32,5 +31,4 @@ class FlexibleAppBarBuilder extends StatelessWidget {
       ),
     );
   }
-
 }
