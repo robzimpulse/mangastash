@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';

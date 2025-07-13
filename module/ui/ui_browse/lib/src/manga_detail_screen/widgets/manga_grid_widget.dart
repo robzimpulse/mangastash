@@ -153,6 +153,7 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
                   childAspectRatio: 100 / 140,
                   children: [
                     for (final manga in widget.mangas)
+                      // TODO: implement this
                       const Center(child: Text('data')),
                     if (widget.hasNext)
                       const SliverToBoxAdapter(
