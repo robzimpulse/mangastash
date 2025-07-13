@@ -172,7 +172,8 @@ class MangaDetailScreenState extends Equatable {
       errorSimilarManga: errorSimilarManga != null
           ? errorSimilarManga()
           : this.errorSimilarManga,
-      isLoadingSimilarManga: isLoadingManga ?? this.isLoadingSimilarManga,
+      isLoadingSimilarManga:
+          isLoadingSimilarManga ?? this.isLoadingSimilarManga,
       hasNextPageSimilarManga:
           hasNextPageSimilarManga ?? this.hasNextPageSimilarManga,
       isPagingNextPageSimilarManga:

@@ -84,7 +84,27 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
           padding: const EdgeInsets.all(16),
           sliver: MultiSliver(
             children: [
-              if (error != null) ...[
+              if (widget.isLoading) ...[
+                SliverGrid.count(
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  crossAxisCount: 3,
+                  childAspectRatio: 100 / 140,
+                  children: List.generate(
+                    20,
+                    (e) => LayoutBuilder(
+                      builder: (context, constraint) => ConstrainedBox(
+                        constraints: constraint,
+                        child: ShimmerLoading.box(
+                          isLoading: true,
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ] else if (error != null) ...[
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: Padding(
@@ -130,28 +150,20 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                   crossAxisCount: 3,
-                  children: widget.isLoading
-                      ? List.generate(
-                          20,
-                          (e) => Center(
-                            child: Text('$e'),
+                  childAspectRatio: 100 / 140,
+                  children: [
+                    for (final manga in widget.mangas)
+                      const Center(child: Text('data')),
+                    if (widget.hasNext)
+                      const SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Center(
+                            child: CircularProgressIndicator(),
                           ),
-                        )
-                      : [
-                          for (final manga in widget.mangas)
-                            const Center(
-                              child: Text('data'),
-                            ),
-                          if (widget.hasNext)
-                            const SliverToBoxAdapter(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 10),
-                                child: Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              ),
-                            ),
-                        ],
+                        ),
+                      ),
+                  ],
                 ),
               ],
             ],

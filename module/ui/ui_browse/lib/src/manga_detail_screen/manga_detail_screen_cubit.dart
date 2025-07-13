@@ -49,6 +49,8 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
             chapterParameter: listenSearchParameterUseCase
                 .searchParameterState.valueOrNull
                 ?.let((e) => SearchChapterParameter.from(e)),
+            similarMangaParameter:
+                listenSearchParameterUseCase.searchParameterState.valueOrNull,
           ),
         ) {
     addSubscription(
@@ -141,11 +143,12 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       state.copyWith(
         isLoadingSimilarManga: true,
         errorSimilarManga: () => null,
-        similarMangaParameter: SearchMangaParameter(
+        similarMangaParameter: state.similarMangaParameter?.copyWith(
           offset: 0,
           page: 1,
           limit: 20,
           includedTags: [...?state.manga?.tags?.map((e) => e.id).nonNulls],
+          excludedTags: [],
         ),
       ),
     );

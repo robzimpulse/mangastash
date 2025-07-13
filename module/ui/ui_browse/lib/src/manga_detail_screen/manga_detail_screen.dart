@@ -386,7 +386,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           builder: (context, state) => ChapterListWidget(
             absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
             onLoadNextPage: () => _cubit(context).nextChapter(),
-            onRefresh: () => _cubit(context).init(useCache: false),
+            onRefresh: () => _cubit(context).initChapter(useCache: false),
             onTapRecrawl: (url) => _cubit(context).recrawl(url: url),
             onTapChapter: (chapter) => widget.onTapChapter?.call(chapter),
             onTapDownload: (option) => _onTapDownload(context, option),
@@ -421,8 +421,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           ].contains(true),
           builder: (context, state) => MangaGridWidget(
             absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-            onRefresh: () => _cubit(context).init(useCache: false),
-            onLoadNextPage: () => _cubit(context).initSimilarManga(
+            onRefresh: () => _cubit(context).initSimilarManga(useCache: false),
+            onLoadNextPage: () => _cubit(context).nextSimilarManga(
               useCache: false,
             ),
             error: state.errorSimilarManga,
