@@ -8,6 +8,7 @@ import '../manga_detail_screen_state.dart';
 class ChapterListWidget extends StatefulWidget {
   const ChapterListWidget({
     super.key,
+    this.pageStorageKey,
     this.onLoadNextPage,
     this.onRefresh,
     this.absorber,
@@ -23,6 +24,8 @@ class ChapterListWidget extends StatefulWidget {
     this.onTapFilter,
     this.onTapPrefetch,
   });
+
+  final PageStorageKey<String>? pageStorageKey;
 
   final VoidCallback? onLoadNextPage;
 
@@ -85,6 +88,7 @@ class _ChapterListWidgetState extends State<ChapterListWidget> {
     final error = widget.error;
 
     Widget view = CustomScrollView(
+      key: widget.pageStorageKey,
       slivers: [
         SliverToBoxAdapter(
           child: ValueListenableBuilder(

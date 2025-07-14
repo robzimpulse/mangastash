@@ -6,6 +6,7 @@ import 'package:ui_common/ui_common.dart';
 class MangaGridWidget extends StatefulWidget {
   const MangaGridWidget({
     super.key,
+    this.pageStorageKey,
     this.onLoadNextPage,
     this.onRefresh,
     this.onTapManga,
@@ -20,6 +21,8 @@ class MangaGridWidget extends StatefulWidget {
     this.libraryMangaId = const {},
     this.cacheManager,
   });
+
+  final PageStorageKey<String>? pageStorageKey;
 
   final VoidCallback? onLoadNextPage;
 
@@ -80,6 +83,7 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
     final error = widget.error;
 
     Widget view = CustomScrollView(
+      key: widget.pageStorageKey,
       slivers: [
         SliverToBoxAdapter(
           child: ValueListenableBuilder(

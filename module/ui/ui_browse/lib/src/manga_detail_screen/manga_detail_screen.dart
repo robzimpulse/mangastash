@@ -414,6 +414,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       children: [
         _builder(
           buildWhen: (prev, curr) => [
+            prev.mangaId != curr.mangaId,
             prev.isLoadingManga != curr.isLoadingManga,
             prev.errorChapters != curr.errorChapters,
             prev.isLoadingChapters != curr.isLoadingChapters,
@@ -424,6 +425,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             prev.config != curr.config,
           ].contains(true),
           builder: (context, state) => ChapterListWidget(
+            pageStorageKey: PageStorageKey('chapter-list-${state.mangaId}'),
             absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
             onLoadNextPage: () => _cubit(context).nextChapter(),
             onRefresh: () => _cubit(context).initChapter(useCache: false),
@@ -454,6 +456,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         ),
         _builder(
           buildWhen: (prev, curr) => [
+            prev.mangaId != curr.mangaId,
             prev.isLoadingManga != curr.isLoadingManga,
             prev.similarManga != curr.similarManga,
             prev.errorSimilarManga != curr.errorSimilarManga,
@@ -463,6 +466,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             prev.libraryMangaId != curr.libraryMangaId,
           ].contains(true),
           builder: (context, state) => MangaGridWidget(
+            pageStorageKey: PageStorageKey('similar-manga-${state.mangaId}'),
             absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
             onRefresh: () => _cubit(context).initSimilarManga(useCache: false),
             onLoadNextPage: () => _cubit(context).nextSimilarManga(
