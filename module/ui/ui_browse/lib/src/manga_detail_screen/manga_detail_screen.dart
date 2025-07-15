@@ -213,52 +213,63 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   Widget _appBarBackground() {
     return _builder(
       buildWhen: (prev, curr) => prev.manga?.coverUrl != curr.manga?.coverUrl,
-      builder: (context, state) => Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned.fill(
-            child: CachedNetworkImageWidget(
-              fit: BoxFit.cover,
-              cacheManager: widget.cacheManager,
-              imageUrl: state.manga?.coverUrl ?? '',
-              errorBuilder: (context, error, _) => const Icon(Icons.error),
-              progressBuilder: (context, progress) => Center(
-                child: SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    value: progress,
+      builder: (context, state) {
+        final url = state.manga?.coverUrl;
+
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            Positioned.fill(
+              child: url != null
+                  ? CachedNetworkImageWidget(
+                      fit: BoxFit.cover,
+                      cacheManager: widget.cacheManager,
+                      imageUrl: url,
+                      errorBuilder: (context, error, _) =>
+                          const Icon(Icons.error),
+                      progressBuilder: (context, progress) => Center(
+                        child: SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            value: progress,
+                          ),
+                        ),
+                      ),
+                    )
+                  : const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(),
+                    ),
+            ),
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.5,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
                   ),
                 ),
               ),
             ),
-          ),
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.5,
+            Positioned.fill(
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: <Color>[
+                      Colors.transparent,
+                      Theme.of(context).scaffoldBackgroundColor,
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: <Color>[
-                    Colors.transparent,
-                    Theme.of(context).scaffoldBackgroundColor,
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+          ],
+        );
+      },
     );
   }
 
