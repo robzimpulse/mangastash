@@ -28,7 +28,7 @@ class MangaTileWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sourceIconUrl =
-        manga.source?.let((e) => SourceEnum.fromValue(name: e))?.url;
+        manga.source?.let((e) => SourceEnum.fromValue(name: e))?.icon;
 
     return Row(
       children: [
