@@ -210,19 +210,22 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
         prev.sources != curr.sources,
         prev.prefetchedMangaIds != curr.prefetchedMangaIds,
       ].contains(true),
-      builder: (context, state) => MangaGridWidget(
-        onTapManga: (manga) => widget.onTapManga?.call(manga),
-        onLongPressManga: (manga) => _onTapMenu(
-          context: context,
-          manga: manga,
+      builder: (context, state) => GridWidget(
+        itemBuilder: (context, data) => MangaItemWidget(
+          manga: data,
+          cacheManager: widget.cacheManager,
+          onTap: () => widget.onTapManga?.call(data),
+          onLongPress: () => _onTapMenu(
+            context: context,
+            manga: data,
+            isOnLibrary: true,
+          ),
           isOnLibrary: true,
         ),
         error: state.error,
         isLoading: state.isLoading,
         hasNext: false,
-        mangas: state.mangas,
-        prefetchedMangaId: state.prefetchedMangaIds,
-        cacheManager: widget.cacheManager,
+        data: state.filteredMangas,
       ),
     );
   }

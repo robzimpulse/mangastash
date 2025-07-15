@@ -1,29 +1,23 @@
-import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 import 'base/next_page_notification_widget.dart';
 import 'base/shimmer_loading_widget.dart';
-import 'manga_item_widget.dart';
 
-class MangaGridWidget extends StatefulWidget {
-  const MangaGridWidget({
+class GridWidget<T> extends StatefulWidget {
+  const GridWidget({
     super.key,
+    required this.itemBuilder,
     this.pageStorageKey,
     this.onLoadNextPage,
     this.onRefresh,
-    this.onTapManga,
-    this.onLongPressManga,
     this.onTapRecrawl,
     this.absorber,
     this.error,
     this.isLoading = false,
     this.hasNext = false,
-    this.mangas = const [],
-    this.prefetchedMangaId = const {},
-    this.libraryMangaId = const {},
-    this.cacheManager,
+    this.data = const [],
   });
 
   final PageStorageKey<String>? pageStorageKey;
@@ -32,9 +26,11 @@ class MangaGridWidget extends StatefulWidget {
 
   final RefreshCallback? onRefresh;
 
-  final ValueSetter<Manga>? onTapManga;
+  final Widget Function(BuildContext context, T data) itemBuilder;
 
-  final ValueSetter<Manga>? onLongPressManga;
+  // final ValueSetter<Manga>? onTapManga;
+  //
+  // final ValueSetter<Manga>? onLongPressManga;
 
   final ValueSetter<String>? onTapRecrawl;
 
@@ -46,19 +42,19 @@ class MangaGridWidget extends StatefulWidget {
 
   final bool hasNext;
 
-  final List<Manga> mangas;
+  final List<T> data;
 
-  final Set<String> prefetchedMangaId;
-
-  final Set<String> libraryMangaId;
-
-  final BaseCacheManager? cacheManager;
+  // final Set<String> prefetchedMangaId;
+  //
+  // final Set<String> libraryMangaId;
+  //
+  // final BaseCacheManager? cacheManager;
 
   @override
-  State<MangaGridWidget> createState() => _MangaGridWidgetState();
+  State<GridWidget> createState() => _GridWidgetState();
 }
 
-class _MangaGridWidgetState extends State<MangaGridWidget> {
+class _GridWidgetState extends State<GridWidget> {
   final ValueNotifier<double> offset = ValueNotifier(0);
 
   @override
@@ -68,7 +64,7 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
   }
 
   @override
-  void didUpdateWidget(covariant MangaGridWidget oldWidget) {
+  void didUpdateWidget(covariant GridWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.absorber != widget.absorber) {
       offset.value = widget.absorber?.layoutExtent ?? 0;
@@ -143,7 +139,7 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
                     ),
                   ),
                 )
-              else if (widget.mangas.isEmpty)
+              else if (widget.data.isEmpty)
                 const SliverFillRemaining(
                   hasScrollBody: false,
                   child: Padding(
@@ -168,14 +164,8 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
                   crossAxisCount: 3,
                   childAspectRatio: 100 / 140,
                   children: [
-                    for (final manga in widget.mangas)
-                      MangaItemWidget(
-                        manga: manga,
-                        cacheManager: widget.cacheManager,
-                        onTap: () => widget.onTapManga?.call(manga),
-                        onLongPress: () => widget.onLongPressManga?.call(manga),
-                        isOnLibrary: widget.libraryMangaId.contains(manga.id),
-                      ),
+                    for (final data in widget.data)
+                      widget.itemBuilder.call(context, data),
                   ],
                 ),
                 if (widget.hasNext)

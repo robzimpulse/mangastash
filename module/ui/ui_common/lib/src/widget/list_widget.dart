@@ -48,7 +48,7 @@ class ListWidget<T> extends StatefulWidget {
 
   final List<T> data;
 
-  final Widget? Function(BuildContext context, T data) itemBuilder;
+  final Widget Function(BuildContext context, T data) itemBuilder;
 
   final int total;
 

@@ -341,24 +341,27 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         prev.parameter != curr.parameter,
         prev.prefetchedMangaIds != curr.prefetchedMangaIds,
         prev.hasNextPage != curr.hasNextPage,
+        prev.parameter != curr.parameter,
       ].contains(true),
-      builder: (context, state) => MangaGridWidget(
+      builder: (context, state) => GridWidget(
+        itemBuilder: (context, data) => MangaItemWidget(
+          manga: data,
+          cacheManager: widget.cacheManager,
+          onTap: () => widget.onTapManga?.call(data, state.parameter),
+          onLongPress: () => _onTapMenu(
+            context: context,
+            manga: data,
+            isOnLibrary: state.libraryMangaIds.contains(data.id),
+          ),
+          isOnLibrary: state.libraryMangaIds.contains(data.id),
+        ),
         onLoadNextPage: () => _cubit(context).next(),
         onRefresh: () => _cubit(context).init(useCache: false),
-        onTapManga: (manga) => widget.onTapManga?.call(manga, state.parameter),
-        onLongPressManga: (manga) => _onTapMenu(
-          context: context,
-          manga: manga,
-          isOnLibrary: state.libraryMangaIds.contains(manga.id),
-        ),
         onTapRecrawl: (url) => _cubit(context).recrawl(url: url),
         error: state.error,
         isLoading: state.isLoading,
         hasNext: state.hasNextPage,
-        mangas: state.mangas,
-        prefetchedMangaId: state.prefetchedMangaIds,
-        libraryMangaId: state.libraryMangaIds,
-        cacheManager: widget.cacheManager,
+        data: state.mangas,
       ),
     );
   }

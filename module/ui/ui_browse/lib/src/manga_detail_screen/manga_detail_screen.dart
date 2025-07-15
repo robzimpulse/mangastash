@@ -101,21 +101,27 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   //   return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   // }
 
-  void _onTapDownload(BuildContext context, DownloadOption option) async {
+  void _onTapDownload({
+    required BuildContext context,
+    required DownloadOption option,
+  }) async {
     return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
 
-  void _onTapFilter(BuildContext context, ChapterConfig config) async {
+  void _onTapFilter({
+    required BuildContext context,
+    required ChapterConfig config,
+  }) async {
     final result = await widget.onTapSort?.call(config);
     if (!context.mounted || result == null) return;
     _cubit(context).initChapter(config: result);
   }
 
-  void _onLongPressManga(
-    BuildContext context,
-    Manga manga,
-    bool isOnLibrary,
-  ) async {
+  void _onLongPressManga({
+    required BuildContext context,
+    required Manga manga,
+    required bool isOnLibrary,
+  }) async {
     final result = await widget.onMangaMenu?.call(manga, isOnLibrary);
     if (!context.mounted || result == null) return;
     switch (result) {
@@ -123,14 +129,14 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       // TODO: download
       // _cubit(context).download(manga: manga);
       case MangaMenu.library:
-        _onTapAddToLibrary(context, manga);
+        _onTapAddToLibrary(context: context, manga: manga);
       case MangaMenu.prefetch:
       // TODO: prefetch
       // _cubit(context).prefetch(manga: manga);
     }
   }
 
-  void _onTapAddToLibrary(BuildContext context, Manga? manga) {
+  void _onTapAddToLibrary({required BuildContext context, Manga? manga}) {
     if (manga == null) return;
     _cubit(context).addToLibrary(manga: manga);
   }
@@ -453,8 +459,14 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             onLoadNextPage: () => _cubit(context).nextChapter(),
             onRefresh: () => _cubit(context).initChapter(useCache: false),
             onTapRecrawl: (url) => _cubit(context).recrawl(url: url),
-            onTapDownload: (option) => _onTapDownload(context, option),
-            onTapFilter: () => _onTapFilter(context, state.config),
+            onTapDownload: (option) => _onTapDownload(
+              context: context,
+              option: option,
+            ),
+            onTapFilter: () => _onTapFilter(
+              context: context,
+              config: state.config,
+            ),
             onTapPrefetch: () => _cubit(context).prefetch(),
             error: state.errorChapters,
             isLoading: state.isLoadingChapters || state.isLoadingManga,
@@ -486,27 +498,29 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             prev.prefetchedMangaId != curr.prefetchedMangaId,
             prev.libraryMangaId != curr.libraryMangaId,
           ].contains(true),
-          builder: (context, state) => MangaGridWidget(
+          builder: (context, state) => GridWidget(
+            itemBuilder: (context, data) => MangaItemWidget(
+              manga: data,
+              cacheManager: widget.cacheManager,
+              onTap: () => widget.onTapManga?.call(data),
+              onLongPress: () => _onLongPressManga(
+                context: context,
+                manga: data,
+                isOnLibrary: state.libraryMangaId.contains(data.id),
+              ),
+              isOnLibrary: state.libraryMangaId.contains(data.id),
+            ),
             pageStorageKey: PageStorageKey('similar-manga-${state.mangaId}'),
             absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
             onRefresh: () => _cubit(context).initSimilarManga(useCache: false),
             onLoadNextPage: () => _cubit(context).nextSimilarManga(
               useCache: false,
             ),
-            onTapManga: (manga) => widget.onTapManga?.call(manga),
-            onLongPressManga: (manga) => _onLongPressManga(
-              context,
-              manga,
-              state.libraryMangaId.contains(manga.id),
-            ),
             onTapRecrawl: (url) => _cubit(context).recrawl(url: url),
             error: state.errorSimilarManga,
             isLoading: state.isLoadingSimilarManga || state.isLoadingManga,
             hasNext: state.hasNextPageSimilarManga,
-            mangas: state.similarManga,
-            prefetchedMangaId: state.prefetchedMangaId,
-            cacheManager: widget.cacheManager,
-            libraryMangaId: state.libraryMangaId,
+            data: state.similarManga,
           ),
         ),
       ],
