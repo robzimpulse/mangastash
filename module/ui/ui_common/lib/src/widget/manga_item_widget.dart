@@ -29,7 +29,7 @@ class MangaItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final sourceIconUrl =
-        manga.source?.let((e) => SourceEnum.fromValue(name: e))?.url;
+        manga.source?.let((e) => SourceEnum.fromValue(name: e))?.icon;
 
     return Material(
       color: theme.scaffoldBackgroundColor,
