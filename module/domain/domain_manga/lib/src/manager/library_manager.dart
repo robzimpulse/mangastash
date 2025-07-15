@@ -18,8 +18,13 @@ class LibraryManager
   }
 
   @override
-  ValueStream<List<Manga>> get libraryStateStream => _stateSubject.stream;
+  Stream<List<Manga>> get libraryStateStream => _stateSubject.stream;
 
   @override
-  List<Manga> get libraryState => libraryStateStream.valueOrNull ?? [];
+  Stream<Set<String>> get libraryMangaIds {
+    return _stateSubject.map((data) => {...data.map((e) => e.id).nonNulls});
+  }
+
+  @override
+  List<Manga> get libraryState => _stateSubject.valueOrNull ?? [];
 }

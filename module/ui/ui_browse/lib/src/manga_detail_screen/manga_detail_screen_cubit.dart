@@ -54,7 +54,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
           ),
         ) {
     addSubscription(
-      listenMangaFromLibraryUseCase.libraryStateStream
+      listenMangaFromLibraryUseCase.libraryMangaIds
           .distinct()
           .listen(_updateMangaLibrary),
     );
@@ -75,10 +75,8 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     );
   }
 
-  void _updateMangaLibrary(List<Manga> library) {
-    emit(
-      state.copyWith(libraryMangaId: {...library.map((e) => e.id).nonNulls}),
-    );
+  void _updateMangaLibrary(Set<String> libraryMangaId) {
+    emit(state.copyWith(libraryMangaId: libraryMangaId));
   }
 
   void _updatePrefetchChapterId(Set<String> prefetchedChapterId) {
