@@ -1,6 +1,11 @@
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:ui_common/ui_common.dart';
+import 'package:flutter/material.dart';
+import 'package:sliver_tools/sliver_tools.dart';
+
+import 'base/next_page_notification_widget.dart';
+import 'base/shimmer_loading_widget.dart';
+import 'manga_item_widget.dart';
 
 class MangaGridWidget extends StatefulWidget {
   const MangaGridWidget({
