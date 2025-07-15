@@ -111,6 +111,7 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
                       builder: (context, constraint) => ConstrainedBox(
                         constraints: constraint,
                         child: ShimmerLoading.box(
+                          radius: 0,
                           isLoading: true,
                           width: double.infinity,
                           height: double.infinity,
