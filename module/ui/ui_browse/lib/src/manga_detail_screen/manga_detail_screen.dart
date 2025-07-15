@@ -60,6 +60,7 @@ class MangaDetailScreen extends StatefulWidget {
         listenSearchParameterUseCase: locator(),
         getAllChapterUseCase: locator(),
         searchMangaUseCase: locator(),
+        cacheManager: locator(),
       )..init(),
       child: MangaDetailScreen(
         cacheManager: locator(),

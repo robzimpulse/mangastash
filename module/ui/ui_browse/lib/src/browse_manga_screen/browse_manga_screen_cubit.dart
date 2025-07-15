@@ -1,5 +1,6 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -15,6 +16,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final GetTagsUseCase _getTagsUseCase;
   final CrawlUrlUseCase _crawlUrlUseCase;
+  final BaseCacheManager _cacheManager;
 
   BrowseMangaScreenCubit({
     required BrowseMangaScreenState initialState,
@@ -28,6 +30,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required GetTagsUseCase getTagsUseCase,
     required CrawlUrlUseCase crawlUrlUseCase,
+    required BaseCacheManager cacheManager,
   })  : _searchMangaUseCase = searchMangaUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
@@ -35,6 +38,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
         _prefetchChapterUseCase = prefetchChapterUseCase,
         _getTagsUseCase = getTagsUseCase,
         _crawlUrlUseCase = crawlUrlUseCase,
+        _cacheManager = cacheManager,
         super(
           initialState.copyWith(
             parameter:
@@ -76,6 +80,11 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
         ),
       ),
     );
+
+    if (!useCache) {
+      await Future.wait(state.cacheKeys.map(_cacheManager.removeFile));
+      emit(state.copyWith(cacheKeys: []));
+    }
 
     await Future.wait([
       _fetchManga(useCache: useCache),
@@ -127,6 +136,17 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
       emit(
         state.copyWith(
+          cacheKeys: [
+            ...state.cacheKeys,
+            '$source-${state.parameter.toJsonString()}',
+            ...[
+              switch (source) {
+                SourceEnum.mangadex => null,
+                SourceEnum.mangaclash => state.parameter.mangaclash,
+                SourceEnum.asurascan => state.parameter.asurascan,
+              },
+            ].nonNulls,
+          ],
           mangas: allMangas,
           hasNextPage: hasNextPage ?? allMangas.length < total,
           parameter: state.parameter.copyWith(

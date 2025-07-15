@@ -20,6 +20,7 @@ class MangaDetailScreenState extends Equatable {
   final bool isPagingNextPageChapter;
   final ChapterConfig config;
   final SearchChapterParameter chapterParameter;
+  final List<String> cacheKeysChapter;
 
   final bool isLoadingSimilarManga;
   final Exception? errorSimilarManga;
@@ -28,6 +29,7 @@ class MangaDetailScreenState extends Equatable {
   final List<Manga> similarManga;
   final String? sourceUrlSimilarManga;
   final SearchMangaParameter? similarMangaParameter;
+  final List<String> cacheKeysSimilarManga;
 
   final Set<String> libraryMangaId;
   final Set<String> prefetchedChapterId;
@@ -83,6 +85,8 @@ class MangaDetailScreenState extends Equatable {
     this.similarManga = const [],
     this.sourceUrlSimilarManga,
     this.similarMangaParameter,
+    this.cacheKeysChapter = const [],
+    this.cacheKeysSimilarManga = const [],
   });
 
   @override
@@ -112,6 +116,8 @@ class MangaDetailScreenState extends Equatable {
         similarManga,
         sourceUrlSimilarManga,
         similarMangaParameter,
+        cacheKeysChapter,
+        cacheKeysSimilarManga,
       ];
 
   MangaDetailScreenState copyWith({
@@ -141,6 +147,8 @@ class MangaDetailScreenState extends Equatable {
     List<Manga>? similarManga,
     ValueGetter<String?>? sourceUrlSimilarManga,
     SearchMangaParameter? similarMangaParameter,
+    List<String>? cacheKeysChapter,
+    List<String>? cacheKeysSimilarManga,
   }) {
     return MangaDetailScreenState(
       config: config ?? this.config,
@@ -179,6 +187,9 @@ class MangaDetailScreenState extends Equatable {
       sourceUrlSimilarManga: sourceUrlSimilarManga != null
           ? sourceUrlSimilarManga()
           : this.sourceUrlSimilarManga,
+      cacheKeysChapter: cacheKeysChapter ?? this.cacheKeysChapter,
+      cacheKeysSimilarManga:
+          cacheKeysSimilarManga ?? this.cacheKeysSimilarManga,
     );
   }
 }

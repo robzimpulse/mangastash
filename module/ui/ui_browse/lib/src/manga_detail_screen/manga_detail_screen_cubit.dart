@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -18,6 +19,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final GetAllChapterUseCase _getAllChapterUseCase;
   final SearchMangaUseCase _searchMangaUseCase;
+  final BaseCacheManager _cacheManager;
   final UpdateChapterLastReadAtUseCase _updateChapterLastReadAtUseCase;
 
   MangaDetailScreenCubit({
@@ -35,6 +37,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required UpdateChapterLastReadAtUseCase updateChapterLastReadAtUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required GetAllChapterUseCase getAllChapterUseCase,
+    required BaseCacheManager cacheManager,
   })  : _getMangaUseCase = getMangaUseCase,
         _searchMangaUseCase = searchMangaUseCase,
         _searchChapterUseCase = searchChapterUseCase,
@@ -44,6 +47,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
         _prefetchChapterUseCase = prefetchChapterUseCase,
         _updateChapterLastReadAtUseCase = updateChapterLastReadAtUseCase,
         _getAllChapterUseCase = getAllChapterUseCase,
+        _cacheManager = cacheManager,
         super(
           initialState.copyWith(
             chapterParameter: listenSearchParameterUseCase
@@ -129,6 +133,11 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       ChapterSortOrderEnum.desc => OrderDirections.descending,
     };
 
+    if (!useCache) {
+      await Future.wait(state.cacheKeysChapter.map(_cacheManager.removeFile));
+      emit(state.copyWith(cacheKeysChapter: []));
+    }
+
     emit(
       state.copyWith(
         chapterParameter: state.chapterParameter.copyWith(
@@ -148,6 +157,12 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   }
 
   Future<void> initSimilarManga({bool useCache = true}) async {
+    if (!useCache) {
+      await Future.wait(
+        state.cacheKeysSimilarManga.map(_cacheManager.removeFile),
+      );
+      emit(state.copyWith(cacheKeysSimilarManga: []));
+    }
     emit(
       state.copyWith(
         isLoadingSimilarManga: true,
@@ -211,6 +226,18 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
       emit(
         state.copyWith(
+          cacheKeysSimilarManga: [
+            ...state.cacheKeysSimilarManga,
+            '$source-${state.similarMangaParameter?.toJsonString()}',
+            ...[
+              switch (source) {
+                SourceEnum.mangadex => null,
+                SourceEnum.mangaclash =>
+                  state.similarMangaParameter?.mangaclash,
+                SourceEnum.asurascan => state.similarMangaParameter?.asurascan,
+              },
+            ].nonNulls,
+          ],
           similarManga: [
             ...allMangas,
           ]..removeWhere((e) => e.id == state.mangaId),
@@ -252,6 +279,18 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
       emit(
         state.copyWith(
+          cacheKeysChapter: [
+            ...state.cacheKeysChapter,
+            '$source-$id-${state.similarMangaParameter?.toJsonString()}',
+            ...[
+              switch (source) {
+                SourceEnum.mangadex => null,
+                SourceEnum.mangaclash =>
+                  state.similarMangaParameter?.mangaclash,
+                SourceEnum.asurascan => state.similarMangaParameter?.asurascan,
+              },
+            ].nonNulls,
+          ],
           chapters: [...state.chapters, ...chapters].distinct(),
           hasNextPageChapter: hasNextPage,
           chapterParameter: state.chapterParameter.copyWith(

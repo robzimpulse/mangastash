@@ -51,6 +51,7 @@ class BrowseMangaScreen extends StatefulWidget {
         listenSearchParameterUseCase: locator(),
         getTagsUseCase: locator(),
         crawlUrlUseCase: locator(),
+        cacheManager: locator(),
       )..init(),
       child: BrowseMangaScreen(
         cacheManager: locator(),
@@ -343,7 +344,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         prev.hasNextPage != curr.hasNextPage,
         prev.parameter != curr.parameter,
       ].contains(true),
-      builder: (context, state) => GridWidget(
+      builder: (context, state) => GridWidget<Manga>(
         itemBuilder: (context, data) => MangaItemWidget(
           manga: data,
           cacheManager: widget.cacheManager,
