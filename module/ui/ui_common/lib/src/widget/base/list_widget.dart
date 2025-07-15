@@ -53,10 +53,10 @@ class ListWidget<T> extends StatefulWidget {
   final int total;
 
   @override
-  State<ListWidget> createState() => _ListWidgetState();
+  State<ListWidget<T>> createState() => _ListWidgetState<T>();
 }
 
-class _ListWidgetState extends State<ListWidget> {
+class _ListWidgetState<T> extends State<ListWidget<T>> {
   final ValueNotifier<double> offset = ValueNotifier(0);
 
   @override
@@ -66,7 +66,7 @@ class _ListWidgetState extends State<ListWidget> {
   }
 
   @override
-  void didUpdateWidget(covariant ListWidget oldWidget) {
+  void didUpdateWidget(covariant ListWidget<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.absorber != widget.absorber) {
       offset.value = widget.absorber?.layoutExtent ?? 0;

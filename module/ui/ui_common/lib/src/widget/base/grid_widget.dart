@@ -28,10 +28,6 @@ class GridWidget<T> extends StatefulWidget {
 
   final Widget Function(BuildContext context, T data) itemBuilder;
 
-  // final ValueSetter<Manga>? onTapManga;
-  //
-  // final ValueSetter<Manga>? onLongPressManga;
-
   final ValueSetter<String>? onTapRecrawl;
 
   final SliverOverlapAbsorberHandle? absorber;
@@ -44,17 +40,11 @@ class GridWidget<T> extends StatefulWidget {
 
   final List<T> data;
 
-  // final Set<String> prefetchedMangaId;
-  //
-  // final Set<String> libraryMangaId;
-  //
-  // final BaseCacheManager? cacheManager;
-
   @override
-  State<GridWidget> createState() => _GridWidgetState();
+  State<GridWidget<T>> createState() => _GridWidgetState<T>();
 }
 
-class _GridWidgetState extends State<GridWidget> {
+class _GridWidgetState<T> extends State<GridWidget<T>> {
   final ValueNotifier<double> offset = ValueNotifier(0);
 
   @override
@@ -64,7 +54,7 @@ class _GridWidgetState extends State<GridWidget> {
   }
 
   @override
-  void didUpdateWidget(covariant GridWidget oldWidget) {
+  void didUpdateWidget(covariant GridWidget<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.absorber != widget.absorber) {
       offset.value = widget.absorber?.layoutExtent ?? 0;
