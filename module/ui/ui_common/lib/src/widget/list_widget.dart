@@ -1,15 +1,14 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 import 'base/next_page_notification_widget.dart';
 import 'base/shimmer_loading_widget.dart';
-import 'chapter_tile_widget.dart';
 
-class ChapterListWidget extends StatefulWidget {
-  const ChapterListWidget({
+class ListWidget<T> extends StatefulWidget {
+  const ListWidget({
     super.key,
+    required this.itemBuilder,
     this.pageStorageKey,
     this.onLoadNextPage,
     this.onRefresh,
@@ -17,10 +16,8 @@ class ChapterListWidget extends StatefulWidget {
     this.error,
     this.isLoading = true,
     this.hasNext = false,
-    this.chapters = const [],
+    this.data = const [],
     this.onTapRecrawl,
-    this.prefetchedChapterId = const {},
-    this.onTapChapter,
     this.total = 0,
     this.onTapDownload,
     this.onTapFilter,
@@ -41,8 +38,6 @@ class ChapterListWidget extends StatefulWidget {
 
   final ValueSetter<String>? onTapRecrawl;
 
-  final ValueSetter<Chapter>? onTapChapter;
-
   final SliverOverlapAbsorberHandle? absorber;
 
   final Exception? error;
@@ -51,17 +46,17 @@ class ChapterListWidget extends StatefulWidget {
 
   final bool hasNext;
 
-  final List<Chapter> chapters;
+  final List<T> data;
 
-  final Set<String> prefetchedChapterId;
+  final Widget? Function(BuildContext context, T data) itemBuilder;
 
   final int total;
 
   @override
-  State<ChapterListWidget> createState() => _ChapterListWidgetState();
+  State<ListWidget> createState() => _ListWidgetState();
 }
 
-class _ChapterListWidgetState extends State<ChapterListWidget> {
+class _ListWidgetState extends State<ListWidget> {
   final ValueNotifier<double> offset = ValueNotifier(0);
 
   @override
@@ -71,7 +66,7 @@ class _ChapterListWidgetState extends State<ChapterListWidget> {
   }
 
   @override
-  void didUpdateWidget(covariant ChapterListWidget oldWidget) {
+  void didUpdateWidget(covariant ListWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.absorber != widget.absorber) {
       offset.value = widget.absorber?.layoutExtent ?? 0;
@@ -202,7 +197,7 @@ class _ChapterListWidgetState extends State<ChapterListWidget> {
                     ),
                   ),
                 ),
-              ] else if (widget.chapters.isEmpty) ...[
+              ] else if (widget.data.isEmpty) ...[
                 const SliverFillRemaining(
                   hasScrollBody: false,
                   child: Padding(
@@ -220,28 +215,14 @@ class _ChapterListWidgetState extends State<ChapterListWidget> {
               ] else ...[
                 SliverList.separated(
                   itemBuilder: (context, index) {
-                    final chapter = widget.chapters.elementAtOrNull(index);
-                    if (chapter == null) return null;
-                    return ChapterTileWidget(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      onTap: () => widget.onTapChapter?.call(chapter),
-                      opacity: chapter.lastReadAt != null ? 0.5 : 1,
-                      title: [
-                        'Chapter ${chapter.chapter}',
-                        chapter.title,
-                      ].nonNulls.join(' - '),
-                      language: Language.fromCode(chapter.translatedLanguage),
-                      uploadedAt: chapter.readableAt,
-                      groups: chapter.scanlationGroup,
-                      isPrefetching:
-                          widget.prefetchedChapterId.contains(chapter.id),
-                      lastReadAt: chapter.lastReadAt,
-                    );
+                    final item = widget.data.elementAtOrNull(index);
+                    if (item == null) return null;
+                    return widget.itemBuilder.call(context, item);
                   },
                   separatorBuilder: (context, index) => const Divider(
                     height: 1,
                   ),
-                  itemCount: widget.chapters.length,
+                  itemCount: widget.data.length,
                 ),
                 if (widget.hasNext)
                   const SliverToBoxAdapter(
