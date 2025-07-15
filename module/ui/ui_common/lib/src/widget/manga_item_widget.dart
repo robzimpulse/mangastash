@@ -12,12 +12,14 @@ class MangaItemWidget extends StatelessWidget {
     this.padding = const EdgeInsets.all(0),
     this.onTap,
     this.isOnLibrary = false,
+    this.isPrefetching = false,
     this.onLongPress,
     this.cacheManager,
   });
 
   final Manga manga;
   final bool isOnLibrary;
+  final bool isPrefetching;
   final BaseCacheManager? cacheManager;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
@@ -26,6 +28,8 @@ class MangaItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final sourceIconUrl =
+        manga.source?.let((e) => SourceEnum.fromValue(name: e))?.url;
 
     return Material(
       color: theme.scaffoldBackgroundColor,
@@ -95,6 +99,44 @@ class MangaItemWidget extends StatelessWidget {
                   ),
                 ),
               ),
+              if (sourceIconUrl != null)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    color: isOnLibrary
+                        ? Colors.transparent
+                        : Colors.black.withValues(alpha: 0.5),
+                    child: Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: CachedNetworkImageWidget(
+                        cacheManager: cacheManager,
+                        imageUrl: sourceIconUrl,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, _) => const Center(
+                          child: Icon(Icons.error),
+                        ),
+                        progressBuilder: (context, progress) => Center(
+                          child: CircularProgressIndicator(
+                            value: progress,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              if (isPrefetching)
+                const Positioned.fill(
+                  child: Center(
+                    child: SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

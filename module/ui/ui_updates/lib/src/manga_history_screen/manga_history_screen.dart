@@ -50,18 +50,12 @@ class MangaHistoryScreen extends StatelessWidget {
   }
 
   Widget _manga({required BuildContext context, required Manga manga}) {
-    return const MangaTileWidget();
-    // return MangaShelfItem(
-    //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    //   title: manga.title ?? '',
-    //   coverUrl: manga.coverUrl ?? '',
-    //   sourceIconUrl: manga.source?.let(
-    //     (e) => SourceEnum.fromValue(name: e)?.icon,
-    //   ),
-    //   layout: MangaShelfItemLayout.list,
-    //   cacheManager: cacheManager,
-    //   onTap: () => onTapManga?.call(manga),
-    // );
+    return MangaTileWidget(
+      padding: const EdgeInsets.all(8),
+      manga: manga,
+      onTap: () => onTapManga?.call(manga),
+      cacheManager: cacheManager,
+    );
   }
 
   Widget _chapter({
