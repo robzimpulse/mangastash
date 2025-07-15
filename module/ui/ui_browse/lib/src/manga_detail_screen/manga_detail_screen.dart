@@ -244,11 +244,13 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                         ),
                       ),
                     )
-                  : const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(),
-                    ),
+                  : const Center(
+                    child: SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(),
+                      ),
+                  ),
             ),
             Positioned.fill(
               child: Opacity(
