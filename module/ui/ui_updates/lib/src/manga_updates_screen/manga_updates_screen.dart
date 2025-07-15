@@ -51,17 +51,18 @@ class MangaUpdatesScreen extends StatelessWidget {
   }
 
   Widget _manga({required BuildContext context, required Manga manga}) {
-    return MangaShelfItem(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      title: manga.title ?? '',
-      coverUrl: manga.coverUrl ?? '',
-      sourceIconUrl: manga.source?.let(
-        (e) => SourceEnum.fromValue(name: e)?.icon,
-      ),
-      layout: MangaShelfItemLayout.list,
-      cacheManager: cacheManager,
-      onTap: () => onTapManga?.call(manga),
-    );
+    return const MangaTileWidget();
+    // return MangaShelfItem(
+    //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    //   title: manga.title ?? '',
+    //   coverUrl: manga.coverUrl ?? '',
+    //   sourceIconUrl: manga.source?.let(
+    //     (e) => SourceEnum.fromValue(name: e)?.icon,
+    //   ),
+    //   layout: MangaShelfItemLayout.list,
+    //   cacheManager: cacheManager,
+    //   onTap: () => onTapManga?.call(manga),
+    // );
   }
 
   Widget _chapter({

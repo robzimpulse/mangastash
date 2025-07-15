@@ -15,8 +15,6 @@ class LibraryMangaScreenState extends Equatable {
 
   final List<SourceEnum> sources;
 
-  final MangaShelfItemLayout layout;
-
   final Set<String> prefetchedMangaIds;
 
   List<Manga> get filteredMangas {
@@ -37,7 +35,6 @@ class LibraryMangaScreenState extends Equatable {
     this.prefetchedMangaIds = const {},
     this.isSearchActive = false,
     this.mangaTitle,
-    this.layout = MangaShelfItemLayout.compactGrid,
   });
 
   @override
@@ -49,7 +46,6 @@ class LibraryMangaScreenState extends Equatable {
       isSearchActive,
       mangaTitle,
       sources,
-      layout,
       prefetchedMangaIds,
     ];
   }
@@ -62,7 +58,6 @@ class LibraryMangaScreenState extends Equatable {
     List<SourceEnum>? sources,
     bool? isSearchActive,
     String? mangaTitle,
-    MangaShelfItemLayout? layout,
   }) {
     return LibraryMangaScreenState(
       isLoading: isLoading ?? this.isLoading,
@@ -71,7 +66,6 @@ class LibraryMangaScreenState extends Equatable {
       error: error != null ? error() : this.error,
       isSearchActive: isSearchActive ?? this.isSearchActive,
       mangaTitle: mangaTitle ?? this.mangaTitle,
-      layout: layout ?? this.layout,
       prefetchedMangaIds: prefetchedMangaIds ?? this.prefetchedMangaIds,
     );
   }

@@ -3,7 +3,6 @@ import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
-import 'package:ui_common/ui_common.dart';
 
 import 'browse_manga_screen_state.dart';
 
@@ -156,16 +155,8 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     emit(state.copyWith(isPagingNextPage: false));
   }
 
-  void update({
-    MangaShelfItemLayout? layout,
-    bool? isSearchActive,
-  }) {
-    emit(
-      state.copyWith(
-        layout: layout,
-        isSearchActive: isSearchActive,
-      ),
-    );
+  void update({bool? isSearchActive}) {
+    emit(state.copyWith(isSearchActive: isSearchActive));
   }
 
   Future<void> addToLibrary({required Manga manga}) async {
@@ -191,15 +182,15 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     // TODO: add download manga
   }
 
-  void recrawl() async {
-    final parameter = state.parameter.copyWith(page: 1);
-    final source = state.source;
-    final url = source == SourceEnum.mangaclash
-        ? parameter.mangaclash
-        : source == SourceEnum.asurascan
-            ? parameter.asurascan
-            : null;
-    if (url == null) return;
+  void recrawl({required String url}) async {
+    // final parameter = state.parameter.copyWith(page: 1);
+    // final source = state.source;
+    // final url = source == SourceEnum.mangaclash
+    //     ? parameter.mangaclash
+    //     : source == SourceEnum.asurascan
+    //         ? parameter.asurascan
+    //         : null;
+    // if (url == null) return;
     await _crawlUrlUseCase.execute(url: url);
     await init(parameter: state.parameter);
   }

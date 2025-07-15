@@ -3,7 +3,6 @@ import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
-import 'package:ui_common/ui_common.dart';
 
 import 'library_manga_screen_state.dart';
 
@@ -87,17 +86,9 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     }
   }
 
-  void update({
-    MangaShelfItemLayout? layout,
-    bool? isSearchActive,
-    String? mangaTitle,
-  }) {
+  void update({bool? isSearchActive, String? mangaTitle}) {
     emit(
-      state.copyWith(
-        layout: layout,
-        isSearchActive: isSearchActive,
-        mangaTitle: mangaTitle,
-      ),
+      state.copyWith(isSearchActive: isSearchActive, mangaTitle: mangaTitle),
     );
   }
 }

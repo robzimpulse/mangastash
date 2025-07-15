@@ -10,8 +10,6 @@ class BrowseMangaScreenState extends Equatable {
 
   final List<Manga> mangas;
 
-  final MangaShelfItemLayout layout;
-
   final SourceEnum? source;
 
   final bool hasNextPage;
@@ -62,7 +60,6 @@ class BrowseMangaScreenState extends Equatable {
     this.isPagingNextPage = false,
     this.isSearchActive = false,
     this.error,
-    this.layout = MangaShelfItemLayout.compactGrid,
     this.source,
     this.mangas = const [],
     this.libraryMangaIds = const {},
@@ -78,7 +75,6 @@ class BrowseMangaScreenState extends Equatable {
       hasNextPage,
       isPagingNextPage,
       error,
-      layout,
       source,
       mangas,
       parameter,
@@ -95,7 +91,6 @@ class BrowseMangaScreenState extends Equatable {
     bool? isPagingNextPage,
     bool? isSearchActive,
     ValueGetter<Exception?>? error,
-    MangaShelfItemLayout? layout,
     SourceEnum? source,
     List<Manga>? mangas,
     Set<String>? libraryMangaIds,
@@ -111,7 +106,6 @@ class BrowseMangaScreenState extends Equatable {
       mangas: mangas ?? this.mangas,
       libraryMangaIds: libraryMangaIds ?? this.libraryMangaIds,
       error: error != null ? error() : this.error,
-      layout: layout ?? this.layout,
       source: source ?? this.source,
       parameter: parameter ?? this.parameter,
       prefetchedMangaIds: prefetchedMangaIds ?? this.prefetchedMangaIds,

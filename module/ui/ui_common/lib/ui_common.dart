@@ -36,7 +36,5 @@ export 'src/widget/chapter_tile_widget.dart';
 export 'src/widget/manga_grid_widget.dart';
 export 'src/widget/manga_item_widget.dart';
 export 'src/widget/manga_parameter_widget.dart';
-export 'src/widget/manga_shelf_widget/manga_shelf_item.dart';
-export 'src/widget/manga_shelf_widget/manga_shelf_item_layout.dart';
-export 'src/widget/manga_shelf_widget/manga_shelf_widget.dart';
+export 'src/widget/manga_tile_widget.dart';
 export 'src/widget/source_tile_widget.dart';

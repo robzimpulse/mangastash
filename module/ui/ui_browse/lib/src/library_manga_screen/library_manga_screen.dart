@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -102,7 +101,6 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
           _layoutSearch(context: context),
           _layoutAdd(context: context),
           _layoutRefresh(context: context),
-          _layoutIcon(context: context),
         ],
       ),
       body: _content(context),
@@ -131,17 +129,6 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
       case MangaMenu.prefetch:
         _cubit(context).prefetch(mangas: [manga]);
     }
-  }
-
-  ResponsiveBreakpointsData _breakpoints(BuildContext context) {
-    return ResponsiveBreakpoints.of(context);
-  }
-
-  int _crossAxisCount(BuildContext context) {
-    if (_breakpoints(context).isMobile) return 3;
-    if (_breakpoints(context).isTablet) return 5;
-    if (_breakpoints(context).isDesktop) return 8;
-    return 12;
   }
 
   Widget _title({required BuildContext context}) {
@@ -216,124 +203,27 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
     );
   }
 
-  Widget _layoutIcon({required BuildContext context}) {
-    return PopupMenuButton<MangaShelfItemLayout>(
-      icon: _builder(
-        buildWhen: (prev, curr) => prev.layout != curr.layout,
-        builder: (context, state) {
-          switch (state.layout) {
-            case MangaShelfItemLayout.comfortableGrid:
-              return const Icon(Icons.grid_view_sharp);
-            case MangaShelfItemLayout.compactGrid:
-              return const Icon(Icons.grid_on);
-            case MangaShelfItemLayout.list:
-              return const Icon(Icons.list);
-          }
-        },
-      ),
-      itemBuilder: (context) {
-        final options = MangaShelfItemLayout.values.map(
-          (e) => PopupMenuItem<MangaShelfItemLayout>(
-            value: e,
-            child: Text(e.rawValue),
-          ),
-        );
-
-        return options.toList();
-      },
-      onSelected: (value) => _cubit(context).update(layout: value),
-    );
-  }
-
   Widget _content(BuildContext context) {
     return _builder(
       buildWhen: (prev, curr) => [
         prev.filteredMangas != curr.filteredMangas,
         prev.sources != curr.sources,
-        prev.layout != curr.layout,
         prev.prefetchedMangaIds != curr.prefetchedMangaIds,
       ].contains(true),
-      builder: (context, state) {
-        if (state.isLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-
-        if (state.error != null) {
-          return Center(
-            child: Text(
-              state.error.toString(),
-              textAlign: TextAlign.center,
-            ),
-          );
-        }
-
-        if (state.filteredMangas.isEmpty) {
-          return const Center(
-            child: Text('Manga Empty'),
-          );
-        }
-
-        final children = state.filteredMangas.map(
-          (e) => MangaShelfItem(
-            cacheManager: widget.cacheManager,
-            title: e.title ?? '',
-            coverUrl: e.coverUrl ?? '',
-            sourceIconUrl:
-                state.sources.firstWhereOrNull((f) => f.name == e.source)?.icon,
-            isPrefetching: state.prefetchedMangaIds.contains(e.id),
-            layout: state.layout,
-            onTap: () => widget.onTapManga?.call(e),
-            onLongPress: () => _onTapMenu(
-              context: context,
-              manga: e,
-              isOnLibrary: true,
-            ),
-          ),
-        );
-
-        const indicator = Padding(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
-
-        switch (state.layout) {
-          case MangaShelfItemLayout.comfortableGrid:
-            return MangaShelfWidget.comfortableGrid(
-              controller: _scrollController,
-              hasNextPage: false,
-              loadingIndicator: indicator,
-              crossAxisCount: _crossAxisCount(context),
-              childAspectRatio: (100 / 140),
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              children: children.toList(),
-            );
-          case MangaShelfItemLayout.compactGrid:
-            return MangaShelfWidget.compactGrid(
-              controller: _scrollController,
-              hasNextPage: false,
-              loadingIndicator: indicator,
-              crossAxisCount: _crossAxisCount(context),
-              childAspectRatio: (100 / 140),
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              children: children.toList(),
-            );
-          case MangaShelfItemLayout.list:
-            return MangaShelfWidget.list(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              controller: _scrollController,
-              hasNextPage: false,
-              loadingIndicator: indicator,
-              separator: const Divider(height: 1, thickness: 1),
-              children: children.toList(),
-            );
-        }
-      },
+      builder: (context, state) => MangaGridWidget(
+        onTapManga: (manga) => widget.onTapManga?.call(manga),
+        onLongPressManga: (manga) => _onTapMenu(
+          context: context,
+          manga: manga,
+          isOnLibrary: true,
+        ),
+        error: state.error,
+        isLoading: state.isLoading,
+        hasNext: false,
+        mangas: state.mangas,
+        prefetchedMangaId: state.prefetchedMangaIds,
+        cacheManager: widget.cacheManager,
+      ),
     );
   }
 }
