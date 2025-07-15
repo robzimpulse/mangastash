@@ -19,13 +19,14 @@ class DetailScreen extends StatelessWidget {
         length: 3,
         child: Scaffold(
           appBar: _appBar(context),
-          body: TabBarView(
-            physics: const NeverScrollableScrollPhysics(),
-            children: [
-              _overviewWidget(),
-              _messageWidget(),
-              _stackTraceWidget(),
-            ],
+          body: SafeArea(
+            child: TabBarView(
+              children: [
+                _overviewWidget(),
+                _messageWidget(),
+                _stackTraceWidget(),
+              ],
+            ),
           ),
         ),
       ),

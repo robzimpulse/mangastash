@@ -29,14 +29,15 @@ class DetailScreen extends StatelessWidget {
             child: const Icon(Icons.copy),
           ),
           appBar: _appBar(context),
-          body: TabBarView(
-            physics: const NeverScrollableScrollPhysics(),
-            children: [
-              _overviewWidget(),
-              _requestWidget(),
-              _responseWidget(),
-              _errorWidget(),
-            ],
+          body: SafeArea(
+            child: TabBarView(
+              children: [
+                _overviewWidget(),
+                _requestWidget(),
+                _responseWidget(),
+                _errorWidget(),
+              ],
+            ),
           ),
         ),
       ),
