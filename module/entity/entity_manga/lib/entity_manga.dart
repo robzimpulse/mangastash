@@ -5,6 +5,7 @@ export 'src/chapter.dart';
 export 'src/enum/chapter_display_enum.dart';
 export 'src/enum/chapter_sort_option_enum.dart';
 export 'src/enum/chapter_sort_order_enum.dart';
+export 'src/enum/download_option.dart';
 export 'src/enum/manga_menu_enum.dart';
 export 'src/enum/source_enum.dart';
 export 'src/exception/data_not_found_exception.dart';

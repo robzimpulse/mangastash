@@ -10,7 +10,6 @@ import 'package:ui_common/ui_common.dart';
 import 'manga_detail_screen_cubit.dart';
 import 'manga_detail_screen_state.dart';
 import 'widgets/chapter_description_widget.dart';
-import 'widgets/chapter_list_widget.dart';
 import 'widgets/manga_detail_app_bar_widget.dart';
 
 class MangaDetailScreen extends StatefulWidget {

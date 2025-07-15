@@ -31,6 +31,7 @@ export 'src/widget/base/icon_with_text_widget.dart';
 export 'src/widget/base/next_page_notification_widget.dart';
 export 'src/widget/base/shimmer_loading_widget.dart';
 export 'src/widget/base/size_notifier_widget.dart';
+export 'src/widget/chapter_list_widget.dart';
 export 'src/widget/chapter_tile_widget.dart';
 export 'src/widget/manga_grid_widget.dart';
 export 'src/widget/manga_item_widget.dart';

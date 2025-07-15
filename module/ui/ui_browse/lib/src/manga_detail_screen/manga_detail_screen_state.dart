@@ -4,15 +4,6 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ui_common/ui_common.dart';
 
-enum DownloadOption {
-  unread('Unread'),
-  all('All');
-
-  final String value;
-
-  const DownloadOption(this.value);
-}
-
 class MangaDetailScreenState extends Equatable {
   final bool isLoadingManga;
   final Exception? errorManga;

@@ -1,8 +1,11 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:feature_common/feature_common.dart';
+import 'package:flutter/material.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 
-import '../manga_detail_screen_state.dart';
+import 'base/next_page_notification_widget.dart';
+import 'base/shimmer_loading_widget.dart';
+import 'chapter_tile_widget.dart';
 
 class ChapterListWidget extends StatefulWidget {
   const ChapterListWidget({
@@ -124,8 +127,9 @@ class _ChapterListWidgetState extends State<ChapterListWidget> {
                         lines: 1,
                         child: PopupMenuButton<DownloadOption>(
                           icon: const Icon(Icons.download),
-                          onSelected: (value) =>
-                              widget.onTapDownload?.call(value),
+                          onSelected: (value) => widget.onTapDownload?.call(
+                            value,
+                          ),
                           itemBuilder: (context) => [
                             ...DownloadOption.values.map(
                               (e) => PopupMenuItem<DownloadOption>(
@@ -187,8 +191,9 @@ class _ChapterListWidgetState extends State<ChapterListWidget> {
                           if (error is FailedParsingHtmlException) ...[
                             const SizedBox(height: 16),
                             OutlinedButton(
-                              onPressed: () =>
-                                  widget.onTapRecrawl?.call(error.url),
+                              onPressed: () => widget.onTapRecrawl?.call(
+                                error.url,
+                              ),
                               child: const Text('Open Debug Browser'),
                             ),
                           ],
