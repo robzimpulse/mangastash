@@ -1,5 +1,4 @@
 import 'package:core_storage/core_storage.dart';
-import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:ui_common/ui_common.dart';
 

@@ -6,8 +6,6 @@ import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 
-import '../../exception/data_not_found_exception.dart';
-import '../../exception/failed_parsing_html_exception.dart';
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../parser/base/manga_detail_html_parser.dart';
