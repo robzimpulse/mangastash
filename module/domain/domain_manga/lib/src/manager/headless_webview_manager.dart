@@ -8,14 +8,11 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:log_box/log_box.dart';
-import 'package:queue/queue.dart';
 import 'package:universal_io/io.dart';
 
 class HeadlessWebviewManager {
   final LogBox _log;
   final BaseCacheManager _cacheManager;
-
-  final _queue = Queue(delay: const Duration(milliseconds: 200), lifo: true);
 
   HeadlessWebviewManager({
     required LogBox log,
@@ -29,9 +26,7 @@ class HeadlessWebviewManager {
     bool useCache = true,
   }) async {
     final uri = WebUri(url);
-    final html = await _queue.add(
-      () => _fetch(uri: uri, scripts: scripts, useCache: useCache),
-    );
+    final html = await _fetch(uri: uri, scripts: scripts, useCache: useCache);
     if (html == null) return null;
     _log.logHtml(uri, html, scripts: scripts, name: runtimeType.toString());
     return parse(html);
@@ -147,6 +142,6 @@ class HeadlessWebviewManager {
   }
 
   Future<void> dispose() async {
-    _queue.cancel();
+    // _queue.cancel();
   }
 }
