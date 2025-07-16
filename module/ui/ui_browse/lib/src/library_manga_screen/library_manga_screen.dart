@@ -220,7 +220,6 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
             manga: data,
             isOnLibrary: true,
           ),
-          isOnLibrary: true,
         ),
         error: state.error,
         isLoading: state.isLoading,
