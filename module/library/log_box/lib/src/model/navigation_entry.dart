@@ -5,38 +5,40 @@ import 'entry.dart';
 
 class NavigationEntry extends Entry {
   final NavigationAction action;
-  final Route<dynamic>? route;
-  final Route<dynamic>? previousRoute;
+  final String? route;
+  final String? previousRoute;
   final DateTime timestamp;
 
-  NavigationEntry({
+  NavigationEntry._({
     required super.id,
     required this.action,
     this.route,
     this.previousRoute,
-  }): timestamp = DateTime.timestamp();
+    required this.timestamp,
+  });
 
-  String get message {
-    return [
-      action.name.toUpperCase(),
-      switch (action) {
-        NavigationAction.push => 'To',
-        NavigationAction.pop => 'From',
-        NavigationAction.remove => 'From',
-        NavigationAction.replace => 'With',
-        NavigationAction.changeTop => 'With',
-        NavigationAction.startUserGesture => 'On',
-        NavigationAction.stopUserGesture => 'On',
-      },
-      switch (action) {
-        NavigationAction.push => route,
-        NavigationAction.pop => route,
-        NavigationAction.remove => previousRoute,
-        NavigationAction.replace => previousRoute,
-        NavigationAction.changeTop => previousRoute,
-        NavigationAction.startUserGesture => route,
-        NavigationAction.stopUserGesture => route,
-      }?.settings.name ?? 'Undefined',
-    ].join(' ');
+  factory NavigationEntry.create({
+    required String id,
+    required NavigationAction action,
+    String? route,
+    String? previousRoute,
+  }) {
+    return NavigationEntry._(
+      id: id,
+      action: action,
+      route: route,
+      previousRoute: previousRoute,
+      timestamp: DateTime.timestamp(),
+    );
+  }
+
+  NavigationEntry copyWith({String? route, String? previousRoute}) {
+    return NavigationEntry._(
+      id: id,
+      action: action,
+      timestamp: timestamp,
+      previousRoute: previousRoute ?? this.previousRoute,
+      route: route ?? this.route,
+    );
   }
 }

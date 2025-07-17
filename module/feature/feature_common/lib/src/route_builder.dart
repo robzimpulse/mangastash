@@ -8,7 +8,7 @@ class CommonRouteBuilder extends BaseRouteBuilder {
   @override
   RouteBase root({
     required ServiceLocator locator,
-    List<NavigatorObserver> observers = const [],
+    ValueGetter<List<NavigatorObserver>>? observers,
   }) {
     // intended empty since this routes should not be used
     throw UnimplementedError();

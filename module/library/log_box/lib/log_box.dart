@@ -15,10 +15,21 @@ export 'src/use_case/measure_process_use_case.dart';
 
 class LogBox {
   static final LogBox _instance = LogBox._();
-  final Storage _storage = Storage(capacity: 200);
-  final NavigatorObserver observer = alt.NavigatorObserver(
-    onEvent: (event) => _instance._storage.add(log: event),
-  );
+  final Storage _storage = Storage(capacity: 1000);
+
+  String? _prevRouteName;
+  NavigatorObserver get observer {
+    return alt.NavigatorObserver(
+      onEvent: (event) {
+        _storage.add(
+          log: event.copyWith(
+            previousRoute: event.previousRoute ?? _prevRouteName,
+          ),
+        );
+        if (event.route != null) _prevRouteName = event.route;
+      },
+    );
+  }
 
   factory LogBox() => _instance;
 
@@ -54,39 +65,33 @@ class LogBox {
 
   void log(
     String message, {
+    String? id,
     Map<String, dynamic>? extra,
-    DateTime? time,
-    int? sequenceNumber,
-    int level = 0,
-    String name = '',
-    Zone? zone,
+    String? name,
     Object? error,
-    StackTrace? stackTrace,
   }) {
     _storage.add(
       log: LogEntry.create(
-        message: [if (name.isNotEmpty) '[$name]', message].join(' '),
+        id: id,
+        message: [
+          if (name != null && name.isNotEmpty) '[$name]',
+          message,
+        ].join(' '),
         extra: extra ?? {},
+        error: error,
       ),
     );
-    dev.log(
-      message,
-      time: time ?? DateTime.now(),
-      sequenceNumber: sequenceNumber,
-      level: level,
-      name: name,
-      zone: zone,
-      error: error,
-      stackTrace: stackTrace,
-    );
+    dev.log(message, name: name ?? 'Log Box');
   }
 
   void navigateToLogBox({
+    required BuildContext context,
     ThemeData? theme,
     Function(String? url, String? html)? onTapSnapshot,
   }) {
-    observer.navigator?.push(
+    Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: 'Log Box Dashboard'),
         builder: (context) {
           return Theme(
             data: theme ?? Theme.of(context),
@@ -98,13 +103,15 @@ class LogBox {
   }
 
   Future<void> navigateToWebview({
+    required BuildContext context,
     required Uri uri,
     required String html,
     ThemeData? theme,
     Function(String? url, String? html)? onTapSnapshot,
   }) async {
-    await observer.navigator?.push(
+    await Navigator.of(context).push(
       MaterialPageRoute(
+        settings: const RouteSettings(name: 'Log Box Webview'),
         builder: (context) {
           return Theme(
             data: theme ?? Theme.of(context),

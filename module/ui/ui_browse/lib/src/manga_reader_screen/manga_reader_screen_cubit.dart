@@ -2,6 +2,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:feature_common/feature_common.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import 'manga_reader_screen_state.dart';
@@ -107,8 +108,8 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     emit(state.copyWith(isLoading: false));
   }
 
-  void recrawl({required String url}) async {
-    await _crawlUrlUseCase.execute(url: url);
+  void recrawl({required BuildContext context, required String url}) async {
+    await _crawlUrlUseCase.execute(context: context, url: url);
     await _fetchChapter(useCache: false);
   }
 }

@@ -12,7 +12,7 @@ class AuthRouteBuilder extends BaseRouteBuilder {
   @override
   GoRoute root({
     required ServiceLocator locator,
-    List<NavigatorObserver> observers = const [],
+    ValueGetter<List<NavigatorObserver>>? observers,
   }) {
     return GoRoute(
       path: AuthRoutePath.auth,

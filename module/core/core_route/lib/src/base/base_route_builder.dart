@@ -5,7 +5,7 @@ import 'package:service_locator/service_locator.dart';
 abstract class BaseRouteBuilder {
   RouteBase root({
     required ServiceLocator locator,
-    List<NavigatorObserver> observers = const [],
+    ValueGetter<List<NavigatorObserver>>? observers,
   });
 
   List<RouteBase> routes({
@@ -16,7 +16,7 @@ abstract class BaseRouteBuilder {
   List<RouteBase> allRoutes({
     required ServiceLocator locator,
     required GlobalKey<NavigatorState> rootNavigatorKey,
-    List<NavigatorObserver> observers = const [],
+    ValueGetter<List<NavigatorObserver>>? observers,
   }) {
     return [
       root(locator: locator, observers: observers),

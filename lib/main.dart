@@ -73,17 +73,13 @@ class _MangaStashAppState extends State<MangaStashApp> {
       log.log(
         details.exceptionAsString(),
         name: 'FlutterError',
-        stackTrace: details.stack,
+        error: details.exception,
       );
     };
 
     PlatformDispatcher.instance.onError = (error, stack) {
       final LogBox log = widget.locator();
-      log.log(
-        error.toString(),
-        name: 'FlutterError',
-        stackTrace: stack,
-      );
+      log.log(error.toString(), name: 'FlutterError', error: error);
       return true;
     };
   }
@@ -107,7 +103,9 @@ class _MangaStashAppState extends State<MangaStashApp> {
         locator: locator,
         rootNavigatorKey: rootNavigatorKey,
         // TODO: add observer here
-        observers: [],
+        observers: () => [
+          logBox.observer,
+        ],
       ),
       observers: [
         BaseRouteObserver(updateCurrentRouteSettingUseCase: locator()),

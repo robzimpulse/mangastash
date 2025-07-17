@@ -3,7 +3,4 @@ enum NavigationAction {
   pop,
   remove,
   replace,
-  changeTop,
-  startUserGesture,
-  stopUserGesture,
 }

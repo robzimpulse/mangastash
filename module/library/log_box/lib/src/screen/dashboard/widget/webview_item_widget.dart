@@ -13,6 +13,7 @@ class WebviewItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: onTap,
+      visualDensity: VisualDensity.compact,
       title: Text('Entry for ${data.id}'),
       subtitle: Text('Type: ${data.runtimeType}'),
     );

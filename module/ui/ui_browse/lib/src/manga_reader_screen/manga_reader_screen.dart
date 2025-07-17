@@ -111,7 +111,7 @@ class MangaReaderScreen extends StatelessWidget {
           if (error is FailedParsingHtmlException) ...[
             const SizedBox(height: 16),
             OutlinedButton(
-              onPressed: () => _cubit(context).recrawl(url: error.url),
+              onPressed: () => _cubit(context).recrawl(context: context, url: error.url),
               child: const Text('Open Debug Browser'),
             ),
           ],
@@ -147,7 +147,10 @@ class MangaReaderScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 state.chapter?.webUrl?.let(
                   (url) => OutlinedButton(
-                    onPressed: () => _cubit(context).recrawl(url: url),
+                    onPressed: () => _cubit(context).recrawl(
+                        context: context,
+                        url: url,
+                    ),
                     child: const Text('Open Debug Browser'),
                   ),
                 ),
@@ -239,7 +242,7 @@ class MangaReaderScreen extends StatelessWidget {
         }
 
         return IconButton(
-          onPressed: () => _cubit(context).recrawl(url: url),
+          onPressed: () => _cubit(context).recrawl(context: context, url: url),
           icon: const Icon(Icons.web),
         );
       },

@@ -310,7 +310,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             Icons.web,
             color: Theme.of(context).appBarTheme.iconTheme?.color,
           ),
-          onPressed: () => _cubit(context).recrawl(url: url),
+          onPressed: () => _cubit(context).recrawl(context: context, url: url),
         );
       },
     );
@@ -461,7 +461,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
             onLoadNextPage: () => _cubit(context).nextChapter(),
             onRefresh: () => _cubit(context).initChapter(useCache: false),
-            onTapRecrawl: (url) => _cubit(context).recrawl(url: url),
+            onTapRecrawl: (url) => _cubit(context).recrawl(
+              context: context,
+              url: url,
+            ),
             onTapDownload: (option) => _onTapDownload(
               context: context,
               option: option,
@@ -519,7 +522,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             onLoadNextPage: () => _cubit(context).nextSimilarManga(
               useCache: false,
             ),
-            onTapRecrawl: (url) => _cubit(context).recrawl(url: url),
+            onTapRecrawl: (url) => _cubit(context).recrawl(
+                context: context,
+                url: url,
+            ),
             error: state.errorSimilarManga,
             isLoading: state.isLoadingSimilarManga || state.isLoadingManga,
             hasNext: state.hasNextPageSimilarManga,

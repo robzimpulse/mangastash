@@ -40,18 +40,14 @@ extension JsonExtension on String? {
 
 extension DateTimeFormatter on DateTime {
   String get dateTimeFormatted {
-    return DateFormat('dd-MM-yyyy hh:mm:ss.s TZD').format(this);
+    return DateFormat('dd-MM-yyyy HH:mm:ss.s').format(toLocal());
   }
 
   String get dateFormatted {
-    return DateFormat('dd-MM-yyyy').format(this);
+    return DateFormat('dd-MM-yyyy').format(toLocal());
   }
 
   String get timeFormatted {
-    return DateFormat('hh:mm:ss.s').format(this);
-  }
-
-  String get timezoneFormatted {
-    return DateFormat('TZD').format(this);
+    return DateFormat('hh:mm:ss.s').format(toLocal());
   }
 }

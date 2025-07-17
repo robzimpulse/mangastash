@@ -55,10 +55,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     if (value is NavigationEntry) {
       return [
-        value.route?.settings.name?.toLowerCase().contains(
+        value.route?.toLowerCase().contains(
           keyword.value.toLowerCase(),
         ),
-        value.previousRoute?.settings.name?.toLowerCase().contains(
+        value.previousRoute?.toLowerCase().contains(
           keyword.value.toLowerCase(),
         ),
       ].nonNulls.contains(true);

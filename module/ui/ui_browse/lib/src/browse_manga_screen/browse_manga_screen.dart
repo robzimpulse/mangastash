@@ -146,7 +146,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
 
         return IconButton(
           icon: const Icon(Icons.open_in_browser),
-          onPressed: () => _cubit(context).recrawl(url: url),
+          onPressed: () => _cubit(context).recrawl(context: context, url: url),
         );
       },
     );
@@ -358,7 +358,10 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         ),
         onLoadNextPage: () => _cubit(context).next(),
         onRefresh: () => _cubit(context).init(useCache: false),
-        onTapRecrawl: (url) => _cubit(context).recrawl(url: url),
+        onTapRecrawl: (url) => _cubit(context).recrawl(
+          context: context,
+          url: url,
+        ),
         error: state.error,
         isLoading: state.isLoading,
         hasNext: state.hasNextPage,

@@ -11,12 +11,13 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
   @override
   GoRoute root({
     required ServiceLocator locator,
-    List<NavigatorObserver> observers = const [],
+    ValueGetter<List<NavigatorObserver>>? observers,
   }) {
     return GoRoute(
       path: BrowseRoutePath.browse,
       name: BrowseRoutePath.browse,
       pageBuilder: (context, state) => NoTransitionPage(
+        name: BrowseRoutePath.browse,
         child: BrowseSourceScreen.create(
           locator: locator,
           // TODO: implement redirect to search source screen

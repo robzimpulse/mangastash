@@ -18,24 +18,43 @@ class NavigationItemWidget extends StatelessWidget {
       NavigationAction.pop => Icons.arrow_back,
       NavigationAction.remove => Icons.remove,
       NavigationAction.replace => Icons.change_circle,
-      NavigationAction.changeTop => Icons.block,
-      NavigationAction.startUserGesture => Icons.block,
-      NavigationAction.stopUserGesture => Icons.block,
     };
 
     return ListTile(
-      title: Row(
+      visualDensity: VisualDensity.compact,
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 16),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              data.message,
-              maxLines: 2,
-              style: theme.textTheme.labelLarge,
-              overflow: TextOverflow.ellipsis,
-            ),
+          Row(
+            children: [
+              Icon(icon, size: 16),
+              const SizedBox(width: 8),
+              Text(data.action.name.toUpperCase()),
+            ],
           ),
+          Text(
+            'Current: ${data.route}',
+            style: theme.textTheme.labelMedium,
+          ),
+          Text(
+            'Previous: ${data.previousRoute}',
+            style: theme.textTheme.labelMedium,
+          ),
+
+          // Row(
+          //   children: [
+          //     Icon(icon, size: 16),
+          //     const SizedBox(width: 8),
+          //     Expanded(
+          //       child: Text(
+          //         data.message,
+          //         maxLines: 2,
+          //         style: theme.textTheme.labelLarge,
+          //         overflow: TextOverflow.ellipsis,
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
       subtitle: Text(

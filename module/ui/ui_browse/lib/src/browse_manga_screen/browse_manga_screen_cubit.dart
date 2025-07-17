@@ -3,6 +3,7 @@ import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:feature_common/feature_common.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import 'browse_manga_screen_state.dart';
@@ -198,7 +199,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     // TODO: add download manga
   }
 
-  void recrawl({required String url}) async {
+  void recrawl({required BuildContext context, required String url}) async {
     // final parameter = state.parameter.copyWith(page: 1);
     // final source = state.source;
     // final url = source == SourceEnum.mangaclash
@@ -207,7 +208,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     //         ? parameter.asurascan
     //         : null;
     // if (url == null) return;
-    await _crawlUrlUseCase.execute(url: url);
+    await _crawlUrlUseCase.execute(context: context, url: url);
     await init(parameter: state.parameter);
   }
 }

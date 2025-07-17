@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:core_storage/core_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:log_box/log_box.dart';
 
 class CrawlUrlUseCase {
@@ -16,6 +17,7 @@ class CrawlUrlUseCase {
         _cacheManager = cacheManager;
 
   Future<void> execute({
+    required BuildContext context,
     required String url,
   }) async {
     final uri = Uri.tryParse(url);
@@ -25,7 +27,9 @@ class CrawlUrlUseCase {
         .getFileFromCache(url)
         .then((file) => file?.file.readAsString());
 
+    if (!context.mounted) return;
     await _logBox.navigateToWebview(
+      context: context,
       uri: uri,
       html: cached ?? '',
       onTapSnapshot: (url, html) => _cacheManager.putFile(

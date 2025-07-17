@@ -10,12 +10,13 @@ class MoreRouteBuilder extends BaseRouteBuilder {
   @override
   GoRoute root({
     required ServiceLocator locator,
-    List<NavigatorObserver> observers = const [],
+    ValueGetter<List<NavigatorObserver>>? observers,
   }) {
     return GoRoute(
       path: MoreRoutePath.more,
       name: MoreRoutePath.more,
       pageBuilder: (context, state) => NoTransitionPage(
+        name: MoreRoutePath.more,
         child: MoreScreen.create(
           locator: locator,
           onTapSetting: () => context.push(MoreRoutePath.setting),

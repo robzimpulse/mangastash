@@ -10,12 +10,13 @@ class HistoryRouteBuilder extends BaseRouteBuilder {
   @override
   GoRoute root({
     required ServiceLocator locator,
-    List<NavigatorObserver> observers = const [],
+    ValueGetter<List<NavigatorObserver>>? observers,
   }) {
     return GoRoute(
       path: HistoryRoutePath.history,
       name: HistoryRoutePath.history,
       pageBuilder: (context, state) => NoTransitionPage(
+        name: HistoryRoutePath.history,
         child: MangaHistoryScreen.create(
           locator: locator,
           onTapChapter: (manga, chapter) => context.pushNamed(

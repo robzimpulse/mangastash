@@ -10,12 +10,13 @@ class LibraryRouteBuilder extends BaseRouteBuilder {
   @override
   GoRoute root({
     required ServiceLocator locator,
-    List<NavigatorObserver> observers = const [],
+    ValueGetter<List<NavigatorObserver>>? observers,
   }) {
     return GoRoute(
       path: LibraryRoutePath.library,
       name: LibraryRoutePath.library,
       pageBuilder: (context, state) => NoTransitionPage(
+        name: LibraryRoutePath.library,
         child: LibraryMangaScreen.create(
           locator: locator,
           onTapManga: (manga) => context.pushNamed(

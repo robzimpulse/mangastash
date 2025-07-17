@@ -28,9 +28,8 @@ class MainRouteBuilder extends BaseRouteBuilder {
         parentNavigatorKey: rootNavigatorKey,
         path: MainPath.notFound,
         name: MainPath.notFound,
-        builder: (context, state) => ErrorScreen(
-          text: state.extra as String? ?? '',
-        ),
+        builder:
+            (context, state) => ErrorScreen(text: state.extra as String? ?? ''),
       ),
       ...CommonRouteBuilder().routes(
         locator: locator,
@@ -62,55 +61,59 @@ class MainRouteBuilder extends BaseRouteBuilder {
   @override
   RouteBase root({
     required ServiceLocator locator,
-    List<NavigatorObserver> observers = const [],
+    ValueGetter<List<NavigatorObserver>>? observers,
   }) {
     return StatefulShellRoute.indexedStack(
-      builder: (context, state, shell) => MainScreen(
-        index: shell.currentIndex,
-        onTapMenu: (index) => shell.goBranch(
-          index,
-          initialLocation: index == shell.currentIndex,
-        ),
-        onTapClosedApps: () => context.pushNamed<bool>(
-          CommonRoutePath.confirmation,
-          queryParameters: {
-            CommonRoutePath.confirmationTitle: 'Exit',
-            CommonRoutePath.confirmationContent: 'Are you sure want to quit?',
-            CommonRoutePath.confirmationNegativeButtonText: 'No',
-            CommonRoutePath.confirmationPositiveButtonText: 'Yes',
-          },
-        ),
-        child: shell,
-      ),
+      builder:
+          (context, state, shell) => MainScreen(
+            index: shell.currentIndex,
+            onTapMenu:
+                (index) => shell.goBranch(
+                  index,
+                  initialLocation: index == shell.currentIndex,
+                ),
+            onTapClosedApps:
+                () => context.pushNamed<bool>(
+                  CommonRoutePath.confirmation,
+                  queryParameters: {
+                    CommonRoutePath.confirmationTitle: 'Exit',
+                    CommonRoutePath.confirmationContent:
+                        'Are you sure want to quit?',
+                    CommonRoutePath.confirmationNegativeButtonText: 'No',
+                    CommonRoutePath.confirmationPositiveButtonText: 'Yes',
+                  },
+                ),
+            child: shell,
+          ),
       branches: [
         StatefulShellBranch(
-          observers: observers,
+          observers: observers?.call(),
           routes: [
-            LibraryRouteBuilder().root(locator: locator),
+            LibraryRouteBuilder().root(locator: locator, observers: observers),
           ],
         ),
         StatefulShellBranch(
-          observers: observers,
+          observers: observers?.call(),
           routes: [
-            UpdatesRouteBuilder().root(locator: locator),
+            UpdatesRouteBuilder().root(locator: locator, observers: observers),
           ],
         ),
         StatefulShellBranch(
-          observers: observers,
+          observers: observers?.call(),
           routes: [
-            HistoryRouteBuilder().root(locator: locator),
+            HistoryRouteBuilder().root(locator: locator, observers: observers),
           ],
         ),
         StatefulShellBranch(
-          observers: observers,
+          observers: observers?.call(),
           routes: [
-            BrowseRouteBuilder().root(locator: locator),
+            BrowseRouteBuilder().root(locator: locator, observers: observers),
           ],
         ),
         StatefulShellBranch(
-          observers: observers,
+          observers: observers?.call(),
           routes: [
-            MoreRouteBuilder().root(locator: locator),
+            MoreRouteBuilder().root(locator: locator, observers: observers),
           ],
         ),
       ],
