@@ -307,6 +307,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             }
 
             return ListView.separated(
+              key: PageStorageKey('${stream.runtimeType}'),
               itemCount: filtered.length,
               itemBuilder: (context, index) {
                 final entry = filtered.elementAtOrNull(index);

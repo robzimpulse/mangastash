@@ -20,6 +20,13 @@ class NavigationItemWidget extends StatelessWidget {
       NavigationAction.replace => Icons.change_circle,
     };
 
+    final color = switch (data.action) {
+      NavigationAction.push => Colors.green,
+      NavigationAction.pop => Colors.red,
+      NavigationAction.remove => Colors.grey,
+      NavigationAction.replace => Colors.blue,
+    };
+
     return ListTile(
       visualDensity: VisualDensity.compact,
       title: Column(
@@ -27,34 +34,19 @@ class NavigationItemWidget extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: 16),
+              Icon(icon, size: 16, color: color),
               const SizedBox(width: 8),
-              Text(data.action.name.toUpperCase()),
+              Text(
+                data.action.name.toUpperCase(),
+                style: theme.textTheme.labelLarge?.copyWith(color: color),
+              ),
             ],
           ),
-          Text(
-            'Current: ${data.route}',
-            style: theme.textTheme.labelMedium,
-          ),
+          Text('Current: ${data.route}', style: theme.textTheme.labelMedium),
           Text(
             'Previous: ${data.previousRoute}',
             style: theme.textTheme.labelMedium,
           ),
-
-          // Row(
-          //   children: [
-          //     Icon(icon, size: 16),
-          //     const SizedBox(width: 8),
-          //     Expanded(
-          //       child: Text(
-          //         data.message,
-          //         maxLines: 2,
-          //         style: theme.textTheme.labelLarge,
-          //         overflow: TextOverflow.ellipsis,
-          //       ),
-          //     ),
-          //   ],
-          // ),
         ],
       ),
       subtitle: Text(
