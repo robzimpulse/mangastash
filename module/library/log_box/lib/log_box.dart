@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import 'src/common/navigator_observer.dart' as alt;
 import 'src/common/storage.dart';
+import 'src/model/log_entry.dart';
 import 'src/screen/dashboard/dashboard_screen.dart';
 import 'src/screen/webview/webview_screen.dart';
 
@@ -62,19 +63,12 @@ class LogBox {
     Object? error,
     StackTrace? stackTrace,
   }) {
-    // _storage.addLog(
-    //   log: LogModel(
-    //     message: message,
-    //     time: time ?? DateTime.now(),
-    //     extra: extra,
-    //     sequenceNumber: sequenceNumber,
-    //     level: level,
-    //     name: name,
-    //     zone: zone,
-    //     error: error,
-    //     stackTrace: stackTrace,
-    //   ),
-    // );
+    _storage.add(
+      log: LogEntry.create(
+        message: [if (name.isNotEmpty) '[$name]', message].join(' '),
+        extra: extra ?? {},
+      ),
+    );
     dev.log(
       message,
       time: time ?? DateTime.now(),

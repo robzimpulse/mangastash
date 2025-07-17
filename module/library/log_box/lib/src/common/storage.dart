@@ -13,7 +13,8 @@ class Storage {
 
   Stream<List<Entry>> get all => _logs.stream;
 
-  Stream<List<T>> typed<T>() => _logs.stream.map((e) => [...e.whereType<T>()]);
+  Stream<List<T>> typed<T>() =>
+      _logs.stream.map((e) => [...e.whereType<T>()]).distinct();
 
   void add({required Entry log}) {
     _logs.add([

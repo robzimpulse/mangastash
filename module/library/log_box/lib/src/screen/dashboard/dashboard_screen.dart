@@ -2,10 +2,16 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../../common/storage.dart';
+import '../../model/entry.dart';
 import '../../model/log_entry.dart';
 import '../../model/navigation_entry.dart';
 import '../../model/network_entry.dart';
 import '../../model/webview_entry.dart';
+import 'widget/item_widget.dart';
+import 'widget/log_item_widget.dart';
+import 'widget/navigation_item_widget.dart';
+import 'widget/network_item_widget.dart';
+import 'widget/webview_item_widget.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key, required this.storage, this.onTapSnapshot});
@@ -42,27 +48,67 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  bool _filter<T>(T value) {
+  bool _filter(Entry value) {
     if (value is LogEntry) {
-      return value.message.contains(keyword.value);
+      return value.message.toLowerCase().contains(keyword.value.toLowerCase());
     }
 
     if (value is NavigationEntry) {
       return [
-        value.route?.settings.name?.contains(keyword.value),
-        value.previousRoute?.settings.name?.contains(keyword.value),
+        value.route?.settings.name?.toLowerCase().contains(
+          keyword.value.toLowerCase(),
+        ),
+        value.previousRoute?.settings.name?.toLowerCase().contains(
+          keyword.value.toLowerCase(),
+        ),
       ].nonNulls.contains(true);
     }
 
     if (value is NetworkEntry) {
-      return value.uri.contains(keyword.value);
+      return value.uri.toLowerCase().contains(keyword.value.toLowerCase());
     }
 
     if (value is WebviewEntry) {
-      return value.uri.contains(keyword.value);
+      return value.uri.toLowerCase().contains(keyword.value.toLowerCase());
     }
 
     return false;
+  }
+
+  Widget _item(Entry value) {
+    void onTap() {
+      final id = value.id;
+      // TODO: redirect to detail item
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) {
+      //       return DetailScreen(
+      //         data: value,
+      //         onTapSnapshot: widget.onTapSnapshot,
+      //       );
+      //     },
+      //   ),
+      // );
+    }
+
+    if (value is LogEntry) {
+      return LogItemWidget(data: value, onTap: onTap);
+    }
+
+    if (value is NavigationEntry) {
+      return NavigationItemWidget(data: value);
+    }
+
+    if (value is NetworkEntry) {
+      return NetworkItemWidget(data: value, onTap: onTap);
+    }
+
+    if (value is WebviewEntry) {
+      return WebviewItemWidget(data: value, onTap: onTap);
+    }
+
+    return ItemWidget(data: value);
   }
 
   @override
@@ -93,7 +139,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               valueListenable: isSearchMode,
               builder: (context, isSearch, _) {
                 if (!isSearch) {
-                  return const Text('Log Activities');
+                  return const Text('Log Dashboard');
                 }
                 final titleLarge = Theme.of(context).textTheme.titleLarge;
                 return Container(
@@ -115,14 +161,110 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 );
               },
             ),
-            bottom: const TabBar(
+            bottom: TabBar(
+              tabAlignment: TabAlignment.start,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white,
               isScrollable: true,
               tabs: [
-                Tab(text: 'All'),
-                Tab(text: 'Log'),
-                Tab(text: 'Navigation'),
-                Tab(text: 'Network'),
-                Tab(text: 'Webview'),
+                Tab(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.list_alt, size: 24),
+                        const SizedBox(height: 4),
+                        StreamBuilder(
+                          stream: widget.storage.all,
+                          builder: (context, snapshot) {
+                            return Text('All (${snapshot.data?.length ?? 0})');
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Tab(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.bug_report, size: 24),
+                        const SizedBox(height: 4),
+                        StreamBuilder(
+                          stream: widget.storage.typed<LogEntry>(),
+                          builder: (context, snapshot) {
+                            return Text(
+                              'Logging (${snapshot.data?.length ?? 0})',
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Tab(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.navigation, size: 24),
+                        const SizedBox(height: 4),
+                        StreamBuilder(
+                          stream: widget.storage.typed<NavigationEntry>(),
+                          builder: (context, snapshot) {
+                            return Text(
+                              'Navigation (${snapshot.data?.length ?? 0})',
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Tab(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.public, size: 24),
+                        const SizedBox(height: 4),
+                        StreamBuilder(
+                          stream: widget.storage.typed<NetworkEntry>(),
+                          builder: (context, snapshot) {
+                            return Text(
+                              'Network (${snapshot.data?.length ?? 0})',
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Tab(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.open_in_browser, size: 24),
+                        const SizedBox(height: 4),
+                        StreamBuilder(
+                          stream: widget.storage.typed<WebviewEntry>(),
+                          builder: (context, snapshot) {
+                            return Text(
+                              'Webview (${snapshot.data?.length ?? 0})',
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -142,7 +284,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _content<T>({required Stream<List<T>> stream}) {
+  Widget _content({required Stream<List<Entry>> stream}) {
     return StreamBuilder(
       stream: stream,
       builder: (context, snapshot) {
@@ -155,21 +297,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return AnimatedBuilder(
           animation: Listenable.merge([isSearchMode, keyword]),
           builder: (context, _) {
-            final filtered = data.where(_filter);
+            final filtered =
+                isSearchMode.value && keyword.value.isNotEmpty
+                    ? data.where(_filter)
+                    : data;
 
             if (filtered.isEmpty) {
               return const Center(child: Text('No Data'));
             }
 
-            return ListView.builder(
+            return ListView.separated(
               itemCount: filtered.length,
-              itemBuilder: (BuildContext context, int index) {
+              itemBuilder: (context, index) {
                 final entry = filtered.elementAtOrNull(index);
                 if (entry == null) return null;
-                return ListTile(
-                  title: Text('Entry for $index'),
-                  subtitle: Text('Type: ${entry.runtimeType}'),
-                );
+                return _item(entry);
+              },
+              separatorBuilder: (context, index) {
+                return const Divider(height: 1);
               },
             );
           },

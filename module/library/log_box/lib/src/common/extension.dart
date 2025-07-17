@@ -39,8 +39,12 @@ extension JsonExtension on String? {
 }
 
 extension DateTimeFormatter on DateTime {
+  String get dateTimeFormatted {
+    return DateFormat('dd-MM-yyyy hh:mm:ss.s TZD').format(this);
+  }
+
   String get dateFormatted {
-    return DateFormat('DD-MM-YYYY').format(this);
+    return DateFormat('dd-MM-yyyy').format(this);
   }
 
   String get timeFormatted {
