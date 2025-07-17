@@ -214,6 +214,7 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
         itemBuilder: (context, data) => MangaItemWidget(
           manga: data,
           cacheManager: widget.cacheManager,
+          isPrefetching: state.prefetchedMangaIds.contains(data.id),
           onTap: () => widget.onTapManga?.call(data),
           onLongPress: () => _onTapMenu(
             context: context,
