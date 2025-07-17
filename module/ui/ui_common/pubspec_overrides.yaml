@@ -1,0 +1,20 @@
+# melos_managed_dependency_overrides: core_environment,core_route,core_storage,entity_manga,log_box,manga_dex_api,manga_service_drift,safe_bloc,service_locator
+dependency_overrides:
+  core_environment:
+    path: ../../core/core_environment
+  core_route:
+    path: ../../core/core_route
+  core_storage:
+    path: ../../core/core_storage
+  entity_manga:
+    path: ../../entity/entity_manga
+  log_box:
+    path: ../../library/log_box
+  manga_dex_api:
+    path: ../../library/manga_dex_api
+  manga_service_drift:
+    path: ../../library/manga_service_drift
+  safe_bloc:
+    path: ../../library/safe_bloc
+  service_locator:
+    path: ../../library/service_locator
