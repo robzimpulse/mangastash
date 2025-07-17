@@ -130,17 +130,23 @@ class _GridWidgetState<T> extends State<GridWidget<T>> {
                   ),
                 )
               else if (widget.data.isEmpty)
-                const SliverFillRemaining(
+                SliverFillRemaining(
                   hasScrollBody: false,
                   child: Padding(
-                    padding: EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(24),
                     child: Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'No Similar Manga',
+                            EmojiAsciiEnum.crying.ascii,
                             textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.displayMedium,
+                          ),
+                          Text(
+                            'Empty Data',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         ],
                       ),

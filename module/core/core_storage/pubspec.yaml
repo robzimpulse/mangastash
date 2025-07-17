@@ -4,14 +4,13 @@ version: 0.0.1
 publish_to: none
 
 environment:
-  sdk: ">=3.6.2 <4.0.0"
+  sdk: ">=3.7.2 <4.0.0"
   flutter: ">=3.29.3"
 
 dependencies:
   flutter:
     sdk: flutter
-  shared_preferences: ^2.0.15
-  shared_preferences_android: 2.0.17
+  shared_preferences: ^2.2.3
   flutter_cache_manager: ^3.3.1
   path_provider: ^2.1.4
   filesystem_picker: ^4.1.0
