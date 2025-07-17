@@ -122,7 +122,7 @@ extension ActivityExtension on HttpActivityModel {
   }
 
   String get description {
-    var contentTypeList = response?.headers?["content-type"];
+    var contentTypeList = response?.headers?['content-type'];
     final isImage = contentTypeList != null &&
         contentTypeList.any((element) => element.contains('image'));
 
@@ -169,7 +169,7 @@ extension ActivityExtension on HttpActivityModel {
     final responseBody = (response?.body ?? '').isJson
         ? response?.body.prettify
         : isImage
-            ? "Image Body"
+            ? 'Image Body'
             : response?.body;
     activityDetails.writeln('Body: $responseBody');
 

@@ -9,12 +9,10 @@ extension ServiceLocatorX on ServiceLocator {
   void alias<A extends Object, B extends A>() {
     assert(
       A != Object && B != A,
-      "The Generics must be specified, also A & B must be different",
+      'The Generics must be specified, also A & B must be different',
     );
     final locator = this;
-    locator.registerFactory<A>(
-      () => locator<B>(),
-    );
+    locator.registerFactory<A>(() => locator<B>());
   }
 
   /// Provides the instance of a registered type [T] optionally.
@@ -27,11 +25,7 @@ extension ServiceLocatorX on ServiceLocator {
     dynamic param2,
   }) {
     if (isRegistered<T>()) {
-      return get<T>(
-        instanceName: instanceName,
-        param1: param1,
-        param2: param2,
-      );
+      return get<T>(instanceName: instanceName, param1: param1, param2: param2);
     }
     return null;
   }
@@ -43,11 +37,8 @@ extension ServiceLocatorX on ServiceLocator {
     dynamic param2,
   }) {
     final locator = this;
-    return () => locator(
-          instanceName: instanceName,
-          param1: param1,
-          param2: param2,
-        );
+    return () =>
+        locator(instanceName: instanceName, param1: param1, param2: param2);
   }
 
   /// Returns the instance of a registered type wrapped in a FactoryAsync<T>.
@@ -58,10 +49,10 @@ extension ServiceLocatorX on ServiceLocator {
   }) {
     final locator = this;
     return () => locator.getAsync(
-          instanceName: instanceName,
-          param1: param1,
-          param2: param2,
-        );
+      instanceName: instanceName,
+      param1: param1,
+      param2: param2,
+    );
   }
 
   /// Returns the instance of a registered type [T] wrapped in a Lazy<T>.
@@ -71,11 +62,7 @@ extension ServiceLocatorX on ServiceLocator {
     dynamic param2,
   }) {
     return Lazy(
-      factory(
-        instanceName: instanceName,
-        param1: param1,
-        param2: param2,
-      ),
+      factory(instanceName: instanceName, param1: param1, param2: param2),
     );
   }
 

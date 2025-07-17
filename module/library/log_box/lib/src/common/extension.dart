@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:intl/intl.dart';
+
 extension JsonExtension on String? {
   String get prettify {
     if (this != null) {
@@ -33,5 +35,19 @@ extension JsonExtension on String? {
       return <String, dynamic>{};
     }
     return json.decode(this!);
+  }
+}
+
+extension DateTimeFormatter on DateTime {
+  String get dateFormatted {
+    return DateFormat('DD-MM-YYYY').format(this);
+  }
+
+  String get timeFormatted {
+    return DateFormat('hh:mm:ss.s').format(this);
+  }
+
+  String get timezoneFormatted {
+    return DateFormat('TZD').format(this);
   }
 }

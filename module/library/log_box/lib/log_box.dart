@@ -3,12 +3,10 @@ library log_box;
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:flutter/material.dart' as material;
+import 'package:flutter/material.dart';
 
-import 'src/common/navigator_observer.dart';
+import 'src/common/navigator_observer.dart' as alt;
 import 'src/common/storage.dart';
-import 'src/model/log_html_model.dart';
-import 'src/model/log_model.dart';
 import 'src/screen/dashboard/dashboard_screen.dart';
 import 'src/screen/webview/webview_screen.dart';
 
@@ -17,7 +15,9 @@ export 'src/use_case/measure_process_use_case.dart';
 class LogBox {
   static final LogBox _instance = LogBox._();
   final Storage _storage = Storage(capacity: 200);
-  final navigatorObserver = NavigatorObserver();
+  final NavigatorObserver observer = alt.NavigatorObserver(
+    onEvent: (event) => _instance._storage.add(log: event),
+  );
 
   factory LogBox() => _instance;
 
@@ -35,20 +35,20 @@ class LogBox {
     Object? error,
     StackTrace? stackTrace,
   }) {
-    _storage.addLog(
-      log: LogHtmlModel(
-        uri: uri,
-        html: html,
-        scripts: scripts,
-        time: time ?? DateTime.now(),
-        sequenceNumber: sequenceNumber,
-        level: level,
-        name: name,
-        zone: zone,
-        error: error,
-        stackTrace: stackTrace,
-      ),
-    );
+    // _storage.addLog(
+    //   log: LogHtmlModel(
+    //     uri: uri,
+    //     html: html,
+    //     scripts: scripts,
+    //     time: time ?? DateTime.now(),
+    //     sequenceNumber: sequenceNumber,
+    //     level: level,
+    //     name: name,
+    //     zone: zone,
+    //     error: error,
+    //     stackTrace: stackTrace,
+    //   ),
+    // );
   }
 
   void log(
@@ -62,19 +62,19 @@ class LogBox {
     Object? error,
     StackTrace? stackTrace,
   }) {
-    _storage.addLog(
-      log: LogModel(
-        message: message,
-        time: time ?? DateTime.now(),
-        extra: extra,
-        sequenceNumber: sequenceNumber,
-        level: level,
-        name: name,
-        zone: zone,
-        error: error,
-        stackTrace: stackTrace,
-      ),
-    );
+    // _storage.addLog(
+    //   log: LogModel(
+    //     message: message,
+    //     time: time ?? DateTime.now(),
+    //     extra: extra,
+    //     sequenceNumber: sequenceNumber,
+    //     level: level,
+    //     name: name,
+    //     zone: zone,
+    //     error: error,
+    //     stackTrace: stackTrace,
+    //   ),
+    // );
     dev.log(
       message,
       time: time ?? DateTime.now(),
@@ -88,16 +88,17 @@ class LogBox {
   }
 
   void navigateToLogBox({
-    material.ThemeData? theme,
+    ThemeData? theme,
     Function(String? url, String? html)? onTapSnapshot,
   }) {
-    navigatorObserver.navigator?.push(
-      material.MaterialPageRoute(
-        builder:
-            (context) => material.Theme(
-              data: theme ?? material.Theme.of(context),
-              child: DashboardScreen(storage: _storage),
-            ),
+    observer.navigator?.push(
+      MaterialPageRoute(
+        builder: (context) {
+          return Theme(
+            data: theme ?? Theme.of(context),
+            child: DashboardScreen(storage: _storage),
+          );
+        },
       ),
     );
   }
@@ -105,20 +106,21 @@ class LogBox {
   Future<void> navigateToWebview({
     required Uri uri,
     required String html,
-    material.ThemeData? theme,
+    ThemeData? theme,
     Function(String? url, String? html)? onTapSnapshot,
   }) async {
-    await navigatorObserver.navigator?.push(
-      material.MaterialPageRoute(
-        builder:
-            (context) => material.Theme(
-              data: theme ?? material.Theme.of(context),
-              child: WebviewScreen(
-                uri: uri,
-                html: html,
-                onTapSnapshot: onTapSnapshot,
-              ),
+    await observer.navigator?.push(
+      MaterialPageRoute(
+        builder: (context) {
+          return Theme(
+            data: theme ?? Theme.of(context),
+            child: WebviewScreen(
+              uri: uri,
+              html: html,
+              onTapSnapshot: onTapSnapshot,
             ),
+          );
+        },
       ),
     );
   }

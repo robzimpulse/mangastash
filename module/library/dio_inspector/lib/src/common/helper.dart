@@ -8,12 +8,12 @@ class Helper {
   static const int _megabyteAsByte = 1000000;
   static const int _secondAsMillisecond = 1000;
   static const int _minuteAsMillisecond = 60000;
-  static const String _bytes = "B";
-  static const String _kiloBytes = "kB";
-  static const String _megaBytes = "MB";
-  static const String _milliseconds = "ms";
-  static const String _seconds = "s";
-  static const String _minutes = "min";
+  static const String _bytes = 'B';
+  static const String _kiloBytes = 'kB';
+  static const String _megaBytes = 'MB';
+  static const String _milliseconds = 'ms';
+  static const String _seconds = 's';
+  static const String _minutes = 'min';
 
   static Map<String, dynamic> decodeRawJson(String json) {
     try {

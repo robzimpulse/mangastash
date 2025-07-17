@@ -154,7 +154,7 @@ class DetailScreen extends StatelessWidget {
   }
 
   Widget _responseWidget() {
-    var contentTypeList = data.response?.headers?["content-type"];
+    var contentTypeList = data.response?.headers?['content-type'];
     final isImage = contentTypeList != null &&
         contentTypeList.any((element) => element.contains('image'));
 

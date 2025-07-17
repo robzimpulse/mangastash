@@ -1,13 +1,11 @@
 import 'package:collection/collection.dart';
-import 'package:dynamic_tabbar/dynamic_tabbar.dart';
 import 'package:flutter/material.dart';
 
-import '../../common/enum.dart';
 import '../../common/storage.dart';
-import '../../model/log_html_model.dart';
-import '../../model/log_model.dart';
-import '../detail/detail_screen.dart';
-import 'widget/item_log_widget.dart';
+import '../../model/log_entry.dart';
+import '../../model/navigation_entry.dart';
+import '../../model/network_entry.dart';
+import '../../model/webview_entry.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key, required this.storage, this.onTapSnapshot});
@@ -21,217 +19,162 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  TextEditingController searchController = TextEditingController();
-  FocusNode focusNode = FocusNode();
-
-  String query = '';
-  bool isHtml = false;
-  bool isSearch = false;
-  Sort currentSort = Sort.byTime;
+  final TextEditingController searchController = TextEditingController();
+  final FocusNode focusNode = FocusNode();
+  final ValueNotifier<String> keyword = ValueNotifier('');
+  final ValueNotifier<bool> isSearchMode = ValueNotifier(false);
 
   @override
   void dispose() {
     searchController.dispose();
     focusNode.dispose();
+    keyword.dispose();
+    isSearchMode.dispose();
     super.dispose();
   }
 
   void _toggleSearch() {
-    setState(() {
-      isSearch = !isSearch;
-      if (!isSearch) {
-        searchController.clear();
-        focusNode.unfocus();
-      }
-    });
+    final isSearch = isSearchMode.value;
+    isSearchMode.value = !isSearch;
+    if (!isSearch) {
+      searchController.clear();
+      focusNode.unfocus();
+    }
   }
 
-  void _toggleHtml() {
-    setState(() {
-      isHtml = !isHtml;
-    });
-  }
-
-  void _search(String query) {
-    setState(() {
-      this.query = query;
-    });
-  }
-
-  void _sort(Sort sortType) {
-    setState(() {
-      currentSort = sortType;
-    });
-  }
-
-  List<LogModel> _filter(List<LogModel> value) {
-    var data = value;
-
-    if (isSearch) {
-      data = data
-          .where((e) => e.message.toLowerCase().contains(query.toLowerCase()))
-          .toList();
+  bool _filter<T>(T value) {
+    if (value is LogEntry) {
+      return value.message.contains(keyword.value);
     }
 
-    if (isHtml) {
-      data = [...data.whereType<LogHtmlModel>()];
+    if (value is NavigationEntry) {
+      return [
+        value.route?.settings.name?.contains(keyword.value),
+        value.previousRoute?.settings.name?.contains(keyword.value),
+      ].nonNulls.contains(true);
     }
 
-    int sortByTime(LogModel a, LogModel b) {
-      final aTime = a.time;
-      final bTime = b.time;
-      if (aTime == null || bTime == null) return 0;
-      return aTime.isBefore(bTime) ? 1 : -1;
+    if (value is NetworkEntry) {
+      return value.uri.contains(keyword.value);
     }
 
-    int sortByName(LogModel a, LogModel b) {
-      final aName = a.name;
-      final bName = b.name;
-      if (aName == null || bName == null) return 0;
-      return aName.compareTo(bName);
+    if (value is WebviewEntry) {
+      return value.uri.contains(keyword.value);
     }
 
-    return switch (currentSort) {
-      Sort.byTime => data.sorted(sortByTime),
-      Sort.byName => data.sorted(sortByName),
-    };
+    return false;
   }
 
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: !isSearch,
+      canPop: !isSearchMode.value,
       onPopInvokedWithResult: (success, _) => !success ? _toggleSearch() : {},
-      child: Scaffold(
-        appBar: AppBar(
-          actions: [
-            IconButton(
-              onPressed: _toggleSearch,
-              icon: Icon(isSearch ? Icons.close : Icons.search),
-            ),
-            IconButton(
-              onPressed: _toggleHtml,
-              icon: Icon(isHtml ? Icons.web_asset_off : Icons.web),
-            ),
-            PopupMenuButton(
-              icon: const Icon(Icons.sort),
-              itemBuilder: (context) {
-                return [
-                  const PopupMenuItem(
-                    value: Sort.byTime,
-                    child: Text('Time'),
-                  ),
-                  const PopupMenuItem(
-                    value: Sort.byName,
-                    child: Text('Name'),
-                  ),
-                ];
-              },
-              onSelected: _sort,
-            ),
-          ],
-          title: _title(context),
-        ),
-        floatingActionButton: FloatingActionButton(
-          shape: const CircleBorder(),
-          child: const Icon(Icons.delete),
-          onPressed: () => widget.storage.clear(),
-        ),
-        body: SafeArea(
-          child: StreamBuilder(
-            stream: widget.storage.activities.map(_filter),
-            builder: (context, snapshot) {
-              final data = snapshot.data;
-
-              if (data == null) {
-                return const CircularProgressIndicator();
-              }
-
-              return _body(context: context, filteredActivities: data);
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _title(BuildContext context) {
-    if (!isSearch) {
-      return const Text('Log Activities');
-    }
-    final titleLarge = Theme.of(context).textTheme.titleLarge;
-    return Container(
-      alignment: Alignment.centerLeft,
-      child: TextField(
-        autofocus: true,
-        onChanged: _search,
-        focusNode: focusNode,
-        controller: searchController,
-        decoration: InputDecoration(
-          hintText: 'Search...',
-          filled: false,
-          border: InputBorder.none,
-          hintStyle: titleLarge?.copyWith(color: Colors.white),
-        ),
-        cursorColor: Colors.white,
-        style: titleLarge?.copyWith(color: Colors.white),
-      ),
-    );
-  }
-
-  Widget _body({
-    required BuildContext context,
-    required List<LogModel> filteredActivities,
-  }) {
-    if (filteredActivities.isEmpty) {
-      return const Center(child: Text('No Data'));
-    }
-
-    final groups = filteredActivities.groupListsBy((e) => e.name);
-    final keys = groups.keys.nonNulls.sortedBy((e) => e);
-
-    return Column(
-      children: [
-        Expanded(
-          child: DynamicTabBarWidget(
-            isScrollable: true,
-            showBackIcon: false,
-            showNextIcon: false,
-            tabAlignment: TabAlignment.center,
-            onTabChanged: (index) {},
-            onTabControllerUpdated: (controller) {},
-            dynamicTabs: [
-              for (final (index, key) in keys.indexed)
-                TabData(
-                  index: index,
-                  title: Tab(child: Text(key)),
-                  content: ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: groups[key]?.length,
-                    itemBuilder: (context, index) {
-                      final data = groups[key]?.elementAtOrNull(index);
-                      if (data == null) return null;
-                      return ItemLogWidget(
-                        data: data,
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DetailScreen(
-                              data: data,
-                              onTapSnapshot: widget.onTapSnapshot,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+      child: DefaultTabController(
+        length: 5,
+        child: Scaffold(
+          appBar: AppBar(
+            actions: [
+              ValueListenableBuilder(
+                valueListenable: isSearchMode,
+                builder: (context, isSearch, _) {
+                  return IconButton(
+                    onPressed: _toggleSearch,
+                    icon: Icon(isSearch ? Icons.close : Icons.search),
+                  );
+                },
+              ),
+              IconButton(
+                onPressed: () => widget.storage.clear(),
+                icon: const Icon(Icons.delete),
+              ),
             ],
-            onAddTabMoveTo: MoveToTab.idol,
+            title: ValueListenableBuilder(
+              valueListenable: isSearchMode,
+              builder: (context, isSearch, _) {
+                if (!isSearch) {
+                  return const Text('Log Activities');
+                }
+                final titleLarge = Theme.of(context).textTheme.titleLarge;
+                return Container(
+                  alignment: Alignment.centerLeft,
+                  child: TextField(
+                    autofocus: true,
+                    onChanged: (text) => keyword.value = text,
+                    focusNode: focusNode,
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search...',
+                      filled: false,
+                      border: InputBorder.none,
+                      hintStyle: titleLarge?.copyWith(color: Colors.white),
+                    ),
+                    cursorColor: Colors.white,
+                    style: titleLarge?.copyWith(color: Colors.white),
+                  ),
+                );
+              },
+            ),
+            bottom: const TabBar(
+              isScrollable: true,
+              tabs: [
+                Tab(text: 'All'),
+                Tab(text: 'Log'),
+                Tab(text: 'Navigation'),
+                Tab(text: 'Network'),
+                Tab(text: 'Webview'),
+              ],
+            ),
+          ),
+          body: SafeArea(
+            child: TabBarView(
+              children: [
+                _content(stream: widget.storage.all),
+                _content(stream: widget.storage.typed<LogEntry>()),
+                _content(stream: widget.storage.typed<NavigationEntry>()),
+                _content(stream: widget.storage.typed<NetworkEntry>()),
+                _content(stream: widget.storage.typed<WebviewEntry>()),
+              ],
+            ),
           ),
         ),
-      ],
+      ),
+    );
+  }
+
+  Widget _content<T>({required Stream<List<T>> stream}) {
+    return StreamBuilder(
+      stream: stream,
+      builder: (context, snapshot) {
+        final data = snapshot.data;
+
+        if (data == null) {
+          return const CircularProgressIndicator();
+        }
+
+        return AnimatedBuilder(
+          animation: Listenable.merge([isSearchMode, keyword]),
+          builder: (context, _) {
+            final filtered = data.where(_filter);
+
+            if (filtered.isEmpty) {
+              return const Center(child: Text('No Data'));
+            }
+
+            return ListView.builder(
+              itemCount: filtered.length,
+              itemBuilder: (BuildContext context, int index) {
+                final entry = filtered.elementAtOrNull(index);
+                if (entry == null) return null;
+                return ListTile(
+                  title: Text('Entry for $index'),
+                  subtitle: Text('Type: ${entry.runtimeType}'),
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 }

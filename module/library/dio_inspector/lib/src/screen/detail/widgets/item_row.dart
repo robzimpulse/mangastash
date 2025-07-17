@@ -29,7 +29,7 @@ class ItemRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         const Text(
-          "Headers :",
+          'Headers :',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         const Padding(

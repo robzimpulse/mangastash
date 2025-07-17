@@ -1,1 +1,9 @@
-enum Sort { byTime, byName }
+enum NavigationAction {
+  push,
+  pop,
+  remove,
+  replace,
+  changeTop,
+  startUserGesture,
+  stopUserGesture,
+}
