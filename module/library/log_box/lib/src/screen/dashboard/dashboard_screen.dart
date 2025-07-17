@@ -2,8 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:dynamic_tabbar/dynamic_tabbar.dart';
 import 'package:flutter/material.dart';
 
-import '../../common/log_storage.dart';
-import '../../common/sort_log_enum.dart';
+import '../../common/enum.dart';
+import '../../common/storage.dart';
 import '../../model/log_html_model.dart';
 import '../../model/log_model.dart';
 import '../detail/detail_screen.dart';
@@ -12,7 +12,7 @@ import 'widget/item_log_widget.dart';
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key, required this.storage, this.onTapSnapshot});
 
-  final LogStorage storage;
+  final Storage storage;
 
   final Function(String? url, String? html)? onTapSnapshot;
 
@@ -27,7 +27,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String query = '';
   bool isHtml = false;
   bool isSearch = false;
-  SortLog currentSort = SortLog.byTime;
+  Sort currentSort = Sort.byTime;
 
   @override
   void dispose() {
@@ -58,7 +58,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  void _sort(SortLog sortType) {
+  void _sort(Sort sortType) {
     setState(() {
       currentSort = sortType;
     });
@@ -92,8 +92,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
 
     return switch (currentSort) {
-      SortLog.byTime => data.sorted(sortByTime),
-      SortLog.byName => data.sorted(sortByName),
+      Sort.byTime => data.sorted(sortByTime),
+      Sort.byName => data.sorted(sortByName),
     };
   }
 
@@ -118,11 +118,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               itemBuilder: (context) {
                 return [
                   const PopupMenuItem(
-                    value: SortLog.byTime,
+                    value: Sort.byTime,
                     child: Text('Time'),
                   ),
                   const PopupMenuItem(
-                    value: SortLog.byName,
+                    value: Sort.byName,
                     child: Text('Name'),
                   ),
                 ];

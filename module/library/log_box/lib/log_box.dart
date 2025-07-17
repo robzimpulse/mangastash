@@ -3,9 +3,10 @@ library log_box;
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as material;
 
-import 'src/common/log_storage.dart';
+import 'src/common/navigator_observer.dart';
+import 'src/common/storage.dart';
 import 'src/model/log_html_model.dart';
 import 'src/model/log_model.dart';
 import 'src/screen/dashboard/dashboard_screen.dart';
@@ -15,7 +16,7 @@ export 'src/use_case/measure_process_use_case.dart';
 
 class LogBox {
   static final LogBox _instance = LogBox._();
-  final LogStorage _storage = LogStorage(capacity: 200);
+  final Storage _storage = Storage(capacity: 200);
   final navigatorObserver = NavigatorObserver();
 
   factory LogBox() => _instance;
@@ -87,17 +88,16 @@ class LogBox {
   }
 
   void navigateToLogBox({
-    ThemeData? theme,
+    material.ThemeData? theme,
     Function(String? url, String? html)? onTapSnapshot,
   }) {
     navigatorObserver.navigator?.push(
-      MaterialPageRoute<dynamic>(
-        builder: (context) => Theme(
-          data: theme ?? Theme.of(context),
-          child: DashboardScreen(
-            storage: _storage,
-          ),
-        ),
+      material.MaterialPageRoute(
+        builder:
+            (context) => material.Theme(
+              data: theme ?? material.Theme.of(context),
+              child: DashboardScreen(storage: _storage),
+            ),
       ),
     );
   }
@@ -105,19 +105,20 @@ class LogBox {
   Future<void> navigateToWebview({
     required Uri uri,
     required String html,
-    ThemeData? theme,
+    material.ThemeData? theme,
     Function(String? url, String? html)? onTapSnapshot,
   }) async {
     await navigatorObserver.navigator?.push(
-      MaterialPageRoute<dynamic>(
-        builder: (context) => Theme(
-          data: theme ?? Theme.of(context),
-          child: WebviewScreen(
-            uri: uri,
-            html: html,
-            onTapSnapshot: onTapSnapshot,
-          ),
-        ),
+      material.MaterialPageRoute(
+        builder:
+            (context) => material.Theme(
+              data: theme ?? material.Theme.of(context),
+              child: WebviewScreen(
+                uri: uri,
+                html: html,
+                onTapSnapshot: onTapSnapshot,
+              ),
+            ),
       ),
     );
   }

@@ -42,15 +42,6 @@ class ItemLogWidget extends StatelessWidget {
     );
   }
 
-  // final String message;
-  // final DateTime? time;
-  // final int? sequenceNumber;
-  // final int level;
-  // final String? name;
-  // final Zone? zone;
-  // final Object? error;
-  // final StackTrace? stackTrace;
-
   Widget _buildLogInfo(BuildContext context) {
     return Expanded(
       child: Padding(

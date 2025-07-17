@@ -2,12 +2,12 @@ import 'package:rxdart/rxdart.dart';
 
 import '../model/log_model.dart';
 
-class LogStorage {
+class Storage {
   final BehaviorSubject<List<LogModel>> _logs;
 
   final int _capacity;
 
-  LogStorage({required int capacity})
+  Storage({required int capacity})
       : _logs = BehaviorSubject.seeded([]),
         _capacity = capacity;
 
