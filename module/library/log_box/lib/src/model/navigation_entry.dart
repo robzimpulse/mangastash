@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import '../common/enum.dart';
 import 'entry.dart';
 
