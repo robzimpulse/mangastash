@@ -62,6 +62,7 @@ class MainRouteBuilder extends BaseRouteBuilder {
   @override
   RouteBase root({
     required ServiceLocator locator,
+    List<NavigatorObserver> observers = const [],
   }) {
     return StatefulShellRoute.indexedStack(
       builder: (context, state, shell) => MainScreen(
@@ -83,26 +84,31 @@ class MainRouteBuilder extends BaseRouteBuilder {
       ),
       branches: [
         StatefulShellBranch(
+          observers: observers,
           routes: [
             LibraryRouteBuilder().root(locator: locator),
           ],
         ),
         StatefulShellBranch(
+          observers: observers,
           routes: [
             UpdatesRouteBuilder().root(locator: locator),
           ],
         ),
         StatefulShellBranch(
+          observers: observers,
           routes: [
             HistoryRouteBuilder().root(locator: locator),
           ],
         ),
         StatefulShellBranch(
+          observers: observers,
           routes: [
             BrowseRouteBuilder().root(locator: locator),
           ],
         ),
         StatefulShellBranch(
+          observers: observers,
           routes: [
             MoreRouteBuilder().root(locator: locator),
           ],

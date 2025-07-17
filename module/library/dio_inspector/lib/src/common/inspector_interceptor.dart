@@ -14,12 +14,8 @@ import 'http_activity_storage.dart';
 
 class InspectorInterceptor extends InterceptorsWrapper {
   final HttpActivityStorage storage;
-  NavigatorObserver? navigatorKey;
 
-  InspectorInterceptor({
-    required this.storage,
-    this.navigatorKey,
-  });
+  InspectorInterceptor({required this.storage});
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {

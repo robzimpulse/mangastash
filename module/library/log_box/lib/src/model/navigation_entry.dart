@@ -15,4 +15,28 @@ class NavigationEntry extends Entry {
     this.route,
     this.previousRoute,
   }): timestamp = DateTime.timestamp();
+
+  String get message {
+    return [
+      action.name.toUpperCase(),
+      switch (action) {
+        NavigationAction.push => 'To',
+        NavigationAction.pop => 'From',
+        NavigationAction.remove => 'From',
+        NavigationAction.replace => 'With',
+        NavigationAction.changeTop => 'With',
+        NavigationAction.startUserGesture => 'On',
+        NavigationAction.stopUserGesture => 'On',
+      },
+      switch (action) {
+        NavigationAction.push => route,
+        NavigationAction.pop => route,
+        NavigationAction.remove => previousRoute,
+        NavigationAction.replace => previousRoute,
+        NavigationAction.changeTop => previousRoute,
+        NavigationAction.startUserGesture => route,
+        NavigationAction.stopUserGesture => route,
+      }?.settings.name ?? 'Undefined',
+    ].join(' ');
+  }
 }

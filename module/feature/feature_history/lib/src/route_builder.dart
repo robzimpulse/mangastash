@@ -10,6 +10,7 @@ class HistoryRouteBuilder extends BaseRouteBuilder {
   @override
   GoRoute root({
     required ServiceLocator locator,
+    List<NavigatorObserver> observers = const [],
   }) {
     return GoRoute(
       path: HistoryRoutePath.history,

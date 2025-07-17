@@ -106,6 +106,8 @@ class _MangaStashAppState extends State<MangaStashApp> {
       routes: MainRouteBuilder().allRoutes(
         locator: locator,
         rootNavigatorKey: rootNavigatorKey,
+        // TODO: add observer here
+        observers: [],
       ),
       observers: [
         BaseRouteObserver(updateCurrentRouteSettingUseCase: locator()),

@@ -16,10 +16,7 @@ class DioInspector {
   DioInspector._();
 
   InspectorInterceptor getDioRequestInterceptor() {
-    return InspectorInterceptor(
-      navigatorKey: navigatorObserver,
-      storage: _storage,
-    );
+    return InspectorInterceptor(storage: _storage);
   }
 
   void navigateToInspector({ThemeData? theme}) {
