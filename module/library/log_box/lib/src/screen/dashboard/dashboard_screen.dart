@@ -29,6 +29,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final FocusNode focusNode = FocusNode();
   final ValueNotifier<String> keyword = ValueNotifier('');
   final ValueNotifier<bool> isSearchMode = ValueNotifier(false);
+  final ValueNotifier<Set<Type>> types = ValueNotifier({});
 
   @override
   void dispose() {
@@ -36,6 +37,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     focusNode.dispose();
     keyword.dispose();
     isSearchMode.dispose();
+    types.dispose();
     super.dispose();
   }
 
@@ -49,27 +51,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  bool _filter({required Entry value, required String keyword}) {
-    if (value is LogEntry) {
-      return value.message.toLowerCase().contains(keyword.toLowerCase());
-    }
+  bool _filter({
+    required Entry value,
+    required String keyword,
+    Set<Type> types = const {},
+  }) {
+    return [
+      if (value is LogEntry)
+        value.message.toLowerCase().contains(keyword.toLowerCase())
+      else if (value is NavigationEntry)
+        [
+          value.route?.toLowerCase().contains(keyword.toLowerCase()),
+          value.previousRoute?.toLowerCase().contains(keyword.toLowerCase()),
+        ].nonNulls.contains(true)
+      else if (value is NetworkEntry)
+        value.uri?.toLowerCase().contains(keyword.toLowerCase()) ?? false
+      else if (value is WebviewEntry)
+        value.uri.toLowerCase().contains(keyword.toLowerCase()),
 
-    if (value is NavigationEntry) {
-      return [
-        value.route?.toLowerCase().contains(keyword.toLowerCase()),
-        value.previousRoute?.toLowerCase().contains(keyword.toLowerCase()),
-      ].nonNulls.contains(true);
-    }
-
-    if (value is NetworkEntry) {
-      return value.uri?.toLowerCase().contains(keyword.toLowerCase()) ?? false;
-    }
-
-    if (value is WebviewEntry) {
-      return value.uri.toLowerCase().contains(keyword.toLowerCase());
-    }
-
-    return false;
+      if (types.isNotEmpty) types.contains(value.runtimeType),
+    ].every((e) => e);
   }
 
   Widget _item(Entry value) {
@@ -115,143 +116,122 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return PopScope(
       canPop: !isSearchMode.value,
       onPopInvokedWithResult: (success, _) => !success ? _toggleSearch() : {},
-      child: DefaultTabController(
-        length: 5,
-        child: Scaffold(
-          appBar: AppBar(
-            actions: [
-              ValueListenableBuilder(
-                valueListenable: isSearchMode,
-                builder: (context, isSearch, _) {
-                  return IconButton(
-                    onPressed: _toggleSearch,
-                    icon: Icon(isSearch ? Icons.close : Icons.search),
-                  );
-                },
-              ),
-              IconButton(
-                onPressed: () => widget.storage.clear(),
-                icon: const Icon(Icons.delete),
-              ),
-            ],
-            title: ValueListenableBuilder(
+      child: Scaffold(
+        appBar: AppBar(
+          actions: [
+            ValueListenableBuilder(
               valueListenable: isSearchMode,
               builder: (context, isSearch, _) {
-                if (!isSearch) return const Text('Log Dashboard');
-                return Container(
-                  alignment: Alignment.centerLeft,
-                  child: TextField(
-                    autofocus: true,
-                    onChanged: (text) => keyword.value = text,
-                    focusNode: focusNode,
-                    controller: searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search...',
-                      filled: false,
-                      border: InputBorder.none,
-                      hintStyle: theme.textTheme.titleLarge?.copyWith(
-                        color: Colors.white,
-                      ),
-                    ),
-                    cursorColor: Colors.white,
-                    style: theme.textTheme.titleLarge?.copyWith(
+                return IconButton(
+                  onPressed: _toggleSearch,
+                  icon: Icon(isSearch ? Icons.close : Icons.search),
+                );
+              },
+            ),
+            IconButton(
+              onPressed: () => widget.storage.clear(),
+              icon: const Icon(Icons.delete),
+            ),
+          ],
+          title: ValueListenableBuilder(
+            valueListenable: isSearchMode,
+            builder: (context, isSearch, _) {
+              if (!isSearch) return const Text('Log Dashboard');
+              return Container(
+                alignment: Alignment.centerLeft,
+                child: TextField(
+                  autofocus: true,
+                  onChanged: (text) => keyword.value = text,
+                  focusNode: focusNode,
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search...',
+                    filled: false,
+                    border: InputBorder.none,
+                    hintStyle: theme.textTheme.titleLarge?.copyWith(
                       color: Colors.white,
                     ),
                   ),
-                );
-              },
-            ),
-            bottom: TabBar(
-              tabAlignment: TabAlignment.start,
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.white,
-              isScrollable: true,
-              tabs: [
-                _tab(
-                  icon: Icons.list_alt,
-                  title: 'All',
-                  stream: widget.storage.all,
+                  cursorColor: Colors.white,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: Colors.white,
+                  ),
                 ),
-                _tab(
-                  icon: Icons.bug_report,
-                  title: 'Logging',
-                  stream: widget.storage.typed<LogEntry>(),
-                ),
-                _tab(
-                  icon: Icons.navigation,
-                  title: 'Navigation',
-                  stream: widget.storage.typed<NavigationEntry>(),
-                ),
-                _tab(
-                  icon: Icons.public,
-                  title: 'Network',
-                  stream: widget.storage.typed<NetworkEntry>(),
-                ),
-                _tab(
-                  icon: Icons.open_in_browser,
-                  title: 'Webview',
-                  stream: widget.storage.typed<WebviewEntry>(),
-                ),
-              ],
-            ),
+              );
+            },
           ),
-          body: SafeArea(
-            child: TabBarView(
-              children: [
-                _content(stream: widget.storage.all),
-                _content(stream: widget.storage.typed<LogEntry>()),
-                _content(stream: widget.storage.typed<NavigationEntry>()),
-                _content(stream: widget.storage.typed<NetworkEntry>()),
-                _content(stream: widget.storage.typed<WebviewEntry>()),
-              ],
-            ),
-          ),
+        ),
+        body: SafeArea(
+          child: Column(children: [_types(), Expanded(child: _content())]),
         ),
       ),
     );
   }
 
-  Tab _tab({
-    required IconData icon,
-    required String title,
-    required Stream<List<Entry>> stream,
-  }) {
-    return Tab(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+  Widget _types() {
+    return StreamBuilder(
+      stream: widget.storage.type,
+      builder: (context, snapshot) {
+        final data = snapshot.data;
+
+        if (data == null || data.isEmpty) return const SizedBox.shrink();
+
+        return Row(
           children: [
-            Icon(icon, size: 24),
-            const SizedBox(height: 4),
-            ValueListenableBuilder(
-              valueListenable: keyword,
-              builder: (context, keyword, _) {
-                return StreamBuilder(
-                  stream: stream.map(
-                    (e) => [
-                      ...e.where((e) => _filter(value: e, keyword: keyword)),
-                    ],
-                  ),
-                  builder: (context, snapshot) {
-                    return Text('$title (${snapshot.data?.length ?? 0})');
-                  },
-                );
-              },
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                direction: Axis.horizontal,
+                children: [
+                  for (final type in data)
+                    ValueListenableBuilder(
+                      valueListenable: types,
+                      builder: (context, types, child) {
+                        return OutlinedButton(
+                          onPressed: () {
+                            var data = {...types};
+                            if (data.contains(type)) {
+                              data.remove(type);
+                            } else {
+                              data.add(type);
+                            }
+                            this.types.value = data;
+                          },
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor:
+                                types.contains(type) ? Colors.grey : null,
+                          ),
+                          child: child,
+                        );
+                      },
+                      child: Text(type.toString()),
+                    ),
+                ],
+              ),
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _content({required Stream<List<Entry>> stream}) {
-    return ValueListenableBuilder(
-      valueListenable: keyword,
-      builder: (context, keyword, _) {
+  Widget _content() {
+    return AnimatedBuilder(
+      animation: Listenable.merge([keyword, types]),
+      builder: (context, _) {
         return StreamBuilder(
-          stream: stream.map(
-            (e) => [...e.where((e) => _filter(value: e, keyword: keyword))],
+          stream: widget.storage.all.map(
+            (e) => [
+              ...e.where(
+                (e) => _filter(
+                  value: e,
+                  keyword: keyword.value,
+                  types: types.value,
+                ),
+              ),
+            ],
           ),
           builder: (context, snapshot) {
             final data = snapshot.data;
@@ -260,16 +240,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               return const CircularProgressIndicator();
             }
 
-            final filtered =
-                keyword.isNotEmpty
-                    ? data.where((e) => _filter(value: e, keyword: keyword))
-                    : data;
-
             return ListView.separated(
-              key: PageStorageKey('${stream.runtimeType}'),
-              itemCount: filtered.length,
+              itemCount: data.length,
               itemBuilder: (context, index) {
-                final entry = filtered.elementAtOrNull(index);
+                final entry = data.elementAtOrNull(index);
                 if (entry == null) return null;
                 return _item(entry);
               },

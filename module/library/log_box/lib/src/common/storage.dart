@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../model/entry.dart';
@@ -16,8 +17,8 @@ class Storage {
 
   Stream<List<Entry>> get all => _logs.stream;
 
-  Stream<List<T>> typed<T>() =>
-      _logs.stream.map((e) => [...e.whereType<T>()]).distinct();
+  Stream<List<Type>> get type =>
+      _logs.stream.map((e) => [...e.groupListsBy((e) => e.runtimeType).keys]);
 
   void add({required Entry log}) {
     var logs = [...?_logs.valueOrNull];
@@ -25,12 +26,16 @@ class Storage {
     if (index >= 0) {
       final data = _merge(log: log, old: logs.removeAt(index));
       if (data != null) {
-        _logs.add([...[data, ...logs].take(_capacity)]);
+        _logs.add([
+          ...[data, ...logs].take(_capacity),
+        ]);
         return;
       }
     }
 
-    _logs.add([...[log, ...logs].take(_capacity)]);
+    _logs.add([
+      ...[log, ...logs].take(_capacity),
+    ]);
   }
 
   Entry? _merge({required Entry log, required Entry old}) {
