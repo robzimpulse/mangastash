@@ -62,7 +62,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
 
     if (value is NetworkEntry) {
-      return value.uri.toLowerCase().contains(keyword.toLowerCase());
+      return value.uri?.toLowerCase().contains(keyword.toLowerCase()) ?? false;
     }
 
     if (value is WebviewEntry) {

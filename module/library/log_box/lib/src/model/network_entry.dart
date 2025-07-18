@@ -4,29 +4,29 @@ import 'package:universal_io/io.dart';
 import 'entry.dart';
 
 class NetworkEntry extends Entry {
-  final String client;
-  final bool loading;
-  final bool secure;
-  final String method;
-  final String endpoint;
-  final String server;
-  final String uri;
-  final HttpRequestModel request;
-  final HttpResponseModel response;
-  final HttpErrorModel error;
+  final String? client;
+  final bool? loading;
+  final bool? secure;
+  final String? method;
+  final String? endpoint;
+  final String? server;
+  final String? uri;
+  final HttpRequestModel? request;
+  final HttpResponseModel? response;
+  final HttpErrorModel? error;
 
   NetworkEntry({
     required super.id,
-    required this.client,
-    required this.loading,
-    required this.secure,
-    required this.method,
-    required this.endpoint,
-    required this.server,
-    required this.uri,
-    required this.request,
-    required this.response,
-    required this.error,
+    this.client,
+    this.loading = true,
+    this.secure,
+    this.method,
+    this.endpoint,
+    this.server,
+    this.uri,
+    this.request,
+    this.response,
+    this.error,
   });
 
   NetworkEntry copyWith({

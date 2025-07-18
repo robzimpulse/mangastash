@@ -3,9 +3,11 @@ library log_box;
 import 'dart:async';
 import 'dart:developer' as dev;
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'src/common/navigator_observer.dart' as alt;
+import 'src/common/network_interceptor.dart';
 import 'src/common/storage.dart';
 import 'src/model/log_entry.dart';
 import 'src/screen/dashboard/dashboard_screen.dart';
@@ -28,6 +30,8 @@ class LogBox {
       },
     );
   }
+
+  Interceptor get interceptor => NetworkInterceptor(storage: _storage);
 
   factory LogBox() => _instance;
 

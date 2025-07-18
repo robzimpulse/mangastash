@@ -26,6 +26,7 @@ class DioManager {
 
     dio.interceptors.addAll(
       [
+        log.interceptor,
         inspector.getDioRequestInterceptor(),
         DioThrottlerInterceptor(
           const Duration(milliseconds: 200),
