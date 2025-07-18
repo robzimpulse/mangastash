@@ -4,3 +4,9 @@ enum NavigationAction {
   remove,
   replace,
 }
+
+enum WebviewNavigationAction {
+  allow,
+  cancel,
+  download,
+}

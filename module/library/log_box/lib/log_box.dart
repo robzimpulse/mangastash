@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'src/common/navigator_observer.dart' as alt;
 import 'src/common/network_interceptor.dart';
 import 'src/common/storage.dart';
+import 'src/common/webview_delegate.dart';
 import 'src/model/log_entry.dart';
 import 'src/screen/dashboard/dashboard_screen.dart';
 import 'src/screen/webview/webview_screen.dart';
@@ -33,6 +34,8 @@ class LogBox {
 
   Interceptor get interceptor => NetworkInterceptor(storage: _storage);
 
+  WebviewDelegate get webviewDelegate => WebviewDelegate(storage: _storage);
+
   factory LogBox() => _instance;
 
   LogBox._();
@@ -56,10 +59,7 @@ class LogBox {
     dev.log(message, name: name ?? 'Log Box');
   }
 
-  void dashboard({
-    required BuildContext context,
-    ThemeData? theme,
-  }) {
+  void dashboard({required BuildContext context, ThemeData? theme}) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -91,6 +91,7 @@ class LogBox {
             child: WebviewScreen(
               uri: uri,
               html: html,
+              delegate: webviewDelegate,
               onTapSnapshot: onTapSnapshot,
             ),
           );

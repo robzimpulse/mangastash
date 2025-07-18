@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../model/log_html_model.dart';
 import '../../model/log_model.dart';
-import '../webview/webview_screen.dart';
 import 'widget/item_column.dart';
 
 class DetailScreen extends StatelessWidget {
@@ -42,23 +41,6 @@ class DetailScreen extends StatelessWidget {
         onPressed: () => Navigator.pop(context),
         icon: const Icon(Icons.arrow_back),
       ),
-      actions: [
-        if (data is LogHtmlModel)
-          IconButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => WebviewScreen(
-                  html: data.html,
-                  uri: data.uri,
-                  scripts: data.scripts,
-                  onTapSnapshot: onTapSnapshot,
-                ),
-              ),
-            ),
-            icon: const Icon(Icons.web),
-          ),
-      ],
       bottom: const TabBar(
         labelColor: Colors.white,
         unselectedLabelColor: Colors.white,
