@@ -28,7 +28,6 @@ class HeadlessWebviewManager {
     final uri = WebUri(url);
     final html = await _fetch(uri: uri, scripts: scripts, useCache: useCache);
     if (html == null) return null;
-    _log.logHtml(uri, html, scripts: scripts, name: runtimeType.toString());
     return parse(html);
   }
 
