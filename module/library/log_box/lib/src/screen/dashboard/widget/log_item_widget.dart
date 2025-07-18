@@ -17,17 +17,33 @@ class LogItemWidget extends StatelessWidget {
     return ListTile(
       visualDensity: VisualDensity.compact,
       onTap: onTap,
-      title: Row(
+      title: Column(
         children: [
-          const Icon(Icons.bug_report, size: 16),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              data.message,
-              maxLines: 2,
-              style: theme.textTheme.labelLarge,
-              overflow: TextOverflow.ellipsis,
-            ),
+          Row(
+            children: [
+              const Icon(Icons.bug_report, size: 16),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  data.name ?? 'Logging',
+                  maxLines: 1,
+                  style: theme.textTheme.labelLarge,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  data.message,
+                  maxLines: 2,
+                  style: theme.textTheme.labelMedium,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
         ],
       ),

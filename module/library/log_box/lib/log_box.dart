@@ -75,10 +75,8 @@ class LogBox {
     _storage.add(
       log: LogEntry.create(
         id: id,
-        message: [
-          if (name != null && name.isNotEmpty) '[$name]',
-          message,
-        ].join(' '),
+        name: name,
+        message: message,
         extra: extra ?? {},
         error: error,
       ),
