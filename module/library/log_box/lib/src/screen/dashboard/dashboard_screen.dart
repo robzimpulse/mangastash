@@ -176,42 +176,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
         if (data == null || data.isEmpty) return const SizedBox.shrink();
 
-        return Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                direction: Axis.horizontal,
-                children: [
-                  for (final type in data)
-                    ValueListenableBuilder(
-                      valueListenable: types,
-                      builder: (context, types, child) {
-                        return OutlinedButton(
-                          onPressed: () {
-                            var data = {...types};
-                            if (data.contains(type)) {
-                              data.remove(type);
-                            } else {
-                              data.add(type);
-                            }
-                            this.types.value = data;
-                          },
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor:
-                                types.contains(type) ? Colors.grey : null,
-                          ),
-                          child: child,
-                        );
-                      },
-                      child: Text(type.toString()),
-                    ),
-                ],
-              ),
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            scrollDirection: Axis.horizontal,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              direction: Axis.horizontal,
+              children: [
+                for (final type in data)
+                  ValueListenableBuilder(
+                    valueListenable: types,
+                    builder: (context, types, child) {
+                      return OutlinedButton(
+                        onPressed: () {
+                          var data = {...types};
+                          if (data.contains(type)) {
+                            data.remove(type);
+                          } else {
+                            data.add(type);
+                          }
+                          this.types.value = data;
+                        },
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor:
+                              types.contains(type) ? Colors.grey : null,
+                        ),
+                        child: child,
+                      );
+                    },
+                    child: Text(type.toString()),
+                  ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
