@@ -36,7 +36,7 @@ class DetailScreen extends StatelessWidget {
   PreferredSizeWidget _appBar(BuildContext context) {
     final data = this.data;
     return AppBar(
-      title: const Text('Detail Activities'),
+      title: const Text('Detail Log'),
       elevation: 3,
       leading: IconButton(
         onPressed: () => Navigator.pop(context),

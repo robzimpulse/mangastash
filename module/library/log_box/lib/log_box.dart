@@ -87,9 +87,9 @@ class LogBox {
   void dashboard({
     required BuildContext context,
     ThemeData? theme,
-    Function(String? url, String? html)? onTapSnapshot,
   }) {
-    Navigator.of(context).push(
+    Navigator.push(
+      context,
       MaterialPageRoute(
         settings: const RouteSettings(name: 'Log Box Dashboard'),
         builder: (context) {
@@ -109,7 +109,8 @@ class LogBox {
     ThemeData? theme,
     Function(String? url, String? html)? onTapSnapshot,
   }) async {
-    await Navigator.of(context).push(
+    await Navigator.push(
+      context,
       MaterialPageRoute(
         settings: const RouteSettings(name: 'Log Box Webview'),
         builder: (context) {

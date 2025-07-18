@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:core_storage/core_storage.dart';
 import 'package:dio_inspector/dio_inspector.dart';
 import 'package:log_box/log_box.dart';
@@ -25,9 +23,7 @@ class AdvancedScreen extends StatelessWidget {
     required this.cacheManager,
   });
 
-  static Widget create({
-    required ServiceLocator locator,
-  }) {
+  static Widget create({required ServiceLocator locator}) {
     return BlocProvider(
       create: (_) => AdvancedScreenCubit(),
       child: AdvancedScreen(
@@ -43,16 +39,12 @@ class AdvancedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      appBar: AppBar(
-        title: const Text('Advanced Screen'),
-      ),
+      appBar: AppBar(title: const Text('Advanced Screen')),
       body: AdaptivePhysicListView(
         children: [
           ListTile(
             title: const Text('HTTP Inspector'),
-            onTap: () => inspector.navigateToInspector(
-              theme: Theme.of(context),
-            ),
+            onTap: () => inspector.navigateToInspector(),
             leading: const SizedBox(
               height: double.infinity,
               child: Icon(Icons.http),
@@ -60,18 +52,7 @@ class AdvancedScreen extends StatelessWidget {
           ),
           ListTile(
             title: const Text('Log Inspector'),
-            onTap: () => logBox.dashboard(
-              context: context,
-              onTapSnapshot: (url, html) {
-                if (url == null || html == null) return;
-                cacheManager.putFile(
-                  url,
-                  utf8.encode(html),
-                  fileExtension: 'html',
-                  maxAge: const Duration(minutes: 30),
-                );
-              },
-            ),
+            onTap: () => logBox.dashboard(context: context),
             leading: const SizedBox(
               height: double.infinity,
               child: Icon(Icons.wrap_text),
