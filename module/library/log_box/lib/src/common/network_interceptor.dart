@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 import '../model/network_entry.dart';
-import 'extension.dart';
 import 'storage.dart';
 
 class NetworkInterceptor extends Interceptor {
@@ -17,11 +16,11 @@ class NetworkInterceptor extends Interceptor {
 
     for (final entry in options.queryParameters.entries) {
       if (mergedQueryParameters.containsKey(entry.key)) {
-        mergedQueryParameters[entry.key] =
-            [
-              mergedQueryParameters[entry],
-              entry.value,
-            ].expand((e) => e is List ? e : [e]).toList();
+        final values = [
+          mergedQueryParameters[entry],
+          entry.value,
+        ].expand((e) => e is List ? e : [e]);
+        mergedQueryParameters[entry.key] = [...values];
       } else {
         mergedQueryParameters[entry.key] = entry.value;
       }
