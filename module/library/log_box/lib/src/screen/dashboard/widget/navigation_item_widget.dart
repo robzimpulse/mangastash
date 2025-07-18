@@ -42,7 +42,7 @@ class NavigationItemWidget extends StatelessWidget {
               ),
             ],
           ),
-          Text('Current: ${data.route}', style: theme.textTheme.labelMedium),
+          Text('Route: ${data.route}', style: theme.textTheme.labelMedium),
           Text(
             'Previous: ${data.previousRoute}',
             style: theme.textTheme.labelMedium,
