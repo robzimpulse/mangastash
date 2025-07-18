@@ -107,7 +107,6 @@ class _MangaStashAppState extends State<MangaStashApp> {
         observers: () => [logBox.observer],
       ),
       observers: [
-        BaseRouteObserver(updateCurrentRouteSettingUseCase: locator()),
         inspector.navigatorObserver,
         logBox.observer,
         viewer.navigatorObserver,
