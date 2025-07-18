@@ -10,12 +10,47 @@ class NetworkItemWidget extends StatelessWidget {
 
   const NetworkItemWidget({super.key, required this.data, this.onTap});
 
+  Color? _color() {
+    final status = data.response?.status;
+
+    if (status == null) return null;
+
+    if (status >= 200 && status < 300) {
+      return Colors.green;
+    } else if (status >= 300 && status < 400) {
+      return Colors.orange;
+    } else {
+      return Colors.red;
+    }
+  }
+
+  Widget _status(BuildContext context) {
+    if (data.loading == true) {
+      return const SizedBox(width: 16, height: 16, child: CircularProgressIndicator());
+    }
+
+    final theme = Theme.of(context);
+    final status = data.response?.status;
+    if (status != null) {
+      return Text(
+        '$status',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.labelLarge?.copyWith(color: _color()),
+      );
+    }
+
+    return Text(
+      'ERROR',
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: theme.textTheme.labelLarge?.copyWith(color: Colors.red),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    final start = data.request?.time;
-    final stop = data.response?.time;
 
     return ListTile(
       onTap: onTap,
@@ -24,11 +59,13 @@ class NetworkItemWidget extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.public, size: 16),
+              Icon(Icons.public, size: 16, color: _color()),
+              const SizedBox(width: 8),
+              _status(context),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '${data.method ?? 'Undefined'} ${data.server}',
+                  '${data.method ?? 'Undefined'} ${data.endpoint}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.labelLarge,
@@ -40,7 +77,7 @@ class NetworkItemWidget extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  '${data.endpoint}',
+                  '${data.server}',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.labelMedium,
@@ -50,19 +87,9 @@ class NetworkItemWidget extends StatelessWidget {
           ),
         ],
       ),
-      subtitle: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            '${start?.dateTimeFormatted} ',
-            style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
-          ),
-
-          Text(
-            '${stop?.dateTimeFormatted} ',
-            style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
-          ),
-        ],
+      subtitle: Text(
+        '${data.request?.time.dateTimeFormatted} ',
+        style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
       ),
       trailing: const Icon(Icons.chevron_right),
     );

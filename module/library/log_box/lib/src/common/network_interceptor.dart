@@ -93,6 +93,7 @@ class NetworkInterceptor extends Interceptor {
     _storage.add(
       log: NetworkEntry(
         id: response.requestOptions.hashCode.toString(),
+        loading: false,
         response: HttpResponseModel.create(
           status: response.statusCode,
           headers: response.headers.map,
@@ -113,6 +114,7 @@ class NetworkInterceptor extends Interceptor {
     _storage.add(
       log: NetworkEntry(
         id: err.requestOptions.hashCode.toString(),
+        loading: false,
         error: HttpErrorModel(
           error: err.toString(),
           stackTrace: err.stackTrace,
