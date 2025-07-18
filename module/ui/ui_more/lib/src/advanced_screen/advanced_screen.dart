@@ -60,7 +60,7 @@ class AdvancedScreen extends StatelessWidget {
           ),
           ListTile(
             title: const Text('Log Inspector'),
-            onTap: () => logBox.navigateToLogBox(
+            onTap: () => logBox.dashboard(
               context: context,
               onTapSnapshot: (url, html) {
                 if (url == null || html == null) return;

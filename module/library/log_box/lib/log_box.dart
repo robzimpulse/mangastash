@@ -82,7 +82,7 @@ class LogBox {
     dev.log(message, name: name ?? 'Log Box');
   }
 
-  void navigateToLogBox({
+  void dashboard({
     required BuildContext context,
     ThemeData? theme,
     Function(String? url, String? html)? onTapSnapshot,
@@ -100,7 +100,7 @@ class LogBox {
     );
   }
 
-  Future<void> navigateToWebview({
+  Future<void> webview({
     required BuildContext context,
     required Uri uri,
     required String html,

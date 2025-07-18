@@ -28,7 +28,7 @@ class CrawlUrlUseCase {
         .then((file) => file?.file.readAsString());
 
     if (!context.mounted) return;
-    await _logBox.navigateToWebview(
+    await _logBox.webview(
       context: context,
       uri: uri,
       html: cached ?? '',
