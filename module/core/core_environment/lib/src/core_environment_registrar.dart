@@ -15,27 +15,32 @@ class CoreEnvironmentRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
-    final MeasureProcessUseCase measurement = locator();
-
-    await measurement.execute(() async {
-      locator.registerSingleton(ThemeManager(storage: locator()));
-      locator.alias<UpdateThemeUseCase, ThemeManager>();
-      locator.alias<ListenThemeUseCase, ThemeManager>();
-
-      locator.registerSingleton(await LocaleManager.create(storage: locator()));
-      locator.alias<UpdateLocaleUseCase, LocaleManager>();
-      locator.alias<ListenLocaleUseCase, LocaleManager>();
-
-      locator.registerSingleton(await DateManager.create());
-      locator.alias<ListenCurrentTimezoneUseCase, DateManager>();
-
-      await workerManager.init(dynamicSpawning: true);
-    });
 
     log.log(
-      'Finish Register ${runtimeType.toString()}',
+      'Register ${runtimeType.toString()}',
+      id: runtimeType.toString(),
       name: 'Services',
-      extra: {'duration': measurement.elapsed},
+      extra: {'start': DateTime.timestamp()},
+    );
+
+    locator.registerSingleton(ThemeManager(storage: locator()));
+    locator.alias<UpdateThemeUseCase, ThemeManager>();
+    locator.alias<ListenThemeUseCase, ThemeManager>();
+
+    locator.registerSingleton(await LocaleManager.create(storage: locator()));
+    locator.alias<UpdateLocaleUseCase, LocaleManager>();
+    locator.alias<ListenLocaleUseCase, LocaleManager>();
+
+    locator.registerSingleton(await DateManager.create());
+    locator.alias<ListenCurrentTimezoneUseCase, DateManager>();
+
+    await workerManager.init(dynamicSpawning: true);
+
+    log.log(
+      'Register ${runtimeType.toString()}',
+      id: runtimeType.toString(),
+      name: 'Services',
+      extra: {'finish': DateTime.timestamp()},
     );
   }
 }

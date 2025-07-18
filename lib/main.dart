@@ -59,7 +59,6 @@ class _MangaStashAppState extends State<MangaStashApp> {
     if (widget.testing) return;
 
     widget.locator.registerSingleton(LogBox());
-    widget.locator.registerFactory(() => MeasureProcessUseCase());
 
     // TODO: register module registrar here
     await widget.locator.registerRegistrar(CoreStorageRegistrar());
@@ -95,17 +94,17 @@ class _MangaStashAppState extends State<MangaStashApp> {
     return GoRouter(
       navigatorKey: rootNavigatorKey,
       initialLocation: initialRoute,
-      onException: (context, state, router) => router.push(
-        MainPath.notFound,
-        extra: 'Path Not Found (${state.uri.toString()})',
-      ),
+      onException: (context, state, router) {
+        router.push(
+          MainPath.notFound,
+          extra: 'Path Not Found (${state.uri.toString()})',
+        );
+      },
       routes: MainRouteBuilder().allRoutes(
         locator: locator,
         rootNavigatorKey: rootNavigatorKey,
         // TODO: add observer here
-        observers: () => [
-          logBox.observer,
-        ],
+        observers: () => [logBox.observer],
       ),
       observers: [
         BaseRouteObserver(updateCurrentRouteSettingUseCase: locator()),

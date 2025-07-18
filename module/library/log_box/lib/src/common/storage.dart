@@ -20,23 +20,17 @@ class Storage {
       _logs.stream.map((e) => [...e.whereType<T>()]).distinct();
 
   void add({required Entry log}) {
-    final logs = [..._logs.value];
+    var logs = [...?_logs.valueOrNull];
     final index = logs.indexWhere((e) => e.id == log.id);
     if (index >= 0) {
-      final data = _merge(log: log, old: logs.elementAt(index));
+      final data = _merge(log: log, old: logs.removeAt(index));
       if (data != null) {
-        _insert(log: data);
+        _logs.add([...[data, ...logs].take(_capacity)]);
         return;
       }
     }
 
-    _insert(log: log);
-  }
-
-  void _insert({required Entry log}) {
-    _logs.add([
-      ...[log, ...?_logs.valueOrNull].take(_capacity),
-    ]);
+    _logs.add([...[log, ...logs].take(_capacity)]);
   }
 
   Entry? _merge({required Entry log, required Entry old}) {

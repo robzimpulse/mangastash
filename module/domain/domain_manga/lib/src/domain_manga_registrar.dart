@@ -34,155 +34,146 @@ class DomainMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
-    final MeasureProcessUseCase measurement = locator();
-
-    await measurement.execute(() async {
-
-      locator.registerSingleton(
-        GlobalOptionsManager(storage: locator()),
-        dispose: (e) => e.dispose(),
-      );
-      locator.alias<ListenSearchParameterUseCase, GlobalOptionsManager>();
-      locator.alias<UpdateSearchParameterUseCase, GlobalOptionsManager>();
-      locator.alias<ListenSourcesUseCase, GlobalOptionsManager>();
-      locator.alias<UpdateSourcesUseCase, GlobalOptionsManager>();
-
-      locator.registerSingleton(
-        JobManager(
-          log: log,
-          jobDao: locator(),
-          cacheManager: locator(),
-          getChapterUseCase: () => locator(),
-          getMangaUseCase: () => locator(),
-          getAllChapterUseCase: () => locator(),
-          listenSearchParameterUseCase: locator(),
-        ),
-        dispose: (e) => e.dispose(),
-      );
-      locator.alias<PrefetchMangaUseCase, JobManager>();
-      locator.alias<PrefetchChapterUseCase, JobManager>();
-      locator.alias<ListenPrefetchUseCase, JobManager>();
-
-      locator.registerSingleton(HistoryManager(historyDao: locator()));
-      locator.alias<ListenReadHistoryUseCase, HistoryManager>();
-      locator.alias<ListenUnreadHistoryUseCase, HistoryManager>();
-
-      locator.registerSingleton(
-        HeadlessWebviewManager(log: log, cacheManager: locator()),
-        dispose: (e) => e.dispose(),
-      );
-
-      // manga dex services
-      locator.registerFactory(() => MangaService(locator()));
-      locator.registerFactory(() => ChapterService(locator()));
-      locator.registerFactory(() => AtHomeService(locator()));
-      locator.registerFactory(() => AuthorService(locator()));
-      locator.registerFactory(() => CoverArtService(locator()));
-
-      // manga dex repositories
-      locator.registerFactory(() => AtHomeRepository(service: locator()));
-      locator.registerFactory(() => MangaRepository(service: locator()));
-      locator.registerFactory(
-        () => ChapterRepository(
-          mangaService: locator(),
-          chapterService: locator(),
-        ),
-      );
-      locator.registerFactory(() => AuthorRepository(service: locator()));
-      locator.registerFactory(() => CoverRepository(service: locator()));
-
-      locator.registerFactory(
-        () => CrawlUrlUseCase(
-          logBox: locator(),
-          cacheManager: locator(),
-        ),
-      );
-      locator.registerFactory(
-        () => SearchMangaUseCase(
-          logBox: locator(),
-          webview: locator(),
-          mangaDao: locator(),
-          cacheManager: locator(),
-          mangaRepository: locator(),
-        ),
-      );
-      locator.registerFactory(
-        () => SearchChapterUseCase(
-          logBox: locator(),
-          webview: locator(),
-          mangaDao: locator(),
-          chapterDao: locator(),
-          cacheManager: locator(),
-          chapterRepository: locator(),
-        ),
-      );
-      locator.registerFactory(
-        () => GetAllChapterUseCase(
-          searchChapterUseCase: locator(),
-        ),
-      );
-      locator.registerFactory(
-        () => GetMangaUseCase(
-          logBox: locator(),
-          webview: locator(),
-          mangaDao: locator(),
-          mangaService: locator(),
-          cacheManager: locator(),
-        ),
-      );
-      locator.registerFactory(
-        () => GetMangaFromUrlUseCase(
-          webview: locator(),
-          cacheManager: locator(),
-          mangaDao: locator(),
-          logBox: locator(),
-        ),
-      );
-      locator.registerFactory(
-        () => GetChapterUseCase(
-          logBox: locator(),
-          webview: locator(),
-          chapterDao: locator(),
-          cacheManager: locator(),
-          atHomeRepository: locator(),
-          chapterRepository: locator(),
-        ),
-      );
-      locator.registerFactory(
-        () => AddToLibraryUseCase(
-          libraryDao: locator(),
-        ),
-      );
-      locator.registerFactory(
-        () => RemoveFromLibraryUseCase(
-          libraryDao: locator(),
-        ),
-      );
-      locator.registerFactory(
-        () => UpdateChapterLastReadAtUseCase(
-          chapterDao: locator(),
-          logBox: locator(),
-        ),
-      );
-      locator.registerFactory(
-        () => GetTagsUseCase(
-          webview: locator(),
-          tagDao: locator(),
-          logBox: locator(),
-          mangaService: locator(),
-          cacheManager: locator(),
-        ),
-      );
-
-      locator.registerSingleton(LibraryManager(libraryDao: locator()));
-      locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
-      locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
-    });
 
     log.log(
-      'Finish Register ${runtimeType.toString()}',
+      'Register ${runtimeType.toString()}',
+      id: runtimeType.toString(),
       name: 'Services',
-      extra: {'duration': measurement.elapsed},
+      extra: {'start': DateTime.timestamp()},
+    );
+
+    locator.registerSingleton(
+      GlobalOptionsManager(storage: locator()),
+      dispose: (e) => e.dispose(),
+    );
+    locator.alias<ListenSearchParameterUseCase, GlobalOptionsManager>();
+    locator.alias<UpdateSearchParameterUseCase, GlobalOptionsManager>();
+    locator.alias<ListenSourcesUseCase, GlobalOptionsManager>();
+    locator.alias<UpdateSourcesUseCase, GlobalOptionsManager>();
+
+    locator.registerSingleton(
+      JobManager(
+        log: log,
+        jobDao: locator(),
+        cacheManager: locator(),
+        getChapterUseCase: () => locator(),
+        getMangaUseCase: () => locator(),
+        getAllChapterUseCase: () => locator(),
+        listenSearchParameterUseCase: locator(),
+      ),
+      dispose: (e) => e.dispose(),
+    );
+    locator.alias<PrefetchMangaUseCase, JobManager>();
+    locator.alias<PrefetchChapterUseCase, JobManager>();
+    locator.alias<ListenPrefetchUseCase, JobManager>();
+
+    locator.registerSingleton(HistoryManager(historyDao: locator()));
+    locator.alias<ListenReadHistoryUseCase, HistoryManager>();
+    locator.alias<ListenUnreadHistoryUseCase, HistoryManager>();
+
+    locator.registerSingleton(
+      HeadlessWebviewManager(log: log, cacheManager: locator()),
+      dispose: (e) => e.dispose(),
+    );
+
+    // manga dex services
+    locator.registerFactory(() => MangaService(locator()));
+    locator.registerFactory(() => ChapterService(locator()));
+    locator.registerFactory(() => AtHomeService(locator()));
+    locator.registerFactory(() => AuthorService(locator()));
+    locator.registerFactory(() => CoverArtService(locator()));
+
+    // manga dex repositories
+    locator.registerFactory(() => AtHomeRepository(service: locator()));
+    locator.registerFactory(() => MangaRepository(service: locator()));
+    locator.registerFactory(
+      () =>
+          ChapterRepository(mangaService: locator(), chapterService: locator()),
+    );
+    locator.registerFactory(() => AuthorRepository(service: locator()));
+    locator.registerFactory(() => CoverRepository(service: locator()));
+
+    locator.registerFactory(
+      () => CrawlUrlUseCase(logBox: locator(), cacheManager: locator()),
+    );
+    locator.registerFactory(
+      () => SearchMangaUseCase(
+        logBox: locator(),
+        webview: locator(),
+        mangaDao: locator(),
+        cacheManager: locator(),
+        mangaRepository: locator(),
+      ),
+    );
+    locator.registerFactory(
+      () => SearchChapterUseCase(
+        logBox: locator(),
+        webview: locator(),
+        mangaDao: locator(),
+        chapterDao: locator(),
+        cacheManager: locator(),
+        chapterRepository: locator(),
+      ),
+    );
+    locator.registerFactory(
+      () => GetAllChapterUseCase(searchChapterUseCase: locator()),
+    );
+    locator.registerFactory(
+      () => GetMangaUseCase(
+        logBox: locator(),
+        webview: locator(),
+        mangaDao: locator(),
+        mangaService: locator(),
+        cacheManager: locator(),
+      ),
+    );
+    locator.registerFactory(
+      () => GetMangaFromUrlUseCase(
+        webview: locator(),
+        cacheManager: locator(),
+        mangaDao: locator(),
+        logBox: locator(),
+      ),
+    );
+    locator.registerFactory(
+      () => GetChapterUseCase(
+        logBox: locator(),
+        webview: locator(),
+        chapterDao: locator(),
+        cacheManager: locator(),
+        atHomeRepository: locator(),
+        chapterRepository: locator(),
+      ),
+    );
+    locator.registerFactory(() => AddToLibraryUseCase(libraryDao: locator()));
+    locator.registerFactory(
+      () => RemoveFromLibraryUseCase(libraryDao: locator()),
+    );
+    locator.registerFactory(
+      () => UpdateChapterLastReadAtUseCase(
+        chapterDao: locator(),
+        logBox: locator(),
+      ),
+    );
+    locator.registerFactory(
+      () => GetTagsUseCase(
+        webview: locator(),
+        tagDao: locator(),
+        logBox: locator(),
+        mangaService: locator(),
+        cacheManager: locator(),
+      ),
+    );
+
+    locator.registerSingleton(LibraryManager(libraryDao: locator()));
+    locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
+    locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
+
+    log.log(
+      'Register ${runtimeType.toString()}',
+      id: runtimeType.toString(),
+      name: 'Services',
+      extra: {'finish': DateTime.timestamp()},
     );
   }
 }

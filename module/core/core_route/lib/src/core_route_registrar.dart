@@ -9,18 +9,23 @@ class CoreRouteRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
-    final MeasureProcessUseCase measurement = locator();
-
-    await measurement.execute(() async {
-      locator.registerSingleton(RouteHistoryManager());
-      locator.alias<ListenCurrentRouteSettingUseCase, RouteHistoryManager>();
-      locator.alias<UpdateCurrentRouteSettingUseCase, RouteHistoryManager>();
-    });
 
     log.log(
-      'Finish Register ${runtimeType.toString()}',
+      'Register ${runtimeType.toString()}',
+      id: runtimeType.toString(),
       name: 'Services',
-      extra: {'duration': measurement.elapsed},
+      extra: {'start': DateTime.timestamp()},
+    );
+
+    locator.registerSingleton(RouteHistoryManager());
+    locator.alias<ListenCurrentRouteSettingUseCase, RouteHistoryManager>();
+    locator.alias<UpdateCurrentRouteSettingUseCase, RouteHistoryManager>();
+
+    log.log(
+      'Register ${runtimeType.toString()}',
+      id: runtimeType.toString(),
+      name: 'Services',
+      extra: {'finish': DateTime.timestamp()},
     );
   }
 }

@@ -11,44 +11,46 @@ class CoreStorageRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final LogBox log = locator();
-    final MeasureProcessUseCase measurement = locator();
-
-    await measurement.execute(() async {
-      locator.registerSingleton(
-        AppDatabase(),
-        dispose: (e) => e.close(),
-      );
-      locator.registerSingleton(DatabaseViewer());
-      locator.registerFactory(() => MangaDao(locator()));
-      locator.registerFactory(() => ChapterDao(locator()));
-      locator.registerFactory(() => LibraryDao(locator()));
-      locator.registerFactory(() => JobDao(locator()));
-      locator.registerFactory(() => CacheDao(locator()));
-      locator.registerFactory(() => HistoryDao(locator()));
-      locator.registerFactory(() => TagDao(locator()));
-
-      locator.registerSingleton(await SharedPreferencesStorage.create());
-      locator.alias<Storage, SharedPreferencesStorage>();
-
-      // TODO: @robzimpulse - broken on web
-      // locator.registerSingleton(await PathManager.create(storage: locator()));
-      // locator.alias<GetRootPathUseCase, PathManager>();
-      // locator.alias<ListenDownloadPathUseCase, PathManager>();
-      // locator.alias<SetDownloadPathUseCase, PathManager>();
-      // locator.alias<ListenBackupPathUseCase, PathManager>();
-      // locator.alias<SetBackupPathUseCase, PathManager>();
-
-      locator.registerSingleton(
-        CustomCacheManager(dio: () => locator(), dao: () => locator()),
-        dispose: (e) => e.dispose(),
-      );
-      locator.alias<BaseCacheManager, CustomCacheManager>();
-    });
 
     log.log(
-      'Finish Register ${runtimeType.toString()}',
+      'Register ${runtimeType.toString()}',
+      id: runtimeType.toString(),
       name: 'Services',
-      extra: {'duration': measurement.elapsed},
+      extra: {'start': DateTime.timestamp()},
+    );
+
+    locator.registerSingleton(AppDatabase(), dispose: (e) => e.close());
+    locator.registerSingleton(DatabaseViewer());
+    locator.registerFactory(() => MangaDao(locator()));
+    locator.registerFactory(() => ChapterDao(locator()));
+    locator.registerFactory(() => LibraryDao(locator()));
+    locator.registerFactory(() => JobDao(locator()));
+    locator.registerFactory(() => CacheDao(locator()));
+    locator.registerFactory(() => HistoryDao(locator()));
+    locator.registerFactory(() => TagDao(locator()));
+
+    locator.registerSingleton(await SharedPreferencesStorage.create());
+    locator.alias<Storage, SharedPreferencesStorage>();
+
+    // TODO: @robzimpulse - broken on web
+    // locator.registerSingleton(await PathManager.create(storage: locator()));
+    // locator.alias<GetRootPathUseCase, PathManager>();
+    // locator.alias<ListenDownloadPathUseCase, PathManager>();
+    // locator.alias<SetDownloadPathUseCase, PathManager>();
+    // locator.alias<ListenBackupPathUseCase, PathManager>();
+    // locator.alias<SetBackupPathUseCase, PathManager>();
+
+    locator.registerSingleton(
+      CustomCacheManager(dio: () => locator(), dao: () => locator()),
+      dispose: (e) => e.dispose(),
+    );
+    locator.alias<BaseCacheManager, CustomCacheManager>();
+
+    log.log(
+      'Register ${runtimeType.toString()}',
+      id: runtimeType.toString(),
+      name: 'Services',
+      extra: {'finish': DateTime.timestamp()},
     );
   }
 }

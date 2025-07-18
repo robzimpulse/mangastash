@@ -10,7 +10,6 @@ import 'src/common/storage.dart';
 import 'src/model/log_entry.dart';
 import 'src/screen/dashboard/dashboard_screen.dart';
 import 'src/screen/webview/webview_screen.dart';
-export 'src/use_case/measure_process_use_case.dart';
 
 class LogBox {
   static final LogBox _instance = LogBox._();
