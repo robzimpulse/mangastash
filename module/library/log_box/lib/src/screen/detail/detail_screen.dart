@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import '../../common/extension.dart';
 import '../../model/entry.dart';
 import '../../model/log_entry.dart';
+import '../../model/network_entry.dart';
+import '../../model/webview_entry.dart';
 import 'widget/item_column.dart';
+import 'widget/item_row.dart';
 
 class DetailScreen extends StatelessWidget {
   final Entry data;
@@ -30,6 +35,7 @@ class DetailScreen extends StatelessWidget {
   }
 
   PreferredSizeWidget _appBar(BuildContext context) {
+    final data = this.data;
     return AppBar(
       title: const Text('Detail Log'),
       elevation: 3,
@@ -43,7 +49,7 @@ class DetailScreen extends StatelessWidget {
         unselectedLabelColor: Colors.white,
         tabs: [
           Tab(text: 'Overview', icon: Icon(Icons.info, color: Colors.white)),
-          Tab(text: 'Extra', icon: Icon(Icons.data_array, color: Colors.white)),
+          Tab(text: 'Detail', icon: Icon(Icons.data_array, color: Colors.white)),
           Tab(text: 'Error', icon: Icon(Icons.error, color: Colors.white)),
         ],
       ),
@@ -61,11 +67,17 @@ class DetailScreen extends StatelessWidget {
             if (data is LogEntry) ...[
               ItemColumn(name: 'Name', value: data.name),
               ItemColumn(name: 'Message', value: data.message),
-              ItemColumn(
-                name: 'Timestamp',
-                value: data.timestamp.toIso8601String(),
-              ),
+            ] else if (data is NetworkEntry) ...[
+              ItemColumn(name: 'Method', value: data.method),
+              ItemColumn(name: 'Url', value: data.uri),
+            ] else if (data is WebviewEntry) ...[
+              ItemColumn(name: 'url', value: data.uri.toString()),
+              ItemColumn(name: 'scripts', value: jsonEncode(data.scripts)),
             ],
+            ItemColumn(
+              name: 'Timestamp',
+              value: data.timestamp.toIso8601String(),
+            ),
           ],
         ),
       ),
@@ -82,6 +94,10 @@ class DetailScreen extends StatelessWidget {
           children: [
             if (data is LogEntry) ...[
               ItemColumn(name: 'Extra', value: data.extra.json),
+            ] else if (data is NetworkEntry) ...[
+              // TODO: add item column
+            ] else if (data is WebviewEntry) ...[
+              ItemColumn(name: 'Html', value: data.html),
             ],
           ],
         ),
@@ -103,6 +119,10 @@ class DetailScreen extends StatelessWidget {
                 name: 'Stack Trace',
                 value: data.stackTrace.toString(),
               ),
+            ] else if (data is NetworkEntry) ...[
+              // TODO: add item column
+            ] else if (data is WebviewEntry) ...[
+              ItemColumn(name: 'Error', value: data.error.toString()),
             ],
           ],
         ),

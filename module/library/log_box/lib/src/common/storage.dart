@@ -42,7 +42,10 @@ class Storage {
     if (old is LogEntry && log is LogEntry) {
       return old.copyWith(
         message: log.message,
+        name: log.name,
         extra: {...log.extra, ...old.extra},
+        error: log.error,
+        stackTrace: log.stackTrace,
       );
     }
 
@@ -59,6 +62,8 @@ class Storage {
       return old.copyWith(
         scripts: log.scripts,
         events: [...log.events, ...old.events],
+        html: log.html,
+        error: log.error,
       );
     }
 
