@@ -12,16 +12,15 @@ class WebviewEntry extends Entry {
 
   final Object? error;
 
-  final DateTime timestamp;
-
   WebviewEntry({
-    required super.id,
+    String? id,
+    DateTime? timestamp,
     this.uri,
     this.scripts = const [],
     this.events = const [],
     this.html,
     this.error,
-  }) : timestamp = DateTime.timestamp();
+  }) : super(id: id, timestamp: timestamp);
 
   WebviewEntry copyWith({
     Uri? uri,
@@ -32,6 +31,7 @@ class WebviewEntry extends Entry {
   }) {
     return WebviewEntry(
       id: id,
+      timestamp: timestamp,
       uri: uri ?? this.uri,
       scripts: scripts ?? this.scripts,
       events: events ?? this.events,

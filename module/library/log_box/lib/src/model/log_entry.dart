@@ -1,5 +1,3 @@
-import 'package:uuid/uuid.dart';
-
 import 'entry.dart';
 
 class LogEntry extends Entry {
@@ -8,36 +6,16 @@ class LogEntry extends Entry {
   final Object? error;
   final StackTrace? stackTrace;
   final Map<String, dynamic> extra;
-  final DateTime timestamp;
 
-  LogEntry._({
-    required super.id,
+  LogEntry({
+    String? id,
+    DateTime? timestamp,
     required this.message,
-    required this.extra,
-    required this.timestamp,
+    this.extra = const {},
     this.name,
     this.error,
     this.stackTrace,
-  });
-
-  factory LogEntry.create({
-    String? id,
-    required String message,
-    String? name,
-    Map<String, dynamic> extra = const {},
-    Object? error,
-    StackTrace? stackTrace,
-  }) {
-    return LogEntry._(
-      id: id ?? const Uuid().v4(),
-      message: message,
-      name: name,
-      extra: extra,
-      timestamp: DateTime.timestamp(),
-      error: error,
-      stackTrace: stackTrace,
-    );
-  }
+  }) : super(id: id, timestamp: timestamp);
 
   LogEntry copyWith({
     String? message,
@@ -46,7 +24,7 @@ class LogEntry extends Entry {
     Object? error,
     StackTrace? stackTrace,
   }) {
-    return LogEntry._(
+    return LogEntry(
       id: id,
       timestamp: timestamp,
       name: name ?? this.name,

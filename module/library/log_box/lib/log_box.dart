@@ -51,7 +51,7 @@ class LogBox {
     StackTrace? stackTrace,
   }) {
     _storage.add(
-      log: LogEntry.create(
+      log: LogEntry(
         id: id,
         name: name,
         message: message,

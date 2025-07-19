@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' as material;
-import 'package:uuid/uuid.dart';
 
 import '../model/navigation_entry.dart';
 import 'enum.dart';
@@ -13,8 +12,7 @@ class NavigatorObserver extends material.NavigatorObserver {
   @override
   void didPush(material.Route route, material.Route? previousRoute) {
     onEvent(
-      NavigationEntry.create(
-        id: const Uuid().v4(),
+      NavigationEntry(
         action: NavigationAction.push,
         route: route.settings.name,
         previousRoute: previousRoute?.settings.name,
@@ -25,8 +23,7 @@ class NavigatorObserver extends material.NavigatorObserver {
   @override
   void didPop(material.Route route, material.Route? previousRoute) {
     onEvent(
-      NavigationEntry.create(
-        id: const Uuid().v4(),
+      NavigationEntry(
         action: NavigationAction.pop,
         route: route.settings.name,
         previousRoute: previousRoute?.settings.name,
@@ -37,8 +34,7 @@ class NavigatorObserver extends material.NavigatorObserver {
   @override
   void didRemove(material.Route route, material.Route? previousRoute) {
     onEvent(
-      NavigationEntry.create(
-        id: const Uuid().v4(),
+      NavigationEntry(
         action: NavigationAction.remove,
         route: route.settings.name,
         previousRoute: previousRoute?.settings.name,
@@ -49,8 +45,7 @@ class NavigatorObserver extends material.NavigatorObserver {
   @override
   void didReplace({material.Route? newRoute, material.Route? oldRoute}) {
     onEvent(
-      NavigationEntry.create(
-        id: const Uuid().v4(),
+      NavigationEntry(
         action: NavigationAction.replace,
         route: newRoute?.settings.name,
         previousRoute: oldRoute?.settings.name,

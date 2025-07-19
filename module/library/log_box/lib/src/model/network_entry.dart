@@ -16,7 +16,8 @@ class NetworkEntry extends Entry {
   final HttpErrorModel? error;
 
   NetworkEntry({
-    required super.id,
+    String? id,
+    DateTime? timestamp,
     this.client,
     this.loading = true,
     this.secure,
@@ -27,7 +28,7 @@ class NetworkEntry extends Entry {
     this.request,
     this.response,
     this.error,
-  });
+  }) : super(id: id, timestamp: timestamp);
 
   NetworkEntry copyWith({
     bool? loading,
@@ -37,6 +38,7 @@ class NetworkEntry extends Entry {
   }) {
     return NetworkEntry(
       id: id,
+      timestamp: timestamp,
       client: client,
       loading: loading ?? this.loading,
       secure: secure,
