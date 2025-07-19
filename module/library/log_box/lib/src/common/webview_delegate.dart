@@ -15,6 +15,10 @@ class WebviewDelegate {
     : _storage = storage,
       _id = const Uuid().v4();
 
+  void set({String? html, Object? error}) {
+    _storage.add(log: WebviewEntry(id: _id, html: html, error: error));
+  }
+
   void onWebViewCreated({required Uri uri, List<String> scripts = const []}) {
     _storage.add(
       log: WebviewEntry(
@@ -71,7 +75,7 @@ class WebviewDelegate {
     );
   }
 
-  void onProgressChanged({Uri? uri, int? progress}) {
+  void onProgressChanged({int? progress}) {
     _storage.add(
       log: WebviewEntry(
         id: _id,
@@ -99,29 +103,12 @@ class WebviewDelegate {
     );
   }
 
-  void onConsoleMessage({Uri? uri, Map<String, dynamic>? extra}) {
+  void onConsoleMessage({Map<String, dynamic>? extra}) {
     _storage.add(
       log: WebviewEntry(
         id: _id,
         events: [
-          WebviewEntryLog(
-            event: WebviewEvent.onConsoleMessage,
-            extra: {'uri': uri.toString(), ...?extra},
-          ),
-        ],
-      ),
-    );
-  }
-
-  void onNavigationResponse({Map<String, dynamic>? extra}) {
-    _storage.add(
-      log: WebviewEntry(
-        id: _id,
-        events: [
-          WebviewEntryLog(
-            event: WebviewEvent.onNavigationResponse,
-            extra: extra,
-          ),
+          WebviewEntryLog(event: WebviewEvent.onConsoleMessage, extra: extra),
         ],
       ),
     );

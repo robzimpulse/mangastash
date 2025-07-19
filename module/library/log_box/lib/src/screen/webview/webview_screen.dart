@@ -167,10 +167,7 @@ class _WebviewScreenState extends State<WebviewScreen> {
           },
           onProgressChanged: (controller, progress) async {
             _log('onProgress: $progress');
-            widget.delegate.onProgressChanged(
-              uri: (await controller.getUrl())?.uriValue,
-              progress: progress,
-            );
+            widget.delegate.onProgressChanged(progress: progress);
           },
           onReceivedError: (_, request, error) {
             _log('onReceivedError: ${request.url} - ${error.description}');
@@ -181,16 +178,7 @@ class _WebviewScreenState extends State<WebviewScreen> {
           },
           onConsoleMessage: (controller, message) async {
             _log('onConsoleMessage: ${message.message}');
-            widget.delegate.onConsoleMessage(
-              uri: (await controller.getUrl())?.uriValue,
-              extra: message.toMap(),
-            );
-          },
-          onNavigationResponse: (_, response) async {
-            final destination = response.response?.url;
-            _log('onNavigationResponse: $destination');
-            widget.delegate.onNavigationResponse(extra: response.toMap());
-            return NavigationResponseAction.ALLOW;
+            widget.delegate.onConsoleMessage(extra: message.toMap());
           },
           shouldOverrideUrlLoading: (_, action) async {
             final destination = action.request.url;

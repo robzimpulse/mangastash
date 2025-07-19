@@ -8,6 +8,10 @@ class WebviewEntry extends Entry {
 
   final List<WebviewEntryLog> events;
 
+  final String? html;
+
+  final Object? error;
+
   final DateTime timestamp;
 
   WebviewEntry({
@@ -15,18 +19,24 @@ class WebviewEntry extends Entry {
     this.uri,
     this.scripts = const [],
     this.events = const [],
+    this.html,
+    this.error,
   }) : timestamp = DateTime.timestamp();
 
   WebviewEntry copyWith({
     Uri? uri,
     List<String>? scripts,
     List<WebviewEntryLog>? events,
+    String? html,
+    Object? error,
   }) {
     return WebviewEntry(
       id: id,
       uri: uri ?? this.uri,
       scripts: scripts ?? this.scripts,
       events: events ?? this.events,
+      html: html ?? this.html,
+      error: error ?? this.error,
     );
   }
 }

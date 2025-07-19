@@ -14,6 +14,8 @@ import 'src/model/log_entry.dart';
 import 'src/screen/dashboard/dashboard_screen.dart';
 import 'src/screen/webview/webview_screen.dart';
 
+export 'src/common/webview_delegate.dart';
+
 class LogBox {
   static final LogBox _instance = LogBox._();
   final Storage _storage = Storage(capacity: 1000);

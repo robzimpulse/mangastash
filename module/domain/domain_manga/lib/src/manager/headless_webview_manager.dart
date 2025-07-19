@@ -17,8 +17,8 @@ class HeadlessWebviewManager {
   HeadlessWebviewManager({
     required LogBox log,
     required BaseCacheManager cacheManager,
-  })  : _log = log,
-        _cacheManager = cacheManager;
+  }) : _log = log,
+       _cacheManager = cacheManager;
 
   Future<Document?> open(
     String url, {
@@ -26,13 +26,19 @@ class HeadlessWebviewManager {
     bool useCache = true,
   }) async {
     final uri = WebUri(url);
-    final html = await _fetch(uri: uri, scripts: scripts, useCache: useCache);
+    final html = await _fetch(
+      uri: uri,
+      scripts: scripts,
+      useCache: useCache,
+      delegate: _log.webviewDelegate,
+    );
     if (html == null) return null;
     return parse(html);
   }
 
   Future<String?> _fetch({
     required WebUri uri,
+    required WebviewDelegate delegate,
     List<String> scripts = const [],
     bool useCache = true,
   }) async {
@@ -40,9 +46,9 @@ class HeadlessWebviewManager {
     final data = await cache?.file.readAsString();
 
     if (data != null && useCache) {
+      delegate.set(html: data);
       return data;
     }
-
     final onLoadStartCompleter = Completer();
     final onLoadStopCompleter = Completer();
     final onLoadErrorCompleter = Completer();
@@ -57,12 +63,37 @@ class HeadlessWebviewManager {
         javaScriptEnabled: true,
         supportZoom: false,
       ),
-      onLoadStart: (_, __) => onLoadStartCompleter.safeComplete(),
-      onLoadStop: (_, __) => onLoadStopCompleter.safeComplete(),
-      onReceivedError: (_, __, ___) => onLoadErrorCompleter.safeComplete(),
-      onNavigationResponse: (_, __) async => NavigationResponseAction.ALLOW,
+      onWebViewCreated: (_) {
+        delegate.onWebViewCreated(uri: uri, scripts: scripts);
+      },
+      onLoadStart: (_, uri) {
+        delegate.onLoadStart(uri: uri?.uriValue);
+        onLoadStartCompleter.safeComplete();
+      },
+      onLoadStop: (_, uri) {
+        delegate.onLoadStop(uri: uri?.uriValue);
+        onLoadStopCompleter.safeComplete();
+      },
+      onReceivedError: (_, request, error) {
+        delegate.onReceivedError(
+          message: error.description,
+          extra: {'request': request.toMap(), 'error': error.toMap()},
+        );
+        onLoadErrorCompleter.safeComplete();
+      },
+      onContentSizeChanged: (_, prev, curr) {
+        delegate.onContentSizeChanged(previous: prev, current: curr);
+      },
+      onProgressChanged: (_, progress) {
+        delegate.onProgressChanged(progress: progress);
+      },
+      onConsoleMessage: (_, message) {
+        delegate.onConsoleMessage(extra: message.toMap());
+      },
       shouldOverrideUrlLoading: (_, action) async {
         final destination = action.request.url;
+
+        delegate.shouldOverrideUrlLoading(extra: action.toMap());
 
         if (destination == null) {
           return NavigationActionPolicy.CANCEL;
@@ -79,19 +110,15 @@ class HeadlessWebviewManager {
       },
     );
 
-    await Future.wait(
-      [
-        webview.run(),
-        onLoadStartCompleter.future,
-        Future.any(
-          [
-            onLoadStopCompleter.future,
-            onLoadErrorCompleter.future,
-            Future.delayed(const Duration(seconds: 15)),
-          ],
-        ),
-      ],
-    );
+    await Future.wait([
+      webview.run(),
+      onLoadStartCompleter.future,
+      Future.any([
+        onLoadStopCompleter.future,
+        onLoadErrorCompleter.future,
+        Future.delayed(const Duration(seconds: 15)),
+      ]),
+    ]);
 
     for (final script in scripts) {
       if (script.isEmpty) continue;
@@ -104,6 +131,7 @@ class HeadlessWebviewManager {
     await webview.dispose();
 
     if (html == null) {
+      delegate.set(error: Exception('Null Html'));
       return null;
     }
 
@@ -113,6 +141,8 @@ class HeadlessWebviewManager {
       fileExtension: 'html',
       maxAge: const Duration(minutes: 30),
     );
+
+    delegate.set(html: html);
     return html;
   }
 

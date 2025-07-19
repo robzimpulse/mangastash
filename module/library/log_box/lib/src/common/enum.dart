@@ -13,6 +13,5 @@ enum WebviewEvent {
   onProgressChanged,
   onReceivedError,
   onConsoleMessage,
-  onNavigationResponse,
   shouldOverrideUrlLoading,
 }
