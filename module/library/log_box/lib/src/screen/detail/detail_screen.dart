@@ -8,7 +8,6 @@ import '../../model/log_entry.dart';
 import '../../model/network_entry.dart';
 import '../../model/webview_entry.dart';
 import 'widget/item_column.dart';
-import 'widget/item_row.dart';
 
 class DetailScreen extends StatelessWidget {
   final Entry data;
@@ -35,7 +34,6 @@ class DetailScreen extends StatelessWidget {
   }
 
   PreferredSizeWidget _appBar(BuildContext context) {
-    final data = this.data;
     return AppBar(
       title: const Text('Detail Log'),
       elevation: 3,

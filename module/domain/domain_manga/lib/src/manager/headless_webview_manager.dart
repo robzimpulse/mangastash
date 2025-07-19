@@ -46,7 +46,7 @@ class HeadlessWebviewManager {
     final data = await cache?.file.readAsString();
 
     if (data != null && useCache) {
-      delegate.set(html: data);
+      delegate.set(uri: uri, html: data);
       return data;
     }
     final onLoadStartCompleter = Completer();

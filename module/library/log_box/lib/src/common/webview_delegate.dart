@@ -15,8 +15,10 @@ class WebviewDelegate {
     : _storage = storage,
       _id = const Uuid().v4();
 
-  void set({String? html, Object? error}) {
-    _storage.add(log: WebviewEntry(id: _id, html: html, error: error));
+  void set({Uri? uri, String? html, Object? error}) {
+    _storage.add(
+      log: WebviewEntry(id: _id, uri: uri, html: html, error: error),
+    );
   }
 
   void onWebViewCreated({required Uri uri, List<String> scripts = const []}) {
