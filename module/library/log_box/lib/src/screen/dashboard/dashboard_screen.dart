@@ -162,7 +162,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         body: SafeArea(
-          child: Column(children: [_types(), Expanded(child: _content())]),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [_types(), Expanded(child: _content())],
+          ),
         ),
       ),
     );
@@ -189,20 +192,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 for (final type in data)
                   ValueListenableBuilder(
                     valueListenable: types,
-                    builder: (context, types, child) {
+                    builder: (context, datas, child) {
+                      final selected = datas.contains(type);
                       return OutlinedButton(
                         onPressed: () {
-                          var data = {...types};
-                          if (data.contains(type)) {
-                            data.remove(type);
-                          } else {
-                            data.add(type);
-                          }
-                          this.types.value = data;
+                          var data = {...datas};
+                          selected ? data.remove(type) : data.add(type);
+                          types.value = data;
                         },
                         style: OutlinedButton.styleFrom(
-                          backgroundColor:
-                              types.contains(type) ? Colors.grey : null,
+                          backgroundColor: selected ? Colors.grey : null,
                         ),
                         child: child,
                       );
