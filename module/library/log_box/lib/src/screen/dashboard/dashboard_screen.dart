@@ -7,6 +7,7 @@ import '../../model/log_entry.dart';
 import '../../model/navigation_entry.dart';
 import '../../model/network_entry.dart';
 import '../../model/webview_entry.dart';
+import '../detail/detail_screen.dart';
 import 'widget/item_widget.dart';
 import 'widget/log_item_widget.dart';
 import 'widget/navigation_item_widget.dart';
@@ -73,21 +74,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ].every((e) => e);
   }
 
-  Widget _item(Entry value) {
+  Widget _item({required BuildContext context, required Entry value}) {
     void onTap() {
-      final id = value.id;
-      // TODO: redirect to detail item
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) {
-      //       return DetailScreen(
-      //         data: value,
-      //         onTapSnapshot: widget.onTapSnapshot,
-      //       );
-      //     },
-      //   ),
-      // );
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          settings: const RouteSettings(name: 'Log Box Detail'),
+          builder: (context) {
+            return DetailScreen(
+              data: value,
+              onTapSnapshot: widget.onTapSnapshot,
+            );
+          },
+        ),
+      );
     }
 
     if (value is LogEntry) {
@@ -244,7 +244,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               itemBuilder: (context, index) {
                 final entry = data.elementAtOrNull(index);
                 if (entry == null) return null;
-                return _item(entry);
+                return _item(context: context, value: entry);
               },
               separatorBuilder: (context, index) {
                 return const Divider(height: 1);

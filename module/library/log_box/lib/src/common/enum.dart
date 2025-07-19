@@ -15,5 +15,4 @@ enum WebviewEvent {
   onConsoleMessage,
   onNavigationResponse,
   shouldOverrideUrlLoading,
-
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../common/extension.dart';
 import '../../../model/webview_entry.dart';
 
 class WebviewItemWidget extends StatelessWidget {
@@ -48,7 +47,7 @@ class WebviewItemWidget extends StatelessWidget {
         ],
       ),
       subtitle: Text(
-        '${data.timestamp.dateTimeFormatted} ',
+        '${data.timestamp.toIso8601String()} ',
         style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
       ),
       trailing: const Icon(Icons.chevron_right),

@@ -36,21 +36,10 @@ class HeadlessWebviewManager {
     List<String> scripts = const [],
     bool useCache = true,
   }) async {
-    _log.log(
-      'Start loading $uri',
-      extra: {'url': uri.toString()},
-      name: runtimeType.toString(),
-    );
-
     final cache = await _cacheManager.getFileFromCache(uri.toString());
     final data = await cache?.file.readAsString();
 
     if (data != null && useCache) {
-      _log.log(
-        'Finish loading $uri',
-        extra: {'url': uri.toString(), 'cache': true},
-        name: runtimeType.toString(),
-      );
       return data;
     }
 
@@ -115,12 +104,6 @@ class HeadlessWebviewManager {
     await webview.dispose();
 
     if (html == null) {
-      _log.log(
-        'Finish loading $uri',
-        extra: {'url': uri.toString(), 'cache': false},
-        error: Exception('Null Html String'),
-        name: runtimeType.toString(),
-      );
       return null;
     }
 
@@ -130,13 +113,6 @@ class HeadlessWebviewManager {
       fileExtension: 'html',
       maxAge: const Duration(minutes: 30),
     );
-
-    _log.log(
-      'Finish loading $uri',
-      extra: {'url': uri.toString(), 'cache': false},
-      name: runtimeType.toString(),
-    );
-
     return html;
   }
 

@@ -46,6 +46,7 @@ class LogBox {
     Map<String, dynamic>? extra,
     String? name,
     Object? error,
+    StackTrace? stackTrace,
   }) {
     _storage.add(
       log: LogEntry.create(
@@ -54,6 +55,7 @@ class LogBox {
         message: message,
         extra: extra ?? {},
         error: error,
+        stackTrace: stackTrace,
       ),
     );
     dev.log(message, name: name ?? 'Log Box');

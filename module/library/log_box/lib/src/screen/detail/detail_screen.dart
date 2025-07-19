@@ -1,11 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
-import '../../model/log_html_model.dart';
-import '../../model/log_model.dart';
+import '../../common/extension.dart';
+import '../../model/entry.dart';
+import '../../model/log_entry.dart';
 import 'widget/item_column.dart';
 
 class DetailScreen extends StatelessWidget {
-  final LogModel data;
+  final Entry data;
 
   final Function(String? url, String? html)? onTapSnapshot;
 
@@ -20,11 +23,7 @@ class DetailScreen extends StatelessWidget {
           appBar: _appBar(context),
           body: SafeArea(
             child: TabBarView(
-              children: [
-                _overviewWidget(),
-                _messageWidget(),
-                _stackTraceWidget(),
-              ],
+              children: [_overviewWidget(), _extraWidget(), _errorWidget()],
             ),
           ),
         ),
@@ -33,10 +32,10 @@ class DetailScreen extends StatelessWidget {
   }
 
   PreferredSizeWidget _appBar(BuildContext context) {
-    final data = this.data;
     return AppBar(
       title: const Text('Detail Log'),
       elevation: 3,
+      centerTitle: false,
       leading: IconButton(
         onPressed: () => Navigator.pop(context),
         icon: const Icon(Icons.arrow_back),
@@ -45,71 +44,68 @@ class DetailScreen extends StatelessWidget {
         labelColor: Colors.white,
         unselectedLabelColor: Colors.white,
         tabs: [
-          Tab(
-            text: 'Overview',
-            icon: Icon(Icons.info, color: Colors.white),
-          ),
-          Tab(
-            text: 'Message',
-            icon: Icon(Icons.message, color: Colors.white),
-          ),
-          Tab(
-            text: 'Stack Trace',
-            icon: Icon(Icons.list_outlined, color: Colors.white),
-          ),
+          Tab(text: 'Overview', icon: Icon(Icons.info, color: Colors.white)),
+          Tab(text: 'Extra', icon: Icon(Icons.data_array, color: Colors.white)),
+          Tab(text: 'Error', icon: Icon(Icons.error, color: Colors.white)),
         ],
       ),
     );
   }
 
   Widget _overviewWidget() {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        child: Column(
-          children: [
-            ItemColumn(name: 'Name', value: data.name),
-            ItemColumn(name: 'Time', value: data.time?.toIso8601String()),
-            ItemColumn(
-              name: 'Sequence Number',
-              value: '${data.sequenceNumber}',
-            ),
-            ItemColumn(name: 'Level', value: '${data.level}'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _messageWidget() {
     final data = this.data;
-    final extras = data.extra?.entries ?? [];
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         child: Column(
           children: [
-            ItemColumn(name: 'Message', value: data.message),
-            for (final group in extras)
-              ItemColumn(name: group.key, value: group.value.toString()),
-            if (data is LogHtmlModel)
-              ItemColumn(name: 'Html', value: data.html),
+            if (data is LogEntry) ...[
+              ItemColumn(name: 'Name', value: data.name),
+              ItemColumn(name: 'Message', value: data.message),
+              ItemColumn(
+                name: 'Timestamp',
+                value: data.timestamp.toIso8601String(),
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Widget _stackTraceWidget() {
+  Widget _extraWidget() {
+    final data = this.data;
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         child: Column(
           children: [
-            ItemColumn(name: 'Stack Trace', value: data.stackTrace.toString()),
+            if (data is LogEntry) ...[
+              ItemColumn(name: 'Extra', value: data.extra.json),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _errorWidget() {
+    final data = this.data;
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        child: Column(
+          children: [
+            if (data is LogEntry) ...[
+              ItemColumn(name: 'Error', value: data.error.toString()),
+              ItemColumn(
+                name: 'Stack Trace',
+                value: data.stackTrace.toString(),
+              ),
+            ],
           ],
         ),
       ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../common/extension.dart';
 import '../../../model/network_entry.dart';
 
 class NetworkItemWidget extends StatelessWidget {
@@ -88,7 +87,7 @@ class NetworkItemWidget extends StatelessWidget {
         ],
       ),
       subtitle: Text(
-        '${data.request?.time.dateTimeFormatted} ',
+        '${data.request?.time.toIso8601String()} ',
         style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
       ),
       trailing: const Icon(Icons.chevron_right),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../common/enum.dart';
-import '../../../common/extension.dart';
 import '../../../model/navigation_entry.dart';
 
 class NavigationItemWidget extends StatelessWidget {
@@ -50,7 +49,7 @@ class NavigationItemWidget extends StatelessWidget {
         ],
       ),
       subtitle: Text(
-        data.timestamp.dateTimeFormatted,
+        data.timestamp.toIso8601String(),
         style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
       ),
     );

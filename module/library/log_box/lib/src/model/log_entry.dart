@@ -6,6 +6,7 @@ class LogEntry extends Entry {
   final String message;
   final String? name;
   final Object? error;
+  final StackTrace? stackTrace;
   final Map<String, dynamic> extra;
   final DateTime timestamp;
 
@@ -16,6 +17,7 @@ class LogEntry extends Entry {
     required this.timestamp,
     this.name,
     this.error,
+    this.stackTrace,
   });
 
   factory LogEntry.create({
@@ -24,6 +26,7 @@ class LogEntry extends Entry {
     String? name,
     Map<String, dynamic> extra = const {},
     Object? error,
+    StackTrace? stackTrace,
   }) {
     return LogEntry._(
       id: id ?? const Uuid().v4(),
@@ -32,6 +35,7 @@ class LogEntry extends Entry {
       extra: extra,
       timestamp: DateTime.timestamp(),
       error: error,
+      stackTrace: stackTrace,
     );
   }
 
@@ -40,6 +44,7 @@ class LogEntry extends Entry {
     String? name,
     Map<String, dynamic>? extra,
     Object? error,
+    StackTrace? stackTrace,
   }) {
     return LogEntry._(
       id: id,
@@ -48,6 +53,7 @@ class LogEntry extends Entry {
       message: message ?? this.message,
       extra: extra ?? this.extra,
       error: error ?? this.error,
+      stackTrace: stackTrace ?? this.stackTrace,
     );
   }
 }

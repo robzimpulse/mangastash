@@ -19,7 +19,7 @@ class CoreAuthRegistrar extends Registrar {
       'Register ${runtimeType.toString()}',
       name: 'Services',
       id: runtimeType.toString(),
-      extra: {'start': DateTime.timestamp()},
+      extra: {'start': DateTime.timestamp().toIso8601String()},
     );
 
     locator.registerFactory(() => AuthService(app: locator()));
@@ -38,7 +38,7 @@ class CoreAuthRegistrar extends Registrar {
       'Register ${runtimeType.toString()}',
       name: 'Services',
       id: runtimeType.toString(),
-      extra: {'finish': DateTime.timestamp()},
+      extra: {'finish': DateTime.timestamp().toIso8601String()},
     );
   }
 }

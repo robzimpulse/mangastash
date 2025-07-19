@@ -39,7 +39,7 @@ class DomainMangaRegistrar extends Registrar {
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
       name: 'Services',
-      extra: {'start': DateTime.timestamp()},
+      extra: {'start': DateTime.timestamp().toIso8601String()},
     );
 
     locator.registerSingleton(
@@ -173,7 +173,7 @@ class DomainMangaRegistrar extends Registrar {
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
       name: 'Services',
-      extra: {'finish': DateTime.timestamp()},
+      extra: {'finish': DateTime.timestamp().toIso8601String()},
     );
   }
 }
