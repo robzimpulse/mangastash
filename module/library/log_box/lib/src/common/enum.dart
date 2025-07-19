@@ -5,8 +5,15 @@ enum NavigationAction {
   replace,
 }
 
-enum WebviewNavigationAction {
-  allow,
-  cancel,
-  download,
+enum WebviewEvent {
+  onWebViewCreated,
+  onContentSizeChanged,
+  onLoadStart,
+  onLoadStop,
+  onProgressChanged,
+  onReceivedError,
+  onConsoleMessage,
+  onNavigationResponse,
+  shouldOverrideUrlLoading,
+
 }

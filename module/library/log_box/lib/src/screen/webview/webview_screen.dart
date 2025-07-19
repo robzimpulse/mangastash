@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:universal_io/io.dart';
 
-import '../../common/enum.dart';
 import '../../common/webview_delegate.dart';
 
 class WebviewScreen extends StatefulWidget {
@@ -82,17 +81,18 @@ class _WebviewScreenState extends State<WebviewScreen> {
 
               await showDialog(
                 context: context,
-                builder:
-                    (context) => AlertDialog(
-                      title: const Text('Run JavaScript'),
-                      content: TextField(controller: controller),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Close'),
-                        ),
-                      ],
-                    ),
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('Run JavaScript'),
+                    content: TextField(controller: controller),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Close'),
+                      ),
+                    ],
+                  );
+                },
               );
 
               final script = controller.text;
@@ -104,19 +104,21 @@ class _WebviewScreenState extends State<WebviewScreen> {
             icon: const Icon(Icons.javascript),
           ),
           IconButton(
-            onPressed:
-                () => webViewController?.loadUrl(
-                  urlRequest: URLRequest(url: WebUri.uri(widget.uri)),
-                ),
+            onPressed: () {
+              webViewController?.loadUrl(
+                urlRequest: URLRequest(url: WebUri.uri(widget.uri)),
+              );
+            },
             icon: const Icon(Icons.refresh),
           ),
           if (widget.onTapSnapshot != null)
             IconButton(
-              onPressed:
-                  () async => widget.onTapSnapshot?.call(
-                    (await webViewController?.getUrl()).toString(),
-                    await webViewController?.getHtml(),
-                  ),
+              onPressed: () async {
+                widget.onTapSnapshot?.call(
+                  (await webViewController?.getUrl()).toString(),
+                  await webViewController?.getHtml(),
+                );
+              },
               icon: const Icon(Icons.camera_alt),
             ),
           Builder(
@@ -144,67 +146,58 @@ class _WebviewScreenState extends State<WebviewScreen> {
                   : null,
           onWebViewCreated: (controller) {
             webViewController = controller;
-            widget.delegate.onWebViewCreated();
+            widget.delegate.onWebViewCreated(uri: widget.uri);
           },
           initialSettings: InAppWebViewSettings(
             isInspectable: true,
             javaScriptEnabled: true,
             supportZoom: false,
           ),
-          onContentSizeChanged:
-              (_, curr, prev) => _log('onContentSizeChanged: $curr - $prev'),
+          onContentSizeChanged: (_, curr, prev) {
+            _log('onContentSizeChanged: $curr - $prev');
+            widget.delegate.onContentSizeChanged(previous: prev, current: curr);
+          },
           onLoadStart: (_, url) {
             _log('onLoadStart: $url');
-            widget.delegate.onLoadStart(url?.uriValue);
+            widget.delegate.onLoadStart(uri: url?.uriValue);
           },
-          onLoadStop: (controller, url) async {
+          onLoadStop: (_, url) async {
             _log('onLoadStop: $url');
-            widget.delegate.onLoadStop(url?.uriValue);
-
-            for (final script in widget.scripts) {
-              _log('Running Script: $script');
-              final result = await controller.evaluateJavascript(
-                source: script,
-              );
-              _log('Result: $result');
-            }
+            widget.delegate.onLoadStop(uri: url?.uriValue);
           },
           onProgressChanged: (controller, progress) async {
             _log('onProgress: $progress');
-
             widget.delegate.onProgressChanged(
-              (await controller.getUrl())?.uriValue,
-              progress,
+              uri: (await controller.getUrl())?.uriValue,
+              progress: progress,
             );
           },
           onReceivedError: (_, request, error) {
             _log('onReceivedError: ${request.url} - ${error.description}');
             widget.delegate.onReceivedError(
-              request.url.uriValue,
-              error.description,
+              message: error.description,
+              extra: {'request': request.toMap(), 'error': error.toMap()},
             );
           },
           onConsoleMessage: (controller, message) async {
             _log('onConsoleMessage: ${message.message}');
             widget.delegate.onConsoleMessage(
-              (await controller.getUrl())?.uriValue,
-              message.message,
+              uri: (await controller.getUrl())?.uriValue,
+              extra: message.toMap(),
             );
           },
           onNavigationResponse: (_, response) async {
             final destination = response.response?.url;
             _log('onNavigationResponse: $destination');
-            widget.delegate.onNavigationResponse(destination?.uriValue);
+            widget.delegate.onNavigationResponse(extra: response.toMap());
             return NavigationResponseAction.ALLOW;
           },
           shouldOverrideUrlLoading: (_, action) async {
             final destination = action.request.url;
             _log('shouldOverrideUrlLoading: $destination');
+            widget.delegate.shouldOverrideUrlLoading(extra: action.toMap());
+
             if (destination == null) {
-              widget.delegate.shouldOverrideUrlLoading(
-                null,
-                WebviewNavigationAction.cancel,
-              );
               return NavigationActionPolicy.CANCEL;
             }
 
@@ -213,12 +206,6 @@ class _WebviewScreenState extends State<WebviewScreen> {
               destination.host == widget.uri.host,
             ].every((e) => e);
 
-            widget.delegate.shouldOverrideUrlLoading(
-              destination.uriValue,
-              isSame
-                  ? WebviewNavigationAction.allow
-                  : WebviewNavigationAction.cancel,
-            );
             return isSame
                 ? NavigationActionPolicy.ALLOW
                 : NavigationActionPolicy.CANCEL;

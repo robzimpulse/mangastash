@@ -67,7 +67,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       else if (value is NetworkEntry)
         value.uri?.toLowerCase().contains(keyword.toLowerCase()) ?? false
       else if (value is WebviewEntry)
-        value.uri.toLowerCase().contains(keyword.toLowerCase()),
+        value.uri.toString().toLowerCase().contains(keyword.toLowerCase()),
 
       if (types.isNotEmpty) types.contains(value.runtimeType),
     ].every((e) => e);
