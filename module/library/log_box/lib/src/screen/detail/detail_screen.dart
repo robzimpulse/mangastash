@@ -1,15 +1,15 @@
-import 'dart:convert';
+import 'package:flutter/material.dart' hide ErrorWidget;
 
-import 'package:flutter/material.dart';
-import 'package:sliver_tools/sliver_tools.dart';
-
-import '../../common/extension.dart';
-import '../../common/helper.dart';
 import '../../model/entry.dart';
-import '../../model/log_entry.dart';
 import '../../model/network_entry.dart';
 import '../../model/webview_entry.dart';
-import 'widget/item_column.dart';
+import 'widget/detail_widget.dart';
+import 'widget/error_widget.dart';
+import 'widget/event_widget.dart';
+import 'widget/html_widget.dart';
+import 'widget/overview_widget.dart';
+import 'widget/request_widget.dart';
+import 'widget/response_widget.dart';
 
 class DetailScreen extends StatelessWidget {
   final Entry data;
@@ -21,12 +21,23 @@ class DetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: data is NetworkEntry || data is WebviewEntry ? 4 : 3,
       child: Scaffold(
         appBar: _appBar(context),
         body: SafeArea(
           child: TabBarView(
-            children: [_overviewWidget(), _extraWidget(), _errorWidget()],
+            children: [
+              OverviewWidget(data: data),
+              if (data is NetworkEntry) ...[
+                RequestWidget(data: data),
+                ResponseWidget(data: data),
+              ] else if (data is WebviewEntry) ...[
+                HtmlWidget(data: data),
+                EventWidget(data: data),
+              ] else
+                DetailWidget(data: data),
+              ErrorWidget(data: data),
+            ],
           ),
         ),
       ),
@@ -42,147 +53,43 @@ class DetailScreen extends StatelessWidget {
         onPressed: () => Navigator.pop(context),
         icon: const Icon(Icons.arrow_back),
       ),
-      bottom: const TabBar(
+      bottom: TabBar(
         labelColor: Colors.white,
         unselectedLabelColor: Colors.white,
         tabs: [
-          Tab(text: 'Overview', icon: Icon(Icons.info, color: Colors.white)),
-          Tab(text: 'Detail', icon: Icon(Icons.list, color: Colors.white)),
-          Tab(text: 'Error', icon: Icon(Icons.bug_report, color: Colors.white)),
+          const Tab(
+            text: 'Overview',
+            icon: Icon(Icons.info, color: Colors.white),
+          ),
+          if (data is NetworkEntry) ...[
+            const Tab(
+              text: 'Request',
+              icon: Icon(Icons.arrow_upward, color: Colors.white),
+            ),
+            const Tab(
+              text: 'Response',
+              icon: Icon(Icons.arrow_downward, color: Colors.white),
+            ),
+          ] else if (data is WebviewEntry) ...[
+            const Tab(
+              text: 'Html',
+              icon: Icon(Icons.html, color: Colors.white),
+            ),
+            const Tab(
+              text: 'Events',
+              icon: Icon(Icons.event, color: Colors.white),
+            ),
+          ] else
+            const Tab(
+              text: 'Detail',
+              icon: Icon(Icons.list, color: Colors.white),
+            ),
+          const Tab(
+            text: 'Error',
+            icon: Icon(Icons.warning, color: Colors.white),
+          ),
         ],
       ),
-    );
-  }
-
-  Widget _overviewWidget() {
-    final data = this.data;
-
-    return CustomScrollView(
-      slivers: [
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          sliver: MultiSliver(
-            children: [
-              if (data is LogEntry) ...[
-                SliverToBoxAdapter(
-                  child: ItemColumn(name: 'Name', value: data.name),
-                ),
-                SliverToBoxAdapter(
-                  child: ItemColumn(name: 'Message', value: data.message),
-                ),
-                SliverToBoxAdapter(
-                  child: ItemColumn(
-                    name: 'Timestamp',
-                    value: data.timestamp.toIso8601String(),
-                  ),
-                ),
-              ] else if (data is NetworkEntry) ...[
-                SliverToBoxAdapter(
-                  child: ItemColumn(name: 'Method', value: data.method),
-                ),
-                SliverToBoxAdapter(
-                  child: ItemColumn(name: 'Url', value: data.uri),
-                ),
-                ItemColumn(
-                  name: 'Duration',
-                  value: data.duration.toString(),
-                ),
-              ] else if (data is WebviewEntry) ...[
-                SliverToBoxAdapter(
-                  child: ItemColumn(name: 'url', value: data.uri.toString()),
-                ),
-                SliverToBoxAdapter(
-                  child: ItemColumn(
-                    name: 'scripts',
-                    value: jsonEncode(data.scripts),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: ItemColumn(
-                    name: 'Timestamp',
-                    value: data.timestamp.toIso8601String(),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _extraWidget() {
-    final data = this.data;
-    return CustomScrollView(
-      slivers: [
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          sliver: MultiSliver(
-            children: [
-              if (data is LogEntry) ...[
-                SliverToBoxAdapter(
-                  child: ItemColumn(name: 'Extra', value: data.extra.json),
-                ),
-              ] else if (data is NetworkEntry)
-                ...[]
-              else if (data is WebviewEntry) ...[
-                SliverToBoxAdapter(
-                  child: ItemColumn(name: 'Html', value: data.html),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _errorWidget() {
-    final data = this.data;
-    return CustomScrollView(
-      slivers: [
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          sliver: MultiSliver(
-            children: [
-              if (data is LogEntry) ...[
-                SliverToBoxAdapter(
-                  child: ItemColumn(
-                    name: 'Error',
-                    value: data.error.toString(),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: ItemColumn(
-                    name: 'Stack Trace',
-                    value: data.stackTrace.toString(),
-                  ),
-                ),
-              ] else if (data is NetworkEntry) ...[
-                SliverToBoxAdapter(
-                  child: ItemColumn(
-                    name: 'Error',
-                    value: data.error?.error.toString(),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: ItemColumn(
-                    name: 'Stack Trace',
-                    value: data.error?.stackTrace.toString(),
-                  ),
-                ),
-              ] else if (data is WebviewEntry) ...[
-                SliverToBoxAdapter(
-                  child: ItemColumn(
-                    name: 'Error',
-                    value: data.error.toString(),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
