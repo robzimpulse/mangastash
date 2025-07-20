@@ -90,6 +90,14 @@ class HeadlessWebviewManager {
       onConsoleMessage: (_, message) {
         delegate.onConsoleMessage(extra: message.toMap());
       },
+      onAjaxProgress: (_, request) async {
+        delegate.onAjaxRequest(extra: request.toMap());
+        return AjaxRequestAction.PROCEED;
+      },
+      onAjaxReadyStateChange: (_, request) async {
+        delegate.onAjaxRequest(extra: request.toMap());
+        return null;
+      },
       shouldOverrideUrlLoading: (_, action) async {
         final destination = action.request.url;
 
