@@ -30,6 +30,15 @@ class NetworkEntry extends Entry {
     this.error,
   }) : super(id: id, timestamp: timestamp);
 
+  Duration get duration {
+    final request = this.request;
+    final response = this.response;
+    if (request != null && response != null) {
+      return response.time.difference(request.time);
+    }
+    return Duration.zero;
+  }
+
   NetworkEntry copyWith({
     bool? loading,
     HttpRequestModel? request,

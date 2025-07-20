@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 import '../../common/extension.dart';
+import '../../common/helper.dart';
 import '../../model/entry.dart';
 import '../../model/log_entry.dart';
 import '../../model/network_entry.dart';
@@ -62,12 +63,6 @@ class DetailScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           sliver: MultiSliver(
             children: [
-              SliverToBoxAdapter(
-                child: ItemColumn(
-                  name: 'Timestamp',
-                  value: data.timestamp.toIso8601String(),
-                ),
-              ),
               if (data is LogEntry) ...[
                 SliverToBoxAdapter(
                   child: ItemColumn(name: 'Name', value: data.name),
@@ -75,12 +70,22 @@ class DetailScreen extends StatelessWidget {
                 SliverToBoxAdapter(
                   child: ItemColumn(name: 'Message', value: data.message),
                 ),
+                SliverToBoxAdapter(
+                  child: ItemColumn(
+                    name: 'Timestamp',
+                    value: data.timestamp.toIso8601String(),
+                  ),
+                ),
               ] else if (data is NetworkEntry) ...[
                 SliverToBoxAdapter(
                   child: ItemColumn(name: 'Method', value: data.method),
                 ),
                 SliverToBoxAdapter(
                   child: ItemColumn(name: 'Url', value: data.uri),
+                ),
+                ItemColumn(
+                  name: 'Duration',
+                  value: data.duration.toString(),
                 ),
               ] else if (data is WebviewEntry) ...[
                 SliverToBoxAdapter(
@@ -90,6 +95,12 @@ class DetailScreen extends StatelessWidget {
                   child: ItemColumn(
                     name: 'scripts',
                     value: jsonEncode(data.scripts),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: ItemColumn(
+                    name: 'Timestamp',
+                    value: data.timestamp.toIso8601String(),
                   ),
                 ),
               ],
@@ -112,29 +123,9 @@ class DetailScreen extends StatelessWidget {
                 SliverToBoxAdapter(
                   child: ItemColumn(name: 'Extra', value: data.extra.json),
                 ),
-              ] else if (data is NetworkEntry) ...[
-                SliverPinnedHeader(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Center(
-                        child: TextButton(
-                          onPressed: () {},
-                          child: Text('Request'),
-                        ),
-                      ),
-                      Center(
-                        child: TextButton(
-                          onPressed: () {},
-                          child: Text('Response'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // SliverToBoxAdapter(child: ItemColumn(name: 'Request', value: data.request?.json),),
-                // SliverToBoxAdapter(child: ItemColumn(name: 'Response', value: data.request?.json),),
-              ] else if (data is WebviewEntry) ...[
+              ] else if (data is NetworkEntry)
+                ...[]
+              else if (data is WebviewEntry) ...[
                 SliverToBoxAdapter(
                   child: ItemColumn(name: 'Html', value: data.html),
                 ),
