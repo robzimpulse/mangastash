@@ -19,15 +19,13 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SelectionArea(
-      child: DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          appBar: _appBar(context),
-          body: SafeArea(
-            child: TabBarView(
-              children: [_overviewWidget(), _extraWidget(), _errorWidget()],
-            ),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: _appBar(context),
+        body: SafeArea(
+          child: TabBarView(
+            children: [_overviewWidget(), _extraWidget(), _errorWidget()],
           ),
         ),
       ),
@@ -48,11 +46,8 @@ class DetailScreen extends StatelessWidget {
         unselectedLabelColor: Colors.white,
         tabs: [
           Tab(text: 'Overview', icon: Icon(Icons.info, color: Colors.white)),
-          Tab(
-            text: 'Detail',
-            icon: Icon(Icons.data_array, color: Colors.white),
-          ),
-          Tab(text: 'Error', icon: Icon(Icons.error, color: Colors.white)),
+          Tab(text: 'Detail', icon: Icon(Icons.list, color: Colors.white)),
+          Tab(text: 'Error', icon: Icon(Icons.bug_report, color: Colors.white)),
         ],
       ),
     );
@@ -114,12 +109,35 @@ class DetailScreen extends StatelessWidget {
           sliver: MultiSliver(
             children: [
               if (data is LogEntry) ...[
-                SliverToBoxAdapter(child: ItemColumn(name: 'Extra', value: data.extra.json)),
+                SliverToBoxAdapter(
+                  child: ItemColumn(name: 'Extra', value: data.extra.json),
+                ),
               ] else if (data is NetworkEntry) ...[
+                SliverPinnedHeader(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Center(
+                        child: TextButton(
+                          onPressed: () {},
+                          child: Text('Request'),
+                        ),
+                      ),
+                      Center(
+                        child: TextButton(
+                          onPressed: () {},
+                          child: Text('Response'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 // SliverToBoxAdapter(child: ItemColumn(name: 'Request', value: data.request?.json),),
                 // SliverToBoxAdapter(child: ItemColumn(name: 'Response', value: data.request?.json),),
               ] else if (data is WebviewEntry) ...[
-                SliverToBoxAdapter(child: ItemColumn(name: 'Html', value: data.html)),
+                SliverToBoxAdapter(
+                  child: ItemColumn(name: 'Html', value: data.html),
+                ),
               ],
             ],
           ),
@@ -130,26 +148,50 @@ class DetailScreen extends StatelessWidget {
 
   Widget _errorWidget() {
     final data = this.data;
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        child: Column(
-          children: [
-            if (data is LogEntry) ...[
-              ItemColumn(name: 'Error', value: data.error.toString()),
-              ItemColumn(
-                name: 'Stack Trace',
-                value: data.stackTrace.toString(),
-              ),
-            ] else if (data is NetworkEntry) ...[
-              // TODO: add item column
-            ] else if (data is WebviewEntry) ...[
-              ItemColumn(name: 'Error', value: data.error.toString()),
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          sliver: MultiSliver(
+            children: [
+              if (data is LogEntry) ...[
+                SliverToBoxAdapter(
+                  child: ItemColumn(
+                    name: 'Error',
+                    value: data.error.toString(),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: ItemColumn(
+                    name: 'Stack Trace',
+                    value: data.stackTrace.toString(),
+                  ),
+                ),
+              ] else if (data is NetworkEntry) ...[
+                SliverToBoxAdapter(
+                  child: ItemColumn(
+                    name: 'Error',
+                    value: data.error?.error.toString(),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: ItemColumn(
+                    name: 'Stack Trace',
+                    value: data.error?.stackTrace.toString(),
+                  ),
+                ),
+              ] else if (data is WebviewEntry) ...[
+                SliverToBoxAdapter(
+                  child: ItemColumn(
+                    name: 'Error',
+                    value: data.error.toString(),
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }

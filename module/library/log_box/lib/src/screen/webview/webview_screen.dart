@@ -97,6 +97,8 @@ class _WebviewScreenState extends State<WebviewScreen> {
 
               final script = controller.text;
 
+              controller.dispose();
+
               if (script.isEmpty) return;
 
               webViewController?.evaluateJavascript(source: script);

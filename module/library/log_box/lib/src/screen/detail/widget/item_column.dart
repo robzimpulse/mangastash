@@ -54,9 +54,11 @@ class ItemColumn extends StatelessWidget {
             ),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(
-                value.isJson ? value.prettify : value,
-                style: Theme.of(context).textTheme.labelSmall,
+              child: SelectionArea(
+                child: Text(
+                  value.isJson ? value.prettify : value,
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
               ),
             ),
           ),

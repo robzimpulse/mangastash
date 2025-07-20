@@ -206,7 +206,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         child: child,
                       );
                     },
-                    child: Text(type.toString()),
+                    child: Text(
+                      switch (type.toString()) {
+                        'NavigationEntry' => 'Navigation',
+                        'WebviewEntry' => 'Webview',
+                        'NetworkEntry' => 'Network',
+                        'LogEntry' => 'Log',
+                        _ => 'Undefined',
+                      },
+                    ),
                   ),
               ],
             ),
