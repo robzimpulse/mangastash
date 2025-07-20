@@ -1,5 +1,4 @@
 import 'package:core_storage/core_storage.dart';
-import 'package:dio_inspector/dio_inspector.dart';
 import 'package:log_box/log_box.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -8,7 +7,6 @@ import 'package:ui_common/ui_common.dart';
 import 'advanced_screen_cubit.dart';
 
 class AdvancedScreen extends StatelessWidget {
-  final DioInspector inspector;
   final LogBox logBox;
   final DatabaseViewer viewer;
   final AppDatabase database;
@@ -16,7 +14,6 @@ class AdvancedScreen extends StatelessWidget {
 
   const AdvancedScreen({
     super.key,
-    required this.inspector,
     required this.logBox,
     required this.viewer,
     required this.database,
@@ -27,7 +24,6 @@ class AdvancedScreen extends StatelessWidget {
     return BlocProvider(
       create: (_) => AdvancedScreenCubit(),
       child: AdvancedScreen(
-        inspector: locator(),
         logBox: locator(),
         database: locator(),
         viewer: locator(),
@@ -42,14 +38,6 @@ class AdvancedScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Advanced Screen')),
       body: AdaptivePhysicListView(
         children: [
-          ListTile(
-            title: const Text('HTTP Inspector'),
-            onTap: () => inspector.navigateToInspector(),
-            leading: const SizedBox(
-              height: double.infinity,
-              child: Icon(Icons.http),
-            ),
-          ),
           ListTile(
             title: const Text('Log Inspector'),
             onTap: () => logBox.dashboard(context: context),

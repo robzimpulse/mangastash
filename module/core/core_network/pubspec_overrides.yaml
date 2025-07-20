@@ -1,7 +1,5 @@
 # melos_managed_dependency_overrides: dio_inspector,log_box,manga_service_drift,service_locator
 dependency_overrides:
-  dio_inspector:
-    path: ../../library/dio_inspector
   log_box:
     path: ../../library/log_box
   manga_service_drift:

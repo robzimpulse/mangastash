@@ -1,4 +1,3 @@
-import 'package:dio_inspector/dio_inspector.dart';
 import 'package:log_box/log_box.dart';
 import 'package:service_locator/service_locator.dart';
 
@@ -16,10 +15,8 @@ class CoreNetworkRegistrar extends Registrar {
       extra: {'start': DateTime.timestamp().toIso8601String()},
     );
 
-    locator.registerSingleton(DioInspector());
-
     locator.registerSingleton(
-      DioManager.create(inspector: locator(), log: locator(), db: locator()),
+      DioManager.create(log: locator(), db: locator()),
       dispose: (e) => e.close(force: true),
     );
 

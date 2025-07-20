@@ -8,8 +8,6 @@ dependency_overrides:
     path: ../../core/core_route
   core_storage:
     path: ../../core/core_storage
-  dio_inspector:
-    path: ../../library/dio_inspector
   domain_manga:
     path: ../../domain/domain_manga
   entity_manga:

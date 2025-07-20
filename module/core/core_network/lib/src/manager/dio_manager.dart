@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
-import 'package:dio_inspector/dio_inspector.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
@@ -12,7 +11,6 @@ import '../mixin/user_agent_mixin.dart';
 
 class DioManager {
   static Dio create({
-    required DioInspector inspector,
     required LogBox log,
     required AppDatabase db,
   }) {
@@ -27,7 +25,6 @@ class DioManager {
     dio.interceptors.addAll(
       [
         log.interceptor,
-        inspector.getDioRequestInterceptor(),
         DioThrottlerInterceptor(
           const Duration(milliseconds: 200),
           onThrottled: (req, scheduled) => log.log(

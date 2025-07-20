@@ -2,7 +2,6 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
-import 'package:dio_inspector/dio_inspector.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:flutter/foundation.dart';
 import 'package:log_box/log_box.dart';
@@ -94,7 +93,6 @@ class _MangaStashAppState extends State<MangaStashApp> {
     String initialRoute = MainPath.main,
   }) {
     final rootNavigatorKey = GlobalKey<NavigatorState>();
-    final DioInspector inspector = locator();
     final LogBox logBox = locator();
     final DatabaseViewer viewer = locator();
     return GoRouter(
@@ -113,7 +111,6 @@ class _MangaStashAppState extends State<MangaStashApp> {
         observers: () => [logBox.observer],
       ),
       observers: [
-        inspector.navigatorObserver,
         logBox.observer,
         viewer.navigatorObserver,
       ],

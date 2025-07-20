@@ -6,8 +6,6 @@ dependency_overrides:
     path: ../../core/core_network
   core_storage:
     path: ../../core/core_storage
-  dio_inspector:
-    path: ../../library/dio_inspector
   entity_manga:
     path: ../../entity/entity_manga
   log_box:
