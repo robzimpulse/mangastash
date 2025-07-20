@@ -6,11 +6,8 @@ import 'entry.dart';
 class NetworkEntry extends Entry {
   final String? client;
   final bool? loading;
-  final bool? secure;
   final String? method;
-  final String? endpoint;
-  final String? server;
-  final String? uri;
+  final Uri? uri;
   final HttpRequestModel? request;
   final HttpResponseModel? response;
   final HttpErrorModel? error;
@@ -20,24 +17,12 @@ class NetworkEntry extends Entry {
     DateTime? timestamp,
     this.client,
     this.loading = true,
-    this.secure,
     this.method,
-    this.endpoint,
-    this.server,
     this.uri,
     this.request,
     this.response,
     this.error,
   }) : super(id: id, timestamp: timestamp);
-
-  Duration get duration {
-    final request = this.request;
-    final response = this.response;
-    if (request != null && response != null) {
-      return response.time.difference(request.time);
-    }
-    return Duration.zero;
-  }
 
   NetworkEntry copyWith({
     bool? loading,
@@ -50,10 +35,7 @@ class NetworkEntry extends Entry {
       timestamp: timestamp,
       client: client,
       loading: loading ?? this.loading,
-      secure: secure,
       method: method,
-      endpoint: endpoint,
-      server: server,
       uri: uri,
       request: request ?? this.request,
       response: response ?? this.response,

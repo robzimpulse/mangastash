@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
+import '../../../common/extension.dart';
 import '../../../model/entry.dart';
 import '../../../model/log_entry.dart';
 import '../../../model/network_entry.dart';
@@ -42,7 +43,7 @@ class OverviewWidget extends StatelessWidget {
                   child: ItemColumn(name: 'Method', value: data.method),
                 ),
                 SliverToBoxAdapter(
-                  child: ItemColumn(name: 'Url', value: data.uri),
+                  child: ItemColumn(name: 'Url', value: data.uri.toString()),
                 ),
                 ItemColumn(name: 'Duration', value: data.duration.toString()),
               ] else if (data is WebviewEntry) ...[

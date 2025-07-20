@@ -65,10 +65,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
           value.route?.toLowerCase().contains(keyword.toLowerCase()),
           value.previousRoute?.toLowerCase().contains(keyword.toLowerCase()),
         ].nonNulls.contains(true)
-      else if (value is NetworkEntry)
-        value.uri?.toLowerCase().contains(keyword.toLowerCase()) ?? false
-      else if (value is WebviewEntry)
-        value.uri.toString().toLowerCase().contains(keyword.toLowerCase()),
+      else if (value is NetworkEntry) ...[
+        value.uri?.path.toLowerCase().contains(keyword.toLowerCase()) ?? false,
+        value.uri?.host.toLowerCase().contains(keyword.toLowerCase()) ?? false,
+      ] else if (value is WebviewEntry) ...[
+        value.uri?.path.toLowerCase().contains(keyword.toLowerCase()) ?? false,
+        value.uri?.host.toLowerCase().contains(keyword.toLowerCase()) ?? false,
+      ],
 
       if (types.isNotEmpty) types.contains(value.runtimeType),
     ].every((e) => e);
@@ -179,6 +182,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
         if (data == null || data.isEmpty) return const SizedBox.shrink();
 
+        String text(Type type) => switch (type.toString()) {
+          'NavigationEntry' => 'Navigation',
+          'WebviewEntry' => 'Webview',
+          'NetworkEntry' => 'Network',
+          'LogEntry' => 'Log',
+          _ => 'Undefined',
+        };
+
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: SingleChildScrollView(
@@ -206,15 +217,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         child: child,
                       );
                     },
-                    child: Text(
-                      switch (type.toString()) {
-                        'NavigationEntry' => 'Navigation',
-                        'WebviewEntry' => 'Webview',
-                        'NetworkEntry' => 'Network',
-                        'LogEntry' => 'Log',
-                        _ => 'Undefined',
-                      },
-                    ),
+                    child: Text(text(type)),
                   ),
               ],
             ),

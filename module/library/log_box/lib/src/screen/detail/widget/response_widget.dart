@@ -30,7 +30,7 @@ class ResponseWidget extends StatelessWidget {
                 ),
                 SliverToBoxAdapter(
                   child: ItemColumn(
-                    name: 'Size',
+                    name: 'Size (bytes)',
                     value: data.response?.size.toString(),
                   ),
                 ),

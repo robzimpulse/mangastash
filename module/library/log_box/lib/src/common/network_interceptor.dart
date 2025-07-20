@@ -62,11 +62,11 @@ class NetworkInterceptor extends Interceptor {
       log: NetworkEntry(
         id: options.hashCode.toString(),
         client: 'Dio',
-        secure: options.uri.scheme == 'https',
+        // secure: options.uri.scheme == 'https',
         method: options.method,
-        endpoint: options.uri.path.isEmpty ? '/' : options.uri.path,
-        server: options.uri.host,
-        uri: options.uri.toString(),
+        // endpoint: options.uri.path.isEmpty ? '/' : options.uri.path,
+        // server: options.uri.host,
+        uri: options.uri,
         request: HttpRequestModel.create(
           queryParameters: mergedQueryParameters,
           headers: _rawJson(options.headers),

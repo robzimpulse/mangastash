@@ -64,7 +64,7 @@ class NetworkItemWidget extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '${data.method ?? 'Undefined'} ${data.endpoint}',
+                  '${data.method ?? 'Undefined'} ${data.uri?.path}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.labelLarge,
@@ -76,7 +76,7 @@ class NetworkItemWidget extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  '${data.server}',
+                  '${data.uri?.host}',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.labelMedium,

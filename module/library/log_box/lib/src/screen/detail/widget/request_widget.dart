@@ -42,6 +42,12 @@ class RequestWidget extends StatelessWidget {
                 ),
                 SliverToBoxAdapter(
                   child: ItemColumn(
+                    name: 'Size (bytes)',
+                    value: data.request?.size.toString(),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: ItemColumn(
                     name: 'Body',
                     value: data.request?.body,
                   ),
