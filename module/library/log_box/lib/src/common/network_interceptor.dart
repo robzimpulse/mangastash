@@ -69,7 +69,7 @@ class NetworkInterceptor extends Interceptor {
         uri: options.uri,
         request: HttpRequestModel.create(
           queryParameters: mergedQueryParameters,
-          headers: _rawJson(options.headers),
+          headers: options.headers,
           contentType: options.contentType.toString(),
           size: data == null ? 0 : utf8.encode(data.toString()).length,
           body:

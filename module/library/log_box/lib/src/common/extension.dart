@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:universal_io/io.dart';
+
 import '../model/network_entry.dart';
 
 extension NullableStringJsonExtension on String? {
@@ -60,61 +62,26 @@ extension DurationNetworkExtension on NetworkEntry {
 }
 
 extension CurlCommandExtension on NetworkEntry {
-  // String get getCurlCommand {
-  //   bool compressed = false;
-  //   final StringBuffer curlCmd = StringBuffer('curl');
-  //
-  //   curlCmd.write(' -X $method');
-  //
-  //   final headers = Helper.decodeRawJson(request?.headers ?? '{}');
-  //   for (final MapEntry<String, dynamic> header in headers.entries) {
-  //     final headerValue = header.value?.toString() ?? '';
-  //     if (headerValue.isNotEmpty) {
-  //       if (header.key.toLowerCase() == HttpHeaders.acceptEncodingHeader &&
-  //           headerValue.toLowerCase() == 'gzip') {
-  //         compressed = true;
-  //       }
-  //
-  //       curlCmd.write(' -H "${header.key}: $headerValue"');
-  //     }
-  //   }
-  //
-  //   final String? requestBody = request?.body?.toString();
-  //   if (requestBody != null &&
-  //       requestBody.isNotEmpty &&
-  //       requestBody != 'null') {
-  //     curlCmd.write(" --data \$'${requestBody.replaceAll("\n", r"\n")}'");
-  //   }
-  //
-  //   final Map<String, dynamic>? queryParamMap = request?.queryParameters;
-  //   int paramCount = queryParamMap?.keys.length ?? 0;
-  //   final StringBuffer queryParams = StringBuffer();
-  //
-  //   if (paramCount > 0) {
-  //     queryParams.write('?');
-  //     for (final MapEntry<String, dynamic> queryParam
-  //         in queryParamMap?.entries ?? []) {
-  //       queryParams.write('${queryParam.key}=${queryParam.value}');
-  //       paramCount--;
-  //       if (paramCount > 0) {
-  //         queryParams.write('&');
-  //       }
-  //     }
-  //   }
-  //
-  //   if (server?.contains('http://') == true ||
-  //       server?.contains('https://') == true) {
-  //     curlCmd.write(
-  //       "${compressed ? " --compressed " : " "}"
-  //       "${"'$server$endpoint$queryParams'"}",
-  //     );
-  //   } else {
-  //     curlCmd.write(
-  //       "${compressed ? " --compressed " : " "}"
-  //       "${"'${secure ?? false ? 'https://' : 'http://'}$server$endpoint$queryParams'"}",
-  //     );
-  //   }
-  //
-  //   return curlCmd.toString();
-  // }
+  String get curl {
+    final String? body = request?.body?.toString();
+    final encodingKey = HttpHeaders.acceptEncodingHeader.toLowerCase();
+    final compressed = request?.headers?.entries.where(
+      (entry) => [
+        entry.key.toLowerCase() == encodingKey,
+        entry.value == 'gzip',
+      ].every((e) => e),
+    );
+
+    return [
+      'curl',
+      '-X $method',
+      for (final header in {...?request?.headers?.entries})
+        if (header.value.toString().isNotEmpty)
+          '-H \'${header.key}: ${header.value.toString()}\'',
+      if (body != null && body.isNotEmpty && body != 'null')
+        '--data \'${body.replaceAll('\n', r'\n')}\'',
+      if (compressed?.isNotEmpty == true) '--compressed',
+      '\'${uri.toString()}\'',
+    ].join(' ');
+  }
 }

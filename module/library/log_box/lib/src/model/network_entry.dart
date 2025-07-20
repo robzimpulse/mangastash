@@ -91,7 +91,7 @@ class HttpResponseModel extends Equatable {
 class HttpRequestModel extends Equatable {
   factory HttpRequestModel.create({
     int size = 0,
-    String? headers,
+    Map<String, dynamic>? headers,
     String? body,
     String? contentType,
     List<Cookie> cookies = const <Cookie>[],
@@ -126,7 +126,7 @@ class HttpRequestModel extends Equatable {
 
   final int size;
   final DateTime time;
-  final String? headers;
+  final Map<String, dynamic>? headers;
   final String? body;
   final String? contentType;
   final List<Cookie> cookies;
@@ -149,7 +149,7 @@ class HttpRequestModel extends Equatable {
 
   HttpRequestModel copyWith({
     int? size,
-    String? headers,
+    Map<String, dynamic>? headers,
     String? body,
     String? contentType,
     List<Cookie>? cookies,

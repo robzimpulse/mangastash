@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart' hide ErrorWidget;
 
+import '../../common/extension.dart';
+import '../../common/helper.dart';
 import '../../model/entry.dart';
 import '../../model/network_entry.dart';
 import '../../model/webview_entry.dart';
@@ -45,6 +47,8 @@ class DetailScreen extends StatelessWidget {
   }
 
   PreferredSizeWidget _appBar(BuildContext context) {
+    final data = this.data;
+
     return AppBar(
       title: const Text('Detail Log'),
       elevation: 3,
@@ -53,6 +57,15 @@ class DetailScreen extends StatelessWidget {
         onPressed: () => Navigator.pop(context),
         icon: const Icon(Icons.arrow_back),
       ),
+      actions: [
+        if (data is NetworkEntry)
+          IconButton(
+            onPressed: () {
+              Helper.copyToClipboard(text: data.curl, context: context);
+            },
+            icon: const Icon(Icons.copy),
+          ),
+      ],
       bottom: TabBar(
         labelColor: Colors.white,
         unselectedLabelColor: Colors.white,

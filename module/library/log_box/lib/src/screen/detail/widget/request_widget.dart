@@ -31,7 +31,7 @@ class RequestWidget extends StatelessWidget {
                 SliverToBoxAdapter(
                   child: ItemColumn(
                     name: 'Headers',
-                    value: data.request?.headers,
+                    value: data.request?.headers?.json,
                   ),
                 ),
                 SliverToBoxAdapter(
