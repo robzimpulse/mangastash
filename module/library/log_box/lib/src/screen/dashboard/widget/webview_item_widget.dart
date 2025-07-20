@@ -22,6 +22,14 @@ class WebviewItemWidget extends StatelessWidget {
             children: [
               const Icon(Icons.web, size: 16),
               const SizedBox(width: 8),
+              if (data.html == null && data.error == null) ...[
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(),
+                ),
+                const SizedBox(width: 8),
+              ],
               Expanded(
                 child: Text(
                   '${data.uri?.path}',

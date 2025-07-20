@@ -200,7 +200,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               runSpacing: 8,
               direction: Axis.horizontal,
               children: [
-                for (final type in data)
+                for (final type in data.sortedBy(text))
                   ValueListenableBuilder(
                     valueListenable: types,
                     builder: (context, datas, child) {

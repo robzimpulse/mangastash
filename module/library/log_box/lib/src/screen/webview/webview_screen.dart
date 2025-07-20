@@ -167,6 +167,14 @@ class _WebviewScreenState extends State<WebviewScreen> {
             _log('onLoadStop: $url');
             widget.delegate.onLoadStop(uri: url?.uriValue);
           },
+          onAjaxProgress: (_, request) async {
+            widget.delegate.onAjaxRequest(extra: request.toMap());
+            return AjaxRequestAction.PROCEED;
+          },
+          onAjaxReadyStateChange: (_, request) async {
+            widget.delegate.onAjaxRequest(extra: request.toMap());
+            return null;
+          },
           onProgressChanged: (controller, progress) async {
             _log('onProgress: $progress');
             widget.delegate.onProgressChanged(progress: progress);

@@ -27,14 +27,14 @@ class Storage {
       final data = _merge(log: log, old: logs.removeAt(index));
       if (data != null) {
         _logs.add([
-          ...[data, ...logs].take(_capacity),
+          ...[data, ...logs].sortedBy((e) => e.timestamp).take(_capacity),
         ]);
         return;
       }
     }
 
     _logs.add([
-      ...[log, ...logs].take(_capacity),
+      ...[log, ...logs].sortedBy((e) => e.timestamp).take(_capacity),
     ]);
   }
 

@@ -32,6 +32,20 @@ class WebviewDelegate {
     );
   }
 
+  void onAjaxRequest({Map<String, dynamic>? extra}) {
+    _storage.add(
+      log: WebviewEntry(
+        id: _id,
+        events: [
+          WebviewEntryLog(
+            event: WebviewEvent.onAjaxRequest,
+            extra: extra,
+          ),
+        ],
+      ),
+    );
+  }
+
   void onContentSizeChanged({Size? previous, Size? current}) {
     _storage.add(
       log: WebviewEntry(
