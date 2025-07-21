@@ -524,8 +524,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               useCache: false,
             ),
             onTapRecrawl: (url) => _cubit(context).recrawl(
-                context: context,
-                url: url,
+              context: context,
+              url: url,
             ),
             error: state.errorSimilarManga,
             isLoading: state.isLoadingSimilarManga || state.isLoadingManga,
