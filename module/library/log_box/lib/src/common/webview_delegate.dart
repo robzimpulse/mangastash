@@ -143,4 +143,18 @@ class WebviewDelegate {
       ),
     );
   }
+
+  void onRunJavascript({required String script}) {
+    _storage.add(
+      log: WebviewEntry(
+        id: _id,
+        events: [
+          WebviewEntryLog(
+            event: WebviewEvent.onRunJavascript,
+            extra: {'script': script},
+          ),
+        ],
+      ),
+    );
+  }
 }

@@ -14,5 +14,6 @@ enum WebviewEvent {
   onReceivedError,
   onConsoleMessage,
   onAjaxRequest,
+  onRunJavascript,
   shouldOverrideUrlLoading,
 }
