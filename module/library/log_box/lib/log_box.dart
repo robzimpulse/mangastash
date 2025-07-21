@@ -19,11 +19,28 @@ export 'src/common/webview_delegate.dart';
 class LogBox {
   static final LogBox _instance = LogBox._();
   final Storage _storage = Storage(capacity: 1000);
+  final _dashboardRouteName = const RouteSettings(name: 'Log Box Dashboard');
+  final _webviewRouteName = const RouteSettings(name: 'Log Box Webview');
 
   String? _prevRouteName;
   NavigatorObserver get observer {
     return alt.NavigatorObserver(
       onEvent: (event) {
+        final route = event.route;
+        final prev = event.previousRoute;
+        final shouldSkip = [
+          if (route != null && route.isNotEmpty) ...[
+            route == _dashboardRouteName.name,
+            route == _webviewRouteName.name,
+          ],
+          if (prev != null && prev.isNotEmpty) ...[
+            route == _dashboardRouteName.name,
+            route == _webviewRouteName.name,
+          ],
+        ].contains(true);
+
+        if (shouldSkip) return;
+
         _storage.add(
           log: event.copyWith(
             previousRoute: event.previousRoute ?? _prevRouteName,
@@ -67,7 +84,7 @@ class LogBox {
     Navigator.push(
       context,
       MaterialPageRoute(
-        settings: const RouteSettings(name: 'Log Box Dashboard'),
+        settings: _dashboardRouteName,
         builder: (context) {
           return Theme(
             data: theme ?? Theme.of(context),
@@ -88,7 +105,7 @@ class LogBox {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        settings: const RouteSettings(name: 'Log Box Webview'),
+        settings: _webviewRouteName,
         builder: (context) {
           return Theme(
             data: theme ?? Theme.of(context),
