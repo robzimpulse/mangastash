@@ -355,6 +355,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             isOnLibrary: state.libraryMangaIds.contains(data.id),
           ),
           isOnLibrary: state.libraryMangaIds.contains(data.id),
+          isPrefetching: state.prefetchedMangaIds.contains(data.id),
         ),
         onLoadNextPage: () => _cubit(context).next(),
         onRefresh: () => _cubit(context).init(useCache: false),
