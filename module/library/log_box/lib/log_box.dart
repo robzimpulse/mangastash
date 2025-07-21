@@ -18,7 +18,7 @@ export 'src/common/webview_delegate.dart';
 
 class LogBox {
   static final LogBox _instance = LogBox._();
-  final Storage _storage = Storage();
+  final Storage _storage = Storage(capacity: 1000);
 
   String? _prevRouteName;
   NavigatorObserver get observer {

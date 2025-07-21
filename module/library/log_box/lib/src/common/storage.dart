@@ -9,7 +9,11 @@ import '../model/webview_entry.dart';
 class Storage {
   final BehaviorSubject<Map<String, Entry>> _logs;
 
-  Storage() : _logs = BehaviorSubject.seeded({});
+  final int _capacity;
+
+  Storage({required int capacity})
+    : _logs = BehaviorSubject.seeded({}),
+      _capacity = capacity;
 
   Stream<Map<String, Entry>> get all => _logs.stream;
 
@@ -26,7 +30,11 @@ class Storage {
       ifAbsent: () => log,
     );
 
-    _logs.add(logs);
+    final values = logs.values
+        .sorted((a, b) => b.timestamp.compareTo(a.timestamp))
+        .take(_capacity);
+
+    _logs.add({for (final value in values) value.id: value});
   }
 
   Entry? _merge({required Entry log, required Entry old}) {
