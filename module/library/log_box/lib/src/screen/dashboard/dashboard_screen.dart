@@ -234,13 +234,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return StreamBuilder(
           stream: widget.storage.all.map(
             (e) => [
-              ...e.where(
-                (e) => _filter(
-                  value: e,
-                  keyword: keyword.value,
-                  types: types.value,
-                ),
-              ),
+              ...e.values
+                  .where(
+                    (e) => _filter(
+                      value: e,
+                      keyword: keyword.value,
+                      types: types.value,
+                    ),
+                  )
+                  .sorted((a, b) => b.timestamp.compareTo(a.timestamp)),
             ],
           ),
           builder: (context, snapshot) {

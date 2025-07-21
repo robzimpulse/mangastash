@@ -7,35 +7,26 @@ import '../model/network_entry.dart';
 import '../model/webview_entry.dart';
 
 class Storage {
-  final BehaviorSubject<List<Entry>> _logs;
+  final BehaviorSubject<Map<String, Entry>> _logs;
 
-  final int _capacity;
+  Storage() : _logs = BehaviorSubject.seeded({});
 
-  Storage({required int capacity})
-    : _logs = BehaviorSubject.seeded([]),
-      _capacity = capacity;
+  Stream<Map<String, Entry>> get all => _logs.stream;
 
-  Stream<List<Entry>> get all => _logs.stream;
-
-  Stream<List<Type>> get type =>
-      _logs.stream.map((e) => [...e.groupListsBy((e) => e.runtimeType).keys]);
+  Stream<List<Type>> get type => _logs.stream.map(
+    (e) => [...e.values.groupListsBy((e) => e.runtimeType).keys],
+  );
 
   void add({required Entry log}) {
-    var logs = [...?_logs.valueOrNull];
-    final index = logs.indexWhere((e) => e.id == log.id);
-    if (index >= 0) {
-      final data = _merge(log: log, old: logs.removeAt(index));
-      if (data != null) {
-        _logs.add([
-          ...[data, ...logs].sortedBy((e) => e.timestamp).take(_capacity),
-        ]);
-        return;
-      }
-    }
+    var logs = {...?_logs.valueOrNull};
 
-    _logs.add([
-      ...[log, ...logs].sortedBy((e) => e.timestamp).take(_capacity),
-    ]);
+    logs.update(
+      log.id,
+      (old) => _merge(log: log, old: old) ?? old,
+      ifAbsent: () => log,
+    );
+
+    _logs.add(logs);
   }
 
   Entry? _merge({required Entry log, required Entry old}) {
@@ -70,5 +61,5 @@ class Storage {
     return null;
   }
 
-  void clear() => _logs.add([]);
+  void clear() => _logs.add({});
 }
