@@ -200,14 +200,6 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   }
 
   void recrawl({required BuildContext context, required String url}) async {
-    // final parameter = state.parameter.copyWith(page: 1);
-    // final source = state.source;
-    // final url = source == SourceEnum.mangaclash
-    //     ? parameter.mangaclash
-    //     : source == SourceEnum.asurascan
-    //         ? parameter.asurascan
-    //         : null;
-    // if (url == null) return;
     await _crawlUrlUseCase.execute(context: context, url: url);
     await init(parameter: state.parameter);
   }
