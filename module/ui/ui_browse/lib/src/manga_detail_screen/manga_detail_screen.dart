@@ -515,6 +515,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 isOnLibrary: state.libraryMangaId.contains(data.id),
               ),
               isOnLibrary: state.libraryMangaId.contains(data.id),
+              isPrefetching: state.prefetchedMangaId.contains(data.id),
             ),
             pageStorageKey: PageStorageKey('similar-manga-${state.mangaId}'),
             absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
