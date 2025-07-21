@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 
 import 'src/common/navigator_observer.dart' as alt;
 import 'src/common/network_interceptor.dart';
-import 'src/common/storage.dart';
+import 'src/manager/storage.dart';
 import 'src/common/webview_delegate.dart';
 import 'src/model/log_entry.dart';
 import 'src/screen/dashboard/dashboard_screen.dart';

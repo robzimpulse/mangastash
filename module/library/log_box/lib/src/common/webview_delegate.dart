@@ -4,7 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import '../model/webview_entry.dart';
 import 'enum.dart';
-import 'storage.dart';
+import '../manager/storage.dart';
 
 class WebviewDelegate {
   final Storage _storage;

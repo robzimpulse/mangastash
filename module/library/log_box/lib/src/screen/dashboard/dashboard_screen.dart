@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
-import '../../common/storage.dart';
+import '../../manager/storage.dart';
 import '../../model/entry.dart';
 import '../../model/log_entry.dart';
 import '../../model/navigation_entry.dart';
