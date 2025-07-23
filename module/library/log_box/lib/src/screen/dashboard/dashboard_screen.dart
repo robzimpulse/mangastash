@@ -8,18 +8,11 @@ import '../../model/navigation_entry.dart';
 import '../../model/network_entry.dart';
 import '../../model/webview_entry.dart';
 import '../detail/detail_screen.dart';
-import 'widget/item_widget.dart';
-import 'widget/log_item_widget.dart';
-import 'widget/navigation_item_widget.dart';
-import 'widget/network_item_widget.dart';
-import 'widget/webview_item_widget.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key, required this.storage, this.onTapSnapshot});
+  const DashboardScreen({super.key, required this.storage});
 
   final Storage storage;
-
-  final Function(String? url, String? html)? onTapSnapshot;
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -83,33 +76,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
         context,
         MaterialPageRoute(
           settings: const RouteSettings(name: 'Log Box Detail'),
-          builder: (context) {
-            return DetailScreen(
-              data: value,
-              onTapSnapshot: widget.onTapSnapshot,
-            );
-          },
+          builder: (context) => DetailScreen(data: value),
         ),
       );
     }
 
-    if (value is LogEntry) {
-      return LogItemWidget(data: value, onTap: onTap);
-    }
+    final hasDetail = value.tabs(context).isNotEmpty;
 
-    if (value is NavigationEntry) {
-      return NavigationItemWidget(data: value);
-    }
-
-    if (value is NetworkEntry) {
-      return NetworkItemWidget(data: value, onTap: onTap);
-    }
-
-    if (value is WebviewEntry) {
-      return WebviewItemWidget(data: value, onTap: onTap);
-    }
-
-    return ItemWidget(data: value);
+    return ListTile(
+      onTap: hasDetail ? onTap : null,
+      visualDensity: VisualDensity.compact,
+      title: value.title(context),
+      subtitle: value.subtitle(context),
+      trailing: hasDetail ? const Icon(Icons.chevron_right) : null,
+    );
   }
 
   @override

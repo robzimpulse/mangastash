@@ -1,6 +1,12 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/src/material/tabs.dart';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 import 'package:universal_io/io.dart';
 
+import '../common/extension.dart';
+import '../screen/detail/widget/item_column.dart';
 import 'entry.dart';
 
 class NetworkEntry extends Entry {
@@ -40,6 +46,212 @@ class NetworkEntry extends Entry {
       request: request ?? this.request,
       response: response ?? this.response,
       error: error ?? this.error,
+    );
+  }
+
+  @override
+  Map<Tab, Widget> tabs(BuildContext context) {
+    return {
+      const Tab(
+        text: 'Overview',
+        icon: Icon(Icons.info, color: Colors.white),
+      ): CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            sliver: MultiSliver(
+              children: [
+                SliverToBoxAdapter(
+                  child: ItemColumn(name: 'Method', value: method),
+                ),
+                SliverToBoxAdapter(
+                  child: ItemColumn(name: 'Url', value: uri.toString()),
+                ),
+                ItemColumn(name: 'Duration', value: duration.toString()),
+              ],
+            ),
+          ),
+        ],
+      ),
+      const Tab(
+        text: 'Request',
+        icon: Icon(Icons.arrow_upward, color: Colors.white),
+      ): CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            sliver: MultiSliver(
+              children: [
+                SliverToBoxAdapter(
+                  child: ItemColumn(
+                    name: 'Timestamp',
+                    value: request?.time.toIso8601String(),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: ItemColumn(
+                    name: 'Headers',
+                    value: request?.headers?.json,
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: ItemColumn(
+                    name: 'Query',
+                    value: request?.queryParameters.json,
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: ItemColumn(
+                    name: 'Size (bytes)',
+                    value: request?.size.toString(),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: ItemColumn(name: 'Body', value: request?.body),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      const Tab(
+        text: 'Response',
+        icon: Icon(Icons.arrow_downward, color: Colors.white),
+      ): CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            sliver: MultiSliver(
+              children: [
+                SliverToBoxAdapter(
+                  child: ItemColumn(
+                    name: 'Timestamp',
+                    value: response?.time.toIso8601String(),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: ItemColumn(
+                    name: 'Size (bytes)',
+                    value: response?.size.toString(),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: ItemColumn(
+                    name: 'Headers',
+                    value: response?.headers?.json,
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: ItemColumn(name: 'Body', value: response?.body),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      const Tab(
+        text: 'Error',
+        icon: Icon(Icons.warning, color: Colors.white),
+      ): CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            sliver: MultiSliver(
+              children: [
+                SliverToBoxAdapter(
+                  child: ItemColumn(
+                    name: 'Error',
+                    value: error?.error.toString(),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: ItemColumn(
+                    name: 'Stack Trace',
+                    value: error?.stackTrace.toString(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    };
+  }
+
+  @override
+  Widget title(BuildContext context) {
+    final theme = Theme.of(context);
+
+    Color? color() {
+      final status = response?.status;
+      if (status == null) return null;
+      if (status >= 200 && status < 300) {
+        return Colors.green;
+      } else if (status >= 300 && status < 400) {
+        return Colors.orange;
+      } else {
+        return Colors.red;
+      }
+    }
+
+    Widget status0(BuildContext context) {
+      if (loading == true) {
+        return const SizedBox(
+          width: 16,
+          height: 16,
+          child: CircularProgressIndicator(),
+        );
+      }
+
+      final status = response?.status;
+      if (status != null) {
+        return Text(
+          '$status',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.labelLarge?.copyWith(color: color()),
+        );
+      }
+
+      return Text(
+        'ERROR',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.labelLarge?.copyWith(color: Colors.red),
+      );
+    }
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            Icon(Icons.public, size: 16, color: color()),
+            const SizedBox(width: 8),
+            status0(context),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '${method ?? 'Undefined'} ${uri?.path}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelLarge,
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                '${uri?.host}',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelMedium,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
