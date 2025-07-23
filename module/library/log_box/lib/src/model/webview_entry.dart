@@ -205,6 +205,14 @@ class WebviewEntry extends Entry {
       ],
     );
   }
+
+  @override
+  bool contains(String keyword) {
+    return [
+      uri?.path.toLowerCase().contains(keyword.toLowerCase()) ?? false,
+      uri?.host.toLowerCase().contains(keyword.toLowerCase()) ?? false,
+    ].contains(true);
+  }
 }
 
 class WebviewEntryLog {

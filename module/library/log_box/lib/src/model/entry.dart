@@ -21,4 +21,6 @@ abstract class Entry {
   }
 
   Map<Tab, Widget> tabs(BuildContext context);
+
+  bool contains(String keyword);
 }

@@ -71,4 +71,12 @@ class NavigationEntry extends Entry {
       ],
     );
   }
+
+  @override
+  bool contains(String keyword) {
+    return [
+      route?.toLowerCase().contains(keyword.toLowerCase()),
+      previousRoute?.toLowerCase().contains(keyword.toLowerCase()),
+    ].nonNulls.contains(true);
+  }
 }

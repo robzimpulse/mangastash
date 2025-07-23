@@ -146,4 +146,9 @@ class LogEntry extends Entry {
       ],
     );
   }
+
+  @override
+  bool contains(String keyword) {
+    return message.toLowerCase().contains(keyword.toLowerCase());
+  }
 }

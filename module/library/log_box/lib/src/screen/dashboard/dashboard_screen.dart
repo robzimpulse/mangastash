@@ -51,21 +51,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Set<Type> types = const {},
   }) {
     return [
-      if (value is LogEntry)
-        value.message.toLowerCase().contains(keyword.toLowerCase())
-      else if (value is NavigationEntry)
-        [
-          value.route?.toLowerCase().contains(keyword.toLowerCase()),
-          value.previousRoute?.toLowerCase().contains(keyword.toLowerCase()),
-        ].nonNulls.contains(true)
-      else if (value is NetworkEntry) ...[
-        value.uri?.path.toLowerCase().contains(keyword.toLowerCase()) ?? false,
-        value.uri?.host.toLowerCase().contains(keyword.toLowerCase()) ?? false,
-      ] else if (value is WebviewEntry) ...[
-        value.uri?.path.toLowerCase().contains(keyword.toLowerCase()) ?? false,
-        value.uri?.host.toLowerCase().contains(keyword.toLowerCase()) ?? false,
-      ],
-
+      value.contains(keyword),
       if (types.isNotEmpty) types.contains(value.runtimeType),
     ].every((e) => e);
   }
