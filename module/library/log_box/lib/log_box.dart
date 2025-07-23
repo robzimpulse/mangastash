@@ -29,14 +29,8 @@ class LogBox {
         final route = event.route;
         final prev = event.previousRoute;
         final shouldSkip = [
-          if (route != null && route.isNotEmpty) ...[
-            route == _dashboardRouteName.name,
-            route == _webviewRouteName.name,
-          ],
-          if (prev != null && prev.isNotEmpty) ...[
-            route == _dashboardRouteName.name,
-            route == _webviewRouteName.name,
-          ],
+          route == _dashboardRouteName.name,
+          prev == _webviewRouteName.name,
         ].contains(true);
 
         if (shouldSkip) return;
