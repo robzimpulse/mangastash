@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 
-import '../model/network_entry.dart';
 import '../manager/storage.dart';
+import '../model/network_entry.dart';
 
 class NetworkInterceptor extends Interceptor {
   final Storage _storage;
