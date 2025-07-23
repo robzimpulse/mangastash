@@ -31,6 +31,8 @@ class LogBox {
         final shouldSkip = [
           route == _dashboardRouteName.name,
           prev == _webviewRouteName.name,
+          route == _webviewRouteName.name,
+          prev == _dashboardRouteName.name,
         ].contains(true);
 
         if (shouldSkip) return;
