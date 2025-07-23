@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../common/extension.dart';
-import '../../../common/helper.dart';
+import '../common/extension.dart';
+import '../common/helper.dart';
 
 class ItemColumn extends StatelessWidget {
   final String? name;

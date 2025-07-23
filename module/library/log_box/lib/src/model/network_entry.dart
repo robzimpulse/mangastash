@@ -6,7 +6,7 @@ import 'package:sliver_tools/sliver_tools.dart';
 import 'package:universal_io/io.dart';
 
 import '../common/extension.dart';
-import '../screen/detail/widget/item_column.dart';
+import '../widget/item_column.dart';
 import 'entry.dart';
 
 class NetworkEntry extends Entry {
