@@ -9,84 +9,126 @@ class $ImageTablesTable extends ImageTables
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $ImageTablesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-      'created_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp());
-  static const VerificationMeta _updatedAtMeta =
-      const VerificationMeta('updatedAt');
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-      'updated_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp());
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: false,
-      clientDefault: () => const Uuid().v4());
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: () => const Uuid().v4(),
+  );
   static const VerificationMeta _orderMeta = const VerificationMeta('order');
   @override
   late final GeneratedColumn<int> order = GeneratedColumn<int>(
-      'order', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _chapterIdMeta =
-      const VerificationMeta('chapterId');
+    'order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _chapterIdMeta = const VerificationMeta(
+    'chapterId',
+  );
   @override
   late final GeneratedColumn<String> chapterId = GeneratedColumn<String>(
-      'chapter_id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'chapter_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _webUrlMeta = const VerificationMeta('webUrl');
   @override
   late final GeneratedColumn<String> webUrl = GeneratedColumn<String>(
-      'web_url', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'web_url',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   @override
-  List<GeneratedColumn> get $columns =>
-      [createdAt, updatedAt, id, order, chapterId, webUrl];
+  List<GeneratedColumn> get $columns => [
+    createdAt,
+    updatedAt,
+    id,
+    order,
+    chapterId,
+    webUrl,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'image_tables';
   @override
-  VerificationContext validateIntegrity(Insertable<ImageDrift> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<ImageDrift> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
     }
     if (data.containsKey('updated_at')) {
-      context.handle(_updatedAtMeta,
-          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
     }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('order')) {
       context.handle(
-          _orderMeta, order.isAcceptableOrUnknown(data['order']!, _orderMeta));
+        _orderMeta,
+        order.isAcceptableOrUnknown(data['order']!, _orderMeta),
+      );
     } else if (isInserting) {
       context.missing(_orderMeta);
     }
     if (data.containsKey('chapter_id')) {
-      context.handle(_chapterIdMeta,
-          chapterId.isAcceptableOrUnknown(data['chapter_id']!, _chapterIdMeta));
+      context.handle(
+        _chapterIdMeta,
+        chapterId.isAcceptableOrUnknown(data['chapter_id']!, _chapterIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_chapterIdMeta);
     }
     if (data.containsKey('web_url')) {
-      context.handle(_webUrlMeta,
-          webUrl.isAcceptableOrUnknown(data['web_url']!, _webUrlMeta));
+      context.handle(
+        _webUrlMeta,
+        webUrl.isAcceptableOrUnknown(data['web_url']!, _webUrlMeta),
+      );
     } else if (isInserting) {
       context.missing(_webUrlMeta);
     }
@@ -97,27 +139,45 @@ class $ImageTablesTable extends ImageTables
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   List<Set<GeneratedColumn>> get uniqueKeys => [
-        {chapterId, webUrl, order},
-        {chapterId, webUrl},
-        {webUrl, order},
-        {chapterId, order},
-      ];
+    {chapterId, webUrl, order},
+    {chapterId, webUrl},
+    {webUrl, order},
+    {chapterId, order},
+  ];
   @override
   ImageDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ImageDrift(
-      createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
-      updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      order: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}order'])!,
-      chapterId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}chapter_id'])!,
-      webUrl: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}web_url'])!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      order:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}order'],
+          )!,
+      chapterId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}chapter_id'],
+          )!,
+      webUrl:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}web_url'],
+          )!,
     );
   }
 
@@ -134,13 +194,14 @@ class ImageDrift extends DataClass implements Insertable<ImageDrift> {
   final int order;
   final String chapterId;
   final String webUrl;
-  const ImageDrift(
-      {required this.createdAt,
-      required this.updatedAt,
-      required this.id,
-      required this.order,
-      required this.chapterId,
-      required this.webUrl});
+  const ImageDrift({
+    required this.createdAt,
+    required this.updatedAt,
+    required this.id,
+    required this.order,
+    required this.chapterId,
+    required this.webUrl,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -164,8 +225,10 @@ class ImageDrift extends DataClass implements Insertable<ImageDrift> {
     );
   }
 
-  factory ImageDrift.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory ImageDrift.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ImageDrift(
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -189,21 +252,21 @@ class ImageDrift extends DataClass implements Insertable<ImageDrift> {
     };
   }
 
-  ImageDrift copyWith(
-          {DateTime? createdAt,
-          DateTime? updatedAt,
-          String? id,
-          int? order,
-          String? chapterId,
-          String? webUrl}) =>
-      ImageDrift(
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        id: id ?? this.id,
-        order: order ?? this.order,
-        chapterId: chapterId ?? this.chapterId,
-        webUrl: webUrl ?? this.webUrl,
-      );
+  ImageDrift copyWith({
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? id,
+    int? order,
+    String? chapterId,
+    String? webUrl,
+  }) => ImageDrift(
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    id: id ?? this.id,
+    order: order ?? this.order,
+    chapterId: chapterId ?? this.chapterId,
+    webUrl: webUrl ?? this.webUrl,
+  );
   ImageDrift copyWithCompanion(ImageTablesCompanion data) {
     return ImageDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -268,9 +331,9 @@ class ImageTablesCompanion extends UpdateCompanion<ImageDrift> {
     required String chapterId,
     required String webUrl,
     this.rowid = const Value.absent(),
-  })  : order = Value(order),
-        chapterId = Value(chapterId),
-        webUrl = Value(webUrl);
+  }) : order = Value(order),
+       chapterId = Value(chapterId),
+       webUrl = Value(webUrl);
   static Insertable<ImageDrift> custom({
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -291,14 +354,15 @@ class ImageTablesCompanion extends UpdateCompanion<ImageDrift> {
     });
   }
 
-  ImageTablesCompanion copyWith(
-      {Value<DateTime>? createdAt,
-      Value<DateTime>? updatedAt,
-      Value<String>? id,
-      Value<int>? order,
-      Value<String>? chapterId,
-      Value<String>? webUrl,
-      Value<int>? rowid}) {
+  ImageTablesCompanion copyWith({
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<String>? id,
+    Value<int>? order,
+    Value<String>? chapterId,
+    Value<String>? webUrl,
+    Value<int>? rowid,
+  }) {
     return ImageTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -358,170 +422,255 @@ class $ChapterTablesTable extends ChapterTables
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $ChapterTablesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-      'created_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp());
-  static const VerificationMeta _updatedAtMeta =
-      const VerificationMeta('updatedAt');
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-      'updated_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp());
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: false,
-      clientDefault: () => const Uuid().v4());
-  static const VerificationMeta _mangaIdMeta =
-      const VerificationMeta('mangaId');
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: () => const Uuid().v4(),
+  );
+  static const VerificationMeta _mangaIdMeta = const VerificationMeta(
+    'mangaId',
+  );
   @override
   late final GeneratedColumn<String> mangaId = GeneratedColumn<String>(
-      'manga_id', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'manga_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
-      'title', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'title',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _volumeMeta = const VerificationMeta('volume');
   @override
   late final GeneratedColumn<String> volume = GeneratedColumn<String>(
-      'volume', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _chapterMeta =
-      const VerificationMeta('chapter');
+    'volume',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _chapterMeta = const VerificationMeta(
+    'chapter',
+  );
   @override
   late final GeneratedColumn<String> chapter = GeneratedColumn<String>(
-      'chapter', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'chapter',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _translatedLanguageMeta =
       const VerificationMeta('translatedLanguage');
   @override
   late final GeneratedColumn<String> translatedLanguage =
-      GeneratedColumn<String>('translated_language', aliasedName, true,
-          type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _scanlationGroupMeta =
-      const VerificationMeta('scanlationGroup');
+      GeneratedColumn<String>(
+        'translated_language',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _scanlationGroupMeta = const VerificationMeta(
+    'scanlationGroup',
+  );
   @override
   late final GeneratedColumn<String> scanlationGroup = GeneratedColumn<String>(
-      'scanlation_group', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'scanlation_group',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _webUrlMeta = const VerificationMeta('webUrl');
   @override
   late final GeneratedColumn<String> webUrl = GeneratedColumn<String>(
-      'webUrl', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _readableAtMeta =
-      const VerificationMeta('readableAt');
+    'webUrl',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _readableAtMeta = const VerificationMeta(
+    'readableAt',
+  );
   @override
   late final GeneratedColumn<DateTime> readableAt = GeneratedColumn<DateTime>(
-      'readable_at', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
-  static const VerificationMeta _publishAtMeta =
-      const VerificationMeta('publishAt');
+    'readable_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _publishAtMeta = const VerificationMeta(
+    'publishAt',
+  );
   @override
   late final GeneratedColumn<DateTime> publishAt = GeneratedColumn<DateTime>(
-      'publish_at', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
-  static const VerificationMeta _lastReadAtMeta =
-      const VerificationMeta('lastReadAt');
+    'publish_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastReadAtMeta = const VerificationMeta(
+    'lastReadAt',
+  );
   @override
   late final GeneratedColumn<DateTime> lastReadAt = GeneratedColumn<DateTime>(
-      'last_read_at', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+    'last_read_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
-        createdAt,
-        updatedAt,
-        id,
-        mangaId,
-        title,
-        volume,
-        chapter,
-        translatedLanguage,
-        scanlationGroup,
-        webUrl,
-        readableAt,
-        publishAt,
-        lastReadAt
-      ];
+    createdAt,
+    updatedAt,
+    id,
+    mangaId,
+    title,
+    volume,
+    chapter,
+    translatedLanguage,
+    scanlationGroup,
+    webUrl,
+    readableAt,
+    publishAt,
+    lastReadAt,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'chapter_tables';
   @override
-  VerificationContext validateIntegrity(Insertable<ChapterDrift> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<ChapterDrift> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
     }
     if (data.containsKey('updated_at')) {
-      context.handle(_updatedAtMeta,
-          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
     }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('manga_id')) {
-      context.handle(_mangaIdMeta,
-          mangaId.isAcceptableOrUnknown(data['manga_id']!, _mangaIdMeta));
+      context.handle(
+        _mangaIdMeta,
+        mangaId.isAcceptableOrUnknown(data['manga_id']!, _mangaIdMeta),
+      );
     }
     if (data.containsKey('title')) {
       context.handle(
-          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
     }
     if (data.containsKey('volume')) {
-      context.handle(_volumeMeta,
-          volume.isAcceptableOrUnknown(data['volume']!, _volumeMeta));
+      context.handle(
+        _volumeMeta,
+        volume.isAcceptableOrUnknown(data['volume']!, _volumeMeta),
+      );
     }
     if (data.containsKey('chapter')) {
-      context.handle(_chapterMeta,
-          chapter.isAcceptableOrUnknown(data['chapter']!, _chapterMeta));
+      context.handle(
+        _chapterMeta,
+        chapter.isAcceptableOrUnknown(data['chapter']!, _chapterMeta),
+      );
     }
     if (data.containsKey('translated_language')) {
       context.handle(
+        _translatedLanguageMeta,
+        translatedLanguage.isAcceptableOrUnknown(
+          data['translated_language']!,
           _translatedLanguageMeta,
-          translatedLanguage.isAcceptableOrUnknown(
-              data['translated_language']!, _translatedLanguageMeta));
+        ),
+      );
     }
     if (data.containsKey('scanlation_group')) {
       context.handle(
+        _scanlationGroupMeta,
+        scanlationGroup.isAcceptableOrUnknown(
+          data['scanlation_group']!,
           _scanlationGroupMeta,
-          scanlationGroup.isAcceptableOrUnknown(
-              data['scanlation_group']!, _scanlationGroupMeta));
+        ),
+      );
     }
     if (data.containsKey('webUrl')) {
-      context.handle(_webUrlMeta,
-          webUrl.isAcceptableOrUnknown(data['webUrl']!, _webUrlMeta));
+      context.handle(
+        _webUrlMeta,
+        webUrl.isAcceptableOrUnknown(data['webUrl']!, _webUrlMeta),
+      );
     }
     if (data.containsKey('readable_at')) {
       context.handle(
-          _readableAtMeta,
-          readableAt.isAcceptableOrUnknown(
-              data['readable_at']!, _readableAtMeta));
+        _readableAtMeta,
+        readableAt.isAcceptableOrUnknown(data['readable_at']!, _readableAtMeta),
+      );
     }
     if (data.containsKey('publish_at')) {
-      context.handle(_publishAtMeta,
-          publishAt.isAcceptableOrUnknown(data['publish_at']!, _publishAtMeta));
+      context.handle(
+        _publishAtMeta,
+        publishAt.isAcceptableOrUnknown(data['publish_at']!, _publishAtMeta),
+      );
     }
     if (data.containsKey('last_read_at')) {
       context.handle(
+        _lastReadAtMeta,
+        lastReadAt.isAcceptableOrUnknown(
+          data['last_read_at']!,
           _lastReadAtMeta,
-          lastReadAt.isAcceptableOrUnknown(
-              data['last_read_at']!, _lastReadAtMeta));
+        ),
+      );
     }
     return context;
   }
@@ -530,42 +679,71 @@ class $ChapterTablesTable extends ChapterTables
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   List<Set<GeneratedColumn>> get uniqueKeys => [
-        {mangaId, webUrl, title},
-        {mangaId, title},
-        {mangaId, webUrl},
-        {webUrl, title},
-        {webUrl},
-      ];
+    {mangaId, webUrl, title},
+    {mangaId, title},
+    {mangaId, webUrl},
+    {webUrl, title},
+    {webUrl},
+  ];
   @override
   ChapterDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ChapterDrift(
-      createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
-      updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      mangaId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}manga_id']),
-      title: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}title']),
-      volume: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}volume']),
-      chapter: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}chapter']),
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      mangaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}manga_id'],
+      ),
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      ),
+      volume: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}volume'],
+      ),
+      chapter: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}chapter'],
+      ),
       translatedLanguage: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}translated_language']),
+        DriftSqlType.string,
+        data['${effectivePrefix}translated_language'],
+      ),
       scanlationGroup: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}scanlation_group']),
-      webUrl: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}webUrl']),
-      readableAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}readable_at']),
-      publishAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}publish_at']),
-      lastReadAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}last_read_at']),
+        DriftSqlType.string,
+        data['${effectivePrefix}scanlation_group'],
+      ),
+      webUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}webUrl'],
+      ),
+      readableAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}readable_at'],
+      ),
+      publishAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}publish_at'],
+      ),
+      lastReadAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_read_at'],
+      ),
     );
   }
 
@@ -589,20 +767,21 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
   final DateTime? readableAt;
   final DateTime? publishAt;
   final DateTime? lastReadAt;
-  const ChapterDrift(
-      {required this.createdAt,
-      required this.updatedAt,
-      required this.id,
-      this.mangaId,
-      this.title,
-      this.volume,
-      this.chapter,
-      this.translatedLanguage,
-      this.scanlationGroup,
-      this.webUrl,
-      this.readableAt,
-      this.publishAt,
-      this.lastReadAt});
+  const ChapterDrift({
+    required this.createdAt,
+    required this.updatedAt,
+    required this.id,
+    this.mangaId,
+    this.title,
+    this.volume,
+    this.chapter,
+    this.translatedLanguage,
+    this.scanlationGroup,
+    this.webUrl,
+    this.readableAt,
+    this.publishAt,
+    this.lastReadAt,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -647,38 +826,47 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       id: Value(id),
-      mangaId: mangaId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(mangaId),
+      mangaId:
+          mangaId == null && nullToAbsent
+              ? const Value.absent()
+              : Value(mangaId),
       title:
           title == null && nullToAbsent ? const Value.absent() : Value(title),
       volume:
           volume == null && nullToAbsent ? const Value.absent() : Value(volume),
-      chapter: chapter == null && nullToAbsent
-          ? const Value.absent()
-          : Value(chapter),
-      translatedLanguage: translatedLanguage == null && nullToAbsent
-          ? const Value.absent()
-          : Value(translatedLanguage),
-      scanlationGroup: scanlationGroup == null && nullToAbsent
-          ? const Value.absent()
-          : Value(scanlationGroup),
+      chapter:
+          chapter == null && nullToAbsent
+              ? const Value.absent()
+              : Value(chapter),
+      translatedLanguage:
+          translatedLanguage == null && nullToAbsent
+              ? const Value.absent()
+              : Value(translatedLanguage),
+      scanlationGroup:
+          scanlationGroup == null && nullToAbsent
+              ? const Value.absent()
+              : Value(scanlationGroup),
       webUrl:
           webUrl == null && nullToAbsent ? const Value.absent() : Value(webUrl),
-      readableAt: readableAt == null && nullToAbsent
-          ? const Value.absent()
-          : Value(readableAt),
-      publishAt: publishAt == null && nullToAbsent
-          ? const Value.absent()
-          : Value(publishAt),
-      lastReadAt: lastReadAt == null && nullToAbsent
-          ? const Value.absent()
-          : Value(lastReadAt),
+      readableAt:
+          readableAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(readableAt),
+      publishAt:
+          publishAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(publishAt),
+      lastReadAt:
+          lastReadAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(lastReadAt),
     );
   }
 
-  factory ChapterDrift.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory ChapterDrift.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ChapterDrift(
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -688,8 +876,9 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       title: serializer.fromJson<String?>(json['title']),
       volume: serializer.fromJson<String?>(json['volume']),
       chapter: serializer.fromJson<String?>(json['chapter']),
-      translatedLanguage:
-          serializer.fromJson<String?>(json['translatedLanguage']),
+      translatedLanguage: serializer.fromJson<String?>(
+        json['translatedLanguage'],
+      ),
       scanlationGroup: serializer.fromJson<String?>(json['scanlationGroup']),
       webUrl: serializer.fromJson<String?>(json['webUrl']),
       readableAt: serializer.fromJson<DateTime?>(json['readableAt']),
@@ -717,39 +906,39 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
     };
   }
 
-  ChapterDrift copyWith(
-          {DateTime? createdAt,
-          DateTime? updatedAt,
-          String? id,
-          Value<String?> mangaId = const Value.absent(),
-          Value<String?> title = const Value.absent(),
-          Value<String?> volume = const Value.absent(),
-          Value<String?> chapter = const Value.absent(),
-          Value<String?> translatedLanguage = const Value.absent(),
-          Value<String?> scanlationGroup = const Value.absent(),
-          Value<String?> webUrl = const Value.absent(),
-          Value<DateTime?> readableAt = const Value.absent(),
-          Value<DateTime?> publishAt = const Value.absent(),
-          Value<DateTime?> lastReadAt = const Value.absent()}) =>
-      ChapterDrift(
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        id: id ?? this.id,
-        mangaId: mangaId.present ? mangaId.value : this.mangaId,
-        title: title.present ? title.value : this.title,
-        volume: volume.present ? volume.value : this.volume,
-        chapter: chapter.present ? chapter.value : this.chapter,
-        translatedLanguage: translatedLanguage.present
+  ChapterDrift copyWith({
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? id,
+    Value<String?> mangaId = const Value.absent(),
+    Value<String?> title = const Value.absent(),
+    Value<String?> volume = const Value.absent(),
+    Value<String?> chapter = const Value.absent(),
+    Value<String?> translatedLanguage = const Value.absent(),
+    Value<String?> scanlationGroup = const Value.absent(),
+    Value<String?> webUrl = const Value.absent(),
+    Value<DateTime?> readableAt = const Value.absent(),
+    Value<DateTime?> publishAt = const Value.absent(),
+    Value<DateTime?> lastReadAt = const Value.absent(),
+  }) => ChapterDrift(
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    id: id ?? this.id,
+    mangaId: mangaId.present ? mangaId.value : this.mangaId,
+    title: title.present ? title.value : this.title,
+    volume: volume.present ? volume.value : this.volume,
+    chapter: chapter.present ? chapter.value : this.chapter,
+    translatedLanguage:
+        translatedLanguage.present
             ? translatedLanguage.value
             : this.translatedLanguage,
-        scanlationGroup: scanlationGroup.present
-            ? scanlationGroup.value
-            : this.scanlationGroup,
-        webUrl: webUrl.present ? webUrl.value : this.webUrl,
-        readableAt: readableAt.present ? readableAt.value : this.readableAt,
-        publishAt: publishAt.present ? publishAt.value : this.publishAt,
-        lastReadAt: lastReadAt.present ? lastReadAt.value : this.lastReadAt,
-      );
+    scanlationGroup:
+        scanlationGroup.present ? scanlationGroup.value : this.scanlationGroup,
+    webUrl: webUrl.present ? webUrl.value : this.webUrl,
+    readableAt: readableAt.present ? readableAt.value : this.readableAt,
+    publishAt: publishAt.present ? publishAt.value : this.publishAt,
+    lastReadAt: lastReadAt.present ? lastReadAt.value : this.lastReadAt,
+  );
   ChapterDrift copyWithCompanion(ChapterTablesCompanion data) {
     return ChapterDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -759,12 +948,14 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       title: data.title.present ? data.title.value : this.title,
       volume: data.volume.present ? data.volume.value : this.volume,
       chapter: data.chapter.present ? data.chapter.value : this.chapter,
-      translatedLanguage: data.translatedLanguage.present
-          ? data.translatedLanguage.value
-          : this.translatedLanguage,
-      scanlationGroup: data.scanlationGroup.present
-          ? data.scanlationGroup.value
-          : this.scanlationGroup,
+      translatedLanguage:
+          data.translatedLanguage.present
+              ? data.translatedLanguage.value
+              : this.translatedLanguage,
+      scanlationGroup:
+          data.scanlationGroup.present
+              ? data.scanlationGroup.value
+              : this.scanlationGroup,
       webUrl: data.webUrl.present ? data.webUrl.value : this.webUrl,
       readableAt:
           data.readableAt.present ? data.readableAt.value : this.readableAt,
@@ -796,19 +987,20 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
 
   @override
   int get hashCode => Object.hash(
-      createdAt,
-      updatedAt,
-      id,
-      mangaId,
-      title,
-      volume,
-      chapter,
-      translatedLanguage,
-      scanlationGroup,
-      webUrl,
-      readableAt,
-      publishAt,
-      lastReadAt);
+    createdAt,
+    updatedAt,
+    id,
+    mangaId,
+    title,
+    volume,
+    chapter,
+    translatedLanguage,
+    scanlationGroup,
+    webUrl,
+    readableAt,
+    publishAt,
+    lastReadAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -909,21 +1101,22 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterDrift> {
     });
   }
 
-  ChapterTablesCompanion copyWith(
-      {Value<DateTime>? createdAt,
-      Value<DateTime>? updatedAt,
-      Value<String>? id,
-      Value<String?>? mangaId,
-      Value<String?>? title,
-      Value<String?>? volume,
-      Value<String?>? chapter,
-      Value<String?>? translatedLanguage,
-      Value<String?>? scanlationGroup,
-      Value<String?>? webUrl,
-      Value<DateTime?>? readableAt,
-      Value<DateTime?>? publishAt,
-      Value<DateTime?>? lastReadAt,
-      Value<int>? rowid}) {
+  ChapterTablesCompanion copyWith({
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<String>? id,
+    Value<String?>? mangaId,
+    Value<String?>? title,
+    Value<String?>? volume,
+    Value<String?>? chapter,
+    Value<String?>? translatedLanguage,
+    Value<String?>? scanlationGroup,
+    Value<String?>? webUrl,
+    Value<DateTime?>? readableAt,
+    Value<DateTime?>? publishAt,
+    Value<DateTime?>? lastReadAt,
+    Value<int>? rowid,
+  }) {
     return ChapterTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -1018,28 +1211,41 @@ class $LibraryTablesTable extends LibraryTables
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $LibraryTablesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-      'created_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp());
-  static const VerificationMeta _updatedAtMeta =
-      const VerificationMeta('updatedAt');
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-      'updated_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp());
-  static const VerificationMeta _mangaIdMeta =
-      const VerificationMeta('mangaId');
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _mangaIdMeta = const VerificationMeta(
+    'mangaId',
+  );
   @override
   late final GeneratedColumn<String> mangaId = GeneratedColumn<String>(
-      'manga_id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'manga_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   @override
   List<GeneratedColumn> get $columns => [createdAt, updatedAt, mangaId];
   @override
@@ -1048,21 +1254,29 @@ class $LibraryTablesTable extends LibraryTables
   String get actualTableName => $name;
   static const String $name = 'library_tables';
   @override
-  VerificationContext validateIntegrity(Insertable<LibraryDrift> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<LibraryDrift> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
     }
     if (data.containsKey('updated_at')) {
-      context.handle(_updatedAtMeta,
-          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
     }
     if (data.containsKey('manga_id')) {
-      context.handle(_mangaIdMeta,
-          mangaId.isAcceptableOrUnknown(data['manga_id']!, _mangaIdMeta));
+      context.handle(
+        _mangaIdMeta,
+        mangaId.isAcceptableOrUnknown(data['manga_id']!, _mangaIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_mangaIdMeta);
     }
@@ -1075,12 +1289,21 @@ class $LibraryTablesTable extends LibraryTables
   LibraryDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return LibraryDrift(
-      createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
-      updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
-      mangaId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}manga_id'])!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      mangaId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}manga_id'],
+          )!,
     );
   }
 
@@ -1094,10 +1317,11 @@ class LibraryDrift extends DataClass implements Insertable<LibraryDrift> {
   final DateTime createdAt;
   final DateTime updatedAt;
   final String mangaId;
-  const LibraryDrift(
-      {required this.createdAt,
-      required this.updatedAt,
-      required this.mangaId});
+  const LibraryDrift({
+    required this.createdAt,
+    required this.updatedAt,
+    required this.mangaId,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1115,8 +1339,10 @@ class LibraryDrift extends DataClass implements Insertable<LibraryDrift> {
     );
   }
 
-  factory LibraryDrift.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory LibraryDrift.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return LibraryDrift(
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -1134,13 +1360,15 @@ class LibraryDrift extends DataClass implements Insertable<LibraryDrift> {
     };
   }
 
-  LibraryDrift copyWith(
-          {DateTime? createdAt, DateTime? updatedAt, String? mangaId}) =>
-      LibraryDrift(
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        mangaId: mangaId ?? this.mangaId,
-      );
+  LibraryDrift copyWith({
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? mangaId,
+  }) => LibraryDrift(
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    mangaId: mangaId ?? this.mangaId,
+  );
   LibraryDrift copyWithCompanion(LibraryTablesCompanion data) {
     return LibraryDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -1201,11 +1429,12 @@ class LibraryTablesCompanion extends UpdateCompanion<LibraryDrift> {
     });
   }
 
-  LibraryTablesCompanion copyWith(
-      {Value<DateTime>? createdAt,
-      Value<DateTime>? updatedAt,
-      Value<String>? mangaId,
-      Value<int>? rowid}) {
+  LibraryTablesCompanion copyWith({
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<String>? mangaId,
+    Value<int>? rowid,
+  }) {
     return LibraryTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -1250,129 +1479,191 @@ class $MangaTablesTable extends MangaTables
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $MangaTablesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-      'created_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp());
-  static const VerificationMeta _updatedAtMeta =
-      const VerificationMeta('updatedAt');
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-      'updated_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp());
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: false,
-      clientDefault: () => const Uuid().v4());
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: () => const Uuid().v4(),
+  );
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
-      'title', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _coverUrlMeta =
-      const VerificationMeta('coverUrl');
+    'title',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _coverUrlMeta = const VerificationMeta(
+    'coverUrl',
+  );
   @override
   late final GeneratedColumn<String> coverUrl = GeneratedColumn<String>(
-      'cover_url', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'cover_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _authorMeta = const VerificationMeta('author');
   @override
   late final GeneratedColumn<String> author = GeneratedColumn<String>(
-      'author', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'author',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _statusMeta = const VerificationMeta('status');
   @override
   late final GeneratedColumn<String> status = GeneratedColumn<String>(
-      'status', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _descriptionMeta =
-      const VerificationMeta('description');
+    'status',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
   @override
   late final GeneratedColumn<String> description = GeneratedColumn<String>(
-      'description', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'description',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _webUrlMeta = const VerificationMeta('webUrl');
   @override
   late final GeneratedColumn<String> webUrl = GeneratedColumn<String>(
-      'web_url', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'web_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _sourceMeta = const VerificationMeta('source');
   @override
   late final GeneratedColumn<String> source = GeneratedColumn<String>(
-      'source', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'source',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
-        createdAt,
-        updatedAt,
-        id,
-        title,
-        coverUrl,
-        author,
-        status,
-        description,
-        webUrl,
-        source
-      ];
+    createdAt,
+    updatedAt,
+    id,
+    title,
+    coverUrl,
+    author,
+    status,
+    description,
+    webUrl,
+    source,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'manga_tables';
   @override
-  VerificationContext validateIntegrity(Insertable<MangaDrift> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<MangaDrift> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
     }
     if (data.containsKey('updated_at')) {
-      context.handle(_updatedAtMeta,
-          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
     }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('title')) {
       context.handle(
-          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
     }
     if (data.containsKey('cover_url')) {
-      context.handle(_coverUrlMeta,
-          coverUrl.isAcceptableOrUnknown(data['cover_url']!, _coverUrlMeta));
+      context.handle(
+        _coverUrlMeta,
+        coverUrl.isAcceptableOrUnknown(data['cover_url']!, _coverUrlMeta),
+      );
     }
     if (data.containsKey('author')) {
-      context.handle(_authorMeta,
-          author.isAcceptableOrUnknown(data['author']!, _authorMeta));
+      context.handle(
+        _authorMeta,
+        author.isAcceptableOrUnknown(data['author']!, _authorMeta),
+      );
     }
     if (data.containsKey('status')) {
-      context.handle(_statusMeta,
-          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
     }
     if (data.containsKey('description')) {
       context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
           _descriptionMeta,
-          description.isAcceptableOrUnknown(
-              data['description']!, _descriptionMeta));
+        ),
+      );
     }
     if (data.containsKey('web_url')) {
-      context.handle(_webUrlMeta,
-          webUrl.isAcceptableOrUnknown(data['web_url']!, _webUrlMeta));
+      context.handle(
+        _webUrlMeta,
+        webUrl.isAcceptableOrUnknown(data['web_url']!, _webUrlMeta),
+      );
     }
     if (data.containsKey('source')) {
-      context.handle(_sourceMeta,
-          source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
     }
     return context;
   }
@@ -1381,33 +1672,56 @@ class $MangaTablesTable extends MangaTables
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   List<Set<GeneratedColumn>> get uniqueKeys => [
-        {webUrl, source},
-        {webUrl},
-      ];
+    {webUrl, source},
+    {webUrl},
+  ];
   @override
   MangaDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return MangaDrift(
-      createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
-      updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      title: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}title']),
-      coverUrl: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}cover_url']),
-      author: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}author']),
-      status: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}status']),
-      description: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}description']),
-      webUrl: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}web_url']),
-      source: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}source']),
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      ),
+      coverUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cover_url'],
+      ),
+      author: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}author'],
+      ),
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      ),
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      ),
+      webUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}web_url'],
+      ),
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      ),
     );
   }
 
@@ -1428,17 +1742,18 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
   final String? description;
   final String? webUrl;
   final String? source;
-  const MangaDrift(
-      {required this.createdAt,
-      required this.updatedAt,
-      required this.id,
-      this.title,
-      this.coverUrl,
-      this.author,
-      this.status,
-      this.description,
-      this.webUrl,
-      this.source});
+  const MangaDrift({
+    required this.createdAt,
+    required this.updatedAt,
+    required this.id,
+    this.title,
+    this.coverUrl,
+    this.author,
+    this.status,
+    this.description,
+    this.webUrl,
+    this.source,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1476,16 +1791,18 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
       id: Value(id),
       title:
           title == null && nullToAbsent ? const Value.absent() : Value(title),
-      coverUrl: coverUrl == null && nullToAbsent
-          ? const Value.absent()
-          : Value(coverUrl),
+      coverUrl:
+          coverUrl == null && nullToAbsent
+              ? const Value.absent()
+              : Value(coverUrl),
       author:
           author == null && nullToAbsent ? const Value.absent() : Value(author),
       status:
           status == null && nullToAbsent ? const Value.absent() : Value(status),
-      description: description == null && nullToAbsent
-          ? const Value.absent()
-          : Value(description),
+      description:
+          description == null && nullToAbsent
+              ? const Value.absent()
+              : Value(description),
       webUrl:
           webUrl == null && nullToAbsent ? const Value.absent() : Value(webUrl),
       source:
@@ -1493,8 +1810,10 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
     );
   }
 
-  factory MangaDrift.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory MangaDrift.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return MangaDrift(
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -1526,29 +1845,29 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
     };
   }
 
-  MangaDrift copyWith(
-          {DateTime? createdAt,
-          DateTime? updatedAt,
-          String? id,
-          Value<String?> title = const Value.absent(),
-          Value<String?> coverUrl = const Value.absent(),
-          Value<String?> author = const Value.absent(),
-          Value<String?> status = const Value.absent(),
-          Value<String?> description = const Value.absent(),
-          Value<String?> webUrl = const Value.absent(),
-          Value<String?> source = const Value.absent()}) =>
-      MangaDrift(
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        id: id ?? this.id,
-        title: title.present ? title.value : this.title,
-        coverUrl: coverUrl.present ? coverUrl.value : this.coverUrl,
-        author: author.present ? author.value : this.author,
-        status: status.present ? status.value : this.status,
-        description: description.present ? description.value : this.description,
-        webUrl: webUrl.present ? webUrl.value : this.webUrl,
-        source: source.present ? source.value : this.source,
-      );
+  MangaDrift copyWith({
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? id,
+    Value<String?> title = const Value.absent(),
+    Value<String?> coverUrl = const Value.absent(),
+    Value<String?> author = const Value.absent(),
+    Value<String?> status = const Value.absent(),
+    Value<String?> description = const Value.absent(),
+    Value<String?> webUrl = const Value.absent(),
+    Value<String?> source = const Value.absent(),
+  }) => MangaDrift(
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    id: id ?? this.id,
+    title: title.present ? title.value : this.title,
+    coverUrl: coverUrl.present ? coverUrl.value : this.coverUrl,
+    author: author.present ? author.value : this.author,
+    status: status.present ? status.value : this.status,
+    description: description.present ? description.value : this.description,
+    webUrl: webUrl.present ? webUrl.value : this.webUrl,
+    source: source.present ? source.value : this.source,
+  );
   MangaDrift copyWithCompanion(MangaTablesCompanion data) {
     return MangaDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -1583,8 +1902,18 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
   }
 
   @override
-  int get hashCode => Object.hash(createdAt, updatedAt, id, title, coverUrl,
-      author, status, description, webUrl, source);
+  int get hashCode => Object.hash(
+    createdAt,
+    updatedAt,
+    id,
+    title,
+    coverUrl,
+    author,
+    status,
+    description,
+    webUrl,
+    source,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1667,18 +1996,19 @@ class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
     });
   }
 
-  MangaTablesCompanion copyWith(
-      {Value<DateTime>? createdAt,
-      Value<DateTime>? updatedAt,
-      Value<String>? id,
-      Value<String?>? title,
-      Value<String?>? coverUrl,
-      Value<String?>? author,
-      Value<String?>? status,
-      Value<String?>? description,
-      Value<String?>? webUrl,
-      Value<String?>? source,
-      Value<int>? rowid}) {
+  MangaTablesCompanion copyWith({
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<String>? id,
+    Value<String?>? title,
+    Value<String?>? coverUrl,
+    Value<String?>? author,
+    Value<String?>? status,
+    Value<String?>? description,
+    Value<String?>? webUrl,
+    Value<String?>? source,
+    Value<int>? rowid,
+  }) {
     return MangaTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -1758,83 +2088,125 @@ class $TagTablesTable extends TagTables
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $TagTablesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-      'created_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp());
-  static const VerificationMeta _updatedAtMeta =
-      const VerificationMeta('updatedAt');
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-      'updated_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp());
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
   static const VerificationMeta _tagIdMeta = const VerificationMeta('tagId');
   @override
   late final GeneratedColumn<String> tagId = GeneratedColumn<String>(
-      'tag_id', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'tag_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
-      'name', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _sourceMeta = const VerificationMeta('source');
   @override
   late final GeneratedColumn<String> source = GeneratedColumn<String>(
-      'source', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'source',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
-  List<GeneratedColumn> get $columns =>
-      [createdAt, updatedAt, id, tagId, name, source];
+  List<GeneratedColumn> get $columns => [
+    createdAt,
+    updatedAt,
+    id,
+    tagId,
+    name,
+    source,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'tag_tables';
   @override
-  VerificationContext validateIntegrity(Insertable<TagDrift> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<TagDrift> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
     }
     if (data.containsKey('updated_at')) {
-      context.handle(_updatedAtMeta,
-          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
     }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('tag_id')) {
       context.handle(
-          _tagIdMeta, tagId.isAcceptableOrUnknown(data['tag_id']!, _tagIdMeta));
+        _tagIdMeta,
+        tagId.isAcceptableOrUnknown(data['tag_id']!, _tagIdMeta),
+      );
     }
     if (data.containsKey('name')) {
       context.handle(
-          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
     if (data.containsKey('source')) {
-      context.handle(_sourceMeta,
-          source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
     }
     return context;
   }
@@ -1843,25 +2215,41 @@ class $TagTablesTable extends TagTables
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   List<Set<GeneratedColumn>> get uniqueKeys => [
-        {tagId, name},
-        {tagId, name, source},
-      ];
+    {tagId, name},
+    {tagId, name, source},
+  ];
   @override
   TagDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TagDrift(
-      createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
-      updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      tagId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}tag_id']),
-      name: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
-      source: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}source']),
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      tagId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tag_id'],
+      ),
+      name:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}name'],
+          )!,
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      ),
     );
   }
 
@@ -1878,13 +2266,14 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
   final String? tagId;
   final String name;
   final String? source;
-  const TagDrift(
-      {required this.createdAt,
-      required this.updatedAt,
-      required this.id,
-      this.tagId,
-      required this.name,
-      this.source});
+  const TagDrift({
+    required this.createdAt,
+    required this.updatedAt,
+    required this.id,
+    this.tagId,
+    required this.name,
+    this.source,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1914,8 +2303,10 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
     );
   }
 
-  factory TagDrift.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory TagDrift.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return TagDrift(
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -1939,21 +2330,21 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
     };
   }
 
-  TagDrift copyWith(
-          {DateTime? createdAt,
-          DateTime? updatedAt,
-          int? id,
-          Value<String?> tagId = const Value.absent(),
-          String? name,
-          Value<String?> source = const Value.absent()}) =>
-      TagDrift(
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        id: id ?? this.id,
-        tagId: tagId.present ? tagId.value : this.tagId,
-        name: name ?? this.name,
-        source: source.present ? source.value : this.source,
-      );
+  TagDrift copyWith({
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    int? id,
+    Value<String?> tagId = const Value.absent(),
+    String? name,
+    Value<String?> source = const Value.absent(),
+  }) => TagDrift(
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    id: id ?? this.id,
+    tagId: tagId.present ? tagId.value : this.tagId,
+    name: name ?? this.name,
+    source: source.present ? source.value : this.source,
+  );
   TagDrift copyWithCompanion(TagTablesCompanion data) {
     return TagDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -2034,13 +2425,14 @@ class TagTablesCompanion extends UpdateCompanion<TagDrift> {
     });
   }
 
-  TagTablesCompanion copyWith(
-      {Value<DateTime>? createdAt,
-      Value<DateTime>? updatedAt,
-      Value<int>? id,
-      Value<String?>? tagId,
-      Value<String>? name,
-      Value<String?>? source}) {
+  TagTablesCompanion copyWith({
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? id,
+    Value<String?>? tagId,
+    Value<String>? name,
+    Value<String?>? source,
+  }) {
     return TagTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -2095,33 +2487,50 @@ class $RelationshipTablesTable extends RelationshipTables
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $RelationshipTablesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-      'created_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp());
-  static const VerificationMeta _updatedAtMeta =
-      const VerificationMeta('updatedAt');
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-      'updated_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp());
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
   static const VerificationMeta _tagIdMeta = const VerificationMeta('tagId');
   @override
   late final GeneratedColumn<int> tagId = GeneratedColumn<int>(
-      'tag_id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _mangaIdMeta =
-      const VerificationMeta('mangaId');
+    'tag_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mangaIdMeta = const VerificationMeta(
+    'mangaId',
+  );
   @override
   late final GeneratedColumn<String> mangaId = GeneratedColumn<String>(
-      'manga_id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'manga_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   @override
   List<GeneratedColumn> get $columns => [createdAt, updatedAt, tagId, mangaId];
   @override
@@ -2130,27 +2539,37 @@ class $RelationshipTablesTable extends RelationshipTables
   String get actualTableName => $name;
   static const String $name = 'relationship_tables';
   @override
-  VerificationContext validateIntegrity(Insertable<RelationshipTable> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<RelationshipTable> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
     }
     if (data.containsKey('updated_at')) {
-      context.handle(_updatedAtMeta,
-          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
     }
     if (data.containsKey('tag_id')) {
       context.handle(
-          _tagIdMeta, tagId.isAcceptableOrUnknown(data['tag_id']!, _tagIdMeta));
+        _tagIdMeta,
+        tagId.isAcceptableOrUnknown(data['tag_id']!, _tagIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_tagIdMeta);
     }
     if (data.containsKey('manga_id')) {
-      context.handle(_mangaIdMeta,
-          mangaId.isAcceptableOrUnknown(data['manga_id']!, _mangaIdMeta));
+      context.handle(
+        _mangaIdMeta,
+        mangaId.isAcceptableOrUnknown(data['manga_id']!, _mangaIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_mangaIdMeta);
     }
@@ -2161,20 +2580,32 @@ class $RelationshipTablesTable extends RelationshipTables
   Set<GeneratedColumn> get $primaryKey => const {};
   @override
   List<Set<GeneratedColumn>> get uniqueKeys => [
-        {tagId, mangaId},
-      ];
+    {tagId, mangaId},
+  ];
   @override
   RelationshipTable map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return RelationshipTable(
-      createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
-      updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
-      tagId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}tag_id'])!,
-      mangaId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}manga_id'])!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      tagId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}tag_id'],
+          )!,
+      mangaId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}manga_id'],
+          )!,
     );
   }
 
@@ -2190,11 +2621,12 @@ class RelationshipTable extends DataClass
   final DateTime updatedAt;
   final int tagId;
   final String mangaId;
-  const RelationshipTable(
-      {required this.createdAt,
-      required this.updatedAt,
-      required this.tagId,
-      required this.mangaId});
+  const RelationshipTable({
+    required this.createdAt,
+    required this.updatedAt,
+    required this.tagId,
+    required this.mangaId,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2214,8 +2646,10 @@ class RelationshipTable extends DataClass
     );
   }
 
-  factory RelationshipTable.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory RelationshipTable.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return RelationshipTable(
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -2235,17 +2669,17 @@ class RelationshipTable extends DataClass
     };
   }
 
-  RelationshipTable copyWith(
-          {DateTime? createdAt,
-          DateTime? updatedAt,
-          int? tagId,
-          String? mangaId}) =>
-      RelationshipTable(
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        tagId: tagId ?? this.tagId,
-        mangaId: mangaId ?? this.mangaId,
-      );
+  RelationshipTable copyWith({
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    int? tagId,
+    String? mangaId,
+  }) => RelationshipTable(
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    tagId: tagId ?? this.tagId,
+    mangaId: mangaId ?? this.mangaId,
+  );
   RelationshipTable copyWithCompanion(RelationshipTablesCompanion data) {
     return RelationshipTable(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -2297,8 +2731,8 @@ class RelationshipTablesCompanion extends UpdateCompanion<RelationshipTable> {
     required int tagId,
     required String mangaId,
     this.rowid = const Value.absent(),
-  })  : tagId = Value(tagId),
-        mangaId = Value(mangaId);
+  }) : tagId = Value(tagId),
+       mangaId = Value(mangaId);
   static Insertable<RelationshipTable> custom({
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -2315,12 +2749,13 @@ class RelationshipTablesCompanion extends UpdateCompanion<RelationshipTable> {
     });
   }
 
-  RelationshipTablesCompanion copyWith(
-      {Value<DateTime>? createdAt,
-      Value<DateTime>? updatedAt,
-      Value<int>? tagId,
-      Value<String>? mangaId,
-      Value<int>? rowid}) {
+  RelationshipTablesCompanion copyWith({
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? tagId,
+    Value<String>? mangaId,
+    Value<int>? rowid,
+  }) {
     return RelationshipTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -2370,98 +2805,155 @@ class $JobTablesTable extends JobTables
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $JobTablesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-      'created_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp());
-  static const VerificationMeta _updatedAtMeta =
-      const VerificationMeta('updatedAt');
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-      'updated_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp());
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
   @override
   late final GeneratedColumnWithTypeConverter<JobTypeEnum, String> type =
-      GeneratedColumn<String>('type', aliasedName, false,
-              type: DriftSqlType.string, requiredDuringInsert: true)
-          .withConverter<JobTypeEnum>($JobTablesTable.$convertertype);
+      GeneratedColumn<String>(
+        'type',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<JobTypeEnum>($JobTablesTable.$convertertype);
   static const VerificationMeta _sourceMeta = const VerificationMeta('source');
   @override
   late final GeneratedColumn<String> source = GeneratedColumn<String>(
-      'source', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _chapterIdMeta =
-      const VerificationMeta('chapterId');
+    'source',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _chapterIdMeta = const VerificationMeta(
+    'chapterId',
+  );
   @override
   late final GeneratedColumn<String> chapterId = GeneratedColumn<String>(
-      'chapter_id', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _mangaIdMeta =
-      const VerificationMeta('mangaId');
+    'chapter_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _mangaIdMeta = const VerificationMeta(
+    'mangaId',
+  );
   @override
   late final GeneratedColumn<String> mangaId = GeneratedColumn<String>(
-      'manga_id', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _imageUrlMeta =
-      const VerificationMeta('imageUrl');
+    'manga_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _imageUrlMeta = const VerificationMeta(
+    'imageUrl',
+  );
   @override
   late final GeneratedColumn<String> imageUrl = GeneratedColumn<String>(
-      'image_url', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'image_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
-  List<GeneratedColumn> get $columns =>
-      [createdAt, updatedAt, id, type, source, chapterId, mangaId, imageUrl];
+  List<GeneratedColumn> get $columns => [
+    createdAt,
+    updatedAt,
+    id,
+    type,
+    source,
+    chapterId,
+    mangaId,
+    imageUrl,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'job_tables';
   @override
-  VerificationContext validateIntegrity(Insertable<JobDrift> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<JobDrift> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
     }
     if (data.containsKey('updated_at')) {
-      context.handle(_updatedAtMeta,
-          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
     }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('source')) {
-      context.handle(_sourceMeta,
-          source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
     }
     if (data.containsKey('chapter_id')) {
-      context.handle(_chapterIdMeta,
-          chapterId.isAcceptableOrUnknown(data['chapter_id']!, _chapterIdMeta));
+      context.handle(
+        _chapterIdMeta,
+        chapterId.isAcceptableOrUnknown(data['chapter_id']!, _chapterIdMeta),
+      );
     }
     if (data.containsKey('manga_id')) {
-      context.handle(_mangaIdMeta,
-          mangaId.isAcceptableOrUnknown(data['manga_id']!, _mangaIdMeta));
+      context.handle(
+        _mangaIdMeta,
+        mangaId.isAcceptableOrUnknown(data['manga_id']!, _mangaIdMeta),
+      );
     }
     if (data.containsKey('image_url')) {
-      context.handle(_imageUrlMeta,
-          imageUrl.isAcceptableOrUnknown(data['image_url']!, _imageUrlMeta));
+      context.handle(
+        _imageUrlMeta,
+        imageUrl.isAcceptableOrUnknown(data['image_url']!, _imageUrlMeta),
+      );
     }
     return context;
   }
@@ -2472,22 +2964,43 @@ class $JobTablesTable extends JobTables
   JobDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return JobDrift(
-      createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
-      updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      type: $JobTablesTable.$convertertype.fromSql(attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}type'])!),
-      source: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}source']),
-      chapterId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}chapter_id']),
-      mangaId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}manga_id']),
-      imageUrl: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}image_url']),
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      type: $JobTablesTable.$convertertype.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}type'],
+        )!,
+      ),
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      ),
+      chapterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}chapter_id'],
+      ),
+      mangaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}manga_id'],
+      ),
+      imageUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}image_url'],
+      ),
     );
   }
 
@@ -2509,15 +3022,16 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
   final String? chapterId;
   final String? mangaId;
   final String? imageUrl;
-  const JobDrift(
-      {required this.createdAt,
-      required this.updatedAt,
-      required this.id,
-      required this.type,
-      this.source,
-      this.chapterId,
-      this.mangaId,
-      this.imageUrl});
+  const JobDrift({
+    required this.createdAt,
+    required this.updatedAt,
+    required this.id,
+    required this.type,
+    this.source,
+    this.chapterId,
+    this.mangaId,
+    this.imageUrl,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2525,8 +3039,9 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
     map['updated_at'] = Variable<DateTime>(updatedAt);
     map['id'] = Variable<int>(id);
     {
-      map['type'] =
-          Variable<String>($JobTablesTable.$convertertype.toSql(type));
+      map['type'] = Variable<String>(
+        $JobTablesTable.$convertertype.toSql(type),
+      );
     }
     if (!nullToAbsent || source != null) {
       map['source'] = Variable<String>(source);
@@ -2551,27 +3066,33 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
       type: Value(type),
       source:
           source == null && nullToAbsent ? const Value.absent() : Value(source),
-      chapterId: chapterId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(chapterId),
-      mangaId: mangaId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(mangaId),
-      imageUrl: imageUrl == null && nullToAbsent
-          ? const Value.absent()
-          : Value(imageUrl),
+      chapterId:
+          chapterId == null && nullToAbsent
+              ? const Value.absent()
+              : Value(chapterId),
+      mangaId:
+          mangaId == null && nullToAbsent
+              ? const Value.absent()
+              : Value(mangaId),
+      imageUrl:
+          imageUrl == null && nullToAbsent
+              ? const Value.absent()
+              : Value(imageUrl),
     );
   }
 
-  factory JobDrift.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory JobDrift.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return JobDrift(
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       id: serializer.fromJson<int>(json['id']),
-      type: $JobTablesTable.$convertertype
-          .fromJson(serializer.fromJson<String>(json['type'])),
+      type: $JobTablesTable.$convertertype.fromJson(
+        serializer.fromJson<String>(json['type']),
+      ),
       source: serializer.fromJson<String?>(json['source']),
       chapterId: serializer.fromJson<String?>(json['chapterId']),
       mangaId: serializer.fromJson<String?>(json['mangaId']),
@@ -2585,8 +3106,9 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'id': serializer.toJson<int>(id),
-      'type': serializer
-          .toJson<String>($JobTablesTable.$convertertype.toJson(type)),
+      'type': serializer.toJson<String>(
+        $JobTablesTable.$convertertype.toJson(type),
+      ),
       'source': serializer.toJson<String?>(source),
       'chapterId': serializer.toJson<String?>(chapterId),
       'mangaId': serializer.toJson<String?>(mangaId),
@@ -2594,25 +3116,25 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
     };
   }
 
-  JobDrift copyWith(
-          {DateTime? createdAt,
-          DateTime? updatedAt,
-          int? id,
-          JobTypeEnum? type,
-          Value<String?> source = const Value.absent(),
-          Value<String?> chapterId = const Value.absent(),
-          Value<String?> mangaId = const Value.absent(),
-          Value<String?> imageUrl = const Value.absent()}) =>
-      JobDrift(
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        id: id ?? this.id,
-        type: type ?? this.type,
-        source: source.present ? source.value : this.source,
-        chapterId: chapterId.present ? chapterId.value : this.chapterId,
-        mangaId: mangaId.present ? mangaId.value : this.mangaId,
-        imageUrl: imageUrl.present ? imageUrl.value : this.imageUrl,
-      );
+  JobDrift copyWith({
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    int? id,
+    JobTypeEnum? type,
+    Value<String?> source = const Value.absent(),
+    Value<String?> chapterId = const Value.absent(),
+    Value<String?> mangaId = const Value.absent(),
+    Value<String?> imageUrl = const Value.absent(),
+  }) => JobDrift(
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    id: id ?? this.id,
+    type: type ?? this.type,
+    source: source.present ? source.value : this.source,
+    chapterId: chapterId.present ? chapterId.value : this.chapterId,
+    mangaId: mangaId.present ? mangaId.value : this.mangaId,
+    imageUrl: imageUrl.present ? imageUrl.value : this.imageUrl,
+  );
   JobDrift copyWithCompanion(JobTablesCompanion data) {
     return JobDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -2643,7 +3165,15 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
 
   @override
   int get hashCode => Object.hash(
-      createdAt, updatedAt, id, type, source, chapterId, mangaId, imageUrl);
+    createdAt,
+    updatedAt,
+    id,
+    type,
+    source,
+    chapterId,
+    mangaId,
+    imageUrl,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2709,15 +3239,16 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
     });
   }
 
-  JobTablesCompanion copyWith(
-      {Value<DateTime>? createdAt,
-      Value<DateTime>? updatedAt,
-      Value<int>? id,
-      Value<JobTypeEnum>? type,
-      Value<String?>? source,
-      Value<String?>? chapterId,
-      Value<String?>? mangaId,
-      Value<String?>? imageUrl}) {
+  JobTablesCompanion copyWith({
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? id,
+    Value<JobTypeEnum>? type,
+    Value<String?>? source,
+    Value<String?>? chapterId,
+    Value<String?>? mangaId,
+    Value<String?>? imageUrl,
+  }) {
     return JobTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -2743,8 +3274,9 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
       map['id'] = Variable<int>(id.value);
     }
     if (type.present) {
-      map['type'] =
-          Variable<String>($JobTablesTable.$convertertype.toSql(type.value));
+      map['type'] = Variable<String>(
+        $JobTablesTable.$convertertype.toSql(type.value),
+      );
     }
     if (source.present) {
       map['source'] = Variable<String>(source.value);
@@ -2783,140 +3315,204 @@ class $CacheTablesTable extends CacheTables
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $CacheTablesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-      'created_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp());
-  static const VerificationMeta _updatedAtMeta =
-      const VerificationMeta('updatedAt');
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-      'updated_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      clientDefault: () => DateTime.timestamp());
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
   static const VerificationMeta _urlMeta = const VerificationMeta('url');
   @override
   late final GeneratedColumn<String> url = GeneratedColumn<String>(
-      'url', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'url',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _keyMeta = const VerificationMeta('key');
   @override
   late final GeneratedColumn<String> key = GeneratedColumn<String>(
-      'key', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _relativePathMeta =
-      const VerificationMeta('relativePath');
+    'key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _relativePathMeta = const VerificationMeta(
+    'relativePath',
+  );
   @override
   late final GeneratedColumn<String> relativePath = GeneratedColumn<String>(
-      'relativePath', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'relativePath',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _eTagMeta = const VerificationMeta('eTag');
   @override
   late final GeneratedColumn<String> eTag = GeneratedColumn<String>(
-      'e_tag', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _validTillMeta =
-      const VerificationMeta('validTill');
+    'e_tag',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _validTillMeta = const VerificationMeta(
+    'validTill',
+  );
   @override
   late final GeneratedColumn<DateTime> validTill = GeneratedColumn<DateTime>(
-      'valid_till', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _touchedMeta =
-      const VerificationMeta('touched');
+    'valid_till',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _touchedMeta = const VerificationMeta(
+    'touched',
+  );
   @override
   late final GeneratedColumn<DateTime> touched = GeneratedColumn<DateTime>(
-      'touched', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+    'touched',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _lengthMeta = const VerificationMeta('length');
   @override
   late final GeneratedColumn<int> length = GeneratedColumn<int>(
-      'length', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+    'length',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
-        createdAt,
-        updatedAt,
-        id,
-        url,
-        key,
-        relativePath,
-        eTag,
-        validTill,
-        touched,
-        length
-      ];
+    createdAt,
+    updatedAt,
+    id,
+    url,
+    key,
+    relativePath,
+    eTag,
+    validTill,
+    touched,
+    length,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'cache_tables';
   @override
-  VerificationContext validateIntegrity(Insertable<CacheDrift> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<CacheDrift> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
     }
     if (data.containsKey('updated_at')) {
-      context.handle(_updatedAtMeta,
-          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
     }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('url')) {
       context.handle(
-          _urlMeta, url.isAcceptableOrUnknown(data['url']!, _urlMeta));
+        _urlMeta,
+        url.isAcceptableOrUnknown(data['url']!, _urlMeta),
+      );
     } else if (isInserting) {
       context.missing(_urlMeta);
     }
     if (data.containsKey('key')) {
       context.handle(
-          _keyMeta, key.isAcceptableOrUnknown(data['key']!, _keyMeta));
+        _keyMeta,
+        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
+      );
     } else if (isInserting) {
       context.missing(_keyMeta);
     }
     if (data.containsKey('relativePath')) {
       context.handle(
+        _relativePathMeta,
+        relativePath.isAcceptableOrUnknown(
+          data['relativePath']!,
           _relativePathMeta,
-          relativePath.isAcceptableOrUnknown(
-              data['relativePath']!, _relativePathMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_relativePathMeta);
     }
     if (data.containsKey('e_tag')) {
       context.handle(
-          _eTagMeta, eTag.isAcceptableOrUnknown(data['e_tag']!, _eTagMeta));
+        _eTagMeta,
+        eTag.isAcceptableOrUnknown(data['e_tag']!, _eTagMeta),
+      );
     }
     if (data.containsKey('valid_till')) {
-      context.handle(_validTillMeta,
-          validTill.isAcceptableOrUnknown(data['valid_till']!, _validTillMeta));
+      context.handle(
+        _validTillMeta,
+        validTill.isAcceptableOrUnknown(data['valid_till']!, _validTillMeta),
+      );
     } else if (isInserting) {
       context.missing(_validTillMeta);
     }
     if (data.containsKey('touched')) {
-      context.handle(_touchedMeta,
-          touched.isAcceptableOrUnknown(data['touched']!, _touchedMeta));
+      context.handle(
+        _touchedMeta,
+        touched.isAcceptableOrUnknown(data['touched']!, _touchedMeta),
+      );
     }
     if (data.containsKey('length')) {
-      context.handle(_lengthMeta,
-          length.isAcceptableOrUnknown(data['length']!, _lengthMeta));
+      context.handle(
+        _lengthMeta,
+        length.isAcceptableOrUnknown(data['length']!, _lengthMeta),
+      );
     }
     return context;
   }
@@ -2927,26 +3523,53 @@ class $CacheTablesTable extends CacheTables
   CacheDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return CacheDrift(
-      createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
-      updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      url: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}url'])!,
-      key: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}key'])!,
-      relativePath: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}relativePath'])!,
-      eTag: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}e_tag']),
-      validTill: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}valid_till'])!,
-      touched: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}touched']),
-      length: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}length']),
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      url:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}url'],
+          )!,
+      key:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}key'],
+          )!,
+      relativePath:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}relativePath'],
+          )!,
+      eTag: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}e_tag'],
+      ),
+      validTill:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}valid_till'],
+          )!,
+      touched: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}touched'],
+      ),
+      length: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}length'],
+      ),
     );
   }
 
@@ -2967,17 +3590,18 @@ class CacheDrift extends DataClass implements Insertable<CacheDrift> {
   final DateTime validTill;
   final DateTime? touched;
   final int? length;
-  const CacheDrift(
-      {required this.createdAt,
-      required this.updatedAt,
-      required this.id,
-      required this.url,
-      required this.key,
-      required this.relativePath,
-      this.eTag,
-      required this.validTill,
-      this.touched,
-      this.length});
+  const CacheDrift({
+    required this.createdAt,
+    required this.updatedAt,
+    required this.id,
+    required this.url,
+    required this.key,
+    required this.relativePath,
+    this.eTag,
+    required this.validTill,
+    this.touched,
+    this.length,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -3010,16 +3634,19 @@ class CacheDrift extends DataClass implements Insertable<CacheDrift> {
       relativePath: Value(relativePath),
       eTag: eTag == null && nullToAbsent ? const Value.absent() : Value(eTag),
       validTill: Value(validTill),
-      touched: touched == null && nullToAbsent
-          ? const Value.absent()
-          : Value(touched),
+      touched:
+          touched == null && nullToAbsent
+              ? const Value.absent()
+              : Value(touched),
       length:
           length == null && nullToAbsent ? const Value.absent() : Value(length),
     );
   }
 
-  factory CacheDrift.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory CacheDrift.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return CacheDrift(
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -3051,29 +3678,29 @@ class CacheDrift extends DataClass implements Insertable<CacheDrift> {
     };
   }
 
-  CacheDrift copyWith(
-          {DateTime? createdAt,
-          DateTime? updatedAt,
-          int? id,
-          String? url,
-          String? key,
-          String? relativePath,
-          Value<String?> eTag = const Value.absent(),
-          DateTime? validTill,
-          Value<DateTime?> touched = const Value.absent(),
-          Value<int?> length = const Value.absent()}) =>
-      CacheDrift(
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        id: id ?? this.id,
-        url: url ?? this.url,
-        key: key ?? this.key,
-        relativePath: relativePath ?? this.relativePath,
-        eTag: eTag.present ? eTag.value : this.eTag,
-        validTill: validTill ?? this.validTill,
-        touched: touched.present ? touched.value : this.touched,
-        length: length.present ? length.value : this.length,
-      );
+  CacheDrift copyWith({
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    int? id,
+    String? url,
+    String? key,
+    String? relativePath,
+    Value<String?> eTag = const Value.absent(),
+    DateTime? validTill,
+    Value<DateTime?> touched = const Value.absent(),
+    Value<int?> length = const Value.absent(),
+  }) => CacheDrift(
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    id: id ?? this.id,
+    url: url ?? this.url,
+    key: key ?? this.key,
+    relativePath: relativePath ?? this.relativePath,
+    eTag: eTag.present ? eTag.value : this.eTag,
+    validTill: validTill ?? this.validTill,
+    touched: touched.present ? touched.value : this.touched,
+    length: length.present ? length.value : this.length,
+  );
   CacheDrift copyWithCompanion(CacheTablesCompanion data) {
     return CacheDrift(
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -3081,9 +3708,10 @@ class CacheDrift extends DataClass implements Insertable<CacheDrift> {
       id: data.id.present ? data.id.value : this.id,
       url: data.url.present ? data.url.value : this.url,
       key: data.key.present ? data.key.value : this.key,
-      relativePath: data.relativePath.present
-          ? data.relativePath.value
-          : this.relativePath,
+      relativePath:
+          data.relativePath.present
+              ? data.relativePath.value
+              : this.relativePath,
       eTag: data.eTag.present ? data.eTag.value : this.eTag,
       validTill: data.validTill.present ? data.validTill.value : this.validTill,
       touched: data.touched.present ? data.touched.value : this.touched,
@@ -3109,8 +3737,18 @@ class CacheDrift extends DataClass implements Insertable<CacheDrift> {
   }
 
   @override
-  int get hashCode => Object.hash(createdAt, updatedAt, id, url, key,
-      relativePath, eTag, validTill, touched, length);
+  int get hashCode => Object.hash(
+    createdAt,
+    updatedAt,
+    id,
+    url,
+    key,
+    relativePath,
+    eTag,
+    validTill,
+    touched,
+    length,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3161,10 +3799,10 @@ class CacheTablesCompanion extends UpdateCompanion<CacheDrift> {
     required DateTime validTill,
     this.touched = const Value.absent(),
     this.length = const Value.absent(),
-  })  : url = Value(url),
-        key = Value(key),
-        relativePath = Value(relativePath),
-        validTill = Value(validTill);
+  }) : url = Value(url),
+       key = Value(key),
+       relativePath = Value(relativePath),
+       validTill = Value(validTill);
   static Insertable<CacheDrift> custom({
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -3191,17 +3829,18 @@ class CacheTablesCompanion extends UpdateCompanion<CacheDrift> {
     });
   }
 
-  CacheTablesCompanion copyWith(
-      {Value<DateTime>? createdAt,
-      Value<DateTime>? updatedAt,
-      Value<int>? id,
-      Value<String>? url,
-      Value<String>? key,
-      Value<String>? relativePath,
-      Value<String?>? eTag,
-      Value<DateTime>? validTill,
-      Value<DateTime?>? touched,
-      Value<int?>? length}) {
+  CacheTablesCompanion copyWith({
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? id,
+    Value<String>? url,
+    Value<String>? key,
+    Value<String>? relativePath,
+    Value<String?>? eTag,
+    Value<DateTime>? validTill,
+    Value<DateTime?>? touched,
+    Value<int?>? length,
+  }) {
     return CacheTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -3276,187 +3915,286 @@ class $DioCacheTablesTable extends DioCacheTables
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $DioCacheTablesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _cacheKeyMeta =
-      const VerificationMeta('cacheKey');
+  static const VerificationMeta _cacheKeyMeta = const VerificationMeta(
+    'cacheKey',
+  );
   @override
   late final GeneratedColumn<String> cacheKey = GeneratedColumn<String>(
-      'cache_key', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'cache_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _dateMeta = const VerificationMeta('date');
   @override
   late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
-      'date', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
-  static const VerificationMeta _cacheControlMeta =
-      const VerificationMeta('cacheControl');
+    'date',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cacheControlMeta = const VerificationMeta(
+    'cacheControl',
+  );
   @override
   late final GeneratedColumn<String> cacheControl = GeneratedColumn<String>(
-      'cache_control', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _contentMeta =
-      const VerificationMeta('content');
+    'cache_control',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _contentMeta = const VerificationMeta(
+    'content',
+  );
   @override
   late final GeneratedColumn<Uint8List> content = GeneratedColumn<Uint8List>(
-      'content', aliasedName, true,
-      type: DriftSqlType.blob, requiredDuringInsert: false);
+    'content',
+    aliasedName,
+    true,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _eTagMeta = const VerificationMeta('eTag');
   @override
   late final GeneratedColumn<String> eTag = GeneratedColumn<String>(
-      'e_tag', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _expiresMeta =
-      const VerificationMeta('expires');
+    'e_tag',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _expiresMeta = const VerificationMeta(
+    'expires',
+  );
   @override
   late final GeneratedColumn<DateTime> expires = GeneratedColumn<DateTime>(
-      'expires', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
-  static const VerificationMeta _headersMeta =
-      const VerificationMeta('headers');
+    'expires',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _headersMeta = const VerificationMeta(
+    'headers',
+  );
   @override
   late final GeneratedColumn<Uint8List> headers = GeneratedColumn<Uint8List>(
-      'headers', aliasedName, true,
-      type: DriftSqlType.blob, requiredDuringInsert: false);
-  static const VerificationMeta _lastModifiedMeta =
-      const VerificationMeta('lastModified');
+    'headers',
+    aliasedName,
+    true,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastModifiedMeta = const VerificationMeta(
+    'lastModified',
+  );
   @override
   late final GeneratedColumn<String> lastModified = GeneratedColumn<String>(
-      'last_modified', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _maxStaleMeta =
-      const VerificationMeta('maxStale');
+    'last_modified',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _maxStaleMeta = const VerificationMeta(
+    'maxStale',
+  );
   @override
   late final GeneratedColumn<DateTime> maxStale = GeneratedColumn<DateTime>(
-      'max_stale', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
-  static const VerificationMeta _priorityMeta =
-      const VerificationMeta('priority');
+    'max_stale',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _priorityMeta = const VerificationMeta(
+    'priority',
+  );
   @override
   late final GeneratedColumn<int> priority = GeneratedColumn<int>(
-      'priority', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _requestDateMeta =
-      const VerificationMeta('requestDate');
+    'priority',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _requestDateMeta = const VerificationMeta(
+    'requestDate',
+  );
   @override
   late final GeneratedColumn<DateTime> requestDate = GeneratedColumn<DateTime>(
-      'request_date', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
-  static const VerificationMeta _responseDateMeta =
-      const VerificationMeta('responseDate');
+    'request_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _responseDateMeta = const VerificationMeta(
+    'responseDate',
+  );
   @override
   late final GeneratedColumn<DateTime> responseDate = GeneratedColumn<DateTime>(
-      'response_date', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+    'response_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _urlMeta = const VerificationMeta('url');
   @override
   late final GeneratedColumn<String> url = GeneratedColumn<String>(
-      'url', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _statusCodeMeta =
-      const VerificationMeta('statusCode');
+    'url',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusCodeMeta = const VerificationMeta(
+    'statusCode',
+  );
   @override
   late final GeneratedColumn<int> statusCode = GeneratedColumn<int>(
-      'status_code', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+    'status_code',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
-        cacheKey,
-        date,
-        cacheControl,
-        content,
-        eTag,
-        expires,
-        headers,
-        lastModified,
-        maxStale,
-        priority,
-        requestDate,
-        responseDate,
-        url,
-        statusCode
-      ];
+    cacheKey,
+    date,
+    cacheControl,
+    content,
+    eTag,
+    expires,
+    headers,
+    lastModified,
+    maxStale,
+    priority,
+    requestDate,
+    responseDate,
+    url,
+    statusCode,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'dio_cache_tables';
   @override
-  VerificationContext validateIntegrity(Insertable<DioCacheDrift> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<DioCacheDrift> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('cache_key')) {
-      context.handle(_cacheKeyMeta,
-          cacheKey.isAcceptableOrUnknown(data['cache_key']!, _cacheKeyMeta));
+      context.handle(
+        _cacheKeyMeta,
+        cacheKey.isAcceptableOrUnknown(data['cache_key']!, _cacheKeyMeta),
+      );
     } else if (isInserting) {
       context.missing(_cacheKeyMeta);
     }
     if (data.containsKey('date')) {
       context.handle(
-          _dateMeta, date.isAcceptableOrUnknown(data['date']!, _dateMeta));
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
     }
     if (data.containsKey('cache_control')) {
       context.handle(
+        _cacheControlMeta,
+        cacheControl.isAcceptableOrUnknown(
+          data['cache_control']!,
           _cacheControlMeta,
-          cacheControl.isAcceptableOrUnknown(
-              data['cache_control']!, _cacheControlMeta));
+        ),
+      );
     }
     if (data.containsKey('content')) {
-      context.handle(_contentMeta,
-          content.isAcceptableOrUnknown(data['content']!, _contentMeta));
+      context.handle(
+        _contentMeta,
+        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
+      );
     }
     if (data.containsKey('e_tag')) {
       context.handle(
-          _eTagMeta, eTag.isAcceptableOrUnknown(data['e_tag']!, _eTagMeta));
+        _eTagMeta,
+        eTag.isAcceptableOrUnknown(data['e_tag']!, _eTagMeta),
+      );
     }
     if (data.containsKey('expires')) {
-      context.handle(_expiresMeta,
-          expires.isAcceptableOrUnknown(data['expires']!, _expiresMeta));
+      context.handle(
+        _expiresMeta,
+        expires.isAcceptableOrUnknown(data['expires']!, _expiresMeta),
+      );
     }
     if (data.containsKey('headers')) {
-      context.handle(_headersMeta,
-          headers.isAcceptableOrUnknown(data['headers']!, _headersMeta));
+      context.handle(
+        _headersMeta,
+        headers.isAcceptableOrUnknown(data['headers']!, _headersMeta),
+      );
     }
     if (data.containsKey('last_modified')) {
       context.handle(
+        _lastModifiedMeta,
+        lastModified.isAcceptableOrUnknown(
+          data['last_modified']!,
           _lastModifiedMeta,
-          lastModified.isAcceptableOrUnknown(
-              data['last_modified']!, _lastModifiedMeta));
+        ),
+      );
     }
     if (data.containsKey('max_stale')) {
-      context.handle(_maxStaleMeta,
-          maxStale.isAcceptableOrUnknown(data['max_stale']!, _maxStaleMeta));
+      context.handle(
+        _maxStaleMeta,
+        maxStale.isAcceptableOrUnknown(data['max_stale']!, _maxStaleMeta),
+      );
     }
     if (data.containsKey('priority')) {
-      context.handle(_priorityMeta,
-          priority.isAcceptableOrUnknown(data['priority']!, _priorityMeta));
+      context.handle(
+        _priorityMeta,
+        priority.isAcceptableOrUnknown(data['priority']!, _priorityMeta),
+      );
     } else if (isInserting) {
       context.missing(_priorityMeta);
     }
     if (data.containsKey('request_date')) {
       context.handle(
+        _requestDateMeta,
+        requestDate.isAcceptableOrUnknown(
+          data['request_date']!,
           _requestDateMeta,
-          requestDate.isAcceptableOrUnknown(
-              data['request_date']!, _requestDateMeta));
+        ),
+      );
     }
     if (data.containsKey('response_date')) {
       context.handle(
+        _responseDateMeta,
+        responseDate.isAcceptableOrUnknown(
+          data['response_date']!,
           _responseDateMeta,
-          responseDate.isAcceptableOrUnknown(
-              data['response_date']!, _responseDateMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_responseDateMeta);
     }
     if (data.containsKey('url')) {
       context.handle(
-          _urlMeta, url.isAcceptableOrUnknown(data['url']!, _urlMeta));
+        _urlMeta,
+        url.isAcceptableOrUnknown(data['url']!, _urlMeta),
+      );
     } else if (isInserting) {
       context.missing(_urlMeta);
     }
     if (data.containsKey('status_code')) {
       context.handle(
-          _statusCodeMeta,
-          statusCode.isAcceptableOrUnknown(
-              data['status_code']!, _statusCodeMeta));
+        _statusCodeMeta,
+        statusCode.isAcceptableOrUnknown(data['status_code']!, _statusCodeMeta),
+      );
     }
     return context;
   }
@@ -3467,34 +4205,66 @@ class $DioCacheTablesTable extends DioCacheTables
   DioCacheDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return DioCacheDrift(
-      cacheKey: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}cache_key'])!,
-      date: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}date']),
-      cacheControl: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}cache_control']),
-      content: attachedDatabase.typeMapping
-          .read(DriftSqlType.blob, data['${effectivePrefix}content']),
-      eTag: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}e_tag']),
-      expires: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}expires']),
-      headers: attachedDatabase.typeMapping
-          .read(DriftSqlType.blob, data['${effectivePrefix}headers']),
-      lastModified: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}last_modified']),
-      maxStale: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}max_stale']),
-      priority: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}priority'])!,
-      requestDate: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}request_date']),
-      responseDate: attachedDatabase.typeMapping.read(
-          DriftSqlType.dateTime, data['${effectivePrefix}response_date'])!,
-      url: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}url'])!,
-      statusCode: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}status_code']),
+      cacheKey:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}cache_key'],
+          )!,
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}date'],
+      ),
+      cacheControl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cache_control'],
+      ),
+      content: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}content'],
+      ),
+      eTag: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}e_tag'],
+      ),
+      expires: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}expires'],
+      ),
+      headers: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}headers'],
+      ),
+      lastModified: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_modified'],
+      ),
+      maxStale: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}max_stale'],
+      ),
+      priority:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}priority'],
+          )!,
+      requestDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}request_date'],
+      ),
+      responseDate:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}response_date'],
+          )!,
+      url:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}url'],
+          )!,
+      statusCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}status_code'],
+      ),
     );
   }
 
@@ -3519,21 +4289,22 @@ class DioCacheDrift extends DataClass implements Insertable<DioCacheDrift> {
   final DateTime responseDate;
   final String url;
   final int? statusCode;
-  const DioCacheDrift(
-      {required this.cacheKey,
-      this.date,
-      this.cacheControl,
-      this.content,
-      this.eTag,
-      this.expires,
-      this.headers,
-      this.lastModified,
-      this.maxStale,
-      required this.priority,
-      this.requestDate,
-      required this.responseDate,
-      required this.url,
-      this.statusCode});
+  const DioCacheDrift({
+    required this.cacheKey,
+    this.date,
+    this.cacheControl,
+    this.content,
+    this.eTag,
+    this.expires,
+    this.headers,
+    this.lastModified,
+    this.maxStale,
+    required this.priority,
+    this.requestDate,
+    required this.responseDate,
+    required this.url,
+    this.statusCode,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -3578,39 +4349,49 @@ class DioCacheDrift extends DataClass implements Insertable<DioCacheDrift> {
     return DioCacheTablesCompanion(
       cacheKey: Value(cacheKey),
       date: date == null && nullToAbsent ? const Value.absent() : Value(date),
-      cacheControl: cacheControl == null && nullToAbsent
-          ? const Value.absent()
-          : Value(cacheControl),
-      content: content == null && nullToAbsent
-          ? const Value.absent()
-          : Value(content),
+      cacheControl:
+          cacheControl == null && nullToAbsent
+              ? const Value.absent()
+              : Value(cacheControl),
+      content:
+          content == null && nullToAbsent
+              ? const Value.absent()
+              : Value(content),
       eTag: eTag == null && nullToAbsent ? const Value.absent() : Value(eTag),
-      expires: expires == null && nullToAbsent
-          ? const Value.absent()
-          : Value(expires),
-      headers: headers == null && nullToAbsent
-          ? const Value.absent()
-          : Value(headers),
-      lastModified: lastModified == null && nullToAbsent
-          ? const Value.absent()
-          : Value(lastModified),
-      maxStale: maxStale == null && nullToAbsent
-          ? const Value.absent()
-          : Value(maxStale),
+      expires:
+          expires == null && nullToAbsent
+              ? const Value.absent()
+              : Value(expires),
+      headers:
+          headers == null && nullToAbsent
+              ? const Value.absent()
+              : Value(headers),
+      lastModified:
+          lastModified == null && nullToAbsent
+              ? const Value.absent()
+              : Value(lastModified),
+      maxStale:
+          maxStale == null && nullToAbsent
+              ? const Value.absent()
+              : Value(maxStale),
       priority: Value(priority),
-      requestDate: requestDate == null && nullToAbsent
-          ? const Value.absent()
-          : Value(requestDate),
+      requestDate:
+          requestDate == null && nullToAbsent
+              ? const Value.absent()
+              : Value(requestDate),
       responseDate: Value(responseDate),
       url: Value(url),
-      statusCode: statusCode == null && nullToAbsent
-          ? const Value.absent()
-          : Value(statusCode),
+      statusCode:
+          statusCode == null && nullToAbsent
+              ? const Value.absent()
+              : Value(statusCode),
     );
   }
 
-  factory DioCacheDrift.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory DioCacheDrift.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return DioCacheDrift(
       cacheKey: serializer.fromJson<String>(json['cacheKey']),
@@ -3650,60 +4431,61 @@ class DioCacheDrift extends DataClass implements Insertable<DioCacheDrift> {
     };
   }
 
-  DioCacheDrift copyWith(
-          {String? cacheKey,
-          Value<DateTime?> date = const Value.absent(),
-          Value<String?> cacheControl = const Value.absent(),
-          Value<Uint8List?> content = const Value.absent(),
-          Value<String?> eTag = const Value.absent(),
-          Value<DateTime?> expires = const Value.absent(),
-          Value<Uint8List?> headers = const Value.absent(),
-          Value<String?> lastModified = const Value.absent(),
-          Value<DateTime?> maxStale = const Value.absent(),
-          int? priority,
-          Value<DateTime?> requestDate = const Value.absent(),
-          DateTime? responseDate,
-          String? url,
-          Value<int?> statusCode = const Value.absent()}) =>
-      DioCacheDrift(
-        cacheKey: cacheKey ?? this.cacheKey,
-        date: date.present ? date.value : this.date,
-        cacheControl:
-            cacheControl.present ? cacheControl.value : this.cacheControl,
-        content: content.present ? content.value : this.content,
-        eTag: eTag.present ? eTag.value : this.eTag,
-        expires: expires.present ? expires.value : this.expires,
-        headers: headers.present ? headers.value : this.headers,
-        lastModified:
-            lastModified.present ? lastModified.value : this.lastModified,
-        maxStale: maxStale.present ? maxStale.value : this.maxStale,
-        priority: priority ?? this.priority,
-        requestDate: requestDate.present ? requestDate.value : this.requestDate,
-        responseDate: responseDate ?? this.responseDate,
-        url: url ?? this.url,
-        statusCode: statusCode.present ? statusCode.value : this.statusCode,
-      );
+  DioCacheDrift copyWith({
+    String? cacheKey,
+    Value<DateTime?> date = const Value.absent(),
+    Value<String?> cacheControl = const Value.absent(),
+    Value<Uint8List?> content = const Value.absent(),
+    Value<String?> eTag = const Value.absent(),
+    Value<DateTime?> expires = const Value.absent(),
+    Value<Uint8List?> headers = const Value.absent(),
+    Value<String?> lastModified = const Value.absent(),
+    Value<DateTime?> maxStale = const Value.absent(),
+    int? priority,
+    Value<DateTime?> requestDate = const Value.absent(),
+    DateTime? responseDate,
+    String? url,
+    Value<int?> statusCode = const Value.absent(),
+  }) => DioCacheDrift(
+    cacheKey: cacheKey ?? this.cacheKey,
+    date: date.present ? date.value : this.date,
+    cacheControl: cacheControl.present ? cacheControl.value : this.cacheControl,
+    content: content.present ? content.value : this.content,
+    eTag: eTag.present ? eTag.value : this.eTag,
+    expires: expires.present ? expires.value : this.expires,
+    headers: headers.present ? headers.value : this.headers,
+    lastModified: lastModified.present ? lastModified.value : this.lastModified,
+    maxStale: maxStale.present ? maxStale.value : this.maxStale,
+    priority: priority ?? this.priority,
+    requestDate: requestDate.present ? requestDate.value : this.requestDate,
+    responseDate: responseDate ?? this.responseDate,
+    url: url ?? this.url,
+    statusCode: statusCode.present ? statusCode.value : this.statusCode,
+  );
   DioCacheDrift copyWithCompanion(DioCacheTablesCompanion data) {
     return DioCacheDrift(
       cacheKey: data.cacheKey.present ? data.cacheKey.value : this.cacheKey,
       date: data.date.present ? data.date.value : this.date,
-      cacheControl: data.cacheControl.present
-          ? data.cacheControl.value
-          : this.cacheControl,
+      cacheControl:
+          data.cacheControl.present
+              ? data.cacheControl.value
+              : this.cacheControl,
       content: data.content.present ? data.content.value : this.content,
       eTag: data.eTag.present ? data.eTag.value : this.eTag,
       expires: data.expires.present ? data.expires.value : this.expires,
       headers: data.headers.present ? data.headers.value : this.headers,
-      lastModified: data.lastModified.present
-          ? data.lastModified.value
-          : this.lastModified,
+      lastModified:
+          data.lastModified.present
+              ? data.lastModified.value
+              : this.lastModified,
       maxStale: data.maxStale.present ? data.maxStale.value : this.maxStale,
       priority: data.priority.present ? data.priority.value : this.priority,
       requestDate:
           data.requestDate.present ? data.requestDate.value : this.requestDate,
-      responseDate: data.responseDate.present
-          ? data.responseDate.value
-          : this.responseDate,
+      responseDate:
+          data.responseDate.present
+              ? data.responseDate.value
+              : this.responseDate,
       url: data.url.present ? data.url.value : this.url,
       statusCode:
           data.statusCode.present ? data.statusCode.value : this.statusCode,
@@ -3733,20 +4515,21 @@ class DioCacheDrift extends DataClass implements Insertable<DioCacheDrift> {
 
   @override
   int get hashCode => Object.hash(
-      cacheKey,
-      date,
-      cacheControl,
-      $driftBlobEquality.hash(content),
-      eTag,
-      expires,
-      $driftBlobEquality.hash(headers),
-      lastModified,
-      maxStale,
-      priority,
-      requestDate,
-      responseDate,
-      url,
-      statusCode);
+    cacheKey,
+    date,
+    cacheControl,
+    $driftBlobEquality.hash(content),
+    eTag,
+    expires,
+    $driftBlobEquality.hash(headers),
+    lastModified,
+    maxStale,
+    priority,
+    requestDate,
+    responseDate,
+    url,
+    statusCode,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3816,10 +4599,10 @@ class DioCacheTablesCompanion extends UpdateCompanion<DioCacheDrift> {
     required String url,
     this.statusCode = const Value.absent(),
     this.rowid = const Value.absent(),
-  })  : cacheKey = Value(cacheKey),
-        priority = Value(priority),
-        responseDate = Value(responseDate),
-        url = Value(url);
+  }) : cacheKey = Value(cacheKey),
+       priority = Value(priority),
+       responseDate = Value(responseDate),
+       url = Value(url);
   static Insertable<DioCacheDrift> custom({
     Expression<String>? cacheKey,
     Expression<DateTime>? date,
@@ -3856,22 +4639,23 @@ class DioCacheTablesCompanion extends UpdateCompanion<DioCacheDrift> {
     });
   }
 
-  DioCacheTablesCompanion copyWith(
-      {Value<String>? cacheKey,
-      Value<DateTime?>? date,
-      Value<String?>? cacheControl,
-      Value<Uint8List?>? content,
-      Value<String?>? eTag,
-      Value<DateTime?>? expires,
-      Value<Uint8List?>? headers,
-      Value<String?>? lastModified,
-      Value<DateTime?>? maxStale,
-      Value<int>? priority,
-      Value<DateTime?>? requestDate,
-      Value<DateTime>? responseDate,
-      Value<String>? url,
-      Value<int?>? statusCode,
-      Value<int>? rowid}) {
+  DioCacheTablesCompanion copyWith({
+    Value<String>? cacheKey,
+    Value<DateTime?>? date,
+    Value<String?>? cacheControl,
+    Value<Uint8List?>? content,
+    Value<String?>? eTag,
+    Value<DateTime?>? expires,
+    Value<Uint8List?>? headers,
+    Value<String?>? lastModified,
+    Value<DateTime?>? maxStale,
+    Value<int>? priority,
+    Value<DateTime?>? requestDate,
+    Value<DateTime>? responseDate,
+    Value<String>? url,
+    Value<int?>? statusCode,
+    Value<int>? rowid,
+  }) {
     return DioCacheTablesCompanion(
       cacheKey: cacheKey ?? this.cacheKey,
       date: date ?? this.date,
@@ -3991,38 +4775,38 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
-        imageTables,
-        chapterTables,
-        libraryTables,
-        mangaTables,
-        tagTables,
-        relationshipTables,
-        jobTables,
-        cacheTables,
-        dioCacheTables
-      ];
+    imageTables,
+    chapterTables,
+    libraryTables,
+    mangaTables,
+    tagTables,
+    relationshipTables,
+    jobTables,
+    cacheTables,
+    dioCacheTables,
+  ];
 }
 
-typedef $$ImageTablesTableCreateCompanionBuilder = ImageTablesCompanion
-    Function({
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  Value<String> id,
-  required int order,
-  required String chapterId,
-  required String webUrl,
-  Value<int> rowid,
-});
-typedef $$ImageTablesTableUpdateCompanionBuilder = ImageTablesCompanion
-    Function({
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  Value<String> id,
-  Value<int> order,
-  Value<String> chapterId,
-  Value<String> webUrl,
-  Value<int> rowid,
-});
+typedef $$ImageTablesTableCreateCompanionBuilder =
+    ImageTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<String> id,
+      required int order,
+      required String chapterId,
+      required String webUrl,
+      Value<int> rowid,
+    });
+typedef $$ImageTablesTableUpdateCompanionBuilder =
+    ImageTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<String> id,
+      Value<int> order,
+      Value<String> chapterId,
+      Value<String> webUrl,
+      Value<int> rowid,
+    });
 
 class $$ImageTablesTableFilterComposer
     extends Composer<_$AppDatabase, $ImageTablesTable> {
@@ -4034,22 +4818,34 @@ class $$ImageTablesTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get order => $composableBuilder(
-      column: $table.order, builder: (column) => ColumnFilters(column));
+    column: $table.order,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get chapterId => $composableBuilder(
-      column: $table.chapterId, builder: (column) => ColumnFilters(column));
+    column: $table.chapterId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get webUrl => $composableBuilder(
-      column: $table.webUrl, builder: (column) => ColumnFilters(column));
+    column: $table.webUrl,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$ImageTablesTableOrderingComposer
@@ -4062,22 +4858,34 @@ class $$ImageTablesTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get order => $composableBuilder(
-      column: $table.order, builder: (column) => ColumnOrderings(column));
+    column: $table.order,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get chapterId => $composableBuilder(
-      column: $table.chapterId, builder: (column) => ColumnOrderings(column));
+    column: $table.chapterId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get webUrl => $composableBuilder(
-      column: $table.webUrl, builder: (column) => ColumnOrderings(column));
+    column: $table.webUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ImageTablesTableAnnotationComposer
@@ -4108,117 +4916,138 @@ class $$ImageTablesTableAnnotationComposer
       $composableBuilder(column: $table.webUrl, builder: (column) => column);
 }
 
-class $$ImageTablesTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $ImageTablesTable,
-    ImageDrift,
-    $$ImageTablesTableFilterComposer,
-    $$ImageTablesTableOrderingComposer,
-    $$ImageTablesTableAnnotationComposer,
-    $$ImageTablesTableCreateCompanionBuilder,
-    $$ImageTablesTableUpdateCompanionBuilder,
-    (ImageDrift, BaseReferences<_$AppDatabase, $ImageTablesTable, ImageDrift>),
-    ImageDrift,
-    PrefetchHooks Function()> {
+class $$ImageTablesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ImageTablesTable,
+          ImageDrift,
+          $$ImageTablesTableFilterComposer,
+          $$ImageTablesTableOrderingComposer,
+          $$ImageTablesTableAnnotationComposer,
+          $$ImageTablesTableCreateCompanionBuilder,
+          $$ImageTablesTableUpdateCompanionBuilder,
+          (
+            ImageDrift,
+            BaseReferences<_$AppDatabase, $ImageTablesTable, ImageDrift>,
+          ),
+          ImageDrift,
+          PrefetchHooks Function()
+        > {
   $$ImageTablesTableTableManager(_$AppDatabase db, $ImageTablesTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$ImageTablesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$ImageTablesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$ImageTablesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<String> id = const Value.absent(),
-            Value<int> order = const Value.absent(),
-            Value<String> chapterId = const Value.absent(),
-            Value<String> webUrl = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              ImageTablesCompanion(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            id: id,
-            order: order,
-            chapterId: chapterId,
-            webUrl: webUrl,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<String> id = const Value.absent(),
-            required int order,
-            required String chapterId,
-            required String webUrl,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              ImageTablesCompanion.insert(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            id: id,
-            order: order,
-            chapterId: chapterId,
-            webUrl: webUrl,
-            rowid: rowid,
-          ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
+          createFilteringComposer:
+              () => $$ImageTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$ImageTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () =>
+                  $$ImageTablesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<int> order = const Value.absent(),
+                Value<String> chapterId = const Value.absent(),
+                Value<String> webUrl = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ImageTablesCompanion(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                order: order,
+                chapterId: chapterId,
+                webUrl: webUrl,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                required int order,
+                required String chapterId,
+                required String webUrl,
+                Value<int> rowid = const Value.absent(),
+              }) => ImageTablesCompanion.insert(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                order: order,
+                chapterId: chapterId,
+                webUrl: webUrl,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$ImageTablesTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $ImageTablesTable,
-    ImageDrift,
-    $$ImageTablesTableFilterComposer,
-    $$ImageTablesTableOrderingComposer,
-    $$ImageTablesTableAnnotationComposer,
-    $$ImageTablesTableCreateCompanionBuilder,
-    $$ImageTablesTableUpdateCompanionBuilder,
-    (ImageDrift, BaseReferences<_$AppDatabase, $ImageTablesTable, ImageDrift>),
-    ImageDrift,
-    PrefetchHooks Function()>;
-typedef $$ChapterTablesTableCreateCompanionBuilder = ChapterTablesCompanion
-    Function({
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  Value<String> id,
-  Value<String?> mangaId,
-  Value<String?> title,
-  Value<String?> volume,
-  Value<String?> chapter,
-  Value<String?> translatedLanguage,
-  Value<String?> scanlationGroup,
-  Value<String?> webUrl,
-  Value<DateTime?> readableAt,
-  Value<DateTime?> publishAt,
-  Value<DateTime?> lastReadAt,
-  Value<int> rowid,
-});
-typedef $$ChapterTablesTableUpdateCompanionBuilder = ChapterTablesCompanion
-    Function({
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  Value<String> id,
-  Value<String?> mangaId,
-  Value<String?> title,
-  Value<String?> volume,
-  Value<String?> chapter,
-  Value<String?> translatedLanguage,
-  Value<String?> scanlationGroup,
-  Value<String?> webUrl,
-  Value<DateTime?> readableAt,
-  Value<DateTime?> publishAt,
-  Value<DateTime?> lastReadAt,
-  Value<int> rowid,
-});
+typedef $$ImageTablesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ImageTablesTable,
+      ImageDrift,
+      $$ImageTablesTableFilterComposer,
+      $$ImageTablesTableOrderingComposer,
+      $$ImageTablesTableAnnotationComposer,
+      $$ImageTablesTableCreateCompanionBuilder,
+      $$ImageTablesTableUpdateCompanionBuilder,
+      (
+        ImageDrift,
+        BaseReferences<_$AppDatabase, $ImageTablesTable, ImageDrift>,
+      ),
+      ImageDrift,
+      PrefetchHooks Function()
+    >;
+typedef $$ChapterTablesTableCreateCompanionBuilder =
+    ChapterTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<String> id,
+      Value<String?> mangaId,
+      Value<String?> title,
+      Value<String?> volume,
+      Value<String?> chapter,
+      Value<String?> translatedLanguage,
+      Value<String?> scanlationGroup,
+      Value<String?> webUrl,
+      Value<DateTime?> readableAt,
+      Value<DateTime?> publishAt,
+      Value<DateTime?> lastReadAt,
+      Value<int> rowid,
+    });
+typedef $$ChapterTablesTableUpdateCompanionBuilder =
+    ChapterTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<String> id,
+      Value<String?> mangaId,
+      Value<String?> title,
+      Value<String?> volume,
+      Value<String?> chapter,
+      Value<String?> translatedLanguage,
+      Value<String?> scanlationGroup,
+      Value<String?> webUrl,
+      Value<DateTime?> readableAt,
+      Value<DateTime?> publishAt,
+      Value<DateTime?> lastReadAt,
+      Value<int> rowid,
+    });
 
 class $$ChapterTablesTableFilterComposer
     extends Composer<_$AppDatabase, $ChapterTablesTable> {
@@ -4230,45 +5059,69 @@ class $$ChapterTablesTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get mangaId => $composableBuilder(
-      column: $table.mangaId, builder: (column) => ColumnFilters(column));
+    column: $table.mangaId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get title => $composableBuilder(
-      column: $table.title, builder: (column) => ColumnFilters(column));
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get volume => $composableBuilder(
-      column: $table.volume, builder: (column) => ColumnFilters(column));
+    column: $table.volume,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get chapter => $composableBuilder(
-      column: $table.chapter, builder: (column) => ColumnFilters(column));
+    column: $table.chapter,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get translatedLanguage => $composableBuilder(
-      column: $table.translatedLanguage,
-      builder: (column) => ColumnFilters(column));
+    column: $table.translatedLanguage,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get scanlationGroup => $composableBuilder(
-      column: $table.scanlationGroup,
-      builder: (column) => ColumnFilters(column));
+    column: $table.scanlationGroup,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get webUrl => $composableBuilder(
-      column: $table.webUrl, builder: (column) => ColumnFilters(column));
+    column: $table.webUrl,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get readableAt => $composableBuilder(
-      column: $table.readableAt, builder: (column) => ColumnFilters(column));
+    column: $table.readableAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get publishAt => $composableBuilder(
-      column: $table.publishAt, builder: (column) => ColumnFilters(column));
+    column: $table.publishAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get lastReadAt => $composableBuilder(
-      column: $table.lastReadAt, builder: (column) => ColumnFilters(column));
+    column: $table.lastReadAt,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$ChapterTablesTableOrderingComposer
@@ -4281,45 +5134,69 @@ class $$ChapterTablesTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get mangaId => $composableBuilder(
-      column: $table.mangaId, builder: (column) => ColumnOrderings(column));
+    column: $table.mangaId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get title => $composableBuilder(
-      column: $table.title, builder: (column) => ColumnOrderings(column));
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get volume => $composableBuilder(
-      column: $table.volume, builder: (column) => ColumnOrderings(column));
+    column: $table.volume,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get chapter => $composableBuilder(
-      column: $table.chapter, builder: (column) => ColumnOrderings(column));
+    column: $table.chapter,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get translatedLanguage => $composableBuilder(
-      column: $table.translatedLanguage,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.translatedLanguage,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get scanlationGroup => $composableBuilder(
-      column: $table.scanlationGroup,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.scanlationGroup,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get webUrl => $composableBuilder(
-      column: $table.webUrl, builder: (column) => ColumnOrderings(column));
+    column: $table.webUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get readableAt => $composableBuilder(
-      column: $table.readableAt, builder: (column) => ColumnOrderings(column));
+    column: $table.readableAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get publishAt => $composableBuilder(
-      column: $table.publishAt, builder: (column) => ColumnOrderings(column));
+    column: $table.publishAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get lastReadAt => $composableBuilder(
-      column: $table.lastReadAt, builder: (column) => ColumnOrderings(column));
+    column: $table.lastReadAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ChapterTablesTableAnnotationComposer
@@ -4353,149 +5230,175 @@ class $$ChapterTablesTableAnnotationComposer
       $composableBuilder(column: $table.chapter, builder: (column) => column);
 
   GeneratedColumn<String> get translatedLanguage => $composableBuilder(
-      column: $table.translatedLanguage, builder: (column) => column);
+    column: $table.translatedLanguage,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get scanlationGroup => $composableBuilder(
-      column: $table.scanlationGroup, builder: (column) => column);
+    column: $table.scanlationGroup,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get webUrl =>
       $composableBuilder(column: $table.webUrl, builder: (column) => column);
 
   GeneratedColumn<DateTime> get readableAt => $composableBuilder(
-      column: $table.readableAt, builder: (column) => column);
+    column: $table.readableAt,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get publishAt =>
       $composableBuilder(column: $table.publishAt, builder: (column) => column);
 
   GeneratedColumn<DateTime> get lastReadAt => $composableBuilder(
-      column: $table.lastReadAt, builder: (column) => column);
+    column: $table.lastReadAt,
+    builder: (column) => column,
+  );
 }
 
-class $$ChapterTablesTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $ChapterTablesTable,
-    ChapterDrift,
-    $$ChapterTablesTableFilterComposer,
-    $$ChapterTablesTableOrderingComposer,
-    $$ChapterTablesTableAnnotationComposer,
-    $$ChapterTablesTableCreateCompanionBuilder,
-    $$ChapterTablesTableUpdateCompanionBuilder,
-    (
-      ChapterDrift,
-      BaseReferences<_$AppDatabase, $ChapterTablesTable, ChapterDrift>
-    ),
-    ChapterDrift,
-    PrefetchHooks Function()> {
+class $$ChapterTablesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ChapterTablesTable,
+          ChapterDrift,
+          $$ChapterTablesTableFilterComposer,
+          $$ChapterTablesTableOrderingComposer,
+          $$ChapterTablesTableAnnotationComposer,
+          $$ChapterTablesTableCreateCompanionBuilder,
+          $$ChapterTablesTableUpdateCompanionBuilder,
+          (
+            ChapterDrift,
+            BaseReferences<_$AppDatabase, $ChapterTablesTable, ChapterDrift>,
+          ),
+          ChapterDrift,
+          PrefetchHooks Function()
+        > {
   $$ChapterTablesTableTableManager(_$AppDatabase db, $ChapterTablesTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$ChapterTablesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$ChapterTablesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$ChapterTablesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<String> id = const Value.absent(),
-            Value<String?> mangaId = const Value.absent(),
-            Value<String?> title = const Value.absent(),
-            Value<String?> volume = const Value.absent(),
-            Value<String?> chapter = const Value.absent(),
-            Value<String?> translatedLanguage = const Value.absent(),
-            Value<String?> scanlationGroup = const Value.absent(),
-            Value<String?> webUrl = const Value.absent(),
-            Value<DateTime?> readableAt = const Value.absent(),
-            Value<DateTime?> publishAt = const Value.absent(),
-            Value<DateTime?> lastReadAt = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              ChapterTablesCompanion(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            id: id,
-            mangaId: mangaId,
-            title: title,
-            volume: volume,
-            chapter: chapter,
-            translatedLanguage: translatedLanguage,
-            scanlationGroup: scanlationGroup,
-            webUrl: webUrl,
-            readableAt: readableAt,
-            publishAt: publishAt,
-            lastReadAt: lastReadAt,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<String> id = const Value.absent(),
-            Value<String?> mangaId = const Value.absent(),
-            Value<String?> title = const Value.absent(),
-            Value<String?> volume = const Value.absent(),
-            Value<String?> chapter = const Value.absent(),
-            Value<String?> translatedLanguage = const Value.absent(),
-            Value<String?> scanlationGroup = const Value.absent(),
-            Value<String?> webUrl = const Value.absent(),
-            Value<DateTime?> readableAt = const Value.absent(),
-            Value<DateTime?> publishAt = const Value.absent(),
-            Value<DateTime?> lastReadAt = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              ChapterTablesCompanion.insert(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            id: id,
-            mangaId: mangaId,
-            title: title,
-            volume: volume,
-            chapter: chapter,
-            translatedLanguage: translatedLanguage,
-            scanlationGroup: scanlationGroup,
-            webUrl: webUrl,
-            readableAt: readableAt,
-            publishAt: publishAt,
-            lastReadAt: lastReadAt,
-            rowid: rowid,
-          ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
+          createFilteringComposer:
+              () => $$ChapterTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () =>
+                  $$ChapterTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () => $$ChapterTablesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String?> mangaId = const Value.absent(),
+                Value<String?> title = const Value.absent(),
+                Value<String?> volume = const Value.absent(),
+                Value<String?> chapter = const Value.absent(),
+                Value<String?> translatedLanguage = const Value.absent(),
+                Value<String?> scanlationGroup = const Value.absent(),
+                Value<String?> webUrl = const Value.absent(),
+                Value<DateTime?> readableAt = const Value.absent(),
+                Value<DateTime?> publishAt = const Value.absent(),
+                Value<DateTime?> lastReadAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ChapterTablesCompanion(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                mangaId: mangaId,
+                title: title,
+                volume: volume,
+                chapter: chapter,
+                translatedLanguage: translatedLanguage,
+                scanlationGroup: scanlationGroup,
+                webUrl: webUrl,
+                readableAt: readableAt,
+                publishAt: publishAt,
+                lastReadAt: lastReadAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String?> mangaId = const Value.absent(),
+                Value<String?> title = const Value.absent(),
+                Value<String?> volume = const Value.absent(),
+                Value<String?> chapter = const Value.absent(),
+                Value<String?> translatedLanguage = const Value.absent(),
+                Value<String?> scanlationGroup = const Value.absent(),
+                Value<String?> webUrl = const Value.absent(),
+                Value<DateTime?> readableAt = const Value.absent(),
+                Value<DateTime?> publishAt = const Value.absent(),
+                Value<DateTime?> lastReadAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ChapterTablesCompanion.insert(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                mangaId: mangaId,
+                title: title,
+                volume: volume,
+                chapter: chapter,
+                translatedLanguage: translatedLanguage,
+                scanlationGroup: scanlationGroup,
+                webUrl: webUrl,
+                readableAt: readableAt,
+                publishAt: publishAt,
+                lastReadAt: lastReadAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$ChapterTablesTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $ChapterTablesTable,
-    ChapterDrift,
-    $$ChapterTablesTableFilterComposer,
-    $$ChapterTablesTableOrderingComposer,
-    $$ChapterTablesTableAnnotationComposer,
-    $$ChapterTablesTableCreateCompanionBuilder,
-    $$ChapterTablesTableUpdateCompanionBuilder,
-    (
+typedef $$ChapterTablesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ChapterTablesTable,
       ChapterDrift,
-      BaseReferences<_$AppDatabase, $ChapterTablesTable, ChapterDrift>
-    ),
-    ChapterDrift,
-    PrefetchHooks Function()>;
-typedef $$LibraryTablesTableCreateCompanionBuilder = LibraryTablesCompanion
-    Function({
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  required String mangaId,
-  Value<int> rowid,
-});
-typedef $$LibraryTablesTableUpdateCompanionBuilder = LibraryTablesCompanion
-    Function({
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  Value<String> mangaId,
-  Value<int> rowid,
-});
+      $$ChapterTablesTableFilterComposer,
+      $$ChapterTablesTableOrderingComposer,
+      $$ChapterTablesTableAnnotationComposer,
+      $$ChapterTablesTableCreateCompanionBuilder,
+      $$ChapterTablesTableUpdateCompanionBuilder,
+      (
+        ChapterDrift,
+        BaseReferences<_$AppDatabase, $ChapterTablesTable, ChapterDrift>,
+      ),
+      ChapterDrift,
+      PrefetchHooks Function()
+    >;
+typedef $$LibraryTablesTableCreateCompanionBuilder =
+    LibraryTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      required String mangaId,
+      Value<int> rowid,
+    });
+typedef $$LibraryTablesTableUpdateCompanionBuilder =
+    LibraryTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<String> mangaId,
+      Value<int> rowid,
+    });
 
 class $$LibraryTablesTableFilterComposer
     extends Composer<_$AppDatabase, $LibraryTablesTable> {
@@ -4507,13 +5410,19 @@ class $$LibraryTablesTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get mangaId => $composableBuilder(
-      column: $table.mangaId, builder: (column) => ColumnFilters(column));
+    column: $table.mangaId,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$LibraryTablesTableOrderingComposer
@@ -4526,13 +5435,19 @@ class $$LibraryTablesTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get mangaId => $composableBuilder(
-      column: $table.mangaId, builder: (column) => ColumnOrderings(column));
+    column: $table.mangaId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$LibraryTablesTableAnnotationComposer
@@ -4554,105 +5469,123 @@ class $$LibraryTablesTableAnnotationComposer
       $composableBuilder(column: $table.mangaId, builder: (column) => column);
 }
 
-class $$LibraryTablesTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $LibraryTablesTable,
-    LibraryDrift,
-    $$LibraryTablesTableFilterComposer,
-    $$LibraryTablesTableOrderingComposer,
-    $$LibraryTablesTableAnnotationComposer,
-    $$LibraryTablesTableCreateCompanionBuilder,
-    $$LibraryTablesTableUpdateCompanionBuilder,
-    (
-      LibraryDrift,
-      BaseReferences<_$AppDatabase, $LibraryTablesTable, LibraryDrift>
-    ),
-    LibraryDrift,
-    PrefetchHooks Function()> {
+class $$LibraryTablesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LibraryTablesTable,
+          LibraryDrift,
+          $$LibraryTablesTableFilterComposer,
+          $$LibraryTablesTableOrderingComposer,
+          $$LibraryTablesTableAnnotationComposer,
+          $$LibraryTablesTableCreateCompanionBuilder,
+          $$LibraryTablesTableUpdateCompanionBuilder,
+          (
+            LibraryDrift,
+            BaseReferences<_$AppDatabase, $LibraryTablesTable, LibraryDrift>,
+          ),
+          LibraryDrift,
+          PrefetchHooks Function()
+        > {
   $$LibraryTablesTableTableManager(_$AppDatabase db, $LibraryTablesTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$LibraryTablesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$LibraryTablesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$LibraryTablesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<String> mangaId = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              LibraryTablesCompanion(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            mangaId: mangaId,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            required String mangaId,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              LibraryTablesCompanion.insert(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            mangaId: mangaId,
-            rowid: rowid,
-          ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
+          createFilteringComposer:
+              () => $$LibraryTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () =>
+                  $$LibraryTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () => $$LibraryTablesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<String> mangaId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LibraryTablesCompanion(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                mangaId: mangaId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                required String mangaId,
+                Value<int> rowid = const Value.absent(),
+              }) => LibraryTablesCompanion.insert(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                mangaId: mangaId,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$LibraryTablesTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $LibraryTablesTable,
-    LibraryDrift,
-    $$LibraryTablesTableFilterComposer,
-    $$LibraryTablesTableOrderingComposer,
-    $$LibraryTablesTableAnnotationComposer,
-    $$LibraryTablesTableCreateCompanionBuilder,
-    $$LibraryTablesTableUpdateCompanionBuilder,
-    (
+typedef $$LibraryTablesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LibraryTablesTable,
       LibraryDrift,
-      BaseReferences<_$AppDatabase, $LibraryTablesTable, LibraryDrift>
-    ),
-    LibraryDrift,
-    PrefetchHooks Function()>;
-typedef $$MangaTablesTableCreateCompanionBuilder = MangaTablesCompanion
-    Function({
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  Value<String> id,
-  Value<String?> title,
-  Value<String?> coverUrl,
-  Value<String?> author,
-  Value<String?> status,
-  Value<String?> description,
-  Value<String?> webUrl,
-  Value<String?> source,
-  Value<int> rowid,
-});
-typedef $$MangaTablesTableUpdateCompanionBuilder = MangaTablesCompanion
-    Function({
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  Value<String> id,
-  Value<String?> title,
-  Value<String?> coverUrl,
-  Value<String?> author,
-  Value<String?> status,
-  Value<String?> description,
-  Value<String?> webUrl,
-  Value<String?> source,
-  Value<int> rowid,
-});
+      $$LibraryTablesTableFilterComposer,
+      $$LibraryTablesTableOrderingComposer,
+      $$LibraryTablesTableAnnotationComposer,
+      $$LibraryTablesTableCreateCompanionBuilder,
+      $$LibraryTablesTableUpdateCompanionBuilder,
+      (
+        LibraryDrift,
+        BaseReferences<_$AppDatabase, $LibraryTablesTable, LibraryDrift>,
+      ),
+      LibraryDrift,
+      PrefetchHooks Function()
+    >;
+typedef $$MangaTablesTableCreateCompanionBuilder =
+    MangaTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<String> id,
+      Value<String?> title,
+      Value<String?> coverUrl,
+      Value<String?> author,
+      Value<String?> status,
+      Value<String?> description,
+      Value<String?> webUrl,
+      Value<String?> source,
+      Value<int> rowid,
+    });
+typedef $$MangaTablesTableUpdateCompanionBuilder =
+    MangaTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<String> id,
+      Value<String?> title,
+      Value<String?> coverUrl,
+      Value<String?> author,
+      Value<String?> status,
+      Value<String?> description,
+      Value<String?> webUrl,
+      Value<String?> source,
+      Value<int> rowid,
+    });
 
 class $$MangaTablesTableFilterComposer
     extends Composer<_$AppDatabase, $MangaTablesTable> {
@@ -4664,34 +5597,54 @@ class $$MangaTablesTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get title => $composableBuilder(
-      column: $table.title, builder: (column) => ColumnFilters(column));
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get coverUrl => $composableBuilder(
-      column: $table.coverUrl, builder: (column) => ColumnFilters(column));
+    column: $table.coverUrl,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get author => $composableBuilder(
-      column: $table.author, builder: (column) => ColumnFilters(column));
+    column: $table.author,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get status => $composableBuilder(
-      column: $table.status, builder: (column) => ColumnFilters(column));
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => ColumnFilters(column));
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get webUrl => $composableBuilder(
-      column: $table.webUrl, builder: (column) => ColumnFilters(column));
+    column: $table.webUrl,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get source => $composableBuilder(
-      column: $table.source, builder: (column) => ColumnFilters(column));
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$MangaTablesTableOrderingComposer
@@ -4704,34 +5657,54 @@ class $$MangaTablesTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get title => $composableBuilder(
-      column: $table.title, builder: (column) => ColumnOrderings(column));
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get coverUrl => $composableBuilder(
-      column: $table.coverUrl, builder: (column) => ColumnOrderings(column));
+    column: $table.coverUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get author => $composableBuilder(
-      column: $table.author, builder: (column) => ColumnOrderings(column));
+    column: $table.author,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get status => $composableBuilder(
-      column: $table.status, builder: (column) => ColumnOrderings(column));
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => ColumnOrderings(column));
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get webUrl => $composableBuilder(
-      column: $table.webUrl, builder: (column) => ColumnOrderings(column));
+    column: $table.webUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get source => $composableBuilder(
-      column: $table.source, builder: (column) => ColumnOrderings(column));
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$MangaTablesTableAnnotationComposer
@@ -4765,7 +5738,9 @@ class $$MangaTablesTableAnnotationComposer
       $composableBuilder(column: $table.status, builder: (column) => column);
 
   GeneratedColumn<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => column);
+    column: $table.description,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get webUrl =>
       $composableBuilder(column: $table.webUrl, builder: (column) => column);
@@ -4774,115 +5749,138 @@ class $$MangaTablesTableAnnotationComposer
       $composableBuilder(column: $table.source, builder: (column) => column);
 }
 
-class $$MangaTablesTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $MangaTablesTable,
-    MangaDrift,
-    $$MangaTablesTableFilterComposer,
-    $$MangaTablesTableOrderingComposer,
-    $$MangaTablesTableAnnotationComposer,
-    $$MangaTablesTableCreateCompanionBuilder,
-    $$MangaTablesTableUpdateCompanionBuilder,
-    (MangaDrift, BaseReferences<_$AppDatabase, $MangaTablesTable, MangaDrift>),
-    MangaDrift,
-    PrefetchHooks Function()> {
+class $$MangaTablesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MangaTablesTable,
+          MangaDrift,
+          $$MangaTablesTableFilterComposer,
+          $$MangaTablesTableOrderingComposer,
+          $$MangaTablesTableAnnotationComposer,
+          $$MangaTablesTableCreateCompanionBuilder,
+          $$MangaTablesTableUpdateCompanionBuilder,
+          (
+            MangaDrift,
+            BaseReferences<_$AppDatabase, $MangaTablesTable, MangaDrift>,
+          ),
+          MangaDrift,
+          PrefetchHooks Function()
+        > {
   $$MangaTablesTableTableManager(_$AppDatabase db, $MangaTablesTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$MangaTablesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$MangaTablesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$MangaTablesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<String> id = const Value.absent(),
-            Value<String?> title = const Value.absent(),
-            Value<String?> coverUrl = const Value.absent(),
-            Value<String?> author = const Value.absent(),
-            Value<String?> status = const Value.absent(),
-            Value<String?> description = const Value.absent(),
-            Value<String?> webUrl = const Value.absent(),
-            Value<String?> source = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              MangaTablesCompanion(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            id: id,
-            title: title,
-            coverUrl: coverUrl,
-            author: author,
-            status: status,
-            description: description,
-            webUrl: webUrl,
-            source: source,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<String> id = const Value.absent(),
-            Value<String?> title = const Value.absent(),
-            Value<String?> coverUrl = const Value.absent(),
-            Value<String?> author = const Value.absent(),
-            Value<String?> status = const Value.absent(),
-            Value<String?> description = const Value.absent(),
-            Value<String?> webUrl = const Value.absent(),
-            Value<String?> source = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              MangaTablesCompanion.insert(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            id: id,
-            title: title,
-            coverUrl: coverUrl,
-            author: author,
-            status: status,
-            description: description,
-            webUrl: webUrl,
-            source: source,
-            rowid: rowid,
-          ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
+          createFilteringComposer:
+              () => $$MangaTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$MangaTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () =>
+                  $$MangaTablesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String?> title = const Value.absent(),
+                Value<String?> coverUrl = const Value.absent(),
+                Value<String?> author = const Value.absent(),
+                Value<String?> status = const Value.absent(),
+                Value<String?> description = const Value.absent(),
+                Value<String?> webUrl = const Value.absent(),
+                Value<String?> source = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MangaTablesCompanion(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                title: title,
+                coverUrl: coverUrl,
+                author: author,
+                status: status,
+                description: description,
+                webUrl: webUrl,
+                source: source,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String?> title = const Value.absent(),
+                Value<String?> coverUrl = const Value.absent(),
+                Value<String?> author = const Value.absent(),
+                Value<String?> status = const Value.absent(),
+                Value<String?> description = const Value.absent(),
+                Value<String?> webUrl = const Value.absent(),
+                Value<String?> source = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MangaTablesCompanion.insert(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                title: title,
+                coverUrl: coverUrl,
+                author: author,
+                status: status,
+                description: description,
+                webUrl: webUrl,
+                source: source,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$MangaTablesTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $MangaTablesTable,
-    MangaDrift,
-    $$MangaTablesTableFilterComposer,
-    $$MangaTablesTableOrderingComposer,
-    $$MangaTablesTableAnnotationComposer,
-    $$MangaTablesTableCreateCompanionBuilder,
-    $$MangaTablesTableUpdateCompanionBuilder,
-    (MangaDrift, BaseReferences<_$AppDatabase, $MangaTablesTable, MangaDrift>),
-    MangaDrift,
-    PrefetchHooks Function()>;
-typedef $$TagTablesTableCreateCompanionBuilder = TagTablesCompanion Function({
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  Value<int> id,
-  Value<String?> tagId,
-  required String name,
-  Value<String?> source,
-});
-typedef $$TagTablesTableUpdateCompanionBuilder = TagTablesCompanion Function({
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  Value<int> id,
-  Value<String?> tagId,
-  Value<String> name,
-  Value<String?> source,
-});
+typedef $$MangaTablesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MangaTablesTable,
+      MangaDrift,
+      $$MangaTablesTableFilterComposer,
+      $$MangaTablesTableOrderingComposer,
+      $$MangaTablesTableAnnotationComposer,
+      $$MangaTablesTableCreateCompanionBuilder,
+      $$MangaTablesTableUpdateCompanionBuilder,
+      (
+        MangaDrift,
+        BaseReferences<_$AppDatabase, $MangaTablesTable, MangaDrift>,
+      ),
+      MangaDrift,
+      PrefetchHooks Function()
+    >;
+typedef $$TagTablesTableCreateCompanionBuilder =
+    TagTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> id,
+      Value<String?> tagId,
+      required String name,
+      Value<String?> source,
+    });
+typedef $$TagTablesTableUpdateCompanionBuilder =
+    TagTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> id,
+      Value<String?> tagId,
+      Value<String> name,
+      Value<String?> source,
+    });
 
 class $$TagTablesTableFilterComposer
     extends Composer<_$AppDatabase, $TagTablesTable> {
@@ -4894,22 +5892,34 @@ class $$TagTablesTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get tagId => $composableBuilder(
-      column: $table.tagId, builder: (column) => ColumnFilters(column));
+    column: $table.tagId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => ColumnFilters(column));
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get source => $composableBuilder(
-      column: $table.source, builder: (column) => ColumnFilters(column));
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$TagTablesTableOrderingComposer
@@ -4922,22 +5932,34 @@ class $$TagTablesTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get tagId => $composableBuilder(
-      column: $table.tagId, builder: (column) => ColumnOrderings(column));
+    column: $table.tagId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => ColumnOrderings(column));
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get source => $composableBuilder(
-      column: $table.source, builder: (column) => ColumnOrderings(column));
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$TagTablesTableAnnotationComposer
@@ -4968,95 +5990,109 @@ class $$TagTablesTableAnnotationComposer
       $composableBuilder(column: $table.source, builder: (column) => column);
 }
 
-class $$TagTablesTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $TagTablesTable,
-    TagDrift,
-    $$TagTablesTableFilterComposer,
-    $$TagTablesTableOrderingComposer,
-    $$TagTablesTableAnnotationComposer,
-    $$TagTablesTableCreateCompanionBuilder,
-    $$TagTablesTableUpdateCompanionBuilder,
-    (TagDrift, BaseReferences<_$AppDatabase, $TagTablesTable, TagDrift>),
-    TagDrift,
-    PrefetchHooks Function()> {
+class $$TagTablesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TagTablesTable,
+          TagDrift,
+          $$TagTablesTableFilterComposer,
+          $$TagTablesTableOrderingComposer,
+          $$TagTablesTableAnnotationComposer,
+          $$TagTablesTableCreateCompanionBuilder,
+          $$TagTablesTableUpdateCompanionBuilder,
+          (TagDrift, BaseReferences<_$AppDatabase, $TagTablesTable, TagDrift>),
+          TagDrift,
+          PrefetchHooks Function()
+        > {
   $$TagTablesTableTableManager(_$AppDatabase db, $TagTablesTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$TagTablesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$TagTablesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$TagTablesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<int> id = const Value.absent(),
-            Value<String?> tagId = const Value.absent(),
-            Value<String> name = const Value.absent(),
-            Value<String?> source = const Value.absent(),
-          }) =>
-              TagTablesCompanion(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            id: id,
-            tagId: tagId,
-            name: name,
-            source: source,
-          ),
-          createCompanionCallback: ({
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<int> id = const Value.absent(),
-            Value<String?> tagId = const Value.absent(),
-            required String name,
-            Value<String?> source = const Value.absent(),
-          }) =>
-              TagTablesCompanion.insert(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            id: id,
-            tagId: tagId,
-            name: name,
-            source: source,
-          ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
+          createFilteringComposer:
+              () => $$TagTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$TagTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () => $$TagTablesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> id = const Value.absent(),
+                Value<String?> tagId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> source = const Value.absent(),
+              }) => TagTablesCompanion(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                tagId: tagId,
+                name: name,
+                source: source,
+              ),
+          createCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> id = const Value.absent(),
+                Value<String?> tagId = const Value.absent(),
+                required String name,
+                Value<String?> source = const Value.absent(),
+              }) => TagTablesCompanion.insert(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                tagId: tagId,
+                name: name,
+                source: source,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$TagTablesTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $TagTablesTable,
-    TagDrift,
-    $$TagTablesTableFilterComposer,
-    $$TagTablesTableOrderingComposer,
-    $$TagTablesTableAnnotationComposer,
-    $$TagTablesTableCreateCompanionBuilder,
-    $$TagTablesTableUpdateCompanionBuilder,
-    (TagDrift, BaseReferences<_$AppDatabase, $TagTablesTable, TagDrift>),
-    TagDrift,
-    PrefetchHooks Function()>;
-typedef $$RelationshipTablesTableCreateCompanionBuilder
-    = RelationshipTablesCompanion Function({
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  required int tagId,
-  required String mangaId,
-  Value<int> rowid,
-});
-typedef $$RelationshipTablesTableUpdateCompanionBuilder
-    = RelationshipTablesCompanion Function({
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  Value<int> tagId,
-  Value<String> mangaId,
-  Value<int> rowid,
-});
+typedef $$TagTablesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TagTablesTable,
+      TagDrift,
+      $$TagTablesTableFilterComposer,
+      $$TagTablesTableOrderingComposer,
+      $$TagTablesTableAnnotationComposer,
+      $$TagTablesTableCreateCompanionBuilder,
+      $$TagTablesTableUpdateCompanionBuilder,
+      (TagDrift, BaseReferences<_$AppDatabase, $TagTablesTable, TagDrift>),
+      TagDrift,
+      PrefetchHooks Function()
+    >;
+typedef $$RelationshipTablesTableCreateCompanionBuilder =
+    RelationshipTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      required int tagId,
+      required String mangaId,
+      Value<int> rowid,
+    });
+typedef $$RelationshipTablesTableUpdateCompanionBuilder =
+    RelationshipTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> tagId,
+      Value<String> mangaId,
+      Value<int> rowid,
+    });
 
 class $$RelationshipTablesTableFilterComposer
     extends Composer<_$AppDatabase, $RelationshipTablesTable> {
@@ -5068,16 +6104,24 @@ class $$RelationshipTablesTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get tagId => $composableBuilder(
-      column: $table.tagId, builder: (column) => ColumnFilters(column));
+    column: $table.tagId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get mangaId => $composableBuilder(
-      column: $table.mangaId, builder: (column) => ColumnFilters(column));
+    column: $table.mangaId,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$RelationshipTablesTableOrderingComposer
@@ -5090,16 +6134,24 @@ class $$RelationshipTablesTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get tagId => $composableBuilder(
-      column: $table.tagId, builder: (column) => ColumnOrderings(column));
+    column: $table.tagId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get mangaId => $composableBuilder(
-      column: $table.mangaId, builder: (column) => ColumnOrderings(column));
+    column: $table.mangaId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$RelationshipTablesTableAnnotationComposer
@@ -5124,103 +6176,136 @@ class $$RelationshipTablesTableAnnotationComposer
       $composableBuilder(column: $table.mangaId, builder: (column) => column);
 }
 
-class $$RelationshipTablesTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $RelationshipTablesTable,
-    RelationshipTable,
-    $$RelationshipTablesTableFilterComposer,
-    $$RelationshipTablesTableOrderingComposer,
-    $$RelationshipTablesTableAnnotationComposer,
-    $$RelationshipTablesTableCreateCompanionBuilder,
-    $$RelationshipTablesTableUpdateCompanionBuilder,
-    (
-      RelationshipTable,
-      BaseReferences<_$AppDatabase, $RelationshipTablesTable, RelationshipTable>
-    ),
-    RelationshipTable,
-    PrefetchHooks Function()> {
+class $$RelationshipTablesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $RelationshipTablesTable,
+          RelationshipTable,
+          $$RelationshipTablesTableFilterComposer,
+          $$RelationshipTablesTableOrderingComposer,
+          $$RelationshipTablesTableAnnotationComposer,
+          $$RelationshipTablesTableCreateCompanionBuilder,
+          $$RelationshipTablesTableUpdateCompanionBuilder,
+          (
+            RelationshipTable,
+            BaseReferences<
+              _$AppDatabase,
+              $RelationshipTablesTable,
+              RelationshipTable
+            >,
+          ),
+          RelationshipTable,
+          PrefetchHooks Function()
+        > {
   $$RelationshipTablesTableTableManager(
-      _$AppDatabase db, $RelationshipTablesTable table)
-      : super(TableManagerState(
+    _$AppDatabase db,
+    $RelationshipTablesTable table,
+  ) : super(
+        TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$RelationshipTablesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$RelationshipTablesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$RelationshipTablesTableAnnotationComposer(
-                  $db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<int> tagId = const Value.absent(),
-            Value<String> mangaId = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              RelationshipTablesCompanion(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            tagId: tagId,
-            mangaId: mangaId,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            required int tagId,
-            required String mangaId,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              RelationshipTablesCompanion.insert(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            tagId: tagId,
-            mangaId: mangaId,
-            rowid: rowid,
-          ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
+          createFilteringComposer:
+              () => $$RelationshipTablesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$RelationshipTablesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$RelationshipTablesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> tagId = const Value.absent(),
+                Value<String> mangaId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RelationshipTablesCompanion(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                tagId: tagId,
+                mangaId: mangaId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                required int tagId,
+                required String mangaId,
+                Value<int> rowid = const Value.absent(),
+              }) => RelationshipTablesCompanion.insert(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                tagId: tagId,
+                mangaId: mangaId,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$RelationshipTablesTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $RelationshipTablesTable,
-    RelationshipTable,
-    $$RelationshipTablesTableFilterComposer,
-    $$RelationshipTablesTableOrderingComposer,
-    $$RelationshipTablesTableAnnotationComposer,
-    $$RelationshipTablesTableCreateCompanionBuilder,
-    $$RelationshipTablesTableUpdateCompanionBuilder,
-    (
+typedef $$RelationshipTablesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $RelationshipTablesTable,
       RelationshipTable,
-      BaseReferences<_$AppDatabase, $RelationshipTablesTable, RelationshipTable>
-    ),
-    RelationshipTable,
-    PrefetchHooks Function()>;
-typedef $$JobTablesTableCreateCompanionBuilder = JobTablesCompanion Function({
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  Value<int> id,
-  required JobTypeEnum type,
-  Value<String?> source,
-  Value<String?> chapterId,
-  Value<String?> mangaId,
-  Value<String?> imageUrl,
-});
-typedef $$JobTablesTableUpdateCompanionBuilder = JobTablesCompanion Function({
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  Value<int> id,
-  Value<JobTypeEnum> type,
-  Value<String?> source,
-  Value<String?> chapterId,
-  Value<String?> mangaId,
-  Value<String?> imageUrl,
-});
+      $$RelationshipTablesTableFilterComposer,
+      $$RelationshipTablesTableOrderingComposer,
+      $$RelationshipTablesTableAnnotationComposer,
+      $$RelationshipTablesTableCreateCompanionBuilder,
+      $$RelationshipTablesTableUpdateCompanionBuilder,
+      (
+        RelationshipTable,
+        BaseReferences<
+          _$AppDatabase,
+          $RelationshipTablesTable,
+          RelationshipTable
+        >,
+      ),
+      RelationshipTable,
+      PrefetchHooks Function()
+    >;
+typedef $$JobTablesTableCreateCompanionBuilder =
+    JobTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> id,
+      required JobTypeEnum type,
+      Value<String?> source,
+      Value<String?> chapterId,
+      Value<String?> mangaId,
+      Value<String?> imageUrl,
+    });
+typedef $$JobTablesTableUpdateCompanionBuilder =
+    JobTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> id,
+      Value<JobTypeEnum> type,
+      Value<String?> source,
+      Value<String?> chapterId,
+      Value<String?> mangaId,
+      Value<String?> imageUrl,
+    });
 
 class $$JobTablesTableFilterComposer
     extends Composer<_$AppDatabase, $JobTablesTable> {
@@ -5232,30 +6317,45 @@ class $$JobTablesTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnWithTypeConverterFilters<JobTypeEnum, JobTypeEnum, String> get type =>
       $composableBuilder(
-          column: $table.type,
-          builder: (column) => ColumnWithTypeConverterFilters(column));
+        column: $table.type,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
 
   ColumnFilters<String> get source => $composableBuilder(
-      column: $table.source, builder: (column) => ColumnFilters(column));
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get chapterId => $composableBuilder(
-      column: $table.chapterId, builder: (column) => ColumnFilters(column));
+    column: $table.chapterId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get mangaId => $composableBuilder(
-      column: $table.mangaId, builder: (column) => ColumnFilters(column));
+    column: $table.mangaId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get imageUrl => $composableBuilder(
-      column: $table.imageUrl, builder: (column) => ColumnFilters(column));
+    column: $table.imageUrl,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$JobTablesTableOrderingComposer
@@ -5268,28 +6368,44 @@ class $$JobTablesTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get type => $composableBuilder(
-      column: $table.type, builder: (column) => ColumnOrderings(column));
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get source => $composableBuilder(
-      column: $table.source, builder: (column) => ColumnOrderings(column));
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get chapterId => $composableBuilder(
-      column: $table.chapterId, builder: (column) => ColumnOrderings(column));
+    column: $table.chapterId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get mangaId => $composableBuilder(
-      column: $table.mangaId, builder: (column) => ColumnOrderings(column));
+    column: $table.mangaId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get imageUrl => $composableBuilder(
-      column: $table.imageUrl, builder: (column) => ColumnOrderings(column));
+    column: $table.imageUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$JobTablesTableAnnotationComposer
@@ -5326,113 +6442,127 @@ class $$JobTablesTableAnnotationComposer
       $composableBuilder(column: $table.imageUrl, builder: (column) => column);
 }
 
-class $$JobTablesTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $JobTablesTable,
-    JobDrift,
-    $$JobTablesTableFilterComposer,
-    $$JobTablesTableOrderingComposer,
-    $$JobTablesTableAnnotationComposer,
-    $$JobTablesTableCreateCompanionBuilder,
-    $$JobTablesTableUpdateCompanionBuilder,
-    (JobDrift, BaseReferences<_$AppDatabase, $JobTablesTable, JobDrift>),
-    JobDrift,
-    PrefetchHooks Function()> {
+class $$JobTablesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $JobTablesTable,
+          JobDrift,
+          $$JobTablesTableFilterComposer,
+          $$JobTablesTableOrderingComposer,
+          $$JobTablesTableAnnotationComposer,
+          $$JobTablesTableCreateCompanionBuilder,
+          $$JobTablesTableUpdateCompanionBuilder,
+          (JobDrift, BaseReferences<_$AppDatabase, $JobTablesTable, JobDrift>),
+          JobDrift,
+          PrefetchHooks Function()
+        > {
   $$JobTablesTableTableManager(_$AppDatabase db, $JobTablesTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$JobTablesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$JobTablesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$JobTablesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<int> id = const Value.absent(),
-            Value<JobTypeEnum> type = const Value.absent(),
-            Value<String?> source = const Value.absent(),
-            Value<String?> chapterId = const Value.absent(),
-            Value<String?> mangaId = const Value.absent(),
-            Value<String?> imageUrl = const Value.absent(),
-          }) =>
-              JobTablesCompanion(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            id: id,
-            type: type,
-            source: source,
-            chapterId: chapterId,
-            mangaId: mangaId,
-            imageUrl: imageUrl,
-          ),
-          createCompanionCallback: ({
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<int> id = const Value.absent(),
-            required JobTypeEnum type,
-            Value<String?> source = const Value.absent(),
-            Value<String?> chapterId = const Value.absent(),
-            Value<String?> mangaId = const Value.absent(),
-            Value<String?> imageUrl = const Value.absent(),
-          }) =>
-              JobTablesCompanion.insert(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            id: id,
-            type: type,
-            source: source,
-            chapterId: chapterId,
-            mangaId: mangaId,
-            imageUrl: imageUrl,
-          ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
+          createFilteringComposer:
+              () => $$JobTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$JobTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () => $$JobTablesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> id = const Value.absent(),
+                Value<JobTypeEnum> type = const Value.absent(),
+                Value<String?> source = const Value.absent(),
+                Value<String?> chapterId = const Value.absent(),
+                Value<String?> mangaId = const Value.absent(),
+                Value<String?> imageUrl = const Value.absent(),
+              }) => JobTablesCompanion(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                type: type,
+                source: source,
+                chapterId: chapterId,
+                mangaId: mangaId,
+                imageUrl: imageUrl,
+              ),
+          createCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> id = const Value.absent(),
+                required JobTypeEnum type,
+                Value<String?> source = const Value.absent(),
+                Value<String?> chapterId = const Value.absent(),
+                Value<String?> mangaId = const Value.absent(),
+                Value<String?> imageUrl = const Value.absent(),
+              }) => JobTablesCompanion.insert(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                type: type,
+                source: source,
+                chapterId: chapterId,
+                mangaId: mangaId,
+                imageUrl: imageUrl,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$JobTablesTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $JobTablesTable,
-    JobDrift,
-    $$JobTablesTableFilterComposer,
-    $$JobTablesTableOrderingComposer,
-    $$JobTablesTableAnnotationComposer,
-    $$JobTablesTableCreateCompanionBuilder,
-    $$JobTablesTableUpdateCompanionBuilder,
-    (JobDrift, BaseReferences<_$AppDatabase, $JobTablesTable, JobDrift>),
-    JobDrift,
-    PrefetchHooks Function()>;
-typedef $$CacheTablesTableCreateCompanionBuilder = CacheTablesCompanion
-    Function({
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  Value<int> id,
-  required String url,
-  required String key,
-  required String relativePath,
-  Value<String?> eTag,
-  required DateTime validTill,
-  Value<DateTime?> touched,
-  Value<int?> length,
-});
-typedef $$CacheTablesTableUpdateCompanionBuilder = CacheTablesCompanion
-    Function({
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  Value<int> id,
-  Value<String> url,
-  Value<String> key,
-  Value<String> relativePath,
-  Value<String?> eTag,
-  Value<DateTime> validTill,
-  Value<DateTime?> touched,
-  Value<int?> length,
-});
+typedef $$JobTablesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $JobTablesTable,
+      JobDrift,
+      $$JobTablesTableFilterComposer,
+      $$JobTablesTableOrderingComposer,
+      $$JobTablesTableAnnotationComposer,
+      $$JobTablesTableCreateCompanionBuilder,
+      $$JobTablesTableUpdateCompanionBuilder,
+      (JobDrift, BaseReferences<_$AppDatabase, $JobTablesTable, JobDrift>),
+      JobDrift,
+      PrefetchHooks Function()
+    >;
+typedef $$CacheTablesTableCreateCompanionBuilder =
+    CacheTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> id,
+      required String url,
+      required String key,
+      required String relativePath,
+      Value<String?> eTag,
+      required DateTime validTill,
+      Value<DateTime?> touched,
+      Value<int?> length,
+    });
+typedef $$CacheTablesTableUpdateCompanionBuilder =
+    CacheTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> id,
+      Value<String> url,
+      Value<String> key,
+      Value<String> relativePath,
+      Value<String?> eTag,
+      Value<DateTime> validTill,
+      Value<DateTime?> touched,
+      Value<int?> length,
+    });
 
 class $$CacheTablesTableFilterComposer
     extends Composer<_$AppDatabase, $CacheTablesTable> {
@@ -5444,34 +6574,54 @@ class $$CacheTablesTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get url => $composableBuilder(
-      column: $table.url, builder: (column) => ColumnFilters(column));
+    column: $table.url,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get key => $composableBuilder(
-      column: $table.key, builder: (column) => ColumnFilters(column));
+    column: $table.key,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get relativePath => $composableBuilder(
-      column: $table.relativePath, builder: (column) => ColumnFilters(column));
+    column: $table.relativePath,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get eTag => $composableBuilder(
-      column: $table.eTag, builder: (column) => ColumnFilters(column));
+    column: $table.eTag,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get validTill => $composableBuilder(
-      column: $table.validTill, builder: (column) => ColumnFilters(column));
+    column: $table.validTill,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get touched => $composableBuilder(
-      column: $table.touched, builder: (column) => ColumnFilters(column));
+    column: $table.touched,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get length => $composableBuilder(
-      column: $table.length, builder: (column) => ColumnFilters(column));
+    column: $table.length,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$CacheTablesTableOrderingComposer
@@ -5484,35 +6634,54 @@ class $$CacheTablesTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get url => $composableBuilder(
-      column: $table.url, builder: (column) => ColumnOrderings(column));
+    column: $table.url,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get key => $composableBuilder(
-      column: $table.key, builder: (column) => ColumnOrderings(column));
+    column: $table.key,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get relativePath => $composableBuilder(
-      column: $table.relativePath,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.relativePath,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get eTag => $composableBuilder(
-      column: $table.eTag, builder: (column) => ColumnOrderings(column));
+    column: $table.eTag,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get validTill => $composableBuilder(
-      column: $table.validTill, builder: (column) => ColumnOrderings(column));
+    column: $table.validTill,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get touched => $composableBuilder(
-      column: $table.touched, builder: (column) => ColumnOrderings(column));
+    column: $table.touched,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get length => $composableBuilder(
-      column: $table.length, builder: (column) => ColumnOrderings(column));
+    column: $table.length,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CacheTablesTableAnnotationComposer
@@ -5540,7 +6709,9 @@ class $$CacheTablesTableAnnotationComposer
       $composableBuilder(column: $table.key, builder: (column) => column);
 
   GeneratedColumn<String> get relativePath => $composableBuilder(
-      column: $table.relativePath, builder: (column) => column);
+    column: $table.relativePath,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get eTag =>
       $composableBuilder(column: $table.eTag, builder: (column) => column);
@@ -5555,131 +6726,152 @@ class $$CacheTablesTableAnnotationComposer
       $composableBuilder(column: $table.length, builder: (column) => column);
 }
 
-class $$CacheTablesTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $CacheTablesTable,
-    CacheDrift,
-    $$CacheTablesTableFilterComposer,
-    $$CacheTablesTableOrderingComposer,
-    $$CacheTablesTableAnnotationComposer,
-    $$CacheTablesTableCreateCompanionBuilder,
-    $$CacheTablesTableUpdateCompanionBuilder,
-    (CacheDrift, BaseReferences<_$AppDatabase, $CacheTablesTable, CacheDrift>),
-    CacheDrift,
-    PrefetchHooks Function()> {
+class $$CacheTablesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CacheTablesTable,
+          CacheDrift,
+          $$CacheTablesTableFilterComposer,
+          $$CacheTablesTableOrderingComposer,
+          $$CacheTablesTableAnnotationComposer,
+          $$CacheTablesTableCreateCompanionBuilder,
+          $$CacheTablesTableUpdateCompanionBuilder,
+          (
+            CacheDrift,
+            BaseReferences<_$AppDatabase, $CacheTablesTable, CacheDrift>,
+          ),
+          CacheDrift,
+          PrefetchHooks Function()
+        > {
   $$CacheTablesTableTableManager(_$AppDatabase db, $CacheTablesTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$CacheTablesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$CacheTablesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$CacheTablesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<int> id = const Value.absent(),
-            Value<String> url = const Value.absent(),
-            Value<String> key = const Value.absent(),
-            Value<String> relativePath = const Value.absent(),
-            Value<String?> eTag = const Value.absent(),
-            Value<DateTime> validTill = const Value.absent(),
-            Value<DateTime?> touched = const Value.absent(),
-            Value<int?> length = const Value.absent(),
-          }) =>
-              CacheTablesCompanion(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            id: id,
-            url: url,
-            key: key,
-            relativePath: relativePath,
-            eTag: eTag,
-            validTill: validTill,
-            touched: touched,
-            length: length,
-          ),
-          createCompanionCallback: ({
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<int> id = const Value.absent(),
-            required String url,
-            required String key,
-            required String relativePath,
-            Value<String?> eTag = const Value.absent(),
-            required DateTime validTill,
-            Value<DateTime?> touched = const Value.absent(),
-            Value<int?> length = const Value.absent(),
-          }) =>
-              CacheTablesCompanion.insert(
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            id: id,
-            url: url,
-            key: key,
-            relativePath: relativePath,
-            eTag: eTag,
-            validTill: validTill,
-            touched: touched,
-            length: length,
-          ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
+          createFilteringComposer:
+              () => $$CacheTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$CacheTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () =>
+                  $$CacheTablesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> id = const Value.absent(),
+                Value<String> url = const Value.absent(),
+                Value<String> key = const Value.absent(),
+                Value<String> relativePath = const Value.absent(),
+                Value<String?> eTag = const Value.absent(),
+                Value<DateTime> validTill = const Value.absent(),
+                Value<DateTime?> touched = const Value.absent(),
+                Value<int?> length = const Value.absent(),
+              }) => CacheTablesCompanion(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                url: url,
+                key: key,
+                relativePath: relativePath,
+                eTag: eTag,
+                validTill: validTill,
+                touched: touched,
+                length: length,
+              ),
+          createCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> id = const Value.absent(),
+                required String url,
+                required String key,
+                required String relativePath,
+                Value<String?> eTag = const Value.absent(),
+                required DateTime validTill,
+                Value<DateTime?> touched = const Value.absent(),
+                Value<int?> length = const Value.absent(),
+              }) => CacheTablesCompanion.insert(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                url: url,
+                key: key,
+                relativePath: relativePath,
+                eTag: eTag,
+                validTill: validTill,
+                touched: touched,
+                length: length,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$CacheTablesTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $CacheTablesTable,
-    CacheDrift,
-    $$CacheTablesTableFilterComposer,
-    $$CacheTablesTableOrderingComposer,
-    $$CacheTablesTableAnnotationComposer,
-    $$CacheTablesTableCreateCompanionBuilder,
-    $$CacheTablesTableUpdateCompanionBuilder,
-    (CacheDrift, BaseReferences<_$AppDatabase, $CacheTablesTable, CacheDrift>),
-    CacheDrift,
-    PrefetchHooks Function()>;
-typedef $$DioCacheTablesTableCreateCompanionBuilder = DioCacheTablesCompanion
-    Function({
-  required String cacheKey,
-  Value<DateTime?> date,
-  Value<String?> cacheControl,
-  Value<Uint8List?> content,
-  Value<String?> eTag,
-  Value<DateTime?> expires,
-  Value<Uint8List?> headers,
-  Value<String?> lastModified,
-  Value<DateTime?> maxStale,
-  required int priority,
-  Value<DateTime?> requestDate,
-  required DateTime responseDate,
-  required String url,
-  Value<int?> statusCode,
-  Value<int> rowid,
-});
-typedef $$DioCacheTablesTableUpdateCompanionBuilder = DioCacheTablesCompanion
-    Function({
-  Value<String> cacheKey,
-  Value<DateTime?> date,
-  Value<String?> cacheControl,
-  Value<Uint8List?> content,
-  Value<String?> eTag,
-  Value<DateTime?> expires,
-  Value<Uint8List?> headers,
-  Value<String?> lastModified,
-  Value<DateTime?> maxStale,
-  Value<int> priority,
-  Value<DateTime?> requestDate,
-  Value<DateTime> responseDate,
-  Value<String> url,
-  Value<int?> statusCode,
-  Value<int> rowid,
-});
+typedef $$CacheTablesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CacheTablesTable,
+      CacheDrift,
+      $$CacheTablesTableFilterComposer,
+      $$CacheTablesTableOrderingComposer,
+      $$CacheTablesTableAnnotationComposer,
+      $$CacheTablesTableCreateCompanionBuilder,
+      $$CacheTablesTableUpdateCompanionBuilder,
+      (
+        CacheDrift,
+        BaseReferences<_$AppDatabase, $CacheTablesTable, CacheDrift>,
+      ),
+      CacheDrift,
+      PrefetchHooks Function()
+    >;
+typedef $$DioCacheTablesTableCreateCompanionBuilder =
+    DioCacheTablesCompanion Function({
+      required String cacheKey,
+      Value<DateTime?> date,
+      Value<String?> cacheControl,
+      Value<Uint8List?> content,
+      Value<String?> eTag,
+      Value<DateTime?> expires,
+      Value<Uint8List?> headers,
+      Value<String?> lastModified,
+      Value<DateTime?> maxStale,
+      required int priority,
+      Value<DateTime?> requestDate,
+      required DateTime responseDate,
+      required String url,
+      Value<int?> statusCode,
+      Value<int> rowid,
+    });
+typedef $$DioCacheTablesTableUpdateCompanionBuilder =
+    DioCacheTablesCompanion Function({
+      Value<String> cacheKey,
+      Value<DateTime?> date,
+      Value<String?> cacheControl,
+      Value<Uint8List?> content,
+      Value<String?> eTag,
+      Value<DateTime?> expires,
+      Value<Uint8List?> headers,
+      Value<String?> lastModified,
+      Value<DateTime?> maxStale,
+      Value<int> priority,
+      Value<DateTime?> requestDate,
+      Value<DateTime> responseDate,
+      Value<String> url,
+      Value<int?> statusCode,
+      Value<int> rowid,
+    });
 
 class $$DioCacheTablesTableFilterComposer
     extends Composer<_$AppDatabase, $DioCacheTablesTable> {
@@ -5691,46 +6883,74 @@ class $$DioCacheTablesTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<String> get cacheKey => $composableBuilder(
-      column: $table.cacheKey, builder: (column) => ColumnFilters(column));
+    column: $table.cacheKey,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get date => $composableBuilder(
-      column: $table.date, builder: (column) => ColumnFilters(column));
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get cacheControl => $composableBuilder(
-      column: $table.cacheControl, builder: (column) => ColumnFilters(column));
+    column: $table.cacheControl,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<Uint8List> get content => $composableBuilder(
-      column: $table.content, builder: (column) => ColumnFilters(column));
+    column: $table.content,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get eTag => $composableBuilder(
-      column: $table.eTag, builder: (column) => ColumnFilters(column));
+    column: $table.eTag,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get expires => $composableBuilder(
-      column: $table.expires, builder: (column) => ColumnFilters(column));
+    column: $table.expires,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<Uint8List> get headers => $composableBuilder(
-      column: $table.headers, builder: (column) => ColumnFilters(column));
+    column: $table.headers,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get lastModified => $composableBuilder(
-      column: $table.lastModified, builder: (column) => ColumnFilters(column));
+    column: $table.lastModified,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get maxStale => $composableBuilder(
-      column: $table.maxStale, builder: (column) => ColumnFilters(column));
+    column: $table.maxStale,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get priority => $composableBuilder(
-      column: $table.priority, builder: (column) => ColumnFilters(column));
+    column: $table.priority,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get requestDate => $composableBuilder(
-      column: $table.requestDate, builder: (column) => ColumnFilters(column));
+    column: $table.requestDate,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get responseDate => $composableBuilder(
-      column: $table.responseDate, builder: (column) => ColumnFilters(column));
+    column: $table.responseDate,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get url => $composableBuilder(
-      column: $table.url, builder: (column) => ColumnFilters(column));
+    column: $table.url,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get statusCode => $composableBuilder(
-      column: $table.statusCode, builder: (column) => ColumnFilters(column));
+    column: $table.statusCode,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$DioCacheTablesTableOrderingComposer
@@ -5743,49 +6963,74 @@ class $$DioCacheTablesTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<String> get cacheKey => $composableBuilder(
-      column: $table.cacheKey, builder: (column) => ColumnOrderings(column));
+    column: $table.cacheKey,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get date => $composableBuilder(
-      column: $table.date, builder: (column) => ColumnOrderings(column));
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get cacheControl => $composableBuilder(
-      column: $table.cacheControl,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.cacheControl,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<Uint8List> get content => $composableBuilder(
-      column: $table.content, builder: (column) => ColumnOrderings(column));
+    column: $table.content,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get eTag => $composableBuilder(
-      column: $table.eTag, builder: (column) => ColumnOrderings(column));
+    column: $table.eTag,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get expires => $composableBuilder(
-      column: $table.expires, builder: (column) => ColumnOrderings(column));
+    column: $table.expires,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<Uint8List> get headers => $composableBuilder(
-      column: $table.headers, builder: (column) => ColumnOrderings(column));
+    column: $table.headers,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get lastModified => $composableBuilder(
-      column: $table.lastModified,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.lastModified,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get maxStale => $composableBuilder(
-      column: $table.maxStale, builder: (column) => ColumnOrderings(column));
+    column: $table.maxStale,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get priority => $composableBuilder(
-      column: $table.priority, builder: (column) => ColumnOrderings(column));
+    column: $table.priority,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get requestDate => $composableBuilder(
-      column: $table.requestDate, builder: (column) => ColumnOrderings(column));
+    column: $table.requestDate,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get responseDate => $composableBuilder(
-      column: $table.responseDate,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.responseDate,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get url => $composableBuilder(
-      column: $table.url, builder: (column) => ColumnOrderings(column));
+    column: $table.url,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get statusCode => $composableBuilder(
-      column: $table.statusCode, builder: (column) => ColumnOrderings(column));
+    column: $table.statusCode,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$DioCacheTablesTableAnnotationComposer
@@ -5804,7 +7049,9 @@ class $$DioCacheTablesTableAnnotationComposer
       $composableBuilder(column: $table.date, builder: (column) => column);
 
   GeneratedColumn<String> get cacheControl => $composableBuilder(
-      column: $table.cacheControl, builder: (column) => column);
+    column: $table.cacheControl,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<Uint8List> get content =>
       $composableBuilder(column: $table.content, builder: (column) => column);
@@ -5819,7 +7066,9 @@ class $$DioCacheTablesTableAnnotationComposer
       $composableBuilder(column: $table.headers, builder: (column) => column);
 
   GeneratedColumn<String> get lastModified => $composableBuilder(
-      column: $table.lastModified, builder: (column) => column);
+    column: $table.lastModified,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get maxStale =>
       $composableBuilder(column: $table.maxStale, builder: (column) => column);
@@ -5828,134 +7077,159 @@ class $$DioCacheTablesTableAnnotationComposer
       $composableBuilder(column: $table.priority, builder: (column) => column);
 
   GeneratedColumn<DateTime> get requestDate => $composableBuilder(
-      column: $table.requestDate, builder: (column) => column);
+    column: $table.requestDate,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get responseDate => $composableBuilder(
-      column: $table.responseDate, builder: (column) => column);
+    column: $table.responseDate,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get url =>
       $composableBuilder(column: $table.url, builder: (column) => column);
 
   GeneratedColumn<int> get statusCode => $composableBuilder(
-      column: $table.statusCode, builder: (column) => column);
+    column: $table.statusCode,
+    builder: (column) => column,
+  );
 }
 
-class $$DioCacheTablesTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $DioCacheTablesTable,
-    DioCacheDrift,
-    $$DioCacheTablesTableFilterComposer,
-    $$DioCacheTablesTableOrderingComposer,
-    $$DioCacheTablesTableAnnotationComposer,
-    $$DioCacheTablesTableCreateCompanionBuilder,
-    $$DioCacheTablesTableUpdateCompanionBuilder,
-    (
-      DioCacheDrift,
-      BaseReferences<_$AppDatabase, $DioCacheTablesTable, DioCacheDrift>
-    ),
-    DioCacheDrift,
-    PrefetchHooks Function()> {
+class $$DioCacheTablesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DioCacheTablesTable,
+          DioCacheDrift,
+          $$DioCacheTablesTableFilterComposer,
+          $$DioCacheTablesTableOrderingComposer,
+          $$DioCacheTablesTableAnnotationComposer,
+          $$DioCacheTablesTableCreateCompanionBuilder,
+          $$DioCacheTablesTableUpdateCompanionBuilder,
+          (
+            DioCacheDrift,
+            BaseReferences<_$AppDatabase, $DioCacheTablesTable, DioCacheDrift>,
+          ),
+          DioCacheDrift,
+          PrefetchHooks Function()
+        > {
   $$DioCacheTablesTableTableManager(
-      _$AppDatabase db, $DioCacheTablesTable table)
-      : super(TableManagerState(
+    _$AppDatabase db,
+    $DioCacheTablesTable table,
+  ) : super(
+        TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$DioCacheTablesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$DioCacheTablesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$DioCacheTablesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<String> cacheKey = const Value.absent(),
-            Value<DateTime?> date = const Value.absent(),
-            Value<String?> cacheControl = const Value.absent(),
-            Value<Uint8List?> content = const Value.absent(),
-            Value<String?> eTag = const Value.absent(),
-            Value<DateTime?> expires = const Value.absent(),
-            Value<Uint8List?> headers = const Value.absent(),
-            Value<String?> lastModified = const Value.absent(),
-            Value<DateTime?> maxStale = const Value.absent(),
-            Value<int> priority = const Value.absent(),
-            Value<DateTime?> requestDate = const Value.absent(),
-            Value<DateTime> responseDate = const Value.absent(),
-            Value<String> url = const Value.absent(),
-            Value<int?> statusCode = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              DioCacheTablesCompanion(
-            cacheKey: cacheKey,
-            date: date,
-            cacheControl: cacheControl,
-            content: content,
-            eTag: eTag,
-            expires: expires,
-            headers: headers,
-            lastModified: lastModified,
-            maxStale: maxStale,
-            priority: priority,
-            requestDate: requestDate,
-            responseDate: responseDate,
-            url: url,
-            statusCode: statusCode,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required String cacheKey,
-            Value<DateTime?> date = const Value.absent(),
-            Value<String?> cacheControl = const Value.absent(),
-            Value<Uint8List?> content = const Value.absent(),
-            Value<String?> eTag = const Value.absent(),
-            Value<DateTime?> expires = const Value.absent(),
-            Value<Uint8List?> headers = const Value.absent(),
-            Value<String?> lastModified = const Value.absent(),
-            Value<DateTime?> maxStale = const Value.absent(),
-            required int priority,
-            Value<DateTime?> requestDate = const Value.absent(),
-            required DateTime responseDate,
-            required String url,
-            Value<int?> statusCode = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              DioCacheTablesCompanion.insert(
-            cacheKey: cacheKey,
-            date: date,
-            cacheControl: cacheControl,
-            content: content,
-            eTag: eTag,
-            expires: expires,
-            headers: headers,
-            lastModified: lastModified,
-            maxStale: maxStale,
-            priority: priority,
-            requestDate: requestDate,
-            responseDate: responseDate,
-            url: url,
-            statusCode: statusCode,
-            rowid: rowid,
-          ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
+          createFilteringComposer:
+              () => $$DioCacheTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () =>
+                  $$DioCacheTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () => $$DioCacheTablesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> cacheKey = const Value.absent(),
+                Value<DateTime?> date = const Value.absent(),
+                Value<String?> cacheControl = const Value.absent(),
+                Value<Uint8List?> content = const Value.absent(),
+                Value<String?> eTag = const Value.absent(),
+                Value<DateTime?> expires = const Value.absent(),
+                Value<Uint8List?> headers = const Value.absent(),
+                Value<String?> lastModified = const Value.absent(),
+                Value<DateTime?> maxStale = const Value.absent(),
+                Value<int> priority = const Value.absent(),
+                Value<DateTime?> requestDate = const Value.absent(),
+                Value<DateTime> responseDate = const Value.absent(),
+                Value<String> url = const Value.absent(),
+                Value<int?> statusCode = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DioCacheTablesCompanion(
+                cacheKey: cacheKey,
+                date: date,
+                cacheControl: cacheControl,
+                content: content,
+                eTag: eTag,
+                expires: expires,
+                headers: headers,
+                lastModified: lastModified,
+                maxStale: maxStale,
+                priority: priority,
+                requestDate: requestDate,
+                responseDate: responseDate,
+                url: url,
+                statusCode: statusCode,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String cacheKey,
+                Value<DateTime?> date = const Value.absent(),
+                Value<String?> cacheControl = const Value.absent(),
+                Value<Uint8List?> content = const Value.absent(),
+                Value<String?> eTag = const Value.absent(),
+                Value<DateTime?> expires = const Value.absent(),
+                Value<Uint8List?> headers = const Value.absent(),
+                Value<String?> lastModified = const Value.absent(),
+                Value<DateTime?> maxStale = const Value.absent(),
+                required int priority,
+                Value<DateTime?> requestDate = const Value.absent(),
+                required DateTime responseDate,
+                required String url,
+                Value<int?> statusCode = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DioCacheTablesCompanion.insert(
+                cacheKey: cacheKey,
+                date: date,
+                cacheControl: cacheControl,
+                content: content,
+                eTag: eTag,
+                expires: expires,
+                headers: headers,
+                lastModified: lastModified,
+                maxStale: maxStale,
+                priority: priority,
+                requestDate: requestDate,
+                responseDate: responseDate,
+                url: url,
+                statusCode: statusCode,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$DioCacheTablesTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $DioCacheTablesTable,
-    DioCacheDrift,
-    $$DioCacheTablesTableFilterComposer,
-    $$DioCacheTablesTableOrderingComposer,
-    $$DioCacheTablesTableAnnotationComposer,
-    $$DioCacheTablesTableCreateCompanionBuilder,
-    $$DioCacheTablesTableUpdateCompanionBuilder,
-    (
+typedef $$DioCacheTablesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DioCacheTablesTable,
       DioCacheDrift,
-      BaseReferences<_$AppDatabase, $DioCacheTablesTable, DioCacheDrift>
-    ),
-    DioCacheDrift,
-    PrefetchHooks Function()>;
+      $$DioCacheTablesTableFilterComposer,
+      $$DioCacheTablesTableOrderingComposer,
+      $$DioCacheTablesTableAnnotationComposer,
+      $$DioCacheTablesTableCreateCompanionBuilder,
+      $$DioCacheTablesTableUpdateCompanionBuilder,
+      (
+        DioCacheDrift,
+        BaseReferences<_$AppDatabase, $DioCacheTablesTable, DioCacheDrift>,
+      ),
+      DioCacheDrift,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;

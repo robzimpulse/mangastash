@@ -11,15 +11,45 @@ ide:
 scripts:
   flutter_clean:
     description: Clean all packages.
-    run: melos exec -c 1 -- "flutter clean"
+    run: flutter clean
+    exec:
+      concurrency: 5
+      failFast: true
+      orderDependents: true
+
   get:
     description: Get dependencies for all packages.
-    run: melos exec -- "flutter pub get"
+    run: flutter pub get
+    exec:
+      concurrency: 5
+      failFast: true
+      orderDependents: true
+
   generate:
     description: Generate files for all packages.
-    run: melos exec --depends-on=build_runner -- "flutter pub run build_runner build --delete-conflicting-outputs;"
+    run: flutter pub run build_runner build --delete-conflicting-outputs
+    exec:
+      concurrency: 1
+      failFast: true
+      orderDependents: true
+    packageFilters:
+      dependsOn: "build_runner"
+
+
   upgrade:
     description: Upgrade dependencies for all packages.
-    run: melos exec -- "flutter pub upgrade"
-  unit_test:
-    run: melos exec -c 3 --flutter --fail-fast -- flutter test --no-pub
+    run: flutter pub upgrade
+    exec:
+      concurrency: 5
+      failFast: true
+      orderDependents: true
+
+  test:
+    description: Test for all packages.
+    run: flutter test
+    exec:
+      concurrency: 5
+      failFast: true
+      orderDependents: true
+    packageFilters:
+      dirExists: "test"
