@@ -20,7 +20,7 @@ class MangaItemWidget extends StatelessWidget {
   final Manga manga;
   final bool isOnLibrary;
   final bool isPrefetching;
-  final BaseCacheManager? cacheManager;
+  final CustomCacheManager? cacheManager;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final EdgeInsetsGeometry padding;

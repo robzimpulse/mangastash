@@ -21,7 +21,7 @@ class LibraryMangaScreen extends StatefulWidget {
 
   final AsyncValueGetter<String?>? onTapAddManga;
 
-  final BaseCacheManager cacheManager;
+  final CustomCacheManager cacheManager;
 
   static Widget create({
     required ServiceLocator locator,

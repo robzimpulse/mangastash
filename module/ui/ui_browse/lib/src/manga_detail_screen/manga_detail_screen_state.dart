@@ -20,7 +20,6 @@ class MangaDetailScreenState extends Equatable {
   final bool isPagingNextPageChapter;
   final ChapterConfig config;
   final SearchChapterParameter chapterParameter;
-  final List<String> cacheKeysChapter;
 
   final bool isLoadingSimilarManga;
   final Exception? errorSimilarManga;
@@ -29,7 +28,6 @@ class MangaDetailScreenState extends Equatable {
   final List<Manga> similarManga;
   final String? sourceUrlSimilarManga;
   final SearchMangaParameter? similarMangaParameter;
-  final List<String> cacheKeysSimilarManga;
 
   final Set<String> libraryMangaId;
   final Set<String> prefetchedChapterId;
@@ -40,22 +38,22 @@ class MangaDetailScreenState extends Equatable {
 
   List<Chapter> get filtered {
     return [
-      ...chapters.where(
-        (data) {
-          final chapter = histories[data.id].or(data);
+      ...chapters
+          .where((data) {
+            final chapter = histories[data.id].or(data);
 
-          final shouldAdd = [
-            if (config.unread == true)
-              chapter.lastReadAt == null
-            else if (config.unread == null)
-              chapter.lastReadAt != null
-            else
-              true,
-          ];
+            final shouldAdd = [
+              if (config.unread == true)
+                chapter.lastReadAt == null
+              else if (config.unread == null)
+                chapter.lastReadAt != null
+              else
+                true,
+            ];
 
-          return shouldAdd.contains(true);
-        },
-      ).map((e) => e.copyWith(lastReadAt: histories[e.id]?.lastReadAt)),
+            return shouldAdd.contains(true);
+          })
+          .map((e) => e.copyWith(lastReadAt: histories[e.id]?.lastReadAt)),
     ];
   }
 
@@ -85,40 +83,36 @@ class MangaDetailScreenState extends Equatable {
     this.similarManga = const [],
     this.sourceUrlSimilarManga,
     this.similarMangaParameter,
-    this.cacheKeysChapter = const [],
-    this.cacheKeysSimilarManga = const [],
   });
 
   @override
   List<Object?> get props => [
-        isLoadingManga,
-        isLoadingChapters,
-        errorManga,
-        errorChapters,
-        mangaId,
-        manga,
-        chapters,
-        source,
-        config,
-        libraryMangaId,
-        chapterParameter,
-        hasNextPageChapter,
-        isPagingNextPageChapter,
-        sourceUrlChapter,
-        prefetchedChapterId,
-        prefetchedMangaId,
-        histories,
-        totalChapter,
-        errorSimilarManga,
-        isLoadingSimilarManga,
-        hasNextPageSimilarManga,
-        isPagingNextPageSimilarManga,
-        similarManga,
-        sourceUrlSimilarManga,
-        similarMangaParameter,
-        cacheKeysChapter,
-        cacheKeysSimilarManga,
-      ];
+    isLoadingManga,
+    isLoadingChapters,
+    errorManga,
+    errorChapters,
+    mangaId,
+    manga,
+    chapters,
+    source,
+    config,
+    libraryMangaId,
+    chapterParameter,
+    hasNextPageChapter,
+    isPagingNextPageChapter,
+    sourceUrlChapter,
+    prefetchedChapterId,
+    prefetchedMangaId,
+    histories,
+    totalChapter,
+    errorSimilarManga,
+    isLoadingSimilarManga,
+    hasNextPageSimilarManga,
+    isPagingNextPageSimilarManga,
+    similarManga,
+    sourceUrlSimilarManga,
+    similarMangaParameter,
+  ];
 
   MangaDetailScreenState copyWith({
     bool? isLoadingManga,
@@ -147,8 +141,6 @@ class MangaDetailScreenState extends Equatable {
     List<Manga>? similarManga,
     ValueGetter<String?>? sourceUrlSimilarManga,
     SearchMangaParameter? similarMangaParameter,
-    List<String>? cacheKeysChapter,
-    List<String>? cacheKeysSimilarManga,
   }) {
     return MangaDetailScreenState(
       config: config ?? this.config,
@@ -172,9 +164,10 @@ class MangaDetailScreenState extends Equatable {
       prefetchedMangaId: prefetchedMangaId ?? this.prefetchedMangaId,
       histories: histories ?? this.histories,
       totalChapter: totalChapter ?? this.totalChapter,
-      errorSimilarManga: errorSimilarManga != null
-          ? errorSimilarManga()
-          : this.errorSimilarManga,
+      errorSimilarManga:
+          errorSimilarManga != null
+              ? errorSimilarManga()
+              : this.errorSimilarManga,
       isLoadingSimilarManga:
           isLoadingSimilarManga ?? this.isLoadingSimilarManga,
       hasNextPageSimilarManga:
@@ -184,12 +177,10 @@ class MangaDetailScreenState extends Equatable {
       similarManga: similarManga ?? this.similarManga,
       similarMangaParameter:
           similarMangaParameter ?? this.similarMangaParameter,
-      sourceUrlSimilarManga: sourceUrlSimilarManga != null
-          ? sourceUrlSimilarManga()
-          : this.sourceUrlSimilarManga,
-      cacheKeysChapter: cacheKeysChapter ?? this.cacheKeysChapter,
-      cacheKeysSimilarManga:
-          cacheKeysSimilarManga ?? this.cacheKeysSimilarManga,
+      sourceUrlSimilarManga:
+          sourceUrlSimilarManga != null
+              ? sourceUrlSimilarManga()
+              : this.sourceUrlSimilarManga,
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 extension ParseableDateStringExtension on String {
 
+  // TODO: add cache for parsing date
   DateTime? get asDateTime {
     /// put supported date format here with the longest format first
     final formats = [

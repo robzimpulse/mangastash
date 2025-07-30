@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -14,22 +11,19 @@ import '../../parser/base/tag_list_html_parser.dart';
 
 class GetTagsUseCase with SyncTagsMixin {
   final HeadlessWebviewManager _webview;
-  final BaseCacheManager _cacheManager;
   final MangaService _mangaService;
   final TagDao _tagDao;
   final LogBox _logBox;
 
   const GetTagsUseCase({
     required HeadlessWebviewManager webview,
-    required BaseCacheManager cacheManager,
     required MangaService mangaService,
     required TagDao tagDao,
     required LogBox logBox,
-  })  : _mangaService = mangaService,
-        _cacheManager = cacheManager,
-        _tagDao = tagDao,
-        _webview = webview,
-        _logBox = logBox;
+  }) : _mangaService = mangaService,
+       _tagDao = tagDao,
+       _webview = webview,
+       _logBox = logBox;
 
   Future<List<Tag>> _mangadex({required SourceEnum source}) async {
     final result = await _mangaService.tags();
@@ -45,10 +39,7 @@ class GetTagsUseCase with SyncTagsMixin {
     ];
   }
 
-  Future<List<Tag>> _scrapping({
-    required SourceEnum source,
-    bool useCache = true,
-  }) async {
+  Future<List<Tag>> _scrapping({required SourceEnum source}) async {
     const parameter = SearchMangaParameter(page: 1);
     String url = '';
     if (source == SourceEnum.asurascan) {
@@ -57,23 +48,25 @@ class GetTagsUseCase with SyncTagsMixin {
       url = parameter.mangaclash;
     }
 
+    final selector = [
+      'button',
+      'inline-flex',
+      'items-center',
+      'whitespace-nowrap',
+      'px-4',
+      'py-2',
+      'w-full',
+      'justify-center',
+      'font-normal',
+      'align-middle',
+      'border-solid',
+    ].join('.');
+
     final document = await _webview.open(
       url,
       scripts: [
         if (source == SourceEnum.asurascan)
-          'window.document.querySelectorAll(\'${[
-            'button',
-            'inline-flex',
-            'items-center',
-            'whitespace-nowrap',
-            'px-4',
-            'py-2',
-            'w-full',
-            'justify-center',
-            'font-normal',
-            'align-middle',
-            'border-solid',
-          ].join('.')}\')[0].click()',
+          'window.document.querySelectorAll(\'$selector\')[0].click()',
       ],
     );
 
@@ -81,44 +74,22 @@ class GetTagsUseCase with SyncTagsMixin {
       throw FailedParsingHtmlException(url);
     }
 
-    final parser = TagListHtmlParser.forSource(
-      root: document,
-      source: source,
-    );
+    final parser = TagListHtmlParser.forSource(root: document, source: source);
 
     return [...parser.tags.map((e) => e.copyWith(source: source.name))];
   }
 
-  Future<Result<List<Tag>>> execute({
-    required SourceEnum source,
-    bool useCache = true,
-  }) async {
-    final cache = await _cacheManager.getFileFromCache(source.name);
-    final file = await cache?.file.readAsString();
-    final object = file.let((e) => json.decode(e))?.castOrNull<List<dynamic>>();
-    final data = [...?object?.map((e) => Tag.fromJson(e))];
-
-    if (data.isNotEmpty && useCache) {
-      return Success(data);
-    }
-
+  Future<Result<List<Tag>>> execute({required SourceEnum source}) async {
     try {
-      final promise = source == SourceEnum.mangadex
-          ? _mangadex(source: source)
-          : _scrapping(source: source, useCache: useCache);
+      final promise =
+          source == SourceEnum.mangadex
+              ? _mangadex(source: source)
+              : _scrapping(source: source);
 
       final data = await sync(
         dao: _tagDao,
         values: await promise,
         logBox: _logBox,
-      );
-
-      await _cacheManager.putFile(
-        source.name,
-        key: source.name,
-        utf8.encode(json.encode([...data.map((e) => e.toJson())])),
-        fileExtension: 'json',
-        maxAge: const Duration(minutes: 30),
       );
 
       return Success(data);

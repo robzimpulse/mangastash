@@ -34,7 +34,7 @@ class MangaUpdatesScreen extends StatelessWidget {
     );
   }
 
-  final BaseCacheManager cacheManager;
+  final CustomCacheManager cacheManager;
 
   final ValueSetter<Manga?>? onTapManga;
 

@@ -25,7 +25,7 @@ class BrowseMangaScreen extends StatefulWidget {
     List<Tag> availableTags,
   )? onTapFilter;
 
-  final BaseCacheManager cacheManager;
+  final CustomCacheManager cacheManager;
 
   static Widget create({
     required ServiceLocator locator,
@@ -51,7 +51,6 @@ class BrowseMangaScreen extends StatefulWidget {
         listenSearchParameterUseCase: locator(),
         getTagsUseCase: locator(),
         crawlUrlUseCase: locator(),
-        cacheManager: locator(),
       )..init(),
       child: BrowseMangaScreen(
         cacheManager: locator(),
@@ -358,7 +357,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
           isPrefetching: state.prefetchedMangaIds.contains(data.id),
         ),
         onLoadNextPage: () => _cubit(context).next(),
-        onRefresh: () => _cubit(context).init(useCache: false),
+        onRefresh: () => _cubit(context).init(),
         onTapRecrawl: (url) => _cubit(context).recrawl(
           context: context,
           url: url,

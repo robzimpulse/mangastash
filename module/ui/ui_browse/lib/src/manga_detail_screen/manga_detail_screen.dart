@@ -30,7 +30,7 @@ class MangaDetailScreen extends StatefulWidget {
 
   final Future<ChapterConfig?> Function(ChapterConfig? value)? onTapSort;
 
-  final BaseCacheManager cacheManager;
+  final CustomCacheManager cacheManager;
 
   static Widget create({
     required ServiceLocator locator,
@@ -42,26 +42,26 @@ class MangaDetailScreen extends StatefulWidget {
     Future<ChapterConfig?> Function(ChapterConfig? value)? onTapSort,
   }) {
     return BlocProvider(
-      create: (context) => MangaDetailScreenCubit(
-        initialState: MangaDetailScreenState(
-          mangaId: mangaId,
-          source: source?.let((e) => SourceEnum.fromValue(name: e)),
-        ),
-        getMangaUseCase: locator(),
-        searchChapterUseCase: locator(),
-        addToLibraryUseCase: locator(),
-        removeFromLibraryUseCase: locator(),
-        listenMangaFromLibraryUseCase: locator(),
-        crawlUrlUseCase: locator(),
-        listenPrefetchUseCase: locator(),
-        prefetchChapterUseCase: locator(),
-        listenReadHistoryUseCase: locator(),
-        updateChapterLastReadAtUseCase: locator(),
-        listenSearchParameterUseCase: locator(),
-        getAllChapterUseCase: locator(),
-        searchMangaUseCase: locator(),
-        cacheManager: locator(),
-      )..init(),
+      create: (context) {
+        return MangaDetailScreenCubit(
+          initialState: MangaDetailScreenState(
+            mangaId: mangaId,
+            source: source?.let((e) => SourceEnum.fromValue(name: e)),
+          ),
+          getMangaUseCase: locator(),
+          searchChapterUseCase: locator(),
+          addToLibraryUseCase: locator(),
+          removeFromLibraryUseCase: locator(),
+          listenMangaFromLibraryUseCase: locator(),
+          crawlUrlUseCase: locator(),
+          listenPrefetchUseCase: locator(),
+          prefetchChapterUseCase: locator(),
+          listenReadHistoryUseCase: locator(),
+          listenSearchParameterUseCase: locator(),
+          getAllChapterUseCase: locator(),
+          searchMangaUseCase: locator(),
+        )..init();
+      },
       child: MangaDetailScreen(
         cacheManager: locator(),
         onTapChapter: onTapChapter,
@@ -97,10 +97,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   MangaDetailScreenCubit _cubit(BuildContext context) => context.read();
 
-  // void _onTapTag(BuildContext context, {Tag? tag}) {
-  //   // TODO: implement this
-  //   return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
-  // }
+  void _onTapTag(BuildContext context, {Tag? tag}) {
+    // TODO: implement this
+    return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+  }
 
   void _onTapDownload({
     required BuildContext context,
@@ -149,68 +149,78 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         length: 3,
         child: NestedScrollView(
           controller: _scrollController,
-          headerSliverBuilder: (context, isInnerBoxScrolled) => [
-            SliverOverlapAbsorber(
-              handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-              sliver: SliverAppBar(
-                stretch: true,
-                pinned: true,
-                elevation: 0,
-                expandedHeight: MediaQuery.of(context).size.height * 0.4,
-                automaticallyImplyLeading: false,
-                flexibleSpace: FlexibleAppBarBuilder(
-                  builder: (context, progress) => Padding(
-                    padding: const EdgeInsets.only(bottom: kTextTabBarHeight),
-                    child: MangaDetailAppBarWidget(
-                      progress: progress,
-                      background: _appBarBackground(),
-                      leading: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey.withAlpha(
-                            (lerpDouble(200, 0, progress) ?? 0.0).toInt(),
+          headerSliverBuilder: (context, isInnerBoxScrolled) {
+            return [
+              SliverOverlapAbsorber(
+                handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                  context,
+                ),
+                sliver: SliverAppBar(
+                  stretch: true,
+                  pinned: true,
+                  elevation: 0,
+                  expandedHeight: MediaQuery.of(context).size.height * 0.4,
+                  automaticallyImplyLeading: false,
+                  flexibleSpace: FlexibleAppBarBuilder(
+                    builder:
+                        (context, progress) => Padding(
+                          padding: const EdgeInsets.only(
+                            bottom: kTextTabBarHeight,
                           ),
-                          borderRadius: const BorderRadius.only(
-                            topRight: Radius.circular(16),
-                            bottomRight: Radius.circular(16),
+                          child: MangaDetailAppBarWidget(
+                            progress: progress,
+                            background: _appBarBackground(),
+                            leading: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey.withAlpha(
+                                  (lerpDouble(200, 0, progress) ?? 0.0).toInt(),
+                                ),
+                                borderRadius: const BorderRadius.only(
+                                  topRight: Radius.circular(16),
+                                  bottomRight: Radius.circular(16),
+                                ),
+                              ),
+                              child: BackButton(
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).appBarTheme.iconTheme?.color,
+                              ),
+                            ),
+                            title: _title(progress: progress),
+                            actionsDecoration: BoxDecoration(
+                              color: Colors.grey.withAlpha(
+                                (lerpDouble(200, 0, progress) ?? 0.0).toInt(),
+                              ),
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(16),
+                                bottomLeft: Radius.circular(16),
+                              ),
+                            ),
+                            actions: [
+                              _addToLibraryButton(context: context),
+                              _websiteButton(context: context),
+                              _shareButton(context: context),
+                            ],
                           ),
                         ),
-                        child: BackButton(
-                          color: Theme.of(context).appBarTheme.iconTheme?.color,
-                        ),
-                      ),
-                      title: _title(progress: progress),
-                      actionsDecoration: BoxDecoration(
-                        color: Colors.grey.withAlpha(
-                          (lerpDouble(200, 0, progress) ?? 0.0).toInt(),
-                        ),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(16),
-                          bottomLeft: Radius.circular(16),
-                        ),
-                      ),
-                      actions: [
-                        _addToLibraryButton(context: context),
-                        _websiteButton(context: context),
-                        _shareButton(context: context),
+                  ),
+                  bottom: DecoratedPreferredSizeWidget(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                    ),
+                    child: const TabBar(
+                      tabs: [
+                        Tab(text: 'Chapter'),
+                        Tab(text: 'Description'),
+                        Tab(text: 'Similar'),
                       ],
                     ),
                   ),
                 ),
-                bottom: DecoratedPreferredSizeWidget(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                  ),
-                  child: const TabBar(
-                    tabs: [
-                      Tab(text: 'Chapter'),
-                      Tab(text: 'Description'),
-                      Tab(text: 'Similar'),
-                    ],
-                  ),
-                ),
               ),
-            ),
-          ],
+            ];
+          },
           body: _content(),
         ),
       ),
@@ -227,30 +237,32 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           fit: StackFit.expand,
           children: [
             Positioned.fill(
-              child: url != null
-                  ? CachedNetworkImageWidget(
-                      fit: BoxFit.cover,
-                      cacheManager: widget.cacheManager,
-                      imageUrl: url,
-                      errorBuilder: (context, error, _) =>
-                          const Icon(Icons.error),
-                      progressBuilder: (context, progress) => Center(
+              child:
+                  url != null
+                      ? CachedNetworkImageWidget(
+                        fit: BoxFit.cover,
+                        cacheManager: widget.cacheManager,
+                        imageUrl: url,
+                        errorBuilder:
+                            (context, error, _) => const Icon(Icons.error),
+                        progressBuilder:
+                            (context, progress) => Center(
+                              child: SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  value: progress,
+                                ),
+                              ),
+                            ),
+                      )
+                      : const Center(
                         child: SizedBox(
                           width: 16,
                           height: 16,
-                          child: CircularProgressIndicator(
-                            value: progress,
-                          ),
+                          child: CircularProgressIndicator(),
                         ),
                       ),
-                    )
-                  : const Center(
-                    child: SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(),
-                      ),
-                  ),
             ),
             Positioned.fill(
               child: Opacity(
@@ -318,10 +330,12 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   Widget _addToLibraryButton({required BuildContext context}) {
     return _builder(
-      buildWhen: (prev, curr) => [
-        prev.manga != curr.manga,
-        prev.isOnLibrary != curr.isOnLibrary,
-      ].contains(true),
+      buildWhen: (prev, curr) {
+        return [
+          prev.manga != curr.manga,
+          prev.isOnLibrary != curr.isOnLibrary,
+        ].contains(true);
+      },
       builder: (context, state) {
         if (state.manga == null) return const SizedBox.shrink();
         return IconButton(
@@ -341,10 +355,12 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   Widget _title({required double progress}) {
     return _builder(
-      buildWhen: (prev, curr) => [
-        prev.isLoadingManga != curr.isLoadingManga,
-        prev.manga?.title != curr.manga?.title,
-      ].contains(true),
+      buildWhen: (prev, curr) {
+        return [
+          prev.isLoadingManga != curr.isLoadingManga,
+          prev.manga?.title != curr.manga?.title,
+        ].contains(true);
+      },
       builder: (context, state) {
         final theme = Theme.of(context);
 
@@ -431,107 +447,125 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     return TabBarView(
       children: [
         _builder(
-          buildWhen: (prev, curr) => [
-            prev.mangaId != curr.mangaId,
-            prev.isLoadingManga != curr.isLoadingManga,
-            prev.errorChapters != curr.errorChapters,
-            prev.isLoadingChapters != curr.isLoadingChapters,
-            prev.filtered != curr.filtered,
-            prev.totalChapter != curr.totalChapter,
-            prev.hasNextPageChapter != curr.hasNextPageChapter,
-            prev.prefetchedChapterId != curr.prefetchedChapterId,
-            prev.config != curr.config,
-          ].contains(true),
-          builder: (context, state) => ListWidget(
-            itemBuilder: (context, data) => ChapterTileWidget(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              onTap: () => widget.onTapChapter?.call(data),
-              opacity: data.lastReadAt != null ? 0.5 : 1,
-              title: [
-                'Chapter ${data.chapter}',
-                data.title,
-              ].nonNulls.join(' - '),
-              language: Language.fromCode(data.translatedLanguage),
-              uploadedAt: data.readableAt,
-              groups: data.scanlationGroup,
-              isPrefetching: state.prefetchedChapterId.contains(data.id),
-              lastReadAt: data.lastReadAt,
-            ),
-            pageStorageKey: PageStorageKey('chapter-list-${state.mangaId}'),
-            absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-            onLoadNextPage: () => _cubit(context).nextChapter(),
-            onRefresh: () => _cubit(context).initChapter(useCache: false),
-            onTapRecrawl: (url) => _cubit(context).recrawl(
-              context: context,
-              url: url,
-            ),
-            onTapDownload: (option) => _onTapDownload(
-              context: context,
-              option: option,
-            ),
-            onTapFilter: () => _onTapFilter(
-              context: context,
-              config: state.config,
-            ),
-            onTapPrefetch: () => _cubit(context).prefetch(),
-            error: state.errorChapters,
-            isLoading: state.isLoadingChapters || state.isLoadingManga,
-            hasNext: state.hasNextPageChapter,
-            data: state.filtered,
-            total: state.totalChapter ?? 0,
-          ),
-        ),
-        _builder(
-          buildWhen: (prev, curr) => [
-            prev.manga != curr.manga,
-            prev.isLoadingManga != curr.isLoadingManga,
-          ].contains(true),
-          builder: (context, state) => ChapterDescriptionWidget(
-            absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-            isLoading: state.isLoadingManga,
-            tags: [...?state.manga?.tags],
-            description: state.manga?.description,
-          ),
-        ),
-        _builder(
-          buildWhen: (prev, curr) => [
-            prev.mangaId != curr.mangaId,
-            prev.isLoadingManga != curr.isLoadingManga,
-            prev.similarManga != curr.similarManga,
-            prev.errorSimilarManga != curr.errorSimilarManga,
-            prev.isLoadingSimilarManga != curr.isLoadingSimilarManga,
-            prev.hasNextPageSimilarManga != curr.hasNextPageSimilarManga,
-            prev.prefetchedMangaId != curr.prefetchedMangaId,
-            prev.libraryMangaId != curr.libraryMangaId,
-          ].contains(true),
-          builder: (context, state) => GridWidget(
-            itemBuilder: (context, data) => MangaItemWidget(
-              manga: data,
-              cacheManager: widget.cacheManager,
-              onTap: () => widget.onTapManga?.call(data),
-              onLongPress: () => _onLongPressManga(
-                context: context,
-                manga: data,
-                isOnLibrary: state.libraryMangaId.contains(data.id),
+          buildWhen: (prev, curr) {
+            return [
+              prev.mangaId != curr.mangaId,
+              prev.isLoadingManga != curr.isLoadingManga,
+              prev.errorChapters != curr.errorChapters,
+              prev.isLoadingChapters != curr.isLoadingChapters,
+              prev.filtered != curr.filtered,
+              prev.totalChapter != curr.totalChapter,
+              prev.hasNextPageChapter != curr.hasNextPageChapter,
+              prev.prefetchedChapterId != curr.prefetchedChapterId,
+              prev.config != curr.config,
+            ].contains(true);
+          },
+          builder: (context, state) {
+            return ListWidget(
+              itemBuilder: (context, data) {
+                return ChapterTileWidget(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  onTap: () => widget.onTapChapter?.call(data),
+                  opacity: data.lastReadAt != null ? 0.5 : 1,
+                  title: [
+                    'Chapter ${data.chapter}',
+                    data.title,
+                  ].nonNulls.join(' - '),
+                  language: Language.fromCode(data.translatedLanguage),
+                  uploadedAt: data.readableAt,
+                  groups: data.scanlationGroup,
+                  isPrefetching: state.prefetchedChapterId.contains(data.id),
+                  lastReadAt: data.lastReadAt,
+                );
+              },
+              pageStorageKey: PageStorageKey('chapter-list-${state.mangaId}'),
+              absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                context,
               ),
-              isOnLibrary: state.libraryMangaId.contains(data.id),
-              isPrefetching: state.prefetchedMangaId.contains(data.id),
-            ),
-            pageStorageKey: PageStorageKey('similar-manga-${state.mangaId}'),
-            absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-            onRefresh: () => _cubit(context).initSimilarManga(useCache: false),
-            onLoadNextPage: () => _cubit(context).nextSimilarManga(
-              useCache: false,
-            ),
-            onTapRecrawl: (url) => _cubit(context).recrawl(
-              context: context,
-              url: url,
-            ),
-            error: state.errorSimilarManga,
-            isLoading: state.isLoadingSimilarManga || state.isLoadingManga,
-            hasNext: state.hasNextPageSimilarManga,
-            data: state.similarManga,
-          ),
+              onLoadNextPage: () => _cubit(context).nextChapter(),
+              onRefresh: () => _cubit(context).initChapter(),
+              onTapRecrawl: (url) {
+                return _cubit(context).recrawl(context: context, url: url);
+              },
+              onTapDownload: (option) {
+                return _onTapDownload(context: context, option: option);
+              },
+              onTapFilter: () {
+                return _onTapFilter(context: context, config: state.config);
+              },
+              onTapPrefetch: () => _cubit(context).prefetch(),
+              error: state.errorChapters,
+              isLoading: state.isLoadingChapters || state.isLoadingManga,
+              hasNext: state.hasNextPageChapter,
+              data: state.filtered,
+              total: state.totalChapter ?? 0,
+            );
+          },
+        ),
+        _builder(
+          buildWhen: (prev, curr) {
+            return [
+              prev.manga != curr.manga,
+              prev.isLoadingManga != curr.isLoadingManga,
+            ].contains(true);
+          },
+          builder: (context, state) {
+            return ChapterDescriptionWidget(
+              absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                context,
+              ),
+              isLoading: state.isLoadingManga,
+              tags: [...?state.manga?.tags],
+              description: state.manga?.description,
+              onTapTag: (tag) => _onTapTag(context, tag: tag),
+            );
+          },
+        ),
+        _builder(
+          buildWhen: (prev, curr) {
+            return [
+              prev.mangaId != curr.mangaId,
+              prev.isLoadingManga != curr.isLoadingManga,
+              prev.similarManga != curr.similarManga,
+              prev.errorSimilarManga != curr.errorSimilarManga,
+              prev.isLoadingSimilarManga != curr.isLoadingSimilarManga,
+              prev.hasNextPageSimilarManga != curr.hasNextPageSimilarManga,
+              prev.prefetchedMangaId != curr.prefetchedMangaId,
+              prev.libraryMangaId != curr.libraryMangaId,
+            ].contains(true);
+          },
+          builder: (context, state) {
+            return GridWidget(
+              itemBuilder: (context, data) {
+                return MangaItemWidget(
+                  manga: data,
+                  cacheManager: widget.cacheManager,
+                  onTap: () => widget.onTapManga?.call(data),
+                  onLongPress: () {
+                    _onLongPressManga(
+                      context: context,
+                      manga: data,
+                      isOnLibrary: state.libraryMangaId.contains(data.id),
+                    );
+                  },
+                  isOnLibrary: state.libraryMangaId.contains(data.id),
+                  isPrefetching: state.prefetchedMangaId.contains(data.id),
+                );
+              },
+              pageStorageKey: PageStorageKey('similar-manga-${state.mangaId}'),
+              absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                context,
+              ),
+              onRefresh: () => _cubit(context).initSimilarManga(),
+              onLoadNextPage: () => _cubit(context).nextSimilarManga(),
+              onTapRecrawl:
+                  (url) => _cubit(context).recrawl(context: context, url: url),
+              error: state.errorSimilarManga,
+              isLoading: state.isLoadingSimilarManga || state.isLoadingManga,
+              hasNext: state.hasNextPageSimilarManga,
+              data: state.similarManga,
+            );
+          },
         ),
       ],
     );

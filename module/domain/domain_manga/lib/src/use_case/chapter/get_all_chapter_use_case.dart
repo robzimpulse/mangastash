@@ -17,7 +17,6 @@ class GetAllChapterUseCase {
     required String mangaId,
     List<Chapter> chapters = const [],
     SearchChapterParameter? parameter,
-    bool useCache = true,
   }) async {
     final param = parameter.or(
       const SearchChapterParameter(
@@ -31,7 +30,6 @@ class GetAllChapterUseCase {
       source: source,
       mangaId: mangaId,
       parameter: param,
-      useCache: useCache,
     );
 
     if (result is Success<Pagination<Chapter>>) {
@@ -45,7 +43,6 @@ class GetAllChapterUseCase {
             page: param.page + 1,
             limit: param.limit,
           ),
-          useCache: useCache,
         );
       }
 

@@ -8,13 +8,13 @@ import 'package:log_box/log_box.dart';
 class CrawlUrlUseCase {
   final LogBox _logBox;
 
-  final BaseCacheManager _cacheManager;
+  final CustomCacheManager _cacheManager;
 
   CrawlUrlUseCase({
     required LogBox logBox,
-    required BaseCacheManager cacheManager,
-  })  : _logBox = logBox,
-        _cacheManager = cacheManager;
+    required CustomCacheManager cacheManager,
+  }) : _logBox = logBox,
+       _cacheManager = cacheManager;
 
   Future<void> execute({
     required BuildContext context,
@@ -23,7 +23,7 @@ class CrawlUrlUseCase {
     final uri = Uri.tryParse(url);
     if (uri == null) return;
 
-    final String? cached = await _cacheManager
+    final String? cached = await _cacheManager.html
         .getFileFromCache(url)
         .then((file) => file?.file.readAsString());
 
@@ -32,12 +32,14 @@ class CrawlUrlUseCase {
       context: context,
       uri: uri,
       html: cached ?? '',
-      onTapSnapshot: (url, html) => _cacheManager.putFile(
-        url ?? uri.toString(),
-        utf8.encode(html ?? ''),
-        fileExtension: 'html',
-        maxAge: const Duration(minutes: 30),
-      ),
+      onTapSnapshot: (url, html) {
+        _cacheManager.html.putFile(
+          url ?? uri.toString(),
+          utf8.encode(html ?? ''),
+          fileExtension: 'html',
+          maxAge: const Duration(minutes: 30),
+        );
+      },
     );
   }
 }

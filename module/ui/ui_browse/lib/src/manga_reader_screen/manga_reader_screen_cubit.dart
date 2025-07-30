@@ -24,33 +24,30 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     required UpdateChapterLastReadAtUseCase updateChapterLastReadAtUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required GetAllChapterUseCase getAllChapterUseCase,
-  })  : _getChapterUseCase = getChapterUseCase,
-        _crawlUrlUseCase = crawlUrlUseCase,
-        _getAllChapterUseCase = getAllChapterUseCase,
-        _updateChapterLastReadAtUseCase = updateChapterLastReadAtUseCase,
-        super(
-          initialState.copyWith(
-            parameter: listenSearchParameterUseCase
-                .searchParameterState.valueOrNull
-                ?.let((e) => SearchChapterParameter.from(e)),
-          ),
-        );
+  }) : _getChapterUseCase = getChapterUseCase,
+       _crawlUrlUseCase = crawlUrlUseCase,
+       _getAllChapterUseCase = getAllChapterUseCase,
+       _updateChapterLastReadAtUseCase = updateChapterLastReadAtUseCase,
+       super(
+         initialState.copyWith(
+           parameter: listenSearchParameterUseCase
+               .searchParameterState
+               .valueOrNull
+               ?.let((e) => SearchChapterParameter.from(e)),
+         ),
+       );
 
   @override
   Future<void> close() async {
     await state.chapter?.let(
-      (chapter) async => await _updateChapterLastReadAtUseCase.execute(
-        chapter: chapter,
-      ),
+      (chapter) async =>
+          await _updateChapterLastReadAtUseCase.execute(chapter: chapter),
     );
     await super.close();
   }
 
   Future<void> init() async {
-    await Future.wait([
-      _fetchChapter(),
-      _fetchPreviousAndNextChapter(),
-    ]);
+    await Future.wait([_fetchChapter(), _fetchPreviousAndNextChapter()]);
   }
 
   Future<void> _fetchPreviousAndNextChapter() async {
@@ -67,14 +64,10 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
       ),
     );
 
-    emit(
-      state.copyWith(
-        chapterIds: [...response.map((e) => e.id).nonNulls],
-      ),
-    );
+    emit(state.copyWith(chapterIds: [...response.map((e) => e.id).nonNulls]));
   }
 
-  Future<void> _fetchChapter({bool useCache = true}) async {
+  Future<void> _fetchChapter() async {
     final chapterId = state.chapterId;
     final mangaId = state.mangaId;
     final source = state.source;
@@ -94,7 +87,6 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
       chapterId: chapterId,
       mangaId: mangaId,
       source: source,
-      useCache: useCache,
     );
 
     if (response is Success<Chapter>) {
@@ -110,6 +102,6 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
 
   void recrawl({required BuildContext context, required String url}) async {
     await _crawlUrlUseCase.execute(context: context, url: url);
-    await _fetchChapter(useCache: false);
+    await _fetchChapter();
   }
 }

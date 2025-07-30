@@ -12,11 +12,11 @@ import 'package:universal_io/io.dart';
 
 class HeadlessWebviewManager {
   final LogBox _log;
-  final BaseCacheManager _cacheManager;
+  final CustomCacheManager _cacheManager;
 
   HeadlessWebviewManager({
     required LogBox log,
-    required BaseCacheManager cacheManager,
+    required CustomCacheManager cacheManager,
   }) : _log = log,
        _cacheManager = cacheManager;
 
@@ -42,7 +42,7 @@ class HeadlessWebviewManager {
     List<String> scripts = const [],
     bool useCache = true,
   }) async {
-    final cache = await _cacheManager.getFileFromCache(uri.toString());
+    final cache = await _cacheManager.html.getFileFromCache(uri.toString());
     final data = await cache?.file.readAsString();
 
     if (data != null && useCache) {
@@ -144,7 +144,7 @@ class HeadlessWebviewManager {
       return null;
     }
 
-    await _cacheManager.putFile(
+    await _cacheManager.html.putFile(
       uri.toString(),
       utf8.encode(html),
       fileExtension: 'html',

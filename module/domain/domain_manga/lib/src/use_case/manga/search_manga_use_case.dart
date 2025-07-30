@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -15,21 +12,20 @@ import '../../parser/base/manga_list_html_parser.dart';
 class SearchMangaUseCase with SyncMangasMixin {
   final MangaRepository _mangaRepository;
   final HeadlessWebviewManager _webview;
-  final BaseCacheManager _cacheManager;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   const SearchMangaUseCase({
     required MangaRepository mangaRepository,
     required HeadlessWebviewManager webview,
-    required BaseCacheManager cacheManager,
+
     required MangaDao mangaDao,
     required LogBox logBox,
-  })  : _mangaRepository = mangaRepository,
-        _cacheManager = cacheManager,
-        _mangaDao = mangaDao,
-        _webview = webview,
-        _logBox = logBox;
+  }) : _mangaRepository = mangaRepository,
+
+       _mangaDao = mangaDao,
+       _webview = webview,
+       _logBox = logBox;
 
   Future<Pagination<Manga>> _mangadex({
     required SourceEnum source,
@@ -37,11 +33,7 @@ class SearchMangaUseCase with SyncMangasMixin {
   }) async {
     final result = await _mangaRepository.search(
       parameter: parameter.copyWith(
-        includes: [
-          ...?parameter.includes,
-          Include.author,
-          Include.coverArt,
-        ],
+        includes: [...?parameter.includes, Include.author, Include.coverArt],
       ),
     );
 
@@ -60,7 +52,6 @@ class SearchMangaUseCase with SyncMangasMixin {
   Future<Pagination<Manga>> _scrapping({
     required SourceEnum source,
     required SearchMangaParameter parameter,
-    bool useCache = true,
   }) async {
     String url = '';
     if (source == SourceEnum.asurascan) {
@@ -69,7 +60,7 @@ class SearchMangaUseCase with SyncMangasMixin {
       url = parameter.mangaclash;
     }
 
-    final document = await _webview.open(url, useCache: useCache);
+    final document = await _webview.open(url);
 
     if (document == null) {
       throw FailedParsingHtmlException(url);
@@ -93,26 +84,12 @@ class SearchMangaUseCase with SyncMangasMixin {
   Future<Result<Pagination<Manga>>> execute({
     required SourceEnum source,
     required SearchMangaParameter parameter,
-    bool useCache = true,
   }) async {
-    final key = '$source-${parameter.toJsonString()}';
-    final cache = await _cacheManager.getFileFromCache(key);
-    final file = await cache?.file.readAsString();
-    final data = file.let(
-      (e) => Pagination.fromJsonString(
-        e,
-        (e) => Manga.fromJson(e.castOrNull()),
-      ),
-    );
-
-    if (data != null && useCache) {
-      return Success(data);
-    }
-
     try {
-      final promise = source == SourceEnum.mangadex
-          ? _mangadex(source: source, parameter: parameter)
-          : _scrapping(source: source, parameter: parameter, useCache: useCache,);
+      final promise =
+          source == SourceEnum.mangadex
+              ? _mangadex(source: source, parameter: parameter)
+              : _scrapping(source: source, parameter: parameter);
 
       final data = await promise;
 
@@ -122,14 +99,6 @@ class SearchMangaUseCase with SyncMangasMixin {
           values: [...?data.data],
           logBox: _logBox,
         ),
-      );
-
-      await _cacheManager.putFile(
-        key,
-        key: key,
-        utf8.encode(result.toJsonString((e) => e.toJson())),
-        fileExtension: 'json',
-        maxAge: const Duration(minutes: 30),
       );
 
       return Success(result);

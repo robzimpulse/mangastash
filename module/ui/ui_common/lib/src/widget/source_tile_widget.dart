@@ -25,7 +25,7 @@ class SourceTileWidget extends StatelessWidget {
 
   final bool isLoading;
 
-  final BaseCacheManager? cacheManager;
+  final CustomCacheManager? cacheManager;
 
   @override
   Widget build(BuildContext context) {

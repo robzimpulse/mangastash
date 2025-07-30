@@ -1,6 +1,5 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
-import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:feature_common/feature_common.dart';
@@ -17,7 +16,6 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final GetTagsUseCase _getTagsUseCase;
   final CrawlUrlUseCase _crawlUrlUseCase;
-  final BaseCacheManager _cacheManager;
 
   BrowseMangaScreenCubit({
     required BrowseMangaScreenState initialState,
@@ -31,30 +29,29 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required GetTagsUseCase getTagsUseCase,
     required CrawlUrlUseCase crawlUrlUseCase,
-    required BaseCacheManager cacheManager,
-  })  : _searchMangaUseCase = searchMangaUseCase,
-        _addToLibraryUseCase = addToLibraryUseCase,
-        _removeFromLibraryUseCase = removeFromLibraryUseCase,
-        _prefetchMangaUseCase = prefetchMangaUseCase,
-        _prefetchChapterUseCase = prefetchChapterUseCase,
-        _getTagsUseCase = getTagsUseCase,
-        _crawlUrlUseCase = crawlUrlUseCase,
-        _cacheManager = cacheManager,
-        super(
-          initialState.copyWith(
-            parameter:
-                listenSearchParameterUseCase.searchParameterState.valueOrNull,
-          ),
-        ) {
+  }) : _searchMangaUseCase = searchMangaUseCase,
+       _addToLibraryUseCase = addToLibraryUseCase,
+       _removeFromLibraryUseCase = removeFromLibraryUseCase,
+       _prefetchMangaUseCase = prefetchMangaUseCase,
+       _prefetchChapterUseCase = prefetchChapterUseCase,
+       _getTagsUseCase = getTagsUseCase,
+       _crawlUrlUseCase = crawlUrlUseCase,
+
+       super(
+         initialState.copyWith(
+           parameter:
+               listenSearchParameterUseCase.searchParameterState.valueOrNull,
+         ),
+       ) {
     addSubscription(
-      listenMangaFromLibraryUseCase.libraryMangaIds
-          .distinct()
-          .listen(_updateLibraryState),
+      listenMangaFromLibraryUseCase.libraryMangaIds.distinct().listen(
+        _updateLibraryState,
+      ),
     );
     addSubscription(
-      listenPrefetchMangaUseCase.mangaIdsStream
-          .distinct()
-          .listen(_updatePrefetchState),
+      listenPrefetchMangaUseCase.mangaIdsStream.distinct().listen(
+        _updatePrefetchState,
+      ),
     );
   }
 
@@ -66,10 +63,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     emit(state.copyWith(prefetchedMangaIds: prefetchedMangaIds));
   }
 
-  Future<void> init({
-    SearchMangaParameter? parameter,
-    bool useCache = true,
-  }) async {
+  Future<void> init({SearchMangaParameter? parameter}) async {
     emit(
       state.copyWith(
         isLoading: true,
@@ -82,28 +76,17 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
       ),
     );
 
-    if (!useCache) {
-      await Future.wait(state.cacheKeys.map(_cacheManager.removeFile));
-      emit(state.copyWith(cacheKeys: []));
-    }
-
-    await Future.wait([
-      _fetchManga(useCache: useCache),
-      _fetchTags(useCache: useCache),
-    ]);
+    await Future.wait([_fetchManga(), _fetchTags()]);
 
     emit(state.copyWith(isLoading: false));
   }
 
-  Future<void> _fetchTags({bool useCache = true}) async {
+  Future<void> _fetchTags() async {
     final source = state.source;
 
     if (source == null) return;
 
-    final result = await _getTagsUseCase.execute(
-      source: source,
-      useCache: useCache,
-    );
+    final result = await _getTagsUseCase.execute(source: source);
 
     if (result is Success<List<Tag>>) {
       emit(state.copyWith(tags: result.data));
@@ -114,7 +97,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     }
   }
 
-  Future<void> _fetchManga({bool useCache = true}) async {
+  Future<void> _fetchManga() async {
     final source = state.source;
 
     if (source == null) return;
@@ -122,7 +105,6 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     final result = await _searchMangaUseCase.execute(
       source: source,
       parameter: state.parameter,
-      useCache: useCache,
     );
 
     if (result is Success<Pagination<Manga>>) {
@@ -137,17 +119,6 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
       emit(
         state.copyWith(
-          cacheKeys: [
-            ...state.cacheKeys,
-            '$source-${state.parameter.toJsonString()}',
-            ...[
-              switch (source) {
-                SourceEnum.mangadex => null,
-                SourceEnum.mangaclash => state.parameter.mangaclash,
-                SourceEnum.asurascan => state.parameter.asurascan,
-              },
-            ].nonNulls,
-          ],
           mangas: allMangas,
           hasNextPage: hasNextPage ?? allMangas.length < total,
           parameter: state.parameter.copyWith(
@@ -165,10 +136,10 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     }
   }
 
-  Future<void> next({bool useCache = true}) async {
+  Future<void> next() async {
     if (!state.hasNextPage || state.isPagingNextPage) return;
     emit(state.copyWith(isPagingNextPage: true));
-    await _fetchManga(useCache: useCache);
+    await _fetchManga();
     emit(state.copyWith(isPagingNextPage: false));
   }
 

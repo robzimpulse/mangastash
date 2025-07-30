@@ -31,7 +31,7 @@ class JobManager
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
   final ValueGetter<GetAllChapterUseCase> _getAllChapterUseCase;
   final ListenSearchParameterUseCase _listenSearchParameterUseCase;
-  final BaseCacheManager _cacheManager;
+  final CustomCacheManager _cacheManager;
   final JobDao _jobDao;
   final LogBox _log;
 
@@ -42,7 +42,7 @@ class JobManager
   JobManager({
     required LogBox log,
     required JobDao jobDao,
-    required BaseCacheManager cacheManager,
+    required CustomCacheManager cacheManager,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required ValueGetter<GetMangaUseCase> getMangaUseCase,
@@ -285,10 +285,10 @@ class JobManager
       return;
     }
 
-    final existing = (await _cacheManager.getFileFromCache(url))?.file;
+    final existing = (await _cacheManager.images.getFileFromCache(url))?.file;
 
     final path = existing.or(
-      await _cacheManager.getSingleFile(
+      await _cacheManager.images.getSingleFile(
         url,
         headers: {HttpHeaders.userAgentHeader: userAgent},
       ),

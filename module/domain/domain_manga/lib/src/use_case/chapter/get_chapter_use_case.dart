@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
@@ -15,7 +13,6 @@ class GetChapterUseCase with SyncChaptersMixin {
   final ChapterRepository _chapterRepository;
   final AtHomeRepository _atHomeRepository;
   final HeadlessWebviewManager _webview;
-  final BaseCacheManager _cacheManager;
   final ChapterDao _chapterDao;
   final LogBox _logBox;
 
@@ -23,15 +20,13 @@ class GetChapterUseCase with SyncChaptersMixin {
     required ChapterRepository chapterRepository,
     required AtHomeRepository atHomeRepository,
     required HeadlessWebviewManager webview,
-    required BaseCacheManager cacheManager,
     required ChapterDao chapterDao,
     required LogBox logBox,
-  })  : _chapterRepository = chapterRepository,
-        _atHomeRepository = atHomeRepository,
-        _cacheManager = cacheManager,
-        _chapterDao = chapterDao,
-        _logBox = logBox,
-        _webview = webview;
+  }) : _chapterRepository = chapterRepository,
+       _atHomeRepository = atHomeRepository,
+       _chapterDao = chapterDao,
+       _logBox = logBox,
+       _webview = webview;
 
   Future<Chapter> _mangadex({
     required String mangaId,
@@ -59,13 +54,12 @@ class GetChapterUseCase with SyncChaptersMixin {
   Future<List<String>> _scrapping({
     required String? url,
     required SourceEnum source,
-    bool useCache = true,
   }) async {
     if (url == null) {
       throw DataNotFoundException();
     }
 
-    final document = await _webview.open(url, useCache: useCache);
+    final document = await _webview.open(url);
 
     if (document == null) {
       throw FailedParsingHtmlException(url);
@@ -83,32 +77,19 @@ class GetChapterUseCase with SyncChaptersMixin {
     required SourceEnum source,
     required String mangaId,
     required String chapterId,
-    bool useCache = true,
   }) async {
-    final key = '$source-$mangaId-$chapterId';
-    final cache = await _cacheManager.getFileFromCache(key);
-    final file = await cache?.file.readAsString();
-    final data = file.let((e) => Chapter.fromJsonString(e));
-
-    if (data != null && useCache) {
-      return Success(data);
-    }
-
     final raw = await _chapterDao.search(ids: [chapterId]);
     final chapter = raw.firstOrNull.let(
       (e) => e.chapter?.let((d) => Chapter.fromDrift(d, images: e.images)),
     );
 
     try {
-      final data = source == SourceEnum.mangadex
-          ? await _mangadex(mangaId: mangaId, chapterId: chapterId)
-          : chapter?.copyWith(
-              images: await _scrapping(
-                url: chapter.webUrl,
-                source: source,
-                useCache: useCache,
-              ),
-            );
+      final data =
+          source == SourceEnum.mangadex
+              ? await _mangadex(mangaId: mangaId, chapterId: chapterId)
+              : chapter?.copyWith(
+                images: await _scrapping(url: chapter.webUrl, source: source),
+              );
 
       final results = await sync(
         dao: _chapterDao,
@@ -123,14 +104,6 @@ class GetChapterUseCase with SyncChaptersMixin {
       if (result == null) {
         throw DataNotFoundException();
       }
-
-      await _cacheManager.putFile(
-        key,
-        key: key,
-        utf8.encode(result.toJsonString()),
-        fileExtension: 'json',
-        maxAge: const Duration(minutes: 30),
-      );
 
       return Success(result);
     } catch (e) {

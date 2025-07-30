@@ -2,6 +2,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class CachedNetworkImageWidget extends StatelessWidget {
   const CachedNetworkImageWidget({
@@ -16,7 +17,7 @@ class CachedNetworkImageWidget extends StatelessWidget {
     this.height,
   });
 
-  final BaseCacheManager? cacheManager;
+  final CustomCacheManager? cacheManager;
 
   final String imageUrl;
 
@@ -24,10 +25,7 @@ class CachedNetworkImageWidget extends StatelessWidget {
 
   final Map<String, String>? headers;
 
-  final Widget Function(
-    BuildContext context,
-    double? progress,
-  )? progressBuilder;
+  final Widget Function(BuildContext, double?)? progressBuilder;
 
   final ImageErrorWidgetBuilder? errorBuilder;
 
@@ -98,36 +96,40 @@ class CachedNetworkImageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cache = cacheManager;
-    return SizedBox(
-      width: width,
-      height: height,
-      child: cache == null
-          ? Image.network(
-              imageUrl,
-              fit: fit,
-              headers: headers,
-              loadingBuilder: (context, child, event) {
-                final progress = event?.progress;
-                if (progress == null) return child;
-                return progressBuilder?.call(context, progress) ?? child;
-              },
-              errorBuilder: errorBuilder,
-              width: width,
-              height: height,
-            )
-          : StreamBuilder(
-              stream: cache.getFileStream(
-                imageUrl,
-                headers: headers,
-                withProgress: true,
-              ),
-              builder: (context, snapshot) => _buildFrom(
-                context,
-                response: snapshot.data,
-                error: snapshot.error,
-              ),
-            ),
-    );
+
+    Widget view;
+    if (cache == null) {
+      view = Image.network(
+        imageUrl,
+        fit: fit,
+        headers: headers,
+        loadingBuilder: (context, child, event) {
+          final progress = event?.progress;
+          if (progress == null) return child;
+          return progressBuilder?.call(context, progress) ?? child;
+        },
+        errorBuilder: errorBuilder,
+        width: width,
+        height: height,
+      );
+    } else {
+      view = StreamBuilder(
+        stream: cache.images.getFileStream(
+          imageUrl,
+          headers: headers,
+          withProgress: true,
+        ),
+        builder: (context, snapshot) {
+          return _buildFrom(
+            context,
+            response: snapshot.data,
+            error: snapshot.error,
+          );
+        },
+      );
+    }
+
+    return SizedBox(width: width, height: height, child: view);
   }
 }
 

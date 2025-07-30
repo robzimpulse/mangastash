@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -13,19 +10,16 @@ import '../../parser/base/manga_detail_html_parser.dart';
 
 class GetMangaUseCase with SyncMangasMixin {
   final HeadlessWebviewManager _webview;
-  final BaseCacheManager _cacheManager;
   final MangaService _mangaService;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   GetMangaUseCase({
     required HeadlessWebviewManager webview,
-    required BaseCacheManager cacheManager,
     required MangaService mangaService,
     required MangaDao mangaDao,
     required LogBox logBox,
   })  : _mangaService = mangaService,
-        _cacheManager = cacheManager,
         _mangaDao = mangaDao,
         _logBox = logBox,
         _webview = webview;
@@ -51,13 +45,12 @@ class GetMangaUseCase with SyncMangasMixin {
   Future<Manga> _scrapping({
     required SourceEnum source,
     required String? url,
-    bool useCache = true,
   }) async {
     if (url == null) {
       throw DataNotFoundException();
     }
 
-    final document = await _webview.open(url, useCache: useCache);
+    final document = await _webview.open(url);
 
     if (document == null) {
       throw FailedParsingHtmlException(url);
@@ -74,17 +67,7 @@ class GetMangaUseCase with SyncMangasMixin {
   Future<Result<Manga>> execute({
     required SourceEnum source,
     required String mangaId,
-    bool useCache = true,
   }) async {
-
-    final key = '$source-$mangaId';
-    final cache = await _cacheManager.getFileFromCache(key);
-    final file = await cache?.file.readAsString();
-    final data = file.let((e) => Manga.fromJsonString(e));
-
-    if (data != null && useCache) {
-      return Success(data);
-    }
 
     try {
       final raw = await _mangaDao.search(ids: [mangaId]);
@@ -92,7 +75,7 @@ class GetMangaUseCase with SyncMangasMixin {
 
       final promise = source == SourceEnum.mangadex
           ? _mangadex(source: source, mangaId: mangaId)
-          : _scrapping(url: manga?.webUrl, source: source, useCache: useCache);
+          : _scrapping(url: manga?.webUrl, source: source);
 
       final results = await sync(
         dao: _mangaDao,
@@ -105,14 +88,6 @@ class GetMangaUseCase with SyncMangasMixin {
       if (result == null) {
         throw DataNotFoundException();
       }
-
-      await _cacheManager.putFile(
-        key,
-        key: key,
-        utf8.encode(result.toJsonString()),
-        fileExtension: 'json',
-        maxAge: const Duration(minutes: 30),
-      );
 
       return Success(result);
     } catch (e) {

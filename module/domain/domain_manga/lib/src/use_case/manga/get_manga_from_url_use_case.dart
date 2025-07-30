@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
@@ -12,16 +10,15 @@ import '../../parser/base/manga_detail_html_parser.dart';
 
 class GetMangaFromUrlUseCase with SyncMangasMixin {
   final HeadlessWebviewManager _webview;
-  final BaseCacheManager _cacheManager;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   GetMangaFromUrlUseCase({
     required HeadlessWebviewManager webview,
-    required BaseCacheManager cacheManager,
+
     required MangaDao mangaDao,
     required LogBox logBox,
-  })  : _cacheManager = cacheManager,
+  })  :
         _mangaDao = mangaDao,
         _logBox = logBox,
         _webview = webview;
@@ -29,9 +26,8 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
   Future<Manga> _scrapping({
     required SourceEnum source,
     required String url,
-    bool useCache = true,
   }) async {
-    final document = await _webview.open(url, useCache: useCache);
+    final document = await _webview.open(url);
 
     if (document == null) {
       throw FailedParsingHtmlException(url);
@@ -48,17 +44,7 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
   Future<Result<Manga>> execute({
     required SourceEnum source,
     required String url,
-    bool useCache = true,
   }) async {
-    final key = '$source-$url';
-    final cache = await _cacheManager.getFileFromCache(key);
-    final file = await cache?.file.readAsString();
-    final data = file.let((e) => Manga.fromJsonString(e));
-
-    if (data != null && useCache) {
-      return Success(data);
-    }
-
     try {
       final raw = await _mangaDao.search(webUrls: [url]);
       final manga = Manga.fromDatabase(raw.firstOrNull);
@@ -69,7 +55,6 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
           await _scrapping(
             source: source,
             url: (manga?.webUrl).or(url),
-            useCache: useCache,
           ),
         ],
         logBox: _logBox,
@@ -80,14 +65,6 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
       if (result == null) {
         throw DataNotFoundException();
       }
-
-      await _cacheManager.putFile(
-        key,
-        key: key,
-        utf8.encode(result.toJsonString()),
-        fileExtension: 'json',
-        maxAge: const Duration(minutes: 30),
-      );
 
       return Success(result);
     } catch (e) {

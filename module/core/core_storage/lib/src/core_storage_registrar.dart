@@ -1,11 +1,8 @@
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:log_box/log_box.dart';
-import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:service_locator/service_locator.dart';
 
-import 'manager/custom_cache_manager/custom_cache_manager.dart';
+import '../core_storage.dart';
 import 'storage/shared_preferences_storage.dart';
-import 'storage/storage.dart';
 
 class CoreStorageRegistrar extends Registrar {
   @override
@@ -43,7 +40,6 @@ class CoreStorageRegistrar extends Registrar {
       CustomCacheManager(dio: () => locator()),
       dispose: (e) => e.dispose(),
     );
-    locator.alias<BaseCacheManager, CustomCacheManager>();
 
     log.log(
       'Register ${runtimeType.toString()}',

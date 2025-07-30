@@ -10,7 +10,7 @@ class AdvancedScreen extends StatelessWidget {
   final LogBox logBox;
   final DatabaseViewer viewer;
   final AppDatabase database;
-  final BaseCacheManager cacheManager;
+  final CustomCacheManager cacheManager;
 
   const AdvancedScreen({
     super.key,
@@ -55,7 +55,7 @@ class AdvancedScreen extends StatelessWidget {
             ),
             trailing: IconButton(
               onPressed: () async {
-                await cacheManager.emptyCache();
+                await cacheManager.empty();
                 await database.clear();
                 if (!context.mounted) return;
                 context.showSnackBar(message: 'Success Clear Database & Cache');
