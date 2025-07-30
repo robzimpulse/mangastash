@@ -25,7 +25,6 @@ class CoreStorageRegistrar extends Registrar {
     locator.registerFactory(() => ChapterDao(locator()));
     locator.registerFactory(() => LibraryDao(locator()));
     locator.registerFactory(() => JobDao(locator()));
-    locator.registerFactory(() => CacheDao(locator()));
     locator.registerFactory(() => HistoryDao(locator()));
     locator.registerFactory(() => TagDao(locator()));
 
@@ -41,7 +40,7 @@ class CoreStorageRegistrar extends Registrar {
     // locator.alias<SetBackupPathUseCase, PathManager>();
 
     locator.registerSingleton(
-      CustomCacheManager(dio: () => locator(), dao: () => locator()),
+      CustomCacheManager(dio: () => locator()),
       dispose: (e) => e.dispose(),
     );
     locator.alias<BaseCacheManager, CustomCacheManager>();

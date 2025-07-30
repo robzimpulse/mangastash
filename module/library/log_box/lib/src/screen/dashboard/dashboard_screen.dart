@@ -3,10 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../../manager/storage.dart';
 import '../../model/entry.dart';
-import '../../model/log_entry.dart';
-import '../../model/navigation_entry.dart';
-import '../../model/network_entry.dart';
-import '../../model/webview_entry.dart';
 import '../detail/detail_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
