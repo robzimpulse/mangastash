@@ -11,7 +11,6 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:universal_io/io.dart';
 
-import '../mixin/generate_task_id_mixin.dart';
 import '../use_case/chapter/get_all_chapter_use_case.dart';
 import '../use_case/chapter/get_chapter_use_case.dart';
 import '../use_case/manga/get_manga_use_case.dart';
@@ -21,7 +20,7 @@ import '../use_case/prefetch/prefetch_chapter_use_case.dart';
 import '../use_case/prefetch/prefetch_manga_use_case.dart';
 
 class JobManager
-    with GenerateTaskIdMixin, UserAgentMixin, WidgetsBindingObserver
+    with UserAgentMixin, WidgetsBindingObserver
     implements
         PrefetchMangaUseCase,
         PrefetchChapterUseCase,
@@ -47,13 +46,13 @@ class JobManager
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required ValueGetter<GetMangaUseCase> getMangaUseCase,
     required ValueGetter<GetAllChapterUseCase> getAllChapterUseCase,
-  })  : _log = log,
-        _jobDao = jobDao,
-        _cacheManager = cacheManager,
-        _getMangaUseCase = getMangaUseCase,
-        _getChapterUseCase = getChapterUseCase,
-        _getAllChapterUseCase = getAllChapterUseCase,
-        _listenSearchParameterUseCase = listenSearchParameterUseCase {
+  }) : _log = log,
+       _jobDao = jobDao,
+       _cacheManager = cacheManager,
+       _getMangaUseCase = getMangaUseCase,
+       _getChapterUseCase = getChapterUseCase,
+       _getAllChapterUseCase = getAllChapterUseCase,
+       _listenSearchParameterUseCase = listenSearchParameterUseCase {
     _streamSubscription = _jobs.distinct().listen(_onData);
     _jobs.addStream(jobDao.stream);
     WidgetsBinding.instance.addObserver(this);
@@ -309,10 +308,7 @@ class JobManager
   }
 
   @override
-  void prefetchChapters({
-    required String mangaId,
-    required SourceEnum source,
-  }) {
+  void prefetchChapters({required String mangaId, required SourceEnum source}) {
     _jobDao.add(
       JobTablesCompanion.insert(
         type: JobTypeEnum.chapters,
@@ -339,10 +335,7 @@ class JobManager
   }
 
   @override
-  void prefetchManga({
-    required String mangaId,
-    required SourceEnum source,
-  }) {
+  void prefetchManga({required String mangaId, required SourceEnum source}) {
     _jobDao.add(
       JobTablesCompanion.insert(
         type: JobTypeEnum.manga,
