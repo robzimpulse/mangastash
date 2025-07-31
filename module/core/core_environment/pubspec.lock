@@ -521,7 +521,7 @@ packages:
     source: hosted
     version: "1.3.0"
   manga_service_drift:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       path: "../../library/manga_service_drift"
       relative: true

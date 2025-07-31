@@ -185,7 +185,7 @@ packages:
     source: path
     version: "0.0.1"
   core_storage:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       path: "../../core/core_storage"
       relative: true
@@ -798,7 +798,7 @@ packages:
     source: hosted
     version: "0.27.7"
   service_locator:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       path: "../../library/service_locator"
       relative: true
