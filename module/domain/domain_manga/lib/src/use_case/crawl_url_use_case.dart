@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:core_storage/core_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:log_box/log_box.dart';
+import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
 
 class CrawlUrlUseCase {
   final LogBox _logBox;
@@ -31,11 +32,12 @@ class CrawlUrlUseCase {
     await _logBox.webview(
       context: context,
       uri: uri,
-      html: cached ?? '',
+      html: cached,
       onTapSnapshot: (url, html) {
+        if (html == null) return;
         _cacheManager.html.putFile(
           url ?? uri.toString(),
-          utf8.encode(html ?? ''),
+          utf8.encode(html),
           fileExtension: 'html',
           maxAge: const Duration(minutes: 30),
         );

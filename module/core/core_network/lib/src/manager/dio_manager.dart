@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:log_box/log_box.dart';
+import 'package:log_box_dio_logger/log_box_dio_logger.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:universal_io/io.dart';
 

@@ -8,6 +8,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:log_box/log_box.dart';
+import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
 import 'package:universal_io/io.dart';
 
 class HeadlessWebviewManager {
@@ -30,7 +31,7 @@ class HeadlessWebviewManager {
       uri: uri,
       scripts: scripts,
       useCache: useCache,
-      delegate: _log.webviewDelegate,
+      delegate: _log.inAppWebviewObserver,
     );
     if (html == null) return null;
     return parse(html);
@@ -38,7 +39,7 @@ class HeadlessWebviewManager {
 
   Future<String?> _fetch({
     required WebUri uri,
-    required WebviewDelegate delegate,
+    required InAppWebviewObserver delegate,
     List<String> scripts = const [],
     bool useCache = true,
   }) async {
@@ -46,7 +47,7 @@ class HeadlessWebviewManager {
     final data = await cache?.file.readAsString();
 
     if (data != null && useCache) {
-      delegate.set(uri: uri, html: data);
+      delegate.set(uri: uri, html: data, loading: false);
       return data;
     }
     final onLoadStartCompleter = Completer();
@@ -140,7 +141,7 @@ class HeadlessWebviewManager {
     await webview.dispose();
 
     if (html == null) {
-      delegate.set(error: Exception('Null Html'));
+      delegate.set(error: Exception('Null Html'), loading: false);
       return null;
     }
 
@@ -151,7 +152,7 @@ class HeadlessWebviewManager {
       maxAge: const Duration(minutes: 30),
     );
 
-    delegate.set(html: html);
+    delegate.set(html: html, loading: false);
     return html;
   }
 

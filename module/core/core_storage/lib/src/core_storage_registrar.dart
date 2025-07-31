@@ -1,4 +1,4 @@
-import 'package:log_box/log_box.dart';
+import 'package:log_box/log_box.dart' hide Storage;
 import 'package:service_locator/service_locator.dart';
 
 import '../core_storage.dart';

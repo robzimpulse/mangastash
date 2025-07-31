@@ -15,6 +15,16 @@ dependencies:
   mutex: ^3.1.0
   universal_io: ^2.2.2
   dio_cache_interceptor: ^4.0.3
+  log_box:
+    git:
+      url: https://github.com/robzimpulse/log_box.git
+      ref: master
+      path: packages/log_box
+  log_box_dio_logger:
+    git:
+      url: https://github.com/robzimpulse/log_box.git
+      ref: master
+      path: packages/log_box_dio_logger
 
   # library
   service_locator:

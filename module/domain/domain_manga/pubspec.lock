@@ -623,9 +623,29 @@ packages:
   log_box:
     dependency: "direct main"
     description:
-      path: "../../library/log_box"
-      relative: true
-    source: path
+      path: "packages/log_box"
+      ref: master
+      resolved-ref: e1178b4d9f1b69473d8b922801f1e85abd77c4db
+      url: "https://github.com/robzimpulse/log_box.git"
+    source: git
+    version: "0.1.0"
+  log_box_dio_logger:
+    dependency: transitive
+    description:
+      path: "packages/log_box_dio_logger"
+      ref: master
+      resolved-ref: e1178b4d9f1b69473d8b922801f1e85abd77c4db
+      url: "https://github.com/robzimpulse/log_box.git"
+    source: git
+    version: "0.0.1"
+  log_box_in_app_webview_logger:
+    dependency: "direct main"
+    description:
+      path: "packages/log_box_in_app_webview_logger"
+      ref: master
+      resolved-ref: e1178b4d9f1b69473d8b922801f1e85abd77c4db
+      url: "https://github.com/robzimpulse/log_box.git"
+    source: git
     version: "0.0.1"
   logging:
     dependency: transitive
@@ -989,14 +1009,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  sliver_tools:
-    dependency: transitive
-    description:
-      name: sliver_tools
-      sha256: eae28220badfb9d0559207badcbbc9ad5331aac829a88cb0964d330d2a4636a6
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.12"
   source_gen:
     dependency: transitive
     description:

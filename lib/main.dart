@@ -5,6 +5,7 @@ import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:flutter/foundation.dart';
 import 'package:log_box/log_box.dart';
+import 'package:log_box_navigation_logger/log_box_navigation_logger.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
@@ -57,7 +58,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
   Future<void> initiateAppLocator() async {
     if (widget.testing) return;
 
-    widget.locator.registerSingleton(LogBox());
+    widget.locator.registerSingleton(LogBox(capacity: 1000));
 
     // TODO: register module registrar here
     await widget.locator.registerRegistrar(CoreStorageRegistrar());
