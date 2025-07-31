@@ -77,7 +77,6 @@ class HeadlessWebviewManager {
       },
       onReceivedError: (_, request, error) {
         delegate.onReceivedError(
-          message: error.description,
           extra: {'request': request.toMap(), 'error': error.toMap()},
         );
         onLoadErrorCompleter.safeComplete();
