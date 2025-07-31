@@ -26,8 +26,6 @@ dependencies:
   # library
   service_locator:
     path: ../../library/service_locator
-  log_box:
-    path: ../../library/log_box
 
   # core
   core_storage:

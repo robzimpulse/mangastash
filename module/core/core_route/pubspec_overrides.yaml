@@ -1,6 +1,0 @@
-# melos_managed_dependency_overrides: log_box,service_locator
-dependency_overrides:
-  log_box:
-    path: ../../library/log_box
-  service_locator:
-    path: ../../library/service_locator

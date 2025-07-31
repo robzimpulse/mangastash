@@ -12,8 +12,6 @@ dependency_overrides:
     path: ../../domain/domain_manga
   entity_manga:
     path: ../../entity/entity_manga
-  log_box:
-    path: ../../library/log_box
   manga_dex_api:
     path: ../../library/manga_dex_api
   manga_service_drift:

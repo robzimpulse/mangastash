@@ -33,8 +33,6 @@ dependencies:
     path: ../../library/service_locator
   manga_dex_api:
     path: ../../library/manga_dex_api
-  log_box:
-    path: ../../library/log_box
 
 dev_dependencies:
   flutter_test:

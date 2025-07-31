@@ -23,8 +23,6 @@ dependencies:
     path: module/library/safe_bloc
   service_locator:
     path: module/library/service_locator
-  log_box:
-    path: module/library/log_box
   manga_service_firebase:
     path: module/library/manga_service_firebase
   manga_service_drift:
