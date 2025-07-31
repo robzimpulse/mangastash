@@ -9,7 +9,7 @@ class ErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: beautify error screen
-    return Scaffold(
+    return ScaffoldScreen(
       appBar: AppBar(
         title: const Text('Error Screen'),
         leading: IconButton(
