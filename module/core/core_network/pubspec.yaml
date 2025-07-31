@@ -14,7 +14,6 @@ dependencies:
   dio_smart_retry: ^6.0.0
   mutex: ^3.1.0
   universal_io: ^2.2.2
-  dio_cache_interceptor: ^4.0.3
   log_box:
     git:
       url: https://github.com/robzimpulse/log_box.git

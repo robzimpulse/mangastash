@@ -12,7 +12,6 @@ import '../dao/manga_dao.dart';
 import '../dao/tag_dao.dart';
 import '../interceptor/log_interceptor.dart';
 import '../tables/chapter_tables.dart';
-import '../tables/dio_cache_tables.dart';
 import '../tables/image_tables.dart';
 import '../tables/job_tables.dart';
 import '../tables/library_tables.dart';
@@ -37,7 +36,6 @@ part 'database.g.dart';
     TagTables,
     RelationshipTables,
     JobTables,
-    DioCacheTables,
   ],
   daos: [
     MangaDao,
