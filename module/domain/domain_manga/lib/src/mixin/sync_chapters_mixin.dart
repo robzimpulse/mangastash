@@ -8,6 +8,8 @@ mixin SyncChaptersMixin {
     required List<Chapter> values,
     required LogBox logBox,
   }) async {
+    final stopwatch = Stopwatch()..start();
+
     final results = await dao.adds(
       values: {
         for (final value in values) value.toDrift: [...?value.images],
@@ -16,6 +18,8 @@ mixin SyncChaptersMixin {
 
     final data = [...results.map((e) => Chapter.fromDatabase(e)).nonNulls];
 
+    stopwatch.stop();
+
     logBox.log(
       'Insert & Update Chapter',
       extra: {
@@ -23,6 +27,7 @@ mixin SyncChaptersMixin {
         'after count': data.length,
         'before data': [...values.map((e) => e.toJson())],
         'after data': [...data.map((e) => e.toJson())],
+        'duration': stopwatch.elapsed.toString(),
       },
       name: 'Sync Process',
     );

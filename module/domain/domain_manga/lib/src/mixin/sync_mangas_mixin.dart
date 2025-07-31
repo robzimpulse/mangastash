@@ -8,6 +8,7 @@ mixin SyncMangasMixin {
     required List<Manga> values,
     required LogBox logBox,
   }) async {
+    final stopwatch = Stopwatch()..start();
 
     final results = await dao.adds(
       values: {
@@ -18,6 +19,8 @@ mixin SyncMangasMixin {
 
     final data = [...results.map((e) => Manga.fromDatabase(e)).nonNulls];
 
+    stopwatch.stop();
+
     logBox.log(
       'Insert & Update Manga',
       extra: {
@@ -25,6 +28,7 @@ mixin SyncMangasMixin {
         'after count': data.length,
         'before data': [...values.map((e) => e.toJson())],
         'after data': [...data.map((e) => e.toJson())],
+        'duration': stopwatch.elapsed.toString(),
       },
       name: 'Sync Process',
     );
