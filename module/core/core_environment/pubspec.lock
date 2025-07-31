@@ -500,7 +500,7 @@ packages:
     description:
       path: "packages/log_box"
       ref: master
-      resolved-ref: "96d22b9af9acf24519e7c75f1be8fde76eb7d867"
+      resolved-ref: f9e7a38065ec863dcbfb2d95f4c634e2baeaa654
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
