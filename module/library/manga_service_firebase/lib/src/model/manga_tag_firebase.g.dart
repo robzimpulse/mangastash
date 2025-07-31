@@ -7,13 +7,7 @@ part of 'manga_tag_firebase.dart';
 // **************************************************************************
 
 MangaTagFirebase _$MangaTagFirebaseFromJson(Map<String, dynamic> json) =>
-    MangaTagFirebase(
-      name: json['name'] as String?,
-      id: json['id'] as String?,
-    );
+    MangaTagFirebase(name: json['name'] as String?, id: json['id'] as String?);
 
 Map<String, dynamic> _$MangaTagFirebaseToJson(MangaTagFirebase instance) =>
-    <String, dynamic>{
-      'name': instance.name,
-      'id': instance.id,
-    };
+    <String, dynamic>{'name': instance.name, 'id': instance.id};

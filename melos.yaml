@@ -35,7 +35,6 @@ scripts:
     packageFilters:
       dependsOn: "build_runner"
 
-
   upgrade:
     description: Upgrade dependencies for all packages.
     run: flutter pub upgrade

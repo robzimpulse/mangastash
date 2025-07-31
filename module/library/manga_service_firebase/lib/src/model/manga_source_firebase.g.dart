@@ -15,10 +15,10 @@ MangaSourceFirebase _$MangaSourceFirebaseFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$MangaSourceFirebaseToJson(
-        MangaSourceFirebase instance) =>
-    <String, dynamic>{
-      'icon_url': instance.iconUrl,
-      'name': instance.name,
-      'url': instance.url,
-      'id': instance.id,
-    };
+  MangaSourceFirebase instance,
+) => <String, dynamic>{
+  'icon_url': instance.iconUrl,
+  'name': instance.name,
+  'url': instance.url,
+  'id': instance.id,
+};
