@@ -48,6 +48,18 @@ jobs:
           user_name: 'robzimpulse'
           user_email: 'kugelfang.killaruna@gmail.com'
           commit_message: 'Publish to gh-pages'
+      - name: 'Compress Directory'
+        uses: somaz94/compress-decompress@v1
+        with:
+          command: compress
+          source: build/web
+          format: zip
+          dest: build
+          destfilename: 'web'
+      - name: 'Attach artifact to release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/web.zip
 
   build-apk:
     timeout-minutes: 30
@@ -94,27 +106,7 @@ jobs:
             Branch or TAG: ${{ github.ref }}
             Commit SHA: ${{ github.sha }}
             Artifact URL is: ${{ steps.upload_artifact.outputs.artifact-url }}
-
-  post-build:
-    timeout-minutes: 30
-    runs-on: ubuntu-latest
-    needs: [build-web, build-apk]
-    steps:
-      - name: 'Download artifact web'
-        id: download_artifact_web
-        uses: actions/download-artifact@v4
-        with:
-          name: release-web
-          path: artifact/web
-      - name: 'Download artifact apk'
-        id: download_artifact_apk
-        uses: actions/download-artifact@v4
-        with:
-          name: release-apk
-          path: artifact/apk
       - name: 'Attach artifact to release'
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            artifact/apk/app-release.apk
-            artifact/web
+          files: build/app/outputs/apk/release/app-release.apk
