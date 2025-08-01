@@ -28,5 +28,5 @@ jobs:
       - name: "Bootstrap Workspace"
         run: melos bootstrap --verbose
 
-      - name: "Build Application"
+      - name: "Run Test"
         run: melos test
