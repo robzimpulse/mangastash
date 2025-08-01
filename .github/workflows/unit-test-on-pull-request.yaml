@@ -7,7 +7,7 @@ jobs:
     timeout-minutes: 30
     runs-on: macos-latest
     steps:
-      - name: "Git Checkout'
+      - name: 'Git Checkout'
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
