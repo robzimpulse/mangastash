@@ -3,7 +3,7 @@ name: Build APK
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
-on: [push, workflow_dispatch]
+on: [pull_request, workflow_dispatch]
 
 jobs:
   build:
@@ -32,9 +32,6 @@ jobs:
 
       - name: "Bootstrap Workspace"
         run: melos bootstrap --verbose
-
-      - name: "Install Dependency"
-        run: melos get --verbose
 
       - name: "Build Application"
         run: flutter build apk
