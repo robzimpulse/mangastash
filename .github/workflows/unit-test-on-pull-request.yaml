@@ -3,7 +3,7 @@ name: Unit Test on Pull Request
 on: [pull_request]
 
 jobs:
-  build:
+  test:
     timeout-minutes: 30
     runs-on: macos-latest
     steps:
