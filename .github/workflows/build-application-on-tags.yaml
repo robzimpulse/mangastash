@@ -39,7 +39,6 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MANGASTASH_4BF38 }}
           channelId: live
           projectId: mangastash-4bf38
-          entrypoint: /build/web
       - name: 'Deploy to Github Page'
         uses: peaceiris/actions-gh-pages@v4
         with:
