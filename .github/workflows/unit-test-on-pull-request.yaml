@@ -7,23 +7,23 @@ jobs:
     timeout-minutes: 30
     runs-on: macos-latest
     steps:
-      - name: "Git Checkout"
+      - name: "Git Checkout'
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ github.ref }}
 
-      - name: "Install Flutter"
+      - name: 'Install Flutter'
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.29.3'
           cache: true
 
-      - name: "Install Melos"
+      - name: 'Install Melos'
         run: flutter pub global activate melos 6.2.0
 
-      - name: "Bootstrap Workspace"
+      - name: 'Bootstrap Workspace'
         run: melos bootstrap --verbose
 
-      - name: "Run Test"
+      - name: 'Run Test'
         run: melos test

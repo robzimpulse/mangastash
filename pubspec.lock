@@ -290,14 +290,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.7.0"
-  dio_cache_interceptor:
-    dependency: transitive
-    description:
-      name: dio_cache_interceptor
-      sha256: c1cbf8be886b3e077165dda50a1b3bb299b8a72694af94d065b4d2ac0fee67d7
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.3"
   dio_smart_retry:
     dependency: transitive
     description:

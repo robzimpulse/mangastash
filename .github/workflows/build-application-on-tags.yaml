@@ -32,6 +32,23 @@ jobs:
         with:
           name: release-web
           path: build/web
+      - name: 'Deploy to Firebase'
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MANGASTASH_4BF38 }}
+          channelId: live
+          projectId: mangastash-4bf38
+          entrypoint: /build/web
+      - name: 'Deploy to Github Page'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: /build/web
+          force_orphan: true
+          user_name: 'robzimpulse'
+          user_email: 'kugelfang.killaruna@gmail.com'
+          commit_message: 'Publish to gh-pages'
 
   build-apk:
     timeout-minutes: 30
@@ -42,21 +59,21 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.ref }}
-      - name: "Install Flutter"
+      - name: 'Install Flutter'
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.29.3'
           cache: true
-      - name: "Install Java"
+      - name: 'Install Java'
         uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
           java-version: '17'
-      - name: "Install Melos"
+      - name: 'Install Melos'
         run: flutter pub global activate melos 6.2.0
-      - name: "Bootstrap Workspace"
+      - name: 'Bootstrap Workspace'
         run: melos bootstrap --verbose
-      - name: "Build APK"
+      - name: 'Build APK'
         run: flutter build apk
       - name: 'Save Artifact'
         id: upload_artifact
@@ -82,11 +99,14 @@ jobs:
         with:
           name: release-apk
           path: artifact/apk
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - uses: 'marvinpinto/action-automatic-releases@latest'
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          files: artifact/apk/app-release.apk
-      - name: Send debug APK to telegram
+          repo_token: '${{ secrets.GITHUB_TOKEN }}'
+          prerelease: false
+          files: |
+            artifact/apk/app-release.apk
+            artifact/web
+      - name: 'Send debug APK to telegram'
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_GROUP_CHAT_ID }}
