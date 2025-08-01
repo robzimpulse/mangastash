@@ -175,11 +175,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-windows
-          path: build/windows
+          path: build/windows/x64/runner/Release/mangastash.exe
       - name: 'Attach artifact to release'
         uses: softprops/action-gh-release@v2
         with:
-          files: build/windows
+          files: build/windows/x64/runner/Release/mangastash.exe
 
   build-linux:
     timeout-minutes: 30
@@ -212,8 +212,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-linux
-          path: build/linux
+          path: build/linux/x64/release/bundle/mangastash
       - name: 'Attach artifact to release'
         uses: softprops/action-gh-release@v2
         with:
-          files: build/linux
+          files: build/linux/x64/release/bundle/mangastash
