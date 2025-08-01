@@ -605,7 +605,7 @@ packages:
     source: path
     version: "0.0.1"
   manga_service_drift:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../../library/manga_service_drift"
       relative: true

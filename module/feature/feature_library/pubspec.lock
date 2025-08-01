@@ -194,14 +194,14 @@ packages:
     source: hosted
     version: "3.1.2"
   core_environment:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../../core/core_environment"
       relative: true
     source: path
     version: "0.0.1"
   core_network:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../../core/core_network"
       relative: true
@@ -215,7 +215,7 @@ packages:
     source: path
     version: "0.0.1"
   core_storage:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../../core/core_storage"
       relative: true
@@ -294,7 +294,7 @@ packages:
     source: hosted
     version: "2.1.1"
   domain_manga:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../../domain/domain_manga"
       relative: true
@@ -732,14 +732,14 @@ packages:
     source: hosted
     version: "1.3.0"
   manga_dex_api:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../../library/manga_dex_api"
       relative: true
     source: path
     version: "0.0.1"
   manga_service_drift:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../../library/manga_service_drift"
       relative: true
@@ -1308,7 +1308,7 @@ packages:
     source: path
     version: "0.0.1"
   ui_common:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../../ui/ui_common"
       relative: true
