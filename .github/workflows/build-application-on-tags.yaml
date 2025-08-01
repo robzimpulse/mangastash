@@ -3,7 +3,7 @@ name: Build Application
 on:
   push:
     tags:
-      - "v*"
+      - "v*.*.*"
 
 jobs:
   build-web:
@@ -80,6 +80,20 @@ jobs:
         with:
           name: release-apk
           path: build/app/outputs/apk/release/app-release.apk
+      - name: 'Send debug APK to telegram'
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_GROUP_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: |
+            Here is the debug APK for ${{ github.event_name }}
+            Runner OS: ${{ runner.os }}
+            Event: ${{ github.event_name }}
+            Job ID: ${{ github.job }}
+            Triggered by: ${{ github.actor }}
+            Branch or TAG: ${{ github.ref }}
+            Commit SHA: ${{ github.sha }}
+            Artifact URL is: ${{ steps.upload_artifact.outputs.artifact-url }}
 
   post-build:
     timeout-minutes: 30
@@ -98,24 +112,9 @@ jobs:
         with:
           name: release-apk
           path: artifact/apk
-      - uses: 'marvinpinto/action-automatic-releases@latest'
+      - name: 'Attach artifact to release'
+        uses: softprops/action-gh-release@v2
         with:
-          repo_token: '${{ secrets.GITHUB_TOKEN }}'
-          prerelease: false
           files: |
             artifact/apk/app-release.apk
             artifact/web
-      - name: 'Send debug APK to telegram'
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_GROUP_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: |
-            Here is the debug APK for ${{ github.event_name }}
-            Runner OS: ${{ runner.os }}
-            Event: ${{ github.event_name }}
-            Job ID: ${{ github.job }}
-            Triggered by: ${{ github.actor }}
-            Branch or TAG: ${{ github.ref }}
-            Commit SHA: ${{ github.sha }}
-            Artifact URL is: ${{ steps.download_artifact_apk.outputs.artifact-url }}
