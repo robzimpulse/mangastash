@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
@@ -13,24 +12,14 @@ import 'package:universal_io/io.dart';
 
 class HeadlessWebviewManager {
   final LogBox _log;
-  final CustomCacheManager _cacheManager;
 
-  HeadlessWebviewManager({
-    required LogBox log,
-    required CustomCacheManager cacheManager,
-  }) : _log = log,
-       _cacheManager = cacheManager;
+  HeadlessWebviewManager({required LogBox log}) : _log = log;
 
-  Future<Document?> open(
-    String url, {
-    List<String> scripts = const [],
-    bool useCache = true,
-  }) async {
+  Future<Document?> open(String url, {List<String> scripts = const []}) async {
     final uri = WebUri(url);
     final html = await _fetch(
       uri: uri,
       scripts: scripts,
-      useCache: useCache,
       delegate: _log.inAppWebviewObserver,
     );
     if (html == null) return null;
@@ -41,15 +30,7 @@ class HeadlessWebviewManager {
     required WebUri uri,
     required InAppWebviewObserver delegate,
     List<String> scripts = const [],
-    bool useCache = true,
   }) async {
-    final cache = await _cacheManager.html.getFileFromCache(uri.toString());
-    final data = await cache?.file.readAsString();
-
-    if (data != null && useCache) {
-      delegate.set(uri: uri, html: data, loading: false);
-      return data;
-    }
     final onLoadStartCompleter = Completer();
     final onLoadStopCompleter = Completer();
     final onLoadErrorCompleter = Completer();
@@ -143,13 +124,6 @@ class HeadlessWebviewManager {
       delegate.set(error: Exception('Null Html'), loading: false);
       return null;
     }
-
-    await _cacheManager.html.putFile(
-      uri.toString(),
-      utf8.encode(html),
-      fileExtension: 'html',
-      maxAge: const Duration(minutes: 30),
-    );
 
     delegate.set(html: html, loading: false);
     return html;
