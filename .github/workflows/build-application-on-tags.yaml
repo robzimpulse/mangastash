@@ -61,7 +61,6 @@ jobs:
       - name: 'Attach artifact to release'
         uses: softprops/action-gh-release@v2
         with:
-          name: release-web
           files: build/web.zip
 
   build-apk:
@@ -114,7 +113,6 @@ jobs:
       - name: 'Attach artifact to release'
         uses: softprops/action-gh-release@v2
         with:
-          name: release-apk
           files: build/app/outputs/apk/release/app-release.apk
 
   build-macos:
@@ -148,5 +146,74 @@ jobs:
       - name: 'Attach artifact to release'
         uses: softprops/action-gh-release@v2
         with:
-          name: release-macos
           files: build/macos/Build/Products/Release/mangastash.app
+
+  build-windows:
+    timeout-minutes: 30
+    runs-on: windows-latest
+    steps:
+      - name: 'Git Checkout'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+      - name: 'Install Flutter'
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+          cache: true
+      - name: 'Flutter Doctor'
+        run: flutter doctor -v
+      - name: 'Install Melos'
+        run: flutter pub global activate melos 6.2.0
+      - name: 'Bootstrap Workspace'
+        run: melos bootstrap --verbose
+      - name: 'Build Application'
+        run: flutter build windows
+      - name: 'Save Artifact'
+        id: upload_artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-windows
+          path: build/windows
+      - name: 'Attach artifact to release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/windows
+
+  build-linux:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Git Checkout'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+      - name: 'Install Flutter'
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+          cache: true
+      - name: 'Install Linux Dependencies'
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ninja-build libgtk-3-dev
+      - name: 'Flutter Doctor'
+        run: flutter doctor -v
+      - name: 'Install Melos'
+        run: flutter pub global activate melos 6.2.0
+      - name: 'Bootstrap Workspace'
+        run: melos bootstrap --verbose
+      - name: 'Build Application'
+        run: flutter build linux
+      - name: 'Save Artifact'
+        id: upload_artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-linux
+          path: build/linux
+      - name: 'Attach artifact to release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/linux
