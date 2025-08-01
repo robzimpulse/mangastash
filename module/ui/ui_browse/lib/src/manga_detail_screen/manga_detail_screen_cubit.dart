@@ -4,7 +4,6 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:feature_common/feature_common.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import 'manga_detail_screen_state.dart';
@@ -15,7 +14,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   final SearchChapterUseCase _searchChapterUseCase;
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
   final AddToLibraryUseCase _addToLibraryUseCase;
-  final CrawlUrlUseCase _crawlUrlUseCase;
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final GetAllChapterUseCase _getAllChapterUseCase;
   final SearchMangaUseCase _searchMangaUseCase;
@@ -28,7 +26,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required AddToLibraryUseCase addToLibraryUseCase,
     required RemoveFromLibraryUseCase removeFromLibraryUseCase,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
-    required CrawlUrlUseCase crawlUrlUseCase,
     required ListenPrefetchUseCase listenPrefetchUseCase,
     required PrefetchChapterUseCase prefetchChapterUseCase,
     required ListenReadHistoryUseCase listenReadHistoryUseCase,
@@ -39,7 +36,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
        _searchChapterUseCase = searchChapterUseCase,
        _addToLibraryUseCase = addToLibraryUseCase,
        _removeFromLibraryUseCase = removeFromLibraryUseCase,
-       _crawlUrlUseCase = crawlUrlUseCase,
        _prefetchChapterUseCase = prefetchChapterUseCase,
        _getAllChapterUseCase = getAllChapterUseCase,
        super(
@@ -296,10 +292,5 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
         chapterId: chapterId,
       );
     }
-  }
-
-  void recrawl({required BuildContext context, required String url}) async {
-    await _crawlUrlUseCase.execute(context: context, url: url);
-    await init();
   }
 }

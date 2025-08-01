@@ -23,7 +23,8 @@ class BrowseMangaScreen extends StatefulWidget {
   final Future<SearchMangaParameter?>? Function(
     SearchMangaParameter? value,
     List<Tag> availableTags,
-  )? onTapFilter;
+  )?
+  onTapFilter;
 
   final CustomCacheManager cacheManager;
 
@@ -33,25 +34,27 @@ class BrowseMangaScreen extends StatefulWidget {
     Future<SearchMangaParameter?>? Function(
       SearchMangaParameter? value,
       List<Tag> availableTags,
-    )? onTapFilter,
+    )?
+    onTapFilter,
     String? source,
   }) {
     return BlocProvider(
-      create: (context) => BrowseMangaScreenCubit(
-        initialState: BrowseMangaScreenState(
-          source: source?.let((e) => SourceEnum.fromValue(name: source)),
-        ),
-        searchMangaUseCase: locator(),
-        listenMangaFromLibraryUseCase: locator(),
-        addToLibraryUseCase: locator(),
-        removeFromLibraryUseCase: locator(),
-        prefetchMangaUseCase: locator(),
-        listenPrefetchMangaUseCase: locator(),
-        prefetchChapterUseCase: locator(),
-        listenSearchParameterUseCase: locator(),
-        getTagsUseCase: locator(),
-        crawlUrlUseCase: locator(),
-      )..init(),
+      create: (context) {
+        return BrowseMangaScreenCubit(
+          initialState: BrowseMangaScreenState(
+            source: source?.let((e) => SourceEnum.fromValue(name: source)),
+          ),
+          searchMangaUseCase: locator(),
+          listenMangaFromLibraryUseCase: locator(),
+          addToLibraryUseCase: locator(),
+          removeFromLibraryUseCase: locator(),
+          prefetchMangaUseCase: locator(),
+          listenPrefetchMangaUseCase: locator(),
+          prefetchChapterUseCase: locator(),
+          listenSearchParameterUseCase: locator(),
+          getTagsUseCase: locator(),
+        )..init();
+      },
       child: BrowseMangaScreen(
         cacheManager: locator(),
         onTapManga: onTapManga,
@@ -128,16 +131,19 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
 
   Widget _menuSource({required BuildContext context}) {
     return _builder(
-      buildWhen: (prev, curr) => [
-        prev.source != curr.source,
-        prev.parameter != curr.parameter,
-      ].contains(true),
+      buildWhen: (prev, curr) {
+        return [
+          prev.source != curr.source,
+          prev.parameter != curr.parameter,
+        ].contains(true);
+      },
       builder: (context, state) {
         final parameter = state.parameter.copyWith(page: 1);
         final source = state.source;
-        final url = source == SourceEnum.mangaclash
-            ? parameter.mangaclash
-            : source == SourceEnum.asurascan
+        final url =
+            source == SourceEnum.mangaclash
+                ? parameter.mangaclash
+                : source == SourceEnum.asurascan
                 ? parameter.asurascan
                 : null;
 
@@ -145,7 +151,9 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
 
         return IconButton(
           icon: const Icon(Icons.open_in_browser),
-          onPressed: () => _cubit(context).recrawl(context: context, url: url),
+          onPressed: () {
+            context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+          },
         );
       },
     );
@@ -154,12 +162,14 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
   Widget _menuSearch({required BuildContext context}) {
     return _builder(
       buildWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
-      builder: (context, state) => IconButton(
-        icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
-        onPressed: () => _cubit(context).update(
-          isSearchActive: !state.isSearchActive,
-        ),
-      ),
+      builder:
+          (context, state) => IconButton(
+            icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
+            onPressed:
+                () => _cubit(
+                  context,
+                ).update(isSearchActive: !state.isSearchActive),
+          ),
     );
   }
 
@@ -168,10 +178,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     return ScaffoldScreen(
       appBar: AppBar(
         title: _title(context),
-        actions: [
-          _menuSearch(context: context),
-          _menuSource(context: context),
-        ],
+        actions: [_menuSearch(context: context), _menuSource(context: context)],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(44),
           child: ConstrainedBox(
@@ -200,92 +207,109 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
       ),
     );
 
+    final List<Widget> menus = [
+      _builder(
+        buildWhen: (prev, curr) {
+          return [
+            prev.isFavoriteActive != curr.isFavoriteActive,
+            prev.parameter != curr.parameter,
+          ].contains(true);
+        },
+        builder: (context, state) {
+          return IconButton.outlined(
+            style: buttonStyle?.copyWith(
+              backgroundColor:
+                  state.isFavoriteActive
+                      ? const WidgetStatePropertyAll(Colors.grey)
+                      : null,
+            ),
+            icon: Icon(Icons.favorite, color: color),
+            onPressed: () {
+              _cubit(context).init(
+                parameter: state.parameter.copyWith(
+                  orders: Map.fromEntries([
+                    MapEntry(
+                      state.isFavoriteActive
+                          ? SearchOrders.relevance
+                          : SearchOrders.rating,
+                      OrderDirections.descending,
+                    ),
+                  ]),
+                ),
+              );
+            },
+          );
+        },
+      ),
+      _builder(
+        buildWhen: (prev, curr) {
+          return [
+            prev.isUpdatedActive != curr.isUpdatedActive,
+            prev.parameter != curr.parameter,
+          ].contains(true);
+        },
+        builder: (context, state) {
+          return IconButton.outlined(
+            style: buttonStyle?.copyWith(
+              backgroundColor:
+                  state.isUpdatedActive
+                      ? const WidgetStatePropertyAll(Colors.grey)
+                      : null,
+            ),
+            icon: Icon(Icons.update, color: color),
+            onPressed: () {
+              _cubit(context).init(
+                parameter: state.parameter.copyWith(
+                  orders: Map.fromEntries([
+                    MapEntry(
+                      state.isUpdatedActive
+                          ? SearchOrders.relevance
+                          : SearchOrders.updatedAt,
+                      OrderDirections.descending,
+                    ),
+                  ]),
+                ),
+              );
+            },
+          );
+        },
+      ),
+      _builder(
+        buildWhen: (prev, curr) {
+          return [
+            prev.parameter != curr.parameter,
+            prev.isFilterActive != curr.isFilterActive,
+            prev.tags != curr.tags,
+          ].contains(true);
+        },
+        builder: (context, state) {
+          return OutlinedButton.icon(
+            style: buttonStyle?.copyWith(
+              backgroundColor:
+                  state.isFilterActive
+                      ? const WidgetStatePropertyAll(Colors.grey)
+                      : null,
+            ),
+            icon: Icon(Icons.filter_list, color: color),
+            label: Text('Filter', style: labelStyle?.copyWith(color: color)),
+            onPressed: () async {
+              final result = await widget.onTapFilter?.call(
+                state.parameter,
+                state.tags,
+              );
+              if (context.mounted && result != null) {
+                _cubit(context).init(parameter: result);
+              }
+            },
+          );
+        },
+      ),
+    ];
+
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          _builder(
-            buildWhen: (prev, curr) => [
-              prev.isFavoriteActive != curr.isFavoriteActive,
-              prev.parameter != curr.parameter,
-            ].contains(true),
-            builder: (context, state) => IconButton.outlined(
-              style: buttonStyle?.copyWith(
-                backgroundColor: state.isFavoriteActive
-                    ? const WidgetStatePropertyAll(Colors.grey)
-                    : null,
-              ),
-              icon: Icon(Icons.favorite, color: color),
-              onPressed: () => _cubit(context).init(
-                parameter: state.parameter.copyWith(
-                  orders: Map.fromEntries(
-                    [
-                      MapEntry(
-                        state.isFavoriteActive
-                            ? SearchOrders.relevance
-                            : SearchOrders.rating,
-                        OrderDirections.descending,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          _builder(
-            buildWhen: (prev, curr) => [
-              prev.isUpdatedActive != curr.isUpdatedActive,
-              prev.parameter != curr.parameter,
-            ].contains(true),
-            builder: (context, state) => IconButton.outlined(
-              style: buttonStyle?.copyWith(
-                backgroundColor: state.isUpdatedActive
-                    ? const WidgetStatePropertyAll(Colors.grey)
-                    : null,
-              ),
-              icon: Icon(Icons.update, color: color),
-              onPressed: () => _cubit(context).init(
-                parameter: state.parameter.copyWith(
-                  orders: Map.fromEntries(
-                    [
-                      MapEntry(
-                        state.isUpdatedActive
-                            ? SearchOrders.relevance
-                            : SearchOrders.updatedAt,
-                        OrderDirections.descending,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          _builder(
-            buildWhen: (prev, curr) => [
-              prev.parameter != curr.parameter,
-              prev.isFilterActive != curr.isFilterActive,
-              prev.tags != curr.tags,
-            ].contains(true),
-            builder: (context, state) => OutlinedButton.icon(
-              style: buttonStyle?.copyWith(
-                backgroundColor: state.isFilterActive
-                    ? const WidgetStatePropertyAll(Colors.grey)
-                    : null,
-              ),
-              icon: Icon(Icons.filter_list, color: color),
-              label: Text('Filter', style: labelStyle?.copyWith(color: color)),
-              onPressed: () async {
-                final result = await widget.onTapFilter?.call(
-                  state.parameter,
-                  state.tags,
-                );
-                if (context.mounted && result != null) {
-                  _cubit(context).init(parameter: result);
-                }
-              },
-            ),
-          ),
-        ].intersperse(const SizedBox(width: 4)).toList(),
+        children: menus.intersperse(const SizedBox(width: 4)).toList(),
       ),
     );
   }
@@ -303,70 +327,85 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
           ),
         );
       },
-      buildWhen: (prev, curr) => [
-        prev.source != curr.source,
-        prev.isSearchActive != curr.isSearchActive,
-        prev.parameter != curr.parameter,
-      ].contains(true),
-      builder: (context, state) => !state.isSearchActive
-          ? Text(state.source?.name ?? '')
-          : Container(
-              alignment: Alignment.centerLeft,
-              child: TextField(
-                controller: _searchController,
-                focusNode: _searchFocusNode,
-                decoration: InputDecoration(
-                  hintText: 'Search...',
-                  filled: false,
-                  border: InputBorder.none,
-                  hintStyle: DefaultTextStyle.of(context).style,
-                ),
-                cursorColor: DefaultTextStyle.of(context).style.color,
-                style: DefaultTextStyle.of(context).style,
-                onSubmitted: (value) => _cubit(context).init(
-                  parameter: state.parameter.copyWith(title: value),
-                ),
+      buildWhen: (prev, curr) {
+        return [
+          prev.source != curr.source,
+          prev.isSearchActive != curr.isSearchActive,
+          prev.parameter != curr.parameter,
+        ].contains(true);
+      },
+      builder: (context, state) {
+        if (state.isSearchActive) {
+          return Container(
+            alignment: Alignment.centerLeft,
+            child: TextField(
+              controller: _searchController,
+              focusNode: _searchFocusNode,
+              decoration: InputDecoration(
+                hintText: 'Search...',
+                filled: false,
+                border: InputBorder.none,
+                hintStyle: DefaultTextStyle.of(context).style,
               ),
+              cursorColor: DefaultTextStyle.of(context).style.color,
+              style: DefaultTextStyle.of(context).style,
+              onSubmitted:
+                  (value) => _cubit(
+                    context,
+                  ).init(parameter: state.parameter.copyWith(title: value)),
             ),
+          );
+        }
+
+        return Text(state.source?.name ?? '');
+      },
     );
   }
 
   Widget _content(BuildContext context) {
     return _builder(
-      buildWhen: (prev, curr) => [
-        prev.isLoading != curr.isLoading,
-        prev.error != curr.error,
-        prev.mangas != curr.mangas,
-        prev.libraryMangaIds != curr.libraryMangaIds,
-        prev.parameter != curr.parameter,
-        prev.prefetchedMangaIds != curr.prefetchedMangaIds,
-        prev.hasNextPage != curr.hasNextPage,
-        prev.parameter != curr.parameter,
-      ].contains(true),
-      builder: (context, state) => GridWidget<Manga>(
-        itemBuilder: (context, data) => MangaItemWidget(
-          manga: data,
-          cacheManager: widget.cacheManager,
-          onTap: () => widget.onTapManga?.call(data, state.parameter),
-          onLongPress: () => _onTapMenu(
-            context: context,
-            manga: data,
-            isOnLibrary: state.libraryMangaIds.contains(data.id),
-          ),
-          isOnLibrary: state.libraryMangaIds.contains(data.id),
-          isPrefetching: state.prefetchedMangaIds.contains(data.id),
-        ),
-        onLoadNextPage: () => _cubit(context).next(),
-        onRefresh: () => _cubit(context).init(),
-        onTapRecrawl: (url) => _cubit(context).recrawl(
-          context: context,
-          url: url,
-        ),
-        error: state.error,
-        isLoading: state.isLoading,
-        hasNext: state.hasNextPage,
-        data: state.mangas,
-      ),
+      buildWhen: (prev, curr) {
+        return [
+          prev.isLoading != curr.isLoading,
+          prev.error != curr.error,
+          prev.mangas != curr.mangas,
+          prev.libraryMangaIds != curr.libraryMangaIds,
+          prev.parameter != curr.parameter,
+          prev.prefetchedMangaIds != curr.prefetchedMangaIds,
+          prev.hasNextPage != curr.hasNextPage,
+          prev.parameter != curr.parameter,
+        ].contains(true);
+      },
+      builder: (context, state) {
+        return GridWidget<Manga>(
+          itemBuilder: (context, data) {
+            return MangaItemWidget(
+              manga: data,
+              cacheManager: widget.cacheManager,
+              onTap: () => widget.onTapManga?.call(data, state.parameter),
+              onLongPress: () {
+                _onTapMenu(
+                  context: context,
+                  manga: data,
+                  isOnLibrary: state.libraryMangaIds.contains(data.id),
+                );
+              },
+              isOnLibrary: state.libraryMangaIds.contains(data.id),
+              isPrefetching: state.prefetchedMangaIds.contains(data.id),
+            );
+          },
+          onLoadNextPage: () => _cubit(context).next(),
+          onRefresh: () => _cubit(context).init(),
+          onTapRecrawl: (url) {
+            // TODO: implement recrawl from url
+            context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+          },
+          error: state.error,
+          isLoading: state.isLoading,
+          hasNext: state.hasNextPage,
+          data: state.mangas,
+        );
+      },
     );
   }
 }

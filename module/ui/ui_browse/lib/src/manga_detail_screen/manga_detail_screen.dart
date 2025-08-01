@@ -53,7 +53,6 @@ class MangaDetailScreen extends StatefulWidget {
           addToLibraryUseCase: locator(),
           removeFromLibraryUseCase: locator(),
           listenMangaFromLibraryUseCase: locator(),
-          crawlUrlUseCase: locator(),
           listenPrefetchUseCase: locator(),
           prefetchChapterUseCase: locator(),
           listenReadHistoryUseCase: locator(),
@@ -97,9 +96,14 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   MangaDetailScreenCubit _cubit(BuildContext context) => context.read();
 
-  void _onTapTag(BuildContext context, {Tag? tag}) {
+  void _onTapTag({required BuildContext context, Tag? tag}) {
     // TODO: implement this
     return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+  }
+
+  void _onTapRecrawl({required BuildContext context, required String url}) {
+    // TODO: implement recrawl from url
+    context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
 
   void _onTapDownload({
@@ -233,37 +237,36 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       builder: (context, state) {
         final url = state.manga?.coverUrl;
 
+        Widget view;
+        if (url == null) {
+          view = const Center(
+            child: SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(),
+            ),
+          );
+        } else {
+          view = CachedNetworkImageWidget(
+            fit: BoxFit.cover,
+            cacheManager: widget.cacheManager,
+            imageUrl: url,
+            errorBuilder: (context, error, _) => const Icon(Icons.error),
+            progressBuilder:
+                (context, progress) => Center(
+                  child: SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(value: progress),
+                  ),
+                ),
+          );
+        }
+
         return Stack(
           fit: StackFit.expand,
           children: [
-            Positioned.fill(
-              child:
-                  url != null
-                      ? CachedNetworkImageWidget(
-                        fit: BoxFit.cover,
-                        cacheManager: widget.cacheManager,
-                        imageUrl: url,
-                        errorBuilder:
-                            (context, error, _) => const Icon(Icons.error),
-                        progressBuilder:
-                            (context, progress) => Center(
-                              child: SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  value: progress,
-                                ),
-                              ),
-                            ),
-                      )
-                      : const Center(
-                        child: SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-            ),
+            Positioned.fill(child: view),
             Positioned.fill(
               child: Opacity(
                 opacity: 0.5,
@@ -322,7 +325,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             Icons.web,
             color: Theme.of(context).appBarTheme.iconTheme?.color,
           ),
-          onPressed: () => _cubit(context).recrawl(context: context, url: url),
+          onPressed: () => _onTapRecrawl(context: context, url: url),
         );
       },
     );
@@ -484,14 +487,12 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               ),
               onLoadNextPage: () => _cubit(context).nextChapter(),
               onRefresh: () => _cubit(context).initChapter(),
-              onTapRecrawl: (url) {
-                return _cubit(context).recrawl(context: context, url: url);
-              },
+              onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
               onTapDownload: (option) {
-                return _onTapDownload(context: context, option: option);
+                _onTapDownload(context: context, option: option);
               },
               onTapFilter: () {
-                return _onTapFilter(context: context, config: state.config);
+                _onTapFilter(context: context, config: state.config);
               },
               onTapPrefetch: () => _cubit(context).prefetch(),
               error: state.errorChapters,
@@ -517,7 +518,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               isLoading: state.isLoadingManga,
               tags: [...?state.manga?.tags],
               description: state.manga?.description,
-              onTapTag: (tag) => _onTapTag(context, tag: tag),
+              onTapTag: (tag) => _onTapTag(context: context, tag: tag),
             );
           },
         ),
@@ -558,8 +559,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               ),
               onRefresh: () => _cubit(context).initSimilarManga(),
               onLoadNextPage: () => _cubit(context).nextSimilarManga(),
-              onTapRecrawl:
-                  (url) => _cubit(context).recrawl(context: context, url: url),
+              onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
               error: state.errorSimilarManga,
               isLoading: state.isLoadingSimilarManga || state.isLoadingManga,
               hasNext: state.hasNextPageSimilarManga,

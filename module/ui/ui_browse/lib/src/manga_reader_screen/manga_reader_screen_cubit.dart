@@ -2,7 +2,6 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:feature_common/feature_common.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import 'manga_reader_screen_state.dart';
@@ -13,19 +12,15 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
 
   final GetAllChapterUseCase _getAllChapterUseCase;
 
-  final CrawlUrlUseCase _crawlUrlUseCase;
-
   final UpdateChapterLastReadAtUseCase _updateChapterLastReadAtUseCase;
 
   MangaReaderScreenCubit({
     required GetChapterUseCase getChapterUseCase,
-    required CrawlUrlUseCase crawlUrlUseCase,
     required MangaReaderScreenState initialState,
     required UpdateChapterLastReadAtUseCase updateChapterLastReadAtUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required GetAllChapterUseCase getAllChapterUseCase,
   }) : _getChapterUseCase = getChapterUseCase,
-       _crawlUrlUseCase = crawlUrlUseCase,
        _getAllChapterUseCase = getAllChapterUseCase,
        _updateChapterLastReadAtUseCase = updateChapterLastReadAtUseCase,
        super(
@@ -98,10 +93,5 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     }
 
     emit(state.copyWith(isLoading: false));
-  }
-
-  void recrawl({required BuildContext context, required String url}) async {
-    await _crawlUrlUseCase.execute(context: context, url: url);
-    await _fetchChapter();
   }
 }

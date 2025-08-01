@@ -2,7 +2,6 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:feature_common/feature_common.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import 'browse_manga_screen_state.dart';
@@ -15,7 +14,6 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   final PrefetchMangaUseCase _prefetchMangaUseCase;
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final GetTagsUseCase _getTagsUseCase;
-  final CrawlUrlUseCase _crawlUrlUseCase;
 
   BrowseMangaScreenCubit({
     required BrowseMangaScreenState initialState,
@@ -28,15 +26,12 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     required PrefetchChapterUseCase prefetchChapterUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required GetTagsUseCase getTagsUseCase,
-    required CrawlUrlUseCase crawlUrlUseCase,
   }) : _searchMangaUseCase = searchMangaUseCase,
        _addToLibraryUseCase = addToLibraryUseCase,
        _removeFromLibraryUseCase = removeFromLibraryUseCase,
        _prefetchMangaUseCase = prefetchMangaUseCase,
        _prefetchChapterUseCase = prefetchChapterUseCase,
        _getTagsUseCase = getTagsUseCase,
-       _crawlUrlUseCase = crawlUrlUseCase,
-
        super(
          initialState.copyWith(
            parameter:
@@ -168,10 +163,5 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     final source = manga.source;
     if (id == null || source == null) return;
     // TODO: add download manga
-  }
-
-  void recrawl({required BuildContext context, required String url}) async {
-    await _crawlUrlUseCase.execute(context: context, url: url);
-    await init(parameter: state.parameter);
   }
 }
