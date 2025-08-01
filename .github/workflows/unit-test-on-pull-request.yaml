@@ -1,8 +1,5 @@
 name: Unit Test on Pull Request
 
-env:
-  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-
 on: [pull_request]
 
 jobs:
