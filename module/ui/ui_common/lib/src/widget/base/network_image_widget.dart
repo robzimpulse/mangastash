@@ -57,6 +57,7 @@ class NetworkImageWidget extends StatelessWidget {
         fit: fit,
         loadingBuilder: (context, child, event) {
           final progress = event?.progress;
+          print('Progress: $progress');
           if (progress == null) return child;
           return progressBuilder?.call(context, progress) ?? child;
         },
