@@ -1,5 +1,5 @@
 import 'package:core_environment/core_environment.dart';
-import 'package:core_storage/core_storage.dart';
+import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -11,12 +11,12 @@ import 'manga_history_screen_state.dart';
 class MangaHistoryScreen extends StatelessWidget {
   const MangaHistoryScreen({
     super.key,
-    required this.cacheManager,
+    required this.dio,
     this.onTapManga,
     this.onTapChapter,
   });
 
-  final CustomCacheManager cacheManager;
+  final Dio dio;
 
   final ValueSetter<Manga?>? onTapManga;
 
@@ -32,7 +32,7 @@ class MangaHistoryScreen extends StatelessWidget {
         listenReadHistoryUseCase: locator(),
       )..init(),
       child: MangaHistoryScreen(
-        cacheManager: locator(),
+        dio: locator(),
         onTapChapter: onTapChapter,
         onTapManga: onTapManga,
       ),
@@ -54,7 +54,7 @@ class MangaHistoryScreen extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       manga: manga,
       onTap: () => onTapManga?.call(manga),
-      cacheManager: cacheManager,
+      dio: dio,
     );
   }
 

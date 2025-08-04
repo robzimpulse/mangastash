@@ -1,5 +1,5 @@
 import 'package:core_environment/core_environment.dart';
-import 'package:core_storage/core_storage.dart';
+import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -9,13 +9,9 @@ import 'manga_reader_screen_cubit.dart';
 import 'manga_reader_screen_state.dart';
 
 class MangaReaderScreen extends StatelessWidget {
-  const MangaReaderScreen({
-    super.key,
-    required this.cacheManager,
-    this.onTapShortcut,
-  });
+  const MangaReaderScreen({super.key, required this.dio, this.onTapShortcut});
 
-  final CustomCacheManager cacheManager;
+  final Dio dio;
 
   final void Function(String?)? onTapShortcut;
 
@@ -40,10 +36,7 @@ class MangaReaderScreen extends StatelessWidget {
           getAllChapterUseCase: locator(),
         )..init();
       },
-      child: MangaReaderScreen(
-        cacheManager: locator(),
-        onTapShortcut: onTapShortcut,
-      ),
+      child: MangaReaderScreen(dio: locator(), onTapShortcut: onTapShortcut),
     );
   }
 
@@ -148,7 +141,7 @@ class MangaReaderScreen extends StatelessWidget {
                 if (url != null) ...[
                   const SizedBox(height: 16),
                   OutlinedButton(
-                    onPressed: () {},
+                    onPressed: () => _onTapRecrawl(context: context, url: url),
                     child: const Text('Open Debug Browser'),
                   ),
                 ],
@@ -161,33 +154,35 @@ class MangaReaderScreen extends StatelessWidget {
           child: Column(
             children: [
               for (final image in images)
-                CachedNetworkImageWidget(
-                  cacheManager: cacheManager,
+                NetworkImageWidget(
+                  dio: dio,
                   imageUrl: image,
-                  errorBuilder:
-                      (context, error, _) => ConstrainedBox(
-                        constraints: const BoxConstraints(maxHeight: 300),
-                        child: Center(
-                          child: Row(
-                            children: [
-                              const Icon(Icons.error),
-                              const SizedBox(width: 8),
-                              Expanded(child: Text(error.toString())),
-                            ],
-                          ),
+                  errorBuilder: (context, error, _) {
+                    return ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 300),
+                      child: Center(
+                        child: Row(
+                          children: [
+                            const Icon(Icons.error),
+                            const SizedBox(width: 8),
+                            Expanded(child: Text(error.toString())),
+                          ],
                         ),
                       ),
-                  progressBuilder:
-                      (context, progress) => ConstrainedBox(
-                        constraints: const BoxConstraints(maxHeight: 300),
-                        child: Center(
-                          child: SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(value: progress),
-                          ),
+                    );
+                  },
+                  progressBuilder: (context, progress) {
+                    return ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 300),
+                      child: Center(
+                        child: SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(value: progress),
                         ),
                       ),
+                    );
+                  },
                 ),
             ],
           ),
@@ -198,9 +193,9 @@ class MangaReaderScreen extends StatelessWidget {
 
   Widget _prevButton() {
     return _builder(
-      buildWhen:
-          (prev, curr) =>
-              [prev.previousChapterId != curr.previousChapterId].contains(true),
+      buildWhen: (prev, curr) {
+        return prev.previousChapterId != curr.previousChapterId;
+      },
       builder: (context, state) {
         if (state.previousChapterId == null) {
           return const SizedBox.shrink();

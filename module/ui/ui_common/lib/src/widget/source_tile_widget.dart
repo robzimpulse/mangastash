@@ -1,7 +1,7 @@
-import 'package:core_storage/core_storage.dart';
+import 'package:core_network/core_network.dart';
 import 'package:flutter/material.dart';
 
-import 'base/cached_network_image_widget.dart';
+import 'base/network_image_widget.dart';
 import 'base/shimmer_loading_widget.dart';
 
 class SourceTileWidget extends StatelessWidget {
@@ -12,7 +12,7 @@ class SourceTileWidget extends StatelessWidget {
     this.onTap,
     this.iconUrl,
     this.isLoading = false,
-    this.cacheManager,
+    this.dio,
   });
 
   final String? iconUrl;
@@ -25,7 +25,7 @@ class SourceTileWidget extends StatelessWidget {
 
   final bool isLoading;
 
-  final CustomCacheManager? cacheManager;
+  final Dio? dio;
 
   @override
   Widget build(BuildContext context) {
@@ -35,21 +35,21 @@ class SourceTileWidget extends StatelessWidget {
         child: ShimmerLoading.circular(
           isLoading: isLoading,
           size: 16,
-          child: CachedNetworkImageWidget(
-            cacheManager: cacheManager,
+          child: NetworkImageWidget(
+            dio: dio,
             imageUrl: iconUrl ?? '',
             width: 16,
             height: 16,
             errorBuilder: (context, error, _) => const Icon(Icons.error),
-            progressBuilder: (context, progress) => Center(
-              child: SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  value: progress,
+            progressBuilder: (context, progress) {
+              return Center(
+                child: SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(value: progress),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ),
       ),
