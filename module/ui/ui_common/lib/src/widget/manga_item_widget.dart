@@ -1,5 +1,5 @@
 import 'package:core_environment/core_environment.dart';
-import 'package:core_storage/core_storage.dart';
+import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 
@@ -14,13 +14,13 @@ class MangaItemWidget extends StatelessWidget {
     this.isOnLibrary = false,
     this.isPrefetching = false,
     this.onLongPress,
-    this.cacheManager,
+    this.dio,
   });
 
   final Manga manga;
   final bool isOnLibrary;
   final bool isPrefetching;
-  final CustomCacheManager? cacheManager;
+  final Dio? dio;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final EdgeInsetsGeometry padding;
@@ -46,7 +46,7 @@ class MangaItemWidget extends StatelessWidget {
                     border: Border.all(color: theme.dividerColor),
                   ),
                   child: NetworkImageWidget(
-                    cacheManager: cacheManager,
+                    dio: dio,
                     fit: BoxFit.fill,
                     imageUrl: manga.coverUrl.or(
                       'https://placehold.co/400?text=Cover+Url',
@@ -112,7 +112,7 @@ class MangaItemWidget extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(4),
                       child: NetworkImageWidget(
-                        cacheManager: cacheManager,
+                        dio: dio,
                         imageUrl: sourceIconUrl,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, _) => const Center(

@@ -1,5 +1,5 @@
 import 'package:core_environment/core_environment.dart';
-import 'package:core_storage/core_storage.dart';
+import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -9,13 +9,9 @@ import 'manga_reader_screen_cubit.dart';
 import 'manga_reader_screen_state.dart';
 
 class MangaReaderScreen extends StatelessWidget {
-  const MangaReaderScreen({
-    super.key,
-    required this.cacheManager,
-    this.onTapShortcut,
-  });
+  const MangaReaderScreen({super.key, required this.dio, this.onTapShortcut});
 
-  final CustomCacheManager cacheManager;
+  final Dio dio;
 
   final void Function(String?)? onTapShortcut;
 
@@ -40,10 +36,7 @@ class MangaReaderScreen extends StatelessWidget {
           getAllChapterUseCase: locator(),
         )..init();
       },
-      child: MangaReaderScreen(
-        cacheManager: locator(),
-        onTapShortcut: onTapShortcut,
-      ),
+      child: MangaReaderScreen(dio: locator(), onTapShortcut: onTapShortcut),
     );
   }
 
@@ -162,7 +155,7 @@ class MangaReaderScreen extends StatelessWidget {
             children: [
               for (final image in images)
                 NetworkImageWidget(
-                  cacheManager: cacheManager,
+                  dio: dio,
                   imageUrl: image,
                   errorBuilder:
                       (context, error, _) => ConstrainedBox(

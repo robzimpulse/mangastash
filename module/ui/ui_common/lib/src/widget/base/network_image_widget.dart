@@ -1,13 +1,11 @@
 import 'package:core_environment/core_environment.dart';
-import 'package:core_storage/core_storage.dart';
-import 'package:flutter/foundation.dart';
+import 'package:core_network/core_network.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class NetworkImageWidget extends StatelessWidget {
   const NetworkImageWidget({
     super.key,
-    this.cacheManager,
+    this.dio,
     required this.imageUrl,
     this.fit,
     this.headers,
@@ -17,7 +15,7 @@ class NetworkImageWidget extends StatelessWidget {
     this.height,
   });
 
-  final CustomCacheManager? cacheManager;
+  final Dio? dio;
 
   final String imageUrl;
 
@@ -33,72 +31,13 @@ class NetworkImageWidget extends StatelessWidget {
 
   final double? height;
 
-  Widget _buildFrom(
-    BuildContext context, {
-    FileResponse? response,
-    Object? error,
-  }) {
-    const fallback = SizedBox.shrink();
-    final data = response;
-
-    if (error != null) {
-      return errorBuilder?.call(context, error, null) ?? fallback;
-    }
-
-    if (data == null) {
-      return progressBuilder?.call(context, null) ?? fallback;
-    }
-
-    if (data is FileInfo) {
-      if (kIsWeb) {
-        return FutureBuilder(
-          future: data.file.readAsBytes(),
-          builder: (context, snapshot) {
-            final data = snapshot.data;
-            final error = snapshot.error;
-
-            if (error != null) {
-              return errorBuilder?.call(context, error, null) ?? fallback;
-            }
-
-            if (data == null) {
-              return progressBuilder?.call(context, null) ?? fallback;
-            }
-
-            return Image.memory(
-              data,
-              fit: fit,
-              width: width,
-              height: height,
-              errorBuilder: errorBuilder,
-            );
-          },
-        );
-      }
-
-      return Image.file(
-        data.file,
-        fit: fit,
-        width: width,
-        height: height,
-        errorBuilder: errorBuilder,
-      );
-    }
-
-    if (data is DownloadProgress) {
-      final progress = data.progress;
-      return progressBuilder?.call(context, progress) ?? fallback;
-    }
-
-    return fallback;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final cache = cacheManager;
+    final dio = this.dio;
 
     Widget view;
-    if (cache == null) {
+
+    if (dio == null) {
       view = Image.network(
         imageUrl,
         fit: fit,
@@ -113,19 +52,17 @@ class NetworkImageWidget extends StatelessWidget {
         height: height,
       );
     } else {
-      view = StreamBuilder(
-        stream: cache.images.getFileStream(
-          imageUrl,
-          headers: headers,
-          withProgress: true,
-        ),
-        builder: (context, snapshot) {
-          return _buildFrom(
-            context,
-            response: snapshot.data,
-            error: snapshot.error,
-          );
+      view = Image(
+        image: DioImage.string(imageUrl, dio: dio, headers: headers),
+        fit: fit,
+        loadingBuilder: (context, child, event) {
+          final progress = event?.progress;
+          if (progress == null) return child;
+          return progressBuilder?.call(context, progress) ?? child;
         },
+        errorBuilder: errorBuilder,
+        width: width,
+        height: height,
       );
     }
 

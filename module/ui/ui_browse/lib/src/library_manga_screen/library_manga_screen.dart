@@ -1,5 +1,5 @@
+import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
-import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:feature_common/feature_common.dart';
 import 'package:flutter/foundation.dart';
@@ -12,7 +12,7 @@ import 'library_manga_screen_state.dart';
 class LibraryMangaScreen extends StatefulWidget {
   const LibraryMangaScreen({
     super.key,
-    required this.cacheManager,
+    required this.dio,
     this.onTapManga,
     this.onTapAddManga,
   });
@@ -21,7 +21,7 @@ class LibraryMangaScreen extends StatefulWidget {
 
   final AsyncValueGetter<String?>? onTapAddManga;
 
-  final CustomCacheManager cacheManager;
+  final Dio dio;
 
   static Widget create({
     required ServiceLocator locator,
@@ -40,7 +40,7 @@ class LibraryMangaScreen extends StatefulWidget {
         addToLibraryUseCase: locator(),
       ),
       child: LibraryMangaScreen(
-        cacheManager: locator(),
+        dio: locator(),
         onTapManga: onTapManga,
         onTapAddManga: onTapAddManga,
       ),
@@ -213,7 +213,7 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
       builder: (context, state) => GridWidget(
         itemBuilder: (context, data) => MangaItemWidget(
           manga: data,
-          cacheManager: widget.cacheManager,
+          dio: widget.dio,
           isPrefetching: state.prefetchedMangaIds.contains(data.id),
           onTap: () => widget.onTapManga?.call(data),
           onLongPress: () => _onTapMenu(

@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:core_environment/core_environment.dart';
-import 'package:core_storage/core_storage.dart';
+import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -19,7 +19,7 @@ class MangaDetailScreen extends StatefulWidget {
     this.onTapManga,
     this.onMangaMenu,
     this.onTapSort,
-    required this.cacheManager,
+    required this.dio,
   });
 
   final ValueSetter<Chapter>? onTapChapter;
@@ -30,7 +30,7 @@ class MangaDetailScreen extends StatefulWidget {
 
   final Future<ChapterConfig?> Function(ChapterConfig? value)? onTapSort;
 
-  final CustomCacheManager cacheManager;
+  final Dio dio;
 
   static Widget create({
     required ServiceLocator locator,
@@ -62,7 +62,7 @@ class MangaDetailScreen extends StatefulWidget {
         )..init();
       },
       child: MangaDetailScreen(
-        cacheManager: locator(),
+        dio: locator(),
         onTapChapter: onTapChapter,
         onTapManga: onTapManga,
         onMangaMenu: onMangaMenu,
@@ -249,7 +249,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         } else {
           view = NetworkImageWidget(
             fit: BoxFit.cover,
-            cacheManager: widget.cacheManager,
+            dio: widget.dio,
             imageUrl: url,
             errorBuilder: (context, error, _) => const Icon(Icons.error),
             progressBuilder:
@@ -540,7 +540,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               itemBuilder: (context, data) {
                 return MangaItemWidget(
                   manga: data,
-                  cacheManager: widget.cacheManager,
+                  dio: widget.dio,
                   onTap: () => widget.onTapManga?.call(data),
                   onLongPress: () {
                     _onLongPressManga(
