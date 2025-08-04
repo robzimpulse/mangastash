@@ -200,6 +200,13 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  core_network:
+    dependency: "direct main"
+    description:
+      path: "../../core/core_network"
+      relative: true
+    source: path
+    version: "0.0.1"
   core_route:
     dependency: "direct main"
     description:
@@ -262,6 +269,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.8.0+1"
+  dio_smart_retry:
+    dependency: transitive
+    description:
+      name: dio_smart_retry
+      sha256: "3d71450c19b4d91ef4c7d726a55a284bfc11eb3634f1f25006cdfab3f8595653"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.0"
   dio_web_adapter:
     dependency: transitive
     description:
@@ -589,6 +604,15 @@ packages:
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
+  log_box_dio_logger:
+    dependency: transitive
+    description:
+      path: "packages/log_box_dio_logger"
+      ref: master
+      resolved-ref: f9e7a38065ec863dcbfb2d95f4c634e2baeaa654
+      url: "https://github.com/robzimpulse/log_box.git"
+    source: git
+    version: "0.0.1"
   logging:
     dependency: transitive
     description:
@@ -643,6 +667,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  mutex:
+    dependency: transitive
+    description:
+      name: mutex
+      sha256: "8827da25de792088eb33e572115a5eb0d61d61a3c01acbc8bcbe76ed78f1a1f2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0"
   nested:
     dependency: transitive
     description:
