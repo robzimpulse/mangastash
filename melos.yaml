@@ -2,7 +2,7 @@ name: mangastash
 
 packages:
   - module/**
-  - *
+  - '*'
 
 ide:
   intellij:
