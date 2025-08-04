@@ -3,7 +3,7 @@ import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 
-import 'base/cached_network_image_widget.dart';
+import 'base/network_image_widget.dart';
 
 class MangaTileWidget extends StatelessWidget {
   const MangaTileWidget({

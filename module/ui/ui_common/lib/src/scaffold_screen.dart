@@ -40,10 +40,10 @@ class ScaffoldScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final statusBarColor = Theme.of(context).appBarTheme.backgroundColor;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarColor:
-            backgroundColor ?? Theme.of(context).appBarTheme.backgroundColor,
+        statusBarColor: backgroundColor ?? statusBarColor,
       ),
       child: PopScope(
         canPop: canPop,
@@ -56,11 +56,7 @@ class ScaffoldScreen extends StatelessWidget {
             backgroundColor: backgroundColor,
             appBar: appBar,
             bottomNavigationBar: bottomNavigationBar,
-            body: SafeArea(
-              top: false,
-              bottom: bottomSafeArea,
-              child: body,
-            ),
+            body: SafeArea(top: false, bottom: bottomSafeArea, child: body),
           ),
         ),
       ),
