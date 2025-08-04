@@ -1,6 +1,6 @@
 import 'package:core_environment/core_environment.dart';
+import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
-import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:feature_common/feature_common.dart';
@@ -13,7 +13,7 @@ import 'browse_manga_screen_state.dart';
 class BrowseMangaScreen extends StatefulWidget {
   const BrowseMangaScreen({
     super.key,
-    required this.cacheManager,
+    required this.dio,
     this.onTapManga,
     this.onTapFilter,
   });
@@ -26,7 +26,7 @@ class BrowseMangaScreen extends StatefulWidget {
   )?
   onTapFilter;
 
-  final CustomCacheManager cacheManager;
+  final Dio dio;
 
   static Widget create({
     required ServiceLocator locator,
@@ -56,7 +56,7 @@ class BrowseMangaScreen extends StatefulWidget {
         )..init();
       },
       child: BrowseMangaScreen(
-        cacheManager: locator(),
+        dio: locator(),
         onTapManga: onTapManga,
         onTapFilter: onTapFilter,
       ),
@@ -381,7 +381,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
           itemBuilder: (context, data) {
             return MangaItemWidget(
               manga: data,
-              cacheManager: widget.cacheManager,
+              dio: widget.dio,
               onTap: () => widget.onTapManga?.call(data, state.parameter),
               onLongPress: () {
                 _onTapMenu(
