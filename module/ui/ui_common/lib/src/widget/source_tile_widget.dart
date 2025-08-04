@@ -1,4 +1,4 @@
-import 'package:core_storage/core_storage.dart';
+import 'package:core_network/core_network.dart';
 import 'package:flutter/material.dart';
 
 import 'base/network_image_widget.dart';
@@ -12,7 +12,7 @@ class SourceTileWidget extends StatelessWidget {
     this.onTap,
     this.iconUrl,
     this.isLoading = false,
-    this.cacheManager,
+    this.dio,
   });
 
   final String? iconUrl;
@@ -25,7 +25,7 @@ class SourceTileWidget extends StatelessWidget {
 
   final bool isLoading;
 
-  final CustomCacheManager? cacheManager;
+  final Dio? dio;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class SourceTileWidget extends StatelessWidget {
           isLoading: isLoading,
           size: 16,
           child: NetworkImageWidget(
-            cacheManager: cacheManager,
+            dio: dio,
             imageUrl: iconUrl ?? '',
             width: 16,
             height: 16,
