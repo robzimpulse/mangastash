@@ -38,12 +38,13 @@ class DioImage extends ImageProvider<DioImage> {
   /// The scale to place in the [ImageInfo] object of the image.
   final double scale;
 
-  /// The HTTP headers that will be used with [HttpClient.get] to fetch image from network.
+  /// The HTTP headers that will be used with [HttpClient.get] to fetch image
+  /// from network.
   ///
   /// When running flutter on the web, headers are not used.
   final Map<String, String>? headers;
 
-  /// [dio] will be the default [Dio] if not set.
+  /// Dio client.
   final Dio dio;
 
   @override
@@ -79,6 +80,13 @@ class DioImage extends ImageProvider<DioImage> {
   ) async {
     try {
       assert(key == this);
+
+      chunkEvents.add(
+        const ImageChunkEvent(
+          cumulativeBytesLoaded: 0,
+          expectedTotalBytes: null,
+        ),
+      );
 
       final response = await dio.getUri<dynamic>(
         url,

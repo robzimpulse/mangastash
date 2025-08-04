@@ -29,6 +29,7 @@ class MangaTileWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final sourceIconUrl =
         manga.source?.let((e) => SourceEnum.fromValue(name: e))?.icon;
+    final title = manga.title;
 
     return Row(
       children: [
@@ -41,18 +42,17 @@ class MangaTileWidget extends StatelessWidget {
           width: 50,
           height: 50,
           errorBuilder: (context, error, _) => const Icon(Icons.error),
-          progressBuilder: (context, progress) => Center(
-            child: CircularProgressIndicator(
-              value: progress,
+          progressBuilder: (context, progress) {
+            return Center(child: CircularProgressIndicator(value: progress));
+          },
+        ),
+        if (title != null)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(title),
             ),
           ),
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(manga.title.or('Manga Title')),
-          ),
-        ),
         if (isPrefetching)
           const SizedBox(
             width: 16,
@@ -64,23 +64,24 @@ class MangaTileWidget extends StatelessWidget {
           Container(
             width: 24,
             height: 24,
-            color: isOnLibrary
-                ? Colors.transparent
-                : Colors.black.withValues(alpha: 0.5),
+            color:
+                isOnLibrary
+                    ? Colors.transparent
+                    : Colors.black.withValues(alpha: 0.5),
             child: Padding(
               padding: const EdgeInsets.all(4),
               child: NetworkImageWidget(
                 dio: dio,
                 imageUrl: sourceIconUrl,
                 fit: BoxFit.contain,
-                errorBuilder: (context, error, _) => const Center(
-                  child: Icon(Icons.error),
-                ),
-                progressBuilder: (context, progress) => Center(
-                  child: CircularProgressIndicator(
-                    value: progress,
-                  ),
-                ),
+                errorBuilder: (context, error, _) {
+                  return const Center(child: Icon(Icons.error));
+                },
+                progressBuilder: (context, progress) {
+                  return Center(
+                    child: CircularProgressIndicator(value: progress),
+                  );
+                },
               ),
             ),
           ),

@@ -41,15 +41,15 @@ class SourceTileWidget extends StatelessWidget {
             width: 16,
             height: 16,
             errorBuilder: (context, error, _) => const Icon(Icons.error),
-            progressBuilder: (context, progress) => Center(
-              child: SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  value: progress,
+            progressBuilder: (context, progress) {
+              return Center(
+                child: SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(value: progress),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ),
       ),

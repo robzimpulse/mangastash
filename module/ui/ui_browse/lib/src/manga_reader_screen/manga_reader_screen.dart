@@ -141,7 +141,7 @@ class MangaReaderScreen extends StatelessWidget {
                 if (url != null) ...[
                   const SizedBox(height: 16),
                   OutlinedButton(
-                    onPressed: () {},
+                    onPressed: () => _onTapRecrawl(context: context, url: url),
                     child: const Text('Open Debug Browser'),
                   ),
                 ],
@@ -157,30 +157,32 @@ class MangaReaderScreen extends StatelessWidget {
                 NetworkImageWidget(
                   dio: dio,
                   imageUrl: image,
-                  errorBuilder:
-                      (context, error, _) => ConstrainedBox(
-                        constraints: const BoxConstraints(maxHeight: 300),
-                        child: Center(
-                          child: Row(
-                            children: [
-                              const Icon(Icons.error),
-                              const SizedBox(width: 8),
-                              Expanded(child: Text(error.toString())),
-                            ],
-                          ),
+                  errorBuilder: (context, error, _) {
+                    return ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 300),
+                      child: Center(
+                        child: Row(
+                          children: [
+                            const Icon(Icons.error),
+                            const SizedBox(width: 8),
+                            Expanded(child: Text(error.toString())),
+                          ],
                         ),
                       ),
-                  progressBuilder:
-                      (context, progress) => ConstrainedBox(
-                        constraints: const BoxConstraints(maxHeight: 300),
-                        child: Center(
-                          child: SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(value: progress),
-                          ),
+                    );
+                  },
+                  progressBuilder: (context, progress) {
+                    return ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 300),
+                      child: Center(
+                        child: SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(value: progress),
                         ),
                       ),
+                    );
+                  },
                 ),
             ],
           ),
@@ -191,9 +193,9 @@ class MangaReaderScreen extends StatelessWidget {
 
   Widget _prevButton() {
     return _builder(
-      buildWhen:
-          (prev, curr) =>
-              [prev.previousChapterId != curr.previousChapterId].contains(true),
+      buildWhen: (prev, curr) {
+        return prev.previousChapterId != curr.previousChapterId;
+      },
       builder: (context, state) {
         if (state.previousChapterId == null) {
           return const SizedBox.shrink();

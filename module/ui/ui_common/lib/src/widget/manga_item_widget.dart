@@ -30,6 +30,7 @@ class MangaItemWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final sourceIconUrl =
         manga.source?.let((e) => SourceEnum.fromValue(name: e))?.icon;
+    final title = manga.title;
 
     return Material(
       color: theme.scaffoldBackgroundColor,
@@ -51,20 +52,20 @@ class MangaItemWidget extends StatelessWidget {
                     imageUrl: manga.coverUrl.or(
                       'https://placehold.co/400?text=Cover+Url',
                     ),
-                    errorBuilder: (context, error, _) => const Center(
-                      child: Icon(Icons.error),
-                    ),
-                    progressBuilder: (context, progress) => Center(
-                      child: CircularProgressIndicator(value: progress),
-                    ),
+                    errorBuilder: (context, error, _) {
+                      return const Center(child: Icon(Icons.error));
+                    },
+                    progressBuilder: (context, progress) {
+                      return Center(
+                        child: CircularProgressIndicator(value: progress),
+                      );
+                    },
                   ),
                 ),
               ),
               if (isOnLibrary) ...[
                 Positioned.fill(
-                  child: Container(
-                    color: Colors.black.withValues(alpha: 0.5),
-                  ),
+                  child: Container(color: Colors.black.withValues(alpha: 0.5)),
                 ),
                 Positioned(
                   top: 4,
@@ -84,21 +85,22 @@ class MangaItemWidget extends StatelessWidget {
                   ),
                 ),
               ],
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  width: double.infinity,
-                  color: theme.scaffoldBackgroundColor.withValues(alpha: 0.7),
-                  padding: const EdgeInsets.all(4.0),
-                  child: Text(
-                    manga.title.or('Manga Title'),
-                    maxLines: 2,
-                    textAlign: TextAlign.center,
+              if (title != null)
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    width: double.infinity,
+                    color: theme.scaffoldBackgroundColor.withValues(alpha: 0.7),
+                    padding: const EdgeInsets.all(4.0),
+                    child: Text(
+                      title,
+                      maxLines: 2,
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
-              ),
               if (sourceIconUrl != null)
                 Positioned(
                   right: 0,
@@ -106,23 +108,24 @@ class MangaItemWidget extends StatelessWidget {
                   child: Container(
                     width: 24,
                     height: 24,
-                    color: isOnLibrary
-                        ? Colors.transparent
-                        : Colors.black.withValues(alpha: 0.5),
+                    color:
+                        isOnLibrary
+                            ? Colors.transparent
+                            : Colors.black.withValues(alpha: 0.5),
                     child: Padding(
                       padding: const EdgeInsets.all(4),
                       child: NetworkImageWidget(
                         dio: dio,
                         imageUrl: sourceIconUrl,
                         fit: BoxFit.contain,
-                        errorBuilder: (context, error, _) => const Center(
-                          child: Icon(Icons.error),
-                        ),
-                        progressBuilder: (context, progress) => Center(
-                          child: CircularProgressIndicator(
-                            value: progress,
-                          ),
-                        ),
+                        errorBuilder: (context, error, _) {
+                          return const Center(child: Icon(Icons.error));
+                        },
+                        progressBuilder: (context, progress) {
+                          return Center(
+                            child: CircularProgressIndicator(value: progress),
+                          );
+                        },
                       ),
                     ),
                   ),
