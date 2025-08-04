@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
-class CachedNetworkImageWidget extends StatelessWidget {
-  const CachedNetworkImageWidget({
+class NetworkImageWidget extends StatelessWidget {
+  const NetworkImageWidget({
     super.key,
     this.cacheManager,
     required this.imageUrl,

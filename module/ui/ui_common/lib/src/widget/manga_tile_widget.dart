@@ -32,7 +32,7 @@ class MangaTileWidget extends StatelessWidget {
 
     return Row(
       children: [
-        CachedNetworkImageWidget(
+        NetworkImageWidget(
           fit: BoxFit.cover,
           cacheManager: cacheManager,
           imageUrl: manga.coverUrl.or(
@@ -69,7 +69,7 @@ class MangaTileWidget extends StatelessWidget {
                 : Colors.black.withValues(alpha: 0.5),
             child: Padding(
               padding: const EdgeInsets.all(4),
-              child: CachedNetworkImageWidget(
+              child: NetworkImageWidget(
                 cacheManager: cacheManager,
                 imageUrl: sourceIconUrl,
                 fit: BoxFit.contain,

@@ -45,7 +45,7 @@ class MangaItemWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border.all(color: theme.dividerColor),
                   ),
-                  child: CachedNetworkImageWidget(
+                  child: NetworkImageWidget(
                     cacheManager: cacheManager,
                     fit: BoxFit.fill,
                     imageUrl: manga.coverUrl.or(
@@ -111,7 +111,7 @@ class MangaItemWidget extends StatelessWidget {
                         : Colors.black.withValues(alpha: 0.5),
                     child: Padding(
                       padding: const EdgeInsets.all(4),
-                      child: CachedNetworkImageWidget(
+                      child: NetworkImageWidget(
                         cacheManager: cacheManager,
                         imageUrl: sourceIconUrl,
                         fit: BoxFit.contain,

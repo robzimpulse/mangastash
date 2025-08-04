@@ -247,7 +247,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             ),
           );
         } else {
-          view = CachedNetworkImageWidget(
+          view = NetworkImageWidget(
             fit: BoxFit.cover,
             cacheManager: widget.cacheManager,
             imageUrl: url,

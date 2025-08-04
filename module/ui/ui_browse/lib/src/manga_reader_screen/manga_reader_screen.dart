@@ -161,7 +161,7 @@ class MangaReaderScreen extends StatelessWidget {
           child: Column(
             children: [
               for (final image in images)
-                CachedNetworkImageWidget(
+                NetworkImageWidget(
                   cacheManager: cacheManager,
                   imageUrl: image,
                   errorBuilder:

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
-import 'package:core_storage/core_storage.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';

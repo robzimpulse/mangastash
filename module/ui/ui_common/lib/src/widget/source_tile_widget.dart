@@ -35,7 +35,7 @@ class SourceTileWidget extends StatelessWidget {
         child: ShimmerLoading.circular(
           isLoading: isLoading,
           size: 16,
-          child: CachedNetworkImageWidget(
+          child: NetworkImageWidget(
             cacheManager: cacheManager,
             imageUrl: iconUrl ?? '',
             width: 16,
