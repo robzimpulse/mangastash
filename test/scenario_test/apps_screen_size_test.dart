@@ -1,12 +1,10 @@
 import 'package:core_environment/core_environment.dart';
-import 'package:core_storage/core_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mangastash/main.dart';
 import 'package:service_locator/service_locator.dart';
 
 import '../mock/mock_listen_theme_use_case.dart';
-import '../mock/mock_storage.dart';
 
 void main() {
   ServiceLocatorInitiator.setServiceLocatorFactory(
@@ -15,7 +13,6 @@ void main() {
   final locator = ServiceLocator.asNewInstance();
 
   setUp(() {
-    locator.registerSingleton<Storage>(MockStorage());
     locator.registerSingleton<ListenThemeUseCase>(MockListenThemeUseCase());
   });
 

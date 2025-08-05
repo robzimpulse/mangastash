@@ -1,8 +1,8 @@
+import 'package:core_storage/core_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:log_box/log_box.dart';
 import 'package:log_box_dio_logger/log_box_dio_logger.dart';
-import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:universal_io/io.dart';
 
 import '../interceptor/dio_reject_interceptor.dart';
@@ -10,7 +10,7 @@ import '../interceptor/dio_throttler_interceptor.dart';
 import '../mixin/user_agent_mixin.dart';
 
 class DioManager {
-  static Dio create({required LogBox log, required AppDatabase db}) {
+  static Dio create({required LogBox log, required StorageManager storage}) {
     final dio = Dio(
       BaseOptions(
         headers: {HttpHeaders.userAgentHeader: UserAgentMixin.staticUserAgent},
@@ -19,6 +19,7 @@ class DioManager {
 
     dio.interceptors.addAll([
       log.interceptor,
+      storage.interceptor,
       DioThrottlerInterceptor(
         const Duration(milliseconds: 200),
         onThrottled: (req, scheduled) {

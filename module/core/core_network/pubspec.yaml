@@ -25,6 +25,10 @@ dependencies:
       ref: master
       path: packages/log_box_dio_logger
 
+  # core
+  core_storage:
+    path: ../core_storage
+
   # library
   service_locator:
     path: ../../library/service_locator
