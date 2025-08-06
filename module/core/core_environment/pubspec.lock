@@ -500,7 +500,7 @@ packages:
     description:
       path: "packages/log_box"
       ref: master
-      resolved-ref: c56de1ee0bc69b3286fc75535f1de4c85b22bf13
+      resolved-ref: "85f9479860864fd2075dd77d5f81957616982bcc"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -919,10 +919,10 @@ packages:
     dependency: transitive
     description:
       name: sqlite3_flutter_libs
-      sha256: fd996da5515a73aacd0a04ae7063db5fe8df42670d974df4c3ee538c652eef2e
+      sha256: "2b03273e71867a8a4d030861fc21706200debe5c5858a4b9e58f4a1c129586a4"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.38"
+    version: "0.5.39"
   sqlparser:
     dependency: transitive
     description:
