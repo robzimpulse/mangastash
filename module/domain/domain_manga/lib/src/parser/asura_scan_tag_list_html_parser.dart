@@ -5,7 +5,7 @@ import 'base/tag_list_html_parser.dart';
 
 class AsuraScanTagListHtmlParser extends TagListHtmlParser {
   @override
-  List<Tag> get tags {
+  Future<List<Tag>> get tags async {
     final region = root.querySelector('form#hook-form');
 
     final elements = region?.querySelectorAll(
@@ -25,5 +25,8 @@ class AsuraScanTagListHtmlParser extends TagListHtmlParser {
     return tags;
   }
 
-  AsuraScanTagListHtmlParser({required super.root});
+  AsuraScanTagListHtmlParser({
+    required super.root,
+    required super.storageManager,
+  });
 }

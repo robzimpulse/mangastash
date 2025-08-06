@@ -98,6 +98,7 @@ class DomainMangaRegistrar extends Registrar {
         webview: locator(),
         mangaDao: locator(),
         mangaRepository: locator(),
+        storageManager: locator(),
       ),
     );
     locator.registerFactory(
@@ -107,6 +108,7 @@ class DomainMangaRegistrar extends Registrar {
         mangaDao: locator(),
         chapterDao: locator(),
         chapterRepository: locator(),
+        storageManager: locator(),
       ),
     );
     locator.registerFactory(
@@ -118,6 +120,7 @@ class DomainMangaRegistrar extends Registrar {
         webview: locator(),
         mangaDao: locator(),
         mangaService: locator(),
+        storageManager: locator(),
       ),
     );
     locator.registerFactory(
@@ -125,6 +128,7 @@ class DomainMangaRegistrar extends Registrar {
         webview: locator(),
         mangaDao: locator(),
         logBox: locator(),
+        storageManager: locator(),
       ),
     );
     locator.registerFactory(
@@ -134,6 +138,7 @@ class DomainMangaRegistrar extends Registrar {
         chapterDao: locator(),
         atHomeRepository: locator(),
         chapterRepository: locator(),
+        storageManager: locator(),
       ),
     );
     locator.registerFactory(() => AddToLibraryUseCase(libraryDao: locator()));
@@ -152,6 +157,7 @@ class DomainMangaRegistrar extends Registrar {
         tagDao: locator(),
         logBox: locator(),
         mangaService: locator(),
+        storageManager: locator(),
       ),
     );
 

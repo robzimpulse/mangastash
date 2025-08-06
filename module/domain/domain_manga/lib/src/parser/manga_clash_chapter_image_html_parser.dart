@@ -3,10 +3,13 @@ import 'package:collection/collection.dart';
 import 'base/chapter_image_html_parser.dart';
 
 class MangaClashChapterImageHtmlParser extends ChapterImageHtmlParser {
-  MangaClashChapterImageHtmlParser({required super.root});
+  MangaClashChapterImageHtmlParser({
+    required super.root,
+    required super.storageManager,
+  });
 
   @override
-  List<String> get images {
+  Future<List<String>> get images async {
     final region = root.querySelector('.reading-content');
     final containers = region?.querySelectorAll('img') ?? [];
     final List<(num, String)> data = [];

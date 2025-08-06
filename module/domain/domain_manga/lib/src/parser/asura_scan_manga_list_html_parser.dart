@@ -5,10 +5,9 @@ import 'base/manga_list_html_parser.dart';
 
 class AsuraScanMangaListHtmlParser extends MangaListHtmlParser {
   @override
-  List<Manga> get mangas {
+  Future<List<Manga>> get mangas async {
     final queries = ['div', 'grid', 'grid-cols-2', 'gap-3', 'p-4'].join('.');
     final region = root.querySelector(queries)?.querySelectorAll('a');
-
     return (region ?? []).map((e) {
       final webUrl = ['https://asuracomic.net', e.attributes['href']].join('/');
       final status = e.querySelector('span.status.bg-blue-700')?.text.trim();
@@ -24,7 +23,7 @@ class AsuraScanMangaListHtmlParser extends MangaListHtmlParser {
   }
 
   @override
-  bool? get haveNextPage {
+  Future<bool?> get haveNextPage async {
     final queries = [
       'a',
       'flex',
@@ -41,5 +40,8 @@ class AsuraScanMangaListHtmlParser extends MangaListHtmlParser {
     return region?.attributes['style'] == 'pointer-events:auto';
   }
 
-  AsuraScanMangaListHtmlParser({required super.root});
+  AsuraScanMangaListHtmlParser({
+    required super.root,
+    required super.storageManager,
+  });
 }

@@ -189,8 +189,6 @@ class Chapter extends Equatable {
       title: data.attributes?.title,
       chapter: data.attributes?.chapter,
       volume: data.attributes?.volume,
-      readableAt: data.attributes?.readableAt?.asDateTime,
-      publishAt: data.attributes?.publishAt?.asDateTime,
       scanlationGroup: scanlation is Relationship<ScanlationGroupDataAttributes>
           ? scanlation.attributes?.name
           : null,

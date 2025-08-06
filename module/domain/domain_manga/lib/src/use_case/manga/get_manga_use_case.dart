@@ -10,19 +10,22 @@ import '../../parser/base/manga_detail_html_parser.dart';
 
 class GetMangaUseCase with SyncMangasMixin {
   final HeadlessWebviewManager _webview;
+  final StorageManager _storageManager;
   final MangaService _mangaService;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   GetMangaUseCase({
     required HeadlessWebviewManager webview,
+    required StorageManager storageManager,
     required MangaService mangaService,
     required MangaDao mangaDao,
     required LogBox logBox,
-  })  : _mangaService = mangaService,
-        _mangaDao = mangaDao,
-        _logBox = logBox,
-        _webview = webview;
+  }) : _storageManager = storageManager,
+       _mangaService = mangaService,
+       _mangaDao = mangaDao,
+       _logBox = logBox,
+       _webview = webview;
 
   Future<Manga> _mangadex({
     required SourceEnum source,
@@ -59,27 +62,32 @@ class GetMangaUseCase with SyncMangasMixin {
     final parser = MangaDetailHtmlParser.forSource(
       root: document,
       source: source,
+      storageManager: _storageManager,
     );
 
-    return parser.manga.copyWith(source: source.name, webUrl: url);
+    final manga = await parser.manga;
+
+    return manga.copyWith(source: source.name, webUrl: url);
   }
 
   Future<Result<Manga>> execute({
     required SourceEnum source,
     required String mangaId,
   }) async {
-
     try {
       final raw = await _mangaDao.search(ids: [mangaId]);
       final manga = Manga.fromDatabase(raw.firstOrNull);
 
-      final promise = source == SourceEnum.mangadex
-          ? _mangadex(source: source, mangaId: mangaId)
-          : _scrapping(url: manga?.webUrl, source: source);
+      final Manga data;
+      if (source == SourceEnum.mangadex) {
+        data = await _mangadex(source: source, mangaId: mangaId);
+      } else {
+        data = await _scrapping(url: manga?.webUrl, source: source);
+      }
 
       final results = await sync(
         dao: _mangaDao,
-        values: [await promise],
+        values: [data],
         logBox: _logBox,
       );
 

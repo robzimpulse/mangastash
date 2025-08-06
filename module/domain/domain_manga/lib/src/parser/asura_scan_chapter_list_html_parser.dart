@@ -5,10 +5,13 @@ import 'package:html/dom.dart';
 import 'base/chapter_list_html_parser.dart';
 
 class AsuraScanChapterListHtmlParser extends ChapterListHtmlParser {
-  AsuraScanChapterListHtmlParser({required super.root});
+  AsuraScanChapterListHtmlParser({
+    required super.root,
+    required super.storageManager,
+  });
 
   @override
-  List<Chapter> get chapters {
+  Future<List<Chapter>> get chapters async {
     final region = root.querySelector(
       [
         'div',
@@ -45,14 +48,15 @@ class AsuraScanChapterListHtmlParser extends ChapterListHtmlParser {
       if (isNotPublished) continue;
 
       final chapterData = container?.nodes.firstOrNull?.text?.trim().split(' ');
-      final chapter = chapterData?.map((text) {
-        final value = double.tryParse(text);
-        if (value != null) {
-          final fraction = value - value.truncate();
-          if (fraction > 0.0) return value;
-        }
-        return int.tryParse(text);
-      }).lastOrNull;
+      final chapter =
+          chapterData?.map((text) {
+            final value = double.tryParse(text);
+            if (value != null) {
+              final fraction = value - value.truncate();
+              if (fraction > 0.0) return value;
+            }
+            return int.tryParse(text);
+          }).lastOrNull;
 
       final releaseDate = element
           .querySelector('h3.text-xs')
@@ -67,7 +71,9 @@ class AsuraScanChapterListHtmlParser extends ChapterListHtmlParser {
         Chapter(
           title: title?.isNotEmpty == true ? title : null,
           chapter: '${chapter ?? url?.split('/').lastOrNull}',
-          readableAt: releaseDate?.asDateTime,
+          readableAt: await releaseDate?.asDateTime(
+            storageManager: storageManager,
+          ),
           webUrl: ['https://asuracomic.net', 'series', url].join('/'),
           scanlationGroup: SourceEnum.asurascan.label,
         ),

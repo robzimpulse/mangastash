@@ -1,5 +1,5 @@
-
 import 'package:collection/collection.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -16,6 +16,7 @@ class SearchChapterUseCase
     with SyncChaptersMixin, SortChaptersMixin, FilterChaptersMixin {
   final ChapterRepository _chapterRepository;
   final HeadlessWebviewManager _webview;
+  final StorageManager _storageManager;
   final ChapterDao _chapterDao;
   final MangaDao _mangaDao;
   final LogBox _logBox;
@@ -23,11 +24,12 @@ class SearchChapterUseCase
   const SearchChapterUseCase({
     required ChapterRepository chapterRepository,
     required HeadlessWebviewManager webview,
+    required StorageManager storageManager,
     required ChapterDao chapterDao,
     required MangaDao mangaDao,
     required LogBox logBox,
   }) : _chapterRepository = chapterRepository,
-
+       _storageManager = storageManager,
        _chapterDao = chapterDao,
        _mangaDao = mangaDao,
        _logBox = logBox,
@@ -49,9 +51,21 @@ class SearchChapterUseCase
     final limit = result.limit?.toInt() ?? 0;
     final total = result.total?.toInt() ?? 0;
 
+    // readableAt: data.attributes?.readableAt?.asDateTime,
+    // publishAt: data.attributes?.publishAt?.asDateTime,
+
     return Pagination(
       data: [
-        ...data.map((e) => Chapter.from(data: e).copyWith(mangaId: mangaId)),
+        for (final value in data)
+          Chapter.from(data: value).copyWith(
+            mangaId: mangaId,
+            readableAt: await value.attributes?.readableAt?.asDateTime(
+              storageManager: _storageManager,
+            ),
+            publishAt: await value.attributes?.publishAt?.asDateTime(
+              storageManager: _storageManager,
+            ),
+          ),
       ],
       offset: offset,
       limit: limit,
@@ -83,11 +97,14 @@ class SearchChapterUseCase
     final parser = ChapterListHtmlParser.forSource(
       root: document,
       source: source,
+      storageManager: _storageManager,
     );
+
+    final chapters = await parser.chapters;
 
     final data = filterChapters(
       chapters: sortChapters(
-        chapters: [...parser.chapters.map((e) => e.copyWith(mangaId: mangaId))],
+        chapters: [...chapters.map((e) => e.copyWith(mangaId: mangaId))],
         parameter: parameter,
       ),
       parameter: parameter,
@@ -97,8 +114,8 @@ class SearchChapterUseCase
       data: data,
       page: parameter.page,
       limit: parameter.limit,
-      total: parser.chapters.length,
-      hasNextPage: parser.chapters.length > parameter.page * parameter.limit,
+      total: chapters.length,
+      hasNextPage: chapters.length > parameter.page * parameter.limit,
       sourceUrl: url,
     );
   }
@@ -109,16 +126,16 @@ class SearchChapterUseCase
     required SearchChapterParameter parameter,
   }) async {
     try {
-      final promise =
-          source == SourceEnum.mangadex
-              ? _mangadex(mangaId: mangaId, parameter: parameter)
-              : _scrapping(
-                source: source,
-                mangaId: mangaId,
-                parameter: parameter,
-              );
-
-      final data = await promise;
+      final Pagination<Chapter> data;
+      if (source == SourceEnum.mangadex) {
+        data = await _mangadex(mangaId: mangaId, parameter: parameter);
+      } else {
+        data = await _scrapping(
+          source: source,
+          mangaId: mangaId,
+          parameter: parameter,
+        );
+      }
 
       final result = data.copyWith(
         data: await sync(

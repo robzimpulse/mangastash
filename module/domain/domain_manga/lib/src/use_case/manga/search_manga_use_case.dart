@@ -12,17 +12,18 @@ import '../../parser/base/manga_list_html_parser.dart';
 class SearchMangaUseCase with SyncMangasMixin {
   final MangaRepository _mangaRepository;
   final HeadlessWebviewManager _webview;
+  final StorageManager _storageManager;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   const SearchMangaUseCase({
     required MangaRepository mangaRepository,
     required HeadlessWebviewManager webview,
-
+    required StorageManager storageManager,
     required MangaDao mangaDao,
     required LogBox logBox,
   }) : _mangaRepository = mangaRepository,
-
+       _storageManager = storageManager,
        _mangaDao = mangaDao,
        _webview = webview,
        _logBox = logBox;
@@ -69,14 +70,17 @@ class SearchMangaUseCase with SyncMangasMixin {
     final parser = MangaListHtmlParser.forSource(
       root: document,
       source: source,
+      storageManager: _storageManager,
     );
 
+    final mangas = await parser.mangas;
+
     return Pagination(
-      data: [...parser.mangas.map((e) => e.copyWith(source: source.name))],
+      data: [...mangas.map((e) => e.copyWith(source: source.name))],
       page: parameter.page,
-      limit: parser.mangas.length,
-      total: parser.mangas.length,
-      hasNextPage: parser.haveNextPage,
+      limit: mangas.length,
+      total: mangas.length,
+      hasNextPage: await parser.haveNextPage,
       sourceUrl: url,
     );
   }
@@ -86,12 +90,12 @@ class SearchMangaUseCase with SyncMangasMixin {
     required SearchMangaParameter parameter,
   }) async {
     try {
-      final promise =
-          source == SourceEnum.mangadex
-              ? _mangadex(source: source, parameter: parameter)
-              : _scrapping(source: source, parameter: parameter);
-
-      final data = await promise;
+      final Pagination<Manga> data;
+      if (source == SourceEnum.mangadex) {
+        data = await _mangadex(source: source, parameter: parameter);
+      } else {
+        data = await _scrapping(source: source, parameter: parameter);
+      }
 
       final result = data.copyWith(
         data: await sync(
