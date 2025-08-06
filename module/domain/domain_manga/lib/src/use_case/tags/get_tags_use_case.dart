@@ -11,16 +11,19 @@ import '../../parser/base/tag_list_html_parser.dart';
 
 class GetTagsUseCase with SyncTagsMixin {
   final HeadlessWebviewManager _webview;
+  final StorageManager _storageManager;
   final MangaService _mangaService;
   final TagDao _tagDao;
   final LogBox _logBox;
 
   const GetTagsUseCase({
     required HeadlessWebviewManager webview,
+    required StorageManager storageManager,
     required MangaService mangaService,
     required TagDao tagDao,
     required LogBox logBox,
   }) : _mangaService = mangaService,
+       _storageManager = storageManager,
        _tagDao = tagDao,
        _webview = webview,
        _logBox = logBox;
@@ -74,25 +77,29 @@ class GetTagsUseCase with SyncTagsMixin {
       throw FailedParsingHtmlException(url);
     }
 
-    final parser = TagListHtmlParser.forSource(root: document, source: source);
+    final parser = TagListHtmlParser.forSource(
+      root: document,
+      source: source,
+      storageManager: _storageManager,
+    );
 
-    return [...parser.tags.map((e) => e.copyWith(source: source.name))];
+    final tags = await parser.tags;
+
+    return [...tags.map((e) => e.copyWith(source: source.name))];
   }
 
   Future<Result<List<Tag>>> execute({required SourceEnum source}) async {
     try {
-      final promise =
-          source == SourceEnum.mangadex
-              ? _mangadex(source: source)
-              : _scrapping(source: source);
+      final List<Tag> data;
+      if (source == SourceEnum.mangadex) {
+        data = await _mangadex(source: source);
+      } else {
+        data = await _scrapping(source: source);
+      }
 
-      final data = await sync(
-        dao: _tagDao,
-        values: await promise,
-        logBox: _logBox,
-      );
+      final result = await sync(dao: _tagDao, values: data, logBox: _logBox);
 
-      return Success(data);
+      return Success(result);
     } catch (e) {
       return Error(e);
     }

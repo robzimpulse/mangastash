@@ -20,12 +20,12 @@ class GlobalOptionsManager
   final BehaviorSubject<SearchMangaParameter> _searchMangaParameter;
   final BehaviorSubject<List<SourceEnum>> _sources;
 
-  final Storage _storage;
+  final SharedPreferences _storage;
 
   static const String _mangaParameterKey = 'manga_parameter';
   static const String _sourcesKey = 'sources';
 
-  GlobalOptionsManager({required Storage storage})
+  GlobalOptionsManager({required SharedPreferences storage})
       : _storage = storage,
         _sources = BehaviorSubject.seeded(
           storage

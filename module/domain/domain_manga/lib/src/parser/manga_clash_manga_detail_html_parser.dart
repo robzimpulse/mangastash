@@ -4,10 +4,13 @@ import 'package:entity_manga/entity_manga.dart';
 import 'base/manga_detail_html_parser.dart';
 
 class MangaClashMangaDetailHtmlParser extends MangaDetailHtmlParser {
-  MangaClashMangaDetailHtmlParser({required super.root});
+  MangaClashMangaDetailHtmlParser({
+    required super.root,
+    required super.storageManager,
+  });
 
   @override
-  Manga get manga {
+  Future<Manga> get manga async {
     final description = root
         .querySelector('div.description-summary')
         ?.querySelectorAll('p')
@@ -18,13 +21,17 @@ class MangaClashMangaDetailHtmlParser extends MangaDetailHtmlParser {
 
     final authors = root.querySelector('div.author-content')?.text.trim();
 
-    final coverUrl = root
-        .querySelector('div.summary_image')
-        ?.querySelector('img')
-        ?.attributes['src'];
+    final coverUrl =
+        root
+            .querySelector('div.summary_image')
+            ?.querySelector('img')
+            ?.attributes['src'];
 
-    final tags =
-        root.querySelector('div.genres-content')?.text.trim().split(',');
+    final tags = root
+        .querySelector('div.genres-content')
+        ?.text
+        .trim()
+        .split(',');
 
     return Manga(
       title: title,

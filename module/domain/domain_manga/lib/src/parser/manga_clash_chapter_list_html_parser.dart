@@ -4,27 +4,28 @@ import 'package:entity_manga/entity_manga.dart';
 import 'base/chapter_list_html_parser.dart';
 
 class MangaClashChapterListHtmlParser extends ChapterListHtmlParser {
-  MangaClashChapterListHtmlParser({required super.root});
+  MangaClashChapterListHtmlParser({
+    required super.root,
+    required super.storageManager,
+  });
 
   @override
-  List<Chapter> get chapters {
+  Future<List<Chapter>> get chapters async {
     final List<Chapter> data = [];
 
     for (final element in root.querySelectorAll('li.wp-manga-chapter')) {
       final url = element.querySelector('a')?.attributes['href'];
       final title = element.querySelector('a')?.text.split('-').lastOrNull;
-      final text = element.querySelector('a')?.text.split(' ').map(
-        (text) {
-          final value = double.tryParse(text);
+      final text = element.querySelector('a')?.text.split(' ').map((text) {
+        final value = double.tryParse(text);
 
-          if (value != null) {
-            final fraction = value - value.truncate();
-            if (fraction > 0.0) return value;
-          }
+        if (value != null) {
+          final fraction = value - value.truncate();
+          if (fraction > 0.0) return value;
+        }
 
-          return int.tryParse(text);
-        },
-      );
+        return int.tryParse(text);
+      });
       final releaseDate =
           element.querySelector('.chapter-release-date')?.text.trim();
       final chapter = text?.nonNulls.firstOrNull;
@@ -33,7 +34,9 @@ class MangaClashChapterListHtmlParser extends ChapterListHtmlParser {
         Chapter(
           title: title?.trim(),
           chapter: chapter != null ? '$chapter' : null,
-          readableAt: releaseDate?.asDateTime,
+          readableAt: await releaseDate?.asDateTime(
+            storageManager: storageManager,
+          ),
           webUrl: url,
         ),
       );

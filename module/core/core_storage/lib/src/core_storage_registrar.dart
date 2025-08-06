@@ -1,8 +1,9 @@
 import 'package:log_box/log_box.dart' hide Storage;
+import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:service_locator/service_locator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../core_storage.dart';
-import 'storage/shared_preferences_storage.dart';
+import 'manager/storage_manager/storage_manager.dart';
 
 class CoreStorageRegistrar extends Registrar {
   @override
@@ -25,21 +26,8 @@ class CoreStorageRegistrar extends Registrar {
     locator.registerFactory(() => HistoryDao(locator()));
     locator.registerFactory(() => TagDao(locator()));
 
-    locator.registerSingleton(await SharedPreferencesStorage.create());
-    locator.alias<Storage, SharedPreferencesStorage>();
-
-    // TODO: @robzimpulse - broken on web
-    // locator.registerSingleton(await PathManager.create(storage: locator()));
-    // locator.alias<GetRootPathUseCase, PathManager>();
-    // locator.alias<ListenDownloadPathUseCase, PathManager>();
-    // locator.alias<SetDownloadPathUseCase, PathManager>();
-    // locator.alias<ListenBackupPathUseCase, PathManager>();
-    // locator.alias<SetBackupPathUseCase, PathManager>();
-
-    locator.registerSingleton(
-      CustomCacheManager(dio: () => locator()),
-      dispose: (e) => e.dispose(),
-    );
+    locator.registerSingleton(await SharedPreferences.getInstance());
+    locator.registerSingleton(await StorageManager.create());
 
     log.log(
       'Register ${runtimeType.toString()}',

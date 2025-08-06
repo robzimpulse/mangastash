@@ -3,10 +3,13 @@ import 'package:collection/collection.dart';
 import 'base/chapter_image_html_parser.dart';
 
 class AsuraScanChapterImageHtmlParser extends ChapterImageHtmlParser {
-  AsuraScanChapterImageHtmlParser({required super.root});
+  AsuraScanChapterImageHtmlParser({
+    required super.root,
+    required super.storageManager,
+  });
 
   @override
-  List<String> get images {
+  Future<List<String>> get images async {
     final region = root.querySelector(
       'div.py-8.-mx-5.flex.flex-col.items-center.justify-center',
     );

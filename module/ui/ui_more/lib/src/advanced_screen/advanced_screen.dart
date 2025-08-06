@@ -10,14 +10,14 @@ class AdvancedScreen extends StatelessWidget {
   final LogBox logBox;
   final DatabaseViewer viewer;
   final AppDatabase database;
-  final CustomCacheManager cacheManager;
+  final StorageManager storageManager;
 
   const AdvancedScreen({
     super.key,
     required this.logBox,
     required this.viewer,
     required this.database,
-    required this.cacheManager,
+    required this.storageManager,
   });
 
   static Widget create({required ServiceLocator locator}) {
@@ -27,7 +27,7 @@ class AdvancedScreen extends StatelessWidget {
         logBox: locator(),
         database: locator(),
         viewer: locator(),
-        cacheManager: locator(),
+        storageManager: locator(),
       ),
     );
   }
@@ -55,8 +55,7 @@ class AdvancedScreen extends StatelessWidget {
             ),
             trailing: IconButton(
               onPressed: () async {
-                await cacheManager.empty();
-                await database.clear();
+                await Future.wait([storageManager.clear(), database.clear()]);
                 if (!context.mounted) return;
                 context.showSnackBar(message: 'Success Clear Database & Cache');
               },

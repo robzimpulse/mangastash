@@ -30,7 +30,7 @@ class JobManager
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
   final ValueGetter<GetAllChapterUseCase> _getAllChapterUseCase;
   final ListenSearchParameterUseCase _listenSearchParameterUseCase;
-  final CustomCacheManager _cacheManager;
+  final Dio _dio;
   final JobDao _jobDao;
   final LogBox _log;
 
@@ -39,16 +39,16 @@ class JobManager
   late final StreamSubscription _streamSubscription;
 
   JobManager({
+    required Dio dio,
     required LogBox log,
     required JobDao jobDao,
-    required CustomCacheManager cacheManager,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required ValueGetter<GetMangaUseCase> getMangaUseCase,
     required ValueGetter<GetAllChapterUseCase> getAllChapterUseCase,
-  }) : _log = log,
+  }) : _dio = dio,
+       _log = log,
        _jobDao = jobDao,
-       _cacheManager = cacheManager,
        _getMangaUseCase = getMangaUseCase,
        _getChapterUseCase = getChapterUseCase,
        _getAllChapterUseCase = getAllChapterUseCase,
@@ -246,9 +246,9 @@ class JobManager
       source: source,
       mangaId: mangaId,
       parameter: parameter.valueOrNull?.let(
-        (value) => SearchChapterParameter.from(value).copyWith(
-          orders: {ChapterOrders.chapter: OrderDirections.ascending},
-        ),
+        (value) => SearchChapterParameter.from(
+          value,
+        ).copyWith(orders: {ChapterOrders.chapter: OrderDirections.ascending}),
       ),
     );
 
@@ -284,13 +284,9 @@ class JobManager
       return;
     }
 
-    final existing = (await _cacheManager.images.getFileFromCache(url))?.file;
-
-    final path = existing.or(
-      await _cacheManager.images.getSingleFile(
-        url,
-        headers: {HttpHeaders.userAgentHeader: userAgent},
-      ),
+    _dio.get(
+      url,
+      options: Options(headers: {HttpHeaders.userAgentHeader: userAgent}),
     );
 
     _log.log(
@@ -301,7 +297,6 @@ class JobManager
         'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
         'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
         'image': job.image,
-        'data': path.uri.toString(),
       },
       name: runtimeType.toString(),
     );

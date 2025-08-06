@@ -600,7 +600,7 @@ packages:
     description:
       path: "packages/log_box"
       ref: master
-      resolved-ref: "5a9be199b290f6998d544e67979b27af74299989"
+      resolved-ref: "85f9479860864fd2075dd77d5f81957616982bcc"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -609,7 +609,7 @@ packages:
     description:
       path: "packages/log_box_dio_logger"
       ref: master
-      resolved-ref: "5a9be199b290f6998d544e67979b27af74299989"
+      resolved-ref: "85f9479860864fd2075dd77d5f81957616982bcc"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -1090,10 +1090,10 @@ packages:
     dependency: transitive
     description:
       name: sqlite3_flutter_libs
-      sha256: fd996da5515a73aacd0a04ae7063db5fe8df42670d974df4c3ee538c652eef2e
+      sha256: "2b03273e71867a8a4d030861fc21706200debe5c5858a4b9e58f4a1c129586a4"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.38"
+    version: "0.5.39"
   sqlparser:
     dependency: transitive
     description:
@@ -1110,6 +1110,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.12.1"
+  stash:
+    dependency: transitive
+    description:
+      name: stash
+      sha256: c1482f64dcaa9b2d9eb112106ef018aad49adb284e1ba371c892c2ad9f99fc12
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.2.0"
+  stash_dio:
+    dependency: transitive
+    description:
+      name: stash_dio
+      sha256: b3d6e6d7964b9a5e960dfc598b3e9135d96358427e22c5a1ea273711b01bc66b
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.2.0"
+  stash_sqlite:
+    dependency: transitive
+    description:
+      name: stash_sqlite
+      sha256: "376598d5fafa8b9008a3686b8850d816028546537dc2ed3d58c569124ef4d4c6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.3.0"
   stream_channel:
     dependency: transitive
     description:

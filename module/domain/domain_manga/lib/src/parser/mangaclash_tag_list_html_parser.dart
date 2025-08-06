@@ -5,7 +5,7 @@ import 'base/tag_list_html_parser.dart';
 
 class MangaClashTagListHtmlParser extends TagListHtmlParser {
   @override
-  List<Tag> get tags {
+  Future<List<Tag>> get tags async {
     final region = root.querySelector('div.form-group.checkbox-group.row');
 
     return [
@@ -17,5 +17,8 @@ class MangaClashTagListHtmlParser extends TagListHtmlParser {
     ];
   }
 
-  MangaClashTagListHtmlParser({required super.root});
+  MangaClashTagListHtmlParser({
+    required super.root,
+    required super.storageManager,
+  });
 }
