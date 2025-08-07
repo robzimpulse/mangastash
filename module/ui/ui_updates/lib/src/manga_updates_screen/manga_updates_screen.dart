@@ -1,5 +1,5 @@
 import 'package:core_environment/core_environment.dart';
-import 'package:core_network/core_network.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -11,7 +11,7 @@ import 'manga_updates_screen_state.dart';
 class MangaUpdatesScreen extends StatelessWidget {
   const MangaUpdatesScreen({
     super.key,
-    required this.dio,
+    required this.storageManager,
     this.onTapManga,
     this.onTapChapter,
   });
@@ -27,14 +27,14 @@ class MangaUpdatesScreen extends StatelessWidget {
         listenMangaFromLibraryUseCase: locator(),
       )..init(),
       child: MangaUpdatesScreen(
-        dio: locator(),
+        storageManager: locator(),
         onTapChapter: onTapChapter,
         onTapManga: onTapManga,
       ),
     );
   }
 
-  final Dio dio;
+  final StorageManager storageManager;
 
   final ValueSetter<Manga?>? onTapManga;
 
@@ -55,7 +55,7 @@ class MangaUpdatesScreen extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       manga: manga,
       onTap: () => onTapManga?.call(manga),
-      dio: dio,
+      cacheManager: storageManager.images,
     );
   }
 

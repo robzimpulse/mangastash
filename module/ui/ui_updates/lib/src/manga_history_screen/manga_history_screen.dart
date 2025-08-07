@@ -1,5 +1,5 @@
 import 'package:core_environment/core_environment.dart';
-import 'package:core_network/core_network.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -11,12 +11,12 @@ import 'manga_history_screen_state.dart';
 class MangaHistoryScreen extends StatelessWidget {
   const MangaHistoryScreen({
     super.key,
-    required this.dio,
+    required this.storageManager,
     this.onTapManga,
     this.onTapChapter,
   });
 
-  final Dio dio;
+  final StorageManager storageManager;
 
   final ValueSetter<Manga?>? onTapManga;
 
@@ -28,11 +28,11 @@ class MangaHistoryScreen extends StatelessWidget {
     Function(Manga, Chapter)? onTapChapter,
   }) {
     return BlocProvider(
-      create: (context) => MangaHistoryScreenCubit(
-        listenReadHistoryUseCase: locator(),
-      )..init(),
+      create: (context) {
+        return MangaHistoryScreenCubit(listenReadHistoryUseCase: locator());
+      },
       child: MangaHistoryScreen(
-        dio: locator(),
+        storageManager: locator(),
         onTapChapter: onTapChapter,
         onTapManga: onTapManga,
       ),
@@ -54,7 +54,7 @@ class MangaHistoryScreen extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       manga: manga,
       onTap: () => onTapManga?.call(manga),
-      dio: dio,
+      cacheManager: storageManager.images,
     );
   }
 
@@ -77,32 +77,31 @@ class MangaHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      appBar: AppBar(
-        centerTitle: false,
-        title: const Text('Histories'),
-      ),
+      appBar: AppBar(centerTitle: false, title: const Text('Histories')),
       body: _builder(
-        builder: (context, state) => CustomScrollView(
-          slivers: [
-            for (final history in state.histories.entries)
-              MultiSliver(
-                pushPinnedChildren: true,
-                children: [
-                  SliverPinnedHeader(
-                    child: _manga(context: context, manga: history.key),
-                  ),
-                  for (final item in history.value)
-                    SliverToBoxAdapter(
-                      child: _chapter(
-                        context: context,
-                        manga: history.key,
-                        chapter: item,
-                      ),
+        builder: (context, state) {
+          return CustomScrollView(
+            slivers: [
+              for (final history in state.histories.entries)
+                MultiSliver(
+                  pushPinnedChildren: true,
+                  children: [
+                    SliverPinnedHeader(
+                      child: _manga(context: context, manga: history.key),
                     ),
-                ],
-              ),
-          ],
-        ),
+                    for (final item in history.value)
+                      SliverToBoxAdapter(
+                        child: _chapter(
+                          context: context,
+                          manga: history.key,
+                          chapter: item,
+                        ),
+                      ),
+                  ],
+                ),
+            ],
+          );
+        },
       ),
     );
   }

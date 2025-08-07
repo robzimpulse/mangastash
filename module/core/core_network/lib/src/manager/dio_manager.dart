@@ -19,7 +19,6 @@ class DioManager {
 
     dio.interceptors.addAll([
       log.interceptor,
-      storage.interceptor,
       DioThrottlerInterceptor(
         const Duration(milliseconds: 200),
         onThrottled: (req, scheduled) {
@@ -38,7 +37,6 @@ class DioManager {
               message: 'Try to access domain without path',
             );
           }
-
           return null;
         },
       ),

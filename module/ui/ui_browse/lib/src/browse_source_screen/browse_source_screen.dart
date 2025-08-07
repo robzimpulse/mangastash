@@ -1,4 +1,4 @@
-import 'package:core_network/core_network.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -12,14 +12,14 @@ class BrowseSourceScreen extends StatelessWidget {
     super.key,
     this.onTapSearchManga,
     this.onTapSource,
-    required this.dio,
+    required this.storageManager,
   });
 
   final VoidCallback? onTapSearchManga;
 
   final ValueSetter<SourceEnum>? onTapSource;
 
-  final Dio dio;
+  final StorageManager storageManager;
 
   static Widget create({
     required ServiceLocator locator,
@@ -33,7 +33,7 @@ class BrowseSourceScreen extends StatelessWidget {
       child: BrowseSourceScreen(
         onTapSearchManga: onTapSearchManga,
         onTapSource: onTapSource,
-        dio: locator(),
+        storageManager: locator(),
       ),
     );
   }
@@ -58,7 +58,7 @@ class BrowseSourceScreen extends StatelessWidget {
             thickness: 1,
           ),
           itemBuilder: (context, index) => SourceTileWidget(
-            dio: dio,
+            cacheManager: storageManager.images,
             iconUrl: state.sources[index].icon,
             url: state.sources[index].url,
             name: state.sources[index].name,
