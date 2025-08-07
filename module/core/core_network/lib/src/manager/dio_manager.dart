@@ -6,6 +6,7 @@ import 'package:log_box_dio_logger/log_box_dio_logger.dart';
 import 'package:universal_io/io.dart';
 
 import '../interceptor/dio_reject_interceptor.dart';
+import '../interceptor/dio_sequential_interceptor.dart';
 import '../interceptor/dio_throttler_interceptor.dart';
 import '../mixin/user_agent_mixin.dart';
 
@@ -20,6 +21,13 @@ class DioManager {
     dio.interceptors.addAll([
       log.interceptor,
       storage.interceptor,
+      DioSequentialInterceptor(
+        shouldQueue: (options) {
+          return options.uri.toString().contains(
+            RegExp(r'/([a-z-_0-9\/:.]*.(jpg|jpeg|png|gif|ico|webp))'),
+          );
+        },
+      ),
       DioThrottlerInterceptor(
         const Duration(milliseconds: 200),
         onThrottled: (req, scheduled) {
@@ -38,7 +46,6 @@ class DioManager {
               message: 'Try to access domain without path',
             );
           }
-
           return null;
         },
       ),

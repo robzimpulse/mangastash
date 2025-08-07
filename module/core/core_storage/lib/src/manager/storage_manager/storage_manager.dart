@@ -14,7 +14,7 @@ class StorageManager {
   });
 
   Interceptor get interceptor {
-    return network.interceptor('/([a-z-_0-9/:.]*.(jpg|jpeg|png|gif|ico))/i');
+    return network.interceptor(r'/([a-z-_0-9\/:.]*.(jpg|jpeg|png|gif|ico|webp))');
   }
 
   Future<void> clear() async {
