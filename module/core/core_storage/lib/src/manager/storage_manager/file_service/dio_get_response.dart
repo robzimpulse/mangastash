@@ -13,7 +13,12 @@ class DioGetResponse implements FileServiceResponse {
   Stream<List<int>> get content => _response.data!.stream;
 
   @override
-  int get contentLength => _getContentLength();
+  int get contentLength {
+    final result = int.tryParse(
+      _response.headers[Headers.contentLengthHeader]?.first ?? '-1',
+    );
+    return result ?? -1;
+  }
 
   @override
   String get eTag => _response.headers['etag']?.first ?? '-1';
@@ -55,12 +60,5 @@ class DioGetResponse implements FileServiceResponse {
     }
 
     return _receivedTime.add(ageDuration);
-  }
-
-  int _getContentLength() {
-    final result = int.tryParse(
-      _response.headers[Headers.contentLengthHeader]?.first ?? '-1',
-    );
-    return result ?? -1;
   }
 }

@@ -14,15 +14,13 @@ class DioFileService extends FileService {
     String url, {
     Map<String, String>? headers,
   }) async {
-    Options options = Options(
-      headers: headers ?? {},
-      responseType: ResponseType.stream,
-    );
-
     return DioGetResponse(
       await _dio().get<ResponseBody>(
         url,
-        options: options,
+        options: Options(
+          headers: headers ?? {},
+          responseType: ResponseType.stream,
+        ),
       ),
     );
   }
