@@ -13,30 +13,27 @@ class DioGetResponse implements FileServiceResponse {
   Stream<List<int>> get content => _response.data!.stream;
 
   @override
-  int get contentLength {
-    final result = int.tryParse(
-      _response.headers[Headers.contentLengthHeader]?.first ?? '-1',
-    );
-    return result ?? -1;
+  int? get contentLength {
+    final length = _response.headers[Headers.contentLengthHeader]?.first;
+    if (length == null) return null;
+    return int.tryParse(length);
   }
 
   @override
-  String get eTag => _response.headers['etag']?.first ?? '-1';
+  String? get eTag => _response.headers['etag']?.first;
 
   @override
   String get fileExtension {
-    var fileExtension = '';
-    final contentTypeHeader =
-        _response.headers[Headers.contentTypeHeader]?.first;
-    if (contentTypeHeader != null) {
-      final contentType = ContentType.parse(contentTypeHeader);
-      fileExtension = mimeTypes[contentType.mimeType]!;
+    final header = _response.headers[Headers.contentTypeHeader]?.first;
+    if (header != null) {
+      final contentType = ContentType.parse(header);
+      return mimeTypes[contentType.mimeType] ?? '';
     }
-    return fileExtension;
+    return '';
   }
 
   @override
-  int get statusCode => _response.statusCode!;
+  int get statusCode => _response.statusCode ?? -1;
 
   @override
   DateTime get validTill {
