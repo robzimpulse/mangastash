@@ -27,7 +27,9 @@ class CoreStorageRegistrar extends Registrar {
     locator.registerFactory(() => TagDao(locator()));
 
     locator.registerSingleton(await SharedPreferences.getInstance());
-    locator.registerSingleton(await StorageManager.create());
+    locator.registerSingleton(
+      await StorageManager.create(dio: () => locator()),
+    );
 
     log.log(
       'Register ${runtimeType.toString()}',

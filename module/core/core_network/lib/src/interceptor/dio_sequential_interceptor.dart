@@ -17,9 +17,7 @@ class DioSequentialInterceptor extends Interceptor {
       if (!_processing) {
         _processing = true;
         handler.next(options);
-        print('onRequest: ${options.uri.toString()}');
       } else {
-        print('onRequest Pending: ${options.uri.toString()}');
         pending.addLast((options, handler));
       }
     } else {
@@ -30,7 +28,6 @@ class DioSequentialInterceptor extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     if (shouldQueue?.call(response.requestOptions) == true) {
-      print('onResponse: ${response.requestOptions.uri.toString()}');
       handler.next(response);
       final hashcode = response.requestOptions.hashCode;
       pending.removeWhere((e) => e.$1.hashCode == hashcode);
@@ -45,7 +42,6 @@ class DioSequentialInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     if (shouldQueue?.call(err.requestOptions) == true) {
-      print('onError: ${err.requestOptions.uri.toString()}');
       handler.next(err);
       pending.removeWhere((e) => e.$1.hashCode == err.requestOptions.hashCode);
       _processing = false;

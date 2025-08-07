@@ -1,9 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core_environment/core_environment.dart';
-import 'package:core_network/core_network.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
-
-import 'base/network_image_widget.dart';
 
 class MangaTileWidget extends StatelessWidget {
   const MangaTileWidget({
@@ -14,13 +13,13 @@ class MangaTileWidget extends StatelessWidget {
     this.isOnLibrary = false,
     this.isPrefetching = false,
     this.onLongPress,
-    this.dio,
+    this.cacheManager,
   });
 
   final Manga manga;
   final bool isOnLibrary;
   final bool isPrefetching;
-  final Dio? dio;
+  final BaseCacheManager? cacheManager;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final EdgeInsetsGeometry padding;
@@ -33,17 +32,21 @@ class MangaTileWidget extends StatelessWidget {
 
     return Row(
       children: [
-        NetworkImageWidget(
+        CachedNetworkImage(
           fit: BoxFit.cover,
-          dio: dio,
+          cacheManager: cacheManager,
           imageUrl: manga.coverUrl.or(
             'https://placehold.co/400?text=Cover+Url',
           ),
           width: 50,
           height: 50,
-          errorBuilder: (context, error, _) => const Icon(Icons.error),
-          progressBuilder: (context, progress) {
-            return Center(child: CircularProgressIndicator(value: progress));
+          errorWidget: (context, url, error) {
+            return const Center(child: Icon(Icons.error));
+          },
+          progressIndicatorBuilder: (context, url, progress) {
+            return Center(
+              child: CircularProgressIndicator(value: progress.progress),
+            );
           },
         ),
         if (title != null)
@@ -70,16 +73,16 @@ class MangaTileWidget extends StatelessWidget {
                     : Colors.black.withValues(alpha: 0.5),
             child: Padding(
               padding: const EdgeInsets.all(4),
-              child: NetworkImageWidget(
-                dio: dio,
+              child: CachedNetworkImage(
+                cacheManager: cacheManager,
                 imageUrl: sourceIconUrl,
                 fit: BoxFit.contain,
-                errorBuilder: (context, error, _) {
+                errorWidget: (context, url, error) {
                   return const Center(child: Icon(Icons.error));
                 },
-                progressBuilder: (context, progress) {
+                progressIndicatorBuilder: (context, url, progress) {
                   return Center(
-                    child: CircularProgressIndicator(value: progress),
+                    child: CircularProgressIndicator(value: progress.progress),
                   );
                 },
               ),

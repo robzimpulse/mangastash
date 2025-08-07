@@ -1,5 +1,5 @@
 import 'package:core_environment/core_environment.dart';
-import 'package:core_network/core_network.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -9,9 +9,13 @@ import 'manga_reader_screen_cubit.dart';
 import 'manga_reader_screen_state.dart';
 
 class MangaReaderScreen extends StatelessWidget {
-  const MangaReaderScreen({super.key, required this.dio, this.onTapShortcut});
+  const MangaReaderScreen({
+    super.key,
+    required this.storageManager,
+    this.onTapShortcut,
+  });
 
-  final Dio dio;
+  final StorageManager storageManager;
 
   final void Function(String?)? onTapShortcut;
 
@@ -36,7 +40,10 @@ class MangaReaderScreen extends StatelessWidget {
           getAllChapterUseCase: locator(),
         )..init();
       },
-      child: MangaReaderScreen(dio: locator(), onTapShortcut: onTapShortcut),
+      child: MangaReaderScreen(
+        storageManager: locator(),
+        onTapShortcut: onTapShortcut,
+      ),
     );
   }
 
@@ -154,10 +161,10 @@ class MangaReaderScreen extends StatelessWidget {
           child: Column(
             children: [
               for (final image in images)
-                NetworkImageWidget(
-                  dio: dio,
+                CachedNetworkImage(
+                  cacheManager: storageManager.images,
                   imageUrl: image,
-                  errorBuilder: (context, error, _) {
+                  errorWidget: (context, url, error) {
                     return ConstrainedBox(
                       constraints: const BoxConstraints(maxHeight: 300),
                       child: Center(
@@ -171,14 +178,16 @@ class MangaReaderScreen extends StatelessWidget {
                       ),
                     );
                   },
-                  progressBuilder: (context, progress) {
+                  progressIndicatorBuilder: (context, url, progress) {
                     return ConstrainedBox(
                       constraints: const BoxConstraints(maxHeight: 300),
                       child: Center(
                         child: SizedBox(
                           width: 16,
                           height: 16,
-                          child: CircularProgressIndicator(value: progress),
+                          child: CircularProgressIndicator(
+                            value: progress.progress,
+                          ),
                         ),
                       ),
                     );

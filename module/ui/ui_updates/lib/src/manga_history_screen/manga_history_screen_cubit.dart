@@ -27,6 +27,4 @@ class MangaHistoryScreenCubit extends Cubit<MangaHistoryScreenState>
       ),
     );
   }
-
-  void init() {}
 }

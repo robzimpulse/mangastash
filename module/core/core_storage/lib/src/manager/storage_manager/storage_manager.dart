@@ -1,33 +1,29 @@
 import 'package:dio/dio.dart';
-import 'package:stash/stash_api.dart';
-import 'package:stash_dio/stash_dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:stash/stash_api.dart' hide CacheManager;
 import 'package:stash_sqlite/stash_sqlite.dart';
 
+import 'file_service/dio_file_service.dart';
+
 class StorageManager {
-  final Cache network;
+  final BaseCacheManager images;
 
   final Cache<DateTime> converter;
 
-  StorageManager._({
-    required this.network,
-    required this.converter,
-  });
-
-  Interceptor get interceptor {
-    return network.interceptor(r'/([a-z-_0-9\/:.]*.(jpg|jpeg|png|gif|ico|webp))');
-  }
+  StorageManager._({required this.images, required this.converter});
 
   Future<void> clear() async {
-    await Future.wait([network.clear(), converter.clear()]);
+    await Future.wait([images.emptyCache(), converter.clear()]);
   }
 
-  static Future<StorageManager> create() async {
+  static Future<StorageManager> create({required ValueGetter<Dio> dio}) async {
     final memory = await newSqliteMemoryCacheStore();
     final persistent = await newSqliteLocalCacheStore();
 
     return StorageManager._(
       converter: newTieredCache(
-        DefaultCacheManager(),
+        null,
         await memory.cache(
           name: 'converter-cache',
           maxEntries: 100,
@@ -43,23 +39,7 @@ class StorageManager {
         name: 'converter',
         statsEnabled: true,
       ),
-      network: newTieredCache(
-        DefaultCacheManager(),
-        await memory.cache(
-          name: 'network-cache',
-          maxEntries: 100,
-          evictionPolicy: const LruEvictionPolicy(),
-          expiryPolicy: const TouchedExpiryPolicy(Duration(minutes: 30)),
-          eventListenerMode: EventListenerMode.synchronous,
-        ),
-        await persistent.cache(
-          name: 'network-storage',
-          expiryPolicy: const EternalExpiryPolicy(),
-          eventListenerMode: EventListenerMode.synchronous,
-        ),
-        name: 'network',
-        statsEnabled: true,
-      ),
+      images: CacheManager(Config('image', fileService: DioFileService(dio))),
     );
   }
 }

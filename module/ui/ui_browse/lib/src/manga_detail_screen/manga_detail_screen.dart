@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:core_environment/core_environment.dart';
-import 'package:core_network/core_network.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -19,7 +19,7 @@ class MangaDetailScreen extends StatefulWidget {
     this.onTapManga,
     this.onMangaMenu,
     this.onTapSort,
-    required this.dio,
+    required this.storageManager,
   });
 
   final ValueSetter<Chapter>? onTapChapter;
@@ -30,7 +30,7 @@ class MangaDetailScreen extends StatefulWidget {
 
   final Future<ChapterConfig?> Function(ChapterConfig? value)? onTapSort;
 
-  final Dio dio;
+  final StorageManager storageManager;
 
   static Widget create({
     required ServiceLocator locator,
@@ -62,7 +62,7 @@ class MangaDetailScreen extends StatefulWidget {
         )..init();
       },
       child: MangaDetailScreen(
-        dio: locator(),
+        storageManager: locator(),
         onTapChapter: onTapChapter,
         onTapManga: onTapManga,
         onMangaMenu: onMangaMenu,
@@ -247,18 +247,16 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             ),
           );
         } else {
-          view = NetworkImageWidget(
+          view = CachedNetworkImage(
             fit: BoxFit.cover,
-            dio: widget.dio,
+            cacheManager: widget.storageManager.images,
             imageUrl: url,
-            errorBuilder: (context, error, _) => const Icon(Icons.error),
-            progressBuilder: (context, progress) {
+            errorWidget: (context, url, error) {
+              return const Center(child: Icon(Icons.error));
+            },
+            progressIndicatorBuilder: (context, url, progress) {
               return Center(
-                child: SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(value: progress),
-                ),
+                child: CircularProgressIndicator(value: progress.progress),
               );
             },
           );
@@ -541,7 +539,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               itemBuilder: (context, data) {
                 return MangaItemWidget(
                   manga: data,
-                  dio: widget.dio,
+                  cacheManager: widget.storageManager.images,
                   onTap: () => widget.onTapManga?.call(data),
                   onLongPress: () {
                     _onLongPressManga(
