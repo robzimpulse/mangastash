@@ -116,7 +116,7 @@ jobs:
             | -------- | -------- |
             | Android | - |
             | iOS | - |
-            | Web | ${{ build.steps.upload_artifact_web.outputs.artifact-url }} |
+            | Web | ${{ build:web.steps.upload_artifact_web.outputs.artifact-url }} |
             | Windows | - |
             | Macos | - |
             | Linux | - |
