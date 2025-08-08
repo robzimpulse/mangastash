@@ -9,7 +9,6 @@ import 'package:flutter/widgets.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:universal_io/io.dart';
 
 import '../use_case/chapter/get_all_chapter_use_case.dart';
 import '../use_case/chapter/get_chapter_use_case.dart';
@@ -30,7 +29,7 @@ class JobManager
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
   final ValueGetter<GetAllChapterUseCase> _getAllChapterUseCase;
   final ListenSearchParameterUseCase _listenSearchParameterUseCase;
-  final Dio _dio;
+  final StorageManager _storageManager;
   final JobDao _jobDao;
   final LogBox _log;
 
@@ -39,16 +38,16 @@ class JobManager
   late final StreamSubscription _streamSubscription;
 
   JobManager({
-    required Dio dio,
     required LogBox log,
     required JobDao jobDao,
+    required StorageManager storageManager,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required ValueGetter<GetMangaUseCase> getMangaUseCase,
     required ValueGetter<GetAllChapterUseCase> getAllChapterUseCase,
-  }) : _dio = dio,
-       _log = log,
+  }) : _log = log,
        _jobDao = jobDao,
+       _storageManager = storageManager,
        _getMangaUseCase = getMangaUseCase,
        _getChapterUseCase = getChapterUseCase,
        _getAllChapterUseCase = getAllChapterUseCase,
@@ -284,10 +283,7 @@ class JobManager
       return;
     }
 
-    _dio.get(
-      url,
-      options: Options(headers: {HttpHeaders.userAgentHeader: userAgent}),
-    );
+    final file = await _storageManager.images.getSingleFile(url);
 
     _log.log(
       'Success execute job ${job.id} - ${job.type}',
@@ -297,6 +293,7 @@ class JobManager
         'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
         'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
         'image': job.image,
+        'path': file.path,
       },
       name: runtimeType.toString(),
     );

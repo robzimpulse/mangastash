@@ -54,7 +54,7 @@ class DomainMangaRegistrar extends Registrar {
       JobManager(
         log: log,
         jobDao: locator(),
-        dio: locator(),
+        storageManager: locator(),
         getChapterUseCase: () => locator(),
         getMangaUseCase: () => locator(),
         getAllChapterUseCase: () => locator(),
