@@ -107,7 +107,6 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           edit-mode: replace
           body: |
-            body: |-
             ![badge]
             
             Build Successful! You can find a link to the downloadable artifact below.
