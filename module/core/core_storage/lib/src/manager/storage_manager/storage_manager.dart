@@ -12,23 +12,7 @@ class StorageManager {
 
   final Cache<DateTime> converter;
 
-  StorageManager._({required this.images, required this.converter}) {
-    converter.on<CacheEntryCreatedEvent<DateTime>>().listen(
-      (e) => print('Created: ${e.entry.key}'),
-    );
-    converter.on<CacheEntryUpdatedEvent<DateTime>>().listen(
-      (e) => print('Updated: ${e.newEntry.key}'),
-    );
-    converter.on<CacheEntryRemovedEvent<DateTime>>().listen(
-      (e) => print('Removed: ${e.entry.key}'),
-    );
-    converter.on<CacheEntryExpiredEvent<DateTime>>().listen(
-      (e) => print('Expired: ${e.entry.key}'),
-    );
-    converter.on<CacheEntryEvictedEvent<DateTime>>().listen(
-      (e) => print('Evicted: ${e.entry.key}'),
-    );
-  }
+  StorageManager._({required this.images, required this.converter});
 
   Future<void> clear() async {
     await Future.wait([images.emptyCache(), converter.clear()]);
