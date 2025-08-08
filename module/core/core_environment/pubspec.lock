@@ -383,6 +383,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.2"
+  hive:
+    dependency: transitive
+    description:
+      name: hive
+      sha256: "8dcf6db979d7933da8217edcec84e9df1bdb4e4edc7fc77dbd5aa74356d6d941"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.3"
   http:
     dependency: transitive
     description:
@@ -947,11 +955,11 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.2.0"
-  stash_memory:
+  stash_hive:
     dependency: transitive
     description:
-      name: stash_memory
-      sha256: "84ffcc108d345909dc40bd11d43e3fe87a115c30b157ca2bfa8e84c0e313d5c4"
+      name: stash_hive
+      sha256: "336f15dd8d3419425c5711ef0c6b8fd2a518e426bffdb2b38e1cd74ef7472f29"
       url: "https://pub.dev"
     source: hosted
     version: "5.2.0"
@@ -1043,6 +1051,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.2"
+  universal_platform:
+    dependency: transitive
+    description:
+      name: universal_platform
+      sha256: "64e16458a0ea9b99260ceb5467a214c1f298d647c659af1bff6d3bf82536b1ec"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   uuid:
     dependency: transitive
     description:

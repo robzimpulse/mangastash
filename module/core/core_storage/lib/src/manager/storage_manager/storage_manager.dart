@@ -1,8 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:stash/stash_api.dart' hide CacheManager;
-import 'package:stash_memory/stash_memory.dart';
+import 'package:stash_hive/stash_hive.dart';
 
 import 'file_service/dio_file_service.dart';
 
@@ -34,7 +35,9 @@ class StorageManager {
   }
 
   static Future<StorageManager> create({required ValueGetter<Dio> dio}) async {
-    final memory = await newMemoryCacheStore();
+    final memory = await newHiveLazyCacheStore(
+      path: kIsWeb ? null : (await getApplicationDocumentsDirectory()).path,
+    );
 
     return StorageManager._(
       converter: newTieredCache(
