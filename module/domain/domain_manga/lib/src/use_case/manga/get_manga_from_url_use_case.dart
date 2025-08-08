@@ -49,6 +49,11 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
     required SourceEnum source,
     required String url,
   }) async {
+    final cached = await _storageManager.manga.get('${source.name}-$url');
+    if (cached != null) {
+      return Success(Manga.fromJson(cached));
+    }
+
     try {
       final raw = await _mangaDao.search(webUrls: [url]);
       final manga = Manga.fromDatabase(raw.firstOrNull);
@@ -66,6 +71,8 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
       if (result == null) {
         throw DataNotFoundException();
       }
+
+      await _storageManager.manga.put('${source.name}-$url', result.toJson());
 
       return Success(result);
     } catch (e) {

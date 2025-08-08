@@ -14,18 +14,31 @@ class StorageManager {
 
   final Cache<List<Map<String, dynamic>>> tags;
 
+  final Cache<Map<String, dynamic>> manga;
+
   StorageManager._({
     required this.images,
     required this.converter,
     required this.tags,
+    required this.manga,
   });
 
   Future<void> clear() async {
-    await Future.wait([images.emptyCache(), converter.clear(), tags.clear()]);
+    await Future.wait([
+      images.emptyCache(),
+      converter.clear(),
+      tags.clear(),
+      manga.clear(),
+    ]);
   }
 
   Future<void> dispose() async {
-    await Future.wait([images.dispose(), converter.close(), tags.close()]);
+    await Future.wait([
+      images.dispose(),
+      converter.close(),
+      tags.close(),
+      manga.close(),
+    ]);
   }
 
   static Future<StorageManager> create({required ValueGetter<Dio> dio}) async {
@@ -41,6 +54,12 @@ class StorageManager {
       ),
       tags: await memory.cache(
         name: 'tags-cache',
+        evictionPolicy: const LruEvictionPolicy(),
+        expiryPolicy: const TouchedExpiryPolicy(Duration(minutes: 30)),
+        eventListenerMode: EventListenerMode.synchronous,
+      ),
+      manga: await memory.cache(
+        name: 'manga-cache',
         evictionPolicy: const LruEvictionPolicy(),
         expiryPolicy: const TouchedExpiryPolicy(Duration(minutes: 30)),
         eventListenerMode: EventListenerMode.synchronous,
