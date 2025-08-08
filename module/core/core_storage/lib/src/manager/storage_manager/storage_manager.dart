@@ -16,11 +16,14 @@ class StorageManager {
 
   final Cache<Map<String, dynamic>> manga;
 
+  final Cache<Map<String, dynamic>> chapter;
+
   StorageManager._({
     required this.images,
     required this.converter,
     required this.tags,
     required this.manga,
+    required this.chapter,
   });
 
   Future<void> clear() async {
@@ -29,6 +32,7 @@ class StorageManager {
       converter.clear(),
       tags.clear(),
       manga.clear(),
+      chapter.clear(),
     ]);
   }
 
@@ -38,6 +42,7 @@ class StorageManager {
       converter.close(),
       tags.close(),
       manga.close(),
+      chapter.close(),
     ]);
   }
 
@@ -60,6 +65,12 @@ class StorageManager {
       ),
       manga: await memory.cache(
         name: 'manga-cache',
+        evictionPolicy: const LruEvictionPolicy(),
+        expiryPolicy: const TouchedExpiryPolicy(Duration(minutes: 30)),
+        eventListenerMode: EventListenerMode.synchronous,
+      ),
+      chapter: await memory.cache(
+        name: 'chapter-cache',
         evictionPolicy: const LruEvictionPolicy(),
         expiryPolicy: const TouchedExpiryPolicy(Duration(minutes: 30)),
         eventListenerMode: EventListenerMode.synchronous,
