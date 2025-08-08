@@ -740,14 +740,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.2"
-  hive:
-    dependency: transitive
-    description:
-      name: hive
-      sha256: "8dcf6db979d7933da8217edcec84e9df1bdb4e4edc7fc77dbd5aa74356d6d941"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.3"
   html:
     dependency: transitive
     description:
@@ -1472,22 +1464,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.12.1"
-  stash:
-    dependency: transitive
-    description:
-      name: stash
-      sha256: c1482f64dcaa9b2d9eb112106ef018aad49adb284e1ba371c892c2ad9f99fc12
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.2.0"
-  stash_hive:
-    dependency: transitive
-    description:
-      name: stash_hive
-      sha256: "336f15dd8d3419425c5711ef0c6b8fd2a518e426bffdb2b38e1cd74ef7472f29"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.2.0"
   stream_channel:
     dependency: transitive
     description:
@@ -1604,14 +1580,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.2"
-  universal_platform:
-    dependency: transitive
-    description:
-      name: universal_platform
-      sha256: "64e16458a0ea9b99260ceb5467a214c1f298d647c659af1bff6d3bf82536b1ec"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
   url_launcher_linux:
     dependency: transitive
     description:

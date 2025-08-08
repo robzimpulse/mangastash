@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -89,10 +92,12 @@ class GetTagsUseCase with SyncTagsMixin {
   }
 
   Future<Result<List<Tag>>> execute({required SourceEnum source}) async {
-    final cached = await _storageManager.tags.get(source.name);
-    if (cached != null) {
-      return Success([for (final data in cached) Tag.fromJson(data)]);
-    }
+    final key = source.name;
+    final file = await _storageManager.chapter.getFileFromCache(key);
+    final str = await file?.file.readAsString(encoding: utf8);
+    final object = str?.let((e) => json.decode(e))?.castOrNull<List<dynamic>>();
+    final data = [...?object?.map((e) => Tag.fromJson(e))];
+    if (data.isNotEmpty) return Success(data);
 
     try {
       final List<Tag> data;
@@ -103,9 +108,13 @@ class GetTagsUseCase with SyncTagsMixin {
       }
 
       final result = await sync(dao: _tagDao, values: data, logBox: _logBox);
-      await _storageManager.tags.put(source.name, [
-        ...result.map((e) => e.toJson()),
-      ]);
+
+      await _storageManager.chapter.putFile(
+        key,
+        utf8.encode(json.encode([...data.map((e) => e.toJson())])),
+        key: key,
+      );
+
       return Success(result);
     } catch (e) {
       return Error(e);
