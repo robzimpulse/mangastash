@@ -99,6 +99,13 @@ jobs:
           user_name: 'robzimpulse'
           user_email: 'kugelfang.killaruna@gmail.com'
           commit_message: 'Publish to gh-pages'
+      - name: 'Save Artifact'
+        if: ${{ matrix.platform == 'apk' }}
+        id: upload_artifact_apk
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.platform }}
+          path: ${{ matrix.path }}
       - name: 'Send debug APK to telegram'
         if: ${{ matrix.platform == 'apk' }}
         uses: appleboy/telegram-action@master
@@ -113,7 +120,7 @@ jobs:
             Triggered by: ${{ github.actor }}
             Branch or TAG: ${{ github.ref }}
             Commit SHA: ${{ github.sha }}
-            Artifact URL is: ${{ steps.upload_artifact.outputs.artifact-url }}
+            Artifact URL is: ${{ steps.upload_artifact_apk.outputs.artifact-url }}
 
 #
 #  build-web:
