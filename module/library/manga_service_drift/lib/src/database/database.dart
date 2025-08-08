@@ -51,15 +51,13 @@ class AppDatabase extends _$AppDatabase {
   // After generating code, this class needs to define a `schemaVersion` getter
   // and a constructor telling drift where the database should be stored.
   // These are described in the getting started guide: https://drift.simonbinder.eu/setup/
-  AppDatabase({
-    QueryExecutor? executor,
-    LoggerCallback? logger,
-  }) : super(
-          LazyDatabase(
-            () async => (executor ?? await _openConnection(logger: logger))
-                .interceptWith(LogInterceptor(logger: logger)),
-          ),
-        );
+  AppDatabase({QueryExecutor? executor, LoggerCallback? logger})
+    : super(
+        LazyDatabase(() async {
+          final exec = (executor ?? await _openConnection(logger: logger));
+          return exec.interceptWith(LogInterceptor(logger: logger));
+        }),
+      );
 
   @override
   int get schemaVersion => 1;
@@ -77,12 +75,11 @@ Future<QueryExecutor> _openConnection({LoggerCallback? logger}) async {
   return driftDatabase(
     name: 'mangastash-local',
     native: DriftNativeOptions(
-      databaseDirectory: () => getApplicationDocumentsDirectory().then(
-        (value) {
-          logger?.call('Database location: $value', name: 'AppDatabase');
-          return value;
-        },
-      ),
+      databaseDirectory: () async {
+        final directory = await getApplicationDocumentsDirectory();
+        logger?.call('Database location: $directory', name: 'AppDatabase');
+        return directory;
+      },
     ),
     web: DriftWebOptions(
       sqlite3Wasm: Uri.parse('sqlite3.wasm'),
