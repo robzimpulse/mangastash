@@ -62,9 +62,26 @@ jobs:
         run: melos bootstrap --verbose
       - name: 'Build Application'
         run: flutter build ${{ matrix.platform }}
+      - name: 'Compress Directory'
+        uses: somaz94/compress-decompress@v1
+        if: ${{ matrix.platform == 'web' }}
+        with:
+          command: compress
+          source: ${{ matrix.path }}
+          format: zip
+          dest: build
+          destfilename: 'web'
       - name: 'Save Artifact'
+        if: ${{ matrix.platform != 'web' }}
         id: upload_artifact
         uses: actions/upload-artifact@v4
         with:
           name: release-${{ matrix.platform }}
           path: ${{ matrix.path }}
+      - name: 'Save Artifact'
+        if: ${{ matrix.platform == 'web' }}
+        id: upload_artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.platform }}
+          path: ${{ matrix.path }}.zip
