@@ -1,0 +1,52 @@
+name: Build Application on Pull Request
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - platform: web
+            os: ubuntu-latest
+          - platform: macos
+            os: macos-latest
+          - platform: windows
+            os: windows-latest
+          - platform: linux
+            os: ubuntu-latest
+          - platform: ios
+            os: macos-latest
+          - platform: apk
+            os: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: 'Git Checkout'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+      - name: 'Install Java'
+        uses: actions/setup-java@v2
+        if: ${{ matrix.platform == 'apk' }}
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      - name: 'Install Flutter'
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+          cache: true
+      - name: 'Flutter Doctor'
+        run: flutter doctor -v
+      - name: 'Install Melos'
+        run: flutter pub global activate melos 6.2.0
+      - name: 'Bootstrap Workspace'
+        run: melos bootstrap --verbose
+      - name: 'Build Application'
+        run: flutter build ${{ matrix.platform }}
