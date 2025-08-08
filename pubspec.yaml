@@ -2,7 +2,7 @@ name: mangastash
 description: Manga Reader Apps
 publish_to: 'none'
 
-version: 0.1.5+0
+version: 0.1.6+0
 
 environment:
   sdk: ">=3.7.2 <4.0.0"
