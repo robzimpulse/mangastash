@@ -100,6 +100,7 @@ jobs:
           user_email: 'kugelfang.killaruna@gmail.com'
           commit_message: 'Publish to gh-pages'
       - name: 'Send debug APK to telegram'
+        if: ${{ matrix.platform == 'apk' }}
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_GROUP_CHAT_ID }}
