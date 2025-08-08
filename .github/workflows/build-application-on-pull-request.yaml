@@ -73,14 +73,14 @@ jobs:
           destfilename: 'web'
       - name: 'Save Artifact'
         if: ${{ matrix.platform != 'web' }}
-        id: upload_artifact
+        id: upload_artifact_non_web
         uses: actions/upload-artifact@v4
         with:
           name: release-${{ matrix.platform }}
           path: ${{ matrix.path }}
       - name: 'Save Artifact'
         if: ${{ matrix.platform == 'web' }}
-        id: upload_artifact
+        id: upload_artifact_web
         uses: actions/upload-artifact@v4
         with:
           name: release-${{ matrix.platform }}
