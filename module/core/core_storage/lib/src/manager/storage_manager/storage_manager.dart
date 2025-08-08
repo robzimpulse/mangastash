@@ -12,10 +12,20 @@ class StorageManager {
 
   final Cache<DateTime> converter;
 
-  StorageManager._({required this.images, required this.converter});
+  final Cache<List<Map<String, dynamic>>> tags;
+
+  StorageManager._({
+    required this.images,
+    required this.converter,
+    required this.tags,
+  });
 
   Future<void> clear() async {
-    await Future.wait([images.emptyCache(), converter.clear()]);
+    await Future.wait([images.emptyCache(), converter.clear(), tags.clear()]);
+  }
+
+  Future<void> dispose() async {
+    await Future.wait([images.dispose(), converter.close(), tags.close()]);
   }
 
   static Future<StorageManager> create({required ValueGetter<Dio> dio}) async {
@@ -24,22 +34,16 @@ class StorageManager {
     );
 
     return StorageManager._(
-      converter: newTieredCache(
-        null,
-        await memory.cache(
-          name: 'converter-cache',
-          maxEntries: 100,
-          evictionPolicy: const LruEvictionPolicy(),
-          expiryPolicy: const TouchedExpiryPolicy(Duration(minutes: 30)),
-          eventListenerMode: EventListenerMode.synchronous,
-        ),
-        await memory.cache(
-          name: 'converter-storage',
-          expiryPolicy: const EternalExpiryPolicy(),
-          eventListenerMode: EventListenerMode.synchronous,
-        ),
-        name: 'converter',
-        statsEnabled: true,
+      converter: await memory.cache(
+        name: 'converter-cache',
+        expiryPolicy: const EternalExpiryPolicy(),
+        eventListenerMode: EventListenerMode.synchronous,
+      ),
+      tags: await memory.cache(
+        name: 'tags-cache',
+        evictionPolicy: const LruEvictionPolicy(),
+        expiryPolicy: const TouchedExpiryPolicy(Duration(minutes: 30)),
+        eventListenerMode: EventListenerMode.synchronous,
       ),
       images: CacheManager(Config('image', fileService: DioFileService(dio))),
     );

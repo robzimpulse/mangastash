@@ -89,6 +89,11 @@ class GetTagsUseCase with SyncTagsMixin {
   }
 
   Future<Result<List<Tag>>> execute({required SourceEnum source}) async {
+    final cached = await _storageManager.tags.get(source.name);
+    if (cached != null) {
+      return Success([for (final data in cached) Tag.fromJson(data)]);
+    }
+
     try {
       final List<Tag> data;
       if (source == SourceEnum.mangadex) {
@@ -98,7 +103,9 @@ class GetTagsUseCase with SyncTagsMixin {
       }
 
       final result = await sync(dao: _tagDao, values: data, logBox: _logBox);
-
+      await _storageManager.tags.put(source.name, [
+        ...result.map((e) => e.toJson()),
+      ]);
       return Success(result);
     } catch (e) {
       return Error(e);
