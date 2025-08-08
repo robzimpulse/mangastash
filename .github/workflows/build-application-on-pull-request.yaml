@@ -18,21 +18,21 @@ jobs:
           - platform: web
             os: ubuntu-latest
             path: build/web
-#          - platform: macos
-#            os: macos-15
-#            path: build/macos/Build/Products/Release/mangastash.app
-#          - platform: windows
-#            os: windows-latest
-#            path: build/windows/x64/runner/Release/mangastash.exe
-#          - platform: linux
-#            os: ubuntu-latest
-#            path: build/linux/x64/release/bundle/mangastash
+          - platform: macos
+            os: macos-15
+            path: build/macos/Build/Products/Release/mangastash.app
+          - platform: windows
+            os: windows-latest
+            path: build/windows/x64/runner/Release/mangastash.exe
+          - platform: linux
+            os: ubuntu-latest
+            path: build/linux/x64/release/bundle/mangastash
 #          - platform: ipa
 #            os: macos-latest
 #            path: build/ios/ipa
-#          - platform: apk
-#            os: ubuntu-latest
-#            path: build/app/outputs/apk/release/app-release.apk
+          - platform: apk
+            os: ubuntu-latest
+            path: build/app/outputs/apk/release/app-release.apk
     runs-on: ${{ matrix.os }}
     steps:
       - name: 'Git Checkout'
