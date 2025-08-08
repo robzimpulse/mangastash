@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -75,10 +77,10 @@ class GetMangaUseCase with SyncMangasMixin {
     required String mangaId,
   }) async {
     final key = '$source-$mangaId';
-    final cached = await _storageManager.manga.get(key);
-    if (cached != null) {
-      return Success(Manga.fromJson(cached));
-    }
+    final file = await _storageManager.chapter.getFileFromCache(key);
+    final data = await file?.file.readAsString(encoding: utf8);
+    final cache = Manga.fromJsonString(data ?? '');
+    if (cache != null) return Success(cache);
 
     try {
       final raw = await _mangaDao.search(ids: [mangaId]);
@@ -103,7 +105,11 @@ class GetMangaUseCase with SyncMangasMixin {
         throw DataNotFoundException();
       }
 
-      await _storageManager.manga.put(key, result.toJson());
+      await _storageManager.chapter.putFile(
+        key,
+        utf8.encode(result.toJsonString()),
+        key: key,
+      );
 
       return Success(result);
     } catch (e) {

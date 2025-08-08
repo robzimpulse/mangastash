@@ -1,10 +1,10 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:core_storage/core_storage.dart';
 import 'package:intl/intl.dart';
 
 extension ParseableDateStringExtension on String {
-
   Future<DateTime?> asDateTime({StorageManager? storageManager}) async {
     if (isEmpty) return null;
 
@@ -16,15 +16,19 @@ extension ParseableDateStringExtension on String {
       'MM/dd/yyyy',
     ];
 
-    final cached = await storageManager?.converter.get(this);
-    if (cached != null) {
-      return cached;
-    }
+    final file = await storageManager?.converter.getFileFromCache(this);
+    final data = await file?.file.readAsString(encoding: utf8);
+    final date = DateTime.tryParse(data ?? '');
+    if (date != null) return date;
 
     for (final format in formats) {
       try {
         final result = DateFormat(format).parse(this).toUtc();
-        await storageManager?.converter.put(this, result);
+        await storageManager?.converter.putFile(
+          this,
+          utf8.encode(result.toIso8601String()),
+          key: this,
+        );
         return result;
       } catch (e) {
         log('$e ($this)', name: 'ParseableDateStringExtension');

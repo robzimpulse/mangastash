@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
@@ -83,10 +85,10 @@ class GetChapterUseCase with SyncChaptersMixin {
     required String chapterId,
   }) async {
     final key = '${source.name} - $mangaId - $chapterId';
-    final cached = await _storageManager.chapter.get(key);
-    if (cached != null) {
-      return Success(Chapter.fromJson(cached));
-    }
+    final file = await _storageManager.chapter.getFileFromCache(key);
+    final data = await file?.file.readAsString(encoding: utf8);
+    final cache = Chapter.fromJsonString(data ?? '');
+    if (cache != null) return Success(cache);
 
     final raw = await _chapterDao.search(ids: [chapterId]);
     final chapter = raw.firstOrNull.let(
@@ -115,7 +117,11 @@ class GetChapterUseCase with SyncChaptersMixin {
         throw DataNotFoundException();
       }
 
-      await _storageManager.chapter.put(key, result.toJson());
+      await _storageManager.chapter.putFile(
+        key,
+        utf8.encode(result.toJsonString()),
+        key: key,
+      );
 
       return Success(result);
     } catch (e) {

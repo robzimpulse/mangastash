@@ -19,8 +19,6 @@ dependencies:
   path: ^1.9.0
   dio: ^5.7.0
   universal_io: ^2.2.2
-  stash: ^5.2.0
-  stash_hive: ^5.2.0
   log_box:
     git:
       url: https://github.com/robzimpulse/log_box.git
