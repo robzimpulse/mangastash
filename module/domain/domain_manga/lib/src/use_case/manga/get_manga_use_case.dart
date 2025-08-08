@@ -74,6 +74,12 @@ class GetMangaUseCase with SyncMangasMixin {
     required SourceEnum source,
     required String mangaId,
   }) async {
+    final key = '$source-$mangaId';
+    final cached = await _storageManager.manga.get(key);
+    if (cached != null) {
+      return Success(Manga.fromJson(cached));
+    }
+
     try {
       final raw = await _mangaDao.search(ids: [mangaId]);
       final manga = Manga.fromDatabase(raw.firstOrNull);
@@ -96,6 +102,8 @@ class GetMangaUseCase with SyncMangasMixin {
       if (result == null) {
         throw DataNotFoundException();
       }
+
+      await _storageManager.manga.put(key, result.toJson());
 
       return Success(result);
     } catch (e) {

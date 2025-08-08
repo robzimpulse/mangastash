@@ -51,9 +51,6 @@ class SearchChapterUseCase
     final limit = result.limit?.toInt() ?? 0;
     final total = result.total?.toInt() ?? 0;
 
-    // readableAt: data.attributes?.readableAt?.asDateTime,
-    // publishAt: data.attributes?.publishAt?.asDateTime,
-
     return Pagination(
       data: [
         for (final value in data)

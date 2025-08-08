@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 extension ParseableDateStringExtension on String {
 
   Future<DateTime?> asDateTime({StorageManager? storageManager}) async {
+    if (isEmpty) return null;
+
     /// put supported date format here with the longest format first
     final formats = [
       'yyyy-MM-ddTHH:mm:ss.mmmZ',
@@ -22,10 +24,10 @@ extension ParseableDateStringExtension on String {
     for (final format in formats) {
       try {
         final result = DateFormat(format).parse(this).toUtc();
-        storageManager?.converter.put(this, result);
+        await storageManager?.converter.put(this, result);
         return result;
       } catch (e) {
-        log('$e', name: 'ParseableDateStringExtension');
+        log('$e ($this)', name: 'ParseableDateStringExtension');
       }
     }
 

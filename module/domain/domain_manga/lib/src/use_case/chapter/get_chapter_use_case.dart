@@ -82,6 +82,12 @@ class GetChapterUseCase with SyncChaptersMixin {
     required String mangaId,
     required String chapterId,
   }) async {
+    final key = '${source.name} - $mangaId - $chapterId';
+    final cached = await _storageManager.chapter.get(key);
+    if (cached != null) {
+      return Success(Chapter.fromJson(cached));
+    }
+
     final raw = await _chapterDao.search(ids: [chapterId]);
     final chapter = raw.firstOrNull.let(
       (e) => e.chapter?.let((d) => Chapter.fromDrift(d, images: e.images)),
@@ -108,6 +114,8 @@ class GetChapterUseCase with SyncChaptersMixin {
       if (result == null) {
         throw DataNotFoundException();
       }
+
+      await _storageManager.chapter.put(key, result.toJson());
 
       return Success(result);
     } catch (e) {

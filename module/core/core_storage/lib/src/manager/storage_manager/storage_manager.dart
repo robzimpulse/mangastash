@@ -1,8 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:stash/stash_api.dart' hide CacheManager;
-import 'package:stash_sqlite/stash_sqlite.dart';
+import 'package:stash_hive/stash_hive.dart';
 
 import 'file_service/dio_file_service.dart';
 
@@ -11,33 +12,68 @@ class StorageManager {
 
   final Cache<DateTime> converter;
 
-  StorageManager._({required this.images, required this.converter});
+  final Cache<List<Map<String, dynamic>>> tags;
+
+  final Cache<Map<String, dynamic>> manga;
+
+  final Cache<Map<String, dynamic>> chapter;
+
+  StorageManager._({
+    required this.images,
+    required this.converter,
+    required this.tags,
+    required this.manga,
+    required this.chapter,
+  });
 
   Future<void> clear() async {
-    await Future.wait([images.emptyCache(), converter.clear()]);
+    await Future.wait([
+      images.emptyCache(),
+      converter.clear(),
+      tags.clear(),
+      manga.clear(),
+      chapter.clear(),
+    ]);
+  }
+
+  Future<void> dispose() async {
+    await Future.wait([
+      images.dispose(),
+      converter.close(),
+      tags.close(),
+      manga.close(),
+      chapter.close(),
+    ]);
   }
 
   static Future<StorageManager> create({required ValueGetter<Dio> dio}) async {
-    final memory = await newSqliteMemoryCacheStore();
-    final persistent = await newSqliteLocalCacheStore();
+    final memory = await newHiveLazyCacheStore(
+      path: kIsWeb ? null : (await getApplicationDocumentsDirectory()).path,
+    );
 
     return StorageManager._(
-      converter: newTieredCache(
-        null,
-        await memory.cache(
-          name: 'converter-cache',
-          maxEntries: 100,
-          evictionPolicy: const LruEvictionPolicy(),
-          expiryPolicy: const TouchedExpiryPolicy(Duration(minutes: 30)),
-          eventListenerMode: EventListenerMode.synchronous,
-        ),
-        await persistent.cache(
-          name: 'converter-storage',
-          expiryPolicy: const EternalExpiryPolicy(),
-          eventListenerMode: EventListenerMode.synchronous,
-        ),
-        name: 'converter',
-        statsEnabled: true,
+      converter: await memory.cache(
+        name: 'converter-cache',
+        expiryPolicy: const EternalExpiryPolicy(),
+        eventListenerMode: EventListenerMode.synchronous,
+      ),
+      tags: await memory.cache(
+        name: 'tags-cache',
+        evictionPolicy: const LruEvictionPolicy(),
+        expiryPolicy: const TouchedExpiryPolicy(Duration(minutes: 30)),
+        eventListenerMode: EventListenerMode.synchronous,
+      ),
+      manga: await memory.cache(
+        name: 'manga-cache',
+        evictionPolicy: const LruEvictionPolicy(),
+        expiryPolicy: const TouchedExpiryPolicy(Duration(minutes: 30)),
+        eventListenerMode: EventListenerMode.synchronous,
+      ),
+      chapter: await memory.cache(
+        name: 'chapter-cache',
+        evictionPolicy: const LruEvictionPolicy(),
+        expiryPolicy: const TouchedExpiryPolicy(Duration(minutes: 30)),
+        eventListenerMode: EventListenerMode.synchronous,
       ),
       images: CacheManager(Config('image', fileService: DioFileService(dio))),
     );
