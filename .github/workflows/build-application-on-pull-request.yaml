@@ -73,16 +73,16 @@ jobs:
           format: zip
           dest: build
           destfilename: 'web'
-      - name: 'Save Artifact'
+      - name: 'Save Artifact Non Web'
         if: ${{ matrix.platform != 'web' }}
-        id: upload_artifact_${{ matrix.platform }}
+        id: upload_artifact_non_web
         uses: actions/upload-artifact@v4
         with:
           name: release-${{ matrix.platform }}
           path: ${{ matrix.path }}
       - name: 'Save Artifact Web'
         if: ${{ matrix.platform == 'web' }}
-        id: upload_artifact_${{ matrix.platform }}
+        id: upload_artifact_web
         uses: actions/upload-artifact@v4
         with:
           name: release-${{ matrix.platform }}
@@ -116,7 +116,7 @@ jobs:
             | -------- | -------- |
             | Android | - |
             | iOS | - |
-            | Web | ${{ build:web.steps.upload_artifact_web.outputs.artifact-url }} |
+            | Web | - |
             | Windows | - |
             | Macos | - |
             | Linux | - |
