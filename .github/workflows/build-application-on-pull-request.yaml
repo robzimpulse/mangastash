@@ -19,7 +19,7 @@ jobs:
             os: ubuntu-latest
             path: build/web
           - platform: macos
-            os: macos-latest
+            os: macos-15
             path: build/macos/Build/Products/Release/mangastash.app
           - platform: windows
             os: windows-latest
