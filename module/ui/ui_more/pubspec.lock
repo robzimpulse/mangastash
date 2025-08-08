@@ -1246,22 +1246,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.2.0"
-  stash_dio:
+  stash_memory:
     dependency: transitive
     description:
-      name: stash_dio
-      sha256: b3d6e6d7964b9a5e960dfc598b3e9135d96358427e22c5a1ea273711b01bc66b
+      name: stash_memory
+      sha256: "84ffcc108d345909dc40bd11d43e3fe87a115c30b157ca2bfa8e84c0e313d5c4"
       url: "https://pub.dev"
     source: hosted
     version: "5.2.0"
-  stash_sqlite:
-    dependency: transitive
-    description:
-      name: stash_sqlite
-      sha256: "376598d5fafa8b9008a3686b8850d816028546537dc2ed3d58c569124ef4d4c6"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.3.0"
   stream_channel:
     dependency: transitive
     description:
