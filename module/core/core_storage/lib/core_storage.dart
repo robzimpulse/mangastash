@@ -6,3 +6,4 @@ export 'package:shared_preferences/shared_preferences.dart';
 
 export 'src/core_storage_registrar.dart';
 export 'src/manager/storage_manager/storage_manager.dart';
+export 'src/manager/typed_cache_manager/typed_cache_manager.dart';
