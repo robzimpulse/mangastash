@@ -3,6 +3,7 @@ import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
+import 'package:super_paging/super_paging.dart' as sp;
 
 import 'browse_manga_screen_state.dart';
 
@@ -56,6 +57,10 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
   void _updatePrefetchState(Set<String> prefetchedMangaIds) {
     emit(state.copyWith(prefetchedMangaIds: prefetchedMangaIds));
+  }
+
+  MangaDataSource get dataSource {
+    return MangaDataSource(usecase: _searchMangaUseCase, source: state.source);
   }
 
   Future<void> init({SearchMangaParameter? parameter}) async {
@@ -163,5 +168,52 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     final source = manga.source;
     if (id == null || source == null) return;
     // TODO: add download manga
+  }
+}
+
+class MangaDataSource extends sp.PagingSource<SearchMangaParameter, Manga> {
+  const MangaDataSource({required this.usecase, this.source});
+
+  final SearchMangaUseCase usecase;
+  final SourceEnum? source;
+
+  @override
+  Future<sp.LoadResult<SearchMangaParameter, Manga>> load(
+    sp.LoadParams<SearchMangaParameter> params,
+  ) async {
+    final source = this.source;
+    if (source == null) return sp.LoadResult.error(Exception('Empty Source'));
+
+    final parameter = params.key ?? const SearchMangaParameter();
+
+    final result = await usecase.execute(source: source, parameter: parameter);
+
+    if (result is Success<Pagination<Manga>>) {
+      final offset = result.data.offset ?? 0;
+      final limit = result.data.limit ?? 0;
+
+      final nextKey = parameter.copyWith(
+        page: parameter.page + 1,
+        offset: offset + limit,
+      );
+
+      final prevKey = parameter.copyWith(
+        page: parameter.page - 1,
+        offset: offset - limit,
+      );
+
+      return sp.LoadResult.page(
+        items: result.data.data ?? [],
+        nextKey: nextKey,
+        currKey: parameter,
+        prevKey: prevKey.page < 1 ? null : prevKey,
+      );
+    }
+
+    if (result is Error<Pagination<Manga>>) {
+      return sp.LoadResult.error(result.error);
+    }
+
+    return sp.LoadResult.error(Exception('Unknown Error'));
   }
 }

@@ -6,6 +6,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:feature_common/feature_common.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
+import 'package:super_paging/super_paging.dart';
 
 import 'browse_manga_screen_cubit.dart';
 import 'browse_manga_screen_state.dart';
@@ -18,7 +19,7 @@ class BrowseMangaScreen extends StatefulWidget {
     this.onTapFilter,
   });
 
-  final Function(Manga, SearchMangaParameter)? onTapManga;
+  final Function(Manga, SearchMangaParameter?)? onTapManga;
 
   final Future<SearchMangaParameter?>? Function(
     SearchMangaParameter? value,
@@ -30,7 +31,7 @@ class BrowseMangaScreen extends StatefulWidget {
 
   static Widget create({
     required ServiceLocator locator,
-    Function(Manga, SearchMangaParameter)? onTapManga,
+    Function(Manga, SearchMangaParameter?)? onTapManga,
     Future<SearchMangaParameter?>? Function(
       SearchMangaParameter? value,
       List<Tag> availableTags,
@@ -72,8 +73,15 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
 
   final FocusNode _searchFocusNode = FocusNode();
 
+  late final pager = Pager(
+    initialKey: const SearchMangaParameter(), // Initial page to load.
+    config: const PagingConfig(pageSize: 20, initialLoadSize: 60),
+    pagingSourceFactory: () => _cubit(context).dataSource,
+  );
+
   @override
   void dispose() {
+    pager.dispose();
     _searchController.dispose();
     _searchFocusNode.dispose();
     super.dispose();
@@ -366,44 +374,59 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     return _builder(
       buildWhen: (prev, curr) {
         return [
-          prev.isLoading != curr.isLoading,
-          prev.error != curr.error,
-          prev.mangas != curr.mangas,
+          prev.parameter != curr.parameter,
+          prev.source != curr.source,
           prev.libraryMangaIds != curr.libraryMangaIds,
-          prev.parameter != curr.parameter,
           prev.prefetchedMangaIds != curr.prefetchedMangaIds,
-          prev.hasNextPage != curr.hasNextPage,
-          prev.parameter != curr.parameter,
         ].contains(true);
       },
       builder: (context, state) {
-        return GridWidget<Manga>(
-          itemBuilder: (context, data) {
-            return MangaItemWidget(
-              manga: data,
-              cacheManager: widget.storageManager.images,
-              onTap: () => widget.onTapManga?.call(data, state.parameter),
-              onLongPress: () {
-                _onTapMenu(
-                  context: context,
-                  manga: data,
-                  isOnLibrary: state.libraryMangaIds.contains(data.id),
-                );
-              },
-              isOnLibrary: state.libraryMangaIds.contains(data.id),
-              isPrefetching: state.prefetchedMangaIds.contains(data.id),
-            );
-          },
-          onLoadNextPage: () => _cubit(context).next(),
-          onRefresh: () => _cubit(context).init(),
-          onTapRecrawl: (url) {
-            // TODO: implement recrawl from url
-            context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
-          },
-          error: state.error,
-          isLoading: state.isLoading,
-          hasNext: state.hasNextPage,
-          data: state.mangas,
+        return CustomScrollView(
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.all(10),
+              sliver: PagingSliverGrid(
+                pager: pager,
+                itemBuilder: (BuildContext context, int index) {
+                  final data = pager.items.elementAt(index);
+
+                  return MangaItemWidget(
+                    manga: data,
+                    cacheManager: widget.storageManager.images,
+                    onTap: () {
+                      widget.onTapManga?.call(data, pager.page(index));
+                    },
+                    onLongPress: () {
+                      _onTapMenu(
+                        context: context,
+                        manga: data,
+                        isOnLibrary: state.libraryMangaIds.contains(data.id),
+                      );
+                    },
+                    isOnLibrary: state.libraryMangaIds.contains(data.id),
+                    isPrefetching: state.prefetchedMangaIds.contains(data.id),
+                  );
+                },
+                emptyBuilder: (BuildContext context) {
+                  return const Center(child: Text('No characters found'));
+                },
+                errorBuilder: (BuildContext context, Object? error) {
+                  return Center(child: Text('$error'));
+                },
+                loadingBuilder: (BuildContext context) {
+                  return const Center(
+                    child: CircularProgressIndicator.adaptive(),
+                  );
+                },
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 100 / 140,
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
