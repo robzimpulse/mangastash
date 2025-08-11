@@ -4,7 +4,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_cache_manager/src/cache_store.dart';
 import 'package:universal_io/io.dart';
 
-class TypedCacheStore implements CacheStore {
+class CustomCacheStore implements CacheStore {
   @override
   Duration cleanupRunMinInterval = const Duration(seconds: 10);
 
@@ -38,7 +38,7 @@ class TypedCacheStore implements CacheStore {
   DateTime lastCleanupRun = DateTime.now();
   Timer? _scheduledCleanup;
 
-  TypedCacheStore(Config config)
+  CustomCacheStore(Config config)
     : _config = config,
       fileSystem = config.fileSystem,
       _cacheInfoRepository = config.repo.open().then((value) => config.repo);
