@@ -95,7 +95,6 @@ class SearchMangaUseCase with SyncMangasMixin {
     for (final value in data) {
       final key = SourceSearchMangaParameter.fromJsonString(value);
       if (key == null) continue;
-      final url = key.url;
       if (key.source != parameter.source) continue;
       final paramIgnorePagination = parameter.parameter.copyWith(
         limit: key.parameter.limit,
@@ -104,6 +103,7 @@ class SearchMangaUseCase with SyncMangasMixin {
       );
       if (paramIgnorePagination != key.parameter) continue;
       promises.add(_storageManager.searchManga.removeFile(value));
+      final url = key.url?.let((url) => Uri.tryParse(url).toString());
       if (url == null) continue;
       promises.add(_storageManager.html.removeFile(url));
     }
