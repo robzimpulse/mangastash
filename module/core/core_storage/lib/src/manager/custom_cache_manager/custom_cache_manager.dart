@@ -12,10 +12,10 @@ class CustomCacheManager implements BaseCacheManager {
 
   late final LogBox _logBox;
 
-  CustomCacheManager(Config config, {required LogBox logbox}) {
+  CustomCacheManager(Config config, {required LogBox logBox}) {
     _cacheStore = CustomCacheStore(config);
     _cache = CacheManager.custom(config, cacheStore: _cacheStore);
-    _logBox = logbox;
+    _logBox = logBox;
   }
 
   Future<Set<String>> get keys => _cacheStore.keys;

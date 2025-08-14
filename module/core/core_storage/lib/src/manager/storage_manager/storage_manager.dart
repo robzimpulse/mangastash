@@ -23,7 +23,7 @@ class StorageManager {
 
   final CustomCacheManager searchChapter;
 
-  StorageManager({required ValueGetter<Dio> dio, required LogBox logbox})
+  StorageManager({required ValueGetter<Dio> dio, required LogBox logBox})
     : images = CacheManager(Config('image', fileService: DioFileService(dio))),
       converter = CacheManager(
         Config('converter', fileService: DioFileService(dio)),
@@ -36,11 +36,11 @@ class StorageManager {
       html = CacheManager(Config('html', fileService: DioFileService(dio))),
       searchChapter = CustomCacheManager(
         Config('search_chapter', fileService: DioFileService(dio)),
-        logbox: logbox,
+        logBox: logBox,
       ),
       searchManga = CustomCacheManager(
         Config('search_manga', fileService: DioFileService(dio)),
-        logbox: logbox,
+        logBox: logBox,
       );
 
   Future<void> clear() async {
