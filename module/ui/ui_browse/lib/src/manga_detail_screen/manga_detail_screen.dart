@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:log_box/log_box.dart';
+import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -20,6 +22,7 @@ class MangaDetailScreen extends StatefulWidget {
     this.onMangaMenu,
     this.onTapSort,
     required this.storageManager,
+    required this.logBox,
   });
 
   final ValueSetter<Chapter>? onTapChapter;
@@ -31,6 +34,8 @@ class MangaDetailScreen extends StatefulWidget {
   final Future<ChapterConfig?> Function(ChapterConfig? value)? onTapSort;
 
   final StorageManager storageManager;
+
+  final LogBox logBox;
 
   static Widget create({
     required ServiceLocator locator,
@@ -67,6 +72,7 @@ class MangaDetailScreen extends StatefulWidget {
         onTapManga: onTapManga,
         onMangaMenu: onMangaMenu,
         onTapSort: onTapSort,
+        logBox: locator(),
       ),
     );
   }
@@ -102,8 +108,9 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   void _onTapRecrawl({required BuildContext context, required String url}) {
-    // TODO: implement recrawl from url
-    context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    widget.logBox.webview(context: context, uri: uri);
   }
 
   void _onTapDownload({

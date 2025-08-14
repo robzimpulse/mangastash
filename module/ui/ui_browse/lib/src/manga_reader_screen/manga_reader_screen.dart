@@ -1,6 +1,8 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:log_box/log_box.dart';
+import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -12,10 +14,13 @@ class MangaReaderScreen extends StatelessWidget {
   const MangaReaderScreen({
     super.key,
     required this.storageManager,
+    required this.logBox,
     this.onTapShortcut,
   });
 
   final StorageManager storageManager;
+
+  final LogBox logBox;
 
   final void Function(String?)? onTapShortcut;
 
@@ -43,6 +48,7 @@ class MangaReaderScreen extends StatelessWidget {
       child: MangaReaderScreen(
         storageManager: locator(),
         onTapShortcut: onTapShortcut,
+        logBox: locator(),
       ),
     );
   }
@@ -252,7 +258,8 @@ class MangaReaderScreen extends StatelessWidget {
   }
 
   void _onTapRecrawl({required BuildContext context, required String url}) {
-    // TODO: implement recrawl from url
-    context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    logBox.webview(context: context, uri: uri);
   }
 }

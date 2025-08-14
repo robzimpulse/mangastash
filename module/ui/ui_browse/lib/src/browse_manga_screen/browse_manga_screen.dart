@@ -135,6 +135,12 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     }
   }
 
+  void _onTapRecrawl({required BuildContext context, required String url}) {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    widget.logBox.webview(context: context, uri: uri);
+  }
+
   Widget _menuSource({required BuildContext context}) {
     return _builder(
       buildWhen: (prev, curr) {
@@ -144,18 +150,18 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         ].contains(true);
       },
       builder: (context, state) {
-        final uri = state.source?.let((source) {
+        final url = state.source?.let((source) {
           return SourceSearchMangaParameter(
             source: source,
             parameter: state.parameter.copyWith(page: 1),
-          ).uri;
+          ).url;
         });
 
-        if (uri == null) return const SizedBox.shrink();
+        if (url == null) return const SizedBox.shrink();
 
         return IconButton(
           icon: const Icon(Icons.open_in_browser),
-          onPressed: () => widget.logBox.webview(context: context, uri: uri),
+          onPressed: () => _onTapRecrawl(context: context, url: url),
         );
       },
     );
@@ -398,10 +404,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
           },
           onLoadNextPage: () => _cubit(context).next(),
           onRefresh: () => _cubit(context).init(refresh: true),
-          onTapRecrawl: (url) {
-            // TODO: implement recrawl from url
-            context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
-          },
+          onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
           error: state.error,
           isLoading: state.isLoading,
           hasNext: state.hasNextPage,
