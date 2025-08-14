@@ -38,13 +38,12 @@ class SearchChapterUseCase
        _webview = webview;
 
   Future<Pagination<Chapter>> _mangadex({
-    required String mangaId,
-    required SearchChapterParameter parameter,
+    required SourceSearchChapterParameter parameter,
   }) async {
     final result = await _chapterRepository.feed(
-      mangaId: mangaId,
-      parameter: parameter.copyWith(
-        includes: [Include.scanlationGroup, ...?parameter.includes],
+      mangaId: parameter.mangaId,
+      parameter: parameter.parameter.copyWith(
+        includes: [Include.scanlationGroup, ...?parameter.parameter.includes],
       ),
     );
 
@@ -57,7 +56,7 @@ class SearchChapterUseCase
       data: [
         for (final value in data)
           Chapter.from(data: value).copyWith(
-            mangaId: mangaId,
+            mangaId: parameter.mangaId,
             readableAt: await value.attributes?.readableAt?.asDateTime(
               storageManager: _storageManager,
             ),
@@ -74,11 +73,9 @@ class SearchChapterUseCase
   }
 
   Future<Pagination<Chapter>> _scrapping({
-    required SourceEnum source,
-    required String mangaId,
-    required SearchChapterParameter parameter,
+    required SourceSearchChapterParameter parameter,
   }) async {
-    final raw = await _mangaDao.search(ids: [mangaId]);
+    final raw = await _mangaDao.search(ids: [parameter.mangaId]);
     final result = Manga.fromDatabase(raw.firstOrNull);
 
     final url = result?.webUrl;
@@ -95,7 +92,7 @@ class SearchChapterUseCase
 
     final parser = ChapterListHtmlParser.forSource(
       root: document,
-      source: source,
+      source: parameter.source,
       storageManager: _storageManager,
     );
 
@@ -103,23 +100,30 @@ class SearchChapterUseCase
 
     final data = filterChapters(
       chapters: sortChapters(
-        chapters: [...chapters.map((e) => e.copyWith(mangaId: mangaId))],
-        parameter: parameter,
+        chapters: [
+          ...chapters.map((e) => e.copyWith(mangaId: parameter.mangaId)),
+        ],
+        parameter: parameter.parameter,
       ),
-      parameter: parameter,
+      parameter: parameter.parameter,
     );
 
     return Pagination(
       data: data,
-      page: parameter.page,
-      limit: parameter.limit,
+      page: parameter.parameter.page,
+      limit: parameter.parameter.limit,
       total: chapters.length,
-      hasNextPage: chapters.length > parameter.page * parameter.limit,
+      hasNextPage:
+          chapters.length >
+          parameter.parameter.page * parameter.parameter.limit,
       sourceUrl: url,
     );
   }
 
   Future<void> clear({required SourceSearchChapterParameter parameter}) async {
+    final raw = await _mangaDao.search(ids: [parameter.mangaId]);
+    final result = Manga.fromDatabase(raw.firstOrNull);
+    final url = result?.webUrl;
     final data = await _storageManager.searchChapter.keys;
     final List<Future<void>> promises = [];
     for (final value in data) {
@@ -134,6 +138,7 @@ class SearchChapterUseCase
       if (paramIgnorePagination != key.parameter) continue;
       promises.add(_storageManager.searchChapter.removeFile(value));
     }
+    if (url != null) promises.add(_storageManager.html.removeFile(url));
     await Future.wait(promises);
   }
 
@@ -158,16 +163,9 @@ class SearchChapterUseCase
     try {
       final Pagination<Chapter> data;
       if (parameter.source == SourceEnum.mangadex) {
-        data = await _mangadex(
-          mangaId: parameter.mangaId,
-          parameter: parameter.parameter,
-        );
+        data = await _mangadex(parameter: parameter);
       } else {
-        data = await _scrapping(
-          source: parameter.source,
-          mangaId: parameter.mangaId,
-          parameter: parameter.parameter,
-        );
+        data = await _scrapping(parameter: parameter);
       }
 
       final result = data.copyWith(

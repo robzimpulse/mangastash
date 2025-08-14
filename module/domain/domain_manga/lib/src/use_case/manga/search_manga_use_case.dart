@@ -96,6 +96,7 @@ class SearchMangaUseCase with SyncMangasMixin {
       );
       if (paramIgnorePagination != key.parameter) continue;
       promises.add(_storageManager.searchManga.removeFile(value));
+      promises.add(_storageManager.html.removeFile(key.url));
     }
     await Future.wait(promises);
   }
