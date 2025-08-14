@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
-import '../../../core_storage.dart';
+import '../custom_cache_manager/custom_cache_manager.dart';
 import 'file_service/dio_file_service.dart';
 
 class StorageManager {
@@ -15,6 +15,8 @@ class StorageManager {
   final BaseCacheManager manga;
 
   final BaseCacheManager chapter;
+
+  final BaseCacheManager html;
 
   final CustomCacheManager searchManga;
 
@@ -30,6 +32,7 @@ class StorageManager {
       chapter = CacheManager(
         Config('chapter', fileService: DioFileService(dio)),
       ),
+      html = CacheManager(Config('html', fileService: DioFileService(dio))),
       searchChapter = CustomCacheManager(
         Config('search_chapter', fileService: DioFileService(dio)),
       ),
@@ -44,6 +47,7 @@ class StorageManager {
       tags.emptyCache(),
       manga.emptyCache(),
       chapter.emptyCache(),
+      html.emptyCache(),
       searchChapter.emptyCache(),
       searchManga.emptyCache(),
     ]);
@@ -56,6 +60,7 @@ class StorageManager {
       tags.dispose(),
       manga.dispose(),
       chapter.dispose(),
+      html.dispose(),
       searchChapter.dispose(),
       searchManga.dispose(),
     ]);

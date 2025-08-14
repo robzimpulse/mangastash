@@ -71,8 +71,7 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<ListenUnreadHistoryUseCase, HistoryManager>();
 
     locator.registerSingleton(
-      HeadlessWebviewManager(log: log),
-      dispose: (e) => e.dispose(),
+      HeadlessWebviewManager(log: log, storageManager: locator()),
     );
 
     // manga dex services

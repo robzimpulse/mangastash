@@ -119,6 +119,7 @@ class JobManager
     final result = await _getMangaUseCase().execute(
       source: source,
       mangaId: mangaId,
+      useCache: false,
     );
 
     if (result is Error<Manga>) {
@@ -177,6 +178,7 @@ class JobManager
       source: source,
       mangaId: mangaId,
       chapterId: chapterId,
+      useCache: false,
     );
 
     if (result is Error<Chapter>) {
