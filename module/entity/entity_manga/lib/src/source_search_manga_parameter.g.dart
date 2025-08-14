@@ -9,20 +9,17 @@ part of 'source_search_manga_parameter.dart';
 SourceSearchMangaParameter _$SourceSearchMangaParameterFromJson(
   Map<String, dynamic> json,
 ) => SourceSearchMangaParameter(
-  source: $enumDecodeNullable(_$SourceEnumEnumMap, json['source']),
-  parameter:
-      json['parameter'] == null
-          ? null
-          : SearchMangaParameter.fromJson(
-            json['parameter'] as Map<String, dynamic>,
-          ),
+  source: $enumDecode(_$SourceEnumEnumMap, json['source']),
+  parameter: SearchMangaParameter.fromJson(
+    json['parameter'] as Map<String, dynamic>,
+  ),
 );
 
 Map<String, dynamic> _$SourceSearchMangaParameterToJson(
   SourceSearchMangaParameter instance,
 ) => <String, dynamic>{
-  'source': _$SourceEnumEnumMap[instance.source],
-  'parameter': instance.parameter?.toJson(),
+  'source': _$SourceEnumEnumMap[instance.source]!,
+  'parameter': instance.parameter.toJson(),
 };
 
 const _$SourceEnumEnumMap = {
