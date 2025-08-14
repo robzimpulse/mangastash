@@ -45,7 +45,10 @@ class GetTagsUseCase with SyncTagsMixin {
     ];
   }
 
-  Future<List<Tag>> _scrapping({required SourceEnum source}) async {
+  Future<List<Tag>> _scrapping({
+    required SourceEnum source,
+    bool useCache = true,
+  }) async {
     const parameter = SearchMangaParameter(page: 1);
     String url = '';
     if (source == SourceEnum.asurascan) {
@@ -74,6 +77,7 @@ class GetTagsUseCase with SyncTagsMixin {
         if (source == SourceEnum.asurascan)
           'window.document.querySelectorAll(\'$selector\')[0].click()',
       ],
+      useCache: useCache,
     );
 
     if (document == null) {
@@ -91,20 +95,23 @@ class GetTagsUseCase with SyncTagsMixin {
     return [...tags.map((e) => e.copyWith(source: source.name))];
   }
 
-  Future<Result<List<Tag>>> execute({required SourceEnum source}) async {
+  Future<Result<List<Tag>>> execute({
+    required SourceEnum source,
+    bool useCache = true,
+  }) async {
     final key = source.name;
     final file = await _storageManager.chapter.getFileFromCache(key);
     final str = await file?.file.readAsString(encoding: utf8);
     final object = str?.let((e) => json.decode(e))?.castOrNull<List<dynamic>>();
     final data = [...?object?.map((e) => Tag.fromJson(e))];
-    if (data.isNotEmpty) return Success(data);
+    if (data.isNotEmpty && useCache) return Success(data);
 
     try {
       final List<Tag> data;
       if (source == SourceEnum.mangadex) {
         data = await _mangadex(source: source);
       } else {
-        data = await _scrapping(source: source);
+        data = await _scrapping(source: source, useCache: useCache);
       }
 
       final result = await sync(dao: _tagDao, values: data, logBox: _logBox);

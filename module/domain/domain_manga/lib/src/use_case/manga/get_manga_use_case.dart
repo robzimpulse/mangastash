@@ -50,12 +50,13 @@ class GetMangaUseCase with SyncMangasMixin {
   Future<Manga> _scrapping({
     required SourceEnum source,
     required String? url,
+    bool useCache = true,
   }) async {
     if (url == null) {
       throw DataNotFoundException();
     }
 
-    final document = await _webview.open(url);
+    final document = await _webview.open(url, useCache: useCache);
 
     if (document == null) {
       throw FailedParsingHtmlException(url);
@@ -75,12 +76,13 @@ class GetMangaUseCase with SyncMangasMixin {
   Future<Result<Manga>> execute({
     required SourceEnum source,
     required String mangaId,
+    bool useCache = true,
   }) async {
     final key = '$source-$mangaId';
     final file = await _storageManager.chapter.getFileFromCache(key);
     final data = await file?.file.readAsString(encoding: utf8);
     final cache = Manga.fromJsonString(data ?? '');
-    if (cache != null) return Success(cache);
+    if (cache != null && useCache) return Success(cache);
 
     try {
       final raw = await _mangaDao.search(ids: [mangaId]);
@@ -90,7 +92,11 @@ class GetMangaUseCase with SyncMangasMixin {
       if (source == SourceEnum.mangadex) {
         data = await _mangadex(source: source, mangaId: mangaId);
       } else {
-        data = await _scrapping(url: manga?.webUrl, source: source);
+        data = await _scrapping(
+          url: manga?.webUrl,
+          source: source,
+          useCache: useCache,
+        );
       }
 
       final results = await sync(

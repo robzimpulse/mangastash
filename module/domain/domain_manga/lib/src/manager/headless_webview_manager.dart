@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
@@ -12,14 +14,25 @@ import 'package:universal_io/io.dart';
 class HeadlessWebviewManager {
   final LogBox _log;
 
-  HeadlessWebviewManager({required LogBox log}) : _log = log;
+  final StorageManager _storageManager;
 
-  Future<Document?> open(String url, {List<String> scripts = const []}) async {
+  HeadlessWebviewManager({
+    required LogBox log,
+    required StorageManager storageManager,
+  }) : _log = log,
+       _storageManager = storageManager;
+
+  Future<Document?> open(
+    String url, {
+    List<String> scripts = const [],
+    bool useCache = true,
+  }) async {
     final uri = WebUri(url);
     final html = await _fetch(
       uri: uri,
       scripts: scripts,
       delegate: _log.inAppWebviewObserver,
+      useCache: useCache,
     );
     if (html == null) return null;
     return parse(html);
@@ -29,7 +42,16 @@ class HeadlessWebviewManager {
     required WebUri uri,
     required InAppWebviewObserver delegate,
     List<String> scripts = const [],
+    bool useCache = true,
   }) async {
+    final key = [uri.toString(), ...scripts].join('|');
+    final cache = await _storageManager.html.getFileFromCache(key);
+    final data = await cache?.file.readAsString(encoding: utf8);
+    if (data != null && useCache) {
+      delegate.set(uri: uri, html: data, loading: false);
+      return data;
+    }
+
     final onLoadStartCompleter = Completer();
     final onLoadStopCompleter = Completer();
     final onLoadErrorCompleter = Completer();
@@ -124,11 +146,14 @@ class HeadlessWebviewManager {
       return null;
     }
 
+    await _storageManager.html.putFile(
+      uri.toString(),
+      utf8.encode(html),
+      fileExtension: 'html',
+      maxAge: const Duration(minutes: 30),
+    );
+
     delegate.set(html: html, loading: false);
     return html;
-  }
-
-  Future<void> dispose() async {
-    // _queue.cancel();
   }
 }

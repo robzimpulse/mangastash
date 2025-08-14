@@ -59,12 +59,13 @@ class GetChapterUseCase with SyncChaptersMixin {
   Future<List<String>> _scrapping({
     required String? url,
     required SourceEnum source,
+    bool useCache = true,
   }) async {
     if (url == null) {
       throw DataNotFoundException();
     }
 
-    final document = await _webview.open(url);
+    final document = await _webview.open(url, useCache: useCache);
 
     if (document == null) {
       throw FailedParsingHtmlException(url);
@@ -83,12 +84,13 @@ class GetChapterUseCase with SyncChaptersMixin {
     required SourceEnum source,
     required String mangaId,
     required String chapterId,
+    bool useCache = true,
   }) async {
     final key = '${source.name} - $mangaId - $chapterId';
     final file = await _storageManager.chapter.getFileFromCache(key);
     final data = await file?.file.readAsString(encoding: utf8);
     final cache = Chapter.fromJsonString(data ?? '');
-    if (cache != null) return Success(cache);
+    if (cache != null && useCache) return Success(cache);
 
     final raw = await _chapterDao.search(ids: [chapterId]);
     final chapter = raw.firstOrNull.let(
@@ -96,12 +98,18 @@ class GetChapterUseCase with SyncChaptersMixin {
     );
 
     try {
-      final data =
-          source == SourceEnum.mangadex
-              ? await _mangadex(mangaId: mangaId, chapterId: chapterId)
-              : chapter?.copyWith(
-                images: await _scrapping(url: chapter.webUrl, source: source),
-              );
+      final Chapter? data;
+      if (source == SourceEnum.mangadex) {
+        data = await _mangadex(mangaId: mangaId, chapterId: chapterId);
+      } else {
+        data = chapter?.copyWith(
+          images: await _scrapping(
+            url: chapter.webUrl,
+            source: source,
+            useCache: useCache,
+          ),
+        );
+      }
 
       final results = await sync(
         dao: _chapterDao,
