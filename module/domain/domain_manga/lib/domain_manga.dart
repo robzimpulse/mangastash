@@ -4,7 +4,6 @@ export 'package:manga_dex_api/manga_dex_api.dart';
 
 export 'src/domain_manga_registrar.dart';
 export 'src/extension/language_code_converter.dart';
-export 'src/extension/search_url_extension.dart';
 export 'src/extension/uri_source_extension.dart';
 export 'src/mixin/sort_chapters_mixin.dart';
 export 'src/use_case/chapter/get_all_chapter_use_case.dart';

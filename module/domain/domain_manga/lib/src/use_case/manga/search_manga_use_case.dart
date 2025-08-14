@@ -7,7 +7,6 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-import '../../extension/search_url_extension.dart';
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../parser/base/manga_list_html_parser.dart';
@@ -32,19 +31,22 @@ class SearchMangaUseCase with SyncMangasMixin {
        _logBox = logBox;
 
   Future<Pagination<Manga>> _mangadex({
-    required SourceEnum source,
-    required SearchMangaParameter parameter,
+    required SourceSearchMangaParameter parameter,
   }) async {
     final result = await _mangaRepository.search(
-      parameter: parameter.copyWith(
-        includes: [...?parameter.includes, Include.author, Include.coverArt],
+      parameter: parameter.parameter.copyWith(
+        includes: [
+          ...?parameter.parameter.includes,
+          Include.author,
+          Include.coverArt,
+        ],
       ),
     );
 
     return Pagination(
       data: [
         ...?result.data?.map(
-          (e) => Manga.from(data: e).copyWith(source: source.name),
+          (e) => Manga.from(data: e).copyWith(source: parameter.source.name),
         ),
       ],
       offset: result.offset?.toInt(),
@@ -54,37 +56,29 @@ class SearchMangaUseCase with SyncMangasMixin {
   }
 
   Future<Pagination<Manga>> _scrapping({
-    required SourceEnum source,
-    required SearchMangaParameter parameter,
+    required SourceSearchMangaParameter parameter,
   }) async {
-    String url = '';
-    if (source == SourceEnum.asurascan) {
-      url = parameter.asurascan;
-    } else if (source == SourceEnum.mangaclash) {
-      url = parameter.mangaclash;
-    }
-
-    final document = await _webview.open(url);
+    final document = await _webview.open(parameter.url);
 
     if (document == null) {
-      throw FailedParsingHtmlException(url);
+      throw FailedParsingHtmlException(parameter.url);
     }
 
     final parser = MangaListHtmlParser.forSource(
       root: document,
-      source: source,
+      source: parameter.source,
       storageManager: _storageManager,
     );
 
     final mangas = await parser.mangas;
 
     return Pagination(
-      data: [...mangas.map((e) => e.copyWith(source: source.name))],
-      page: parameter.page,
+      data: [...mangas.map((e) => e.copyWith(source: parameter.source.name))],
+      page: parameter.parameter.page,
       limit: mangas.length,
       total: mangas.length,
       hasNextPage: await parser.haveNextPage,
-      sourceUrl: url,
+      sourceUrl: parameter.url,
     );
   }
 
@@ -127,15 +121,9 @@ class SearchMangaUseCase with SyncMangasMixin {
     try {
       final Pagination<Manga> data;
       if (parameter.source == SourceEnum.mangadex) {
-        data = await _mangadex(
-          source: parameter.source,
-          parameter: parameter.parameter,
-        );
+        data = await _mangadex(parameter: parameter);
       } else {
-        data = await _scrapping(
-          source: parameter.source,
-          parameter: parameter.parameter,
-        );
+        data = await _scrapping(parameter: parameter);
       }
 
       final result = data.copyWith(

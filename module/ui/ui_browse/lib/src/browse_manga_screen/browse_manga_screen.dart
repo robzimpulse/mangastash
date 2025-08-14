@@ -138,16 +138,13 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         ].contains(true);
       },
       builder: (context, state) {
-        final parameter = state.parameter.copyWith(page: 1);
         final source = state.source;
-        final url =
-            source == SourceEnum.mangaclash
-                ? parameter.mangaclash
-                : source == SourceEnum.asurascan
-                ? parameter.asurascan
-                : null;
-
-        if (url == null) return const SizedBox.shrink();
+        if (source == null) return const SizedBox.shrink();
+        final parameter = SourceSearchMangaParameter(
+          source: source,
+          parameter: state.parameter.copyWith(page: 1),
+        );
+        final url = parameter.url;
 
         return IconButton(
           icon: const Icon(Icons.open_in_browser),
