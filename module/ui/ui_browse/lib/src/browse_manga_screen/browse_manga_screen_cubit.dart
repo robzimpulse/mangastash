@@ -1,6 +1,5 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
-import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
