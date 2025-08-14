@@ -39,8 +39,10 @@ class SourceSearchMangaParameter extends Equatable {
 }
 
 extension SearchUrlExtension on SourceSearchMangaParameter {
-  String get url {
 
+  Uri? get uri => Uri.tryParse(url);
+
+  String get url {
     switch (source) {
       case SourceEnum.mangadex:
         // mangadex provider using API
