@@ -102,6 +102,7 @@ class SearchMangaUseCase with SyncMangasMixin {
       );
       if (paramIgnorePagination != key.parameter) continue;
       promises.add(_storageManager.searchManga.removeFile(value));
+      _logBox.log('key: $value', name: '[Pagination][Manga][Remove]');
     }
     await Future.wait(promises);
   }
@@ -121,6 +122,7 @@ class SearchMangaUseCase with SyncMangasMixin {
     });
 
     if (data != null && useCache) {
+      _logBox.log('key: $key', name: '[Pagination][Manga][Add]');
       return Success(data);
     }
 
