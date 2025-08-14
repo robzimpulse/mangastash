@@ -29,8 +29,9 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
   Future<Manga> _scrapping({
     required SourceEnum source,
     required String url,
+    bool useCache = true,
   }) async {
-    final document = await _webview.open(url);
+    final document = await _webview.open(url, useCache: useCache);
 
     if (document == null) {
       throw FailedParsingHtmlException(url);

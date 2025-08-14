@@ -48,10 +48,15 @@ class GetTagsUseCase with SyncTagsMixin {
     required SourceEnum source,
     bool useCache = true,
   }) async {
-    final parameter = SourceSearchMangaParameter(
+    final param = SourceSearchMangaParameter(
       source: source,
       parameter: const SearchMangaParameter(page: 1),
     );
+    final url = param.url;
+
+    if (url == null) {
+      throw DataNotFoundException();
+    }
 
     final selector = [
       'button',
@@ -68,7 +73,7 @@ class GetTagsUseCase with SyncTagsMixin {
     ].join('.');
 
     final document = await _webview.open(
-      parameter.url,
+      url,
       scripts: [
         if (source == SourceEnum.asurascan)
           'window.document.querySelectorAll(\'$selector\')[0].click()',
@@ -77,7 +82,7 @@ class GetTagsUseCase with SyncTagsMixin {
     );
 
     if (document == null) {
-      throw FailedParsingHtmlException(parameter.url);
+      throw FailedParsingHtmlException(url);
     }
 
     final parser = TagListHtmlParser.forSource(

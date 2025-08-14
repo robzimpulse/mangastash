@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:core_environment/core_environment.dart';
@@ -107,10 +108,27 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
 
-  void _onTapRecrawl({required BuildContext context, required String url}) {
+  void _onTapRecrawl({
+    required BuildContext context,
+    required String url,
+  }) async {
     final uri = Uri.tryParse(url);
     if (uri == null) return;
-    widget.logBox.webview(context: context, uri: uri);
+    await widget.logBox.webview(
+      context: context,
+      uri: uri,
+      onTapSnapshot: (url, html) {
+        if (url == null || html == null) return;
+        widget.storageManager.html.putFile(
+          url,
+          utf8.encode(html),
+          fileExtension: 'html',
+          maxAge: const Duration(minutes: 30),
+        );
+      },
+    );
+    if (!context.mounted) return;
+    await _cubit(context).init();
   }
 
   void _onTapDownload({

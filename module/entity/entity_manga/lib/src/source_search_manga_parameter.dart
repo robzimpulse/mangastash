@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:core_environment/core_environment.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
@@ -14,7 +15,10 @@ class SourceSearchMangaParameter extends Equatable {
 
   final SearchMangaParameter parameter;
 
-  const SourceSearchMangaParameter({required this.source, required this.parameter});
+  const SourceSearchMangaParameter({
+    required this.source,
+    required this.parameter,
+  });
 
   @override
   List<Object?> get props => [source, parameter];
@@ -39,21 +43,16 @@ class SourceSearchMangaParameter extends Equatable {
 }
 
 extension SearchUrlExtension on SourceSearchMangaParameter {
+  Uri? get uri => url?.let((e) => Uri.tryParse(e));
 
-  Uri? get uri => Uri.tryParse(url);
-
-  String get url {
+  String? get url {
     switch (source) {
       case SourceEnum.mangadex:
         // mangadex provider using API
-        throw UnimplementedError();
+        return null;
       case SourceEnum.mangaclash:
         return [
-          [
-            'https://toonclash.com',
-            'page',
-            '${parameter.page}',
-          ].join('/'),
+          ['https://toonclash.com', 'page', '${parameter.page}'].join('/'),
           [
             const MapEntry('post_type', 'wp-manga'),
             MapEntry('s', parameter.title ?? ''),
@@ -82,10 +81,7 @@ extension SearchUrlExtension on SourceSearchMangaParameter {
         ].join('?');
       case SourceEnum.asurascan:
         return [
-          [
-            'https://asuracomic.net',
-            'series',
-          ].join('/'),
+          ['https://asuracomic.net', 'series'].join('/'),
           [
             MapEntry('name', parameter.title ?? ''),
             MapEntry('page', parameter.page),
@@ -98,6 +94,5 @@ extension SearchUrlExtension on SourceSearchMangaParameter {
           ].map((e) => '${e.key}=${e.value}').join('&'),
         ].join('?');
     }
-
   }
 }

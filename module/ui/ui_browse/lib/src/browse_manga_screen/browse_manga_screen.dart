@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
@@ -135,10 +137,27 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     }
   }
 
-  void _onTapRecrawl({required BuildContext context, required String url}) {
+  void _onTapRecrawl({
+    required BuildContext context,
+    required String url,
+  }) async {
     final uri = Uri.tryParse(url);
     if (uri == null) return;
-    widget.logBox.webview(context: context, uri: uri);
+    await widget.logBox.webview(
+      context: context,
+      uri: uri,
+      onTapSnapshot: (url, html) {
+        if (url == null || html == null) return;
+        widget.storageManager.html.putFile(
+          url,
+          utf8.encode(html),
+          fileExtension: 'html',
+          maxAge: const Duration(minutes: 30),
+        );
+      },
+    );
+    if (!context.mounted) return;
+    await _cubit(context).init();
   }
 
   Widget _menuSource({required BuildContext context}) {

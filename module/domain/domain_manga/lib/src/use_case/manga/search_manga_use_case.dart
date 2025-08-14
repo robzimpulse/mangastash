@@ -57,11 +57,18 @@ class SearchMangaUseCase with SyncMangasMixin {
 
   Future<Pagination<Manga>> _scrapping({
     required SourceSearchMangaParameter parameter,
+    bool useCache = true,
   }) async {
-    final document = await _webview.open(parameter.url);
+    final url = parameter.url;
+
+    if (url == null) {
+      throw DataNotFoundException();
+    }
+
+    final document = await _webview.open(url, useCache: useCache);
 
     if (document == null) {
-      throw FailedParsingHtmlException(parameter.url);
+      throw FailedParsingHtmlException(url);
     }
 
     final parser = MangaListHtmlParser.forSource(
@@ -88,6 +95,7 @@ class SearchMangaUseCase with SyncMangasMixin {
     for (final value in data) {
       final key = SourceSearchMangaParameter.fromJsonString(value);
       if (key == null) continue;
+      final url = key.url;
       if (key.source != parameter.source) continue;
       final paramIgnorePagination = parameter.parameter.copyWith(
         limit: key.parameter.limit,
@@ -96,7 +104,8 @@ class SearchMangaUseCase with SyncMangasMixin {
       );
       if (paramIgnorePagination != key.parameter) continue;
       promises.add(_storageManager.searchManga.removeFile(value));
-      promises.add(_storageManager.html.removeFile(key.url));
+      if (url == null) continue;
+      promises.add(_storageManager.html.removeFile(url));
     }
     await Future.wait(promises);
   }
@@ -124,7 +133,7 @@ class SearchMangaUseCase with SyncMangasMixin {
       if (parameter.source == SourceEnum.mangadex) {
         data = await _mangadex(parameter: parameter);
       } else {
-        data = await _scrapping(parameter: parameter);
+        data = await _scrapping(parameter: parameter, useCache: useCache);
       }
 
       final result = data.copyWith(

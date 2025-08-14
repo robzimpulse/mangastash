@@ -74,6 +74,7 @@ class SearchChapterUseCase
 
   Future<Pagination<Chapter>> _scrapping({
     required SourceSearchChapterParameter parameter,
+    bool useCache = true,
   }) async {
     final raw = await _mangaDao.search(ids: [parameter.mangaId]);
     final result = Manga.fromDatabase(raw.firstOrNull);
@@ -84,7 +85,7 @@ class SearchChapterUseCase
       throw DataNotFoundException();
     }
 
-    final document = await _webview.open(url);
+    final document = await _webview.open(url, useCache: useCache);
 
     if (document == null) {
       throw FailedParsingHtmlException(url);
@@ -165,7 +166,7 @@ class SearchChapterUseCase
       if (parameter.source == SourceEnum.mangadex) {
         data = await _mangadex(parameter: parameter);
       } else {
-        data = await _scrapping(parameter: parameter);
+        data = await _scrapping(parameter: parameter, useCache: useCache);
       }
 
       final result = data.copyWith(
