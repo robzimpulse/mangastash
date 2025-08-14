@@ -485,7 +485,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 context,
               ),
               onLoadNextPage: () => _cubit(context).nextChapter(),
-              onRefresh: () => _cubit(context).initChapter(),
+              onRefresh: () => _cubit(context).initChapter(refresh: true),
               onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
               onTapDownload: (option) {
                 _onTapDownload(context: context, option: option);
@@ -556,7 +556,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(
                 context,
               ),
-              onRefresh: () => _cubit(context).initSimilarManga(),
+              onRefresh: () => _cubit(context).initSimilarManga(refresh: true),
               onLoadNextPage: () => _cubit(context).nextSimilarManga(),
               onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
               error: state.errorSimilarManga,

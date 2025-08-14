@@ -119,6 +119,24 @@ class SearchChapterUseCase
     );
   }
 
+  Future<void> clear({required SourceSearchChapterParameter parameter}) async {
+    final data = await _storageManager.searchChapter.keys;
+    final List<Future<void>> promises = [];
+    for (final value in data) {
+      final key = SourceSearchChapterParameter.fromJsonString(value);
+      if (key == null) continue;
+      if (key.source != parameter.source) continue;
+      final paramIgnorePagination = parameter.parameter.copyWith(
+        limit: key.parameter.limit,
+        offset: key.parameter.offset,
+        page: key.parameter.page,
+      );
+      if (paramIgnorePagination != key.parameter) continue;
+      promises.add(_storageManager.searchChapter.removeFile(value));
+    }
+    await Future.wait(promises);
+  }
+
   Future<Result<Pagination<Chapter>>> execute({
     required SourceSearchChapterParameter parameter,
     bool useCache = true,

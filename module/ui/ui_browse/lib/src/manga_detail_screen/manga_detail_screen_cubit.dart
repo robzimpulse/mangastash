@@ -102,7 +102,10 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     await Future.wait([initChapter(), initSimilarManga()]);
   }
 
-  Future<void> initChapter({ChapterConfig? config}) async {
+  Future<void> initChapter({
+    ChapterConfig? config,
+    bool refresh = false,
+  }) async {
     final option = switch ((config ?? state.config).sortOption) {
       ChapterSortOptionEnum.chapterNumber => ChapterOrders.chapter,
       ChapterSortOptionEnum.uploadDate => ChapterOrders.readableAt,
@@ -127,11 +130,15 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
         config: config,
       ),
     );
+
+    if (refresh) await _clearChapterCache();
+
     await _fetchChapter();
+
     emit(state.copyWith(isLoadingChapters: false));
   }
 
-  Future<void> initSimilarManga() async {
+  Future<void> initSimilarManga({refresh = false}) async {
     emit(
       state.copyWith(
         isLoadingSimilarManga: true,
@@ -145,7 +152,11 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
         ),
       ),
     );
+
+    if (refresh) await _clearMangaCache();
+
     await _fetchSimilarManga();
+
     emit(state.copyWith(isLoadingSimilarManga: false));
   }
 
@@ -165,6 +176,20 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
 
     emit(state.copyWith(isLoadingManga: false));
+  }
+
+  Future<void> _clearMangaCache() async {
+    final source = state.source;
+    final parameter = state.similarMangaParameter;
+
+    if (source == null || parameter == null) return;
+
+    await _searchMangaUseCase.clear(
+      parameter: SourceSearchMangaParameter(
+        source: source,
+        parameter: parameter,
+      ),
+    );
   }
 
   Future<void> _fetchSimilarManga() async {
@@ -208,6 +233,20 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     if (result is Error<Pagination<Manga>>) {
       emit(state.copyWith(errorSimilarManga: () => result.error));
     }
+  }
+
+  Future<void> _clearChapterCache() async {
+    final id = state.manga?.id ?? state.mangaId;
+    final source = state.source;
+    if (id == null || id.isEmpty || source == null) return;
+
+    await _searchChapterUseCase.clear(
+      parameter: SourceSearchChapterParameter(
+        source: source,
+        parameter: state.chapterParameter,
+        mangaId: id,
+      ),
+    );
   }
 
   Future<void> _fetchChapter() async {
