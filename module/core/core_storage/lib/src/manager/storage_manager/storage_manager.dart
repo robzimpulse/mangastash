@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:log_box/log_box.dart';
 
@@ -22,7 +23,7 @@ class StorageManager {
 
   final CustomCacheManager searchChapter;
 
-  StorageManager({required Dio dio, required LogBox logbox})
+  StorageManager({required ValueGetter<Dio> dio, required LogBox logbox})
     : images = CacheManager(Config('image', fileService: DioFileService(dio))),
       converter = CacheManager(
         Config('converter', fileService: DioFileService(dio)),
