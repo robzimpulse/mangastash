@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:log_box/log_box.dart';
 
 import '../custom_cache_manager/custom_cache_manager.dart';
 import 'file_service/dio_file_service.dart';
@@ -22,7 +22,7 @@ class StorageManager {
 
   final CustomCacheManager searchChapter;
 
-  StorageManager({required ValueGetter<Dio> dio})
+  StorageManager({required Dio dio, required LogBox logbox})
     : images = CacheManager(Config('image', fileService: DioFileService(dio))),
       converter = CacheManager(
         Config('converter', fileService: DioFileService(dio)),
@@ -35,9 +35,11 @@ class StorageManager {
       html = CacheManager(Config('html', fileService: DioFileService(dio))),
       searchChapter = CustomCacheManager(
         Config('search_chapter', fileService: DioFileService(dio)),
+        logbox: logbox,
       ),
       searchManga = CustomCacheManager(
         Config('search_manga', fileService: DioFileService(dio)),
+        logbox: logbox,
       );
 
   Future<void> clear() async {
