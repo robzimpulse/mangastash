@@ -1,6 +1,7 @@
 import 'package:file/src/interface/file.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:log_box/log_box.dart';
 
 import 'custom_cache_store.dart';
 
@@ -9,9 +10,12 @@ class CustomCacheManager implements BaseCacheManager {
 
   late final CustomCacheStore _cacheStore;
 
-  CustomCacheManager(Config config) {
+  late final LogBox _logBox;
+
+  CustomCacheManager(Config config, {required LogBox logBox}) {
     _cacheStore = CustomCacheStore(config);
     _cache = CacheManager.custom(config, cacheStore: _cacheStore);
+    _logBox = logBox;
   }
 
   Future<Set<String>> get keys => _cacheStore.keys;
@@ -44,6 +48,10 @@ class CustomCacheManager implements BaseCacheManager {
     String key, {
     bool ignoreMemCache = false,
   }) {
+    _logBox.log(
+      'Get: $key',
+      name: '${runtimeType.toString()} - ${_cacheStore.storeKey}',
+    );
     return _cache.getFileFromCache(key, ignoreMemCache: ignoreMemCache);
   }
 
@@ -85,6 +93,10 @@ class CustomCacheManager implements BaseCacheManager {
     Duration maxAge = const Duration(days: 30),
     String fileExtension = 'file',
   }) {
+    _logBox.log(
+      'Put: $key',
+      name: '${runtimeType.toString()} - ${_cacheStore.storeKey}',
+    );
     return _cache.putFile(
       url,
       fileBytes,
@@ -115,7 +127,13 @@ class CustomCacheManager implements BaseCacheManager {
   }
 
   @override
-  Future<void> removeFile(String key) => _cache.removeFile(key);
+  Future<void> removeFile(String key) {
+    _logBox.log(
+      'Remove: $key',
+      name: '${runtimeType.toString()} - ${_cacheStore.storeKey}',
+    );
+    return _cache.removeFile(key);
+  }
 
   @override
   Stream<FileInfo> getFile(

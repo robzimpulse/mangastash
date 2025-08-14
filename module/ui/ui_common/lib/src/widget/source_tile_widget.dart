@@ -45,7 +45,11 @@ class SourceTileWidget extends StatelessWidget {
             },
             progressIndicatorBuilder: (context, url, progress) {
               return Center(
-                child: CircularProgressIndicator(value: progress.progress),
+                child: SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(value: progress.progress),
+                ),
               );
             },
           ),

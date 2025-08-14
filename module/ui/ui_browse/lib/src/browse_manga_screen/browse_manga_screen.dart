@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:feature_common/feature_common.dart';
+import 'package:log_box/log_box.dart';
+import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 
@@ -16,6 +20,7 @@ class BrowseMangaScreen extends StatefulWidget {
     required this.storageManager,
     this.onTapManga,
     this.onTapFilter,
+    required this.logBox,
   });
 
   final Function(Manga, SearchMangaParameter)? onTapManga;
@@ -27,6 +32,8 @@ class BrowseMangaScreen extends StatefulWidget {
   onTapFilter;
 
   final StorageManager storageManager;
+
+  final LogBox logBox;
 
   static Widget create({
     required ServiceLocator locator,
@@ -59,6 +66,7 @@ class BrowseMangaScreen extends StatefulWidget {
         storageManager: locator(),
         onTapManga: onTapManga,
         onTapFilter: onTapFilter,
+        logBox: locator(),
       ),
     );
   }
@@ -129,6 +137,29 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     }
   }
 
+  void _onTapRecrawl({
+    required BuildContext context,
+    required String url,
+  }) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    await widget.logBox.webview(
+      context: context,
+      uri: uri,
+      onTapSnapshot: (url, html) {
+        if (url == null || html == null) return;
+        widget.storageManager.html.putFile(
+          url,
+          utf8.encode(html),
+          fileExtension: 'html',
+          maxAge: const Duration(minutes: 30),
+        );
+      },
+    );
+    if (!context.mounted) return;
+    await _cubit(context).init();
+  }
+
   Widget _menuSource({required BuildContext context}) {
     return _builder(
       buildWhen: (prev, curr) {
@@ -138,22 +169,18 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         ].contains(true);
       },
       builder: (context, state) {
-        final parameter = state.parameter.copyWith(page: 1);
-        final source = state.source;
-        final url =
-            source == SourceEnum.mangaclash
-                ? parameter.mangaclash
-                : source == SourceEnum.asurascan
-                ? parameter.asurascan
-                : null;
+        final url = state.source?.let((source) {
+          return SourceSearchMangaParameter(
+            source: source,
+            parameter: state.parameter.copyWith(page: 1),
+          ).url;
+        });
 
         if (url == null) return const SizedBox.shrink();
 
         return IconButton(
           icon: const Icon(Icons.open_in_browser),
-          onPressed: () {
-            context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
-          },
+          onPressed: () => _onTapRecrawl(context: context, url: url),
         );
       },
     );
@@ -349,10 +376,10 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               ),
               cursorColor: DefaultTextStyle.of(context).style.color,
               style: DefaultTextStyle.of(context).style,
-              onSubmitted:
-                  (value) => _cubit(
-                    context,
-                  ).init(parameter: state.parameter.copyWith(title: value)),
+              onSubmitted: (value) {
+                final parameter = state.parameter.copyWith(title: value);
+                _cubit(context).init(parameter: parameter);
+              },
             ),
           );
         }
@@ -395,11 +422,8 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             );
           },
           onLoadNextPage: () => _cubit(context).next(),
-          onRefresh: () => _cubit(context).init(),
-          onTapRecrawl: (url) {
-            // TODO: implement recrawl from url
-            context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
-          },
+          onRefresh: () => _cubit(context).init(refresh: true),
+          onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
           error: state.error,
           isLoading: state.isLoading,
           hasNext: state.hasNextPage,

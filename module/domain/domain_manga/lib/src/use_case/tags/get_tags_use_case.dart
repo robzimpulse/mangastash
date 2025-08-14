@@ -7,7 +7,6 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-import '../../extension/search_url_extension.dart';
 import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_tags_mixin.dart';
 import '../../parser/base/tag_list_html_parser.dart';
@@ -49,12 +48,14 @@ class GetTagsUseCase with SyncTagsMixin {
     required SourceEnum source,
     bool useCache = true,
   }) async {
-    const parameter = SearchMangaParameter(page: 1);
-    String url = '';
-    if (source == SourceEnum.asurascan) {
-      url = parameter.asurascan;
-    } else if (source == SourceEnum.mangaclash) {
-      url = parameter.mangaclash;
+    final param = SourceSearchMangaParameter(
+      source: source,
+      parameter: const SearchMangaParameter(page: 1),
+    );
+    final url = param.url;
+
+    if (url == null) {
+      throw DataNotFoundException();
     }
 
     final selector = [

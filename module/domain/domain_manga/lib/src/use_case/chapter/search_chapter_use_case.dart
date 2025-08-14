@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
@@ -36,13 +38,12 @@ class SearchChapterUseCase
        _webview = webview;
 
   Future<Pagination<Chapter>> _mangadex({
-    required String mangaId,
-    required SearchChapterParameter parameter,
+    required SourceSearchChapterParameter parameter,
   }) async {
     final result = await _chapterRepository.feed(
-      mangaId: mangaId,
-      parameter: parameter.copyWith(
-        includes: [Include.scanlationGroup, ...?parameter.includes],
+      mangaId: parameter.mangaId,
+      parameter: parameter.parameter.copyWith(
+        includes: [Include.scanlationGroup, ...?parameter.parameter.includes],
       ),
     );
 
@@ -55,7 +56,7 @@ class SearchChapterUseCase
       data: [
         for (final value in data)
           Chapter.from(data: value).copyWith(
-            mangaId: mangaId,
+            mangaId: parameter.mangaId,
             readableAt: await value.attributes?.readableAt?.asDateTime(
               storageManager: _storageManager,
             ),
@@ -72,11 +73,10 @@ class SearchChapterUseCase
   }
 
   Future<Pagination<Chapter>> _scrapping({
-    required SourceEnum source,
-    required String mangaId,
-    required SearchChapterParameter parameter,
+    required SourceSearchChapterParameter parameter,
+    bool useCache = true,
   }) async {
-    final raw = await _mangaDao.search(ids: [mangaId]);
+    final raw = await _mangaDao.search(ids: [parameter.mangaId]);
     final result = Manga.fromDatabase(raw.firstOrNull);
 
     final url = result?.webUrl;
@@ -85,7 +85,7 @@ class SearchChapterUseCase
       throw DataNotFoundException();
     }
 
-    final document = await _webview.open(url);
+    final document = await _webview.open(url, useCache: useCache);
 
     if (document == null) {
       throw FailedParsingHtmlException(url);
@@ -93,7 +93,7 @@ class SearchChapterUseCase
 
     final parser = ChapterListHtmlParser.forSource(
       root: document,
-      source: source,
+      source: parameter.source,
       storageManager: _storageManager,
     );
 
@@ -101,37 +101,72 @@ class SearchChapterUseCase
 
     final data = filterChapters(
       chapters: sortChapters(
-        chapters: [...chapters.map((e) => e.copyWith(mangaId: mangaId))],
-        parameter: parameter,
+        chapters: [
+          ...chapters.map((e) => e.copyWith(mangaId: parameter.mangaId)),
+        ],
+        parameter: parameter.parameter,
       ),
-      parameter: parameter,
+      parameter: parameter.parameter,
     );
 
     return Pagination(
       data: data,
-      page: parameter.page,
-      limit: parameter.limit,
+      page: parameter.parameter.page,
+      limit: parameter.parameter.limit,
       total: chapters.length,
-      hasNextPage: chapters.length > parameter.page * parameter.limit,
+      hasNextPage:
+          chapters.length >
+          parameter.parameter.page * parameter.parameter.limit,
       sourceUrl: url,
     );
   }
 
+  Future<void> clear({required SourceSearchChapterParameter parameter}) async {
+    final raw = await _mangaDao.search(ids: [parameter.mangaId]);
+    final result = Manga.fromDatabase(raw.firstOrNull);
+    final url = result?.webUrl;
+    final data = await _storageManager.searchChapter.keys;
+    final List<Future<void>> promises = [];
+    for (final value in data) {
+      final key = SourceSearchChapterParameter.fromJsonString(value);
+      if (key == null) continue;
+      if (key.source != parameter.source) continue;
+      final paramIgnorePagination = parameter.parameter.copyWith(
+        limit: key.parameter.limit,
+        offset: key.parameter.offset,
+        page: key.parameter.page,
+      );
+      if (paramIgnorePagination != key.parameter) continue;
+      promises.add(_storageManager.searchChapter.removeFile(value));
+    }
+    if (url != null) promises.add(_storageManager.html.removeFile(url));
+    await Future.wait(promises);
+  }
+
   Future<Result<Pagination<Chapter>>> execute({
-    required SourceEnum source,
-    required String mangaId,
-    required SearchChapterParameter parameter,
+    required SourceSearchChapterParameter parameter,
+    bool useCache = true,
   }) async {
+    final key = parameter.toJsonString();
+    final cache = await _storageManager.searchChapter.getFileFromCache(key);
+    final file = await cache?.file.readAsString(encoding: utf8);
+    final data = file.let((e) {
+      return Pagination.fromJsonString(
+        e,
+        (e) => Chapter.fromJson(e.castOrNull()),
+      );
+    });
+
+    if (data != null && useCache) {
+      return Success(data);
+    }
+
     try {
       final Pagination<Chapter> data;
-      if (source == SourceEnum.mangadex) {
-        data = await _mangadex(mangaId: mangaId, parameter: parameter);
+      if (parameter.source == SourceEnum.mangadex) {
+        data = await _mangadex(parameter: parameter);
       } else {
-        data = await _scrapping(
-          source: source,
-          mangaId: mangaId,
-          parameter: parameter,
-        );
+        data = await _scrapping(parameter: parameter, useCache: useCache);
       }
 
       final result = data.copyWith(
@@ -140,6 +175,14 @@ class SearchChapterUseCase
           values: [...?data.data],
           logBox: _logBox,
         ),
+      );
+
+      await _storageManager.searchChapter.putFile(
+        key,
+        key: key,
+        utf8.encode(result.toJsonString((e) => e.toJson())),
+        fileExtension: 'json',
+        maxAge: const Duration(minutes: 30),
       );
 
       return Success(result);

@@ -58,7 +58,10 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     emit(state.copyWith(prefetchedMangaIds: prefetchedMangaIds));
   }
 
-  Future<void> init({SearchMangaParameter? parameter}) async {
+  Future<void> init({
+    SearchMangaParameter? parameter,
+    bool refresh = false,
+  }) async {
     emit(
       state.copyWith(
         isLoading: true,
@@ -70,6 +73,8 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
         ),
       ),
     );
+
+    if (refresh) await _clearMangaCache();
 
     await Future.wait([_fetchManga(), _fetchTags()]);
 
@@ -92,14 +97,29 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     }
   }
 
+  Future<void> _clearMangaCache() async {
+    final source = state.source;
+
+    if (source == null) return;
+
+    await _searchMangaUseCase.clear(
+      parameter: SourceSearchMangaParameter(
+        source: source,
+        parameter: state.parameter,
+      ),
+    );
+  }
+
   Future<void> _fetchManga() async {
     final source = state.source;
 
     if (source == null) return;
 
     final result = await _searchMangaUseCase.execute(
-      source: source,
-      parameter: state.parameter,
+      parameter: SourceSearchMangaParameter(
+        source: source,
+        parameter: state.parameter,
+      ),
     );
 
     if (result is Success<Pagination<Manga>>) {

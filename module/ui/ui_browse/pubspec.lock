@@ -714,7 +714,7 @@ packages:
     source: hosted
     version: "2.1.1"
   log_box:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "packages/log_box"
       ref: master
@@ -732,7 +732,7 @@ packages:
     source: git
     version: "0.0.1"
   log_box_in_app_webview_logger:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "packages/log_box_in_app_webview_logger"
       ref: master

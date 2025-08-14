@@ -8,47 +8,44 @@ import 'search_chapter_use_case.dart';
 class GetAllChapterUseCase {
   final SearchChapterUseCase _searchChapterUseCase;
 
-  GetAllChapterUseCase({
-    required SearchChapterUseCase searchChapterUseCase,
-  }) : _searchChapterUseCase = searchChapterUseCase;
+  GetAllChapterUseCase({required SearchChapterUseCase searchChapterUseCase})
+    : _searchChapterUseCase = searchChapterUseCase;
 
   Future<List<Chapter>> execute({
     required SourceEnum source,
     required String mangaId,
-    List<Chapter> chapters = const [],
     SearchChapterParameter? parameter,
+    bool useCache = true,
   }) async {
     final param = parameter.or(
-      const SearchChapterParameter(
-        offset: 0,
-        page: 1,
-        limit: 20,
-      ),
+      const SearchChapterParameter(offset: 0, page: 1, limit: 20),
     );
 
     final result = await _searchChapterUseCase.execute(
-      source: source,
-      mangaId: mangaId,
-      parameter: param,
+      parameter: SourceSearchChapterParameter(
+        source: source,
+        parameter: param,
+        mangaId: mangaId,
+      ),
+      useCache: useCache,
     );
 
     if (result is Success<Pagination<Chapter>>) {
-      if (result.data.hasNextPage == true) {
-        return await execute(
-          source: source,
-          mangaId: mangaId,
-          chapters: [...chapters, ...?result.data.data],
-          parameter: param.copyWith(
-            offset: param.offset + param.limit,
-            page: param.page + 1,
-            limit: param.limit,
+      return [
+        ...?result.data.data,
+        if (result.data.hasNextPage == true)
+          ...await execute(
+            source: source,
+            mangaId: mangaId,
+            parameter: param.copyWith(
+              offset: param.offset + param.limit,
+              page: param.page + 1,
+              limit: param.limit,
+            ),
           ),
-        );
-      }
-
-      return [...chapters, ...?result.data.data];
+      ];
     }
 
-    return chapters;
+    return [];
   }
 }
