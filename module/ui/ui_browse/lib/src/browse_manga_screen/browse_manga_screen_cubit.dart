@@ -1,5 +1,6 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -58,7 +59,10 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     emit(state.copyWith(prefetchedMangaIds: prefetchedMangaIds));
   }
 
-  Future<void> init({SearchMangaParameter? parameter}) async {
+  Future<void> init({
+    SearchMangaParameter? parameter,
+    bool refresh = false,
+  }) async {
     emit(
       state.copyWith(
         isLoading: true,
@@ -70,6 +74,8 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
         ),
       ),
     );
+
+    if (refresh) await _clearCache();
 
     await Future.wait([_fetchManga(), _fetchTags()]);
 
@@ -90,6 +96,19 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     if (result is Error<List<Tag>>) {
       emit(state.copyWith(error: () => result.error));
     }
+  }
+
+  Future<void> _clearCache() async {
+    final source = state.source;
+
+    if (source == null) return;
+
+    await _searchMangaUseCase.clear(
+      parameter: SourceSearchMangaParameter(
+        source: source,
+        parameter: state.parameter,
+      ),
+    );
   }
 
   Future<void> _fetchManga() async {

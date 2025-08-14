@@ -349,10 +349,10 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               ),
               cursorColor: DefaultTextStyle.of(context).style.color,
               style: DefaultTextStyle.of(context).style,
-              onSubmitted:
-                  (value) => _cubit(
-                    context,
-                  ).init(parameter: state.parameter.copyWith(title: value)),
+              onSubmitted: (value) {
+                final parameter = state.parameter.copyWith(title: value);
+                _cubit(context).init(parameter: parameter);
+              },
             ),
           );
         }
@@ -395,7 +395,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             );
           },
           onLoadNextPage: () => _cubit(context).next(),
-          onRefresh: () => _cubit(context).init(),
+          onRefresh: () => _cubit(context).init(refresh: true),
           onTapRecrawl: (url) {
             // TODO: implement recrawl from url
             context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');

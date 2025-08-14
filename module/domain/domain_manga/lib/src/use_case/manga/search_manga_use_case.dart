@@ -88,6 +88,24 @@ class SearchMangaUseCase with SyncMangasMixin {
     );
   }
 
+  Future<void> clear({required SourceSearchMangaParameter parameter}) async {
+    final data = await _storageManager.searchManga.keys;
+    final List<Future<void>> promises = [];
+    for (final value in data) {
+      final key = SourceSearchMangaParameter.fromJsonString(value);
+      if (key == null) continue;
+      if (key.source != parameter.source) continue;
+      final paramIgnorePagination = parameter.parameter.copyWith(
+        limit: key.parameter.limit,
+        offset: key.parameter.offset,
+        page: key.parameter.page,
+      );
+      if (paramIgnorePagination != key.parameter) continue;
+      promises.add(_storageManager.searchManga.removeFile(value));
+    }
+    await Future.wait(promises);
+  }
+
   Future<Result<Pagination<Manga>>> execute({
     required SourceSearchMangaParameter parameter,
     bool useCache = true,
