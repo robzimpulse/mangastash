@@ -251,6 +251,7 @@ class JobManager
           value,
         ).copyWith(orders: {ChapterOrders.chapter: OrderDirections.ascending}),
       ),
+      useCache: false,
     );
 
     _log.log(

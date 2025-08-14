@@ -98,8 +98,10 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     if (source == null) return;
 
     final result = await _searchMangaUseCase.execute(
-      source: source,
-      parameter: state.parameter,
+      parameter: SourceSearchMangaParameter(
+        source: source,
+        parameter: state.parameter,
+      ),
     );
 
     if (result is Success<Pagination<Manga>>) {

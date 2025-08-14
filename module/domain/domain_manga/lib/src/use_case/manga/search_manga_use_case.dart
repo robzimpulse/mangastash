@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -86,15 +89,35 @@ class SearchMangaUseCase with SyncMangasMixin {
   }
 
   Future<Result<Pagination<Manga>>> execute({
-    required SourceEnum source,
-    required SearchMangaParameter parameter,
+    required SourceSearchMangaParameter parameter,
+    bool useCache = true,
   }) async {
+    final key = parameter.toJsonString();
+    final cache = await _storageManager.searchManga.getFileFromCache(key);
+    final file = await cache?.file.readAsString(encoding: utf8);
+    final data = file.let((e) {
+      return Pagination.fromJsonString(
+        e,
+        (e) => Manga.fromJson(e.castOrNull()),
+      );
+    });
+
+    if (data != null && useCache) {
+      return Success(data);
+    }
+
     try {
       final Pagination<Manga> data;
-      if (source == SourceEnum.mangadex) {
-        data = await _mangadex(source: source, parameter: parameter);
+      if (parameter.source == SourceEnum.mangadex) {
+        data = await _mangadex(
+          source: parameter.source,
+          parameter: parameter.parameter,
+        );
       } else {
-        data = await _scrapping(source: source, parameter: parameter);
+        data = await _scrapping(
+          source: parameter.source,
+          parameter: parameter.parameter,
+        );
       }
 
       final result = data.copyWith(
@@ -103,6 +126,14 @@ class SearchMangaUseCase with SyncMangasMixin {
           values: [...?data.data],
           logBox: _logBox,
         ),
+      );
+
+      await _storageManager.searchManga.putFile(
+        key,
+        key: key,
+        utf8.encode(result.toJsonString((e) => e.toJson())),
+        fileExtension: 'json',
+        maxAge: const Duration(minutes: 30),
       );
 
       return Success(result);

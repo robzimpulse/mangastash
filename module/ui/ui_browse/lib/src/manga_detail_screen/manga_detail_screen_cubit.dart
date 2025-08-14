@@ -174,8 +174,10 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     if (source == null || parameter == null) return;
 
     final result = await _searchMangaUseCase.execute(
-      source: source,
-      parameter: parameter,
+      parameter: SourceSearchMangaParameter(
+        source: source,
+        parameter: parameter,
+      ),
     );
 
     if (result is Success<Pagination<Manga>>) {
@@ -214,9 +216,11 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     if (id == null || id.isEmpty || source == null) return;
 
     final result = await _searchChapterUseCase.execute(
-      mangaId: id,
-      source: source,
-      parameter: state.chapterParameter,
+      parameter: SourceSearchChapterParameter(
+        source: source,
+        parameter: state.chapterParameter,
+        mangaId: id,
+      ),
     );
 
     if (result is Success<Pagination<Chapter>>) {

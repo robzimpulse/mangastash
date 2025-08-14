@@ -15,15 +15,19 @@ class GetAllChapterUseCase {
     required SourceEnum source,
     required String mangaId,
     SearchChapterParameter? parameter,
+    bool useCache = true,
   }) async {
     final param = parameter.or(
       const SearchChapterParameter(offset: 0, page: 1, limit: 20),
     );
 
     final result = await _searchChapterUseCase.execute(
-      source: source,
-      mangaId: mangaId,
-      parameter: param,
+      parameter: SourceSearchChapterParameter(
+        source: source,
+        parameter: param,
+        mangaId: mangaId,
+      ),
+      useCache: useCache,
     );
 
     if (result is Success<Pagination<Chapter>>) {

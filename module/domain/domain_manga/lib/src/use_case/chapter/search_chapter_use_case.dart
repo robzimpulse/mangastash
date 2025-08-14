@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
@@ -118,19 +120,35 @@ class SearchChapterUseCase
   }
 
   Future<Result<Pagination<Chapter>>> execute({
-    required SourceEnum source,
-    required String mangaId,
-    required SearchChapterParameter parameter,
+    required SourceSearchChapterParameter parameter,
+    bool useCache = true,
   }) async {
+    final key = parameter.toJsonString();
+    final cache = await _storageManager.searchChapter.getFileFromCache(key);
+    final file = await cache?.file.readAsString(encoding: utf8);
+    final data = file.let((e) {
+      return Pagination.fromJsonString(
+        e,
+        (e) => Chapter.fromJson(e.castOrNull()),
+      );
+    });
+
+    if (data != null && useCache) {
+      return Success(data);
+    }
+
     try {
       final Pagination<Chapter> data;
-      if (source == SourceEnum.mangadex) {
-        data = await _mangadex(mangaId: mangaId, parameter: parameter);
+      if (parameter.source == SourceEnum.mangadex) {
+        data = await _mangadex(
+          mangaId: parameter.mangaId,
+          parameter: parameter.parameter,
+        );
       } else {
         data = await _scrapping(
-          source: source,
-          mangaId: mangaId,
-          parameter: parameter,
+          source: parameter.source,
+          mangaId: parameter.mangaId,
+          parameter: parameter.parameter,
         );
       }
 
@@ -140,6 +158,14 @@ class SearchChapterUseCase
           values: [...?data.data],
           logBox: _logBox,
         ),
+      );
+
+      await _storageManager.searchChapter.putFile(
+        key,
+        key: key,
+        utf8.encode(result.toJsonString((e) => e.toJson())),
+        fileExtension: 'json',
+        maxAge: const Duration(minutes: 30),
       );
 
       return Success(result);

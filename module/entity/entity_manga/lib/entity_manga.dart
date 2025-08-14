@@ -15,4 +15,6 @@ export 'src/extra/search_parameter_extra.dart';
 export 'src/history.dart';
 export 'src/manga.dart';
 export 'src/manga_chapter_config.dart';
+export 'src/source_search_chapter_parameter.dart';
+export 'src/source_search_manga_parameter.dart';
 export 'src/tag.dart';
