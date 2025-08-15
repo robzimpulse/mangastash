@@ -75,7 +75,7 @@ class MangaReaderScreen extends StatelessWidget {
       appBar: AppBar(title: _title(), actions: [_recrawlButton()]),
       body: Column(
         children: [
-          Expanded(child: _content()),
+          Expanded(child: _content(context: context)),
           Row(
             children: [
               Expanded(child: _prevButton()),
@@ -127,7 +127,9 @@ class MangaReaderScreen extends StatelessWidget {
     );
   }
 
-  Widget _content() {
+  Widget _content({required BuildContext context}) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return _builder(
       buildWhen: (prev, curr) {
         return [
@@ -184,12 +186,22 @@ class MangaReaderScreen extends StatelessWidget {
                         .resolve(const ImageConfiguration())
                         .addListener(listener);
 
-                    final screenWidth = MediaQuery.of(context).size.width;
-
                     return FutureBuilder(
                       future: completer.future,
                       builder: (context, snapshot) {
-                        final ratio = snapshot.data?.image.ratio ?? 1;
+                        final data = snapshot.data;
+
+                        if (data == null) {
+                          return const SizedBox(
+                            height: 100,
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
+
+                        final ratio = data.image.ratio;
+
                         return SizedBox(
                           width: screenWidth,
                           height: screenWidth * ratio,
@@ -209,6 +221,16 @@ class MangaReaderScreen extends StatelessWidget {
                           ),
                         );
                       },
+                    );
+                  },
+                  progressIndicatorBuilder: (context, url, progress) {
+                    return SizedBox(
+                      height: screenWidth / 2,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          value: progress.progress,
+                        ),
+                      ),
                     );
                   },
                 ),
