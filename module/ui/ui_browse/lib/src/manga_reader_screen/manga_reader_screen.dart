@@ -1,13 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:core_environment/core_environment.dart';
-import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:photo_view/photo_view_gallery.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -168,29 +167,46 @@ class MangaReaderScreen extends StatelessWidget {
           );
         }
 
-        return PhotoViewGallery.builder(
-          itemCount: images.length,
-          scrollDirection: Axis.vertical,
-          builder: (context, index) {
-            return PhotoViewGalleryPageOptions(
-              initialScale: PhotoViewComputedScale.contained,
-              imageProvider: CachedNetworkImageProvider(
-                images[index],
-                cacheManager: storageManager.images,
+        return CustomScrollView(
+          slivers: [
+            for (final image in images)
+              SliverToBoxAdapter(
+                child: CachedNetworkImage(
+                  imageUrl: image,
+                  cacheManager: storageManager.images,
+                  imageBuilder: (context, provider) {
+                    final completer = Completer<ImageInfo>();
+                    final listener = ImageStreamListener(
+                      (info, _) => completer.complete(info),
+                    );
+
+                    provider
+                        .resolve(const ImageConfiguration())
+                        .addListener(listener);
+
+                    final screenWidth = MediaQuery.of(context).size.width;
+
+                    return FutureBuilder(
+                      future: completer.future,
+                      builder: (context, snapshot) {
+                        final ratio = snapshot.data?.image.ratio ?? 1;
+                        return SizedBox(
+                          width: screenWidth,
+                          height: screenWidth * ratio,
+                          child: PhotoView(
+                            customSize: Size(screenWidth, screenWidth * ratio),
+                            imageProvider: provider,
+                            maxScale: PhotoViewComputedScale.covered * 2.0,
+                            minScale: PhotoViewComputedScale.covered,
+                            initialScale: PhotoViewComputedScale.covered,
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
-              errorBuilder: (context, error, stacktrace) {
-                return Center(
-                  child: Row(
-                    children: [
-                      const Icon(Icons.error),
-                      const SizedBox(width: 8),
-                      Expanded(child: Text(error.toString())),
-                    ],
-                  ),
-                );
-              },
-            );
-          },
+          ],
         );
       },
     );
