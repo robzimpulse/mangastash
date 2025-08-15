@@ -177,7 +177,7 @@ class MangaReaderScreen extends StatelessWidget {
                   imageBuilder: (context, provider) {
                     final completer = Completer<ImageInfo>();
                     final listener = ImageStreamListener(
-                      (info, _) => completer.complete(info),
+                      (info, _) => completer.safeComplete(info),
                     );
 
                     provider
@@ -194,6 +194,13 @@ class MangaReaderScreen extends StatelessWidget {
                           width: screenWidth,
                           height: screenWidth * ratio,
                           child: PhotoView(
+                            loadingBuilder: (context, event) {
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  value: event?.progress,
+                                ),
+                              );
+                            },
                             customSize: Size(screenWidth, screenWidth * ratio),
                             imageProvider: provider,
                             maxScale: PhotoViewComputedScale.covered * 2.0,
