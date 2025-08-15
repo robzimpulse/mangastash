@@ -1,10 +1,13 @@
 import 'dart:convert';
 
 import 'package:core_environment/core_environment.dart';
+import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -165,44 +168,29 @@ class MangaReaderScreen extends StatelessWidget {
           );
         }
 
-        return SingleChildScrollView(
-          child: Column(
-            children: [
-              for (final image in images)
-                CachedNetworkImage(
-                  cacheManager: storageManager.images,
-                  imageUrl: image,
-                  errorWidget: (context, url, error) {
-                    return ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 300),
-                      child: Center(
-                        child: Row(
-                          children: [
-                            const Icon(Icons.error),
-                            const SizedBox(width: 8),
-                            Expanded(child: Text(error.toString())),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                  progressIndicatorBuilder: (context, url, progress) {
-                    return ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 300),
-                      child: Center(
-                        child: SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            value: progress.progress,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-            ],
-          ),
+        return PhotoViewGallery.builder(
+          itemCount: images.length,
+          scrollDirection: Axis.vertical,
+          builder: (context, index) {
+            return PhotoViewGalleryPageOptions(
+              initialScale: PhotoViewComputedScale.contained,
+              imageProvider: CachedNetworkImageProvider(
+                images[index],
+                cacheManager: storageManager.images,
+              ),
+              errorBuilder: (context, error, stacktrace) {
+                return Center(
+                  child: Row(
+                    children: [
+                      const Icon(Icons.error),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(error.toString())),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
         );
       },
     );
