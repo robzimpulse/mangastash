@@ -12,6 +12,7 @@ export 'src/enum/language.dart';
 export 'src/extension/completer_extension.dart';
 export 'src/extension/displayable_enum_extension.dart';
 export 'src/extension/image_chunk_event_extension.dart';
+export 'src/extension/image_provider_extension.dart';
 export 'src/extension/image_ratio_extension.dart';
 export 'src/extension/locale_extension.dart';
 export 'src/extension/parseable_date_string_extension.dart';

@@ -177,26 +177,15 @@ class MangaReaderScreen extends StatelessWidget {
                   imageUrl: image,
                   cacheManager: storageManager.images,
                   imageBuilder: (context, provider) {
-                    final completer = Completer<ImageInfo>();
-                    final listener = ImageStreamListener(
-                      (info, _) => completer.safeComplete(info),
-                    );
-
-                    provider
-                        .resolve(const ImageConfiguration())
-                        .addListener(listener);
-
                     return FutureBuilder(
-                      future: completer.future,
+                      future: provider.imageInfo,
                       builder: (context, snapshot) {
                         final data = snapshot.data;
 
                         if (data == null) {
                           return const SizedBox(
                             height: 100,
-                            child: Center(
-                              child: CircularProgressIndicator(),
-                            ),
+                            child: Center(child: CircularProgressIndicator()),
                           );
                         }
 
