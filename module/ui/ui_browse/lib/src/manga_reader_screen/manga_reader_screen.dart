@@ -47,6 +47,7 @@ class MangaReaderScreen extends StatelessWidget {
           updateChapterLastReadAtUseCase: locator(),
           listenSearchParameterUseCase: locator(),
           getAllChapterUseCase: locator(),
+          recrawlUseCase: locator(),
         )..init();
       },
       child: MangaReaderScreen(
@@ -281,26 +282,7 @@ class MangaReaderScreen extends StatelessWidget {
     );
   }
 
-  void _onTapRecrawl({
-    required BuildContext context,
-    required String url,
-  }) async {
-    final uri = Uri.tryParse(url);
-    if (uri == null) return;
-    await logBox.webview(
-      context: context,
-      uri: uri,
-      onTapSnapshot: (url, html) {
-        if (url == null || html == null) return;
-        storageManager.html.putFile(
-          url,
-          utf8.encode(html),
-          fileExtension: 'html',
-          maxAge: const Duration(minutes: 30),
-        );
-      },
-    );
-    if (!context.mounted) return;
-    await _cubit(context).init();
+  void _onTapRecrawl({required BuildContext context, required String url}) {
+    _cubit(context).recrawl(context: context, url: url);
   }
 }

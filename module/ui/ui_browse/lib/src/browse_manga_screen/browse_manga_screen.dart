@@ -6,8 +6,6 @@ import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:feature_common/feature_common.dart';
-import 'package:log_box/log_box.dart';
-import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 
@@ -20,7 +18,6 @@ class BrowseMangaScreen extends StatefulWidget {
     required this.storageManager,
     this.onTapManga,
     this.onTapFilter,
-    required this.logBox,
   });
 
   final Function(Manga, SearchMangaParameter)? onTapManga;
@@ -32,8 +29,6 @@ class BrowseMangaScreen extends StatefulWidget {
   onTapFilter;
 
   final StorageManager storageManager;
-
-  final LogBox logBox;
 
   static Widget create({
     required ServiceLocator locator,
@@ -60,13 +55,13 @@ class BrowseMangaScreen extends StatefulWidget {
           prefetchChapterUseCase: locator(),
           listenSearchParameterUseCase: locator(),
           getTagsUseCase: locator(),
+          recrawlUseCase: locator()
         )..init();
       },
       child: BrowseMangaScreen(
         storageManager: locator(),
         onTapManga: onTapManga,
         onTapFilter: onTapFilter,
-        logBox: locator(),
       ),
     );
   }
@@ -140,24 +135,8 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
   void _onTapRecrawl({
     required BuildContext context,
     required String url,
-  }) async {
-    final uri = Uri.tryParse(url);
-    if (uri == null) return;
-    await widget.logBox.webview(
-      context: context,
-      uri: uri,
-      onTapSnapshot: (url, html) {
-        if (url == null || html == null) return;
-        widget.storageManager.html.putFile(
-          url,
-          utf8.encode(html),
-          fileExtension: 'html',
-          maxAge: const Duration(minutes: 30),
-        );
-      },
-    );
-    if (!context.mounted) return;
-    await _cubit(context).init();
+  }) {
+    _cubit(context).recrawl(context: context, url: url);
   }
 
   Widget _menuSource({required BuildContext context}) {

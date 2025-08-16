@@ -4,6 +4,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:flutter/material.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import 'manga_detail_screen_state.dart';
@@ -17,6 +18,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final GetAllChapterUseCase _getAllChapterUseCase;
   final SearchMangaUseCase _searchMangaUseCase;
+  final RecrawlUseCase _recrawlUseCase;
 
   MangaDetailScreenCubit({
     required MangaDetailScreenState initialState,
@@ -31,6 +33,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required ListenReadHistoryUseCase listenReadHistoryUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required GetAllChapterUseCase getAllChapterUseCase,
+    required RecrawlUseCase recrawlUseCase,
   }) : _getMangaUseCase = getMangaUseCase,
        _searchMangaUseCase = searchMangaUseCase,
        _searchChapterUseCase = searchChapterUseCase,
@@ -38,6 +41,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
        _removeFromLibraryUseCase = removeFromLibraryUseCase,
        _prefetchChapterUseCase = prefetchChapterUseCase,
        _getAllChapterUseCase = getAllChapterUseCase,
+        _recrawlUseCase = recrawlUseCase,
        super(
          initialState.copyWith(
            chapterParameter: listenSearchParameterUseCase
@@ -335,5 +339,10 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
         chapterId: chapterId,
       );
     }
+  }
+
+  void recrawl({required BuildContext context, required String url}) {
+    _recrawlUseCase.execute(context: context, url: url);
+    init();
   }
 }
