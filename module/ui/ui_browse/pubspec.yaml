@@ -35,11 +35,6 @@ dependencies:
       url: https://github.com/robzimpulse/log_box.git
       ref: master
       path: packages/log_box
-  log_box_in_app_webview_logger:
-    git:
-      url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box_in_app_webview_logger
 
   # core
   core_environment:

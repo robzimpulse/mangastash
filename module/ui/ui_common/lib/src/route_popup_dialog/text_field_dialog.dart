@@ -10,26 +10,29 @@ class TextFieldDialog extends PopupDialogRoute {
     required String title,
     ValueChanged<String>? onSubmitted,
   }) : super(
-          child: (context) {
-            final controller = TextEditingController();
+         child: (context) {
+           final controller = TextEditingController();
 
-            return AlertDialog(
-              title: Text(title),
-              content: TextField(
-                controller: controller,
-                onSubmitted: onSubmitted,
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    final text = controller.text;
-                    controller.dispose();
-                    onSubmitted?.call(text);
-                  },
-                  child: const Text('Submit'),
-                ),
-              ],
-            );
-          },
-        );
+           return AlertDialog(
+             title: Text(title),
+             content: TextField(
+               controller: controller,
+               onSubmitted: (text) {
+                 controller.dispose();
+                 onSubmitted?.call(text);
+               },
+             ),
+             actions: [
+               TextButton(
+                 onPressed: () {
+                   final text = controller.text;
+                   controller.dispose();
+                   onSubmitted?.call(text);
+                 },
+                 child: const Text('Submit'),
+               ),
+             ],
+           );
+         },
+       );
 }

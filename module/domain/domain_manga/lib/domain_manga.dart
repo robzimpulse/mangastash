@@ -24,6 +24,7 @@ export 'src/use_case/parameter/update_search_parameter_use_case.dart';
 export 'src/use_case/prefetch/listen_prefetch_use_case.dart';
 export 'src/use_case/prefetch/prefetch_chapter_use_case.dart';
 export 'src/use_case/prefetch/prefetch_manga_use_case.dart';
+export 'src/use_case/recrawl_use_case.dart';
 export 'src/use_case/source/listen_sources_use_case.dart';
 export 'src/use_case/source/update_sources_use_case.dart';
 export 'src/use_case/tags/get_tags_use_case.dart';

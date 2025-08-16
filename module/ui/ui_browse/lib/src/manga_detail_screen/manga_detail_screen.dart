@@ -1,11 +1,9 @@
-import 'dart:convert';
 import 'dart:ui';
 
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
-import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -65,6 +63,7 @@ class MangaDetailScreen extends StatefulWidget {
           listenSearchParameterUseCase: locator(),
           getAllChapterUseCase: locator(),
           searchMangaUseCase: locator(),
+          recrawlUseCase: locator(),
         )..init();
       },
       child: MangaDetailScreen(
@@ -108,27 +107,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
 
-  void _onTapRecrawl({
-    required BuildContext context,
-    required String url,
-  }) async {
-    final uri = Uri.tryParse(url);
-    if (uri == null) return;
-    await widget.logBox.webview(
-      context: context,
-      uri: uri,
-      onTapSnapshot: (url, html) {
-        if (url == null || html == null) return;
-        widget.storageManager.html.putFile(
-          url,
-          utf8.encode(html),
-          fileExtension: 'html',
-          maxAge: const Duration(minutes: 30),
-        );
-      },
-    );
-    if (!context.mounted) return;
-    await _cubit(context).init();
+  void _onTapRecrawl({required BuildContext context, required String url}) {
+    _cubit(context).recrawl(context: context, url: url);
   }
 
   void _onTapDownload({
