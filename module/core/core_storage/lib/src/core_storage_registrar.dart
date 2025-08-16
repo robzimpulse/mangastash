@@ -28,7 +28,7 @@ class CoreStorageRegistrar extends Registrar {
 
     locator.registerSingleton(await SharedPreferences.getInstance());
     locator.registerSingleton(
-      StorageManager(dio: () => locator(), logBox: log),
+      StorageManager(dio: () => locator()),
       dispose: (e) => e.dispose(),
     );
 

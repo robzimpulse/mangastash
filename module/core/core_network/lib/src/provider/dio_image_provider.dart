@@ -14,12 +14,12 @@ import 'package:flutter/widgets.dart';
 ///  * [Image.network].
 ///  * https://pub.dev/packages/http_image_provider
 @immutable
-class DioImage extends ImageProvider<DioImage> {
+class DioImageProvider extends ImageProvider<DioImageProvider> {
   /// Creates an object that fetches the image at the given URL.
   ///
   /// The arguments [url] and [scale] must not be null.
   /// [dio] will be the default [Dio] if not set.
-  DioImage.string(
+  DioImageProvider.string(
     String url, {
     this.scale = 1.0,
     this.headers,
@@ -30,7 +30,12 @@ class DioImage extends ImageProvider<DioImage> {
   ///
   /// The arguments [url] and [scale] must not be null.
   /// [dio] will be the default [Dio] if not set.
-  const DioImage(this.url, {this.scale = 1.0, this.headers, required this.dio});
+  const DioImageProvider(
+    this.url, {
+    this.scale = 1.0,
+    this.headers,
+    required this.dio,
+  });
 
   /// The URL from which the image will be fetched.
   final Uri url;
@@ -48,12 +53,15 @@ class DioImage extends ImageProvider<DioImage> {
   final Dio dio;
 
   @override
-  Future<DioImage> obtainKey(ImageConfiguration configuration) {
-    return SynchronousFuture<DioImage>(this);
+  Future<DioImageProvider> obtainKey(ImageConfiguration configuration) {
+    return SynchronousFuture<DioImageProvider>(this);
   }
 
   @override
-  ImageStreamCompleter loadImage(DioImage key, ImageDecoderCallback decode) {
+  ImageStreamCompleter loadImage(
+    DioImageProvider key,
+    ImageDecoderCallback decode,
+  ) {
     // Ownership of this controller is handed off to [_loadAsync]; it is that
     // method's responsibility to close the controller's stream when the image
     // has been loaded or an error is thrown.
@@ -67,14 +75,14 @@ class DioImage extends ImageProvider<DioImage> {
       informationCollector: () {
         return <DiagnosticsNode>[
           DiagnosticsProperty<ImageProvider>('Image provider', this),
-          DiagnosticsProperty<DioImage>('Image key', key),
+          DiagnosticsProperty<DioImageProvider>('Image key', key),
         ];
       },
     );
   }
 
   Future<ui.Codec> _loadAsync(
-    DioImage key,
+    DioImageProvider key,
     StreamController<ImageChunkEvent> chunkEvents,
     ImageDecoderCallback decode,
   ) async {
@@ -137,7 +145,9 @@ class DioImage extends ImageProvider<DioImage> {
     if (other.runtimeType != runtimeType) {
       return false;
     }
-    return other is DioImage && other.url == url && other.scale == scale;
+    return other is DioImageProvider &&
+        other.url == url &&
+        other.scale == scale;
   }
 
   @override

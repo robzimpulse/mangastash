@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:core_environment/core_environment.dart';
@@ -5,6 +6,7 @@ import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
 import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -73,7 +75,7 @@ class MangaReaderScreen extends StatelessWidget {
       appBar: AppBar(title: _title(), actions: [_recrawlButton()]),
       body: Column(
         children: [
-          Expanded(child: _content()),
+          Expanded(child: _content(context: context)),
           Row(
             children: [
               Expanded(child: _prevButton()),
@@ -125,7 +127,9 @@ class MangaReaderScreen extends StatelessWidget {
     );
   }
 
-  Widget _content() {
+  Widget _content({required BuildContext context}) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return _builder(
       buildWhen: (prev, curr) {
         return [
@@ -165,44 +169,62 @@ class MangaReaderScreen extends StatelessWidget {
           );
         }
 
-        return SingleChildScrollView(
-          child: Column(
-            children: [
-              for (final image in images)
-                CachedNetworkImage(
-                  cacheManager: storageManager.images,
+        return CustomScrollView(
+          slivers: [
+            for (final image in images)
+              SliverToBoxAdapter(
+                child: CachedNetworkImage(
                   imageUrl: image,
-                  errorWidget: (context, url, error) {
-                    return ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 300),
-                      child: Center(
-                        child: Row(
-                          children: [
-                            const Icon(Icons.error),
-                            const SizedBox(width: 8),
-                            Expanded(child: Text(error.toString())),
-                          ],
-                        ),
-                      ),
+                  cacheManager: storageManager.images,
+                  imageBuilder: (context, provider) {
+                    return FutureBuilder(
+                      future: provider.imageInfo,
+                      builder: (context, snapshot) {
+                        final data = snapshot.data;
+
+                        if (data == null) {
+                          return const SizedBox(
+                            height: 100,
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
+
+                        final ratio = data.image.ratio;
+
+                        return SizedBox(
+                          width: screenWidth,
+                          height: screenWidth * ratio,
+                          child: PhotoView(
+                            loadingBuilder: (context, event) {
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  value: event?.progress,
+                                ),
+                              );
+                            },
+                            customSize: Size(screenWidth, screenWidth * ratio),
+                            imageProvider: provider,
+                            maxScale: PhotoViewComputedScale.covered * 2.0,
+                            minScale: PhotoViewComputedScale.covered,
+                            initialScale: PhotoViewComputedScale.covered,
+                          ),
+                        );
+                      },
                     );
                   },
                   progressIndicatorBuilder: (context, url, progress) {
-                    return ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 300),
+                    return SizedBox(
+                      height: screenWidth / 2,
                       child: Center(
-                        child: SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            value: progress.progress,
-                          ),
+                        child: CircularProgressIndicator(
+                          value: progress.progress,
                         ),
                       ),
                     );
                   },
                 ),
-            ],
-          ),
+              ),
+          ],
         );
       },
     );
