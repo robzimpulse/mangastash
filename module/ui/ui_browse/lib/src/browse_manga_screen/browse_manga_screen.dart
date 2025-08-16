@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
@@ -55,7 +53,7 @@ class BrowseMangaScreen extends StatefulWidget {
           prefetchChapterUseCase: locator(),
           listenSearchParameterUseCase: locator(),
           getTagsUseCase: locator(),
-          recrawlUseCase: locator()
+          recrawlUseCase: locator(),
         )..init();
       },
       child: BrowseMangaScreen(
@@ -132,10 +130,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     }
   }
 
-  void _onTapRecrawl({
-    required BuildContext context,
-    required String url,
-  }) {
+  void _onTapRecrawl({required BuildContext context, required String url}) {
     _cubit(context).recrawl(context: context, url: url);
   }
 

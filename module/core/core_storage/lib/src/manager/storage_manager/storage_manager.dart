@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:log_box/log_box.dart';
 
 import '../custom_cache_manager/custom_cache_manager.dart';
 import 'file_service/dio_file_service.dart';
@@ -22,22 +23,38 @@ class StorageManager {
 
   final CustomCacheManager searchChapter;
 
-  StorageManager({required ValueGetter<Dio> dio})
-    : images = CacheManager(Config('image', fileService: DioFileService(dio))),
-      converter = CacheManager(
+  StorageManager({required ValueGetter<Dio> dio, required LogBox logBox})
+    : images = CustomCacheManager(
+        Config('image', fileService: DioFileService(dio)),
+        logBox: logBox,
+      ),
+      converter = CustomCacheManager(
         Config('converter', fileService: DioFileService(dio)),
+        logBox: logBox,
       ),
-      tags = CacheManager(Config('tags', fileService: DioFileService(dio))),
-      manga = CacheManager(Config('manga', fileService: DioFileService(dio))),
-      chapter = CacheManager(
+      tags = CustomCacheManager(
+        Config('tags', fileService: DioFileService(dio)),
+        logBox: logBox,
+      ),
+      manga = CustomCacheManager(
+        Config('manga', fileService: DioFileService(dio)),
+        logBox: logBox,
+      ),
+      chapter = CustomCacheManager(
         Config('chapter', fileService: DioFileService(dio)),
+        logBox: logBox,
       ),
-      html = CacheManager(Config('html', fileService: DioFileService(dio))),
+      html = CustomCacheManager(
+        Config('html', fileService: DioFileService(dio)),
+        logBox: logBox,
+      ),
       searchChapter = CustomCacheManager(
         Config('search_chapter', fileService: DioFileService(dio)),
+        logBox: logBox,
       ),
       searchManga = CustomCacheManager(
         Config('search_manga', fileService: DioFileService(dio)),
+        logBox: logBox,
       );
 
   Future<void> clear() async {
