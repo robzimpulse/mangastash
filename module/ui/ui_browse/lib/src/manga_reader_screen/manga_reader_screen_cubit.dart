@@ -47,6 +47,20 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     await Future.wait([_fetchChapter(), _fetchPreviousAndNextChapter()]);
   }
 
+  Future<void> _clearPreviousAndNextChapterCache() async {
+    final mangaId = state.mangaId;
+    final source = state.source;
+
+    if (mangaId == null || source == null) return;
+    await _getAllChapterUseCase.clear(
+      source: source,
+      mangaId: mangaId,
+      parameter: state.parameter.copyWith(
+        orders: {ChapterOrders.chapter: OrderDirections.ascending},
+      ),
+    );
+  }
+
   Future<void> _fetchPreviousAndNextChapter() async {
     final mangaId = state.mangaId;
     final source = state.source;
@@ -62,6 +76,18 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     );
 
     emit(state.copyWith(chapterIds: [...response.map((e) => e.id).nonNulls]));
+  }
+
+  Future<void> _clearChapterCache() async {
+    final chapterId = state.chapterId;
+    final mangaId = state.mangaId;
+    final source = state.source;
+    if (chapterId == null || mangaId == null || source == null) return;
+    await _getChapterUseCase.clearCache(
+      source: source,
+      mangaId: mangaId,
+      chapterId: chapterId,
+    );
   }
 
   Future<void> _fetchChapter() async {
@@ -99,15 +125,8 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
 
   void recrawl({required BuildContext context, required String url}) async {
     _recrawlUseCase.execute(context: context, url: url);
-    final chapterId = state.chapterId;
-    final mangaId = state.mangaId;
-    final source = state.source;
-    if (chapterId == null || mangaId == null || source == null) return;
-    await _getChapterUseCase.clearCache(
-      source: source,
-      mangaId: mangaId,
-      chapterId: chapterId,
-    );
+    await _clearChapterCache();
+    await _clearPreviousAndNextChapterCache();
     init();
   }
 }
