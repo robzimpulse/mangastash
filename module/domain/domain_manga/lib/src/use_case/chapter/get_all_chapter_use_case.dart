@@ -37,6 +37,7 @@ class GetAllChapterUseCase {
           ...await execute(
             source: source,
             mangaId: mangaId,
+            useCache: useCache,
             parameter: param.copyWith(
               offset: param.offset + param.limit,
               page: param.page + 1,
