@@ -189,8 +189,8 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     // TODO: add download manga
   }
 
-  void recrawl({required BuildContext context, required String url}) {
-    _recrawlUseCase.execute(context: context, url: url);
-    init();
+  void recrawl({required BuildContext context, required String url}) async {
+    await _recrawlUseCase.execute(context: context, url: url);
+    await init();
   }
 }
