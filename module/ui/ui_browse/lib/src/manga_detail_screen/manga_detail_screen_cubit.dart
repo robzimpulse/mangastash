@@ -4,6 +4,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:flutter/material.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import 'manga_detail_screen_state.dart';
@@ -17,6 +18,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final GetAllChapterUseCase _getAllChapterUseCase;
   final SearchMangaUseCase _searchMangaUseCase;
+  final RecrawlUseCase _recrawlUseCase;
 
   MangaDetailScreenCubit({
     required MangaDetailScreenState initialState,
@@ -31,6 +33,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required ListenReadHistoryUseCase listenReadHistoryUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required GetAllChapterUseCase getAllChapterUseCase,
+    required RecrawlUseCase recrawlUseCase,
   }) : _getMangaUseCase = getMangaUseCase,
        _searchMangaUseCase = searchMangaUseCase,
        _searchChapterUseCase = searchChapterUseCase,
@@ -38,6 +41,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
        _removeFromLibraryUseCase = removeFromLibraryUseCase,
        _prefetchChapterUseCase = prefetchChapterUseCase,
        _getAllChapterUseCase = getAllChapterUseCase,
+        _recrawlUseCase = recrawlUseCase,
        super(
          initialState.copyWith(
            chapterParameter: listenSearchParameterUseCase
@@ -153,11 +157,18 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       ),
     );
 
-    if (refresh) await _clearMangaCache();
+    if (refresh) await _clearSimilarMangaCache();
 
     await _fetchSimilarManga();
 
     emit(state.copyWith(isLoadingSimilarManga: false));
+  }
+
+  Future<void> _clearMangaCache() async {
+    final id = state.manga?.id ?? state.mangaId;
+    final source = state.source;
+    if (id == null || id.isEmpty || source == null) return;
+    await _getMangaUseCase.clearCache(source: source, mangaId: id);
   }
 
   Future<void> _fetchManga() async {
@@ -178,7 +189,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     emit(state.copyWith(isLoadingManga: false));
   }
 
-  Future<void> _clearMangaCache() async {
+  Future<void> _clearSimilarMangaCache() async {
     final source = state.source;
     final parameter = state.similarMangaParameter;
 
@@ -335,5 +346,13 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
         chapterId: chapterId,
       );
     }
+  }
+
+  Future<void> recrawl({required BuildContext context, required String url}) async {
+    _recrawlUseCase.execute(context: context, url: url);
+    await _clearMangaCache();
+    await _clearSimilarMangaCache();
+    await _clearChapterCache();
+    init();
   }
 }

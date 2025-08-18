@@ -25,6 +25,7 @@ import 'use_case/parameter/update_search_parameter_use_case.dart';
 import 'use_case/prefetch/listen_prefetch_use_case.dart';
 import 'use_case/prefetch/prefetch_chapter_use_case.dart';
 import 'use_case/prefetch/prefetch_manga_use_case.dart';
+import 'use_case/recrawl_use_case.dart';
 import 'use_case/source/listen_sources_use_case.dart';
 import 'use_case/source/update_sources_use_case.dart';
 import 'use_case/tags/get_tags_use_case.dart';
@@ -158,6 +159,9 @@ class DomainMangaRegistrar extends Registrar {
         mangaService: locator(),
         storageManager: locator(),
       ),
+    );
+    locator.registerFactory(
+      () => RecrawlUseCase(logBox: log, storageManager: locator()),
     );
 
     locator.registerSingleton(LibraryManager(libraryDao: locator()));

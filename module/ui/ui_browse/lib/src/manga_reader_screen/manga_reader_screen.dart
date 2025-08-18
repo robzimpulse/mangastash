@@ -1,11 +1,8 @@
-import 'dart:async';
-import 'dart:convert';
 
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:log_box/log_box.dart';
-import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -47,6 +44,7 @@ class MangaReaderScreen extends StatelessWidget {
           updateChapterLastReadAtUseCase: locator(),
           listenSearchParameterUseCase: locator(),
           getAllChapterUseCase: locator(),
+          recrawlUseCase: locator(),
         )..init();
       },
       child: MangaReaderScreen(
@@ -281,26 +279,7 @@ class MangaReaderScreen extends StatelessWidget {
     );
   }
 
-  void _onTapRecrawl({
-    required BuildContext context,
-    required String url,
-  }) async {
-    final uri = Uri.tryParse(url);
-    if (uri == null) return;
-    await logBox.webview(
-      context: context,
-      uri: uri,
-      onTapSnapshot: (url, html) {
-        if (url == null || html == null) return;
-        storageManager.html.putFile(
-          url,
-          utf8.encode(html),
-          fileExtension: 'html',
-          maxAge: const Duration(minutes: 30),
-        );
-      },
-    );
-    if (!context.mounted) return;
-    await _cubit(context).init();
+  void _onTapRecrawl({required BuildContext context, required String url}) {
+    _cubit(context).recrawl(context: context, url: url);
   }
 }
