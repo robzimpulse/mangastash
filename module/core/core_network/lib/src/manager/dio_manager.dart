@@ -5,6 +5,7 @@ import 'package:log_box/log_box.dart';
 import 'package:log_box_dio_logger/log_box_dio_logger.dart';
 import 'package:universal_io/io.dart';
 
+import '../interceptor/dio_error_transformer_interceptor.dart';
 import '../interceptor/dio_reject_interceptor.dart';
 import '../interceptor/dio_throttler_interceptor.dart';
 import '../mixin/user_agent_mixin.dart';
@@ -18,6 +19,7 @@ class DioManager {
     );
 
     dio.interceptors.addAll([
+      DioErrorTransformerInterceptor(),
       log.interceptor,
       DioThrottlerInterceptor(
         const Duration(milliseconds: 200),
@@ -31,12 +33,12 @@ class DioManager {
       DioRejectInterceptor(
         rejector: (options) {
           if (options.uri.pathSegments.isEmpty) {
-            return DioException(
+            return DioException.requestCancelled(
               requestOptions: options,
-              type: DioExceptionType.cancel,
-              message: 'Try to access domain without path',
+              reason: Exception('Try to access domain without path'),
             );
           }
+
           return null;
         },
       ),
