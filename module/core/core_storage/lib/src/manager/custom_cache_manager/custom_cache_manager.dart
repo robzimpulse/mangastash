@@ -1,7 +1,6 @@
 import 'package:file/src/interface/file.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:log_box/log_box.dart';
 
 import 'custom_cache_store.dart';
 
@@ -10,10 +9,7 @@ class CustomCacheManager implements BaseCacheManager {
 
   late final CustomCacheStore _cacheStore;
 
-  late final LogBox _logBox;
-
-  CustomCacheManager(Config config, {required LogBox logBox})
-    : _logBox = logBox {
+  CustomCacheManager(Config config) {
     _cacheStore = CustomCacheStore(config);
     _cache = CacheManager.custom(config, cacheStore: _cacheStore);
   }
@@ -32,11 +28,6 @@ class CustomCacheManager implements BaseCacheManager {
     Map<String, String>? authHeaders,
     bool force = false,
   }) {
-    _logBox.log(
-      'Download File',
-      extra: {'key': key, 'url': url},
-      name: '$runtimeType - ${_cacheStore.storeKey}',
-    );
     return _cache.downloadFile(
       url,
       key: key,
@@ -47,7 +38,6 @@ class CustomCacheManager implements BaseCacheManager {
 
   @override
   Future<void> emptyCache() {
-    _logBox.log('Empty Cache', name: '$runtimeType - ${_cacheStore.storeKey}');
     return _cache.emptyCache();
   }
 
@@ -56,21 +46,11 @@ class CustomCacheManager implements BaseCacheManager {
     String key, {
     bool ignoreMemCache = false,
   }) {
-    _logBox.log(
-      'Get File from Cache',
-      extra: {'key': key},
-      name: '$runtimeType - ${_cacheStore.storeKey}',
-    );
     return _cache.getFileFromCache(key, ignoreMemCache: ignoreMemCache);
   }
 
   @override
   Future<FileInfo?> getFileFromMemory(String key) {
-    _logBox.log(
-      'Get File From Memory',
-      extra: {'key': key},
-      name: '$runtimeType - ${_cacheStore.storeKey}',
-    );
     return _cache.getFileFromMemory(key);
   }
 
@@ -81,11 +61,6 @@ class CustomCacheManager implements BaseCacheManager {
     Map<String, String>? headers,
     bool withProgress = false,
   }) {
-    _logBox.log(
-      'Get File Stream',
-      extra: {'key': key, 'url': url},
-      name: '$runtimeType - ${_cacheStore.storeKey}',
-    );
     return _cache.getFileStream(
       url,
       key: key,
@@ -100,11 +75,6 @@ class CustomCacheManager implements BaseCacheManager {
     String? key,
     Map<String, String>? headers,
   }) {
-    _logBox.log(
-      'Get Single File',
-      extra: {'key': key, 'url': url},
-      name: '$runtimeType - ${_cacheStore.storeKey}',
-    );
     return _cache.getSingleFile(url, key: key ?? url, headers: headers ?? {});
   }
 
@@ -117,11 +87,6 @@ class CustomCacheManager implements BaseCacheManager {
     Duration maxAge = const Duration(days: 30),
     String fileExtension = 'file',
   }) {
-    _logBox.log(
-      'Put File',
-      extra: {'key': key, 'url': url},
-      name: '$runtimeType - ${_cacheStore.storeKey}',
-    );
     return _cache.putFile(
       url,
       fileBytes,
@@ -141,11 +106,6 @@ class CustomCacheManager implements BaseCacheManager {
     Duration maxAge = const Duration(days: 30),
     String fileExtension = 'file',
   }) {
-    _logBox.log(
-      'Put File stream',
-      extra: {'key': key, 'url': url},
-      name: '$runtimeType - ${_cacheStore.storeKey}',
-    );
     return _cache.putFileStream(
       url,
       source,
@@ -158,11 +118,6 @@ class CustomCacheManager implements BaseCacheManager {
 
   @override
   Future<void> removeFile(String key) {
-    _logBox.log(
-      'Remove File',
-      extra: {'key': key},
-      name: '$runtimeType - ${_cacheStore.storeKey}',
-    );
     return _cache.removeFile(key);
   }
 
@@ -172,11 +127,6 @@ class CustomCacheManager implements BaseCacheManager {
     String? key,
     Map<String, String>? headers,
   }) {
-    _logBox.log(
-      'Get File',
-      extra: {'key': key, 'url': url},
-      name: '$runtimeType - ${_cacheStore.storeKey}',
-    );
     return _cache.getFile(url, key: key ?? url, headers: headers ?? {});
   }
 }
