@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
@@ -81,12 +83,28 @@ class _MangaStashAppState extends State<MangaStashApp> {
       final LogBox log = widget.locator();
       log.log(
         error.toString(),
-        name: 'FlutterError',
+        name: 'PlatformDispatcher',
         error: error,
         stackTrace: stack,
       );
       return true;
     };
+
+    Isolate.current.addErrorListener(
+      RawReceivePort((pair) {
+        if (pair is! List) return;
+        final LogBox log = widget.locator();
+        final Object? error = pair.firstOrNull.castOrNull();
+        final String? trace = pair.lastOrNull.castOrNull();
+
+        log.log(
+          error.toString(),
+          name: 'Isolate',
+          error: error,
+          stackTrace: trace?.let((e) => StackTrace.fromString(e)),
+        );
+      }).sendPort,
+    );
   }
 
   GoRouter _route({
@@ -111,10 +129,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
         // TODO: add observer here
         observers: () => [logBox.observer],
       ),
-      observers: [
-        logBox.observer,
-        viewer.navigatorObserver,
-      ],
+      observers: [logBox.observer, viewer.navigatorObserver],
     );
   }
 }

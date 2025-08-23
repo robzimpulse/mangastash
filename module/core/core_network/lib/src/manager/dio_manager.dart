@@ -31,12 +31,12 @@ class DioManager {
       DioRejectInterceptor(
         rejector: (options) {
           if (options.uri.pathSegments.isEmpty) {
-            return DioException(
+            return DioException.requestCancelled(
               requestOptions: options,
-              type: DioExceptionType.cancel,
-              message: 'Try to access domain without path',
+              reason: Exception('Try to access domain without path'),
             );
           }
+
           return null;
         },
       ),

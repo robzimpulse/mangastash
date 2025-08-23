@@ -26,35 +26,27 @@ class StorageManager {
   StorageManager({required ValueGetter<Dio> dio, required LogBox logBox})
     : images = CustomCacheManager(
         Config('image', fileService: DioFileService(dio)),
-        logBox: logBox,
       ),
       converter = CustomCacheManager(
         Config('converter', fileService: DioFileService(dio)),
-        logBox: logBox,
       ),
       tags = CustomCacheManager(
         Config('tags', fileService: DioFileService(dio)),
-        logBox: logBox,
       ),
       manga = CustomCacheManager(
         Config('manga', fileService: DioFileService(dio)),
-        logBox: logBox,
       ),
       chapter = CustomCacheManager(
         Config('chapter', fileService: DioFileService(dio)),
-        logBox: logBox,
       ),
       html = CustomCacheManager(
         Config('html', fileService: DioFileService(dio)),
-        logBox: logBox,
       ),
       searchChapter = CustomCacheManager(
         Config('search_chapter', fileService: DioFileService(dio)),
-        logBox: logBox,
       ),
       searchManga = CustomCacheManager(
         Config('search_manga', fileService: DioFileService(dio)),
-        logBox: logBox,
       );
 
   Future<void> clear() async {
