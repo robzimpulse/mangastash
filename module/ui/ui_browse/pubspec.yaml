@@ -35,6 +35,10 @@ dependencies:
       url: https://github.com/robzimpulse/log_box.git
       ref: master
       path: packages/log_box
+  super_paging:
+    git:
+      url: https://github.com/robzimpulse/super_paging.git
+      ref: paging-sliver-grid
 
   # core
   core_environment:
@@ -57,4 +61,4 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^4.0.0
