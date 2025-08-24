@@ -120,8 +120,9 @@ class _GridWidgetState<T> extends State<GridWidget<T>> {
                           if (error is FailedParsingHtmlException) ...[
                             const SizedBox(height: 16),
                             OutlinedButton(
-                              onPressed:
-                                  () => widget.onTapRecrawl?.call(error.url),
+                              onPressed: () {
+                                widget.onTapRecrawl?.call(error.url);
+                              },
                               child: const Text('Open Debug Browser'),
                             ),
                           ],
