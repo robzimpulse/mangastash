@@ -1,5 +1,10 @@
+import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
+
+import 'package:core_environment/core_environment.dart';
 import 'package:feature_common/feature_common.dart';
 import 'package:super_paging/super_paging.dart';
+
+import 'typedef.dart';
 
 class PaginatedListWidget<K, V> extends StatefulWidget {
   const PaginatedListWidget({
@@ -39,7 +44,7 @@ class PaginatedListWidget<K, V> extends StatefulWidget {
 
   final double childAspectRatio;
 
-  final IndexedWidgetBuilder itemBuilder;
+  final ElementWidgetBuilder<V> itemBuilder;
 
   final PagingStateEmptyBuilder emptyBuilder;
 
@@ -47,7 +52,7 @@ class PaginatedListWidget<K, V> extends StatefulWidget {
 
   final PagingStateLoadingBuilder loadingBuilder;
 
-  final IndexedWidgetBuilder? separatorBuilder;
+  final ElementWidgetBuilder<V>? separatorBuilder;
 
   @override
   State<PaginatedListWidget<K, V>> createState() {
@@ -114,8 +119,17 @@ class _PaginatedListWidgetState<K, V> extends State<PaginatedListWidget<K, V>> {
         ),
         PagingSliverList.separated(
           pager: pager,
-          itemBuilder: widget.itemBuilder,
-          separatorBuilder: widget.separatorBuilder,
+          itemBuilder: (context, index) {
+            return widget.itemBuilder.call(
+              context,
+              pager.items.elementAt(index),
+            );
+          },
+          separatorBuilder: widget.separatorBuilder?.let((builder) {
+            return (context, index) {
+              return builder.call(context, pager.items.elementAt(index));
+            };
+          }),
           emptyBuilder: widget.emptyBuilder,
           errorBuilder: widget.errorBuilder,
           loadingBuilder: widget.loadingBuilder,

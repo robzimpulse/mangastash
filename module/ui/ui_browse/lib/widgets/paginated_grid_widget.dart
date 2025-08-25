@@ -1,6 +1,8 @@
 import 'package:feature_common/feature_common.dart';
 import 'package:super_paging/super_paging.dart';
 
+import 'typedef.dart';
+
 class PaginatedGridWidget<K, V> extends StatefulWidget {
   const PaginatedGridWidget({
     super.key,
@@ -38,7 +40,7 @@ class PaginatedGridWidget<K, V> extends StatefulWidget {
 
   final double childAspectRatio;
 
-  final IndexedWidgetBuilder itemBuilder;
+  final ElementWidgetBuilder<V> itemBuilder;
 
   final PagingStateEmptyBuilder emptyBuilder;
 
@@ -111,7 +113,12 @@ class _PaginatedGridWidgetState<K, V> extends State<PaginatedGridWidget<K, V>> {
         ),
         PagingSliverGrid.count(
           pager: pager,
-          itemBuilder: widget.itemBuilder,
+          itemBuilder: (context, index) {
+            return widget.itemBuilder.call(
+              context,
+              pager.items.elementAt(index),
+            );
+          },
           emptyBuilder: widget.emptyBuilder,
           errorBuilder: widget.errorBuilder,
           loadingBuilder: widget.loadingBuilder,
