@@ -35,9 +35,9 @@ class AdaptivePhysicListView extends ListView {
     super.padding,
     super.itemExtent,
     super.prototypeItem,
-    required IndexedWidgetBuilder itemBuilder,
-    ChildIndexGetter? findChildIndexCallback,
-    int? itemCount,
+    required IndexedWidgetBuilder super.itemBuilder,
+    super.findChildIndexCallback,
+    super.itemCount,
     super.addAutomaticKeepAlives,
     super.addRepaintBoundaries,
     super.addSemanticIndexes,
@@ -47,11 +47,7 @@ class AdaptivePhysicListView extends ListView {
     super.keyboardDismissBehavior,
     super.restorationId,
     super.clipBehavior,
-  }) : super.builder(
-          itemBuilder: itemBuilder,
-          findChildIndexCallback: findChildIndexCallback,
-          itemCount: itemCount,
-        );
+  }) : super.builder();
 
   AdaptivePhysicListView.separated({
     super.key,
@@ -62,10 +58,10 @@ class AdaptivePhysicListView extends ListView {
     super.physics = const AlwaysScrollableScrollPhysics(),
     super.shrinkWrap,
     super.padding,
-    required IndexedWidgetBuilder itemBuilder,
-    ChildIndexGetter? findChildIndexCallback,
-    required IndexedWidgetBuilder separatorBuilder,
-    required int itemCount,
+    required IndexedWidgetBuilder super.itemBuilder,
+    super.findChildIndexCallback,
+    required super.separatorBuilder,
+    required super.itemCount,
     super.addAutomaticKeepAlives,
     super.addRepaintBoundaries,
     super.addSemanticIndexes,
@@ -74,12 +70,7 @@ class AdaptivePhysicListView extends ListView {
     super.keyboardDismissBehavior,
     super.restorationId,
     super.clipBehavior,
-  }) : super.separated(
-          itemBuilder: itemBuilder,
-          separatorBuilder: separatorBuilder,
-          itemCount: itemCount,
-          findChildIndexCallback: findChildIndexCallback,
-        );
+  }) : super.separated();
 
   const AdaptivePhysicListView.custom({
     super.key,
@@ -92,12 +83,12 @@ class AdaptivePhysicListView extends ListView {
     super.padding,
     super.itemExtent,
     super.prototypeItem,
-    required SliverChildDelegate childrenDelegate,
+    required super.childrenDelegate,
     super.cacheExtent,
     super.semanticChildCount,
     super.dragStartBehavior,
     super.keyboardDismissBehavior,
     super.restorationId,
     super.clipBehavior,
-  }) : super.custom(childrenDelegate: childrenDelegate);
+  }) : super.custom();
 }

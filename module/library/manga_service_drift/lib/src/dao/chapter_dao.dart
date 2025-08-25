@@ -20,7 +20,7 @@ part 'chapter_dao.g.dart';
   ],
 )
 class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
-  ChapterDao(AppDatabase db) : super(db);
+  ChapterDao(super.db);
 
   late final ImageDao _imageDao = ImageDao(db);
 

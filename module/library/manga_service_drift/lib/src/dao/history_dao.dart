@@ -16,7 +16,7 @@ part 'history_dao.g.dart';
   ],
 )
 class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
-  HistoryDao(AppDatabase db) : super(db);
+  HistoryDao(super.db);
 
   JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
     return select(mangaTables).join(

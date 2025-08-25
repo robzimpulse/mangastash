@@ -20,7 +20,7 @@ part 'job_dao.g.dart';
   ],
 )
 class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
-  JobDao(AppDatabase db) : super(db);
+  JobDao(super.db);
 
   JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
     return select(jobTables).join(

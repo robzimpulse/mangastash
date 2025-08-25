@@ -56,7 +56,7 @@ class MangaLibraryServiceFirebase {
   Stream<List<String>> stream({required String userId}) {
     final stream = _ref.doc(userId).snapshots();
     return stream.map(
-      (event) => [...?event.data()?.values.whereType<String>().toList()],
+      (event) => [...?event.data()?.values.whereType<String>()],
     );
   }
 }

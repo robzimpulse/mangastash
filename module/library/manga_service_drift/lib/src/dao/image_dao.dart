@@ -12,7 +12,7 @@ part 'image_dao.g.dart';
   ],
 )
 class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
-  ImageDao(AppDatabase db) : super(db);
+  ImageDao(super.db);
 
   List<OrderingTerm Function($ImageTablesTable)> get _clauses {
     return [(o) => OrderingTerm(expression: o.order, mode: OrderingMode.asc)];
