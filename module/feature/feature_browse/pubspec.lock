@@ -1298,7 +1298,7 @@ packages:
     description:
       path: "."
       ref: paging-sliver-grid
-      resolved-ref: "2acd44eacfeaa64949eca4d13202045b1d6b7c8b"
+      resolved-ref: "8c6364ffb5327ad74c534711fa6306fab025bd32"
       url: "https://github.com/robzimpulse/super_paging.git"
     source: git
     version: "0.2.0"
