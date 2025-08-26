@@ -88,7 +88,6 @@ class _PaginatedListWidgetState<K, V> extends State<PaginatedListWidget<K, V>> {
         initialKey: widget.initialKey,
         config: widget.config,
         pagingSourceFactory: () => widget.source,
-        initialState: PagingState.fromPages(pager.pages),
       );
     }
 
