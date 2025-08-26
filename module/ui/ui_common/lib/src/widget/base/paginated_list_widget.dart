@@ -105,7 +105,7 @@ class _PaginatedListWidgetState<K, V> extends State<PaginatedListWidget<K, V>> {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
+    Widget view = CustomScrollView(
       key: widget.pageStorageKey,
       slivers: [
         SliverToBoxAdapter(
@@ -132,6 +132,18 @@ class _PaginatedListWidgetState<K, V> extends State<PaginatedListWidget<K, V>> {
           loadingBuilder: widget.loadingBuilder,
         ),
       ],
+    );
+
+    return ValueListenableBuilder(
+      valueListenable: offset,
+      builder: (context, value, child) {
+        return RefreshIndicator(
+          onRefresh: () => pager.refresh(resetPages: true),
+          edgeOffset: value,
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
+      child: view,
     );
   }
 }
