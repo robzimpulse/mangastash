@@ -110,21 +110,27 @@ class _PaginatedGridWidgetState<K, V> extends State<PaginatedGridWidget<K, V>> {
             builder: (context, value, _) => SizedBox(height: value),
           ),
         ),
-        PagingSliverGrid.count(
-          pager: pager,
-          itemBuilder: (context, index) {
-            return widget.itemBuilder.call(
-              context,
-              pager.items.elementAt(index),
-            );
-          },
-          emptyBuilder: widget.emptyBuilder,
-          errorBuilder: widget.errorBuilder,
-          loadingBuilder: widget.loadingBuilder,
-          crossAxisCount: widget.crossAxisCount,
-          mainAxisSpacing: widget.mainAxisSpacing,
-          crossAxisSpacing: widget.crossAxisSpacing,
-          childAspectRatio: widget.childAspectRatio,
+        SliverPadding(
+          padding: EdgeInsets.symmetric(
+            vertical: widget.mainAxisSpacing,
+            horizontal: widget.crossAxisSpacing,
+          ),
+          sliver: PagingSliverGrid.count(
+            pager: pager,
+            itemBuilder: (context, index) {
+              return widget.itemBuilder.call(
+                context,
+                pager.items.elementAt(index),
+              );
+            },
+            emptyBuilder: widget.emptyBuilder,
+            errorBuilder: widget.errorBuilder,
+            loadingBuilder: widget.loadingBuilder,
+            crossAxisCount: widget.crossAxisCount,
+            mainAxisSpacing: widget.mainAxisSpacing,
+            crossAxisSpacing: widget.crossAxisSpacing,
+            childAspectRatio: widget.childAspectRatio,
+          ),
         ),
       ],
     );

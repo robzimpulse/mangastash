@@ -9,10 +9,7 @@ class PaginatedListWidget<K, V> extends StatefulWidget {
     super.key,
     this.pageStorageKey,
     this.absorber,
-    required this.crossAxisCount,
-    this.mainAxisSpacing = 0.0,
-    this.crossAxisSpacing = 0.0,
-    this.childAspectRatio = 1.0,
+    this.padding = EdgeInsets.zero,
 
     this.initialKey,
     required this.config,
@@ -34,13 +31,7 @@ class PaginatedListWidget<K, V> extends StatefulWidget {
 
   final SliverOverlapAbsorberHandle? absorber;
 
-  final int crossAxisCount;
-
-  final double mainAxisSpacing;
-
-  final double crossAxisSpacing;
-
-  final double childAspectRatio;
+  final EdgeInsetsGeometry padding;
 
   final ElementWidgetBuilder<V> itemBuilder;
 
@@ -114,22 +105,25 @@ class _PaginatedListWidgetState<K, V> extends State<PaginatedListWidget<K, V>> {
             builder: (context, value, _) => SizedBox(height: value),
           ),
         ),
-        PagingSliverList.separated(
-          pager: pager,
-          itemBuilder: (context, index) {
-            return widget.itemBuilder.call(
-              context,
-              pager.items.elementAt(index),
-            );
-          },
-          separatorBuilder: widget.separatorBuilder?.let((builder) {
-            return (context, index) {
-              return builder.call(context, pager.items.elementAt(index));
-            };
-          }),
-          emptyBuilder: widget.emptyBuilder,
-          errorBuilder: widget.errorBuilder,
-          loadingBuilder: widget.loadingBuilder,
+        SliverPadding(
+          padding: widget.padding,
+          sliver: PagingSliverList.separated(
+            pager: pager,
+            itemBuilder: (context, index) {
+              return widget.itemBuilder.call(
+                context,
+                pager.items.elementAt(index),
+              );
+            },
+            separatorBuilder: widget.separatorBuilder?.let((builder) {
+              return (context, index) {
+                return builder.call(context, pager.items.elementAt(index));
+              };
+            }),
+            emptyBuilder: widget.emptyBuilder,
+            errorBuilder: widget.errorBuilder,
+            loadingBuilder: widget.loadingBuilder,
+          ),
         ),
       ],
     );
