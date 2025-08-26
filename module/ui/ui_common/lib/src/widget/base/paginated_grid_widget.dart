@@ -84,7 +84,7 @@ class _PaginatedGridWidgetState<K, V> extends State<PaginatedGridWidget<K, V>> {
         initialKey: widget.initialKey,
         config: widget.config,
         pagingSourceFactory: () => widget.source,
-      );
+      )..refresh(resetPages: true);
     }
 
     if (oldWidget.absorber != widget.absorber) {
