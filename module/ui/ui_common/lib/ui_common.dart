@@ -10,6 +10,7 @@ export 'package:log_box/log_box.dart';
 export 'package:responsive_framework/responsive_framework.dart';
 export 'package:share_plus/share_plus.dart';
 export 'package:sliver_tools/sliver_tools.dart';
+export 'package:super_paging/super_paging.dart';
 
 export 'src/extension/bottom_sheet_extension.dart';
 export 'src/extension/expansion_tile_extension.dart';
