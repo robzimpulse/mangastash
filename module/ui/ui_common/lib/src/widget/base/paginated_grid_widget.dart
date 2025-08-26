@@ -1,7 +1,7 @@
-import 'package:feature_common/feature_common.dart';
+import 'package:flutter/material.dart';
 import 'package:super_paging/super_paging.dart';
 
-import 'typedef.dart';
+import '../../util/typedef.dart';
 
 class PaginatedGridWidget<K, V> extends StatefulWidget {
   const PaginatedGridWidget({

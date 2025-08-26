@@ -1,4 +1,4 @@
-import 'package:feature_common/feature_common.dart';
+import 'package:flutter/material.dart';
 
 typedef ElementWidgetBuilder<Value> =
     Widget Function(BuildContext context, Value element);

@@ -1,10 +1,8 @@
-import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
-
 import 'package:core_environment/core_environment.dart';
-import 'package:feature_common/feature_common.dart';
+import 'package:flutter/material.dart';
 import 'package:super_paging/super_paging.dart';
 
-import 'typedef.dart';
+import '../../util/typedef.dart';
 
 class PaginatedListWidget<K, V> extends StatefulWidget {
   const PaginatedListWidget({

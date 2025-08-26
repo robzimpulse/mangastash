@@ -14,11 +14,6 @@ dependencies:
   collection: ^1.16.0
   filesystem_picker: ^4.1.0
   rxdart: ^0.27.7
-  log_box:
-    git:
-      url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box
 
   # library
   service_locator:

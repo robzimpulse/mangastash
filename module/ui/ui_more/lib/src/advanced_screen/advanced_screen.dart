@@ -1,5 +1,4 @@
 import 'package:core_storage/core_storage.dart';
-import 'package:log_box/log_box.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';

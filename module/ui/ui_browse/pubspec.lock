@@ -730,7 +730,7 @@ packages:
     source: hosted
     version: "4.0.0"
   log_box:
-    dependency: "direct main"
+    dependency: transitive
     description:
       path: "packages/log_box"
       ref: master
@@ -1294,7 +1294,7 @@ packages:
     source: hosted
     version: "1.4.1"
   super_paging:
-    dependency: "direct main"
+    dependency: transitive
     description:
       path: "."
       ref: paging-sliver-grid
