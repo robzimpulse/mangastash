@@ -2,20 +2,21 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:flutter/material.dart';
 import 'package:safe_bloc/safe_bloc.dart';
+import 'package:ui_common/ui_common.dart' hide Error;
 
 import 'browse_manga_screen_state.dart';
 
 class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     with AutoSubscriptionMixin {
-  final SearchMangaUseCase _searchMangaUseCase;
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
   final AddToLibraryUseCase _addToLibraryUseCase;
   final PrefetchMangaUseCase _prefetchMangaUseCase;
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final GetTagsUseCase _getTagsUseCase;
   final RecrawlUseCase _recrawlUseCase;
+
+  late final Pager<SearchMangaParameter, Manga> pager;
 
   BrowseMangaScreenCubit({
     required BrowseMangaScreenState initialState,
@@ -29,8 +30,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required GetTagsUseCase getTagsUseCase,
     required RecrawlUseCase recrawlUseCase,
-  }) : _searchMangaUseCase = searchMangaUseCase,
-       _addToLibraryUseCase = addToLibraryUseCase,
+  }) : _addToLibraryUseCase = addToLibraryUseCase,
        _removeFromLibraryUseCase = removeFromLibraryUseCase,
        _prefetchMangaUseCase = prefetchMangaUseCase,
        _prefetchChapterUseCase = prefetchChapterUseCase,
@@ -52,6 +52,63 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
         _updatePrefetchState,
       ),
     );
+    pager = Pager(
+      initialKey: initialState.parameter,
+      config: const PagingConfig(pageSize: 20),
+      pagingSourceFactory: () {
+        return PagingSource.builder(
+          loader: (params) async {
+            final stream = listenSearchParameterUseCase.searchParameterState;
+            const fallback = SearchMangaParameter();
+            final initial = stream.valueOrNull;
+            final key = (params.key ?? initial ?? fallback).copyWith(
+              limit: params.loadSize,
+            );
+
+            final result = await searchMangaUseCase.execute(
+              useCache: false,
+              parameter: SourceSearchMangaParameter(
+                source: initialState.source ?? SourceEnum.mangadex,
+                parameter: key,
+              ),
+            );
+
+            if (result is Success<Pagination<Manga>>) {
+              final items = result.data.data;
+
+              if (items == null) {
+                return LoadResultError(DataNotFoundException());
+              }
+
+              final prevPage = key.page - 1;
+              final prevOffset = key.offset - items.length;
+              final isPrevValid = prevPage > 0 || prevOffset > 0;
+              final prevKey = key.copyWith(
+                page: prevPage,
+                limit: params.loadSize,
+                offset: prevOffset,
+              );
+
+              return LoadResultPage(
+                items: items,
+                nextKey: key.copyWith(
+                  page: key.page + 1,
+                  limit: params.loadSize,
+                  offset: key.offset + items.length,
+                ),
+                prevKey: isPrevValid ? prevKey : null,
+              );
+            }
+
+            if (result is Error<Pagination<Manga>>) {
+              return LoadResultError(result.error);
+            }
+
+            return LoadResultError(Exception('Unknown Error'));
+          },
+        );
+      },
+    );
   }
 
   void _updateLibraryState(Set<String> libraryMangaIds) {
@@ -62,33 +119,12 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     emit(state.copyWith(prefetchedMangaIds: prefetchedMangaIds));
   }
 
-  Future<void> init({
-    SearchMangaParameter? parameter,
-    bool refresh = false,
-  }) async {
-    emit(
-      state.copyWith(
-        isLoading: true,
-        mangas: [],
-        parameter: (parameter ?? state.parameter).copyWith(
-          offset: 0,
-          page: 1,
-          limit: 20,
-        ),
-      ),
-    );
-
-    if (refresh) await _clearMangaCache();
-
-    await Future.wait([_fetchManga(), _fetchTags()]);
-
-    emit(state.copyWith(isLoading: false));
-  }
-
-  Future<void> _fetchTags() async {
+  Future<void> fetchTags() async {
     final source = state.source;
 
     if (source == null) return;
+
+    emit(state.copyWith(isLoading: true, error: () => null));
 
     final result = await _getTagsUseCase.execute(source: source);
 
@@ -99,71 +135,73 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     if (result is Error<List<Tag>>) {
       emit(state.copyWith(error: () => result.error));
     }
+
+    emit(state.copyWith(isLoading: false));
   }
 
-  Future<void> _clearMangaCache() async {
-    final source = state.source;
+  // Future<void> _clearMangaCache() async {
+  //   final source = state.source;
+  //
+  //   if (source == null) return;
+  //
+  //   await _searchMangaUseCase.clear(
+  //     parameter: SourceSearchMangaParameter(
+  //       source: source,
+  //       parameter: state.parameter,
+  //     ),
+  //   );
+  // }
 
-    if (source == null) return;
+  // Future<void> _fetchManga() async {
+  //   final source = state.source;
+  //
+  //   if (source == null) return;
+  //
+  //   final result = await _searchMangaUseCase.execute(
+  //     parameter: SourceSearchMangaParameter(
+  //       source: source,
+  //       parameter: state.parameter,
+  //     ),
+  //   );
+  //
+  //   if (result is Success<Pagination<Manga>>) {
+  //     final offset = result.data.offset ?? 0;
+  //     final page = result.data.page ?? 0;
+  //     final limit = result.data.limit ?? 0;
+  //     final total = result.data.total ?? 0;
+  //     final mangas = result.data.data ?? [];
+  //     final hasNextPage = result.data.hasNextPage;
+  //
+  //     final allMangas = [...state.mangas, ...mangas].distinct();
+  //
+  //     emit(
+  //       state.copyWith(
+  //         mangas: allMangas,
+  //         hasNextPage: hasNextPage ?? allMangas.length < total,
+  //         parameter: state.parameter.copyWith(
+  //           page: page + 1,
+  //           offset: offset + limit,
+  //           limit: limit,
+  //         ),
+  //         error: () => null,
+  //       ),
+  //     );
+  //   }
+  //
+  //   if (result is Error<Pagination<Manga>>) {
+  //     emit(state.copyWith(error: () => result.error));
+  //   }
+  // }
 
-    await _searchMangaUseCase.clear(
-      parameter: SourceSearchMangaParameter(
-        source: source,
-        parameter: state.parameter,
-      ),
-    );
-  }
+  // Future<void> next() async {
+  //   if (!state.hasNextPage || state.isPagingNextPage) return;
+  //   emit(state.copyWith(isPagingNextPage: true));
+  //   await _fetchManga();
+  //   emit(state.copyWith(isPagingNextPage: false));
+  // }
 
-  Future<void> _fetchManga() async {
-    final source = state.source;
-
-    if (source == null) return;
-
-    final result = await _searchMangaUseCase.execute(
-      parameter: SourceSearchMangaParameter(
-        source: source,
-        parameter: state.parameter,
-      ),
-    );
-
-    if (result is Success<Pagination<Manga>>) {
-      final offset = result.data.offset ?? 0;
-      final page = result.data.page ?? 0;
-      final limit = result.data.limit ?? 0;
-      final total = result.data.total ?? 0;
-      final mangas = result.data.data ?? [];
-      final hasNextPage = result.data.hasNextPage;
-
-      final allMangas = [...state.mangas, ...mangas].distinct();
-
-      emit(
-        state.copyWith(
-          mangas: allMangas,
-          hasNextPage: hasNextPage ?? allMangas.length < total,
-          parameter: state.parameter.copyWith(
-            page: page + 1,
-            offset: offset + limit,
-            limit: limit,
-          ),
-          error: () => null,
-        ),
-      );
-    }
-
-    if (result is Error<Pagination<Manga>>) {
-      emit(state.copyWith(error: () => result.error));
-    }
-  }
-
-  Future<void> next() async {
-    if (!state.hasNextPage || state.isPagingNextPage) return;
-    emit(state.copyWith(isPagingNextPage: true));
-    await _fetchManga();
-    emit(state.copyWith(isPagingNextPage: false));
-  }
-
-  void update({bool? isSearchActive}) {
-    emit(state.copyWith(isSearchActive: isSearchActive));
+  void update({bool? isSearchActive, SearchMangaParameter? parameter}) {
+    emit(state.copyWith(isSearchActive: isSearchActive, parameter: parameter));
   }
 
   Future<void> addToLibrary({required Manga manga}) async {
@@ -191,6 +229,6 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
   void recrawl({required BuildContext context, required String url}) async {
     await _recrawlUseCase.execute(context: context, url: url);
-    await init();
+    await pager.refresh(refreshKey: state.parameter);
   }
 }
