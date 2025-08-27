@@ -10,10 +10,9 @@ class PaginatedListWidget<K, V> extends StatefulWidget {
     this.pageStorageKey,
     this.absorber,
     this.padding = EdgeInsets.zero,
+    this.onRefresh,
 
-    this.initialKey,
-    required this.config,
-    required this.source,
+    required this.pager,
     required this.itemBuilder,
     required this.emptyBuilder,
     required this.errorBuilder,
@@ -21,11 +20,7 @@ class PaginatedListWidget<K, V> extends StatefulWidget {
     required this.separatorBuilder,
   });
 
-  final K? initialKey;
-
-  final PagingConfig config;
-
-  final PagingSource<K, V> source;
+  final Pager<K, V> pager;
 
   final PageStorageKey<String>? pageStorageKey;
 
@@ -43,6 +38,8 @@ class PaginatedListWidget<K, V> extends StatefulWidget {
 
   final ElementWidgetBuilder<V>? separatorBuilder;
 
+  final RefreshCallback? onRefresh;
+
   @override
   State<PaginatedListWidget<K, V>> createState() {
     return _PaginatedListWidgetState<K, V>();
@@ -50,37 +47,11 @@ class PaginatedListWidget<K, V> extends StatefulWidget {
 }
 
 class _PaginatedListWidgetState<K, V> extends State<PaginatedListWidget<K, V>> {
-  late Pager<K, V> pager;
-  late ValueNotifier<double> offset;
-
-  @override
-  void initState() {
-    pager = Pager(
-      initialKey: widget.initialKey,
-      config: widget.config,
-      pagingSourceFactory: () => widget.source,
-    );
-    offset = ValueNotifier(0);
-    super.initState();
-  }
+  final ValueNotifier<double> offset = ValueNotifier(0);
 
   @override
   void didUpdateWidget(covariant PaginatedListWidget<K, V> oldWidget) {
     super.didUpdateWidget(oldWidget);
-
-    final shouldReInitPager = [
-      oldWidget.initialKey != widget.initialKey,
-      oldWidget.config != widget.config,
-      oldWidget.source != widget.source,
-    ].any((e) => e);
-
-    if (shouldReInitPager) {
-      pager = Pager(
-        initialKey: widget.initialKey,
-        config: widget.config,
-        pagingSourceFactory: () => widget.source,
-      )..refresh(resetPages: true);
-    }
 
     if (oldWidget.absorber != widget.absorber) {
       offset.value = widget.absorber?.layoutExtent ?? 0;
@@ -89,7 +60,6 @@ class _PaginatedListWidgetState<K, V> extends State<PaginatedListWidget<K, V>> {
 
   @override
   void dispose() {
-    pager.dispose();
     offset.dispose();
     super.dispose();
   }
@@ -108,16 +78,19 @@ class _PaginatedListWidgetState<K, V> extends State<PaginatedListWidget<K, V>> {
         SliverPadding(
           padding: widget.padding,
           sliver: PagingSliverList.separated(
-            pager: pager,
+            pager: widget.pager,
             itemBuilder: (context, index) {
               return widget.itemBuilder.call(
                 context,
-                pager.items.elementAt(index),
+                widget.pager.items.elementAt(index),
               );
             },
             separatorBuilder: widget.separatorBuilder?.let((builder) {
               return (context, index) {
-                return builder.call(context, pager.items.elementAt(index));
+                return builder.call(
+                  context,
+                  widget.pager.items.elementAt(index),
+                );
               };
             }),
             emptyBuilder: widget.emptyBuilder,
@@ -128,11 +101,13 @@ class _PaginatedListWidgetState<K, V> extends State<PaginatedListWidget<K, V>> {
       ],
     );
 
+    final onRefresh = widget.onRefresh;
     return ValueListenableBuilder(
       valueListenable: offset,
       builder: (context, value, child) {
+        if (onRefresh == null) return child ?? const SizedBox.shrink();
         return RefreshIndicator(
-          onRefresh: () => pager.refresh(resetPages: true),
+          onRefresh: onRefresh,
           edgeOffset: value,
           child: child ?? const SizedBox.shrink(),
         );
