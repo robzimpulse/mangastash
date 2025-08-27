@@ -22,7 +22,7 @@ part 'manga_dao.g.dart';
   ],
 )
 class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
-  MangaDao(AppDatabase db) : super(db);
+  MangaDao(super.db);
 
   late final TagDao _tagDao = TagDao(db);
 

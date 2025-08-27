@@ -14,11 +14,6 @@ dependencies:
   collection: ^1.16.0
   filesystem_picker: ^4.1.0
   rxdart: ^0.27.7
-  log_box:
-    git:
-      url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box
 
   # library
   service_locator:
@@ -51,4 +46,4 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^4.0.0

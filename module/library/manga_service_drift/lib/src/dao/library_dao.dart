@@ -19,7 +19,7 @@ part 'library_dao.g.dart';
   ],
 )
 class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
-  LibraryDao(AppDatabase db) : super(db);
+  LibraryDao(super.db);
 
   JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
     final order = [

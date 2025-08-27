@@ -94,15 +94,17 @@ class _GridWidgetState<T> extends State<GridWidget<T>> {
                   children: List.generate(
                     20,
                     (e) => LayoutBuilder(
-                      builder: (context, constraint) => ConstrainedBox(
-                        constraints: constraint,
-                        child: ShimmerLoading.box(
-                          radius: 0,
-                          isLoading: true,
-                          width: double.infinity,
-                          height: double.infinity,
-                        ),
-                      ),
+                      builder: (context, constraint) {
+                        return ConstrainedBox(
+                          constraints: constraint,
+                          child: ShimmerLoading.box(
+                            radius: 0,
+                            isLoading: true,
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 )
@@ -118,9 +120,9 @@ class _GridWidgetState<T> extends State<GridWidget<T>> {
                           if (error is FailedParsingHtmlException) ...[
                             const SizedBox(height: 16),
                             OutlinedButton(
-                              onPressed: () => widget.onTapRecrawl?.call(
-                                error.url,
-                              ),
+                              onPressed: () {
+                                widget.onTapRecrawl?.call(error.url);
+                              },
                               child: const Text('Open Debug Browser'),
                             ),
                           ],
@@ -168,9 +170,7 @@ class _GridWidgetState<T> extends State<GridWidget<T>> {
                   const SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 10),
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
+                      child: Center(child: CircularProgressIndicator()),
                     ),
                   ),
               ],

@@ -17,7 +17,7 @@ part 'tag_dao.g.dart';
   ],
 )
 class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
-  TagDao(AppDatabase db) : super(db);
+  TagDao(super.db);
 
   SimpleSelectStatement<$TagTablesTable, TagDrift> get _selector {
     return select(tagTables);
