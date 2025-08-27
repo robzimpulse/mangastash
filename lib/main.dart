@@ -1,11 +1,11 @@
-import 'dart:isolate';
+import 'dart:async';
 
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutterrific_opentelemetry/flutterrific_opentelemetry.dart';
 import 'package:log_box_navigation_logger/log_box_navigation_logger.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -19,6 +19,32 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   // Service locator/dependency injector code here
   ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
+
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterOTel.reportError(
+      'FlutterError.onError',
+      details.exception,
+      details.stack,
+    );
+  };
+
+  runZonedGuarded(
+    () {
+      FlutterOTel.initialize(
+        serviceName: 'mangastash-app',
+        serviceVersion: '0.1.7',
+        tracerName: 'main',
+        resourceAttributes: Attributes.of({
+          'deployment.environment': 'debug',
+          'service.namespace': 'mobile-apps',
+        }),
+      );
+    },
+    (error, stacktrace) {
+      FlutterOTel.reportError('Zone Error', error, stacktrace);
+    },
+  );
+
   runApp(MangaStashApp(locator: ServiceLocator.asNewInstance()));
 }
 
@@ -68,42 +94,42 @@ class _MangaStashAppState extends State<MangaStashApp> {
     await widget.locator.registerRegistrar(CoreRouteRegistrar());
     await widget.locator.registerRegistrar(DomainMangaRegistrar());
 
-    FlutterError.onError = (details) {
-      final LogBox log = widget.locator();
-      log.log(
-        details.exceptionAsString(),
-        name: 'FlutterError',
-        error: details.exception,
-        stackTrace: details.stack,
-      );
-    };
-
-    PlatformDispatcher.instance.onError = (error, stack) {
-      final LogBox log = widget.locator();
-      log.log(
-        error.toString(),
-        name: 'PlatformDispatcher',
-        error: error,
-        stackTrace: stack,
-      );
-      return true;
-    };
-
-    Isolate.current.addErrorListener(
-      RawReceivePort((pair) {
-        if (pair is! List) return;
-        final LogBox log = widget.locator();
-        final Object? error = pair.firstOrNull.castOrNull();
-        final String? trace = pair.lastOrNull.castOrNull();
-
-        log.log(
-          error.toString(),
-          name: 'Isolate',
-          error: error,
-          stackTrace: trace?.let((e) => StackTrace.fromString(e)),
-        );
-      }).sendPort,
-    );
+    // FlutterError.onError = (details) {
+    //   final LogBox log = widget.locator();
+    //   log.log(
+    //     details.exceptionAsString(),
+    //     name: 'FlutterError',
+    //     error: details.exception,
+    //     stackTrace: details.stack,
+    //   );
+    // };
+    //
+    // PlatformDispatcher.instance.onError = (error, stack) {
+    //   final LogBox log = widget.locator();
+    //   log.log(
+    //     error.toString(),
+    //     name: 'PlatformDispatcher',
+    //     error: error,
+    //     stackTrace: stack,
+    //   );
+    //   return true;
+    // };
+    //
+    // Isolate.current.addErrorListener(
+    //   RawReceivePort((pair) {
+    //     if (pair is! List) return;
+    //     final LogBox log = widget.locator();
+    //     final Object? error = pair.firstOrNull.castOrNull();
+    //     final String? trace = pair.lastOrNull.castOrNull();
+    //
+    //     log.log(
+    //       error.toString(),
+    //       name: 'Isolate',
+    //       error: error,
+    //       stackTrace: trace?.let((e) => StackTrace.fromString(e)),
+    //     );
+    //   }).sendPort,
+    // );
   }
 
   GoRouter _route({
@@ -126,9 +152,13 @@ class _MangaStashAppState extends State<MangaStashApp> {
         locator: locator,
         rootNavigatorKey: rootNavigatorKey,
         // TODO: add observer here
-        observers: () => [logBox.observer],
+        observers: () => [logBox.observer, OTelNavigatorObserver()],
       ),
-      observers: [logBox.observer, viewer.navigatorObserver],
+      observers: [
+        logBox.observer,
+        viewer.navigatorObserver,
+        OTelNavigatorObserver(),
+      ],
     );
   }
 }
