@@ -5,10 +5,12 @@ import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
+import 'package:faro/faro_sdk.dart';
 import 'package:flutter/foundation.dart';
 import 'package:log_box_navigation_logger/log_box_navigation_logger.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
+import 'package:universal_io/io.dart';
 
 import 'main_path.dart';
 import 'main_route.dart';
@@ -19,7 +21,37 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   // Service locator/dependency injector code here
   ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
-  runApp(MangaStashApp(locator: ServiceLocator.asNewInstance()));
+
+  HttpOverrides.global = FaroHttpOverrides(HttpOverrides.current);
+
+  Faro().runApp(
+    optionsConfiguration: FaroConfig(
+      appName: 'mangastash-app',
+      appVersion: '0.1.7',
+      appEnv: 'debug',
+      apiKey: '88e35ef2cb40323b1a7f17c6a8b1e177',
+      collectorUrl: 'https://faro-collector-prod-ap-southeast-2.grafana.net/collect/88e35ef2cb40323b1a7f17c6a8b1e177',
+      enableCrashReporting: true,
+      anrTracking: true,
+      refreshRateVitals: true,
+      namespace: 'flutter'
+      // collectorHeaders: {
+      //   ... // custom headers to be sent with each request to the collector url
+      // }
+    ),
+    appRunner: () {
+      return runApp(
+        DefaultAssetBundle(
+          bundle: FaroAssetBundle(),
+          child: FaroUserInteractionWidget(
+            child: MangaStashApp(locator: ServiceLocator.asNewInstance()),
+          ),
+        ),
+      );
+    },
+  );
+
+  // runApp(MangaStashApp(locator: ServiceLocator.asNewInstance()));
 }
 
 class MangaStashApp extends StatefulWidget {
@@ -126,9 +158,13 @@ class _MangaStashAppState extends State<MangaStashApp> {
         locator: locator,
         rootNavigatorKey: rootNavigatorKey,
         // TODO: add observer here
-        observers: () => [logBox.observer],
+        observers: () => [logBox.observer, FaroNavigationObserver()],
       ),
-      observers: [logBox.observer, viewer.navigatorObserver],
+      observers: [
+        logBox.observer,
+        viewer.navigatorObserver,
+        FaroNavigationObserver(),
+      ],
     );
   }
 }

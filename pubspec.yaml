@@ -17,6 +17,7 @@ dependencies:
   flex_color_scheme: ^7.3.1
   rxdart: ^0.27.7
   universal_io: ^2.2.2
+  faro: ^0.3.2
   log_box:
     git:
       url: https://github.com/robzimpulse/log_box.git
