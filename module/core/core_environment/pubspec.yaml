@@ -27,6 +27,10 @@ dependencies:
       url: https://github.com/robzimpulse/log_box.git
       ref: master
       path: packages/log_box
+  faro:
+    git:
+      url: https://github.com/grafana/faro-flutter-sdk
+      ref: chore/remove_intl_dependency
 
   # library
   service_locator:

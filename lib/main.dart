@@ -5,7 +5,6 @@ import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
-import 'package:faro/faro_sdk.dart';
 import 'package:flutter/foundation.dart';
 import 'package:log_box_navigation_logger/log_box_navigation_logger.dart';
 import 'package:service_locator/service_locator.dart';
@@ -35,9 +34,6 @@ void main() {
       anrTracking: true,
       refreshRateVitals: true,
       namespace: 'flutter'
-      // collectorHeaders: {
-      //   ... // custom headers to be sent with each request to the collector url
-      // }
     ),
     appRunner: () {
       return runApp(

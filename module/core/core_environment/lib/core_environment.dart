@@ -1,5 +1,6 @@
 library core_environment;
 
+export 'package:faro/faro.dart';
 export 'package:intl/intl.dart';
 export 'package:package_info_plus/package_info_plus.dart';
 export 'package:permission_handler/permission_handler.dart';

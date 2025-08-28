@@ -1202,7 +1202,7 @@ PODS:
     - Flutter
   - device_info_plus (0.0.1):
     - Flutter
-  - faro (0.3.2):
+  - faro (0.4.1):
     - Flutter
     - PLCrashReporter
   - Firebase/Auth (11.15.0):
@@ -1516,8 +1516,8 @@ SPEC CHECKSUMS:
   BoringSSL-GRPC: dded2a44897e45f28f08ae87a55ee4bcd19bc508
   cloud_firestore: 97e42181866db3cba3fe3935895ab779b6acacd6
   connectivity_plus: 2a701ffec2c0ae28a48cf7540e279787e77c447d
-  device_info_plus: 97af1d7e84681a90d0693e63169a5d50e0839a0d
-  faro: 466a3152fc60caa9b1d659ec15ad507acf29ba25
+  device_info_plus: bf2e3232933866d73fe290f2942f2156cdd10342
+  faro: 31c505fe8c0578d533c4614b657cbfe44f408aa3
   Firebase: d99ac19b909cd2c548339c2241ecd0d1599ab02e
   firebase_auth: 5342db41af2ba5ed32a6177d9e326eecbebda912
   firebase_core: 99a37263b3c27536063a7b601d9e2a49400a433c
