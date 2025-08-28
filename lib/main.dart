@@ -21,33 +21,36 @@ void main() {
   // Service locator/dependency injector code here
   ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
 
-  HttpOverrides.global = FaroHttpOverrides(HttpOverrides.current);
-
-  Faro().runApp(
-    optionsConfiguration: FaroConfig(
-      appName: 'mangastash-app',
-      appVersion: '0.1.7',
-      appEnv: 'debug',
-      apiKey: '88e35ef2cb40323b1a7f17c6a8b1e177',
-      collectorUrl: 'https://faro-collector-prod-ap-southeast-2.grafana.net/collect/88e35ef2cb40323b1a7f17c6a8b1e177',
-      enableCrashReporting: true,
-      anrTracking: true,
-      refreshRateVitals: true,
-      namespace: 'flutter'
-    ),
-    appRunner: () {
-      return runApp(
-        DefaultAssetBundle(
-          bundle: FaroAssetBundle(),
-          child: FaroUserInteractionWidget(
-            child: MangaStashApp(locator: ServiceLocator.asNewInstance()),
+  const faroApiKey = String.fromEnvironment('FARO_API_KEY');
+  const faroCollectorUrl = String.fromEnvironment('FARO_COLLECTOR_URL');
+  if (faroApiKey.isNotEmpty && faroCollectorUrl.isNotEmpty) {
+    HttpOverrides.global = FaroHttpOverrides(HttpOverrides.current);
+    Faro().runApp(
+      optionsConfiguration: FaroConfig(
+        appName: 'mangastash-app',
+        appVersion: '0.1.7',
+        appEnv: 'debug',
+        apiKey: faroApiKey,
+        collectorUrl: faroCollectorUrl,
+        enableCrashReporting: true,
+        anrTracking: true,
+        refreshRateVitals: true,
+        namespace: 'flutter',
+      ),
+      appRunner: () {
+        return runApp(
+          DefaultAssetBundle(
+            bundle: FaroAssetBundle(),
+            child: FaroUserInteractionWidget(
+              child: MangaStashApp(locator: ServiceLocator.asNewInstance()),
+            ),
           ),
-        ),
-      );
-    },
-  );
-
-  // runApp(MangaStashApp(locator: ServiceLocator.asNewInstance()));
+        );
+      },
+    );
+  } else {
+    runApp(MangaStashApp(locator: ServiceLocator.asNewInstance()));
+  }
 }
 
 class MangaStashApp extends StatefulWidget {
