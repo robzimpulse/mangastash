@@ -32,60 +32,79 @@ class SearchMangaUseCase with SyncMangasMixin, SpanMixin {
 
   Future<Pagination<Manga>> _mangadex({
     required SourceSearchMangaParameter parameter,
+    required Span parent,
   }) async {
-    final result = await _mangaRepository.search(
-      parameter: parameter.parameter.copyWith(
-        includes: [
-          ...?parameter.parameter.includes,
-          Include.author,
-          Include.coverArt,
-        ],
-      ),
-    );
+    return await span(
+      process: () async {
+        final result = await _mangaRepository.search(
+          parameter: parameter.parameter.copyWith(
+            includes: [
+              ...?parameter.parameter.includes,
+              Include.author,
+              Include.coverArt,
+            ],
+          ),
+        );
 
-    return Pagination(
-      data: [
-        ...?result.data?.map(
+        final data = result.data?.map(
           (e) => Manga.from(data: e).copyWith(source: parameter.source.name),
-        ),
-      ],
-      offset: result.offset?.toInt(),
-      limit: result.limit?.toInt() ?? 0,
-      total: result.total?.toInt() ?? 0,
+        );
+
+        return Pagination(
+          data: [...?data],
+          offset: result.offset?.toInt(),
+          limit: result.limit?.toInt() ?? 0,
+          total: result.total?.toInt() ?? 0,
+        );
+      },
+      attributes: {'parameter': parameter.toString()},
+      parent: parent,
     );
   }
 
   Future<Pagination<Manga>> _scrapping({
     required SourceSearchMangaParameter parameter,
+    required Span parent,
     bool useCache = true,
   }) async {
-    final url = parameter.url;
+    return await span(
+      process: () async {
+        final url = parameter.url;
 
-    if (url == null) {
-      throw DataNotFoundException();
-    }
+        if (url == null) {
+          throw DataNotFoundException();
+        }
 
-    final document = await _webview.open(url, useCache: useCache);
+        final document = await _webview.open(url, useCache: useCache);
 
-    if (document == null) {
-      throw FailedParsingHtmlException(url);
-    }
+        if (document == null) {
+          throw FailedParsingHtmlException(url);
+        }
 
-    final parser = MangaListHtmlParser.forSource(
-      root: document,
-      source: parameter.source,
-      storageManager: _storageManager,
-    );
+        final parser = MangaListHtmlParser.forSource(
+          root: document,
+          source: parameter.source,
+          storageManager: _storageManager,
+        );
 
-    final mangas = await parser.mangas;
+        final mangas = await parser.mangas;
 
-    return Pagination(
-      data: [...mangas.map((e) => e.copyWith(source: parameter.source.name))],
-      page: parameter.parameter.page,
-      limit: mangas.length,
-      total: mangas.length,
-      hasNextPage: await parser.haveNextPage,
-      sourceUrl: parameter.url,
+        return Pagination(
+          data: [
+            ...mangas.map((e) => e.copyWith(source: parameter.source.name)),
+          ],
+          page: parameter.parameter.page,
+          limit: mangas.length,
+          total: mangas.length,
+          hasNextPage: await parser.haveNextPage,
+          sourceUrl: parameter.url,
+        );
+      },
+      attributes: {
+        'parameter': parameter.toString(),
+        'useCache': useCache.toString(),
+      },
+      parent: parent,
     );
   }
 
@@ -137,9 +156,13 @@ class SearchMangaUseCase with SyncMangasMixin, SpanMixin {
         try {
           final Pagination<Manga> data;
           if (parameter.source == SourceEnum.mangadex) {
-            data = await _mangadex(parameter: parameter);
+            data = await _mangadex(parameter: parameter, parent: span);
           } else {
-            data = await _scrapping(parameter: parameter, useCache: useCache);
+            data = await _scrapping(
+              parameter: parameter,
+              useCache: useCache,
+              parent: span,
+            );
           }
 
           final result = data.copyWith(
