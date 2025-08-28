@@ -15,7 +15,7 @@ import '../../mixin/sync_chapters_mixin.dart';
 import '../../parser/base/chapter_list_html_parser.dart';
 
 class SearchChapterUseCase
-    with SyncChaptersMixin, SortChaptersMixin, FilterChaptersMixin {
+    with SyncChaptersMixin, SortChaptersMixin, FilterChaptersMixin, SpanMixin {
   final ChapterRepository _chapterRepository;
   final HeadlessWebviewManager _webview;
   final StorageManager _storageManager;
@@ -147,47 +147,64 @@ class SearchChapterUseCase
     required SourceSearchChapterParameter parameter,
     bool useCache = true,
   }) async {
-    final key = parameter.toJsonString();
-    final cache = await _storageManager.searchChapter.getFileFromCache(key);
-    final file = await cache?.file.readAsString(encoding: utf8);
-    final data = file.let((e) {
-      return Pagination.fromJsonString(
-        e,
-        (e) => Chapter.fromJson(e.castOrNull()),
-      );
-    });
+    return faro.startSpan(
+      '$runtimeType',
+      (span) async {
+        final key = parameter.toJsonString();
+        final cache = await _storageManager.searchChapter.getFileFromCache(key);
+        final file = await cache?.file.readAsString(encoding: utf8);
+        final data = file.let((e) {
+          return Pagination.fromJsonString(
+            e,
+            (e) => Chapter.fromJson(e.castOrNull()),
+          );
+        });
 
-    if (data != null && useCache) {
-      return Success(data);
-    }
+        if (data != null && useCache) {
+          span.setStatus(SpanStatusCode.ok);
+          span.setAttribute('source', 'Cache');
+          span.end();
+          return Success(data);
+        }
 
-    try {
-      final Pagination<Chapter> data;
-      if (parameter.source == SourceEnum.mangadex) {
-        data = await _mangadex(parameter: parameter);
-      } else {
-        data = await _scrapping(parameter: parameter, useCache: useCache);
-      }
+        try {
+          final Pagination<Chapter> data;
+          if (parameter.source == SourceEnum.mangadex) {
+            data = await _mangadex(parameter: parameter);
+          } else {
+            data = await _scrapping(parameter: parameter, useCache: useCache);
+          }
 
-      final result = data.copyWith(
-        data: await sync(
-          dao: _chapterDao,
-          values: [...?data.data],
-          logBox: _logBox,
-        ),
-      );
+          final result = data.copyWith(
+            data: await sync(
+              dao: _chapterDao,
+              values: [...?data.data],
+              logBox: _logBox,
+            ),
+          );
 
-      await _storageManager.searchChapter.putFile(
-        key,
-        key: key,
-        utf8.encode(result.toJsonString((e) => e.toJson())),
-        fileExtension: 'json',
-        maxAge: const Duration(minutes: 30),
-      );
+          await _storageManager.searchChapter.putFile(
+            key,
+            key: key,
+            utf8.encode(result.toJsonString((e) => e.toJson())),
+            fileExtension: 'json',
+            maxAge: const Duration(minutes: 30),
+          );
 
-      return Success(result);
-    } catch (e) {
-      return Error(e);
-    }
+          span.setStatus(SpanStatusCode.ok);
+          return Success(result);
+        } catch (e) {
+          span.setStatus(SpanStatusCode.error, message: e.toString());
+          return Error(e);
+        } finally {
+          span.setAttribute('source', 'Service');
+          span.end();
+        }
+      },
+      attributes: {
+        'parameter': parameter.toString(),
+        'useCache': useCache.toString(),
+      },
+    );
   }
 }

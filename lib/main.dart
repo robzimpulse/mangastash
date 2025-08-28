@@ -23,6 +23,7 @@ void main() {
 
   const faroApiKey = String.fromEnvironment('FARO_API_KEY');
   const faroCollectorUrl = String.fromEnvironment('FARO_COLLECTOR_URL');
+
   if (faroApiKey.isNotEmpty && faroCollectorUrl.isNotEmpty) {
     HttpOverrides.global = FaroHttpOverrides(HttpOverrides.current);
     Faro().runApp(
