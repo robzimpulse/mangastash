@@ -16,7 +16,7 @@ import 'main_route.dart';
 import 'screen/apps_screen.dart';
 import 'screen/splash_screen.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Service locator/dependency injector code here
   ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
@@ -26,11 +26,12 @@ void main() {
 
   if (faroApiKey.isNotEmpty && faroCollectorUrl.isNotEmpty) {
     HttpOverrides.global = FaroHttpOverrides(HttpOverrides.current);
+    final info = await PackageInfo.fromPlatform();
     Faro().runApp(
       optionsConfiguration: FaroConfig(
-        appName: 'mangastash-app',
-        appVersion: '0.1.7',
-        appEnv: 'debug',
+        appName: info.appName,
+        appVersion: info.version,
+        appEnv: kDebugMode ? 'debug' : 'release',
         apiKey: faroApiKey,
         collectorUrl: faroCollectorUrl,
         enableCrashReporting: true,
