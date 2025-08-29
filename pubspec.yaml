@@ -39,6 +39,8 @@ dependencies:
     path: module/library/manga_service_drift
 
   # core
+  core_analytics:
+    path: module/core/core_analytics
   core_environment:
     path: module/core/core_environment
   core_network:

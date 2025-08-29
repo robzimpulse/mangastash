@@ -1,5 +1,4 @@
-import 'dart:isolate';
-
+import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';

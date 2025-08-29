@@ -1,6 +1,5 @@
 library core_environment;
 
-export 'package:faro/faro.dart';
 export 'package:intl/intl.dart';
 export 'package:package_info_plus/package_info_plus.dart';
 export 'package:permission_handler/permission_handler.dart';
@@ -19,7 +18,6 @@ export 'src/extension/locale_extension.dart';
 export 'src/extension/parseable_date_string_extension.dart';
 export 'src/extension/readable_date_format_extension.dart';
 export 'src/extension/try_cast_extension.dart';
-export 'src/mixin/span_mixin.dart';
 export 'src/use_case/listen_current_timezone_use_case.dart';
 export 'src/use_case/listen_locale_use_case.dart';
 export 'src/use_case/listen_theme_use_case.dart';

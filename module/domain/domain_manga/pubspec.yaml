@@ -27,6 +27,8 @@ dependencies:
       path: packages/log_box_in_app_webview_logger
 
   # core
+  core_analytics:
+    path: ../../core/core_analytics
   core_network:
     path: ../../core/core_network
   core_environment:

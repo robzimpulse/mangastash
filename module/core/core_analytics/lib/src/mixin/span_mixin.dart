@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:faro/faro.dart';
 import 'package:flutter/foundation.dart';
 
-import '../extension/stacktrace_extension.dart';
+import '../extension/stack_trace_extension.dart';
 
 mixin SpanMixin {
   Faro get faro => Faro();
@@ -14,7 +14,7 @@ mixin SpanMixin {
     Span? parent,
   }) {
     return faro.startSpan<T>(
-      StackTrace.current.traces.callerFunctionName,
+      StackTrace.current.callerFunctionName ?? 'Anonymous',
       (span) async {
         try {
           final result = await process.call();
@@ -30,15 +30,5 @@ mixin SpanMixin {
       attributes: attributes ?? {},
       parentSpan: parent,
     );
-  }
-}
-
-class LocalTransport extends FaroTransport {
-  LocalTransport(): super(apiKey: '', collectorUrl: '');
-
-  @override
-  Future<void> send(Map<String, dynamic> payloadJson) {
-    // TODO: implement send
-    throw UnimplementedError();
   }
 }
