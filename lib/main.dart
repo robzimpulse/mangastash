@@ -91,9 +91,8 @@ class _MangaStashAppState extends State<MangaStashApp> {
   Future<void> initiateAppLocator() async {
     if (widget.testing) return;
 
-    widget.locator.registerSingleton(LogBox(capacity: 1000));
-
     // TODO: register module registrar here
+    await widget.locator.registerRegistrar(CoreAnalyticsRegistrar());
     await widget.locator.registerRegistrar(CoreStorageRegistrar());
     await widget.locator.registerRegistrar(CoreNetworkRegistrar());
     await widget.locator.registerRegistrar(CoreEnvironmentRegistrar());

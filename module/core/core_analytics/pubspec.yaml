@@ -17,6 +17,10 @@ dependencies:
       ref: master
       path: packages/log_box
 
+  # library
+  service_locator:
+    path: ../../library/service_locator
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
