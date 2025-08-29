@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import '../extension/stacktrace_extension.dart';
 
 mixin SpanMixin {
-
   Faro get faro => Faro();
 
   FutureOr<T> span<T>({
@@ -31,5 +30,15 @@ mixin SpanMixin {
       attributes: attributes ?? {},
       parentSpan: parent,
     );
+  }
+}
+
+class LocalTransport extends FaroTransport {
+  LocalTransport(): super(apiKey: '', collectorUrl: '');
+
+  @override
+  Future<void> send(Map<String, dynamic> payloadJson) {
+    // TODO: implement send
+    throw UnimplementedError();
   }
 }

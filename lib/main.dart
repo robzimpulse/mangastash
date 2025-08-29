@@ -101,42 +101,43 @@ class _MangaStashAppState extends State<MangaStashApp> {
     await widget.locator.registerRegistrar(CoreRouteRegistrar());
     await widget.locator.registerRegistrar(DomainMangaRegistrar());
 
-    FlutterError.onError = (details) {
-      final LogBox log = widget.locator();
-      log.log(
-        details.exceptionAsString(),
-        name: 'FlutterError',
-        error: details.exception,
-        stackTrace: details.stack,
-      );
-    };
-
-    PlatformDispatcher.instance.onError = (error, stack) {
-      final LogBox log = widget.locator();
-      log.log(
-        error.toString(),
-        name: 'PlatformDispatcher',
-        error: error,
-        stackTrace: stack,
-      );
-      return true;
-    };
-
-    Isolate.current.addErrorListener(
-      RawReceivePort((pair) {
-        if (pair is! List) return;
-        final LogBox log = widget.locator();
-        final Object? error = pair.firstOrNull.castOrNull();
-        final String? trace = pair.lastOrNull.castOrNull();
-
-        log.log(
-          error.toString(),
-          name: 'Isolate',
-          error: error,
-          stackTrace: trace?.let((e) => StackTrace.fromString(e)),
-        );
-      }).sendPort,
-    );
+    // TODO: commented for a while to test analytics
+    // FlutterError.onError = (details) {
+    //   final LogBox log = widget.locator();
+    //   log.log(
+    //     details.exceptionAsString(),
+    //     name: 'FlutterError',
+    //     error: details.exception,
+    //     stackTrace: details.stack,
+    //   );
+    // };
+    //
+    // PlatformDispatcher.instance.onError = (error, stack) {
+    //   final LogBox log = widget.locator();
+    //   log.log(
+    //     error.toString(),
+    //     name: 'PlatformDispatcher',
+    //     error: error,
+    //     stackTrace: stack,
+    //   );
+    //   return true;
+    // };
+    //
+    // Isolate.current.addErrorListener(
+    //   RawReceivePort((pair) {
+    //     if (pair is! List) return;
+    //     final LogBox log = widget.locator();
+    //     final Object? error = pair.firstOrNull.castOrNull();
+    //     final String? trace = pair.lastOrNull.castOrNull();
+    //
+    //     log.log(
+    //       error.toString(),
+    //       name: 'Isolate',
+    //       error: error,
+    //       stackTrace: trace?.let((e) => StackTrace.fromString(e)),
+    //     );
+    //   }).sendPort,
+    // );
   }
 
   GoRouter _route({
