@@ -11,6 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   faro: ^0.4.2
+  universal_io: ^2.2.2
   log_box:
     git:
       url: https://github.com/robzimpulse/log_box.git

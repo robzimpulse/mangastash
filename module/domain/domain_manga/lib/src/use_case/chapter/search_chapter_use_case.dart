@@ -16,7 +16,12 @@ import '../../mixin/sync_chapters_mixin.dart';
 import '../../parser/base/chapter_list_html_parser.dart';
 
 class SearchChapterUseCase
-    with SyncChaptersMixin, SortChaptersMixin, FilterChaptersMixin, SpanMixin {
+    with
+        SyncChaptersMixin,
+        SortChaptersMixin,
+        FilterChaptersMixin,
+        FaroMixin,
+        SpanMixin {
   final ChapterRepository _chapterRepository;
   final HeadlessWebviewManager _webview;
   final StorageManager _storageManager;
@@ -40,10 +45,10 @@ class SearchChapterUseCase
 
   Future<Pagination<Chapter>> _mangadex({
     required SourceSearchChapterParameter parameter,
-    required Span parent,
+    Span? parent,
   }) async {
     return await span(
-      process: () async {
+      body: () async {
         final result = await _chapterRepository.feed(
           mangaId: parameter.mangaId,
           parameter: parameter.parameter.copyWith(
@@ -85,11 +90,11 @@ class SearchChapterUseCase
 
   Future<Pagination<Chapter>> _scrapping({
     required SourceSearchChapterParameter parameter,
-    required Span parent,
+    Span? parent,
     bool useCache = true,
   }) async {
     return await span(
-      process: () async {
+      body: () async {
         final raw = await _mangaDao.search(ids: [parameter.mangaId]);
         final result = Manga.fromDatabase(raw.firstOrNull);
 
@@ -167,7 +172,7 @@ class SearchChapterUseCase
     required SourceSearchChapterParameter parameter,
     bool useCache = true,
   }) async {
-    return faro.startSpan(
+    return await startSpan(
       '$runtimeType',
       (span) async {
         final key = parameter.toJsonString();
@@ -181,9 +186,9 @@ class SearchChapterUseCase
         });
 
         if (data != null && useCache) {
-          span.setStatus(SpanStatusCode.ok);
-          span.setAttribute('source', 'Cache');
-          span.end();
+          span?.setStatus(SpanStatusCode.ok);
+          span?.setAttribute('source', 'Cache');
+          span?.end();
           return Success(data);
         }
 
@@ -215,14 +220,14 @@ class SearchChapterUseCase
             maxAge: const Duration(minutes: 30),
           );
 
-          span.setStatus(SpanStatusCode.ok);
+          span?.setStatus(SpanStatusCode.ok);
           return Success(result);
         } catch (e) {
-          span.setStatus(SpanStatusCode.error, message: e.toString());
+          span?.setStatus(SpanStatusCode.error, message: e.toString());
           return Error(e);
         } finally {
-          span.setAttribute('source', 'Service');
-          span.end();
+          span?.setAttribute('source', 'Service');
+          span?.end();
         }
       },
       attributes: {

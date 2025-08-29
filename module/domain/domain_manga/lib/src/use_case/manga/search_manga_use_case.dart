@@ -12,7 +12,7 @@ import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../parser/base/manga_list_html_parser.dart';
 
-class SearchMangaUseCase with SyncMangasMixin, SpanMixin {
+class SearchMangaUseCase with SyncMangasMixin, FaroMixin, SpanMixin {
   final MangaRepository _mangaRepository;
   final HeadlessWebviewManager _webview;
   final StorageManager _storageManager;
@@ -33,10 +33,10 @@ class SearchMangaUseCase with SyncMangasMixin, SpanMixin {
 
   Future<Pagination<Manga>> _mangadex({
     required SourceSearchMangaParameter parameter,
-    required Span parent,
+    Span? parent,
   }) async {
     return await span(
-      process: () async {
+      body: () async {
         final result = await _mangaRepository.search(
           parameter: parameter.parameter.copyWith(
             includes: [
@@ -65,11 +65,11 @@ class SearchMangaUseCase with SyncMangasMixin, SpanMixin {
 
   Future<Pagination<Manga>> _scrapping({
     required SourceSearchMangaParameter parameter,
-    required Span parent,
+    Span? parent,
     bool useCache = true,
   }) async {
     return await span(
-      process: () async {
+      body: () async {
         final url = parameter.url;
 
         if (url == null) {
@@ -134,7 +134,7 @@ class SearchMangaUseCase with SyncMangasMixin, SpanMixin {
     required SourceSearchMangaParameter parameter,
     bool useCache = true,
   }) async {
-    return faro.startSpan(
+    return await startSpan(
       '$runtimeType',
       (span) async {
         final key = parameter.toJsonString();
@@ -148,9 +148,9 @@ class SearchMangaUseCase with SyncMangasMixin, SpanMixin {
         });
 
         if (data != null && useCache) {
-          span.setStatus(SpanStatusCode.ok);
-          span.setAttribute('source', 'Cache');
-          span.end();
+          span?.setStatus(SpanStatusCode.ok);
+          span?.setAttribute('source', 'Cache');
+          span?.end();
           return Success(data);
         }
 
@@ -182,14 +182,14 @@ class SearchMangaUseCase with SyncMangasMixin, SpanMixin {
             maxAge: const Duration(minutes: 30),
           );
 
-          span.setStatus(SpanStatusCode.ok);
+          span?.setStatus(SpanStatusCode.ok);
           return Success(result);
         } catch (e) {
-          span.setStatus(SpanStatusCode.error, message: e.toString());
+          span?.setStatus(SpanStatusCode.error, message: e.toString());
           return Error(e);
         } finally {
-          span.setAttribute('source', 'Service');
-          span.end();
+          span?.setAttribute('source', 'Service');
+          span?.end();
         }
       },
       attributes: {
