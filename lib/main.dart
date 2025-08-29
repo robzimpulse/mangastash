@@ -4,11 +4,9 @@ import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
-import 'package:flutter/foundation.dart';
 import 'package:log_box_navigation_logger/log_box_navigation_logger.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
-import 'package:universal_io/io.dart';
 
 import 'main_path.dart';
 import 'main_route.dart';
@@ -19,39 +17,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Service locator/dependency injector code here
   ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
-
-  const faroApiKey = String.fromEnvironment('FARO_API_KEY');
-  const faroCollectorUrl = String.fromEnvironment('FARO_COLLECTOR_URL');
-
-  if (faroApiKey.isNotEmpty && faroCollectorUrl.isNotEmpty) {
-    HttpOverrides.global = FaroHttpOverrides(HttpOverrides.current);
-    final info = await PackageInfo.fromPlatform();
-    Faro().runApp(
-      optionsConfiguration: FaroConfig(
-        appName: info.appName,
-        appVersion: info.version,
-        appEnv: kDebugMode ? 'debug' : 'release',
-        apiKey: faroApiKey,
-        collectorUrl: faroCollectorUrl,
-        enableCrashReporting: true,
-        anrTracking: true,
-        refreshRateVitals: true,
-        namespace: 'flutter',
-      ),
-      appRunner: () {
-        return runApp(
-          DefaultAssetBundle(
-            bundle: FaroAssetBundle(),
-            child: FaroUserInteractionWidget(
-              child: MangaStashApp(locator: ServiceLocator.asNewInstance()),
-            ),
-          ),
-        );
-      },
-    );
-  } else {
-    runApp(MangaStashApp(locator: ServiceLocator.asNewInstance()));
-  }
+  FaroMixin.runApp(MangaStashApp(locator: ServiceLocator.asNewInstance()));
 }
 
 class MangaStashApp extends StatefulWidget {
