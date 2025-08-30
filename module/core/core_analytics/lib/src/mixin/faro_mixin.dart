@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:faro/faro.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -10,6 +12,7 @@ mixin FaroMixin {
 
   static void runApp(Widget app) async {
     if (!(Platform.isAndroid || Platform.isIOS)) {
+      log('Running Without Faro: Platform not android or ios', name: 'Mangastash');
       runApp(app);
       return;
     }
@@ -18,6 +21,7 @@ mixin FaroMixin {
     const faroCollectorUrl = String.fromEnvironment('FARO_COLLECTOR_URL');
 
     if (faroApiKey.isEmpty || faroCollectorUrl.isEmpty) {
+      log('Running Without Faro: api key and collector url empty', name: 'Mangastash');
       runApp(app);
       return;
     }
@@ -25,6 +29,8 @@ mixin FaroMixin {
     HttpOverrides.global = FaroHttpOverrides(HttpOverrides.current);
 
     final info = await PackageInfo.fromPlatform();
+
+    log('Start Running With Faro', name: 'Mangastash');
 
     Faro().runApp(
       optionsConfiguration: FaroConfig(
@@ -39,6 +45,7 @@ mixin FaroMixin {
         namespace: 'flutter',
       ),
       appRunner: () {
+        log('Running With Faro', name: 'Mangastash');
         return runApp(
           DefaultAssetBundle(
             bundle: FaroAssetBundle(),
