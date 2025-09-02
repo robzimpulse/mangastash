@@ -17,6 +17,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.7.1"
+  archive:
+    dependency: transitive
+    description:
+      name: archive
+      sha256: cb6a278ef2dbb298455e1a713bda08524a175630ec643a242c399c932a0a1f7d
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.6.1"
   args:
     dependency: transitive
     description:
@@ -300,6 +308,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.1"
+  dartastic_opentelemetry:
+    dependency: transitive
+    description:
+      name: dartastic_opentelemetry
+      sha256: f61fec0265233ddc5e229e6cb72b5746662212937b59000300292b103cc18126
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.8.6"
+  dartastic_opentelemetry_api:
+    dependency: transitive
+    description:
+      name: dartastic_opentelemetry_api
+      sha256: "2507cc6e5e79b4217965d778f5b9756c0dd41ffb29746f5c4f7150f439410078"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.8.5"
   db_viewer:
     dependency: transitive
     description:
@@ -553,6 +577,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutterrific_opentelemetry:
+    dependency: transitive
+    description:
+      name: flutterrific_opentelemetry
+      sha256: f56550dfca582dce21876cf3ee4f2cd94227433466b987f85bdf30ffd6c178ef
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1"
   freezed_annotation:
     dependency: transitive
     description:
@@ -593,6 +625,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "14.8.1"
+  google_identity_services_web:
+    dependency: transitive
+    description:
+      name: google_identity_services_web
+      sha256: "5d187c46dc59e02646e10fe82665fc3884a9b71bc1c90c2b8b749316d33ee454"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.3+1"
+  googleapis_auth:
+    dependency: transitive
+    description:
+      name: googleapis_auth
+      sha256: befd71383a955535060acde8792e7efc11d2fccd03dd1d3ec434e85b68775938
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.6.0"
   graphs:
     dependency: transitive
     description:
@@ -601,6 +649,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.2"
+  grpc:
+    dependency: transitive
+    description:
+      name: grpc
+      sha256: e93ee3bce45c134bf44e9728119102358c7cd69de7832d9a874e2e74eb8cab40
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.4"
   html:
     dependency: transitive
     description:
@@ -617,6 +673,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.0"
+  http2:
+    dependency: transitive
+    description:
+      name: http2
+      sha256: "382d3aefc5bd6dc68c6b892d7664f29b5beb3251611ae946a98d35158a82bbfa"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.1"
   http_cache_core:
     dependency: transitive
     description:
@@ -1003,6 +1067,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.1"
+  protobuf:
+    dependency: transitive
+    description:
+      name: protobuf
+      sha256: "68645b24e0716782e58948f8467fd42a880f255096a821f9e7d0ec625b00c84d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0"
   provider:
     dependency: transitive
     description:

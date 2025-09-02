@@ -373,7 +373,7 @@ packages:
     source: hosted
     version: "0.8.6"
   dartastic_opentelemetry_api:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: dartastic_opentelemetry_api
       sha256: "23cdb2a447ca5d8b96196f1eb7a225d84e23a53f96b7e1c86a16655a689b325f"
@@ -740,7 +740,7 @@ packages:
     source: sdk
     version: "0.0.0"
   flutterrific_opentelemetry:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: flutterrific_opentelemetry
       sha256: f56550dfca582dce21876cf3ee4f2cd94227433466b987f85bdf30ffd6c178ef
