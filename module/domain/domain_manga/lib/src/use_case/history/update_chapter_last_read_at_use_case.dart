@@ -1,6 +1,6 @@
+import 'package:core_analytics/core_analytics.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:log_box/log_box.dart';
 
 import '../../mixin/sync_chapters_mixin.dart';
 

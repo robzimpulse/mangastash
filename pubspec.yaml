@@ -17,17 +17,6 @@ dependencies:
   flex_color_scheme: ^7.3.1
   rxdart: ^0.27.7
   universal_io: ^2.2.2
-  flutterrific_opentelemetry: 0.3.1
-  log_box:
-    git:
-      url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box
-  log_box_navigation_logger:
-    git:
-      url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box_navigation_logger
 
   # library
   safe_bloc:
@@ -40,6 +29,8 @@ dependencies:
     path: module/library/manga_service_drift
 
   # core
+  core_analytics:
+    path: module/core/core_analytics
   core_environment:
     path: module/core/core_environment
   core_network:
@@ -79,7 +70,4 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
-dependency_overrides:
-  dartastic_opentelemetry_api: 0.8.4
 

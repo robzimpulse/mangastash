@@ -12,15 +12,14 @@ dependencies:
     sdk: flutter
   go_router: ^14.0.0
   rxdart: ^0.27.7
-  log_box:
-    git:
-      url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box
 
   # library
   service_locator:
     path: ../../library/service_locator
+
+  # core
+  core_analytics:
+    path: ../../core/core_analytics
 
 dev_dependencies:
   flutter_test:
