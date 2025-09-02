@@ -16,7 +16,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   // Service locator/dependency injector code here
   ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
-  FaroMixin.runApp(MangaStashApp(locator: ServiceLocator.asNewInstance()));
+  FaroMixin.runner(MangaStashApp(locator: ServiceLocator.asNewInstance()));
 }
 
 class MangaStashApp extends StatefulWidget {
