@@ -24,17 +24,14 @@ dependencies:
     git:
       url: https://github.com/robzimpulse/super_paging.git
       ref: paging-sliver-grid
-  log_box:
-    git:
-      url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box
 
   # entity
   entity_manga:
     path: ../../entity/entity_manga
 
   # core
+  core_analytics:
+    path: ../../core/core_analytics
   core_route:
     path: ../../core/core_route
   core_environment:

@@ -660,7 +660,7 @@ packages:
     source: hosted
     version: "4.0.0"
   log_box:
-    dependency: "direct main"
+    dependency: transitive
     description:
       path: "packages/log_box"
       ref: master
@@ -678,9 +678,18 @@ packages:
     source: git
     version: "0.0.1"
   log_box_in_app_webview_logger:
-    dependency: "direct main"
+    dependency: transitive
     description:
       path: "packages/log_box_in_app_webview_logger"
+      ref: master
+      resolved-ref: "3cc1ae9a450230d7c2e796b22b30858c41e5a2f4"
+      url: "https://github.com/robzimpulse/log_box.git"
+    source: git
+    version: "0.0.1"
+  log_box_navigation_logger:
+    dependency: transitive
+    description:
+      path: "packages/log_box_navigation_logger"
       ref: master
       resolved-ref: "3cc1ae9a450230d7c2e796b22b30858c41e5a2f4"
       url: "https://github.com/robzimpulse/log_box.git"

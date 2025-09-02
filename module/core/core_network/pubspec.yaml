@@ -14,18 +14,10 @@ dependencies:
   dio_smart_retry: ^6.0.0
   mutex: ^3.1.0
   universal_io: ^2.2.2
-  log_box:
-    git:
-      url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box
-  log_box_dio_logger:
-    git:
-      url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box_dio_logger
 
   # core
+  core_analytics:
+    path: ../../core/core_analytics
   core_storage:
     path: ../core_storage
 
