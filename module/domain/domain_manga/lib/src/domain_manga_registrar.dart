@@ -1,4 +1,4 @@
-import 'package:log_box/log_box.dart';
+import 'package:core_analytics/core_analytics.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 

@@ -1,7 +1,7 @@
+import 'package:core_analytics/core_analytics.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:log_box/log_box.dart';
 
 import '../custom_cache_manager/custom_cache_manager.dart';
 import 'file_service/dio_file_service.dart';

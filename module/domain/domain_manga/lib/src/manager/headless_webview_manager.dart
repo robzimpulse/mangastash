@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
-import 'package:log_box/log_box.dart';
-import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
 import 'package:universal_io/io.dart';
 
 class HeadlessWebviewManager {
