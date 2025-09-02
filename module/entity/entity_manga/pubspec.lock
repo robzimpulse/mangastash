@@ -194,7 +194,7 @@ packages:
     source: hosted
     version: "3.1.2"
   core_analytics:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../../core/core_analytics"
       relative: true
