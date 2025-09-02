@@ -17,10 +17,14 @@ import 'screen/apps_screen.dart';
 import 'screen/splash_screen.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
   // Service locator/dependency injector code here
   ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
-  OTelMixin.runApp(MangaStashApp(locator: ServiceLocator.asNewInstance()));
+  OTelMixin.runner(
+    runApp: () {
+      WidgetsFlutterBinding.ensureInitialized();
+      runApp(MangaStashApp(locator: ServiceLocator.asNewInstance()));
+    },
+  );
 }
 
 class MangaStashApp extends StatefulWidget {

@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/widgets.dart' as widget;
+import 'package:flutter/widgets.dart';
 import 'package:flutterrific_opentelemetry/flutterrific_opentelemetry.dart';
 
 mixin OTelMixin {
@@ -12,7 +12,10 @@ mixin OTelMixin {
     FlutterOTel.reportError(message, error, stackTrace, attributes: attributes);
   }
 
-  static void runApp(widget.Widget app) async {
+  static void runner({
+    required VoidCallback runApp,
+    bool enableDebugLog = false,
+  }) async {
     runZonedGuarded(
       () {
         FlutterOTel.initialize(
@@ -25,7 +28,14 @@ mixin OTelMixin {
           }),
         );
 
-        widget.runApp(app);
+        if (enableDebugLog) {
+          OTelLog.logFunction = print;
+          OTelLog.spanLogFunction = print;
+          OTelLog.exportLogFunction = print;
+          OTelLog.metricLogFunction = print;
+        }
+
+        runApp();
       },
       (error, stacktrace) {
         FlutterOTel.reportError('Zone Error', error, stacktrace);
@@ -33,7 +43,7 @@ mixin OTelMixin {
     );
   }
 
-  static widget.NavigatorObserver get observer {
+  static NavigatorObserver get observer {
     return OTelNavigatorObserver();
   }
 }
