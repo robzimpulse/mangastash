@@ -26,6 +26,7 @@ mixin OTelMixin {
             'deployment.environment': 'debug',
             'service.namespace': 'mobile-apps',
           }),
+          secure: false,
         );
 
         if (enableDebugLog) {

@@ -20,6 +20,7 @@ void main() {
   // Service locator/dependency injector code here
   ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
   OTelMixin.runner(
+    enableDebugLog: true,
     runApp: () {
       WidgetsFlutterBinding.ensureInitialized();
       runApp(MangaStashApp(locator: ServiceLocator.asNewInstance()));
