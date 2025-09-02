@@ -22,6 +22,8 @@ dependencies:
     path: ../../library/safe_bloc
 
   # core
+  core_analytics:
+    path: ../../core/core_analytics
   core_environment:
     path: ../../core/core_environment
   core_route:

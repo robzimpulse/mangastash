@@ -1,19 +1,20 @@
-import 'package:core_analytics/core_analytics.dart';
+import 'package:log_box/log_box.dart';
 import 'package:service_locator/service_locator.dart';
 
-class CoreRouteRegistrar extends Registrar {
+class CoreAnalyticsRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    final LogBox log = locator();
+
+    final log = LogBox(capacity: 1000);
 
     log.log(
       'Register ${runtimeType.toString()}',
-      id: runtimeType.toString(),
       name: 'Services',
+      id: runtimeType.toString(),
       extra: {'start': DateTime.timestamp().toIso8601String()},
     );
 
-    // TODO: register any manager here
+    locator.registerSingleton(log);
 
     log.log(
       'Register ${runtimeType.toString()}',

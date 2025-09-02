@@ -1,8 +1,7 @@
+import 'package:core_analytics/core_analytics.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
-import 'package:log_box/log_box.dart';
-import 'package:log_box_dio_logger/log_box_dio_logger.dart';
 import 'package:universal_io/io.dart';
 
 import '../interceptor/dio_reject_interceptor.dart';

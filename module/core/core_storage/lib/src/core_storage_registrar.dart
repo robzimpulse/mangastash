@@ -1,4 +1,4 @@
-import 'package:log_box/log_box.dart' hide Storage;
+import 'package:core_analytics/core_analytics.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:shared_preferences/shared_preferences.dart';

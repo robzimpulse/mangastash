@@ -19,16 +19,15 @@ dependencies:
   path: ^1.9.0
   dio: ^5.7.0
   universal_io: ^2.2.2
-  log_box:
-    git:
-      url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box
 
   service_locator:
     path: ../../library/service_locator
   manga_service_drift:
     path: ../../library/manga_service_drift
+
+  # core
+  core_analytics:
+    path: ../../core/core_analytics
 
 dev_dependencies:
   flutter_test:

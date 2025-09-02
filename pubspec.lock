@@ -281,6 +281,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  core_analytics:
+    dependency: "direct main"
+    description:
+      path: "module/core/core_analytics"
+      relative: true
+    source: path
+    version: "0.0.1"
   core_environment:
     dependency: "direct main"
     description:
@@ -893,7 +900,7 @@ packages:
     source: hosted
     version: "4.0.0"
   log_box:
-    dependency: "direct main"
+    dependency: transitive
     description:
       path: "packages/log_box"
       ref: master
@@ -920,7 +927,7 @@ packages:
     source: git
     version: "0.0.1"
   log_box_navigation_logger:
-    dependency: "direct main"
+    dependency: transitive
     description:
       path: "packages/log_box_navigation_logger"
       ref: master
