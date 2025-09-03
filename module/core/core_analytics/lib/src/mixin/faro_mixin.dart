@@ -29,7 +29,6 @@ mixin FaroMixin {
     Faro().runApp(
       optionsConfiguration: FaroConfig(
         appName: info.appName,
-        appVersion: info.version,
         appEnv: kDebugMode ? 'debug' : 'release',
         apiKey: faroApiKey,
         collectorUrl: faroCollectorUrl,
