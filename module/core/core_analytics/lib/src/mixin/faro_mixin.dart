@@ -5,15 +5,10 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:universal_io/io.dart';
 
 mixin FaroMixin {
-  /// faro only support ios and android only
-  Faro? get faro => Platform.isAndroid || Platform.isIOS ? Faro() : null;
+
+  Faro get faro => Faro();
 
   static void runner(Widget app) async {
-    if (!(Platform.isAndroid || Platform.isIOS)) {
-      runApp(app);
-      return;
-    }
-
     const faroApiKey = String.fromEnvironment('FARO_API_KEY');
     const faroCollectorUrl = String.fromEnvironment('FARO_COLLECTOR_URL');
 
