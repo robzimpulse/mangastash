@@ -22,13 +22,9 @@ mixin FaroMixin {
       return;
     }
 
-    HttpOverrides.global = FaroHttpOverrides(HttpOverrides.current);
-
-    final info = await PackageInfo.fromPlatform();
-
-    Faro().runApp(
+    await Faro().init(
       optionsConfiguration: FaroConfig(
-        appName: info.appName,
+        appName: (await PackageInfo.fromPlatform()).appName,
         appEnv: kDebugMode ? 'debug' : 'release',
         apiKey: faroApiKey,
         collectorUrl: faroCollectorUrl,
@@ -37,14 +33,40 @@ mixin FaroMixin {
         refreshRateVitals: true,
         namespace: 'flutter',
       ),
-      appRunner: () {
-        return runApp(
-          DefaultAssetBundle(
-            bundle: FaroAssetBundle(),
-            child: FaroUserInteractionWidget(child: app),
-          ),
-        );
-      },
+    );
+
+    /// for tracking flutter error
+    final originalOnError = FlutterError.onError;
+    FlutterError.onError = (details) {
+      Faro().pushError(
+        type: 'flutter_error',
+        value: details.exception.toString(),
+        stacktrace: details.stack,
+      );
+      originalOnError?.call(details);
+    };
+
+    /// for tracking platform error
+    final platformOriginalOnError = PlatformDispatcher.instance.onError;
+    PlatformDispatcher.instance.onError = (e, st) {
+      Faro().pushError(
+        type: 'platform_error',
+        value: e.toString(),
+        stacktrace: st,
+      );
+      return platformOriginalOnError?.call(e, st) ?? false;
+    };
+
+    /// for tracking http activity
+    HttpOverrides.global = FaroHttpOverrides(HttpOverrides.current);
+
+    runApp(
+      DefaultAssetBundle(
+        /// for tracking asset load time
+        bundle: FaroAssetBundle(),
+        /// for tracking user interaction
+        child: FaroUserInteractionWidget(child: app),
+      ),
     );
   }
 }
