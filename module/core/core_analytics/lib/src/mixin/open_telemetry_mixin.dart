@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutterrific_opentelemetry/flutterrific_opentelemetry.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 mixin OTelMixin {
   static void reportError(
@@ -17,14 +18,14 @@ mixin OTelMixin {
     bool enableDebugLog = false,
   }) async {
     runZonedGuarded(
-      () {
+      () async {
+        final info = await PackageInfo.fromPlatform();
+
         FlutterOTel.initialize(
-          serviceName: 'mangastash-app',
-          serviceVersion: '0.1.7',
-          tracerName: 'main',
+          appName: info.appName,
           resourceAttributes: Attributes.of({
             'deployment.environment': 'debug',
-            'service.namespace': 'mobile-apps',
+            'service.namespace': 'flutter',
           }),
           secure: false,
         );
