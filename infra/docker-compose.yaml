@@ -1,0 +1,63 @@
+services:
+
+  mimir:
+    image: 'grafana/mimir:latest'
+    volumes:
+      - './mimir/config:/etc/mimir'
+      - './mimir/rules:/tmp/mimir/rules'
+    entrypoint:
+      - '/bin/mimir'
+      - '-config.file=/etc/mimir/config.yaml'
+    ports:
+      - '9009:9009'
+
+  loki:
+    image: 'grafana/loki:latest'
+    command: '-config.file=/etc/loki/local-config.yaml'
+    ports:
+      - '3100:3100'
+
+  tempo:
+    image: 'grafana/tempo:latest'
+    volumes:
+      - './tempo/config:/etc/tempo-config'
+    command:
+      - '-config.file=/etc/tempo-config/tempo.yaml'
+    ports:
+      - '3200:3200'
+      - '9095:9095'
+      - '4318:4318'
+
+  grafana:
+    image: 'grafana/grafana:latest'
+    volumes:
+      - './grafana/config:/etc/grafana-config'
+      - './grafana/datasources:/etc/grafana/provisioning/datasources'
+      - './grafana/dashboards-provisioning:/etc/grafana/provisioning/dashboards'
+      - './grafana/dashboards:/var/lib/grafana/dashboards'
+      - './grafana/config:/var/lib/grafana/plugins'
+      - './grafana/dashboards-provisioning:/etc/grafana/provisioning/plugins'
+    entrypoint:
+      - '/usr/share/grafana/bin/grafana-server'
+      - '--homepath=/usr/share/grafana'
+      - '--config=/etc/grafana-config/grafana.ini'
+    ports:
+      - '3000:3000'
+
+  alloy:
+    image: 'grafana/alloy:latest'
+    volumes:
+      - './alloy/config:/etc/alloy'
+    entrypoint:
+      - '/bin/alloy'
+      - 'run'
+      - '--server.http.listen-addr=0.0.0.0:12345'
+      - '/etc/alloy/config.alloy'
+    ports:
+      - '12345:12345'
+      - '8027:8027'
+    depends_on:
+      - 'tempo'
+      - 'loki'
+      - 'grafana'
+      - 'mimir'

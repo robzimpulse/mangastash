@@ -1,0 +1,68 @@
+logging {
+  level  = "debug"
+  format = "logfmt"
+}
+
+livedebugging {
+  enabled = true
+}
+
+faro.receiver "integrations_app_agent_receiver" {
+	extra_log_labels = {
+		app  = "",
+		kind = "",
+	}
+
+	server {
+		listen_address           = "0.0.0.0"
+		listen_port              = 8027
+		cors_allowed_origins     = ["*"]
+		api_key                  = "api_key"
+		max_allowed_payload_size = "10MiB"
+
+		rate_limiting {
+			rate = 50
+		}
+	}
+
+	sourcemaps { }
+
+	output {
+		logs   = [loki.process.logs_process_client.receiver]
+		traces = [otelcol.exporter.otlphttp.trace_write.input]
+	}
+}
+
+loki.process "logs_process_client" {
+  forward_to = [loki.write.logs_write_client.receiver]
+
+  stage.logfmt {
+      mapping = { "kind" = "", "service_name" = "", "app" = "" }
+  }
+
+  stage.labels {
+      values = { "kind" = "kind", "service_name" = "service_name", "app" = "app" }
+  }
+}
+
+loki.write "logs_write_client" {
+	endpoint {
+		url = format("http://%s:%s/loki/api/v1/push", "loki", "3100")
+	}
+	external_labels = {
+    }
+}
+
+otelcol.exporter.otlphttp "trace_write" {
+	retry_on_failure {
+		max_elapsed_time = "1m0s"
+	}
+
+	client {
+		endpoint = format("http://%s:%s/otlp", "tempo", "4318")
+
+		tls {
+			insecure = true
+		}
+	}
+}
