@@ -19,6 +19,7 @@ import 'screen/splash_screen.dart';
 void main() {
   // Service locator/dependency injector code here
   ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
+  // grafana docker: "docker run -p 4317:4317 -p 4318:4318 -p 3000:3000 --rm -ti grafana/otel-lgtm"
   OTelMixin.runner(
     enableDebugLog: true,
     runApp: () {
