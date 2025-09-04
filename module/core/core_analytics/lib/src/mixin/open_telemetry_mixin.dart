@@ -40,7 +40,7 @@ mixin OTelMixin {
         runApp();
       },
       (error, stacktrace) {
-        FlutterOTel.reportError('Zone Error', error, stacktrace);
+        reportError('Zone Error', error, stacktrace);
       },
     );
   }
