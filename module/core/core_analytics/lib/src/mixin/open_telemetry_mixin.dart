@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutterrific_opentelemetry/flutterrific_opentelemetry.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import '../exporter/custom_oltp_http_metric_exporter.dart';
+
 mixin OTelMixin {
   static void reportError(
     String message,
@@ -30,6 +32,7 @@ mixin OTelMixin {
             'deployment.environment': 'debug',
             'service.namespace': 'flutter',
           }),
+          metricExporter: CustomOtlpHttpMetricExporter(),
           secure: false,
         );
 

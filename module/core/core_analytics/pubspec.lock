@@ -66,7 +66,7 @@ packages:
     source: hosted
     version: "3.0.6"
   dartastic_opentelemetry:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: dartastic_opentelemetry
       sha256: f61fec0265233ddc5e229e6cb72b5746662212937b59000300292b103cc18126
@@ -74,7 +74,7 @@ packages:
     source: hosted
     version: "0.8.6"
   dartastic_opentelemetry_api:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       name: dartastic_opentelemetry_api
       sha256: "23cdb2a447ca5d8b96196f1eb7a225d84e23a53f96b7e1c86a16655a689b325f"
@@ -265,7 +265,7 @@ packages:
     source: hosted
     version: "3.2.4"
   http:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http
       sha256: bb2ce4590bc2667c96f318d68cac1b5a7987ec819351d32b1c987239a815e007
