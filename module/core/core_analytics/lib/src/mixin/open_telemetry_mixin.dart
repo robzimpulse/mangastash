@@ -14,11 +14,14 @@ mixin OTelMixin {
   }
 
   static void runner({
-    required VoidCallback runApp,
+    required VoidCallback ensureInitialized,
+    required VoidCallback run,
     bool enableDebugLog = false,
   }) async {
     runZonedGuarded(
       () async {
+        ensureInitialized();
+
         final info = await PackageInfo.fromPlatform();
 
         FlutterOTel.initialize(
@@ -37,7 +40,7 @@ mixin OTelMixin {
           OTelLog.metricLogFunction = print;
         }
 
-        runApp();
+        run();
       },
       (error, stacktrace) {
         reportError('Zone Error', error, stacktrace);
