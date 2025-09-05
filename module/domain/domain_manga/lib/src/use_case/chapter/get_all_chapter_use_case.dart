@@ -23,7 +23,7 @@ class GetAllChapterUseCase with FaroMixin, SpanMixin {
       const SearchChapterParameter(offset: 0, page: 1, limit: 20),
     );
 
-    return span(
+    return await span(
       body: (span) async {
         final result = await _searchChapterUseCase.execute(
           parameter: SourceSearchChapterParameter(
@@ -57,9 +57,18 @@ class GetAllChapterUseCase with FaroMixin, SpanMixin {
           ];
         }
 
+        if (result is Error<Pagination<Chapter>>) {
+          span?.setAttribute('error', result.error.toString());
+        }
+
         return [];
       },
-      attributes: {},
+      attributes: {
+        'source': source.toString(),
+        'manga_id': mangaId,
+        'parameter': param.toString(),
+        'use_cache': useCache.toString(),
+      },
       parent: parent,
     );
   }
