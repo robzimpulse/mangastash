@@ -35,7 +35,7 @@ class SearchMangaUseCase with SyncMangasMixin, FaroMixin, SpanMixin {
     Span? parent,
   }) async {
     return await span(
-      body: () async {
+      body: (span) async {
         final result = await _mangaRepository.search(
           parameter: parameter.parameter.copyWith(
             includes: [
@@ -68,7 +68,7 @@ class SearchMangaUseCase with SyncMangasMixin, FaroMixin, SpanMixin {
     bool useCache = true,
   }) async {
     return await span(
-      body: () async {
+      body: (span) async {
         final url = parameter.url;
 
         if (url == null) {

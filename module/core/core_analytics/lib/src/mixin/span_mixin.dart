@@ -25,7 +25,7 @@ mixin SpanMixin on FaroMixin {
   /// use this function if [body] don't have any try catch process.
   FutureOr<T> span<T>({
     String? name,
-    required AsyncValueGetter<T> body,
+    required FutureOr<T> Function(Span?) body,
     Map<String, String>? attributes,
     Span? parent,
   }) {
@@ -33,7 +33,7 @@ mixin SpanMixin on FaroMixin {
       name ?? StackTrace.current.callerFunctionName ?? 'Anonymous',
       (span) async {
         try {
-          final result = await body.call();
+          final result = await body.call(span);
           span.setStatus(SpanStatusCode.ok);
           return result;
         } catch (e) {

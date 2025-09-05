@@ -47,7 +47,7 @@ class SearchChapterUseCase
     Span? parent,
   }) async {
     return await span(
-      body: () async {
+      body: (span) async {
         final result = await _chapterRepository.feed(
           mangaId: parameter.mangaId,
           parameter: parameter.parameter.copyWith(
@@ -93,7 +93,7 @@ class SearchChapterUseCase
     bool useCache = true,
   }) async {
     return await span(
-      body: () async {
+      body: (span) async {
         final raw = await _mangaDao.search(ids: [parameter.mangaId]);
         final result = Manga.fromDatabase(raw.firstOrNull);
 
