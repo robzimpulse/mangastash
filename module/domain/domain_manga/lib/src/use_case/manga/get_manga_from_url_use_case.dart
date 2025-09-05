@@ -10,7 +10,7 @@ import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../parser/base/manga_detail_html_parser.dart';
 
-class GetMangaFromUrlUseCase with SyncMangasMixin {
+class GetMangaFromUrlUseCase with SyncMangasMixin, FaroMixin, SpanMixin {
   final HeadlessWebviewManager _webview;
   final StorageManager _storageManager;
   final MangaDao _mangaDao;
@@ -30,61 +30,83 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
     required SourceEnum source,
     required String url,
     bool useCache = true,
+    Span? parent,
   }) async {
-    final document = await _webview.open(url, useCache: useCache);
+    return await span(
+      body: (span) async {
+        final document = await _webview.open(url, useCache: useCache);
 
-    if (document == null) {
-      throw FailedParsingHtmlException(url);
-    }
+        if (document == null) {
+          throw FailedParsingHtmlException(url);
+        }
 
-    final parser = MangaDetailHtmlParser.forSource(
-      root: document,
-      source: source,
-      storageManager: _storageManager,
+        final parser = MangaDetailHtmlParser.forSource(
+          root: document,
+          source: source,
+          storageManager: _storageManager,
+        );
+
+        final manga = await parser.manga;
+
+        return manga.copyWith(source: source.name, webUrl: url);
+      },
+      attributes: {
+        'source': source.toString(),
+        'url': url,
+        'useCache': useCache.toString(),
+      },
+      parent: parent,
     );
-
-    final manga = await parser.manga;
-
-    return manga.copyWith(source: source.name, webUrl: url);
   }
 
   Future<Result<Manga>> execute({
     required SourceEnum source,
     required String url,
+    Span? parent,
   }) async {
-    final key = '${source.name}-$url';
-    final file = await _storageManager.chapter.getFileFromCache(key);
-    final data = await file?.file.readAsString(encoding: utf8);
-    final cache = Manga.fromJsonString(data ?? '');
-    if (cache != null) return Success(cache);
+    return await startSpan(
+      body: (span) async {
+        final key = '${source.name}-$url';
+        final file = await _storageManager.chapter.getFileFromCache(key);
+        final data = await file?.file.readAsString(encoding: utf8);
+        final cache = Manga.fromJsonString(data ?? '');
+        if (cache != null) return Success(cache);
 
-    try {
-      final raw = await _mangaDao.search(webUrls: [url]);
-      final manga = Manga.fromDatabase(raw.firstOrNull);
+        try {
+          final raw = await _mangaDao.search(webUrls: [url]);
+          final manga = Manga.fromDatabase(raw.firstOrNull);
 
-      final results = await sync(
-        dao: _mangaDao,
-        values: [
-          await _scrapping(source: source, url: (manga?.webUrl).or(url)),
-        ],
-        logBox: _logBox,
-      );
+          final results = await sync(
+            dao: _mangaDao,
+            values: [
+              await _scrapping(source: source, url: (manga?.webUrl).or(url)),
+            ],
+            logBox: _logBox,
+          );
 
-      final result = results.firstOrNull;
+          final result = results.firstOrNull;
 
-      if (result == null) {
-        throw DataNotFoundException();
-      }
+          if (result == null) {
+            throw DataNotFoundException();
+          }
 
-      await _storageManager.chapter.putFile(
-        key,
-        utf8.encode(result.toJsonString()),
-        key: key,
-      );
+          await _storageManager.chapter.putFile(
+            key,
+            utf8.encode(result.toJsonString()),
+            key: key,
+          );
 
-      return Success(result);
-    } catch (e) {
-      return Error(e);
-    }
+          span?.setStatus(SpanStatusCode.ok);
+          return Success(result);
+        } catch (e) {
+          span?.setStatus(SpanStatusCode.error, message: e.toString());
+          return Error(e);
+        } finally {
+          span?.end();
+        }
+      },
+      attributes: {'source': source.toString(), 'url': url},
+      parentSpan: parent,
+    );
   }
 }

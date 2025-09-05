@@ -47,7 +47,7 @@ class SearchChapterUseCase
     Span? parent,
   }) async {
     return await span(
-      body: () async {
+      body: (span) async {
         final result = await _chapterRepository.feed(
           mangaId: parameter.mangaId,
           parameter: parameter.parameter.copyWith(
@@ -93,7 +93,7 @@ class SearchChapterUseCase
     bool useCache = true,
   }) async {
     return await span(
-      body: () async {
+      body: (span) async {
         final raw = await _mangaDao.search(ids: [parameter.mangaId]);
         final result = Manga.fromDatabase(raw.firstOrNull);
 
@@ -170,10 +170,10 @@ class SearchChapterUseCase
   Future<Result<Pagination<Chapter>>> execute({
     required SourceSearchChapterParameter parameter,
     bool useCache = true,
+    Span? parent,
   }) async {
     return await startSpan(
-      '$runtimeType',
-      (span) async {
+      body: (span) async {
         final key = parameter.toJsonString();
         final cache = await _storageManager.searchChapter.getFileFromCache(key);
         final file = await cache?.file.readAsString(encoding: utf8);
@@ -233,6 +233,7 @@ class SearchChapterUseCase
         'parameter': parameter.toString(),
         'useCache': useCache.toString(),
       },
+      parentSpan: parent,
     );
   }
 }

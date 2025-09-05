@@ -8,18 +8,14 @@ import 'faro_mixin.dart';
 
 mixin SpanMixin on FaroMixin {
   /// use this function if [body] have any try catch process.
-  FutureOr<T> startSpan<T>(
-    String name,
-    FutureOr<T> Function(Span?) body, {
+  FutureOr<T> startSpan<T>({
+    String? name,
+    required FutureOr<T> Function(Span?) body,
     Map<String, String> attributes = const {},
     Span? parentSpan,
   }) async {
-    final faro = this.faro;
-
-    if (faro == null) return body.call(null);
-
     return faro.startSpan(
-      name,
+      name ?? StackTrace.current.callerFunctionName ?? 'Anonymous',
       body,
       attributes: attributes,
       parentSpan: parentSpan,
@@ -28,19 +24,16 @@ mixin SpanMixin on FaroMixin {
 
   /// use this function if [body] don't have any try catch process.
   FutureOr<T> span<T>({
-    required AsyncValueGetter<T> body,
+    String? name,
+    required FutureOr<T> Function(Span?) body,
     Map<String, String>? attributes,
     Span? parent,
   }) {
-    final faro = this.faro;
-
-    if (faro == null) return body();
-
     return faro.startSpan<T>(
-      StackTrace.current.callerFunctionName ?? 'Anonymous',
+      name ?? StackTrace.current.callerFunctionName ?? 'Anonymous',
       (span) async {
         try {
-          final result = await body.call();
+          final result = await body.call(span);
           span.setStatus(SpanStatusCode.ok);
           return result;
         } catch (e) {
