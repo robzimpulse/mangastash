@@ -73,14 +73,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.6"
-  dartastic_opentelemetry_api:
-    dependency: "direct overridden"
-    description:
-      name: dartastic_opentelemetry_api
-      sha256: "23cdb2a447ca5d8b96196f1eb7a225d84e23a53f96b7e1c86a16655a689b325f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.8.4"
   dbus:
     dependency: transitive
     description:
