@@ -132,10 +132,10 @@ class SearchMangaUseCase with SyncMangasMixin, FaroMixin, SpanMixin {
   Future<Result<Pagination<Manga>>> execute({
     required SourceSearchMangaParameter parameter,
     bool useCache = true,
+    Span? parent,
   }) async {
     return await startSpan(
-      '$runtimeType',
-      (span) async {
+      body: (span) async {
         final key = parameter.toJsonString();
         final cache = await _storageManager.searchManga.getFileFromCache(key);
         final file = await cache?.file.readAsString(encoding: utf8);
@@ -195,6 +195,7 @@ class SearchMangaUseCase with SyncMangasMixin, FaroMixin, SpanMixin {
         'parameter': parameter.toString(),
         'useCache': useCache.toString(),
       },
+      parentSpan: parent,
     );
   }
 }
