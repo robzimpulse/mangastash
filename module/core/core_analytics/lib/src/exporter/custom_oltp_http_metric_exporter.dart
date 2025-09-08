@@ -218,7 +218,7 @@ class CustomOtlpHttpMetricExporter implements MetricExporter {
 
     if (OTelLog.isLogMetrics()) {
       OTelLog.logMetric(
-        "Exporting metrics via HTTP: ${metrics.metrics.length} metrics",
+        'Exporting metrics via HTTP: ${metrics.metrics.length} metrics',
       );
     }
 
