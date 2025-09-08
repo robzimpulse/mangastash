@@ -26,6 +26,7 @@ mixin OTelMixin {
 
         final info = await PackageInfo.fromPlatform();
 
+        /// docker run -p 4317:4317 -p 4318:4318 -p 3000:3000 --rm -ti grafana/otel-lgtm
         FlutterOTel.initialize(
           appName: info.appName,
           resourceAttributes: Attributes.of({
