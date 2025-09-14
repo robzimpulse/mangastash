@@ -5,7 +5,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:universal_io/io.dart';
 
 mixin FaroMixin {
-
   Faro get faro => Faro();
 
   static void runner(Widget app) async {
@@ -59,6 +58,7 @@ mixin FaroMixin {
       DefaultAssetBundle(
         /// for tracking asset load time
         bundle: FaroAssetBundle(),
+
         /// for tracking user interaction
         child: FaroUserInteractionWidget(child: app),
       ),

@@ -10,7 +10,7 @@ import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../parser/base/manga_detail_html_parser.dart';
 
-class GetMangaFromUrlUseCase with SyncMangasMixin, FaroMixin, SpanMixin {
+class GetMangaFromUrlUseCase with SyncMangasMixin, FaroMixin, FaroSpanMixin {
   final HeadlessWebviewManager _webview;
   final StorageManager _storageManager;
   final MangaDao _mangaDao;

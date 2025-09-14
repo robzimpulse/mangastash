@@ -8,4 +8,5 @@ export 'package:log_box_navigation_logger/log_box_navigation_logger.dart';
 
 export 'src/core_analytics_registrar.dart';
 export 'src/mixin/faro_mixin.dart';
-export 'src/mixin/span_mixin.dart';
+export 'src/mixin/faro_span_mixin.dart';
+export 'src/mixin/faro_user_mixin.dart';

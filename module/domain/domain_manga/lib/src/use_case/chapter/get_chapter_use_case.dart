@@ -11,7 +11,7 @@ import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_chapters_mixin.dart';
 import '../../parser/base/chapter_image_html_parser.dart';
 
-class GetChapterUseCase with SyncChaptersMixin, FaroMixin, SpanMixin {
+class GetChapterUseCase with SyncChaptersMixin, FaroMixin, FaroSpanMixin {
   final ChapterRepository _chapterRepository;
   final AtHomeRepository _atHomeRepository;
   final HeadlessWebviewManager _webview;

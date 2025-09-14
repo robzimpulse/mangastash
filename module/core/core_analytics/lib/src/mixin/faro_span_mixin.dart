@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import '../extension/stack_trace_extension.dart';
 import 'faro_mixin.dart';
 
-mixin SpanMixin on FaroMixin {
+mixin FaroSpanMixin on FaroMixin {
   /// use this function if [body] have any try catch process.
   FutureOr<T> startSpan<T>({
     String? name,
