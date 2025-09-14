@@ -4,6 +4,7 @@ import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
+import 'package:flutter/foundation.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
@@ -64,28 +65,32 @@ class _MangaStashAppState extends State<MangaStashApp> {
     await widget.locator.registerRegistrar(CoreRouteRegistrar());
     await widget.locator.registerRegistrar(DomainMangaRegistrar());
 
-    // TODO: commented for a while to test analytics
-    // FlutterError.onError = (details) {
-    //   final LogBox log = widget.locator();
-    //   log.log(
-    //     details.exceptionAsString(),
-    //     name: 'FlutterError',
-    //     error: details.exception,
-    //     stackTrace: details.stack,
-    //   );
-    // };
-    //
-    // PlatformDispatcher.instance.onError = (error, stack) {
-    //   final LogBox log = widget.locator();
-    //   log.log(
-    //     error.toString(),
-    //     name: 'PlatformDispatcher',
-    //     error: error,
-    //     stackTrace: stack,
-    //   );
-    //   return true;
-    // };
-    //
+    /// for tracking flutter error
+    final originalOnError = FlutterError.onError;
+    FlutterError.onError = (details) {
+      final LogBox log = widget.locator();
+      log.log(
+        details.exceptionAsString(),
+        name: 'FlutterError',
+        error: details.exception,
+        stackTrace: details.stack,
+      );
+      originalOnError?.call(details);
+    };
+
+    /// for tracking platform error
+    final platformOriginalOnError = PlatformDispatcher.instance.onError;
+    PlatformDispatcher.instance.onError = (e, st) {
+      final LogBox log = widget.locator();
+      log.log(
+        e.toString(),
+        name: 'PlatformDispatcher',
+        error: e,
+        stackTrace: st,
+      );
+      return platformOriginalOnError?.call(e, st) ?? false;
+    };
+
     // Isolate.current.addErrorListener(
     //   RawReceivePort((pair) {
     //     if (pair is! List) return;
