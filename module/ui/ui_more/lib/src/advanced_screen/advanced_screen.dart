@@ -70,6 +70,7 @@ class AdvancedScreen extends StatelessWidget {
           FutureBuilder(
             future: webview.open(
               'https://www.scrapingcourse.com/cloudflare-challenge',
+              useCache: false,
             ),
             builder: (context, snapshot) {
 
