@@ -68,15 +68,38 @@ class AdvancedScreen extends StatelessWidget {
             ),
           ),
           FutureBuilder(
-            future: webview.open(
-              'https://www.scrapingcourse.com/cloudflare-challenge',
-              useCache: false,
+            future: Future.delayed(
+              const Duration(seconds: 1),
+              () => webview.open(
+                'https://www.scrapingcourse.com/cloudflare-challenge',
+                useCache: false,
+              ),
             ),
             builder: (context, snapshot) {
-
               if (snapshot.connectionState == ConnectionState.done) {
                 final data = snapshot.data;
                 final error = snapshot.error;
+
+                final children = <Widget>[
+                  if (error != null)
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        top: 16,
+                      ),
+                      child: Text(error.toString()),
+                    ),
+                  if (data != null)
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: 16,
+                      ),
+                      child: Text(data.outerHtml),
+                    ),
+                ].intersperse(const SizedBox(height: 16));
 
                 return ExpansionTile(
                   title: const Text('Headless Browser - Cloudflare Challenge'),
@@ -84,10 +107,7 @@ class AdvancedScreen extends StatelessWidget {
                     height: double.infinity,
                     child: Icon(Icons.web),
                   ),
-                  children: [
-                    if (error != null) Text(error.toString()),
-                    if (data != null) Text(data.toString())
-                  ],
+                  children: children.toList(),
                 );
               }
 
@@ -97,7 +117,11 @@ class AdvancedScreen extends StatelessWidget {
                   height: double.infinity,
                   child: Icon(Icons.web),
                 ),
-                trailing: Center(child: CircularProgressIndicator()),
+                trailing: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: Center(child: CircularProgressIndicator()),
+                ),
               );
             },
           ),

@@ -37,7 +37,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       useCache: useCache,
     );
     if (html == null) return null;
-    return parse(html);
+    return parse(html, sourceUrl: url);
   }
 
   Future<String?> _fetch({
