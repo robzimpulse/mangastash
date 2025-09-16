@@ -2,6 +2,7 @@ import 'package:core_analytics/core_analytics.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
+import '../domain_manga.dart';
 import 'manager/global_options_manager.dart';
 import 'manager/headless_webview_manager.dart';
 import 'manager/history_manager.dart';
@@ -74,6 +75,7 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerSingleton(
       HeadlessWebviewManager(log: log, storageManager: locator()),
     );
+    locator.alias<HeadlessWebviewUseCase, HeadlessWebviewManager>();
 
     // manga dex services
     locator.registerFactory(() => MangaService(locator()));
