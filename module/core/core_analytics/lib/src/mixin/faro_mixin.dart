@@ -18,7 +18,7 @@ mixin FaroMixin {
 
     await Faro().init(
       optionsConfiguration: FaroConfig(
-        appName: (await PackageInfo.fromPlatform()).appName,
+        appName: (await PackageInfo.fromPlatform()).appName.toLowerCase(),
         appEnv: kDebugMode ? 'debug' : 'release',
         apiKey: faroApiKey,
         collectorUrl: faroCollectorUrl,
