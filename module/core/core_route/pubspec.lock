@@ -332,7 +332,7 @@ packages:
     description:
       path: "packages/log_box"
       ref: master
-      resolved-ref: "3cc1ae9a450230d7c2e796b22b30858c41e5a2f4"
+      resolved-ref: "25583fbced0e8ab6967eb04c25c5730f9b2c574e"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -341,7 +341,7 @@ packages:
     description:
       path: "packages/log_box_dio_logger"
       ref: master
-      resolved-ref: "3cc1ae9a450230d7c2e796b22b30858c41e5a2f4"
+      resolved-ref: "25583fbced0e8ab6967eb04c25c5730f9b2c574e"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -350,7 +350,7 @@ packages:
     description:
       path: "packages/log_box_in_app_webview_logger"
       ref: master
-      resolved-ref: "3cc1ae9a450230d7c2e796b22b30858c41e5a2f4"
+      resolved-ref: "25583fbced0e8ab6967eb04c25c5730f9b2c574e"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -359,7 +359,7 @@ packages:
     description:
       path: "packages/log_box_navigation_logger"
       ref: master
-      resolved-ref: "3cc1ae9a450230d7c2e796b22b30858c41e5a2f4"
+      resolved-ref: "25583fbced0e8ab6967eb04c25c5730f9b2c574e"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -558,10 +558,10 @@ packages:
     dependency: transitive
     description:
       name: shared_preferences_android
-      sha256: a2608114b1ffdcbc9c120eb71a0e207c71da56202852d4aab8a5e30a82269e74
+      sha256: bd14436108211b0d4ee5038689a56d4ae3620fd72fd6036e113bf1345bc74d9e
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.12"
+    version: "2.4.13"
   shared_preferences_foundation:
     dependency: transitive
     description:
