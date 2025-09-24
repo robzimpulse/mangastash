@@ -1,5 +1,6 @@
 library core_network;
 
+export 'package:cookie_jar/cookie_jar.dart';
 export 'package:dio/dio.dart';
 
 export 'src/core_network_registrar.dart';
