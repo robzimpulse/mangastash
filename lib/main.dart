@@ -128,12 +128,12 @@ class _MangaStashAppState extends State<MangaStashApp> {
         locator: locator,
         rootNavigatorKey: rootNavigatorKey,
         // TODO: add observer here
-        observers: () => [logBox.observer, FaroNavigationObserver()],
+        observers: () => [logBox.observer, FaroShellRouteNavigationObserver()],
       ),
       observers: [
         logBox.observer,
         viewer.navigatorObserver,
-        FaroNavigationObserver(),
+        FaroShellRouteNavigationObserver(),
       ],
     );
   }

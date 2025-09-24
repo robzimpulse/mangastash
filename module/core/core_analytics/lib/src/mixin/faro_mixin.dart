@@ -7,6 +7,8 @@ import 'package:universal_io/io.dart';
 mixin FaroMixin {
   Faro get faro => Faro();
 
+  static String? lastRoute;
+
   static void runner(Widget app) async {
     const faroApiKey = String.fromEnvironment('FARO_API_KEY');
     const faroCollectorUrl = String.fromEnvironment('FARO_COLLECTOR_URL');
