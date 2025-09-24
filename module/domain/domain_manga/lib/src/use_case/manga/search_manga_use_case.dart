@@ -7,20 +7,20 @@ import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../parser/base/manga_list_html_parser.dart';
+import '../headless_webview_use_case.dart';
 
 class SearchMangaUseCase with SyncMangasMixin {
   final MangaRepository _mangaRepository;
-  final HeadlessWebviewManager _webview;
+  final HeadlessWebviewUseCase _webview;
   final StorageManager _storageManager;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   const SearchMangaUseCase({
     required MangaRepository mangaRepository,
-    required HeadlessWebviewManager webview,
+    required HeadlessWebviewUseCase webview,
     required StorageManager storageManager,
     required MangaDao mangaDao,
     required LogBox logBox,

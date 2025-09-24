@@ -7,19 +7,19 @@ import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_tags_mixin.dart';
 import '../../parser/base/tag_list_html_parser.dart';
+import '../headless_webview_use_case.dart';
 
 class GetTagsUseCase with SyncTagsMixin {
-  final HeadlessWebviewManager _webview;
+  final HeadlessWebviewUseCase _webview;
   final StorageManager _storageManager;
   final MangaService _mangaService;
   final TagDao _tagDao;
   final LogBox _logBox;
 
   const GetTagsUseCase({
-    required HeadlessWebviewManager webview,
+    required HeadlessWebviewUseCase webview,
     required StorageManager storageManager,
     required MangaService mangaService,
     required TagDao tagDao,

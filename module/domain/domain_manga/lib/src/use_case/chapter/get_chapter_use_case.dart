@@ -7,14 +7,14 @@ import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_chapters_mixin.dart';
 import '../../parser/base/chapter_image_html_parser.dart';
+import '../headless_webview_use_case.dart';
 
 class GetChapterUseCase with SyncChaptersMixin {
   final ChapterRepository _chapterRepository;
   final AtHomeRepository _atHomeRepository;
-  final HeadlessWebviewManager _webview;
+  final HeadlessWebviewUseCase _webview;
   final StorageManager _storageManager;
   final ChapterDao _chapterDao;
   final LogBox _logBox;
@@ -22,7 +22,7 @@ class GetChapterUseCase with SyncChaptersMixin {
   GetChapterUseCase({
     required ChapterRepository chapterRepository,
     required AtHomeRepository atHomeRepository,
-    required HeadlessWebviewManager webview,
+    required HeadlessWebviewUseCase webview,
     required StorageManager storageManager,
     required ChapterDao chapterDao,
     required LogBox logBox,

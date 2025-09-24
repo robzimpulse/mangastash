@@ -10,7 +10,9 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:universal_io/io.dart';
 
-class HeadlessWebviewManager {
+import '../use_case/headless_webview_use_case.dart';
+
+class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   final LogBox _log;
 
   final StorageManager _storageManager;
@@ -21,6 +23,7 @@ class HeadlessWebviewManager {
   }) : _log = log,
        _storageManager = storageManager;
 
+  @override
   Future<Document?> open(
     String url, {
     List<String> scripts = const [],
@@ -34,7 +37,7 @@ class HeadlessWebviewManager {
       useCache: useCache,
     );
     if (html == null) return null;
-    return parse(html);
+    return parse(html, sourceUrl: url);
   }
 
   Future<String?> _fetch({

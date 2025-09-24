@@ -8,16 +8,16 @@ import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-import '../../manager/headless_webview_manager.dart';
 import '../../mixin/filter_chapters_mixin.dart';
 import '../../mixin/sort_chapters_mixin.dart';
 import '../../mixin/sync_chapters_mixin.dart';
 import '../../parser/base/chapter_list_html_parser.dart';
+import '../headless_webview_use_case.dart';
 
 class SearchChapterUseCase
     with SyncChaptersMixin, SortChaptersMixin, FilterChaptersMixin {
   final ChapterRepository _chapterRepository;
-  final HeadlessWebviewManager _webview;
+  final HeadlessWebviewUseCase _webview;
   final StorageManager _storageManager;
   final ChapterDao _chapterDao;
   final MangaDao _mangaDao;
@@ -25,7 +25,7 @@ class SearchChapterUseCase
 
   const SearchChapterUseCase({
     required ChapterRepository chapterRepository,
-    required HeadlessWebviewManager webview,
+    required HeadlessWebviewUseCase webview,
     required StorageManager storageManager,
     required ChapterDao chapterDao,
     required MangaDao mangaDao,

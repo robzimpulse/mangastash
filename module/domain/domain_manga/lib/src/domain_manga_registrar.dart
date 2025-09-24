@@ -10,6 +10,7 @@ import 'manager/library_manager.dart';
 import 'use_case/chapter/get_all_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
+import 'use_case/headless_webview_use_case.dart';
 import 'use_case/history/listen_read_history_use_case.dart';
 import 'use_case/history/listen_unread_history_use_case.dart';
 import 'use_case/history/update_chapter_last_read_at_use_case.dart';
@@ -74,6 +75,7 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerSingleton(
       HeadlessWebviewManager(log: log, storageManager: locator()),
     );
+    locator.alias<HeadlessWebviewUseCase, HeadlessWebviewManager>();
 
     // manga dex services
     locator.registerFactory(() => MangaService(locator()));
@@ -85,10 +87,12 @@ class DomainMangaRegistrar extends Registrar {
     // manga dex repositories
     locator.registerFactory(() => AtHomeRepository(service: locator()));
     locator.registerFactory(() => MangaRepository(service: locator()));
-    locator.registerFactory(
-      () =>
-          ChapterRepository(mangaService: locator(), chapterService: locator()),
-    );
+    locator.registerFactory(() {
+      return ChapterRepository(
+        mangaService: locator(),
+        chapterService: locator(),
+      );
+    });
     locator.registerFactory(() => AuthorRepository(service: locator()));
     locator.registerFactory(() => CoverRepository(service: locator()));
 
