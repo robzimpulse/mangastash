@@ -9,7 +9,6 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../mixin/sync_tags_mixin.dart';
 import '../../parser/base/tag_list_html_parser.dart';
-import '../headless_webview_use_case.dart';
 
 class GetTagsUseCase with SyncTagsMixin {
   final HeadlessWebviewUseCase _webview;

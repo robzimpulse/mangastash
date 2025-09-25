@@ -3,14 +3,12 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager/global_options_manager.dart';
-import 'manager/headless_webview_manager.dart';
 import 'manager/history_manager.dart';
 import 'manager/job_manager.dart';
 import 'manager/library_manager.dart';
 import 'use_case/chapter/get_all_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
-import 'use_case/headless_webview_use_case.dart';
 import 'use_case/history/listen_read_history_use_case.dart';
 import 'use_case/history/listen_unread_history_use_case.dart';
 import 'use_case/history/update_chapter_last_read_at_use_case.dart';
@@ -71,11 +69,6 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerSingleton(HistoryManager(historyDao: locator()));
     locator.alias<ListenReadHistoryUseCase, HistoryManager>();
     locator.alias<ListenUnreadHistoryUseCase, HistoryManager>();
-
-    locator.registerSingleton(
-      HeadlessWebviewManager(log: log, storageManager: locator()),
-    );
-    locator.alias<HeadlessWebviewUseCase, HeadlessWebviewManager>();
 
     // manga dex services
     locator.registerFactory(() => MangaService(locator()));

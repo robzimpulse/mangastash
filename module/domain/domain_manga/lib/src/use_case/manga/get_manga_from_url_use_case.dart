@@ -8,7 +8,6 @@ import 'package:entity_manga/entity_manga.dart';
 
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../parser/base/manga_detail_html_parser.dart';
-import '../headless_webview_use_case.dart';
 
 class GetMangaFromUrlUseCase with SyncMangasMixin {
   final HeadlessWebviewUseCase _webview;

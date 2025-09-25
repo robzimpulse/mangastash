@@ -9,7 +9,6 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../mixin/sync_chapters_mixin.dart';
 import '../../parser/base/chapter_image_html_parser.dart';
-import '../headless_webview_use_case.dart';
 
 class GetChapterUseCase with SyncChaptersMixin {
   final ChapterRepository _chapterRepository;

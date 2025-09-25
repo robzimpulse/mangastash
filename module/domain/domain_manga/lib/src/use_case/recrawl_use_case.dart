@@ -4,8 +4,6 @@ import 'package:core_analytics/core_analytics.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart'
-    show CookieManager;
 
 class RecrawlUseCase {
   final LogBox _logBox;
@@ -32,8 +30,6 @@ class RecrawlUseCase {
       onTapSnapshot: (url, html) async {
         if (url == null || html == null) return;
 
-
-
         await _storageManager.html.putFile(
           url,
           utf8.encode(html),
@@ -47,6 +43,7 @@ class RecrawlUseCase {
         ]);
 
         _logBox.log(
+          name: runtimeType.toString(),
           'Finish caching html and sync cookies',
           extra: {
             'url': uri.toString(),

@@ -3,14 +3,14 @@ import 'dart:convert';
 
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
-import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:universal_io/io.dart';
 
-import '../use_case/headless_webview_use_case.dart';
+import '../mixin/user_agent_mixin.dart';
+import '../usecase/headless_webview_usecase.dart';
 
 class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   final LogBox _log;

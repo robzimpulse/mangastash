@@ -3,6 +3,8 @@ import 'package:core_analytics/core_analytics.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager/dio_manager.dart';
+import 'manager/headless_webview_manager.dart';
+import 'usecase/headless_webview_usecase.dart';
 
 class CoreNetworkRegistrar extends Registrar {
   @override
@@ -15,6 +17,11 @@ class CoreNetworkRegistrar extends Registrar {
       name: 'Services',
       extra: {'start': DateTime.timestamp().toIso8601String()},
     );
+
+    locator.registerSingleton(
+      HeadlessWebviewManager(log: log, storageManager: locator()),
+    );
+    locator.alias<HeadlessWebviewUseCase, HeadlessWebviewManager>();
 
     locator.registerSingleton(CookieJar());
     locator.registerSingleton(

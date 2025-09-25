@@ -9,7 +9,6 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../parser/base/manga_list_html_parser.dart';
-import '../headless_webview_use_case.dart';
 
 class SearchMangaUseCase with SyncMangasMixin {
   final MangaRepository _mangaRepository;
