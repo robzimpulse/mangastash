@@ -26,7 +26,7 @@ class AdvancedScreen extends StatelessWidget {
 
   static Widget create({required ServiceLocator locator}) {
     return BlocProvider(
-      create: (_) => AdvancedScreenCubit(),
+      create: (_) => AdvancedScreenCubit()..init(),
       child: AdvancedScreen(
         logBox: locator(),
         database: locator(),
@@ -80,10 +80,7 @@ class AdvancedScreen extends StatelessWidget {
             ),
           ),
           ListTile(
-            title: const Text('Cloudflare Challenge'),
-            subtitle: const Text(
-              'List of Browser Cookies after opening cloudflare challenge',
-            ),
+            title: const Text('Browser - Cloudflare Challenge'),
             leading: const SizedBox(
               height: double.infinity,
               child: Icon(Icons.web),
@@ -100,6 +97,14 @@ class AdvancedScreen extends StatelessWidget {
           _builder(
             buildWhen: (prev, curr) => prev.cookies != curr.cookies,
             builder: (context, state) {
+              if (state.cookies.isEmpty) {
+                return ListTile(
+                  title: Text(
+                    'Browser Cookies from Webview (${state.cookies.length})',
+                  ),
+                );
+              }
+
               return ExpansionTile(
                 title: Text(
                   'Browser Cookies from Webview (${state.cookies.length})',
