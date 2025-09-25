@@ -32,18 +32,18 @@ class RecrawlUseCase {
       onTapSnapshot: (url, html) async {
         if (url == null || html == null) return;
 
-        final cookies = await CookieManager.instance().getAllCookies();
 
-        await Future.wait<void>([
-          _storageManager.html.putFile(
-            url,
-            utf8.encode(html),
-            fileExtension: 'html',
-            maxAge: const Duration(minutes: 30),
-          ),
-          _cookieJar.saveFromResponse(uri, [
-            ...cookies.map((e) => Cookie(e.name, e.value)),
-          ]),
+
+        await _storageManager.html.putFile(
+          url,
+          utf8.encode(html),
+          fileExtension: 'html',
+          maxAge: const Duration(minutes: 30),
+        );
+
+        final cookies = await CookieManager.instance().getAllCookies();
+        await _cookieJar.saveFromResponse(uri, [
+          ...cookies.map((e) => Cookie(e.name, e.value)),
         ]);
 
         _logBox.log(
