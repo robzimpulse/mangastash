@@ -29,19 +29,31 @@ class RecrawlUseCase {
     await _logBox.webview(
       context: context,
       uri: uri,
-      onTapSnapshot: (url, html) {
+      onTapSnapshot: (url, html) async {
         if (url == null || html == null) return;
-        _storageManager.html.putFile(
-          url,
-          utf8.encode(html),
-          fileExtension: 'html',
-          maxAge: const Duration(minutes: 30),
+
+        final cookies = await CookieManager.instance().getAllCookies();
+
+        await Future.wait<void>([
+          _storageManager.html.putFile(
+            url,
+            utf8.encode(html),
+            fileExtension: 'html',
+            maxAge: const Duration(minutes: 30),
+          ),
+          _cookieJar.saveFromResponse(uri, [
+            ...cookies.map((e) => Cookie(e.name, e.value)),
+          ]),
+        ]);
+
+        _logBox.log(
+          'Finish caching html and sync cookies',
+          extra: {
+            'url': uri.toString(),
+            'cookies': [...cookies.map((e) => e.toJson())],
+          },
         );
       },
     );
-    final cookies = (await CookieManager.instance().getAllCookies()).map(
-      (e) => Cookie(e.name, e.value),
-    );
-    await _cookieJar.saveFromResponse(uri, cookies.toList());
   }
 }
