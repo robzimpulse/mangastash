@@ -6,6 +6,7 @@ import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
 import 'advanced_screen_cubit.dart';
+import 'advanced_screen_state.dart';
 
 class AdvancedScreen extends StatelessWidget {
   final LogBox logBox;
@@ -33,6 +34,18 @@ class AdvancedScreen extends StatelessWidget {
         storageManager: locator(),
         webview: locator(),
       ),
+    );
+  }
+
+  AdvancedScreenCubit _cubit(BuildContext context) => context.read();
+
+  BlocBuilder _builder({
+    required BlocWidgetBuilder<AdvancedScreenState> builder,
+    BlocBuilderCondition<AdvancedScreenState>? buildWhen,
+  }) {
+    return BlocBuilder<AdvancedScreenCubit, AdvancedScreenState>(
+      buildWhen: buildWhen,
+      builder: builder,
     );
   }
 
@@ -81,11 +94,26 @@ class AdvancedScreen extends StatelessWidget {
               );
               if (uri == null) return;
               await logBox.webview(context: context, uri: uri);
-              final manager = CookieManager.instance();
-              final cookies = await manager.getAllCookies();
-              if (!context.mounted) return;
-              context.showSnackBar(
-                message: 'Cookies Key: ${cookies.map((e) => e.name)}',
+              if (context.mounted) _cubit(context).init();
+            },
+          ),
+          _builder(
+            buildWhen: (prev, curr) => prev.cookies != curr.cookies,
+            builder: (context, state) {
+              return ExpansionTile(
+                title: Text(
+                  'Browser Cookies from Webview (${state.cookies.length})',
+                ),
+                children: [
+                  for (final cookie in state.cookies)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 16,
+                      ),
+                      child: Text('$cookie'),
+                    ),
+                ],
               );
             },
           ),
