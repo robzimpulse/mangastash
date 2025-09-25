@@ -30,7 +30,28 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
     required String url,
     bool useCache = true,
   }) async {
-    final document = await _webview.open(url, useCache: useCache);
+    final selector = [
+      'button',
+      'inline-flex',
+      'items-center',
+      'whitespace-nowrap',
+      'px-4',
+      'py-2',
+      'w-full',
+      'justify-center',
+      'font-normal',
+      'align-middle',
+      'border-solid',
+    ].join('.');
+
+    final document = await _webview.open(
+      url,
+      scripts: [
+        if (source == SourceEnum.asurascan)
+          'window.document.querySelectorAll(\'$selector\')[0].click()',
+      ],
+      useCache: useCache,
+    );
 
     if (document == null) {
       throw FailedParsingHtmlException(url);
