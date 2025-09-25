@@ -67,7 +67,7 @@ class AdvancedScreen extends StatelessWidget {
             ),
           ),
           ListTile(
-            title: const Text('Headless Browser - Cloudflare Challenge'),
+            title: const Text('Cloudflare Challenge'),
             subtitle: const Text(
               'List of Browser Cookies after opening cloudflare challenge',
             ),
