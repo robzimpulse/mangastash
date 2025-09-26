@@ -72,7 +72,7 @@ class AdvancedScreen extends StatelessWidget {
             ),
             trailing: IconButton(
               onPressed: () async {
-                await Future.wait([storageManager.clear(), database.clear()]);
+                await database.clear();
                 if (!context.mounted) return;
                 context.showSnackBar(message: 'Success Clear Database & Cache');
               },
