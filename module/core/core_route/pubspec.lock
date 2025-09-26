@@ -268,7 +268,7 @@ packages:
     description:
       path: "packages/log_box"
       ref: master
-      resolved-ref: "406d7d74f60d0d55bc5db5087643757e8d988f87"
+      resolved-ref: c6195340ea0d7df3d34192a402e8714ab2744b12
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -277,7 +277,7 @@ packages:
     description:
       path: "packages/log_box_dio_logger"
       ref: master
-      resolved-ref: "406d7d74f60d0d55bc5db5087643757e8d988f87"
+      resolved-ref: c6195340ea0d7df3d34192a402e8714ab2744b12
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -286,7 +286,7 @@ packages:
     description:
       path: "packages/log_box_in_app_webview_logger"
       ref: master
-      resolved-ref: "406d7d74f60d0d55bc5db5087643757e8d988f87"
+      resolved-ref: c6195340ea0d7df3d34192a402e8714ab2744b12
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -295,7 +295,7 @@ packages:
     description:
       path: "packages/log_box_navigation_logger"
       ref: master
-      resolved-ref: "406d7d74f60d0d55bc5db5087643757e8d988f87"
+      resolved-ref: c6195340ea0d7df3d34192a402e8714ab2744b12
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
