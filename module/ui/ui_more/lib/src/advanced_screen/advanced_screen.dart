@@ -1,16 +1,19 @@
 import 'package:core_analytics/core_analytics.dart';
+import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
 import 'advanced_screen_cubit.dart';
+import 'advanced_screen_state.dart';
 
 class AdvancedScreen extends StatelessWidget {
   final LogBox logBox;
   final DatabaseViewer viewer;
   final AppDatabase database;
   final StorageManager storageManager;
+  final HeadlessWebviewUseCase webview;
 
   const AdvancedScreen({
     super.key,
@@ -18,17 +21,31 @@ class AdvancedScreen extends StatelessWidget {
     required this.viewer,
     required this.database,
     required this.storageManager,
+    required this.webview,
   });
 
   static Widget create({required ServiceLocator locator}) {
     return BlocProvider(
-      create: (_) => AdvancedScreenCubit(),
+      create: (_) => AdvancedScreenCubit()..init(),
       child: AdvancedScreen(
         logBox: locator(),
         database: locator(),
         viewer: locator(),
         storageManager: locator(),
+        webview: locator(),
       ),
+    );
+  }
+
+  AdvancedScreenCubit _cubit(BuildContext context) => context.read();
+
+  BlocBuilder _builder({
+    required BlocWidgetBuilder<AdvancedScreenState> builder,
+    BlocBuilderCondition<AdvancedScreenState>? buildWhen,
+  }) {
+    return BlocBuilder<AdvancedScreenCubit, AdvancedScreenState>(
+      buildWhen: buildWhen,
+      builder: builder,
     );
   }
 
@@ -55,7 +72,7 @@ class AdvancedScreen extends StatelessWidget {
             ),
             trailing: IconButton(
               onPressed: () async {
-                await Future.wait([storageManager.clear(), database.clear()]);
+                await database.clear();
                 if (!context.mounted) return;
                 context.showSnackBar(message: 'Success Clear Database & Cache');
               },
@@ -117,6 +134,49 @@ class AdvancedScreen extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+          ListTile(
+            title: const Text('Browser - Cloudflare Challenge'),
+            leading: const SizedBox(
+              height: double.infinity,
+              child: Icon(Icons.web),
+            ),
+            onTap: () async {
+              final uri = Uri.tryParse(
+                'https://www.scrapingcourse.com/cloudflare-challenge',
+              );
+              if (uri == null) return;
+              await logBox.webview(context: context, uri: uri);
+              if (context.mounted) _cubit(context).init();
+            },
+          ),
+          _builder(
+            buildWhen: (prev, curr) => prev.cookies != curr.cookies,
+            builder: (context, state) {
+              if (state.cookies.isEmpty) {
+                return ListTile(
+                  title: Text(
+                    'Browser Cookies from Webview (${state.cookies.length})',
+                  ),
+                );
+              }
+
+              return ExpansionTile(
+                title: Text(
+                  'Browser Cookies from Webview (${state.cookies.length})',
+                ),
+                children: [
+                  for (final cookie in state.cookies)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 16,
+                      ),
+                      child: Text('$cookie'),
+                    ),
+                ],
+              );
+            },
           ),
         ],
       ),

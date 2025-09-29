@@ -6,18 +6,17 @@ import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 
-import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../parser/base/manga_detail_html_parser.dart';
 
 class GetMangaFromUrlUseCase with SyncMangasMixin, FaroMixin, SpanMixin {
-  final HeadlessWebviewManager _webview;
+  final HeadlessWebviewUseCase _webview;
   final StorageManager _storageManager;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   GetMangaFromUrlUseCase({
-    required HeadlessWebviewManager webview,
+    required HeadlessWebviewUseCase webview,
     required StorageManager storageManager,
     required MangaDao mangaDao,
     required LogBox logBox,
