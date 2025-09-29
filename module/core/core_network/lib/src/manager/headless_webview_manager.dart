@@ -71,6 +71,9 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       onWebViewCreated: (_) {
         delegate.onWebViewCreated(uri: uri, scripts: scripts);
       },
+      onTitleChanged: (_, name) {
+        delegate.onTitleChanged(title: name);
+      },
       onLoadStart: (_, uri) {
         delegate.onLoadStart(uri: uri?.uriValue);
         onLoadStartCompleter.safeComplete();
@@ -79,33 +82,50 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
         delegate.onLoadStop(uri: uri?.uriValue);
         onLoadStopCompleter.safeComplete();
       },
+      onProgressChanged: (controller, progress) {
+        delegate.onProgressChanged(progress: progress);
+      },
       onReceivedError: (_, request, error) {
         delegate.onReceivedError(
-          extra: {'request': request.toMap(), 'error': error.toMap()},
+          request: request.toMap(),
+          error: error.toMap(),
         );
         onLoadErrorCompleter.safeComplete();
       },
       onContentSizeChanged: (_, prev, curr) {
         delegate.onContentSizeChanged(previous: prev, current: curr);
       },
-      onProgressChanged: (_, progress) {
-        delegate.onProgressChanged(progress: progress);
-      },
-      onConsoleMessage: (_, message) {
-        delegate.onConsoleMessage(extra: message.toMap());
+      shouldInterceptAjaxRequest: (_, request) async {
+        delegate.shouldInterceptAjaxRequest(request: request.toMap());
+        return request;
       },
       onAjaxProgress: (_, request) async {
-        delegate.onAjaxRequest(extra: request.toMap());
+        delegate.onAjaxProgress(request: request.toMap());
         return AjaxRequestAction.PROCEED;
       },
       onAjaxReadyStateChange: (_, request) async {
-        delegate.onAjaxRequest(extra: request.toMap());
-        return null;
+        delegate.onAjaxReadyStateChange(request: request.toMap());
+        return AjaxRequestAction.PROCEED;
+      },
+      onReceivedHttpError: (_, request, response) {
+        delegate.onReceivedHttpError(
+          request: request.toMap(),
+          response: response.toMap(),
+        );
+      },
+      onLoadResource: (_, resource) {
+        delegate.onLoadResource(resource: resource.toMap());
+      },
+      onConsoleMessage: (controller, message) {
+        delegate.onConsoleMessage(message: message.toMap());
       },
       shouldOverrideUrlLoading: (_, action) async {
         final destination = action.request.url;
-
-        delegate.shouldOverrideUrlLoading(extra: action.toMap());
+        final isCloudFlare = action.isCloudFlare(uri);
+        delegate.shouldOverrideUrlLoading(
+          action: action.toMap(),
+          extra: {'is_cloudflare': isCloudFlare},
+        );
 
         if (destination == null) {
           return NavigationActionPolicy.CANCEL;
@@ -115,6 +135,10 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
           destination.scheme == uri.scheme,
           destination.host == uri.host,
         ].every((e) => e);
+
+        if (isCloudFlare) {
+          return NavigationActionPolicy.ALLOW;
+        }
 
         return isSame
             ? NavigationActionPolicy.ALLOW
