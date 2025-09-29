@@ -6,7 +6,7 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 
 import 'search_chapter_use_case.dart';
 
-class GetAllChapterUseCase with FaroMixin, SpanMixin {
+class GetAllChapterUseCase with FaroMixin, FaroSpanMixin {
   final SearchChapterUseCase _searchChapterUseCase;
 
   GetAllChapterUseCase({required SearchChapterUseCase searchChapterUseCase})

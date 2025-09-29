@@ -10,7 +10,7 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import '../../mixin/sync_chapters_mixin.dart';
 import '../../parser/base/chapter_image_html_parser.dart';
 
-class GetChapterUseCase with SyncChaptersMixin, FaroMixin, SpanMixin {
+class GetChapterUseCase with SyncChaptersMixin, FaroMixin, FaroSpanMixin {
   final ChapterRepository _chapterRepository;
   final AtHomeRepository _atHomeRepository;
   final HeadlessWebviewUseCase _webview;

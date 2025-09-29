@@ -19,7 +19,7 @@ class SearchChapterUseCase
         SortChaptersMixin,
         FilterChaptersMixin,
         FaroMixin,
-        SpanMixin {
+        FaroSpanMixin {
   final ChapterRepository _chapterRepository;
   final HeadlessWebviewUseCase _webview;
   final StorageManager _storageManager;

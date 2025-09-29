@@ -10,7 +10,7 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../parser/base/manga_list_html_parser.dart';
 
-class SearchMangaUseCase with SyncMangasMixin, FaroMixin, SpanMixin {
+class SearchMangaUseCase with SyncMangasMixin, FaroMixin, FaroSpanMixin {
   final MangaRepository _mangaRepository;
   final HeadlessWebviewUseCase _webview;
   final StorageManager _storageManager;

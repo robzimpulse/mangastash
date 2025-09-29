@@ -8,6 +8,8 @@ mixin FaroMixin {
 
   Faro get faro => Faro();
 
+  static String? lastRoute;
+
   static void runner(Widget app) async {
     const faroApiKey = String.fromEnvironment('FARO_API_KEY');
     const faroCollectorUrl = String.fromEnvironment('FARO_COLLECTOR_URL');
@@ -19,7 +21,7 @@ mixin FaroMixin {
 
     await Faro().init(
       optionsConfiguration: FaroConfig(
-        appName: (await PackageInfo.fromPlatform()).appName,
+        appName: (await PackageInfo.fromPlatform()).appName.toLowerCase(),
         appEnv: kDebugMode ? 'debug' : 'release',
         apiKey: faroApiKey,
         collectorUrl: faroCollectorUrl,
