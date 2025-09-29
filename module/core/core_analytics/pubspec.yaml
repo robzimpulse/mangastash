@@ -1,0 +1,43 @@
+name: core_analytics
+description: "A new Flutter project."
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ">=3.7.2 <4.0.0"
+  flutter: ">=3.29.3"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  package_info_plus: ^8.3.0
+  universal_io: ^2.2.2
+  log_box:
+    git:
+      url: https://github.com/robzimpulse/log_box.git
+      ref: master
+      path: packages/log_box
+  log_box_navigation_logger:
+    git:
+      url: https://github.com/robzimpulse/log_box.git
+      ref: master
+      path: packages/log_box_navigation_logger
+  log_box_dio_logger:
+    git:
+      url: https://github.com/robzimpulse/log_box.git
+      ref: master
+      path: packages/log_box_dio_logger
+  log_box_in_app_webview_logger:
+    git:
+      url: https://github.com/robzimpulse/log_box.git
+      ref: master
+      path: packages/log_box_in_app_webview_logger
+
+  # library
+  service_locator:
+    path: ../../library/service_locator
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0

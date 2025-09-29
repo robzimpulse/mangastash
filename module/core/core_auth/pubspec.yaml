@@ -13,11 +13,6 @@ dependencies:
   rxdart: ^0.27.7
   equatable: ^2.0.5
   focus_detector_v2: ^3.1.0+1
-  log_box:
-    git:
-      url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box
 
   # library
   service_locator:
@@ -28,6 +23,8 @@ dependencies:
     path: ../../library/manga_service_firebase
 
   # core
+  core_analytics:
+    path: ../../core/core_analytics
   core_storage:
     path: ../../core/core_storage
   core_route:

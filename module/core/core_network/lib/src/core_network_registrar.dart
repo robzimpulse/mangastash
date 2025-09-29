@@ -1,7 +1,10 @@
-import 'package:log_box/log_box.dart';
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:core_analytics/core_analytics.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager/dio_manager.dart';
+import 'manager/headless_webview_manager.dart';
+import 'usecase/headless_webview_usecase.dart';
 
 class CoreNetworkRegistrar extends Registrar {
   @override
@@ -16,7 +19,17 @@ class CoreNetworkRegistrar extends Registrar {
     );
 
     locator.registerSingleton(
-      DioManager.create(log: locator(), storage: locator()),
+      HeadlessWebviewManager(log: log, storageManager: locator()),
+    );
+    locator.alias<HeadlessWebviewUseCase, HeadlessWebviewManager>();
+
+    locator.registerSingleton(CookieJar());
+    locator.registerSingleton(
+      DioManager.create(
+        log: locator(),
+        storage: locator(),
+        cookieJar: locator(),
+      ),
       dispose: (e) => e.close(force: true),
     );
 

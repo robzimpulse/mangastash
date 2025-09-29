@@ -1,8 +1,9 @@
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:core_analytics/core_analytics.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
-import 'package:log_box/log_box.dart';
-import 'package:log_box_dio_logger/log_box_dio_logger.dart';
 import 'package:universal_io/io.dart';
 
 import '../interceptor/dio_reject_interceptor.dart';
@@ -10,7 +11,11 @@ import '../interceptor/dio_throttler_interceptor.dart';
 import '../mixin/user_agent_mixin.dart';
 
 class DioManager {
-  static Dio create({required LogBox log, required StorageManager storage}) {
+  static Dio create({
+    required LogBox log,
+    required StorageManager storage,
+    required CookieJar cookieJar,
+  }) {
     final dio = Dio(
       BaseOptions(
         headers: {HttpHeaders.userAgentHeader: UserAgentMixin.staticUserAgent},
@@ -18,7 +23,6 @@ class DioManager {
     );
 
     dio.interceptors.addAll([
-      log.interceptor,
       DioThrottlerInterceptor(
         const Duration(milliseconds: 200),
         onThrottled: (req, scheduled) {
@@ -40,6 +44,8 @@ class DioManager {
           return null;
         },
       ),
+      CookieManager(cookieJar),
+      log.interceptor,
     ]);
 
     dio.interceptors.add(

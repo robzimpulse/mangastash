@@ -1,19 +1,21 @@
 import 'dart:convert';
 
+import 'package:core_analytics/core_analytics.dart';
+import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:log_box/log_box.dart';
-import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
 
 class RecrawlUseCase {
   final LogBox _logBox;
-
+  final CookieJar _cookieJar;
   final StorageManager _storageManager;
 
   RecrawlUseCase({
     required LogBox logBox,
+    required CookieJar cookieJar,
     required StorageManager storageManager,
   }) : _storageManager = storageManager,
+       _cookieJar = cookieJar,
        _logBox = logBox;
 
   Future<void> execute({
@@ -25,13 +27,28 @@ class RecrawlUseCase {
     await _logBox.webview(
       context: context,
       uri: uri,
-      onTapSnapshot: (url, html) {
+      onTapSnapshot: (url, html) async {
         if (url == null || html == null) return;
-        _storageManager.html.putFile(
+
+        await _storageManager.html.putFile(
           url,
           utf8.encode(html),
           fileExtension: 'html',
           maxAge: const Duration(minutes: 30),
+        );
+
+        final cookies = await CookieManager.instance().getAllCookies();
+        await _cookieJar.saveFromResponse(uri, [
+          ...cookies.map((e) => Cookie(e.name, e.value)),
+        ]);
+
+        _logBox.log(
+          name: runtimeType.toString(),
+          'Finish caching html and sync cookies',
+          extra: {
+            'url': uri.toString(),
+            'cookies': [...cookies.map((e) => e.toJson())],
+          },
         );
       },
     );

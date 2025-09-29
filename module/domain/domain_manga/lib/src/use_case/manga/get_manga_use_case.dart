@@ -1,24 +1,23 @@
 import 'dart:convert';
 
+import 'package:core_analytics/core_analytics.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:log_box/log_box.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../parser/base/manga_detail_html_parser.dart';
 
 class GetMangaUseCase with SyncMangasMixin {
-  final HeadlessWebviewManager _webview;
+  final HeadlessWebviewUseCase _webview;
   final StorageManager _storageManager;
   final MangaService _mangaService;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   GetMangaUseCase({
-    required HeadlessWebviewManager webview,
+    required HeadlessWebviewUseCase webview,
     required StorageManager storageManager,
     required MangaService mangaService,
     required MangaDao mangaDao,
@@ -56,7 +55,28 @@ class GetMangaUseCase with SyncMangasMixin {
       throw DataNotFoundException();
     }
 
-    final document = await _webview.open(url, useCache: useCache);
+    final selector = [
+      'button',
+      'inline-flex',
+      'items-center',
+      'whitespace-nowrap',
+      'px-4',
+      'py-2',
+      'w-full',
+      'justify-center',
+      'font-normal',
+      'align-middle',
+      'border-solid',
+    ].join('.');
+
+    final document = await _webview.open(
+      url,
+      scripts: [
+        if (source == SourceEnum.asurascan)
+          'window.document.querySelectorAll(\'$selector\')[0].click()',
+      ],
+      useCache: useCache,
+    );
 
     if (document == null) {
       throw FailedParsingHtmlException(url);

@@ -1,9 +1,8 @@
-import 'package:log_box/log_box.dart';
+import 'package:core_analytics/core_analytics.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager/global_options_manager.dart';
-import 'manager/headless_webview_manager.dart';
 import 'manager/history_manager.dart';
 import 'manager/job_manager.dart';
 import 'manager/library_manager.dart';
@@ -71,10 +70,6 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<ListenReadHistoryUseCase, HistoryManager>();
     locator.alias<ListenUnreadHistoryUseCase, HistoryManager>();
 
-    locator.registerSingleton(
-      HeadlessWebviewManager(log: log, storageManager: locator()),
-    );
-
     // manga dex services
     locator.registerFactory(() => MangaService(locator()));
     locator.registerFactory(() => ChapterService(locator()));
@@ -85,10 +80,12 @@ class DomainMangaRegistrar extends Registrar {
     // manga dex repositories
     locator.registerFactory(() => AtHomeRepository(service: locator()));
     locator.registerFactory(() => MangaRepository(service: locator()));
-    locator.registerFactory(
-      () =>
-          ChapterRepository(mangaService: locator(), chapterService: locator()),
-    );
+    locator.registerFactory(() {
+      return ChapterRepository(
+        mangaService: locator(),
+        chapterService: locator(),
+      );
+    });
     locator.registerFactory(() => AuthorRepository(service: locator()));
     locator.registerFactory(() => CoverRepository(service: locator()));
 
@@ -161,7 +158,11 @@ class DomainMangaRegistrar extends Registrar {
       ),
     );
     locator.registerFactory(
-      () => RecrawlUseCase(logBox: log, storageManager: locator()),
+      () => RecrawlUseCase(
+        logBox: log,
+        storageManager: locator(),
+        cookieJar: locator(),
+      ),
     );
 
     locator.registerSingleton(LibraryManager(libraryDao: locator()));
