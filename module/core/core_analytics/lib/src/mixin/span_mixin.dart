@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:faro/faro.dart';
-import 'package:flutter/foundation.dart';
 
 import '../extension/stack_trace_extension.dart';
 import 'faro_mixin.dart';

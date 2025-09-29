@@ -7,7 +7,6 @@ import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-import '../../manager/headless_webview_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../parser/base/manga_list_html_parser.dart';
 
