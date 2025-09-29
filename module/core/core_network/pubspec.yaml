@@ -14,12 +14,18 @@ dependencies:
   dio_smart_retry: ^6.0.0
   mutex: ^3.1.0
   universal_io: ^2.2.2
+  dio_cookie_manager: ^3.3.0
+  cookie_jar: ^4.0.8
+  flutter_inappwebview: ^6.1.0
+  html: ^0.15.5
 
   # core
   core_analytics:
     path: ../../core/core_analytics
   core_storage:
     path: ../core_storage
+  core_environment:
+    path: ../core_environment
 
   # library
   service_locator:
