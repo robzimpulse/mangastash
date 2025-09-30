@@ -3,13 +3,13 @@ import 'package:flutter/widgets.dart';
 
 import 'faro_mixin.dart';
 
-class FaroShellRouteNavigationObserver extends RouteObserver {
+class FaroShellRouteNavigationObserver extends RouteObserver with FaroMixin {
   @override
   void didPop(Route route, Route? previousRoute) {
     super.didPop(route, previousRoute);
     final prevRoute = previousRoute?.settings.name ?? FaroMixin.lastRoute;
-    Faro().setViewMeta(name: prevRoute);
-    Faro().pushEvent(
+    faro.setViewMeta(name: prevRoute);
+    faro.pushEvent(
       'view_changed',
       attributes: {
         'fromView': route.settings.name,
@@ -22,8 +22,8 @@ class FaroShellRouteNavigationObserver extends RouteObserver {
   void didPush(Route route, Route? previousRoute) {
     super.didPush(route, previousRoute);
     final prevRoute = previousRoute?.settings.name ?? FaroMixin.lastRoute;
-    Faro().setViewMeta(name: route.settings.name);
-    Faro().pushEvent(
+    faro.setViewMeta(name: route.settings.name);
+    faro.pushEvent(
       'view_changed',
       attributes: {
         'fromView': prevRoute,
@@ -38,8 +38,8 @@ class FaroShellRouteNavigationObserver extends RouteObserver {
     super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
     final prevRoute = oldRoute?.settings.name ?? FaroMixin.lastRoute;
     final currRoute = newRoute?.settings.name;
-    Faro().setViewMeta(name: currRoute);
-    Faro().pushEvent(
+    faro.setViewMeta(name: currRoute);
+    faro.pushEvent(
       'view_changed',
       attributes: {
         'fromView': prevRoute,
@@ -53,8 +53,8 @@ class FaroShellRouteNavigationObserver extends RouteObserver {
   void didRemove(Route route, Route? previousRoute) {
     super.didRemove(route, previousRoute);
     final prevRoute = previousRoute?.settings.name ?? FaroMixin.lastRoute;
-    Faro().setViewMeta(name: route.settings.name);
-    Faro().pushEvent(
+    faro.setViewMeta(name: route.settings.name);
+    faro.pushEvent(
       'view_changed',
       attributes: {
         'fromView': prevRoute,
