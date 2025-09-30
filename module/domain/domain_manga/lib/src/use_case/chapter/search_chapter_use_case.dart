@@ -14,7 +14,12 @@ import '../../mixin/sync_chapters_mixin.dart';
 import '../../parser/base/chapter_list_html_parser.dart';
 
 class SearchChapterUseCase
-    with SyncChaptersMixin, SortChaptersMixin, FilterChaptersMixin {
+    with
+        SyncChaptersMixin,
+        SortChaptersMixin,
+        FilterChaptersMixin,
+        FaroMixin,
+        FaroSpanMixin {
   final ChapterRepository _chapterRepository;
   final HeadlessWebviewUseCase _webview;
   final StorageManager _storageManager;
@@ -38,106 +43,104 @@ class SearchChapterUseCase
 
   Future<Pagination<Chapter>> _mangadex({
     required SourceSearchChapterParameter parameter,
+    Span? parent,
   }) async {
-    final result = await _chapterRepository.feed(
-      mangaId: parameter.mangaId,
-      parameter: parameter.parameter.copyWith(
-        includes: [Include.scanlationGroup, ...?parameter.parameter.includes],
-      ),
-    );
-
-    final data = result.data ?? [];
-    final offset = result.offset?.toInt() ?? 0;
-    final limit = result.limit?.toInt() ?? 0;
-    final total = result.total?.toInt() ?? 0;
-
-    return Pagination(
-      data: [
-        for (final value in data)
-          Chapter.from(data: value).copyWith(
-            mangaId: parameter.mangaId,
-            readableAt: await value.attributes?.readableAt?.asDateTime(
-              storageManager: _storageManager,
-            ),
-            publishAt: await value.attributes?.publishAt?.asDateTime(
-              storageManager: _storageManager,
-            ),
+    return await span(
+      body: (span) async {
+        final result = await _chapterRepository.feed(
+          mangaId: parameter.mangaId,
+          parameter: parameter.parameter.copyWith(
+            includes: [
+              Include.scanlationGroup,
+              ...?parameter.parameter.includes,
+            ],
           ),
-      ],
-      offset: offset,
-      limit: limit,
-      total: total,
-      hasNextPage: offset + data.length < total,
+        );
+
+        final data = result.data ?? [];
+        final offset = result.offset?.toInt() ?? 0;
+        final limit = result.limit?.toInt() ?? 0;
+        final total = result.total?.toInt() ?? 0;
+
+        return Pagination(
+          data: [
+            for (final value in data)
+              Chapter.from(data: value).copyWith(
+                mangaId: parameter.mangaId,
+                readableAt: await value.attributes?.readableAt?.asDateTime(
+                  storageManager: _storageManager,
+                ),
+                publishAt: await value.attributes?.publishAt?.asDateTime(
+                  storageManager: _storageManager,
+                ),
+              ),
+          ],
+          offset: offset,
+          limit: limit,
+          total: total,
+          hasNextPage: offset + data.length < total,
+        );
+      },
+      attributes: {'parameter': parameter.toString()},
+      parent: parent,
     );
   }
 
   Future<Pagination<Chapter>> _scrapping({
     required SourceSearchChapterParameter parameter,
+    Span? parent,
     bool useCache = true,
   }) async {
-    final raw = await _mangaDao.search(ids: [parameter.mangaId]);
-    final result = Manga.fromDatabase(raw.firstOrNull);
+    return await span(
+      body: (span) async {
+        final raw = await _mangaDao.search(ids: [parameter.mangaId]);
+        final result = Manga.fromDatabase(raw.firstOrNull);
 
-    final url = result?.webUrl;
+        final url = result?.webUrl;
 
-    if (url == null) {
-      throw DataNotFoundException();
-    }
+        if (url == null) {
+          throw DataNotFoundException();
+        }
 
-    final selector = [
-      'button',
-      'inline-flex',
-      'items-center',
-      'whitespace-nowrap',
-      'px-4',
-      'py-2',
-      'w-full',
-      'justify-center',
-      'font-normal',
-      'align-middle',
-      'border-solid',
-    ].join('.');
+        final document = await _webview.open(url, useCache: useCache);
 
-    final document = await _webview.open(
-      url,
-      scripts: [
-        if (parameter.source == SourceEnum.asurascan)
-          'window.document.querySelectorAll(\'$selector\')[0].click()',
-      ],
-      useCache: useCache,
-    );
+        if (document == null) {
+          throw FailedParsingHtmlException(url);
+        }
 
-    if (document == null) {
-      throw FailedParsingHtmlException(url);
-    }
+        final parser = ChapterListHtmlParser.forSource(
+          root: document,
+          source: parameter.source,
+          storageManager: _storageManager,
+        );
 
-    final parser = ChapterListHtmlParser.forSource(
-      root: document,
-      source: parameter.source,
-      storageManager: _storageManager,
-    );
+        final chapters = await parser.chapters;
+        final total = parameter.parameter.page * parameter.parameter.limit;
 
-    final chapters = await parser.chapters;
+        final data = filterChapters(
+          chapters: sortChapters(
+            chapters: [
+              ...chapters.map((e) => e.copyWith(mangaId: parameter.mangaId)),
+            ],
+            parameter: parameter.parameter,
+          ),
+          parameter: parameter.parameter,
+        );
 
-    final data = filterChapters(
-      chapters: sortChapters(
-        chapters: [
-          ...chapters.map((e) => e.copyWith(mangaId: parameter.mangaId)),
-        ],
-        parameter: parameter.parameter,
-      ),
-      parameter: parameter.parameter,
-    );
-
-    return Pagination(
-      data: data,
-      page: parameter.parameter.page,
-      limit: parameter.parameter.limit,
-      total: chapters.length,
-      hasNextPage:
-          chapters.length >
-          parameter.parameter.page * parameter.parameter.limit,
-      sourceUrl: url,
+        return Pagination(
+          data: data,
+          page: parameter.parameter.page,
+          limit: parameter.parameter.limit,
+          total: chapters.length,
+          hasNextPage: chapters.length > total,
+          sourceUrl: url,
+        );
+      },
+      attributes: {
+        'parameter': parameter.toString(),
+        'useCache': useCache.toString(),
+      },
+      parent: parent,
     );
   }
 
@@ -166,48 +169,70 @@ class SearchChapterUseCase
   Future<Result<Pagination<Chapter>>> execute({
     required SourceSearchChapterParameter parameter,
     bool useCache = true,
+    Span? parent,
   }) async {
-    final key = parameter.toJsonString();
-    final cache = await _storageManager.searchChapter.getFileFromCache(key);
-    final file = await cache?.file.readAsString(encoding: utf8);
-    final data = file.let((e) {
-      return Pagination.fromJsonString(
-        e,
-        (e) => Chapter.fromJson(e.castOrNull()),
-      );
-    });
+    return await startSpan(
+      body: (span) async {
+        final key = parameter.toJsonString();
+        final cache = await _storageManager.searchChapter.getFileFromCache(key);
+        final file = await cache?.file.readAsString(encoding: utf8);
+        final data = file.let((e) {
+          return Pagination.fromJsonString(
+            e,
+            (e) => Chapter.fromJson(e.castOrNull()),
+          );
+        });
 
-    if (data != null && useCache) {
-      return Success(data);
-    }
+        if (data != null && useCache) {
+          span?.setStatus(SpanStatusCode.ok);
+          span?.setAttribute('source', 'Cache');
+          span?.end();
+          return Success(data);
+        }
 
-    try {
-      final Pagination<Chapter> data;
-      if (parameter.source == SourceEnum.mangadex) {
-        data = await _mangadex(parameter: parameter);
-      } else {
-        data = await _scrapping(parameter: parameter, useCache: useCache);
-      }
+        try {
+          final Pagination<Chapter> data;
+          if (parameter.source == SourceEnum.mangadex) {
+            data = await _mangadex(parameter: parameter, parent: span);
+          } else {
+            data = await _scrapping(
+              parameter: parameter,
+              useCache: useCache,
+              parent: span,
+            );
+          }
 
-      final result = data.copyWith(
-        data: await sync(
-          dao: _chapterDao,
-          values: [...?data.data],
-          logBox: _logBox,
-        ),
-      );
+          final result = data.copyWith(
+            data: await sync(
+              dao: _chapterDao,
+              values: [...?data.data],
+              logBox: _logBox,
+            ),
+          );
 
-      await _storageManager.searchChapter.putFile(
-        key,
-        key: key,
-        utf8.encode(result.toJsonString((e) => e.toJson())),
-        fileExtension: 'json',
-        maxAge: const Duration(minutes: 30),
-      );
+          await _storageManager.searchChapter.putFile(
+            key,
+            key: key,
+            utf8.encode(result.toJsonString((e) => e.toJson())),
+            fileExtension: 'json',
+            maxAge: const Duration(minutes: 30),
+          );
 
-      return Success(result);
-    } catch (e) {
-      return Error(e);
-    }
+          span?.setStatus(SpanStatusCode.ok);
+          return Success(result);
+        } catch (e) {
+          span?.setStatus(SpanStatusCode.error, message: e.toString());
+          return Error(e);
+        } finally {
+          span?.setAttribute('source', 'Service');
+          span?.end();
+        }
+      },
+      attributes: {
+        'parameter': parameter.toString(),
+        'useCache': useCache.toString(),
+      },
+      parentSpan: parent,
+    );
   }
 }

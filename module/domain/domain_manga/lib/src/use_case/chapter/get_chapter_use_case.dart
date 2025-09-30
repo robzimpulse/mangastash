@@ -10,7 +10,7 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import '../../mixin/sync_chapters_mixin.dart';
 import '../../parser/base/chapter_image_html_parser.dart';
 
-class GetChapterUseCase with SyncChaptersMixin {
+class GetChapterUseCase with SyncChaptersMixin, FaroMixin, FaroSpanMixin {
   final ChapterRepository _chapterRepository;
   final AtHomeRepository _atHomeRepository;
   final HeadlessWebviewUseCase _webview;
@@ -35,23 +35,29 @@ class GetChapterUseCase with SyncChaptersMixin {
   Future<Chapter> _mangadex({
     required String mangaId,
     required String chapterId,
+    Span? parent,
   }) async {
-    final response = await Future.wait([
-      _chapterRepository.detail(chapterId, includes: [Include.manga]),
-      _atHomeRepository.url(chapterId),
-    ]);
+    return await span(
+      body: (span) async {
+        final response = await Future.wait([
+          _chapterRepository.detail(chapterId, includes: [Include.manga]),
+          _atHomeRepository.url(chapterId),
+        ]);
 
-    final chapter = response[0] as ChapterResponse;
-    final atHome = response[1] as AtHomeResponse;
+        final chapter = response[0] as ChapterResponse;
+        final atHome = response[1] as AtHomeResponse;
 
-    return Chapter(
-      id: chapter.data?.id,
-      title: chapter.data?.attributes?.title,
-      chapter: chapter.data?.attributes?.chapter,
-      volume: chapter.data?.attributes?.volume,
-      images: atHome.images,
-      translatedLanguage: chapter.data?.attributes?.translatedLanguage,
-      mangaId: mangaId,
+        return Chapter(
+          id: chapter.data?.id,
+          title: chapter.data?.attributes?.title,
+          chapter: chapter.data?.attributes?.chapter,
+          volume: chapter.data?.attributes?.volume,
+          images: atHome.images,
+          translatedLanguage: chapter.data?.attributes?.translatedLanguage,
+          mangaId: mangaId,
+        );
+      },
+      attributes: {'manga_id': mangaId, 'chapter_id': chapterId},
     );
   }
 
@@ -59,45 +65,30 @@ class GetChapterUseCase with SyncChaptersMixin {
     required String? url,
     required SourceEnum source,
     bool useCache = true,
+    Span? parent,
   }) async {
-    if (url == null) {
-      throw DataNotFoundException();
-    }
+    return await span(
+      body: (span) async {
+        if (url == null) {
+          throw DataNotFoundException();
+        }
 
-    final selector = [
-      'button',
-      'inline-flex',
-      'items-center',
-      'whitespace-nowrap',
-      'px-4',
-      'py-2',
-      'w-full',
-      'justify-center',
-      'font-normal',
-      'align-middle',
-      'border-solid',
-    ].join('.');
+        final document = await _webview.open(url, useCache: useCache);
 
-    final document = await _webview.open(
-      url,
-      scripts: [
-        if (source == SourceEnum.asurascan)
-          'window.document.querySelectorAll(\'$selector\')[0].click()',
-      ],
-      useCache: useCache,
+        if (document == null) {
+          throw FailedParsingHtmlException(url);
+        }
+
+        final parser = ChapterImageHtmlParser.forSource(
+          root: document,
+          source: source,
+          storageManager: _storageManager,
+        );
+
+        return parser.images;
+      },
+      attributes: {'url': url ?? '', 'source': source.toString()},
     );
-
-    if (document == null) {
-      throw FailedParsingHtmlException(url);
-    }
-
-    final parser = ChapterImageHtmlParser.forSource(
-      root: document,
-      source: source,
-      storageManager: _storageManager,
-    );
-
-    return parser.images;
   }
 
   Future<void> clearCache({
@@ -114,55 +105,75 @@ class GetChapterUseCase with SyncChaptersMixin {
     required String mangaId,
     required String chapterId,
     bool useCache = true,
+    Span? parent,
   }) async {
-    final key = '${source.name} - $mangaId - $chapterId';
-    final file = await _storageManager.chapter.getFileFromCache(key);
-    final data = await file?.file.readAsString(encoding: utf8);
-    final cache = Chapter.fromJsonString(data ?? '');
-    if (cache != null && useCache) return Success(cache);
+    return await startSpan(
+      body: (span) async {
+        final key = '${source.name} - $mangaId - $chapterId';
+        final file = await _storageManager.chapter.getFileFromCache(key);
+        final data = await file?.file.readAsString(encoding: utf8);
+        final cache = Chapter.fromJsonString(data ?? '');
+        if (cache != null && useCache) return Success(cache);
 
-    final raw = await _chapterDao.search(ids: [chapterId]);
-    final chapter = raw.firstOrNull.let(
-      (e) => e.chapter?.let((d) => Chapter.fromDrift(d, images: e.images)),
-    );
-
-    try {
-      final Chapter? data;
-      if (source == SourceEnum.mangadex) {
-        data = await _mangadex(mangaId: mangaId, chapterId: chapterId);
-      } else {
-        data = chapter?.copyWith(
-          images: await _scrapping(
-            url: chapter.webUrl,
-            source: source,
-            useCache: useCache,
-          ),
+        final raw = await _chapterDao.search(ids: [chapterId]);
+        final chapter = raw.firstOrNull.let(
+          (e) => e.chapter?.let((d) => Chapter.fromDrift(d, images: e.images)),
         );
-      }
 
-      final results = await sync(
-        dao: _chapterDao,
-        values: [
-          ...[data].nonNulls,
-        ],
-        logBox: _logBox,
-      );
+        try {
+          final Chapter? data;
+          if (source == SourceEnum.mangadex) {
+            data = await _mangadex(
+              mangaId: mangaId,
+              chapterId: chapterId,
+              parent: span,
+            );
+          } else {
+            data = chapter?.copyWith(
+              images: await _scrapping(
+                url: chapter.webUrl,
+                source: source,
+                useCache: useCache,
+                parent: span,
+              ),
+            );
+          }
 
-      final result = results.firstOrNull;
+          final results = await sync(
+            dao: _chapterDao,
+            values: [
+              ...[data].nonNulls,
+            ],
+            logBox: _logBox,
+          );
 
-      if (result == null) {
-        throw DataNotFoundException();
-      }
+          final result = results.firstOrNull;
 
-      await _storageManager.chapter.putFile(
-        key,
-        utf8.encode(result.toJsonString()),
-        key: key,
-      );
+          if (result == null) {
+            throw DataNotFoundException();
+          }
 
-      return Success(result);
-    } catch (e) {
-      return Error(e);
-    }
+          await _storageManager.chapter.putFile(
+            key,
+            utf8.encode(result.toJsonString()),
+            key: key,
+          );
+
+          span?.setStatus(SpanStatusCode.ok);
+          return Success(result);
+        } catch (e) {
+          span?.setStatus(SpanStatusCode.error, message: e.toString());
+          return Error(e);
+        } finally {
+          span?.end();
+        }
+      },
+      attributes: {
+        'source': source.toString(),
+        'manga_id': mangaId,
+        'chapter_id': chapterId,
+      },
+      parentSpan: parent,
+    );
   }
 }

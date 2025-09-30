@@ -1,12 +1,9 @@
-import 'dart:isolate';
-
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
-import 'package:flutter/foundation.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
@@ -19,7 +16,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   // Service locator/dependency injector code here
   ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
-  runApp(MangaStashApp(locator: ServiceLocator.asNewInstance()));
+  FaroMixin.runner(MangaStashApp(locator: ServiceLocator.asNewInstance()));
 }
 
 class MangaStashApp extends StatefulWidget {
@@ -59,51 +56,51 @@ class _MangaStashAppState extends State<MangaStashApp> {
   Future<void> initiateAppLocator() async {
     if (widget.testing) return;
 
-    widget.locator.registerSingleton(LogBox(capacity: 1000));
-
     // TODO: register module registrar here
+    await widget.locator.registerRegistrar(CoreAnalyticsRegistrar());
     await widget.locator.registerRegistrar(CoreStorageRegistrar());
     await widget.locator.registerRegistrar(CoreNetworkRegistrar());
     await widget.locator.registerRegistrar(CoreEnvironmentRegistrar());
     await widget.locator.registerRegistrar(CoreRouteRegistrar());
     await widget.locator.registerRegistrar(DomainMangaRegistrar());
 
-    FlutterError.onError = (details) {
-      final LogBox log = widget.locator();
-      log.log(
-        details.exceptionAsString(),
-        name: 'FlutterError',
-        error: details.exception,
-        stackTrace: details.stack,
-      );
-    };
-
-    PlatformDispatcher.instance.onError = (error, stack) {
-      final LogBox log = widget.locator();
-      log.log(
-        error.toString(),
-        name: 'PlatformDispatcher',
-        error: error,
-        stackTrace: stack,
-      );
-      return true;
-    };
-
-    Isolate.current.addErrorListener(
-      RawReceivePort((pair) {
-        if (pair is! List) return;
-        final LogBox log = widget.locator();
-        final Object? error = pair.firstOrNull.castOrNull();
-        final String? trace = pair.lastOrNull.castOrNull();
-
-        log.log(
-          error.toString(),
-          name: 'Isolate',
-          error: error,
-          stackTrace: trace?.let((e) => StackTrace.fromString(e)),
-        );
-      }).sendPort,
-    );
+    // TODO: commented for a while to test analytics
+    // FlutterError.onError = (details) {
+    //   final LogBox log = widget.locator();
+    //   log.log(
+    //     details.exceptionAsString(),
+    //     name: 'FlutterError',
+    //     error: details.exception,
+    //     stackTrace: details.stack,
+    //   );
+    // };
+    //
+    // PlatformDispatcher.instance.onError = (error, stack) {
+    //   final LogBox log = widget.locator();
+    //   log.log(
+    //     error.toString(),
+    //     name: 'PlatformDispatcher',
+    //     error: error,
+    //     stackTrace: stack,
+    //   );
+    //   return true;
+    // };
+    //
+    // Isolate.current.addErrorListener(
+    //   RawReceivePort((pair) {
+    //     if (pair is! List) return;
+    //     final LogBox log = widget.locator();
+    //     final Object? error = pair.firstOrNull.castOrNull();
+    //     final String? trace = pair.lastOrNull.castOrNull();
+    //
+    //     log.log(
+    //       error.toString(),
+    //       name: 'Isolate',
+    //       error: error,
+    //       stackTrace: trace?.let((e) => StackTrace.fromString(e)),
+    //     );
+    //   }).sendPort,
+    // );
   }
 
   GoRouter _route({
@@ -126,9 +123,13 @@ class _MangaStashAppState extends State<MangaStashApp> {
         locator: locator,
         rootNavigatorKey: rootNavigatorKey,
         // TODO: add observer here
-        observers: () => [logBox.observer],
+        observers: () => [logBox.observer, FaroShellRouteNavigationObserver()],
       ),
-      observers: [logBox.observer, viewer.navigatorObserver],
+      observers: [
+        logBox.observer,
+        viewer.navigatorObserver,
+        FaroShellRouteNavigationObserver(),
+      ],
     );
   }
 }

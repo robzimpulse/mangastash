@@ -28,7 +28,7 @@ extension SearchUrlExtension on SourceSearchMangaParameter {
                 MangaStatus.completed => 'end',
                 MangaStatus.hiatus => 'on-hold',
                 MangaStatus.cancelled => 'canceled',
-              }),
+              },),
             for (final tag in parameter.includedTags ?? <String>[])
               MapEntry('genre[]', tag),
             if (parameter.includedTags?.isNotEmpty == true)

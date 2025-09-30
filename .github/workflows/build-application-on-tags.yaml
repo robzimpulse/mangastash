@@ -61,7 +61,7 @@ jobs:
       - name: 'Bootstrap Workspace'
         run: melos bootstrap --verbose
       - name: 'Build Application'
-        run: flutter build ${{ matrix.platform }}
+        run: flutter build ${{ matrix.platform }} --dart-define=FARO_API_KEY=${{ secrets.FARO_API_KEY }} --dart-define=FARO_COLLECTOR_URL=${{ secrets.FARO_COLLECTOR_URL }}
       - name: 'Compress Directory'
         uses: somaz94/compress-decompress@v1
         if: ${{ matrix.platform == 'web' }}

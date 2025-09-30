@@ -10,6 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  faro: ^0.4.2
   package_info_plus: ^8.3.0
   universal_io: ^2.2.2
   log_box:
