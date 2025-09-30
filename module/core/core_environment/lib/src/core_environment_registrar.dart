@@ -5,9 +5,11 @@ import 'package:worker_manager/worker_manager.dart';
 import 'manager/date_manager.dart';
 import 'manager/locale_manager.dart';
 import 'manager/theme_manager.dart';
+import 'manager/worker_manager.dart';
 import 'use_case/listen_current_timezone_use_case.dart';
 import 'use_case/listen_locale_use_case.dart';
 import 'use_case/listen_theme_use_case.dart';
+import 'use_case/task_executor_use_case.dart';
 import 'use_case/update_locale_use_case.dart';
 import 'use_case/update_theme_use_case.dart';
 
@@ -34,7 +36,11 @@ class CoreEnvironmentRegistrar extends Registrar {
     locator.registerSingleton(await DateManager.create());
     locator.alias<ListenCurrentTimezoneUseCase, DateManager>();
 
-    await workerManager.init(dynamicSpawning: true);
+    locator.registerSingleton(
+      await WorkerManager.create(),
+      dispose: (e) => e.dispose(),
+    );
+    locator.alias<TaskExecutor, WorkerManager>();
 
     log.log(
       'Register ${runtimeType.toString()}',
