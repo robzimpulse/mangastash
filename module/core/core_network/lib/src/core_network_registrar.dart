@@ -25,11 +25,7 @@ class CoreNetworkRegistrar extends Registrar {
 
     locator.registerSingleton(CookieJar());
     locator.registerSingleton(
-      DioManager.create(
-        log: locator(),
-        storage: locator(),
-        cookieJar: locator(),
-      ),
+      DioManager.create(log: locator(), cookieJar: locator()),
       dispose: (e) => e.close(force: true),
     );
 
