@@ -1,6 +1,5 @@
 import 'package:core_analytics/core_analytics.dart';
 import 'package:service_locator/service_locator.dart';
-import 'package:worker_manager/worker_manager.dart';
 
 import 'manager/date_manager.dart';
 import 'manager/locale_manager.dart';
