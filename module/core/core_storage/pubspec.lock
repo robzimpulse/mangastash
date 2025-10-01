@@ -363,10 +363,10 @@ packages:
     dependency: transitive
     description:
       name: http_cache_core
-      sha256: b0accfa821e73085b5252dd42a6908d19ea0c29badd46db3668af6f8e510cfe1
+      sha256: "8f9f187d10f8d1a90c51db2389575bbddf71ca0f79d4527652ea1efa3f338071"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.1"
+    version: "1.1.2"
   http_parser:
     dependency: transitive
     description:
@@ -436,7 +436,7 @@ packages:
     description:
       path: "packages/log_box"
       ref: master
-      resolved-ref: "5cbb24802c0b7c4d5572d93ad215bae9294436a0"
+      resolved-ref: e799b7bf915a63c93e0ddf2ddf42d296865c87ba
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -445,7 +445,7 @@ packages:
     description:
       path: "packages/log_box_dio_logger"
       ref: master
-      resolved-ref: "5cbb24802c0b7c4d5572d93ad215bae9294436a0"
+      resolved-ref: e799b7bf915a63c93e0ddf2ddf42d296865c87ba
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -454,7 +454,7 @@ packages:
     description:
       path: "packages/log_box_in_app_webview_logger"
       ref: master
-      resolved-ref: "5cbb24802c0b7c4d5572d93ad215bae9294436a0"
+      resolved-ref: e799b7bf915a63c93e0ddf2ddf42d296865c87ba
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -463,7 +463,7 @@ packages:
     description:
       path: "packages/log_box_navigation_logger"
       ref: master
-      resolved-ref: "5cbb24802c0b7c4d5572d93ad215bae9294436a0"
+      resolved-ref: e799b7bf915a63c93e0ddf2ddf42d296865c87ba
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"

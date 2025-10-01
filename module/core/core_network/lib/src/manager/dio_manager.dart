@@ -1,6 +1,5 @@
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:core_analytics/core_analytics.dart';
-import 'package:core_storage/core_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
@@ -13,7 +12,6 @@ import '../mixin/user_agent_mixin.dart';
 class DioManager {
   static Dio create({
     required LogBox log,
-    required StorageManager storage,
     required CookieJar cookieJar,
   }) {
     final dio = Dio(

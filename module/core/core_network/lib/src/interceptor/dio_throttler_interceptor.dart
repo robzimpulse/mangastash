@@ -17,7 +17,7 @@ class DioThrottlerInterceptor extends Interceptor {
   /// to be fired.
   void Function(RequestOptions req, DateTime until)? onThrottled;
 
-  DateTime _nextAvailable = DateTime.now();
+  DateTime _next = DateTime.now();
   final Mutex _mutex = Mutex();
 
   DioThrottlerInterceptor(
@@ -33,29 +33,44 @@ class DioThrottlerInterceptor extends Interceptor {
       return;
     }
 
-    var now = DateTime.now();
-    _mutex.protect(() async {
-      if (now.isBefore(_nextAvailable)) {
-        // Throttle this request
-        var scheduledTime = _nextAvailable;
-        // Compute the next time a request is able to be fired
-        _nextAvailable = _nextAvailable.add(interval);
-        return scheduledTime;
-      } else {
-        // Not throttled, fire the request immediately
-        _nextAvailable = now.add(interval);
-        return null;
-      }
-    }).then((scheduledTime) {
-      if (scheduledTime != null) {
-        onThrottled?.call(options, scheduledTime);
-        Future.delayed(
-          scheduledTime.difference(now),
-          () => handler.next(options),
-        );
-      } else {
-        handler.next(options);
-      }
-    });
+    // mark a timestamp
+    final now = DateTime.now();
+
+    // handle calculation scheduled time with mutex to eliminate race condition
+    // when calculating value [_next].
+    _mutex
+        .protect(() => _calculateNextScheduledTime(now))
+        .then((date) => _handleNextScheduledTime(options, handler, now, date));
+  }
+
+  Future<DateTime?> _calculateNextScheduledTime(DateTime now) async {
+    // calculate the next scheduled time based on future scheduled time
+    if (now.isBefore(_next)) {
+      final scheduledTime = _next;
+      // Compute the next scheduled time for a request
+      _next = _next.add(interval);
+      return scheduledTime;
+    }
+
+    // compute next scheduled time for a request
+    _next = now.add(interval);
+    return null;
+  }
+
+  void _handleNextScheduledTime(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+    DateTime now,
+    DateTime? scheduledTime,
+  ) {
+    if (scheduledTime == null) {
+      // Not throttled, fire the request immediately
+      handler.next(options);
+      return;
+    }
+
+    // Throttled, fire the request on the scheduled date
+    onThrottled?.call(options, scheduledTime);
+    Future.delayed(scheduledTime.difference(now), () => handler.next(options));
   }
 }
