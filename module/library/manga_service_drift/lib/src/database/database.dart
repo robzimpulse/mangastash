@@ -24,6 +24,7 @@ import '../util/typedef.dart';
 import 'adapter/sql_workaround_adapter.dart'
     if (dart.library.io) 'adapter/sql_workaround_native.dart'
     if (dart.library.js) 'adapter/sql_workaround_web.dart';
+import 'executor.dart';
 
 part 'database.g.dart';
 
@@ -52,12 +53,7 @@ class AppDatabase extends _$AppDatabase {
   // and a constructor telling drift where the database should be stored.
   // These are described in the getting started guide: https://drift.simonbinder.eu/setup/
   AppDatabase({QueryExecutor? executor, LoggerCallback? logger})
-    : super(
-        LazyDatabase(() async {
-          final exec = (executor ?? await _openConnection(logger: logger));
-          return exec.interceptWith(LogInterceptor(logger: logger));
-        }),
-      );
+    : super(executor ?? Executor.create(logger: logger));
 
   @override
   int get schemaVersion => 1;
@@ -67,31 +63,4 @@ class AppDatabase extends _$AppDatabase {
       await delete(table).go();
     }
   }
-}
-
-Future<QueryExecutor> _openConnection({LoggerCallback? logger}) async {
-  await sqlWorkaround();
-
-  return driftDatabase(
-    name: 'mangastash-local',
-    native: DriftNativeOptions(
-      databaseDirectory: () async {
-        final directory = await getApplicationDocumentsDirectory();
-        logger?.call('Database location: $directory', name: 'AppDatabase');
-        return directory;
-      },
-    ),
-    web: DriftWebOptions(
-      sqlite3Wasm: Uri.parse('sqlite3.wasm'),
-      driftWorker: Uri.parse('drift_worker.js'),
-      onResult: (result) {
-        if (result.missingFeatures.isEmpty) return;
-        logger?.call(
-          'Using ${result.chosenImplementation} due to unsupported '
-          'browser features: ${result.missingFeatures}',
-          name: 'AppDatabase',
-        );
-      },
-    ),
-  );
 }
