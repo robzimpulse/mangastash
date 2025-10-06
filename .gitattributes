@@ -1,2 +1,2 @@
-**/*.g.dart -diff
-**/pubspec.lock -diff
+**/*.g.dart linguist-generated
+**/pubspec.lock linguist-generated
