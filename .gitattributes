@@ -1,0 +1,2 @@
+**/*.g.dart -diff
+**/pubspec.lock -diff
