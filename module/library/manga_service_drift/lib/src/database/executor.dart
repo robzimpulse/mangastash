@@ -1,13 +1,27 @@
 import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../interceptor/log_interceptor.dart';
 import '../util/typedef.dart';
-import 'adapter/sql_workaround_adapter.dart';
+import 'adapter/sql_workaround_adapter.dart'
+    if (dart.library.io) 'adapter/sql_workaround_native.dart'
+    if (dart.library.js) 'adapter/sql_workaround_web.dart';
 
 class Executor {
-  static QueryExecutor create({LoggerCallback? logger}) {
+  final LoggerCallback? _logger;
+
+  const Executor({LoggerCallback? logger}) : _logger = logger;
+
+  QueryExecutor buildForTesting() {
+    return DatabaseConnection(
+      NativeDatabase.memory(),
+      closeStreamsSynchronously: true,
+    );
+  }
+
+  QueryExecutor build() {
     return LazyDatabase(() async {
       await sqlWorkaround();
 
@@ -16,7 +30,7 @@ class Executor {
         native: DriftNativeOptions(
           databaseDirectory: () async {
             final directory = await getApplicationDocumentsDirectory();
-            logger?.call('Database location: $directory', name: 'AppDatabase');
+            _logger?.call('Database location: $directory', name: 'AppDatabase');
             return directory;
           },
         ),
@@ -25,7 +39,7 @@ class Executor {
           driftWorker: Uri.parse('drift_worker.js'),
           onResult: (result) {
             if (result.missingFeatures.isEmpty) return;
-            logger?.call(
+            _logger?.call(
               'Using ${result.chosenImplementation} due to unsupported '
               'browser features: ${result.missingFeatures}',
               name: 'AppDatabase',
@@ -34,7 +48,7 @@ class Executor {
         ),
       );
 
-      return executor.interceptWith(LogInterceptor(logger: logger));
+      return executor.interceptWith(LogInterceptor(logger: _logger));
     });
   }
 }
