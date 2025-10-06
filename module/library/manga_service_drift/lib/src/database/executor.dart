@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -13,13 +12,6 @@ class Executor {
   final LoggerCallback? _logger;
 
   const Executor({LoggerCallback? logger}) : _logger = logger;
-
-  QueryExecutor buildForTesting() {
-    return DatabaseConnection(
-      NativeDatabase.memory(),
-      closeStreamsSynchronously: true,
-    );
-  }
 
   QueryExecutor build() {
     return LazyDatabase(() async {
