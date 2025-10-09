@@ -9,14 +9,9 @@ import 'usecase/headless_webview_usecase.dart';
 class CoreNetworkRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    final LogBox log = locator();
+    final start = DateTime.timestamp().toIso8601String();
 
-    log.log(
-      'Register ${runtimeType.toString()}',
-      id: runtimeType.toString(),
-      name: 'Services',
-      extra: {'start': DateTime.timestamp().toIso8601String()},
-    );
+    final LogBox log = locator();
 
     locator.registerSingleton(
       HeadlessWebviewManager(log: log, storageManager: locator()),
@@ -32,7 +27,7 @@ class CoreNetworkRegistrar extends Registrar {
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
       name: 'Services',
-      extra: {'finish': DateTime.timestamp().toIso8601String()},
+      extra: {'start': start, 'finish': DateTime.timestamp().toIso8601String()},
     );
   }
 }

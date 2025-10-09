@@ -4,15 +4,9 @@ import 'package:service_locator/service_locator.dart';
 class CoreAnalyticsRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
+    final start = DateTime.timestamp().toIso8601String();
 
     final log = LogBox(capacity: 1000);
-
-    log.log(
-      'Register ${runtimeType.toString()}',
-      name: 'Services',
-      id: runtimeType.toString(),
-      extra: {'start': DateTime.timestamp().toIso8601String()},
-    );
 
     locator.registerSingleton(log);
 
@@ -20,7 +14,7 @@ class CoreAnalyticsRegistrar extends Registrar {
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
       name: 'Services',
-      extra: {'finish': DateTime.timestamp().toIso8601String()},
+      extra: {'start': start, 'finish': DateTime.timestamp().toIso8601String()},
     );
   }
 }
