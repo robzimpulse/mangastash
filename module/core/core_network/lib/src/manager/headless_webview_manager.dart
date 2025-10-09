@@ -95,18 +95,6 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       onContentSizeChanged: (_, prev, curr) {
         delegate.onContentSizeChanged(previous: prev, current: curr);
       },
-      shouldInterceptAjaxRequest: (_, request) async {
-        delegate.shouldInterceptAjaxRequest(request: request.toMap());
-        return request;
-      },
-      onAjaxProgress: (_, request) async {
-        delegate.onAjaxProgress(request: request.toMap());
-        return AjaxRequestAction.PROCEED;
-      },
-      onAjaxReadyStateChange: (_, request) async {
-        delegate.onAjaxReadyStateChange(request: request.toMap());
-        return AjaxRequestAction.PROCEED;
-      },
       onReceivedHttpError: (_, request, response) {
         delegate.onReceivedHttpError(
           request: request.toMap(),

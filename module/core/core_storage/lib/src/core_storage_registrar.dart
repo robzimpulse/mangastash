@@ -17,7 +17,11 @@ class CoreStorageRegistrar extends Registrar {
       extra: {'start': DateTime.timestamp().toIso8601String()},
     );
 
-    locator.registerSingleton(AppDatabase(), dispose: (e) => e.close());
+    locator.registerFactory(() => const Executor().build());
+    locator.registerSingleton(
+      AppDatabase(executor: locator()),
+      dispose: (e) => e.close(),
+    );
     locator.registerSingleton(DatabaseViewer());
     locator.registerFactory(() => MangaDao(locator()));
     locator.registerFactory(() => ChapterDao(locator()));
