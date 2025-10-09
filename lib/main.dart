@@ -1,9 +1,12 @@
+import 'dart:isolate';
+
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
+import 'package:flutter/foundation.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
@@ -64,6 +67,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
     await widget.locator.registerRegistrar(CoreRouteRegistrar());
     await widget.locator.registerRegistrar(DomainMangaRegistrar());
 
+    final existingFlutterError = FlutterError.onError;
     FlutterError.onError = (details) {
       final LogBox log = widget.locator();
       log.log(
@@ -72,8 +76,10 @@ class _MangaStashAppState extends State<MangaStashApp> {
         error: details.exception,
         stackTrace: details.stack,
       );
+      existingFlutterError?.call(details);
     };
 
+    final existingPlatformDispatcher = PlatformDispatcher.instance.onError;
     PlatformDispatcher.instance.onError = (error, stack) {
       final LogBox log = widget.locator();
       log.log(
@@ -82,7 +88,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
         error: error,
         stackTrace: stack,
       );
-      return true;
+      return existingPlatformDispatcher?.call(error, stack) ?? true;
     };
 
     if (!kIsWeb) {
