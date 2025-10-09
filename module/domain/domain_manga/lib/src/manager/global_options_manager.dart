@@ -26,23 +26,21 @@ class GlobalOptionsManager
   static const String _sourcesKey = 'sources';
 
   GlobalOptionsManager({required SharedPreferences storage})
-      : _storage = storage,
-        _sources = BehaviorSubject.seeded(
-          storage
-              .getStringList(_sourcesKey)
-              .let(
-                (e) => [
-                  ...e.map((e) => SourceEnum.fromValue(name: e)).nonNulls,
-                ],
-              )
-              .or([]),
-        ),
-        _searchMangaParameter = BehaviorSubject.seeded(
-          storage
-              .getString(_mangaParameterKey)
-              .let(SearchMangaParameter.fromJsonString)
-              .or(const SearchMangaParameter()),
-        );
+    : _storage = storage,
+      _sources = BehaviorSubject.seeded(
+        storage
+            .getStringList(_sourcesKey)
+            .let(
+              (e) => [...e.map((e) => SourceEnum.fromValue(name: e)).nonNulls],
+            )
+            .or([]),
+      ),
+      _searchMangaParameter = BehaviorSubject.seeded(
+        storage
+            .getString(_mangaParameterKey)
+            .let(SearchMangaParameter.fromJsonString)
+            .or(const SearchMangaParameter()),
+      );
 
   Future<void> dispose() async {}
 

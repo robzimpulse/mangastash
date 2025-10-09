@@ -89,21 +89,23 @@ class _MangaStashAppState extends State<MangaStashApp> {
       return true;
     };
 
-    Isolate.current.addErrorListener(
-      RawReceivePort((pair) {
-        if (pair is! List) return;
-        final LogBox log = widget.locator();
-        final Object? error = pair.firstOrNull.castOrNull();
-        final String? trace = pair.lastOrNull.castOrNull();
+    if (!kIsWeb) {
+      Isolate.current.addErrorListener(
+        RawReceivePort((pair) {
+          if (pair is! List) return;
+          final LogBox log = widget.locator();
+          final Object? error = pair.firstOrNull.castOrNull();
+          final String? trace = pair.lastOrNull.castOrNull();
 
-        log.log(
-          error.toString(),
-          name: 'Isolate',
-          error: error,
-          stackTrace: trace?.let((e) => StackTrace.fromString(e)),
-        );
-      }).sendPort,
-    );
+          log.log(
+            error.toString(),
+            name: 'Isolate',
+            error: error,
+            stackTrace: trace?.let((e) => StackTrace.fromString(e)),
+          );
+        }).sendPort,
+      );
+    }
   }
 
   GoRouter _route({
