@@ -15,14 +15,9 @@ import 'use_case/update_theme_use_case.dart';
 class CoreEnvironmentRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    final LogBox log = locator();
+    final start = DateTime.timestamp().toIso8601String();
 
-    log.log(
-      'Register ${runtimeType.toString()}',
-      id: runtimeType.toString(),
-      name: 'Services',
-      extra: {'start': DateTime.timestamp().toIso8601String()},
-    );
+    final LogBox log = locator();
 
     locator.registerSingleton(ThemeManager(storage: locator()));
     locator.alias<UpdateThemeUseCase, ThemeManager>();
@@ -45,7 +40,7 @@ class CoreEnvironmentRegistrar extends Registrar {
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
       name: 'Services',
-      extra: {'finish': DateTime.timestamp().toIso8601String()},
+      extra: {'start': start, 'finish': DateTime.timestamp().toIso8601String()},
     );
   }
 }

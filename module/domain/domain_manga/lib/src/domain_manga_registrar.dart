@@ -32,14 +32,9 @@ import 'use_case/tags/get_tags_use_case.dart';
 class DomainMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    final LogBox log = locator();
+    final start = DateTime.timestamp().toIso8601String();
 
-    log.log(
-      'Register ${runtimeType.toString()}',
-      id: runtimeType.toString(),
-      name: 'Services',
-      extra: {'start': DateTime.timestamp().toIso8601String()},
-    );
+    final LogBox log = locator();
 
     locator.registerSingleton(
       GlobalOptionsManager(storage: locator()),
@@ -173,7 +168,7 @@ class DomainMangaRegistrar extends Registrar {
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
       name: 'Services',
-      extra: {'finish': DateTime.timestamp().toIso8601String()},
+      extra: {'start': start, 'finish': DateTime.timestamp().toIso8601String()},
     );
   }
 }

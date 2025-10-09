@@ -13,14 +13,9 @@ import 'use_case/register_use_case.dart';
 class CoreAuthRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    final LogBox log = locator();
+    final start = DateTime.timestamp().toIso8601String();
 
-    log.log(
-      'Register ${runtimeType.toString()}',
-      name: 'Services',
-      id: runtimeType.toString(),
-      extra: {'start': DateTime.timestamp().toIso8601String()},
-    );
+    final LogBox log = locator();
 
     locator.registerFactory(() => AuthService(app: locator()));
     locator.registerFactory(
@@ -36,9 +31,9 @@ class CoreAuthRegistrar extends Registrar {
 
     log.log(
       'Register ${runtimeType.toString()}',
-      name: 'Services',
       id: runtimeType.toString(),
-      extra: {'finish': DateTime.timestamp().toIso8601String()},
+      name: 'Services',
+      extra: {'start': start, 'finish': DateTime.timestamp().toIso8601String()},
     );
   }
 }
