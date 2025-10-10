@@ -96,16 +96,13 @@ class MangaStashApp extends StatelessWidget {
     );
   }
 
-  GoRouter _route({
-    required ServiceLocator locator,
-    String initialRoute = MainPath.main,
-  }) {
+  GoRouter _route({required ServiceLocator locator}) {
     final rootNavigatorKey = GlobalKey<NavigatorState>();
     final LogBox logBox = locator();
     final DatabaseViewer viewer = locator();
     return GoRouter(
       navigatorKey: rootNavigatorKey,
-      initialLocation: initialRoute,
+      initialLocation: _initialRoute(locator: locator),
       onException: (context, state, router) {
         router.push(
           MainPath.notFound,
@@ -120,5 +117,9 @@ class MangaStashApp extends StatelessWidget {
       ),
       observers: [logBox.observer, viewer.navigatorObserver],
     );
+  }
+
+  String _initialRoute({required ServiceLocator locator}) {
+    return MainPath.main;
   }
 }
