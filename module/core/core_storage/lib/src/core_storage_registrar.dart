@@ -8,7 +8,7 @@ import 'manager/storage_manager/storage_manager.dart';
 class CoreStorageRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    final start = DateTime.timestamp().toIso8601String();
+    final start = DateTime.timestamp();
 
     locator.registerFactory(() => const Executor().build());
     locator.registerLazySingleton(
@@ -29,11 +29,17 @@ class CoreStorageRegistrar extends Registrar {
       dispose: (e) => e.dispose(),
     );
 
+    final end = DateTime.timestamp();
+
     locator<LogBox>().log(
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
       name: 'Services',
-      extra: {'start': start, 'finish': DateTime.timestamp().toIso8601String()},
+      extra: {
+        'start': start.toIso8601String(),
+        'finish': end.toIso8601String(),
+        'duration': end.difference(start),
+      },
     );
   }
 }
