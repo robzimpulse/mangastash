@@ -34,8 +34,6 @@ class DomainMangaRegistrar extends Registrar {
   Future<void> register(ServiceLocator locator) async {
     final start = DateTime.timestamp().toIso8601String();
 
-    final LogBox log = locator();
-
     locator.registerLazySingleton(
       () => GlobalOptionsManager(storage: locator()),
       dispose: (e) => e.dispose(),
@@ -47,7 +45,7 @@ class DomainMangaRegistrar extends Registrar {
 
     locator.registerLazySingleton(
       () => JobManager(
-        log: log,
+        log: locator(),
         jobDao: locator(),
         storageManager: locator(),
         getChapterUseCase: () => locator(),
@@ -154,7 +152,7 @@ class DomainMangaRegistrar extends Registrar {
     );
     locator.registerFactory(
       () => RecrawlUseCase(
-        logBox: log,
+        logBox: locator(),
         storageManager: locator(),
         cookieJar: locator(),
       ),
@@ -164,7 +162,7 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
     locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
 
-    log.log(
+    locator<LogBox>().log(
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
       name: 'Services',

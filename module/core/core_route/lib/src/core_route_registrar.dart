@@ -6,11 +6,9 @@ class CoreRouteRegistrar extends Registrar {
   Future<void> register(ServiceLocator locator) async {
     final start = DateTime.timestamp().toIso8601String();
 
-    final LogBox log = locator();
-
     // TODO: register any manager here
 
-    log.log(
+    locator<LogBox>().log(
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
       name: 'Services',

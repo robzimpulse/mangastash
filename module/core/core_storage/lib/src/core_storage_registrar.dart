@@ -10,8 +10,6 @@ class CoreStorageRegistrar extends Registrar {
   Future<void> register(ServiceLocator locator) async {
     final start = DateTime.timestamp().toIso8601String();
 
-    final LogBox log = locator();
-
     locator.registerFactory(() => const Executor().build());
     locator.registerLazySingleton(
       () => AppDatabase(executor: locator()),
@@ -27,11 +25,11 @@ class CoreStorageRegistrar extends Registrar {
 
     locator.registerSingleton(await SharedPreferences.getInstance());
     locator.registerLazySingleton(
-      () => StorageManager(dio: () => locator(), logBox: log),
+      () => StorageManager(dio: () => locator(), logBox: locator()),
       dispose: (e) => e.dispose(),
     );
 
-    log.log(
+    locator<LogBox>().log(
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
       name: 'Services',

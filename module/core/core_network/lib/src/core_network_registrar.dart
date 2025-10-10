@@ -11,10 +11,8 @@ class CoreNetworkRegistrar extends Registrar {
   Future<void> register(ServiceLocator locator) async {
     final start = DateTime.timestamp().toIso8601String();
 
-    final LogBox log = locator();
-
     locator.registerLazySingleton(
-      () => HeadlessWebviewManager(log: log, storageManager: locator()),
+      () => HeadlessWebviewManager(log: locator(), storageManager: locator()),
     );
     locator.alias<HeadlessWebviewUseCase, HeadlessWebviewManager>();
     locator.registerLazySingleton(() => CookieJar());
@@ -23,7 +21,7 @@ class CoreNetworkRegistrar extends Registrar {
       dispose: (e) => e.close(force: true),
     );
 
-    log.log(
+    locator<LogBox>().log(
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
       name: 'Services',

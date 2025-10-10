@@ -17,8 +17,6 @@ class CoreEnvironmentRegistrar extends Registrar {
   Future<void> register(ServiceLocator locator) async {
     final start = DateTime.timestamp().toIso8601String();
 
-    final LogBox log = locator();
-
     locator.registerLazySingleton(() => ThemeManager(storage: locator()));
     locator.alias<UpdateThemeUseCase, ThemeManager>();
     locator.alias<ListenThemeUseCase, ThemeManager>();
@@ -38,7 +36,7 @@ class CoreEnvironmentRegistrar extends Registrar {
     );
     locator.alias<TaskExecutor, WorkerManager>();
 
-    log.log(
+    locator<LogBox>().log(
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
       name: 'Services',
