@@ -74,29 +74,23 @@ void main() async {
   runApp(MangaStashApp(locator: locator));
 }
 
-class MangaStashApp extends StatefulWidget {
+class MangaStashApp extends StatelessWidget {
   const MangaStashApp({super.key, required this.locator});
 
   final ServiceLocator locator;
 
   @override
-  State<StatefulWidget> createState() => _MangaStashAppState();
-}
-
-class _MangaStashAppState extends State<MangaStashApp> {
-
-  @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: widget.locator.allReady(),
+      future: locator.allReady(),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const SplashScreen();
         }
 
         return AppsScreen(
-          listenThemeUseCase: widget.locator(),
-          routerConfig: _route(locator: widget.locator),
+          listenThemeUseCase: locator(),
+          routerConfig: _route(locator: locator),
         );
       },
     );
