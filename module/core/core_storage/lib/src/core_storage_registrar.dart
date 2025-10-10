@@ -8,21 +8,14 @@ import 'manager/storage_manager/storage_manager.dart';
 class CoreStorageRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    final LogBox log = locator();
-
-    log.log(
-      'Register ${runtimeType.toString()}',
-      id: runtimeType.toString(),
-      name: 'Services',
-      extra: {'start': DateTime.timestamp().toIso8601String()},
-    );
+    final start = DateTime.timestamp();
 
     locator.registerFactory(() => const Executor().build());
-    locator.registerSingleton(
-      AppDatabase(executor: locator()),
+    locator.registerLazySingleton(
+      () => AppDatabase(executor: locator()),
       dispose: (e) => e.close(),
     );
-    locator.registerSingleton(DatabaseViewer());
+    locator.registerLazySingleton(() => DatabaseViewer());
     locator.registerFactory(() => MangaDao(locator()));
     locator.registerFactory(() => ChapterDao(locator()));
     locator.registerFactory(() => LibraryDao(locator()));
@@ -31,16 +24,22 @@ class CoreStorageRegistrar extends Registrar {
     locator.registerFactory(() => TagDao(locator()));
 
     locator.registerSingleton(await SharedPreferences.getInstance());
-    locator.registerSingleton(
-      StorageManager(dio: () => locator(), logBox: log),
+    locator.registerLazySingleton(
+      () => StorageManager(dio: () => locator(), logBox: locator()),
       dispose: (e) => e.dispose(),
     );
 
-    log.log(
+    final end = DateTime.timestamp();
+
+    locator<LogBox>().log(
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
       name: 'Services',
-      extra: {'finish': DateTime.timestamp().toIso8601String()},
+      extra: {
+        'start': start.toIso8601String(),
+        'finish': end.toIso8601String(),
+        'duration': end.difference(start),
+      },
     );
   }
 }
