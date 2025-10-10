@@ -36,8 +36,8 @@ class DomainMangaRegistrar extends Registrar {
 
     final LogBox log = locator();
 
-    locator.registerSingleton(
-      GlobalOptionsManager(storage: locator()),
+    locator.registerLazySingleton(
+      () => GlobalOptionsManager(storage: locator()),
       dispose: (e) => e.dispose(),
     );
     locator.alias<ListenSearchParameterUseCase, GlobalOptionsManager>();
@@ -45,8 +45,8 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<ListenSourcesUseCase, GlobalOptionsManager>();
     locator.alias<UpdateSourcesUseCase, GlobalOptionsManager>();
 
-    locator.registerSingleton(
-      JobManager(
+    locator.registerLazySingleton(
+      () => JobManager(
         log: log,
         jobDao: locator(),
         storageManager: locator(),
@@ -61,7 +61,7 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<PrefetchChapterUseCase, JobManager>();
     locator.alias<ListenPrefetchUseCase, JobManager>();
 
-    locator.registerSingleton(HistoryManager(historyDao: locator()));
+    locator.registerLazySingleton(() => HistoryManager(historyDao: locator()));
     locator.alias<ListenReadHistoryUseCase, HistoryManager>();
     locator.alias<ListenUnreadHistoryUseCase, HistoryManager>();
 
@@ -160,7 +160,7 @@ class DomainMangaRegistrar extends Registrar {
       ),
     );
 
-    locator.registerSingleton(LibraryManager(libraryDao: locator()));
+    locator.registerLazySingleton(() => LibraryManager(libraryDao: locator()));
     locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
     locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
 

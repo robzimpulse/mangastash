@@ -13,11 +13,11 @@ class CoreStorageRegistrar extends Registrar {
     final LogBox log = locator();
 
     locator.registerFactory(() => const Executor().build());
-    locator.registerSingleton(
-      AppDatabase(executor: locator()),
+    locator.registerLazySingleton(
+      () => AppDatabase(executor: locator()),
       dispose: (e) => e.close(),
     );
-    locator.registerSingleton(DatabaseViewer());
+    locator.registerLazySingleton(() => DatabaseViewer());
     locator.registerFactory(() => MangaDao(locator()));
     locator.registerFactory(() => ChapterDao(locator()));
     locator.registerFactory(() => LibraryDao(locator()));
@@ -26,8 +26,8 @@ class CoreStorageRegistrar extends Registrar {
     locator.registerFactory(() => TagDao(locator()));
 
     locator.registerSingleton(await SharedPreferences.getInstance());
-    locator.registerSingleton(
-      StorageManager(dio: () => locator(), logBox: log),
+    locator.registerLazySingleton(
+      () => StorageManager(dio: () => locator(), logBox: log),
       dispose: (e) => e.dispose(),
     );
 

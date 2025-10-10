@@ -13,13 +13,13 @@ class CoreNetworkRegistrar extends Registrar {
 
     final LogBox log = locator();
 
-    locator.registerSingleton(
-      HeadlessWebviewManager(log: log, storageManager: locator()),
+    locator.registerLazySingleton(
+      () => HeadlessWebviewManager(log: log, storageManager: locator()),
     );
     locator.alias<HeadlessWebviewUseCase, HeadlessWebviewManager>();
-    locator.registerSingleton(CookieJar());
-    locator.registerSingleton(
-      DioManager.create(log: locator(), cookieJar: locator()),
+    locator.registerLazySingleton(() => CookieJar());
+    locator.registerLazySingleton(
+      () => DioManager.create(log: locator(), cookieJar: locator()),
       dispose: (e) => e.close(force: true),
     );
 

@@ -19,19 +19,21 @@ class CoreEnvironmentRegistrar extends Registrar {
 
     final LogBox log = locator();
 
-    locator.registerSingleton(ThemeManager(storage: locator()));
+    locator.registerLazySingleton(() => ThemeManager(storage: locator()));
     locator.alias<UpdateThemeUseCase, ThemeManager>();
     locator.alias<ListenThemeUseCase, ThemeManager>();
 
-    locator.registerSingleton(await LocaleManager.create(storage: locator()));
+    locator.registerLazySingletonAsync(
+      () => LocaleManager.create(storage: locator()),
+    );
     locator.alias<UpdateLocaleUseCase, LocaleManager>();
     locator.alias<ListenLocaleUseCase, LocaleManager>();
 
-    locator.registerSingleton(await DateManager.create());
+    locator.registerLazySingletonAsync(() => DateManager.create());
     locator.alias<ListenCurrentTimezoneUseCase, DateManager>();
 
-    locator.registerSingleton(
-      await WorkerManager.create(),
+    locator.registerLazySingletonAsync(
+      () => WorkerManager.create(),
       dispose: (e) => e.dispose(),
     );
     locator.alias<TaskExecutor, WorkerManager>();

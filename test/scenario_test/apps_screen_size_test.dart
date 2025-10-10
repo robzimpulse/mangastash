@@ -24,164 +24,84 @@ void main() {
   }
 
   group('test screen size', () {
-    testWidgets(
-      'open apps with screen size 400 x 800',
-      (tester) async {
-        setScreenSize(tester, 400, 800);
+    testWidgets('open apps with screen size 400 x 800', (tester) async {
+      setScreenSize(tester, 400, 800);
 
-        await tester.runAsync(
-          () async => await tester.pumpWidget(
-            MangaStashApp(
-              locator: locator,
-              testing: true,
-            ),
-          ),
-        );
+      await tester.runAsync(
+        () async => await tester.pumpWidget(MangaStashApp(locator: locator)),
+      );
 
-        await tester.pump();
+      await tester.pump();
 
-        expect(
-          find.byKey(const Key('left-navigation-rail')),
-          findsOneWidget,
-        );
+      expect(find.byKey(const Key('left-navigation-rail')), findsOneWidget);
 
-        expect(
-          find.byKey(const Key('bottom-navigation-bar')),
-          findsNothing,
-        );
+      expect(find.byKey(const Key('bottom-navigation-bar')), findsNothing);
 
-        await tester.pump();
+      await tester.pump();
 
-        expect(
-          find.byKey(const Key('left-navigation-rail')),
-          findsNothing,
-        );
+      expect(find.byKey(const Key('left-navigation-rail')), findsNothing);
 
-        expect(
-          find.byKey(const Key('bottom-navigation-bar')),
-          findsOneWidget,
-        );
-      },
-    );
+      expect(find.byKey(const Key('bottom-navigation-bar')), findsOneWidget);
+    });
 
-    testWidgets(
-      'open apps with screen size 600 x 800',
-      (tester) async {
-        setScreenSize(tester, 600, 800);
+    testWidgets('open apps with screen size 600 x 800', (tester) async {
+      setScreenSize(tester, 600, 800);
 
-        await tester.runAsync(
-          () async => await tester.pumpWidget(
-            MangaStashApp(
-              locator: locator,
-              testing: true,
-            ),
-          ),
-        );
+      await tester.runAsync(
+        () async => await tester.pumpWidget(MangaStashApp(locator: locator)),
+      );
 
-        await tester.pump();
+      await tester.pump();
 
-        expect(
-          find.byKey(const Key('left-navigation-rail')),
-          findsOneWidget,
-        );
+      expect(find.byKey(const Key('left-navigation-rail')), findsOneWidget);
 
-        expect(
-          find.byKey(const Key('bottom-navigation-bar')),
-          findsNothing,
-        );
+      expect(find.byKey(const Key('bottom-navigation-bar')), findsNothing);
 
-        await tester.pump();
+      await tester.pump();
 
-        expect(
-          find.byKey(const Key('left-navigation-rail')),
-          findsOneWidget,
-        );
+      expect(find.byKey(const Key('left-navigation-rail')), findsOneWidget);
 
-        expect(
-          find.byKey(const Key('bottom-navigation-bar')),
-          findsNothing,
-        );
-      },
-    );
+      expect(find.byKey(const Key('bottom-navigation-bar')), findsNothing);
+    });
 
-    testWidgets(
-      'open apps with screen size 800 x 800',
-      (tester) async {
-        setScreenSize(tester, 800, 800);
+    testWidgets('open apps with screen size 800 x 800', (tester) async {
+      setScreenSize(tester, 800, 800);
 
-        await tester.runAsync(
-          () async => await tester.pumpWidget(
-            MangaStashApp(
-              locator: locator,
-              testing: true,
-            ),
-          ),
-        );
+      await tester.runAsync(
+        () async => await tester.pumpWidget(MangaStashApp(locator: locator)),
+      );
 
-        await tester.pump();
+      await tester.pump();
 
-        expect(
-          find.byKey(const Key('left-navigation-rail')),
-          findsOneWidget,
-        );
+      expect(find.byKey(const Key('left-navigation-rail')), findsOneWidget);
 
-        expect(
-          find.byKey(const Key('bottom-navigation-bar')),
-          findsNothing,
-        );
+      expect(find.byKey(const Key('bottom-navigation-bar')), findsNothing);
 
-        await tester.pump();
+      await tester.pump();
 
-        expect(
-          find.byKey(const Key('left-navigation-rail')),
-          findsOneWidget,
-        );
+      expect(find.byKey(const Key('left-navigation-rail')), findsOneWidget);
 
-        expect(
-          find.byKey(const Key('bottom-navigation-bar')),
-          findsNothing,
-        );
-      },
-    );
+      expect(find.byKey(const Key('bottom-navigation-bar')), findsNothing);
+    });
 
-    testWidgets(
-      'open apps with screen size 1200 x 800',
-      (tester) async {
-        setScreenSize(tester, 1200, 800);
+    testWidgets('open apps with screen size 1200 x 800', (tester) async {
+      setScreenSize(tester, 1200, 800);
 
-        await tester.runAsync(
-          () async => await tester.pumpWidget(
-            MangaStashApp(
-              locator: locator,
-              testing: true,
-            ),
-          ),
-        );
+      await tester.runAsync(
+        () async => await tester.pumpWidget(MangaStashApp(locator: locator)),
+      );
 
-        await tester.pump();
+      await tester.pump();
 
-        expect(
-          find.byKey(const Key('left-navigation-rail')),
-          findsOneWidget,
-        );
+      expect(find.byKey(const Key('left-navigation-rail')), findsOneWidget);
 
-        expect(
-          find.byKey(const Key('bottom-navigation-bar')),
-          findsNothing,
-        );
+      expect(find.byKey(const Key('bottom-navigation-bar')), findsNothing);
 
-        await tester.pump();
+      await tester.pump();
 
-        expect(
-          find.byKey(const Key('left-navigation-rail')),
-          findsOneWidget,
-        );
+      expect(find.byKey(const Key('left-navigation-rail')), findsOneWidget);
 
-        expect(
-          find.byKey(const Key('bottom-navigation-bar')),
-          findsNothing,
-        );
-      },
-    );
+      expect(find.byKey(const Key('bottom-navigation-bar')), findsNothing);
+    });
   });
 }
