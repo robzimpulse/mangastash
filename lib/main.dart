@@ -84,7 +84,6 @@ class MangaStashApp extends StatefulWidget {
 }
 
 class _MangaStashAppState extends State<MangaStashApp> {
-  // late final Future<GoRouter> _router = _initializeApp();
 
   @override
   Widget build(BuildContext context) {
