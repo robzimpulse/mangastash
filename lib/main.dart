@@ -59,15 +59,15 @@ class _MangaStashAppState extends State<MangaStashApp> {
   Future<void> initiateAppLocator() async {
     if (widget.testing) return;
 
-    widget.locator.registerSingleton(LogBox(capacity: 1000));
-
     // TODO: register module registrar here
+    await widget.locator.registerRegistrar(CoreAnalyticsRegistrar());
     await widget.locator.registerRegistrar(CoreStorageRegistrar());
     await widget.locator.registerRegistrar(CoreNetworkRegistrar());
     await widget.locator.registerRegistrar(CoreEnvironmentRegistrar());
     await widget.locator.registerRegistrar(CoreRouteRegistrar());
     await widget.locator.registerRegistrar(DomainMangaRegistrar());
 
+    final existingFlutterError = FlutterError.onError;
     FlutterError.onError = (details) {
       final LogBox log = widget.locator();
       log.log(
@@ -76,8 +76,10 @@ class _MangaStashAppState extends State<MangaStashApp> {
         error: details.exception,
         stackTrace: details.stack,
       );
+      existingFlutterError?.call(details);
     };
 
+    final existingPlatformDispatcher = PlatformDispatcher.instance.onError;
     PlatformDispatcher.instance.onError = (error, stack) {
       final LogBox log = widget.locator();
       log.log(
@@ -86,7 +88,7 @@ class _MangaStashAppState extends State<MangaStashApp> {
         error: error,
         stackTrace: stack,
       );
-      return true;
+      return existingPlatformDispatcher?.call(error, stack) ?? true;
     };
 
     if (!kIsWeb) {
