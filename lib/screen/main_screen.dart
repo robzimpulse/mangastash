@@ -55,7 +55,7 @@ class MainScreen extends StatelessWidget {
     return Row(
       children: [
         NavigationRail(
-          key: const Key('left-navigation-rail'),
+          key: const Key('left_navigation_rail'),
           labelType: NavigationRailLabelType.all,
           elevation: 8,
           destinations: menus.toList(),
@@ -78,7 +78,7 @@ class MainScreen extends StatelessWidget {
       ),
     );
     return BottomNavigationBar(
-      key: const Key('bottom-navigation-bar'),
+      key: const Key('bottom_navigation_bar'),
       currentIndex: index,
       type: BottomNavigationBarType.fixed,
       showUnselectedLabels: true,
