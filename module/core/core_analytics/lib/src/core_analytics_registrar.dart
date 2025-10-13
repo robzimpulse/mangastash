@@ -5,9 +5,8 @@ class CoreAnalyticsRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final start = DateTime.timestamp();
-    locator.registerLazySingleton(() => LogBox(capacity: 1000));
+    // TODO: add analytics dependency here
     final end = DateTime.timestamp();
-
     locator<LogBox>().log(
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
@@ -18,5 +17,10 @@ class CoreAnalyticsRegistrar extends Registrar {
         'duration': end.difference(start),
       },
     );
+  }
+
+  @override
+  Future<void> isAllReady(ServiceLocator locator) async {
+
   }
 }

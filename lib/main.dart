@@ -19,19 +19,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Service locator/dependency injector code here
   ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
+  final log = LogBox(capacity: 1000);
   final locator = ServiceLocator.asNewInstance();
-
-  // TODO: register module registrar here
-  await locator.registerRegistrar(CoreAnalyticsRegistrar());
-  await locator.registerRegistrar(CoreStorageRegistrar());
-  await locator.registerRegistrar(CoreNetworkRegistrar());
-  await locator.registerRegistrar(CoreEnvironmentRegistrar());
-  await locator.registerRegistrar(CoreRouteRegistrar());
-  await locator.registerRegistrar(DomainMangaRegistrar());
 
   final existingFlutterError = FlutterError.onError;
   FlutterError.onError = (details) {
-    final LogBox log = locator();
     log.log(
       details.exceptionAsString(),
       name: 'FlutterError',
@@ -43,7 +35,6 @@ void main() async {
 
   final existingPlatformDispatcher = PlatformDispatcher.instance.onError;
   PlatformDispatcher.instance.onError = (error, stack) {
-    final LogBox log = locator();
     log.log(
       error.toString(),
       name: 'PlatformDispatcher',
@@ -57,7 +48,6 @@ void main() async {
     Isolate.current.addErrorListener(
       RawReceivePort((pair) {
         if (pair is! List) return;
-        final LogBox log = locator();
         final Object? error = pair.firstOrNull.castOrNull();
         final String? trace = pair.lastOrNull.castOrNull();
 
@@ -71,18 +61,35 @@ void main() async {
     );
   }
 
-  runApp(MangaStashApp(locator: locator));
+  runApp(MangaStashApp(locator: locator..registerSingleton(log)));
 }
 
 class MangaStashApp extends StatelessWidget {
-  const MangaStashApp({super.key, required this.locator});
+  const MangaStashApp({
+    super.key,
+    required this.locator,
+    this.overrideDependencies,
+  });
 
+  final AsyncValueSetter<ServiceLocator>? overrideDependencies;
   final ServiceLocator locator;
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: locator.allReady(),
+    return FutureBuilder<void>(
+      future: Future.delayed(Duration.zero, () async {
+        // TODO: register module registrar here
+        await locator.registerRegistrar(CoreAnalyticsRegistrar());
+        await locator.registerRegistrar(CoreStorageRegistrar());
+        await locator.registerRegistrar(CoreNetworkRegistrar());
+        await locator.registerRegistrar(CoreEnvironmentRegistrar());
+        await locator.registerRegistrar(CoreRouteRegistrar());
+        await locator.registerRegistrar(DomainMangaRegistrar());
+
+        await overrideDependencies?.call(locator);
+
+        await locator.allReady();
+      }),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const SplashScreen();

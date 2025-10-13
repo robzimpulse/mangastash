@@ -49,4 +49,11 @@ class CoreEnvironmentRegistrar extends Registrar {
       },
     );
   }
+
+  @override
+  Future<void> isAllReady(ServiceLocator locator) async {
+    await locator.isReady<LocaleManager>();
+    await locator.isReady<DateManager>();
+    await locator.isReady<WorkerManager>();
+  }
 }

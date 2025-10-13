@@ -36,4 +36,9 @@ class CoreAuthRegistrar extends Registrar {
       extra: {'start': start, 'finish': DateTime.timestamp().toIso8601String()},
     );
   }
+
+  @override
+  Future<void> isAllReady(ServiceLocator locator) async {
+
+  }
 }

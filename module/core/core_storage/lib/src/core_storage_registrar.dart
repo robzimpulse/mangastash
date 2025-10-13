@@ -23,7 +23,7 @@ class CoreStorageRegistrar extends Registrar {
     locator.registerFactory(() => HistoryDao(locator()));
     locator.registerFactory(() => TagDao(locator()));
 
-    locator.registerSingleton(await SharedPreferences.getInstance());
+    locator.registerLazySingletonAsync(() => SharedPreferences.getInstance());
     locator.registerLazySingleton(
       () => StorageManager(dio: () => locator(), logBox: locator()),
       dispose: (e) => e.dispose(),
@@ -41,5 +41,10 @@ class CoreStorageRegistrar extends Registrar {
         'duration': end.difference(start),
       },
     );
+  }
+
+  @override
+  Future<void> isAllReady(ServiceLocator locator) async {
+    await locator.isReady<SharedPreferences>();
   }
 }
