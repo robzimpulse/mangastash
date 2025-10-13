@@ -20,6 +20,7 @@ extension WidgetTesterExtension on WidgetTester {
 
     view.devicePixelRatio = dpi;
     view.physicalSize = Size(width * dpi, height * dpi);
+    binding.setSurfaceSize(Size(width * dpi, height * dpi));
     platformDispatcher.textScaleFactorTestValue = textScaleFactor;
 
     await pumpWidget(
