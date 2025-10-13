@@ -34,9 +34,4 @@ class CoreNetworkRegistrar extends Registrar {
       },
     );
   }
-
-  @override
-  Future<void> isAllReady(ServiceLocator locator) async {
-
-  }
 }

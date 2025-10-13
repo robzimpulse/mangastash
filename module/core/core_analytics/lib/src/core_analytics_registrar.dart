@@ -19,9 +19,4 @@ class CoreAnalyticsRegistrar extends Registrar {
       },
     );
   }
-
-  @override
-  Future<void> isAllReady(ServiceLocator locator) async {
-
-  }
 }
