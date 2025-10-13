@@ -422,6 +422,7 @@ class GetItServiceLocator implements ServiceLocator {
   /// As dispose functions can be async, you should await this function.
   @override
   Future<void> reset({bool dispose = true}) {
+    alreadyRegistered.clear();
     return _getIt.reset(dispose: dispose);
   }
 

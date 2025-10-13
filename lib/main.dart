@@ -19,49 +19,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Service locator/dependency injector code here
   ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
-  final log = LogBox(capacity: 1000);
-  final locator = ServiceLocator.asNewInstance();
-
-  final existingFlutterError = FlutterError.onError;
-  FlutterError.onError = (details) {
-    log.log(
-      details.exceptionAsString(),
-      name: 'FlutterError',
-      error: details.exception,
-      stackTrace: details.stack,
-    );
-    existingFlutterError?.call(details);
-  };
-
-  final existingPlatformDispatcher = PlatformDispatcher.instance.onError;
-  PlatformDispatcher.instance.onError = (error, stack) {
-    log.log(
-      error.toString(),
-      name: 'PlatformDispatcher',
-      error: error,
-      stackTrace: stack,
-    );
-    return existingPlatformDispatcher?.call(error, stack) ?? true;
-  };
-
-  if (!kIsWeb) {
-    Isolate.current.addErrorListener(
-      RawReceivePort((pair) {
-        if (pair is! List) return;
-        final Object? error = pair.firstOrNull.castOrNull();
-        final String? trace = pair.lastOrNull.castOrNull();
-
-        log.log(
-          error.toString(),
-          name: 'Isolate',
-          error: error,
-          stackTrace: trace?.let((e) => StackTrace.fromString(e)),
-        );
-      }).sendPort,
-    );
-  }
-
-  runApp(MangaStashApp(locator: locator..registerSingleton(log)));
+  runApp(MangaStashApp(locator: ServiceLocator.asNewInstance()));
 }
 
 class MangaStashApp extends StatelessWidget {
@@ -76,20 +34,8 @@ class MangaStashApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<void>(
-      future: Future.delayed(Duration.zero, () async {
-        // TODO: register module registrar here
-        await locator.registerRegistrar(CoreAnalyticsRegistrar());
-        await locator.registerRegistrar(CoreStorageRegistrar());
-        await locator.registerRegistrar(CoreNetworkRegistrar());
-        await locator.registerRegistrar(CoreEnvironmentRegistrar());
-        await locator.registerRegistrar(CoreRouteRegistrar());
-        await locator.registerRegistrar(DomainMangaRegistrar());
-
-        await overrideDependencies?.call(locator);
-
-        await locator.allReady();
-      }),
+    return FutureBuilder(
+      future: _setupLocator(),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const SplashScreen();
@@ -128,5 +74,60 @@ class MangaStashApp extends StatelessWidget {
 
   String _initialRoute({required ServiceLocator locator}) {
     return MainPath.main;
+  }
+
+  Future<void> _setupLocator() async {
+    await locator.reset();
+
+    // TODO: register module registrar here
+    await locator.registerRegistrar(CoreAnalyticsRegistrar());
+    await locator.registerRegistrar(CoreStorageRegistrar());
+    await locator.registerRegistrar(CoreNetworkRegistrar());
+    await locator.registerRegistrar(CoreEnvironmentRegistrar());
+    await locator.registerRegistrar(CoreRouteRegistrar());
+    await locator.registerRegistrar(DomainMangaRegistrar());
+
+    await overrideDependencies?.call(locator);
+
+    await locator.allReady();
+
+    final existingFlutterError = FlutterError.onError;
+    FlutterError.onError = (details) {
+      locator<LogBox>().log(
+        details.exceptionAsString(),
+        name: 'FlutterError',
+        error: details.exception,
+        stackTrace: details.stack,
+      );
+      existingFlutterError?.call(details);
+    };
+
+    final existingPlatformDispatcher = PlatformDispatcher.instance.onError;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      locator<LogBox>().log(
+        error.toString(),
+        name: 'PlatformDispatcher',
+        error: error,
+        stackTrace: stack,
+      );
+      return existingPlatformDispatcher?.call(error, stack) ?? true;
+    };
+
+    if (!kIsWeb) {
+      Isolate.current.addErrorListener(
+        RawReceivePort((pair) {
+          if (pair is! List) return;
+          final Object? error = pair.firstOrNull.castOrNull();
+          final String? trace = pair.lastOrNull.castOrNull();
+
+          locator<LogBox>().log(
+            error.toString(),
+            name: 'Isolate',
+            error: error,
+            stackTrace: trace?.let((e) => StackTrace.fromString(e)),
+          );
+        }).sendPort,
+      );
+    }
   }
 }
