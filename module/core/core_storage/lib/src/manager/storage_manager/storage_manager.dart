@@ -23,7 +23,7 @@ class StorageManager {
 
   final CustomCacheManager searchChapter;
 
-  StorageManager({required ValueGetter<Dio> dio, required LogBox logBox})
+  StorageManager({required ValueGetter<Dio> dio})
     : images = CustomCacheManager(
         Config('image', fileService: DioFileService(dio)),
       ),
