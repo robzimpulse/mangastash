@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mangastash/main.dart';
 import 'package:patrol_finders/patrol_finders.dart';
@@ -41,6 +42,6 @@ void testScreen(
 
     await onRunTest.call(locator, $);
 
-    await locator.reset();
+    debugDefaultTargetPlatformOverride = null;
   });
 }

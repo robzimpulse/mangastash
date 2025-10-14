@@ -6,19 +6,19 @@ import '../mock/mock_shared_preferences.dart';
 
 void main() {
   group('test screen size', () {
-    // testScreen(
-    //   'open apps with screen size 400 x 800',
-    //   width: 400,
-    //   height: 800,
-    //   onSetupTestScreen: (locator) async {
-    //     locator.registerSingleton<SharedPreferences>(MockSharedPreferences());
-    //     locator.registerSingleton<Executor>(MemoryExecutor());
-    //   },
-    //   onRunTest: (locator, $) async {
-    //     expect($(#left_navigation_rail), findsNothing);
-    //     expect($(#bottom_navigation_bar), findsOneWidget);
-    //   },
-    // );
+    testScreen(
+      'open apps with screen size 400 x 800',
+      width: 400,
+      height: 800,
+      onSetupTestScreen: (locator) async {
+        locator.registerSingleton<SharedPreferences>(MockSharedPreferences());
+        locator.registerSingleton<Executor>(MemoryExecutor());
+      },
+      onRunTest: (locator, $) async {
+        expect($(#left_navigation_rail), findsNothing);
+        expect($(#bottom_navigation_bar), findsOneWidget);
+      },
+    );
 
     //   testWidgets('open apps with screen size 400 x 800', (tester) async {
     //     await tester.launch(
