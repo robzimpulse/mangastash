@@ -42,6 +42,8 @@ void testScreen(
 
     await onRunTest.call(locator, $);
 
+    await $.tester.runAsync(() => locator.reset());
+
     debugDefaultTargetPlatformOverride = null;
   });
 }
