@@ -63,15 +63,15 @@ class StorageManager {
   }
 
   Future<void> dispose() async {
-    // await Future.wait([
-    //   images.dispose(),
-    //   converter.dispose(),
-    //   tags.dispose(),
-    //   manga.dispose(),
-    //   chapter.dispose(),
-    //   html.dispose(),
-    //   searchChapter.dispose(),
-    //   searchManga.dispose(),
-    // ]);
+    await Future.wait([
+      images.dispose(),
+      converter.dispose(),
+      tags.dispose(),
+      manga.dispose(),
+      chapter.dispose(),
+      html.dispose(),
+      searchChapter.dispose(),
+      searchManga.dispose(),
+    ]);
   }
 }
