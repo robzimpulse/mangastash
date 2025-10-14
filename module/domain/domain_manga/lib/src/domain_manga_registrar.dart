@@ -36,7 +36,6 @@ class DomainMangaRegistrar extends Registrar {
 
     locator.registerLazySingleton(
       () => GlobalOptionsManager(storage: locator()),
-      dispose: (e) => e.dispose(),
     );
     locator.alias<ListenSearchParameterUseCase, GlobalOptionsManager>();
     locator.alias<UpdateSearchParameterUseCase, GlobalOptionsManager>();
@@ -59,7 +58,10 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<PrefetchChapterUseCase, JobManager>();
     locator.alias<ListenPrefetchUseCase, JobManager>();
 
-    locator.registerLazySingleton(() => HistoryManager(historyDao: locator()));
+    locator.registerLazySingleton(
+      () => HistoryManager(historyDao: locator()),
+      dispose: (e) => e.dispose(),
+    );
     locator.alias<ListenReadHistoryUseCase, HistoryManager>();
     locator.alias<ListenUnreadHistoryUseCase, HistoryManager>();
 
@@ -158,7 +160,10 @@ class DomainMangaRegistrar extends Registrar {
       ),
     );
 
-    locator.registerLazySingleton(() => LibraryManager(libraryDao: locator()));
+    locator.registerLazySingleton(
+      () => LibraryManager(libraryDao: locator()),
+      dispose: (e) => e.dispose(),
+    );
     locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
     locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
 

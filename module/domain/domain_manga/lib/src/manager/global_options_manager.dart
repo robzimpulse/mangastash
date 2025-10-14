@@ -42,8 +42,6 @@ class GlobalOptionsManager
             .or(const SearchMangaParameter()),
       );
 
-  Future<void> dispose() async {}
-
   @override
   ValueStream<SearchMangaParameter> get searchParameterState =>
       _searchMangaParameter.stream;

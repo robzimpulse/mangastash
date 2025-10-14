@@ -25,7 +25,10 @@ class CoreAuthRegistrar extends Registrar {
     locator.registerFactory(() => LoginUseCase(authService: locator()));
     locator.registerFactory(() => RegisterUseCase(authService: locator()));
 
-    locator.registerLazySingleton(() => AuthManager(service: locator()));
+    locator.registerLazySingleton(
+      () => AuthManager(service: locator()),
+      dispose: (e) => e.dispose(),
+    );
     locator.alias<ListenAuthUseCase, AuthManager>();
     locator.alias<GetAuthUseCase, AuthManager>();
 
