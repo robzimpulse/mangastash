@@ -1,10 +1,13 @@
 import 'dart:ui';
 
+import 'package:core_storage/core_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mangastash/main.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 import 'package:service_locator/service_locator.dart';
+
+import '../mock/mock_shared_preferences.dart';
 
 typedef OnRunTestScreen =
     Future<void> Function(ServiceLocator locator, PatrolTester $);
@@ -35,7 +38,14 @@ void testScreen(
     final locator = ServiceLocator.asNewInstance();
 
     await $.pumpWidget(
-      MangaStashApp(locator: locator, overrideDependencies: onSetupTestScreen),
+      MangaStashApp(
+        locator: locator,
+        overrideDependencies: (locator) async {
+          locator.registerSingleton<SharedPreferences>(MockSharedPreferences());
+          locator.registerSingleton<Executor>(MemoryExecutor());
+          await onSetupTestScreen?.call(locator);
+        },
+      ),
     );
 
     await $.pumpAndTrySettle();
