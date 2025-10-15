@@ -4,22 +4,21 @@ import 'package:service_locator/service_locator.dart';
 class CoreRouteRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    final LogBox log = locator();
-
-    log.log(
-      'Register ${runtimeType.toString()}',
-      id: runtimeType.toString(),
-      name: 'Services',
-      extra: {'start': DateTime.timestamp().toIso8601String()},
-    );
+    final start = DateTime.timestamp();
 
     // TODO: register any manager here
 
-    log.log(
+    final end = DateTime.timestamp();
+
+    locator<LogBox>().log(
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
       name: 'Services',
-      extra: {'finish': DateTime.timestamp().toIso8601String()},
+      extra: {
+        'start': start.toIso8601String(),
+        'finish': end.toIso8601String(),
+        'duration': end.difference(start).toString(),
+      },
     );
   }
 }

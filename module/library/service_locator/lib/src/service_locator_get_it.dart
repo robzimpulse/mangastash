@@ -47,8 +47,12 @@ class GetItServiceLocator implements ServiceLocator {
   Future<void> allReady({
     Duration? timeout,
     bool ignorePendingAsyncCreation = false,
-  }) {
-    return _getIt.allReady(
+  }) async {
+    for (final registrar in alreadyRegistered.entries) {
+      await registrar.value.allReady(this);
+    }
+
+    return await _getIt.allReady(
       timeout: timeout,
       ignorePendingAsyncCreation: ignorePendingAsyncCreation,
     );
@@ -418,6 +422,7 @@ class GetItServiceLocator implements ServiceLocator {
   /// As dispose functions can be async, you should await this function.
   @override
   Future<void> reset({bool dispose = true}) {
+    alreadyRegistered.clear();
     return _getIt.reset(dispose: dispose);
   }
 
@@ -495,14 +500,15 @@ class GetItServiceLocator implements ServiceLocator {
   }
 
   /// The collection of registered registrars.
-  Set<Type> alreadyRegistered = {};
+  Map<Type, Registrar> alreadyRegistered = {};
 
   /// Register a registrar instance.
   ///
   /// Any double registering of the same registrar's type will be ignored.
   @override
   Future<void> registerRegistrar(Registrar registrar) async {
-    if (alreadyRegistered.add(registrar.runtimeType)) {
+    if (!alreadyRegistered.containsKey(registrar.runtimeType)) {
+      alreadyRegistered[registrar.runtimeType] = registrar;
       await registrar.register(this);
     }
   }

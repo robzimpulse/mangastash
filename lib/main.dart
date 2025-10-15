@@ -15,109 +15,47 @@ import 'main_route.dart';
 import 'screen/apps_screen.dart';
 import 'screen/splash_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Service locator/dependency injector code here
   ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
   runApp(MangaStashApp(locator: ServiceLocator.asNewInstance()));
 }
 
-class MangaStashApp extends StatefulWidget {
-  const MangaStashApp({super.key, required this.locator, this.testing = false});
+class MangaStashApp extends StatelessWidget {
+  const MangaStashApp({
+    super.key,
+    required this.locator,
+    this.overrideDependencies,
+  });
 
-  final bool testing;
-
+  final AsyncValueSetter<ServiceLocator>? overrideDependencies;
   final ServiceLocator locator;
 
   @override
-  State<StatefulWidget> createState() => _MangaStashAppState();
-}
-
-class _MangaStashAppState extends State<MangaStashApp> {
-  late final Future<GoRouter> _router = _initializeApp();
-
-  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<GoRouter>(
-      future: _router,
+    return FutureBuilder(
+      future: _setupLocator(),
       builder: (context, snapshot) {
-        final router = snapshot.data;
-        if (router == null) return const SplashScreen();
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const SplashScreen();
+        }
+
         return AppsScreen(
-          listenThemeUseCase: widget.locator(),
-          routerConfig: router,
+          listenThemeUseCase: locator(),
+          routerConfig: _route(locator: locator),
         );
       },
     );
   }
 
-  Future<GoRouter> _initializeApp() async {
-    await initiateAppLocator();
-    return _route(locator: widget.locator);
-  }
-
-  Future<void> initiateAppLocator() async {
-    if (widget.testing) return;
-
-    widget.locator.registerSingleton(LogBox(capacity: 1000));
-
-    // TODO: register module registrar here
-    await widget.locator.registerRegistrar(CoreStorageRegistrar());
-    await widget.locator.registerRegistrar(CoreNetworkRegistrar());
-    await widget.locator.registerRegistrar(CoreEnvironmentRegistrar());
-    await widget.locator.registerRegistrar(CoreRouteRegistrar());
-    await widget.locator.registerRegistrar(DomainMangaRegistrar());
-
-    FlutterError.onError = (details) {
-      final LogBox log = widget.locator();
-      log.log(
-        details.exceptionAsString(),
-        name: 'FlutterError',
-        error: details.exception,
-        stackTrace: details.stack,
-      );
-    };
-
-    PlatformDispatcher.instance.onError = (error, stack) {
-      final LogBox log = widget.locator();
-      log.log(
-        error.toString(),
-        name: 'PlatformDispatcher',
-        error: error,
-        stackTrace: stack,
-      );
-      return true;
-    };
-
-    if (!kIsWeb) {
-      Isolate.current.addErrorListener(
-        RawReceivePort((pair) {
-          if (pair is! List) return;
-          final LogBox log = widget.locator();
-          final Object? error = pair.firstOrNull.castOrNull();
-          final String? trace = pair.lastOrNull.castOrNull();
-
-          log.log(
-            error.toString(),
-            name: 'Isolate',
-            error: error,
-            stackTrace: trace?.let((e) => StackTrace.fromString(e)),
-          );
-        }).sendPort,
-      );
-    }
-  }
-
-  GoRouter _route({
-    required ServiceLocator locator,
-    String initialRoute = MainPath.main,
-  }) {
+  GoRouter _route({required ServiceLocator locator}) {
     final rootNavigatorKey = GlobalKey<NavigatorState>();
     final LogBox logBox = locator();
     final DatabaseViewer viewer = locator();
     return GoRouter(
       navigatorKey: rootNavigatorKey,
-      initialLocation: initialRoute,
+      initialLocation: _initialRoute(locator: locator),
       onException: (context, state, router) {
         router.push(
           MainPath.notFound,
@@ -132,5 +70,64 @@ class _MangaStashAppState extends State<MangaStashApp> {
       ),
       observers: [logBox.observer, viewer.navigatorObserver],
     );
+  }
+
+  String _initialRoute({required ServiceLocator locator}) {
+    return MainPath.main;
+  }
+
+  Future<void> _setupLocator() async {
+    await locator.reset();
+
+    // TODO: register module registrar here
+    await locator.registerRegistrar(CoreAnalyticsRegistrar());
+    await locator.registerRegistrar(CoreStorageRegistrar());
+    await locator.registerRegistrar(CoreNetworkRegistrar());
+    await locator.registerRegistrar(CoreEnvironmentRegistrar());
+    await locator.registerRegistrar(CoreRouteRegistrar());
+    await locator.registerRegistrar(DomainMangaRegistrar());
+
+    await overrideDependencies?.call(locator);
+
+    await locator.allReady();
+
+    final existingFlutterError = FlutterError.onError;
+    FlutterError.onError = (details) {
+      locator<LogBox>().log(
+        details.exceptionAsString(),
+        name: 'FlutterError',
+        error: details.exception,
+        stackTrace: details.stack,
+      );
+      existingFlutterError?.call(details);
+    };
+
+    final existingPlatformDispatcher = PlatformDispatcher.instance.onError;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      locator<LogBox>().log(
+        error.toString(),
+        name: 'PlatformDispatcher',
+        error: error,
+        stackTrace: stack,
+      );
+      return existingPlatformDispatcher?.call(error, stack) ?? true;
+    };
+
+    if (!kIsWeb) {
+      Isolate.current.addErrorListener(
+        RawReceivePort((pair) {
+          if (pair is! List) return;
+          final Object? error = pair.firstOrNull.castOrNull();
+          final String? trace = pair.lastOrNull.castOrNull();
+
+          locator<LogBox>().log(
+            error.toString(),
+            name: 'Isolate',
+            error: error,
+            stackTrace: trace?.let((e) => StackTrace.fromString(e)),
+          );
+        }).sendPort,
+      );
+    }
   }
 }

@@ -15,37 +15,45 @@ import 'use_case/update_theme_use_case.dart';
 class CoreEnvironmentRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    final LogBox log = locator();
+    final start = DateTime.timestamp();
 
-    log.log(
-      'Register ${runtimeType.toString()}',
-      id: runtimeType.toString(),
-      name: 'Services',
-      extra: {'start': DateTime.timestamp().toIso8601String()},
-    );
-
-    locator.registerSingleton(ThemeManager(storage: locator()));
+    locator.registerLazySingleton(() => ThemeManager(storage: locator()));
     locator.alias<UpdateThemeUseCase, ThemeManager>();
     locator.alias<ListenThemeUseCase, ThemeManager>();
 
-    locator.registerSingleton(await LocaleManager.create(storage: locator()));
+    locator.registerLazySingletonAsync(
+      () => LocaleManager.create(storage: locator()),
+    );
     locator.alias<UpdateLocaleUseCase, LocaleManager>();
     locator.alias<ListenLocaleUseCase, LocaleManager>();
 
-    locator.registerSingleton(await DateManager.create());
+    locator.registerLazySingletonAsync(() => DateManager.create());
     locator.alias<ListenCurrentTimezoneUseCase, DateManager>();
 
-    locator.registerSingleton(
-      await WorkerManager.create(),
+    locator.registerLazySingletonAsync(
+      () => WorkerManager.create(),
       dispose: (e) => e.dispose(),
     );
     locator.alias<TaskExecutor, WorkerManager>();
 
-    log.log(
+    final end = DateTime.timestamp();
+
+    locator<LogBox>().log(
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
       name: 'Services',
-      extra: {'finish': DateTime.timestamp().toIso8601String()},
+      extra: {
+        'start': start.toIso8601String(),
+        'finish': end.toIso8601String(),
+        'duration': end.difference(start).toString(),
+      },
     );
+  }
+
+  @override
+  Future<void> allReady(ServiceLocator locator) async {
+    await locator.isReady<LocaleManager>();
+    await locator.isReady<DateManager>();
+    await locator.isReady<WorkerManager>();
   }
 }

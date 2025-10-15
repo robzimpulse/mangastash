@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:rxdart/rxdart.dart';
@@ -9,12 +11,16 @@ class LibraryManager
     implements GetMangaFromLibraryUseCase, ListenMangaFromLibraryUseCase {
   final _stateSubject = BehaviorSubject<List<Manga>>.seeded([]);
 
+  late final StreamSubscription subscription;
+
   LibraryManager({required LibraryDao libraryDao}) {
-    _stateSubject.addStream(
-      libraryDao.stream.map(
-        (values) => [...values.map(Manga.fromDatabase).nonNulls],
-      ),
-    );
+    subscription = libraryDao.stream
+        .map((values) => [...values.map(Manga.fromDatabase).nonNulls])
+        .listen(_stateSubject.add);
+  }
+
+  Future<void> dispose() async {
+    await subscription.cancel();
   }
 
   @override

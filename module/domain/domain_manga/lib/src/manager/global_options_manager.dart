@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -41,8 +39,6 @@ class GlobalOptionsManager
             .let(SearchMangaParameter.fromJsonString)
             .or(const SearchMangaParameter()),
       );
-
-  Future<void> dispose() async {}
 
   @override
   ValueStream<SearchMangaParameter> get searchParameterState =>

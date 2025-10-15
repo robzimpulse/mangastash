@@ -9,30 +9,29 @@ import 'usecase/headless_webview_usecase.dart';
 class CoreNetworkRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    final LogBox log = locator();
+    final start = DateTime.timestamp();
 
-    log.log(
-      'Register ${runtimeType.toString()}',
-      id: runtimeType.toString(),
-      name: 'Services',
-      extra: {'start': DateTime.timestamp().toIso8601String()},
-    );
-
-    locator.registerSingleton(
-      HeadlessWebviewManager(log: log, storageManager: locator()),
+    locator.registerLazySingleton(
+      () => HeadlessWebviewManager(log: locator(), storageManager: locator()),
     );
     locator.alias<HeadlessWebviewUseCase, HeadlessWebviewManager>();
-    locator.registerSingleton(CookieJar());
-    locator.registerSingleton(
-      DioManager.create(log: locator(), cookieJar: locator()),
+    locator.registerLazySingleton(() => CookieJar());
+    locator.registerLazySingleton(
+      () => DioManager.create(log: locator(), cookieJar: locator()),
       dispose: (e) => e.close(force: true),
     );
 
-    log.log(
+    final end = DateTime.timestamp();
+
+    locator<LogBox>().log(
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
       name: 'Services',
-      extra: {'finish': DateTime.timestamp().toIso8601String()},
+      extra: {
+        'start': start.toIso8601String(),
+        'finish': end.toIso8601String(),
+        'duration': end.difference(start).toString(),
+      },
     );
   }
 }
