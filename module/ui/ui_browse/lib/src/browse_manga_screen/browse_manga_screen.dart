@@ -54,7 +54,7 @@ class BrowseMangaScreen extends StatefulWidget {
           listenSearchParameterUseCase: locator(),
           getTagsUseCase: locator(),
           recrawlUseCase: locator(),
-        )..init();
+        )..fetchTags();
       },
       child: BrowseMangaScreen(
         storageManager: locator(),
@@ -163,14 +163,14 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
   Widget _menuSearch({required BuildContext context}) {
     return _builder(
       buildWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
-      builder:
-          (context, state) => IconButton(
-            icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
-            onPressed:
-                () => _cubit(
-                  context,
-                ).update(isSearchActive: !state.isSearchActive),
-          ),
+      builder: (context, state) {
+        return IconButton(
+          icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
+          onPressed: () {
+            _cubit(context).update(isSearchActive: !state.isSearchActive);
+          },
+        );
+      },
     );
   }
 
@@ -226,7 +226,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             ),
             icon: Icon(Icons.favorite, color: color),
             onPressed: () {
-              _cubit(context).init(
+              _cubit(context).update(
                 parameter: state.parameter.copyWith(
                   orders: Map.fromEntries([
                     MapEntry(
@@ -259,7 +259,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             ),
             icon: Icon(Icons.update, color: color),
             onPressed: () {
-              _cubit(context).init(
+              _cubit(context).update(
                 parameter: state.parameter.copyWith(
                   orders: Map.fromEntries([
                     MapEntry(
@@ -299,7 +299,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
                 state.tags,
               );
               if (context.mounted && result != null) {
-                _cubit(context).init(parameter: result);
+                _cubit(context).update(parameter: result);
               }
             },
           );
@@ -322,7 +322,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         state.isSearchActive
             ? _searchFocusNode.requestFocus()
             : _searchFocusNode.unfocus();
-        _cubit(context).init(
+        _cubit(context).update(
           parameter: state.parameter.copyWith(
             title: state.isSearchActive ? _searchController.text : '',
           ),
@@ -352,7 +352,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               style: DefaultTextStyle.of(context).style,
               onSubmitted: (value) {
                 final parameter = state.parameter.copyWith(title: value);
-                _cubit(context).init(parameter: parameter);
+                _cubit(context).update(parameter: parameter);
               },
             ),
           );
@@ -365,43 +365,55 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
 
   Widget _content(BuildContext context) {
     return _builder(
+      buildWhen: (prev, curr) => prev.parameter != curr.parameter,
+      builder: (context, state) {
+        return PaginatedGridWidget(
+          crossAxisCount: 3,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          childAspectRatio: 100 / 140,
+          pager: _cubit(context).pager..refresh(refreshKey: state.parameter),
+          itemBuilder: (context, item) => _items(context, item),
+          emptyBuilder: (context) {
+            return const Center(child: Text('Empty'));
+          },
+          loadingBuilder: (context) {
+            return const Center(child: CircularProgressIndicator());
+          },
+          errorBuilder: (context, error) {
+            return Center(child: Text('Error: $error'));
+          },
+          onRefresh: () {
+            return _cubit(context).pager.refresh(refreshKey: state.parameter);
+          },
+        );
+      },
+    );
+  }
+
+  Widget _items(BuildContext context, Manga item) {
+    return _builder(
       buildWhen: (prev, curr) {
         return [
-          prev.isLoading != curr.isLoading,
-          prev.error != curr.error,
-          prev.mangas != curr.mangas,
           prev.libraryMangaIds != curr.libraryMangaIds,
           prev.parameter != curr.parameter,
           prev.prefetchedMangaIds != curr.prefetchedMangaIds,
-          prev.hasNextPage != curr.hasNextPage,
-          prev.parameter != curr.parameter,
         ].contains(true);
       },
       builder: (context, state) {
-        return GridWidget<Manga>(
-          itemBuilder: (context, data) {
-            return MangaItemWidget(
-              manga: data,
-              cacheManager: widget.storageManager.images,
-              onTap: () => widget.onTapManga?.call(data, state.parameter),
-              onLongPress: () {
-                _onTapMenu(
-                  context: context,
-                  manga: data,
-                  isOnLibrary: state.libraryMangaIds.contains(data.id),
-                );
-              },
-              isOnLibrary: state.libraryMangaIds.contains(data.id),
-              isPrefetching: state.prefetchedMangaIds.contains(data.id),
+        return MangaItemWidget(
+          manga: item,
+          cacheManager: widget.storageManager.images,
+          onTap: () => widget.onTapManga?.call(item, state.parameter),
+          onLongPress: () {
+            _onTapMenu(
+              context: context,
+              manga: item,
+              isOnLibrary: state.libraryMangaIds.contains(item.id),
             );
           },
-          onLoadNextPage: () => _cubit(context).next(),
-          onRefresh: () => _cubit(context).init(refresh: true),
-          onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
-          error: state.error,
-          isLoading: state.isLoading,
-          hasNext: state.hasNextPage,
-          data: state.mangas,
+          isOnLibrary: state.libraryMangaIds.contains(item.id),
+          isPrefetching: state.prefetchedMangaIds.contains(item.id),
         );
       },
     );
