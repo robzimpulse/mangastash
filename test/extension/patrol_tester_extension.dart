@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:core_storage/core_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manga_service_drift/src/database/memory_executor.dart';
 import 'package:mangastash/main.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 import 'package:service_locator/service_locator.dart';
