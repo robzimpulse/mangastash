@@ -17,7 +17,7 @@ class CoreRouteRegistrar extends Registrar {
       extra: {
         'start': start.toIso8601String(),
         'finish': end.toIso8601String(),
-        'duration': end.difference(start),
+        'duration': end.difference(start).toString(),
       },
     );
   }
