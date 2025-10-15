@@ -26,4 +26,4 @@ jobs:
         run: melos bootstrap --verbose
 
       - name: 'Run Test'
-        run: melos test
+        run: flutter test && melos test
