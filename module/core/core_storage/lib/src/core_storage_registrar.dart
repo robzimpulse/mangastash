@@ -44,7 +44,7 @@ class CoreStorageRegistrar extends Registrar {
   }
 
   @override
-  Future<void> isAllReady(ServiceLocator locator) async {
+  Future<void> allReady(ServiceLocator locator) async {
     await locator.isReady<SharedPreferences>();
   }
 }

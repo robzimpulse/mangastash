@@ -49,7 +49,7 @@ class GetItServiceLocator implements ServiceLocator {
     bool ignorePendingAsyncCreation = false,
   }) async {
     for (final registrar in alreadyRegistered.entries) {
-      await registrar.value.isAllReady(this);
+      await registrar.value.allReady(this);
     }
 
     return await _getIt.allReady(
