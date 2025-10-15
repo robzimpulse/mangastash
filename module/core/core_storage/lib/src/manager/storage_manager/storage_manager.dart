@@ -1,4 +1,3 @@
-import 'package:core_analytics/core_analytics.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
