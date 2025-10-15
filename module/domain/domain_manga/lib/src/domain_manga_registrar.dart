@@ -32,27 +32,19 @@ import 'use_case/tags/get_tags_use_case.dart';
 class DomainMangaRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
-    final LogBox log = locator();
+    final start = DateTime.timestamp();
 
-    log.log(
-      'Register ${runtimeType.toString()}',
-      id: runtimeType.toString(),
-      name: 'Services',
-      extra: {'start': DateTime.timestamp().toIso8601String()},
-    );
-
-    locator.registerSingleton(
-      GlobalOptionsManager(storage: locator()),
-      dispose: (e) => e.dispose(),
+    locator.registerLazySingleton(
+      () => GlobalOptionsManager(storage: locator()),
     );
     locator.alias<ListenSearchParameterUseCase, GlobalOptionsManager>();
     locator.alias<UpdateSearchParameterUseCase, GlobalOptionsManager>();
     locator.alias<ListenSourcesUseCase, GlobalOptionsManager>();
     locator.alias<UpdateSourcesUseCase, GlobalOptionsManager>();
 
-    locator.registerSingleton(
-      JobManager(
-        log: log,
+    locator.registerLazySingleton(
+      () => JobManager(
+        log: locator(),
         jobDao: locator(),
         storageManager: locator(),
         getChapterUseCase: () => locator(),
@@ -66,7 +58,10 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<PrefetchChapterUseCase, JobManager>();
     locator.alias<ListenPrefetchUseCase, JobManager>();
 
-    locator.registerSingleton(HistoryManager(historyDao: locator()));
+    locator.registerLazySingleton(
+      () => HistoryManager(historyDao: locator()),
+      dispose: (e) => e.dispose(),
+    );
     locator.alias<ListenReadHistoryUseCase, HistoryManager>();
     locator.alias<ListenUnreadHistoryUseCase, HistoryManager>();
 
@@ -159,21 +154,30 @@ class DomainMangaRegistrar extends Registrar {
     );
     locator.registerFactory(
       () => RecrawlUseCase(
-        logBox: log,
+        logBox: locator(),
         storageManager: locator(),
         cookieJar: locator(),
       ),
     );
 
-    locator.registerSingleton(LibraryManager(libraryDao: locator()));
+    locator.registerLazySingleton(
+      () => LibraryManager(libraryDao: locator()),
+      dispose: (e) => e.dispose(),
+    );
     locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
     locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
 
-    log.log(
+    final end = DateTime.timestamp();
+
+    locator<LogBox>().log(
       'Register ${runtimeType.toString()}',
       id: runtimeType.toString(),
       name: 'Services',
-      extra: {'finish': DateTime.timestamp().toIso8601String()},
+      extra: {
+        'start': start.toIso8601String(),
+        'finish': end.toIso8601String(),
+        'duration': end.difference(start).toString(),
+      },
     );
   }
 }

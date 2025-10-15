@@ -4,6 +4,8 @@ import 'service_locator.dart';
 abstract class Registrar {
   /// this function will be called everytime the app starts up.
   Future<void> register(ServiceLocator locator);
+  /// this function should be called to make sure any dependency is ready
+  Future<void> allReady(ServiceLocator locator) => Future.value();
 }
 
 /// The class for a library to declare the services that it'll provide.

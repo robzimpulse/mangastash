@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/src/history.dart';
 import 'package:rxdart/rxdart.dart';
@@ -10,13 +12,24 @@ class HistoryManager
   final _historyStateSubject = BehaviorSubject<List<History>>.seeded([]);
   final _unreadStateSubject = BehaviorSubject<List<History>>.seeded([]);
 
+  final List<StreamSubscription> subscriptions = [];
+
   HistoryManager({required HistoryDao historyDao}) {
-    _historyStateSubject.addStream(
-      historyDao.history.map((e) => [...e.map((e) => History.fromDrift(e))]),
-    );
-    _unreadStateSubject.addStream(
-      historyDao.unread.map((e) => [...e.map((e) => History.fromDrift(e))]),
-    );
+    subscriptions.addAll([
+      historyDao.history
+          .map((e) => [...e.map((e) => History.fromDrift(e))])
+          .listen(_historyStateSubject.add),
+      historyDao.unread
+          .map((e) => [...e.map((e) => History.fromDrift(e))])
+          .listen(_unreadStateSubject.add),
+    ]);
+  }
+
+  Future<void> dispose() async {
+    for (final subscription in subscriptions) {
+      await subscription.cancel();
+    }
+    subscriptions.clear();
   }
 
   @override

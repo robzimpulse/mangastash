@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:rxdart/src/streams/value_stream.dart';
 import 'package:rxdart/subjects.dart';
@@ -12,16 +14,22 @@ class AuthManager implements ListenAuthUseCase, GetAuthUseCase {
     const AuthState(status: AuthStatus.uninitialized, user: null),
   );
 
+  late final StreamSubscription subscription;
+
   AuthManager({required AuthService service}) {
-    final stream = service.userChanges();
-    _authStateSubject.addStream(
-      stream.map(
-        (user) => AuthState(
-          status: user == null ? AuthStatus.loggedOut : AuthStatus.loggedIn,
-          user: user,
-        ),
-      ),
-    );
+    subscription = service
+        .userChanges()
+        .map(
+          (user) => AuthState(
+            status: user == null ? AuthStatus.loggedOut : AuthStatus.loggedIn,
+            user: user,
+          ),
+        )
+        .listen(_authStateSubject.add);
+  }
+
+  Future<void> dispose() async {
+    await subscription.cancel();
   }
 
   @override

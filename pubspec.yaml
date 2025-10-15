@@ -66,6 +66,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   melos: ^6.2.0
+  mocktail: ^1.0.4
+  patrol_finders: ^2.8.2
   flutter_lints: ^4.0.0
 
 flutter:

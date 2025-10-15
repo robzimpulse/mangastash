@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -26,25 +24,21 @@ class GlobalOptionsManager
   static const String _sourcesKey = 'sources';
 
   GlobalOptionsManager({required SharedPreferences storage})
-      : _storage = storage,
-        _sources = BehaviorSubject.seeded(
-          storage
-              .getStringList(_sourcesKey)
-              .let(
-                (e) => [
-                  ...e.map((e) => SourceEnum.fromValue(name: e)).nonNulls,
-                ],
-              )
-              .or([]),
-        ),
-        _searchMangaParameter = BehaviorSubject.seeded(
-          storage
-              .getString(_mangaParameterKey)
-              .let(SearchMangaParameter.fromJsonString)
-              .or(const SearchMangaParameter()),
-        );
-
-  Future<void> dispose() async {}
+    : _storage = storage,
+      _sources = BehaviorSubject.seeded(
+        storage
+            .getStringList(_sourcesKey)
+            .let(
+              (e) => [...e.map((e) => SourceEnum.fromValue(name: e)).nonNulls],
+            )
+            .or([]),
+      ),
+      _searchMangaParameter = BehaviorSubject.seeded(
+        storage
+            .getString(_mangaParameterKey)
+            .let(SearchMangaParameter.fromJsonString)
+            .or(const SearchMangaParameter()),
+      );
 
   @override
   ValueStream<SearchMangaParameter> get searchParameterState =>

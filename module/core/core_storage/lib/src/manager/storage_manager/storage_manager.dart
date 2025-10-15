@@ -1,4 +1,3 @@
-import 'package:core_analytics/core_analytics.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -23,7 +22,7 @@ class StorageManager {
 
   final CustomCacheManager searchChapter;
 
-  StorageManager({required ValueGetter<Dio> dio, required LogBox logBox})
+  StorageManager({required ValueGetter<Dio> dio})
     : images = CustomCacheManager(
         Config('image', fileService: DioFileService(dio)),
       ),
