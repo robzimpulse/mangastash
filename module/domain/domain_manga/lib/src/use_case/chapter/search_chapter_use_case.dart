@@ -17,7 +17,9 @@ class SearchChapterUseCase
     with SyncChaptersMixin, SortChaptersMixin, FilterChaptersMixin {
   final ChapterRepository _chapterRepository;
   final HeadlessWebviewUseCase _webview;
-  final StorageManager _storageManager;
+  final ConverterCacheManager _converterCacheManager;
+  final SearchChapterCacheManager _searchChapterCacheManager;
+  final HtmlCacheManager _htmlCacheManager;
   final ChapterDao _chapterDao;
   final MangaDao _mangaDao;
   final LogBox _logBox;
@@ -25,12 +27,16 @@ class SearchChapterUseCase
   const SearchChapterUseCase({
     required ChapterRepository chapterRepository,
     required HeadlessWebviewUseCase webview,
-    required StorageManager storageManager,
+    required ConverterCacheManager converterCacheManager,
+    required HtmlCacheManager htmlCacheManager,
+    required SearchChapterCacheManager searchChapterCacheManager,
     required ChapterDao chapterDao,
     required MangaDao mangaDao,
     required LogBox logBox,
   }) : _chapterRepository = chapterRepository,
-       _storageManager = storageManager,
+       _converterCacheManager = converterCacheManager,
+       _htmlCacheManager = htmlCacheManager,
+       _searchChapterCacheManager = searchChapterCacheManager,
        _chapterDao = chapterDao,
        _mangaDao = mangaDao,
        _logBox = logBox,
@@ -57,10 +63,10 @@ class SearchChapterUseCase
           Chapter.from(data: value).copyWith(
             mangaId: parameter.mangaId,
             readableAt: await value.attributes?.readableAt?.asDateTime(
-              storageManager: _storageManager,
+              manager: _converterCacheManager,
             ),
             publishAt: await value.attributes?.publishAt?.asDateTime(
-              storageManager: _storageManager,
+              manager: _converterCacheManager,
             ),
           ),
       ],
@@ -114,7 +120,7 @@ class SearchChapterUseCase
     final parser = ChapterListHtmlParser.forSource(
       root: document,
       source: parameter.source,
-      storageManager: _storageManager,
+      converterCacheManager: _converterCacheManager,
     );
 
     final chapters = await parser.chapters;
@@ -145,7 +151,7 @@ class SearchChapterUseCase
     final raw = await _mangaDao.search(ids: [parameter.mangaId]);
     final result = Manga.fromDatabase(raw.firstOrNull);
     final url = result?.webUrl;
-    final data = await _storageManager.searchChapter.keys;
+    final data = await _searchChapterCacheManager.keys;
     final List<Future<void>> promises = [];
     for (final value in data) {
       final key = SourceSearchChapterParameter.fromJsonString(value);
@@ -157,9 +163,9 @@ class SearchChapterUseCase
         page: key.parameter.page,
       );
       if (paramIgnorePagination != key.parameter) continue;
-      promises.add(_storageManager.searchChapter.removeFile(value));
+      promises.add(_searchChapterCacheManager.removeFile(value));
     }
-    if (url != null) promises.add(_storageManager.html.removeFile(url));
+    if (url != null) promises.add(_htmlCacheManager.removeFile(url));
     await Future.wait(promises);
   }
 
@@ -168,7 +174,7 @@ class SearchChapterUseCase
     bool useCache = true,
   }) async {
     final key = parameter.toJsonString();
-    final cache = await _storageManager.searchChapter.getFileFromCache(key);
+    final cache = await _searchChapterCacheManager.getFileFromCache(key);
     final file = await cache?.file.readAsString(encoding: utf8);
     final data = file.let((e) {
       return Pagination.fromJsonString(
@@ -197,7 +203,7 @@ class SearchChapterUseCase
         ),
       );
 
-      await _storageManager.searchChapter.putFile(
+      await _searchChapterCacheManager.putFile(
         key,
         key: key,
         utf8.encode(result.toJsonString((e) => e.toJson())),

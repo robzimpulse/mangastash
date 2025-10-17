@@ -42,6 +42,6 @@ class AsuraScanMangaListHtmlParser extends MangaListHtmlParser {
 
   AsuraScanMangaListHtmlParser({
     required super.root,
-    required super.storageManager,
+    required super.converterCacheManager,
   });
 }

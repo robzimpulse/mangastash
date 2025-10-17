@@ -14,7 +14,8 @@ class GetChapterUseCase with SyncChaptersMixin {
   final ChapterRepository _chapterRepository;
   final AtHomeRepository _atHomeRepository;
   final HeadlessWebviewUseCase _webview;
-  final StorageManager _storageManager;
+  final ChapterCacheManager _chapterCacheManager;
+  final ConverterCacheManager _converterCacheManager;
   final ChapterDao _chapterDao;
   final LogBox _logBox;
 
@@ -22,12 +23,14 @@ class GetChapterUseCase with SyncChaptersMixin {
     required ChapterRepository chapterRepository,
     required AtHomeRepository atHomeRepository,
     required HeadlessWebviewUseCase webview,
-    required StorageManager storageManager,
+    required ChapterCacheManager chapterCacheManager,
+    required ConverterCacheManager converterCacheManager,
     required ChapterDao chapterDao,
     required LogBox logBox,
   }) : _chapterRepository = chapterRepository,
        _atHomeRepository = atHomeRepository,
-       _storageManager = storageManager,
+       _chapterCacheManager = chapterCacheManager,
+       _converterCacheManager = converterCacheManager,
        _chapterDao = chapterDao,
        _logBox = logBox,
        _webview = webview;
@@ -94,7 +97,7 @@ class GetChapterUseCase with SyncChaptersMixin {
     final parser = ChapterImageHtmlParser.forSource(
       root: document,
       source: source,
-      storageManager: _storageManager,
+      converterCacheManager: _converterCacheManager,
     );
 
     return parser.images;
@@ -106,7 +109,7 @@ class GetChapterUseCase with SyncChaptersMixin {
     required String chapterId,
   }) async {
     final key = '${source.name} - $mangaId - $chapterId';
-    await _storageManager.chapter.removeFile(key);
+    await _converterCacheManager.removeFile(key);
   }
 
   Future<Result<Chapter>> execute({
@@ -116,7 +119,7 @@ class GetChapterUseCase with SyncChaptersMixin {
     bool useCache = true,
   }) async {
     final key = '${source.name} - $mangaId - $chapterId';
-    final file = await _storageManager.chapter.getFileFromCache(key);
+    final file = await _chapterCacheManager.getFileFromCache(key);
     final data = await file?.file.readAsString(encoding: utf8);
     final cache = Chapter.fromJsonString(data ?? '');
     if (cache != null && useCache) return Success(cache);
@@ -154,7 +157,7 @@ class GetChapterUseCase with SyncChaptersMixin {
         throw DataNotFoundException();
       }
 
-      await _storageManager.chapter.putFile(
+      await _chapterCacheManager.putFile(
         key,
         utf8.encode(result.toJsonString()),
         key: key,

@@ -11,16 +11,19 @@ import '../../parser/base/manga_detail_html_parser.dart';
 
 class GetMangaFromUrlUseCase with SyncMangasMixin {
   final HeadlessWebviewUseCase _webview;
-  final StorageManager _storageManager;
+  final ConverterCacheManager _converterCacheManager;
+  final MangaCacheManager _mangaCacheManager;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   GetMangaFromUrlUseCase({
     required HeadlessWebviewUseCase webview,
-    required StorageManager storageManager,
+    required ConverterCacheManager converterCacheManager,
+    required MangaCacheManager mangaCacheManager,
     required MangaDao mangaDao,
     required LogBox logBox,
-  }) : _storageManager = storageManager,
+  }) : _converterCacheManager = converterCacheManager,
+       _mangaCacheManager = mangaCacheManager,
        _mangaDao = mangaDao,
        _logBox = logBox,
        _webview = webview;
@@ -60,7 +63,7 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
     final parser = MangaDetailHtmlParser.forSource(
       root: document,
       source: source,
-      storageManager: _storageManager,
+      converterCacheManager: _converterCacheManager,
     );
 
     final manga = await parser.manga;
@@ -73,7 +76,7 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
     required String url,
   }) async {
     final key = '${source.name}-$url';
-    final file = await _storageManager.chapter.getFileFromCache(key);
+    final file = await _mangaCacheManager.getFileFromCache(key);
     final data = await file?.file.readAsString(encoding: utf8);
     final cache = Manga.fromJsonString(data ?? '');
     if (cache != null) return Success(cache);
@@ -96,7 +99,7 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
         throw DataNotFoundException();
       }
 
-      await _storageManager.chapter.putFile(
+      await _mangaCacheManager.putFile(
         key,
         utf8.encode(result.toJsonString()),
         key: key,

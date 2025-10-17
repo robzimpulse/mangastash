@@ -9,24 +9,24 @@ import 'base_html_parser.dart';
 abstract class TagListHtmlParser extends BaseHtmlParser {
   Future<List<Tag>> get tags;
 
-  TagListHtmlParser({required super.root, required super.storageManager});
+  TagListHtmlParser({required super.root, required super.converterCacheManager});
 
   factory TagListHtmlParser.forSource({
     required Document root,
     required SourceEnum source,
-    required StorageManager storageManager,
+    required ConverterCacheManager converterCacheManager,
   }) {
     if (SourceEnum.asurascan == source) {
       return AsuraScanTagListHtmlParser(
         root: root,
-        storageManager: storageManager,
+        converterCacheManager: converterCacheManager,
       );
     }
 
     if (SourceEnum.mangaclash == source) {
       return MangaClashTagListHtmlParser(
         root: root,
-        storageManager: storageManager,
+        converterCacheManager: converterCacheManager,
       );
     }
 

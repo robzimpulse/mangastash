@@ -5,7 +5,7 @@ import 'base/chapter_image_html_parser.dart';
 class AsuraScanChapterImageHtmlParser extends ChapterImageHtmlParser {
   AsuraScanChapterImageHtmlParser({
     required super.root,
-    required super.storageManager,
+    required super.converterCacheManager,
   });
 
   @override

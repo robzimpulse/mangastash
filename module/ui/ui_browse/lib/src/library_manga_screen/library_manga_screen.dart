@@ -12,7 +12,7 @@ import 'library_manga_screen_state.dart';
 class LibraryMangaScreen extends StatefulWidget {
   const LibraryMangaScreen({
     super.key,
-    required this.storageManager,
+    required this.imagesCacheManager,
     this.onTapManga,
     this.onTapAddManga,
   });
@@ -21,7 +21,7 @@ class LibraryMangaScreen extends StatefulWidget {
 
   final AsyncValueGetter<String?>? onTapAddManga;
 
-  final StorageManager storageManager;
+  final ImageCacheManager imagesCacheManager;
 
   static Widget create({
     required ServiceLocator locator,
@@ -30,17 +30,19 @@ class LibraryMangaScreen extends StatefulWidget {
     String? sourceId,
   }) {
     return BlocProvider(
-      create: (context) => LibraryMangaScreenCubit(
-        listenMangaFromLibraryUseCase: locator(),
-        prefetchMangaUseCase: locator(),
-        listenPrefetchMangaUseCase: locator(),
-        removeFromLibraryUseCase: locator(),
-        prefetchChapterUseCase: locator(),
-        getMangaFromUrlUseCase: locator(),
-        addToLibraryUseCase: locator(),
-      ),
+      create: (context) {
+        return LibraryMangaScreenCubit(
+          listenMangaFromLibraryUseCase: locator(),
+          prefetchMangaUseCase: locator(),
+          listenPrefetchMangaUseCase: locator(),
+          removeFromLibraryUseCase: locator(),
+          prefetchChapterUseCase: locator(),
+          getMangaFromUrlUseCase: locator(),
+          addToLibraryUseCase: locator(),
+        );
+      },
       child: LibraryMangaScreen(
-        storageManager: locator(),
+        imagesCacheManager: locator(),
         onTapManga: onTapManga,
         onTapAddManga: onTapAddManga,
       ),
@@ -136,29 +138,29 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
       listenWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
       listener: (context, state) => _searchFocusNode.requestFocus(),
       buildWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
-      builder: (context, state) => !state.isSearchActive
-          ? const Text('Library')
-          : Container(
-              alignment: Alignment.centerLeft,
-              child: TextField(
-                controller: _searchController,
-                focusNode: _searchFocusNode,
-                decoration: InputDecoration(
-                  hintText: 'Search...',
-                  filled: false,
-                  border: InputBorder.none,
-                  hintStyle: DefaultTextStyle.of(context).style,
-                ),
-                cursorColor: DefaultTextStyle.of(context).style.color,
-                style: DefaultTextStyle.of(context).style,
-                onChanged: (value) => _cubit(context).update(
-                  mangaTitle: value,
-                ),
-                onSubmitted: (value) => _cubit(context).update(
-                  mangaTitle: value,
-                ),
-              ),
+      builder: (context, state) {
+        if (!state.isSearchActive) {
+          return const Text('Library');
+        }
+
+        return Container(
+          alignment: Alignment.centerLeft,
+          child: TextField(
+            controller: _searchController,
+            focusNode: _searchFocusNode,
+            decoration: InputDecoration(
+              hintText: 'Search...',
+              filled: false,
+              border: InputBorder.none,
+              hintStyle: DefaultTextStyle.of(context).style,
             ),
+            cursorColor: DefaultTextStyle.of(context).style.color,
+            style: DefaultTextStyle.of(context).style,
+            onChanged: (value) => _cubit(context).update(mangaTitle: value),
+            onSubmitted: (value) => _cubit(context).update(mangaTitle: value),
+          ),
+        );
+      },
     );
   }
 
@@ -172,9 +174,7 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
 
         return IconButton(
           icon: const Icon(Icons.cloud_download),
-          onPressed: () => _cubit(context).prefetch(
-            mangas: state.mangas,
-          ),
+          onPressed: () => _cubit(context).prefetch(mangas: state.mangas),
         );
       },
     );
@@ -183,12 +183,14 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
   Widget _layoutSearch({required BuildContext context}) {
     return _builder(
       buildWhen: (prev, curr) => prev.isSearchActive != curr.isSearchActive,
-      builder: (context, state) => IconButton(
-        icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
-        onPressed: () => _cubit(context).update(
-          isSearchActive: !state.isSearchActive,
-        ),
-      ),
+      builder: (context, state) {
+        return IconButton(
+          icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
+          onPressed: () {
+            _cubit(context).update(isSearchActive: !state.isSearchActive);
+          },
+        );
+      },
     );
   }
 
@@ -205,28 +207,32 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
 
   Widget _content(BuildContext context) {
     return _builder(
-      buildWhen: (prev, curr) => [
-        prev.filteredMangas != curr.filteredMangas,
-        prev.sources != curr.sources,
-        prev.prefetchedMangaIds != curr.prefetchedMangaIds,
-      ].contains(true),
-      builder: (context, state) => GridWidget(
-        itemBuilder: (context, data) => MangaItemWidget(
-          manga: data,
-          cacheManager: widget.storageManager.images,
-          isPrefetching: state.prefetchedMangaIds.contains(data.id),
-          onTap: () => widget.onTapManga?.call(data),
-          onLongPress: () => _onTapMenu(
-            context: context,
-            manga: data,
-            isOnLibrary: true,
-          ),
-        ),
-        error: state.error,
-        isLoading: state.isLoading,
-        hasNext: false,
-        data: state.filteredMangas,
-      ),
+      buildWhen: (prev, curr) {
+        return [
+          prev.filteredMangas != curr.filteredMangas,
+          prev.sources != curr.sources,
+          prev.prefetchedMangaIds != curr.prefetchedMangaIds,
+        ].contains(true);
+      },
+      builder: (context, state) {
+        return GridWidget(
+          itemBuilder: (context, data) {
+            return MangaItemWidget(
+              manga: data,
+              cacheManager: widget.imagesCacheManager,
+              isPrefetching: state.prefetchedMangaIds.contains(data.id),
+              onTap: () => widget.onTapManga?.call(data),
+              onLongPress: () {
+                _onTapMenu(context: context, manga: data, isOnLibrary: true);
+              },
+            );
+          },
+          error: state.error,
+          isLoading: state.isLoading,
+          hasNext: false,
+          data: state.filteredMangas,
+        );
+      },
     );
   }
 }

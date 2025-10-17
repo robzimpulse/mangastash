@@ -13,12 +13,12 @@ import 'manga_reader_screen_state.dart';
 class MangaReaderScreen extends StatelessWidget {
   const MangaReaderScreen({
     super.key,
-    required this.storageManager,
+    required this.imagesCacheManager,
     required this.logBox,
     this.onTapShortcut,
   });
 
-  final StorageManager storageManager;
+  final ImageCacheManager imagesCacheManager;
 
   final LogBox logBox;
 
@@ -47,7 +47,7 @@ class MangaReaderScreen extends StatelessWidget {
         )..init();
       },
       child: MangaReaderScreen(
-        storageManager: locator(),
+        imagesCacheManager: locator(),
         onTapShortcut: onTapShortcut,
         logBox: locator(),
       ),
@@ -172,7 +172,7 @@ class MangaReaderScreen extends StatelessWidget {
               SliverToBoxAdapter(
                 child: CachedNetworkImage(
                   imageUrl: image,
-                  cacheManager: storageManager.images,
+                  cacheManager: imagesCacheManager,
                   imageBuilder: (context, provider) {
                     return FutureBuilder(
                       future: provider.imageInfo,

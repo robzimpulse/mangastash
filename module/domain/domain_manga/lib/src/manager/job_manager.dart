@@ -29,7 +29,7 @@ class JobManager
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
   final ValueGetter<GetAllChapterUseCase> _getAllChapterUseCase;
   final ListenSearchParameterUseCase _listenSearchParameterUseCase;
-  final StorageManager _storageManager;
+  final ImageCacheManager _manager;
   final JobDao _jobDao;
   final LogBox _log;
 
@@ -40,14 +40,14 @@ class JobManager
   JobManager({
     required LogBox log,
     required JobDao jobDao,
-    required StorageManager storageManager,
+    required ImageCacheManager manager,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required ValueGetter<GetMangaUseCase> getMangaUseCase,
     required ValueGetter<GetAllChapterUseCase> getAllChapterUseCase,
   }) : _log = log,
        _jobDao = jobDao,
-       _storageManager = storageManager,
+       _manager = manager,
        _getMangaUseCase = getMangaUseCase,
        _getChapterUseCase = getChapterUseCase,
        _getAllChapterUseCase = getAllChapterUseCase,
@@ -286,7 +286,7 @@ class JobManager
       return;
     }
 
-    final file = await _storageManager.images.getSingleFile(url);
+    final file = await _manager.getSingleFile(url);
 
     _log.log(
       'Success execute job ${job.id} - ${job.type}',

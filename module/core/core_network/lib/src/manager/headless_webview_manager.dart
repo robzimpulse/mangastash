@@ -15,13 +15,13 @@ import '../usecase/headless_webview_usecase.dart';
 class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   final LogBox _log;
 
-  final StorageManager _storageManager;
+  final HtmlCacheManager _manager;
 
   HeadlessWebviewManager({
     required LogBox log,
-    required StorageManager storageManager,
+    required HtmlCacheManager manager,
   }) : _log = log,
-       _storageManager = storageManager;
+       _manager = manager;
 
   @override
   Future<Document?> open(
@@ -47,7 +47,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     bool useCache = true,
   }) async {
     final key = [uri.toString(), ...scripts].join('|');
-    final cache = await _storageManager.html.getFileFromCache(key);
+    final cache = await _manager.getFileFromCache(key);
     final data = await cache?.file.readAsString(encoding: utf8);
     if (data != null && useCache) {
       delegate.set(uri: uri, html: data, loading: false);
@@ -160,7 +160,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       return null;
     }
 
-    await _storageManager.html.putFile(
+    await _manager.putFile(
       uri.toString(),
       utf8.encode(html),
       fileExtension: 'html',
