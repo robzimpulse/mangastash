@@ -8,24 +8,24 @@ import 'base_html_parser.dart';
 
 abstract class ChapterListHtmlParser extends BaseHtmlParser {
   Future<List<Chapter>> get chapters;
-  ChapterListHtmlParser({required super.root, required super.storageManager});
+  ChapterListHtmlParser({required super.root, required super.converterCacheManager});
 
   factory ChapterListHtmlParser.forSource({
     required Document root,
     required SourceEnum source,
-    required StorageManager storageManager,
+    required ConverterCacheManager converterCacheManager,
   }) {
     if (SourceEnum.asurascan == source) {
       return AsuraScanChapterListHtmlParser(
         root: root,
-        storageManager: storageManager,
+        converterCacheManager: converterCacheManager,
       );
     }
 
     if (SourceEnum.mangaclash == source) {
       return MangaClashChapterListHtmlParser(
         root: root,
-        storageManager: storageManager,
+        converterCacheManager: converterCacheManager,
       );
     }
 

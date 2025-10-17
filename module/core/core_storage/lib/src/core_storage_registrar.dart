@@ -27,7 +27,35 @@ class CoreStorageRegistrar extends Registrar {
     locator.registerLazySingletonAsync(() => SharedPreferences.getInstance());
     locator.registerFactory(() => DioFileService(() => locator()));
     locator.registerLazySingleton(
-      () => StorageManager(fileService: locator()),
+      () => ImageCacheManager(fileService: locator()),
+      dispose: (e) => e.dispose(),
+    );
+    locator.registerLazySingleton(
+      () => ConverterCacheManager(fileService: locator()),
+      dispose: (e) => e.dispose(),
+    );
+    locator.registerLazySingleton(
+      () => TagCacheManager(fileService: locator()),
+      dispose: (e) => e.dispose(),
+    );
+    locator.registerLazySingleton(
+      () => MangaCacheManager(fileService: locator()),
+      dispose: (e) => e.dispose(),
+    );
+    locator.registerLazySingleton(
+      () => ChapterCacheManager(fileService: locator()),
+      dispose: (e) => e.dispose(),
+    );
+    locator.registerLazySingleton(
+      () => HtmlCacheManager(fileService: locator()),
+      dispose: (e) => e.dispose(),
+    );
+    locator.registerLazySingleton(
+      () => SearchChapterCacheManager(fileService: locator()),
+      dispose: (e) => e.dispose(),
+    );
+    locator.registerLazySingleton(
+      () => SearchMangaCacheManager(fileService: locator()),
       dispose: (e) => e.dispose(),
     );
 

@@ -27,6 +27,6 @@ class AsuraScanTagListHtmlParser extends TagListHtmlParser {
 
   AsuraScanTagListHtmlParser({
     required super.root,
-    required super.storageManager,
+    required super.converterCacheManager,
   });
 }

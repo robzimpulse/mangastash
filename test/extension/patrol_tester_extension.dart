@@ -9,7 +9,6 @@ import 'package:patrol_finders/patrol_finders.dart';
 import 'package:service_locator/service_locator.dart';
 
 import '../mock/mock_shared_preferences.dart';
-import '../mock/mock_storage_manager.dart';
 
 typedef OnRunTestScreen =
     Future<void> Function(ServiceLocator locator, PatrolTester $);
@@ -45,7 +44,6 @@ void testScreen(
         overrideDependencies: (locator) async {
           locator.registerSingleton<SharedPreferences>(MockSharedPreferences());
           locator.registerSingleton<Executor>(MemoryExecutor());
-          locator.registerSingleton<StorageManager>(MockStorageManager());
           await onSetupTestScreen?.call(locator);
         },
       ),

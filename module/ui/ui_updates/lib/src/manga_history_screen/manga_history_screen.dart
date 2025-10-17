@@ -11,12 +11,12 @@ import 'manga_history_screen_state.dart';
 class MangaHistoryScreen extends StatelessWidget {
   const MangaHistoryScreen({
     super.key,
-    required this.storageManager,
+    required this.imagesCacheManager,
     this.onTapManga,
     this.onTapChapter,
   });
 
-  final StorageManager storageManager;
+  final ImageCacheManager imagesCacheManager;
 
   final ValueSetter<Manga?>? onTapManga;
 
@@ -32,7 +32,7 @@ class MangaHistoryScreen extends StatelessWidget {
         return MangaHistoryScreenCubit(listenReadHistoryUseCase: locator());
       },
       child: MangaHistoryScreen(
-        storageManager: locator(),
+        imagesCacheManager: locator(),
         onTapChapter: onTapChapter,
         onTapManga: onTapManga,
       ),
@@ -54,7 +54,7 @@ class MangaHistoryScreen extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       manga: manga,
       onTap: () => onTapManga?.call(manga),
-      cacheManager: storageManager.images,
+      cacheManager: imagesCacheManager,
     );
   }
 

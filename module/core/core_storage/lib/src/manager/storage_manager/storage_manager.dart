@@ -1,64 +1,49 @@
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
-import '../custom_cache_manager/custom_cache_manager.dart';
 import 'file_service/dio_file_service.dart';
 
-class StorageManager {
-  final BaseCacheManager images;
+class ImageCacheManager extends CacheManager {
+  ImageCacheManager({required DioFileService fileService})
+    : super(Config('image', fileService: fileService));
+}
 
-  final BaseCacheManager converter;
+class ConverterCacheManager extends CacheManager {
+  ConverterCacheManager({required DioFileService fileService})
+    : super(Config('converter', fileService: fileService));
+}
 
-  final BaseCacheManager tags;
+class TagCacheManager extends CacheManager {
+  TagCacheManager({required DioFileService fileService})
+    : super(Config('tag', fileService: fileService));
+}
 
-  final BaseCacheManager manga;
+class MangaCacheManager extends CacheManager {
+  MangaCacheManager({required DioFileService fileService})
+    : super(Config('manga', fileService: fileService));
+}
 
-  final BaseCacheManager chapter;
+class ChapterCacheManager extends CacheManager {
+  ChapterCacheManager({required DioFileService fileService})
+    : super(Config('chapter', fileService: fileService));
+}
 
-  final BaseCacheManager html;
+class HtmlCacheManager extends CacheManager {
+  HtmlCacheManager({required DioFileService fileService})
+    : super(Config('html', fileService: fileService));
+}
 
-  final CustomCacheManager searchManga;
+class SearchChapterCacheManager extends CacheManager {
+  SearchChapterCacheManager({required DioFileService fileService})
+    : super(Config('search_chapter', fileService: fileService));
 
-  final CustomCacheManager searchChapter;
+  // TODO: get all keys from this manager
+  Future<Set<String>> get keys => Future.value({});
+}
 
-  StorageManager({required DioFileService fileService})
-    : images = CustomCacheManager(Config('image', fileService: fileService)),
-      converter = CustomCacheManager(
-        Config('converter', fileService: fileService),
-      ),
-      tags = CustomCacheManager(Config('tags', fileService: fileService)),
-      manga = CustomCacheManager(Config('manga', fileService: fileService)),
-      chapter = CustomCacheManager(Config('chapter', fileService: fileService)),
-      html = CustomCacheManager(Config('html', fileService: fileService)),
-      searchChapter = CustomCacheManager(
-        Config('search_chapter', fileService: fileService),
-      ),
-      searchManga = CustomCacheManager(
-        Config('search_manga', fileService: fileService),
-      );
+class SearchMangaCacheManager extends CacheManager {
+  SearchMangaCacheManager({required DioFileService fileService})
+    : super(Config('search_manga', fileService: fileService));
 
-  Future<void> clear() async {
-    await Future.wait([
-      images.emptyCache(),
-      converter.emptyCache(),
-      tags.emptyCache(),
-      manga.emptyCache(),
-      chapter.emptyCache(),
-      html.emptyCache(),
-      searchChapter.emptyCache(),
-      searchManga.emptyCache(),
-    ]);
-  }
-
-  Future<void> dispose() async {
-    await Future.wait([
-      images.dispose(),
-      converter.dispose(),
-      tags.dispose(),
-      manga.dispose(),
-      chapter.dispose(),
-      html.dispose(),
-      searchChapter.dispose(),
-      searchManga.dispose(),
-    ]);
-  }
+  // TODO: get all keys from this manager
+  Future<Set<String>> get keys => Future.value({});
 }
