@@ -3,6 +3,7 @@ import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'manager/storage_manager/file_service/dio_file_service.dart';
 import 'manager/storage_manager/storage_manager.dart';
 
 class CoreStorageRegistrar extends Registrar {
@@ -24,8 +25,9 @@ class CoreStorageRegistrar extends Registrar {
     locator.registerFactory(() => TagDao(locator()));
 
     locator.registerLazySingletonAsync(() => SharedPreferences.getInstance());
+    locator.registerFactory(() => DioFileService(() => locator()));
     locator.registerLazySingleton(
-      () => StorageManager(dio: () => locator()),
+      () => StorageManager(fileService: locator()),
       dispose: (e) => e.dispose(),
     );
 
