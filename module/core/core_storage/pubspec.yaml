@@ -28,6 +28,8 @@ dependencies:
   # core
   core_analytics:
     path: ../../core/core_analytics
+  core_network:
+    path: ../../core/core_network
 
 dev_dependencies:
   flutter_test:

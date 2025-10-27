@@ -161,6 +161,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  cookie_jar:
+    dependency: transitive
+    description:
+      name: cookie_jar
+      sha256: a6ac027d3ed6ed756bfce8f3ff60cb479e266f3b0fdabd6242b804b6765e52de
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.8"
   core_analytics:
     dependency: "direct overridden"
     description:
@@ -172,6 +180,13 @@ packages:
     dependency: "direct main"
     description:
       path: "../../core/core_environment"
+      relative: true
+    source: path
+    version: "0.0.1"
+  core_network:
+    dependency: transitive
+    description:
+      path: "../../core/core_network"
       relative: true
     source: path
     version: "0.0.1"
@@ -198,6 +213,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.6"
+  csslib:
+    dependency: transitive
+    description:
+      name: csslib
+      sha256: "09bad715f418841f976c77db72d5398dc1253c21fb9c0c7f0b0b985860b2d58e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   dart_style:
     dependency: transitive
     description:
@@ -222,6 +245,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.9.0"
+  dio_cookie_manager:
+    dependency: transitive
+    description:
+      name: dio_cookie_manager
+      sha256: d39c16abcc711c871b7b29bd51c6b5f3059ef39503916c6a9df7e22c4fc595e0
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.3.0"
+  dio_smart_retry:
+    dependency: transitive
+    description:
+      name: dio_smart_retry
+      sha256: "3d71450c19b4d91ef4c7d726a55a284bfc11eb3634f1f25006cdfab3f8595653"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.0"
   dio_web_adapter:
     dependency: transitive
     description:
@@ -437,6 +476,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.2"
+  html:
+    dependency: transitive
+    description:
+      name: html
+      sha256: "6d1264f2dffa1b1101c25a91dff0dc2daee4c18e87cd8538729773c073dbf602"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.15.6"
   http:
     dependency: transitive
     description:
@@ -655,6 +702,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  mutex:
+    dependency: transitive
+    description:
+      name: mutex
+      sha256: "8827da25de792088eb33e572115a5eb0d61d61a3c01acbc8bcbe76ed78f1a1f2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0"
   nested:
     dependency: transitive
     description:
