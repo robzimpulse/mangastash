@@ -90,6 +90,11 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
           }
 
           await _imageCacheManager.putFile(url, bytes, fileExtension: ext);
+          _log.log(
+            'Success to download image [$url]',
+            name: runtimeType.toString(),
+            extra: {'url': url, 'data': data, 'ext': ext},
+          );
         },
       },
     );
