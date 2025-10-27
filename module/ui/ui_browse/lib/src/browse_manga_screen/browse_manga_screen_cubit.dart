@@ -16,6 +16,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final GetTagsUseCase _getTagsUseCase;
   final RecrawlUseCase _recrawlUseCase;
+  final HeadlessWebviewUseCase _headlessWebviewUseCase;
 
   BrowseMangaScreenCubit({
     required BrowseMangaScreenState initialState,
@@ -29,9 +30,11 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required GetTagsUseCase getTagsUseCase,
     required RecrawlUseCase recrawlUseCase,
+    required HeadlessWebviewUseCase headlessWebviewUseCase,
   }) : _searchMangaUseCase = searchMangaUseCase,
        _addToLibraryUseCase = addToLibraryUseCase,
        _removeFromLibraryUseCase = removeFromLibraryUseCase,
+       _headlessWebviewUseCase = headlessWebviewUseCase,
        _prefetchMangaUseCase = prefetchMangaUseCase,
        _prefetchChapterUseCase = prefetchChapterUseCase,
        _getTagsUseCase = getTagsUseCase,
@@ -191,6 +194,11 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
   void recrawl({required BuildContext context, required String url}) async {
     await _recrawlUseCase.execute(context: context, url: url);
+    await init();
+  }
+
+  void recrawlImage({required String url}) async {
+    await _headlessWebviewUseCase.image(url);
     await init();
   }
 }
