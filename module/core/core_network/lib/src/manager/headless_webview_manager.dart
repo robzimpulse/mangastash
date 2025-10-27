@@ -50,46 +50,46 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       uri: WebUri(url),
       delegate: _log.inAppWebviewObserver,
       useCache: useCache,
-      initialUserScripts: UnmodifiableListView([
-        UserScript(
-          source: '''
-            const toDataURL = url => fetch(url)
-              .then(response => response.blob())
-              .then(blob => new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-              }));
-          ''',
-          injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
-        ),
-      ]),
       scripts: [
         '''
+        const toDataURL = url => fetch(url)
+          .then(response => response.blob())
+          .then(blob => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          }));
+        
         toDataURL('$url')
           .then(e => window.flutter_inappwebview.callHandler('ch', e));
         ''',
       ],
       javascriptHandlers: {
         'ch': (args) async {
-          final ext = url.split('.').lastOrNull;
-          final String? base64 = args[0].castOrNull();
-          if (base64 == null || ext == null) {
+          if (args.isEmpty) return;
+          final data = args.first;
+          if (data is! String) {
             _log.log(
               'Failed to download image [$url]',
               name: runtimeType.toString(),
-              extra: {'data': base64, 'extension': ext},
             );
-
             return;
           }
 
-          await _imageCacheManager.putFile(
-            url,
-            base64Decode(base64),
-            fileExtension: ext,
-          );
+          final values = data.split(RegExp(r'[:;,]+'));
+          final ext = values[1].let((value) => value.split('/').last);
+          final bytes = values.lastOrNull?.let((value) => base64.decode(value));
+          if (bytes == null || ext == null) {
+            _log.log(
+              'Failed to parse image [$url]',
+              name: runtimeType.toString(),
+              extra: {'url': url, 'data': data},
+            );
+            return;
+          }
+
+          await _imageCacheManager.putFile(url, bytes, fileExtension: ext);
         },
       },
     );
