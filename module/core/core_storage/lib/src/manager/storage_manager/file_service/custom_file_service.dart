@@ -20,11 +20,10 @@ class CustomFileService extends FileService {
     String url, {
     Map<String, String>? headers,
   }) async {
-    try {
-      return _getUsingDio(url, headers: headers);
-    } on DioException {
-      return _getUsingBrowser(url, headers: headers);
-    }
+    return _getUsingDio(
+      url,
+      headers: headers,
+    ).onError((_, __) => _getUsingBrowser(url, headers: headers));
   }
 
   Future<FileServiceResponse> _getUsingDio(
