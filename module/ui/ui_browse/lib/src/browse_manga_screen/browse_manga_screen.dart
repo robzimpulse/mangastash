@@ -392,6 +392,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
                   isOnLibrary: state.libraryMangaIds.contains(data.id),
                 );
               },
+              onRefreshImage: (url) => _cubit(context).recrawlImage(url: url),
               isOnLibrary: state.libraryMangaIds.contains(data.id),
               isPrefetching: state.prefetchedMangaIds.contains(data.id),
             );

@@ -14,6 +14,7 @@ class MangaItemWidget extends StatelessWidget {
     this.isPrefetching = false,
     this.onLongPress,
     this.cacheManager,
+    this.onRefreshImage,
   });
 
   final Manga manga;
@@ -23,6 +24,7 @@ class MangaItemWidget extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final EdgeInsetsGeometry padding;
+  final ValueSetter<String>? onRefreshImage;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +54,12 @@ class MangaItemWidget extends StatelessWidget {
                       'https://placehold.co/400?text=Cover+Url',
                     ),
                     errorWidget: (context, url, error) {
-                      return const Center(child: Icon(Icons.error));
+                      return Center(
+                        child: IconButton(
+                          onPressed: () => onRefreshImage?.call(url),
+                          icon: const Icon(Icons.refresh),
+                        ),
+                      );
                     },
                     progressIndicatorBuilder: (context, url, progress) {
                       return Center(
@@ -120,7 +127,12 @@ class MangaItemWidget extends StatelessWidget {
                         imageUrl: sourceIconUrl,
                         fit: BoxFit.contain,
                         errorWidget: (context, url, error) {
-                          return const Center(child: Icon(Icons.error));
+                          return Center(
+                            child: IconButton(
+                              onPressed: () => onRefreshImage?.call(url),
+                              icon: const Icon(Icons.refresh),
+                            ),
+                          );
                         },
                         progressIndicatorBuilder: (context, url, progress) {
                           return Center(
