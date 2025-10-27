@@ -18,15 +18,12 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   final LogBox _log;
 
   final HtmlCacheManager _htmlCacheManager;
-  final ImageCacheManager _imageCacheManager;
 
   HeadlessWebviewManager({
     required LogBox log,
     required HtmlCacheManager htmlCacheManager,
-    required ImageCacheManager imageCacheManager,
   }) : _log = log,
-       _htmlCacheManager = htmlCacheManager,
-       _imageCacheManager = imageCacheManager;
+       _htmlCacheManager = htmlCacheManager;
 
   @override
   Future<Document?> open(
@@ -93,7 +90,6 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
             return;
           }
 
-          await _imageCacheManager.putFile(url, bytes, fileExtension: ext);
           _log.log(
             'Success to download image [$url]',
             name: runtimeType.toString(),
