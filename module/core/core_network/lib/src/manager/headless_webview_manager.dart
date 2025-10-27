@@ -74,7 +74,15 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
         'ch': (args) async {
           final ext = url.split('.').lastOrNull;
           final String? base64 = args[0].castOrNull();
-          if (base64 == null || ext == null) return;
+          if (base64 == null || ext == null) {
+            _log.log(
+              'Failed to download image [$url]',
+              name: runtimeType.toString(),
+              extra: {'data': base64, 'extension': ext},
+            );
+
+            return;
+          }
 
           await _imageCacheManager.putFile(
             url,
