@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
@@ -43,9 +42,12 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   }
 
   @override
-  Future<Uint8List> image(String url, {bool useCache = true}) async {
-
-    final Completer<Uint8List> completer = Completer();
+  Future<String> image(
+    String url, {
+    bool useCache = true,
+    Map<String, String>? headers,
+  }) async {
+    final Completer<String> completer = Completer();
 
     await _fetch(
       uri: WebUri(url),
@@ -78,25 +80,13 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
             return;
           }
 
-          final values = data.split(RegExp(r'[:;,]+'));
-          final ext = values[1].let((value) => value.split('/').last);
-          final bytes = values.lastOrNull?.let((value) => base64.decode(value));
-          if (bytes == null || ext == null) {
-            _log.log(
-              'Failed to parse image [$url]',
-              name: runtimeType.toString(),
-              extra: {'url': url, 'data': data},
-            );
-            return;
-          }
-
           _log.log(
             'Success to download image [$url]',
             name: runtimeType.toString(),
-            extra: {'url': url, 'data': data, 'ext': ext},
+            extra: {'url': url, 'data': data},
           );
 
-          completer.safeComplete(bytes);
+          completer.safeComplete(data);
         },
       },
     );
