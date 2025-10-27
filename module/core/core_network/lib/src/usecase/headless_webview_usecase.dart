@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:html/dom.dart';
 
 abstract class HeadlessWebviewUseCase {
@@ -7,5 +9,5 @@ abstract class HeadlessWebviewUseCase {
     bool useCache = true,
   });
 
-  Future<void> image(String url, {bool useCache = true});
+  Future<Uint8List> image(String url, {bool useCache = true});
 }

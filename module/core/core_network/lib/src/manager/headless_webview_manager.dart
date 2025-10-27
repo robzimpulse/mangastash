@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
@@ -45,7 +46,10 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   }
 
   @override
-  Future<void> image(String url, {bool useCache = true}) async {
+  Future<Uint8List> image(String url, {bool useCache = true}) async {
+
+    final Completer<Uint8List> completer = Completer();
+
     await _fetch(
       uri: WebUri(url),
       delegate: _log.inAppWebviewObserver,
@@ -95,9 +99,13 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
             name: runtimeType.toString(),
             extra: {'url': url, 'data': data, 'ext': ext},
           );
+
+          completer.safeComplete(bytes);
         },
       },
     );
+
+    return completer.future;
   }
 
   Future<String?> _fetch({
