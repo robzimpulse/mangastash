@@ -12,7 +12,11 @@ class CoreNetworkRegistrar extends Registrar {
     final start = DateTime.timestamp();
 
     locator.registerLazySingleton(
-      () => HeadlessWebviewManager(log: locator(), manager: locator()),
+      () => HeadlessWebviewManager(
+        log: locator(),
+        htmlCacheManager: locator(),
+        imageCacheManager: locator(),
+      ),
     );
     locator.alias<HeadlessWebviewUseCase, HeadlessWebviewManager>();
     locator.registerLazySingleton(() => CookieJar());

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:core_analytics/core_analytics.dart';
@@ -15,13 +16,16 @@ import '../usecase/headless_webview_usecase.dart';
 class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   final LogBox _log;
 
-  final HtmlCacheManager _manager;
+  final HtmlCacheManager _htmlCacheManager;
+  final ImageCacheManager _imageCacheManager;
 
   HeadlessWebviewManager({
     required LogBox log,
-    required HtmlCacheManager manager,
+    required HtmlCacheManager htmlCacheManager,
+    required ImageCacheManager imageCacheManager,
   }) : _log = log,
-       _manager = manager;
+       _htmlCacheManager = htmlCacheManager,
+       _imageCacheManager = imageCacheManager;
 
   @override
   Future<Document?> open(
@@ -40,14 +44,58 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     return parse(html, sourceUrl: url);
   }
 
+  Future<void> image(String url, {bool useCache = true}) async {
+    await _fetch(
+      uri: WebUri(url),
+      delegate: _log.inAppWebviewObserver,
+      useCache: useCache,
+      initialUserScripts: UnmodifiableListView([
+        UserScript(
+          source: '''
+            const toDataURL = url => fetch(url)
+              .then(response => response.blob())
+              .then(blob => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+              }));
+          ''',
+          injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
+        ),
+      ]),
+      scripts: [
+        '''
+        toDataURL('$url')
+          .then(e => window.flutter_inappwebview.callHandler('ch', e));
+        ''',
+      ],
+      javascriptHandlers: {
+        'ch': (args) async {
+          final ext = url.split('.').lastOrNull;
+          final String? base64 = args[0].castOrNull();
+          if (base64 == null || ext == null) return;
+
+          await _imageCacheManager.putFile(
+            url,
+            base64Decode(base64),
+            fileExtension: ext,
+          );
+        },
+      },
+    );
+  }
+
   Future<String?> _fetch({
     required WebUri uri,
     required InAppWebviewObserver delegate,
+    UnmodifiableListView<UserScript>? initialUserScripts,
+    Map<String, JavaScriptHandlerCallback>? javascriptHandlers,
     List<String> scripts = const [],
     bool useCache = true,
   }) async {
     final key = [uri.toString(), ...scripts].join('|');
-    final cache = await _manager.getFileFromCache(key);
+    final cache = await _htmlCacheManager.getFileFromCache(key);
     final data = await cache?.file.readAsString(encoding: utf8);
     if (data != null && useCache) {
       delegate.set(uri: uri, html: data, loading: false);
@@ -59,6 +107,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     final onLoadErrorCompleter = Completer();
 
     final webview = HeadlessInAppWebView(
+      initialUserScripts: initialUserScripts,
       initialUrlRequest: URLRequest(
         url: uri,
         headers: {HttpHeaders.userAgentHeader: UserAgentMixin.staticUserAgent},
@@ -68,8 +117,16 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
         javaScriptEnabled: true,
         supportZoom: false,
       ),
-      onWebViewCreated: (_) {
+      onWebViewCreated: (controller) {
         delegate.onWebViewCreated(uri: uri, scripts: scripts);
+        final handlers = javascriptHandlers?.entries ?? [];
+        if (handlers.isEmpty) return;
+        for (final handler in handlers) {
+          controller.addJavaScriptHandler(
+            handlerName: handler.key,
+            callback: handler.value,
+          );
+        }
       },
       onTitleChanged: (_, name) {
         delegate.onTitleChanged(title: name);
@@ -160,7 +217,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       return null;
     }
 
-    await _manager.putFile(
+    await _htmlCacheManager.putFile(
       uri.toString(),
       utf8.encode(html),
       fileExtension: 'html',
