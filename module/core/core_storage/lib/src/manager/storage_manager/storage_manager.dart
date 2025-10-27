@@ -1,5 +1,6 @@
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
+import '../custom_cache_manager/custom_cache_manager.dart';
 import 'file_service/dio_file_service.dart';
 
 class ImageCacheManager extends CacheManager {
@@ -32,18 +33,12 @@ class HtmlCacheManager extends CacheManager {
     : super(Config('html', fileService: fileService));
 }
 
-class SearchChapterCacheManager extends CacheManager {
+class SearchChapterCacheManager extends CustomCacheManager {
   SearchChapterCacheManager({required DioFileService fileService})
     : super(Config('search_chapter', fileService: fileService));
-
-  // TODO: get all keys from this manager
-  Future<Set<String>> get keys => Future.value({});
 }
 
-class SearchMangaCacheManager extends CacheManager {
+class SearchMangaCacheManager extends CustomCacheManager {
   SearchMangaCacheManager({required DioFileService fileService})
     : super(Config('search_manga', fileService: fileService));
-
-  // TODO: get all keys from this manager
-  Future<Set<String>> get keys => Future.value({});
 }
