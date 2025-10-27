@@ -44,6 +44,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     return parse(html, sourceUrl: url);
   }
 
+  @override
   Future<void> image(String url, {bool useCache = true}) async {
     await _fetch(
       uri: WebUri(url),
