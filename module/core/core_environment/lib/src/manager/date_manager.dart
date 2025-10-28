@@ -1,30 +1,34 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../adapter/timezone_adapter.dart'
-    if (dart.library.io) '../adapter/timezone_adapter_mobile.dart'
-    if (dart.library.js) '../adapter/timezone_adapter_web.dart';
 import '../use_case/listen_current_timezone_use_case.dart';
 
 class DateManager implements ListenCurrentTimezoneUseCase {
-  final _currentTimeZoneData = BehaviorSubject<String>();
+  final BehaviorSubject<String> _currentTimeZoneData;
 
-  DateManager() {
-    _update(Timer.periodic(const Duration(minutes: 5), _update));
+  late final StreamSubscription _subscription;
+
+  DateManager({
+    required String initialTimeZoneData,
+    required AsyncValueGetter<String> fetcher,
+  }) : _currentTimeZoneData = BehaviorSubject.seeded(initialTimeZoneData) {
+    _subscription = Stream.periodic(
+      const Duration(minutes: 5),
+      (_) => fetcher(),
+    ).asyncMap((e) async => await e).listen(_currentTimeZoneData.add);
   }
 
-  static Future<DateManager> create() async {
-    await initializeTimeZone();
-    return DateManager();
+  static Future<DateManager> create({
+    required AsyncValueGetter<String> fetcher,
+  }) async {
+    return DateManager(initialTimeZoneData: await fetcher(), fetcher: fetcher);
   }
 
   @override
   ValueStream<String> get timezoneDataStream => _currentTimeZoneData.stream;
 
-  void _update(Timer t) async {
-    final String tz = await FlutterTimezone.getLocalTimezone();
-    _currentTimeZoneData.add(tz);
-  }
+  Future<void> dispose() => _subscription.cancel();
 }

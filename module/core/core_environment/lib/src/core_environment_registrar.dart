@@ -1,4 +1,5 @@
 import 'package:core_analytics/core_analytics.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:service_locator/service_locator.dart';
 
 import 'manager/date_manager.dart';
@@ -27,7 +28,14 @@ class CoreEnvironmentRegistrar extends Registrar {
     locator.alias<UpdateLocaleUseCase, LocaleManager>();
     locator.alias<ListenLocaleUseCase, LocaleManager>();
 
-    locator.registerLazySingletonAsync(() => DateManager.create());
+    locator.registerLazySingletonAsync(
+      () => DateManager.create(
+        fetcher: () {
+          return FlutterTimezone.getLocalTimezone();
+        },
+      ),
+      dispose: (e) => e.dispose(),
+    );
     locator.alias<ListenCurrentTimezoneUseCase, DateManager>();
 
     locator.registerLazySingletonAsync(
