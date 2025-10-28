@@ -11,7 +11,7 @@ class AdvancedScreen extends StatelessWidget {
   final LogBox logBox;
   final DatabaseViewer viewer;
   final AppDatabase database;
-  final StorageManager storageManager;
+  final ImageCacheManager imagesCacheManager;
   final HeadlessWebviewUseCase webview;
 
   const AdvancedScreen({
@@ -19,7 +19,7 @@ class AdvancedScreen extends StatelessWidget {
     required this.logBox,
     required this.viewer,
     required this.database,
-    required this.storageManager,
+    required this.imagesCacheManager,
     required this.webview,
   });
 
@@ -30,7 +30,7 @@ class AdvancedScreen extends StatelessWidget {
         logBox: locator(),
         database: locator(),
         viewer: locator(),
-        storageManager: locator(),
+        imagesCacheManager: locator(),
         webview: locator(),
       ),
     );

@@ -7,7 +7,7 @@ import 'base/chapter_list_html_parser.dart';
 class AsuraScanChapterListHtmlParser extends ChapterListHtmlParser {
   AsuraScanChapterListHtmlParser({
     required super.root,
-    required super.storageManager,
+    required super.converterCacheManager,
   });
 
   @override
@@ -72,7 +72,7 @@ class AsuraScanChapterListHtmlParser extends ChapterListHtmlParser {
           title: title?.isNotEmpty == true ? title : null,
           chapter: '${chapter ?? url?.split('/').lastOrNull}',
           readableAt: await releaseDate?.asDateTime(
-            storageManager: storageManager,
+            manager: converterCacheManager,
           ),
           webUrl: ['https://asuracomic.net', 'series', url].join('/'),
           scanlationGroup: SourceEnum.asurascan.label,

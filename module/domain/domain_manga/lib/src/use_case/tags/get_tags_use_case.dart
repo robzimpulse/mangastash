@@ -12,19 +12,22 @@ import '../../parser/base/tag_list_html_parser.dart';
 
 class GetTagsUseCase with SyncTagsMixin {
   final HeadlessWebviewUseCase _webview;
-  final StorageManager _storageManager;
+  final TagCacheManager _tagCacheManager;
+  final ConverterCacheManager _converterCacheManager;
   final MangaService _mangaService;
   final TagDao _tagDao;
   final LogBox _logBox;
 
   const GetTagsUseCase({
     required HeadlessWebviewUseCase webview,
-    required StorageManager storageManager,
+    required TagCacheManager tagCacheManager,
+    required ConverterCacheManager converterCacheManager,
     required MangaService mangaService,
     required TagDao tagDao,
     required LogBox logBox,
   }) : _mangaService = mangaService,
-       _storageManager = storageManager,
+       _tagCacheManager = tagCacheManager,
+       _converterCacheManager = converterCacheManager,
        _tagDao = tagDao,
        _webview = webview,
        _logBox = logBox;
@@ -87,7 +90,7 @@ class GetTagsUseCase with SyncTagsMixin {
     final parser = TagListHtmlParser.forSource(
       root: document,
       source: source,
-      storageManager: _storageManager,
+      converterCacheManager: _converterCacheManager,
     );
 
     final tags = await parser.tags;
@@ -100,7 +103,7 @@ class GetTagsUseCase with SyncTagsMixin {
     bool useCache = true,
   }) async {
     final key = source.name;
-    final file = await _storageManager.chapter.getFileFromCache(key);
+    final file = await _tagCacheManager.getFileFromCache(key);
     final str = await file?.file.readAsString(encoding: utf8);
     final object = str?.let((e) => json.decode(e))?.castOrNull<List<dynamic>>();
     final data = [...?object?.map((e) => Tag.fromJson(e))];
@@ -116,7 +119,7 @@ class GetTagsUseCase with SyncTagsMixin {
 
       final result = await sync(dao: _tagDao, values: data, logBox: _logBox);
 
-      await _storageManager.chapter.putFile(
+      await _tagCacheManager.putFile(
         key,
         utf8.encode(json.encode([...data.map((e) => e.toJson())])),
         key: key,

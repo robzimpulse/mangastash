@@ -232,10 +232,10 @@ packages:
     dependency: transitive
     description:
       name: drift
-      sha256: "540cf382a3bfa99b76e51514db5b0ebcd81ce3679b7c1c9cb9478ff3735e47a1"
+      sha256: "83290a32ae006a7535c5ecf300722cb77177250d9df4ee2becc5fa8a36095114"
       url: "https://pub.dev"
     source: hosted
-    version: "2.28.2"
+    version: "2.29.0"
   drift_db_viewer:
     dependency: transitive
     description:
@@ -575,7 +575,7 @@ packages:
     description:
       path: "packages/log_box"
       ref: master
-      resolved-ref: e799b7bf915a63c93e0ddf2ddf42d296865c87ba
+      resolved-ref: b8cb25961fb402c113e5fbff17cfb98fa98954ee
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -584,7 +584,7 @@ packages:
     description:
       path: "packages/log_box_dio_logger"
       ref: master
-      resolved-ref: e799b7bf915a63c93e0ddf2ddf42d296865c87ba
+      resolved-ref: b8cb25961fb402c113e5fbff17cfb98fa98954ee
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -593,7 +593,7 @@ packages:
     description:
       path: "packages/log_box_in_app_webview_logger"
       ref: master
-      resolved-ref: e799b7bf915a63c93e0ddf2ddf42d296865c87ba
+      resolved-ref: b8cb25961fb402c113e5fbff17cfb98fa98954ee
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -602,7 +602,7 @@ packages:
     description:
       path: "packages/log_box_navigation_logger"
       ref: master
-      resolved-ref: e799b7bf915a63c93e0ddf2ddf42d296865c87ba
+      resolved-ref: b8cb25961fb402c113e5fbff17cfb98fa98954ee
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"

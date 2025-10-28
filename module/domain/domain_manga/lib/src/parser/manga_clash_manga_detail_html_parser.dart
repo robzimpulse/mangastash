@@ -6,7 +6,7 @@ import 'base/manga_detail_html_parser.dart';
 class MangaClashMangaDetailHtmlParser extends MangaDetailHtmlParser {
   MangaClashMangaDetailHtmlParser({
     required super.root,
-    required super.storageManager,
+    required super.converterCacheManager,
   });
 
   @override

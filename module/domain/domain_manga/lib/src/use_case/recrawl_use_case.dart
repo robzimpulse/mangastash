@@ -8,13 +8,13 @@ import 'package:flutter/material.dart';
 class RecrawlUseCase {
   final LogBox _logBox;
   final CookieJar _cookieJar;
-  final StorageManager _storageManager;
+  final HtmlCacheManager _htmlCacheManager;
 
   RecrawlUseCase({
     required LogBox logBox,
     required CookieJar cookieJar,
-    required StorageManager storageManager,
-  }) : _storageManager = storageManager,
+    required HtmlCacheManager htmlCacheManager,
+  }) : _htmlCacheManager = htmlCacheManager,
        _cookieJar = cookieJar,
        _logBox = logBox;
 
@@ -30,7 +30,7 @@ class RecrawlUseCase {
       onTapSnapshot: (url, html) async {
         if (url == null || html == null) return;
 
-        await _storageManager.html.putFile(
+        await _htmlCacheManager.putFile(
           url,
           utf8.encode(html),
           fileExtension: 'html',

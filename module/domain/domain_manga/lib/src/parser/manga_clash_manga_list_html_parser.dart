@@ -69,6 +69,6 @@ class MangaClashMangaListHtmlParser extends MangaListHtmlParser {
 
   MangaClashMangaListHtmlParser({
     required super.root,
-    required super.storageManager,
+    required super.converterCacheManager,
   });
 }

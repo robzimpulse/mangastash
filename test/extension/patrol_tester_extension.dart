@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:core_storage/core_storage.dart';
+import 'package:feature_common/feature_common.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manga_service_drift/src/database/memory_executor.dart';
@@ -45,7 +46,22 @@ void testScreen(
         overrideDependencies: (locator) async {
           locator.registerSingleton<SharedPreferences>(MockSharedPreferences());
           locator.registerSingleton<Executor>(MemoryExecutor());
-          locator.registerSingleton<StorageManager>(MockStorageManager());
+          locator.registerSingleton<ImageCacheManager>(FakeImageCacheManager());
+          locator.registerSingleton<ConverterCacheManager>(
+            FakeConverterCacheManager(),
+          );
+          locator.registerSingleton<TagCacheManager>(FakeTagCacheManager());
+          locator.registerSingleton<MangaCacheManager>(FakeMangaCacheManager());
+          locator.registerSingleton<ChapterCacheManager>(
+            FakeChapterCacheManager(),
+          );
+          locator.registerSingleton<HtmlCacheManager>(FakeHtmlCacheManager());
+          locator.registerSingleton<SearchChapterCacheManager>(
+            FakeSearchChapterCacheManager(),
+          );
+          locator.registerSingleton<SearchMangaCacheManager>(
+            FakeSearchMangaCacheManager(),
+          );
           await onSetupTestScreen?.call(locator);
         },
       ),
