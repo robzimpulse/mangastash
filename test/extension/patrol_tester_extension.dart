@@ -12,6 +12,7 @@ import 'package:service_locator/service_locator.dart';
 
 import '../mock/mock_get_timezone_use_case.dart';
 import '../mock/mock_shared_preferences.dart';
+import '../mock/mock_shared_preferences_async.dart';
 import '../mock/mock_storage_manager.dart';
 
 typedef OnRunTestScreen =
@@ -49,6 +50,9 @@ void testScreen(
         overrideDependencies: (locator) async {
           locator.registerSingleton<GetTimeZoneUseCase>(
             MockGetTimezoneUseCase()..setLocal(timezone: timezone),
+          );
+          locator.registerSingleton<SharedPreferencesAsync>(
+            MockSharedPreferencesAsync(),
           );
           locator.registerSingleton<SharedPreferences>(MockSharedPreferences());
           locator.registerSingleton<Executor>(MemoryExecutor());
