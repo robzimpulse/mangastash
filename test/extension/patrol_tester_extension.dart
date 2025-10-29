@@ -54,7 +54,9 @@ void testScreen(
           locator.registerSingleton<SharedPreferencesAsync>(
             MockSharedPreferencesAsync(),
           );
-          locator.registerSingleton<SharedPreferences>(MockSharedPreferences());
+          locator.registerLazySingletonAsync<SharedPreferences>(
+            () async => MockSharedPreferences(),
+          );
           locator.registerSingleton<Executor>(MemoryExecutor());
           locator.registerSingleton<ImageCacheManager>(MockImageCacheManager());
           locator.registerSingleton<ConverterCacheManager>(
