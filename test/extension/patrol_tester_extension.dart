@@ -56,21 +56,21 @@ void testScreen(
           );
           locator.registerSingleton<SharedPreferences>(MockSharedPreferences());
           locator.registerSingleton<Executor>(MemoryExecutor());
-          locator.registerSingleton<ImageCacheManager>(FakeImageCacheManager());
+          locator.registerSingleton<ImageCacheManager>(MockImageCacheManager());
           locator.registerSingleton<ConverterCacheManager>(
-            FakeConverterCacheManager(),
+            MockConverterCacheManager(),
           );
-          locator.registerSingleton<TagCacheManager>(FakeTagCacheManager());
-          locator.registerSingleton<MangaCacheManager>(FakeMangaCacheManager());
+          locator.registerSingleton<TagCacheManager>(MockTagCacheManager());
+          locator.registerSingleton<MangaCacheManager>(MockMangaCacheManager());
           locator.registerSingleton<ChapterCacheManager>(
-            FakeChapterCacheManager(),
+            MockChapterCacheManager(),
           );
-          locator.registerSingleton<HtmlCacheManager>(FakeHtmlCacheManager());
+          locator.registerSingleton<HtmlCacheManager>(MockHtmlCacheManager());
           locator.registerSingleton<SearchChapterCacheManager>(
-            FakeSearchChapterCacheManager(),
+            MockSearchChapterCacheManager(),
           );
           locator.registerSingleton<SearchMangaCacheManager>(
-            FakeSearchMangaCacheManager(),
+            MockSearchMangaCacheManager(),
           );
           await onSetupTestScreen?.call(locator);
         },
