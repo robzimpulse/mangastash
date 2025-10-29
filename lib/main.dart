@@ -13,6 +13,7 @@ import 'package:ui_common/ui_common.dart';
 import 'main_path.dart';
 import 'main_route.dart';
 import 'screen/apps_screen.dart';
+import 'screen/error_screen.dart';
 import 'screen/splash_screen.dart';
 
 void main() async {
@@ -39,6 +40,10 @@ class MangaStashApp extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const SplashScreen();
+        }
+
+        if (snapshot.hasError) {
+          return ErrorScreen(text: snapshot.error.toString());
         }
 
         return AppsScreen(
