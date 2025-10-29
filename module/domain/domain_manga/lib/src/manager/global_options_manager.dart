@@ -4,6 +4,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/src/model/manga/search_manga_parameter.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../../domain_manga.dart';
 import '../use_case/parameter/listen_search_parameter_use_case.dart';
 import '../use_case/parameter/update_search_parameter_use_case.dart';
 import '../use_case/source/listen_sources_use_case.dart';
@@ -32,10 +33,14 @@ class GlobalOptionsManager
       storage: storage,
       initialParameter: parameter
           .let(SearchMangaParameter.fromJsonString)
-          .or(const SearchMangaParameter()),
+          .or(
+            const SearchMangaParameter(
+              availableTranslatedLanguage: [LanguageCodes.english],
+            ),
+          ),
       initialSources: sources
           .let((e) => [...e.map((e) => SourceEnum.fromValue(name: e)).nonNulls])
-          .or([]),
+          .or(SourceEnum.values),
     );
   }
 
