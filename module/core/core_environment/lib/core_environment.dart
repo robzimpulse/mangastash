@@ -3,7 +3,6 @@ library core_environment;
 export 'package:intl/intl.dart';
 export 'package:package_info_plus/package_info_plus.dart';
 export 'package:permission_handler/permission_handler.dart';
-export 'package:worker_manager/worker_manager.dart' show Cancelable, CanceledError;
 
 export 'src/core_environment_registrar.dart';
 export 'src/enum/country.dart';
@@ -21,6 +20,5 @@ export 'src/use_case/get_timezone_use_case.dart';
 export 'src/use_case/listen_current_timezone_use_case.dart';
 export 'src/use_case/listen_locale_use_case.dart';
 export 'src/use_case/listen_theme_use_case.dart';
-export 'src/use_case/task_executor_use_case.dart';
 export 'src/use_case/update_locale_use_case.dart';
 export 'src/use_case/update_theme_use_case.dart';
