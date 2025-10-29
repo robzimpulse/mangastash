@@ -34,8 +34,8 @@ class DomainMangaRegistrar extends Registrar {
   Future<void> register(ServiceLocator locator) async {
     final start = DateTime.timestamp();
 
-    locator.registerLazySingleton(
-      () => GlobalOptionsManager(storage: locator()),
+    locator.registerLazySingletonAsync(
+      () => GlobalOptionsManager.create(storage: locator()),
     );
     locator.alias<ListenSearchParameterUseCase, GlobalOptionsManager>();
     locator.alias<UpdateSearchParameterUseCase, GlobalOptionsManager>();
@@ -187,5 +187,10 @@ class DomainMangaRegistrar extends Registrar {
         'duration': end.difference(start).toString(),
       },
     );
+  }
+
+  @override
+  Future<void> allReady(ServiceLocator locator) async {
+    await locator.isReady<GlobalOptionsManager>();
   }
 }

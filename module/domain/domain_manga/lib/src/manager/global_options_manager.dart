@@ -18,44 +18,53 @@ class GlobalOptionsManager
   final BehaviorSubject<SearchMangaParameter> _searchMangaParameter;
   final BehaviorSubject<List<SourceEnum>> _sources;
 
-  final SharedPreferences _storage;
+  final SharedPreferencesAsync _storage;
 
   static const String _mangaParameterKey = 'manga_parameter';
   static const String _sourcesKey = 'sources';
 
-  GlobalOptionsManager({required SharedPreferences storage})
-    : _storage = storage,
-      _sources = BehaviorSubject.seeded(
-        storage
-            .getStringList(_sourcesKey)
-            .let(
-              (e) => [...e.map((e) => SourceEnum.fromValue(name: e)).nonNulls],
-            )
-            .or([]),
-      ),
-      _searchMangaParameter = BehaviorSubject.seeded(
-        storage
-            .getString(_mangaParameterKey)
-            .let(SearchMangaParameter.fromJsonString)
-            .or(const SearchMangaParameter()),
-      );
+  static Future<GlobalOptionsManager> create({
+    required SharedPreferencesAsync storage,
+  }) async {
+    final sources = await storage.getStringList(_sourcesKey);
+    final parameter = await storage.getString(_mangaParameterKey);
+    return GlobalOptionsManager._(
+      storage: storage,
+      initialParameter: parameter
+          .let(SearchMangaParameter.fromJsonString)
+          .or(const SearchMangaParameter()),
+      initialSources: sources
+          .let((e) => [...e.map((e) => SourceEnum.fromValue(name: e)).nonNulls])
+          .or([]),
+    );
+  }
+
+  GlobalOptionsManager._({
+    required SharedPreferencesAsync storage,
+    required SearchMangaParameter initialParameter,
+    required List<SourceEnum> initialSources,
+  }) : _storage = storage,
+       _sources = BehaviorSubject.seeded(initialSources),
+       _searchMangaParameter = BehaviorSubject.seeded(initialParameter);
 
   @override
   ValueStream<SearchMangaParameter> get searchParameterState =>
       _searchMangaParameter.stream;
 
   @override
-  void updateSearchParameter({required SearchMangaParameter parameter}) {
+  Future<void> updateSearchParameter({
+    required SearchMangaParameter parameter,
+  }) async {
+    await _storage.setString(_mangaParameterKey, parameter.toJsonString());
     _searchMangaParameter.add(parameter);
-    _storage.setString(_mangaParameterKey, parameter.toJsonString());
   }
 
   @override
   ValueStream<List<SourceEnum>> get sourceStateStream => _sources.stream;
 
   @override
-  void updateSources({required List<SourceEnum> sources}) {
+  Future<void> updateSources({required List<SourceEnum> sources}) async {
+    await _storage.setStringList(_sourcesKey, [...sources.map((e) => e.name)]);
     _sources.add(sources);
-    _storage.setStringList(_sourcesKey, [...sources.map((e) => e.name)]);
   }
 }
