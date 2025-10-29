@@ -24,6 +24,7 @@ class CoreStorageRegistrar extends Registrar {
     locator.registerFactory(() => HistoryDao(locator()));
     locator.registerFactory(() => TagDao(locator()));
 
+    locator.registerLazySingleton(() => SharedPreferencesAsync());
     locator.registerLazySingletonAsync(() => SharedPreferences.getInstance());
     locator.registerFactory(
       () => CustomFileService(
