@@ -6,23 +6,31 @@ import '../use_case/listen_theme_use_case.dart';
 import '../use_case/update_theme_use_case.dart';
 
 class ThemeManager implements UpdateThemeUseCase, ListenThemeUseCase {
-  final SharedPreferences _storage;
+  final SharedPreferencesAsync _storage;
 
-  final _themeDataStream = BehaviorSubject<ThemeData>.seeded(ThemeData.light());
+  final BehaviorSubject<ThemeData> _themeDataStream;
 
   static const _key = 'is_dark_mode';
 
-  ThemeManager({
-    required SharedPreferences storage,
-  }) : _storage = storage {
-    final value = storage.getBool(_key);
-    if (value == null) return;
-    updateTheme(theme: value ? ThemeData.dark() : ThemeData.light());
+  ThemeManager._({
+    required SharedPreferencesAsync storage,
+    required ThemeData initialThemeData,
+  }) : _storage = storage,
+       _themeDataStream = BehaviorSubject.seeded(initialThemeData);
+
+  static Future<ThemeManager> create({
+    required SharedPreferencesAsync storage,
+  }) async {
+    final value = await storage.getBool(_key);
+    return ThemeManager._(
+      storage: storage,
+      initialThemeData: value == true ? ThemeData.dark() : ThemeData.light(),
+    );
   }
 
   @override
-  void updateTheme({required ThemeData theme}) {
-    _storage.setBool(_key, theme.brightness == Brightness.dark);
+  Future<void> updateTheme({required ThemeData theme}) async {
+    await _storage.setBool(_key, theme.brightness == Brightness.dark);
     _themeDataStream.add(theme);
   }
 
