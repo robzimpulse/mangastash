@@ -1,20 +1,20 @@
 import 'package:core_storage/core_storage.dart';
 import 'package:mocktail/mocktail.dart';
 
-class FakeImageCacheManager extends Mock implements ImageCacheManager {}
+class MockImageCacheManager extends Mock implements ImageCacheManager {}
 
-class FakeConverterCacheManager extends Mock implements ConverterCacheManager {}
+class MockConverterCacheManager extends Mock implements ConverterCacheManager {}
 
-class FakeTagCacheManager extends Mock implements TagCacheManager {}
+class MockTagCacheManager extends Mock implements TagCacheManager {}
 
-class FakeMangaCacheManager extends Mock implements MangaCacheManager {}
+class MockMangaCacheManager extends Mock implements MangaCacheManager {}
 
-class FakeChapterCacheManager extends Mock implements ChapterCacheManager {}
+class MockChapterCacheManager extends Mock implements ChapterCacheManager {}
 
-class FakeHtmlCacheManager extends Mock implements HtmlCacheManager {}
+class MockHtmlCacheManager extends Mock implements HtmlCacheManager {}
 
-class FakeSearchChapterCacheManager extends Mock
+class MockSearchChapterCacheManager extends Mock
     implements SearchChapterCacheManager {}
 
-class FakeSearchMangaCacheManager extends Mock
+class MockSearchMangaCacheManager extends Mock
     implements SearchMangaCacheManager {}

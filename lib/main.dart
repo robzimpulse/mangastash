@@ -13,6 +13,7 @@ import 'package:ui_common/ui_common.dart';
 import 'main_path.dart';
 import 'main_route.dart';
 import 'screen/apps_screen.dart';
+import 'screen/error_screen.dart';
 import 'screen/splash_screen.dart';
 
 void main() async {
@@ -22,7 +23,7 @@ void main() async {
   runApp(MangaStashApp(locator: ServiceLocator.asNewInstance()));
 }
 
-class MangaStashApp extends StatelessWidget {
+class MangaStashApp extends StatefulWidget {
   const MangaStashApp({
     super.key,
     required this.locator,
@@ -33,17 +34,28 @@ class MangaStashApp extends StatelessWidget {
   final ServiceLocator locator;
 
   @override
+  State<MangaStashApp> createState() => _MangaStashAppState();
+}
+
+class _MangaStashAppState extends State<MangaStashApp> {
+  late final Future<void> _signalReady = _setupLocator();
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _setupLocator(),
+      future: _signalReady,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const SplashScreen();
         }
 
+        if (snapshot.hasError) {
+          return ErrorScreen(text: snapshot.error.toString());
+        }
+
         return AppsScreen(
-          listenThemeUseCase: locator(),
-          routerConfig: _route(locator: locator),
+          listenThemeUseCase: widget.locator(),
+          routerConfig: _route(locator: widget.locator),
         );
       },
     );
@@ -77,23 +89,23 @@ class MangaStashApp extends StatelessWidget {
   }
 
   Future<void> _setupLocator() async {
-    await locator.reset();
+    await widget.locator.reset();
 
     // TODO: register module registrar here
-    await locator.registerRegistrar(CoreAnalyticsRegistrar());
-    await locator.registerRegistrar(CoreStorageRegistrar());
-    await locator.registerRegistrar(CoreNetworkRegistrar());
-    await locator.registerRegistrar(CoreEnvironmentRegistrar());
-    await locator.registerRegistrar(CoreRouteRegistrar());
-    await locator.registerRegistrar(DomainMangaRegistrar());
+    await widget.locator.registerRegistrar(CoreAnalyticsRegistrar());
+    await widget.locator.registerRegistrar(CoreStorageRegistrar());
+    await widget.locator.registerRegistrar(CoreNetworkRegistrar());
+    await widget.locator.registerRegistrar(CoreEnvironmentRegistrar());
+    await widget.locator.registerRegistrar(CoreRouteRegistrar());
+    await widget.locator.registerRegistrar(DomainMangaRegistrar());
 
-    await overrideDependencies?.call(locator);
+    await widget.overrideDependencies?.call(widget.locator);
 
-    await locator.allReady();
+    await widget.locator.allReady();
 
     final existingFlutterError = FlutterError.onError;
     FlutterError.onError = (details) {
-      locator<LogBox>().log(
+      widget.locator<LogBox>().log(
         details.exceptionAsString(),
         name: 'FlutterError',
         error: details.exception,
@@ -104,7 +116,7 @@ class MangaStashApp extends StatelessWidget {
 
     final existingPlatformDispatcher = PlatformDispatcher.instance.onError;
     PlatformDispatcher.instance.onError = (error, stack) {
-      locator<LogBox>().log(
+      widget.locator<LogBox>().log(
         error.toString(),
         name: 'PlatformDispatcher',
         error: error,
@@ -120,7 +132,7 @@ class MangaStashApp extends StatelessWidget {
           final Object? error = pair.firstOrNull.castOrNull();
           final String? trace = pair.lastOrNull.castOrNull();
 
-          locator<LogBox>().log(
+          widget.locator<LogBox>().log(
             error.toString(),
             name: 'Isolate',
             error: error,

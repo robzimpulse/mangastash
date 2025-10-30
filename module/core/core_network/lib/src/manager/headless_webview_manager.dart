@@ -49,13 +49,16 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   }) async {
     final Completer<String> completer = Completer();
 
+    final stringHeaders =
+        headers == null ? '' : ', {headers: ${headers.toString()}}';
+
     await _fetch(
       uri: WebUri(url),
       delegate: _log.inAppWebviewObserver,
       useCache: useCache,
       scripts: [
         '''
-        const toDataURL = url => fetch(url)
+        const toDataURL = url => fetch(url $stringHeaders)
           .then(response => response.blob())
           .then(blob => new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -64,12 +67,14 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
             reader.readAsDataURL(blob);
           }));
         
-        toDataURL('$url')
-          .then(e => window.flutter_inappwebview.callHandler('ch', e));
+        toDataURL('$url').then(
+          e => window.flutter_inappwebview.callHandler('resolved', e),
+          e => window.flutter_inappwebview.callHandler('reject', e),
+        );
         ''',
       ],
       javascriptHandlers: {
-        'ch': (args) async {
+        'resolved': (args) {
           if (args.isEmpty) return;
           final data = args.first;
           if (data is! String) {
@@ -87,6 +92,14 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
           );
 
           completer.safeComplete(data);
+        },
+        'reject': (args) {
+          _log.log(
+            'Failed to download image [$url]',
+            name: runtimeType.toString(),
+            extra: {'url': url, 'error': args.toString()},
+          );
+          completer.completeError(args);
         },
       },
       signalComplete: completer.future,

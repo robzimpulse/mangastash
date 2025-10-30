@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:feature_common/feature_common.dart';
 import 'package:flutter/foundation.dart';
@@ -9,7 +10,8 @@ import 'package:mangastash/main.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 import 'package:service_locator/service_locator.dart';
 
-import '../mock/mock_shared_preferences.dart';
+import '../mock/mock_get_timezone_use_case.dart';
+import '../mock/mock_shared_preferences_async.dart';
 import '../mock/mock_storage_manager.dart';
 
 typedef OnRunTestScreen =
@@ -25,6 +27,7 @@ void testScreen(
   double height = 800,
   double dpi = 2.625,
   double textScaleFactor = 1.1,
+  String timezone = 'Asia/Jakarta',
 }) {
   ServiceLocatorInitiator.setServiceLocatorFactory(
     () => GetItServiceLocator()..setAllowReassignment(true),
@@ -44,23 +47,28 @@ void testScreen(
       MangaStashApp(
         locator: locator,
         overrideDependencies: (locator) async {
-          locator.registerSingleton<SharedPreferences>(MockSharedPreferences());
+          locator.registerSingleton<GetTimeZoneUseCase>(
+            MockGetTimezoneUseCase()..setLocal(timezone: timezone),
+          );
+          locator.registerSingleton<SharedPreferencesAsync>(
+            MockSharedPreferencesAsync(),
+          );
           locator.registerSingleton<Executor>(MemoryExecutor());
-          locator.registerSingleton<ImageCacheManager>(FakeImageCacheManager());
+          locator.registerSingleton<ImageCacheManager>(MockImageCacheManager());
           locator.registerSingleton<ConverterCacheManager>(
-            FakeConverterCacheManager(),
+            MockConverterCacheManager(),
           );
-          locator.registerSingleton<TagCacheManager>(FakeTagCacheManager());
-          locator.registerSingleton<MangaCacheManager>(FakeMangaCacheManager());
+          locator.registerSingleton<TagCacheManager>(MockTagCacheManager());
+          locator.registerSingleton<MangaCacheManager>(MockMangaCacheManager());
           locator.registerSingleton<ChapterCacheManager>(
-            FakeChapterCacheManager(),
+            MockChapterCacheManager(),
           );
-          locator.registerSingleton<HtmlCacheManager>(FakeHtmlCacheManager());
+          locator.registerSingleton<HtmlCacheManager>(MockHtmlCacheManager());
           locator.registerSingleton<SearchChapterCacheManager>(
-            FakeSearchChapterCacheManager(),
+            MockSearchChapterCacheManager(),
           );
           locator.registerSingleton<SearchMangaCacheManager>(
-            FakeSearchMangaCacheManager(),
+            MockSearchMangaCacheManager(),
           );
           await onSetupTestScreen?.call(locator);
         },
