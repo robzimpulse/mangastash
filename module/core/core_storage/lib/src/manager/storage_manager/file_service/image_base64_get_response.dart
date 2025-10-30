@@ -23,7 +23,7 @@ class ImageBase64GetResponse implements FileServiceResponse {
 
   ImageBase64GetResponse({required String imageBase64}) {
     final values = imageBase64.split(RegExp(r'[:;,]+'));
-    final ext = values.firstOrNull?.split('/').lastOrNull;
+    final ext = values[1].split('/').lastOrNull;
     final data = values.lastOrNull;
 
     if (data == null) {
@@ -43,7 +43,7 @@ class ImageBase64GetResponse implements FileServiceResponse {
     final imgExt = ['jpeg', 'jpg', 'gif', 'webp', 'png', 'ico', 'bmp', 'wbmp'];
 
     if (!imgExt.contains(ext.toLowerCase())) {
-      throw ArgumentError('Unsupported Base64 Extension $ext');
+      throw ArgumentError('Unsupported Base64 Extension [$ext]');
     }
 
     content = Stream.value(imageByte);
