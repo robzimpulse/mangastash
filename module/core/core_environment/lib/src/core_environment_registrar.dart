@@ -37,13 +37,6 @@ class CoreEnvironmentRegistrar extends Registrar {
     );
     locator.alias<ListenCurrentTimezoneUseCase, DateManager>();
 
-    // TODO: @robzimpulse - disable worker manager since it cause flakky test
-    // locator.registerLazySingletonAsync(
-    //   () => WorkerManager.create(),
-    //   dispose: (e) => e.dispose(),
-    // );
-    // locator.alias<TaskExecutor, WorkerManager>();
-
     final end = DateTime.timestamp();
 
     locator<LogBox>().log(
