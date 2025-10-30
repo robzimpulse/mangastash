@@ -118,7 +118,6 @@ class SearchMangaUseCase with SyncMangasMixin {
   Future<void> clear({required SourceSearchMangaParameter parameter}) async {
     final data = await _searchMangaCacheManager.keys;
     final List<Future<void>> promises = [
-      _searchMangaCacheManager.removeFile(parameter.source.icon),
       _htmlCacheManager.removeFile(parameter.source.icon),
     ];
     for (final value in data) {
