@@ -46,7 +46,7 @@ class CustomFileService extends FileService {
     Map<String, String>? headers,
   }) async {
     return ImageBase64GetResponse(
-      await _headlessWebviewUseCase().image(url, headers: headers),
+      imageBase64: await _headlessWebviewUseCase().image(url, headers: headers),
     );
   }
 }

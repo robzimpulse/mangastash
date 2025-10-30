@@ -1,10 +1,9 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:manga_dex_api/src/model/manga/search_manga_parameter.dart';
+import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../../domain_manga.dart';
 import '../use_case/parameter/listen_search_parameter_use_case.dart';
 import '../use_case/parameter/update_search_parameter_use_case.dart';
 import '../use_case/source/listen_sources_use_case.dart';

@@ -3,35 +3,54 @@ import 'dart:convert';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class ImageBase64GetResponse implements FileServiceResponse {
-
-  final String _imageBase64;
-
-  ImageBase64GetResponse(this._imageBase64);
+  @override
+  late final Stream<List<int>> content;
 
   @override
-  Stream<List<int>> get content {
-    final values = _imageBase64.split(RegExp(r'[:;,]+'));
+  late final String fileExtension;
+
+  @override
+  late final int? contentLength;
+
+  @override
+  late final String? eTag;
+
+  @override
+  late final int statusCode;
+
+  @override
+  late final DateTime validTill;
+
+  ImageBase64GetResponse({required String imageBase64}) {
+    final values = imageBase64.split(RegExp(r'[:;,]+'));
+    final ext = values.firstOrNull?.split('/').lastOrNull;
     final data = values.lastOrNull;
-    if (data == null) return Stream.value([]);
-    return Stream.value(base64.decode(data));
+
+    if (data == null) {
+      throw ArgumentError('Null Base64 Data');
+    }
+
+    if (ext == null) {
+      throw ArgumentError('Null Base64 Extension');
+    }
+
+    final imageByte = base64.decode(data);
+
+    if (imageBase64.isEmpty) {
+      throw ArgumentError('Empty Base64 Data');
+    }
+
+    final imgExt = ['jpeg', 'jpg', 'gif', 'webp', 'png', 'ico', 'bmp', 'wbmp'];
+
+    if (!imgExt.contains(ext.toLowerCase())) {
+      throw ArgumentError('Unsupported Base64 Extension $ext');
+    }
+
+    content = Stream.value(imageByte);
+    fileExtension = ext;
+    contentLength = imageByte.length;
+    eTag = null;
+    statusCode = 200;
+    validTill = DateTime.now().add(const Duration(days: 7));
   }
-
-  @override
-  int? get contentLength => _imageBase64.length;
-
-  @override
-  String? get eTag => null;
-
-  @override
-  String get fileExtension {
-    final values = _imageBase64.split(RegExp(r'[:;,]+'));
-    final value = values.firstOrNull?.split('/').lastOrNull;
-    return value ?? 'jpeg';
-  }
-
-  @override
-  int get statusCode => 200;
-
-  @override
-  DateTime get validTill => DateTime.now().add(const Duration(days: 7));
- }
+}
