@@ -111,6 +111,12 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     );
   }
 
+  @override
+  Future<void> close() async {
+    pager.dispose();
+    await super.close();
+  }
+
   void _updateLibraryState(Set<String> libraryMangaIds) {
     emit(state.copyWith(libraryMangaIds: libraryMangaIds));
   }
