@@ -150,7 +150,7 @@ class Manga extends Equatable {
 
     return Manga(
       id: data.id,
-      title: title?.en ?? title?.zhRo,
+      title: title?.en ?? title?.jaRo ?? title?.zhRo,
       description: data.attributes?.description?.en,
       coverUrl: filename?.let(
         (filename) => data.id?.let(
