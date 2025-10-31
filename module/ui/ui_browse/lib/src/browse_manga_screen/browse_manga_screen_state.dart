@@ -8,13 +8,7 @@ class BrowseMangaScreenState extends Equatable {
 
   final Exception? error;
 
-  final List<Manga> mangas;
-
   final SourceEnum? source;
-
-  final bool hasNextPage;
-
-  final bool isPagingNextPage;
 
   final bool isSearchActive;
 
@@ -56,12 +50,9 @@ class BrowseMangaScreenState extends Equatable {
 
   const BrowseMangaScreenState({
     this.isLoading = false,
-    this.hasNextPage = false,
-    this.isPagingNextPage = false,
     this.isSearchActive = false,
     this.error,
     this.source,
-    this.mangas = const [],
     this.libraryMangaIds = const {},
     this.parameter = const SearchMangaParameter(),
     this.prefetchedMangaIds = const {},
@@ -72,11 +63,8 @@ class BrowseMangaScreenState extends Equatable {
   List<Object?> get props {
     return [
       isLoading,
-      hasNextPage,
-      isPagingNextPage,
       error,
       source,
-      mangas,
       parameter,
       isSearchActive,
       libraryMangaIds,
@@ -87,12 +75,9 @@ class BrowseMangaScreenState extends Equatable {
 
   BrowseMangaScreenState copyWith({
     bool? isLoading,
-    bool? hasNextPage,
-    bool? isPagingNextPage,
     bool? isSearchActive,
     ValueGetter<Exception?>? error,
     SourceEnum? source,
-    List<Manga>? mangas,
     Set<String>? libraryMangaIds,
     SearchMangaParameter? parameter,
     Set<String>? prefetchedMangaIds,
@@ -100,10 +85,7 @@ class BrowseMangaScreenState extends Equatable {
   }) {
     return BrowseMangaScreenState(
       isLoading: isLoading ?? this.isLoading,
-      hasNextPage: hasNextPage ?? this.hasNextPage,
-      isPagingNextPage: isPagingNextPage ?? this.isPagingNextPage,
       isSearchActive: isSearchActive ?? this.isSearchActive,
-      mangas: mangas ?? this.mangas,
       libraryMangaIds: libraryMangaIds ?? this.libraryMangaIds,
       error: error != null ? error() : this.error,
       source: source ?? this.source,
