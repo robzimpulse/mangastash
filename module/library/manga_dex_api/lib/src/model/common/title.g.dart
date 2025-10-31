@@ -12,6 +12,8 @@ Title _$TitleFromJson(Map<String, dynamic> json) => Title(
       json['it'] as String?,
       json['zh'] as String?,
       json['ja-ro'] as String?,
+      json['ru'] as String?,
+      json['zh-ro'] as String?,
     );
 
 Map<String, dynamic> _$TitleToJson(Title instance) => <String, dynamic>{
@@ -20,4 +22,6 @@ Map<String, dynamic> _$TitleToJson(Title instance) => <String, dynamic>{
       'it': instance.it,
       'zh': instance.zh,
       'ja-ro': instance.jaRo,
+      'ru': instance.ru,
+      'zh-ro': instance.zhRo,
     };

@@ -138,15 +138,19 @@ class Manga extends Equatable {
   }
 
   factory Manga.from({required MangaData data}) {
-    final filename = data.relationships
-        ?.whereType<Relationship<CoverArtDataAttributes>>()
-        .firstOrNull
-        ?.attributes
-        ?.fileName;
+    final filename =
+        data.relationships
+            ?.whereType<Relationship<CoverArtDataAttributes>>()
+            .firstOrNull
+            ?.attributes
+            ?.fileName;
+
+    final titles = [data.attributes?.title, ...?data.attributes?.altTitles];
+    final title = titles.nonNulls.filled;
 
     return Manga(
       id: data.id,
-      title: data.attributes?.title?.en,
+      title: title?.en ?? title?.jaRo ?? title?.zhRo,
       description: data.attributes?.description?.en,
       coverUrl: filename?.let(
         (filename) => data.id?.let(
@@ -154,9 +158,7 @@ class Manga extends Equatable {
         ),
       ),
       status: data.attributes?.status,
-      tags: data.attributes?.tags
-          ?.map((e) => Tag.from(data: e))
-          .toList(),
+      tags: data.attributes?.tags?.map((e) => Tag.from(data: e)).toList(),
       author: data.relationships
           ?.whereType<Relationship<AuthorDataAttributes>>()
           .map((e) => e.attributes?.name)
@@ -186,9 +188,7 @@ class Manga extends Equatable {
 
   static Manga? fromJsonString(String value) {
     try {
-      return Manga.fromJson(
-        json.decode(value) as Map<String, dynamic>,
-      );
+      return Manga.fromJson(json.decode(value) as Map<String, dynamic>);
     } catch (e) {
       return null;
     }
