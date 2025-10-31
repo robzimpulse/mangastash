@@ -64,27 +64,27 @@ class MainRouteBuilder extends BaseRouteBuilder {
     ValueGetter<List<NavigatorObserver>>? observers,
   }) {
     return StatefulShellRoute.indexedStack(
-      builder:
-          (context, state, shell) => MainScreen(
-            index: shell.currentIndex,
-            onTapMenu:
-                (index) => shell.goBranch(
-                  index,
-                  initialLocation: index == shell.currentIndex,
-                ),
-            onTapClosedApps:
-                () => context.pushNamed<bool>(
-                  CommonRoutePath.confirmation,
-                  queryParameters: {
-                    CommonRoutePath.confirmationTitle: 'Exit',
-                    CommonRoutePath.confirmationContent:
-                        'Are you sure want to quit?',
-                    CommonRoutePath.confirmationNegativeButtonText: 'No',
-                    CommonRoutePath.confirmationPositiveButtonText: 'Yes',
-                  },
-                ),
-            child: shell,
-          ),
+      builder: (context, state, shell) {
+        return MainScreen(
+          index: shell.currentIndex,
+          onTapMenu: (index) {
+            shell.goBranch(index, initialLocation: index == shell.currentIndex);
+          },
+          onTapClosedApps: () {
+            return context.pushNamed<bool>(
+              CommonRoutePath.confirmation,
+              queryParameters: {
+                CommonRoutePath.confirmationTitle: 'Exit',
+                CommonRoutePath.confirmationContent:
+                    'Are you sure want to quit?',
+                CommonRoutePath.confirmationNegativeButtonText: 'No',
+                CommonRoutePath.confirmationPositiveButtonText: 'Yes',
+              },
+            );
+          },
+          child: shell,
+        );
+      },
       branches: [
         StatefulShellBranch(
           observers: observers?.call(),

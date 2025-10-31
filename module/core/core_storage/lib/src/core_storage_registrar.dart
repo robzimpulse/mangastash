@@ -3,6 +3,7 @@ import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'manager/storage_manager/file_service/custom_file_service.dart';
 import 'manager/storage_manager/storage_manager.dart';
 
 class CoreStorageRegistrar extends Registrar {
@@ -23,9 +24,43 @@ class CoreStorageRegistrar extends Registrar {
     locator.registerFactory(() => HistoryDao(locator()));
     locator.registerFactory(() => TagDao(locator()));
 
-    locator.registerLazySingletonAsync(() => SharedPreferences.getInstance());
+    locator.registerLazySingleton(() => SharedPreferencesAsync());
+    locator.registerFactory(
+      () => CustomFileService(
+        dio: () => locator(),
+        headlessWebviewUseCase: () => locator(),
+      ),
+    );
     locator.registerLazySingleton(
-      () => StorageManager(dio: () => locator()),
+      () => ImageCacheManager(fileService: locator()),
+      dispose: (e) => e.dispose(),
+    );
+    locator.registerLazySingleton(
+      () => ConverterCacheManager(fileService: locator()),
+      dispose: (e) => e.dispose(),
+    );
+    locator.registerLazySingleton(
+      () => TagCacheManager(fileService: locator()),
+      dispose: (e) => e.dispose(),
+    );
+    locator.registerLazySingleton(
+      () => MangaCacheManager(fileService: locator()),
+      dispose: (e) => e.dispose(),
+    );
+    locator.registerLazySingleton(
+      () => ChapterCacheManager(fileService: locator()),
+      dispose: (e) => e.dispose(),
+    );
+    locator.registerLazySingleton(
+      () => HtmlCacheManager(fileService: locator()),
+      dispose: (e) => e.dispose(),
+    );
+    locator.registerLazySingleton(
+      () => SearchChapterCacheManager(fileService: locator()),
+      dispose: (e) => e.dispose(),
+    );
+    locator.registerLazySingleton(
+      () => SearchMangaCacheManager(fileService: locator()),
       dispose: (e) => e.dispose(),
     );
 
@@ -41,10 +76,5 @@ class CoreStorageRegistrar extends Registrar {
         'duration': end.difference(start).toString(),
       },
     );
-  }
-
-  @override
-  Future<void> allReady(ServiceLocator locator) async {
-    await locator.isReady<SharedPreferences>();
   }
 }

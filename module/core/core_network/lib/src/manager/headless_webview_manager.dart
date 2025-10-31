@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:core_analytics/core_analytics.dart';
@@ -15,13 +16,13 @@ import '../usecase/headless_webview_usecase.dart';
 class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   final LogBox _log;
 
-  final StorageManager _storageManager;
+  final HtmlCacheManager _htmlCacheManager;
 
   HeadlessWebviewManager({
     required LogBox log,
-    required StorageManager storageManager,
+    required HtmlCacheManager htmlCacheManager,
   }) : _log = log,
-       _storageManager = storageManager;
+       _htmlCacheManager = htmlCacheManager;
 
   @override
   Future<Document?> open(
@@ -40,14 +41,84 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     return parse(html, sourceUrl: url);
   }
 
+  @override
+  Future<String> image(
+    String url, {
+    bool useCache = true,
+    Map<String, String>? headers,
+  }) async {
+    final Completer<String> completer = Completer();
+
+    final stringHeaders =
+        headers == null ? '' : ', {headers: ${headers.toString()}}';
+
+    await _fetch(
+      uri: WebUri(url),
+      delegate: _log.inAppWebviewObserver,
+      useCache: useCache,
+      scripts: [
+        '''
+        const toDataURL = url => fetch(url $stringHeaders)
+          .then(response => response.blob())
+          .then(blob => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          }));
+        
+        toDataURL('$url').then(
+          e => window.flutter_inappwebview.callHandler('resolved', e),
+          e => window.flutter_inappwebview.callHandler('reject', e),
+        );
+        ''',
+      ],
+      javascriptHandlers: {
+        'resolved': (args) {
+          if (args.isEmpty) return;
+          final data = args.first;
+          if (data is! String) {
+            _log.log(
+              'Failed to download image [$url]',
+              name: runtimeType.toString(),
+            );
+            return;
+          }
+
+          _log.log(
+            'Success to download image [$url]',
+            name: runtimeType.toString(),
+            extra: {'url': url, 'data': data},
+          );
+
+          completer.safeComplete(data);
+        },
+        'reject': (args) {
+          _log.log(
+            'Failed to download image [$url]',
+            name: runtimeType.toString(),
+            extra: {'url': url, 'error': args.toString()},
+          );
+          completer.completeError(args);
+        },
+      },
+      signalComplete: completer.future,
+    );
+
+    return completer.future;
+  }
+
   Future<String?> _fetch({
     required WebUri uri,
     required InAppWebviewObserver delegate,
+    UnmodifiableListView<UserScript>? initialUserScripts,
+    Map<String, JavaScriptHandlerCallback>? javascriptHandlers,
     List<String> scripts = const [],
     bool useCache = true,
+    Future<void>? signalComplete,
   }) async {
     final key = [uri.toString(), ...scripts].join('|');
-    final cache = await _storageManager.html.getFileFromCache(key);
+    final cache = await _htmlCacheManager.getFileFromCache(key);
     final data = await cache?.file.readAsString(encoding: utf8);
     if (data != null && useCache) {
       delegate.set(uri: uri, html: data, loading: false);
@@ -59,6 +130,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     final onLoadErrorCompleter = Completer();
 
     final webview = HeadlessInAppWebView(
+      initialUserScripts: initialUserScripts,
       initialUrlRequest: URLRequest(
         url: uri,
         headers: {HttpHeaders.userAgentHeader: UserAgentMixin.staticUserAgent},
@@ -68,8 +140,16 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
         javaScriptEnabled: true,
         supportZoom: false,
       ),
-      onWebViewCreated: (_) {
+      onWebViewCreated: (controller) {
         delegate.onWebViewCreated(uri: uri, scripts: scripts);
+        final handlers = javascriptHandlers?.entries ?? [];
+        if (handlers.isEmpty) return;
+        for (final handler in handlers) {
+          controller.addJavaScriptHandler(
+            handlerName: handler.key,
+            callback: handler.value,
+          );
+        }
       },
       onTitleChanged: (_, name) {
         delegate.onTitleChanged(title: name);
@@ -151,6 +231,10 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       delegate.onRunJavascript(script: script);
     }
 
+    if (signalComplete != null) {
+      await signalComplete.timeout(const Duration(seconds: 10));
+    }
+
     final html = await webview.webViewController?.getHtml();
 
     await webview.dispose();
@@ -160,7 +244,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       return null;
     }
 
-    await _storageManager.html.putFile(
+    await _htmlCacheManager.putFile(
       uri.toString(),
       utf8.encode(html),
       fileExtension: 'html',

@@ -6,7 +6,7 @@ import 'base/chapter_list_html_parser.dart';
 class MangaClashChapterListHtmlParser extends ChapterListHtmlParser {
   MangaClashChapterListHtmlParser({
     required super.root,
-    required super.storageManager,
+    required super.converterCacheManager,
   });
 
   @override
@@ -35,7 +35,7 @@ class MangaClashChapterListHtmlParser extends ChapterListHtmlParser {
           title: title?.trim(),
           chapter: chapter != null ? '$chapter' : null,
           readableAt: await releaseDate?.asDateTime(
-            storageManager: storageManager,
+            manager: converterCacheManager,
           ),
           webUrl: url,
         ),

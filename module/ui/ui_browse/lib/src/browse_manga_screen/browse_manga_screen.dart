@@ -13,7 +13,7 @@ import 'browse_manga_screen_state.dart';
 class BrowseMangaScreen extends StatefulWidget {
   const BrowseMangaScreen({
     super.key,
-    required this.storageManager,
+    required this.imagesCacheManager,
     this.onTapManga,
     this.onTapFilter,
   });
@@ -26,7 +26,7 @@ class BrowseMangaScreen extends StatefulWidget {
   )?
   onTapFilter;
 
-  final StorageManager storageManager;
+  final ImageCacheManager imagesCacheManager;
 
   static Widget create({
     required ServiceLocator locator,
@@ -57,7 +57,7 @@ class BrowseMangaScreen extends StatefulWidget {
         )..fetchTags();
       },
       child: BrowseMangaScreen(
-        storageManager: locator(),
+        imagesCacheManager: locator(),
         onTapManga: onTapManga,
         onTapFilter: onTapFilter,
       ),
@@ -403,7 +403,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
       builder: (context, state) {
         return MangaItemWidget(
           manga: item,
-          cacheManager: widget.storageManager.images,
+          cacheManager: widget.imagesCacheManager,
           onTap: () => widget.onTapManga?.call(item, state.parameter),
           onLongPress: () {
             _onTapMenu(

@@ -12,14 +12,14 @@ class BrowseSourceScreen extends StatelessWidget {
     super.key,
     this.onTapSearchManga,
     this.onTapSource,
-    required this.storageManager,
+    required this.imagesCacheManager,
   });
 
   final VoidCallback? onTapSearchManga;
 
   final ValueSetter<SourceEnum>? onTapSource;
 
-  final StorageManager storageManager;
+  final ImageCacheManager imagesCacheManager;
 
   static Widget create({
     required ServiceLocator locator,
@@ -27,13 +27,13 @@ class BrowseSourceScreen extends StatelessWidget {
     ValueSetter<SourceEnum>? onTapSource,
   }) {
     return BlocProvider(
-      create: (context) => BrowseSourceScreenCubit(
-        listenSourceUseCase: locator(),
-      ),
+      create: (context) {
+        return BrowseSourceScreenCubit(listenSourceUseCase: locator());
+      },
       child: BrowseSourceScreen(
         onTapSearchManga: onTapSearchManga,
         onTapSource: onTapSource,
-        storageManager: locator(),
+        imagesCacheManager: locator(),
       ),
     );
   }
@@ -52,20 +52,23 @@ class BrowseSourceScreen extends StatelessWidget {
         ],
       ),
       body: BlocBuilder<BrowseSourceScreenCubit, BrowseSourceScreenState>(
-        builder: (context, state) => AdaptivePhysicListView.separated(
-          separatorBuilder: (context, index) => const Divider(
-            height: 1,
-            thickness: 1,
-          ),
-          itemBuilder: (context, index) => SourceTileWidget(
-            cacheManager: storageManager.images,
-            iconUrl: state.sources[index].icon,
-            url: state.sources[index].url,
-            name: state.sources[index].name,
-            onTap: () => onTapSource?.call(state.sources[index]),
-          ),
-          itemCount: state.sources.length,
-        ),
+        builder: (context, state) {
+          return AdaptivePhysicListView.separated(
+            separatorBuilder: (context, index) {
+              return const Divider(height: 1, thickness: 1);
+            },
+            itemBuilder: (context, index) {
+              return SourceTileWidget(
+                cacheManager: imagesCacheManager,
+                iconUrl: state.sources[index].icon,
+                url: state.sources[index].url,
+                name: state.sources[index].name,
+                onTap: () => onTapSource?.call(state.sources[index]),
+              );
+            },
+            itemCount: state.sources.length,
+          );
+        },
       ),
     );
   }

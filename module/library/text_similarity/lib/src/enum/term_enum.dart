@@ -1,1 +1,0 @@
-enum TermEnum { char, word, ngram }

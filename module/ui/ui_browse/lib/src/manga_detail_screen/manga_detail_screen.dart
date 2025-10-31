@@ -20,7 +20,7 @@ class MangaDetailScreen extends StatefulWidget {
     this.onTapManga,
     this.onMangaMenu,
     this.onTapSort,
-    required this.storageManager,
+    required this.imagesCacheManager,
     required this.logBox,
   });
 
@@ -32,7 +32,7 @@ class MangaDetailScreen extends StatefulWidget {
 
   final Future<ChapterConfig?> Function(ChapterConfig? value)? onTapSort;
 
-  final StorageManager storageManager;
+  final ImageCacheManager imagesCacheManager;
 
   final LogBox logBox;
 
@@ -67,7 +67,7 @@ class MangaDetailScreen extends StatefulWidget {
         )..init();
       },
       child: MangaDetailScreen(
-        storageManager: locator(),
+        imagesCacheManager: locator(),
         onTapChapter: onTapChapter,
         onTapManga: onTapManga,
         onMangaMenu: onMangaMenu,
@@ -254,7 +254,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         } else {
           view = CachedNetworkImage(
             fit: BoxFit.cover,
-            cacheManager: widget.storageManager.images,
+            cacheManager: widget.imagesCacheManager,
             imageUrl: url,
             errorWidget: (context, url, error) {
               return const Center(child: Icon(Icons.error));
@@ -544,7 +544,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               itemBuilder: (context, data) {
                 return MangaItemWidget(
                   manga: data,
-                  cacheManager: widget.storageManager.images,
+                  cacheManager: widget.imagesCacheManager,
                   onTap: () => widget.onTapManga?.call(data),
                   onLongPress: () {
                     _onLongPressManga(

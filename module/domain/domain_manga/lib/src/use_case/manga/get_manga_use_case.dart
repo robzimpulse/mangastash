@@ -11,18 +11,21 @@ import '../../parser/base/manga_detail_html_parser.dart';
 
 class GetMangaUseCase with SyncMangasMixin {
   final HeadlessWebviewUseCase _webview;
-  final StorageManager _storageManager;
+  final ConverterCacheManager _converterCacheManager;
+  final MangaCacheManager _mangaCacheManager;
   final MangaService _mangaService;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   GetMangaUseCase({
     required HeadlessWebviewUseCase webview,
-    required StorageManager storageManager,
+    required ConverterCacheManager converterCacheManager,
+    required MangaCacheManager mangaCacheManager,
     required MangaService mangaService,
     required MangaDao mangaDao,
     required LogBox logBox,
-  }) : _storageManager = storageManager,
+  }) : _converterCacheManager = converterCacheManager,
+       _mangaCacheManager = mangaCacheManager,
        _mangaService = mangaService,
        _mangaDao = mangaDao,
        _logBox = logBox,
@@ -85,7 +88,7 @@ class GetMangaUseCase with SyncMangasMixin {
     final parser = MangaDetailHtmlParser.forSource(
       root: document,
       source: source,
-      storageManager: _storageManager,
+      converterCacheManager: _converterCacheManager,
     );
 
     final manga = await parser.manga;
@@ -98,7 +101,7 @@ class GetMangaUseCase with SyncMangasMixin {
     required String mangaId,
   }) async {
     final key = '$source-$mangaId';
-    await _storageManager.chapter.removeFile(key);
+    await _mangaCacheManager.removeFile(key);
   }
 
   Future<Result<Manga>> execute({
@@ -107,7 +110,7 @@ class GetMangaUseCase with SyncMangasMixin {
     bool useCache = true,
   }) async {
     final key = '$source-$mangaId';
-    final file = await _storageManager.chapter.getFileFromCache(key);
+    final file = await _mangaCacheManager.getFileFromCache(key);
     final data = await file?.file.readAsString(encoding: utf8);
     final cache = Manga.fromJsonString(data ?? '');
     if (cache != null && useCache) return Success(cache);
@@ -139,7 +142,7 @@ class GetMangaUseCase with SyncMangasMixin {
         throw DataNotFoundException();
       }
 
-      await _storageManager.chapter.putFile(
+      await _mangaCacheManager.putFile(
         key,
         utf8.encode(result.toJsonString()),
         key: key,

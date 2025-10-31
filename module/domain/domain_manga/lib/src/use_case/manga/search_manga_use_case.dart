@@ -13,18 +13,24 @@ import '../../parser/base/manga_list_html_parser.dart';
 class SearchMangaUseCase with SyncMangasMixin {
   final MangaRepository _mangaRepository;
   final HeadlessWebviewUseCase _webview;
-  final StorageManager _storageManager;
+  final ConverterCacheManager _converterCacheManager;
+  final HtmlCacheManager _htmlCacheManager;
+  final SearchMangaCacheManager _searchMangaCacheManager;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   const SearchMangaUseCase({
     required MangaRepository mangaRepository,
     required HeadlessWebviewUseCase webview,
-    required StorageManager storageManager,
+    required ConverterCacheManager converterCacheManager,
+    required HtmlCacheManager htmlCacheManager,
+    required SearchMangaCacheManager searchMangaCacheManager,
     required MangaDao mangaDao,
     required LogBox logBox,
   }) : _mangaRepository = mangaRepository,
-       _storageManager = storageManager,
+       _converterCacheManager = converterCacheManager,
+       _htmlCacheManager = htmlCacheManager,
+       _searchMangaCacheManager = searchMangaCacheManager,
        _mangaDao = mangaDao,
        _webview = webview,
        _logBox = logBox;
@@ -94,7 +100,7 @@ class SearchMangaUseCase with SyncMangasMixin {
     final parser = MangaListHtmlParser.forSource(
       root: document,
       source: parameter.source,
-      storageManager: _storageManager,
+      converterCacheManager: _converterCacheManager,
     );
 
     final mangas = await parser.mangas;
@@ -110,8 +116,10 @@ class SearchMangaUseCase with SyncMangasMixin {
   }
 
   Future<void> clear({required SourceSearchMangaParameter parameter}) async {
-    final data = await _storageManager.searchManga.keys;
-    final List<Future<void>> promises = [];
+    final data = await _searchMangaCacheManager.keys;
+    final List<Future<void>> promises = [
+      _htmlCacheManager.removeFile(parameter.source.icon),
+    ];
     for (final value in data) {
       final key = SourceSearchMangaParameter.fromJsonString(value);
       if (key == null) continue;
@@ -122,10 +130,10 @@ class SearchMangaUseCase with SyncMangasMixin {
         page: key.parameter.page,
       );
       if (paramIgnorePagination != key.parameter) continue;
-      promises.add(_storageManager.searchManga.removeFile(value));
+      promises.add(_searchMangaCacheManager.removeFile(value));
       final url = key.url?.let((url) => Uri.tryParse(url).toString());
       if (url == null) continue;
-      promises.add(_storageManager.html.removeFile(url));
+      promises.add(_htmlCacheManager.removeFile(url));
     }
     await Future.wait(promises);
   }
@@ -135,7 +143,7 @@ class SearchMangaUseCase with SyncMangasMixin {
     bool useCache = true,
   }) async {
     final key = parameter.toJsonString();
-    final cache = await _storageManager.searchManga.getFileFromCache(key);
+    final cache = await _searchMangaCacheManager.getFileFromCache(key);
     final file = await cache?.file.readAsString(encoding: utf8);
     final data = file.let((e) {
       return Pagination.fromJsonString(
@@ -164,7 +172,7 @@ class SearchMangaUseCase with SyncMangasMixin {
         ),
       );
 
-      await _storageManager.searchManga.putFile(
+      await _searchMangaCacheManager.putFile(
         key,
         key: key,
         utf8.encode(result.toJsonString((e) => e.toJson())),

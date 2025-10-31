@@ -3,6 +3,6 @@ import 'package:html/dom.dart';
 
 class BaseHtmlParser {
   final Document root;
-  final StorageManager storageManager;
-  BaseHtmlParser({required this.root, required this.storageManager});
+  final ConverterCacheManager converterCacheManager;
+  BaseHtmlParser({required this.root, required this.converterCacheManager});
 }

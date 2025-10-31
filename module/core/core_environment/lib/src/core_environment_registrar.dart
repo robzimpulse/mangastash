@@ -4,11 +4,10 @@ import 'package:service_locator/service_locator.dart';
 import 'manager/date_manager.dart';
 import 'manager/locale_manager.dart';
 import 'manager/theme_manager.dart';
-import 'manager/worker_manager.dart';
+import 'use_case/get_timezone_use_case.dart';
 import 'use_case/listen_current_timezone_use_case.dart';
 import 'use_case/listen_locale_use_case.dart';
 import 'use_case/listen_theme_use_case.dart';
-import 'use_case/task_executor_use_case.dart';
 import 'use_case/update_locale_use_case.dart';
 import 'use_case/update_theme_use_case.dart';
 
@@ -17,7 +16,9 @@ class CoreEnvironmentRegistrar extends Registrar {
   Future<void> register(ServiceLocator locator) async {
     final start = DateTime.timestamp();
 
-    locator.registerLazySingleton(() => ThemeManager(storage: locator()));
+    locator.registerLazySingletonAsync(
+      () => ThemeManager.create(storage: locator()),
+    );
     locator.alias<UpdateThemeUseCase, ThemeManager>();
     locator.alias<ListenThemeUseCase, ThemeManager>();
 
@@ -27,14 +28,14 @@ class CoreEnvironmentRegistrar extends Registrar {
     locator.alias<UpdateLocaleUseCase, LocaleManager>();
     locator.alias<ListenLocaleUseCase, LocaleManager>();
 
-    locator.registerLazySingletonAsync(() => DateManager.create());
-    locator.alias<ListenCurrentTimezoneUseCase, DateManager>();
-
+    locator.registerFactory(() => GetTimeZoneUseCase());
     locator.registerLazySingletonAsync(
-      () => WorkerManager.create(),
+      () => DateManager.create(
+        fetcher: () => locator<GetTimeZoneUseCase>().local(),
+      ),
       dispose: (e) => e.dispose(),
     );
-    locator.alias<TaskExecutor, WorkerManager>();
+    locator.alias<ListenCurrentTimezoneUseCase, DateManager>();
 
     final end = DateTime.timestamp();
 
@@ -54,6 +55,6 @@ class CoreEnvironmentRegistrar extends Registrar {
   Future<void> allReady(ServiceLocator locator) async {
     await locator.isReady<LocaleManager>();
     await locator.isReady<DateManager>();
-    await locator.isReady<WorkerManager>();
+    await locator.isReady<ThemeManager>();
   }
 }
