@@ -87,7 +87,7 @@ class AdvancedScreen extends StatelessWidget {
           FutureBuilder(
             future: mangaDao.all.then((e) {
               final entries = e
-                  .groupListsBy((e) => '${e.manga?.source} | ${e.manga?.title}')
+                  .groupListsBy((e) => (e.manga?.id, e.manga?.webUrl))
                   .entries
                   .where((e) => e.value.length > 1);
 
@@ -119,9 +119,21 @@ class AdvancedScreen extends StatelessWidget {
                         ),
                       ] else ...[
                         for (final value in data.entries)
-                          ListTile(
-                            title: Text(value.key),
-                            subtitle: Text('${value.value.length}'),
+                          ExpansionTile(
+                            title: Text('Web Url: ${value.key.$2}'),
+                            subtitle: Text('Id: ${value.key.$1}'),
+                            children: [
+                              for (final child in value.value)
+                                ListTile(
+                                  title: Text(child.manga?.id ?? ''),
+                                  subtitle: Column(
+                                    children: [
+                                      Text(child.manga?.title ?? ''),
+                                      Text(child.manga?.webUrl ?? ''),
+                                    ],
+                                  ),
+                                ),
+                            ],
                           ),
                       ],
                     ] else ...[
