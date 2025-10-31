@@ -34,7 +34,7 @@ MangaDataAttributes _$MangaDataAttributesFromJson(Map<String, dynamic> json) =>
       (json['tags'] as List<dynamic>?)
           ?.map((e) => TagData.fromJson(e as Map<String, dynamic>))
           .toList(),
-      (json['altTitle'] as List<dynamic>?)
+      (json['altTitles'] as List<dynamic>?)
           ?.map((e) => Title.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -46,7 +46,7 @@ Map<String, dynamic> _$MangaDataAttributesToJson(
       'updatedAt': instance.updatedAt,
       'version': instance.version,
       'title': instance.title,
-      'altTitle': instance.altTitle,
+      'altTitles': instance.altTitles,
       'description': instance.description,
       'isLocked': instance.isLocked,
       'originalLanguage': instance.originalLanguage,
