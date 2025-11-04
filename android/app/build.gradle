@@ -6,6 +6,11 @@ plugins {
 }
 
 android {
+    lintOptions {
+        // quick fix from https://github.com/flutter/flutter/issues/58247
+        checkReleaseBuilds false
+    }
+
     def flutterVersionCode = {
         def properties = new Properties()
         rootProject.file("local.properties").withInputStream { properties.load(it) }
