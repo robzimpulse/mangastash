@@ -9,7 +9,7 @@ part 'manga_data_attributes.g.dart';
 @JsonSerializable()
 class MangaDataAttributes extends Attribute {
   final Title? title;
-  final List<Title>? altTitle;
+  final List<Title>? altTitles;
   final Title? description;
   final bool? isLocked;
   final String? originalLanguage;
@@ -46,7 +46,7 @@ class MangaDataAttributes extends Attribute {
     this.latestUploadedChapter,
     this.availableTranslatedLanguages,
     this.tags,
-    this.altTitle,
+    this.altTitles,
   );
 
   factory MangaDataAttributes.fromJson(Map<String, dynamic> json) {
