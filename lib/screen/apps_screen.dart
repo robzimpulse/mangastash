@@ -32,7 +32,7 @@ class AppsScreen extends StatelessWidget {
       subThemesData: const FlexSubThemesData(
         blendOnLevel: 10,
         blendOnColors: false,
-        useTextTheme: true,
+        useMaterial3Typography: true,
         useM2StyleDividerInM3: true,
         alignedDropdown: true,
         useInputDecoratorThemeInDialogs: true,
@@ -56,7 +56,7 @@ class AppsScreen extends StatelessWidget {
       tabBarStyle: FlexTabBarStyle.forAppBar,
       subThemesData: const FlexSubThemesData(
         blendOnLevel: 20,
-        useTextTheme: true,
+        useMaterial3Typography: true,
         useM2StyleDividerInM3: true,
         alignedDropdown: true,
         useInputDecoratorThemeInDialogs: true,
@@ -84,15 +84,16 @@ class AppsScreen extends StatelessWidget {
           theme: _themeLight().copyWith(pageTransitionsTheme: _transition()),
           darkTheme: _themeDark().copyWith(pageTransitionsTheme: _transition()),
           themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-          builder: (context, child) => ResponsiveBreakpoints.builder(
-            breakpoints: const [
-              Breakpoint(start: 0, end: 450, name: MOBILE),
-              Breakpoint(start: 451, end: 800, name: TABLET),
-              Breakpoint(start: 801, end: 1920, name: DESKTOP),
-              Breakpoint(start: 1921, end: double.infinity, name: '4K'),
-            ],
-            child: child ?? const SizedBox.shrink(),
-          ),
+          builder:
+              (context, child) => ResponsiveBreakpoints.builder(
+                breakpoints: const [
+                  Breakpoint(start: 0, end: 450, name: MOBILE),
+                  Breakpoint(start: 451, end: 800, name: TABLET),
+                  Breakpoint(start: 801, end: 1920, name: DESKTOP),
+                  Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+                ],
+                child: child ?? const SizedBox.shrink(),
+              ),
         );
       },
     );
