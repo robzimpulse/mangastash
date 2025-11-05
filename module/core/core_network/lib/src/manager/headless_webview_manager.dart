@@ -18,6 +18,9 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
 
   final HtmlCacheManager _htmlCacheManager;
 
+  final Map<(String, List<String>, bool), Future<Document?>> _cDocument = {};
+  final Map<(String, Map<String, String>?, bool), Future<String>> _cImage = {};
+
   HeadlessWebviewManager({
     required LogBox log,
     required HtmlCacheManager htmlCacheManager,
@@ -26,6 +29,37 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
 
   @override
   Future<Document?> open(
+    String url, {
+    List<String> scripts = const [],
+    bool useCache = true,
+  }) {
+    return _cDocument.putIfAbsent(
+      (url, scripts, useCache),
+      () => _open(
+        url,
+        scripts: scripts,
+        useCache: useCache,
+      ).whenComplete(() => _cDocument.remove((url, scripts, useCache))),
+    );
+  }
+
+  @override
+  Future<String> image(
+    String url, {
+    bool useCache = true,
+    Map<String, String>? headers,
+  }) {
+    return _cImage.putIfAbsent(
+      (url, headers, useCache),
+      () => _image(
+        url,
+        headers: headers,
+        useCache: useCache,
+      ).whenComplete(() => _cImage.remove((url, headers, useCache))),
+    );
+  }
+
+  Future<Document?> _open(
     String url, {
     List<String> scripts = const [],
     bool useCache = true,
@@ -41,8 +75,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     return parse(html, sourceUrl: url);
   }
 
-  @override
-  Future<String> image(
+  Future<String> _image(
     String url, {
     bool useCache = true,
     Map<String, String>? headers,
