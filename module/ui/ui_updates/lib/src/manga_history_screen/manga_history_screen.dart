@@ -82,23 +82,48 @@ class MangaHistoryScreen extends StatelessWidget {
         builder: (context, state) {
           return CustomScrollView(
             slivers: [
-              for (final history in state.histories.entries)
-                MultiSliver(
-                  pushPinnedChildren: true,
-                  children: [
-                    SliverPinnedHeader(
-                      child: _manga(context: context, manga: history.key),
-                    ),
-                    for (final item in history.value)
-                      SliverToBoxAdapter(
-                        child: _chapter(
-                          context: context,
-                          manga: history.key,
-                          chapter: item,
-                        ),
+              if (state.histories.isEmpty)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            EmojiAsciiEnum.crying.ascii,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.displayMedium,
+                          ),
+                          Text(
+                            'Empty Data',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                        ],
                       ),
-                  ],
-                ),
+                    ),
+                  ),
+                )
+              else
+                for (final history in state.histories.entries)
+                  MultiSliver(
+                    pushPinnedChildren: true,
+                    children: [
+                      SliverPinnedHeader(
+                        child: _manga(context: context, manga: history.key),
+                      ),
+                      for (final item in history.value)
+                        SliverToBoxAdapter(
+                          child: _chapter(
+                            context: context,
+                            manga: history.key,
+                            chapter: item,
+                          ),
+                        ),
+                    ],
+                  ),
             ],
           );
         },
