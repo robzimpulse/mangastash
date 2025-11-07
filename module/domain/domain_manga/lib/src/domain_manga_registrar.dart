@@ -161,11 +161,7 @@ class DomainMangaRegistrar extends Registrar {
       ),
     );
     locator.registerFactory(
-      () => RecrawlUseCase(
-        logBox: locator(),
-        htmlCacheManager: locator(),
-        cookieJar: locator(),
-      ),
+      () => RecrawlUseCase(logBox: locator(), htmlCacheManager: locator()),
     );
 
     locator.registerLazySingleton(

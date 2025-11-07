@@ -1,6 +1,5 @@
 library core_network;
 
-export 'package:cookie_jar/cookie_jar.dart';
 export 'package:dio/dio.dart';
 export 'package:flutter_inappwebview/flutter_inappwebview.dart' show CookieManager;
 
