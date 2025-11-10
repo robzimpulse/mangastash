@@ -1,9 +1,6 @@
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:core_analytics/core_analytics.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
-import 'package:flutter/foundation.dart';
 import 'package:universal_io/io.dart';
 
 import '../interceptor/dio_reject_interceptor.dart';
@@ -11,10 +8,7 @@ import '../interceptor/dio_throttler_interceptor.dart';
 import '../mixin/user_agent_mixin.dart';
 
 class DioManager {
-  static Dio create({
-    required LogBox log,
-    required CookieJar cookieJar,
-  }) {
+  static Dio create({required LogBox log}) {
     final dio = Dio(
       BaseOptions(
         headers: {HttpHeaders.userAgentHeader: UserAgentMixin.staticUserAgent},
@@ -43,7 +37,6 @@ class DioManager {
           return null;
         },
       ),
-      if (!kIsWeb) CookieManager(cookieJar),
       log.interceptor,
     ]);
 

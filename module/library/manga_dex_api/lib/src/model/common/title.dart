@@ -36,8 +36,7 @@ class Title {
     String? zh,
     String? jaRo,
     String? ru,
-    String,
-    zhRo,
+    String? zhRo,
   }) {
     return Title(
       en ?? this.en,

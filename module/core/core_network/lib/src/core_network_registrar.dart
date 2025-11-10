@@ -1,4 +1,3 @@
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:core_analytics/core_analytics.dart';
 import 'package:service_locator/service_locator.dart';
 
@@ -15,9 +14,8 @@ class CoreNetworkRegistrar extends Registrar {
       () => HeadlessWebviewManager(log: locator(), htmlCacheManager: locator()),
     );
     locator.alias<HeadlessWebviewUseCase, HeadlessWebviewManager>();
-    locator.registerLazySingleton(() => CookieJar());
     locator.registerLazySingleton(
-      () => DioManager.create(log: locator(), cookieJar: locator()),
+      () => DioManager.create(log: locator()),
       dispose: (e) => e.close(force: true),
     );
 
