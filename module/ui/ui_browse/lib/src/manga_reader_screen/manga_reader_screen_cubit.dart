@@ -44,6 +44,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
   }
 
   Future<void> init() async {
+    emit(state.copyWith(error: () => null));
     await Future.wait([_fetchChapter(), _fetchPreviousAndNextChapter()]);
   }
 
