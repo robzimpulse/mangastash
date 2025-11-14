@@ -41,7 +41,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
        _removeFromLibraryUseCase = removeFromLibraryUseCase,
        _prefetchChapterUseCase = prefetchChapterUseCase,
        _getAllChapterUseCase = getAllChapterUseCase,
-        _recrawlUseCase = recrawlUseCase,
+       _recrawlUseCase = recrawlUseCase,
        super(
          initialState.copyWith(
            chapterParameter: listenSearchParameterUseCase
@@ -348,11 +348,11 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
   }
 
-  Future<void> recrawl({required BuildContext context, required String url}) async {
+  void recrawl({required BuildContext context, required String url}) async {
     _recrawlUseCase.execute(context: context, url: url);
     await _clearMangaCache();
     await _clearSimilarMangaCache();
     await _clearChapterCache();
-    init();
+    await init();
   }
 }

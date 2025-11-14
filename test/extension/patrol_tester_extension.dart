@@ -14,15 +14,14 @@ import '../mock/mock_get_timezone_use_case.dart';
 import '../mock/mock_shared_preferences_async.dart';
 import '../mock/mock_storage_manager.dart';
 
-typedef OnRunTestScreen =
-    Future<void> Function(ServiceLocator locator, PatrolTester $);
+typedef OnRunTest = Future<void> Function(ServiceLocator l, PatrolTester $);
 
-typedef OnSetupTestScreen = Future<void> Function(ServiceLocator locator);
+typedef OnSetupTest = Future<void> Function(ServiceLocator l);
 
 void testScreen(
   String description, {
-  OnSetupTestScreen? onSetupTestScreen,
-  required OnRunTestScreen onRunTest,
+  OnSetupTest? onSetupTest,
+  required OnRunTest onRunTest,
   double width = 400,
   double height = 800,
   double dpi = 2.625,
@@ -70,7 +69,7 @@ void testScreen(
           locator.registerSingleton<SearchMangaCacheManager>(
             MockSearchMangaCacheManager(),
           );
-          await onSetupTestScreen?.call(locator);
+          await onSetupTest?.call(locator);
         },
       ),
     );
