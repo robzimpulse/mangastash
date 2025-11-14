@@ -22,8 +22,11 @@ jobs:
       - name: 'Install Melos'
         run: flutter pub global activate melos 6.2.0
 
+      - name: 'Install Cobertura'
+        run: dart pub global activate cobertura
+
       - name: 'Bootstrap Workspace'
         run: melos bootstrap --verbose
 
-      - name: 'Run Test'
-        run: melos test
+      - name: 'Run Merged Code Coverage'
+        run: melos coverage:merged
