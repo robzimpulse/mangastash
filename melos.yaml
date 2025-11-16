@@ -85,6 +85,6 @@ scripts:
       melos exec --file-exists="coverage/renamed.lcov.info" -- lcov --remove coverage/renamed.lcov.info '*.g.dart' -o coverage/renamed.lcov.info --ignore-errors unused,unused
       melos exec -c 1 --file-exists="coverage/renamed.lcov.info" -- "cat coverage/renamed.lcov.info >> MELOS_ROOT_PATH/coverage/src/merged.lcov.info"
       genhtml coverage/src/merged.lcov.info -o coverage/html --source-directory MELOS_ROOT_PATH/coverage/src --prefix MELOS_ROOT_PATH/coverage/src
-      cobertura convert -i coverage/merged.lcov.info -o coverage/merged.cobertura.xml
+      cobertura convert -i coverage/src/merged.lcov.info -o coverage/merged.cobertura.xml
       cp coverage/src/merged.lcov.info coverage/html/lcov.info
       rm -rf coverage/src
