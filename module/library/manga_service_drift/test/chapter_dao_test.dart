@@ -39,7 +39,21 @@ void main() {
 
   tearDown(() => db.close());
 
-  group('Image Dao Test', () {
+  test('Create Delete Chapters', () async {
+    final results = await dao.adds(
+      values: {for (final chapter in chapters) chapter.$1: chapter.$2},
+    );
+    expect((await dao.all).length, equals(results.length));
+    expect(dao.stream, emits(await dao.all));
+    expect((await imageDao.all).length, equals((results.length) * 10));
+
+    await dao.remove(ids: results.map((e) => e.chapter?.id).nonNulls.toList());
+    expect(dao.stream, emits([]));
+    expect((await dao.all).length, equals(0));
+    expect((await imageDao.all).length, equals(0));
+  });
+
+  group('Chapter Dao Test', () {
     setUp(() async {
       await dao.adds(
         values: {for (final (chapter, images) in chapters) chapter: images},
@@ -61,33 +75,31 @@ void main() {
             scanlationGroup: Value('scanlation_group_new'),
             webUrl: Value('web_url_new'),
           ),
-          List.generate(
-            10,
-            (imgIdx) => 'chapter_id_new_image_url_$imgIdx',
-          ),
+          List.generate(10, (imgIdx) => 'chapter_id_new_image_url_$imgIdx'),
         );
 
         final chapterUpdated = (
-          chapter.$1.copyWith(
-            lastReadAt: Value(DateTime.timestamp()),
-          ),
-          chapter.$2
+          chapter.$1.copyWith(lastReadAt: Value(DateTime.timestamp())),
+          chapter.$2,
         );
 
         await dao.adds(values: {chapter.$1: chapter.$2});
         expect((await dao.all).length, equals(chapters.length + 1));
+        expect(dao.stream, emits(await dao.all));
 
         final a = await dao.search(ids: [chapter.$1.id.value]);
         expect(a.first.chapter?.lastReadAt == null, isTrue);
 
         await dao.adds(values: {chapterUpdated.$1: chapterUpdated.$2});
         expect((await dao.all).length, equals(chapters.length + 1));
+        expect(dao.stream, emits(await dao.all));
 
         final b = await dao.search(ids: [chapter.$1.id.value]);
         expect(b.first.chapter?.lastReadAt == null, isFalse);
 
         await dao.adds(values: {chapter.$1: chapter.$2});
         expect((await dao.all).length, equals(chapters.length + 1));
+        expect(dao.stream, emits(await dao.all));
 
         final c = await dao.search(ids: [chapter.$1.id.value]);
         expect(c.first.chapter?.lastReadAt == null, isFalse);
@@ -107,16 +119,14 @@ void main() {
           webUrl: const Value('web_url_new'),
           lastReadAt: Value(DateTime.timestamp()),
         ),
-        List.generate(
-          10,
-          (imgIdx) => 'chapter_id_new_image_url_$imgIdx',
-        ),
+        List.generate(10, (imgIdx) => 'chapter_id_new_image_url_$imgIdx'),
       );
 
       test('Add Value', () async {
         await dao.adds(values: {chapter.$1: chapter.$2});
         expect((await dao.all).length, equals(chapters.length + 1));
         expect((await imageDao.all).length, equals((chapters.length + 1) * 10));
+        expect(dao.stream, emits(await dao.all));
       });
 
       group('Search Value', () {
@@ -178,6 +188,7 @@ void main() {
         await dao.adds(values: {chapter.$1: chapter.$2});
         expect((await dao.all).length, equals(chapters.length));
         expect((await imageDao.all).length, equals((chapters.length) * 10));
+        expect(dao.stream, emits(await dao.all));
       });
 
       group('Search Value', () {

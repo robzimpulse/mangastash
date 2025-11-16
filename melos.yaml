@@ -9,8 +9,16 @@ ide:
     enabled: false
 
 scripts:
-  flutter_clean:
-    description: Clean all packages.
+  clean:coverage:
+    description: Clean coverage folders for all packages.
+    run: rm -rf coverage
+    exec:
+      concurrency: 5
+    packageFilters:
+      dirExists: "coverage"
+
+  clean:flutter:
+    description: Flutter clean for all packages.
     run: flutter clean
     exec:
       concurrency: 5
@@ -52,3 +60,35 @@ scripts:
       orderDependents: true
     packageFilters:
       dirExists: "test"
+
+  coverage:
+    description: Generate code coverage for specified package.
+    run: |
+      rm -rf coverage
+      flutter test --no-pub --coverage
+      lcov --remove coverage/lcov.info '*.g.dart' -o coverage/lcov.info --ignore-errors unused
+      cobertura convert -i coverage/lcov.info -o coverage/cobertura.xml
+      genhtml coverage/lcov.info -o coverage
+    exec:
+      concurrency: 5
+    packageFilters:
+      dirExists: "test"
+
+  coverage:merged:
+    description: Generate merged code coverage for whole project.
+    run: >
+      melos clean:coverage
+      && melos exec -- mkdir -p MELOS_ROOT_PATH/coverage/src/MELOS_PACKAGE_NAME/
+      && melos exec -- cp -r lib MELOS_ROOT_PATH/coverage/src/MELOS_PACKAGE_NAME/
+      && melos exec --dir-exists="test" -- flutter test --no-pub --coverage
+      && melos exec --file-exists="coverage/lcov.info" -- "sed -E \"s/SF:lib/SF:MELOS_PACKAGE_NAME\/lib/\" coverage/lcov.info > coverage/renamed.lcov.info"
+      && melos exec --file-exists="coverage/renamed.lcov.info" -- lcov --remove coverage/renamed.lcov.info '*.g.dart' -o coverage/renamed.lcov.info --ignore-errors unused,unused
+      && melos exec -c 1 --file-exists="coverage/renamed.lcov.info" -- "cat coverage/renamed.lcov.info >> MELOS_ROOT_PATH/coverage/src/merged.lcov.info"
+      && genhtml coverage/src/merged.lcov.info -o coverage/html --source-directory MELOS_ROOT_PATH/coverage/src --prefix MELOS_ROOT_PATH/coverage/src
+      && cobertura convert -i coverage/src/merged.lcov.info -o coverage/merged.cobertura.xml
+      && cp coverage/src/merged.lcov.info coverage/html/lcov.info
+      && rm -rf coverage/src
+
+  coverage:merged:open:
+    description: Open generated merged code coverage.
+    run: open coverage/html/index.html

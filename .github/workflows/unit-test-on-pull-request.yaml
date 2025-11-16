@@ -22,8 +22,20 @@ jobs:
       - name: 'Install Melos'
         run: flutter pub global activate melos 6.2.0
 
+      - name: 'Install Cobertura'
+        run: dart pub global activate cobertura
+
+      - name: 'Install Lcov'
+        run: brew install lcov
+
       - name: 'Bootstrap Workspace'
         run: melos bootstrap --verbose
 
-      - name: 'Run Test'
-        run: melos test
+      - name: 'Run Merged Code Coverage'
+        run: melos coverage:merged
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage/merged.cobertura.xml

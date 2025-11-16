@@ -171,48 +171,47 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   expandedHeight: MediaQuery.of(context).size.height * 0.4,
                   automaticallyImplyLeading: false,
                   flexibleSpace: FlexibleAppBarBuilder(
-                    builder:
-                        (context, progress) => Padding(
-                          padding: const EdgeInsets.only(
-                            bottom: kTextTabBarHeight,
-                          ),
-                          child: MangaDetailAppBarWidget(
-                            progress: progress,
-                            background: _appBarBackground(),
-                            leading: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey.withAlpha(
-                                  (lerpDouble(200, 0, progress) ?? 0.0).toInt(),
-                                ),
-                                borderRadius: const BorderRadius.only(
-                                  topRight: Radius.circular(16),
-                                  bottomRight: Radius.circular(16),
-                                ),
-                              ),
-                              child: BackButton(
-                                color:
-                                    Theme.of(
-                                      context,
-                                    ).appBarTheme.iconTheme?.color,
-                              ),
-                            ),
-                            title: _title(progress: progress),
-                            actionsDecoration: BoxDecoration(
+                    builder: (context, progress) {
+                      final theme = Theme.of(context);
+                      return Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: kTextTabBarHeight,
+                        ),
+                        child: MangaDetailAppBarWidget(
+                          progress: progress,
+                          background: _appBarBackground(),
+                          leading: Container(
+                            decoration: BoxDecoration(
                               color: Colors.grey.withAlpha(
                                 (lerpDouble(200, 0, progress) ?? 0.0).toInt(),
                               ),
                               borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(16),
-                                bottomLeft: Radius.circular(16),
+                                topRight: Radius.circular(16),
+                                bottomRight: Radius.circular(16),
                               ),
                             ),
-                            actions: [
-                              _addToLibraryButton(context: context),
-                              _websiteButton(context: context),
-                              _shareButton(context: context),
-                            ],
+                            child: BackButton(
+                              color: theme.appBarTheme.iconTheme?.color,
+                            ),
                           ),
+                          title: _title(progress: progress),
+                          actionsDecoration: BoxDecoration(
+                            color: Colors.grey.withAlpha(
+                              (lerpDouble(200, 0, progress) ?? 0.0).toInt(),
+                            ),
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(16),
+                              bottomLeft: Radius.circular(16),
+                            ),
+                          ),
+                          actions: [
+                            _addToLibraryButton(context: context),
+                            _websiteButton(context: context),
+                            _shareButton(context: context),
+                          ],
                         ),
+                      );
+                    },
                   ),
                   bottom: DecoratedPreferredSizeWidget(
                     decoration: BoxDecoration(
