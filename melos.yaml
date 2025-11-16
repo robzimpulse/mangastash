@@ -88,3 +88,7 @@ scripts:
       cobertura convert -i coverage/src/merged.lcov.info -o coverage/merged.cobertura.xml
       cp coverage/src/merged.lcov.info coverage/html/lcov.info
       rm -rf coverage/src
+
+  coverage:merged:open:
+    description: Open generated merged code coverage.
+    run: open coverage/html/index.html
