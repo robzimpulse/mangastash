@@ -67,6 +67,7 @@ scripts:
       rm -rf coverage
       flutter test --no-pub --coverage
       lcov --remove coverage/lcov.info '*.g.dart' -o coverage/lcov.info --ignore-errors unused
+      cobertura convert -i coverage/lcov.info -o coverage/cobertura.xml
       genhtml coverage/lcov.info -o coverage
     exec:
       concurrency: 5
