@@ -463,10 +463,10 @@ packages:
     dependency: transitive
     description:
       name: http
-      sha256: bb2ce4590bc2667c96f318d68cac1b5a7987ec819351d32b1c987239a815e007
+      sha256: "87721a4a50b19c7f1d49001e51409bddc46303966ce89a65af4f4e6004896412"
       url: "https://pub.dev"
     source: hosted
-    version: "1.5.0"
+    version: "1.6.0"
   http_cache_core:
     dependency: transitive
     description:
@@ -559,8 +559,8 @@ packages:
     dependency: transitive
     description:
       path: "packages/log_box"
-      ref: master
-      resolved-ref: b8cb25961fb402c113e5fbff17cfb98fa98954ee
+      ref: refactor
+      resolved-ref: dc7b0aac9a723433505227551f3e0ab7d9bae5bb
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -568,8 +568,8 @@ packages:
     dependency: transitive
     description:
       path: "packages/log_box_dio_logger"
-      ref: master
-      resolved-ref: b8cb25961fb402c113e5fbff17cfb98fa98954ee
+      ref: refactor
+      resolved-ref: dc7b0aac9a723433505227551f3e0ab7d9bae5bb
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -577,8 +577,8 @@ packages:
     dependency: transitive
     description:
       path: "packages/log_box_in_app_webview_logger"
-      ref: master
-      resolved-ref: b8cb25961fb402c113e5fbff17cfb98fa98954ee
+      ref: refactor
+      resolved-ref: dc7b0aac9a723433505227551f3e0ab7d9bae5bb
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -586,8 +586,8 @@ packages:
     dependency: transitive
     description:
       path: "packages/log_box_navigation_logger"
-      ref: master
-      resolved-ref: b8cb25961fb402c113e5fbff17cfb98fa98954ee
+      ref: refactor
+      resolved-ref: dc7b0aac9a723433505227551f3e0ab7d9bae5bb
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -1028,10 +1028,10 @@ packages:
     dependency: transitive
     description:
       name: universal_io
-      sha256: "1722b2dcc462b4b2f3ee7d188dad008b6eb4c40bbd03a3de451d82c78bba9aad"
+      sha256: f63cbc48103236abf48e345e07a03ce5757ea86285ed313a6a032596ed9301e2
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.2"
+    version: "2.3.1"
   uuid:
     dependency: transitive
     description:

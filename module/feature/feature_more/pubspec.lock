@@ -160,10 +160,10 @@ packages:
     dependency: transitive
     description:
       name: cross_file
-      sha256: "942a4791cd385a68ccb3b32c71c427aba508a1bb949b86dff2adbe4049f16239"
+      sha256: "701dcfc06da0882883a2657c445103380e53e647060ad8d9dfb710c100996608"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.5"
+    version: "0.3.5+1"
   crypto:
     dependency: transitive
     description:
@@ -468,10 +468,10 @@ packages:
     dependency: transitive
     description:
       name: http
-      sha256: bb2ce4590bc2667c96f318d68cac1b5a7987ec819351d32b1c987239a815e007
+      sha256: "87721a4a50b19c7f1d49001e51409bddc46303966ce89a65af4f4e6004896412"
       url: "https://pub.dev"
     source: hosted
-    version: "1.5.0"
+    version: "1.6.0"
   http_cache_core:
     dependency: transitive
     description:
@@ -572,8 +572,8 @@ packages:
     dependency: transitive
     description:
       path: "packages/log_box"
-      ref: master
-      resolved-ref: b8cb25961fb402c113e5fbff17cfb98fa98954ee
+      ref: refactor
+      resolved-ref: dc7b0aac9a723433505227551f3e0ab7d9bae5bb
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -581,8 +581,8 @@ packages:
     dependency: transitive
     description:
       path: "packages/log_box_dio_logger"
-      ref: master
-      resolved-ref: b8cb25961fb402c113e5fbff17cfb98fa98954ee
+      ref: refactor
+      resolved-ref: dc7b0aac9a723433505227551f3e0ab7d9bae5bb
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -590,8 +590,8 @@ packages:
     dependency: transitive
     description:
       path: "packages/log_box_in_app_webview_logger"
-      ref: master
-      resolved-ref: b8cb25961fb402c113e5fbff17cfb98fa98954ee
+      ref: refactor
+      resolved-ref: dc7b0aac9a723433505227551f3e0ab7d9bae5bb
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -599,8 +599,8 @@ packages:
     dependency: transitive
     description:
       path: "packages/log_box_navigation_logger"
-      ref: master
-      resolved-ref: b8cb25961fb402c113e5fbff17cfb98fa98954ee
+      ref: refactor
+      resolved-ref: dc7b0aac9a723433505227551f3e0ab7d9bae5bb
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -846,10 +846,10 @@ packages:
     dependency: transitive
     description:
       name: retrofit
-      sha256: "7d78824afa6eeeaf6ac58220910ee7a97597b39e93360d4bda230b7c6df45089"
+      sha256: "84063c18a00d55af41d6b8401edf8473e8c215bd7068ef7ec5e34c60657ffdbe"
       url: "https://pub.dev"
     source: hosted
-    version: "4.9.0"
+    version: "4.9.1"
   rxdart:
     dependency: transitive
     description:
@@ -1112,18 +1112,18 @@ packages:
     dependency: transitive
     description:
       name: universal_io
-      sha256: "1722b2dcc462b4b2f3ee7d188dad008b6eb4c40bbd03a3de451d82c78bba9aad"
+      sha256: f63cbc48103236abf48e345e07a03ce5757ea86285ed313a6a032596ed9301e2
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.2"
+    version: "2.3.1"
   url_launcher_linux:
     dependency: transitive
     description:
       name: url_launcher_linux
-      sha256: "4e9ba368772369e3e08f231d2301b4ef72b9ff87c31192ef471b380ef29a4935"
+      sha256: d5e14138b3bc193a0f63c10a53c94b91d399df0512b1f29b94a043db7482384a
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.1"
+    version: "3.2.2"
   url_launcher_platform_interface:
     dependency: transitive
     description:
@@ -1144,10 +1144,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_windows
-      sha256: "3284b6d2ac454cf34f114e1d3319866fdd1e19cdc329999057e44ffe936cfa77"
+      sha256: "712c70ab1b99744ff066053cbe3e80c73332b38d46e5e945c98689b2e66fc15f"
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.4"
+    version: "3.1.5"
   uuid:
     dependency: transitive
     description:
@@ -1206,4 +1206,4 @@ packages:
     version: "6.6.1"
 sdks:
   dart: ">=3.8.0 <4.0.0"
-  flutter: ">=3.29.3"
+  flutter: ">=3.32.0"
