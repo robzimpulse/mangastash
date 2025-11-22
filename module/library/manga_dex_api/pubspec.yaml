@@ -13,7 +13,9 @@ dependencies:
   json_annotation: ^4.9.0
   dio: ^5.7.0
   equatable: ^2.0.5
-  retrofit: ^4.4.1
+  # lock version to `4.9.0` since version `4.9.1` have issue with generator error
+  # details: https://github.com/trevorwang/retrofit.dart/issues/862
+  retrofit: 4.9.0
 
 dev_dependencies:
   flutter_test:
