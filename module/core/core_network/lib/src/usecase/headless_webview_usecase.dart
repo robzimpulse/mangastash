@@ -12,4 +12,6 @@ abstract class HeadlessWebviewUseCase {
     bool useCache = true,
     Map<String, String>? headers,
   });
+
+  Stream<String> get onCloudFlareChallenge;
 }

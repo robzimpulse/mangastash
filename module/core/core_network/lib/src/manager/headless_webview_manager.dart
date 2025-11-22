@@ -15,17 +15,31 @@ import '../usecase/headless_webview_usecase.dart';
 
 class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   final LogBox _log;
-
+  final StreamController<String> _onCloudflareChallenge;
   final HtmlCacheManager _htmlCacheManager;
 
   final Map<(String, List<String>, bool), Future<Document?>> _cDocument = {};
   final Map<(String, Map<String, String>?, bool), Future<String>> _cImage = {};
+  final Map<int, HeadlessInAppWebView> _instances = {};
+
+  final _imgExt = ['jpeg', 'jpg', 'gif', 'webp', 'png', 'ico', 'bmp', 'wbmp'];
 
   HeadlessWebviewManager({
     required LogBox log,
     required HtmlCacheManager htmlCacheManager,
   }) : _log = log,
+       _onCloudflareChallenge = StreamController<String>.broadcast(),
        _htmlCacheManager = htmlCacheManager;
+
+  Future<void> dispose() async {
+    await Future.wait([
+      for (final instance in _instances.values) instance.dispose(),
+      _onCloudflareChallenge.close(),
+    ]);
+  }
+
+  @override
+  Stream<String> get onCloudFlareChallenge => _onCloudflareChallenge.stream;
 
   @override
   Future<Document?> open(
@@ -109,18 +123,33 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
           if (data is! String) {
             _log.log(
               'Failed to download image [$url]',
+              extra: {'url': url, 'args': args},
               name: runtimeType.toString(),
             );
             return;
           }
 
-          _log.log(
-            'Success to download image [$url]',
-            name: runtimeType.toString(),
-            extra: {'url': url, 'data': data},
-          );
+          final values = data.split(RegExp(r'[:;,]+'));
+          final ext = values[1].split('/').lastOrNull;
 
-          completer.safeComplete(data);
+          if (_imgExt.contains(ext)) {
+            _log.log(
+              'Success download image [$url]',
+              name: runtimeType.toString(),
+              extra: {'url': url, 'data': data},
+            );
+            completer.safeComplete(data);
+          } else {
+            _log.log(
+              'Failed download image [$url]',
+              name: runtimeType.toString(),
+              error: Exception('Image format $ext not supported'),
+              extra: {'url': url, 'args': args},
+            );
+            completer.safeCompleteError(
+              Exception('Image format $ext not supported'),
+            );
+          }
         },
         'reject': (args) {
           _log.log(
@@ -128,7 +157,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
             name: runtimeType.toString(),
             extra: {'url': url, 'error': args.toString()},
           );
-          completer.completeError(args);
+          completer.safeCompleteError(Exception('Error fetch image'));
         },
       },
       signalComplete: completer.future,
@@ -243,6 +272,8 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       },
     );
 
+    _instances[webview.hashCode] = webview;
+
     await Future.wait([
       webview.run(),
       onLoadStartCompleter.future,
@@ -266,7 +297,15 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
 
     final html = await webview.webViewController?.getHtml();
 
+    final title = await webview.webViewController?.getTitle();
+
+    if (title == 'Just a moment...') {
+      _onCloudflareChallenge.add(uri.path);
+    }
+
     await webview.dispose();
+
+    _instances.remove(webview.hashCode);
 
     if (html == null) {
       delegate.set(error: Exception('Null Html'), loading: false);
