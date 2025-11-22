@@ -447,8 +447,8 @@ packages:
     dependency: transitive
     description:
       path: "packages/log_box"
-      ref: refactor
-      resolved-ref: "6fe5eaf516434eb7d13f118dea003c3930ae63c8"
+      ref: master
+      resolved-ref: "05a98d54ca45b1dd6c0ed9363ffeb4cf662e5f63"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -456,8 +456,8 @@ packages:
     dependency: transitive
     description:
       path: "packages/log_box_dio_logger"
-      ref: refactor
-      resolved-ref: "6fe5eaf516434eb7d13f118dea003c3930ae63c8"
+      ref: master
+      resolved-ref: "05a98d54ca45b1dd6c0ed9363ffeb4cf662e5f63"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -465,8 +465,8 @@ packages:
     dependency: transitive
     description:
       path: "packages/log_box_in_app_webview_logger"
-      ref: refactor
-      resolved-ref: "6fe5eaf516434eb7d13f118dea003c3930ae63c8"
+      ref: master
+      resolved-ref: "05a98d54ca45b1dd6c0ed9363ffeb4cf662e5f63"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -474,8 +474,8 @@ packages:
     dependency: transitive
     description:
       path: "packages/log_box_navigation_logger"
-      ref: refactor
-      resolved-ref: "6fe5eaf516434eb7d13f118dea003c3930ae63c8"
+      ref: master
+      resolved-ref: "05a98d54ca45b1dd6c0ed9363ffeb4cf662e5f63"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"

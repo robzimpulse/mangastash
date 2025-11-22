@@ -37,7 +37,7 @@ scripts:
     description: Generate files for all packages.
     run: flutter pub run build_runner build --delete-conflicting-outputs
     exec:
-      concurrency: 1
+      concurrency: 5
       failFast: true
       orderDependents: true
     packageFilters:
@@ -47,7 +47,7 @@ scripts:
     description: Upgrade dependencies for all packages.
     run: flutter pub upgrade
     exec:
-      concurrency: 1
+      concurrency: 5
       failFast: true
       orderDependents: true
 
