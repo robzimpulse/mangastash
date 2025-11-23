@@ -19,9 +19,10 @@ jobs:
           - platform: web
             os: ubuntu-latest
             path: build/web
-          - platform: macos
-            os: macos-15
-            path: build/macos/Build/Products/Release/mangastash.app
+            # disable macos build, ref: https://github.com/subosito/flutter-action/issues/350
+#          - platform: macos
+#            os: macos-15
+#            path: build/macos/Build/Products/Release/mangastash.app
           - platform: windows
             os: windows-latest
             path: build/windows/x64/runner/Release/mangastash.exe
