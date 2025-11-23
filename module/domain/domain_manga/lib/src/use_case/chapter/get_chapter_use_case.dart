@@ -115,12 +115,16 @@ class GetChapterUseCase with SyncChaptersMixin {
     final cache = Chapter.fromJsonString(data ?? '');
     if (cache != null && useCache) return Success(cache);
 
-    final raw = await _chapterDao.search(ids: [chapterId]);
-    final chapter = raw.firstOrNull.let(
-      (e) => e.chapter?.let((d) => Chapter.fromDrift(d, images: e.images)),
-    );
-
     try {
+      final raw = await _chapterDao.search(ids: [chapterId]);
+      final chapter = raw.firstOrNull.let(
+        (e) => e.chapter?.let((d) => Chapter.fromDrift(d, images: e.images)),
+      );
+
+      if (chapter != null && chapter.images.or([]).isNotEmpty) {
+        return Success(chapter);
+      }
+
       final Chapter? data;
       if (source == SourceEnum.mangadex) {
         data = await _mangadex(mangaId: mangaId, chapterId: chapterId);

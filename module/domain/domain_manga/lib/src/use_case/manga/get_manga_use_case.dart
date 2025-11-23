@@ -111,6 +111,8 @@ class GetMangaUseCase with SyncMangasMixin {
       final raw = await _mangaDao.search(ids: [mangaId]);
       final manga = Manga.fromDatabase(raw.firstOrNull);
 
+      if (manga != null) return Success(manga);
+
       final Manga data;
       if (source == SourceEnum.mangadex) {
         data = await _mangadex(source: source, mangaId: mangaId);

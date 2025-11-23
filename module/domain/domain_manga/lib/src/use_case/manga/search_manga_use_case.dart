@@ -152,9 +152,7 @@ class SearchMangaUseCase with SyncMangasMixin {
       );
     });
 
-    if (data != null && useCache) {
-      return Success(data);
-    }
+    if (data != null && useCache) return Success(data);
 
     try {
       final Pagination<Manga> data;
