@@ -96,14 +96,6 @@ class GetMangaUseCase with SyncMangasMixin {
     return manga.copyWith(source: source.name, webUrl: url);
   }
 
-  Future<void> clearCache({
-    required SourceEnum source,
-    required String mangaId,
-  }) async {
-    final key = '$source-$mangaId';
-    await _mangaCacheManager.removeFile(key);
-  }
-
   Future<Result<Manga>> execute({
     required SourceEnum source,
     required String mangaId,

@@ -103,15 +103,6 @@ class GetChapterUseCase with SyncChaptersMixin {
     return parser.images;
   }
 
-  Future<void> clearCache({
-    required SourceEnum source,
-    required String mangaId,
-    required String chapterId,
-  }) async {
-    final key = '${source.name} - $mangaId - $chapterId';
-    await _converterCacheManager.removeFile(key);
-  }
-
   Future<Result<Chapter>> execute({
     required SourceEnum source,
     required String mangaId,

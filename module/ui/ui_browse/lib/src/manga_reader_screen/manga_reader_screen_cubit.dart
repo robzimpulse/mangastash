@@ -69,18 +69,6 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     emit(state.copyWith(chapterIds: [...response.map((e) => e.id).nonNulls]));
   }
 
-  Future<void> _clearChapterCache() async {
-    final chapterId = state.chapterId;
-    final mangaId = state.mangaId;
-    final source = state.source;
-    if (chapterId == null || mangaId == null || source == null) return;
-    await _getChapterUseCase.clearCache(
-      source: source,
-      mangaId: mangaId,
-      chapterId: chapterId,
-    );
-  }
-
   Future<void> _fetchChapter({bool useCache = true}) async {
     final chapterId = state.chapterId;
     final mangaId = state.mangaId;
@@ -117,7 +105,6 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
 
   void recrawl({required BuildContext context, required String url}) async {
     await _recrawlUseCase.execute(context: context, url: url);
-    await _clearChapterCache();
     await init(useCache: false);
   }
 }
