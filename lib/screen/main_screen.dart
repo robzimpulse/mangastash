@@ -1,19 +1,20 @@
+import 'package:core_network/core_network.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ui_common/ui_common.dart';
 import 'package:universal_io/io.dart';
 
 class MainScreen extends StatelessWidget {
   final Widget child;
-
   final int index;
-
   final ValueSetter<int>? onTapMenu;
   final AsyncValueGetter<bool?>? onTapClosedApps;
+  final HeadlessWebviewUseCase headlessWebviewUseCase;
 
   const MainScreen({
     super.key,
     required this.child,
     required this.index,
+    required this.headlessWebviewUseCase,
     this.onTapMenu,
     this.onTapClosedApps,
   });
@@ -47,10 +48,7 @@ class MainScreen extends StatelessWidget {
     final isPhone = ResponsiveBreakpoints.of(context).isPhone;
     if (isMobile || isPhone) return child;
     final menus = _menus.entries.map(
-      (e) => NavigationRailDestination(
-        icon: Icon(e.value),
-        label: Text(e.key),
-      ),
+      (e) => NavigationRailDestination(icon: Icon(e.value), label: Text(e.key)),
     );
     return Row(
       children: [
@@ -63,6 +61,19 @@ class MainScreen extends StatelessWidget {
           selectedIndex: index,
         ),
         Expanded(child: child),
+        StreamBuilder(
+          stream: headlessWebviewUseCase.onCloudFlareChallenge.distinct(),
+          builder: (context, snapshot) {
+            final url = snapshot.data;
+            if (url != null) {
+              context.showSnackBar(
+                message: 'Url $url need cloudflare challenge',
+              );
+            }
+
+            return const SizedBox.shrink();
+          },
+        ),
       ],
     );
   }
@@ -72,10 +83,7 @@ class MainScreen extends StatelessWidget {
     final isPhone = ResponsiveBreakpoints.of(context).isPhone;
     if (!(isMobile || isPhone)) return null;
     final menus = _menus.entries.map(
-      (e) => BottomNavigationBarItem(
-        icon: Icon(e.value),
-        label: e.key,
-      ),
+      (e) => BottomNavigationBarItem(icon: Icon(e.value), label: e.key),
     );
     return BottomNavigationBar(
       key: const Key('bottom_navigation_bar'),
