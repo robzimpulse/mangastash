@@ -85,7 +85,7 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
       final raw = await _mangaDao.search(webUrls: [url]);
       final manga = Manga.fromDatabase(raw.firstOrNull);
 
-      if (manga != null) return Success(manga);
+      if (manga != null && manga.propertiesFilled) return Success(manga);
 
       final results = await sync(
         dao: _mangaDao,
