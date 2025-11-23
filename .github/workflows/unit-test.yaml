@@ -26,7 +26,8 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.32.8'
-          cache: true
+          # disable cache, ref: https://github.com/subosito/flutter-action/issues/350
+          cache: false
 
       - name: 'Install Melos'
         run: flutter pub global activate melos 6.2.0
