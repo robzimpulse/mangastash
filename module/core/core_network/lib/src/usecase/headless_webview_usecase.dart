@@ -1,3 +1,4 @@
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 
 abstract class HeadlessWebviewUseCase {
@@ -13,5 +14,5 @@ abstract class HeadlessWebviewUseCase {
     Map<String, String>? headers,
   });
 
-  Stream<String> get onCloudFlareChallenge;
+  Stream<WebUri> get onCloudFlareChallenge;
 }
