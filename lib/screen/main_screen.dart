@@ -1,4 +1,3 @@
-import 'package:core_network/core_network.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ui_common/ui_common.dart';
 import 'package:universal_io/io.dart';
@@ -8,13 +7,11 @@ class MainScreen extends StatelessWidget {
   final int index;
   final ValueSetter<int>? onTapMenu;
   final AsyncValueGetter<bool?>? onTapClosedApps;
-  final HeadlessWebviewUseCase headlessWebviewUseCase;
 
   const MainScreen({
     super.key,
     required this.child,
     required this.index,
-    required this.headlessWebviewUseCase,
     this.onTapMenu,
     this.onTapClosedApps,
   });
@@ -61,19 +58,6 @@ class MainScreen extends StatelessWidget {
           selectedIndex: index,
         ),
         Expanded(child: child),
-        StreamBuilder(
-          stream: headlessWebviewUseCase.onCloudFlareChallenge.distinct(),
-          builder: (context, snapshot) {
-            final url = snapshot.data;
-            if (url != null) {
-              context.showSnackBar(
-                message: 'Url $url need cloudflare challenge',
-              );
-            }
-
-            return const SizedBox.shrink();
-          },
-        ),
       ],
     );
   }

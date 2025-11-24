@@ -66,7 +66,6 @@ class MainRouteBuilder extends BaseRouteBuilder {
     return StatefulShellRoute.indexedStack(
       builder: (context, state, shell) {
         return MainScreen(
-          headlessWebviewUseCase: locator(),
           index: shell.currentIndex,
           onTapMenu: (index) {
             shell.goBranch(index, initialLocation: index == shell.currentIndex);

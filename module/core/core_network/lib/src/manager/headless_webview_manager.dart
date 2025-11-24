@@ -15,7 +15,6 @@ import '../usecase/headless_webview_usecase.dart';
 
 class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   final LogBox _log;
-  final StreamController<WebUri> _onCloudflareChallenge;
   final HtmlCacheManager _htmlCacheManager;
 
   final Map<(String, List<String>, bool), Future<Document?>> _cDocument = {};
@@ -28,18 +27,13 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     required LogBox log,
     required HtmlCacheManager htmlCacheManager,
   }) : _log = log,
-       _onCloudflareChallenge = StreamController<WebUri>.broadcast(),
        _htmlCacheManager = htmlCacheManager;
 
   Future<void> dispose() async {
     await Future.wait([
       for (final instance in _instances.values) instance.dispose(),
-      _onCloudflareChallenge.close(),
     ]);
   }
-
-  @override
-  Stream<WebUri> get onCloudFlareChallenge => _onCloudflareChallenge.stream;
 
   @override
   Future<Document?> open(
@@ -299,16 +293,17 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
 
     final title = await webview.webViewController?.getTitle();
 
-    if (title == 'Just a moment...') {
-      _onCloudflareChallenge.add(uri);
-    }
-
     await webview.dispose();
 
     _instances.remove(webview.hashCode);
 
     if (html == null) {
       delegate.set(error: Exception('Null Html'), loading: false);
+      return null;
+    }
+
+    if (title == 'Just a moment...') {
+      delegate.set(error: Exception('Cloudflare Challenge'), loading: false);
       return null;
     }
 
