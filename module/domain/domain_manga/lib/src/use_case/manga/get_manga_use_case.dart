@@ -81,10 +81,6 @@ class GetMangaUseCase with SyncMangasMixin {
       useCache: useCache,
     );
 
-    if (document == null) {
-      throw FailedParsingHtmlException(url);
-    }
-
     final parser = MangaDetailHtmlParser.forSource(
       root: document,
       source: source,

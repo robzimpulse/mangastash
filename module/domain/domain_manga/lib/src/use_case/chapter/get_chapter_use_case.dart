@@ -90,10 +90,6 @@ class GetChapterUseCase with SyncChaptersMixin {
       useCache: useCache,
     );
 
-    if (document == null) {
-      throw FailedParsingHtmlException(url);
-    }
-
     final parser = ChapterImageHtmlParser.forSource(
       root: document,
       source: source,

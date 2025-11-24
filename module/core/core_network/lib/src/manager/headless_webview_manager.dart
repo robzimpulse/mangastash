@@ -10,6 +10,7 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:universal_io/io.dart';
 
+import '../exception/failed_parsing_html_exception.dart';
 import '../mixin/user_agent_mixin.dart';
 import '../usecase/headless_webview_usecase.dart';
 
@@ -17,7 +18,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   final LogBox _log;
   final HtmlCacheManager _htmlCacheManager;
 
-  final Map<(String, List<String>, bool), Future<Document?>> _cDocument = {};
+  final Map<(String, List<String>, bool), Future<Document>> _cDocument = {};
   final Map<(String, Map<String, String>?, bool), Future<String>> _cImage = {};
   final Map<int, HeadlessInAppWebView> _instances = {};
 
@@ -36,7 +37,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   }
 
   @override
-  Future<Document?> open(
+  Future<Document> open(
     String url, {
     List<String> scripts = const [],
     bool useCache = true,
@@ -63,20 +64,20 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     );
   }
 
-  Future<Document?> _open(
+  Future<Document> _open(
     String url, {
     List<String> scripts = const [],
     bool useCache = true,
   }) async {
-    final uri = WebUri(url);
-    final html = await _fetch(
-      uri: uri,
-      scripts: scripts,
-      delegate: _log.inAppWebviewObserver,
-      useCache: useCache,
+    return parse(
+      await _fetch(
+        uri: WebUri(url),
+        scripts: scripts,
+        delegate: _log.inAppWebviewObserver,
+        useCache: useCache,
+      ),
+      sourceUrl: url,
     );
-    if (html == null) return null;
-    return parse(html, sourceUrl: url);
   }
 
   Future<String> _image(
@@ -86,8 +87,11 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   }) async {
     final Completer<String> completer = Completer();
 
-    final stringHeaders =
-        headers == null ? '' : ', {headers: ${headers.toString()}}';
+    String stringHeaders = '';
+
+    if (headers != null) {
+      stringHeaders = ', {headers: ${headers.toString()}}';
+    }
 
     await _fetch(
       uri: WebUri(url),
@@ -160,7 +164,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     return completer.future;
   }
 
-  Future<String?> _fetch({
+  Future<String> _fetch({
     required WebUri uri,
     required InAppWebviewObserver delegate,
     UnmodifiableListView<UserScript>? initialUserScripts,
@@ -299,12 +303,12 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
 
     if (html == null) {
       delegate.set(error: Exception('Null Html'), loading: false);
-      return null;
+      throw FailedParsingHtmlException(uri.toString());
     }
 
     if (title == 'Just a moment...') {
       delegate.set(error: Exception('Cloudflare Challenge'), loading: false);
-      return null;
+      throw FailedParsingHtmlException(uri.toString());
     }
 
     await _htmlCacheManager.putFile(

@@ -113,10 +113,6 @@ class SearchChapterUseCase
       useCache: useCache,
     );
 
-    if (document == null) {
-      throw FailedParsingHtmlException(url);
-    }
-
     final parser = ChapterListHtmlParser.forSource(
       root: document,
       source: parameter.source,
