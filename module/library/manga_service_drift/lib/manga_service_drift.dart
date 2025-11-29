@@ -1,4 +1,4 @@
-library manga_service_drift;
+library;
 
 export 'package:drift/src/runtime/data_class.dart';
 

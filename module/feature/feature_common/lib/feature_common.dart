@@ -1,4 +1,4 @@
-library feature_common;
+library;
 
 export 'package:ui_common/ui_common.dart';
 

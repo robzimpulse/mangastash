@@ -83,10 +83,6 @@ class GetTagsUseCase with SyncTagsMixin {
       useCache: useCache,
     );
 
-    if (document == null) {
-      throw FailedParsingHtmlException(url);
-    }
-
     final parser = TagListHtmlParser.forSource(
       root: document,
       source: source,

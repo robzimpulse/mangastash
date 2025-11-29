@@ -43,12 +43,15 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     await super.close();
   }
 
-  Future<void> init() async {
+  Future<void> init({bool useCache = true}) async {
     emit(state.copyWith(error: () => null));
-    await Future.wait([_fetchChapter(), _fetchPreviousAndNextChapter()]);
+    await Future.wait([
+      _fetchChapter(useCache: useCache),
+      _fetchPreviousAndNextChapter(useCache: useCache),
+    ]);
   }
 
-  Future<void> _fetchPreviousAndNextChapter() async {
+  Future<void> _fetchPreviousAndNextChapter({bool useCache = true}) async {
     final mangaId = state.mangaId;
     final source = state.source;
 
@@ -60,24 +63,13 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
       parameter: state.parameter.copyWith(
         orders: {ChapterOrders.chapter: OrderDirections.ascending},
       ),
+      useCache: useCache,
     );
 
     emit(state.copyWith(chapterIds: [...response.map((e) => e.id).nonNulls]));
   }
 
-  Future<void> _clearChapterCache() async {
-    final chapterId = state.chapterId;
-    final mangaId = state.mangaId;
-    final source = state.source;
-    if (chapterId == null || mangaId == null || source == null) return;
-    await _getChapterUseCase.clearCache(
-      source: source,
-      mangaId: mangaId,
-      chapterId: chapterId,
-    );
-  }
-
-  Future<void> _fetchChapter() async {
+  Future<void> _fetchChapter({bool useCache = true}) async {
     final chapterId = state.chapterId;
     final mangaId = state.mangaId;
     final source = state.source;
@@ -97,6 +89,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
       chapterId: chapterId,
       mangaId: mangaId,
       source: source,
+      useCache: useCache,
     );
 
     if (response is Success<Chapter>) {
@@ -112,7 +105,6 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
 
   void recrawl({required BuildContext context, required String url}) async {
     await _recrawlUseCase.execute(context: context, url: url);
-    await _clearChapterCache();
-    await init();
+    await init(useCache: false);
   }
 }

@@ -1,4 +1,4 @@
-library ui_common;
+library;
 
 export 'package:autoscale_tabbarview/autoscale_tabbarview.dart';
 export 'package:cached_network_image/cached_network_image.dart';

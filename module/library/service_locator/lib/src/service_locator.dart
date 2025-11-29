@@ -104,7 +104,7 @@ abstract class ServiceLocator {
   /// than one instance of one type. Its highly not recommended
   ///
   /// example:
-  ///    locator.registerFactoryParam<TestClassParam,String,int>((s,i)
+  ///    locator.registerFactoryParam`<`TestClassParam,String,int>((s,i)
   ///        => TestClassParam(param1:s, param2: i));
   ///
   /// if you only use one parameter:

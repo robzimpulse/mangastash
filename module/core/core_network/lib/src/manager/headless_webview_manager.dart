@@ -10,16 +10,19 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:universal_io/io.dart';
 
+import '../exception/failed_parsing_html_exception.dart';
 import '../mixin/user_agent_mixin.dart';
 import '../usecase/headless_webview_usecase.dart';
 
 class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   final LogBox _log;
-
   final HtmlCacheManager _htmlCacheManager;
 
-  final Map<(String, List<String>, bool), Future<Document?>> _cDocument = {};
+  final Map<(String, List<String>, bool), Future<Document>> _cDocument = {};
   final Map<(String, Map<String, String>?, bool), Future<String>> _cImage = {};
+  final Map<int, HeadlessInAppWebView> _instances = {};
+
+  final _imgExt = ['jpeg', 'jpg', 'gif', 'webp', 'png', 'ico', 'bmp', 'wbmp'];
 
   HeadlessWebviewManager({
     required LogBox log,
@@ -27,8 +30,14 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   }) : _log = log,
        _htmlCacheManager = htmlCacheManager;
 
+  Future<void> dispose() async {
+    await Future.wait([
+      for (final instance in _instances.values) instance.dispose(),
+    ]);
+  }
+
   @override
-  Future<Document?> open(
+  Future<Document> open(
     String url, {
     List<String> scripts = const [],
     bool useCache = true,
@@ -55,20 +64,20 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     );
   }
 
-  Future<Document?> _open(
+  Future<Document> _open(
     String url, {
     List<String> scripts = const [],
     bool useCache = true,
   }) async {
-    final uri = WebUri(url);
-    final html = await _fetch(
-      uri: uri,
-      scripts: scripts,
-      delegate: _log.inAppWebviewObserver,
-      useCache: useCache,
+    return parse(
+      await _fetch(
+        uri: WebUri(url),
+        scripts: scripts,
+        delegate: _log.inAppWebviewObserver,
+        useCache: useCache,
+      ),
+      sourceUrl: url,
     );
-    if (html == null) return null;
-    return parse(html, sourceUrl: url);
   }
 
   Future<String> _image(
@@ -78,8 +87,11 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   }) async {
     final Completer<String> completer = Completer();
 
-    final stringHeaders =
-        headers == null ? '' : ', {headers: ${headers.toString()}}';
+    String stringHeaders = '';
+
+    if (headers != null) {
+      stringHeaders = ', {headers: ${headers.toString()}}';
+    }
 
     await _fetch(
       uri: WebUri(url),
@@ -109,18 +121,33 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
           if (data is! String) {
             _log.log(
               'Failed to download image [$url]',
+              extra: {'url': url, 'args': args},
               name: runtimeType.toString(),
             );
             return;
           }
 
-          _log.log(
-            'Success to download image [$url]',
-            name: runtimeType.toString(),
-            extra: {'url': url, 'data': data},
-          );
+          final values = data.split(RegExp(r'[:;,]+'));
+          final ext = values[1].split('/').lastOrNull;
 
-          completer.safeComplete(data);
+          if (_imgExt.contains(ext)) {
+            _log.log(
+              'Success download image [$url]',
+              name: runtimeType.toString(),
+              extra: {'url': url, 'data': data},
+            );
+            completer.safeComplete(data);
+          } else {
+            _log.log(
+              'Failed download image [$url]',
+              name: runtimeType.toString(),
+              error: Exception('Image format $ext not supported'),
+              extra: {'url': url, 'args': args},
+            );
+            completer.safeCompleteError(
+              Exception('Image format $ext not supported'),
+            );
+          }
         },
         'reject': (args) {
           _log.log(
@@ -128,7 +155,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
             name: runtimeType.toString(),
             extra: {'url': url, 'error': args.toString()},
           );
-          completer.completeError(args);
+          completer.safeCompleteError(Exception('Error fetch image'));
         },
       },
       signalComplete: completer.future,
@@ -137,7 +164,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     return completer.future;
   }
 
-  Future<String?> _fetch({
+  Future<String> _fetch({
     required WebUri uri,
     required InAppWebviewObserver delegate,
     UnmodifiableListView<UserScript>? initialUserScripts,
@@ -243,6 +270,8 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       },
     );
 
+    _instances[webview.hashCode] = webview;
+
     await Future.wait([
       webview.run(),
       onLoadStartCompleter.future,
@@ -266,11 +295,20 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
 
     final html = await webview.webViewController?.getHtml();
 
+    final title = await webview.webViewController?.getTitle();
+
     await webview.dispose();
+
+    _instances.remove(webview.hashCode);
 
     if (html == null) {
       delegate.set(error: Exception('Null Html'), loading: false);
-      return null;
+      throw FailedParsingHtmlException(uri.toString());
+    }
+
+    if (title == 'Just a moment...') {
+      delegate.set(error: Exception('Cloudflare Challenge'), loading: false);
+      throw FailedParsingHtmlException(uri.toString());
     }
 
     await _htmlCacheManager.putFile(

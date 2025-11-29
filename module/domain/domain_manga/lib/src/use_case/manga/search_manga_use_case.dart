@@ -93,10 +93,6 @@ class SearchMangaUseCase with SyncMangasMixin {
       useCache: useCache,
     );
 
-    if (document == null) {
-      throw FailedParsingHtmlException(url);
-    }
-
     final parser = MangaListHtmlParser.forSource(
       root: document,
       source: parameter.source,
@@ -152,9 +148,7 @@ class SearchMangaUseCase with SyncMangasMixin {
       );
     });
 
-    if (data != null && useCache) {
-      return Success(data);
-    }
+    if (data != null && useCache) return Success(data);
 
     try {
       final Pagination<Manga> data;

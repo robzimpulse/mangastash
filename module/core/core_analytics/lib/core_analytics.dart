@@ -1,4 +1,4 @@
-library core_analytics;
+library;
 
 export 'package:log_box/log_box.dart';
 export 'package:log_box_dio_logger/log_box_dio_logger.dart';

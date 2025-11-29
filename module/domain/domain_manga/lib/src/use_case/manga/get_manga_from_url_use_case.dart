@@ -56,10 +56,6 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
       useCache: useCache,
     );
 
-    if (document == null) {
-      throw FailedParsingHtmlException(url);
-    }
-
     final parser = MangaDetailHtmlParser.forSource(
       root: document,
       source: source,
@@ -84,6 +80,8 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
     try {
       final raw = await _mangaDao.search(webUrls: [url]);
       final manga = Manga.fromDatabase(raw.firstOrNull);
+
+      if (manga != null && manga.propertiesFilled) return Success(manga);
 
       final results = await sync(
         dao: _mangaDao,

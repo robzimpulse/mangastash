@@ -1,18 +1,64 @@
+import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
+import 'package:core_route/core_route.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:ios_willpop_transition_theme/ios_willpop_transition_theme.dart';
+import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-class AppsScreen extends StatelessWidget {
-  final RouterConfig<Object>? routerConfig;
+import '../main_path.dart';
+import '../main_route.dart';
 
-  final ListenThemeUseCase listenThemeUseCase;
+class AppsScreen extends StatefulWidget {
+  final ServiceLocator locator;
+
+  /// expose handler for setting up crash logger since overriding
+  /// [PlatformDispatcher] or [FlutterError] caused issue on unit test
+  final ValueSetter<LogBox> setupError;
 
   const AppsScreen({
     super.key,
-    required this.listenThemeUseCase,
-    this.routerConfig,
+    required this.locator,
+    required this.setupError,
   });
+
+  @override
+  State<AppsScreen> createState() => _AppsScreenState();
+}
+
+class _AppsScreenState extends State<AppsScreen> {
+  late final ListenThemeUseCase _listenThemeUseCase = widget.locator();
+
+  late final RouterConfig<Object> _routerConfig;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final rootNavigatorKey = GlobalKey<NavigatorState>();
+    final LogBox logBox = widget.locator();
+    final DatabaseViewer viewer = widget.locator();
+    _routerConfig = GoRouter(
+      navigatorKey: rootNavigatorKey,
+      initialLocation: MainPath.main,
+      onException: (context, state, router) {
+        router.push(
+          MainPath.notFound,
+          extra: 'Path Not Found (${state.uri.toString()})',
+        );
+      },
+      routes: MainRouteBuilder().allRoutes(
+        locator: widget.locator,
+        rootNavigatorKey: rootNavigatorKey,
+        // TODO: add observer here
+        observers: () => [logBox.observer],
+      ),
+      observers: [logBox.observer, viewer.navigatorObserver],
+    );
+
+    widget.setupError(widget.locator.get());
+  }
 
   PageTransitionsTheme _transition() {
     return const PageTransitionsTheme(
@@ -74,13 +120,13 @@ class AppsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<ThemeData>(
-      stream: listenThemeUseCase.themeDataStream,
+      stream: _listenThemeUseCase.themeDataStream,
       builder: (context, snapshot) {
         final isDarkMode = snapshot.data?.brightness == Brightness.dark;
         return MaterialApp.router(
           title: 'Manga Stash',
           debugShowCheckedModeBanner: false,
-          routerConfig: routerConfig,
+          routerConfig: _routerConfig,
           theme: _themeLight().copyWith(pageTransitionsTheme: _transition()),
           darkTheme: _themeDark().copyWith(pageTransitionsTheme: _transition()),
           themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,

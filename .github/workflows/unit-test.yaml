@@ -1,6 +1,15 @@
-name: Unit Test on Pull Request
+name: Unit Test
 
-on: [pull_request]
+on:
+  # ref: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request
+  pull_request:
+    types: [opened, reopened, synchronize]
+  # ref: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#push
+  push:
+    branches:
+      - 'master'
+    tags:
+      - 'v*.*.*'
 
 jobs:
   test:
@@ -17,7 +26,8 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.32.8'
-          cache: true
+          # disable cache, ref: https://github.com/subosito/flutter-action/issues/350
+          cache: false
 
       - name: 'Install Melos'
         run: flutter pub global activate melos 6.2.0
