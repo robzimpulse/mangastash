@@ -7,9 +7,11 @@ import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:flutter/foundation.dart';
+import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
+import 'firebase_options.dart';
 import 'screen/apps_screen.dart';
 import 'screen/error_screen.dart';
 import 'screen/splash_screen.dart';
@@ -25,6 +27,8 @@ void main() async {
       locatorBuilder: () {
         return Future(() async {
           final locator = ServiceLocator.asNewInstance();
+
+          locator.registerFactory(() => DefaultFirebaseOptions.currentPlatform);
 
           // TODO: register module registrar here
           await locator.registerRegistrar(CoreAnalyticsRegistrar());
