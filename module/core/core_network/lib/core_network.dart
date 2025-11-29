@@ -1,4 +1,4 @@
-library core_network;
+library;
 
 export 'package:dio/dio.dart';
 export 'package:flutter_inappwebview/flutter_inappwebview.dart' show CookieManager;

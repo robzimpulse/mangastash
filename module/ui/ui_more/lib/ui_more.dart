@@ -1,4 +1,4 @@
-library ui_more;
+library;
 
 export 'src/about_screen/about_screen.dart';
 export 'src/advanced_screen/advanced_screen.dart';

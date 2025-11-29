@@ -1,4 +1,4 @@
-library core_environment;
+library;
 
 export 'package:intl/intl.dart';
 export 'package:package_info_plus/package_info_plus.dart';

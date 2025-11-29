@@ -1,4 +1,4 @@
-library manga_dex_api;
+library;
 
 export 'src/enums/boolean_to_string_enum.dart';
 export 'src/enums/content_rating.dart';

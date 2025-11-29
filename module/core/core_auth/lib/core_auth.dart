@@ -1,4 +1,4 @@
-library core_auth;
+library;
 
 export 'package:manga_service_firebase/manga_service_firebase.dart' show User;
 

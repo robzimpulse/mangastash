@@ -1,4 +1,4 @@
-library entity_manga;
+library;
 
 export 'src/base/pagination.dart';
 export 'src/chapter.dart';

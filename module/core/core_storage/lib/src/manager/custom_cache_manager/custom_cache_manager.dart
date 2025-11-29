@@ -11,6 +11,7 @@ class CustomCacheManager implements BaseCacheManager {
 
   CustomCacheManager(Config config) {
     _cacheStore = CustomCacheStore(config);
+    /// ignore: invalid_use_of_visible_for_testing_member
     _cache = CacheManager.custom(config, cacheStore: _cacheStore);
   }
 
