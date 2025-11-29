@@ -7,7 +7,6 @@ import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:flutter/foundation.dart';
-import 'package:manga_service_firebase/manga_service_firebase.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
