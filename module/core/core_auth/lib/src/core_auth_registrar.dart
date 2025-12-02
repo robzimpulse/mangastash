@@ -17,6 +17,9 @@ class CoreAuthRegistrar extends Registrar {
 
     final LogBox log = locator();
 
+    locator.registerLazySingletonAsync(
+      () => Firebase.initializeApp(options: locator.getOrNull()),
+    );
     locator.registerFactory(() => AuthService(app: locator()));
     locator.registerFactory(
       () => LoginAnonymouslyUseCase(authService: locator()),
