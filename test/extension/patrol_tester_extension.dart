@@ -1,4 +1,3 @@
-
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
@@ -15,9 +14,10 @@ import 'package:mangastash/screen/splash_screen.dart';
 import 'package:mangastash/screen/wrapper_screen.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 import 'package:service_locator/service_locator.dart';
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
 import '../fake/fake_method_channel.dart';
-import '../mock/mock_shared_preferences_async.dart';
 import '../mock/mock_storage_manager.dart';
 
 typedef OnRunTest = Future<void> Function(ServiceLocator l, PatrolTester $);
@@ -81,6 +81,14 @@ void testScreen(
       },
     );
 
+    /// set initial values for shared preferences
+    SharedPreferencesAsyncPlatform.instance =
+        InMemorySharedPreferencesAsync.empty();
+
+    /// set initial values for shared preferences for legacy code
+    /// ignore: invalid_use_of_visible_for_testing_member
+    SharedPreferences.setMockInitialValues({});
+
     await $.pumpWidget(
       WrapperScreen(
         locatorBuilder: () {
@@ -95,9 +103,6 @@ void testScreen(
             await locator.registerRegistrar(CoreRouteRegistrar());
             await locator.registerRegistrar(DomainMangaRegistrar());
 
-            locator.registerSingleton<SharedPreferencesAsync>(
-              MockSharedPreferencesAsync(),
-            );
             locator.registerSingleton<Executor>(MemoryExecutor());
             locator.registerSingleton<ImageCacheManager>(
               MockImageCacheManager(),

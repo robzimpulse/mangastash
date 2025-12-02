@@ -69,6 +69,7 @@ dev_dependencies:
   mocktail: ^1.0.4
   patrol_finders: ^2.8.2
   flutter_lints: ^5.0.0
+  shared_preferences_platform_interface: ^2.4.1
 
 flutter:
   uses-material-design: true
