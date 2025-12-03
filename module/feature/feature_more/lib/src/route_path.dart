@@ -3,7 +3,7 @@ class MoreRoutePath {
   static const aboutUs = '$setting/about_us';
   static const advanced = '$setting/advanced';
   static const appearance = '$setting/appearance';
-  static const backupRestore = '$setting/backup_restore';
+  static const dataStorage = '$setting/data_storage';
   static const browse = '$setting/browse';
   static const downloadQueue = '/download_queue';
   static const download = '$setting/download';

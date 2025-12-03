@@ -4,17 +4,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:universal_io/universal_io.dart';
 
-import 'backup_restore_screen_state.dart';
+import 'data_storage_screen_state.dart';
 
-class BackupRestoreScreenCubit extends Cubit<BackupRestoreScreenState>
+class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
     with AutoSubscriptionMixin {
   final RestoreDatabaseUseCase _restoreDatabaseUseCase;
   final BackupDatabaseUseCase _backupDatabaseUseCase;
   final SetBackupPathUseCase _setBackupPathUseCase;
   final FilesystemPickerUsecase _filesystemPickerUsecase;
 
-  BackupRestoreScreenCubit({
-    BackupRestoreScreenState initialState = const BackupRestoreScreenState(),
+  DataStorageScreenCubit({
+    DataStorageScreenState initialState = const DataStorageScreenState(),
     required BackupDatabaseUseCase backupDatabaseUseCase,
     required RestoreDatabaseUseCase restoreDatabaseUseCase,
     required ListenBackupPathUseCase listenBackupPathUseCase,

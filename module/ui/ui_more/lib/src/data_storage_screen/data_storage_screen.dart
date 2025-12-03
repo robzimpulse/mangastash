@@ -3,16 +3,17 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
-import 'backup_restore_screen_cubit.dart';
-import 'backup_restore_screen_state.dart';
+import 'data_storage_screen_cubit.dart';
+import 'data_storage_screen_state.dart';
 
-class BackupRestoreScreen extends StatelessWidget {
-  const BackupRestoreScreen({super.key});
+
+class DataStorageScreen extends StatelessWidget {
+  const DataStorageScreen({super.key});
 
   static Widget create({required ServiceLocator locator}) {
     return BlocProvider(
       create: (context) {
-        return BackupRestoreScreenCubit(
+        return DataStorageScreenCubit(
           backupDatabaseUseCase: locator(),
           setBackupPathUseCase: locator(),
           listenBackupPathUseCase: locator(),
@@ -20,17 +21,17 @@ class BackupRestoreScreen extends StatelessWidget {
           filesystemPickerUsecase: locator(),
         );
       },
-      child: const BackupRestoreScreen(),
+      child: const DataStorageScreen(),
     );
   }
 
-  BackupRestoreScreenCubit _cubit(BuildContext context) => context.read();
+  DataStorageScreenCubit _cubit(BuildContext context) => context.read();
 
   BlocBuilder _builder({
-    required BlocWidgetBuilder<BackupRestoreScreenState> builder,
-    BlocBuilderCondition<BackupRestoreScreenState>? buildWhen,
+    required BlocWidgetBuilder<DataStorageScreenState> builder,
+    BlocBuilderCondition<DataStorageScreenState>? buildWhen,
   }) {
-    return BlocBuilder<BackupRestoreScreenCubit, BackupRestoreScreenState>(
+    return BlocBuilder<DataStorageScreenCubit, DataStorageScreenState>(
       buildWhen: buildWhen,
       builder: builder,
     );
@@ -39,7 +40,7 @@ class BackupRestoreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      appBar: AppBar(title: const Text('Backup and Restore')),
+      appBar: AppBar(title: const Text('Data and Storage')),
       body: CustomScrollView(
         slivers: [
           if (kIsWeb) ...[
