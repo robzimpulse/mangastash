@@ -15,10 +15,11 @@ class BackupRestoreScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) {
         return BackupRestoreScreenCubit(
-          database: locator(),
+          backupDatabaseUseCase: locator(),
           setBackupPathUseCase: locator(),
           listenBackupPathUseCase: locator(),
           getRootPathUseCase: locator(),
+          restoreDatabaseUseCase: locator(),
         );
       },
       child: const BackupRestoreScreen(),
@@ -92,16 +93,26 @@ class BackupRestoreScreen extends StatelessWidget {
               ),
             ),
             SliverToBoxAdapter(
-              child: ElevatedButton(
-                onPressed: () async {
-                  try {
-                    await _cubit(context).backup();
-                  } catch (e) {
-                    if (!context.mounted) return;
-                    context.showSnackBar(message: e.toString());
-                  }
-                },
-                child: Text('Backup'),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      context.showSnackBar(
+                        message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+                      );
+                    },
+                    child: Text('Backup'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.showSnackBar(
+                        message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+                      );
+                    },
+                    child: Text('Restore'),
+                  ),
+                ],
               ),
             ),
           ],

@@ -1,6 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:universal_io/universal_io.dart';
 
 import '../interceptor/log_interceptor.dart';
 import '../util/typedef.dart';
@@ -10,15 +12,18 @@ import 'adapter/sql_workaround_adapter.dart'
 
 class Executor {
   final LoggerCallback? _logger;
+  final String _name;
 
-  const Executor({LoggerCallback? logger}) : _logger = logger;
+  const Executor({LoggerCallback? logger, String name = 'mangastash-local'})
+    : _logger = logger,
+      _name = name;
 
   QueryExecutor build() {
     return LazyDatabase(() async {
       await sqlWorkaround();
 
       final executor = driftDatabase(
-        name: 'mangastash-local',
+        name: _name,
         native: DriftNativeOptions(
           databaseDirectory: () async {
             final directory = await getApplicationDocumentsDirectory();
@@ -42,5 +47,10 @@ class Executor {
 
       return executor.interceptWith(LogInterceptor(logger: _logger));
     });
+  }
+
+  Future<File> getDatabaseFile() async {
+    final directory = await getApplicationDocumentsDirectory();
+    return File(path.join(directory.path, '$_name.sqlite'));
   }
 }

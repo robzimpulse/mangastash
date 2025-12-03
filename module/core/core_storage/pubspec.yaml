@@ -19,6 +19,7 @@ dependencies:
   path: ^1.9.0
   dio: ^5.7.0
   universal_io: ^2.2.2
+  sqlite3: ^2.9.4
 
   service_locator:
     path: ../../library/service_locator
