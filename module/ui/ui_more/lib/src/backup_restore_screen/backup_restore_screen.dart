@@ -1,5 +1,3 @@
-import 'package:core_environment/core_environment.dart';
-import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -18,8 +16,8 @@ class BackupRestoreScreen extends StatelessWidget {
           backupDatabaseUseCase: locator(),
           setBackupPathUseCase: locator(),
           listenBackupPathUseCase: locator(),
-          getRootPathUseCase: locator(),
           restoreDatabaseUseCase: locator(),
+          filesystemPickerUsecase: locator(),
         );
       },
       child: const BackupRestoreScreen(),
@@ -59,34 +57,12 @@ class BackupRestoreScreen extends StatelessWidget {
                     title: const Text('Backup Location'),
                     subtitle: Text(state.backupPath?.path ?? '-'),
                     onTap: () async {
-                      final path = await FilesystemPicker.open(
-                        title: 'Save to folder',
-                        context: context,
-                        rootDirectory: state.rootPath,
-                        directory: state.backupPath,
-                        fsType: FilesystemType.folder,
-                        pickText: 'Save file to this folder',
-                        contextActions: [
-                          FilesystemPickerNewFolderContextAction(),
-                        ],
-                        requestPermission: () async {
-                          await [
-                            Permission.manageExternalStorage,
-                            Permission.storage,
-                          ].request();
+                      final e = await _cubit(context).setBackupPath(context);
+                      if (!context.mounted) return;
 
-                          final isGranted = await Future.wait([
-                            Permission.manageExternalStorage.isGranted,
-                            Permission.storage.isGranted,
-                          ]);
-
-                          return isGranted.any((e) => e);
-                        },
+                      context.showSnackBar(
+                        message: e != null ? '$e' : 'Success set backup path',
                       );
-
-                      if (!context.mounted || path == null) return;
-
-                      _cubit(context).setBackupPath(path);
                     },
                   );
                 },
@@ -97,17 +73,21 @@ class BackupRestoreScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      final e = await _cubit(context).backup(context);
+                      if (!context.mounted) return;
                       context.showSnackBar(
-                        message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+                        message: e != null ? '$e' : 'Success backup database',
                       );
                     },
                     child: Text('Backup'),
                   ),
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      final e = await _cubit(context).restore(context);
+                      if (!context.mounted) return;
                       context.showSnackBar(
-                        message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+                        message: e != null ? '$e' : 'Success restore database',
                       );
                     },
                     child: Text('Restore'),

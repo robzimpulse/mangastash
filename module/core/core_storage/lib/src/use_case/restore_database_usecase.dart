@@ -16,7 +16,7 @@ class RestoreDatabaseUseCase {
        _executor = executor;
 
   // Example: https://github.com/simolus3/drift/blob/96b3947fc16de99ffe25bcabc124e3b3a7c69571/examples/app/lib/screens/backup/supported.dart#L47-L68
-  Future<Result<void>> execute({required Directory file}) async {
+  Future<Result<void>> execute({required File file}) async {
     try {
       await _database.close();
 

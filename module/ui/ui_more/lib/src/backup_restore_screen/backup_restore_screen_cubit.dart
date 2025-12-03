@@ -1,5 +1,8 @@
+import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:safe_bloc/safe_bloc.dart';
+import 'package:universal_io/universal_io.dart';
 
 import 'backup_restore_screen_state.dart';
 
@@ -8,6 +11,7 @@ class BackupRestoreScreenCubit extends Cubit<BackupRestoreScreenState>
   final RestoreDatabaseUseCase _restoreDatabaseUseCase;
   final BackupDatabaseUseCase _backupDatabaseUseCase;
   final SetBackupPathUseCase _setBackupPathUseCase;
+  final FilesystemPickerUsecase _filesystemPickerUsecase;
 
   BackupRestoreScreenCubit({
     BackupRestoreScreenState initialState = const BackupRestoreScreenState(),
@@ -15,11 +19,12 @@ class BackupRestoreScreenCubit extends Cubit<BackupRestoreScreenState>
     required RestoreDatabaseUseCase restoreDatabaseUseCase,
     required ListenBackupPathUseCase listenBackupPathUseCase,
     required SetBackupPathUseCase setBackupPathUseCase,
-    required GetRootPathUseCase getRootPathUseCase,
+    required FilesystemPickerUsecase filesystemPickerUsecase,
   }) : _backupDatabaseUseCase = backupDatabaseUseCase,
        _setBackupPathUseCase = setBackupPathUseCase,
        _restoreDatabaseUseCase = restoreDatabaseUseCase,
-       super(initialState.copyWith(rootPath: getRootPathUseCase.rootPath)) {
+       _filesystemPickerUsecase = filesystemPickerUsecase,
+       super(initialState) {
     addSubscription(
       listenBackupPathUseCase.backupPathStream.listen(
         (e) => emit(state.copyWith(backupPath: e)),
@@ -27,49 +32,48 @@ class BackupRestoreScreenCubit extends Cubit<BackupRestoreScreenState>
     );
   }
 
-  void setBackupPath(String path) => _setBackupPathUseCase.setBackupPath(path);
+  Future<Exception?> setBackupPath(BuildContext context) async {
+    final directory = await _filesystemPickerUsecase.directory(context);
 
-  // Future<void> restore() async {
-  //   final db = ref.read(AppDatabase.provider);
-  //   await db.close();
-  //
-  //   // Open the selected database file
-  //   final backupFile = await FilePicker.platform.pickFiles();
-  //   if (backupFile == null) return;
-  //   final backupDb = sqlite3.open(backupFile.files.single.path!);
-  //
-  //   // Vacuum it into a temporary location first to make sure it's working.
-  //   final tempPath = await getTemporaryDirectory();
-  //   final tempDb = p.join(tempPath.path, 'import.db');
-  //   backupDb
-  //     ..execute('VACUUM INTO ?', [tempDb])
-  //     ..dispose();
-  //
-  //   // Then replace the existing database file with it.
-  //   final tempDbFile = File(tempDb);
-  //   await tempDbFile.copy((await databaseFile).path);
-  //   await tempDbFile.delete();
-  //
-  //   // And now, re-open the database!
-  //   ref.read(AppDatabase.provider.notifier).state = AppDatabase();
-  // }
+    if (directory is Success<Directory>) {
+      _setBackupPathUseCase.setBackupPath(directory.data.path);
+      return null;
+    }
 
-  // Future<void> createDatabaseBackup(DatabaseConnectionUser database) async {
-  //   final choosenDirectory = await FilePicker.platform.getDirectoryPath();
-  //   if (choosenDirectory == null) return;
-  //
-  //   final parent = Directory(choosenDirectory);
-  //   final file = File(p.join(choosenDirectory, 'drift_example_backup.db'));
-  //
-  //   // Make sure the directory of the file exists
-  //   if (!await parent.exists()) {
-  //     await parent.create(recursive: true);
-  //   }
-  //   // However, the file itself must not exist
-  //   if (await file.exists()) {
-  //     await file.delete();
-  //   }
-  //
-  //   await database.customStatement('VACUUM INTO ?', [file.absolute.path]);
-  // }
+    if (directory is Error<Directory>) {
+      return directory.error;
+    }
+
+    return Exception('Something went wrong');
+  }
+
+  Future<Exception?> backup(BuildContext context) async {
+    final directory = await _filesystemPickerUsecase.directory(context);
+
+    if (directory is Success<Directory>) {
+      await _backupDatabaseUseCase.execute(directory: directory.data);
+      return null;
+    }
+
+    if (directory is Error<Directory>) {
+      return directory.error;
+    }
+
+    return Exception('Something went wrong');
+  }
+
+  Future<Exception?> restore(BuildContext context) async {
+    final file = await _filesystemPickerUsecase.file(context);
+
+    if (file is Success<File>) {
+      await _restoreDatabaseUseCase.execute(file: file.data);
+      return null;
+    }
+
+    if (file is Error<File>) {
+      return file.error;
+    }
+
+    return Exception('Something went wrong');
+  }
 }
