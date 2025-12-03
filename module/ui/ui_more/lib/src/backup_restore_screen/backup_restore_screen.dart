@@ -1,3 +1,6 @@
+import 'package:core_environment/core_environment.dart';
+import 'package:filesystem_picker/filesystem_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -11,7 +14,12 @@ class BackupRestoreScreen extends StatelessWidget {
   static Widget create({required ServiceLocator locator}) {
     return BlocProvider(
       create: (context) {
-        return BackupRestoreScreenCubit(database: locator())..init();
+        return BackupRestoreScreenCubit(
+          database: locator(),
+          setBackupPathUseCase: locator(),
+          listenBackupPathUseCase: locator(),
+          getRootPathUseCase: locator(),
+        );
       },
       child: const BackupRestoreScreen(),
     );
@@ -35,47 +43,68 @@ class BackupRestoreScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Backup and Restore')),
       body: CustomScrollView(
         slivers: [
-          // TODO: @robzimpulse - broken on web
-          // _builder(
-          //   builder: (context, state) => SliverToBoxAdapter(
-          //     child: ListTile(
-          //       title: const Text('Backup Location'),
-          //       subtitle: Text(
-          //         state.backupPath?.path ?? 'Unsupported Platform',
-          //       ),
-          //       onTap: () async {
-          //         final path = await FilesystemPicker.open(
-          //           title: 'Save to folder',
-          //           context: context,
-          //           rootDirectory: state.rootPath,
-          //           directory: state.backupPath,
-          //           fsType: FilesystemType.folder,
-          //           pickText: 'Save file to this folder',
-          //           contextActions: [
-          //             FilesystemPickerNewFolderContextAction(),
-          //           ],
-          //           requestPermission: () async {
-          //             await [
-          //               Permission.manageExternalStorage,
-          //               Permission.storage,
-          //             ].request();
-          //
-          //             final isGranted = await Future.wait([
-          //               Permission.manageExternalStorage.isGranted,
-          //               Permission.storage.isGranted,
-          //             ]);
-          //
-          //             return isGranted.any((e) => e);
-          //           },
-          //         );
-          //
-          //         if (!context.mounted || path == null) return;
-          //
-          //         _cubit(context).setBackupPath(path);
-          //       },
-          //     ),
-          //   ),
-          // ),
+          if (kIsWeb) ...[
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(
+                child: Text('This feature were unsupported on Web'),
+              ),
+            ),
+          ] else ...[
+            SliverToBoxAdapter(
+              child: _builder(
+                builder: (context, state) {
+                  return ListTile(
+                    title: const Text('Backup Location'),
+                    subtitle: Text(state.backupPath?.path ?? '-'),
+                    onTap: () async {
+                      final path = await FilesystemPicker.open(
+                        title: 'Save to folder',
+                        context: context,
+                        rootDirectory: state.rootPath,
+                        directory: state.backupPath,
+                        fsType: FilesystemType.folder,
+                        pickText: 'Save file to this folder',
+                        contextActions: [
+                          FilesystemPickerNewFolderContextAction(),
+                        ],
+                        requestPermission: () async {
+                          await [
+                            Permission.manageExternalStorage,
+                            Permission.storage,
+                          ].request();
+
+                          final isGranted = await Future.wait([
+                            Permission.manageExternalStorage.isGranted,
+                            Permission.storage.isGranted,
+                          ]);
+
+                          return isGranted.any((e) => e);
+                        },
+                      );
+
+                      if (!context.mounted || path == null) return;
+
+                      _cubit(context).setBackupPath(path);
+                    },
+                  );
+                },
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: ElevatedButton(
+                onPressed: () async {
+                  try {
+                    await _cubit(context).backup();
+                  } catch (e) {
+                    if (!context.mounted) return;
+                    context.showSnackBar(message: e.toString());
+                  }
+                },
+                child: Text('Backup'),
+              ),
+            ),
+          ],
         ],
       ),
     );

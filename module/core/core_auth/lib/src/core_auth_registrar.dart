@@ -42,4 +42,9 @@ class CoreAuthRegistrar extends Registrar {
       extra: {'start': start, 'finish': DateTime.timestamp().toIso8601String()},
     );
   }
+
+  @override
+  Future<void> allReady(ServiceLocator locator) async {
+    await locator.isReady<FirebaseApp>();
+  }
 }
