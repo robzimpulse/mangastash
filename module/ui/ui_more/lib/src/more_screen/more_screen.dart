@@ -9,7 +9,7 @@ import 'more_screen_state.dart';
 class MoreScreen extends StatelessWidget {
   final VoidCallback? onTapSetting;
   final VoidCallback? onTapStatistic;
-  final VoidCallback? onTapBackupRestore;
+  final VoidCallback? onTapDataStorage;
   final VoidCallback? onTapDownloadQueue;
   final VoidCallback? onTapAbout;
   final VoidCallback? onTapHelp;
@@ -18,7 +18,7 @@ class MoreScreen extends StatelessWidget {
     super.key,
     this.onTapSetting,
     this.onTapStatistic,
-    this.onTapBackupRestore,
+    this.onTapDataStorage,
     this.onTapDownloadQueue,
     this.onTapAbout,
     this.onTapHelp,
@@ -28,7 +28,7 @@ class MoreScreen extends StatelessWidget {
     required ServiceLocator locator,
     VoidCallback? onTapSetting,
     VoidCallback? onTapStatistic,
-    VoidCallback? onTapBackupRestore,
+    VoidCallback? onTapDataStorage,
     VoidCallback? onTapDownloadQueue,
     VoidCallback? onTapAbout,
     VoidCallback? onTapHelp,
@@ -40,7 +40,7 @@ class MoreScreen extends StatelessWidget {
       child: MoreScreen(
         onTapSetting: onTapSetting,
         onTapStatistic: onTapStatistic,
-        onTapBackupRestore: onTapBackupRestore,
+        onTapDataStorage: onTapDataStorage,
         onTapDownloadQueue: onTapDownloadQueue,
         onTapAbout: onTapAbout,
       ),
@@ -139,11 +139,11 @@ class MoreScreen extends StatelessWidget {
                   ),
                 ),
                 ListTile(
-                  title: const Text('Backup and Restore'),
-                  onTap: onTapBackupRestore,
+                  title: const Text('Data and Storage'),
+                  onTap: onTapDataStorage,
                   leading: const SizedBox(
                     height: double.infinity,
-                    child: Icon(Icons.settings_backup_restore),
+                    child: Icon(Icons.storage),
                   ),
                 ),
                 const Divider(height: 1, thickness: 1),

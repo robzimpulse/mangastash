@@ -12,5 +12,5 @@ export 'src/use_case/backup_database_usecase.dart';
 export 'src/use_case/filesystem_picker_usecase.dart';
 export 'src/use_case/get_root_path_use_case.dart';
 export 'src/use_case/listen_backup_path_use_case.dart';
-export 'src/use_case/restore_database_usecase.dart';
+export 'src/use_case/restore_database_usecase/restore_database_usecase.dart';
 export 'src/use_case/set_backup_path_use_case.dart';

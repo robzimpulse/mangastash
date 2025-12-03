@@ -11,7 +11,7 @@ import 'use_case/filesystem_picker_usecase.dart';
 import 'use_case/get_root_path_use_case.dart';
 import 'use_case/listen_backup_path_use_case.dart';
 import 'use_case/listen_download_path_use_case.dart';
-import 'use_case/restore_database_usecase.dart';
+import 'use_case/restore_database_usecase/restore_database_usecase.dart';
 import 'use_case/set_backup_path_use_case.dart';
 import 'use_case/set_download_path_use_case.dart';
 
