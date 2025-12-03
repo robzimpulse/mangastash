@@ -42,12 +42,7 @@ class CoreStorageRegistrar extends Registrar {
     locator.alias<SetBackupPathUseCase, PathManager>();
     locator.alias<GetRootPathUseCase, PathManager>();
 
-    locator.registerFactory(
-      () => BackupDatabaseUseCase(
-        database: locator(),
-        listenBackupPathUseCase: locator(),
-      ),
-    );
+    locator.registerFactory(() => BackupDatabaseUseCase(database: locator()));
     locator.registerFactory(
       () => RestoreDatabaseUseCase(database: locator(), executor: locator()),
     );
