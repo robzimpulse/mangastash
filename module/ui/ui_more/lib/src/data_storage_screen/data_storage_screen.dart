@@ -6,7 +6,6 @@ import 'package:ui_common/ui_common.dart';
 import 'data_storage_screen_cubit.dart';
 import 'data_storage_screen_state.dart';
 
-
 class DataStorageScreen extends StatelessWidget {
   const DataStorageScreen({super.key});
 
@@ -14,10 +13,9 @@ class DataStorageScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) {
         return DataStorageScreenCubit(
-          backupDatabaseUseCase: locator(),
+          database: locator(),
           setBackupPathUseCase: locator(),
           listenBackupPathUseCase: locator(),
-          restoreDatabaseUseCase: locator(),
           filesystemPickerUsecase: locator(),
         );
       },
@@ -57,14 +55,7 @@ class DataStorageScreen extends StatelessWidget {
                   return ListTile(
                     title: const Text('Backup Location'),
                     subtitle: Text(state.backupPath?.path ?? '-'),
-                    onTap: () async {
-                      final e = await _cubit(context).setBackupPath(context);
-                      if (!context.mounted) return;
-
-                      context.showSnackBar(
-                        message: e != null ? '$e' : 'Success set backup path',
-                      );
-                    },
+                    onTap: () => _onTapSetBackupPath(context),
                   );
                 },
               ),
@@ -74,23 +65,11 @@ class DataStorageScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
-                    onPressed: () async {
-                      final e = await _cubit(context).backup(context);
-                      if (!context.mounted) return;
-                      context.showSnackBar(
-                        message: e != null ? '$e' : 'Success backup database',
-                      );
-                    },
+                    onPressed: () => _onTapBackup(context),
                     child: Text('Backup'),
                   ),
                   ElevatedButton(
-                    onPressed: () async {
-                      final e = await _cubit(context).restore(context);
-                      if (!context.mounted) return;
-                      context.showSnackBar(
-                        message: e != null ? '$e' : 'Success restore database',
-                      );
-                    },
+                    onPressed: () => _onTapRestore(context),
                     child: Text('Restore'),
                   ),
                 ],
@@ -100,5 +79,38 @@ class DataStorageScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _onTapRestore(BuildContext context) async {
+    try {
+      await _cubit(context).restore(context);
+      if (!context.mounted) return;
+      context.showSnackBar(message: 'Success restore database');
+    } catch (e) {
+      if (!context.mounted) return;
+      context.showSnackBar(message: e.toString());
+    }
+  }
+
+  void _onTapBackup(BuildContext context) async {
+    try {
+      final file = await _cubit(context).backup(context);
+      if (!context.mounted) return;
+      context.showSnackBar(message: 'Success backup database to ${file.path}');
+    } catch (e) {
+      if (!context.mounted) return;
+      context.showSnackBar(message: e.toString());
+    }
+  }
+
+  void _onTapSetBackupPath(BuildContext context) async {
+    try {
+      await _cubit(context).setBackupPath(context);
+      if (!context.mounted) return;
+      context.showSnackBar(message: 'Success set backup path');
+    } catch (e) {
+      if (!context.mounted) return;
+      context.showSnackBar(message: e.toString());
+    }
   }
 }

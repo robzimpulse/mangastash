@@ -8,22 +8,19 @@ import 'data_storage_screen_state.dart';
 
 class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
     with AutoSubscriptionMixin {
-  final RestoreDatabaseUseCase _restoreDatabaseUseCase;
-  final BackupDatabaseUseCase _backupDatabaseUseCase;
   final SetBackupPathUseCase _setBackupPathUseCase;
   final FilesystemPickerUsecase _filesystemPickerUsecase;
+  final AppDatabase _database;
 
   DataStorageScreenCubit({
     DataStorageScreenState initialState = const DataStorageScreenState(),
-    required BackupDatabaseUseCase backupDatabaseUseCase,
-    required RestoreDatabaseUseCase restoreDatabaseUseCase,
     required ListenBackupPathUseCase listenBackupPathUseCase,
     required SetBackupPathUseCase setBackupPathUseCase,
     required FilesystemPickerUsecase filesystemPickerUsecase,
-  }) : _backupDatabaseUseCase = backupDatabaseUseCase,
-       _setBackupPathUseCase = setBackupPathUseCase,
-       _restoreDatabaseUseCase = restoreDatabaseUseCase,
+    required AppDatabase database,
+  }) : _setBackupPathUseCase = setBackupPathUseCase,
        _filesystemPickerUsecase = filesystemPickerUsecase,
+       _database = database,
        super(initialState) {
     addSubscription(
       listenBackupPathUseCase.backupPathStream.listen(
@@ -32,53 +29,32 @@ class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
     );
   }
 
-  Future<Exception?> setBackupPath(BuildContext context) async {
+  Future<void> setBackupPath(BuildContext context) async {
     final directory = await _filesystemPickerUsecase.directory(context);
-
+    if (directory is Error<Directory>) throw directory.error;
     if (directory is Success<Directory>) {
       _setBackupPathUseCase.setBackupPath(directory.data.path);
-      return null;
     }
-
-    if (directory is Error<Directory>) {
-      return directory.error;
-    }
-
-    return Exception('Something went wrong');
   }
 
-  Future<Exception?> backup(BuildContext context) async {
+  Future<File> backup(BuildContext context) async {
     final directory = await _filesystemPickerUsecase.directory(context);
-
+    if (directory is Error<Directory>) throw directory.error;
     if (directory is Success<Directory>) {
-      final result = await _backupDatabaseUseCase.execute(
-        directory: directory.data,
-      );
-
-      if (result is Success<File>) return null;
-      if (result is Error<File>) return result.error;
+      return _database.backup(directory: directory.data);
     }
-
-    if (directory is Error<Directory>) {
-      return directory.error;
-    }
-
-    return Exception('Something went wrong');
+    throw Exception('Something went wrong');
   }
 
-  Future<Exception?> restore(BuildContext context) async {
+  Future<void> restore(BuildContext context) async {
     final file = await _filesystemPickerUsecase.file(context);
 
     if (file is Success<File>) {
-      final result = await _restoreDatabaseUseCase.execute(file: file.data);
-      if (result is Success) return null;
-      if (result is Error) return result.error;
+      await _database.restore(file: file.data);
+      return;
     }
 
-    if (file is Error<File>) {
-      return file.error;
-    }
-
-    return Exception('Something went wrong');
+    if (file is Error<File>) throw file.error;
+    throw Exception('Something went wrong');
   }
 }

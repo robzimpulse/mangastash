@@ -1,28 +1,19 @@
-import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
+import 'package:manga_service_drift/src/database/memory_executor.dart';
 
 void main() {
   late AppDatabase db;
   late TagDao dao;
 
   setUp(() {
-    db = AppDatabase(
-      executor: DatabaseConnection(
-        NativeDatabase.memory(),
-        closeStreamsSynchronously: true,
-      ),
-    );
+    db = AppDatabase(executor: MemoryExecutor());
     dao = TagDao(db);
   });
 
   final values = List.generate(
     10,
-    (index) => TagTablesCompanion(
-      id: Value(index),
-      name: Value('name_$index'),
-    ),
+    (index) => TagTablesCompanion(id: Value(index), name: Value('name_$index')),
   );
 
   tearDown(() => db.close());
@@ -35,10 +26,7 @@ void main() {
     tearDown(() async => await db.clear());
 
     group('With New Value', () {
-      const value = TagTablesCompanion(
-        id: Value(11),
-        name: Value('name_new'),
-      );
+      const value = TagTablesCompanion(id: Value(11), name: Value('name_new'));
 
       group('Search Value', () {
         test('By Name', () async {
@@ -49,10 +37,7 @@ void main() {
         });
 
         test('By Id', () async {
-          expect(
-            (await dao.search(ids: [value.id.value])).length,
-            equals(0),
-          );
+          expect((await dao.search(ids: [value.id.value])).length, equals(0));
         });
       });
 
@@ -63,22 +48,12 @@ void main() {
             equals(0),
           );
 
-          expect(
-            (await dao.all).length,
-            equals(values.length),
-          );
+          expect((await dao.all).length, equals(values.length));
         });
 
         test('By Id', () async {
-          expect(
-            (await dao.remove(ids: [value.id.value])).length,
-            equals(0),
-          );
-
-          expect(
-            (await dao.all).length,
-            equals(values.length),
-          );
+          expect((await dao.remove(ids: [value.id.value])).length, equals(0));
+          expect((await dao.all).length, equals(values.length));
         });
       });
 
@@ -100,10 +75,7 @@ void main() {
         });
 
         test('By Id', () async {
-          expect(
-            (await dao.search(ids: [value.id.value])).length,
-            equals(1),
-          );
+          expect((await dao.search(ids: [value.id.value])).length, equals(1));
         });
       });
 
@@ -114,22 +86,12 @@ void main() {
             equals(1),
           );
 
-          expect(
-            (await dao.all).length,
-            equals(values.length - 1),
-          );
+          expect((await dao.all).length, equals(values.length - 1));
         });
 
         test('By Id', () async {
-          expect(
-            (await dao.remove(ids: [value.id.value])).length,
-            equals(1),
-          );
-
-          expect(
-            (await dao.all).length,
-            equals(values.length - 1),
-          );
+          expect((await dao.remove(ids: [value.id.value])).length, equals(1));
+          expect((await dao.all).length, equals(values.length - 1));
         });
       });
 
