@@ -19,7 +19,7 @@ class FilesystemPickerUsecase {
 
   Future<Result<Directory>> directory(BuildContext context) async {
     try {
-      final path = await picker(
+      final path = await _picker(
         context,
         FilesystemType.folder,
         contextActions: [FilesystemPickerNewFolderContextAction()],
@@ -33,7 +33,7 @@ class FilesystemPickerUsecase {
 
   Future<Result<File>> file(BuildContext context) async {
     try {
-      final path = await picker(context, FilesystemType.file);
+      final path = await _picker(context, FilesystemType.file);
       if (path == null) throw Exception('Path is null');
       return Success(File(path));
     } catch (e) {
@@ -41,7 +41,7 @@ class FilesystemPickerUsecase {
     }
   }
 
-  Future<String?> picker(
+  Future<String?> _picker(
     BuildContext context,
     FilesystemType? type, {
     List<FilesystemPickerContextAction> contextActions = const [],
@@ -54,6 +54,7 @@ class FilesystemPickerUsecase {
       fsType: type,
       pickText: 'Select current folder',
       contextActions: contextActions,
+      allowedExtensions: ['.sqlite'],
       requestPermission: () async {
         await [Permission.manageExternalStorage, Permission.storage].request();
 

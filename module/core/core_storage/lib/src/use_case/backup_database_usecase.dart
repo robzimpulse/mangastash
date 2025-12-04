@@ -12,7 +12,7 @@ class BackupDatabaseUseCase {
   // Example: https://github.com/simolus3/drift/blob/96b3947fc16de99ffe25bcabc124e3b3a7c69571/examples/app/lib/screens/backup/supported.dart#L47-L68
   Future<Result<File>> execute({required Directory directory}) async {
     try {
-      final name = 'mangastash_backup_${DateTime.timestamp().toString()}.db';
+      final name = 'mangastash_${DateTime.timestamp().toString()}.sqlite';
       final file = File(join(directory.path, name));
 
       // Make sure the directory of the file exists

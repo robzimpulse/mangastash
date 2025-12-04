@@ -51,8 +51,12 @@ class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
     final directory = await _filesystemPickerUsecase.directory(context);
 
     if (directory is Success<Directory>) {
-      await _backupDatabaseUseCase.execute(directory: directory.data);
-      return null;
+      final result = await _backupDatabaseUseCase.execute(
+        directory: directory.data,
+      );
+
+      if (result is Success<File>) return null;
+      if (result is Error<File>) return result.error;
     }
 
     if (directory is Error<Directory>) {
@@ -66,8 +70,9 @@ class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
     final file = await _filesystemPickerUsecase.file(context);
 
     if (file is Success<File>) {
-      await _restoreDatabaseUseCase.execute(file: file.data);
-      return null;
+      final result = await _restoreDatabaseUseCase.execute(file: file.data);
+      if (result is Success) return null;
+      if (result is Error) return result.error;
     }
 
     if (file is Error<File>) {
