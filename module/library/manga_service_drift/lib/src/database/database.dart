@@ -22,6 +22,9 @@ import '../tables/tag_tables.dart';
 import '../util/job_type_enum.dart';
 import 'executor.dart';
 
+import 'adapter/restore_database_unsupported.dart'
+    if (dart.library.ffi) 'adapter/restore_database_supported.dart';
+
 part 'database.g.dart';
 
 @DriftDatabase(
@@ -84,23 +87,7 @@ class AppDatabase extends _$AppDatabase {
     return file;
   }
 
-  // Example: https://github.com/simolus3/drift/blob/96b3947fc16de99ffe25bcabc124e3b3a7c69571/examples/app/lib/screens/backup/supported.dart#L47-L68
-  Future<void> restore({required File file}) async {
-    await close();
-
-    final backupDb = sqlite3.open(file.absolute.path);
-
-    // Vacuum it into a temporary location first to make sure it's working.
-    final tempPath = await getTemporaryDirectory();
-    final tempDb = join(tempPath.path, 'import.db');
-
-    backupDb
-      ..execute('VACUUM INTO ?', [tempDb])
-      ..dispose();
-
-    // Then replace the existing database file with it.
-    final tempDbFile = File(tempDb);
-    await tempDbFile.copy((await _executor.getDatabaseFile()).path);
-    await tempDbFile.delete();
+  Future<void> restore({required File file}) {
+    return restoreDatabase(file: file, database: this, executor: _executor);
   }
 }
