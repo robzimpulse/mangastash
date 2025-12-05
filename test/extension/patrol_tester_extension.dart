@@ -68,12 +68,25 @@ void testScreen(
     methodChannel.addChannel(
       channel: MethodChannel('flutter_timezone'),
       handler: (method) async {
-        if (method.method == 'getLocalTimezone') {
-          return timezone;
+        switch (method.method) {
+          case 'getLocalTimezone':
+            return timezone;
+          case 'getAvailableTimezones':
+            return availableTimezone;
         }
 
-        if (method.method == 'getAvailableTimezones') {
-          return availableTimezone;
+        throw Exception(
+          'Unhandled [${method.method}] with argument [${method.arguments}]',
+        );
+      },
+    );
+
+    methodChannel.addChannel(
+      channel: MethodChannel('plugins.flutter.io/path_provider'),
+      handler: (method) async {
+        switch (method.method) {
+          case 'getApplicationDocumentsDirectory':
+            return '/getApplicationDocumentsDirectory';
         }
 
         throw Exception(
