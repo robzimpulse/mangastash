@@ -156,5 +156,6 @@ class DataStorageScreen extends StatelessWidget {
     await _cubit(context).restoreBackup(file);
     if (!context.mounted) return;
     context.showSnackBar(message: 'Success restore backup');
+    WrapperScreen.restart(context);
   }
 }

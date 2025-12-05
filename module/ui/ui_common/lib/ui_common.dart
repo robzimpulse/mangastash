@@ -41,3 +41,4 @@ export 'src/widget/manga_item_widget.dart';
 export 'src/widget/manga_parameter_widget.dart';
 export 'src/widget/manga_tile_widget.dart';
 export 'src/widget/source_tile_widget.dart';
+export 'src/widget/wrapper_widget.dart';

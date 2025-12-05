@@ -14,18 +14,18 @@ import 'firebase_options.dart';
 import 'screen/apps_screen.dart';
 import 'screen/error_screen.dart';
 import 'screen/splash_screen.dart';
-import 'screen/wrapper_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Service locator/dependency injector code here
   ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
 
+  final locator = ServiceLocator.asNewInstance();
   runApp(
     WrapperScreen(
       locatorBuilder: () {
         return Future(() async {
-          final locator = ServiceLocator.asNewInstance();
+          await locator.reset();
 
           locator.registerFactory(() => DefaultFirebaseOptions.currentPlatform);
 

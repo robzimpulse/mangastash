@@ -18,10 +18,7 @@ class CoreStorageRegistrar extends Registrar {
 
     locator.registerFactory(() => const Executor());
     locator.registerLazySingleton(
-      () => AppDatabase(
-        executor: locator(),
-        onRestore: () => locator.resetLazySingleton<AppDatabase>(),
-      ),
+      () => AppDatabase(executor: locator()),
       dispose: (e) => e.close(),
     );
     locator.registerLazySingleton(() => DatabaseViewer());
