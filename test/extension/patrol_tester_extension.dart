@@ -17,7 +17,10 @@ import 'package:patrol_finders/patrol_finders.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+import 'package:universal_io/universal_io.dart';
 
+import '../fake/fake_directory.dart';
+import '../fake/fake_io_override.dart';
 import '../fake/fake_method_channel.dart';
 import '../mock/mock_storage_manager.dart';
 
@@ -106,61 +109,56 @@ void testScreen(
     /// mock firebase related feature
     setupFirebaseCoreMocks();
 
-    await $.pumpWidget(
-      WrapperScreen(
-        locatorBuilder: () {
-          return Future(() async {
-            locator.registerSingleton(methodChannel);
+    await IOOverrides.runWithIOOverrides(() async {
+      await $.tester.runAsync(() async {
+        locator.registerSingleton(methodChannel);
 
-            // TODO: register module registrar here
-            await locator.registerRegistrar(CoreAnalyticsRegistrar());
-            await locator.registerRegistrar(CoreStorageRegistrar());
-            await locator.registerRegistrar(CoreNetworkRegistrar());
-            await locator.registerRegistrar(CoreEnvironmentRegistrar());
-            await locator.registerRegistrar(CoreRouteRegistrar());
-            await locator.registerRegistrar(DomainMangaRegistrar());
+        // TODO: register module registrar here
+        await locator.registerRegistrar(CoreAnalyticsRegistrar());
+        await locator.registerRegistrar(CoreStorageRegistrar());
+        await locator.registerRegistrar(CoreNetworkRegistrar());
+        await locator.registerRegistrar(CoreEnvironmentRegistrar());
+        await locator.registerRegistrar(CoreRouteRegistrar());
+        await locator.registerRegistrar(DomainMangaRegistrar());
 
-            locator.registerSingleton<Executor>(MemoryExecutor());
-            locator.registerSingleton<ImageCacheManager>(
-              MockImageCacheManager(),
-            );
-            locator.registerSingleton<ConverterCacheManager>(
-              MockConverterCacheManager(),
-            );
-            locator.registerSingleton<TagCacheManager>(MockTagCacheManager());
-            locator.registerSingleton<MangaCacheManager>(
-              MockMangaCacheManager(),
-            );
-            locator.registerSingleton<ChapterCacheManager>(
-              MockChapterCacheManager(),
-            );
-            locator.registerSingleton<HtmlCacheManager>(MockHtmlCacheManager());
-            locator.registerSingleton<SearchChapterCacheManager>(
-              MockSearchChapterCacheManager(),
-            );
-            locator.registerSingleton<SearchMangaCacheManager>(
-              MockSearchMangaCacheManager(),
-            );
+        locator.registerSingleton<Executor>(MemoryExecutor());
+        locator.registerSingleton<ImageCacheManager>(MockImageCacheManager());
+        locator.registerSingleton<ConverterCacheManager>(
+          MockConverterCacheManager(),
+        );
+        locator.registerSingleton<TagCacheManager>(MockTagCacheManager());
+        locator.registerSingleton<MangaCacheManager>(MockMangaCacheManager());
+        locator.registerSingleton<ChapterCacheManager>(
+          MockChapterCacheManager(),
+        );
+        locator.registerSingleton<HtmlCacheManager>(MockHtmlCacheManager());
+        locator.registerSingleton<SearchChapterCacheManager>(
+          MockSearchChapterCacheManager(),
+        );
+        locator.registerSingleton<SearchMangaCacheManager>(
+          MockSearchMangaCacheManager(),
+        );
 
-            await onSetupTest?.call(locator);
+        await onSetupTest?.call(locator);
 
-            await locator.allReady();
+        await locator.allReady();
+      });
 
-            return locator;
-          });
-        },
-        appScreenBuilder: (_, locator) {
-          return AppsScreen(locator: locator, setupError: (logbox) {});
-        },
-        splashScreenBuilder: (_) => const SplashScreen(),
-        errorScreenBuilder: (_, error) => ErrorScreen(text: error.toString()),
-      ),
-    );
-
-    await $.pumpAndTrySettle();
-    await onRunTest.call(locator, $);
+      await $.pumpWidget(
+        WrapperScreen(
+          locatorBuilder: () => Future.value(locator),
+          appScreenBuilder: (_, locator) {
+            return AppsScreen(locator: locator, setupError: (logbox) {});
+          },
+          splashScreenBuilder: (_) => const SplashScreen(),
+          errorScreenBuilder: (_, error) => ErrorScreen(text: error.toString()),
+        ),
+      );
+      await $.pumpAndTrySettle();
+      await onRunTest.call(locator, $);
+      await $.pumpAndTrySettle();
+    }, FakeIOOverride(directory: FakeDirectory()));
     await $.tester.runAsync(() => locator.reset());
-    await $.pumpAndTrySettle();
     debugDefaultTargetPlatformOverride = null;
   });
 }
