@@ -1,4 +1,4 @@
-library service_locator;
+library;
 
 export 'package:lazy_evaluation/lazy_evaluation.dart';
 

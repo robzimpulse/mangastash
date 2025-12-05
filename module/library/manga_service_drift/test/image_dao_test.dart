@@ -1,19 +1,13 @@
-import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
+import 'package:manga_service_drift/src/database/memory_executor.dart';
 
 void main() {
   late AppDatabase db;
   late ImageDao dao;
 
   setUp(() {
-    db = AppDatabase(
-      executor: DatabaseConnection(
-        NativeDatabase.memory(),
-        closeStreamsSynchronously: true,
-      ),
-    );
+    db = AppDatabase(executor: MemoryExecutor());
     dao = ImageDao(db);
   });
 
@@ -63,10 +57,7 @@ void main() {
         });
 
         test('By Id', () async {
-          expect(
-            (await dao.search(ids: [value.id.value])).length,
-            equals(0),
-          );
+          expect((await dao.search(ids: [value.id.value])).length, equals(0));
         });
 
         test('By Web Url', () async {
@@ -97,10 +88,7 @@ void main() {
         });
 
         test('By Id', () async {
-          expect(
-            (await dao.remove(ids: [value.id.value])).length,
-            equals(0),
-          );
+          expect((await dao.remove(ids: [value.id.value])).length, equals(0));
 
           expect((await dao.all).length, equals(values.length));
         });
@@ -110,7 +98,6 @@ void main() {
         await dao.add(value: value);
         expect((await dao.all).length, equals(values.length + 1));
       });
-
     });
 
     group('With Existing Value', () {
@@ -125,10 +112,7 @@ void main() {
         });
 
         test('By Id', () async {
-          expect(
-            (await dao.search(ids: [value.id.value])).length,
-            equals(1),
-          );
+          expect((await dao.search(ids: [value.id.value])).length, equals(1));
         });
 
         test('By Web Url', () async {
@@ -159,10 +143,7 @@ void main() {
         });
 
         test('By Id', () async {
-          expect(
-            (await dao.remove(ids: [value.id.value])).length,
-            equals(1),
-          );
+          expect((await dao.remove(ids: [value.id.value])).length, equals(1));
 
           expect((await dao.all).length, equals(values.length - 1));
         });

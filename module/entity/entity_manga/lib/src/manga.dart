@@ -193,4 +193,14 @@ class Manga extends Equatable {
       return null;
     }
   }
+
+  bool get propertiesFilled {
+    return [
+      title != null,
+      author != null,
+      description != null,
+      coverUrl != null,
+      (tags ?? []).isNotEmpty,
+    ].every((e) => e);
+  }
 }

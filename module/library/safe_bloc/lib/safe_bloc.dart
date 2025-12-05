@@ -1,4 +1,4 @@
-library safe_bloc;
+library;
 
 export 'package:flutter_bloc/flutter_bloc.dart' hide Cubit;
 

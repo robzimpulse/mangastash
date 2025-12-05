@@ -1,7 +1,6 @@
-import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
+import 'package:manga_service_drift/src/database/memory_executor.dart';
 
 void main() {
   late AppDatabase db;
@@ -26,12 +25,7 @@ void main() {
   );
 
   setUp(() {
-    db = AppDatabase(
-      executor: DatabaseConnection(
-        NativeDatabase.memory(),
-        closeStreamsSynchronously: true,
-      ),
-    );
+    db = AppDatabase(executor: MemoryExecutor());
     dao = MangaDao(db);
     tagDao = TagDao(db);
   });

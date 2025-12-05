@@ -17,6 +17,9 @@ class CoreAuthRegistrar extends Registrar {
 
     final LogBox log = locator();
 
+    locator.registerLazySingletonAsync(
+      () => Firebase.initializeApp(options: locator.getOrNull()),
+    );
     locator.registerFactory(() => AuthService(app: locator()));
     locator.registerFactory(
       () => LoginAnonymouslyUseCase(authService: locator()),
@@ -38,5 +41,10 @@ class CoreAuthRegistrar extends Registrar {
       name: 'Services',
       extra: {'start': start, 'finish': DateTime.timestamp().toIso8601String()},
     );
+  }
+
+  @override
+  Future<void> allReady(ServiceLocator locator) async {
+    await locator.isReady<FirebaseApp>();
   }
 }

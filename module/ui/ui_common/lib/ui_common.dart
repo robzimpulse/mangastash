@@ -1,4 +1,4 @@
-library ui_common;
+library;
 
 export 'package:autoscale_tabbarview/autoscale_tabbarview.dart';
 export 'package:cached_network_image/cached_network_image.dart';
@@ -36,7 +36,9 @@ export 'src/widget/base/paginated_list_widget.dart';
 export 'src/widget/base/shimmer_loading_widget.dart';
 export 'src/widget/base/size_notifier_widget.dart';
 export 'src/widget/chapter_tile_widget.dart';
+export 'src/widget/info_widget.dart';
 export 'src/widget/manga_item_widget.dart';
 export 'src/widget/manga_parameter_widget.dart';
 export 'src/widget/manga_tile_widget.dart';
 export 'src/widget/source_tile_widget.dart';
+export 'src/widget/wrapper_widget.dart';

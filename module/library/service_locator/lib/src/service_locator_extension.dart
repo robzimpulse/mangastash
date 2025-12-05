@@ -30,7 +30,7 @@ extension ServiceLocatorX on ServiceLocator {
     return null;
   }
 
-  /// Returns the instance of a registered type [T] wrapped in a Factory<T>.
+  /// Returns the instance of a registered type [T] wrapped in a Factory`<`T>.
   Factory<T> factory<T extends Object>({
     String? instanceName,
     dynamic param1,

@@ -98,12 +98,15 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     emit(state.copyWith(histories: map));
   }
 
-  Future<void> init() async {
+  Future<void> init({bool useCache = true}) async {
     emit(state.copyWith(isLoadingManga: true, errorManga: () => null));
-    await _fetchManga();
+    await _fetchManga(useCache: useCache);
     emit(state.copyWith(isLoadingManga: false));
 
-    await Future.wait([initChapter(), initSimilarManga()]);
+    await Future.wait([
+      initChapter(refresh: !useCache),
+      initSimilarManga(refresh: !useCache),
+    ]);
   }
 
   Future<void> initChapter({
@@ -137,7 +140,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     if (refresh) await _clearChapterCache();
 
-    await _fetchChapter();
+    await _fetchChapter(useCache: !refresh);
 
     emit(state.copyWith(isLoadingChapters: false));
   }
@@ -159,24 +162,21 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     if (refresh) await _clearSimilarMangaCache();
 
-    await _fetchSimilarManga();
+    await _fetchSimilarManga(useCache: !refresh);
 
     emit(state.copyWith(isLoadingSimilarManga: false));
   }
 
-  Future<void> _clearMangaCache() async {
-    final id = state.manga?.id ?? state.mangaId;
-    final source = state.source;
-    if (id == null || id.isEmpty || source == null) return;
-    await _getMangaUseCase.clearCache(source: source, mangaId: id);
-  }
-
-  Future<void> _fetchManga() async {
+  Future<void> _fetchManga({bool useCache = true}) async {
     final id = state.manga?.id ?? state.mangaId;
     final source = state.source;
     if (id == null || id.isEmpty || source == null) return;
 
-    final result = await _getMangaUseCase.execute(mangaId: id, source: source);
+    final result = await _getMangaUseCase.execute(
+      mangaId: id,
+      source: source,
+      useCache: useCache,
+    );
 
     if (result is Success<Manga>) {
       emit(state.copyWith(manga: result.data));
@@ -203,7 +203,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     );
   }
 
-  Future<void> _fetchSimilarManga() async {
+  Future<void> _fetchSimilarManga({bool useCache = true}) async {
     final source = state.source;
     final parameter = state.similarMangaParameter;
 
@@ -214,6 +214,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
         source: source,
         parameter: parameter,
       ),
+      useCache: useCache,
     );
 
     if (result is Success<Pagination<Manga>>) {
@@ -260,7 +261,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     );
   }
 
-  Future<void> _fetchChapter() async {
+  Future<void> _fetchChapter({bool useCache = true}) async {
     final id = state.manga?.id ?? state.mangaId;
     final source = state.source;
     if (id == null || id.isEmpty || source == null) return;
@@ -271,6 +272,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
         parameter: state.chapterParameter,
         mangaId: id,
       ),
+      useCache: useCache,
     );
 
     if (result is Success<Pagination<Chapter>>) {
@@ -350,9 +352,6 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
   void recrawl({required BuildContext context, required String url}) async {
     _recrawlUseCase.execute(context: context, url: url);
-    await _clearMangaCache();
-    await _clearSimilarMangaCache();
-    await _clearChapterCache();
-    await init();
+    await init(useCache: false);
   }
 }

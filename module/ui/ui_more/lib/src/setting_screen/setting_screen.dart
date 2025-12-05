@@ -14,7 +14,7 @@ class SettingScreen extends StatelessWidget {
   final VoidCallback? onTapDownloadMenu;
   final VoidCallback? onTapTrackingMenu;
   final VoidCallback? onTapBrowseMenu;
-  final VoidCallback? onTapManualBackupRestoreMenu;
+  final VoidCallback? onTapDataStorageMenu;
   final VoidCallback? onTapSecurityMenu;
   final VoidCallback? onTapAboutMenu;
 
@@ -28,7 +28,7 @@ class SettingScreen extends StatelessWidget {
     this.onTapDownloadMenu,
     this.onTapTrackingMenu,
     this.onTapBrowseMenu,
-    this.onTapManualBackupRestoreMenu,
+    this.onTapDataStorageMenu,
     this.onTapSecurityMenu,
     this.onTapAboutMenu,
   });
@@ -43,7 +43,7 @@ class SettingScreen extends StatelessWidget {
     VoidCallback? onTapDownloadMenu,
     VoidCallback? onTapTrackingMenu,
     VoidCallback? onTapBrowseMenu,
-    VoidCallback? onTapManualBackupRestoreMenu,
+    VoidCallback? onTapDataStorageMenu,
     VoidCallback? onTapSecurityMenu,
     VoidCallback? onTapAboutMenu,
   }) {
@@ -58,7 +58,7 @@ class SettingScreen extends StatelessWidget {
         onTapDownloadMenu: onTapDownloadMenu,
         onTapTrackingMenu: onTapTrackingMenu,
         onTapBrowseMenu: onTapBrowseMenu,
-        onTapManualBackupRestoreMenu: onTapManualBackupRestoreMenu,
+        onTapDataStorageMenu: onTapDataStorageMenu,
         onTapSecurityMenu: onTapSecurityMenu,
         onTapAboutMenu: onTapAboutMenu,
       ),
@@ -68,9 +68,7 @@ class SettingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      appBar: AppBar(
-        title: const Text('Setting'),
-      ),
+      appBar: AppBar(title: const Text('Setting')),
       body: AdaptivePhysicListView(
         children: [
           ListTile(
@@ -116,10 +114,10 @@ class SettingScreen extends StatelessWidget {
             onTap: () => onTapBrowseMenu?.call(),
           ),
           ListTile(
-            leading: const Icon(Icons.settings_backup_restore_outlined),
-            title: const Text('Backup & Restore'),
-            subtitle: const Text('Manual & Automatic Backup'),
-            onTap: () => onTapManualBackupRestoreMenu?.call(),
+            leading: const Icon(Icons.storage),
+            title: const Text('Data & Storage'),
+            subtitle: const Text('Manual/Automatic Backup & Storage Usage'),
+            onTap: () => onTapDataStorageMenu?.call(),
           ),
           ListTile(
             leading: const Icon(Icons.security_outlined),

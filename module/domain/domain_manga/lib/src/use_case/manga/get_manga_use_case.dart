@@ -81,10 +81,6 @@ class GetMangaUseCase with SyncMangasMixin {
       useCache: useCache,
     );
 
-    if (document == null) {
-      throw FailedParsingHtmlException(url);
-    }
-
     final parser = MangaDetailHtmlParser.forSource(
       root: document,
       source: source,
@@ -94,14 +90,6 @@ class GetMangaUseCase with SyncMangasMixin {
     final manga = await parser.manga;
 
     return manga.copyWith(source: source.name, webUrl: url);
-  }
-
-  Future<void> clearCache({
-    required SourceEnum source,
-    required String mangaId,
-  }) async {
-    final key = '$source-$mangaId';
-    await _mangaCacheManager.removeFile(key);
   }
 
   Future<Result<Manga>> execute({
@@ -118,6 +106,8 @@ class GetMangaUseCase with SyncMangasMixin {
     try {
       final raw = await _mangaDao.search(ids: [mangaId]);
       final manga = Manga.fromDatabase(raw.firstOrNull);
+
+      if (manga != null && manga.propertiesFilled) return Success(manga);
 
       final Manga data;
       if (source == SourceEnum.mangadex) {

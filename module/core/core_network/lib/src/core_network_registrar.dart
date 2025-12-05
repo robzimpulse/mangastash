@@ -12,6 +12,7 @@ class CoreNetworkRegistrar extends Registrar {
 
     locator.registerLazySingleton(
       () => HeadlessWebviewManager(log: locator(), htmlCacheManager: locator()),
+      dispose: (e) => e.dispose(),
     );
     locator.alias<HeadlessWebviewUseCase, HeadlessWebviewManager>();
     locator.registerLazySingleton(

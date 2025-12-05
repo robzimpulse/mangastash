@@ -19,6 +19,7 @@ dependencies:
   path: ^1.9.0
   dio: ^5.7.0
   universal_io: ^2.2.2
+  permission_handler: ^11.3.1
 
   service_locator:
     path: ../../library/service_locator
@@ -34,4 +35,4 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0

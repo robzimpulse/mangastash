@@ -4,9 +4,7 @@ import 'package:universal_io/io.dart';
 
 class MainScreen extends StatelessWidget {
   final Widget child;
-
   final int index;
-
   final ValueSetter<int>? onTapMenu;
   final AsyncValueGetter<bool?>? onTapClosedApps;
 
@@ -47,10 +45,7 @@ class MainScreen extends StatelessWidget {
     final isPhone = ResponsiveBreakpoints.of(context).isPhone;
     if (isMobile || isPhone) return child;
     final menus = _menus.entries.map(
-      (e) => NavigationRailDestination(
-        icon: Icon(e.value),
-        label: Text(e.key),
-      ),
+      (e) => NavigationRailDestination(icon: Icon(e.value), label: Text(e.key)),
     );
     return Row(
       children: [
@@ -72,10 +67,7 @@ class MainScreen extends StatelessWidget {
     final isPhone = ResponsiveBreakpoints.of(context).isPhone;
     if (!(isMobile || isPhone)) return null;
     final menus = _menus.entries.map(
-      (e) => BottomNavigationBarItem(
-        icon: Icon(e.value),
-        label: e.key,
-      ),
+      (e) => BottomNavigationBarItem(icon: Icon(e.value), label: e.key),
     );
     return BottomNavigationBar(
       key: const Key('bottom_navigation_bar'),

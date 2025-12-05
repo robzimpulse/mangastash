@@ -84,7 +84,7 @@ class MangaUpdatesScreen extends StatelessWidget {
         builder: (context, state) {
           return CustomScrollView(
             slivers: [
-              if (state.updates.isEmpty)
+              if (state.updates.values.every((e) => e.isEmpty))
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: Padding(

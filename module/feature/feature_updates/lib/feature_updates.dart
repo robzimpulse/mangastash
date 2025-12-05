@@ -1,4 +1,4 @@
-library feature_updates;
+library;
 
 export 'src/route_builder.dart';
 export 'src/route_path.dart';

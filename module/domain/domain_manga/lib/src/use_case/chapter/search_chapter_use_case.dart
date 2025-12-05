@@ -113,10 +113,6 @@ class SearchChapterUseCase
       useCache: useCache,
     );
 
-    if (document == null) {
-      throw FailedParsingHtmlException(url);
-    }
-
     final parser = ChapterListHtmlParser.forSource(
       root: document,
       source: parameter.source,
@@ -183,9 +179,7 @@ class SearchChapterUseCase
       );
     });
 
-    if (data != null && useCache) {
-      return Success(data);
-    }
+    if (data != null && useCache) return Success(data);
 
     try {
       final Pagination<Chapter> data;
