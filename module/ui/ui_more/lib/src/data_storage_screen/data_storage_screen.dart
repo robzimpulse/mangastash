@@ -98,6 +98,7 @@ class DataStorageScreen extends StatelessWidget {
       final result = await SharePlus.instance.share(
         ShareParams(files: [XFile(file.path)]),
       );
+      await file.delete();
       if (!context.mounted) return;
 
       switch (result.status) {
