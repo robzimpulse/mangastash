@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:drift/drift.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -48,10 +50,12 @@ part 'database.g.dart';
 class AppDatabase extends _$AppDatabase {
   final Executor _executor;
 
+  FutureOr Function()? onRestore;
+
   // After generating code, this class needs to define a `schemaVersion` getter
   // and a constructor telling drift where the database should be stored.
   // These are described in the getting started guide: https://drift.simonbinder.eu/setup/
-  AppDatabase({required Executor executor})
+  AppDatabase({required Executor executor, this.onRestore})
     : _executor = executor,
       super(executor.build());
 
@@ -86,7 +90,8 @@ class AppDatabase extends _$AppDatabase {
     return file;
   }
 
-  Future<void> restore({required File file}) {
-    return restoreDatabase(file: file, database: this, executor: _executor);
+  Future<void> restore({required File file}) async {
+    await restoreDatabase(file: file, database: this, executor: _executor);
+    await onRestore?.call();
   }
 }
