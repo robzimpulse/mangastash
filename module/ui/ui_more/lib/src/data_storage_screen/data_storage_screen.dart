@@ -94,9 +94,20 @@ class DataStorageScreen extends StatelessWidget {
 
   void _onTapBackup(BuildContext context) async {
     try {
-      final file = await _cubit(context).backup(context);
+      final file = await _cubit(context).backup();
+      final result = await SharePlus.instance.share(
+        ShareParams(files: [XFile(file.path)]),
+      );
       if (!context.mounted) return;
-      context.showSnackBar(message: 'Success backup database to ${file.path}');
+
+      switch (result.status) {
+        case ShareResultStatus.success:
+          context.showSnackBar(message: 'Success backup database');
+        case ShareResultStatus.dismissed:
+          context.showSnackBar(message: 'Cancel backup database');
+        case ShareResultStatus.unavailable:
+          context.showSnackBar(message: 'Failed backup database');
+      }
     } catch (e) {
       if (!context.mounted) return;
       context.showSnackBar(message: e.toString());

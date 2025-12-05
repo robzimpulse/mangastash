@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sqlite3/sqlite3.dart';
 import 'package:universal_io/universal_io.dart';
 import 'package:uuid/uuid.dart';
 
@@ -20,10 +19,9 @@ import '../tables/manga_tables.dart';
 import '../tables/relationship_tables.dart';
 import '../tables/tag_tables.dart';
 import '../util/job_type_enum.dart';
-import 'executor.dart';
-
 import 'adapter/restore_database_unsupported.dart'
     if (dart.library.ffi) 'adapter/restore_database_supported.dart';
+import 'executor.dart';
 
 part 'database.g.dart';
 
