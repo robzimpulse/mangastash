@@ -5,35 +5,21 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:universal_io/universal_io.dart';
 
 import 'get_root_path_use_case.dart';
-import 'listen_backup_path_use_case.dart';
 
-class FilesystemPickerUsecase {
+class FilesystemPickerUseCase {
   final GetRootPathUseCase _getRootPathUseCase;
-  final ListenBackupPathUseCase _listenBackupPathUseCase;
 
-  FilesystemPickerUsecase({
+  const FilesystemPickerUseCase({
     required GetRootPathUseCase getRootPathUseCase,
-    required ListenBackupPathUseCase listenBackupPathUseCase,
-  }) : _getRootPathUseCase = getRootPathUseCase,
-       _listenBackupPathUseCase = listenBackupPathUseCase;
-
-  Future<Result<Directory>> directory(BuildContext context) async {
-    try {
-      final path = await _picker(
-        context,
-        FilesystemType.folder,
-        contextActions: [FilesystemPickerNewFolderContextAction()],
-      );
-      if (path == null) throw Exception('Path is null');
-      return Success(Directory.fromUri(Uri.file(path)));
-    } catch (e) {
-      return Error(e);
-    }
-  }
+  }) : _getRootPathUseCase = getRootPathUseCase;
 
   Future<Result<File>> file(BuildContext context) async {
     try {
-      final path = await _picker(context, FilesystemType.file);
+      final path = await _picker(
+        context,
+        type: FilesystemType.file,
+        rootDirectory: _getRootPathUseCase.rootForPickFile,
+      );
       if (path == null) throw Exception('Path is null');
       return Success(File(path));
     } catch (e) {
@@ -42,15 +28,15 @@ class FilesystemPickerUsecase {
   }
 
   Future<String?> _picker(
-    BuildContext context,
-    FilesystemType? type, {
+    BuildContext context, {
     List<FilesystemPickerContextAction> contextActions = const [],
+    FilesystemType? type,
+    Directory? rootDirectory,
   }) {
     return FilesystemPicker.openDialog(
       title: 'Select file or folder',
       context: context,
-      rootDirectory: _getRootPathUseCase.rootPath,
-      directory: _listenBackupPathUseCase.backupPathStream.valueOrNull,
+      rootDirectory: rootDirectory,
       fsType: type,
       pickText: 'Select current folder',
       contextActions: contextActions,

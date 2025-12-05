@@ -65,9 +65,10 @@ class AppDatabase extends _$AppDatabase {
   }
 
   // Example: https://github.com/simolus3/drift/blob/96b3947fc16de99ffe25bcabc124e3b3a7c69571/examples/app/lib/screens/backup/supported.dart#L47-L68
-  Future<File> backup({Directory? directory}) async {
+  Future<File> backup({Directory? directory, String? filename}) async {
     final dir = directory ?? await getTemporaryDirectory();
-    final name = 'backup_${DateTime.timestamp().toString()}.sqlite';
+    final timestamp = DateTime.timestamp().microsecondsSinceEpoch;
+    final name = filename ?? '$timestamp.sqlite';
     final file = File(join(dir.path, name));
 
     // Make sure the directory of the file exists

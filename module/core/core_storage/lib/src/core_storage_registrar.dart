@@ -7,11 +7,9 @@ import 'manager/path_manager/path_manager.dart';
 import 'manager/storage_manager/file_service/custom_file_service.dart';
 import 'manager/storage_manager/storage_manager.dart';
 import 'use_case/filesystem_picker_usecase.dart';
+import 'use_case/get_backup_path_usecase.dart';
+import 'use_case/get_download_path_usecase.dart';
 import 'use_case/get_root_path_use_case.dart';
-import 'use_case/listen_backup_path_use_case.dart';
-import 'use_case/listen_download_path_use_case.dart';
-import 'use_case/set_backup_path_use_case.dart';
-import 'use_case/set_download_path_use_case.dart';
 
 class CoreStorageRegistrar extends Registrar {
   @override
@@ -32,20 +30,13 @@ class CoreStorageRegistrar extends Registrar {
     locator.registerFactory(() => TagDao(locator()));
 
     locator.registerLazySingleton(() => SharedPreferencesAsync());
-    locator.registerLazySingletonAsync(
-      () => PathManager.create(storage: locator()),
-    );
-    locator.alias<ListenDownloadPathUseCase, PathManager>();
-    locator.alias<SetDownloadPathUseCase, PathManager>();
-    locator.alias<ListenBackupPathUseCase, PathManager>();
-    locator.alias<SetBackupPathUseCase, PathManager>();
+    locator.registerLazySingletonAsync(() => PathManager.create());
     locator.alias<GetRootPathUseCase, PathManager>();
+    locator.alias<GetBackupPathUseCase, PathManager>();
+    locator.alias<GetDownloadPathUseCase, PathManager>();
 
     locator.registerFactory(
-      () => FilesystemPickerUsecase(
-        getRootPathUseCase: locator(),
-        listenBackupPathUseCase: locator(),
-      ),
+      () => FilesystemPickerUseCase(getRootPathUseCase: locator()),
     );
     locator.registerFactory(
       () => CustomFileService(
