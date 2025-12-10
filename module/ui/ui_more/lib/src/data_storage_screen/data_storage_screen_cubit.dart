@@ -66,5 +66,6 @@ class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
         isDefaultRootPath: _getRootPathUseCase.isDefault,
       ),
     );
+    refreshListBackup();
   }
 }

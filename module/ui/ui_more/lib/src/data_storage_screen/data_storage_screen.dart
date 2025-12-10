@@ -9,11 +9,20 @@ import 'data_storage_screen_cubit.dart';
 import 'data_storage_screen_state.dart';
 
 class DataStorageScreen extends StatelessWidget {
-  const DataStorageScreen({super.key, required this.filesystemPickerUseCase});
+  const DataStorageScreen({
+    super.key,
+    required this.filesystemPickerUseCase,
+    this.onUpdateRootPathConfirmation,
+  });
 
   final FilesystemPickerUseCase filesystemPickerUseCase;
 
-  static Widget create({required ServiceLocator locator}) {
+  final AsyncValueGetter<bool?>? onUpdateRootPathConfirmation;
+
+  static Widget create({
+    required ServiceLocator locator,
+    required AsyncValueGetter<bool?>? onUpdateRootPathConfirmation,
+  }) {
     return BlocProvider(
       create: (context) {
         return DataStorageScreenCubit(
@@ -25,6 +34,7 @@ class DataStorageScreen extends StatelessWidget {
       },
       child: DataStorageScreen(
         filesystemPickerUseCase: locator(),
+        onUpdateRootPathConfirmation: onUpdateRootPathConfirmation,
       ),
     );
   }
@@ -187,8 +197,10 @@ class DataStorageScreen extends StatelessWidget {
   }
 
   void _onTapUpdateStoragePath(BuildContext context) async {
-    final result = await filesystemPickerUseCase.directory(context);
-    if (!context.mounted || result == null) return;
-    _cubit(context).updateStoragePath(result.path);
+    final confirm = await onUpdateRootPathConfirmation?.call();
+    if (!context.mounted || confirm != true) return;
+    final directory = await filesystemPickerUseCase.directory(context);
+    if (!context.mounted || directory == null) return;
+    _cubit(context).updateStoragePath(directory.path);
   }
 }
