@@ -68,4 +68,8 @@ class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
     );
     refreshListBackup();
   }
+
+  Future<void> resetStoragePath() async {
+    await updateStoragePath(_getRootPathUseCase.defaultRootDirectory.path);
+  }
 }

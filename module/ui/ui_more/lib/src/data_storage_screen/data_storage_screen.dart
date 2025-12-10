@@ -69,22 +69,36 @@ class DataStorageScreen extends StatelessWidget {
   }
 
   Widget _buildStorageLocationSection(BuildContext context) {
-    return ListTile(
-      title: Text('Storage Location'),
-      leading: Icon(Icons.terminal),
-      subtitle: _builder(
-        buildWhen: (prev, curr) {
-          return [
-            prev.rootPath != curr.rootPath,
-            curr.isDefaultRootPath != curr.isDefaultRootPath,
-          ].contains(true);
-        },
-        builder: (context, state) {
-          if (state.isDefaultRootPath) return Text('Default');
-          return Text(state.rootPath?.path ?? 'Not Available');
-        },
-      ),
-      onTap: () => _onTapUpdateStoragePath(context),
+    return _builder(
+      buildWhen: (prev, curr) {
+        return [
+          prev.rootPath != curr.rootPath,
+          curr.isDefaultRootPath != curr.isDefaultRootPath,
+        ].contains(true);
+      },
+      builder: (context, state) {
+
+        Widget subtitle;
+        Widget? trailing;
+
+        if (state.isDefaultRootPath) {
+          subtitle = Text('Default');
+        } else {
+          subtitle = Text(state.rootPath?.path ?? 'Not Available');
+          trailing = IconButton(
+            onPressed: () => _cubit(context).resetStoragePath(),
+            icon: Icon(Icons.undo),
+          );
+        }
+
+        return ListTile(
+          title: Text('Storage Location'),
+          leading: Icon(Icons.terminal),
+          trailing: trailing,
+          subtitle: subtitle,
+          onTap: () => _onTapUpdateStoragePath(context),
+        );
+      },
     );
   }
 

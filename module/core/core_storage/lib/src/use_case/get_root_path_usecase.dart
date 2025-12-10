@@ -7,5 +7,5 @@ abstract class GetRootPathUseCase {
 }
 
 extension DefaultRootPath on GetRootPathUseCase {
-  bool get isDefault => rootPath == defaultRootDirectory;
+  bool get isDefault => rootPath?.path == defaultRootDirectory.path;
 }
