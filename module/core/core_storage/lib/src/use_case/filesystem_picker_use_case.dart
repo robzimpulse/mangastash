@@ -14,13 +14,17 @@ class FilesystemPickerUseCase {
   }) : _getRootPathUseCase = getRootPathUseCase;
 
   Future<Directory?> directory(BuildContext context) async {
-    final path = await _picker(context, type: FilesystemType.folder);
+    final path = await _picker(
+      context,
+      type: FilesystemType.folder,
+      contextActions: [FilesystemPickerNewFolderContextAction()],
+    );
     if (path == null) return null;
     return Directory(path);
   }
 
   Future<File?> file(BuildContext context) async {
-    final path = await _picker(context, type: FilesystemType.folder);
+    final path = await _picker(context, type: FilesystemType.file);
     if (path == null) return null;
     return File(path);
   }
