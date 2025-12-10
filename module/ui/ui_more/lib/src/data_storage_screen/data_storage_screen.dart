@@ -2,14 +2,16 @@ import 'package:core_storage/core_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
-import 'package:ui_common/ui_common.dart';
+import 'package:ui_common/ui_common.dart' hide Error;
 import 'package:universal_io/universal_io.dart';
 
 import 'data_storage_screen_cubit.dart';
 import 'data_storage_screen_state.dart';
 
 class DataStorageScreen extends StatelessWidget {
-  const DataStorageScreen({super.key});
+  const DataStorageScreen({super.key, required this.filesystemPickerUseCase});
+
+  final FilesystemPickerUseCase filesystemPickerUseCase;
 
   static Widget create({required ServiceLocator locator}) {
     return BlocProvider(
@@ -17,9 +19,13 @@ class DataStorageScreen extends StatelessWidget {
         return DataStorageScreenCubit(
           database: locator(),
           getBackupPathUseCase: locator(),
+          getRootPathUseCase: locator(),
+          updateRootPathUseCase: locator(),
         )..refreshListBackup();
       },
-      child: const DataStorageScreen(),
+      child: DataStorageScreen(
+        filesystemPickerUseCase: locator(),
+      ),
     );
   }
 
@@ -42,12 +48,33 @@ class DataStorageScreen extends StatelessWidget {
       body: ListView(
         children: [
           if (!kIsWeb) ...[
+            _buildStorageLocationSection(context),
             _buildBackupRestoreSection(context),
           ] else ...[
             Center(child: Text('This feature were unsupported on Web')),
           ],
         ],
       ),
+    );
+  }
+
+  Widget _buildStorageLocationSection(BuildContext context) {
+    return ListTile(
+      title: Text('Storage Location'),
+      leading: Icon(Icons.terminal),
+      subtitle: _builder(
+        buildWhen: (prev, curr) {
+          return [
+            prev.rootPath != curr.rootPath,
+            curr.isDefaultRootPath != curr.isDefaultRootPath,
+          ].contains(true);
+        },
+        builder: (context, state) {
+          if (state.isDefaultRootPath) return Text('Default');
+          return Text(state.rootPath?.path ?? 'Not Available');
+        },
+      ),
+      onTap: () => _onTapUpdateStoragePath(context),
     );
   }
 
@@ -157,5 +184,11 @@ class DataStorageScreen extends StatelessWidget {
     if (!context.mounted) return;
     context.showSnackBar(message: 'Success restore backup');
     WrapperScreen.restart(context);
+  }
+
+  void _onTapUpdateStoragePath(BuildContext context) async {
+    final result = await filesystemPickerUseCase.directory(context);
+    if (!context.mounted || result == null) return;
+    _cubit(context).updateStoragePath(result.path);
   }
 }

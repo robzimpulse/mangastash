@@ -12,5 +12,5 @@ export 'src/manager/storage_manager/storage_manager.dart';
 export 'src/use_case/filesystem_picker_usecase.dart';
 export 'src/use_case/get_backup_path_usecase.dart';
 export 'src/use_case/get_download_path_usecase.dart';
-export 'src/use_case/get_root_path_use_case.dart';
-
+export 'src/use_case/get_root_path_usecase.dart';
+export 'src/use_case/update_root_path_usecase.dart';

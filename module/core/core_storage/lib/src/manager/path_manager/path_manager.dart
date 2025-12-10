@@ -6,78 +6,82 @@ import 'package:universal_io/io.dart';
 
 import '../../use_case/get_backup_path_usecase.dart';
 import '../../use_case/get_download_path_usecase.dart';
-import '../../use_case/get_root_path_use_case.dart';
+import '../../use_case/get_root_path_usecase.dart';
+import '../../use_case/update_root_path_usecase.dart';
 
 class PathManager
     implements
         GetRootPathUseCase,
+        UpdateRootPathUseCase,
         GetBackupPathUseCase,
         GetDownloadPathUseCase {
-  final Directory? _rootDirectory;
-  final Directory? _backupDirectory;
-  final Directory? _downloadDirectory;
+  final Directory _defaultRootDirectory;
+  Directory? _rootDirectory;
+  Directory? _backupDirectory;
+  Directory? _downloadDirectory;
 
   PathManager._({
+    required Directory defaultRootDirectory,
     Directory? rootDirectory,
     Directory? backupDirectory,
     Directory? downloadDirectory,
   }) : _rootDirectory = rootDirectory,
        _backupDirectory = backupDirectory,
-       _downloadDirectory = downloadDirectory;
+       _downloadDirectory = downloadDirectory,
+       _defaultRootDirectory = defaultRootDirectory;
 
   static Future<PathManager> create() async {
-    Directory? root;
-    Directory? backup;
-    Directory? download;
-
-    if (!kIsWeb) {
-      /// if platform were android, try to check root on `/storage/emulated/0`
-      if (defaultTargetPlatform == TargetPlatform.android) {
-        await [Permission.manageExternalStorage, Permission.storage].request();
-
-        final isGranted = await Future.wait([
-          Permission.manageExternalStorage.isGranted,
-          Permission.storage.isGranted,
-        ]);
-
-        final androidRoot = Directory.fromUri(
-          Uri.file('/storage/emulated/0/Mangastash'),
-        );
-        try {
-          if (!isGranted.contains(true)) throw Exception('Permission denied');
-
-          /// test create folder on path `/storage/emulated/0`, if success we
-          /// set it as android root directory
-          await androidRoot.create(recursive: true);
-
-          /// set root to android root
-          root = androidRoot;
-        } catch (e) {
-          /// fallback to application documents directory
-          root = await getApplicationDocumentsDirectory();
-        }
-      } else {
-        root = await getApplicationDocumentsDirectory();
-      }
-
-      backup = Directory(join(root.path, 'backup'));
-      download = Directory(join(root.path, 'download'));
-    }
-
-    if (backup != null && !await backup.exists()) {
-      await backup.create(recursive: true);
-    }
-
-    if (download != null && !await download.exists()) {
-      await download.create(recursive: true);
-    }
+    final root = await getApplicationDocumentsDirectory();
 
     return PathManager._(
       rootDirectory: root,
-      downloadDirectory: download,
-      backupDirectory: backup,
+      defaultRootDirectory: root,
+      downloadDirectory: await Directory(
+        join(root.path, 'download'),
+      ).create(recursive: true),
+      backupDirectory: await Directory(
+        join(root.path, 'backup'),
+      ).create(recursive: true),
     );
   }
+
+  @override
+  Future<void> updateRootPath(String path) async {
+    if (kIsWeb) return;
+
+    await [Permission.manageExternalStorage, Permission.storage].request();
+
+    final isGranted = await Future.wait([
+      Permission.manageExternalStorage.isGranted,
+      Permission.storage.isGranted,
+    ]);
+
+    if (!isGranted.contains(true)) return;
+
+    final root = Directory.fromUri(Uri.file(path));
+    final backup = Directory(join(root.path, 'backup'));
+    final download = Directory(join(root.path, 'download'));
+
+    try {
+      /// test create folder on [path] if success we set it as root directory
+      /// along with backup and download folder
+      await Future.wait([
+        root.create(recursive: true),
+        backup.create(recursive: true),
+        download.create(recursive: true),
+      ]);
+    } catch (e) {
+      /// failed to create folder
+      return;
+    }
+
+    _rootDirectory = root;
+    _backupDirectory = backup;
+    _downloadDirectory = backup;
+  }
+
+  @override
+  Directory get defaultRootDirectory => _defaultRootDirectory;
 
   @override
   Directory? get rootPath => _rootDirectory;

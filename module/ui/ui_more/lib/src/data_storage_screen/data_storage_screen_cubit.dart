@@ -8,15 +8,26 @@ import 'data_storage_screen_state.dart';
 class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
     with AutoSubscriptionMixin {
   final GetBackupPathUseCase _getBackupPathUseCase;
+  final UpdateRootPathUseCase _updateRootPathUseCase;
+  final GetRootPathUseCase _getRootPathUseCase;
   final AppDatabase _database;
 
   DataStorageScreenCubit({
     DataStorageScreenState initialState = const DataStorageScreenState(),
     required GetBackupPathUseCase getBackupPathUseCase,
+    required GetRootPathUseCase getRootPathUseCase,
+    required UpdateRootPathUseCase updateRootPathUseCase,
     required AppDatabase database,
   }) : _getBackupPathUseCase = getBackupPathUseCase,
+       _updateRootPathUseCase = updateRootPathUseCase,
+       _getRootPathUseCase = getRootPathUseCase,
        _database = database,
-       super(initialState);
+       super(
+         initialState.copyWith(
+           rootPath: getRootPathUseCase.rootPath,
+           isDefaultRootPath: getRootPathUseCase.isDefault,
+         ),
+       );
 
   Future<void> addBackup() async {
     final dir = _getBackupPathUseCase.backupPath;
@@ -45,5 +56,15 @@ class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
 
   Future<void> restoreBackup(FileSystemEntity file) async {
     await _database.restore(file: File(file.path));
+  }
+
+  Future<void> updateStoragePath(String path) async {
+    await _updateRootPathUseCase.updateRootPath(path);
+    emit(
+      state.copyWith(
+        rootPath: _getRootPathUseCase.rootPath,
+        isDefaultRootPath: _getRootPathUseCase.isDefault,
+      ),
+    );
   }
 }

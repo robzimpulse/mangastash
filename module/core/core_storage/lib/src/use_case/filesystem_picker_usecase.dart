@@ -1,10 +1,10 @@
-import 'package:core_network/core_network.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:universal_io/universal_io.dart';
 
-import 'get_root_path_use_case.dart';
+import 'get_root_path_usecase.dart';
 
 class FilesystemPickerUseCase {
   final GetRootPathUseCase _getRootPathUseCase;
@@ -13,30 +13,30 @@ class FilesystemPickerUseCase {
     required GetRootPathUseCase getRootPathUseCase,
   }) : _getRootPathUseCase = getRootPathUseCase;
 
-  Future<Result<File>> file(BuildContext context) async {
-    try {
-      final path = await _picker(
-        context,
-        type: FilesystemType.file,
-        rootDirectory: _getRootPathUseCase.rootPath,
-      );
-      if (path == null) throw Exception('Path is null');
-      return Success(File(path));
-    } catch (e) {
-      return Error(e);
-    }
+  Future<Directory?> directory(BuildContext context) async {
+    final path = await _picker(context, type: FilesystemType.folder);
+    if (path == null) return null;
+    return Directory(path);
+  }
+
+  Future<File?> file(BuildContext context) async {
+    final path = await _picker(context, type: FilesystemType.folder);
+    if (path == null) return null;
+    return File(path);
   }
 
   Future<String?> _picker(
     BuildContext context, {
     List<FilesystemPickerContextAction> contextActions = const [],
     FilesystemType? type,
-    Directory? rootDirectory,
   }) {
     return FilesystemPicker.openDialog(
       title: 'Select file or folder',
       context: context,
-      rootDirectory: rootDirectory,
+      rootDirectory:
+          defaultTargetPlatform == TargetPlatform.android
+              ? Directory('/storage/emulated/0')
+              : _getRootPathUseCase.defaultRootDirectory,
       fsType: type,
       pickText: 'Select current folder',
       contextActions: contextActions,
