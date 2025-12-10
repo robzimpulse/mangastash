@@ -13,15 +13,23 @@ class DataStorageScreen extends StatelessWidget {
     super.key,
     required this.filesystemPickerUseCase,
     this.onUpdateRootPathConfirmation,
+    this.onRestoreBackupConfirmation,
+    this.onDeleteBackupConfirmation,
   });
 
   final FilesystemPickerUseCase filesystemPickerUseCase;
 
   final AsyncValueGetter<bool?>? onUpdateRootPathConfirmation;
 
+  final AsyncValueGetter<bool?>? onRestoreBackupConfirmation;
+
+  final AsyncValueGetter<bool?>? onDeleteBackupConfirmation;
+
   static Widget create({
     required ServiceLocator locator,
     required AsyncValueGetter<bool?>? onUpdateRootPathConfirmation,
+    required AsyncValueGetter<bool?>? onRestoreBackupConfirmation,
+    required AsyncValueGetter<bool?>? onDeleteBackupConfirmation,
   }) {
     return BlocProvider(
       create: (context) {
@@ -35,6 +43,8 @@ class DataStorageScreen extends StatelessWidget {
       child: DataStorageScreen(
         filesystemPickerUseCase: locator(),
         onUpdateRootPathConfirmation: onUpdateRootPathConfirmation,
+        onRestoreBackupConfirmation: onRestoreBackupConfirmation,
+        onDeleteBackupConfirmation: onDeleteBackupConfirmation,
       ),
     );
   }
@@ -151,25 +161,44 @@ class DataStorageScreen extends StatelessWidget {
                         final data = snapshot.data;
                         if (data == null) return SizedBox.shrink();
 
-                        return Text(data.modified.toString());
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Last Modified: ${data.modified.toString()}'),
+                            Text('Size: ${data.sizeInKb} KB'),
+                          ],
+                        );
                       },
                     ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          onPressed: () => _onTapShareBackup(context, file),
-                          icon: Icon(Icons.share),
-                        ),
-                        IconButton(
-                          onPressed: () => _onTapRestoreBackup(context, file),
-                          icon: Icon(Icons.restore),
-                        ),
-                        IconButton(
-                          onPressed: () => _onTapDeleteBackup(context, file),
-                          icon: Icon(Icons.delete),
-                        ),
-                      ],
+                    trailing: PopupMenuButton<_MenuOption>(
+                      icon: Icon(Icons.more_vert),
+                      onSelected: (value) {
+                        switch (value) {
+                          case _MenuOption.share:
+                            _onTapShareBackup(context, file);
+                          case _MenuOption.restore:
+                            _onTapRestoreBackup(context, file);
+                          case _MenuOption.delete:
+                            _onTapDeleteBackup(context, file);
+                        }
+                      },
+                      itemBuilder: (context) {
+                        return [
+                          PopupMenuItem<_MenuOption>(
+                            value: _MenuOption.restore,
+                            child: Text('Restore'),
+                          ),
+                          PopupMenuItem<_MenuOption>(
+                            value: _MenuOption.share,
+                            child: Text('Share'),
+                          ),
+                          PopupMenuItem<_MenuOption>(
+                            value: _MenuOption.delete,
+                            child: Text('Delete'),
+                          ),
+                        ];
+                      },
                     ),
                   ),
               ],
@@ -181,6 +210,8 @@ class DataStorageScreen extends StatelessWidget {
   }
 
   void _onTapDeleteBackup(BuildContext context, FileSystemEntity file) async {
+    final confirm = await onDeleteBackupConfirmation?.call();
+    if (!context.mounted || confirm != true) return;
     await _cubit(context).deleteBackup(file);
     if (!context.mounted) return;
     context.showSnackBar(message: 'Success delete backup');
@@ -202,6 +233,8 @@ class DataStorageScreen extends StatelessWidget {
   }
 
   void _onTapRestoreBackup(BuildContext context, FileSystemEntity file) async {
+    final confirm = await onRestoreBackupConfirmation?.call();
+    if (!context.mounted || confirm != true) return;
     await _cubit(context).restoreBackup(file);
     if (!context.mounted) return;
     context.showSnackBar(message: 'Success restore backup');
@@ -216,3 +249,5 @@ class DataStorageScreen extends StatelessWidget {
     _cubit(context).updateStoragePath(directory.path);
   }
 }
+
+enum _MenuOption { share, restore, delete }

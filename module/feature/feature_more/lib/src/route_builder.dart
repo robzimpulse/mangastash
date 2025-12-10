@@ -78,6 +78,31 @@ class MoreRouteBuilder extends BaseRouteBuilder {
                 },
               );
             },
+            onRestoreBackupConfirmation: () {
+              return context.pushNamed<bool>(
+                CommonRoutePath.confirmation,
+                queryParameters: {
+                  CommonRoutePath.confirmationTitle: 'Restore Data',
+                  CommonRoutePath.confirmationContent:
+                      'Your current download and backup data will be replaced '
+                      'with backup data, are you sure want to restore this? ',
+                  CommonRoutePath.confirmationNegativeButtonText: 'No',
+                  CommonRoutePath.confirmationPositiveButtonText: 'Yes',
+                },
+              );
+            },
+            onDeleteBackupConfirmation: () {
+              return context.pushNamed<bool>(
+                CommonRoutePath.confirmation,
+                queryParameters: {
+                  CommonRoutePath.confirmationTitle: 'Delete Backup Data',
+                  CommonRoutePath.confirmationContent:
+                      'are you sure want to delete this data? ',
+                  CommonRoutePath.confirmationNegativeButtonText: 'No',
+                  CommonRoutePath.confirmationPositiveButtonText: 'Yes',
+                },
+              );
+            },
           );
         },
       ),
