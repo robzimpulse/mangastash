@@ -77,7 +77,6 @@ class DataStorageScreen extends StatelessWidget {
         ].contains(true);
       },
       builder: (context, state) {
-
         Widget subtitle;
         Widget? trailing;
 
@@ -115,20 +114,19 @@ class DataStorageScreen extends StatelessWidget {
             return prev.isLoadingBackup != curr.isLoadingBackup;
           },
           builder: (context, state) {
-            Widget trailing = Icon(Icons.backup);
-
-            if (state.isLoadingBackup) {
-              trailing = SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(),
-              );
-            }
-
             return ListTile(
               title: Text('List of Backup Data'),
-              trailing: trailing,
-              onTap: () => _cubit(context).addBackup(),
+              trailing:
+                  state.isLoadingBackup
+                      ? SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(),
+                      )
+                      : IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: () => _cubit(context).addBackup(),
+                      ),
             );
           },
         ),
