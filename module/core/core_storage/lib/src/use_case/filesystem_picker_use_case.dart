@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:universal_io/universal_io.dart';
 
-import 'get_root_path_usecase.dart';
+import 'get_root_path_use_case.dart';
 
 class FilesystemPickerUseCase {
   final GetRootPathUseCase _getRootPathUseCase;

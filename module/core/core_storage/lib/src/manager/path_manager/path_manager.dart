@@ -4,10 +4,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:universal_io/io.dart';
 
-import '../../use_case/get_backup_path_usecase.dart';
-import '../../use_case/get_download_path_usecase.dart';
-import '../../use_case/get_root_path_usecase.dart';
-import '../../use_case/update_root_path_usecase.dart';
+import '../../use_case/get_backup_path_use_case.dart';
+import '../../use_case/get_download_path_use_case.dart';
+import '../../use_case/get_root_path_use_case.dart';
+import '../../use_case/update_root_path_use_case.dart';
 
 class PathManager
     implements

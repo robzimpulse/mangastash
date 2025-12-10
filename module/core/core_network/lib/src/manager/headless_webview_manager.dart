@@ -12,7 +12,7 @@ import 'package:universal_io/io.dart';
 
 import '../exception/failed_parsing_html_exception.dart';
 import '../mixin/user_agent_mixin.dart';
-import '../usecase/headless_webview_usecase.dart';
+import '../usecase/headless_webview_use_case.dart';
 
 class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   final LogBox _log;
