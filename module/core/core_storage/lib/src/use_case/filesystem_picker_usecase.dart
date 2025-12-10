@@ -18,7 +18,7 @@ class FilesystemPickerUseCase {
       final path = await _picker(
         context,
         type: FilesystemType.file,
-        rootDirectory: _getRootPathUseCase.rootForPickFile,
+        rootDirectory: _getRootPathUseCase.rootPath,
       );
       if (path == null) throw Exception('Path is null');
       return Success(File(path));
