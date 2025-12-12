@@ -25,15 +25,13 @@ class PathManager
 
   static Future<PathManager> create() async {
     final root = await getApplicationDocumentsDirectory();
+    final download = Directory(join(root.path, 'download'));
+    final backup = Directory(join(root.path, 'backup'));
 
     return PathManager._(
       rootDirectory: root,
-      downloadDirectory: await Directory(
-        join(root.path, 'download'),
-      ).create(recursive: true),
-      backupDirectory: await Directory(
-        join(root.path, 'backup'),
-      ).create(recursive: true),
+      downloadDirectory: await download.create(recursive: true),
+      backupDirectory: await backup.create(recursive: true),
     );
   }
 
