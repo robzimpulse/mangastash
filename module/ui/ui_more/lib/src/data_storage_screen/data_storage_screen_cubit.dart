@@ -54,8 +54,8 @@ class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
     await refreshListBackup();
   }
 
-  Future<void> restoreBackup(FileSystemEntity file) async {
-    await _database.restore(file: File(file.path));
+  Future<void> restoreBackup(File file) async {
+    await _database.restore(file: file);
   }
 
   Future<void> updateStoragePath(String path) async {

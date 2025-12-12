@@ -124,19 +124,43 @@ class DataStorageScreen extends StatelessWidget {
             return prev.isLoadingBackup != curr.isLoadingBackup;
           },
           builder: (context, state) {
+            Widget trailing;
+
+            if (state.isLoadingBackup) {
+              trailing = SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              trailing = PopupMenuButton<_BackupMenuOption>(
+                icon: Icon(Icons.more_vert),
+                onSelected: (value) {
+                  switch (value) {
+                    case _BackupMenuOption.restoreFromFile:
+                      _onTapRestoreBackupFromExternal(context);
+                    case _BackupMenuOption.backupNow:
+                      _onTapBackupNow(context);
+                  }
+                },
+                itemBuilder: (context) {
+                  return [
+                    PopupMenuItem<_BackupMenuOption>(
+                      value: _BackupMenuOption.backupNow,
+                      child: Text('Backup Current Data'),
+                    ),
+                    PopupMenuItem<_BackupMenuOption>(
+                      value: _BackupMenuOption.restoreFromFile,
+                      child: Text('Restore from File'),
+                    ),
+                  ];
+                },
+              );
+            }
+
             return ListTile(
               title: Text('List of Backup Data'),
-              trailing:
-                  state.isLoadingBackup
-                      ? SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(),
-                      )
-                      : IconButton(
-                        icon: Icon(Icons.add),
-                        onPressed: () => _cubit(context).addBackup(),
-                      ),
+              trailing: trailing,
             );
           },
         ),
@@ -235,6 +259,17 @@ class DataStorageScreen extends StatelessWidget {
   void _onTapRestoreBackup(BuildContext context, FileSystemEntity file) async {
     final confirm = await onRestoreBackupConfirmation?.call();
     if (!context.mounted || confirm != true) return;
+    await _cubit(context).restoreBackup(File(file.path));
+    if (!context.mounted) return;
+    context.showSnackBar(message: 'Success restore backup');
+    WrapperScreen.restart(context);
+  }
+
+  void _onTapRestoreBackupFromExternal(BuildContext context) async {
+    final file = await filesystemPickerUseCase.file(context);
+    if (file == null) return;
+    final confirm = await onRestoreBackupConfirmation?.call();
+    if (!context.mounted || confirm != true) return;
     await _cubit(context).restoreBackup(file);
     if (!context.mounted) return;
     context.showSnackBar(message: 'Success restore backup');
@@ -248,6 +283,14 @@ class DataStorageScreen extends StatelessWidget {
     if (!context.mounted || directory == null) return;
     _cubit(context).updateStoragePath(directory.path);
   }
+
+  void _onTapBackupNow(BuildContext context) async {
+    await _cubit(context).addBackup();
+    if (!context.mounted) return;
+    context.showSnackBar(message: 'Success adding backup');
+  }
 }
 
 enum _MenuOption { share, restore, delete }
+
+enum _BackupMenuOption { restoreFromFile, backupNow }
