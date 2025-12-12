@@ -1,41 +1,33 @@
-import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:universal_io/io.dart';
 
 import '../../use_case/get_backup_path_use_case.dart';
 import '../../use_case/get_download_path_use_case.dart';
 import '../../use_case/get_root_path_use_case.dart';
-import '../../use_case/update_root_path_use_case.dart';
 
 class PathManager
     implements
         GetRootPathUseCase,
-        UpdateRootPathUseCase,
         GetBackupPathUseCase,
         GetDownloadPathUseCase {
-  final Directory _defaultRootDirectory;
-  Directory? _rootDirectory;
-  Directory? _backupDirectory;
-  Directory? _downloadDirectory;
+  final Directory _rootDirectory;
+  final Directory _backupDirectory;
+  final Directory _downloadDirectory;
 
   PathManager._({
-    required Directory defaultRootDirectory,
-    Directory? rootDirectory,
-    Directory? backupDirectory,
-    Directory? downloadDirectory,
+    required Directory rootDirectory,
+    required Directory backupDirectory,
+    required Directory downloadDirectory,
   }) : _rootDirectory = rootDirectory,
        _backupDirectory = backupDirectory,
-       _downloadDirectory = downloadDirectory,
-       _defaultRootDirectory = defaultRootDirectory;
+       _downloadDirectory = downloadDirectory;
 
   static Future<PathManager> create() async {
     final root = await getApplicationDocumentsDirectory();
 
     return PathManager._(
       rootDirectory: root,
-      defaultRootDirectory: root,
       downloadDirectory: await Directory(
         join(root.path, 'download'),
       ).create(recursive: true),
@@ -44,44 +36,6 @@ class PathManager
       ).create(recursive: true),
     );
   }
-
-  @override
-  Future<void> updateRootPath(String path) async {
-    if (kIsWeb) return;
-
-    await [Permission.manageExternalStorage, Permission.storage].request();
-
-    final isGranted = await Future.wait([
-      Permission.manageExternalStorage.isGranted,
-      Permission.storage.isGranted,
-    ]);
-
-    if (!isGranted.contains(true)) return;
-
-    final root = Directory.fromUri(Uri.file(path));
-    final backup = Directory(join(root.path, 'backup'));
-    final download = Directory(join(root.path, 'download'));
-
-    try {
-      /// test create folder on [path] if success we set it as root directory
-      /// along with backup and download folder
-      await Future.wait([
-        root.create(recursive: true),
-        backup.create(recursive: true),
-        download.create(recursive: true),
-      ]);
-    } catch (e) {
-      /// failed to create folder
-      return;
-    }
-
-    _rootDirectory = root;
-    _backupDirectory = backup;
-    _downloadDirectory = backup;
-  }
-
-  @override
-  Directory get defaultRootDirectory => _defaultRootDirectory;
 
   @override
   Directory? get rootPath => _rootDirectory;

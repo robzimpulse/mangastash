@@ -10,7 +10,6 @@ import 'use_case/filesystem_picker_use_case.dart';
 import 'use_case/get_backup_path_use_case.dart';
 import 'use_case/get_download_path_use_case.dart';
 import 'use_case/get_root_path_use_case.dart';
-import 'use_case/update_root_path_use_case.dart';
 
 class CoreStorageRegistrar extends Registrar {
   @override
@@ -33,7 +32,6 @@ class CoreStorageRegistrar extends Registrar {
     locator.registerLazySingleton(() => SharedPreferencesAsync());
     locator.registerLazySingletonAsync(() => PathManager.create());
     locator.alias<GetRootPathUseCase, PathManager>();
-    locator.alias<UpdateRootPathUseCase, PathManager>();
     locator.alias<GetBackupPathUseCase, PathManager>();
     locator.alias<GetDownloadPathUseCase, PathManager>();
 

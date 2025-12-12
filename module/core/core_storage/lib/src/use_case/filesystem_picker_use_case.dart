@@ -40,7 +40,7 @@ class FilesystemPickerUseCase {
       rootDirectory:
           defaultTargetPlatform == TargetPlatform.android
               ? Directory('/storage/emulated/0')
-              : _getRootPathUseCase.defaultRootDirectory,
+              : _getRootPathUseCase.rootPath,
       fsType: type,
       pickText: 'Select current folder',
       contextActions: contextActions,

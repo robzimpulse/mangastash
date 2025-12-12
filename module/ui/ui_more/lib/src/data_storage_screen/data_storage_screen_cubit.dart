@@ -8,26 +8,15 @@ import 'data_storage_screen_state.dart';
 class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
     with AutoSubscriptionMixin {
   final GetBackupPathUseCase _getBackupPathUseCase;
-  final UpdateRootPathUseCase _updateRootPathUseCase;
-  final GetRootPathUseCase _getRootPathUseCase;
   final AppDatabase _database;
 
   DataStorageScreenCubit({
     DataStorageScreenState initialState = const DataStorageScreenState(),
     required GetBackupPathUseCase getBackupPathUseCase,
-    required GetRootPathUseCase getRootPathUseCase,
-    required UpdateRootPathUseCase updateRootPathUseCase,
     required AppDatabase database,
   }) : _getBackupPathUseCase = getBackupPathUseCase,
-       _updateRootPathUseCase = updateRootPathUseCase,
-       _getRootPathUseCase = getRootPathUseCase,
        _database = database,
-       super(
-         initialState.copyWith(
-           rootPath: getRootPathUseCase.rootPath,
-           isDefaultRootPath: getRootPathUseCase.isDefault,
-         ),
-       );
+       super(initialState);
 
   Future<void> addBackup() async {
     final dir = _getBackupPathUseCase.backupPath;
@@ -37,6 +26,16 @@ class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
     final file = await _database.backup(filename: filename);
     await file.copy(join(dir.path, filename));
     await file.delete();
+    emit(state.copyWith(isLoadingBackup: false));
+    refreshListBackup();
+  }
+
+  Future<void> addBackupFromFile(File source) async {
+    final dir = _getBackupPathUseCase.backupPath;
+    if (dir == null) return;
+    emit(state.copyWith(isLoadingBackup: true));
+    final filename = '${source.filename}.sqlite';
+    await source.copy(join(dir.path, filename));
     emit(state.copyWith(isLoadingBackup: false));
     refreshListBackup();
   }
@@ -56,20 +55,5 @@ class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
 
   Future<void> restoreBackup(File file) async {
     await _database.restore(file: file);
-  }
-
-  Future<void> updateStoragePath(String path) async {
-    await _updateRootPathUseCase.updateRootPath(path);
-    emit(
-      state.copyWith(
-        rootPath: _getRootPathUseCase.rootPath,
-        isDefaultRootPath: _getRootPathUseCase.isDefault,
-      ),
-    );
-    refreshListBackup();
-  }
-
-  Future<void> resetStoragePath() async {
-    await updateStoragePath(_getRootPathUseCase.defaultRootDirectory.path);
   }
 }
