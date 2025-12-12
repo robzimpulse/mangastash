@@ -1,5 +1,6 @@
 import 'package:core_storage/core_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:path/path.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart' hide Error;
@@ -169,6 +170,8 @@ class DataStorageScreen extends StatelessWidget {
                             _onTapRestoreBackup(context, file);
                           case _MenuOption.delete:
                             _onTapDeleteBackup(context, file);
+                          case _MenuOption.save:
+                            _onTapSaveBackup(context, file);
                         }
                       },
                       itemBuilder: (context) {
@@ -184,6 +187,10 @@ class DataStorageScreen extends StatelessWidget {
                           PopupMenuItem<_MenuOption>(
                             value: _MenuOption.delete,
                             child: Text('Delete'),
+                          ),
+                          PopupMenuItem<_MenuOption>(
+                            value: _MenuOption.save,
+                            child: Text('Save to File'),
                           ),
                         ];
                       },
@@ -220,6 +227,15 @@ class DataStorageScreen extends StatelessWidget {
     }
   }
 
+  void _onTapSaveBackup(BuildContext context, FileSystemEntity file) async {
+    final dir = await filesystemPickerUseCase.directory(context);
+    if (dir == null) return;
+    final source = File(file.path);
+    await source.copy(join(dir.path, '${source.filename}.${source.extension}'));
+    if (!context.mounted) return;
+    context.showSnackBar(message: 'Success save backup to file');
+  }
+
   void _onTapRestoreBackup(BuildContext context, FileSystemEntity file) async {
     final confirm = await onRestoreBackupConfirmation?.call();
     if (!context.mounted || confirm != true) return;
@@ -242,6 +258,6 @@ class DataStorageScreen extends StatelessWidget {
   }
 }
 
-enum _MenuOption { share, restore, delete }
+enum _MenuOption { share, restore, delete, save }
 
 enum _AddBackupMenuOption { fromExternalFile, fromDatabase }
