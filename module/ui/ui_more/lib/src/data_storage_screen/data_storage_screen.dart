@@ -65,7 +65,11 @@ class DataStorageScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Data and Storage')),
       body: ListView(
         children: [
-          _buildBackupRestoreSection(context),
+          if (!kIsWeb) ...[
+            _buildBackupRestoreSection(context),
+          ] else ...[
+            Center(child: Text('This feature were unsupported on Web')),
+          ],
         ],
       ),
     );
