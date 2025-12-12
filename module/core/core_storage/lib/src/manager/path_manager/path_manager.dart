@@ -1,10 +1,13 @@
+import 'package:file/file.dart';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:universal_io/io.dart';
 
 import '../../use_case/get_backup_path_use_case.dart';
 import '../../use_case/get_download_path_use_case.dart';
 import '../../use_case/get_root_path_use_case.dart';
+
+import 'adapter/filesystem.dart'
+    if (dart.library.io) 'adapter/filesystem_io.dart'
+    if (dart.library.js) 'adapter/filesystem_web.dart';
 
 class PathManager
     implements
@@ -24,9 +27,9 @@ class PathManager
        _downloadDirectory = downloadDirectory;
 
   static Future<PathManager> create() async {
-    final root = await getApplicationDocumentsDirectory();
-    final download = Directory(join(root.path, 'download'));
-    final backup = Directory(join(root.path, 'backup'));
+    final root = await rootDirectory();
+    final download = filesystem().directory(join(root.path, 'download'));
+    final backup = filesystem().directory(join(root.path, 'backup'));
 
     return PathManager._(
       rootDirectory: root,
