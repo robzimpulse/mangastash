@@ -26,7 +26,7 @@ class Executor {
         name: _name,
         native: DriftNativeOptions(
           databaseDirectory: () async {
-            final directory = await getApplicationDocumentsDirectory();
+            final directory = await databaseDirectory();
             _logger?.call('Database location: $directory', name: 'AppDatabase');
             return directory;
           },
@@ -49,8 +49,13 @@ class Executor {
     });
   }
 
-  Future<File> getDatabaseFile() async {
-    final directory = await getApplicationDocumentsDirectory();
-    return File(path.join(directory.path, '$_name.sqlite'));
+  Future<Directory> databaseDirectory() => getApplicationDocumentsDirectory();
+
+  Future<File> databaseFile() async {
+    return File(
+      path.join((await databaseDirectory()).path, '$databaseName.sqlite'),
+    );
   }
+
+  String get databaseName => _name;
 }

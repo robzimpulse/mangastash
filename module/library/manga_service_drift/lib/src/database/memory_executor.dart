@@ -14,7 +14,12 @@ class MemoryExecutor extends Executor {
   }
 
   @override
-  Future<File> getDatabaseFile() {
-    throw UnimplementedError('Memory database do not have any path');
+  Future<File> databaseFile() {
+    throw UnimplementedError('Memory database do not have any file');
+  }
+
+  @override
+  Future<Directory> databaseDirectory() {
+    throw UnimplementedError('Memory database do not have any directory');
   }
 }

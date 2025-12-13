@@ -25,6 +25,6 @@ Future<void> restoreDatabase({
     ..dispose();
   // Then replace the existing database file with it.
   final tempDbFile = File(tempDb);
-  await tempDbFile.copy((await executor.getDatabaseFile()).path);
+  await tempDbFile.copy((await executor.databaseFile()).path);
   await tempDbFile.delete();
 }
