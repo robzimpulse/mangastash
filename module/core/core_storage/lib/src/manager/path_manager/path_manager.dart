@@ -5,7 +5,7 @@ import '../../use_case/get_download_path_use_case.dart';
 import '../../use_case/get_root_path_use_case.dart';
 import 'adapter/filesystem_adapter.dart'
     if (dart.library.js_interop) 'adapter/filesystem_web.dart'
-    if (dart.library.io) 'adapter_filesystem_io.dart';
+    if (dart.library.io) 'adapter/filesystem_io.dart';
 
 class PathManager
     implements
@@ -37,11 +37,11 @@ class PathManager
   }
 
   @override
-  Directory? get rootPath => _rootDirectory;
+  Directory get rootPath => _rootDirectory;
 
   @override
-  Directory? get backupPath => _backupDirectory;
+  Directory get backupPath => _backupDirectory;
 
   @override
-  Directory? get downloadPath => _downloadDirectory;
+  Directory get downloadPath => _downloadDirectory;
 }

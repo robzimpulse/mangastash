@@ -1,7 +1,7 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
-import 'package:path/path.dart';
+import 'package:file/file.dart';
 import 'package:safe_bloc/safe_bloc.dart';
-import 'package:universal_io/universal_io.dart';
 
 import 'data_storage_screen_state.dart';
 
@@ -18,42 +18,42 @@ class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
        _database = database,
        super(initialState);
 
-  Future<void> addBackup() async {
-    final dir = _getBackupPathUseCase.backupPath;
-    if (dir == null) return;
-    emit(state.copyWith(isLoadingBackup: true));
+  Future<void> addBackupFromDatabase() async {
     final filename = '${DateTime.timestamp().microsecondsSinceEpoch}.sqlite';
-    final file = await _database.backup(filename: filename);
-    await file.copy(join(dir.path, filename));
-    await file.delete();
+    final dir = _getBackupPathUseCase.backupPath;
+    emit(state.copyWith(isLoadingBackup: true));
+    await dir.childFile(filename).writeAsBytes(await _database.backup());
     emit(state.copyWith(isLoadingBackup: false));
     refreshListBackup();
   }
 
   Future<void> addBackupFromFile(File source) async {
+    final filename = '${source.filename}.${source.extension}';
     final dir = _getBackupPathUseCase.backupPath;
-    if (dir == null) return;
     emit(state.copyWith(isLoadingBackup: true));
-    final filename = '${source.filename}.sqlite';
-    await source.copy(join(dir.path, filename));
+    await dir.childFile(filename).writeAsBytes(await source.readAsBytes());
     emit(state.copyWith(isLoadingBackup: false));
     refreshListBackup();
   }
 
   Future<void> refreshListBackup() async {
     final dir = _getBackupPathUseCase.backupPath;
-    if (dir == null) return;
     emit(state.copyWith(isLoadingListBackup: true));
     final files = await dir.list().toList();
-    emit(state.copyWith(listBackup: files, isLoadingListBackup: false));
+    emit(
+      state.copyWith(
+        listBackup: [...files.map((e) => e.castOrNull<File>()).nonNulls],
+        isLoadingListBackup: false,
+      ),
+    );
   }
 
-  Future<void> deleteBackup(FileSystemEntity file) async {
+  Future<void> deleteBackup(File file) async {
     await file.delete();
     await refreshListBackup();
   }
 
   Future<void> restoreBackup(File file) async {
-    await _database.restore(file: file);
+    await _database.restore(data: await file.readAsBytes());
   }
 }

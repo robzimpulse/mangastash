@@ -1,10 +1,10 @@
 import 'package:core_storage/core_storage.dart';
+import 'package:file/file.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart' hide Error;
-import 'package:universal_io/universal_io.dart';
 
 import 'data_storage_screen_cubit.dart';
 import 'data_storage_screen_state.dart';
@@ -64,15 +64,7 @@ class DataStorageScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScaffoldScreen(
       appBar: AppBar(title: const Text('Data and Storage')),
-      body: ListView(
-        children: [
-          if (!kIsWeb) ...[
-            _buildBackupRestoreSection(context),
-          ] else ...[
-            Center(child: Text('This feature were unsupported on Web')),
-          ],
-        ],
-      ),
+      body: ListView(children: [_buildBackupRestoreSection(context)]),
     );
   }
 
@@ -204,7 +196,7 @@ class DataStorageScreen extends StatelessWidget {
     );
   }
 
-  void _onTapDeleteBackup(BuildContext context, FileSystemEntity file) async {
+  void _onTapDeleteBackup(BuildContext context, File file) async {
     final confirm = await onDeleteBackupConfirmation?.call();
     if (!context.mounted || confirm != true) return;
     await _cubit(context).deleteBackup(file);
@@ -212,10 +204,22 @@ class DataStorageScreen extends StatelessWidget {
     context.showSnackBar(message: 'Success delete backup');
   }
 
-  void _onTapShareBackup(BuildContext context, FileSystemEntity file) async {
+  void _onTapShareBackup(BuildContext context, File file) async {
     final result = await SharePlus.instance.share(
-      ShareParams(files: [XFile(file.path)]),
+      ShareParams(
+        files: [
+          XFile.fromData(
+            await file.readAsBytes(),
+            name: file.filename,
+            mimeType: 'text/plain',
+            path: file.path,
+            length: await file.length(),
+            lastModified: await file.lastModified(),
+          ),
+        ],
+      ),
     );
+
     if (!context.mounted) return;
     switch (result.status) {
       case ShareResultStatus.success:
@@ -227,19 +231,19 @@ class DataStorageScreen extends StatelessWidget {
     }
   }
 
-  void _onTapSaveBackup(BuildContext context, FileSystemEntity file) async {
-    final dir = await filesystemPickerUseCase.directory(context);
-    if (dir == null) return;
-    final source = File(file.path);
-    await source.copy(join(dir.path, '${source.filename}.${source.extension}'));
+  void _onTapSaveBackup(BuildContext context, File file) async {
+    final filename = '${file.filename}.${file.extension}';
+    final directory = await filesystemPickerUseCase.directory(context);
+    if (directory == null) return;
+    await directory.childFile(filename).writeAsBytes(await file.readAsBytes());
     if (!context.mounted) return;
     context.showSnackBar(message: 'Success save backup to file');
   }
 
-  void _onTapRestoreBackup(BuildContext context, FileSystemEntity file) async {
+  void _onTapRestoreBackup(BuildContext context, File file) async {
     final confirm = await onRestoreBackupConfirmation?.call();
     if (!context.mounted || confirm != true) return;
-    await _cubit(context).restoreBackup(File(file.path));
+    await _cubit(context).restoreBackup(file);
     if (!context.mounted) return;
     context.showSnackBar(message: 'Success restore backup');
     WrapperScreen.restart(context);
@@ -252,7 +256,7 @@ class DataStorageScreen extends StatelessWidget {
   }
 
   void _onTapBackupNow(BuildContext context) async {
-    await _cubit(context).addBackup();
+    await _cubit(context).addBackupFromDatabase();
     if (!context.mounted) return;
     context.showSnackBar(message: 'Success adding backup');
   }

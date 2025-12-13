@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:universal_io/universal_io.dart';
+import 'package:file/file.dart';
 
 class DataStorageScreenState extends Equatable {
   const DataStorageScreenState({
@@ -9,7 +9,7 @@ class DataStorageScreenState extends Equatable {
   });
 
   final bool isLoadingBackup;
-  final List<FileSystemEntity> listBackup;
+  final List<File> listBackup;
   final bool isLoadingListBackup;
 
   @override
@@ -21,7 +21,7 @@ class DataStorageScreenState extends Equatable {
 
   DataStorageScreenState copyWith({
     bool? isLoadingBackup,
-    List<FileSystemEntity>? listBackup,
+    List<File>? listBackup,
     bool? isLoadingListBackup,
   }) {
     return DataStorageScreenState(

@@ -1,8 +1,8 @@
+import 'package:file/file.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:universal_io/universal_io.dart';
 
 import 'get_root_path_use_case.dart';
 
@@ -20,26 +20,30 @@ class FilesystemPickerUseCase {
       contextActions: [FilesystemPickerNewFolderContextAction()],
     );
     if (path == null) return null;
-    return Directory(path);
+    return _getRootPathUseCase.rootPath.fileSystem.directory(path);
   }
 
   Future<File?> file(BuildContext context) async {
     final path = await _picker(context, type: FilesystemType.file);
     if (path == null) return null;
-    return File(path);
+    return _getRootPathUseCase.rootPath.fileSystem.file(path);
   }
 
   Future<String?> _picker(
     BuildContext context, {
     List<FilesystemPickerContextAction> contextActions = const [],
     FilesystemType? type,
-  }) {
+  }) async {
+    // TODO: search proper file picker on web
+    if (kIsWeb) return null;
     return FilesystemPicker.openDialog(
       title: 'Select file or folder',
       context: context,
       rootDirectory:
           defaultTargetPlatform == TargetPlatform.android
-              ? Directory('/storage/emulated/0')
+              ? _getRootPathUseCase.rootPath.fileSystem.directory(
+                '/storage/emulated/0',
+              )
               : _getRootPathUseCase.rootPath,
       fsType: type,
       pickText: 'Select current folder',

@@ -1,5 +1,5 @@
-import 'package:universal_io/io.dart';
+import 'package:file/file.dart';
 
 abstract class GetBackupPathUseCase {
-  Directory? get backupPath;
+  Directory get backupPath;
 }

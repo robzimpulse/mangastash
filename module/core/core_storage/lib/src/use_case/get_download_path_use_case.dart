@@ -1,5 +1,5 @@
-import 'package:universal_io/io.dart';
+import 'package:file/file.dart';
 
 abstract class GetDownloadPathUseCase {
-  Directory? get downloadPath;
+  Directory get downloadPath;
 }
