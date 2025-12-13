@@ -7,7 +7,7 @@ import 'package:universal_io/universal_io.dart';
 import '../interceptor/log_interceptor.dart';
 import '../util/typedef.dart';
 import 'adapter/sql_workaround_adapter.dart'
-    if (dart.library.io) 'adapter/sql_workaround_native.dart'
+    if (dart.library.io) 'adapter/sql_workaround_io.dart'
     if (dart.library.js) 'adapter/sql_workaround_web.dart';
 
 class Executor {

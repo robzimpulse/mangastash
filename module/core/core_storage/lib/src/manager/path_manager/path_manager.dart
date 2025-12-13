@@ -12,29 +12,24 @@ class PathManager
         GetRootPathUseCase,
         GetBackupPathUseCase,
         GetDownloadPathUseCase {
-  final FileSystem _fileSystem;
   final Directory _rootDirectory;
   final Directory _backupDirectory;
   final Directory _downloadDirectory;
 
   PathManager._({
-    required FileSystem fileSystem,
     required Directory rootDirectory,
     required Directory backupDirectory,
     required Directory downloadDirectory,
-  }) : _fileSystem = fileSystem,
-       _rootDirectory = rootDirectory,
+  }) : _rootDirectory = rootDirectory,
        _backupDirectory = backupDirectory,
        _downloadDirectory = downloadDirectory;
 
   static Future<PathManager> create() async {
-    final system = fileSystem();
-    final root = await rootDirectory(system: system);
+    final root = await rootDirectory();
     final download = root.childDirectory('download');
     final backup = root.childDirectory('backup');
 
     return PathManager._(
-      fileSystem: system,
       rootDirectory: root,
       downloadDirectory: await download.create(recursive: true),
       backupDirectory: await backup.create(recursive: true),

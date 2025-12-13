@@ -1,7 +1,5 @@
 import 'package:file/file.dart';
 
-FileSystem fileSystem() => throw UnimplementedError('Unimplemented');
-
-Future<Directory> rootDirectory({required FileSystem system}) {
+Future<Directory> rootDirectory() {
   throw UnimplementedError('Unimplemented');
 }
