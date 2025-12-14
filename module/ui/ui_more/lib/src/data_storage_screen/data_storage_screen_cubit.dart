@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:file/file.dart';
@@ -19,19 +21,14 @@ class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
        super(initialState);
 
   Future<void> addBackupFromDatabase() async {
+    await addBackupFromData(data: await _database.backup());
+  }
+
+  Future<void> addBackupFromData({required Uint8List data}) async {
     final filename = '${DateTime.timestamp().microsecondsSinceEpoch}.sqlite';
     final dir = _getBackupPathUseCase.backupPath;
     emit(state.copyWith(isLoadingBackup: true));
-    await dir.childFile(filename).writeAsBytes(await _database.backup());
-    emit(state.copyWith(isLoadingBackup: false));
-    refreshListBackup();
-  }
-
-  Future<void> addBackupFromFile(File source) async {
-    final filename = '${source.filename}.${source.extension}';
-    final dir = _getBackupPathUseCase.backupPath;
-    emit(state.copyWith(isLoadingBackup: true));
-    await dir.childFile(filename).writeAsBytes(await source.readAsBytes());
+    await dir.childFile(filename).writeAsBytes(data);
     emit(state.copyWith(isLoadingBackup: false));
     refreshListBackup();
   }

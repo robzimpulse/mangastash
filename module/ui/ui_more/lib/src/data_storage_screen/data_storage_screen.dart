@@ -1,7 +1,6 @@
 import 'package:core_storage/core_storage.dart';
 import 'package:file/file.dart';
 import 'package:flutter/foundation.dart';
-import 'package:path/path.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart' hide Error;
@@ -12,13 +11,16 @@ import 'data_storage_screen_state.dart';
 class DataStorageScreen extends StatelessWidget {
   const DataStorageScreen({
     super.key,
-    required this.filesystemPickerUseCase,
+    required this.fileSaverUseCase,
+    required this.filePickerUseCase,
     this.onUpdateRootPathConfirmation,
     this.onRestoreBackupConfirmation,
     this.onDeleteBackupConfirmation,
   });
 
-  final FilesystemPickerUseCase filesystemPickerUseCase;
+  final FileSaverUseCase fileSaverUseCase;
+
+  final FilePickerUseCase filePickerUseCase;
 
   final AsyncValueGetter<bool?>? onUpdateRootPathConfirmation;
 
@@ -40,7 +42,8 @@ class DataStorageScreen extends StatelessWidget {
         )..refreshListBackup();
       },
       child: DataStorageScreen(
-        filesystemPickerUseCase: locator(),
+        fileSaverUseCase: locator(),
+        filePickerUseCase: locator(),
         onUpdateRootPathConfirmation: onUpdateRootPathConfirmation,
         onRestoreBackupConfirmation: onRestoreBackupConfirmation,
         onDeleteBackupConfirmation: onDeleteBackupConfirmation,
@@ -172,10 +175,11 @@ class DataStorageScreen extends StatelessWidget {
                             value: _MenuOption.restore,
                             child: Text('Restore'),
                           ),
-                          PopupMenuItem<_MenuOption>(
-                            value: _MenuOption.share,
-                            child: Text('Share'),
-                          ),
+                          if (!kIsWeb)
+                            PopupMenuItem<_MenuOption>(
+                              value: _MenuOption.share,
+                              child: Text('Share'),
+                            ),
                           PopupMenuItem<_MenuOption>(
                             value: _MenuOption.delete,
                             child: Text('Delete'),
@@ -233,9 +237,10 @@ class DataStorageScreen extends StatelessWidget {
 
   void _onTapSaveBackup(BuildContext context, File file) async {
     final filename = '${file.filename}.${file.extension}';
-    final directory = await filesystemPickerUseCase.directory(context);
-    if (directory == null) return;
-    await directory.childFile(filename).writeAsBytes(await file.readAsBytes());
+    await fileSaverUseCase.execute(
+      filename: filename,
+      data: await file.readAsBytes(),
+    );
     if (!context.mounted) return;
     context.showSnackBar(message: 'Success save backup to file');
   }
@@ -250,9 +255,9 @@ class DataStorageScreen extends StatelessWidget {
   }
 
   void _onTapAddBackupFromExternal(BuildContext context) async {
-    final file = await filesystemPickerUseCase.file(context);
-    if (!context.mounted || file == null) return;
-    _cubit(context).addBackupFromFile(file);
+    final data = await filePickerUseCase.execute(context);
+    if (!context.mounted || data == null) return;
+    _cubit(context).addBackupFromData(data: data);
   }
 
   void _onTapBackupNow(BuildContext context) async {
