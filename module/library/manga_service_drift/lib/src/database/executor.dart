@@ -27,7 +27,10 @@ class Executor {
         native: DriftNativeOptions(
           databaseDirectory: () async {
             final directory = await databaseDirectory();
-            _logger?.call('Database location: $directory', name: 'AppDatabase');
+            _logger?.call(
+              'Database location: $directory',
+              name: runtimeType.toString(),
+            );
             return directory;
           },
         ),
@@ -39,7 +42,7 @@ class Executor {
             _logger?.call(
               'Using ${result.chosenImplementation} due to unsupported '
               'browser features: ${result.missingFeatures}',
-              name: 'AppDatabase',
+              name: runtimeType.toString(),
             );
           },
         ),
