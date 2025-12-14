@@ -62,9 +62,7 @@ class AppDatabase extends _$AppDatabase {
   int get schemaVersion => 1;
 
   Future<void> clear() async {
-    for (final table in allTables) {
-      await delete(table).go();
-    }
+    await Future.wait([for (final table in allTables) delete(table).go()]);
   }
 
   Future<Uint8List> backup() {
