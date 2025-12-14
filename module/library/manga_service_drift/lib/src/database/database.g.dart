@@ -3309,6 +3309,371 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
   }
 }
 
+class $ImageByteTablesTable extends ImageByteTables
+    with TableInfo<$ImageByteTablesTable, ImageByteDrift> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ImageByteTablesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: () => const Uuid().v4(),
+  );
+  static const VerificationMeta _webUrlMeta = const VerificationMeta('webUrl');
+  @override
+  late final GeneratedColumn<String> webUrl = GeneratedColumn<String>(
+    'web_url',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _byteMeta = const VerificationMeta('byte');
+  @override
+  late final GeneratedColumn<Uint8List> byte = GeneratedColumn<Uint8List>(
+    'byte',
+    aliasedName,
+    true,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    createdAt,
+    updatedAt,
+    id,
+    webUrl,
+    byte,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'image_byte_tables';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ImageByteDrift> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('web_url')) {
+      context.handle(
+        _webUrlMeta,
+        webUrl.isAcceptableOrUnknown(data['web_url']!, _webUrlMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_webUrlMeta);
+    }
+    if (data.containsKey('byte')) {
+      context.handle(
+        _byteMeta,
+        byte.isAcceptableOrUnknown(data['byte']!, _byteMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {webUrl},
+  ];
+  @override
+  ImageByteDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ImageByteDrift(
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      webUrl:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}web_url'],
+          )!,
+      byte: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}byte'],
+      ),
+    );
+  }
+
+  @override
+  $ImageByteTablesTable createAlias(String alias) {
+    return $ImageByteTablesTable(attachedDatabase, alias);
+  }
+}
+
+class ImageByteDrift extends DataClass implements Insertable<ImageByteDrift> {
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String id;
+  final String webUrl;
+  final Uint8List? byte;
+  const ImageByteDrift({
+    required this.createdAt,
+    required this.updatedAt,
+    required this.id,
+    required this.webUrl,
+    this.byte,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['id'] = Variable<String>(id);
+    map['web_url'] = Variable<String>(webUrl);
+    if (!nullToAbsent || byte != null) {
+      map['byte'] = Variable<Uint8List>(byte);
+    }
+    return map;
+  }
+
+  ImageByteTablesCompanion toCompanion(bool nullToAbsent) {
+    return ImageByteTablesCompanion(
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      id: Value(id),
+      webUrl: Value(webUrl),
+      byte: byte == null && nullToAbsent ? const Value.absent() : Value(byte),
+    );
+  }
+
+  factory ImageByteDrift.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ImageByteDrift(
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      id: serializer.fromJson<String>(json['id']),
+      webUrl: serializer.fromJson<String>(json['webUrl']),
+      byte: serializer.fromJson<Uint8List?>(json['byte']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'id': serializer.toJson<String>(id),
+      'webUrl': serializer.toJson<String>(webUrl),
+      'byte': serializer.toJson<Uint8List?>(byte),
+    };
+  }
+
+  ImageByteDrift copyWith({
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? id,
+    String? webUrl,
+    Value<Uint8List?> byte = const Value.absent(),
+  }) => ImageByteDrift(
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    id: id ?? this.id,
+    webUrl: webUrl ?? this.webUrl,
+    byte: byte.present ? byte.value : this.byte,
+  );
+  ImageByteDrift copyWithCompanion(ImageByteTablesCompanion data) {
+    return ImageByteDrift(
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      id: data.id.present ? data.id.value : this.id,
+      webUrl: data.webUrl.present ? data.webUrl.value : this.webUrl,
+      byte: data.byte.present ? data.byte.value : this.byte,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ImageByteDrift(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('id: $id, ')
+          ..write('webUrl: $webUrl, ')
+          ..write('byte: $byte')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    createdAt,
+    updatedAt,
+    id,
+    webUrl,
+    $driftBlobEquality.hash(byte),
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ImageByteDrift &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.id == this.id &&
+          other.webUrl == this.webUrl &&
+          $driftBlobEquality.equals(other.byte, this.byte));
+}
+
+class ImageByteTablesCompanion extends UpdateCompanion<ImageByteDrift> {
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<String> id;
+  final Value<String> webUrl;
+  final Value<Uint8List?> byte;
+  final Value<int> rowid;
+  const ImageByteTablesCompanion({
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.id = const Value.absent(),
+    this.webUrl = const Value.absent(),
+    this.byte = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ImageByteTablesCompanion.insert({
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.id = const Value.absent(),
+    required String webUrl,
+    this.byte = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : webUrl = Value(webUrl);
+  static Insertable<ImageByteDrift> custom({
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<String>? id,
+    Expression<String>? webUrl,
+    Expression<Uint8List>? byte,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (id != null) 'id': id,
+      if (webUrl != null) 'web_url': webUrl,
+      if (byte != null) 'byte': byte,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ImageByteTablesCompanion copyWith({
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<String>? id,
+    Value<String>? webUrl,
+    Value<Uint8List?>? byte,
+    Value<int>? rowid,
+  }) {
+    return ImageByteTablesCompanion(
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      id: id ?? this.id,
+      webUrl: webUrl ?? this.webUrl,
+      byte: byte ?? this.byte,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (webUrl.present) {
+      map['web_url'] = Variable<String>(webUrl.value);
+    }
+    if (byte.present) {
+      map['byte'] = Variable<Uint8List>(byte.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ImageByteTablesCompanion(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('id: $id, ')
+          ..write('webUrl: $webUrl, ')
+          ..write('byte: $byte, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3320,6 +3685,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $RelationshipTablesTable relationshipTables =
       $RelationshipTablesTable(this);
   late final $JobTablesTable jobTables = $JobTablesTable(this);
+  late final $ImageByteTablesTable imageByteTables = $ImageByteTablesTable(
+    this,
+  );
   late final MangaDao mangaDao = MangaDao(this as AppDatabase);
   late final ChapterDao chapterDao = ChapterDao(this as AppDatabase);
   late final LibraryDao libraryDao = LibraryDao(this as AppDatabase);
@@ -3327,6 +3695,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final ImageDao imageDao = ImageDao(this as AppDatabase);
   late final TagDao tagDao = TagDao(this as AppDatabase);
   late final HistoryDao historyDao = HistoryDao(this as AppDatabase);
+  late final ImageByteDao imageByteDao = ImageByteDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3339,6 +3708,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     tagTables,
     relationshipTables,
     jobTables,
+    imageByteTables,
   ];
 }
 
@@ -5092,6 +5462,226 @@ typedef $$JobTablesTableProcessedTableManager =
       JobDrift,
       PrefetchHooks Function()
     >;
+typedef $$ImageByteTablesTableCreateCompanionBuilder =
+    ImageByteTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<String> id,
+      required String webUrl,
+      Value<Uint8List?> byte,
+      Value<int> rowid,
+    });
+typedef $$ImageByteTablesTableUpdateCompanionBuilder =
+    ImageByteTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<String> id,
+      Value<String> webUrl,
+      Value<Uint8List?> byte,
+      Value<int> rowid,
+    });
+
+class $$ImageByteTablesTableFilterComposer
+    extends Composer<_$AppDatabase, $ImageByteTablesTable> {
+  $$ImageByteTablesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get webUrl => $composableBuilder(
+    column: $table.webUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get byte => $composableBuilder(
+    column: $table.byte,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ImageByteTablesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ImageByteTablesTable> {
+  $$ImageByteTablesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get webUrl => $composableBuilder(
+    column: $table.webUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get byte => $composableBuilder(
+    column: $table.byte,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ImageByteTablesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ImageByteTablesTable> {
+  $$ImageByteTablesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get webUrl =>
+      $composableBuilder(column: $table.webUrl, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get byte =>
+      $composableBuilder(column: $table.byte, builder: (column) => column);
+}
+
+class $$ImageByteTablesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ImageByteTablesTable,
+          ImageByteDrift,
+          $$ImageByteTablesTableFilterComposer,
+          $$ImageByteTablesTableOrderingComposer,
+          $$ImageByteTablesTableAnnotationComposer,
+          $$ImageByteTablesTableCreateCompanionBuilder,
+          $$ImageByteTablesTableUpdateCompanionBuilder,
+          (
+            ImageByteDrift,
+            BaseReferences<
+              _$AppDatabase,
+              $ImageByteTablesTable,
+              ImageByteDrift
+            >,
+          ),
+          ImageByteDrift,
+          PrefetchHooks Function()
+        > {
+  $$ImageByteTablesTableTableManager(
+    _$AppDatabase db,
+    $ImageByteTablesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () =>
+                  $$ImageByteTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$ImageByteTablesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$ImageByteTablesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> webUrl = const Value.absent(),
+                Value<Uint8List?> byte = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ImageByteTablesCompanion(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                webUrl: webUrl,
+                byte: byte,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                required String webUrl,
+                Value<Uint8List?> byte = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ImageByteTablesCompanion.insert(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                webUrl: webUrl,
+                byte: byte,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ImageByteTablesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ImageByteTablesTable,
+      ImageByteDrift,
+      $$ImageByteTablesTableFilterComposer,
+      $$ImageByteTablesTableOrderingComposer,
+      $$ImageByteTablesTableAnnotationComposer,
+      $$ImageByteTablesTableCreateCompanionBuilder,
+      $$ImageByteTablesTableUpdateCompanionBuilder,
+      (
+        ImageByteDrift,
+        BaseReferences<_$AppDatabase, $ImageByteTablesTable, ImageByteDrift>,
+      ),
+      ImageByteDrift,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5110,4 +5700,6 @@ class $AppDatabaseManager {
       $$RelationshipTablesTableTableManager(_db, _db.relationshipTables);
   $$JobTablesTableTableManager get jobTables =>
       $$JobTablesTableTableManager(_db, _db.jobTables);
+  $$ImageByteTablesTableTableManager get imageByteTables =>
+      $$ImageByteTablesTableTableManager(_db, _db.imageByteTables);
 }

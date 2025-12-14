@@ -5,12 +5,14 @@ import 'package:uuid/uuid.dart';
 
 import '../dao/chapter_dao.dart';
 import '../dao/history_dao.dart';
+import '../dao/image_byte_dao.dart';
 import '../dao/image_dao.dart';
 import '../dao/job_dao.dart';
 import '../dao/library_dao.dart';
 import '../dao/manga_dao.dart';
 import '../dao/tag_dao.dart';
 import '../tables/chapter_tables.dart';
+import '../tables/image_byte_tables.dart';
 import '../tables/image_tables.dart';
 import '../tables/job_tables.dart';
 import '../tables/library_tables.dart';
@@ -37,6 +39,7 @@ part 'database.g.dart';
     TagTables,
     RelationshipTables,
     JobTables,
+    ImageByteTables,
   ],
   daos: [
     MangaDao,
@@ -46,6 +49,7 @@ part 'database.g.dart';
     ImageDao,
     TagDao,
     HistoryDao,
+    ImageByteDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
