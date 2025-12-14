@@ -1,5 +1,7 @@
 import 'package:universal_io/universal_io.dart';
 
+import 'int_extension.dart';
+
 extension FileSystemEntityExtension on FileSystemEntity {
   String? get _lastPathComponent => path.split('/').lastOrNull;
 
@@ -10,9 +12,11 @@ extension FileSystemEntityExtension on FileSystemEntity {
 
 extension FileStatExtension on FileStat {
 
-  double get sizeInKb => size / (1024);
+  double get sizeInKb => size.inKb;
 
-  double get sizeInMb => sizeInKb / (1024);
+  double get sizeInMb => size.inMb;
 
-  double get sizeInGb => sizeInMb / (1024);
+  double get sizeInGb => size.inGb;
+
+  String get formattedSize => size.formattedSize;
 }

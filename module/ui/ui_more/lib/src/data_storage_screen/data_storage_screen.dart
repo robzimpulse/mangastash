@@ -11,12 +11,15 @@ import 'data_storage_screen_state.dart';
 class DataStorageScreen extends StatelessWidget {
   const DataStorageScreen({
     super.key,
+    required this.imageCacheManager,
     required this.fileSaverUseCase,
     required this.filePickerUseCase,
     this.onUpdateRootPathConfirmation,
     this.onRestoreBackupConfirmation,
     this.onDeleteBackupConfirmation,
   });
+
+  final ImageCacheManager imageCacheManager;
 
   final FileSaverUseCase fileSaverUseCase;
 
@@ -44,6 +47,7 @@ class DataStorageScreen extends StatelessWidget {
       child: DataStorageScreen(
         fileSaverUseCase: locator(),
         filePickerUseCase: locator(),
+        imageCacheManager: locator(),
         onUpdateRootPathConfirmation: onUpdateRootPathConfirmation,
         onRestoreBackupConfirmation: onRestoreBackupConfirmation,
         onDeleteBackupConfirmation: onDeleteBackupConfirmation,
@@ -67,7 +71,28 @@ class DataStorageScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScaffoldScreen(
       appBar: AppBar(title: const Text('Data and Storage')),
-      body: ListView(children: [_buildBackupRestoreSection(context)]),
+      body: ListView(
+        children: [
+          _buildImageCacheSize(context),
+          _buildBackupRestoreSection(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageCacheSize(BuildContext context) {
+    return ListTile(
+      title: const Text('Image Cache Size'),
+      subtitle: FutureBuilder(
+        future: imageCacheManager.getSize(),
+        builder: (context, snapshot) {
+          return Text('Size: ${snapshot.data?.formattedSize}');
+        },
+      ),
+      trailing: IconButton(
+        onPressed: () => imageCacheManager.emptyCache(),
+        icon: Icon(Icons.delete),
+      ),
     );
   }
 
@@ -150,7 +175,7 @@ class DataStorageScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Last Modified: ${data.modified.toString()}'),
-                            Text('Size: ${data.sizeInKb} KB'),
+                            Text('Size: ${data.formattedSize}'),
                           ],
                         );
                       },
@@ -255,9 +280,7 @@ class DataStorageScreen extends StatelessWidget {
   }
 
   void _onTapAddBackupFromExternal(BuildContext context) async {
-    final data = await filePickerUseCase.execute(
-      allowedExtensions: ['sqlite'],
-    );
+    final data = await filePickerUseCase.execute(allowedExtensions: ['sqlite']);
     if (!context.mounted || data == null) return;
     _cubit(context).addBackupFromData(data: data);
   }

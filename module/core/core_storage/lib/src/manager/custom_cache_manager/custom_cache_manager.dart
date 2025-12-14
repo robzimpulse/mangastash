@@ -9,8 +9,12 @@ class CustomCacheManager implements BaseCacheManager {
 
   late final CustomCacheStore _cacheStore;
 
-  CustomCacheManager(Config config) {
-    _cacheStore = CustomCacheStore(config);
+  CustomCacheManager(
+    Config config, {
+    Future<void> Function(CacheObject object, Uint8List data)? onDeleteFile,
+  }) {
+    _cacheStore = CustomCacheStore(config, onDeleteFile: onDeleteFile);
+
     /// ignore: invalid_use_of_visible_for_testing_member
     _cache = CacheManager.custom(config, cacheStore: _cacheStore);
   }
@@ -130,4 +134,6 @@ class CustomCacheManager implements BaseCacheManager {
   }) {
     return _cache.getFile(url, key: key ?? url, headers: headers ?? {});
   }
+
+  Future<int> getSize() => _cacheStore.getCacheSize();
 }
