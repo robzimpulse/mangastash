@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 
 import '../database.dart';
 import '../executor.dart';
@@ -8,5 +8,9 @@ Future<void> restoreDatabase({
   required AppDatabase database,
   required Executor executor,
 }) async {
-  throw UnimplementedError('Restore database is not supported web');
+  if (kIsWasm) {
+    throw UnimplementedError('Restore database is not supported web wasm');
+  } else {
+    throw UnimplementedError('Restore database is not supported web');
+  }
 }
