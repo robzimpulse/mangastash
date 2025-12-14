@@ -38,12 +38,13 @@ class Executor {
           sqlite3Wasm: Uri.parse('sqlite3.wasm'),
           driftWorker: Uri.parse('drift_worker.js'),
           onResult: (result) {
-            if (result.missingFeatures.isEmpty) return;
-            _logger?.call(
-              'Using ${result.chosenImplementation} due to unsupported '
-              'browser features: ${result.missingFeatures}',
-              name: runtimeType.toString(),
-            );
+            if (result.missingFeatures.isNotEmpty) {
+              _logger?.call(
+                'Using ${result.chosenImplementation} due to unsupported '
+                'browser features: ${result.missingFeatures}',
+                name: runtimeType.toString(),
+              );
+            }
           },
         ),
       );
