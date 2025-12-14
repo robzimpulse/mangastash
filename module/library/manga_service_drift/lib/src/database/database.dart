@@ -21,6 +21,9 @@ import '../util/job_type_enum.dart';
 import 'adapter/backup_database_adapter.dart'
     if (dart.library.js_interop) 'adapter/backup_database_web.dart'
     if (dart.library.io) 'adapter/backup_database_io.dart';
+import 'adapter/restore_database_adapter.dart'
+    if (dart.library.js_interop) 'adapter/restore_database_web.dart'
+    if (dart.library.io) 'adapter/restore_database_io.dart';
 import 'executor.dart';
 
 part 'database.g.dart';
@@ -68,9 +71,7 @@ class AppDatabase extends _$AppDatabase {
     return backupDatabase(dbName: _executor.databaseName, database: this);
   }
 
-  Future<void> restore({required Uint8List data}) async {}
-
-  // Future<void> restore({required File file}) async {
-  //   await restoreDatabase(file: file, database: this, executor: _executor);
-  // }
+  Future<void> restore({required Uint8List data}) async {
+    return restoreDatabase(data: data, database: this, executor: _executor);
+  }
 }
