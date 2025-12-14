@@ -7,5 +7,6 @@ class FakeIOOverride extends Mock implements IOOverrides {
 
   FakeIOOverride({required FakeDirectory directory}) {
     when(() => createDirectory(any())).thenReturn(directory);
+    when(() => getCurrentDirectory()).thenReturn(directory);
   }
 }
