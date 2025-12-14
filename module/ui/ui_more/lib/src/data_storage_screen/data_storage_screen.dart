@@ -255,7 +255,9 @@ class DataStorageScreen extends StatelessWidget {
   }
 
   void _onTapAddBackupFromExternal(BuildContext context) async {
-    final data = await filePickerUseCase.execute(context);
+    final data = await filePickerUseCase.execute(
+      allowedExtensions: ['sqlite'],
+    );
     if (!context.mounted || data == null) return;
     _cubit(context).addBackupFromData(data: data);
   }
