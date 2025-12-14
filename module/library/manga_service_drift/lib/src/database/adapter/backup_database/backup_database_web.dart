@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:sqlite3/wasm.dart';
 
-import '../database.dart';
+import '../../database.dart';
 
 /// Example: https://github.com/simolus3/drift/issues/3511#issuecomment-2755611490
 Future<Uint8List> backupDatabase({

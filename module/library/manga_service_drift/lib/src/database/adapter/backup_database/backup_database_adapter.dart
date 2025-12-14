@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import '../database.dart';
+import '../../database.dart';
 
 Future<Uint8List> backupDatabase({
   required String dbName,
