@@ -1,11 +1,5 @@
-import 'package:universal_io/io.dart';
+import 'package:file/file.dart';
 
 abstract class GetRootPathUseCase {
-  Directory? get rootPath;
-
-  Directory? get androidRootPath;
-}
-
-extension RootForPickingFile on GetRootPathUseCase {
-  Directory? get rootForPickFile => androidRootPath ?? rootPath;
+  Directory get rootPath;
 }

@@ -11,4 +11,4 @@ export 'src/provider/dio_image_provider.dart';
 export 'src/response/error.dart';
 export 'src/response/result.dart';
 export 'src/response/success.dart';
-export 'src/usecase/headless_webview_usecase.dart';
+export 'src/usecase/headless_webview_use_case.dart';

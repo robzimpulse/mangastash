@@ -1,9 +1,6 @@
 import 'dart:async';
 
 import 'package:drift/drift.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:universal_io/universal_io.dart';
 import 'package:uuid/uuid.dart';
 
 import '../dao/chapter_dao.dart';
@@ -21,8 +18,12 @@ import '../tables/manga_tables.dart';
 import '../tables/relationship_tables.dart';
 import '../tables/tag_tables.dart';
 import '../util/job_type_enum.dart';
-import 'adapter/restore_database_unsupported.dart'
-    if (dart.library.ffi) 'adapter/restore_database_supported.dart';
+import 'adapter/backup_database/backup_database_adapter.dart'
+    if (dart.library.js_interop) 'adapter/backup_database/backup_database_web.dart'
+    if (dart.library.io) 'adapter/backup_database/backup_database_io.dart';
+import 'adapter/restore_database/restore_database_adapter.dart'
+    if (dart.library.js_interop) 'adapter/restore_database/restore_database_web.dart'
+    if (dart.library.io) 'adapter/restore_database/restore_database_io.dart';
 import 'executor.dart';
 
 part 'database.g.dart';
@@ -61,34 +62,14 @@ class AppDatabase extends _$AppDatabase {
   int get schemaVersion => 1;
 
   Future<void> clear() async {
-    for (final table in allTables) {
-      await delete(table).go();
-    }
+    await Future.wait([for (final table in allTables) delete(table).go()]);
   }
 
-  // Example: https://github.com/simolus3/drift/blob/96b3947fc16de99ffe25bcabc124e3b3a7c69571/examples/app/lib/screens/backup/supported.dart#L47-L68
-  Future<File> backup({Directory? directory, String? filename}) async {
-    final dir = directory ?? await getTemporaryDirectory();
-    final timestamp = DateTime.timestamp().microsecondsSinceEpoch;
-    final name = filename ?? '$timestamp.sqlite';
-    final file = File(join(dir.path, name));
-
-    // Make sure the directory of the file exists
-    if (!await dir.exists()) {
-      await dir.create(recursive: true);
-    }
-
-    // However, the file itself must not exist
-    if (await file.exists()) {
-      await file.delete();
-    }
-
-    await customStatement('VACUUM INTO ?', [file.absolute.path]);
-
-    return file;
+  Future<Uint8List> backup() {
+    return backupDatabase(dbName: _executor.databaseName, database: this);
   }
 
-  Future<void> restore({required File file}) async {
-    await restoreDatabase(file: file, database: this, executor: _executor);
+  Future<void> restore({required Uint8List data}) async {
+    return restoreDatabase(data: data, database: this, executor: _executor);
   }
 }

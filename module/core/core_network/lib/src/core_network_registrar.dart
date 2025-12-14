@@ -3,7 +3,7 @@ import 'package:service_locator/service_locator.dart';
 
 import 'manager/dio_manager.dart';
 import 'manager/headless_webview_manager.dart';
-import 'usecase/headless_webview_usecase.dart';
+import 'usecase/headless_webview_use_case.dart';
 
 class CoreNetworkRegistrar extends Registrar {
   @override

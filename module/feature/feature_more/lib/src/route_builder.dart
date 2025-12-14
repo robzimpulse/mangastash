@@ -62,7 +62,49 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         parentNavigatorKey: rootNavigatorKey,
         path: MoreRoutePath.dataStorage,
         name: MoreRoutePath.dataStorage,
-        builder: (context, state) => DataStorageScreen.create(locator: locator),
+        builder: (context, state) {
+          return DataStorageScreen.create(
+            locator: locator,
+            onUpdateRootPathConfirmation: () {
+              return context.pushNamed<bool>(
+                CommonRoutePath.confirmation,
+                queryParameters: {
+                  CommonRoutePath.confirmationTitle: 'Change Storage Location',
+                  CommonRoutePath.confirmationContent:
+                      'Your download and backup data will be lost, '
+                      'are you sure want to change storage location? ',
+                  CommonRoutePath.confirmationNegativeButtonText: 'No',
+                  CommonRoutePath.confirmationPositiveButtonText: 'Yes',
+                },
+              );
+            },
+            onRestoreBackupConfirmation: () {
+              return context.pushNamed<bool>(
+                CommonRoutePath.confirmation,
+                queryParameters: {
+                  CommonRoutePath.confirmationTitle: 'Restore Data',
+                  CommonRoutePath.confirmationContent:
+                      'Your current download and backup data will be replaced '
+                      'with backup data, are you sure want to restore this? ',
+                  CommonRoutePath.confirmationNegativeButtonText: 'No',
+                  CommonRoutePath.confirmationPositiveButtonText: 'Yes',
+                },
+              );
+            },
+            onDeleteBackupConfirmation: () {
+              return context.pushNamed<bool>(
+                CommonRoutePath.confirmation,
+                queryParameters: {
+                  CommonRoutePath.confirmationTitle: 'Delete Backup Data',
+                  CommonRoutePath.confirmationContent:
+                      'are you sure want to delete this data? ',
+                  CommonRoutePath.confirmationNegativeButtonText: 'No',
+                  CommonRoutePath.confirmationPositiveButtonText: 'Yes',
+                },
+              );
+            },
+          );
+        },
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,

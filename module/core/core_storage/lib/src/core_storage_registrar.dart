@@ -6,9 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'manager/path_manager/path_manager.dart';
 import 'manager/storage_manager/file_service/custom_file_service.dart';
 import 'manager/storage_manager/storage_manager.dart';
-import 'use_case/filesystem_picker_usecase.dart';
-import 'use_case/get_backup_path_usecase.dart';
-import 'use_case/get_download_path_usecase.dart';
+import 'use_case/file_picker_use_case.dart';
+import 'use_case/file_saver_use_case.dart';
+import 'use_case/get_backup_path_use_case.dart';
+import 'use_case/get_download_path_use_case.dart';
 import 'use_case/get_root_path_use_case.dart';
 
 class CoreStorageRegistrar extends Registrar {
@@ -36,7 +37,10 @@ class CoreStorageRegistrar extends Registrar {
     locator.alias<GetDownloadPathUseCase, PathManager>();
 
     locator.registerFactory(
-      () => FilesystemPickerUseCase(getRootPathUseCase: locator()),
+      () => FilePickerUseCase(getRootPathUseCase: locator()),
+    );
+    locator.registerFactory(
+      () => FileSaverUseCase(getRootPathUseCase: locator()),
     );
     locator.registerFactory(
       () => CustomFileService(

@@ -70,20 +70,40 @@ class AdvancedScreen extends StatelessWidget {
               icon: const Icon(Icons.delete_forever),
             ),
           ),
-          ListTile(
-            title: const Text('Browser - Cloudflare Challenge'),
-            leading: const SizedBox(
-              height: double.infinity,
-              child: Icon(Icons.web),
-            ),
-            onTap: () async {
-              final uri = Uri.tryParse(
-                'https://www.scrapingcourse.com/cloudflare-challenge',
-              );
-              if (uri == null) return;
-              await logBox.webview(context: context, uri: uri);
-            },
+          ExpansionTile(
+            title: const Text('Browser Tester'),
+            subtitle: const Text('Cloudflare Challenge Tester and Browser'),
+            leading: Icon(Icons.web),
+            children: [
+              ListTile(
+                title: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'eg: https://www.google.com',
+                    border: OutlineInputBorder(),
+                  ),
+                  onSubmitted: (text) async {
+                    final uri = Uri.tryParse(text);
+                    if (uri == null) return;
+                    await logBox.webview(context: context, uri: uri);
+                  },
+                ),
+                leading: Icon(Icons.web_asset),
+                trailing: Icon(Icons.chevron_right),
+              ),
+              ListTile(
+                title: const Text('Cloudflare Challenge'),
+                leading: Icon(Icons.cloud_circle),
+                onTap: () async {
+                  final uri = Uri.tryParse(
+                    'https://www.scrapingcourse.com/cloudflare-challenge',
+                  );
+                  if (uri == null) return;
+                  await logBox.webview(context: context, uri: uri);
+                },
+              ),
+            ],
           ),
+
           FutureBuilder(
             future: mangaDao.all.then((e) {
               final entries = e
