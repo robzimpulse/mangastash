@@ -21,7 +21,7 @@ class ImageCacheManager extends CustomCacheManager {
          Config('image', fileService: fileService, maxNrOfCacheObjects: 10),
          onDeleteFile: (object, data) async {
            logBox.log(
-             'Moving image file to Database',
+             '[Move] Image file to Database',
              extra: {'cache': object.toMap(setTouchedToNow: false)},
              name: 'ImageCacheManager',
            );
