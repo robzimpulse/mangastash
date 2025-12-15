@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_cache_manager/src/cache_store.dart';
@@ -30,7 +29,6 @@ class CustomCacheStore implements CacheStore {
   @override
   String get storeKey => _config.cacheKey;
   final Future<CacheInfoRepository> _cacheInfoRepository;
-  final Future<void> Function(CacheObject object, Uint8List data)? _onDeleteFile;
 
   int get _capacity => _config.maxNrOfCacheObjects;
 
@@ -40,13 +38,10 @@ class CustomCacheStore implements CacheStore {
   DateTime lastCleanupRun = DateTime.now();
   Timer? _scheduledCleanup;
 
-  CustomCacheStore(
-    Config config, {
-    Future<void> Function(CacheObject object, Uint8List data)? onDeleteFile,
-  }) : _config = config,
-       _onDeleteFile = onDeleteFile,
-       fileSystem = config.fileSystem,
-       _cacheInfoRepository = config.repo.open().then((value) => config.repo);
+  CustomCacheStore(Config config)
+    : _config = config,
+      fileSystem = config.fileSystem,
+      _cacheInfoRepository = config.repo.open().then((value) => config.repo);
 
   @override
   Future<FileInfo?> getFile(String key, {bool ignoreMemCache = false}) async {
@@ -218,11 +213,10 @@ class CustomCacheStore implements CacheStore {
     if (_futureCache.containsKey(cacheObject.key)) {
       await _futureCache.remove(cacheObject.key);
     }
-    final file = await _config.fileSystem.createFile(cacheObject.relativePath);
+    final file = File(cacheObject.relativePath);
 
     if (file.existsSync()) {
       try {
-        await _onDeleteFile?.call(cacheObject, await file.readAsBytes());
         await file.delete();
         // ignore: unused_catch_clause
       } on PathNotFoundException catch (e) {
