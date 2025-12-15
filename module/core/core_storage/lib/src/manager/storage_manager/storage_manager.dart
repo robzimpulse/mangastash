@@ -3,7 +3,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import '../custom_cache_manager/custom_cache_manager.dart';
 import 'file_service/custom_file_service.dart';
 
-class ImageCacheManager extends CacheManager {
+class ImageCacheManager extends CustomCacheManager {
   ImageCacheManager({required CustomFileService fileService})
     : super(Config('image', fileService: fileService));
 }
