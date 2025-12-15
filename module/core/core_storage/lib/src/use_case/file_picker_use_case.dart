@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -33,9 +35,12 @@ class FilePickerUseCase {
       initialDirectory: initialDirectory,
       type: FileType.custom,
       allowedExtensions: allowedExtensions,
+      withReadStream: true,
     );
-    if (result == null) return null;
 
-    return result.files.firstOrNull?.bytes;
+    final file = result?.files.firstOrNull;
+    final bytes = await file?.readStream?.toList();
+    if (bytes == null) return null;
+    return Uint8List.fromList([...bytes.expand((e) => e)]);
   }
 }
