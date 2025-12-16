@@ -156,7 +156,6 @@ class DomainMangaRegistrar extends Registrar {
         tagDao: locator(),
         logBox: locator(),
         mangaService: locator(),
-        tagCacheManager: locator(),
         converterCacheManager: locator(),
       ),
     );

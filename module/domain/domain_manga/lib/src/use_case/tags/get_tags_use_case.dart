@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:core_analytics/core_analytics.dart';
-import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -12,7 +9,6 @@ import '../../parser/base/tag_list_html_parser.dart';
 
 class GetTagsUseCase with SyncTagsMixin {
   final HeadlessWebviewUseCase _webview;
-  final TagCacheManager _tagCacheManager;
   final ConverterCacheManager _converterCacheManager;
   final MangaService _mangaService;
   final TagDao _tagDao;
@@ -20,13 +16,11 @@ class GetTagsUseCase with SyncTagsMixin {
 
   const GetTagsUseCase({
     required HeadlessWebviewUseCase webview,
-    required TagCacheManager tagCacheManager,
     required ConverterCacheManager converterCacheManager,
     required MangaService mangaService,
     required TagDao tagDao,
     required LogBox logBox,
   }) : _mangaService = mangaService,
-       _tagCacheManager = tagCacheManager,
        _converterCacheManager = converterCacheManager,
        _tagDao = tagDao,
        _webview = webview,
@@ -98,11 +92,8 @@ class GetTagsUseCase with SyncTagsMixin {
     required SourceEnum source,
     bool useCache = true,
   }) async {
-    final key = source.name;
-    final file = await _tagCacheManager.getFileFromCache(key);
-    final str = await file?.file.readAsString(encoding: utf8);
-    final object = str?.let((e) => json.decode(e))?.castOrNull<List<dynamic>>();
-    final data = [...?object?.map((e) => Tag.fromJson(e))];
+    final cache = await _tagDao.search(sources: [source.name]);
+    final data = [...cache.map(Tag.fromDrift)];
     if (data.isNotEmpty && useCache) return Success(data);
 
     try {
@@ -113,15 +104,7 @@ class GetTagsUseCase with SyncTagsMixin {
         data = await _scrapping(source: source, useCache: useCache);
       }
 
-      final result = await sync(dao: _tagDao, values: data, logBox: _logBox);
-
-      await _tagCacheManager.putFile(
-        key,
-        utf8.encode(json.encode([...data.map((e) => e.toJson())])),
-        key: key,
-      );
-
-      return Success(result);
+      return Success(await sync(dao: _tagDao, values: data, logBox: _logBox));
     } catch (e) {
       return Error(e);
     }
