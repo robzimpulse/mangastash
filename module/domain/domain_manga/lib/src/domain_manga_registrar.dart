@@ -117,7 +117,6 @@ class DomainMangaRegistrar extends Registrar {
         mangaDao: locator(),
         mangaService: locator(),
         converterCacheManager: locator(),
-        mangaCacheManager: locator(),
       ),
     );
     locator.registerFactory(
@@ -126,7 +125,6 @@ class DomainMangaRegistrar extends Registrar {
         mangaDao: locator(),
         logBox: locator(),
         converterCacheManager: locator(),
-        mangaCacheManager: locator(),
       ),
     );
     locator.registerFactory(

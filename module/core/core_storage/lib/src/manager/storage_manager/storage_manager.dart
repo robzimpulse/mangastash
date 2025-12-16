@@ -13,11 +13,6 @@ class ConverterCacheManager extends CacheManager {
     : super(Config('converter', fileService: fileService));
 }
 
-class MangaCacheManager extends CacheManager {
-  MangaCacheManager({required CustomFileService fileService})
-    : super(Config('manga', fileService: fileService));
-}
-
 class HtmlCacheManager extends CacheManager {
   HtmlCacheManager({required CustomFileService fileService})
     : super(Config('html', fileService: fileService));
