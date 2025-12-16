@@ -18,11 +18,6 @@ class MangaCacheManager extends CacheManager {
     : super(Config('manga', fileService: fileService));
 }
 
-class ChapterCacheManager extends CacheManager {
-  ChapterCacheManager({required CustomFileService fileService})
-    : super(Config('chapter', fileService: fileService));
-}
-
 class HtmlCacheManager extends CacheManager {
   HtmlCacheManager({required CustomFileService fileService})
     : super(Config('html', fileService: fileService));

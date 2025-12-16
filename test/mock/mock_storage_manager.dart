@@ -7,8 +7,6 @@ class MockConverterCacheManager extends Mock implements ConverterCacheManager {}
 
 class MockMangaCacheManager extends Mock implements MangaCacheManager {}
 
-class MockChapterCacheManager extends Mock implements ChapterCacheManager {}
-
 class MockHtmlCacheManager extends Mock implements HtmlCacheManager {}
 
 class MockSearchChapterCacheManager extends Mock

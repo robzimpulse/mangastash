@@ -137,7 +137,6 @@ class DomainMangaRegistrar extends Registrar {
         atHomeRepository: locator(),
         chapterRepository: locator(),
         converterCacheManager: locator(),
-        chapterCacheManager: locator(),
       ),
     );
     locator.registerFactory(() => AddToLibraryUseCase(libraryDao: locator()));
