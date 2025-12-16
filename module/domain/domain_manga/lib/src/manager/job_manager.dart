@@ -29,7 +29,7 @@ class JobManager
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
   final ValueGetter<GetAllChapterUseCase> _getAllChapterUseCase;
   final ListenSearchParameterUseCase _listenSearchParameterUseCase;
-  final ImageCacheManager _manager;
+  final ImagesCacheManager _manager;
   final JobDao _jobDao;
   final LogBox _log;
 
@@ -40,7 +40,7 @@ class JobManager
   JobManager({
     required LogBox log,
     required JobDao jobDao,
-    required ImageCacheManager manager,
+    required ImagesCacheManager manager,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required ValueGetter<GetMangaUseCase> getMangaUseCase,

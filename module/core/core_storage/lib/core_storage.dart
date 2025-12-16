@@ -9,6 +9,7 @@ export 'src/core_storage_registrar.dart';
 export 'src/extension/file_system_entity_extension.dart';
 export 'src/extension/int_extension.dart';
 export 'src/manager/custom_cache_manager/custom_cache_manager.dart';
+export 'src/manager/storage_manager/images_cache_manager.dart';
 export 'src/manager/storage_manager/storage_manager.dart';
 export 'src/use_case/file_picker_use_case.dart';
 export 'src/use_case/file_saver_use_case.dart';

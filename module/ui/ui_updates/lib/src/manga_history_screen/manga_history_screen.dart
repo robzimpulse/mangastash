@@ -16,7 +16,7 @@ class MangaHistoryScreen extends StatelessWidget {
     this.onTapChapter,
   });
 
-  final ImageCacheManager imagesCacheManager;
+  final ImagesCacheManager imagesCacheManager;
 
   final ValueSetter<Manga?>? onTapManga;
 

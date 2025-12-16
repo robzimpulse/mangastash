@@ -19,7 +19,7 @@ class DataStorageScreen extends StatelessWidget {
     this.onDeleteBackupConfirmation,
   });
 
-  final ImageCacheManager imageCacheManager;
+  final ImagesCacheManager imageCacheManager;
 
   final FileSaverUseCase fileSaverUseCase;
 

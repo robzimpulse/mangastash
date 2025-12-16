@@ -30,7 +30,7 @@ class CustomCacheStore implements CacheStore {
   @override
   String get storeKey => _config.cacheKey;
   final Future<CacheInfoRepository> _cacheInfoRepository;
-  final Future<void> Function(CacheObject object, Uint8List data)? _onDeleteFile;
+  final void Function(CacheObject object, Uint8List data)? _onDeleteFile;
 
   int get _capacity => _config.maxNrOfCacheObjects;
 
@@ -42,11 +42,11 @@ class CustomCacheStore implements CacheStore {
 
   CustomCacheStore(
     Config config, {
-    Future<void> Function(CacheObject object, Uint8List data)? onDeleteFile,
-  }) : _config = config,
-       _onDeleteFile = onDeleteFile,
-       fileSystem = config.fileSystem,
-       _cacheInfoRepository = config.repo.open().then((value) => config.repo);
+    void Function(CacheObject object, Uint8List data)? onDeleteFile,
+  })  : _config = config,
+        _onDeleteFile = onDeleteFile,
+        fileSystem = config.fileSystem,
+        _cacheInfoRepository = config.repo.open().then((value) => config.repo);
 
   @override
   Future<FileInfo?> getFile(String key, {bool ignoreMemCache = false}) async {
@@ -222,7 +222,7 @@ class CustomCacheStore implements CacheStore {
 
     if (file.existsSync()) {
       try {
-        await _onDeleteFile?.call(cacheObject, await file.readAsBytes());
+        _onDeleteFile?.call(cacheObject, await file.readAsBytes());
         await file.delete();
         // ignore: unused_catch_clause
       } on PathNotFoundException catch (e) {

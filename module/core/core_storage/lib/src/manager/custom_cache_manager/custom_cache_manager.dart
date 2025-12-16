@@ -11,7 +11,7 @@ class CustomCacheManager implements BaseCacheManager {
 
   CustomCacheManager(
     Config config, {
-    Future<void> Function(CacheObject object, Uint8List data)? onDeleteFile,
+    void Function(CacheObject object, Uint8List data)? onDeleteFile,
   }) {
     _cacheStore = CustomCacheStore(config, onDeleteFile: onDeleteFile);
 

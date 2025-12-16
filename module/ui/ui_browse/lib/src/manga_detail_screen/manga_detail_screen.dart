@@ -32,7 +32,7 @@ class MangaDetailScreen extends StatefulWidget {
 
   final Future<ChapterConfig?> Function(ChapterConfig? value)? onTapSort;
 
-  final ImageCacheManager imagesCacheManager;
+  final ImagesCacheManager imagesCacheManager;
 
   final LogBox logBox;
 

@@ -1,7 +1,7 @@
 import 'package:core_storage/core_storage.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockImageCacheManager extends Mock implements ImageCacheManager {}
+class MockImagesCacheManager extends Mock implements ImagesCacheManager {}
 
 class MockConverterCacheManager extends Mock implements ConverterCacheManager {}
 

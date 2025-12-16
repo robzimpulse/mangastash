@@ -26,7 +26,7 @@ class BrowseMangaScreen extends StatefulWidget {
   )?
   onTapFilter;
 
-  final ImageCacheManager imagesCacheManager;
+  final ImagesCacheManager imagesCacheManager;
 
   static Widget create({
     required ServiceLocator locator,

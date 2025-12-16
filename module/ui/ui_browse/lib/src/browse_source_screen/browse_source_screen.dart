@@ -19,7 +19,7 @@ class BrowseSourceScreen extends StatelessWidget {
 
   final ValueSetter<SourceEnum>? onTapSource;
 
-  final ImageCacheManager imagesCacheManager;
+  final ImagesCacheManager imagesCacheManager;
 
   static Widget create({
     required ServiceLocator locator,
