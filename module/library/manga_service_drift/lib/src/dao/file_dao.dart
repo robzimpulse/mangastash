@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:file/file.dart';
 import 'package:uuid/uuid.dart';
 
 import '../database/database.dart';
@@ -54,7 +55,7 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
 
       final value = FileTablesCompanion.insert(
         webUrl: webUrl,
-        relativePath: Value.absentIfNull(filename),
+        relativePath: filename,
       );
 
       return into(fileTables).insertReturning(
@@ -65,5 +66,11 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
         ),
       );
     });
+  }
+
+  Future<File> file(FileDrift data) {
+    return attachedDatabase.databaseDirectory().then(
+      (e) => e.childFile(data.relativePath),
+    );
   }
 }

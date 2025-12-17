@@ -7,7 +7,7 @@ import '../mixin/auto_timestamp_table.dart';
 class FileTables extends Table with AutoTimestampTable, AutoTextIdTable {
   TextColumn get webUrl => text().named('web_url')();
 
-  TextColumn get relativePath => text().named('relative_path').nullable()();
+  TextColumn get relativePath => text().named('relative_path')();
 
   @override
   Set<Column<Object>>? get primaryKey => {id};

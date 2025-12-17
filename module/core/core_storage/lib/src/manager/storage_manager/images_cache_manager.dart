@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:core_analytics/core_analytics.dart';
+import 'package:file/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 
@@ -47,7 +48,11 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
 
     _fileDao
         .search(webUrls: [url])
-        .then((results) => results.firstOrNull?.file)
+        .then<File?>((results) {
+          final data = results.firstOrNull;
+          if (data == null) return null;
+          return _fileDao.file(data);
+        })
         .then<void>((file) async {
           if (file != null && await file.exists()) {
             _logBox.log(

@@ -3365,9 +3365,9 @@ class $FileTablesTable extends FileTables
   late final GeneratedColumn<String> relativePath = GeneratedColumn<String>(
     'relative_path',
     aliasedName,
-    true,
+    false,
     type: DriftSqlType.string,
-    requiredDuringInsert: false,
+    requiredDuringInsert: true,
   );
   @override
   List<GeneratedColumn> get $columns => [
@@ -3420,6 +3420,8 @@ class $FileTablesTable extends FileTables
           _relativePathMeta,
         ),
       );
+    } else if (isInserting) {
+      context.missing(_relativePathMeta);
     }
     return context;
   }
@@ -3454,10 +3456,11 @@ class $FileTablesTable extends FileTables
             DriftSqlType.string,
             data['${effectivePrefix}web_url'],
           )!,
-      relativePath: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}relative_path'],
-      ),
+      relativePath:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}relative_path'],
+          )!,
     );
   }
 
@@ -3472,13 +3475,13 @@ class FileDrift extends DataClass implements Insertable<FileDrift> {
   final DateTime updatedAt;
   final String id;
   final String webUrl;
-  final String? relativePath;
+  final String relativePath;
   const FileDrift({
     required this.createdAt,
     required this.updatedAt,
     required this.id,
     required this.webUrl,
-    this.relativePath,
+    required this.relativePath,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3487,9 +3490,7 @@ class FileDrift extends DataClass implements Insertable<FileDrift> {
     map['updated_at'] = Variable<DateTime>(updatedAt);
     map['id'] = Variable<String>(id);
     map['web_url'] = Variable<String>(webUrl);
-    if (!nullToAbsent || relativePath != null) {
-      map['relative_path'] = Variable<String>(relativePath);
-    }
+    map['relative_path'] = Variable<String>(relativePath);
     return map;
   }
 
@@ -3499,10 +3500,7 @@ class FileDrift extends DataClass implements Insertable<FileDrift> {
       updatedAt: Value(updatedAt),
       id: Value(id),
       webUrl: Value(webUrl),
-      relativePath:
-          relativePath == null && nullToAbsent
-              ? const Value.absent()
-              : Value(relativePath),
+      relativePath: Value(relativePath),
     );
   }
 
@@ -3516,7 +3514,7 @@ class FileDrift extends DataClass implements Insertable<FileDrift> {
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       id: serializer.fromJson<String>(json['id']),
       webUrl: serializer.fromJson<String>(json['webUrl']),
-      relativePath: serializer.fromJson<String?>(json['relativePath']),
+      relativePath: serializer.fromJson<String>(json['relativePath']),
     );
   }
   @override
@@ -3527,7 +3525,7 @@ class FileDrift extends DataClass implements Insertable<FileDrift> {
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'id': serializer.toJson<String>(id),
       'webUrl': serializer.toJson<String>(webUrl),
-      'relativePath': serializer.toJson<String?>(relativePath),
+      'relativePath': serializer.toJson<String>(relativePath),
     };
   }
 
@@ -3536,13 +3534,13 @@ class FileDrift extends DataClass implements Insertable<FileDrift> {
     DateTime? updatedAt,
     String? id,
     String? webUrl,
-    Value<String?> relativePath = const Value.absent(),
+    String? relativePath,
   }) => FileDrift(
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     id: id ?? this.id,
     webUrl: webUrl ?? this.webUrl,
-    relativePath: relativePath.present ? relativePath.value : this.relativePath,
+    relativePath: relativePath ?? this.relativePath,
   );
   FileDrift copyWithCompanion(FileTablesCompanion data) {
     return FileDrift(
@@ -3588,7 +3586,7 @@ class FileTablesCompanion extends UpdateCompanion<FileDrift> {
   final Value<DateTime> updatedAt;
   final Value<String> id;
   final Value<String> webUrl;
-  final Value<String?> relativePath;
+  final Value<String> relativePath;
   final Value<int> rowid;
   const FileTablesCompanion({
     this.createdAt = const Value.absent(),
@@ -3603,9 +3601,10 @@ class FileTablesCompanion extends UpdateCompanion<FileDrift> {
     this.updatedAt = const Value.absent(),
     this.id = const Value.absent(),
     required String webUrl,
-    this.relativePath = const Value.absent(),
+    required String relativePath,
     this.rowid = const Value.absent(),
-  }) : webUrl = Value(webUrl);
+  }) : webUrl = Value(webUrl),
+       relativePath = Value(relativePath);
   static Insertable<FileDrift> custom({
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -3629,7 +3628,7 @@ class FileTablesCompanion extends UpdateCompanion<FileDrift> {
     Value<DateTime>? updatedAt,
     Value<String>? id,
     Value<String>? webUrl,
-    Value<String?>? relativePath,
+    Value<String>? relativePath,
     Value<int>? rowid,
   }) {
     return FileTablesCompanion(
@@ -5472,7 +5471,7 @@ typedef $$FileTablesTableCreateCompanionBuilder =
       Value<DateTime> updatedAt,
       Value<String> id,
       required String webUrl,
-      Value<String?> relativePath,
+      required String relativePath,
       Value<int> rowid,
     });
 typedef $$FileTablesTableUpdateCompanionBuilder =
@@ -5481,7 +5480,7 @@ typedef $$FileTablesTableUpdateCompanionBuilder =
       Value<DateTime> updatedAt,
       Value<String> id,
       Value<String> webUrl,
-      Value<String?> relativePath,
+      Value<String> relativePath,
       Value<int> rowid,
     });
 
@@ -5617,7 +5616,7 @@ class $$FileTablesTableTableManager
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<String> id = const Value.absent(),
                 Value<String> webUrl = const Value.absent(),
-                Value<String?> relativePath = const Value.absent(),
+                Value<String> relativePath = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => FileTablesCompanion(
                 createdAt: createdAt,
@@ -5633,7 +5632,7 @@ class $$FileTablesTableTableManager
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<String> id = const Value.absent(),
                 required String webUrl,
-                Value<String?> relativePath = const Value.absent(),
+                required String relativePath,
                 Value<int> rowid = const Value.absent(),
               }) => FileTablesCompanion.insert(
                 createdAt: createdAt,
