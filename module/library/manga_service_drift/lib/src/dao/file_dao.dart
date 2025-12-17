@@ -20,6 +20,10 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     return select(fileTables)..orderBy(_clauses);
   }
 
+  DeleteStatement<$FileTablesTable, FileDrift> get _deleter {
+    return delete(fileTables);
+  }
+
   Expression<bool> _filter({
     required $FileTablesTable f,
     List<String> ids = const [],
@@ -72,5 +76,14 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     return attachedDatabase.databaseDirectory().then(
       (e) => e.childFile(data.relativePath),
     );
+  }
+
+  Future<List<FileDrift>> remove({
+    List<String> ids = const [],
+    List<String> webUrls = const [],
+  }) {
+    final selector = _deleter;
+    selector.where((f) => _filter(f: f, ids: ids, webUrls: webUrls));
+    return transaction(() => selector.goAndReturn());
   }
 }

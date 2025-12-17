@@ -48,43 +48,33 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
 
     _fileDao
         .search(webUrls: [url])
-        .then<File?>((results) {
-          final data = results.firstOrNull;
-          if (data == null) return null;
-          return _fileDao.file(data);
-        })
-        .then<void>((file) async {
-          if (file != null && await file.exists()) {
-            _logBox.log(
-              '[Hit] Copy image file from Database to Cache',
-              name: runtimeType.toString(),
-              extra: {'url': url},
-            );
+        .then((results) async {
+          final data = results.first;
+          final file = await _fileDao.file(data);
 
-            controller.add(
-              FileInfo(
-                file,
-                FileSource.Cache,
-                DateTime.now().add(Duration(days: 1)),
-                url,
-              ),
-            );
-          } else {
-            _logBox.log(
-              '[Miss] Using image file from Cache',
-              name: runtimeType.toString(),
-              extra: {'url': url},
-            );
+          if (!await file.exists()) {
+            await _fileDao.remove(ids: [data.id]);
 
-            await controller.addStream(
-              super.getFileStream(
-                url,
-                key: key,
-                headers: headers,
-                withProgress: withProgress,
-              ),
+            throw FileSystemException(
+              'File not found, deleting $data from database',
+              file.path,
             );
           }
+
+          _logBox.log(
+            '[Hit] Using image file from Database',
+            name: runtimeType.toString(),
+            extra: {'url': url},
+          );
+
+          controller.add(
+            FileInfo(
+              file,
+              FileSource.Cache,
+              DateTime.now().add(Duration(days: 1)),
+              url,
+            ),
+          );
         })
         .onError((e, st) async {
           _logBox.log(
