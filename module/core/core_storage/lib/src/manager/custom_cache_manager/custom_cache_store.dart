@@ -221,7 +221,7 @@ class CustomCacheStore implements CacheStore {
     if (_futureCache.containsKey(cacheObject.key)) {
       await _futureCache.remove(cacheObject.key);
     }
-    final file = File(cacheObject.relativePath);
+    final file = await _config.fileSystem.createFile(cacheObject.relativePath);
 
     if (file.existsSync()) {
       try {
