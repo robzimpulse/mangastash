@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:file/file.dart';
 import 'package:flutter/foundation.dart';
@@ -241,8 +242,17 @@ class DataStorageScreen extends StatelessWidget {
   }
 
   void _onTapShareBackup(BuildContext context, File file) async {
+    /// share_plus requires iPad users to provide the [sharePositionOrigin]
+    /// parameter. Without it, share_plus will not work on iPads and may cause
+    /// a crash or leave the UI unresponsive.
+    final sharePositionOrigin = context
+        .findRenderObject()
+        .castOrNull<RenderBox>()
+        .let((box) => box.localToGlobal(Offset.zero) & box.size);
+
     final result = await SharePlus.instance.share(
       ShareParams(
+        sharePositionOrigin: sharePositionOrigin,
         files: [
           XFile.fromData(
             await file.readAsBytes(),
