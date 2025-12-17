@@ -81,18 +81,25 @@ class DataStorageScreen extends StatelessWidget {
   }
 
   Widget _buildImageCacheSize(BuildContext context) {
-    return ListTile(
-      title: const Text('Image Cache Size'),
-      subtitle: FutureBuilder(
-        future: imageCacheManager.getSize(),
-        builder: (context, snapshot) {
-          return Text('Size: ${snapshot.data?.formattedSize}');
-        },
-      ),
-      trailing: IconButton(
-        onPressed: () => imageCacheManager.emptyCache(),
-        icon: Icon(Icons.delete),
-      ),
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return ListTile(
+          title: const Text('Image Cache Size'),
+          subtitle: FutureBuilder(
+            future: imageCacheManager.getSize(),
+            builder: (context, snapshot) {
+              return Text('Size: ${snapshot.data?.formattedSize}');
+            },
+          ),
+          trailing: IconButton(
+            onPressed: () async {
+              await imageCacheManager.emptyCache();
+              setState(() {});
+            },
+            icon: Icon(Icons.delete),
+          ),
+        );
+      },
     );
   }
 
