@@ -3,6 +3,7 @@ library;
 export 'package:drift/src/runtime/data_class.dart';
 
 export 'src/dao/chapter_dao.dart';
+export 'src/dao/file_dao.dart';
 export 'src/dao/history_dao.dart';
 export 'src/dao/image_dao.dart';
 export 'src/dao/job_dao.dart';

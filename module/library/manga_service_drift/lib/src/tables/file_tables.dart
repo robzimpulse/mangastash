@@ -3,11 +3,11 @@ import 'package:drift/drift.dart';
 import '../mixin/auto_id.dart';
 import '../mixin/auto_timestamp_table.dart';
 
-@DataClassName('ImageByteDrift')
-class ImageByteTables extends Table with AutoTimestampTable, AutoTextIdTable {
+@DataClassName('FileDrift')
+class FileTables extends Table with AutoTimestampTable, AutoTextIdTable {
   TextColumn get webUrl => text().named('web_url')();
 
-  BlobColumn get byte => blob().named('byte').nullable()();
+  TextColumn get relativePath => text().named('relative_path').nullable()();
 
   @override
   Set<Column<Object>>? get primaryKey => {id};

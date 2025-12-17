@@ -3309,6 +3309,377 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
   }
 }
 
+class $FileTablesTable extends FileTables
+    with TableInfo<$FileTablesTable, FileDrift> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FileTablesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: () => const Uuid().v4(),
+  );
+  static const VerificationMeta _webUrlMeta = const VerificationMeta('webUrl');
+  @override
+  late final GeneratedColumn<String> webUrl = GeneratedColumn<String>(
+    'web_url',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _relativePathMeta = const VerificationMeta(
+    'relativePath',
+  );
+  @override
+  late final GeneratedColumn<String> relativePath = GeneratedColumn<String>(
+    'relative_path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    createdAt,
+    updatedAt,
+    id,
+    webUrl,
+    relativePath,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'file_tables';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FileDrift> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('web_url')) {
+      context.handle(
+        _webUrlMeta,
+        webUrl.isAcceptableOrUnknown(data['web_url']!, _webUrlMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_webUrlMeta);
+    }
+    if (data.containsKey('relative_path')) {
+      context.handle(
+        _relativePathMeta,
+        relativePath.isAcceptableOrUnknown(
+          data['relative_path']!,
+          _relativePathMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {webUrl},
+  ];
+  @override
+  FileDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FileDrift(
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      webUrl:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}web_url'],
+          )!,
+      relativePath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}relative_path'],
+      ),
+    );
+  }
+
+  @override
+  $FileTablesTable createAlias(String alias) {
+    return $FileTablesTable(attachedDatabase, alias);
+  }
+}
+
+class FileDrift extends DataClass implements Insertable<FileDrift> {
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String id;
+  final String webUrl;
+  final String? relativePath;
+  const FileDrift({
+    required this.createdAt,
+    required this.updatedAt,
+    required this.id,
+    required this.webUrl,
+    this.relativePath,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['id'] = Variable<String>(id);
+    map['web_url'] = Variable<String>(webUrl);
+    if (!nullToAbsent || relativePath != null) {
+      map['relative_path'] = Variable<String>(relativePath);
+    }
+    return map;
+  }
+
+  FileTablesCompanion toCompanion(bool nullToAbsent) {
+    return FileTablesCompanion(
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      id: Value(id),
+      webUrl: Value(webUrl),
+      relativePath:
+          relativePath == null && nullToAbsent
+              ? const Value.absent()
+              : Value(relativePath),
+    );
+  }
+
+  factory FileDrift.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FileDrift(
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      id: serializer.fromJson<String>(json['id']),
+      webUrl: serializer.fromJson<String>(json['webUrl']),
+      relativePath: serializer.fromJson<String?>(json['relativePath']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'id': serializer.toJson<String>(id),
+      'webUrl': serializer.toJson<String>(webUrl),
+      'relativePath': serializer.toJson<String?>(relativePath),
+    };
+  }
+
+  FileDrift copyWith({
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? id,
+    String? webUrl,
+    Value<String?> relativePath = const Value.absent(),
+  }) => FileDrift(
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    id: id ?? this.id,
+    webUrl: webUrl ?? this.webUrl,
+    relativePath: relativePath.present ? relativePath.value : this.relativePath,
+  );
+  FileDrift copyWithCompanion(FileTablesCompanion data) {
+    return FileDrift(
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      id: data.id.present ? data.id.value : this.id,
+      webUrl: data.webUrl.present ? data.webUrl.value : this.webUrl,
+      relativePath:
+          data.relativePath.present
+              ? data.relativePath.value
+              : this.relativePath,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FileDrift(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('id: $id, ')
+          ..write('webUrl: $webUrl, ')
+          ..write('relativePath: $relativePath')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(createdAt, updatedAt, id, webUrl, relativePath);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FileDrift &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.id == this.id &&
+          other.webUrl == this.webUrl &&
+          other.relativePath == this.relativePath);
+}
+
+class FileTablesCompanion extends UpdateCompanion<FileDrift> {
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<String> id;
+  final Value<String> webUrl;
+  final Value<String?> relativePath;
+  final Value<int> rowid;
+  const FileTablesCompanion({
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.id = const Value.absent(),
+    this.webUrl = const Value.absent(),
+    this.relativePath = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FileTablesCompanion.insert({
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.id = const Value.absent(),
+    required String webUrl,
+    this.relativePath = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : webUrl = Value(webUrl);
+  static Insertable<FileDrift> custom({
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<String>? id,
+    Expression<String>? webUrl,
+    Expression<String>? relativePath,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (id != null) 'id': id,
+      if (webUrl != null) 'web_url': webUrl,
+      if (relativePath != null) 'relative_path': relativePath,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FileTablesCompanion copyWith({
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<String>? id,
+    Value<String>? webUrl,
+    Value<String?>? relativePath,
+    Value<int>? rowid,
+  }) {
+    return FileTablesCompanion(
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      id: id ?? this.id,
+      webUrl: webUrl ?? this.webUrl,
+      relativePath: relativePath ?? this.relativePath,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (webUrl.present) {
+      map['web_url'] = Variable<String>(webUrl.value);
+    }
+    if (relativePath.present) {
+      map['relative_path'] = Variable<String>(relativePath.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FileTablesCompanion(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('id: $id, ')
+          ..write('webUrl: $webUrl, ')
+          ..write('relativePath: $relativePath, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3320,6 +3691,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $RelationshipTablesTable relationshipTables =
       $RelationshipTablesTable(this);
   late final $JobTablesTable jobTables = $JobTablesTable(this);
+  late final $FileTablesTable fileTables = $FileTablesTable(this);
   late final MangaDao mangaDao = MangaDao(this as AppDatabase);
   late final ChapterDao chapterDao = ChapterDao(this as AppDatabase);
   late final LibraryDao libraryDao = LibraryDao(this as AppDatabase);
@@ -3327,6 +3699,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final ImageDao imageDao = ImageDao(this as AppDatabase);
   late final TagDao tagDao = TagDao(this as AppDatabase);
   late final HistoryDao historyDao = HistoryDao(this as AppDatabase);
+  late final FileDao fileDao = FileDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3339,6 +3712,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     tagTables,
     relationshipTables,
     jobTables,
+    fileTables,
   ];
 }
 
@@ -5092,6 +5466,212 @@ typedef $$JobTablesTableProcessedTableManager =
       JobDrift,
       PrefetchHooks Function()
     >;
+typedef $$FileTablesTableCreateCompanionBuilder =
+    FileTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<String> id,
+      required String webUrl,
+      Value<String?> relativePath,
+      Value<int> rowid,
+    });
+typedef $$FileTablesTableUpdateCompanionBuilder =
+    FileTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<String> id,
+      Value<String> webUrl,
+      Value<String?> relativePath,
+      Value<int> rowid,
+    });
+
+class $$FileTablesTableFilterComposer
+    extends Composer<_$AppDatabase, $FileTablesTable> {
+  $$FileTablesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get webUrl => $composableBuilder(
+    column: $table.webUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get relativePath => $composableBuilder(
+    column: $table.relativePath,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$FileTablesTableOrderingComposer
+    extends Composer<_$AppDatabase, $FileTablesTable> {
+  $$FileTablesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get webUrl => $composableBuilder(
+    column: $table.webUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get relativePath => $composableBuilder(
+    column: $table.relativePath,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$FileTablesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FileTablesTable> {
+  $$FileTablesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get webUrl =>
+      $composableBuilder(column: $table.webUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get relativePath => $composableBuilder(
+    column: $table.relativePath,
+    builder: (column) => column,
+  );
+}
+
+class $$FileTablesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FileTablesTable,
+          FileDrift,
+          $$FileTablesTableFilterComposer,
+          $$FileTablesTableOrderingComposer,
+          $$FileTablesTableAnnotationComposer,
+          $$FileTablesTableCreateCompanionBuilder,
+          $$FileTablesTableUpdateCompanionBuilder,
+          (
+            FileDrift,
+            BaseReferences<_$AppDatabase, $FileTablesTable, FileDrift>,
+          ),
+          FileDrift,
+          PrefetchHooks Function()
+        > {
+  $$FileTablesTableTableManager(_$AppDatabase db, $FileTablesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$FileTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$FileTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () => $$FileTablesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> webUrl = const Value.absent(),
+                Value<String?> relativePath = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FileTablesCompanion(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                webUrl: webUrl,
+                relativePath: relativePath,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                required String webUrl,
+                Value<String?> relativePath = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FileTablesCompanion.insert(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                webUrl: webUrl,
+                relativePath: relativePath,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$FileTablesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FileTablesTable,
+      FileDrift,
+      $$FileTablesTableFilterComposer,
+      $$FileTablesTableOrderingComposer,
+      $$FileTablesTableAnnotationComposer,
+      $$FileTablesTableCreateCompanionBuilder,
+      $$FileTablesTableUpdateCompanionBuilder,
+      (FileDrift, BaseReferences<_$AppDatabase, $FileTablesTable, FileDrift>),
+      FileDrift,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5110,4 +5690,6 @@ class $AppDatabaseManager {
       $$RelationshipTablesTableTableManager(_db, _db.relationshipTables);
   $$JobTablesTableTableManager get jobTables =>
       $$JobTablesTableTableManager(_db, _db.jobTables);
+  $$FileTablesTableTableManager get fileTables =>
+      $$FileTablesTableTableManager(_db, _db.fileTables);
 }

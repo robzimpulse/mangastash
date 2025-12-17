@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:universal_io/universal_io.dart';
+import 'package:file/file.dart';
 
 import 'executor.dart';
 
