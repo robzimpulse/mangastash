@@ -19,7 +19,7 @@ jobs:
           - platform: web
             os: ubuntu-latest
             path: build/web
-            arguments: '--base-href=mangastash --wasm'
+            arguments: '--base-href=/mangastash/ --wasm'
           - platform: macos
             os: macos-15
             path: build/macos/Build/Products/Release/mangastash.app
