@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:drift/drift.dart';
+import 'package:file/file.dart';
 import 'package:uuid/uuid.dart';
 
 import '../dao/chapter_dao.dart';
@@ -76,4 +77,6 @@ class AppDatabase extends _$AppDatabase {
   Future<void> restore({required Uint8List data}) async {
     return restoreDatabase(data: data, database: this, executor: _executor);
   }
+
+  Future<Directory> databaseDirectory() => _executor.databaseDirectory();
 }

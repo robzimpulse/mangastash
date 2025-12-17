@@ -1,9 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
-import '../database/adapter/filesystem/filesystem_adapter.dart'
-    if (dart.library.js_interop) '../database/adapter/filesystem/filesystem_web.dart'
-    if (dart.library.io) '../database/adapter/filesystem/filesystem_io.dart';
 import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
 import '../tables/file_tables.dart';
@@ -50,7 +47,7 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     String? extension,
   }) async {
     return transaction(() async {
-      final directory = await databaseDirectory();
+      final directory = (await attachedDatabase.databaseDirectory());
       final filename = '${Uuid().v4()}.$extension';
       final dest = await directory.childFile(filename).create(recursive: true);
       await dest.writeAsBytes(data);

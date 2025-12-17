@@ -49,7 +49,9 @@ class Executor {
     ).interceptWith(LogInterceptor(logger: _logger));
   }
 
-  Future<Directory> databaseDirectory() => fs.databaseDirectory();
+  Future<Directory> databaseDirectory() async {
+    return (await fs.databaseDirectory()).childDirectory(_name);
+  }
 
   Future<File> databaseFile() async {
     return (await databaseDirectory()).childFile('$_name.sqlite');
