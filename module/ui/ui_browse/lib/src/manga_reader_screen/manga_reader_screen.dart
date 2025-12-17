@@ -19,7 +19,7 @@ class MangaReaderScreen extends StatelessWidget {
     this.onTapShortcut,
   });
 
-  final ImageCacheManager imagesCacheManager;
+  final ImagesCacheManager imagesCacheManager;
 
   final LogBox logBox;
 

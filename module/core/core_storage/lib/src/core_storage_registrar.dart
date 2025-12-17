@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'manager/path_manager/path_manager.dart';
 import 'manager/storage_manager/file_service/custom_file_service.dart';
+import 'manager/storage_manager/images_cache_manager.dart';
 import 'manager/storage_manager/storage_manager.dart';
 import 'use_case/file_picker_use_case.dart';
 import 'use_case/file_saver_use_case.dart';
@@ -23,6 +24,7 @@ class CoreStorageRegistrar extends Registrar {
       dispose: (e) => e.close(),
     );
     locator.registerLazySingleton(() => DatabaseViewer());
+    locator.registerFactory(() => FileDao(locator()));
     locator.registerFactory(() => MangaDao(locator()));
     locator.registerFactory(() => ChapterDao(locator()));
     locator.registerFactory(() => LibraryDao(locator()));
@@ -49,7 +51,11 @@ class CoreStorageRegistrar extends Registrar {
       ),
     );
     locator.registerLazySingleton(
-      () => ImageCacheManager(fileService: locator()),
+      () => ImagesCacheManager(
+        fileService: locator(),
+        logBox: locator(),
+        fileDao: locator(),
+      ),
       dispose: (e) => e.dispose(),
     );
     locator.registerLazySingleton(

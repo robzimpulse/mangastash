@@ -8,7 +8,7 @@ Future<Uint8List> backupDatabase({
   required String dbName,
   required AppDatabase database,
 }) async {
-  final directory = await rootDirectory();
+  final directory = await databaseDirectory();
   final timestamp = DateTime.timestamp().microsecondsSinceEpoch;
   final file = directory.childFile('$timestamp.sqlite');
 

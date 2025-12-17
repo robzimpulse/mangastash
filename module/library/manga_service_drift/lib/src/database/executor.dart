@@ -1,11 +1,13 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:universal_io/universal_io.dart';
+import 'package:file/file.dart';
 
 import '../interceptor/log_interceptor.dart';
 import '../util/typedef.dart';
+import 'adapter/filesystem/filesystem_adapter.dart'
+    if (dart.library.js_interop) 'adapter/filesystem/filesystem_web.dart'
+    if (dart.library.io) 'adapter/filesystem/filesystem_io.dart'
+    as fs;
 import 'adapter/query_executor/query_executor_adapter.dart'
     if (dart.library.js_interop) 'adapter/query_executor/query_executor_web.dart'
     if (dart.library.io) 'adapter/query_executor/query_executor_io.dart';
@@ -47,10 +49,12 @@ class Executor {
     ).interceptWith(LogInterceptor(logger: _logger));
   }
 
-  Future<Directory> databaseDirectory() => getApplicationDocumentsDirectory();
+  Future<Directory> databaseDirectory() async {
+    return (await fs.databaseDirectory()).childDirectory(_name);
+  }
 
   Future<File> databaseFile() async {
-    return File(join((await databaseDirectory()).path, '$databaseName.sqlite'));
+    return (await databaseDirectory()).childFile('$_name.sqlite');
   }
 
   String get databaseName => _name;

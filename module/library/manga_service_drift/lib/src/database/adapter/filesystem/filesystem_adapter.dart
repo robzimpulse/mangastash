@@ -1,5 +1,5 @@
 import 'package:file/file.dart';
 
-Future<Directory> rootDirectory() {
+Future<Directory> databaseDirectory() {
   throw UnimplementedError('Unimplemented');
 }

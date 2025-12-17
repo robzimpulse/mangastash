@@ -6,11 +6,7 @@ import '../tables/image_tables.dart';
 
 part 'image_dao.g.dart';
 
-@DriftAccessor(
-  tables: [
-    ImageTables,
-  ],
-)
+@DriftAccessor(tables: [ImageTables])
 class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
   ImageDao(super.db);
 
@@ -46,17 +42,11 @@ class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
     List<String> webUrls = const [],
     List<String> chapterIds = const [],
   }) {
-    final a = _selector
-      ..where(
-        (f) => _filter(
-          f: f,
-          ids: ids,
-          webUrls: webUrls,
-          chapterIds: chapterIds,
-        ),
-      );
-
-    return transaction(() => a.get());
+    final selector = _selector;
+    selector.where(
+      (f) => _filter(f: f, ids: ids, webUrls: webUrls, chapterIds: chapterIds),
+    );
+    return transaction(() => selector.get());
   }
 
   Future<List<ImageDrift>> remove({
@@ -64,16 +54,10 @@ class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
     List<String> webUrls = const [],
     List<String> chapterIds = const [],
   }) {
-    final selector = _deleter
-      ..where(
-        (f) => _filter(
-          f: f,
-          ids: ids,
-          webUrls: webUrls,
-          chapterIds: chapterIds,
-        ),
-      );
-
+    final selector = _deleter;
+    selector.where(
+      (f) => _filter(f: f, ids: ids, webUrls: webUrls, chapterIds: chapterIds),
+    );
     return transaction(() => selector.goAndReturn());
   }
 
@@ -100,9 +84,10 @@ class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
       List<ImageDrift> results = [];
 
       for (final (index, image) in values.indexed) {
-        final data = existing.isEmpty
-            ? const ImageTablesCompanion()
-            : existing.removeAt(0).toCompanion(true);
+        final data =
+            existing.isEmpty
+                ? const ImageTablesCompanion()
+                : existing.removeAt(0).toCompanion(true);
 
         results.add(
           await add(

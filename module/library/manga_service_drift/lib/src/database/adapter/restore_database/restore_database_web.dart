@@ -9,9 +9,4 @@ Future<void> restoreDatabase({
   required Executor executor,
 }) async {
   Executor.setBackup(data);
-  // if (kIsWasm) {
-  //   throw UnimplementedError('Restore database is not supported web wasm');
-  // } else {
-  //   throw UnimplementedError('Restore database is not supported web');
-  // }
 }

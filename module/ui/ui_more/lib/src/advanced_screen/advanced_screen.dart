@@ -12,7 +12,7 @@ class AdvancedScreen extends StatelessWidget {
   final LogBox logBox;
   final DatabaseViewer viewer;
   final AppDatabase database;
-  final ImageCacheManager imagesCacheManager;
+  final ImagesCacheManager imagesCacheManager;
   final HeadlessWebviewUseCase webview;
   final MangaDao mangaDao;
 

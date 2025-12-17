@@ -16,7 +16,7 @@ Future<void> restoreDatabase({
   await database.close();
 
   /// put database data into temporary file
-  final directory = await rootDirectory();
+  final directory = await databaseDirectory();
   final file = await directory.childFile('backup.sqlite').writeAsBytes(data);
 
   /// Open the temporary file
