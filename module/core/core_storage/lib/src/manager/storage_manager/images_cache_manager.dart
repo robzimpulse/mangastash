@@ -49,7 +49,7 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
         .search(webUrls: [url])
         .then((results) => results.firstOrNull?.file)
         .then<void>((file) async {
-          if (file != null) {
+          if (file != null && await file.exists()) {
             _logBox.log(
               '[Hit] Copy image file from Database to Cache',
               name: runtimeType.toString(),
