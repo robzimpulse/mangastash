@@ -19,7 +19,6 @@ jobs:
           - platform: web
             os: ubuntu-latest
             path: build/web
-            arguments: '--base-href=/mangastash/ --wasm'
           - platform: macos
             os: macos-15
             path: build/macos/Build/Products/Release/mangastash.app
@@ -66,7 +65,7 @@ jobs:
       - name: 'Bootstrap Workspace'
         run: melos bootstrap --verbose
       - name: 'Build Application'
-        run: flutter build ${{ matrix.platform }} ${{ matrix.arguments }}
+        run: flutter build ${{ matrix.platform }}
       - name: 'Compress Directory'
         uses: somaz94/compress-decompress@v1
         if: ${{ matrix.platform == 'web' }}

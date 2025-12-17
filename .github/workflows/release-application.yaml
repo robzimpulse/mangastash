@@ -16,7 +16,13 @@ jobs:
           - platform: web
             os: ubuntu-latest
             path: build/web
+            arguments: '--wasm'
+            deploy: firebase
+          - platform: web
+            os: ubuntu-latest
+            path: build/web
             arguments: '--base-href=/mangastash/ --wasm'
+            deploy: github
           - platform: macos
             os: macos-15
             path: build/macos/Build/Products/Release/mangastash.app
@@ -71,7 +77,7 @@ jobs:
           source: ${{ matrix.path }}
           format: zip
           dest: build
-          destfilename: 'web'
+          destfilename: 'web-${{ matrix.deploy }}'
       - name: 'Attach artifact to release'
         if: ${{ matrix.platform == 'web' }}
         uses: softprops/action-gh-release@v2
@@ -83,7 +89,7 @@ jobs:
         with:
           files: ${{ matrix.path }}
       - name: 'Deploy to Firebase'
-        if: ${{ matrix.platform == 'web' }}
+        if: ${{ matrix.platform == 'web' && matrix.deploy == 'firebase'}}
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
@@ -91,7 +97,7 @@ jobs:
           channelId: live
           projectId: mangastash-4bf38
       - name: 'Deploy to Github Page'
-        if: ${{ matrix.platform == 'web' }}
+        if: ${{ matrix.platform == 'web' && matrix.deploy == 'github' }}
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
