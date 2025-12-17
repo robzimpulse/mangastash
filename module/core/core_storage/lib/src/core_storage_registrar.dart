@@ -24,7 +24,6 @@ class CoreStorageRegistrar extends Registrar {
       dispose: (e) => e.close(),
     );
     locator.registerLazySingleton(() => DatabaseViewer());
-    locator.registerFactory(() => ImageByteDao(locator()));
     locator.registerFactory(() => MangaDao(locator()));
     locator.registerFactory(() => ChapterDao(locator()));
     locator.registerFactory(() => LibraryDao(locator()));
@@ -51,11 +50,7 @@ class CoreStorageRegistrar extends Registrar {
       ),
     );
     locator.registerLazySingleton(
-      () => ImagesCacheManager(
-        fileService: locator(),
-        imageByteDao: locator(),
-        logBox: locator(),
-      ),
+      () => ImagesCacheManager(fileService: locator(), logBox: locator()),
       dispose: (e) => e.dispose(),
     );
     locator.registerLazySingleton(
