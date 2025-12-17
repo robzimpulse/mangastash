@@ -82,7 +82,7 @@ jobs:
         if: ${{ matrix.platform == 'web' }}
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ matrix.path }}.zip
+          files: ${{ matrix.path }}-${{ matrix.deploy }}.zip
       - name: 'Attach artifact to release'
         if: ${{ matrix.platform != 'web' }}
         uses: softprops/action-gh-release@v2
