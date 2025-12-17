@@ -1,12 +1,10 @@
 import 'package:drift/drift.dart';
-import 'package:file/file.dart';
 import 'package:uuid/uuid.dart';
 
 import '../database/adapter/filesystem/filesystem_adapter.dart'
     if (dart.library.js_interop) '../database/adapter/filesystem/filesystem_web.dart'
     if (dart.library.io) '../database/adapter/filesystem/filesystem_io.dart';
 import '../database/database.dart';
-import '../extension/file_system_entity_extension.dart';
 import '../extension/non_empty_string_list_extension.dart';
 import '../tables/file_tables.dart';
 
@@ -22,10 +20,6 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
 
   SimpleSelectStatement<$FileTablesTable, FileDrift> get _selector {
     return select(fileTables)..orderBy(_clauses);
-  }
-
-  DeleteStatement<$FileTablesTable, FileDrift> get _deleter {
-    return delete(fileTables);
   }
 
   Expression<bool> _filter({
@@ -50,16 +44,16 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     return transaction(() => selector.get());
   }
 
-  Future<FileDrift> add({required String webUrl, required File file}) async {
+  Future<FileDrift> add({
+    required String webUrl,
+    required Uint8List data,
+    String? extension,
+  }) async {
     return transaction(() async {
-      if (!await file.exists()) {
-        throw FileSystemException('File not found', file.path);
-      }
-
       final directory = await databaseDirectory();
-      final filename = '${Uuid().v4()}.${file.extension}';
+      final filename = '${Uuid().v4()}.$extension';
       final dest = await directory.childFile(filename).create(recursive: true);
-      await dest.openWrite().addStream(file.openRead());
+      await dest.writeAsBytes(data);
 
       final value = FileTablesCompanion.insert(
         webUrl: webUrl,
@@ -74,14 +68,5 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
         ),
       );
     });
-  }
-
-  Future<List<FileDrift>> remove({
-    List<String> ids = const [],
-    List<String> webUrls = const [],
-  }) {
-    final selector = _deleter;
-    selector.where((f) => _filter(f: f, ids: ids, webUrls: webUrls));
-    return transaction(() => selector.goAndReturn());
   }
 }
