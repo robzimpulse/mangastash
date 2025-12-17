@@ -77,7 +77,7 @@ jobs:
           source: ${{ matrix.path }}
           format: zip
           dest: build
-          destfilename: 'web'
+          destfilename: 'web-${{ matrix.deploy }}'
       - name: 'Attach artifact to release'
         if: ${{ matrix.platform == 'web' }}
         uses: softprops/action-gh-release@v2
