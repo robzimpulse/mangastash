@@ -40,6 +40,8 @@ class SourceTileWidget extends StatelessWidget {
             imageUrl: iconUrl ?? '',
             width: 16,
             height: 16,
+            memCacheWidth: 16,
+            memCacheHeight: 16,
             errorWidget: (context, url, error) {
               return const Center(child: Icon(Icons.error));
             },

@@ -45,6 +45,8 @@ class MangaTileWidget extends StatelessWidget {
               ),
               width: 50,
               height: 50,
+              memCacheWidth: 50,
+              memCacheHeight: 50,
               errorWidget: (context, url, error) {
                 return const Center(child: Icon(Icons.error));
               },
