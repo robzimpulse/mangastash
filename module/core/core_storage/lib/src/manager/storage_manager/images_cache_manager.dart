@@ -9,24 +9,15 @@ import '../custom_cache_manager/custom_cache_manager.dart';
 import 'file_service/custom_file_service.dart';
 
 class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
-  final LogBox _logBox;
   final FileDao _fileDao;
 
   ImagesCacheManager({
     required CustomFileService fileService,
-    required LogBox logBox,
     required FileDao fileDao,
-  }) : _logBox = logBox,
-       _fileDao = fileDao,
+  }) : _fileDao = fileDao,
        super(
          Config('image', fileService: fileService),
          onDeleteFile: (object, data, ext) {
-           logBox.log(
-             '[Move] Image file to Database',
-             extra: {'cache': object.toMap(setTouchedToNow: false)},
-             name: 'ImageCacheManager',
-           );
-
            fileDao.add(webUrl: object.url, data: data, extension: ext);
          },
        );
