@@ -169,6 +169,7 @@ class MangaReaderScreen extends StatelessWidget {
             precacheAhead: 1,
             precacheBehind: 1,
             maxZoomLevel: 4,
+            minZoomLevel: 1,
             edgeIndicatorContainerSize: 100,
           ),
           pageBuilder: (context, index) {
