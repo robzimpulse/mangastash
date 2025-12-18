@@ -3,7 +3,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:photo_view/photo_view.dart';
+import 'package:manga_page_view/manga_page_view.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -71,17 +71,7 @@ class MangaReaderScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScaffoldScreen(
       appBar: AppBar(title: _title(), actions: [_recrawlButton()]),
-      body: Column(
-        children: [
-          Expanded(child: _content(context: context)),
-          Row(
-            children: [
-              Expanded(child: _prevButton()),
-              Expanded(child: _nextButton()),
-            ],
-          ),
-        ],
-      ),
+      body: _content(context: context),
     );
   }
 
@@ -126,14 +116,14 @@ class MangaReaderScreen extends StatelessWidget {
   }
 
   Widget _content({required BuildContext context}) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return _builder(
       buildWhen: (prev, curr) {
         return [
           prev.isLoading != curr.isLoading,
           prev.error != curr.error,
           prev.chapter?.images != curr.chapter?.images,
+          prev.previousChapterId != curr.previousChapterId,
+          prev.nextChapterId != curr.nextChapterId,
         ].contains(true);
       },
       builder: (context, state) {
@@ -167,96 +157,69 @@ class MangaReaderScreen extends StatelessWidget {
           );
         }
 
-        return CustomScrollView(
-          slivers: [
-            for (final image in images)
-              SliverToBoxAdapter(
-                child: CachedNetworkImage(
-                  imageUrl: image,
-                  cacheManager: imagesCacheManager,
-                  imageBuilder: (context, provider) {
-                    return FutureBuilder(
-                      future: provider.imageInfo,
-                      builder: (context, snapshot) {
-                        final data = snapshot.data;
-
-                        if (data == null) {
-                          return const SizedBox(
-                            height: 100,
-                            child: Center(child: CircularProgressIndicator()),
-                          );
-                        }
-
-                        final ratio = data.image.ratio;
-
-                        return SizedBox(
-                          width: screenWidth,
-                          height: screenWidth * ratio,
-                          child: PhotoView(
-                            loadingBuilder: (context, event) {
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  value: event?.progress,
-                                ),
-                              );
-                            },
-                            customSize: Size(screenWidth, screenWidth * ratio),
-                            imageProvider: provider,
-                            maxScale: PhotoViewComputedScale.covered * 2.0,
-                            minScale: PhotoViewComputedScale.covered,
-                            initialScale: PhotoViewComputedScale.covered,
-                          ),
-                        );
-                      },
-                    );
-                  },
-                  progressIndicatorBuilder: (context, url, progress) {
-                    return SizedBox(
-                      height: screenWidth / 2,
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          value: progress.progress,
-                        ),
-                      ),
-                    );
-                  },
-                ),
+        return MangaPageView(
+          mode: MangaPageViewMode.continuous,
+          direction: MangaPageViewDirection.down,
+          pageCount: images.length,
+          options: MangaPageViewOptions(
+            crossAxisOverscroll: false,
+            precacheAhead: 1,
+            precacheBehind: 1,
+            maxZoomLevel: 4,
+          ),
+          pageBuilder: (context, index) {
+            return CachedNetworkImage(
+              imageUrl: images.elementAt(index),
+              cacheManager: imagesCacheManager,
+              errorWidget: (context, url, error) {
+                return const Center(child: Icon(Icons.error));
+              },
+              progressIndicatorBuilder: (context, url, progress) {
+                return Center(
+                  child: CircularProgressIndicator(value: progress.progress),
+                );
+              },
+            );
+          },
+          onPageChange: (index) {
+            print('Current page: $index');
+          },
+          onZoomChange: (zoomLevel) {
+            print('Current zoom: $zoomLevel');
+          },
+          onProgressChange: (progress) {
+            print('Scroll progress: $progress');
+          },
+          startEdgeDragIndicatorBuilder: (context, info) {
+            return Center(
+              child: Column(
+                children: [
+                  if (state.previousChapterId == null) ...[
+                    Text('No Previous Chapter'),
+                  ] else ...[
+                    Icon(Icons.arrow_upward),
+                    Text('Previous Chapter'),
+                  ],
+                ],
               ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _prevButton() {
-    return _builder(
-      buildWhen: (prev, curr) {
-        return prev.previousChapterId != curr.previousChapterId;
-      },
-      builder: (context, state) {
-        if (state.previousChapterId == null) {
-          return const SizedBox.shrink();
-        }
-        return IconButton(
-          alignment: Alignment.centerLeft,
-          onPressed: () => onTapShortcut?.call(state.previousChapterId),
-          icon: const Icon(Icons.navigate_before),
-        );
-      },
-    );
-  }
-
-  Widget _nextButton() {
-    return _builder(
-      buildWhen: (prev, curr) => prev.nextChapterId != curr.nextChapterId,
-      builder: (context, state) {
-        if (state.nextChapterId == null) {
-          return const SizedBox.shrink();
-        }
-        return IconButton(
-          alignment: Alignment.centerRight,
-          onPressed: () => onTapShortcut?.call(state.nextChapterId),
-          icon: const Icon(Icons.navigate_next),
+            );
+          },
+          endEdgeDragIndicatorBuilder: (context, info) {
+            return Center(
+              child: Column(
+                children: [
+                  if (state.nextChapterId == null) ...[
+                    Text('No Previous Chapter'),
+                  ] else ...[
+                    Icon(Icons.arrow_downward),
+                    Text('Next Chapter'),
+                  ],
+                ],
+              ),
+            );
+          },
+          onStartEdgeDrag: () => onTapShortcut?.call(state.previousChapterId),
+          onEndEdgeDrag: () => onTapShortcut?.call(state.nextChapterId),
         );
       },
     );
