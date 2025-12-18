@@ -52,10 +52,10 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     String? extension,
   }) async {
     return transaction(() async {
-      final directory = (await attachedDatabase.databaseDirectory());
       final filename = '${Uuid().v4()}.$extension';
-      final dest = await directory.childFile(filename).create(recursive: true);
-      await dest.writeAsBytes(data);
+      final destination = (await directory()).childFile(filename);
+      await destination.create(recursive: true);
+      await destination.writeAsBytes(data);
 
       final value = FileTablesCompanion.insert(
         webUrl: webUrl,
@@ -72,10 +72,12 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     });
   }
 
-  Future<File> file(FileDrift data) {
-    return attachedDatabase.databaseDirectory().then(
-      (e) => e.childFile(data.relativePath),
-    );
+  Future<Directory> directory() async  {
+    return (await attachedDatabase.databaseDirectory()).childDirectory('file');
+  }
+
+  Future<File> file(FileDrift data) async {
+    return (await directory()).childFile(data.relativePath);
   }
 
   Future<List<FileDrift>> remove({
