@@ -3,9 +3,8 @@ import 'dart:typed_data';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_cache_manager/src/cache_store.dart';
+import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:universal_io/io.dart';
-
-import '../../extension/file_system_entity_extension.dart';
 
 typedef DeletedFileData =
     void Function(CacheObject object, Uint8List data, String? ext);

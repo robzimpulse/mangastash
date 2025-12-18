@@ -84,7 +84,8 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
   }
 
   Future<Directory> directory() async {
-    return (await attachedDatabase.databaseDirectory()).childDirectory('file');
+    final root = await attachedDatabase.databaseDirectory();
+    return root.childDirectory('file').create();
   }
 
   Future<File> file(FileDrift data) async {
