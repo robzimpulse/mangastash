@@ -177,11 +177,19 @@ class MangaReaderScreen extends StatelessWidget {
               imageUrl: images.elementAt(index),
               cacheManager: imagesCacheManager,
               errorWidget: (context, url, error) {
-                return const Center(child: Icon(Icons.error));
+                return SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: const Center(child: Icon(Icons.error)),
+                );
               },
               progressIndicatorBuilder: (context, url, progress) {
-                return Center(
-                  child: CircularProgressIndicator(value: progress.progress),
+                return SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: Center(
+                    child: CircularProgressIndicator(value: progress.progress),
+                  ),
                 );
               },
             );
@@ -215,8 +223,8 @@ class MangaReaderScreen extends StatelessWidget {
                       width: 32,
                       height: 32,
                       child: CircularProgressIndicator(),
-                    )
-                  ] else if (nextId != null)...[
+                    ),
+                  ] else if (nextId != null) ...[
                     Icon(Icons.arrow_downward),
                     Text('Next Chapter'),
                   ] else ...[

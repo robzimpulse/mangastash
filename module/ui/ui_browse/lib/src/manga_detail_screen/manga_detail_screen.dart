@@ -245,8 +245,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         if (url == null) {
           view = const Center(
             child: SizedBox(
-              width: 16,
-              height: 16,
+              width: 32,
+              height: 32,
               child: CircularProgressIndicator(),
             ),
           );
