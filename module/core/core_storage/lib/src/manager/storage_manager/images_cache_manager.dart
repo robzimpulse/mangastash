@@ -32,19 +32,8 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
 
     _fileDao
         .search(webUrls: [url])
-        .then((results) async {
-          final data = results.first;
-          final file = await _fileDao.file(data);
-
-          if (!await file.exists()) {
-            await _fileDao.remove(ids: [data.id]);
-
-            throw FileSystemException(
-              'File not found, deleting $data from database',
-              file.path,
-            );
-          }
-
+        .then((results) => _fileDao.file(results.first))
+        .then((file) {
           controller.add(
             FileInfo(
               file,
@@ -68,4 +57,21 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
 
     return controller.stream;
   }
+
+  @override
+  Future<File> getSingleFile(
+    String url, {
+    String? key,
+    Map<String, String>? headers,
+  }) {
+    return _fileDao
+        .search(webUrls: [url])
+        .then((results) => _fileDao.file(results.first))
+        .onError(
+          (_, __) => super.getSingleFile(url, key: key, headers: headers),
+        );
+  }
+
+
+
 }

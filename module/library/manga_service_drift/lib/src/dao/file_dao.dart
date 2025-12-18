@@ -89,7 +89,18 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
   }
 
   Future<File> file(FileDrift data) async {
-    return (await directory()).childFile(data.relativePath);
+    final file = (await directory()).childFile(data.relativePath);
+
+    if (!await file.exists()) {
+      await remove(ids: [data.id]);
+
+      throw FileSystemException(
+        'File not found, deleting $data from database',
+        file.path,
+      );
+    }
+
+    return file;
   }
 
   Future<void> sync() async {
