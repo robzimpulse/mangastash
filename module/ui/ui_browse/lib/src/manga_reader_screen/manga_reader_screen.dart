@@ -185,15 +185,6 @@ class MangaReaderScreen extends StatelessWidget {
               },
             );
           },
-          onPageChange: (index) {
-            print('Current page: $index');
-          },
-          onZoomChange: (zoomLevel) {
-            print('Current zoom: $zoomLevel');
-          },
-          onProgressChange: (progress) {
-            print('Scroll progress: $progress');
-          },
           startEdgeDragIndicatorBuilder: (context, info) {
             return Center(
               child: Column(
@@ -204,9 +195,11 @@ class MangaReaderScreen extends StatelessWidget {
                       height: 32,
                       child: CircularProgressIndicator(),
                     ),
-                  ] else ...[
+                  ] else if (prevId != null) ...[
                     Icon(Icons.arrow_upward),
                     Text('Previous Chapter'),
+                  ] else ...[
+                    Text('No Previous Chapter'),
                   ],
                 ],
               ),
@@ -222,9 +215,11 @@ class MangaReaderScreen extends StatelessWidget {
                       height: 32,
                       child: CircularProgressIndicator(),
                     )
-                  ] else ...[
+                  ] else if (nextId != null)...[
                     Icon(Icons.arrow_downward),
                     Text('Next Chapter'),
+                  ] else ...[
+                    Text('No Next Chapter'),
                   ],
                 ],
               ),

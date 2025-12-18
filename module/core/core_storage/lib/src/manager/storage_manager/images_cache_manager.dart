@@ -40,12 +40,6 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
   }) {
     final controller = StreamController<FileResponse>();
 
-    _logBox.log(
-      '[Start] get file stream',
-      name: runtimeType.toString(),
-      extra: {'url': url},
-    );
-
     _fileDao
         .search(webUrls: [url])
         .then((results) async {
@@ -61,12 +55,6 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
             );
           }
 
-          _logBox.log(
-            '[Hit] Using image file from Database',
-            name: runtimeType.toString(),
-            extra: {'url': url},
-          );
-
           controller.add(
             FileInfo(
               file,
@@ -77,14 +65,6 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
           );
         })
         .onError((e, st) async {
-          _logBox.log(
-            '[Error] Using image file from Cache',
-            name: runtimeType.toString(),
-            extra: {'url': url},
-            error: e,
-            stackTrace: st,
-          );
-
           await controller.addStream(
             super.getFileStream(
               url,
@@ -94,15 +74,7 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
             ),
           );
         })
-        .whenComplete(() {
-          _logBox.log(
-            '[Finish] get file stream',
-            name: runtimeType.toString(),
-            extra: {'url': url},
-          );
-
-          controller.close();
-        });
+        .whenComplete(() => controller.close());
 
     return controller.stream;
   }
