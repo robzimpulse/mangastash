@@ -3,6 +3,7 @@ import 'package:file/file.dart';
 import 'package:uuid/uuid.dart';
 
 import '../database/database.dart';
+import '../extension/file_system_entity_extension.dart';
 import '../extension/non_empty_string_list_extension.dart';
 import '../tables/file_tables.dart';
 
@@ -28,10 +29,12 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     required $FileTablesTable f,
     List<String> ids = const [],
     List<String> webUrls = const [],
+    List<String> relativePaths = const [],
   }) {
     return [
       f.id.isIn(ids.nonEmpty.distinct),
       f.webUrl.isIn(webUrls.nonEmpty.distinct),
+      f.relativePath.isIn(relativePaths.nonEmpty.distinct),
     ].fold(const Constant(false), (a, b) => a | b);
   }
 
@@ -40,9 +43,17 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
   Future<List<FileDrift>> search({
     List<String> ids = const [],
     List<String> webUrls = const [],
+    List<String> relativePaths = const [],
   }) {
     final selector = _selector;
-    selector.where((f) => _filter(f: f, ids: ids, webUrls: webUrls));
+    selector.where(
+      (f) => _filter(
+        f: f,
+        ids: ids,
+        webUrls: webUrls,
+        relativePaths: relativePaths,
+      ),
+    );
     return transaction(() => selector.get());
   }
 
@@ -72,7 +83,7 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     });
   }
 
-  Future<Directory> directory() async  {
+  Future<Directory> directory() async {
     return (await attachedDatabase.databaseDirectory()).childDirectory('file');
   }
 
@@ -80,12 +91,41 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     return (await directory()).childFile(data.relativePath);
   }
 
+  Future<void> sync() async {
+    /// remove [FileDrift] record that file not exists on storage
+    await remove(
+      ids: [
+        for (final result in await all)
+          if (!(await file(result).then((e) => e.exists()))) result.id,
+      ],
+    );
+
+    /// remove [File] that do not exists on database
+    final files = await directory().then((e) => e.list().toList());
+    final existing = await search(
+      relativePaths: [...files.map((e) => e.filename).nonNulls],
+    );
+    for (final file in files) {
+      if (!existing.any((e) => e.relativePath == file.filename)) {
+        await file.delete();
+      }
+    }
+  }
+
   Future<List<FileDrift>> remove({
     List<String> ids = const [],
     List<String> webUrls = const [],
+    List<String> relativePaths = const [],
   }) {
     final selector = _deleter;
-    selector.where((f) => _filter(f: f, ids: ids, webUrls: webUrls));
+    selector.where(
+      (f) => _filter(
+        f: f,
+        ids: ids,
+        webUrls: webUrls,
+        relativePaths: relativePaths,
+      ),
+    );
     return transaction(() => selector.goAndReturn());
   }
 }
