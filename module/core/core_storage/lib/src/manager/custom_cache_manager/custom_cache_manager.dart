@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import 'custom_cache_store.dart';
+import 'custom_web_helper.dart';
 
 class CustomCacheManager implements BaseCacheManager {
   late final BaseCacheManager _cache;
@@ -13,7 +14,11 @@ class CustomCacheManager implements BaseCacheManager {
     _cacheStore = CustomCacheStore(config, onDeleteFile: onDeleteFile);
 
     /// ignore: invalid_use_of_visible_for_testing_member
-    _cache = CacheManager.custom(config, cacheStore: _cacheStore);
+    _cache = CacheManager.custom(
+      config,
+      cacheStore: _cacheStore,
+      webHelper: CustomWebHelper(_cacheStore, config.fileService),
+    );
   }
 
   Future<Set<String>> get keys => _cacheStore.keys;
