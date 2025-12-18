@@ -88,10 +88,12 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     return root.childDirectory('file').create();
   }
 
-  Future<File> file(FileDrift data) async {
+  /// if [checkFile] is true then throw [FileSystemException] if file not
+  /// exists otherwise return [File] from [FileDrift] data,
+  Future<File> file(FileDrift data, {bool checkFile = true}) async {
     final file = (await directory()).childFile(data.relativePath);
 
-    if (!await file.exists()) {
+    if (checkFile && !await file.exists()) {
       await remove(ids: [data.id]);
 
       throw FileSystemException(
@@ -108,7 +110,8 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     await remove(
       ids: [
         for (final result in await all)
-          if (!(await file(result).then((e) => e.exists()))) result.id,
+          if (!(await file(result, checkFile: false).then((e) => e.exists())))
+            result.id,
       ],
     );
 
