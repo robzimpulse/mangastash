@@ -3,11 +3,13 @@ import 'package:file/file.dart';
 extension FileSystemEntityExtension on FileSystemEntity {
   String? get _lastPathComponent => path.split('/').lastOrNull;
 
-  String? get filename {
+  String? get name {
     return (_lastPathComponent?.split('.')?..removeLast())?.join('.');
   }
 
-  String? get extension => _lastPathComponent?.split('.').lastOrNull;
+  String? get ext => _lastPathComponent?.split('.').lastOrNull;
+
+  String? get filename => [name, ext].nonNulls.join('.');
 }
 
 extension FileStatExtension on FileStat {

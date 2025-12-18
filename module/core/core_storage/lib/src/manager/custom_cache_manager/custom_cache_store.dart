@@ -224,11 +224,7 @@ class CustomCacheStore implements CacheStore {
 
     if (file.existsSync()) {
       try {
-        _onDeleteFile?.call(
-          cacheObject,
-          await file.readAsBytes(),
-          file.extension,
-        );
+        _onDeleteFile?.call(cacheObject, await file.readAsBytes(), file.ext);
         await file.delete();
         // ignore: unused_catch_clause
       } on PathNotFoundException catch (e) {

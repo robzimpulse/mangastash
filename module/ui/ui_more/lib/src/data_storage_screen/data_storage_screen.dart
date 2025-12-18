@@ -199,7 +199,7 @@ class DataStorageScreen extends StatelessWidget {
               children: [
                 for (final file in state.listBackup.reversed)
                   ListTile(
-                    title: Text(file.filename ?? 'Unknown'),
+                    title: Text(file.name ?? 'Unknown'),
                     subtitle: FutureBuilder(
                       future: file.stat(),
                       builder: (context, snapshot) {
@@ -284,7 +284,7 @@ class DataStorageScreen extends StatelessWidget {
         files: [
           XFile.fromData(
             await file.readAsBytes(),
-            name: file.filename,
+            name: file.name,
             mimeType: 'text/plain',
             path: file.path,
             length: await file.length(),
@@ -306,9 +306,8 @@ class DataStorageScreen extends StatelessWidget {
   }
 
   void _onTapSaveBackup(BuildContext context, File file) async {
-    final filename = '${file.filename}.${file.extension}';
     await fileSaverUseCase.execute(
-      filename: filename,
+      filename: file.filename,
       data: await file.readAsBytes(),
     );
     if (!context.mounted) return;

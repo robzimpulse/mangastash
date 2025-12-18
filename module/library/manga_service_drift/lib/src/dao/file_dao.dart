@@ -104,7 +104,9 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     /// remove [File] that do not exists on database
     final files = await directory().then((e) => e.list().toList());
     final existing = await search(
-      relativePaths: [...files.map((e) => e.filename).nonNulls],
+      relativePaths: [
+        ...[for (final file in files) file.filename].nonNulls,
+      ],
     );
     for (final file in files) {
       if (!existing.any((e) => e.relativePath == file.filename)) {
