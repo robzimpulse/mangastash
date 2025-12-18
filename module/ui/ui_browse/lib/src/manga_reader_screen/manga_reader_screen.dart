@@ -23,14 +23,14 @@ class MangaReaderScreen extends StatelessWidget {
 
   final LogBox logBox;
 
-  final void Function(String?)? onTapShortcut;
+  final void Function(String)? onTapShortcut;
 
   static Widget create({
     required ServiceLocator locator,
     required String? source,
     required String? mangaId,
     required String? chapterId,
-    void Function(String?)? onTapShortcut,
+    void Function(String)? onTapShortcut,
   }) {
     return BlocProvider(
       create: (context) {
@@ -124,12 +124,15 @@ class MangaReaderScreen extends StatelessWidget {
           prev.chapter?.images != curr.chapter?.images,
           prev.previousChapterId != curr.previousChapterId,
           prev.nextChapterId != curr.nextChapterId,
+          prev.isLoadingChapterIds != curr.isLoadingChapterIds,
         ].contains(true);
       },
       builder: (context, state) {
         final error = state.error;
         final images = state.chapter?.images ?? [];
         final url = state.chapter?.webUrl;
+        final prevId = state.previousChapterId;
+        final nextId = state.nextChapterId;
 
         if (error != null) {
           return _errorContent(context: context, error: error);
@@ -166,6 +169,7 @@ class MangaReaderScreen extends StatelessWidget {
             precacheAhead: 1,
             precacheBehind: 1,
             maxZoomLevel: 4,
+            edgeIndicatorContainerSize: 100,
           ),
           pageBuilder: (context, index) {
             return CachedNetworkImage(
@@ -194,8 +198,12 @@ class MangaReaderScreen extends StatelessWidget {
             return Center(
               child: Column(
                 children: [
-                  if (state.previousChapterId == null) ...[
-                    Text('No Previous Chapter'),
+                  if (state.isLoadingChapterIds) ...[
+                    SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: CircularProgressIndicator(),
+                    ),
                   ] else ...[
                     Icon(Icons.arrow_upward),
                     Text('Previous Chapter'),
@@ -208,8 +216,12 @@ class MangaReaderScreen extends StatelessWidget {
             return Center(
               child: Column(
                 children: [
-                  if (state.nextChapterId == null) ...[
-                    Text('No Previous Chapter'),
+                  if (state.isLoadingChapterIds) ...[
+                    SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: CircularProgressIndicator(),
+                    )
                   ] else ...[
                     Icon(Icons.arrow_downward),
                     Text('Next Chapter'),
@@ -218,8 +230,14 @@ class MangaReaderScreen extends StatelessWidget {
               ),
             );
           },
-          onStartEdgeDrag: () => onTapShortcut?.call(state.previousChapterId),
-          onEndEdgeDrag: () => onTapShortcut?.call(state.nextChapterId),
+          onStartEdgeDrag: () {
+            if (state.isLoadingChapterIds || prevId == null) return;
+            onTapShortcut?.call(prevId);
+          },
+          onEndEdgeDrag: () {
+            if (state.isLoadingChapterIds || nextId == null) return;
+            onTapShortcut?.call(nextId);
+          },
         );
       },
     );

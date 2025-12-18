@@ -57,6 +57,8 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
 
     if (mangaId == null || source == null) return;
 
+    emit(state.copyWith(isLoadingChapterIds: true));
+
     final response = await _getAllChapterUseCase.execute(
       source: source,
       mangaId: mangaId,
@@ -66,7 +68,12 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
       useCache: useCache,
     );
 
-    emit(state.copyWith(chapterIds: [...response.map((e) => e.id).nonNulls]));
+    emit(
+      state.copyWith(
+        chapterIds: [...response.map((e) => e.id).nonNulls],
+        isLoadingChapterIds: false,
+      ),
+    );
   }
 
   Future<void> _fetchChapter({bool useCache = true}) async {
