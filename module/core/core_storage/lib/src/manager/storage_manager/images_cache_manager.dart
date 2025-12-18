@@ -13,17 +13,11 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
 
   ImagesCacheManager({
     required CustomFileService fileService,
-    required LogBox logBox,
     required FileDao fileDao,
   }) : _fileDao = fileDao,
        super(
          Config('image', fileService: fileService),
          onDeleteFile: (object, data, ext) {
-           logBox.log(
-             '[Move] Image file to Database',
-             extra: {'cache': object.toMap(setTouchedToNow: false), 'ext': ext},
-             name: 'ImageCacheManager',
-           );
            fileDao.add(webUrl: object.url, data: data, extension: ext);
          },
        );
