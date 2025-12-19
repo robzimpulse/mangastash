@@ -51,7 +51,11 @@ class CoreStorageRegistrar extends Registrar {
       ),
     );
     locator.registerLazySingleton(
-      () => ImagesCacheManager(fileService: locator(), fileDao: locator()),
+      () => ImagesCacheManager(
+        fileService: locator(),
+        fileDao: locator(),
+        logBox: locator(),
+      ),
       dispose: (e) => e.dispose(),
     );
     locator.registerLazySingleton(
