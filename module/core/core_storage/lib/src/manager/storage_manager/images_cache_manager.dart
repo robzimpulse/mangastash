@@ -60,8 +60,8 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
               LogEntryModel(
                 message: '[Miss] Using file from database',
                 name: runtimeType.toString(),
-                error: e,
-                stackTrace: st,
+                error: e.toString(),
+                stackTrace: st.toString(),
               ),
             );
 
@@ -104,8 +104,8 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
               LogEntryModel(
                 message: '[Miss] Using file from database',
                 name: runtimeType.toString(),
-                error: e,
-                stackTrace: st,
+                error: e.toString(),
+                stackTrace: st.toString(),
               ),
             );
             return super.getSingleFile(url, key: key, headers: headers);
