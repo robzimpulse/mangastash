@@ -8,17 +8,11 @@ import 'queue_screen_cubit.dart';
 import 'queue_screen_state.dart';
 
 class QueueScreen extends StatelessWidget {
-  const QueueScreen({
-    super.key,
-  });
+  const QueueScreen({super.key});
 
-  static Widget create({
-    required ServiceLocator locator,
-  }) {
+  static Widget create({required ServiceLocator locator}) {
     return BlocProvider(
-      create: (context) => QueueScreenCubit(
-        listenPrefetchUseCase: locator(),
-      ),
+      create: (context) => QueueScreenCubit(listenPrefetchUseCase: locator()),
       child: const QueueScreen(),
     );
   }
@@ -50,18 +44,19 @@ class QueueScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      appBar: AppBar(
-        title: const Text('Queues'),
-      ),
+      appBar: AppBar(title: const Text('Queues')),
       body: _builder(
         buildWhen: (prev, curr) => prev.jobs != curr.jobs,
-        builder: (context, state) => CustomScrollView(
-          slivers: [
-            ...state.jobs.map(
-              (e) => SliverToBoxAdapter(child: _jobItem(job: e)),
-            ),
-          ],
-        ),
+        builder: (context, state) {
+          return ListView.builder(
+            itemBuilder: (context, index) {
+              final job = state.jobs.elementAtOrNull(index);
+              if (job == null) return const SizedBox.shrink();
+              return _jobItem(job: job);
+            },
+            itemCount: state.jobs.length,
+          );
+        },
       ),
     );
   }
