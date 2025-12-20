@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../use_case/cancel_job_use_case.dart';
 import '../use_case/chapter/get_all_chapter_use_case.dart';
 import '../use_case/chapter/get_chapter_use_case.dart';
 import '../use_case/manga/get_manga_use_case.dart';
@@ -23,7 +24,8 @@ class JobManager
     implements
         PrefetchMangaUseCase,
         PrefetchChapterUseCase,
-        ListenPrefetchUseCase {
+        ListenPrefetchUseCase,
+        CancelJobUseCase {
   final _jobs = BehaviorSubject<List<JobModel>>.seeded([]);
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
@@ -33,7 +35,7 @@ class JobManager
   final JobDao _jobDao;
   final LogBox _log;
 
-  bool _isFetching = false;
+  int? _processedJobId;
 
   late final StreamSubscription _streamSubscription;
 
@@ -77,9 +79,9 @@ class JobManager
 
   void _onData(List<JobModel> jobs) async {
     final job = jobs.firstOrNull;
-    if (job == null || _isFetching) return;
+    if (job == null || _processedJobId != null) return;
 
-    _isFetching = true;
+    _processedJobId = job.id;
 
     switch (job.type) {
       case JobTypeEnum.manga:
@@ -93,7 +95,7 @@ class JobManager
     }
 
     await _jobDao.remove(job.id);
-    _isFetching = false;
+    _processedJobId = null;
   }
 
   Future<void> _fetchManga(JobModel job) async {
@@ -338,6 +340,17 @@ class JobManager
         mangaId: Value(mangaId),
       ),
     );
+  }
+
+  @override
+  void cancelJob({required int id}) {
+    final ongoingJob = _processedJobId;
+    if (ongoingJob != null) {
+      _jobDao.remove(id);
+      return;
+    }
+
+    // TODO: cancel ongoing job
   }
 
   @override

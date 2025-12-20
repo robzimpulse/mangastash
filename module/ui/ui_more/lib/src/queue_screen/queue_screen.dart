@@ -1,5 +1,6 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -8,12 +9,14 @@ import 'queue_screen_cubit.dart';
 import 'queue_screen_state.dart';
 
 class QueueScreen extends StatelessWidget {
-  const QueueScreen({super.key});
+  const QueueScreen({super.key, required this.cancelJobUseCase});
+
+  final CancelJobUseCase cancelJobUseCase;
 
   static Widget create({required ServiceLocator locator}) {
     return BlocProvider(
       create: (context) => QueueScreenCubit(listenPrefetchUseCase: locator()),
-      child: const QueueScreen(),
+      child: QueueScreen(cancelJobUseCase: locator()),
     );
   }
 
@@ -42,7 +45,10 @@ class QueueScreen extends StatelessWidget {
           if (imageUrl != null) Text('Image: $imageUrl'),
         ],
       ),
-      trailing: IconButton(onPressed: () {}, icon: Icon(Icons.cancel_outlined)),
+      trailing: IconButton(
+        onPressed: () => cancelJobUseCase.cancelJob(id: job.id),
+        icon: Icon(Icons.cancel_outlined),
+      ),
     );
   }
 

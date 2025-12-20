@@ -6,6 +6,7 @@ export 'src/domain_manga_registrar.dart';
 export 'src/extension/language_code_converter.dart';
 export 'src/extension/uri_source_extension.dart';
 export 'src/mixin/sort_chapters_mixin.dart';
+export 'src/use_case/cancel_job_use_case.dart';
 export 'src/use_case/chapter/get_all_chapter_use_case.dart';
 export 'src/use_case/chapter/get_chapter_use_case.dart';
 export 'src/use_case/chapter/search_chapter_use_case.dart';
