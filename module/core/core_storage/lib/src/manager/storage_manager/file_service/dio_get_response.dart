@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_cache_manager/src/web/mime_converter.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:universal_io/io.dart';
 
 class DioGetResponse implements FileServiceResponse {
@@ -10,7 +11,18 @@ class DioGetResponse implements FileServiceResponse {
   DioGetResponse(this._response);
 
   @override
-  Stream<List<int>> get content => _response.data!.stream;
+  Stream<List<int>> get content {
+    final replay = ReplaySubject<List<int>>();
+
+    final stream = _response.data?.stream;
+    if (stream != null) {
+      replay.addStream(stream).whenComplete(() => replay.close());
+    } else {
+      replay.close();
+    }
+
+    return replay.stream;
+  }
 
   @override
   int? get contentLength {
