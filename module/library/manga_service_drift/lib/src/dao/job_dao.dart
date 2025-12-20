@@ -11,30 +11,30 @@ import '../util/job_type_enum.dart';
 
 part 'job_dao.g.dart';
 
-@DriftAccessor(
-  tables: [
-    JobTables,
-    MangaTables,
-    ChapterTables,
-    ImageTables,
-  ],
-)
+@DriftAccessor(tables: [JobTables, MangaTables, ChapterTables, ImageTables])
 class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
   JobDao(super.db);
 
+  InsertStatement<$JobTablesTable, JobDrift> get _inserter {
+    return into(jobTables);
+  }
+
+  SimpleSelectStatement<$JobTablesTable, JobDrift> get _selector {
+    return select(jobTables);
+  }
+
+  DeleteStatement<$JobTablesTable, JobDrift> get _deleter {
+    return delete(jobTables);
+  }
+
   JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
-    return select(jobTables).join(
-      [
-        leftOuterJoin(
-          mangaTables,
-          mangaTables.id.equalsExp(jobTables.mangaId),
-        ),
-        leftOuterJoin(
-          chapterTables,
-          chapterTables.id.equalsExp(jobTables.chapterId),
-        ),
-      ],
-    );
+    return _selector.join([
+      leftOuterJoin(mangaTables, mangaTables.id.equalsExp(jobTables.mangaId)),
+      leftOuterJoin(
+        chapterTables,
+        chapterTables.id.equalsExp(jobTables.chapterId),
+      ),
+    ]);
   }
 
   List<JobModel> _parse(List<TypedResult> rows) {
@@ -65,17 +65,13 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
     return _aggregate.watch().map((e) => _parse(e));
   }
 
-  Future<void> add(JobTablesCompanion value) async {
-    await transaction(
-      () => into(jobTables).insert(
-        value,
-        mode: InsertMode.insertOrIgnore,
-      ),
+  Future<JobDrift> add(JobTablesCompanion value) {
+    return transaction(
+      () => _inserter.insertReturning(value, mode: InsertMode.insertOrIgnore),
     );
   }
 
   Future<void> remove(int id) async {
-    final s = delete(jobTables)..where((f) => f.id.equals(id));
-    await transaction(() => s.go());
+    await transaction(() => (_deleter..where((f) => f.id.equals(id))).go());
   }
 }
