@@ -28,16 +28,21 @@ class QueueScreen extends StatelessWidget {
   }
 
   Widget _jobItem({required JobModel job}) {
+    final mangaTitle = job.manga?.title;
+    final chapterTitle = job.chapter?.title;
+    final imageUrl = job.image;
+
     return ListTile(
       title: Text('${job.id} - ${job.type.label}'),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Manga: ${job.manga?.title}'),
-          Text('Chapter: ${job.chapter?.title}'),
-          Text('Image: ${job.image}'),
+          if (mangaTitle != null) Text('Manga: $mangaTitle'),
+          if (chapterTitle != null) Text('Chapter: $chapterTitle'),
+          if (imageUrl != null) Text('Image: $imageUrl'),
         ],
       ),
+      trailing: IconButton(onPressed: () {}, icon: Icon(Icons.cancel_outlined)),
     );
   }
 
