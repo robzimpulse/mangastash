@@ -65,9 +65,9 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
     return _aggregate.watch().map((e) => _parse(e));
   }
 
-  Future<JobDrift> add(JobTablesCompanion value) {
+  Future<void> add(JobTablesCompanion value) {
     return transaction(
-      () => _inserter.insertReturning(value, mode: InsertMode.insertOrIgnore),
+      () => _inserter.insert(value, mode: InsertMode.insertOrIgnore),
     );
   }
 
