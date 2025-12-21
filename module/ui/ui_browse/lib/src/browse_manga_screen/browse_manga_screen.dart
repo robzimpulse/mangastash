@@ -37,12 +37,16 @@ class BrowseMangaScreen extends StatefulWidget {
     )?
     onTapFilter,
     String? source,
+    String? tagId,
   }) {
     return BlocProvider(
       create: (context) {
         return BrowseMangaScreenCubit(
           initialState: BrowseMangaScreenState(
             source: source?.let((e) => SourceEnum.fromValue(name: source)),
+            parameter: SearchMangaParameter(
+              includedTags: tagId.let((e) => [e]),
+            ),
           ),
           searchMangaUseCase: locator(),
           listenMangaFromLibraryUseCase: locator(),
