@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
+import 'package:intersperse/intersperse.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import 'base/checkbox_with_text_widget.dart';
@@ -28,7 +29,10 @@ class MangaParameterWidget extends StatelessWidget {
     final active = parameter.status?.labels;
     return ExpansionTile(
       title: const Text('Status'),
-      subtitle: active != null && active.isNotEmpty ? Text(active) : null,
+      subtitle:
+          active != null && active.isNotEmpty
+              ? Text(active, style: Theme.of(context).textTheme.labelMedium)
+              : null,
       children: [
         ...MangaStatus.values.map(
           (key) => CheckboxListTile(
@@ -50,7 +54,10 @@ class MangaParameterWidget extends StatelessWidget {
     final active = parameter.contentRating?.labels;
     return ExpansionTile(
       title: const Text('Content Rating'),
-      subtitle: active != null && active.isNotEmpty ? Text(active) : null,
+      subtitle:
+          active != null && active.isNotEmpty
+              ? Text(active, style: Theme.of(context).textTheme.labelMedium)
+              : null,
       children: [
         ...ContentRating.values.map(
           (key) => CheckboxListTile(
@@ -72,7 +79,7 @@ class MangaParameterWidget extends StatelessWidget {
     final included = parameter.originalLanguage?.labels;
     final excluded = parameter.excludedOriginalLanguages?.labels;
 
-    final shouldShowSubtitle = [
+    final shouldHideSubtitle = [
       included == null || included.isEmpty,
       excluded == null || excluded.isEmpty,
     ].every((e) => e);
@@ -80,15 +87,21 @@ class MangaParameterWidget extends StatelessWidget {
     return ExpansionTile(
       title: const Text('Original Language'),
       subtitle:
-          shouldShowSubtitle
+          shouldHideSubtitle
               ? null
               : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (included != null && included.isNotEmpty)
-                    Text('Included: $included'),
+                    Text(
+                      'Included: $included',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
                   if (excluded != null && excluded.isNotEmpty)
-                    Text('Excluded: $excluded'),
+                    Text(
+                      'Excluded: $excluded',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
                 ],
               ),
       children: [
@@ -133,7 +146,10 @@ class MangaParameterWidget extends StatelessWidget {
     final active = parameter.availableTranslatedLanguage?.labels;
     return ExpansionTile(
       title: const Text('Available Translated Language'),
-      subtitle: active != null && active.isNotEmpty ? Text(active) : null,
+      subtitle:
+          active != null && active.isNotEmpty
+              ? Text(active, style: Theme.of(context).textTheme.labelMedium)
+              : null,
       children: [
         ...LanguageCodes.values.map((key) {
           final param = parameter.availableTranslatedLanguage;
@@ -158,7 +174,10 @@ class MangaParameterWidget extends StatelessWidget {
     final active = parameter.publicationDemographic?.labels;
     return ExpansionTile(
       title: const Text('Publication Demographic'),
-      subtitle: active != null && active.isNotEmpty ? Text(active) : null,
+      subtitle:
+          active != null && active.isNotEmpty
+              ? Text(active, style: Theme.of(context).textTheme.labelMedium)
+              : null,
       children: [
         ...PublicDemographic.values.map((key) {
           final param = parameter.publicationDemographic;
@@ -183,13 +202,32 @@ class MangaParameterWidget extends StatelessWidget {
     final inc = parameter.includedTags
         ?.map((e) => availableTags.firstWhereOrNull((tag) => tag.id == e)?.name)
         .nonNulls
-        .join(' ${parameter.includedTagsMode.label} ');
+        .where((e) => e.isNotEmpty)
+        .map(
+          (e) => TextSpan(
+            text: e,
+            style: Theme.of(
+              context,
+            ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+          ),
+        )
+        .intersperse(TextSpan(text: ' ${parameter.includedTagsMode.label} '));
+
     final exc = parameter.excludedTags
         ?.map((e) => availableTags.firstWhereOrNull((tag) => tag.id == e)?.name)
         .nonNulls
-        .join(' ${parameter.excludedTagsMode.label} ');
+        .where((e) => e.isNotEmpty)
+        .map(
+          (e) => TextSpan(
+            text: e,
+            style: Theme.of(
+              context,
+            ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+          ),
+        )
+        .intersperse(TextSpan(text: ' ${parameter.excludedTagsMode.label} '));
 
-    final shouldShowSubtitle = [
+    final shouldHideSubtitle = [
       inc == null || inc.isEmpty,
       exc == null || exc.isEmpty,
     ].every((e) => e);
@@ -197,13 +235,27 @@ class MangaParameterWidget extends StatelessWidget {
     return ExpansionTile(
       title: const Text('Tags'),
       subtitle:
-          shouldShowSubtitle
+          shouldHideSubtitle
               ? null
               : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (inc != null && inc.isNotEmpty) Text('Included: $inc'),
-                  if (exc != null && exc.isNotEmpty) Text('Excluded: $exc'),
+                  if (inc != null && inc.isNotEmpty)
+                    RichText(
+                      text: TextSpan(
+                        text: 'Included: ',
+                        children: [...inc],
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                    ),
+                  if (exc != null && exc.isNotEmpty)
+                    RichText(
+                      text: TextSpan(
+                        text: 'Excluded: ',
+                        children: [...exc],
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                    ),
                 ],
               ),
       children: [
