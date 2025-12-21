@@ -28,7 +28,7 @@ class MangaParameterWidget extends StatelessWidget {
     final active = parameter.status?.labels;
     return ExpansionTile(
       title: const Text('Status'),
-      subtitle: active != null ? Text(active) : null,
+      subtitle: active != null && active.isNotEmpty ? Text(active) : null,
       children: [
         ...MangaStatus.values.map(
           (key) => CheckboxListTile(
@@ -50,7 +50,7 @@ class MangaParameterWidget extends StatelessWidget {
     final active = parameter.contentRating?.labels;
     return ExpansionTile(
       title: const Text('Content Rating'),
-      subtitle: active != null ? Text(active) : null,
+      subtitle: active != null && active.isNotEmpty ? Text(active) : null,
       children: [
         ...ContentRating.values.map(
           (key) => CheckboxListTile(
@@ -78,8 +78,8 @@ class MangaParameterWidget extends StatelessWidget {
               ? null
               : Column(
                 children: [
-                  if (included != null) Text(included),
-                  if (excluded != null) Text(excluded),
+                  if (included != null && included.isNotEmpty) Text(included),
+                  if (excluded != null && excluded.isNotEmpty) Text(excluded),
                 ],
               ),
       children: [
@@ -124,7 +124,7 @@ class MangaParameterWidget extends StatelessWidget {
     final active = parameter.contentRating?.labels;
     return ExpansionTile(
       title: const Text('Available Translated Language'),
-      subtitle: active != null ? Text(active) : null,
+      subtitle: active != null && active.isNotEmpty ? Text(active) : null,
       children: [
         ...LanguageCodes.values.map((key) {
           final param = parameter.availableTranslatedLanguage;
@@ -149,7 +149,7 @@ class MangaParameterWidget extends StatelessWidget {
     final active = parameter.publicationDemographic?.labels;
     return ExpansionTile(
       title: const Text('Publication Demographic'),
-      subtitle: active != null ? Text(active) : null,
+      subtitle: active != null && active.isNotEmpty ? Text(active) : null,
       children: [
         ...PublicDemographic.values.map((key) {
           final param = parameter.publicationDemographic;
