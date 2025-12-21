@@ -11,4 +11,5 @@ class BrowseRoutePath {
   static const sourceQuery = 'source';
   static const mangaIdQuery = 'mangaId';
   static const chapterIdQuery = 'chapterId';
+  static const tagIdQuery = 'tagId';
 }

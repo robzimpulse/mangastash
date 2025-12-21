@@ -38,8 +38,9 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
        _recrawlUseCase = recrawlUseCase,
        super(
          initialState.copyWith(
-           parameter:
-               listenSearchParameterUseCase.searchParameterState.valueOrNull,
+           parameter: initialState.parameter.merge(
+             listenSearchParameterUseCase.searchParameterState.valueOrNull,
+           ),
          ),
        ) {
     addSubscription(

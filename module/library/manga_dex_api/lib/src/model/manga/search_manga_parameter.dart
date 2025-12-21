@@ -75,6 +75,34 @@ class SearchMangaParameter extends SearchParameter {
     ];
   }
 
+  SearchMangaParameter merge(SearchMangaParameter? other) {
+    return copyWith(
+      updatedAtSince: other?.updatedAtSince ?? updatedAtSince,
+      includes: other?.includes ?? includes,
+      contentRating: other?.contentRating ?? contentRating,
+      originalLanguage: other?.originalLanguage ?? originalLanguage,
+      excludedOriginalLanguages:
+          other?.excludedOriginalLanguages ?? excludedOriginalLanguages,
+      createdAtSince: other?.createdAtSince ?? createdAtSince,
+      ids: other?.ids ?? ids,
+      title: other?.title ?? title,
+      authors: other?.authors ?? authors,
+      artists: other?.artists ?? artists,
+      year: other?.year ?? year,
+      includedTags: other?.includedTags ?? includedTags,
+      includedTagsMode: other?.includedTagsMode ?? includedTagsMode,
+      excludedTags: other?.excludedTags ?? excludedTags,
+      excludedTagsMode: other?.excludedTagsMode ?? excludedTagsMode,
+      status: other?.status ?? status,
+      availableTranslatedLanguage:
+          other?.availableTranslatedLanguage ?? availableTranslatedLanguage,
+      publicationDemographic:
+          other?.publicationDemographic ?? publicationDemographic,
+      group: other?.group ?? group,
+      orders: other?.orders ?? orders,
+    );
+  }
+
   @override
   SearchMangaParameter copyWith({
     int? limit,

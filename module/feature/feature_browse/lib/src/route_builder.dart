@@ -30,7 +30,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
             onTapSource: (source) {
               context.pushNamed(
                 BrowseRoutePath.browseManga,
-                pathParameters: {'source': source.name},
+                pathParameters: {BrowseRoutePath.sourceQuery: source.name},
               );
             },
           ),
@@ -51,17 +51,21 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         name: BrowseRoutePath.browseManga,
         builder: (context, state) {
           final params = state.pathParameters;
+          final queries = state.uri.queryParameters;
           final source = params[BrowseRoutePath.sourceQuery];
+          final tagId = queries[BrowseRoutePath.tagIdQuery];
 
           return BrowseMangaScreen.create(
             locator: locator,
             source: source,
+            tagId: tagId,
             onTapManga: (manga, param) {
+              final mangaId = manga.id;
               return context.pushNamed(
                 BrowseRoutePath.mangaDetail,
                 pathParameters: {
-                  BrowseRoutePath.sourceQuery: source ?? '',
-                  BrowseRoutePath.mangaIdQuery: manga.id ?? '',
+                  if (source != null) BrowseRoutePath.sourceQuery: source,
+                  if (mangaId != null) BrowseRoutePath.mangaIdQuery: mangaId,
                 },
               );
             },
@@ -88,12 +92,14 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
             source: source,
             mangaId: mangaId,
             onTapChapter: (chapter) {
+              final chapterId = chapter.id;
               context.pushNamed(
                 BrowseRoutePath.chapterDetail,
                 pathParameters: {
-                  BrowseRoutePath.sourceQuery: source ?? '',
-                  BrowseRoutePath.mangaIdQuery: mangaId ?? '',
-                  BrowseRoutePath.chapterIdQuery: chapter.id ?? '',
+                  if (source != null) BrowseRoutePath.sourceQuery: source,
+                  if (mangaId != null) BrowseRoutePath.mangaIdQuery: mangaId,
+                  if (chapterId != null)
+                    BrowseRoutePath.chapterIdQuery: chapterId,
                 },
               );
             },
@@ -104,11 +110,24 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
               );
             },
             onTapManga: (manga) {
+              final mangaId = manga.id;
               context.pushNamed(
                 BrowseRoutePath.mangaDetail,
                 pathParameters: {
-                  BrowseRoutePath.sourceQuery: source ?? '',
-                  BrowseRoutePath.mangaIdQuery: manga.id ?? '',
+                  if (source != null) BrowseRoutePath.sourceQuery: source,
+                  if (mangaId != null) BrowseRoutePath.mangaIdQuery: mangaId,
+                },
+              );
+            },
+            onTapTag: (tag) {
+              final tagId = tag.id;
+              context.pushNamed(
+                BrowseRoutePath.browseManga,
+                pathParameters: {
+                  if (source != null) BrowseRoutePath.sourceQuery: source,
+                },
+                queryParameters: {
+                  if (tagId != null) BrowseRoutePath.tagIdQuery: tagId,
                 },
               );
             },
@@ -142,8 +161,8 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
               return context.pushReplacementNamed(
                 BrowseRoutePath.chapterDetail,
                 pathParameters: {
-                  BrowseRoutePath.sourceQuery: source ?? '',
-                  BrowseRoutePath.mangaIdQuery: mangaId ?? '',
+                  if (source != null) BrowseRoutePath.sourceQuery: source,
+                  if (mangaId != null) BrowseRoutePath.mangaIdQuery: mangaId,
                   BrowseRoutePath.chapterIdQuery: chapterId,
                 },
               );
