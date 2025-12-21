@@ -180,8 +180,32 @@ class MangaParameterWidget extends StatelessWidget {
   }
 
   Widget _buildTags(BuildContext context) {
+    final inc = parameter.includedTags
+        ?.map((e) => availableTags.firstWhereOrNull((tag) => tag.id == e)?.name)
+        .nonNulls
+        .join(' ${parameter.includedTagsMode.label} ');
+    final exc = parameter.excludedTags
+        ?.map((e) => availableTags.firstWhereOrNull((tag) => tag.id == e)?.name)
+        .nonNulls
+        .join(' ${parameter.excludedTagsMode.label} ');
+
+    final shouldShowSubtitle = [
+      inc == null || inc.isEmpty,
+      exc == null || exc.isEmpty,
+    ].every((e) => e);
+
     return ExpansionTile(
       title: const Text('Tags'),
+      subtitle:
+          shouldShowSubtitle
+              ? null
+              : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (inc != null && inc.isNotEmpty) Text('Included: $inc'),
+                  if (exc != null && exc.isNotEmpty) Text('Excluded: $exc'),
+                ],
+              ),
       children: [
         SwitchListTile(
           title: const Text('Included Tags Mode'),
