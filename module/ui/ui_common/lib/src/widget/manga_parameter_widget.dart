@@ -71,15 +71,24 @@ class MangaParameterWidget extends StatelessWidget {
   Widget _buildOriginalLanguage(BuildContext context) {
     final included = parameter.originalLanguage?.labels;
     final excluded = parameter.excludedOriginalLanguages?.labels;
+
+    final shouldShowSubtitle = [
+      included == null || included.isEmpty,
+      excluded == null || excluded.isEmpty,
+    ].every((e) => e);
+
     return ExpansionTile(
       title: const Text('Original Language'),
       subtitle:
-          included != null && excluded == null
+          shouldShowSubtitle
               ? null
               : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (included != null && included.isNotEmpty) Text(included),
-                  if (excluded != null && excluded.isNotEmpty) Text(excluded),
+                  if (included != null && included.isNotEmpty)
+                    Text('Included: $included'),
+                  if (excluded != null && excluded.isNotEmpty)
+                    Text('Excluded: $excluded'),
                 ],
               ),
       children: [
@@ -121,7 +130,7 @@ class MangaParameterWidget extends StatelessWidget {
   }
 
   Widget _buildAvailableTranslatedLanguage(BuildContext context) {
-    final active = parameter.contentRating?.labels;
+    final active = parameter.availableTranslatedLanguage?.labels;
     return ExpansionTile(
       title: const Text('Available Translated Language'),
       subtitle: active != null && active.isNotEmpty ? Text(active) : null,
