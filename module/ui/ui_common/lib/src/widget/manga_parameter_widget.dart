@@ -208,10 +208,15 @@ class MangaParameterWidget extends StatelessWidget {
             text: e,
             style: Theme.of(
               context,
-            ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+            ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
         )
-        .intersperse(TextSpan(text: ' ${parameter.includedTagsMode.label} '));
+        .intersperse(
+          TextSpan(
+            text: ' ${parameter.includedTagsMode.label} ',
+            style: Theme.of(context).textTheme.labelMedium,
+          ),
+        );
 
     final exc = parameter.excludedTags
         ?.map((e) => availableTags.firstWhereOrNull((tag) => tag.id == e)?.name)
@@ -222,10 +227,15 @@ class MangaParameterWidget extends StatelessWidget {
             text: e,
             style: Theme.of(
               context,
-            ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+            ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
         )
-        .intersperse(TextSpan(text: ' ${parameter.excludedTagsMode.label} '));
+        .intersperse(
+          TextSpan(
+            text: ' ${parameter.excludedTagsMode.label} ',
+            style: Theme.of(context).textTheme.labelMedium,
+          ),
+        );
 
     final shouldHideSubtitle = [
       inc == null || inc.isEmpty,
