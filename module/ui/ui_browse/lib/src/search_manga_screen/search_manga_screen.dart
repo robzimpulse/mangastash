@@ -58,6 +58,7 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
   @override
   Widget build(BuildContext context) {
     return _builder(
+      buildWhen: (prev, curr) => prev.sources != curr.sources,
       builder: (context, state) {
         return DefaultTabController(
           length: state.sources.length,
@@ -86,8 +87,8 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
                 isScrollable: true,
                 tabAlignment: TabAlignment.start,
                 tabs: [
-                  for (final source in state.sources)
-                    Tab(
+                  ...state.sources.map(
+                    (source) => Tab(
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -102,6 +103,7 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
                         ],
                       ),
                     ),
+                  ),
                 ],
               ),
             ),
@@ -119,65 +121,5 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
         );
       },
     );
-    // return ScaffoldScreen(
-    //   body: _builder(
-    //     builder: (context, state) {
-    //       return DefaultTabController(
-    //         length: state.sources.length,
-    //         child: NestedScrollView(
-    //           controller: _scrollController,
-    //           headerSliverBuilder: headerSliverBuilder,
-    //           body: body,
-    //         ),
-    //       );
-    //     },
-    //   ),
-    //   appBar: AppBar(
-    //     centerTitle: false,
-    //     title: Container(
-    //       alignment: Alignment.centerLeft,
-    //       child: TextField(
-    //         controller: _searchController,
-    //         focusNode: _searchFocusNode,
-    //         decoration: InputDecoration(
-    //           hintText: 'Search...',
-    //           filled: false,
-    //           border: InputBorder.none,
-    //           hintStyle: DefaultTextStyle.of(context).style,
-    //         ),
-    //         cursorColor: DefaultTextStyle.of(context).style.color,
-    //         style: DefaultTextStyle.of(context).style,
-    //         onSubmitted: (value) => _cubit(context).search(keyword: value),
-    //       ),
-    //     ),
-    //   ),
-    // body: _builder(
-    //   builder: (context, state) {
-    //     return CustomScrollView(
-    //       slivers: [
-    //         ...<Widget>[
-    //           for (final source in state.sources)
-    //             MultiSliver(
-    //               children: [
-    //                 SliverToBoxAdapter(
-    //                   child: SourceTileWidget(
-    //                     cacheManager: widget.imagesCacheManager,
-    //                     iconUrl: source.icon,
-    //                     url: source.url,
-    //                     name: source.name,
-    //                   ),
-    //                 ),
-    //               ],
-    //             ),
-    //         ].intersperse(
-    //           SliverToBoxAdapter(
-    //             child: const Divider(height: 1, thickness: 1),
-    //           ),
-    //         ),
-    //       ],
-    //     );
-    //   },
-    // ),
-    // );
   }
 }
