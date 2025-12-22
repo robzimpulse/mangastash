@@ -21,9 +21,36 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
        super(
          Config('image', fileService: fileService),
          onDeleteFile: (object, data, ext) {
-           fileDao.add(webUrl: object.url, data: data, extension: ext);
+           fileDao
+               .add(webUrl: object.url, data: data, extension: ext)
+               .then(
+                 (file) => logBox.log(
+                   'Move cache file to database',
+                   name: 'ImagesCacheManager',
+                   extra: {
+                     'cache_object': object.toMap(setTouchedToNow: false),
+                     'database_object': file.toJson(),
+                   },
+                 ),
+               )
+               .catchError(
+                 (e, st) => logBox.log(
+                   'Failed move cache file to database',
+                   extra: {
+                     'cache_object': object.toMap(setTouchedToNow: false),
+                   },
+                   error: e,
+                   stackTrace: st,
+                 ),
+               );
          },
        );
+
+  Future<File> _getFromDatabase({required String url}) {
+    return _fileDao
+        .search(webUrls: [url])
+        .then((results) => _fileDao.file(results.first));
+  }
 
   @override
   Stream<FileResponse> getFileStream(
@@ -34,48 +61,53 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
   }) {
     final controller = StreamController<FileResponse>();
 
-    _logbox.tracer('[ImagesCacheManager] getFileStream', (tracer) {
-      return _fileDao
-          .search(webUrls: [url])
-          .then((results) => _fileDao.file(results.first))
-          .then((file) {
-            tracer(
-              LogEntryModel(
-                message: '[Hit] Using file from database',
-                name: runtimeType.toString(),
-              ),
-            );
+    _getFromDatabase(url: url)
+        .then(
+          (file) => controller.add(
+            FileInfo(
+              file,
+              FileSource.Cache,
+              DateTime.now().add(Duration(days: 1)),
+              url,
+            ),
+          ),
+        )
+        .then(
+          (_) => _logbox.log(
+            'Using file from database',
+            name: runtimeType.toString(),
+            extra: {
+              'url': url,
+              'key': key,
+              'headers': headers,
+              'withProgress': withProgress,
+            },
+          ),
+        )
+        .onError((e, st) {
+          _logbox.log(
+            'Using file from cache',
+            name: runtimeType.toString(),
+            extra: {
+              'url': url,
+              'key': key,
+              'headers': headers,
+              'withProgress': withProgress,
+            },
+            error: e,
+            stackTrace: st,
+          );
 
-            controller.add(
-              FileInfo(
-                file,
-                FileSource.Cache,
-                DateTime.now().add(Duration(days: 1)),
-                url,
-              ),
-            );
-          })
-          .onError((e, st) async {
-            tracer(
-              LogEntryModel(
-                message: '[Miss] Using file from database',
-                name: runtimeType.toString(),
-                error: e.toString(),
-                stackTrace: st.toString(),
-              ),
-            );
-
-            await controller.addStream(
-              super.getFileStream(
-                url,
-                key: key,
-                headers: headers,
-                withProgress: withProgress,
-              ),
-            );
-          })
-          .whenComplete(() => controller.close());
-    });
+          return controller.addStream(
+            super.getFileStream(
+              url,
+              key: key,
+              headers: headers,
+              withProgress: withProgress,
+            ),
+          );
+        })
+        .whenComplete(() => controller.close());
 
     return controller.stream;
   }
@@ -86,30 +118,25 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
     String? key,
     Map<String, String>? headers,
   }) async {
-    return _logbox.tracer('getSingleFile', (tracer) {
-      return _fileDao
-          .search(webUrls: [url])
-          .then((results) {
-            tracer(
-              LogEntryModel(
-                message: '[Hit] Using file from database',
-                name: runtimeType.toString(),
-              ),
-            );
+    return _getFromDatabase(url: url)
+        .then((file) {
+          _logbox.log(
+            'Using file from database',
+            name: runtimeType.toString(),
+            extra: {'url': url, 'key': key, 'headers': headers},
+          );
+          return file;
+        })
+        .onError((e, st) {
+          _logbox.log(
+            'Using file from cache',
+            name: runtimeType.toString(),
+            extra: {'url': url, 'key': key, 'headers': headers},
+            error: e,
+            stackTrace: st,
+          );
 
-            return _fileDao.file(results.first);
-          })
-          .onError((e, st) {
-            tracer(
-              LogEntryModel(
-                message: '[Miss] Using file from database',
-                name: runtimeType.toString(),
-                error: e.toString(),
-                stackTrace: st.toString(),
-              ),
-            );
-            return super.getSingleFile(url, key: key, headers: headers);
-          });
-    });
+          return super.getSingleFile(url, key: key, headers: headers);
+        });
   }
 }
