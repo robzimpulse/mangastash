@@ -1,19 +1,21 @@
 class BrowseRoutePath {
   static const browse = '/browse_source';
 
-  static const browseManga = '/browse_manga/${BrowsePathParam.source}';
+  static const searchManga = '/search_browse_manga';
+
+  static const browseManga = '/browse_manga/:${BrowsePathParam.source}';
 
   static String get mangaDetail => [
     'browse_manga',
-    BrowsePathParam.source,
-    BrowsePathParam.mangaId,
+    ':${BrowsePathParam.source}',
+    ':${BrowsePathParam.mangaId}',
   ].join('/');
 
   static String get chapterDetail => [
     'browse_manga',
-    BrowsePathParam.source,
-    BrowsePathParam.mangaId,
-    BrowsePathParam.chapterId,
+    ':${BrowsePathParam.source}',
+    ':${BrowsePathParam.mangaId}',
+    ':${BrowsePathParam.chapterId}',
   ].join('/');
 
   static const chapterConfig = '/manga_chapter_config';
@@ -22,9 +24,9 @@ class BrowseRoutePath {
 }
 
 class BrowsePathParam {
-  static const source = ':source';
-  static const mangaId = ':mangaId';
-  static const chapterId = ':chapterId';
+  static const source = 'source';
+  static const mangaId = 'mangaId';
+  static const chapterId = 'chapterId';
 }
 
 class BrowseQueryParam {

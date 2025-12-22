@@ -21,11 +21,8 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
           name: BrowseRoutePath.browse,
           child: BrowseSourceScreen.create(
             locator: locator,
-            // TODO: implement redirect to search source screen
             onTapSearchManga: () {
-              return context.showSnackBar(
-                message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-              );
+              context.push(BrowseRoutePath.searchManga);
             },
             onTapSource: (source) {
               context.pushNamed(
@@ -190,6 +187,11 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
             extra: state.extra.castOrNull(),
           );
         },
+      ),
+      GoRoute(
+        path: BrowseRoutePath.searchManga,
+        name: BrowseRoutePath.searchManga,
+        builder: (context, state) => SearchMangaScreen.create(locator: locator),
       ),
     ];
   }
