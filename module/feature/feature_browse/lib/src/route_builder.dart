@@ -191,7 +191,22 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
       GoRoute(
         path: BrowseRoutePath.searchManga,
         name: BrowseRoutePath.searchManga,
-        builder: (context, state) => SearchMangaScreen.create(locator: locator),
+        builder: (context, state) {
+          return SearchMangaScreen.create(
+            locator: locator,
+            onTapManga: (manga, parameter) {
+              final mangaId = manga.id;
+              final source = manga.source;
+              context.pushNamed(
+                BrowseRoutePath.mangaDetail,
+                pathParameters: {
+                  if (source != null) BrowsePathParam.source: source,
+                  if (mangaId != null) BrowsePathParam.mangaId: mangaId,
+                },
+              );
+            },
+          );
+        },
       ),
     ];
   }

@@ -28,8 +28,9 @@ class MainRouteBuilder extends BaseRouteBuilder {
         parentNavigatorKey: rootNavigatorKey,
         path: MainPath.notFound,
         name: MainPath.notFound,
-        builder:
-            (context, state) => ErrorScreen(text: state.extra as String? ?? ''),
+        builder: (context, state) {
+          return ErrorScreen(text: state.extra as String? ?? '');
+        },
       ),
       ...CommonRouteBuilder().routes(
         locator: locator,

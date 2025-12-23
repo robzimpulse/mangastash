@@ -1,22 +1,44 @@
 import 'package:core_storage/core_storage.dart';
+import 'package:domain_manga/domain_manga.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:feature_common/feature_common.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 
+import '../widget/manga_grid_widget/manga_grid_widget.dart';
 import 'search_manga_screen_cubit.dart';
 import 'search_manga_screen_state.dart';
 
 class SearchMangaScreen extends StatefulWidget {
-  const SearchMangaScreen({super.key, required this.imagesCacheManager});
+  const SearchMangaScreen({
+    super.key,
+    required this.imagesCacheManager,
+    required this.widgetBuilder,
+  });
 
   final ImagesCacheManager imagesCacheManager;
 
-  static Widget create({required ServiceLocator locator}) {
+  final Widget Function(SourceEnum, SearchMangaScreenCubit) widgetBuilder;
+
+  static Widget create({
+    required ServiceLocator locator,
+    void Function(Manga, SearchMangaParameter)? onTapManga,
+  }) {
     return BlocProvider(
       create: (context) {
         return SearchMangaScreenCubit(listenSourceUseCase: locator());
       },
-      child: SearchMangaScreen(imagesCacheManager: locator()),
+      child: SearchMangaScreen(
+        imagesCacheManager: locator(),
+        widgetBuilder: (source, cubit) {
+          return MangaGridWidget.create(
+            locator: locator,
+            source: source,
+            parent: cubit,
+            onTapManga: onTapManga,
+          );
+        },
+      ),
     );
   }
 
@@ -35,12 +57,6 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
     _searchController.dispose();
     _searchFocusNode.dispose();
     super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _searchFocusNode.requestFocus();
   }
 
   SearchMangaScreenCubit _cubit(BuildContext context) => context.read();
@@ -78,9 +94,7 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
                   ),
                   cursorColor: DefaultTextStyle.of(context).style.color,
                   style: DefaultTextStyle.of(context).style,
-                  onSubmitted: (value) {
-                    _cubit(context).search(keyword: value);
-                  },
+                  onSubmitted: (value) => _cubit(context).set(keyword: value),
                 ),
               ),
               bottom: TabBar(
@@ -109,12 +123,9 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
             ),
             body: TabBarView(
               children: [
-                // TODO: @robzimpulse - add manga grid widget with states
-                Container(color: Colors.red),
-                // TODO: @robzimpulse - add manga grid widget with states
-                Container(color: Colors.green),
-                // TODO: @robzimpulse - add manga grid widget with states
-                Container(color: Colors.blue),
+                ...state.sources.map(
+                  (source) => widget.widgetBuilder(source, _cubit(context)),
+                ),
               ],
             ),
           ),

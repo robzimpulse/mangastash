@@ -4,22 +4,22 @@ import 'package:equatable/equatable.dart';
 
 class SearchMangaScreenState extends Equatable {
   final String keyword;
-
-  final List<SourceEnum> sources;
+  final Set<SourceEnum> sources;
 
   const SearchMangaScreenState({
     this.keyword = '',
-    this.sources = const [],
+    this.sources = const {},
   });
 
   @override
-  List<Object?> get props => [keyword, sources];
+  List<Object?> get props => [
+    keyword,
+    sources,
+  ];
 
   SearchMangaScreenState copyWith({
     String? keyword,
-    List<SourceEnum>? sources,
-    Map<SourceEnum, SearchMangaParameter>? parameters,
-    Map<SourceEnum, List<Manga>>? results,
+    Set<SourceEnum>? sources,
   }) {
     return SearchMangaScreenState(
       keyword: keyword ?? this.keyword,
