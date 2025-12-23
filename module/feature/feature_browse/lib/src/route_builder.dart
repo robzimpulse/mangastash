@@ -70,7 +70,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
               return context.pushNamed(
                 CommonRoutePath.menu,
                 queryParameters: {
-                  CommonRoutePath.menuIsOnLibrary: isOnLibrary.toString(),
+                  CommonQueryParam.isOnLibrary: isOnLibrary.toString(),
                 },
               );
             },
@@ -139,7 +139,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
               return context.pushNamed<MangaMenu>(
                 CommonRoutePath.menu,
                 queryParameters: {
-                  CommonRoutePath.menuIsOnLibrary: isOnLibrary.toString(),
+                  CommonQueryParam.isOnLibrary: isOnLibrary.toString(),
                 },
               );
             },

@@ -69,12 +69,12 @@ class MoreRouteBuilder extends BaseRouteBuilder {
               return context.pushNamed<bool>(
                 CommonRoutePath.confirmation,
                 queryParameters: {
-                  CommonRoutePath.confirmationTitle: 'Change Storage Location',
-                  CommonRoutePath.confirmationContent:
+                  CommonQueryParam.title: 'Change Storage Location',
+                  CommonQueryParam.content:
                       'Your download and backup data will be lost, '
                       'are you sure want to change storage location? ',
-                  CommonRoutePath.confirmationNegativeButtonText: 'No',
-                  CommonRoutePath.confirmationPositiveButtonText: 'Yes',
+                  CommonQueryParam.negativeButtonText: 'No',
+                  CommonQueryParam.positiveButtonText: 'Yes',
                 },
               );
             },
@@ -82,12 +82,12 @@ class MoreRouteBuilder extends BaseRouteBuilder {
               return context.pushNamed<bool>(
                 CommonRoutePath.confirmation,
                 queryParameters: {
-                  CommonRoutePath.confirmationTitle: 'Restore Data',
-                  CommonRoutePath.confirmationContent:
+                  CommonQueryParam.title: 'Restore Data',
+                  CommonQueryParam.content:
                       'Your current download and backup data will be replaced '
                       'with backup data, are you sure want to restore this? ',
-                  CommonRoutePath.confirmationNegativeButtonText: 'No',
-                  CommonRoutePath.confirmationPositiveButtonText: 'Yes',
+                  CommonQueryParam.negativeButtonText: 'No',
+                  CommonQueryParam.positiveButtonText: 'Yes',
                 },
               );
             },
@@ -95,11 +95,11 @@ class MoreRouteBuilder extends BaseRouteBuilder {
               return context.pushNamed<bool>(
                 CommonRoutePath.confirmation,
                 queryParameters: {
-                  CommonRoutePath.confirmationTitle: 'Delete Backup Data',
-                  CommonRoutePath.confirmationContent:
+                  CommonQueryParam.title: 'Delete Backup Data',
+                  CommonQueryParam.content:
                       'are you sure want to delete this data? ',
-                  CommonRoutePath.confirmationNegativeButtonText: 'No',
-                  CommonRoutePath.confirmationPositiveButtonText: 'Yes',
+                  CommonQueryParam.negativeButtonText: 'No',
+                  CommonQueryParam.positiveButtonText: 'Yes',
                 },
               );
             },

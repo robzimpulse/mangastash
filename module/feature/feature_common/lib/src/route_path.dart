@@ -1,11 +1,12 @@
 class CommonRoutePath {
   static const confirmation = '/confirmation';
   static const menu = '/menu';
+}
 
-  static const menuIsOnLibrary = 'menu_is_on_library';
-
-  static const confirmationTitle = 'confirmation_title';
-  static const confirmationContent = 'confirmation_content';
-  static const confirmationPositiveButtonText = 'confirmation_positive_button_text';
-  static const confirmationNegativeButtonText = 'confirmation_negative_button_text';
+class CommonQueryParam {
+  static const isOnLibrary = 'is_on_library';
+  static const title = 'title';
+  static const content = 'content';
+  static const positiveButtonText = 'positive_button_text';
+  static const negativeButtonText = 'negative_button_text';
 }

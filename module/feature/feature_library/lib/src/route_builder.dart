@@ -35,7 +35,7 @@ class LibraryRouteBuilder extends BaseRouteBuilder {
               return context.pushNamed(
                 CommonRoutePath.menu,
                 queryParameters: {
-                  CommonRoutePath.menuIsOnLibrary: isOnLibrary.toString(),
+                  CommonQueryParam.isOnLibrary: isOnLibrary.toString(),
                 },
               );
             },
