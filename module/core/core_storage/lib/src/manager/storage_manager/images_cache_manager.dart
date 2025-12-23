@@ -23,10 +23,10 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
        _logbox = logBox,
        super(Config('image', fileService: fileService)) {
     _subscription = deleteFileEvent.listen((event) {
-      final (object, data, ext) = event;
+      final (object, file) = event;
 
       _ongoingProcess[object.key] = fileDao
-          .add(webUrl: object.url, data: data, extension: ext)
+          .addFromFile(webUrl: object.url, file: file)
           .then(
             (file) => logBox.log(
               'Move cache file to database',
@@ -46,7 +46,10 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
               name: runtimeType.toString(),
             ),
           )
-          .whenComplete(() => _ongoingProcess.remove(object.key));
+          .whenComplete(() async {
+            _ongoingProcess.remove(object.key);
+            await file.delete();
+          });
     });
   }
 
