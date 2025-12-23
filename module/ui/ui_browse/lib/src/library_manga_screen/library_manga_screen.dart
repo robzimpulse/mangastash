@@ -1,4 +1,3 @@
-import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:feature_common/feature_common.dart';
@@ -15,11 +14,14 @@ class LibraryMangaScreen extends StatefulWidget {
     required this.imagesCacheManager,
     this.onTapManga,
     this.onTapAddManga,
+    this.onTapMangaMenu,
   });
 
   final ValueSetter<Manga?>? onTapManga;
 
   final AsyncValueGetter<String?>? onTapAddManga;
+
+  final Future<MangaMenu?> Function(bool)? onTapMangaMenu;
 
   final ImagesCacheManager imagesCacheManager;
 
@@ -27,6 +29,7 @@ class LibraryMangaScreen extends StatefulWidget {
     required ServiceLocator locator,
     ValueSetter<Manga?>? onTapManga,
     AsyncValueGetter<String?>? onTapAddManga,
+    Future<MangaMenu?> Function(bool)? onTapMangaMenu,
     String? sourceId,
   }) {
     return BlocProvider(
@@ -45,6 +48,7 @@ class LibraryMangaScreen extends StatefulWidget {
         imagesCacheManager: locator(),
         onTapManga: onTapManga,
         onTapAddManga: onTapAddManga,
+        onTapMangaMenu: onTapMangaMenu,
       ),
     );
   }
@@ -114,12 +118,7 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
     required Manga manga,
     required bool isOnLibrary,
   }) async {
-    final result = await context.pushNamed<MangaMenu>(
-      CommonRoutePath.menu,
-      queryParameters: {
-        CommonRoutePath.menuIsOnLibrary: isOnLibrary ? 'true' : 'false',
-      },
-    );
+    final result = await widget.onTapMangaMenu?.call(isOnLibrary);
 
     if (result == null || !context.mounted) return;
 

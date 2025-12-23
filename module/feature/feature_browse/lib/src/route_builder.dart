@@ -66,6 +66,14 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
                 },
               );
             },
+            onTapMangaMenu: (isOnLibrary) {
+              return context.pushNamed(
+                CommonRoutePath.menu,
+                queryParameters: {
+                  CommonRoutePath.menuIsOnLibrary: isOnLibrary.toString(),
+                },
+              );
+            },
             onTapFilter: (param, tags) {
               return context.push(
                 BrowseRoutePath.searchParam,
