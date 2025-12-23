@@ -33,14 +33,14 @@ class AuthRouteBuilder extends BaseRouteBuilder {
         name: AuthRoutePath.login,
         redirect: (context, state) {
           final queryParams = state.uri.queryParameters;
-          final destination = queryParams[AuthRoutePath.onFinishPath];
+          final destination = queryParams[AuthQueryParam.onFinishPath];
           final status = locator<GetAuthUseCase>().authState?.status;
           final isLoggedIn = status == AuthStatus.loggedIn;
           return isLoggedIn ? destination : null;
         },
         builder: (context, state) => LoginScreen.create(
           locator: locator,
-          onFinishPath: state.uri.queryParameters[AuthRoutePath.onFinishPath],
+          onFinishPath: state.uri.queryParameters[AuthQueryParam.onFinishPath],
           onTapRegister: () => context.push(AuthRoutePath.register),
         ),
       ),
