@@ -16,6 +16,7 @@ class MangaGridWidget extends StatefulWidget {
     required SearchMangaScreenCubit parent,
     SourceEnum? source,
     void Function(Manga, SearchMangaParameter)? onTapManga,
+    Future<MangaMenu?> Function(bool)? onTapMangaMenu,
   }) {
     return BlocProvider(
       create: (context) {
@@ -27,12 +28,16 @@ class MangaGridWidget extends StatefulWidget {
           listenPrefetchMangaUseCase: locator(),
           listenSearchParameterUseCase: locator(),
           recrawlUseCase: locator(),
+          prefetchChapterUseCase: locator(),
+          prefetchMangaUseCase: locator(),
+          removeFromLibraryUseCase: locator(),
         )..init();
       },
       child: MangaGridWidget._(
         key: key,
         imagesCacheManager: locator(),
         onTapManga: onTapManga,
+        onTapMangaMenu: onTapMangaMenu,
       ),
     );
   }
@@ -41,10 +46,13 @@ class MangaGridWidget extends StatefulWidget {
 
   final Function(Manga, SearchMangaParameter)? onTapManga;
 
+  final Future<MangaMenu?> Function(bool)? onTapMangaMenu;
+
   const MangaGridWidget._({
     super.key,
     required this.imagesCacheManager,
     this.onTapManga,
+    this.onTapMangaMenu,
   });
 
   @override
@@ -62,6 +70,25 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
       buildWhen: buildWhen,
       builder: builder,
     );
+  }
+
+  void _onTapMenu({
+    required BuildContext context,
+    required Manga manga,
+    required bool isOnLibrary,
+  }) async {
+    final result = await widget.onTapMangaMenu?.call(isOnLibrary);
+
+    if (result == null || !context.mounted) return;
+
+    switch (result) {
+      case MangaMenu.download:
+        _cubit(context).download(manga: manga);
+      case MangaMenu.library:
+        _cubit(context).remove(manga: manga);
+      case MangaMenu.prefetch:
+        _cubit(context).prefetch(mangas: [manga]);
+    }
   }
 
   @override
@@ -89,13 +116,13 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
               isOnLibrary: state.libraryMangaIds.contains(data.id),
               isPrefetching: state.prefetchedMangaIds.contains(data.id),
               onTap: () => widget.onTapManga?.call(data, state.parameter),
-              // onLongPress: () {
-              //   _onTapMenu(
-              //     context: context,
-              //     manga: data,
-              //     isOnLibrary: state.libraryMangaIds.contains(data.id),
-              //   );
-              // },
+              onLongPress: () {
+                _onTapMenu(
+                  context: context,
+                  manga: data,
+                  isOnLibrary: state.libraryMangaIds.contains(data.id),
+                );
+              },
             );
           },
           onLoadNextPage: () => _cubit(context).next(),

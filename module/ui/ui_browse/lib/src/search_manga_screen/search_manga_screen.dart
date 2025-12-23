@@ -23,6 +23,7 @@ class SearchMangaScreen extends StatefulWidget {
   static Widget create({
     required ServiceLocator locator,
     void Function(Manga, SearchMangaParameter)? onTapManga,
+    Future<MangaMenu?> Function(bool)? onTapMangaMenu,
   }) {
     return BlocProvider(
       create: (context) {
@@ -36,6 +37,7 @@ class SearchMangaScreen extends StatefulWidget {
             source: source,
             parent: cubit,
             onTapManga: onTapManga,
+            onTapMangaMenu: onTapMangaMenu,
           );
         },
       ),

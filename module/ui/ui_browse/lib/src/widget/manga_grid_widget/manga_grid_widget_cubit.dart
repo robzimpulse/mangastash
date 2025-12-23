@@ -12,6 +12,9 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
     with AutoSubscriptionMixin {
   final SearchMangaUseCase _searchMangaUseCase;
   final RecrawlUseCase _recrawlUseCase;
+  final PrefetchMangaUseCase _prefetchMangaUseCase;
+  final PrefetchChapterUseCase _prefetchChapterUseCase;
+  final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
 
   MangaGridWidgetCubit({
     MangaGridWidgetState initialState = const MangaGridWidgetState(),
@@ -21,8 +24,14 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
     required ListenPrefetchUseCase listenPrefetchMangaUseCase,
     required SearchMangaUseCase searchMangaUseCase,
     required RecrawlUseCase recrawlUseCase,
+    required PrefetchMangaUseCase prefetchMangaUseCase,
+    required PrefetchChapterUseCase prefetchChapterUseCase,
+    required RemoveFromLibraryUseCase removeFromLibraryUseCase,
   }) : _searchMangaUseCase = searchMangaUseCase,
        _recrawlUseCase = recrawlUseCase,
+       _removeFromLibraryUseCase = removeFromLibraryUseCase,
+       _prefetchMangaUseCase = prefetchMangaUseCase,
+       _prefetchChapterUseCase = prefetchChapterUseCase,
        super(
          initialState.copyWith(
            parameter: initialState.parameter.copyWith(
@@ -130,5 +139,26 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
   void recrawl({required BuildContext context, required String url}) async {
     await _recrawlUseCase.execute(context: context, url: url);
     await init(refresh: true);
+  }
+
+  void prefetch({required List<Manga> mangas}) {
+    for (final manga in mangas) {
+      final id = manga.id;
+      final source = manga.source?.let((e) => SourceEnum.fromValue(name: e));
+      if (id == null || source == null) continue;
+      _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
+      _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);
+    }
+  }
+
+  void remove({required Manga manga}) {
+    _removeFromLibraryUseCase.execute(manga: manga);
+  }
+
+  void download({required Manga manga}) {
+    final id = manga.id;
+    final source = manga.source;
+    if (id == null || source == null) return;
+    // TODO: add download manga
   }
 }
