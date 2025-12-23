@@ -81,6 +81,7 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
       },
       builder: (context, state) {
         return GridWidget<Manga>(
+          pageStorageKey: PageStorageKey('manga-grid-widget-${state.source}'),
           itemBuilder: (context, data) {
             return MangaItemWidget(
               manga: data,
