@@ -6,8 +6,7 @@ import 'package:flutter_cache_manager/src/cache_store.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:universal_io/io.dart';
 
-typedef DeletedFileData =
-    void Function(CacheObject object, Uint8List data, String? ext);
+typedef DeletedFileData = (CacheObject object, Uint8List data, String? ext);
 
 class CustomCacheStore implements CacheStore {
   @override
@@ -34,7 +33,6 @@ class CustomCacheStore implements CacheStore {
   @override
   String get storeKey => _config.cacheKey;
   final Future<CacheInfoRepository> _cacheInfoRepository;
-  final DeletedFileData? _onDeleteFile;
 
   int get _capacity => _config.maxNrOfCacheObjects;
 
@@ -44,9 +42,12 @@ class CustomCacheStore implements CacheStore {
   DateTime lastCleanupRun = DateTime.now();
   Timer? _scheduledCleanup;
 
-  CustomCacheStore(Config config, {DeletedFileData? onDeleteFile})
+  final _controller = StreamController<DeletedFileData>.broadcast();
+
+  Stream<DeletedFileData> get deleteFileEvent => _controller.stream;
+
+  CustomCacheStore(Config config)
     : _config = config,
-      _onDeleteFile = onDeleteFile,
       fileSystem = config.fileSystem,
       _cacheInfoRepository = config.repo.open().then((value) => config.repo);
 
@@ -225,7 +226,7 @@ class CustomCacheStore implements CacheStore {
 
     if (file.existsSync()) {
       try {
-        _onDeleteFile?.call(cacheObject, await file.readAsBytes(), file.ext);
+        _controller.add((cacheObject, await file.readAsBytes(), file.ext));
         await file.delete();
         // ignore: unused_catch_clause
       } on PathNotFoundException catch (e) {
@@ -243,6 +244,7 @@ class CustomCacheStore implements CacheStore {
   Future<void> dispose() async {
     final provider = await _cacheInfoRepository;
     await provider.close();
+    await _controller.close();
   }
 
   @override
