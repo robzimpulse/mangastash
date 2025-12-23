@@ -15,6 +15,7 @@ class DataStorageScreen extends StatelessWidget {
     required this.imageCacheManager,
     required this.fileSaverUseCase,
     required this.filePickerUseCase,
+    required this.fileDao,
     this.onUpdateRootPathConfirmation,
     this.onRestoreBackupConfirmation,
     this.onDeleteBackupConfirmation,
@@ -25,6 +26,8 @@ class DataStorageScreen extends StatelessWidget {
   final FileSaverUseCase fileSaverUseCase;
 
   final FilePickerUseCase filePickerUseCase;
+
+  final FileDao fileDao;
 
   final AsyncValueGetter<bool?>? onUpdateRootPathConfirmation;
 
@@ -46,6 +49,7 @@ class DataStorageScreen extends StatelessWidget {
         )..refreshListBackup();
       },
       child: DataStorageScreen(
+        fileDao: locator(),
         fileSaverUseCase: locator(),
         filePickerUseCase: locator(),
         imageCacheManager: locator(),
@@ -75,6 +79,7 @@ class DataStorageScreen extends StatelessWidget {
       body: ListView(
         children: [
           _buildImageCacheSize(context),
+          _buildImageStorageSize(context),
           _buildBackupRestoreSection(context),
         ],
       ),
@@ -98,6 +103,29 @@ class DataStorageScreen extends StatelessWidget {
               setState(() {});
             },
             icon: Icon(Icons.delete),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildImageStorageSize(BuildContext context) {
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return ListTile(
+          title: const Text('Image Storage Size'),
+          subtitle: FutureBuilder(
+            future: fileDao.directory().then((e) => e.size),
+            builder: (context, snapshot) {
+              return Text('Size: ${snapshot.data?.formattedSize}');
+            },
+          ),
+          trailing: IconButton(
+            onPressed: () async {
+              await fileDao.sync();
+              setState(() {});
+            },
+            icon: Icon(Icons.refresh),
           ),
         );
       },
@@ -171,7 +199,7 @@ class DataStorageScreen extends StatelessWidget {
               children: [
                 for (final file in state.listBackup.reversed)
                   ListTile(
-                    title: Text(file.filename ?? 'Unknown'),
+                    title: Text(file.name ?? 'Unknown'),
                     subtitle: FutureBuilder(
                       future: file.stat(),
                       builder: (context, snapshot) {
@@ -256,7 +284,7 @@ class DataStorageScreen extends StatelessWidget {
         files: [
           XFile.fromData(
             await file.readAsBytes(),
-            name: file.filename,
+            name: file.name,
             mimeType: 'text/plain',
             path: file.path,
             length: await file.length(),
@@ -278,9 +306,8 @@ class DataStorageScreen extends StatelessWidget {
   }
 
   void _onTapSaveBackup(BuildContext context, File file) async {
-    final filename = '${file.filename}.${file.extension}';
     await fileSaverUseCase.execute(
-      filename: filename,
+      filename: file.filename,
       data: await file.readAsBytes(),
     );
     if (!context.mounted) return;

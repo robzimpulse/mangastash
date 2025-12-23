@@ -5,7 +5,7 @@ class CoreAnalyticsRegistrar extends Registrar {
   @override
   Future<void> register(ServiceLocator locator) async {
     final start = DateTime.timestamp();
-    locator.registerLazySingleton(() => LogBox(capacity: 1000));
+    locator.registerLazySingleton(() => LogBox());
     // TODO: add analytics dependency here
     final end = DateTime.timestamp();
     locator<LogBox>().log(

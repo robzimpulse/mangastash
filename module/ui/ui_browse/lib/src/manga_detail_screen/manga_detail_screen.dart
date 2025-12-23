@@ -20,9 +20,12 @@ class MangaDetailScreen extends StatefulWidget {
     this.onTapManga,
     this.onMangaMenu,
     this.onTapSort,
+    this.onTapTag,
     required this.imagesCacheManager,
     required this.logBox,
   });
+
+  final ValueSetter<Tag>? onTapTag;
 
   final ValueSetter<Chapter>? onTapChapter;
 
@@ -40,6 +43,7 @@ class MangaDetailScreen extends StatefulWidget {
     required ServiceLocator locator,
     String? source,
     String? mangaId,
+    ValueSetter<Tag>? onTapTag,
     ValueSetter<Chapter>? onTapChapter,
     ValueSetter<Manga>? onTapManga,
     Future<MangaMenu?>? Function(Manga, bool)? onMangaMenu,
@@ -72,6 +76,7 @@ class MangaDetailScreen extends StatefulWidget {
         onTapManga: onTapManga,
         onMangaMenu: onMangaMenu,
         onTapSort: onTapSort,
+        onTapTag: onTapTag,
         logBox: locator(),
       ),
     );
@@ -101,11 +106,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }
 
   MangaDetailScreenCubit _cubit(BuildContext context) => context.read();
-
-  void _onTapTag({required BuildContext context, Tag? tag}) {
-    // TODO: implement this
-    return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
-  }
 
   void _onTapRecrawl({required BuildContext context, required String url}) {
     _cubit(context).recrawl(context: context, url: url);
@@ -245,8 +245,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         if (url == null) {
           view = const Center(
             child: SizedBox(
-              width: 16,
-              height: 16,
+              width: 32,
+              height: 32,
               child: CircularProgressIndicator(),
             ),
           );
@@ -521,7 +521,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               isLoading: state.isLoadingManga,
               tags: [...?state.manga?.tags],
               description: state.manga?.description,
-              onTapTag: (tag) => _onTapTag(context: context, tag: tag),
+              onTapTag: widget.onTapTag,
             );
           },
         ),

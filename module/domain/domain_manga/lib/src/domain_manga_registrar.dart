@@ -6,6 +6,7 @@ import 'manager/global_options_manager.dart';
 import 'manager/history_manager.dart';
 import 'manager/job_manager.dart';
 import 'manager/library_manager.dart';
+import 'use_case/cancel_job_use_case.dart';
 import 'use_case/chapter/get_all_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
@@ -57,6 +58,7 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<PrefetchMangaUseCase, JobManager>();
     locator.alias<PrefetchChapterUseCase, JobManager>();
     locator.alias<ListenPrefetchUseCase, JobManager>();
+    locator.alias<CancelJobUseCase, JobManager>();
 
     locator.registerLazySingleton(
       () => HistoryManager(historyDao: locator()),

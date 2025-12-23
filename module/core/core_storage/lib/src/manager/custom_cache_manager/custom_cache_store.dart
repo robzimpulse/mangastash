@@ -3,9 +3,8 @@ import 'dart:typed_data';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_cache_manager/src/cache_store.dart';
+import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:universal_io/io.dart';
-
-import '../../extension/file_system_entity_extension.dart';
 
 typedef DeletedFileData =
     void Function(CacheObject object, Uint8List data, String? ext);
@@ -225,11 +224,7 @@ class CustomCacheStore implements CacheStore {
 
     if (file.existsSync()) {
       try {
-        _onDeleteFile?.call(
-          cacheObject,
-          await file.readAsBytes(),
-          file.extension,
-        );
+        _onDeleteFile?.call(cacheObject, await file.readAsBytes(), file.ext);
         await file.delete();
         // ignore: unused_catch_clause
       } on PathNotFoundException catch (e) {

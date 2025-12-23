@@ -13,6 +13,7 @@ class MangaReaderScreenState extends Equatable {
     this.source,
     this.parameter = const SearchChapterParameter(),
     this.chapterIds = const [],
+    this.isLoadingChapterIds = false,
   });
 
   final bool isLoading;
@@ -31,10 +32,12 @@ class MangaReaderScreenState extends Equatable {
 
   final List<String> chapterIds;
 
+  final bool isLoadingChapterIds;
+
   String? get previousChapterId {
     return chapterId?.let((id) {
-     final index = chapterIds.indexOf(id);
-     return index > 0 ? chapterIds.elementAtOrNull(index - 1) : null;
+      final index = chapterIds.indexOf(id);
+      return index > 0 ? chapterIds.elementAtOrNull(index - 1) : null;
     });
   }
 
@@ -56,6 +59,7 @@ class MangaReaderScreenState extends Equatable {
       source,
       parameter,
       chapterIds,
+      isLoadingChapterIds,
     ];
   }
 
@@ -68,6 +72,7 @@ class MangaReaderScreenState extends Equatable {
     SourceEnum? source,
     SearchChapterParameter? parameter,
     List<String>? chapterIds,
+    bool? isLoadingChapterIds,
   }) {
     return MangaReaderScreenState(
       mangaId: mangaId ?? this.mangaId,
@@ -78,6 +83,7 @@ class MangaReaderScreenState extends Equatable {
       source: source ?? this.source,
       parameter: parameter ?? this.parameter,
       chapterIds: chapterIds ?? this.chapterIds,
+      isLoadingChapterIds: isLoadingChapterIds ?? this.isLoadingChapterIds,
     );
   }
 }

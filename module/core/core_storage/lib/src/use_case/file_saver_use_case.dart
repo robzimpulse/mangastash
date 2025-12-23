@@ -11,7 +11,7 @@ class FileSaverUseCase {
     : _getRootPathUseCase = getRootPathUseCase;
 
   Future<void> execute({
-    required String filename,
+    String? filename,
     required Uint8List data,
   }) async {
     if (!kIsWeb) {

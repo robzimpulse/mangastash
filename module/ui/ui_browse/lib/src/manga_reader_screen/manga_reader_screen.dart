@@ -3,7 +3,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
-import 'package:photo_view/photo_view.dart';
+import 'package:manga_page_view/manga_page_view.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -23,14 +23,14 @@ class MangaReaderScreen extends StatelessWidget {
 
   final LogBox logBox;
 
-  final void Function(String?)? onTapShortcut;
+  final void Function(String)? onTapShortcut;
 
   static Widget create({
     required ServiceLocator locator,
     required String? source,
     required String? mangaId,
     required String? chapterId,
-    void Function(String?)? onTapShortcut,
+    void Function(String)? onTapShortcut,
   }) {
     return BlocProvider(
       create: (context) {
@@ -71,17 +71,7 @@ class MangaReaderScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScaffoldScreen(
       appBar: AppBar(title: _title(), actions: [_recrawlButton()]),
-      body: Column(
-        children: [
-          Expanded(child: _content(context: context)),
-          Row(
-            children: [
-              Expanded(child: _prevButton()),
-              Expanded(child: _nextButton()),
-            ],
-          ),
-        ],
-      ),
+      body: _content(context: context),
     );
   }
 
@@ -126,20 +116,23 @@ class MangaReaderScreen extends StatelessWidget {
   }
 
   Widget _content({required BuildContext context}) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return _builder(
       buildWhen: (prev, curr) {
         return [
           prev.isLoading != curr.isLoading,
           prev.error != curr.error,
           prev.chapter?.images != curr.chapter?.images,
+          prev.previousChapterId != curr.previousChapterId,
+          prev.nextChapterId != curr.nextChapterId,
+          prev.isLoadingChapterIds != curr.isLoadingChapterIds,
         ].contains(true);
       },
       builder: (context, state) {
         final error = state.error;
         final images = state.chapter?.images ?? [];
         final url = state.chapter?.webUrl;
+        final prevId = state.previousChapterId;
+        final nextId = state.nextChapterId;
 
         if (error != null) {
           return _errorContent(context: context, error: error);
@@ -167,96 +160,88 @@ class MangaReaderScreen extends StatelessWidget {
           );
         }
 
-        return CustomScrollView(
-          slivers: [
-            for (final image in images)
-              SliverToBoxAdapter(
-                child: CachedNetworkImage(
-                  imageUrl: image,
-                  cacheManager: imagesCacheManager,
-                  imageBuilder: (context, provider) {
-                    return FutureBuilder(
-                      future: provider.imageInfo,
-                      builder: (context, snapshot) {
-                        final data = snapshot.data;
-
-                        if (data == null) {
-                          return const SizedBox(
-                            height: 100,
-                            child: Center(child: CircularProgressIndicator()),
-                          );
-                        }
-
-                        final ratio = data.image.ratio;
-
-                        return SizedBox(
-                          width: screenWidth,
-                          height: screenWidth * ratio,
-                          child: PhotoView(
-                            loadingBuilder: (context, event) {
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  value: event?.progress,
-                                ),
-                              );
-                            },
-                            customSize: Size(screenWidth, screenWidth * ratio),
-                            imageProvider: provider,
-                            maxScale: PhotoViewComputedScale.covered * 2.0,
-                            minScale: PhotoViewComputedScale.covered,
-                            initialScale: PhotoViewComputedScale.covered,
-                          ),
-                        );
-                      },
-                    );
-                  },
-                  progressIndicatorBuilder: (context, url, progress) {
-                    return SizedBox(
-                      height: screenWidth / 2,
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          value: progress.progress,
-                        ),
-                      ),
-                    );
-                  },
-                ),
+        return MangaPageView(
+          mode: MangaPageViewMode.continuous,
+          direction: MangaPageViewDirection.down,
+          pageCount: images.length,
+          options: MangaPageViewOptions(
+            crossAxisOverscroll: false,
+            precacheAhead: 1,
+            precacheBehind: 1,
+            maxZoomLevel: 4,
+            minZoomLevel: 1,
+            edgeIndicatorContainerSize: 100,
+          ),
+          pageBuilder: (context, index) {
+            return CachedNetworkImage(
+              imageUrl: images.elementAt(index),
+              cacheManager: imagesCacheManager,
+              errorWidget: (context, url, error) {
+                return SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: const Center(child: Icon(Icons.error)),
+                );
+              },
+              progressIndicatorBuilder: (context, url, progress) {
+                return SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: Center(
+                    child: CircularProgressIndicator(value: progress.progress),
+                  ),
+                );
+              },
+            );
+          },
+          startEdgeDragIndicatorBuilder: (context, info) {
+            return Center(
+              child: Column(
+                children: [
+                  if (state.isLoadingChapterIds) ...[
+                    SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: CircularProgressIndicator(),
+                    ),
+                  ] else if (prevId != null) ...[
+                    Icon(Icons.arrow_upward),
+                    Text('Previous Chapter'),
+                  ] else ...[
+                    Text('No Previous Chapter'),
+                  ],
+                ],
               ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _prevButton() {
-    return _builder(
-      buildWhen: (prev, curr) {
-        return prev.previousChapterId != curr.previousChapterId;
-      },
-      builder: (context, state) {
-        if (state.previousChapterId == null) {
-          return const SizedBox.shrink();
-        }
-        return IconButton(
-          alignment: Alignment.centerLeft,
-          onPressed: () => onTapShortcut?.call(state.previousChapterId),
-          icon: const Icon(Icons.navigate_before),
-        );
-      },
-    );
-  }
-
-  Widget _nextButton() {
-    return _builder(
-      buildWhen: (prev, curr) => prev.nextChapterId != curr.nextChapterId,
-      builder: (context, state) {
-        if (state.nextChapterId == null) {
-          return const SizedBox.shrink();
-        }
-        return IconButton(
-          alignment: Alignment.centerRight,
-          onPressed: () => onTapShortcut?.call(state.nextChapterId),
-          icon: const Icon(Icons.navigate_next),
+            );
+          },
+          endEdgeDragIndicatorBuilder: (context, info) {
+            return Center(
+              child: Column(
+                children: [
+                  if (state.isLoadingChapterIds) ...[
+                    SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: CircularProgressIndicator(),
+                    ),
+                  ] else if (nextId != null) ...[
+                    Icon(Icons.arrow_downward),
+                    Text('Next Chapter'),
+                  ] else ...[
+                    Text('No Next Chapter'),
+                  ],
+                ],
+              ),
+            );
+          },
+          onStartEdgeDrag: () {
+            if (state.isLoadingChapterIds || prevId == null) return;
+            onTapShortcut?.call(prevId);
+          },
+          onEndEdgeDrag: () {
+            if (state.isLoadingChapterIds || nextId == null) return;
+            onTapShortcut?.call(nextId);
+          },
         );
       },
     );

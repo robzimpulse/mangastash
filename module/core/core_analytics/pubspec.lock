@@ -208,6 +208,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+  json_annotation:
+    dependency: transitive
+    description:
+      name: json_annotation
+      sha256: "1ce844379ca14835a50d2f019a3099f419082cfdd231cd86a142af94dd5c6bb1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.9.0"
   lazy_evaluation:
     dependency: transitive
     description:
@@ -253,7 +261,7 @@ packages:
     description:
       path: "packages/log_box"
       ref: master
-      resolved-ref: "05a98d54ca45b1dd6c0ed9363ffeb4cf662e5f63"
+      resolved-ref: dda5b0bce9c6e2ecf05fa919692ce1dce9b06741
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -262,7 +270,7 @@ packages:
     description:
       path: "packages/log_box_dio_logger"
       ref: master
-      resolved-ref: "05a98d54ca45b1dd6c0ed9363ffeb4cf662e5f63"
+      resolved-ref: dda5b0bce9c6e2ecf05fa919692ce1dce9b06741
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -271,7 +279,7 @@ packages:
     description:
       path: "packages/log_box_in_app_webview_logger"
       ref: master
-      resolved-ref: "05a98d54ca45b1dd6c0ed9363ffeb4cf662e5f63"
+      resolved-ref: dda5b0bce9c6e2ecf05fa919692ce1dce9b06741
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -280,7 +288,7 @@ packages:
     description:
       path: "packages/log_box_navigation_logger"
       ref: master
-      resolved-ref: "05a98d54ca45b1dd6c0ed9363ffeb4cf662e5f63"
+      resolved-ref: dda5b0bce9c6e2ecf05fa919692ce1dce9b06741
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -348,6 +356,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
+  rxdart:
+    dependency: transitive
+    description:
+      name: rxdart
+      sha256: "0c7c0cedd93788d996e33041ffecda924cc54389199cde4e6a34b440f50044cb"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.27.7"
   service_locator:
     dependency: "direct main"
     description:

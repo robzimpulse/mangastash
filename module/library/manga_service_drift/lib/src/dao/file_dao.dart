@@ -3,6 +3,7 @@ import 'package:file/file.dart';
 import 'package:uuid/uuid.dart';
 
 import '../database/database.dart';
+import '../extension/file_system_entity_extension.dart';
 import '../extension/non_empty_string_list_extension.dart';
 import '../tables/file_tables.dart';
 
@@ -28,10 +29,12 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     required $FileTablesTable f,
     List<String> ids = const [],
     List<String> webUrls = const [],
+    List<String> relativePaths = const [],
   }) {
     return [
       f.id.isIn(ids.nonEmpty.distinct),
       f.webUrl.isIn(webUrls.nonEmpty.distinct),
+      f.relativePath.isIn(relativePaths.nonEmpty.distinct),
     ].fold(const Constant(false), (a, b) => a | b);
   }
 
@@ -40,9 +43,17 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
   Future<List<FileDrift>> search({
     List<String> ids = const [],
     List<String> webUrls = const [],
+    List<String> relativePaths = const [],
   }) {
     final selector = _selector;
-    selector.where((f) => _filter(f: f, ids: ids, webUrls: webUrls));
+    selector.where(
+      (f) => _filter(
+        f: f,
+        ids: ids,
+        webUrls: webUrls,
+        relativePaths: relativePaths,
+      ),
+    );
     return transaction(() => selector.get());
   }
 
@@ -52,10 +63,10 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     String? extension,
   }) async {
     return transaction(() async {
-      final directory = (await attachedDatabase.databaseDirectory());
       final filename = '${Uuid().v4()}.$extension';
-      final dest = await directory.childFile(filename).create(recursive: true);
-      await dest.writeAsBytes(data);
+      final destination = (await directory()).childFile(filename);
+      await destination.create(recursive: true);
+      await destination.writeAsBytes(data);
 
       final value = FileTablesCompanion.insert(
         webUrl: webUrl,
@@ -72,18 +83,66 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     });
   }
 
-  Future<File> file(FileDrift data) {
-    return attachedDatabase.databaseDirectory().then(
-      (e) => e.childFile(data.relativePath),
+  Future<Directory> directory() async {
+    final root = await attachedDatabase.databaseDirectory();
+    return root.childDirectory('file').create();
+  }
+
+  /// if [checkFile] is true then throw [FileSystemException] if file not
+  /// exists otherwise return [File] from [FileDrift] data,
+  Future<File> file(FileDrift data, {bool checkFile = true}) async {
+    final file = (await directory()).childFile(data.relativePath);
+
+    if (checkFile && !await file.exists()) {
+      await remove(ids: [data.id]);
+
+      throw FileSystemException(
+        'File not found, deleting $data from database',
+        file.path,
+      );
+    }
+
+    return file;
+  }
+
+  Future<void> sync() async {
+    /// remove [FileDrift] record that file not exists on storage
+    await remove(
+      ids: [
+        for (final result in await all)
+          if (!(await file(result, checkFile: false).then((e) => e.exists())))
+            result.id,
+      ],
     );
+
+    /// remove [File] that do not exists on database
+    final files = await directory().then((e) => e.list().toList());
+    final existing = await search(
+      relativePaths: [
+        ...[for (final file in files) file.filename].nonNulls,
+      ],
+    );
+    for (final file in files) {
+      if (!existing.any((e) => e.relativePath == file.filename)) {
+        await file.delete();
+      }
+    }
   }
 
   Future<List<FileDrift>> remove({
     List<String> ids = const [],
     List<String> webUrls = const [],
+    List<String> relativePaths = const [],
   }) {
     final selector = _deleter;
-    selector.where((f) => _filter(f: f, ids: ids, webUrls: webUrls));
+    selector.where(
+      (f) => _filter(
+        f: f,
+        ids: ids,
+        webUrls: webUrls,
+        relativePaths: relativePaths,
+      ),
+    );
     return transaction(() => selector.goAndReturn());
   }
 }

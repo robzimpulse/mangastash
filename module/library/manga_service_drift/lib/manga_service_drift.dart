@@ -12,6 +12,7 @@ export 'src/dao/manga_dao.dart';
 export 'src/dao/tag_dao.dart';
 export 'src/database/database.dart';
 export 'src/database/executor.dart';
+export 'src/extension/file_system_entity_extension.dart';
 export 'src/extension/value_or_null_extension.dart';
 export 'src/model/chapter_model.dart';
 export 'src/model/history_model.dart';
