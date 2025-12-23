@@ -92,12 +92,12 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
                     hintText: 'Search...',
                     filled: false,
                     border: InputBorder.none,
-                    hintStyle: theme.textTheme.titleMedium?.copyWith(
+                    hintStyle: theme.textTheme.titleLarge?.copyWith(
                       color: Colors.white,
                     ),
                   ),
                   cursorColor: Colors.white,
-                  style: theme.textTheme.titleMedium?.copyWith(
+                  style: theme.textTheme.titleLarge?.copyWith(
                     color: Colors.white,
                   ),
                   onSubmitted: (value) => _cubit(context).set(keyword: value),
