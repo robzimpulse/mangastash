@@ -6,13 +6,13 @@ class BrowseRoutePath {
   static const browseManga = '/browse_manga/:${BrowsePathParam.source}';
 
   static String get mangaDetail => [
-    'browse_manga',
+    '/browse_manga',
     ':${BrowsePathParam.source}',
     ':${BrowsePathParam.mangaId}',
   ].join('/');
 
   static String get chapterDetail => [
-    'browse_manga',
+    '/browse_manga',
     ':${BrowsePathParam.source}',
     ':${BrowsePathParam.mangaId}',
     ':${BrowsePathParam.chapterId}',
