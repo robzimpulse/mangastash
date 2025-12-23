@@ -76,6 +76,8 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
     return _builder(
       buildWhen: (prev, curr) => prev.sources != curr.sources,
       builder: (context, state) {
+        final theme = Theme.of(context);
+
         return DefaultTabController(
           length: state.sources.length,
           child: ScaffoldScreen(
@@ -90,10 +92,14 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
                     hintText: 'Search...',
                     filled: false,
                     border: InputBorder.none,
-                    hintStyle: DefaultTextStyle.of(context).style,
+                    hintStyle: theme.textTheme.titleMedium?.copyWith(
+                      color: Colors.white,
+                    ),
                   ),
-                  cursorColor: DefaultTextStyle.of(context).style.color,
-                  style: DefaultTextStyle.of(context).style,
+                  cursorColor: Colors.white,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: Colors.white,
+                  ),
                   onSubmitted: (value) => _cubit(context).set(keyword: value),
                 ),
               ),
@@ -113,7 +119,12 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
                             width: 16,
                           ),
                           SizedBox(width: 8),
-                          Text(source.name),
+                          Text(
+                            source.name,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: Colors.white,
+                            ),
+                          ),
                         ],
                       ),
                     ),
