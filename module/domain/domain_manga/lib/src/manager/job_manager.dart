@@ -231,6 +231,7 @@ class JobManager
     }
 
     await _fileDao.addFromFile(webUrl: url, file: file);
+    await file.delete();
   }
 
   @override
