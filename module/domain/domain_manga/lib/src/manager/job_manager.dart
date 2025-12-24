@@ -83,19 +83,32 @@ class JobManager
 
     _processedJobId = job.id;
 
-    switch (job.type) {
-      case JobTypeEnum.manga:
-        await _fetchManga(job);
-      case JobTypeEnum.chapters:
-        await _fetchAllChapter(job);
-      case JobTypeEnum.chapter:
-        await _fetchChapter(job);
-      case JobTypeEnum.image:
-        await _fetchImage(job);
+    try {
+      switch (job.type) {
+        case JobTypeEnum.manga:
+          await _fetchManga(job);
+        case JobTypeEnum.chapters:
+          await _fetchAllChapter(job);
+        case JobTypeEnum.chapter:
+          await _fetchChapter(job);
+        case JobTypeEnum.image:
+          await _fetchImage(job);
+      }
+    } catch (error, stackTrace) {
+      _log.log(
+        'Failed execute job ${job.id} - ${job.type}',
+        error: error,
+        stackTrace: stackTrace,
+        name: runtimeType.toString(),
+      );
+    } finally {
+      await _jobDao.remove(job.id);
+      _processedJobId = null;
+      _log.log(
+        'Success execute job ${job.id} - ${job.type}',
+        name: runtimeType.toString(),
+      );
     }
-
-    await _jobDao.remove(job.id);
-    _processedJobId = null;
   }
 
   Future<void> _fetchManga(JobModel job) async {
@@ -103,19 +116,7 @@ class JobManager
     final source = job.manga?.source?.let((e) => SourceEnum.fromValue(name: e));
 
     if (mangaId == null || source == null) {
-      _log.log(
-        'Failed execute job ${job.id} - ${job.type}',
-        extra: {
-          'id': job.id,
-          'type': job.type,
-          'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
-          'image': job.image,
-          'error': 'No Manga ID',
-        },
-        name: runtimeType.toString(),
-      );
-      return;
+      throw Exception('No Manga ID or Source Url');
     }
 
     final result = await _getMangaUseCase().execute(
@@ -125,33 +126,7 @@ class JobManager
     );
 
     if (result is Error<Manga>) {
-      _log.log(
-        'Failed execute job ${job.id} - ${job.type}',
-        extra: {
-          'id': job.id,
-          'type': job.type,
-          'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
-          'image': job.image,
-          'error': result.error.toString(),
-        },
-        name: runtimeType.toString(),
-      );
-    }
-
-    if (result is Success<Manga>) {
-      _log.log(
-        'Success execute job ${job.id} - ${job.type}',
-        extra: {
-          'id': job.id,
-          'type': job.type,
-          'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
-          'image': job.image,
-          'data': result.data.toJson(),
-        },
-        name: runtimeType.toString(),
-      );
+      throw result.error;
     }
   }
 
@@ -161,19 +136,7 @@ class JobManager
     final source = job.manga?.source?.let((e) => SourceEnum.fromValue(name: e));
 
     if (mangaId == null || chapterId == null || source == null) {
-      _log.log(
-        'Failed execute job ${job.id} - ${job.type}',
-        extra: {
-          'id': job.id,
-          'type': job.type,
-          'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
-          'image': job.image,
-          'error': 'No Manga ID or Chapter ID or Source',
-        },
-        name: runtimeType.toString(),
-      );
-      return;
+      throw Exception('No Manga ID or Chapter ID or Source');
     }
 
     final result = await _getChapterUseCase().execute(
@@ -184,34 +147,10 @@ class JobManager
     );
 
     if (result is Error<Chapter>) {
-      _log.log(
-        'Failed execute job ${job.id} - ${job.type}',
-        extra: {
-          'id': job.id,
-          'type': job.type,
-          'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
-          'image': job.image,
-          'error': result.error.toString(),
-        },
-        name: runtimeType.toString(),
-      );
+      throw result.error;
     }
 
     if (result is Success<Chapter>) {
-      _log.log(
-        'Success execute job ${job.id} - ${job.type}',
-        extra: {
-          'id': job.id,
-          'type': job.type,
-          'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
-          'image': job.image,
-          'data': result.data.toJson(),
-        },
-        name: runtimeType.toString(),
-      );
-
       for (final image in result.data.images ?? <String>[]) {
         await _jobDao.add(
           JobTablesCompanion.insert(
@@ -230,78 +169,28 @@ class JobManager
     final source = job.manga?.source?.let((e) => SourceEnum.fromValue(name: e));
 
     if (mangaId == null || source == null) {
-      _log.log(
-        'Failed execute job ${job.id} - ${job.type}',
-        extra: {
-          'id': job.id,
-          'type': job.type,
-          'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
-          'image': job.image,
-          'error': 'No Manga ID or Source',
-        },
-        name: runtimeType.toString(),
-      );
-      return;
+      throw Exception('No Manga ID or Source');
     }
-    final parameter = _listenSearchParameterUseCase.searchParameterState;
-    final result = await _getAllChapterUseCase().execute(
+
+    final stream = _listenSearchParameterUseCase.searchParameterState;
+    final parameter = stream.valueOrNull?.let(SearchChapterParameter.from);
+    await _getAllChapterUseCase().execute(
       source: source,
       mangaId: mangaId,
-      parameter: parameter.valueOrNull
-          ?.let(SearchChapterParameter.from)
-          ?.copyWith(
-            orders: {ChapterOrders.chapter: OrderDirections.ascending},
-          ),
+      parameter: parameter?.copyWith(
+        orders: {ChapterOrders.chapter: OrderDirections.ascending},
+      ),
       useCache: false,
-    );
-
-    _log.log(
-      'Success execute job ${job.id} - ${job.type}',
-      extra: {
-        'id': job.id,
-        'type': job.type,
-        'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-        'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
-        'image': job.image,
-        'data': result.map((e) => e.toJson()),
-      },
-      name: runtimeType.toString(),
     );
   }
 
   Future<void> _fetchImage(JobModel job) async {
     final url = job.image;
     if (url == null) {
-      _log.log(
-        'Failed execute job ${job.id} - ${job.type}',
-        extra: {
-          'id': job.id,
-          'type': job.type,
-          'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-          'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
-          'image': job.image,
-          'error': 'No Image URL',
-        },
-        name: runtimeType.toString(),
-      );
-      return;
+      throw Exception('No Image URL');
     }
 
-    final file = await _manager.getSingleFile(url);
-
-    _log.log(
-      'Success execute job ${job.id} - ${job.type}',
-      extra: {
-        'id': job.id,
-        'type': job.type,
-        'manga': job.manga?.let((e) => Manga.fromDrift(e).toJson()),
-        'chapter': job.chapter?.let((e) => Chapter.fromDrift(e).toJson()),
-        'image': job.image,
-        'path': file.path,
-      },
-      name: runtimeType.toString(),
-    );
+    await _manager.getSingleFile(url);
   }
 
   @override
