@@ -6,6 +6,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:file/file.dart';
 import 'package:flutter/widgets.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
@@ -33,35 +34,44 @@ class JobManager
   final ListenSearchParameterUseCase _listenSearchParameterUseCase;
   final ImagesCacheManager _manager;
   final JobDao _jobDao;
+  final FileDao _fileDao;
   final LogBox _log;
+  final GetRootPathUseCase _getRootPathUseCase;
 
   int? _processedJobId;
 
-  late final StreamSubscription _streamSubscription;
+  late final StreamSubscription _jobStreamSubscription;
+  late final StreamSubscription _deleteFileSubscription;
 
   JobManager({
     required LogBox log,
     required JobDao jobDao,
+    required FileDao fileDao,
     required ImagesCacheManager manager,
+    required GetRootPathUseCase getRootPathUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required ValueGetter<GetMangaUseCase> getMangaUseCase,
     required ValueGetter<GetAllChapterUseCase> getAllChapterUseCase,
   }) : _log = log,
        _jobDao = jobDao,
+       _fileDao = fileDao,
        _manager = manager,
+       _getRootPathUseCase = getRootPathUseCase,
        _getMangaUseCase = getMangaUseCase,
        _getChapterUseCase = getChapterUseCase,
        _getAllChapterUseCase = getAllChapterUseCase,
        _listenSearchParameterUseCase = listenSearchParameterUseCase {
-    _streamSubscription = _jobs.distinct().listen(_onData);
+    _jobStreamSubscription = _jobs.distinct().listen(_onData);
+    _deleteFileSubscription = manager.deleteFileEvent.listen(_onDeleteFile);
     _jobs.addStream(jobDao.stream);
     WidgetsBinding.instance.addObserver(this);
   }
 
   Future<void> dispose() async {
     WidgetsBinding.instance.removeObserver(this);
-    await _streamSubscription.cancel();
+    await _jobStreamSubscription.cancel();
+    await _deleteFileSubscription.cancel();
   }
 
   @override
@@ -70,11 +80,24 @@ class JobManager
     if (state == AppLifecycleState.resumed) {
       _log.log(
         'Resume executing jobs',
-        extra: {'state': _streamSubscription.isPaused},
+        extra: {'state': _jobStreamSubscription.isPaused},
         name: runtimeType.toString(),
       );
-      _streamSubscription.resume();
+      _jobStreamSubscription.resume();
+      _deleteFileSubscription.resume();
     }
+  }
+
+  void _onDeleteFile((CacheObject object, File file) event) async {
+    final (object, file) = event;
+
+    await _jobDao.add(
+      JobTablesCompanion.insert(
+        imageUrl: Value(object.url),
+        path: Value(file.path),
+        type: JobTypeEnum.persistentImage,
+      ),
+    );
   }
 
   void _onData(List<JobModel> jobs) async {
@@ -85,14 +108,16 @@ class JobManager
 
     try {
       switch (job.type) {
-        case JobTypeEnum.manga:
+        case JobTypeEnum.prefetchManga:
           await _fetchManga(job);
-        case JobTypeEnum.chapters:
+        case JobTypeEnum.prefetchChapters:
           await _fetchAllChapter(job);
-        case JobTypeEnum.chapter:
+        case JobTypeEnum.prefetchChapter:
           await _fetchChapter(job);
-        case JobTypeEnum.image:
+        case JobTypeEnum.prefetchImage:
           await _fetchImage(job);
+        case JobTypeEnum.persistentImage:
+          await _persistentImage(job);
       }
     } catch (error, stackTrace) {
       _log.log(
@@ -157,7 +182,7 @@ class JobManager
             mangaId: Value(mangaId),
             chapterId: Value(chapterId),
             imageUrl: Value(image),
-            type: JobTypeEnum.image,
+            type: JobTypeEnum.prefetchImage,
           ),
         );
       }
@@ -193,11 +218,26 @@ class JobManager
     await _manager.getSingleFile(url);
   }
 
+  Future<void> _persistentImage(JobModel job) async {
+    final url = job.image;
+    final path = job.path;
+    if (url == null || path == null) {
+      throw Exception('No Image URL or Path File');
+    }
+    final file = _getRootPathUseCase.rootPath.fileSystem.file(path);
+
+    if (!await file.exists()) {
+      throw Exception('File on $path do not exists');
+    }
+
+    await _fileDao.addFromFile(webUrl: url, file: file);
+  }
+
   @override
   void prefetchChapters({required String mangaId, required SourceEnum source}) {
     _jobDao.add(
       JobTablesCompanion.insert(
-        type: JobTypeEnum.chapters,
+        type: JobTypeEnum.prefetchChapters,
         source: Value(mangaId),
         mangaId: Value(mangaId),
       ),
@@ -212,7 +252,7 @@ class JobManager
   }) {
     _jobDao.add(
       JobTablesCompanion.insert(
-        type: JobTypeEnum.chapter,
+        type: JobTypeEnum.prefetchChapter,
         source: Value(source.name),
         mangaId: Value(mangaId),
         chapterId: Value(chapterId),
@@ -224,7 +264,7 @@ class JobManager
   void prefetchManga({required String mangaId, required SourceEnum source}) {
     _jobDao.add(
       JobTablesCompanion.insert(
-        type: JobTypeEnum.manga,
+        type: JobTypeEnum.prefetchManga,
         source: Value(source.name),
         mangaId: Value(mangaId),
       ),

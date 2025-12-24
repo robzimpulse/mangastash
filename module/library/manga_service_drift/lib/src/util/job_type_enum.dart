@@ -1,3 +1,4 @@
 enum JobTypeEnum {
-  manga, chapters, chapter, image;
+  persistentImage,
+  prefetchManga, prefetchChapters, prefetchChapter, prefetchImage;
 }

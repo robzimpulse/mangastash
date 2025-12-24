@@ -12,52 +12,13 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
   final FileDao _fileDao;
   final LogBox _logbox;
 
-  final Map<String, Future> _ongoingProcess = {};
-  late final StreamSubscription _subscription;
-
   ImagesCacheManager({
     required CustomFileService fileService,
     required FileDao fileDao,
     required LogBox logBox,
   }) : _fileDao = fileDao,
        _logbox = logBox,
-       super(Config('image', fileService: fileService)) {
-    _subscription = deleteFileEvent.listen((event) {
-      final (object, file) = event;
-
-      _ongoingProcess[object.key] = fileDao
-          .addFromFile(webUrl: object.url, file: file)
-          .then(
-            (file) => logBox.log(
-              'Move cache file to database',
-              name: runtimeType.toString(),
-              extra: {
-                'cache_object': object.toMap(setTouchedToNow: false),
-                'database_object': file.toJson(),
-              },
-            ),
-          )
-          .catchError(
-            (e, st) => logBox.log(
-              'Failed move cache file to database',
-              extra: {'cache_object': object.toMap(setTouchedToNow: false)},
-              error: e,
-              stackTrace: st,
-              name: runtimeType.toString(),
-            ),
-          )
-          .whenComplete(() async {
-            _ongoingProcess.remove(object.key);
-            await file.delete();
-          });
-    });
-  }
-
-  @override
-  Future<void> dispose() async {
-    await _subscription.cancel();
-    await super.dispose();
-  }
+       super(Config('image', fileService: fileService));
 
   Future<File> _getFromDatabase({required String url}) {
     return _fileDao
