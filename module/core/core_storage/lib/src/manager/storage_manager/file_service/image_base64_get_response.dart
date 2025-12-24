@@ -41,14 +41,14 @@ class ImageBase64GetResponse implements FileServiceResponse {
       throw ArgumentError('Empty Base64 Data');
     }
 
-    final mime = mimeTypes.values.where((e) => e.contains(ext)).firstOrNull;
+    final imgExt = ['jpeg', 'jpg', 'gif', 'webp', 'png', 'ico', 'bmp', 'wbmp'];
 
-    if (mime == null) {
+    if (!imgExt.contains(ext.toLowerCase())) {
       throw ArgumentError('Unsupported Base64 Extension [$ext]');
     }
 
     content = Stream.value(imageByte);
-    fileExtension = mime;
+    fileExtension = '.$ext';
     contentLength = imageByte.length;
     eTag = null;
     statusCode = 200;
