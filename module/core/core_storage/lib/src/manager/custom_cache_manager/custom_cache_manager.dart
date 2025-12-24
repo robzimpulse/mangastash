@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import 'custom_cache_store.dart';
-import 'custom_web_helper.dart';
 
 class CustomCacheManager implements BaseCacheManager {
   late final BaseCacheManager _cache;
@@ -17,7 +16,6 @@ class CustomCacheManager implements BaseCacheManager {
     _cache = CacheManager.custom(
       config,
       cacheStore: _cacheStore,
-      webHelper: CustomWebHelper(_cacheStore, config.fileService),
     );
   }
 
