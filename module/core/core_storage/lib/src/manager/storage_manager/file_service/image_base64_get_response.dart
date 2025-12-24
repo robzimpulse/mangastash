@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:flutter_cache_manager/src/web/mime_converter.dart';
 
 class ImageBase64GetResponse implements FileServiceResponse {
   @override
@@ -40,14 +41,14 @@ class ImageBase64GetResponse implements FileServiceResponse {
       throw ArgumentError('Empty Base64 Data');
     }
 
-    final imgExt = ['jpeg', 'jpg', 'gif', 'webp', 'png', 'ico', 'bmp', 'wbmp'];
+    final mime = mimeTypes.values.where((e) => e.contains(ext)).firstOrNull;
 
-    if (!imgExt.contains(ext.toLowerCase())) {
+    if (mime == null) {
       throw ArgumentError('Unsupported Base64 Extension [$ext]');
     }
 
     content = Stream.value(imageByte);
-    fileExtension = ext;
+    fileExtension = mime;
     contentLength = imageByte.length;
     eTag = null;
     statusCode = 200;
