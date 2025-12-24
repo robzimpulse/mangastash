@@ -248,11 +248,11 @@ class JobManager
     final result = await _getAllChapterUseCase().execute(
       source: source,
       mangaId: mangaId,
-      parameter: parameter.valueOrNull?.let(
-        (value) => SearchChapterParameter.from(
-          value,
-        ).copyWith(orders: {ChapterOrders.chapter: OrderDirections.ascending}),
-      ),
+      parameter: parameter.valueOrNull
+          ?.let(SearchChapterParameter.from)
+          ?.copyWith(
+            orders: {ChapterOrders.chapter: OrderDirections.ascending},
+          ),
       useCache: false,
     );
 
@@ -348,8 +348,6 @@ class JobManager
       _jobDao.remove(id);
       return;
     }
-
-
 
     // TODO: cancel ongoing job
   }
