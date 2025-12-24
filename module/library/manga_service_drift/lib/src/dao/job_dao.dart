@@ -53,6 +53,7 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
             manga: row.readTableOrNull(mangaTables),
             chapter: row.readTableOrNull(chapterTables),
             image: row.read(jobTables.imageUrl),
+            path: row.read(jobTables.path),
           ),
         );
       }

@@ -2893,6 +2893,15 @@ class $JobTablesTable extends JobTables
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _pathMeta = const VerificationMeta('path');
+  @override
+  late final GeneratedColumn<String> path = GeneratedColumn<String>(
+    'path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     createdAt,
@@ -2903,6 +2912,7 @@ class $JobTablesTable extends JobTables
     chapterId,
     mangaId,
     imageUrl,
+    path,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2955,6 +2965,12 @@ class $JobTablesTable extends JobTables
         imageUrl.isAcceptableOrUnknown(data['image_url']!, _imageUrlMeta),
       );
     }
+    if (data.containsKey('path')) {
+      context.handle(
+        _pathMeta,
+        path.isAcceptableOrUnknown(data['path']!, _pathMeta),
+      );
+    }
     return context;
   }
 
@@ -3001,6 +3017,10 @@ class $JobTablesTable extends JobTables
         DriftSqlType.string,
         data['${effectivePrefix}image_url'],
       ),
+      path: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}path'],
+      ),
     );
   }
 
@@ -3022,6 +3042,7 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
   final String? chapterId;
   final String? mangaId;
   final String? imageUrl;
+  final String? path;
   const JobDrift({
     required this.createdAt,
     required this.updatedAt,
@@ -3031,6 +3052,7 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
     this.chapterId,
     this.mangaId,
     this.imageUrl,
+    this.path,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3055,6 +3077,9 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
     if (!nullToAbsent || imageUrl != null) {
       map['image_url'] = Variable<String>(imageUrl);
     }
+    if (!nullToAbsent || path != null) {
+      map['path'] = Variable<String>(path);
+    }
     return map;
   }
 
@@ -3078,6 +3103,7 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
           imageUrl == null && nullToAbsent
               ? const Value.absent()
               : Value(imageUrl),
+      path: path == null && nullToAbsent ? const Value.absent() : Value(path),
     );
   }
 
@@ -3097,6 +3123,7 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
       chapterId: serializer.fromJson<String?>(json['chapterId']),
       mangaId: serializer.fromJson<String?>(json['mangaId']),
       imageUrl: serializer.fromJson<String?>(json['imageUrl']),
+      path: serializer.fromJson<String?>(json['path']),
     );
   }
   @override
@@ -3113,6 +3140,7 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
       'chapterId': serializer.toJson<String?>(chapterId),
       'mangaId': serializer.toJson<String?>(mangaId),
       'imageUrl': serializer.toJson<String?>(imageUrl),
+      'path': serializer.toJson<String?>(path),
     };
   }
 
@@ -3125,6 +3153,7 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
     Value<String?> chapterId = const Value.absent(),
     Value<String?> mangaId = const Value.absent(),
     Value<String?> imageUrl = const Value.absent(),
+    Value<String?> path = const Value.absent(),
   }) => JobDrift(
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -3134,6 +3163,7 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
     chapterId: chapterId.present ? chapterId.value : this.chapterId,
     mangaId: mangaId.present ? mangaId.value : this.mangaId,
     imageUrl: imageUrl.present ? imageUrl.value : this.imageUrl,
+    path: path.present ? path.value : this.path,
   );
   JobDrift copyWithCompanion(JobTablesCompanion data) {
     return JobDrift(
@@ -3145,6 +3175,7 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
       chapterId: data.chapterId.present ? data.chapterId.value : this.chapterId,
       mangaId: data.mangaId.present ? data.mangaId.value : this.mangaId,
       imageUrl: data.imageUrl.present ? data.imageUrl.value : this.imageUrl,
+      path: data.path.present ? data.path.value : this.path,
     );
   }
 
@@ -3158,7 +3189,8 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
           ..write('source: $source, ')
           ..write('chapterId: $chapterId, ')
           ..write('mangaId: $mangaId, ')
-          ..write('imageUrl: $imageUrl')
+          ..write('imageUrl: $imageUrl, ')
+          ..write('path: $path')
           ..write(')'))
         .toString();
   }
@@ -3173,6 +3205,7 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
     chapterId,
     mangaId,
     imageUrl,
+    path,
   );
   @override
   bool operator ==(Object other) =>
@@ -3185,7 +3218,8 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
           other.source == this.source &&
           other.chapterId == this.chapterId &&
           other.mangaId == this.mangaId &&
-          other.imageUrl == this.imageUrl);
+          other.imageUrl == this.imageUrl &&
+          other.path == this.path);
 }
 
 class JobTablesCompanion extends UpdateCompanion<JobDrift> {
@@ -3197,6 +3231,7 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
   final Value<String?> chapterId;
   final Value<String?> mangaId;
   final Value<String?> imageUrl;
+  final Value<String?> path;
   const JobTablesCompanion({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -3206,6 +3241,7 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
     this.chapterId = const Value.absent(),
     this.mangaId = const Value.absent(),
     this.imageUrl = const Value.absent(),
+    this.path = const Value.absent(),
   });
   JobTablesCompanion.insert({
     this.createdAt = const Value.absent(),
@@ -3216,6 +3252,7 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
     this.chapterId = const Value.absent(),
     this.mangaId = const Value.absent(),
     this.imageUrl = const Value.absent(),
+    this.path = const Value.absent(),
   }) : type = Value(type);
   static Insertable<JobDrift> custom({
     Expression<DateTime>? createdAt,
@@ -3226,6 +3263,7 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
     Expression<String>? chapterId,
     Expression<String>? mangaId,
     Expression<String>? imageUrl,
+    Expression<String>? path,
   }) {
     return RawValuesInsertable({
       if (createdAt != null) 'created_at': createdAt,
@@ -3236,6 +3274,7 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
       if (chapterId != null) 'chapter_id': chapterId,
       if (mangaId != null) 'manga_id': mangaId,
       if (imageUrl != null) 'image_url': imageUrl,
+      if (path != null) 'path': path,
     });
   }
 
@@ -3248,6 +3287,7 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
     Value<String?>? chapterId,
     Value<String?>? mangaId,
     Value<String?>? imageUrl,
+    Value<String?>? path,
   }) {
     return JobTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
@@ -3258,6 +3298,7 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
       chapterId: chapterId ?? this.chapterId,
       mangaId: mangaId ?? this.mangaId,
       imageUrl: imageUrl ?? this.imageUrl,
+      path: path ?? this.path,
     );
   }
 
@@ -3290,6 +3331,9 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
     if (imageUrl.present) {
       map['image_url'] = Variable<String>(imageUrl.value);
     }
+    if (path.present) {
+      map['path'] = Variable<String>(path.value);
+    }
     return map;
   }
 
@@ -3303,7 +3347,8 @@ class JobTablesCompanion extends UpdateCompanion<JobDrift> {
           ..write('source: $source, ')
           ..write('chapterId: $chapterId, ')
           ..write('mangaId: $mangaId, ')
-          ..write('imageUrl: $imageUrl')
+          ..write('imageUrl: $imageUrl, ')
+          ..write('path: $path')
           ..write(')'))
         .toString();
   }
@@ -5222,6 +5267,7 @@ typedef $$JobTablesTableCreateCompanionBuilder =
       Value<String?> chapterId,
       Value<String?> mangaId,
       Value<String?> imageUrl,
+      Value<String?> path,
     });
 typedef $$JobTablesTableUpdateCompanionBuilder =
     JobTablesCompanion Function({
@@ -5233,6 +5279,7 @@ typedef $$JobTablesTableUpdateCompanionBuilder =
       Value<String?> chapterId,
       Value<String?> mangaId,
       Value<String?> imageUrl,
+      Value<String?> path,
     });
 
 class $$JobTablesTableFilterComposer
@@ -5282,6 +5329,11 @@ class $$JobTablesTableFilterComposer
 
   ColumnFilters<String> get imageUrl => $composableBuilder(
     column: $table.imageUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get path => $composableBuilder(
+    column: $table.path,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -5334,6 +5386,11 @@ class $$JobTablesTableOrderingComposer
     column: $table.imageUrl,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get path => $composableBuilder(
+    column: $table.path,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$JobTablesTableAnnotationComposer
@@ -5368,6 +5425,9 @@ class $$JobTablesTableAnnotationComposer
 
   GeneratedColumn<String> get imageUrl =>
       $composableBuilder(column: $table.imageUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get path =>
+      $composableBuilder(column: $table.path, builder: (column) => column);
 }
 
 class $$JobTablesTableTableManager
@@ -5406,6 +5466,7 @@ class $$JobTablesTableTableManager
                 Value<String?> chapterId = const Value.absent(),
                 Value<String?> mangaId = const Value.absent(),
                 Value<String?> imageUrl = const Value.absent(),
+                Value<String?> path = const Value.absent(),
               }) => JobTablesCompanion(
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -5415,6 +5476,7 @@ class $$JobTablesTableTableManager
                 chapterId: chapterId,
                 mangaId: mangaId,
                 imageUrl: imageUrl,
+                path: path,
               ),
           createCompanionCallback:
               ({
@@ -5426,6 +5488,7 @@ class $$JobTablesTableTableManager
                 Value<String?> chapterId = const Value.absent(),
                 Value<String?> mangaId = const Value.absent(),
                 Value<String?> imageUrl = const Value.absent(),
+                Value<String?> path = const Value.absent(),
               }) => JobTablesCompanion.insert(
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -5435,6 +5498,7 @@ class $$JobTablesTableTableManager
                 chapterId: chapterId,
                 mangaId: mangaId,
                 imageUrl: imageUrl,
+                path: path,
               ),
           withReferenceMapper:
               (p0) =>
