@@ -64,6 +64,7 @@ class JobManager
        _getAllChapterUseCase = getAllChapterUseCase,
        _listenSearchParameterUseCase = listenSearchParameterUseCase {
     _jobStreamSubscription = _jobs.distinct().listen(_onData);
+    /// TODO: @robzimpulse - [_deleteFileSubscription] caused error on unit test
     _deleteFileSubscription = manager.deleteFileEvent.listen(_onDeleteFile);
     _jobs.addStream(jobDao.stream);
     WidgetsBinding.instance.addObserver(this);
