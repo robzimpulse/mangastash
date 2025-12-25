@@ -1,7 +1,11 @@
 import 'package:core_storage/core_storage.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockImagesCacheManager extends Mock implements ImagesCacheManager {}
+class MockImagesCacheManager extends Mock implements ImagesCacheManager {
+  MockImagesCacheManager() {
+    when(() => deleteFileEvent).thenAnswer((_) => Stream.empty());
+  }
+}
 
 class MockConverterCacheManager extends Mock implements ConverterCacheManager {}
 
