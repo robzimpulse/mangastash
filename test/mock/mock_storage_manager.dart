@@ -1,20 +1,52 @@
 import 'package:core_storage/core_storage.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockImagesCacheManager extends Mock implements ImagesCacheManager {}
+class MockImagesCacheManager extends Mock implements ImagesCacheManager {
+  MockImagesCacheManager() {
+    when(() => deleteFileEvent).thenAnswer((_) => Stream.empty());
+  }
+}
 
-class MockConverterCacheManager extends Mock implements ConverterCacheManager {}
+class MockConverterCacheManager extends Mock implements ConverterCacheManager {
+  MockConverterCacheManager() {
+    when(() => deleteFileEvent).thenAnswer((_) => Stream.empty());
+  }
+}
 
-class MockTagCacheManager extends Mock implements TagCacheManager {}
+class MockTagCacheManager extends Mock implements TagCacheManager {
+  MockTagCacheManager() {
+    when(() => deleteFileEvent).thenAnswer((_) => Stream.empty());
+  }
+}
 
-class MockMangaCacheManager extends Mock implements MangaCacheManager {}
+class MockMangaCacheManager extends Mock implements MangaCacheManager {
+  MockMangaCacheManager() {
+    when(() => deleteFileEvent).thenAnswer((_) => Stream.empty());
+  }
+}
 
-class MockChapterCacheManager extends Mock implements ChapterCacheManager {}
+class MockChapterCacheManager extends Mock implements ChapterCacheManager {
+  MockChapterCacheManager() {
+    when(() => deleteFileEvent).thenAnswer((_) => Stream.empty());
+  }
+}
 
-class MockHtmlCacheManager extends Mock implements HtmlCacheManager {}
+class MockHtmlCacheManager extends Mock implements HtmlCacheManager {
+  MockHtmlCacheManager() {
+    when(() => deleteFileEvent).thenAnswer((_) => Stream.empty());
+  }
+}
 
 class MockSearchChapterCacheManager extends Mock
-    implements SearchChapterCacheManager {}
+    implements SearchChapterCacheManager {
+  MockSearchChapterCacheManager() {
+    when(() => deleteFileEvent).thenAnswer((_) => Stream.empty());
+  }
+}
 
 class MockSearchMangaCacheManager extends Mock
-    implements SearchMangaCacheManager {}
+    implements SearchMangaCacheManager {
+  MockSearchMangaCacheManager() {
+    when(() => deleteFileEvent).thenAnswer((_) => Stream.empty());
+  }
+}

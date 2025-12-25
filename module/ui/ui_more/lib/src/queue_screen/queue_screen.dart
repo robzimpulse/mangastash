@@ -1,36 +1,21 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
-import 'package:safe_bloc/safe_bloc.dart';
-import 'package:service_locator/service_locator.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:ui_common/ui_common.dart';
 
-import 'queue_screen_cubit.dart';
-import 'queue_screen_state.dart';
 
 class QueueScreen extends StatelessWidget {
-  const QueueScreen({super.key, required this.cancelJobUseCase});
+  const QueueScreen({
+    super.key,
+    required this.cancelJobUseCase,
+    required this.listenJobUseCase,
+  });
 
   final CancelJobUseCase cancelJobUseCase;
+  final ListenJobUseCase listenJobUseCase;
 
-  static Widget create({required ServiceLocator locator}) {
-    return BlocProvider(
-      create: (context) => QueueScreenCubit(listenPrefetchUseCase: locator()),
-      child: QueueScreen(cancelJobUseCase: locator()),
-    );
-  }
-
-  BlocBuilder _builder({
-    required BlocWidgetBuilder<QueueScreenState> builder,
-    BlocBuilderCondition<QueueScreenState>? buildWhen,
-  }) {
-    return BlocBuilder<QueueScreenCubit, QueueScreenState>(
-      buildWhen: buildWhen,
-      builder: builder,
-    );
-  }
-
-  Widget _jobItem({required JobModel job}) {
+  Widget _jobItem({required JobModel job, bool cancellable = true}) {
     final mangaTitle = job.manga?.title;
     final chapterTitle = job.chapter?.title;
     final imageUrl = job.image;
@@ -45,10 +30,13 @@ class QueueScreen extends StatelessWidget {
           if (imageUrl != null) Text('Image: $imageUrl'),
         ],
       ),
-      trailing: IconButton(
-        onPressed: () => cancelJobUseCase.cancelJob(id: job.id),
-        icon: Icon(Icons.cancel_outlined),
-      ),
+      trailing:
+          cancellable
+              ? IconButton(
+                onPressed: () => cancelJobUseCase.cancelJob(id: job.id),
+                icon: Icon(Icons.cancel_outlined),
+              )
+              : null,
     );
   }
 
@@ -56,16 +44,28 @@ class QueueScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScaffoldScreen(
       appBar: AppBar(title: const Text('Queues')),
-      body: _builder(
-        buildWhen: (prev, curr) => prev.jobs != curr.jobs,
-        builder: (context, state) {
+      body: StreamBuilder(
+        stream: CombineLatestStream.combine2(
+          listenJobUseCase.jobsStream,
+          listenJobUseCase.ongoingJobId,
+          (a, b) => (a, b),
+        ),
+        builder: (context, snapshot) {
+          final data = snapshot.data;
+
+          if (data == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final (jobs, ongoingJobId) = data;
+
           return ListView.builder(
             itemBuilder: (context, index) {
-              final job = state.jobs.elementAtOrNull(index);
+              final job = jobs.elementAtOrNull(index);
               if (job == null) return const SizedBox.shrink();
-              return _jobItem(job: job);
+              return _jobItem(job: job, cancellable: ongoingJobId != job.id);
             },
-            itemCount: state.jobs.length,
+            itemCount: jobs.length,
           );
         },
       ),

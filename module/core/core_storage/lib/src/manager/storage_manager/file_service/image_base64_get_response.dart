@@ -47,7 +47,7 @@ class ImageBase64GetResponse implements FileServiceResponse {
     }
 
     content = Stream.value(imageByte);
-    fileExtension = ext;
+    fileExtension = '.$ext';
     contentLength = imageByte.length;
     eTag = null;
     statusCode = 200;

@@ -3,23 +3,23 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import 'custom_cache_store.dart';
-import 'custom_web_helper.dart';
 
 class CustomCacheManager implements BaseCacheManager {
   late final BaseCacheManager _cache;
 
   late final CustomCacheStore _cacheStore;
 
-  CustomCacheManager(Config config, {DeletedFileData? onDeleteFile}) {
-    _cacheStore = CustomCacheStore(config, onDeleteFile: onDeleteFile);
+  CustomCacheManager(Config config) {
+    _cacheStore = CustomCacheStore(config);
 
     /// ignore: invalid_use_of_visible_for_testing_member
     _cache = CacheManager.custom(
       config,
       cacheStore: _cacheStore,
-      webHelper: CustomWebHelper(_cacheStore, config.fileService),
     );
   }
+
+  Stream<DeletedFileData> get deleteFileEvent => _cacheStore.deleteFileEvent;
 
   Future<Set<String>> get keys => _cacheStore.keys;
 

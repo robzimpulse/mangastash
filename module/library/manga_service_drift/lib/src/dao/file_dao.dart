@@ -57,7 +57,7 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     return transaction(() => selector.get());
   }
 
-  Future<FileDrift> add({
+  Future<FileDrift> addFromData({
     required String webUrl,
     required Uint8List data,
     String? extension,
@@ -67,6 +67,31 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
       final destination = (await directory()).childFile(filename);
       await destination.create(recursive: true);
       await destination.writeAsBytes(data);
+
+      final value = FileTablesCompanion.insert(
+        webUrl: webUrl,
+        relativePath: filename,
+      );
+
+      return into(fileTables).insertReturning(
+        value,
+        mode: InsertMode.insertOrReplace,
+        onConflict: DoUpdate(
+          (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
+        ),
+      );
+    });
+  }
+
+  Future<FileDrift> addFromFile({
+    required String webUrl,
+    required File file,
+  }) async {
+    return transaction(() async {
+      final filename = '${Uuid().v4()}.${file.ext}';
+      final destination = (await directory()).childFile(filename);
+      await destination.create(recursive: true);
+      await destination.openWrite().addStream(file.openRead());
 
       final value = FileTablesCompanion.insert(
         webUrl: webUrl,

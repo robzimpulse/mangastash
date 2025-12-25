@@ -15,27 +15,38 @@ class HistoryRouteBuilder extends BaseRouteBuilder {
     return GoRoute(
       path: HistoryRoutePath.history,
       name: HistoryRoutePath.history,
-      pageBuilder: (context, state) => NoTransitionPage(
-        name: HistoryRoutePath.history,
-        child: MangaHistoryScreen.create(
-          locator: locator,
-          onTapChapter: (manga, chapter) => context.pushNamed(
-            BrowseRoutePath.chapterDetail,
-            pathParameters: {
-              BrowseRoutePath.sourceQuery: manga.source ?? '',
-              BrowseRoutePath.mangaIdQuery: manga.id ?? '',
-              BrowseRoutePath.chapterIdQuery: chapter.id ?? '',
+      pageBuilder: (context, state) {
+        return NoTransitionPage(
+          name: HistoryRoutePath.history,
+          child: MangaHistoryScreen.create(
+            locator: locator,
+            onTapChapter: (manga, chapter) {
+              final source = manga.source;
+              final mangaId = manga.id;
+              final chapterId = chapter.id;
+              return context.pushNamed(
+                BrowseRoutePath.chapterDetail,
+                pathParameters: {
+                  if (source != null) BrowsePathParam.source: source,
+                  if (mangaId != null) BrowsePathParam.mangaId: mangaId,
+                  if (chapterId != null) BrowsePathParam.chapterId: chapterId,
+                },
+              );
+            },
+            onTapManga: (manga) {
+              final source = manga?.source;
+              final mangaId = manga?.id;
+              context.pushNamed(
+                BrowseRoutePath.mangaDetail,
+                pathParameters: {
+                  if (source != null) BrowsePathParam.source: source,
+                  if (mangaId != null) BrowsePathParam.mangaId: mangaId,
+                },
+              );
             },
           ),
-          onTapManga: (manga) => context.pushNamed(
-            BrowseRoutePath.mangaDetail,
-            pathParameters: {
-              BrowseRoutePath.sourceQuery: manga?.source ?? '',
-              BrowseRoutePath.mangaIdQuery: manga?.id ?? '',
-            },
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 

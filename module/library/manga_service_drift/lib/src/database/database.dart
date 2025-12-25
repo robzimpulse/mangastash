@@ -27,6 +27,7 @@ import 'adapter/backup_database/backup_database_adapter.dart'
 import 'adapter/restore_database/restore_database_adapter.dart'
     if (dart.library.js_interop) 'adapter/restore_database/restore_database_web.dart'
     if (dart.library.io) 'adapter/restore_database/restore_database_io.dart';
+import 'database.steps.dart';
 import 'executor.dart';
 
 part 'database.g.dart';
@@ -53,6 +54,7 @@ part 'database.g.dart';
     FileDao,
   ],
 )
+
 class AppDatabase extends _$AppDatabase {
   final Executor _executor;
 
@@ -64,7 +66,18 @@ class AppDatabase extends _$AppDatabase {
       super(executor.build());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onUpgrade: stepByStep(
+        from1To2: (m, schema) async {
+          await m.addColumn(jobTables, jobTables.path);
+        },
+      ),
+    );
+  }
 
   Future<void> clear() async {
     await Future.wait([for (final table in allTables) delete(table).go()]);

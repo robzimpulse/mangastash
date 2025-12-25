@@ -18,33 +18,7 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
     required LogBox logBox,
   }) : _fileDao = fileDao,
        _logbox = logBox,
-       super(
-         Config('image', fileService: fileService),
-         onDeleteFile: (object, data, ext) {
-           fileDao
-               .add(webUrl: object.url, data: data, extension: ext)
-               .then(
-                 (file) => logBox.log(
-                   'Move cache file to database',
-                   name: 'ImagesCacheManager',
-                   extra: {
-                     'cache_object': object.toMap(setTouchedToNow: false),
-                     'database_object': file.toJson(),
-                   },
-                 ),
-               )
-               .catchError(
-                 (e, st) => logBox.log(
-                   'Failed move cache file to database',
-                   extra: {
-                     'cache_object': object.toMap(setTouchedToNow: false),
-                   },
-                   error: e,
-                   stackTrace: st,
-                 ),
-               );
-         },
-       );
+       super(Config('image', fileService: fileService));
 
   Future<File> _getFromDatabase({required String url}) {
     return _fileDao

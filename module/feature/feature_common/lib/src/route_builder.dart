@@ -24,34 +24,28 @@ class CommonRouteBuilder extends BaseRouteBuilder {
         parentNavigatorKey: rootNavigatorKey,
         path: CommonRoutePath.confirmation,
         name: CommonRoutePath.confirmation,
-        pageBuilder:
-            (context, state) => ConfirmationRouteBottomSheet(
-              locator: locator,
-              title:
-                  state.uri.queryParameters[CommonRoutePath.confirmationTitle],
-              content:
-                  state.uri.queryParameters[CommonRoutePath
-                      .confirmationContent] ??
-                  '',
-              positiveButtonText:
-                  state.uri.queryParameters[CommonRoutePath
-                      .confirmationPositiveButtonText],
-              negativeButtonText:
-                  state.uri.queryParameters[CommonRoutePath
-                      .confirmationNegativeButtonText],
-            ),
+        pageBuilder: (context, state) {
+          final queries = state.uri.queryParameters;
+          return ConfirmationRouteBottomSheet(
+            locator: locator,
+            title: queries[CommonQueryParam.title],
+            content: queries[CommonQueryParam.content] ?? '',
+            positiveButtonText: queries[CommonQueryParam.positiveButtonText],
+            negativeButtonText: queries[CommonQueryParam.negativeButtonText],
+          );
+        },
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: CommonRoutePath.menu,
         name: CommonRoutePath.menu,
-        pageBuilder:
-            (context, state) => MenuRouteBottomSheet(
-              locator: locator,
-              isOnLibrary:
-                  state.uri.queryParameters[CommonRoutePath.menuIsOnLibrary] ==
-                  'true',
-            ),
+        pageBuilder: (context, state) {
+          final queries = state.uri.queryParameters;
+          return MenuRouteBottomSheet(
+            locator: locator,
+            isOnLibrary: queries[CommonQueryParam.isOnLibrary] == 'true',
+          );
+        },
       ),
     ];
   }

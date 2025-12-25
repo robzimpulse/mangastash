@@ -35,7 +35,7 @@ class MoreScreen extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (context) => MoreScreenCubit(
-        listenPrefetchUseCase: locator(),
+        listenJobUseCase: locator(),
       ),
       child: MoreScreen(
         onTapSetting: onTapSetting,

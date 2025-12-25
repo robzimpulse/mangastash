@@ -173,6 +173,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     bool useCache = true,
     Future<void>? signalComplete,
   }) async {
+    delegate.set(uri: uri, loading: true);
     final key = [uri.toString(), ...scripts].join('|');
     final cache = await _htmlCacheManager.getFileFromCache(key);
     final data = await cache?.file.readAsString(encoding: utf8);

@@ -15,4 +15,6 @@ class JobTables extends Table with AutoTimestampTable, AutoIntegerIdTable {
   TextColumn get mangaId => text().named('manga_id').nullable()();
 
   TextColumn get imageUrl => text().named('image_url').nullable()();
+
+  TextColumn get path => text().named('path').nullable()();
 }

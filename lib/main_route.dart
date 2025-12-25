@@ -75,11 +75,10 @@ class MainRouteBuilder extends BaseRouteBuilder {
             return context.pushNamed<bool>(
               CommonRoutePath.confirmation,
               queryParameters: {
-                CommonRoutePath.confirmationTitle: 'Exit',
-                CommonRoutePath.confirmationContent:
-                    'Are you sure want to quit?',
-                CommonRoutePath.confirmationNegativeButtonText: 'No',
-                CommonRoutePath.confirmationPositiveButtonText: 'Yes',
+                CommonQueryParam.title: 'Exit',
+                CommonQueryParam.content: 'Are you sure want to quit?',
+                CommonQueryParam.negativeButtonText: 'No',
+                CommonQueryParam.positiveButtonText: 'Yes',
               },
             );
           },

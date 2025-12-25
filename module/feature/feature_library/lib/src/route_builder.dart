@@ -15,22 +15,34 @@ class LibraryRouteBuilder extends BaseRouteBuilder {
     return GoRoute(
       path: LibraryRoutePath.library,
       name: LibraryRoutePath.library,
-      pageBuilder: (context, state) => NoTransitionPage(
-        name: LibraryRoutePath.library,
-        child: LibraryMangaScreen.create(
-          locator: locator,
-          onTapManga: (manga) => context.pushNamed(
-            BrowseRoutePath.mangaDetail,
-            pathParameters: {
-              BrowseRoutePath.sourceQuery: manga?.source ?? '',
-              BrowseRoutePath.mangaIdQuery: manga?.id ?? '',
+      pageBuilder: (context, state) {
+        return NoTransitionPage(
+          name: LibraryRoutePath.library,
+          child: LibraryMangaScreen.create(
+            locator: locator,
+            onTapManga: (manga) {
+              final source = manga?.source;
+              final mangaId = manga?.id;
+              context.pushNamed(
+                BrowseRoutePath.mangaDetail,
+                pathParameters: {
+                  if (source != null) BrowsePathParam.source: source,
+                  if (mangaId != null) BrowsePathParam.mangaId: mangaId,
+                },
+              );
             },
+            onTapMangaMenu: (isOnLibrary) {
+              return context.pushNamed(
+                CommonRoutePath.menu,
+                queryParameters: {
+                  CommonQueryParam.isOnLibrary: isOnLibrary.toString(),
+                },
+              );
+            },
+            onTapAddManga: () => context.pushNamed(BrowseRoutePath.addManga),
           ),
-          onTapAddManga: () => context.pushNamed<String>(
-            BrowseRoutePath.addManga,
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -44,11 +56,13 @@ class LibraryRouteBuilder extends BaseRouteBuilder {
         parentNavigatorKey: rootNavigatorKey,
         path: BrowseRoutePath.addManga,
         name: BrowseRoutePath.addManga,
-        pageBuilder: (context, state) => TextFieldDialog(
-          locator: locator,
-          title: 'Add Manga',
-          onSubmitted: (text) => context.pop(text),
-        ),
+        pageBuilder: (context, state) {
+          return TextFieldDialog(
+            locator: locator,
+            title: 'Add Manga',
+            onSubmitted: (text) => context.pop(text),
+          );
+        },
       ),
     ];
   }

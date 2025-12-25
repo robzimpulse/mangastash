@@ -7,6 +7,7 @@ class JobModel extends Equatable {
   final int id;
   final JobTypeEnum type;
   final String? image;
+  final String? path;
 
   final MangaDrift? manga;
   final ChapterDrift? chapter;
@@ -17,8 +18,9 @@ class JobModel extends Equatable {
     this.manga,
     this.chapter,
     this.image,
+    this.path,
   });
 
   @override
-  List<Object?> get props => [id, type, manga, chapter, image];
+  List<Object?> get props => [id, type, manga, chapter, image, path];
 }

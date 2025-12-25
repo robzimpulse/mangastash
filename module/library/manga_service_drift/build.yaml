@@ -3,6 +3,8 @@ targets:
     builders:
       drift_dev:
         options:
+          databases:
+            database: lib/src/database/database.dart
           sql:
             dialect: sqlite
             options:

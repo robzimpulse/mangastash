@@ -1,5 +1,4 @@
 import 'package:core_environment/core_environment.dart';
-import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -16,6 +15,7 @@ class BrowseMangaScreen extends StatefulWidget {
     required this.imagesCacheManager,
     this.onTapManga,
     this.onTapFilter,
+    this.onTapMangaMenu,
   });
 
   final Function(Manga, SearchMangaParameter)? onTapManga;
@@ -25,6 +25,8 @@ class BrowseMangaScreen extends StatefulWidget {
     List<Tag> availableTags,
   )?
   onTapFilter;
+
+  final Future<MangaMenu?> Function(bool)? onTapMangaMenu;
 
   final ImagesCacheManager imagesCacheManager;
 
@@ -36,6 +38,7 @@ class BrowseMangaScreen extends StatefulWidget {
       List<Tag> availableTags,
     )?
     onTapFilter,
+    Future<MangaMenu?> Function(bool)? onTapMangaMenu,
     String? source,
     String? tagId,
   }) {
@@ -64,6 +67,7 @@ class BrowseMangaScreen extends StatefulWidget {
         imagesCacheManager: locator(),
         onTapManga: onTapManga,
         onTapFilter: onTapFilter,
+        onTapMangaMenu: onTapMangaMenu,
       ),
     );
   }
@@ -115,12 +119,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     required Manga manga,
     required bool isOnLibrary,
   }) async {
-    final result = await context.pushNamed<MangaMenu>(
-      CommonRoutePath.menu,
-      queryParameters: {
-        CommonRoutePath.menuIsOnLibrary: isOnLibrary ? 'true' : 'false',
-      },
-    );
+    final result = await widget.onTapMangaMenu?.call(isOnLibrary);
 
     if (result == null || !context.mounted) return;
 

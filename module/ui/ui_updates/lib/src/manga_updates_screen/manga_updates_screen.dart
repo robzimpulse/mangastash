@@ -26,7 +26,9 @@ class MangaUpdatesScreen extends StatelessWidget {
         return MangaUpdatesScreenCubit(
           listenUnreadHistoryUseCase: locator(),
           listenMangaFromLibraryUseCase: locator(),
-        )..init();
+          listenPrefetchUseCase: locator(),
+          prefetchChapterUseCase: locator(),
+        );
       },
       child: MangaUpdatesScreen(
         imagesCacheManager: locator(),
@@ -42,6 +44,8 @@ class MangaUpdatesScreen extends StatelessWidget {
 
   final Function(Manga, Chapter)? onTapChapter;
 
+  MangaUpdatesScreenCubit _cubit(BuildContext context) => context.read();
+
   BlocBuilder _builder({
     required BlocWidgetBuilder<MangaUpdatesScreenState> builder,
     BlocBuilderCondition<MangaUpdatesScreenState>? buildWhen,
@@ -52,12 +56,17 @@ class MangaUpdatesScreen extends StatelessWidget {
     );
   }
 
-  Widget _manga({required BuildContext context, required Manga manga}) {
+  Widget _manga({
+    required BuildContext context,
+    required Manga manga,
+    bool isPrefetching = false,
+  }) {
     return MangaTileWidget(
       padding: const EdgeInsets.all(8),
       manga: manga,
       onTap: () => onTapManga?.call(manga),
       cacheManager: imagesCacheManager,
+      isPrefetching: isPrefetching,
     );
   }
 
@@ -65,6 +74,7 @@ class MangaUpdatesScreen extends StatelessWidget {
     required BuildContext context,
     required Manga manga,
     required Chapter chapter,
+    bool isPrefetching = false,
   }) {
     return ChapterTileWidget(
       padding: const EdgeInsets.all(8),
@@ -72,14 +82,35 @@ class MangaUpdatesScreen extends StatelessWidget {
       language: Language.fromCode(chapter.translatedLanguage),
       uploadedAt: chapter.readableAt,
       groups: chapter.scanlationGroup,
+      isPrefetching: isPrefetching,
       onTap: () => onTapChapter?.call(manga, chapter),
+    );
+  }
+
+  Widget _layoutRefresh({required BuildContext context}) {
+    return _builder(
+      buildWhen: (prev, curr) => prev.updates != curr.updates,
+      builder: (context, state) {
+        if (state.updates.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return IconButton(
+          icon: const Icon(Icons.cloud_download),
+          onPressed: () => _cubit(context).prefetch(),
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      appBar: AppBar(centerTitle: false, title: const Text('Manga Updates')),
+      appBar: AppBar(
+        centerTitle: false,
+        title: const Text('Manga Updates'),
+        actions: [_layoutRefresh(context: context)],
+      ),
       body: _builder(
         builder: (context, state) {
           return CustomScrollView(
@@ -115,16 +146,28 @@ class MangaUpdatesScreen extends StatelessWidget {
                       pushPinnedChildren: true,
                       children: [
                         SliverPinnedHeader(
-                          child: _manga(context: context, manga: history.key),
+                          child: _manga(
+                            context: context,
+                            manga: history.key,
+                            isPrefetching: state.prefetchedMangaIds.contains(
+                              history.key.id,
+                            ),
+                          ),
                         ),
-                        for (final item in history.value)
-                          SliverToBoxAdapter(
-                            child: _chapter(
+                        SliverList.builder(
+                          itemBuilder: (context, index) {
+                            final item = history.value.elementAtOrNull(index);
+                            if (item == null) return null;
+                            final ids = state.prefetchedChapterIds;
+                            return _chapter(
                               context: context,
                               manga: history.key,
                               chapter: item,
-                            ),
-                          ),
+                              isPrefetching: ids.contains(item.id),
+                            );
+                          },
+                          itemCount: history.value.length,
+                        ),
                       ],
                     ),
             ],
