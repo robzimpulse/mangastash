@@ -9,11 +9,16 @@ import 'manga_updates_screen_state.dart';
 
 class MangaUpdatesScreenCubit extends Cubit<MangaUpdatesScreenState>
     with AutoSubscriptionMixin, SortChaptersMixin {
+  final PrefetchChapterUseCase _prefetchChapterUseCase;
+
   MangaUpdatesScreenCubit({
+    MangaUpdatesScreenState initialState = const MangaUpdatesScreenState(),
     required ListenUnreadHistoryUseCase listenUnreadHistoryUseCase,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
-    MangaUpdatesScreenState initialState = const MangaUpdatesScreenState(),
-  }) : super(initialState) {
+    required ListenPrefetchUseCase listenPrefetchUseCase,
+    required PrefetchChapterUseCase prefetchChapterUseCase,
+  }) : _prefetchChapterUseCase = prefetchChapterUseCase,
+       super(initialState) {
     addSubscription(
       CombineLatestStream.combine2(
         listenUnreadHistoryUseCase.unreadHistoryStream.distinct(),
@@ -29,6 +34,18 @@ class MangaUpdatesScreenCubit extends Cubit<MangaUpdatesScreenState>
           ),
         ],
       ).listen(_onUpdate),
+    );
+
+    addSubscription(
+      listenPrefetchUseCase.chapterIdsStream.distinct().listen(
+        _updatePrefetchChapterState,
+      ),
+    );
+
+    addSubscription(
+      listenPrefetchUseCase.mangaIdsStream.distinct().listen(
+        _updatePrefetchMangaState,
+      ),
     );
   }
 
@@ -49,5 +66,29 @@ class MangaUpdatesScreenCubit extends Cubit<MangaUpdatesScreenState>
     );
   }
 
-  void init() {}
+  void _updatePrefetchChapterState(Set<String> prefetchedChapterIds) {
+    emit(state.copyWith(prefetchedChapterIds: prefetchedChapterIds));
+  }
+
+  void _updatePrefetchMangaState(Set<String> prefetchedMangaIds) {
+    emit(state.copyWith(prefetchedMangaIds: prefetchedMangaIds));
+  }
+
+  Future<void> prefetch() async {
+    for (final entry in state.updates.entries) {
+      for (final chapter in entry.value) {
+        final mangaId = entry.key.id;
+        final chapterId = chapter.id;
+        final source = entry.key.source.let(
+          (e) => SourceEnum.fromValue(name: e),
+        );
+        if (mangaId == null || source == null || chapterId == null) continue;
+        _prefetchChapterUseCase.prefetchChapter(
+          mangaId: mangaId,
+          source: source,
+          chapterId: chapterId,
+        );
+      }
+    }
+  }
 }

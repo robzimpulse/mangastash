@@ -61,12 +61,14 @@ class MangaTileWidget extends StatelessWidget {
                   child: Text(title),
                 ),
               ),
-            if (isPrefetching)
+            if (isPrefetching) ...[
               const SizedBox(
                 width: 16,
                 height: 16,
                 child: CircularProgressIndicator(),
               ),
+              SizedBox(width: 8),
+            ],
             if (isOnLibrary) const Icon(Icons.bookmark),
             if (sourceIconUrl != null) ...[
               SizedBox(
