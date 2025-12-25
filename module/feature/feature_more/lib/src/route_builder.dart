@@ -116,7 +116,12 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         parentNavigatorKey: rootNavigatorKey,
         path: MoreRoutePath.downloadQueue,
         name: MoreRoutePath.downloadQueue,
-        builder: (context, state) => QueueScreen.create(locator: locator),
+        builder: (context, state) {
+          return QueueScreen(
+            listenJobUseCase: locator(),
+            cancelJobUseCase: locator(),
+          );
+        },
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,

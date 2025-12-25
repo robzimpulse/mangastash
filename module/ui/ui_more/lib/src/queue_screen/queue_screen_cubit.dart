@@ -6,13 +6,18 @@ import 'queue_screen_state.dart';
 class QueueScreenCubit extends Cubit<QueueScreenState>
     with AutoSubscriptionMixin {
   QueueScreenCubit({
-    required ListenPrefetchUseCase listenPrefetchUseCase,
+    required ListenJobUseCase listenJobUseCase,
     QueueScreenState initialState = const QueueScreenState(),
   }) : super(initialState) {
     addSubscription(
-      listenPrefetchUseCase.jobsStream
-          .distinct()
-          .listen((jobs) => emit(state.copyWith(jobs: jobs))),
+      listenJobUseCase.jobsStream.distinct().listen(
+        (jobs) => emit(state.copyWith(jobs: jobs)),
+      ),
+    );
+    addSubscription(
+      listenJobUseCase.ongoingJobId.distinct().listen(
+        (id) => emit(state.copyWith(ongoingJobId: id)),
+      ),
     );
   }
 }

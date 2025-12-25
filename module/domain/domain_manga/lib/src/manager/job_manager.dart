@@ -16,6 +16,7 @@ import '../use_case/chapter/get_all_chapter_use_case.dart';
 import '../use_case/chapter/get_chapter_use_case.dart';
 import '../use_case/manga/get_manga_use_case.dart';
 import '../use_case/parameter/listen_search_parameter_use_case.dart';
+import '../use_case/prefetch/listen_job_use_case.dart';
 import '../use_case/prefetch/listen_prefetch_use_case.dart';
 import '../use_case/prefetch/prefetch_chapter_use_case.dart';
 import '../use_case/prefetch/prefetch_manga_use_case.dart';
@@ -26,8 +27,10 @@ class JobManager
         PrefetchMangaUseCase,
         PrefetchChapterUseCase,
         ListenPrefetchUseCase,
-        CancelJobUseCase {
+        CancelJobUseCase,
+        ListenJobUseCase {
   final _jobs = BehaviorSubject<List<JobModel>>.seeded([]);
+  final _ongoingJobId = BehaviorSubject<int?>.seeded(null);
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
   final ValueGetter<GetAllChapterUseCase> _getAllChapterUseCase;
@@ -37,8 +40,6 @@ class JobManager
   final FileDao _fileDao;
   final LogBox _log;
   final GetRootPathUseCase _getRootPathUseCase;
-
-  int? _processedJobId;
 
   late final StreamSubscription _jobStreamSubscription;
   late final StreamSubscription _deleteFileSubscription;
@@ -102,9 +103,9 @@ class JobManager
 
   void _onData(List<JobModel> jobs) async {
     final job = jobs.firstOrNull;
-    if (job == null || _processedJobId != null) return;
+    if (job == null || _ongoingJobId.valueOrNull != null) return;
 
-    _processedJobId = job.id;
+    _ongoingJobId.add(job.id);
 
     try {
       switch (job.type) {
@@ -128,7 +129,7 @@ class JobManager
       );
     } finally {
       await _jobDao.remove(job.id);
-      _processedJobId = null;
+      _ongoingJobId.add(null);
       _log.log(
         'Success execute job ${job.id} - ${job.type}',
         name: runtimeType.toString(),
@@ -274,7 +275,7 @@ class JobManager
 
   @override
   void cancelJob({required int id}) {
-    if (_processedJobId == null) {
+    if (_ongoingJobId.valueOrNull == null) {
       _jobDao.remove(id);
       return;
     }
@@ -294,4 +295,7 @@ class JobManager
 
   @override
   Stream<List<JobModel>> get jobsStream => _jobs.stream;
+
+  @override
+  Stream<int?> get ongoingJobId => _ongoingJobId.stream;
 }

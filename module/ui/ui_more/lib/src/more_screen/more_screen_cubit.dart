@@ -7,10 +7,10 @@ class MoreScreenCubit extends Cubit<MoreScreenState>
     with AutoSubscriptionMixin {
   MoreScreenCubit({
     MoreScreenState initialState = const MoreScreenState(),
-    required ListenPrefetchUseCase listenPrefetchUseCase,
+    required ListenJobUseCase listenJobUseCase,
   }) : super(initialState) {
     addSubscription(
-      listenPrefetchUseCase.jobsStream
+      listenJobUseCase.jobsStream
           .distinct()
           .listen((jobs) => emit(state.copyWith(jobCount: jobs.length))),
     );
