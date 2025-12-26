@@ -41,8 +41,7 @@ class JobManager
   final LogBox _log;
   final GetRootPathUseCase _getRootPathUseCase;
 
-  late final StreamSubscription _jobStreamSubscription;
-  late final StreamSubscription _deleteFileSubscription;
+  final List<StreamSubscription> _subscriptions = [];
 
   JobManager({
     required LogBox log,
@@ -63,30 +62,32 @@ class JobManager
        _getChapterUseCase = getChapterUseCase,
        _getAllChapterUseCase = getAllChapterUseCase,
        _listenSearchParameterUseCase = listenSearchParameterUseCase {
-    _jobStreamSubscription = _jobs.distinct().listen(_onData);
-    /// TODO: @robzimpulse - [_deleteFileSubscription] caused error on unit test
-    _deleteFileSubscription = manager.deleteFileEvent.listen(_onDeleteFile);
+    _subscriptions.addAll([
+      _jobs.distinct().listen(_onData),
+      manager.deleteFileEvent.listen(_onDeleteFile),
+    ]);
     _jobs.addStream(jobDao.stream);
     WidgetsBinding.instance.addObserver(this);
   }
 
   Future<void> dispose() async {
     WidgetsBinding.instance.removeObserver(this);
-    await _jobStreamSubscription.cancel();
-    await _deleteFileSubscription.cancel();
+    await Future.wait(_subscriptions.map((e) => e.cancel()));
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      _log.log(
-        'Resume executing jobs',
-        extra: {'state': _jobStreamSubscription.isPaused},
-        name: runtimeType.toString(),
-      );
-      _jobStreamSubscription.resume();
-      _deleteFileSubscription.resume();
+      _log.log('Resume executing jobs', name: runtimeType.toString());
+      for (final subscription in _subscriptions) {
+        subscription.resume();
+      }
+    } else {
+      _log.log('Pause executing jobs', name: runtimeType.toString());
+      for (final subscription in _subscriptions) {
+        subscription.pause();
+      }
     }
   }
 
