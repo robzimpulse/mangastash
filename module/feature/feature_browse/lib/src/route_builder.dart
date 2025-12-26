@@ -202,6 +202,12 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         builder: (context, state) {
           return SearchMangaScreen.create(
             locator: locator,
+            onTapFilter: (param) {
+              return context.push(
+                BrowseRoutePath.searchParam,
+                extra: SearchParameterExtra(parameter: param),
+              );
+            },
             onTapManga: (manga, parameter) {
               final mangaId = manga.id;
               final source = manga.source;

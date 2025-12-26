@@ -8,7 +8,13 @@ class SearchMangaScreenCubit extends Cubit<SearchMangaScreenState>
   SearchMangaScreenCubit({
     SearchMangaScreenState initialState = const SearchMangaScreenState(),
     required ListenSourcesUseCase listenSourceUseCase,
-  }) : super(initialState) {
+    required ListenSearchParameterUseCase listenSearchParameterUseCase,
+  }) : super(
+         initialState.copyWith(
+           parameter:
+               listenSearchParameterUseCase.searchParameterState.valueOrNull,
+         ),
+       ) {
     addSubscription(
       listenSourceUseCase.sourceStateStream.distinct().listen(
         (e) => emit(state.copyWith(sources: {...e})),
@@ -16,7 +22,11 @@ class SearchMangaScreenCubit extends Cubit<SearchMangaScreenState>
     );
   }
 
-  void set({required String keyword}) {
-    emit(state.copyWith(keyword: keyword));
+  void set({String? keyword, SearchMangaParameter? parameter}) {
+    emit(
+      state.copyWith(
+        parameter: (parameter ?? state.parameter).copyWith(title: keyword),
+      ),
+    );
   }
 }
