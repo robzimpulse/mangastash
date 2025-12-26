@@ -219,6 +219,14 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
                 },
               );
             },
+            onTapMangaMenu: (isOnLibrary) {
+              return context.pushNamed(
+                CommonRoutePath.menu,
+                queryParameters: {
+                  CommonQueryParam.isOnLibrary: isOnLibrary.toString(),
+                },
+              );
+            },
           );
         },
       ),
