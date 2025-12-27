@@ -86,11 +86,6 @@ class JobManager
       for (final subscription in _subscriptions) {
         subscription.resume();
       }
-    } else {
-      _log.log('Pause executing jobs', name: runtimeType.toString());
-      for (final subscription in _subscriptions) {
-        subscription.pause();
-      }
     }
   }
 
