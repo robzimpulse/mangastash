@@ -90,7 +90,8 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     final prevChapters = response
         .splitBefore((e) => e.id == state.chapterId)
         .firstOrNull
-        ?.take(prevCount ?? 0);
+        ?.reversed
+        .take(prevCount ?? 0);
     final nextChapters = response
         .splitAfter((e) => e.id == state.chapterId)
         .lastOrNull
