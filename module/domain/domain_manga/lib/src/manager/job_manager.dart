@@ -307,7 +307,9 @@ class JobManager
   }
 
   @override
-  Stream<List<JobModel>> get jobsStream => _jobs.stream;
+  Stream<(List<JobModel>, int)> get jobsStream {
+    return _jobs.stream.map((e) => (e, _ongoingFuture.length));
+  }
 
   @override
   Stream<int?> get ongoingJobId => _ongoingJobId.stream;
