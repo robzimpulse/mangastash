@@ -10,6 +10,7 @@ import 'package:file/file.dart';
 import 'package:flutter/widgets.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:uuid/uuid.dart';
 
 import '../use_case/cancel_job_use_case.dart';
 import '../use_case/chapter/get_all_chapter_use_case.dart';
@@ -41,6 +42,7 @@ class JobManager
   final LogBox _log;
   final GetRootPathUseCase _getRootPathUseCase;
 
+  final Map<String, Future> _ongoingFuture = {};
   final List<StreamSubscription> _subscriptions = [];
 
   JobManager({
@@ -91,14 +93,16 @@ class JobManager
     }
   }
 
-  void _onDeleteFile((CacheObject object, File file) event) async {
+  void _onDeleteFile((CacheObject object, File file) event) {
     final (object, file) = event;
 
-    await _jobDao.add(
-      JobTablesCompanion.insert(
-        imageUrl: Value(object.url),
-        path: Value(file.path),
-        type: JobTypeEnum.persistentImage,
+    _ensureExecuted(
+      future: _jobDao.add(
+        JobTablesCompanion.insert(
+          imageUrl: Value(object.url),
+          path: Value(file.path),
+          type: JobTypeEnum.persistentImage,
+        ),
       ),
     );
   }
@@ -237,13 +241,20 @@ class JobManager
     await file.delete();
   }
 
+  void _ensureExecuted({required Future<void> future}) {
+    final id = Uuid().v4();
+    _ongoingFuture[id] = future.whenComplete(() => _ongoingFuture.remove(id));
+  }
+
   @override
   void prefetchChapters({required String mangaId, required SourceEnum source}) {
-    _jobDao.add(
-      JobTablesCompanion.insert(
-        type: JobTypeEnum.prefetchChapters,
-        source: Value(mangaId),
-        mangaId: Value(mangaId),
+    _ensureExecuted(
+      future: _jobDao.add(
+        JobTablesCompanion.insert(
+          type: JobTypeEnum.prefetchChapters,
+          source: Value(mangaId),
+          mangaId: Value(mangaId),
+        ),
       ),
     );
   }
@@ -254,35 +265,35 @@ class JobManager
     required String chapterId,
     required SourceEnum source,
   }) {
-    _jobDao.add(
-      JobTablesCompanion.insert(
-        type: JobTypeEnum.prefetchChapter,
-        source: Value(source.name),
-        mangaId: Value(mangaId),
-        chapterId: Value(chapterId),
+    _ensureExecuted(
+      future: _jobDao.add(
+        JobTablesCompanion.insert(
+          type: JobTypeEnum.prefetchChapter,
+          source: Value(source.name),
+          mangaId: Value(mangaId),
+          chapterId: Value(chapterId),
+        ),
       ),
     );
   }
 
   @override
   void prefetchManga({required String mangaId, required SourceEnum source}) {
-    _jobDao.add(
-      JobTablesCompanion.insert(
-        type: JobTypeEnum.prefetchManga,
-        source: Value(source.name),
-        mangaId: Value(mangaId),
+    _ensureExecuted(
+      future: _jobDao.add(
+        JobTablesCompanion.insert(
+          type: JobTypeEnum.prefetchManga,
+          source: Value(source.name),
+          mangaId: Value(mangaId),
+        ),
       ),
     );
   }
 
   @override
   void cancelJob({required int id}) {
-    if (_ongoingJobId.valueOrNull == null) {
-      _jobDao.remove(id);
-      return;
-    }
-
-    // TODO: cancel ongoing job
+    if (_ongoingJobId.valueOrNull != null) return;
+    _jobDao.remove(id);
   }
 
   @override
