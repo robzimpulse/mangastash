@@ -14,23 +14,33 @@ class SearchMangaScreen extends StatefulWidget {
     super.key,
     required this.imagesCacheManager,
     required this.widgetBuilder,
+    this.onTapFilter,
   });
 
   final ImagesCacheManager imagesCacheManager;
 
   final Widget Function(SourceEnum, SearchMangaScreenCubit) widgetBuilder;
 
+  final Future<SearchMangaParameter?>? Function(SearchMangaParameter? value)?
+  onTapFilter;
+
   static Widget create({
     required ServiceLocator locator,
     void Function(Manga, SearchMangaParameter)? onTapManga,
     Future<MangaMenu?> Function(bool)? onTapMangaMenu,
+    Future<SearchMangaParameter?>? Function(SearchMangaParameter? value)?
+    onTapFilter,
   }) {
     return BlocProvider(
       create: (context) {
-        return SearchMangaScreenCubit(listenSourceUseCase: locator());
+        return SearchMangaScreenCubit(
+          listenSourceUseCase: locator(),
+          listenSearchParameterUseCase: locator(),
+        );
       },
       child: SearchMangaScreen(
         imagesCacheManager: locator(),
+        onTapFilter: onTapFilter,
         widgetBuilder: (source, cubit) {
           return MangaGridWidget.create(
             locator: locator,
@@ -133,6 +143,25 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
                   ),
                 ],
               ),
+              actions: [
+                _builder(
+                  buildWhen: (prev, curr) => prev.parameter != curr.parameter,
+                  builder: (context, state) {
+                    return IconButton(
+                      onPressed: () async {
+                        final result = await widget.onTapFilter?.call(
+                          state.parameter,
+                        );
+
+                        if (context.mounted && result != null) {
+                          _cubit(context).set(parameter: result);
+                        }
+                      },
+                      icon: Icon(Icons.filter_list),
+                    );
+                  },
+                ),
+              ],
             ),
             body: TabBarView(
               children: [

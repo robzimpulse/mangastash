@@ -45,6 +45,8 @@ class MangaReaderScreen extends StatelessWidget {
           listenSearchParameterUseCase: locator(),
           getAllChapterUseCase: locator(),
           recrawlUseCase: locator(),
+          listenPrefetchChapterConfig: locator(),
+          prefetchChapterUseCase: locator()
         )..init();
       },
       child: MangaReaderScreen(

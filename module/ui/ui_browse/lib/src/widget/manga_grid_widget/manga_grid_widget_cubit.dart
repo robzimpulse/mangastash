@@ -34,9 +34,7 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
        _prefetchChapterUseCase = prefetchChapterUseCase,
        super(
          initialState.copyWith(
-           parameter: initialState.parameter.copyWith(
-             title: parentCubit.state.keyword,
-           ),
+           parameter: initialState.parameter.merge(parentCubit.state.parameter),
          ),
        ) {
     addSubscription(
@@ -50,17 +48,19 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
       ),
     );
     addSubscription(
-      parentCubit.stream.distinct().listen((e) => init(keyword: e.keyword)),
+      parentCubit.stream.distinct().listen((e) => init(parameter: e.parameter)),
     );
   }
 
-  Future<void> init({String? keyword, bool refresh = false}) async {
+  Future<void> init({
+    SearchMangaParameter? parameter,
+    bool refresh = false,
+  }) async {
     emit(
       state.copyWith(
         isLoading: true,
         mangas: [],
-        parameter: state.parameter.copyWith(
-          title: keyword,
+        parameter: (parameter ?? state.parameter).copyWith(
           offset: 0,
           page: 1,
           limit: 20,

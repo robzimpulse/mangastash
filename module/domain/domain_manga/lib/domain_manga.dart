@@ -23,6 +23,7 @@ export 'src/use_case/manga/search_manga_use_case.dart';
 export 'src/use_case/parameter/listen_search_parameter_use_case.dart';
 export 'src/use_case/parameter/update_search_parameter_use_case.dart';
 export 'src/use_case/prefetch/listen_job_use_case.dart';
+export 'src/use_case/prefetch/listen_prefetch_chapter_config.dart';
 export 'src/use_case/prefetch/listen_prefetch_use_case.dart';
 export 'src/use_case/prefetch/prefetch_chapter_use_case.dart';
 export 'src/use_case/prefetch/prefetch_manga_use_case.dart';

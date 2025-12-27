@@ -25,6 +25,85 @@ class MangaParameterWidget extends StatelessWidget {
 
   List<String> get excludedTags => [...?parameter.excludedTags];
 
+  Widget _buildOrders(BuildContext context) {
+    final active = parameter.orders?.entries.firstOrNull;
+
+    return ExpansionTile(
+      title: const Text('Order'),
+      subtitle:
+          active != null
+              ? Text(
+                '${active.key.label}: ${active.value.label}',
+                style: Theme.of(context).textTheme.labelMedium,
+              )
+              : null,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+          child: Row(
+            children: [
+              Text('By: ', maxLines: 1, overflow: TextOverflow.ellipsis),
+              SizedBox(width: 8),
+              Flexible(
+                child: DropdownButton<SearchOrders>(
+                  isExpanded: true,
+                  value: active?.key,
+                  items: [
+                    ...SearchOrders.values.map(
+                      (e) => DropdownMenuItem(
+                        value: e,
+                        child: Text(
+                          e.label,
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
+                      ),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    if (value == null) return;
+                    onChanged?.call(
+                      parameter.copyWith(
+                        orders: {
+                          value: active?.value ?? OrderDirections.ascending,
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+              SizedBox(width: 8),
+              Flexible(
+                child: DropdownButton<OrderDirections>(
+                  isExpanded: true,
+                  value: active?.value,
+                  items: [
+                    ...OrderDirections.values.map(
+                      (e) => DropdownMenuItem(
+                        value: e,
+                        child: Text(
+                          e.label,
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
+                      ),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    if (value == null) return;
+                    onChanged?.call(
+                      parameter.copyWith(
+                        orders: {active?.key ?? SearchOrders.relevance: value},
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildStatus(BuildContext context) {
     final active = parameter.status?.labels;
     return ExpansionTile(
@@ -359,6 +438,7 @@ class MangaParameterWidget extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        _buildOrders(context),
         _buildStatus(context),
         _buildContentRating(context),
         _buildOriginalLanguage(context),
