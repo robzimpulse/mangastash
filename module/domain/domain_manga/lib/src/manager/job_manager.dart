@@ -32,6 +32,7 @@ class JobManager
         ListenJobUseCase {
   final _jobs = BehaviorSubject<List<JobModel>>.seeded([]);
   final _ongoingJobId = BehaviorSubject<int?>.seeded(null);
+  final _upcomingJob = BehaviorSubject<int>.seeded(0);
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
   final ValueGetter<GetAllChapterUseCase> _getAllChapterUseCase;
@@ -243,7 +244,11 @@ class JobManager
 
   void _ensureExecuted({required Future<void> future}) {
     final id = Uuid().v4();
-    _ongoingFuture[id] = future.whenComplete(() => _ongoingFuture.remove(id));
+    _upcomingJob.add((_upcomingJob.valueOrNull ?? 0) + 1);
+    _ongoingFuture[id] = future.whenComplete(() {
+      _upcomingJob.add((_upcomingJob.valueOrNull ?? 1) - 1);
+      _ongoingFuture.remove(id);
+    });
   }
 
   @override
@@ -307,9 +312,10 @@ class JobManager
   }
 
   @override
-  Stream<(List<JobModel>, int)> get jobsStream {
-    return _jobs.stream.map((e) => (e, _ongoingFuture.length));
-  }
+  Stream<List<JobModel>> get jobsStream => _jobs.stream;
+
+  @override
+  Stream<int> get upcomingJobLength => _upcomingJob.stream;
 
   @override
   Stream<int?> get ongoingJobId => _ongoingJobId.stream;

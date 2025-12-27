@@ -34,6 +34,7 @@ class GlobalOptionsManager
           .let(SearchMangaParameter.fromJsonString)
           .or(
             const SearchMangaParameter(
+              orders: {SearchOrders.createdAt: OrderDirections.descending},
               availableTranslatedLanguage: [LanguageCodes.english],
             ),
           ),
