@@ -4,7 +4,7 @@ import 'package:file/file.dart';
 import 'package:flutter/foundation.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
-import 'package:ui_common/ui_common.dart' hide Error;
+import 'package:ui_common/ui_common.dart';
 
 import 'data_storage_screen_cubit.dart';
 import 'data_storage_screen_state.dart';
