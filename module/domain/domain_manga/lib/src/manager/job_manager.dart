@@ -127,6 +127,7 @@ class JobManager
         'Failed execute job ${job.id} - ${job.type}',
         error: error,
         stackTrace: stackTrace,
+        extra: job.toExtra(),
         name: runtimeType.toString(),
       );
     } finally {
@@ -134,6 +135,7 @@ class JobManager
       _ongoingJobId.add(null);
       _log.log(
         'Success execute job ${job.id} - ${job.type}',
+        extra: job.toExtra(),
         name: runtimeType.toString(),
       );
     }
