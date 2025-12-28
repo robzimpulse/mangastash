@@ -8,11 +8,6 @@ class ConverterCacheManager extends CustomCacheManager {
     : super(Config('converter', fileService: fileService));
 }
 
-class TagCacheManager extends CustomCacheManager {
-  TagCacheManager({required CustomFileService fileService})
-    : super(Config('tag', fileService: fileService));
-}
-
 class HtmlCacheManager extends CustomCacheManager {
   HtmlCacheManager({required CustomFileService fileService})
     : super(Config('html', fileService: fileService));

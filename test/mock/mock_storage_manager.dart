@@ -13,12 +13,6 @@ class MockConverterCacheManager extends Mock implements ConverterCacheManager {
   }
 }
 
-class MockTagCacheManager extends Mock implements TagCacheManager {
-  MockTagCacheManager() {
-    when(() => deleteFileEvent).thenAnswer((_) => Stream.empty());
-  }
-}
-
 class MockHtmlCacheManager extends Mock implements HtmlCacheManager {
   MockHtmlCacheManager() {
     when(() => deleteFileEvent).thenAnswer((_) => Stream.empty());
