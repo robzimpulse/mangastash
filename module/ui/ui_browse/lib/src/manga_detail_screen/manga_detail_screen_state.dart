@@ -29,12 +29,12 @@ class MangaDetailScreenState extends Equatable {
   final String? sourceUrlSimilarManga;
   final SearchMangaParameter? similarMangaParameter;
 
-  final Set<String> libraryMangaId;
-  final Set<String> prefetchedChapterId;
-  final Set<String> prefetchedMangaId;
+  final Set<String> libraryMangaIds;
+  final Set<String> prefetchedChapterIds;
+  final Set<String> prefetchedMangaIds;
   final Map<String, Chapter> histories;
 
-  bool get isOnLibrary => libraryMangaId.contains(mangaId);
+  bool get isOnLibrary => libraryMangaIds.contains(mangaId);
 
   List<Chapter> get filtered {
     return [
@@ -68,9 +68,9 @@ class MangaDetailScreenState extends Equatable {
     this.chapters = const [],
     this.source,
     this.config = const ChapterConfig(),
-    this.libraryMangaId = const {},
-    this.prefetchedChapterId = const {},
-    this.prefetchedMangaId = const {},
+    this.libraryMangaIds = const {},
+    this.prefetchedChapterIds = const {},
+    this.prefetchedMangaIds = const {},
     this.chapterParameter = const SearchChapterParameter(),
     this.hasNextPageChapter = false,
     this.isPagingNextPageChapter = false,
@@ -96,13 +96,13 @@ class MangaDetailScreenState extends Equatable {
     chapters,
     source,
     config,
-    libraryMangaId,
+    libraryMangaIds,
     chapterParameter,
     hasNextPageChapter,
     isPagingNextPageChapter,
     sourceUrlChapter,
-    prefetchedChapterId,
-    prefetchedMangaId,
+    prefetchedChapterIds,
+    prefetchedMangaIds,
     histories,
     totalChapter,
     errorSimilarManga,
@@ -125,9 +125,9 @@ class MangaDetailScreenState extends Equatable {
     String? sourceId,
     SourceEnum? source,
     ChapterConfig? config,
-    Set<String>? libraryMangaId,
-    Set<String>? prefetchedChapterId,
-    Set<String>? prefetchedMangaId,
+    Set<String>? libraryMangaIds,
+    Set<String>? prefetchedChapterIds,
+    Set<String>? prefetchedMangaIds,
     SearchChapterParameter? chapterParameter,
     bool? hasNextPageChapter,
     bool? isPagingNextPageChapter,
@@ -153,15 +153,15 @@ class MangaDetailScreenState extends Equatable {
       manga: manga ?? this.manga,
       chapters: chapters ?? this.chapters,
       source: source ?? this.source,
-      libraryMangaId: libraryMangaId ?? this.libraryMangaId,
+      libraryMangaIds: libraryMangaIds ?? this.libraryMangaIds,
       chapterParameter: chapterParameter ?? this.chapterParameter,
       hasNextPageChapter: hasNextPageChapter ?? this.hasNextPageChapter,
       isPagingNextPageChapter:
           isPagingNextPageChapter ?? this.isPagingNextPageChapter,
       sourceUrlChapter:
           sourceUrlChapter != null ? sourceUrlChapter() : this.sourceUrlChapter,
-      prefetchedChapterId: prefetchedChapterId ?? this.prefetchedChapterId,
-      prefetchedMangaId: prefetchedMangaId ?? this.prefetchedMangaId,
+      prefetchedChapterIds: prefetchedChapterIds ?? this.prefetchedChapterIds,
+      prefetchedMangaIds: prefetchedMangaIds ?? this.prefetchedMangaIds,
       histories: histories ?? this.histories,
       totalChapter: totalChapter ?? this.totalChapter,
       errorSimilarManga:

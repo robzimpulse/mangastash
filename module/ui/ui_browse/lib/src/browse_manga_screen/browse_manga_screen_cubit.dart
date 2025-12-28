@@ -149,6 +149,18 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
           error: () => null,
         ),
       );
+
+      final mangasInLibrary = mangas.where(
+        (e) => state.libraryMangaIds.contains(e.id),
+      );
+      for (final manga in mangasInLibrary) {
+        final mangaId = manga.id;
+        if (mangaId == null) continue;
+        _prefetchChapterUseCase.prefetchChapters(
+          mangaId: mangaId,
+          source: source,
+        );
+      }
     }
 
     if (result is Error<Pagination<Manga>>) {

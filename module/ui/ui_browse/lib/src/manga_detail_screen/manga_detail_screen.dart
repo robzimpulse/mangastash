@@ -462,7 +462,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               prev.filtered != curr.filtered,
               prev.totalChapter != curr.totalChapter,
               prev.hasNextPageChapter != curr.hasNextPageChapter,
-              prev.prefetchedChapterId != curr.prefetchedChapterId,
+              prev.prefetchedChapterIds != curr.prefetchedChapterIds,
               prev.config != curr.config,
             ].contains(true);
           },
@@ -480,7 +480,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   language: Language.fromCode(data.translatedLanguage),
                   uploadedAt: data.readableAt,
                   groups: data.scanlationGroup,
-                  isPrefetching: state.prefetchedChapterId.contains(data.id),
+                  isPrefetching: state.prefetchedChapterIds.contains(data.id),
                   lastReadAt: data.lastReadAt,
                 );
               },
@@ -534,8 +534,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               prev.errorSimilarManga != curr.errorSimilarManga,
               prev.isLoadingSimilarManga != curr.isLoadingSimilarManga,
               prev.hasNextPageSimilarManga != curr.hasNextPageSimilarManga,
-              prev.prefetchedMangaId != curr.prefetchedMangaId,
-              prev.libraryMangaId != curr.libraryMangaId,
+              prev.prefetchedMangaIds != curr.prefetchedMangaIds,
+              prev.libraryMangaIds != curr.libraryMangaIds,
             ].contains(true);
           },
           builder: (context, state) {
@@ -549,11 +549,11 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                     _onLongPressManga(
                       context: context,
                       manga: data,
-                      isOnLibrary: state.libraryMangaId.contains(data.id),
+                      isOnLibrary: state.libraryMangaIds.contains(data.id),
                     );
                   },
-                  isOnLibrary: state.libraryMangaId.contains(data.id),
-                  isPrefetching: state.prefetchedMangaId.contains(data.id),
+                  isOnLibrary: state.libraryMangaIds.contains(data.id),
+                  isPrefetching: state.prefetchedMangaIds.contains(data.id),
                 );
               },
               pageStorageKey: PageStorageKey('similar-manga-${state.mangaId}'),
