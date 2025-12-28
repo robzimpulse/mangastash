@@ -19,18 +19,6 @@ class MockTagCacheManager extends Mock implements TagCacheManager {
   }
 }
 
-class MockMangaCacheManager extends Mock implements MangaCacheManager {
-  MockMangaCacheManager() {
-    when(() => deleteFileEvent).thenAnswer((_) => Stream.empty());
-  }
-}
-
-class MockChapterCacheManager extends Mock implements ChapterCacheManager {
-  MockChapterCacheManager() {
-    when(() => deleteFileEvent).thenAnswer((_) => Stream.empty());
-  }
-}
-
 class MockHtmlCacheManager extends Mock implements HtmlCacheManager {
   MockHtmlCacheManager() {
     when(() => deleteFileEvent).thenAnswer((_) => Stream.empty());

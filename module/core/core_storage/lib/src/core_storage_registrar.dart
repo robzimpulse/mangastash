@@ -67,14 +67,6 @@ class CoreStorageRegistrar extends Registrar {
       dispose: (e) => e.dispose(),
     );
     locator.registerLazySingleton(
-      () => MangaCacheManager(fileService: locator()),
-      dispose: (e) => e.dispose(),
-    );
-    locator.registerLazySingleton(
-      () => ChapterCacheManager(fileService: locator()),
-      dispose: (e) => e.dispose(),
-    );
-    locator.registerLazySingleton(
       () => HtmlCacheManager(fileService: locator()),
       dispose: (e) => e.dispose(),
     );

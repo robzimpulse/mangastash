@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
@@ -12,7 +10,6 @@ import '../../parser/base/manga_detail_html_parser.dart';
 class GetMangaUseCase with SyncMangasMixin {
   final HeadlessWebviewUseCase _webview;
   final ConverterCacheManager _converterCacheManager;
-  final MangaCacheManager _mangaCacheManager;
   final MangaService _mangaService;
   final MangaDao _mangaDao;
   final LogBox _logBox;
@@ -20,12 +17,10 @@ class GetMangaUseCase with SyncMangasMixin {
   GetMangaUseCase({
     required HeadlessWebviewUseCase webview,
     required ConverterCacheManager converterCacheManager,
-    required MangaCacheManager mangaCacheManager,
     required MangaService mangaService,
     required MangaDao mangaDao,
     required LogBox logBox,
   }) : _converterCacheManager = converterCacheManager,
-       _mangaCacheManager = mangaCacheManager,
        _mangaService = mangaService,
        _mangaDao = mangaDao,
        _logBox = logBox,
@@ -97,17 +92,13 @@ class GetMangaUseCase with SyncMangasMixin {
     required String mangaId,
     bool useCache = true,
   }) async {
-    final key = '$source-$mangaId';
-    final file = await _mangaCacheManager.getFileFromCache(key);
-    final data = await file?.file.readAsString(encoding: utf8);
-    final cache = Manga.fromJsonString(data ?? '');
-    if (cache != null && useCache) return Success(cache);
-
     try {
       final raw = await _mangaDao.search(ids: [mangaId]);
       final manga = Manga.fromDatabase(raw.firstOrNull);
 
-      if (manga != null && manga.propertiesFilled) return Success(manga);
+      if (manga != null && manga.propertiesFilled && useCache) {
+        return Success(manga);
+      }
 
       final Manga data;
       if (source == SourceEnum.mangadex) {
@@ -131,12 +122,6 @@ class GetMangaUseCase with SyncMangasMixin {
       if (result == null) {
         throw DataNotFoundException();
       }
-
-      await _mangaCacheManager.putFile(
-        key,
-        utf8.encode(result.toJsonString()),
-        key: key,
-      );
 
       return Success(result);
     } catch (e) {
