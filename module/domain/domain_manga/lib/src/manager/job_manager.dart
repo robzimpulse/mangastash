@@ -241,8 +241,8 @@ class JobManager
     final id = Uuid().v4();
     _upcomingJob.add(_ongoingFuture.length);
     _ongoingFuture[id] = future.whenComplete(() {
-      _upcomingJob.add(_ongoingFuture.length);
       _ongoingFuture.remove(id);
+      _upcomingJob.add(_ongoingFuture.length);
     });
   }
 
