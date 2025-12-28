@@ -82,23 +82,24 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
       ),
     );
 
+    final currentIndex = response.indexWhere((e) => e.id == state.chapterId);
+    if (currentIndex < 0) return;
+
     final prevCount =
         _listenPrefetchChapterConfig.numOfPrefetchedPrevChapter.valueOrNull;
+
     final nextCount =
         _listenPrefetchChapterConfig.numOfPrefetchedNextChapter.valueOrNull;
 
-    final prevChapters = response
-        .splitBefore((e) => e.id == state.chapterId)
-        .firstOrNull
-        ?.reversed
-        .take(prevCount ?? 0);
-    final nextChapters = response
-        .splitAfter((e) => e.id == state.chapterId)
-        .lastOrNull
-        ?.take(nextCount ?? 0);
+    final indexes = [
+      if (prevCount != null && prevCount > 0)
+        ...List.generate(prevCount, (index) => currentIndex - index - 1),
+      if (nextCount != null && nextCount > 0)
+        ...List.generate(nextCount, (index) => currentIndex + index + 1),
+    ].where((e) => e > 0 && e < response.length);
 
-    for (final chapter in [...?prevChapters, ...?nextChapters]) {
-      final chapterId = chapter.id;
+    for (final index in indexes) {
+      final chapterId = response.elementAtOrNull(index)?.id;
       if (chapterId == null) continue;
       _prefetchChapterUseCase.prefetchChapter(
         mangaId: mangaId,
