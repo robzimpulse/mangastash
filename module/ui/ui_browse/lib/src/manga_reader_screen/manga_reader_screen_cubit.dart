@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
@@ -13,6 +14,8 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
   final GetAllChapterUseCase _getAllChapterUseCase;
   final UpdateChapterLastReadAtUseCase _updateChapterLastReadAtUseCase;
   final RecrawlUseCase _recrawlUseCase;
+  final ListenPrefetchChapterConfig _listenPrefetchChapterConfig;
+  final PrefetchChapterUseCase _prefetchChapterUseCase;
 
   MangaReaderScreenCubit({
     required GetChapterUseCase getChapterUseCase,
@@ -21,10 +24,14 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required GetAllChapterUseCase getAllChapterUseCase,
     required RecrawlUseCase recrawlUseCase,
+    required ListenPrefetchChapterConfig listenPrefetchChapterConfig,
+    required PrefetchChapterUseCase prefetchChapterUseCase,
   }) : _getChapterUseCase = getChapterUseCase,
        _getAllChapterUseCase = getAllChapterUseCase,
        _updateChapterLastReadAtUseCase = updateChapterLastReadAtUseCase,
        _recrawlUseCase = recrawlUseCase,
+       _listenPrefetchChapterConfig = listenPrefetchChapterConfig,
+       _prefetchChapterUseCase = prefetchChapterUseCase,
        super(
          initialState.copyWith(
            parameter: listenSearchParameterUseCase
@@ -74,6 +81,32 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
         isLoadingChapterIds: false,
       ),
     );
+
+    final currentIndex = response.indexWhere((e) => e.id == state.chapterId);
+    if (currentIndex < 0) return;
+
+    final prevCount =
+        _listenPrefetchChapterConfig.numOfPrefetchedPrevChapter.valueOrNull;
+
+    final nextCount =
+        _listenPrefetchChapterConfig.numOfPrefetchedNextChapter.valueOrNull;
+
+    final indexes = [
+      if (prevCount != null && prevCount > 0)
+        ...List.generate(prevCount, (index) => currentIndex - index - 1),
+      if (nextCount != null && nextCount > 0)
+        ...List.generate(nextCount, (index) => currentIndex + index + 1),
+    ].where((e) => e > 0 && e < response.length);
+
+    for (final index in indexes) {
+      final chapterId = response.elementAtOrNull(index)?.id;
+      if (chapterId == null) continue;
+      _prefetchChapterUseCase.prefetchChapter(
+        mangaId: mangaId,
+        chapterId: chapterId,
+        source: source,
+      );
+    }
   }
 
   Future<void> _fetchChapter({bool useCache = true}) async {

@@ -10,6 +10,7 @@ import 'package:file/file.dart';
 import 'package:flutter/widgets.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:uuid/uuid.dart';
 
 import '../use_case/cancel_job_use_case.dart';
 import '../use_case/chapter/get_all_chapter_use_case.dart';
@@ -31,6 +32,7 @@ class JobManager
         ListenJobUseCase {
   final _jobs = BehaviorSubject<List<JobModel>>.seeded([]);
   final _ongoingJobId = BehaviorSubject<int?>.seeded(null);
+  final _upcomingJob = BehaviorSubject<int>.seeded(0);
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
   final ValueGetter<GetAllChapterUseCase> _getAllChapterUseCase;
@@ -41,8 +43,8 @@ class JobManager
   final LogBox _log;
   final GetRootPathUseCase _getRootPathUseCase;
 
-  late final StreamSubscription _jobStreamSubscription;
-  late final StreamSubscription _deleteFileSubscription;
+  final Map<String, Future> _ongoingFuture = {};
+  final List<StreamSubscription> _subscriptions = [];
 
   JobManager({
     required LogBox log,
@@ -63,41 +65,40 @@ class JobManager
        _getChapterUseCase = getChapterUseCase,
        _getAllChapterUseCase = getAllChapterUseCase,
        _listenSearchParameterUseCase = listenSearchParameterUseCase {
-    _jobStreamSubscription = _jobs.distinct().listen(_onData);
-    /// TODO: @robzimpulse - [_deleteFileSubscription] caused error on unit test
-    _deleteFileSubscription = manager.deleteFileEvent.listen(_onDeleteFile);
+    _subscriptions.addAll([
+      _jobs.distinct().listen(_onData),
+      manager.deleteFileEvent.listen(_onDeleteFile),
+    ]);
     _jobs.addStream(jobDao.stream);
     WidgetsBinding.instance.addObserver(this);
   }
 
   Future<void> dispose() async {
     WidgetsBinding.instance.removeObserver(this);
-    await _jobStreamSubscription.cancel();
-    await _deleteFileSubscription.cancel();
+    await Future.wait(_subscriptions.map((e) => e.cancel()));
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      _log.log(
-        'Resume executing jobs',
-        extra: {'state': _jobStreamSubscription.isPaused},
-        name: runtimeType.toString(),
-      );
-      _jobStreamSubscription.resume();
-      _deleteFileSubscription.resume();
+      _log.log('Resume executing jobs', name: runtimeType.toString());
+      for (final subscription in _subscriptions) {
+        subscription.resume();
+      }
     }
   }
 
-  void _onDeleteFile((CacheObject object, File file) event) async {
+  void _onDeleteFile((CacheObject object, File file) event) {
     final (object, file) = event;
 
-    await _jobDao.add(
-      JobTablesCompanion.insert(
-        imageUrl: Value(object.url),
-        path: Value(file.path),
-        type: JobTypeEnum.persistentImage,
+    _ensureExecuted(
+      future: _jobDao.add(
+        JobTablesCompanion.insert(
+          imageUrl: Value(object.url),
+          path: Value(file.path),
+          type: JobTypeEnum.persistentImage,
+        ),
       ),
     );
   }
@@ -236,13 +237,24 @@ class JobManager
     await file.delete();
   }
 
+  void _ensureExecuted({required Future<void> future}) {
+    final id = Uuid().v4();
+    _upcomingJob.add(_ongoingFuture.length);
+    _ongoingFuture[id] = future.whenComplete(() {
+      _ongoingFuture.remove(id);
+      _upcomingJob.add(_ongoingFuture.length);
+    });
+  }
+
   @override
   void prefetchChapters({required String mangaId, required SourceEnum source}) {
-    _jobDao.add(
-      JobTablesCompanion.insert(
-        type: JobTypeEnum.prefetchChapters,
-        source: Value(mangaId),
-        mangaId: Value(mangaId),
+    _ensureExecuted(
+      future: _jobDao.add(
+        JobTablesCompanion.insert(
+          type: JobTypeEnum.prefetchChapters,
+          source: Value(mangaId),
+          mangaId: Value(mangaId),
+        ),
       ),
     );
   }
@@ -253,35 +265,35 @@ class JobManager
     required String chapterId,
     required SourceEnum source,
   }) {
-    _jobDao.add(
-      JobTablesCompanion.insert(
-        type: JobTypeEnum.prefetchChapter,
-        source: Value(source.name),
-        mangaId: Value(mangaId),
-        chapterId: Value(chapterId),
+    _ensureExecuted(
+      future: _jobDao.add(
+        JobTablesCompanion.insert(
+          type: JobTypeEnum.prefetchChapter,
+          source: Value(source.name),
+          mangaId: Value(mangaId),
+          chapterId: Value(chapterId),
+        ),
       ),
     );
   }
 
   @override
   void prefetchManga({required String mangaId, required SourceEnum source}) {
-    _jobDao.add(
-      JobTablesCompanion.insert(
-        type: JobTypeEnum.prefetchManga,
-        source: Value(source.name),
-        mangaId: Value(mangaId),
+    _ensureExecuted(
+      future: _jobDao.add(
+        JobTablesCompanion.insert(
+          type: JobTypeEnum.prefetchManga,
+          source: Value(source.name),
+          mangaId: Value(mangaId),
+        ),
       ),
     );
   }
 
   @override
   void cancelJob({required int id}) {
-    if (_ongoingJobId.valueOrNull == null) {
-      _jobDao.remove(id);
-      return;
-    }
-
-    // TODO: cancel ongoing job
+    if (_ongoingJobId.valueOrNull != null) return;
+    _jobDao.remove(id);
   }
 
   @override
@@ -296,6 +308,9 @@ class JobManager
 
   @override
   Stream<List<JobModel>> get jobsStream => _jobs.stream;
+
+  @override
+  Stream<int> get upcomingJobLength => _upcomingJob.stream;
 
   @override
   Stream<int?> get ongoingJobId => _ongoingJobId.stream;

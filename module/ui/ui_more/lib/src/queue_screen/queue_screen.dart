@@ -4,7 +4,6 @@ import 'package:domain_manga/domain_manga.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:ui_common/ui_common.dart';
 
-
 class QueueScreen extends StatelessWidget {
   const QueueScreen({
     super.key,
@@ -43,7 +42,23 @@ class QueueScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      appBar: AppBar(title: const Text('Queues')),
+      appBar: AppBar(
+        title: const Text('Queues'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: StreamBuilder(
+              stream: listenJobUseCase.upcomingJobLength,
+              builder: (context, snapshot) {
+                return IconWithTextWidget(
+                  icon: Icon(Icons.pending_actions, size: 16),
+                  text: Text('${snapshot.data ?? 0}'),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
       body: StreamBuilder(
         stream: CombineLatestStream.combine2(
           listenJobUseCase.jobsStream,

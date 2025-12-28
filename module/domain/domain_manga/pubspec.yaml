@@ -15,6 +15,7 @@ dependencies:
   html: ^0.15.5
   universal_io: ^2.2.2
   file: ^7.0.0
+  uuid: ^4.5.1
 
   # core
   core_analytics:

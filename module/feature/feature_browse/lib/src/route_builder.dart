@@ -202,6 +202,12 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         builder: (context, state) {
           return SearchMangaScreen.create(
             locator: locator,
+            onTapFilter: (param) {
+              return context.push(
+                BrowseRoutePath.searchParam,
+                extra: SearchParameterExtra(parameter: param),
+              );
+            },
             onTapManga: (manga, parameter) {
               final mangaId = manga.id;
               final source = manga.source;
@@ -210,6 +216,14 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
                 pathParameters: {
                   if (source != null) BrowsePathParam.source: source,
                   if (mangaId != null) BrowsePathParam.mangaId: mangaId,
+                },
+              );
+            },
+            onTapMangaMenu: (isOnLibrary) {
+              return context.pushNamed(
+                CommonRoutePath.menu,
+                queryParameters: {
+                  CommonQueryParam.isOnLibrary: isOnLibrary.toString(),
                 },
               );
             },
