@@ -43,6 +43,16 @@ scripts:
     packageFilters:
       dependsOn: "build_runner"
 
+  generate:migration:
+    description: Generate migration files for drift packages.
+    run: flutter pub run drift_dev make-migrations
+    exec:
+      concurrency: 5
+      failFast: true
+      orderDependents: true
+    packageFilters:
+      dependsOn: "drift_dev"
+
   upgrade:
     description: Upgrade dependencies for all packages.
     run: flutter pub upgrade

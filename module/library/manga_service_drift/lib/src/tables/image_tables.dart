@@ -16,9 +16,9 @@ class ImageTables extends Table with AutoTimestampTable, AutoTextIdTable {
 
   @override
   List<Set<Column<Object>>>? get uniqueKeys => [
-        {chapterId, webUrl, order},
-        {chapterId, webUrl},
-        {webUrl, order},
-        {chapterId, order},
-      ];
+    {chapterId, webUrl, order},
+    {chapterId, webUrl},
+    {webUrl, order},
+    {chapterId, order},
+  ];
 }

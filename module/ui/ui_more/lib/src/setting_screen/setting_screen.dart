@@ -11,7 +11,6 @@ class SettingScreen extends StatelessWidget {
   final VoidCallback? onTapGeneralMenu;
   final VoidCallback? onTapLibraryMenu;
   final VoidCallback? onTapReaderMenu;
-  final VoidCallback? onTapDownloadMenu;
   final VoidCallback? onTapTrackingMenu;
   final VoidCallback? onTapBrowseMenu;
   final VoidCallback? onTapDataStorageMenu;
@@ -25,7 +24,6 @@ class SettingScreen extends StatelessWidget {
     this.onTapGeneralMenu,
     this.onTapLibraryMenu,
     this.onTapReaderMenu,
-    this.onTapDownloadMenu,
     this.onTapTrackingMenu,
     this.onTapBrowseMenu,
     this.onTapDataStorageMenu,
@@ -40,7 +38,6 @@ class SettingScreen extends StatelessWidget {
     VoidCallback? onTapGeneralMenu,
     VoidCallback? onTapLibraryMenu,
     VoidCallback? onTapReaderMenu,
-    VoidCallback? onTapDownloadMenu,
     VoidCallback? onTapTrackingMenu,
     VoidCallback? onTapBrowseMenu,
     VoidCallback? onTapDataStorageMenu,
@@ -55,7 +52,6 @@ class SettingScreen extends StatelessWidget {
         onTapGeneralMenu: onTapGeneralMenu,
         onTapLibraryMenu: onTapLibraryMenu,
         onTapReaderMenu: onTapReaderMenu,
-        onTapDownloadMenu: onTapDownloadMenu,
         onTapTrackingMenu: onTapTrackingMenu,
         onTapBrowseMenu: onTapBrowseMenu,
         onTapDataStorageMenu: onTapDataStorageMenu,
@@ -94,12 +90,6 @@ class SettingScreen extends StatelessWidget {
             title: const Text('Reader'),
             subtitle: const Text('Reading Mode, Display, Navigation'),
             onTap: () => onTapReaderMenu?.call(),
-          ),
-          ListTile(
-            leading: const Icon(Icons.download_outlined),
-            title: const Text('Downloads'),
-            subtitle: const Text('Automatic Download, Download Ahead'),
-            onTap: () => onTapDownloadMenu?.call(),
           ),
           ListTile(
             leading: const Icon(Icons.autorenew_outlined),

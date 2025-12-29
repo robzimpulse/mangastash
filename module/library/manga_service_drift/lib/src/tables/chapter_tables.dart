@@ -33,10 +33,10 @@ class ChapterTables extends Table with AutoTimestampTable, AutoTextIdTable {
 
   @override
   List<Set<Column<Object>>>? get uniqueKeys => [
-        {mangaId, webUrl, title},
-        {mangaId, title},
-        {mangaId, webUrl},
-        {webUrl, title},
-        {webUrl},
-      ];
+    {mangaId, webUrl, title},
+    {mangaId, title},
+    {mangaId, webUrl},
+    {webUrl, title},
+    {webUrl},
+  ];
 }

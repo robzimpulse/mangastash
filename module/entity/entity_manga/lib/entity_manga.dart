@@ -7,6 +7,7 @@ export 'src/enum/chapter_sort_option_enum.dart';
 export 'src/enum/chapter_sort_order_enum.dart';
 export 'src/enum/download_option.dart';
 export 'src/enum/emoji_ascii_enum.dart';
+export 'src/enum/image_menu_enum.dart';
 export 'src/enum/manga_menu_enum.dart';
 export 'src/enum/source_enum.dart';
 export 'src/extension/source_search_manga_parameter_extension.dart';

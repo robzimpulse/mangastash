@@ -31,6 +31,7 @@ class MangaGridWidget extends StatefulWidget {
           prefetchChapterUseCase: locator(),
           prefetchMangaUseCase: locator(),
           removeFromLibraryUseCase: locator(),
+          addToLibraryUseCase: locator(),
         )..init();
       },
       child: MangaGridWidget._(
@@ -85,7 +86,7 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
       case MangaMenu.download:
         _cubit(context).download(manga: manga);
       case MangaMenu.library:
-        _cubit(context).remove(manga: manga);
+        _cubit(context).addToLibrary(manga: manga);
       case MangaMenu.prefetch:
         _cubit(context).prefetch(mangas: [manga]);
     }

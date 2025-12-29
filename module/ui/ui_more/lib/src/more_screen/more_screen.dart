@@ -10,7 +10,7 @@ class MoreScreen extends StatelessWidget {
   final VoidCallback? onTapSetting;
   final VoidCallback? onTapStatistic;
   final VoidCallback? onTapDataStorage;
-  final VoidCallback? onTapDownloadQueue;
+  final VoidCallback? onTapQueue;
   final VoidCallback? onTapAbout;
   final VoidCallback? onTapHelp;
 
@@ -19,7 +19,7 @@ class MoreScreen extends StatelessWidget {
     this.onTapSetting,
     this.onTapStatistic,
     this.onTapDataStorage,
-    this.onTapDownloadQueue,
+    this.onTapQueue,
     this.onTapAbout,
     this.onTapHelp,
   });
@@ -29,19 +29,17 @@ class MoreScreen extends StatelessWidget {
     VoidCallback? onTapSetting,
     VoidCallback? onTapStatistic,
     VoidCallback? onTapDataStorage,
-    VoidCallback? onTapDownloadQueue,
+    VoidCallback? onTapQueue,
     VoidCallback? onTapAbout,
     VoidCallback? onTapHelp,
   }) {
     return BlocProvider(
-      create: (context) => MoreScreenCubit(
-        listenJobUseCase: locator(),
-      ),
+      create: (context) => MoreScreenCubit(listenJobUseCase: locator()),
       child: MoreScreen(
         onTapSetting: onTapSetting,
         onTapStatistic: onTapStatistic,
         onTapDataStorage: onTapDataStorage,
-        onTapDownloadQueue: onTapDownloadQueue,
+        onTapQueue: onTapQueue,
         onTapAbout: onTapAbout,
       ),
     );
@@ -74,13 +72,15 @@ class MoreScreen extends StatelessWidget {
                   ),
                   FutureBuilder(
                     future: PackageInfo.fromPlatform(),
-                    builder: (context, snapshot) => Text(
-                      [
-                        snapshot.data?.version,
-                        '(${snapshot.data?.buildNumber})',
-                      ].join(' '),
-                      textAlign: TextAlign.center,
-                    ),
+                    builder: (context, snapshot) {
+                      return Text(
+                        [
+                          snapshot.data?.version,
+                          '(${snapshot.data?.buildNumber})',
+                        ].join(' '),
+                        textAlign: TextAlign.center,
+                      );
+                    },
                   ),
                 ],
               ),
@@ -96,9 +96,11 @@ class MoreScreen extends StatelessWidget {
                   subtitle: const Text('Filters all entries in your library'),
                   value: true,
                   // TODO: implement this
-                  onChanged: (value) => context.showSnackBar(
-                    message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-                  ),
+                  onChanged: (value) {
+                    context.showSnackBar(
+                      message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+                    );
+                  },
                   secondary: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.cloud_off),
@@ -109,9 +111,11 @@ class MoreScreen extends StatelessWidget {
                   subtitle: const Text('Pause reading history'),
                   value: true,
                   // TODO: implement this
-                  onChanged: (value) => context.showSnackBar(
-                    message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-                  ),
+                  onChanged: (value) {
+                    context.showSnackBar(
+                      message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+                    );
+                  },
                   secondary: const SizedBox(
                     height: double.infinity,
                     child: Icon(Icons.disabled_visible),
@@ -120,15 +124,17 @@ class MoreScreen extends StatelessWidget {
                 const Divider(height: 1, thickness: 1),
                 _builder(
                   buildWhen: (prev, curr) => prev.jobCount != curr.jobCount,
-                  builder: (context, state) => ListTile(
-                    title: const Text('Job Queue'),
-                    subtitle: Text('${state.jobCount} remaining'),
-                    onTap: onTapDownloadQueue,
-                    leading: const SizedBox(
-                      height: double.infinity,
-                      child: Icon(Icons.download),
-                    ),
-                  ),
+                  builder: (context, state) {
+                    return ListTile(
+                      title: const Text('Job Queue'),
+                      subtitle: Text('${state.jobCount} remaining'),
+                      onTap: onTapQueue,
+                      leading: const SizedBox(
+                        height: double.infinity,
+                        child: Icon(Icons.download),
+                      ),
+                    );
+                  },
                 ),
                 ListTile(
                   title: const Text('Statistic'),

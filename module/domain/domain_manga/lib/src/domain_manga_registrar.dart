@@ -10,9 +10,9 @@ import 'use_case/cancel_job_use_case.dart';
 import 'use_case/chapter/get_all_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
+import 'use_case/chapter/update_chapter_use_case.dart';
 import 'use_case/history/listen_read_history_use_case.dart';
 import 'use_case/history/listen_unread_history_use_case.dart';
-import 'use_case/history/update_chapter_last_read_at_use_case.dart';
 import 'use_case/library/add_to_library_use_case.dart';
 import 'use_case/library/get_manga_from_library_use_case.dart';
 import 'use_case/library/listen_manga_from_library_use_case.dart';
@@ -125,7 +125,6 @@ class DomainMangaRegistrar extends Registrar {
         mangaDao: locator(),
         mangaService: locator(),
         converterCacheManager: locator(),
-        mangaCacheManager: locator(),
       ),
     );
     locator.registerFactory(
@@ -134,7 +133,6 @@ class DomainMangaRegistrar extends Registrar {
         mangaDao: locator(),
         logBox: locator(),
         converterCacheManager: locator(),
-        mangaCacheManager: locator(),
       ),
     );
     locator.registerFactory(
@@ -145,7 +143,6 @@ class DomainMangaRegistrar extends Registrar {
         atHomeRepository: locator(),
         chapterRepository: locator(),
         converterCacheManager: locator(),
-        chapterCacheManager: locator(),
       ),
     );
     locator.registerFactory(() => AddToLibraryUseCase(libraryDao: locator()));
@@ -153,7 +150,7 @@ class DomainMangaRegistrar extends Registrar {
       () => RemoveFromLibraryUseCase(libraryDao: locator()),
     );
     locator.registerFactory(
-      () => UpdateChapterLastReadAtUseCase(
+      () => UpdateChapterUseCase(
         chapterDao: locator(),
         logBox: locator(),
       ),
@@ -164,7 +161,6 @@ class DomainMangaRegistrar extends Registrar {
         tagDao: locator(),
         logBox: locator(),
         mangaService: locator(),
-        tagCacheManager: locator(),
         converterCacheManager: locator(),
       ),
     );

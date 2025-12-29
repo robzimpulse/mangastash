@@ -13,7 +13,7 @@ class TagTables extends Table with AutoTimestampTable, AutoIntegerIdTable {
 
   @override
   List<Set<Column<Object>>>? get uniqueKeys => [
-        {tagId, name},
-        {tagId, name, source},
-      ];
+    {tagId, name},
+    {tagId, name, source},
+  ];
 }

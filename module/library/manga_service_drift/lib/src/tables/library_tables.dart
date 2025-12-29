@@ -8,5 +8,4 @@ class LibraryTables extends Table with AutoTimestampTable {
 
   @override
   Set<Column<Object>>? get primaryKey => {mangaId};
-
 }

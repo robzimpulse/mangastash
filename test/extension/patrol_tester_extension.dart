@@ -126,11 +126,6 @@ void testScreen(
         locator.registerSingleton<ConverterCacheManager>(
           MockConverterCacheManager(),
         );
-        locator.registerSingleton<TagCacheManager>(MockTagCacheManager());
-        locator.registerSingleton<MangaCacheManager>(MockMangaCacheManager());
-        locator.registerSingleton<ChapterCacheManager>(
-          MockChapterCacheManager(),
-        );
         locator.registerSingleton<HtmlCacheManager>(MockHtmlCacheManager());
         locator.registerSingleton<SearchChapterCacheManager>(
           MockSearchChapterCacheManager(),

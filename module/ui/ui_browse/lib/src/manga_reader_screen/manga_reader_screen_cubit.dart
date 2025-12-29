@@ -12,7 +12,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     with AutoSubscriptionMixin {
   final GetChapterUseCase _getChapterUseCase;
   final GetAllChapterUseCase _getAllChapterUseCase;
-  final UpdateChapterLastReadAtUseCase _updateChapterLastReadAtUseCase;
+  final UpdateChapterUseCase _updateChapterUseCase;
   final RecrawlUseCase _recrawlUseCase;
   final ListenPrefetchChapterConfig _listenPrefetchChapterConfig;
   final PrefetchChapterUseCase _prefetchChapterUseCase;
@@ -20,7 +20,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
   MangaReaderScreenCubit({
     required GetChapterUseCase getChapterUseCase,
     required MangaReaderScreenState initialState,
-    required UpdateChapterLastReadAtUseCase updateChapterLastReadAtUseCase,
+    required UpdateChapterUseCase updateChapterUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required GetAllChapterUseCase getAllChapterUseCase,
     required RecrawlUseCase recrawlUseCase,
@@ -28,7 +28,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     required PrefetchChapterUseCase prefetchChapterUseCase,
   }) : _getChapterUseCase = getChapterUseCase,
        _getAllChapterUseCase = getAllChapterUseCase,
-       _updateChapterLastReadAtUseCase = updateChapterLastReadAtUseCase,
+       _updateChapterUseCase = updateChapterUseCase,
        _recrawlUseCase = recrawlUseCase,
        _listenPrefetchChapterConfig = listenPrefetchChapterConfig,
        _prefetchChapterUseCase = prefetchChapterUseCase,
@@ -43,9 +43,9 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
 
   @override
   Future<void> close() async {
-    final chapter = state.chapter;
-    if (chapter != null) {
-      await _updateChapterLastReadAtUseCase.execute(chapter: chapter);
+    final chapterId = state.chapterId;
+    if (chapterId != null) {
+      await _updateChapterUseCase.updateLastRead(chapterId: chapterId);
     }
     await super.close();
   }
@@ -146,5 +146,15 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
   void recrawl({required BuildContext context, required String url}) async {
     await _recrawlUseCase.execute(context: context, url: url);
     await init(useCache: false);
+  }
+
+  Future<void> removeImage({required String url}) async {
+    final chapterId = state.chapterId;
+    if (chapterId == null) return;
+    await _updateChapterUseCase.removeImage(
+      chapterId: chapterId,
+      imageUrls: [url],
+    );
+    await init();
   }
 }

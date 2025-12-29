@@ -5,7 +5,6 @@ export 'src/advanced_screen/advanced_screen.dart';
 export 'src/appearance_screen/appearance_screen.dart';
 export 'src/browse_screen/browse_screen.dart';
 export 'src/data_storage_screen/data_storage_screen.dart';
-export 'src/download_screen/download_screen.dart';
 export 'src/general_screen/general_screen.dart';
 export 'src/library screen/library_screen.dart';
 export 'src/more_screen/more_screen.dart';

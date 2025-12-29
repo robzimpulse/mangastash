@@ -33,7 +33,7 @@ class LibraryRouteBuilder extends BaseRouteBuilder {
             },
             onTapMangaMenu: (isOnLibrary) {
               return context.pushNamed(
-                CommonRoutePath.menu,
+                CommonRoutePath.mangaMenu,
                 queryParameters: {
                   CommonQueryParam.isOnLibrary: isOnLibrary.toString(),
                 },

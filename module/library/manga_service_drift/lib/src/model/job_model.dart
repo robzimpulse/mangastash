@@ -23,4 +23,24 @@ class JobModel extends Equatable {
 
   @override
   List<Object?> get props => [id, type, manga, chapter, image, path];
+
+  Map<String, dynamic> toExtra() {
+    final source = manga?.source;
+    final mangaTitle = manga?.title;
+    final chapterTitle = chapter?.title;
+    final image = this.image;
+    final path = this.path;
+
+    return {
+      'id': id,
+      'type': type.name,
+      if (source != null && source.isNotEmpty) 'manga_source': source,
+      if (mangaTitle != null && mangaTitle.isNotEmpty)
+        'manga_title': mangaTitle,
+      if (chapterTitle != null && chapterTitle.isNotEmpty)
+        'chapter_title': chapterTitle,
+      if (image != null && image.isNotEmpty) 'image': image,
+      if (path != null && path.isNotEmpty) 'path': path,
+    };
+  }
 }

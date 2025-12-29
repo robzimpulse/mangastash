@@ -74,16 +74,16 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     );
   }
 
-  void _updateMangaLibrary(Set<String> libraryMangaId) {
-    emit(state.copyWith(libraryMangaId: libraryMangaId));
+  void _updateMangaLibrary(Set<String> libraryMangaIds) {
+    emit(state.copyWith(libraryMangaIds: libraryMangaIds));
   }
 
-  void _updatePrefetchChapterId(Set<String> prefetchedChapterId) {
-    emit(state.copyWith(prefetchedChapterId: prefetchedChapterId));
+  void _updatePrefetchChapterId(Set<String> prefetchedChapterIds) {
+    emit(state.copyWith(prefetchedChapterIds: prefetchedChapterIds));
   }
 
-  void _updatePrefetchMangaId(Set<String> prefetchedMangaId) {
-    emit(state.copyWith(prefetchedMangaId: prefetchedMangaId));
+  void _updatePrefetchMangaId(Set<String> prefetchedMangaIds) {
+    emit(state.copyWith(prefetchedMangaIds: prefetchedMangaIds));
   }
 
   void _updateHistories(List<History> histories) {
@@ -240,6 +240,18 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
           errorSimilarManga: () => null,
         ),
       );
+
+      final mangasInLibrary = mangas.where(
+        (e) => state.libraryMangaIds.contains(e.id),
+      );
+      for (final manga in mangasInLibrary) {
+        final mangaId = manga.id;
+        if (mangaId == null) continue;
+        _prefetchChapterUseCase.prefetchChapters(
+          mangaId: mangaId,
+          source: source,
+        );
+      }
     }
 
     if (result is Error<Pagination<Manga>>) {
@@ -323,7 +335,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   }
 
   Future<void> addToLibrary({required Manga manga}) async {
-    if (state.libraryMangaId.contains(manga.id)) {
+    if (state.libraryMangaIds.contains(manga.id)) {
       await _removeFromLibraryUseCase.execute(manga: manga);
     } else {
       await _addToLibraryUseCase.execute(manga: manga);

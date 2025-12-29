@@ -5,8 +5,7 @@ class MoreRoutePath {
   static const appearance = '$setting/appearance';
   static const dataStorage = '$setting/data_storage';
   static const browse = '$setting/browse';
-  static const downloadQueue = '/download_queue';
-  static const download = '$setting/download';
+  static const queue = '$setting/queue';
   static const general = '$setting/general';
   static const library = '$setting/library';
   static const reader = '$setting/reader';
