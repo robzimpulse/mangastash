@@ -20,16 +20,17 @@ class UpdateChapterUseCase with SyncChaptersMixin {
   }) async {
     if (imageUrls.isEmpty) return;
 
-    await _execute(
-      chapterId: chapterId,
-      updater: (chapter) async {
-        final images = chapter.images;
-        if (images == null || images.isEmpty) return null;
-        return chapter.copyWith(
-          images: [...images.whereNot((e) => imageUrls.contains(e))],
-        );
-      },
-    );
+    // TODO: adjust chapter images
+    // await _execute(
+    //   chapterId: chapterId,
+    //   updater: (chapter) async {
+    //     final images = chapter.images;
+    //     if (images == null || images.isEmpty) return null;
+    //     return chapter.copyWith(
+    //       images: [...images.whereNot((e) => imageUrls.contains(e))],
+    //     );
+    //   },
+    // );
   }
 
   Future<void> updateLastRead({required String chapterId}) async {
