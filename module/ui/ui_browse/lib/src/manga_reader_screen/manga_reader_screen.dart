@@ -46,7 +46,7 @@ class MangaReaderScreen extends StatelessWidget {
             source: source?.let((e) => SourceEnum.fromValue(name: source)),
           ),
           getChapterUseCase: locator(),
-          updateChapterLastReadAtUseCase: locator(),
+          updateChapterUseCase: locator(),
           listenSearchParameterUseCase: locator(),
           getAllChapterUseCase: locator(),
           recrawlUseCase: locator(),
@@ -288,6 +288,6 @@ class MangaReaderScreen extends StatelessWidget {
   void _onTapMenu({required BuildContext context, required String url}) async {
     final result = await onTapImageMenu?.call();
     if (!context.mounted || result == null) return;
-    // TODO: delete image from chapter
+    await _cubit(context).removeImage(url: url);
   }
 }
