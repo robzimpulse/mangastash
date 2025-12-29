@@ -3,6 +3,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:flutter/foundation.dart';
 import 'package:manga_page_view/manga_page_view.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -17,20 +18,24 @@ class MangaReaderScreen extends StatelessWidget {
     required this.imagesCacheManager,
     required this.logBox,
     this.onTapShortcut,
+    this.onTapImageMenu,
   });
 
   final ImagesCacheManager imagesCacheManager;
 
   final LogBox logBox;
 
-  final void Function(String)? onTapShortcut;
+  final ValueSetter<String>? onTapShortcut;
+
+  final AsyncValueGetter<ImageMenu?>? onTapImageMenu;
 
   static Widget create({
     required ServiceLocator locator,
     required String? source,
     required String? mangaId,
     required String? chapterId,
-    void Function(String)? onTapShortcut,
+    ValueSetter<String>? onTapShortcut,
+    AsyncValueGetter<ImageMenu?>? onTapImageMenu,
   }) {
     return BlocProvider(
       create: (context) {
@@ -46,12 +51,13 @@ class MangaReaderScreen extends StatelessWidget {
           getAllChapterUseCase: locator(),
           recrawlUseCase: locator(),
           listenPrefetchChapterConfig: locator(),
-          prefetchChapterUseCase: locator()
+          prefetchChapterUseCase: locator(),
         )..init();
       },
       child: MangaReaderScreen(
         imagesCacheManager: locator(),
         onTapShortcut: onTapShortcut,
+        onTapImageMenu: onTapImageMenu,
         logBox: locator(),
       ),
     );
@@ -175,25 +181,32 @@ class MangaReaderScreen extends StatelessWidget {
             edgeIndicatorContainerSize: 100,
           ),
           pageBuilder: (context, index) {
-            return CachedNetworkImage(
-              imageUrl: images.elementAt(index),
-              cacheManager: imagesCacheManager,
-              errorWidget: (context, url, error) {
-                return SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: const Center(child: Icon(Icons.error)),
-                );
+            return InkWell(
+              onLongPress: () {
+                _onTapMenu(context: context, url: images.elementAt(index));
               },
-              progressIndicatorBuilder: (context, url, progress) {
-                return SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: Center(
-                    child: CircularProgressIndicator(value: progress.progress),
-                  ),
-                );
-              },
+              child: CachedNetworkImage(
+                imageUrl: images.elementAt(index),
+                cacheManager: imagesCacheManager,
+                errorWidget: (context, url, error) {
+                  return SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: const Center(child: Icon(Icons.error)),
+                  );
+                },
+                progressIndicatorBuilder: (context, url, progress) {
+                  return SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: progress.progress,
+                      ),
+                    ),
+                  );
+                },
+              ),
             );
           },
           startEdgeDragIndicatorBuilder: (context, info) {
@@ -270,5 +283,11 @@ class MangaReaderScreen extends StatelessWidget {
 
   void _onTapRecrawl({required BuildContext context, required String url}) {
     _cubit(context).recrawl(context: context, url: url);
+  }
+
+  void _onTapMenu({required BuildContext context, required String url}) async {
+    final result = await onTapImageMenu?.call();
+    if (!context.mounted || result == null) return;
+    // TODO: delete image from chapter
   }
 }

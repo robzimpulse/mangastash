@@ -37,14 +37,22 @@ class CommonRouteBuilder extends BaseRouteBuilder {
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: CommonRoutePath.menu,
-        name: CommonRoutePath.menu,
+        path: CommonRoutePath.mangaMenu,
+        name: CommonRoutePath.mangaMenu,
         pageBuilder: (context, state) {
           final queries = state.uri.queryParameters;
-          return MenuRouteBottomSheet(
+          return MangaMenuRouteBottomSheet(
             locator: locator,
             isOnLibrary: queries[CommonQueryParam.isOnLibrary] == 'true',
           );
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: CommonRoutePath.imageMenu,
+        name: CommonRoutePath.imageMenu,
+        pageBuilder: (context, state) {
+          return ImageMenuRouteBottomSheet(locator: locator);
         },
       ),
     ];

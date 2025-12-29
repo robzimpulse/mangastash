@@ -68,7 +68,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
             },
             onTapMangaMenu: (isOnLibrary) {
               return context.pushNamed(
-                CommonRoutePath.menu,
+                CommonRoutePath.mangaMenu,
                 queryParameters: {
                   CommonQueryParam.isOnLibrary: isOnLibrary.toString(),
                 },
@@ -137,7 +137,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
             },
             onMangaMenu: (manga, isOnLibrary) {
               return context.pushNamed<MangaMenu>(
-                CommonRoutePath.menu,
+                CommonRoutePath.mangaMenu,
                 queryParameters: {
                   CommonQueryParam.isOnLibrary: isOnLibrary.toString(),
                 },
@@ -171,6 +171,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
                 },
               );
             },
+            onTapImageMenu: () => context.push(CommonRoutePath.imageMenu),
           );
         },
       ),
@@ -221,7 +222,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
             },
             onTapMangaMenu: (isOnLibrary) {
               return context.pushNamed(
-                CommonRoutePath.menu,
+                CommonRoutePath.mangaMenu,
                 queryParameters: {
                   CommonQueryParam.isOnLibrary: isOnLibrary.toString(),
                 },

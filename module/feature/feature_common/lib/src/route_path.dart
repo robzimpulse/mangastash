@@ -1,6 +1,7 @@
 class CommonRoutePath {
   static const confirmation = '/confirmation';
-  static const menu = '/menu';
+  static const mangaMenu = '/menu/manga';
+  static const imageMenu = '/menu/image';
 }
 
 class CommonQueryParam {

@@ -25,34 +25,34 @@ class MangaMenuWidget extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          child: Text(
-            'Action',
-            style: Theme.of(context).textTheme.titleLarge,
-            textAlign: TextAlign.start,
-          ),
-        ),
-        isOnLibrary?.let(
-          (value) => ListTile(
-            title: Text('${value ? 'Remove from' : 'Add to'} Library'),
-            leading: Icon(
-              value ? Icons.favorite_border : Icons.favorite,
+        ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: Text(
+              'Action',
+              style: Theme.of(context).textTheme.titleLarge,
+              textAlign: TextAlign.start,
             ),
-            onTap: onTapLibrary,
           ),
-        ),
-        ListTile(
-          title: const Text('Prefetch'),
-          leading: const Icon(Icons.cloud_download),
-          onTap: onTapPrefetch,
-        ),
-        ListTile(
-          title: const Text('Download'),
-          leading: const Icon(Icons.download),
-          onTap: onTapDownload,
-        ),
-      ].nonNulls.intersperse(const Divider(height: 1, thickness: 1)).toList(),
+          isOnLibrary?.let(
+            (value) => ListTile(
+              title: Text('${value ? 'Remove from' : 'Add to'} Library'),
+              leading: Icon(value ? Icons.favorite_border : Icons.favorite),
+              onTap: onTapLibrary,
+            ),
+          ),
+          ListTile(
+            title: const Text('Prefetch'),
+            leading: const Icon(Icons.cloud_download),
+            onTap: onTapPrefetch,
+          ),
+          ListTile(
+            title: const Text('Download'),
+            leading: const Icon(Icons.download),
+            onTap: onTapDownload,
+          ),
+        ].nonNulls.intersperse(const Divider(height: 1, thickness: 1)),
+      ],
     );
   }
 }
