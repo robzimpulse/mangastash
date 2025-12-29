@@ -9,6 +9,6 @@ class RelationshipTables extends Table with AutoTimestampTable {
 
   @override
   List<Set<Column<Object>>>? get uniqueKeys => [
-        {tagId, mangaId},
-      ];
+    {tagId, mangaId},
+  ];
 }
