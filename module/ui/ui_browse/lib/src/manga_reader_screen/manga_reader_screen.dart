@@ -199,6 +199,7 @@ class MangaReaderScreen extends StatelessWidget {
           startEdgeDragIndicatorBuilder: (context, info) {
             return Center(
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   if (state.isLoadingChapterIds) ...[
                     SizedBox(
@@ -219,6 +220,7 @@ class MangaReaderScreen extends StatelessWidget {
           endEdgeDragIndicatorBuilder: (context, info) {
             return Center(
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   if (state.isLoadingChapterIds) ...[
                     SizedBox(
