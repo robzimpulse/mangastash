@@ -15,6 +15,7 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
   final PrefetchMangaUseCase _prefetchMangaUseCase;
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
+  final AddToLibraryUseCase _addToLibraryUseCase;
 
   MangaGridWidgetCubit({
     MangaGridWidgetState initialState = const MangaGridWidgetState(),
@@ -27,9 +28,11 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
     required PrefetchMangaUseCase prefetchMangaUseCase,
     required PrefetchChapterUseCase prefetchChapterUseCase,
     required RemoveFromLibraryUseCase removeFromLibraryUseCase,
+    required AddToLibraryUseCase addToLibraryUseCase,
   }) : _searchMangaUseCase = searchMangaUseCase,
        _recrawlUseCase = recrawlUseCase,
        _removeFromLibraryUseCase = removeFromLibraryUseCase,
+       _addToLibraryUseCase = addToLibraryUseCase,
        _prefetchMangaUseCase = prefetchMangaUseCase,
        _prefetchChapterUseCase = prefetchChapterUseCase,
        super(
@@ -163,8 +166,12 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
     }
   }
 
-  void remove({required Manga manga}) {
-    _removeFromLibraryUseCase.execute(manga: manga);
+  Future<void> addToLibrary({required Manga manga}) async {
+    if (state.libraryMangaIds.contains(manga.id)) {
+      await _removeFromLibraryUseCase.execute(manga: manga);
+    } else {
+      await _addToLibraryUseCase.execute(manga: manga);
+    }
   }
 
   void download({required Manga manga}) {
