@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_drift/src/database/memory_executor.dart';
+import 'package:manga_service_drift/src/extension/nullable_generic.dart';
 
 void main() {
   late AppDatabase db;
@@ -11,59 +12,73 @@ void main() {
     dao = ImageDao(db);
   });
 
-  final values = List.generate(
-    10,
-    (chpIdx) => (
-      chpIdx,
-      List.generate(
-        10,
-        (imgIdx) => ImageTablesCompanion(
-          id: Value('id_$imgIdx'),
-          webUrl: Value('web_url_$imgIdx'),
-          chapterId: Value('chapter_id_$imgIdx'),
-          order: Value(imgIdx),
-        ),
-      ),
-    ),
+  final values = Map.fromEntries(
+    List.generate(10, (chpIdx) {
+      return MapEntry(
+        'chapter_id_$chpIdx',
+        List.generate(10, (imgIdx) => 'web_url_${chpIdx}_$imgIdx'),
+      );
+    }),
+  );
+
+  final valuesLength = values.entries.fold(
+    0,
+    (total, curr) => total + curr.value.length,
   );
 
   tearDown(() => db.close());
 
   group('Image Dao Test', () {
     setUp(() async {
-      for (final (_, values) in values) {
-        for (final value in values) {
-          await dao.add(value: value);
-        }
+      for (final entry in values.entries) {
+        await dao.adds(entry.key, values: entry.value);
       }
     });
 
     tearDown(() async => await db.clear());
 
     group('With New Value', () {
-      const value = ImageTablesCompanion(
-        id: Value('id_new'),
-        webUrl: Value('web_url_new'),
-        chapterId: Value('chapter_id_new'),
-        order: Value(0),
+      final newValues = Map.fromEntries(
+        List.generate(10, (chpIdx) {
+          return MapEntry(
+            'chapter_id_new_$chpIdx',
+            List.generate(10, (imgIdx) => 'web_url_new_${chpIdx}_$imgIdx'),
+          );
+        }),
       );
 
+      final newValuesLength = newValues.entries.fold(
+        0,
+        (total, curr) => total + curr.value.length,
+      );
+
+      setUp(() async {
+        for (final entry in newValues.entries) {
+          await dao.adds(entry.key, values: entry.value);
+        }
+      });
+
       group('Search Value', () {
         test('By Chapter Id', () async {
           expect(
-            (await dao.search(chapterIds: [value.chapterId.value])).length,
-            equals(0),
+            (await dao.search(chapterIds: [...newValues.keys])).length,
+            equals(newValuesLength),
+          );
+          expect(
+            (await dao.all).length,
+            equals(valuesLength + newValuesLength),
           );
         });
 
-        test('By Id', () async {
-          expect((await dao.search(ids: [value.id.value])).length, equals(0));
-        });
-
         test('By Web Url', () async {
+          final urls = [...newValues.values.expand((e) => e)];
           expect(
-            (await dao.search(ids: [value.webUrl.value])).length,
-            equals(0),
+            (await dao.search(webUrls: urls)).length,
+            equals(newValuesLength),
+          );
+          expect(
+            (await dao.all).length,
+            equals(valuesLength + newValuesLength),
           );
         });
       });
@@ -71,87 +86,40 @@ void main() {
       group('Remove Value', () {
         test('By Chapter ID', () async {
           expect(
-            (await dao.remove(chapterIds: [value.chapterId.value])).length,
-            equals(0),
+            (await dao.remove(chapterIds: [...newValues.keys])).length,
+            equals(newValuesLength),
           );
 
-          expect((await dao.all).length, equals(values.length));
+          expect((await dao.all).length, equals(valuesLength));
         });
 
         test('By Web Url', () async {
+          final urls = [...newValues.values.expand((e) => e)];
           expect(
-            (await dao.remove(webUrls: [value.webUrl.value])).length,
-            equals(0),
+            (await dao.remove(webUrls: urls)).length,
+            equals(newValuesLength),
           );
-
-          expect((await dao.all).length, equals(values.length));
+          expect((await dao.all).length, equals(valuesLength));
         });
 
-        test('By Id', () async {
-          expect((await dao.remove(ids: [value.id.value])).length, equals(0));
-
-          expect((await dao.all).length, equals(values.length));
+        test('Single Value', () async {
+          final updatedValue = newValues.map(
+            (key, value) => MapEntry(key, [...value.take(3)]),
+          );
+          final urls = [...updatedValue.values.expand((e) => e)];
+          expect((await dao.remove(webUrls: urls)).length, equals(urls.length));
+          expect(
+            (await dao.all).length,
+            equals(valuesLength + newValuesLength - urls.length),
+          );
         });
       });
 
       test('Add Value', () async {
-        await dao.add(value: value);
-        expect((await dao.all).length, equals(values.length + 1));
-      });
-    });
-
-    group('With Existing Value', () {
-      final value = ([...values.expand((e) => e.$2)]..shuffle()).first;
-
-      group('Search Value', () {
-        test('By Chapter Id', () async {
-          expect(
-            (await dao.search(chapterIds: [value.chapterId.value])).length,
-            greaterThan(0),
-          );
-        });
-
-        test('By Id', () async {
-          expect((await dao.search(ids: [value.id.value])).length, equals(1));
-        });
-
-        test('By Web Url', () async {
-          expect(
-            (await dao.search(ids: [value.webUrl.value])).length,
-            equals(0),
-          );
-        });
-      });
-
-      group('Remove Value', () {
-        test('By Chapter ID', () async {
-          expect(
-            (await dao.remove(chapterIds: [value.chapterId.value])).length,
-            equals(1),
-          );
-
-          expect((await dao.all).length, equals(values.length - 1));
-        });
-
-        test('By Web Url', () async {
-          expect(
-            (await dao.remove(webUrls: [value.webUrl.value])).length,
-            equals(1),
-          );
-
-          expect((await dao.all).length, equals(values.length - 1));
-        });
-
-        test('By Id', () async {
-          expect((await dao.remove(ids: [value.id.value])).length, equals(1));
-
-          expect((await dao.all).length, equals(values.length - 1));
-        });
-      });
-
-      test('Add Value', () async {
-        await dao.add(value: value);
-        expect((await dao.all).length, equals(values.length));
+        expect(
+          (await dao.all).length,
+          equals(valuesLength + newValuesLength),
+        );
       });
     });
   });

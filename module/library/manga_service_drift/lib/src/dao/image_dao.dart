@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 
 import '../database/database.dart';
@@ -61,18 +62,6 @@ class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
     return transaction(() => selector.goAndReturn());
   }
 
-  Future<ImageDrift> add({required ImageTablesCompanion value}) {
-    return transaction(
-      () => into(imageTables).insertReturning(
-        value,
-        mode: InsertMode.insertOrReplace,
-        onConflict: DoUpdate(
-          (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
-        ),
-      ),
-    );
-  }
-
   Future<List<ImageDrift>> adds(
     String chapterId, {
     List<String> values = const [],
@@ -80,29 +69,29 @@ class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
     if (values.isEmpty) return Future.value([]);
 
     return transaction(() async {
-      List<ImageDrift> existing = await search(chapterIds: [chapterId]);
-      List<ImageDrift> results = [];
+      final existing = await remove(chapterIds: [chapterId]);
 
-      for (final (index, image) in values.indexed) {
-        final data =
-            existing.isEmpty
-                ? const ImageTablesCompanion()
-                : existing.removeAt(0).toCompanion(true);
-
-        results.add(
-          await add(
-            value: data.copyWith(
+      return [
+        ...await Future.wait(
+          values.mapIndexed((index, value) {
+            final old = existing.firstWhereOrNull((e) => e.webUrl == value);
+            final data = old?.toCompanion(true) ?? const ImageTablesCompanion();
+            final entry = data.copyWith(
               chapterId: Value(chapterId),
-              webUrl: Value(image),
+              webUrl: Value(value),
               order: Value(index),
-            ),
-          ),
-        );
-      }
+            );
 
-      await remove(ids: [...existing.map((e) => e.id)]);
-
-      return results;
+            return into(imageTables).insertReturning(
+              entry,
+              mode: InsertMode.insertOrReplace,
+              onConflict: DoUpdate(
+                (old) => entry.copyWith(updatedAt: Value(DateTime.timestamp())),
+              ),
+            );
+          }),
+        ),
+      ];
     });
   }
 }
