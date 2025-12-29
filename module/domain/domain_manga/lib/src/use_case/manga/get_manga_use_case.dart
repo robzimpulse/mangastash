@@ -100,16 +100,10 @@ class GetMangaUseCase with SyncMangasMixin {
         return Success(manga);
       }
 
-      final Manga data;
-      if (source == SourceEnum.mangadex) {
-        data = await _mangadex(source: source, mangaId: mangaId);
-      } else {
-        data = await _scrapping(
-          url: manga?.webUrl,
-          source: source,
-          useCache: useCache,
-        );
-      }
+      final data = await switch (source) {
+        SourceEnum.mangadex => _mangadex(source: source, mangaId: mangaId),
+        _ => _scrapping(url: manga?.webUrl, source: source, useCache: useCache),
+      };
 
       final results = await sync(
         dao: _mangaDao,

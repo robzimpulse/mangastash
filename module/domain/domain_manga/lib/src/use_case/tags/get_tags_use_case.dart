@@ -97,12 +97,10 @@ class GetTagsUseCase with SyncTagsMixin {
       final tags = [...cache.map(Tag.fromDrift)];
       if (tags.isNotEmpty && useCache) return Success(tags);
 
-      final List<Tag> data;
-      if (source == SourceEnum.mangadex) {
-        data = await _mangadex(source: source);
-      } else {
-        data = await _scrapping(source: source, useCache: useCache);
-      }
+      final data = await switch (source) {
+        SourceEnum.mangadex => _mangadex(source: source),
+        _ => _scrapping(source: source, useCache: useCache),
+      };
 
       final result = await sync(dao: _tagDao, values: data, logBox: _logBox);
 

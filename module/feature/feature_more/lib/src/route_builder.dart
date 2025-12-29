@@ -23,7 +23,7 @@ class MoreRouteBuilder extends BaseRouteBuilder {
             onTapSetting: () => context.push(MoreRoutePath.setting),
             onTapStatistic: () => context.push(MoreRoutePath.statistic),
             onTapDataStorage: () => context.push(MoreRoutePath.dataStorage),
-            onTapDownloadQueue: () => context.push(MoreRoutePath.downloadQueue),
+            onTapQueue: () => context.push(MoreRoutePath.queue),
             onTapAbout: () => context.push(MoreRoutePath.aboutUs),
             onTapHelp: () {
               context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
@@ -114,20 +114,14 @@ class MoreRouteBuilder extends BaseRouteBuilder {
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: MoreRoutePath.downloadQueue,
-        name: MoreRoutePath.downloadQueue,
+        path: MoreRoutePath.queue,
+        name: MoreRoutePath.queue,
         builder: (context, state) {
           return QueueScreen(
             listenJobUseCase: locator(),
             cancelJobUseCase: locator(),
           );
         },
-      ),
-      GoRoute(
-        parentNavigatorKey: rootNavigatorKey,
-        path: MoreRoutePath.download,
-        name: MoreRoutePath.download,
-        builder: (context, state) => DownloadScreen.create(locator: locator),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
@@ -189,7 +183,6 @@ class MoreRouteBuilder extends BaseRouteBuilder {
             onTapSecurityMenu: () => context.push(MoreRoutePath.security),
             onTapTrackingMenu: () => context.push(MoreRoutePath.tracking),
             onTapBrowseMenu: () => context.push(MoreRoutePath.browse),
-            onTapDownloadMenu: () => context.push(MoreRoutePath.download),
             onTapLibraryMenu: () => context.push(MoreRoutePath.library),
             onTapDataStorageMenu: () => context.push(MoreRoutePath.dataStorage),
             onTapReaderMenu: () => context.push(MoreRoutePath.reader),

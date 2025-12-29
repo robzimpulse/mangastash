@@ -110,18 +110,17 @@ class GetChapterUseCase with SyncChaptersMixin {
         return Success(chapter);
       }
 
-      final Chapter? data;
-      if (source == SourceEnum.mangadex) {
-        data = await _mangadex(mangaId: mangaId, chapterId: chapterId);
-      } else {
-        data = chapter?.copyWith(
-          images: await _scrapping(
-            url: chapter.webUrl,
-            source: source,
-            useCache: useCache,
-          ),
-        );
-      }
+      final data = await switch (source) {
+        SourceEnum.mangadex => _mangadex(
+          mangaId: mangaId,
+          chapterId: chapterId,
+        ),
+        _ => _scrapping(
+          url: chapter?.webUrl,
+          source: source,
+          useCache: useCache,
+        ).then((e) => chapter?.copyWith(images: e)),
+      };
 
       final results = await sync(
         dao: _chapterDao,
