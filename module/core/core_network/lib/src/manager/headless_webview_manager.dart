@@ -171,7 +171,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     Map<String, JavaScriptHandlerCallback>? javascriptHandlers,
     List<String> scripts = const [],
     bool useCache = true,
-    Future<void>? signalComplete,
+    Future? signalComplete,
   }) async {
     delegate.set(uri: uri, loading: true);
     final key = [uri.toString(), ...scripts].join('|');
@@ -276,12 +276,8 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     await Future.wait([
       webview.run(),
       onLoadStartCompleter.future,
-      Future.any([
-        onLoadStopCompleter.future,
-        onLoadErrorCompleter.future,
-        Future.delayed(const Duration(seconds: 15)),
-      ]),
-    ]);
+      Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
+    ]).timeout(const Duration(seconds: 15));
 
     for (final script in scripts) {
       if (script.isEmpty) continue;
@@ -291,7 +287,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     }
 
     if (signalComplete != null) {
-      await signalComplete.timeout(const Duration(seconds: 10));
+      await signalComplete.timeout(const Duration(seconds: 15));
     }
 
     final html = await webview.webViewController?.getHtml();
