@@ -189,7 +189,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
   void prefetch({required Manga manga}) {
     final id = manga.id;
-    final source = manga.source?.let((e) => SourceEnum.fromValue(name: e));
+    final source = manga.source?.let(SourceEnum.fromName);
     if (id == null || source == null) return;
     _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
     _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);
