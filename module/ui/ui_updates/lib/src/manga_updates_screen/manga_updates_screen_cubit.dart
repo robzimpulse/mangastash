@@ -79,9 +79,7 @@ class MangaUpdatesScreenCubit extends Cubit<MangaUpdatesScreenState>
       for (final chapter in entry.value) {
         final mangaId = entry.key.id;
         final chapterId = chapter.id;
-        final source = entry.key.source.let(
-          (e) => SourceEnum.fromValue(name: e),
-        );
+        final source = entry.key.source.let(SourceEnum.fromName);
         if (mangaId == null || source == null || chapterId == null) continue;
         _prefetchChapterUseCase.prefetchChapter(
           mangaId: mangaId,

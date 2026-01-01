@@ -52,7 +52,7 @@ class GlobalOptionsManager
             ),
           ),
       initialSources: sources
-          .let((e) => [...e.map((e) => SourceEnum.fromValue(name: e)).nonNulls])
+          .let((e) => [...e.map(SourceEnum.fromName).nonNulls])
           .or(SourceEnum.values),
       numOfPrefetchedPrevChapter: numOfPrefetchedPrevChapter ?? 0,
       numOfPrefetchedNextChapter: numOfPrefetchedNextChapter ?? 0,

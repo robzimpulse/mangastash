@@ -43,7 +43,7 @@ class MangaReaderScreen extends StatelessWidget {
           initialState: MangaReaderScreenState(
             mangaId: mangaId,
             chapterId: chapterId,
-            source: source?.let((e) => SourceEnum.fromValue(name: source)),
+            source: source?.let(SourceEnum.fromName),
           ),
           getChapterUseCase: locator(),
           updateChapterUseCase: locator(),

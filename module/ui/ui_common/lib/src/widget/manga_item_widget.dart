@@ -27,7 +27,7 @@ class MangaItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final source = manga.source?.let((e) => SourceEnum.fromValue(name: e));
+    final source = manga.source?.let(SourceEnum.fromName);
     final sourceIconUrl = source?.icon;
     final title = manga.title;
 

@@ -46,7 +46,7 @@ class BrowseMangaScreen extends StatefulWidget {
       create: (context) {
         return BrowseMangaScreenCubit(
           initialState: BrowseMangaScreenState(
-            source: source?.let((e) => SourceEnum.fromValue(name: e)),
+            source: source?.let(SourceEnum.fromName),
             parameter: SearchMangaParameter(
               includedTags: tagId.let((e) => [e]),
             ),

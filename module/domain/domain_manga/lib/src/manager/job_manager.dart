@@ -143,7 +143,7 @@ class JobManager
 
   Future<void> _fetchManga(JobModel job) async {
     final mangaId = job.manga?.id;
-    final source = job.manga?.source?.let((e) => SourceEnum.fromValue(name: e));
+    final source = job.manga?.source?.let(SourceEnum.fromName);
 
     if (mangaId == null || source == null) {
       throw Exception('No Manga ID or Source Url');
@@ -163,7 +163,7 @@ class JobManager
   Future<void> _fetchChapter(JobModel job) async {
     final mangaId = job.manga?.id;
     final chapterId = job.chapter?.id;
-    final source = job.manga?.source?.let((e) => SourceEnum.fromValue(name: e));
+    final source = job.manga?.source?.let(SourceEnum.fromName);
 
     if (mangaId == null || chapterId == null || source == null) {
       throw Exception('No Manga ID or Chapter ID or Source');
@@ -196,7 +196,7 @@ class JobManager
 
   Future<void> _fetchAllChapter(JobModel job) async {
     final mangaId = job.manga?.id;
-    final source = job.manga?.source?.let((e) => SourceEnum.fromValue(name: e));
+    final source = job.manga?.source?.let(SourceEnum.fromName);
 
     if (mangaId == null || source == null) {
       throw Exception('No Manga ID or Source');

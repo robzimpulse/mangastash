@@ -344,9 +344,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
   Future<void> prefetch() async {
     final mangaId = state.manga?.id;
-    final source = state.manga?.source?.let(
-      (e) => SourceEnum.fromValue(name: e),
-    );
+    final source = state.manga?.source?.let(SourceEnum.fromName);
     if (mangaId == null || source == null) return;
     final chapters = await _getAllChapterUseCase.execute(
       source: source,

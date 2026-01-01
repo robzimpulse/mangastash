@@ -52,7 +52,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
   void prefetch({required List<Manga> mangas}) {
     for (final manga in mangas) {
       final id = manga.id;
-      final source = manga.source?.let((e) => SourceEnum.fromValue(name: e));
+      final source = manga.source?.let(SourceEnum.fromName);
       if (id == null || source == null) continue;
       _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
       _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);
