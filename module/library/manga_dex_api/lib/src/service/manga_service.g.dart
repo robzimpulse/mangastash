@@ -100,7 +100,7 @@ class _MangaService implements MangaService {
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
     late SearchMangaResponse _value;
     try {
-      _value = await compute(deserializeSearchMangaResponse, _result.data!);
+      _value = SearchMangaResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -138,7 +138,7 @@ class _MangaService implements MangaService {
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
     late TagResponse _value;
     try {
-      _value = await compute(deserializeTagResponse, _result.data!);
+      _value = TagResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -180,7 +180,7 @@ class _MangaService implements MangaService {
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
     late MangaResponse _value;
     try {
-      _value = await compute(deserializeMangaResponse, _result.data!);
+      _value = MangaResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -256,7 +256,7 @@ class _MangaService implements MangaService {
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
     late SearchChapterResponse _value;
     try {
-      _value = await compute(deserializeSearchChapterResponse, _result.data!);
+      _value = SearchChapterResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
