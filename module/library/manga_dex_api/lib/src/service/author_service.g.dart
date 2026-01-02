@@ -57,7 +57,7 @@ class _AuthorService implements AuthorService {
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
     late AuthorResponse _value;
     try {
-      _value = await compute(deserializeAuthorResponse, _result.data!);
+      _value = AuthorResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

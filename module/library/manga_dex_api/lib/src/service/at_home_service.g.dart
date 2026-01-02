@@ -53,7 +53,7 @@ class _AtHomeService implements AtHomeService {
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
     late AtHomeResponse _value;
     try {
-      _value = await compute(deserializeAtHomeResponse, _result.data!);
+      _value = AtHomeResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
