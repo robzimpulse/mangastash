@@ -1,1 +1,1 @@
-enum MangaMenu { download, library, prefetch; }
+enum MangaMenu { download, library, prefetch }

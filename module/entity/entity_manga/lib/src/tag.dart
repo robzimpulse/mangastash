@@ -19,13 +19,7 @@ class Tag extends Equatable {
 
   final DateTime? updatedAt;
 
-  const Tag({
-    this.id,
-    this.name,
-    this.source,
-    this.createdAt,
-    this.updatedAt,
-  });
+  const Tag({this.id, this.name, this.source, this.createdAt, this.updatedAt});
 
   @override
   List<Object?> get props => [id, name, source, createdAt, updatedAt];
@@ -73,19 +67,14 @@ class Tag extends Equatable {
   }
 
   factory Tag.from({required TagData data}) {
-    return Tag(
-      id: data.id,
-      name: data.attributes?.name?.en,
-    );
+    return Tag(id: data.id, name: data.attributes?.name?.en);
   }
 
   String toJsonString() => json.encode(toJson());
 
   static Tag? fromJsonString(String value) {
     try {
-      return Tag.fromJson(
-        json.decode(value) as Map<String, dynamic>,
-      );
+      return Tag.fromJson(json.decode(value) as Map<String, dynamic>);
     } catch (e) {
       return null;
     }
