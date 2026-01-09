@@ -17,6 +17,7 @@ class AsuraScanMangaListHtmlParser extends MangaListHtmlParser {
         title: title,
         coverUrl: coverUrl,
         webUrl: webUrl,
+        // TODO: move to intermediary object like [ChapterScrapped]
         status: toBeginningOfSentenceCase(status?.toLowerCase()),
       );
     }).toList();
@@ -40,8 +41,5 @@ class AsuraScanMangaListHtmlParser extends MangaListHtmlParser {
     return region?.attributes['style'] == 'pointer-events:auto';
   }
 
-  AsuraScanMangaListHtmlParser({
-    required super.root,
-    required super.converterCacheManager,
-  });
+  AsuraScanMangaListHtmlParser({required super.root});
 }

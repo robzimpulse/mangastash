@@ -1,4 +1,3 @@
-import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:html/dom.dart';
 
@@ -8,25 +7,18 @@ import 'base_html_parser.dart';
 
 abstract class ChapterImageHtmlParser extends BaseHtmlParser {
   Future<List<String>> get images;
-  ChapterImageHtmlParser({required super.root, required super.converterCacheManager});
+  ChapterImageHtmlParser({required super.root});
 
   factory ChapterImageHtmlParser.forSource({
     required Document root,
     required SourceEnum source,
-    required ConverterCacheManager converterCacheManager,
   }) {
     if (SourceEnum.asurascan == source) {
-      return AsuraScanChapterImageHtmlParser(
-        root: root,
-        converterCacheManager: converterCacheManager,
-      );
+      return AsuraScanChapterImageHtmlParser(root: root);
     }
 
     if (SourceEnum.mangaclash == source) {
-      return MangaClashChapterImageHtmlParser(
-        root: root,
-        converterCacheManager: converterCacheManager,
-      );
+      return MangaClashChapterImageHtmlParser(root: root);
     }
 
     throw UnimplementedError();

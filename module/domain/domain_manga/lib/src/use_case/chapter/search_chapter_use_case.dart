@@ -8,6 +8,7 @@ import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
+import '../../extension/chapter_extension.dart';
 import '../../mixin/filter_chapters_mixin.dart';
 import '../../mixin/sort_chapters_mixin.dart';
 import '../../mixin/sync_chapters_mixin.dart';
@@ -116,16 +117,21 @@ class SearchChapterUseCase
     final parser = ChapterListHtmlParser.forSource(
       root: document,
       source: parameter.source,
-      converterCacheManager: _converterCacheManager,
     );
 
-    final chapters = await parser.chapters;
+    final chapters = await parser.chapters.then((e) {
+      return Future.wait(
+        e.map(
+          (e) => e
+              .convert(manager: _converterCacheManager)
+              .then((e) => e.copyWith(mangaId: parameter.mangaId)),
+        ),
+      );
+    });
 
     final data = filterChapters(
       chapters: sortChapters(
-        chapters: [
-          ...chapters.map((e) => e.copyWith(mangaId: parameter.mangaId)),
-        ],
+        chapters: chapters,
         parameter: parameter.parameter,
       ),
       parameter: parameter.parameter,

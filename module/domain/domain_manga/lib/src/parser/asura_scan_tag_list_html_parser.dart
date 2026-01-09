@@ -16,6 +16,7 @@ class AsuraScanTagListHtmlParser extends TagListHtmlParser {
       for (final (index, element) in [...?elements].indexed)
         Tag(
           id: (index + 1).toString(),
+          // TODO: move to intermediary object like [ChapterScrapped]
           name: toBeginningOfSentenceCase(
             element.querySelector('label')?.text.trim(),
           ),
@@ -25,8 +26,5 @@ class AsuraScanTagListHtmlParser extends TagListHtmlParser {
     return tags;
   }
 
-  AsuraScanTagListHtmlParser({
-    required super.root,
-    required super.converterCacheManager,
-  });
+  AsuraScanTagListHtmlParser({required super.root});
 }

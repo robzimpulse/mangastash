@@ -26,6 +26,7 @@ class MangaClashMangaListHtmlParser extends MangaListHtmlParser {
           ?.querySelector('div.summary-content')
           ?.text
           .split(',')
+          // TODO: move to intermediary object like [ChapterScrapped]
           .map((e) => toBeginningOfSentenceCase(e.trim()));
       final status =
           element
@@ -39,12 +40,14 @@ class MangaClashMangaListHtmlParser extends MangaListHtmlParser {
           title: title,
           coverUrl: coverUrl,
           webUrl: webUrl,
+          // TODO: move to intermediary object like [ChapterScrapped]
           status: toBeginningOfSentenceCase(status?.toLowerCase()),
           tags:
               genres
                   ?.map(
                     (e) =>
-                        Tag(name: toBeginningOfSentenceCase(e.toLowerCase())),
+                    // TODO: move to intermediary object like [ChapterScrapped]
+                    Tag(name: toBeginningOfSentenceCase(e.toLowerCase())),
                   )
                   .toList(),
         ),
@@ -67,8 +70,5 @@ class MangaClashMangaListHtmlParser extends MangaListHtmlParser {
     return values?.firstOrNull != values?.lastOrNull;
   }
 
-  MangaClashMangaListHtmlParser({
-    required super.root,
-    required super.converterCacheManager,
-  });
+  MangaClashMangaListHtmlParser({required super.root});
 }

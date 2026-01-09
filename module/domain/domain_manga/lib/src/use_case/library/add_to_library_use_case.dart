@@ -5,9 +5,8 @@ import 'package:entity_manga/entity_manga.dart';
 class AddToLibraryUseCase {
   final LibraryDao _libraryDao;
 
-  const AddToLibraryUseCase({
-    required LibraryDao libraryDao,
-  }) : _libraryDao = libraryDao;
+  const AddToLibraryUseCase({required LibraryDao libraryDao})
+    : _libraryDao = libraryDao;
 
   Future<Result<bool>> execute({required Manga manga}) async {
     final mangaId = manga.id;

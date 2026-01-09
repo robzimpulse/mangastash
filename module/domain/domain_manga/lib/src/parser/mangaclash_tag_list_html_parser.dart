@@ -12,13 +12,11 @@ class MangaClashTagListHtmlParser extends TagListHtmlParser {
       for (final child in [...?region?.children])
         Tag(
           id: child.querySelector('input')?.attributes['value'],
+          // TODO: move to intermediary object like [ChapterScrapped]
           name: toBeginningOfSentenceCase(child.text.trim()),
         ),
     ];
   }
 
-  MangaClashTagListHtmlParser({
-    required super.root,
-    required super.converterCacheManager,
-  });
+  MangaClashTagListHtmlParser({required super.root});
 }

@@ -1,7 +1,6 @@
 import 'package:rxdart/rxdart.dart';
 
 abstract class ListenPrefetchChapterConfig {
-
   ValueStream<int> get numOfPrefetchedPrevChapter;
 
   ValueStream<int> get numOfPrefetchedNextChapter;

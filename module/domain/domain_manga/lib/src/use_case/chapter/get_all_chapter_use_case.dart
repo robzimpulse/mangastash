@@ -37,6 +37,7 @@ class GetAllChapterUseCase {
           ...await execute(
             source: source,
             mangaId: mangaId,
+
             /// force other source to use cache on the next page since only
             /// mangadex use true pagination, while other source provide all
             /// chapter on the first fetch
