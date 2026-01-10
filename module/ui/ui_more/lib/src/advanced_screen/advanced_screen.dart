@@ -1,4 +1,5 @@
 import 'package:core_analytics/core_analytics.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -138,10 +139,19 @@ class AdvancedScreen extends StatelessWidget {
                         'Source: ${value.duplicatedManga?.key.$1}',
                       ),
                       children: [
-                        for (final child in value.duplicatedManga?.value ?? [])
+                        for (final child in value.duplicatedManga?.value ?? <MangaModel>[])
                           ListTile(
                             title: Text(child.manga?.id ?? ''),
-                            subtitle: Text(child.manga?.webUrl ?? ''),
+                            subtitle: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(child.manga?.webUrl ?? ''),
+                                Text(
+                                  'Updated At: ${child.manga?.updatedAt.readableFormat}',
+                                ),
+                              ],
+                            ),
                           ),
                       ],
                     ),

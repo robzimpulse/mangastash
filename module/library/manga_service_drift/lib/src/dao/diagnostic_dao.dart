@@ -66,6 +66,19 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
           .groupListsBy((e) => (e.manga?.title, e.manga?.source))
           .entries
           .where((e) => e.value.length > 1)
+          .map(
+            (e) => MapEntry(
+              e.key,
+              e.value
+                  .sortedBy(
+                    (e) =>
+                        e.manga?.updatedAt ??
+                        DateTime.fromMillisecondsSinceEpoch(0),
+                  )
+                  .reversed
+                  .toList(),
+            ),
+          )
           .map((e) => DiagnosticModel(duplicatedManga: e))
           .toList();
     });
