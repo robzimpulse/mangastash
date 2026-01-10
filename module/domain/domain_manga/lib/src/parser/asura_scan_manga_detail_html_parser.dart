@@ -45,11 +45,7 @@ class AsuraScanMangaDetailHtmlParser extends MangaDetailHtmlParser {
       coverUrl: coverUrl,
       tags: [
         ...?genres?.map(
-          (e) => Tag(
-            // TODO: move to intermediary object like [ChapterScrapped]
-            name: toBeginningOfSentenceCase(e.toLowerCase()),
-            source: SourceEnum.mangaclash.label,
-          ),
+          (e) => Tag(name: e, source: SourceEnum.mangaclash.label),
         ),
       ],
     );

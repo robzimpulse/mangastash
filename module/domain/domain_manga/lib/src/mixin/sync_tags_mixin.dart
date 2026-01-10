@@ -2,6 +2,8 @@ import 'package:core_analytics/core_analytics.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 
+import '../extension/data_scrapped_extension.dart';
+
 mixin SyncTagsMixin {
   Future<List<Tag>> sync({
     required TagDao dao,
@@ -10,7 +12,9 @@ mixin SyncTagsMixin {
   }) async {
     final stopwatch = Stopwatch()..start();
 
-    final results = await dao.adds(values: [...values.map((e) => e.toDrift)]);
+    final results = await dao.adds(
+      values: [...values.map((e) => e.adjust().toDrift)],
+    );
 
     final data = [...results.map((e) => Tag.fromDrift(e)).nonNulls];
 

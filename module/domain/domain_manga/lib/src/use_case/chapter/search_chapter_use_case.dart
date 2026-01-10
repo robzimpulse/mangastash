@@ -8,7 +8,7 @@ import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-import '../../extension/chapter_extension.dart';
+import '../../extension/data_scrapped_extension.dart';
 import '../../mixin/filter_chapters_mixin.dart';
 import '../../mixin/sort_chapters_mixin.dart';
 import '../../mixin/sync_chapters_mixin.dart';

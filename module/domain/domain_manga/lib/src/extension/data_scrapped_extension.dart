@@ -2,8 +2,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 
-extension ChapterConverter on ChapterScrapped {
-
+extension ChapterScrappedExtension on ChapterScrapped {
   Future<Chapter> convert({ConverterCacheManager? manager}) async {
     return Chapter(
       id: id,
@@ -22,5 +21,16 @@ extension ChapterConverter on ChapterScrapped {
       updatedAt: await updatedAtRaw?.asDateTime(manager: manager),
     );
   }
+}
 
+extension MangaExtension on Manga {
+  Manga adjust() {
+    return copyWith(status: toBeginningOfSentenceCase(status?.toLowerCase()));
+  }
+}
+
+extension TagExtension on Tag {
+  Tag adjust() {
+    return copyWith(name: toBeginningOfSentenceCase(name?.toLowerCase()));
+  }
 }
