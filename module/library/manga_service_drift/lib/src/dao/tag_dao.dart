@@ -10,12 +10,7 @@ import '../tables/tag_tables.dart';
 
 part 'tag_dao.g.dart';
 
-@DriftAccessor(
-  tables: [
-    TagTables,
-    RelationshipTables,
-  ],
-)
+@DriftAccessor(tables: [TagTables, RelationshipTables])
 class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
   TagDao(super.db);
 
@@ -50,16 +45,16 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
     List<String> names = const [],
     List<String> sources = const [],
   }) {
-    final selector = _selector
-      ..where(
-        (f) => _filter(
-          f: f,
-          ids: ids,
-          tagIds: tagIds,
-          names: names,
-          sources: sources,
-        ),
-      );
+    final selector =
+        _selector..where(
+          (f) => _filter(
+            f: f,
+            ids: ids,
+            tagIds: tagIds,
+            names: names,
+            sources: sources,
+          ),
+        );
     return transaction(() => selector.get());
   }
 
@@ -69,16 +64,16 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
     List<String> names = const [],
     List<String> sources = const [],
   }) {
-    final selector = _deleter
-      ..where(
-        (f) => _filter(
-          f: f,
-          ids: ids,
-          tagIds: tagIds,
-          names: names,
-          sources: sources,
-        ),
-      );
+    final selector =
+        _deleter..where(
+          (f) => _filter(
+            f: f,
+            ids: ids,
+            tagIds: tagIds,
+            names: names,
+            sources: sources,
+          ),
+        );
     return transaction(() => selector.goAndReturn());
   }
 
@@ -117,15 +112,9 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
         }
 
         final value = entry.copyWith(
-          id: Value.absentIfNull(
-            entry.id.valueOrNull ?? tag?.id,
-          ),
-          tagId: Value.absentIfNull(
-            entry.tagId.valueOrNull ?? tag?.tagId,
-          ),
-          name: Value.absentIfNull(
-            entry.name.valueOrNull ?? tag?.name,
-          ),
+          id: Value.absentIfNull(entry.id.valueOrNull ?? tag?.id),
+          tagId: Value.absentIfNull(entry.tagId.valueOrNull ?? tag?.tagId),
+          name: Value.absentIfNull(entry.name.valueOrNull ?? tag?.name),
         );
 
         final result = await into(tagTables).insertReturning(
@@ -191,17 +180,13 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
     );
   }
 
-  Future<void> detach({
-    required String mangaId,
-    int? tagId,
-  }) async {
-    final selector = delete(relationshipTables)
-      ..where(
-        (f) => [
-          f.mangaId.equals(mangaId),
-          if (tagId != null) f.tagId.equals(tagId),
-        ].reduce((a, b) => a & b),
-      );
+  Future<void> detach({required String mangaId, int? tagId}) async {
+    final selector = delete(relationshipTables)..where(
+      (f) => [
+        f.mangaId.equals(mangaId),
+        if (tagId != null) f.tagId.equals(tagId),
+      ].reduce((a, b) => a & b),
+    );
 
     return transaction(() => selector.go());
   }

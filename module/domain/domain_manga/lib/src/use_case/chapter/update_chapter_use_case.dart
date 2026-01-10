@@ -33,9 +33,12 @@ class UpdateChapterUseCase with SyncChaptersMixin {
   }
 
   Future<void> updateLastRead({required String chapterId}) async {
-    await _execute(chapterId: chapterId, updater: (chapter) async {
-      return chapter.copyWith(lastReadAt: DateTime.now());
-    });
+    await _execute(
+      chapterId: chapterId,
+      updater: (chapter) async {
+        return chapter.copyWith(lastReadAt: DateTime.now());
+      },
+    );
   }
 
   Future<void> _execute({

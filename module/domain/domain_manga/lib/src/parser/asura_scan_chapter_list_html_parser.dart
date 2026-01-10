@@ -5,13 +5,10 @@ import 'package:html/dom.dart';
 import 'base/chapter_list_html_parser.dart';
 
 class AsuraScanChapterListHtmlParser extends ChapterListHtmlParser {
-  AsuraScanChapterListHtmlParser({
-    required super.root,
-    required super.converterCacheManager,
-  });
+  AsuraScanChapterListHtmlParser({required super.root});
 
   @override
-  Future<List<Chapter>> get chapters async {
+  Future<List<ChapterScrapped>> get chapters async {
     final region = root.querySelector(
       [
         'div',
@@ -26,7 +23,7 @@ class AsuraScanChapterListHtmlParser extends ChapterListHtmlParser {
       ].join('.'),
     );
 
-    final List<Chapter> data = [];
+    final List<ChapterScrapped> data = [];
     for (final element in region?.children ?? <Element>[]) {
       final url = element.querySelector('a')?.attributes['href'];
 
@@ -68,12 +65,10 @@ class AsuraScanChapterListHtmlParser extends ChapterListHtmlParser {
           .replaceAll('th', '');
 
       data.add(
-        Chapter(
+        ChapterScrapped(
           title: title?.isNotEmpty == true ? title : null,
           chapter: '${chapter ?? url?.split('/').lastOrNull}',
-          readableAt: await releaseDate?.asDateTime(
-            manager: converterCacheManager,
-          ),
+          readableAtRaw: releaseDate,
           webUrl: ['https://asuracomic.net', 'series', url].join('/'),
           scanlationGroup: SourceEnum.asurascan.label,
         ),

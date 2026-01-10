@@ -4,10 +4,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'base/manga_detail_html_parser.dart';
 
 class AsuraScanMangaDetailHtmlParser extends MangaDetailHtmlParser {
-  AsuraScanMangaDetailHtmlParser({
-    required super.root,
-    required super.converterCacheManager,
-  });
+  AsuraScanMangaDetailHtmlParser({required super.root});
 
   @override
   Future<Manga> get manga async {
@@ -48,10 +45,7 @@ class AsuraScanMangaDetailHtmlParser extends MangaDetailHtmlParser {
       coverUrl: coverUrl,
       tags: [
         ...?genres?.map(
-          (e) => Tag(
-            name: toBeginningOfSentenceCase(e.toLowerCase()),
-            source: SourceEnum.mangaclash.label,
-          ),
+          (e) => Tag(name: e, source: SourceEnum.mangaclash.label),
         ),
       ],
     );

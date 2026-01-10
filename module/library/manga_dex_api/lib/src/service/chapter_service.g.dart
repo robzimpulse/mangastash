@@ -92,7 +92,7 @@ class _ChapterService implements ChapterService {
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
     late SearchChapterResponse _value;
     try {
-      _value = await compute(deserializeSearchChapterResponse, _result.data!);
+      _value = SearchChapterResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -134,7 +134,7 @@ class _ChapterService implements ChapterService {
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
     late ChapterResponse _value;
     try {
-      _value = await compute(deserializeChapterResponse, _result.data!);
+      _value = ChapterResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

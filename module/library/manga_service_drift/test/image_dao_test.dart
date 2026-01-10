@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_drift/src/database/memory_executor.dart';
-import 'package:manga_service_drift/src/extension/nullable_generic.dart';
 
 void main() {
   late AppDatabase db;

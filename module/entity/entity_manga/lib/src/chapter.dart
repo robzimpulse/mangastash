@@ -58,21 +58,21 @@ class Chapter extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        mangaId,
-        title,
-        volume,
-        chapter,
-        readableAt,
-        publishAt,
-        images,
-        translatedLanguage,
-        scanlationGroup,
-        webUrl,
-        lastReadAt,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    mangaId,
+    title,
+    volume,
+    chapter,
+    readableAt,
+    publishAt,
+    images,
+    translatedLanguage,
+    scanlationGroup,
+    webUrl,
+    lastReadAt,
+    createdAt,
+    updatedAt,
+  ];
 
   static Chapter? fromDatabase(ChapterModel? model) {
     return model?.chapter?.let(
@@ -189,9 +189,10 @@ class Chapter extends Equatable {
       title: data.attributes?.title,
       chapter: data.attributes?.chapter,
       volume: data.attributes?.volume,
-      scanlationGroup: scanlation is Relationship<ScanlationGroupDataAttributes>
-          ? scanlation.attributes?.name
-          : null,
+      scanlationGroup:
+          scanlation is Relationship<ScanlationGroupDataAttributes>
+              ? scanlation.attributes?.name
+              : null,
     );
   }
 
@@ -199,9 +200,7 @@ class Chapter extends Equatable {
 
   static Chapter? fromJsonString(String value) {
     try {
-      return Chapter.fromJson(
-        json.decode(value) as Map<String, dynamic>,
-      );
+      return Chapter.fromJson(json.decode(value) as Map<String, dynamic>);
     } catch (e) {
       return null;
     }

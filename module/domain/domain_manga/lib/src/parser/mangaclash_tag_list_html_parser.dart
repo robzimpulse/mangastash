@@ -1,4 +1,3 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/src/tag.dart';
 
 import 'base/tag_list_html_parser.dart';
@@ -12,13 +11,10 @@ class MangaClashTagListHtmlParser extends TagListHtmlParser {
       for (final child in [...?region?.children])
         Tag(
           id: child.querySelector('input')?.attributes['value'],
-          name: toBeginningOfSentenceCase(child.text.trim()),
+          name: child.text.trim(),
         ),
     ];
   }
 
-  MangaClashTagListHtmlParser({
-    required super.root,
-    required super.converterCacheManager,
-  });
+  MangaClashTagListHtmlParser({required super.root});
 }

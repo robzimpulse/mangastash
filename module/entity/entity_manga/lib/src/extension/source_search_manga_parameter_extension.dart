@@ -23,15 +23,12 @@ extension SearchUrlExtension on SourceSearchMangaParameter {
             if (parameter.orders?.containsKey(SearchOrders.updatedAt) == true)
               const MapEntry('m_orderby', 'latest'),
             for (final status in parameter.status ?? <MangaStatus>[])
-              MapEntry(
-                'status[]',
-                switch (status) {
-                  MangaStatus.ongoing => 'on-going',
-                  MangaStatus.completed => 'end',
-                  MangaStatus.hiatus => 'on-hold',
-                  MangaStatus.cancelled => 'canceled',
-                },
-              ),
+              MapEntry('status[]', switch (status) {
+                MangaStatus.ongoing => 'on-going',
+                MangaStatus.completed => 'end',
+                MangaStatus.hiatus => 'on-hold',
+                MangaStatus.cancelled => 'canceled',
+              }),
             for (final tag in parameter.includedTags ?? <String>[])
               MapEntry('genre[]', tag),
             if (parameter.includedTags?.isNotEmpty == true)

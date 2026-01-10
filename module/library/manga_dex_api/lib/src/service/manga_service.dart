@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart' hide Headers;
-import 'package:flutter/foundation.dart';
 import 'package:retrofit/retrofit.dart';
 
 import '../model/chapter/search_chapter_response.dart';
@@ -9,10 +8,7 @@ import '../model/tag/tag_response.dart';
 
 part 'manga_service.g.dart';
 
-@RestApi(
-  baseUrl: 'https://api.mangadex.org',
-  parser: Parser.FlutterCompute,
-)
+@RestApi(baseUrl: 'https://api.mangadex.org')
 abstract class MangaService {
   factory MangaService(
     Dio dio, {

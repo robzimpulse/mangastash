@@ -13,26 +13,19 @@ import 'image_dao.dart';
 
 part 'chapter_dao.g.dart';
 
-@DriftAccessor(
-  tables: [
-    ChapterTables,
-    ImageTables,
-  ],
-)
+@DriftAccessor(tables: [ChapterTables, ImageTables])
 class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
   ChapterDao(super.db);
 
   late final ImageDao _imageDao = ImageDao(db);
 
   JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
-    return select(chapterTables).join(
-      [
-        leftOuterJoin(
-          imageTables,
-          imageTables.chapterId.equalsExp(chapterTables.id),
-        ),
-      ],
-    );
+    return select(chapterTables).join([
+      leftOuterJoin(
+        imageTables,
+        imageTables.chapterId.equalsExp(chapterTables.id),
+      ),
+    ]);
   }
 
   List<ChapterModel> _parse(List<TypedResult> rows) {
@@ -106,9 +99,7 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
         f.title.isIn(titles.nonEmpty.distinct),
         f.volume.isIn(volumes.nonEmpty.distinct),
         f.chapter.isIn(chapters.nonEmpty.distinct),
-        f.translatedLanguage.isIn(
-          translatedLanguages.nonEmpty.distinct,
-        ),
+        f.translatedLanguage.isIn(translatedLanguages.nonEmpty.distinct),
         f.scanlationGroup.isIn(scanlationGroups.nonEmpty.distinct),
         f.webUrl.isIn(webUrls.nonEmpty.distinct),
       ].fold(const Constant(false), (a, b) => a | b);
@@ -141,15 +132,11 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
 
       for (final entry in values.entries) {
         final byId = entry.key.id.valueOrNull.let(
-          (id) => chapters.firstWhereOrNull(
-            (e) => e.chapter?.id == id,
-          ),
+          (id) => chapters.firstWhereOrNull((e) => e.chapter?.id == id),
         );
 
         final byWebUrl = entry.key.webUrl.valueOrNull.let(
-          (url) => chapters.firstWhereOrNull(
-            (e) => e.chapter?.webUrl == url,
-          ),
+          (url) => chapters.firstWhereOrNull((e) => e.chapter?.webUrl == url),
         );
 
         final chapter = (byId ?? byWebUrl);

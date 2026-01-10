@@ -31,14 +31,14 @@ class Pagination<T extends Equatable> extends Equatable {
 
   @override
   List<Object?> get props => [
-        limit,
-        page,
-        offset,
-        total,
-        data,
-        hasNextPage,
-        sourceUrl,
-      ];
+    limit,
+    page,
+    offset,
+    total,
+    data,
+    hasNextPage,
+    sourceUrl,
+  ];
 
   factory Pagination.fromJson(
     Map<String, dynamic> json,
@@ -47,9 +47,7 @@ class Pagination<T extends Equatable> extends Equatable {
     return _$PaginationFromJson(json, fromJsonT);
   }
 
-  Map<String, dynamic> toJson(
-    Object? Function(T value) toJsonT,
-  ) =>
+  Map<String, dynamic> toJson(Object? Function(T value) toJsonT) =>
       _$PaginationToJson(this, toJsonT);
 
   Pagination<T> copyWith({

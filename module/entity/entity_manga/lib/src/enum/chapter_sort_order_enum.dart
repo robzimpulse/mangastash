@@ -1,5 +1,6 @@
 enum ChapterSortOrderEnum {
-  asc('ASC'), desc('DESC');
+  asc('ASC'),
+  desc('DESC');
 
   final String value;
 

@@ -1,1 +1,1 @@
-enum ImageMenu { delete; }
+enum ImageMenu { delete }

@@ -54,7 +54,6 @@ part 'database.g.dart';
     FileDao,
   ],
 )
-
 class AppDatabase extends _$AppDatabase {
   final Executor _executor;
 

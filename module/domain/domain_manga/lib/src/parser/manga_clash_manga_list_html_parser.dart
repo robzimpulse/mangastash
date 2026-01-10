@@ -1,4 +1,3 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 
 import 'base/manga_list_html_parser.dart';
@@ -25,8 +24,7 @@ class MangaClashMangaListHtmlParser extends MangaListHtmlParser {
           .querySelector('div.post-content_item.mg_genres')
           ?.querySelector('div.summary-content')
           ?.text
-          .split(',')
-          .map((e) => toBeginningOfSentenceCase(e.trim()));
+          .split(',');
       final status =
           element
               .querySelector('div.post-content_item.mg_status')
@@ -39,14 +37,8 @@ class MangaClashMangaListHtmlParser extends MangaListHtmlParser {
           title: title,
           coverUrl: coverUrl,
           webUrl: webUrl,
-          status: toBeginningOfSentenceCase(status?.toLowerCase()),
-          tags:
-              genres
-                  ?.map(
-                    (e) =>
-                        Tag(name: toBeginningOfSentenceCase(e.toLowerCase())),
-                  )
-                  .toList(),
+          status: status,
+          tags: genres?.map((e) => Tag(name: e.trim())).toList(),
         ),
       );
     }
@@ -67,8 +59,5 @@ class MangaClashMangaListHtmlParser extends MangaListHtmlParser {
     return values?.firstOrNull != values?.lastOrNull;
   }
 
-  MangaClashMangaListHtmlParser({
-    required super.root,
-    required super.converterCacheManager,
-  });
+  MangaClashMangaListHtmlParser({required super.root});
 }

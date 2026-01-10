@@ -1,4 +1,3 @@
-import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:html/dom.dart';
 
@@ -9,25 +8,18 @@ import 'base_html_parser.dart';
 abstract class TagListHtmlParser extends BaseHtmlParser {
   Future<List<Tag>> get tags;
 
-  TagListHtmlParser({required super.root, required super.converterCacheManager});
+  TagListHtmlParser({required super.root});
 
   factory TagListHtmlParser.forSource({
     required Document root,
     required SourceEnum source,
-    required ConverterCacheManager converterCacheManager,
   }) {
     if (SourceEnum.asurascan == source) {
-      return AsuraScanTagListHtmlParser(
-        root: root,
-        converterCacheManager: converterCacheManager,
-      );
+      return AsuraScanTagListHtmlParser(root: root);
     }
 
     if (SourceEnum.mangaclash == source) {
-      return MangaClashTagListHtmlParser(
-        root: root,
-        converterCacheManager: converterCacheManager,
-      );
+      return MangaClashTagListHtmlParser(root: root);
     }
 
     throw UnimplementedError();

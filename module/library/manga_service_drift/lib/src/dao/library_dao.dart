@@ -11,12 +11,7 @@ import '../tables/tag_tables.dart';
 part 'library_dao.g.dart';
 
 @DriftAccessor(
-  tables: [
-    MangaTables,
-    TagTables,
-    RelationshipTables,
-    LibraryTables,
-  ],
+  tables: [MangaTables, TagTables, RelationshipTables, LibraryTables],
 )
 class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
   LibraryDao(super.db);
@@ -26,24 +21,20 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
       OrderingTerm(expression: mangaTables.title, mode: OrderingMode.asc),
     ];
 
-    return select(libraryTables).join(
-      [
-        leftOuterJoin(
-          mangaTables,
-          mangaTables.id.equalsExp(libraryTables.mangaId),
-        ),
-        leftOuterJoin(
-          relationshipTables,
-          relationshipTables.mangaId.equalsExp(
-            libraryTables.mangaId,
-          ),
-        ),
-        leftOuterJoin(
-          tagTables,
-          tagTables.id.equalsExp(relationshipTables.tagId),
-        ),
-      ],
-    )..orderBy(order);
+    return select(libraryTables).join([
+      leftOuterJoin(
+        mangaTables,
+        mangaTables.id.equalsExp(libraryTables.mangaId),
+      ),
+      leftOuterJoin(
+        relationshipTables,
+        relationshipTables.mangaId.equalsExp(libraryTables.mangaId),
+      ),
+      leftOuterJoin(
+        tagTables,
+        tagTables.id.equalsExp(relationshipTables.tagId),
+      ),
+    ])..orderBy(order);
   }
 
   List<MangaModel> _parse(List<TypedResult> rows) {
@@ -65,9 +56,9 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
 
   Future<void> add(String mangaId) {
     return transaction(
-      () => into(libraryTables).insert(
-        LibraryTablesCompanion.insert(mangaId: mangaId),
-      ),
+      () => into(
+        libraryTables,
+      ).insert(LibraryTablesCompanion.insert(mangaId: mangaId)),
     );
   }
 

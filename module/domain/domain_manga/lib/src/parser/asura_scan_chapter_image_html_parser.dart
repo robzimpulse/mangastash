@@ -3,10 +3,7 @@ import 'package:collection/collection.dart';
 import 'base/chapter_image_html_parser.dart';
 
 class AsuraScanChapterImageHtmlParser extends ChapterImageHtmlParser {
-  AsuraScanChapterImageHtmlParser({
-    required super.root,
-    required super.converterCacheManager,
-  });
+  AsuraScanChapterImageHtmlParser({required super.root});
 
   @override
   Future<List<String>> get images async {

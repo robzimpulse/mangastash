@@ -9,19 +9,16 @@ import '../../parser/base/tag_list_html_parser.dart';
 
 class GetTagsUseCase with SyncTagsMixin {
   final HeadlessWebviewUseCase _webview;
-  final ConverterCacheManager _converterCacheManager;
   final MangaService _mangaService;
   final TagDao _tagDao;
   final LogBox _logBox;
 
   const GetTagsUseCase({
     required HeadlessWebviewUseCase webview,
-    required ConverterCacheManager converterCacheManager,
     required MangaService mangaService,
     required TagDao tagDao,
     required LogBox logBox,
   }) : _mangaService = mangaService,
-       _converterCacheManager = converterCacheManager,
        _tagDao = tagDao,
        _webview = webview,
        _logBox = logBox;
@@ -77,11 +74,7 @@ class GetTagsUseCase with SyncTagsMixin {
       useCache: useCache,
     );
 
-    final parser = TagListHtmlParser.forSource(
-      root: document,
-      source: source,
-      converterCacheManager: _converterCacheManager,
-    );
+    final parser = TagListHtmlParser.forSource(root: document, source: source);
 
     final tags = await parser.tags;
 

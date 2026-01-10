@@ -3,10 +3,7 @@ import 'package:collection/collection.dart';
 import 'base/chapter_image_html_parser.dart';
 
 class MangaClashChapterImageHtmlParser extends ChapterImageHtmlParser {
-  MangaClashChapterImageHtmlParser({
-    required super.root,
-    required super.converterCacheManager,
-  });
+  MangaClashChapterImageHtmlParser({required super.root});
 
   @override
   Future<List<String>> get images async {

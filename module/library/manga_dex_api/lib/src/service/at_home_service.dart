@@ -1,15 +1,11 @@
 import 'package:dio/dio.dart' hide Headers;
-import 'package:flutter/foundation.dart';
 import 'package:retrofit/retrofit.dart';
 
 import '../model/at_home/at_home_response.dart';
 
 part 'at_home_service.g.dart';
 
-@RestApi(
-  baseUrl: 'https://api.mangadex.org',
-  parser: Parser.FlutterCompute,
-)
+@RestApi(baseUrl: 'https://api.mangadex.org')
 abstract class AtHomeService {
   factory AtHomeService(
     Dio dio, {

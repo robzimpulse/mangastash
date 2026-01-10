@@ -24,14 +24,7 @@ class ChapterConfig extends Equatable {
 
   @override
   List<Object?> get props {
-    return [
-      downloaded,
-      unread,
-      bookmarked,
-      display,
-      sortOption,
-      sortOrder,
-    ];
+    return [downloaded, unread, bookmarked, display, sortOption, sortOrder];
   }
 
   ChapterConfig copyWith({

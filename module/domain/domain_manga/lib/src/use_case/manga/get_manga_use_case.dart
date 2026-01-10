@@ -9,19 +9,17 @@ import '../../parser/base/manga_detail_html_parser.dart';
 
 class GetMangaUseCase with SyncMangasMixin {
   final HeadlessWebviewUseCase _webview;
-  final ConverterCacheManager _converterCacheManager;
   final MangaService _mangaService;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   GetMangaUseCase({
     required HeadlessWebviewUseCase webview,
-    required ConverterCacheManager converterCacheManager,
+
     required MangaService mangaService,
     required MangaDao mangaDao,
     required LogBox logBox,
-  }) : _converterCacheManager = converterCacheManager,
-       _mangaService = mangaService,
+  }) : _mangaService = mangaService,
        _mangaDao = mangaDao,
        _logBox = logBox,
        _webview = webview;
@@ -79,7 +77,6 @@ class GetMangaUseCase with SyncMangasMixin {
     final parser = MangaDetailHtmlParser.forSource(
       root: document,
       source: source,
-      converterCacheManager: _converterCacheManager,
     );
 
     final manga = await parser.manga;

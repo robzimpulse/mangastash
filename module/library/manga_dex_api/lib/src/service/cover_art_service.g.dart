@@ -57,7 +57,7 @@ class _CoverArtService implements CoverArtService {
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
     late CoverArtResponse _value;
     try {
-      _value = await compute(deserializeCoverArtResponse, _result.data!);
+      _value = CoverArtResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

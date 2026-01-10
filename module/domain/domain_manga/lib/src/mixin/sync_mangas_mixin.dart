@@ -2,6 +2,8 @@ import 'package:core_analytics/core_analytics.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 
+import '../extension/data_scrapped_extension.dart';
+
 mixin SyncMangasMixin {
   Future<List<Manga>> sync({
     required MangaDao dao,
@@ -13,7 +15,9 @@ mixin SyncMangasMixin {
     final results = await dao.adds(
       values: {
         for (final value in values)
-          value.toDrift: [...?value.tags?.map((e) => e.name).nonNulls],
+          value.adjust().toDrift: [
+            ...?value.tags?.map((e) => e.adjust().name).nonNulls,
+          ],
       },
     );
 

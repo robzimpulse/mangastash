@@ -8,25 +8,17 @@ import '../tables/relationship_tables.dart';
 
 part 'history_dao.g.dart';
 
-@DriftAccessor(
-  tables: [
-    MangaTables,
-    RelationshipTables,
-    ChapterTables,
-  ],
-)
+@DriftAccessor(tables: [MangaTables, RelationshipTables, ChapterTables])
 class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
   HistoryDao(super.db);
 
   JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
-    return select(mangaTables).join(
-      [
-        leftOuterJoin(
-          chapterTables,
-          chapterTables.mangaId.equalsExp(mangaTables.id),
-        ),
-      ],
-    );
+    return select(mangaTables).join([
+      leftOuterJoin(
+        chapterTables,
+        chapterTables.mangaId.equalsExp(mangaTables.id),
+      ),
+    ]);
   }
 
   List<HistoryModel> _parse(List<TypedResult> rows) {
@@ -47,9 +39,10 @@ class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
       ),
     ];
 
-    final selector = _aggregate
-      ..where(chapterTables.lastReadAt.isNotNull())
-      ..orderBy(order);
+    final selector =
+        _aggregate
+          ..where(chapterTables.lastReadAt.isNotNull())
+          ..orderBy(order);
 
     return selector.watch().map(_parse);
   }
@@ -62,9 +55,10 @@ class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
       ),
     ];
 
-    final selector = _aggregate
-      ..where(chapterTables.lastReadAt.isNull())
-      ..orderBy(order);
+    final selector =
+        _aggregate
+          ..where(chapterTables.lastReadAt.isNull())
+          ..orderBy(order);
 
     return selector.watch().map(_parse);
   }
