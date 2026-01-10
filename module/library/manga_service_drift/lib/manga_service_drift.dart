@@ -18,6 +18,5 @@ export 'src/model/chapter_model.dart';
 export 'src/model/history_model.dart';
 export 'src/model/job_model.dart';
 export 'src/model/manga_model.dart';
-export 'src/model/orphan_manga_model.dart';
 export 'src/util/database_viewer.dart';
 export 'src/util/job_type_enum.dart';

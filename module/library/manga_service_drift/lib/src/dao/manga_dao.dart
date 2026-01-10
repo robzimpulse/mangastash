@@ -7,7 +7,6 @@ import '../extension/non_empty_string_list_extension.dart';
 import '../extension/nullable_generic.dart';
 import '../extension/value_or_null_extension.dart';
 import '../model/manga_model.dart';
-import '../model/orphan_manga_model.dart';
 import '../tables/manga_tables.dart';
 import '../tables/relationship_tables.dart';
 import '../tables/tag_tables.dart';
@@ -23,11 +22,11 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
 
   JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
     return select(mangaTables).join([
-      fullOuterJoin(
+      leftOuterJoin(
         relationshipTables,
         relationshipTables.mangaId.equalsExp(mangaTables.id),
       ),
-      fullOuterJoin(
+      leftOuterJoin(
         tagTables,
         relationshipTables.tagId.equalsExp(tagTables.id),
       ),
@@ -53,27 +52,9 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     return data;
   }
 
-  List<OrphanMangaModel> _parseOrphan(List<TypedResult> rows) {
-    final data = <OrphanMangaModel>[];
-
-    for (final row in rows) {
-      final manga = row.readTableOrNull(mangaTables);
-      final tag = row.readTableOrNull(tagTables);
-      if (manga == null || tag == null) {
-        data.add(OrphanMangaModel(manga: manga, tag: tag));
-      }
-    }
-
-    return data;
-  }
-
   Stream<List<MangaModel>> get stream => _aggregate.watch().map(_parse);
 
   Future<List<MangaModel>> get all => _aggregate.get().then(_parse);
-
-  Future<List<OrphanMangaModel>> get orphan {
-    return _aggregate.get().then(_parseOrphan);
-  }
 
   Future<List<MangaModel>> search({
     List<String> ids = const [],

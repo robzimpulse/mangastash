@@ -28,17 +28,17 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
 
     return select(libraryTables).join(
       [
-        fullOuterJoin(
+        leftOuterJoin(
           mangaTables,
           mangaTables.id.equalsExp(libraryTables.mangaId),
         ),
-        fullOuterJoin(
+        leftOuterJoin(
           relationshipTables,
           relationshipTables.mangaId.equalsExp(
             libraryTables.mangaId,
           ),
         ),
-        fullOuterJoin(
+        leftOuterJoin(
           tagTables,
           tagTables.id.equalsExp(relationshipTables.tagId),
         ),
