@@ -1,3 +1,1 @@
-Future<void> sqlWorkaround() async {
-
-}
+Future<void> sqlWorkaround() async {}

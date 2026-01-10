@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 
 extension CompanionEquality<T> on UpdateCompanion<T> {
-
   bool shouldUpdate(UpdateCompanion<T> other) {
     final columns = toColumns(true);
     final otherColumns = other.toColumns(true);
@@ -15,5 +14,4 @@ extension CompanionEquality<T> on UpdateCompanion<T> {
 
     return false;
   }
-
 }
