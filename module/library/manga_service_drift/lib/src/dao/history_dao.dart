@@ -21,7 +21,7 @@ class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
   JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
     return select(mangaTables).join(
       [
-        leftOuterJoin(
+        fullOuterJoin(
           chapterTables,
           chapterTables.mangaId.equalsExp(mangaTables.id),
         ),

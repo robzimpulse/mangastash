@@ -29,8 +29,8 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
 
   JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
     return _selector.join([
-      leftOuterJoin(mangaTables, mangaTables.id.equalsExp(jobTables.mangaId)),
-      leftOuterJoin(
+      fullOuterJoin(mangaTables, mangaTables.id.equalsExp(jobTables.mangaId)),
+      fullOuterJoin(
         chapterTables,
         chapterTables.id.equalsExp(jobTables.chapterId),
       ),

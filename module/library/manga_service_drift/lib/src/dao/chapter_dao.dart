@@ -27,7 +27,7 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
   JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
     return select(chapterTables).join(
       [
-        leftOuterJoin(
+        fullOuterJoin(
           imageTables,
           imageTables.chapterId.equalsExp(chapterTables.id),
         ),
