@@ -1,28 +1,22 @@
 import 'package:equatable/equatable.dart';
 
 import '../database/database.dart';
-import 'manga_model.dart';
 
 class DiagnosticModel extends Equatable {
   const DiagnosticModel({
-    this.mangaTagRelationship,
-    this.manga,
-    this.tag,
-
-    this.duplicatedManga,
+    this.duplicatedManga = const {},
+    this.duplicatedChapter = const {},
+    this.duplicatedTag = const {},
   });
 
-  final RelationshipTable? mangaTagRelationship;
-  final MangaDrift? manga;
-  final TagDrift? tag;
-
-  final MapEntry<(String?, String?), List<MangaModel>>? duplicatedManga;
+  final Map<(String?, String?), List<MangaDrift>> duplicatedManga;
+  final Map<(String?, String?), List<TagDrift>> duplicatedTag;
+  final Map<(String?, String?), List<ChapterDrift>> duplicatedChapter;
 
   @override
   List<Object?> get props => [
-    manga,
-    tag,
-    mangaTagRelationship,
     duplicatedManga,
+    duplicatedChapter,
+    duplicatedTag,
   ];
 }
