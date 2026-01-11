@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import '../database/database.dart';
+
 typedef LoggerCallback =
     void Function(
       String message, {
@@ -12,3 +14,7 @@ typedef LoggerCallback =
       Object? error,
       StackTrace? stackTrace,
     });
+
+typedef DuplicatedMangaResult = Map<(String?, String?), List<MangaDrift>>;
+typedef DuplicatedChapterResult = Map<(String?, String?), List<MangaDrift>>;
+typedef DuplicatedTagResult = Map<(String?, String?), List<MangaDrift>>;

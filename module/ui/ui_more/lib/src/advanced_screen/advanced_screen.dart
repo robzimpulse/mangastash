@@ -108,7 +108,7 @@ class AdvancedScreen extends StatelessWidget {
 
   Widget _buildDuplicateMangaDetector(BuildContext context) {
     return FutureBuilder(
-      future: diagnosticDao.duplicatedManga,
+      future: diagnosticDao.duplicateManga,
       builder: (context, snapshot) {
         final data = snapshot.data;
 
@@ -132,101 +132,26 @@ class AdvancedScreen extends StatelessWidget {
                     ),
                   ),
                 ] else ...[
-                  for (final value in data)
+                  for (final value in data.entries)
                     ExpansionTile(
-                      title: Text('Title: ${value.duplicatedManga?.key.$2}'),
-                      subtitle: Text(
-                        'Source: ${value.duplicatedManga?.key.$1}',
-                      ),
+                      title: Text('Title: ${value.key.$1}'),
+                      subtitle: Text('Source: ${value.key.$2}'),
                       children: [
-                        for (final child in value.duplicatedManga?.value ?? <MangaModel>[])
+                        for (final child in value.value)
                           ListTile(
-                            title: Text(child.manga?.id ?? ''),
+                            title: Text(child.id),
                             subtitle: Column(
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(child.manga?.webUrl ?? ''),
+                                Text(child.webUrl ?? ''),
                                 Text(
-                                  'Updated At: ${child.manga?.updatedAt.readableFormat}',
+                                  'Updated At: ${child.updatedAt.readableFormat}',
                                 ),
                               ],
                             ),
                           ),
                       ],
-                    ),
-                ],
-              ] else ...[
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    'Error: ${snapshot.error}',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ),
-              ],
-            ],
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildMissingMangaTagRelationshipDetector(BuildContext context) {
-    return FutureBuilder(
-      future: diagnosticDao.missingMangaTagRelationship,
-      builder: (context, snapshot) {
-        final data = snapshot.data;
-
-        return ExpansionTile(
-          title: const Text('Missing Manga <-> Tag Relationship'),
-          subtitle: Text('${data?.length} Record Found'),
-          children: [
-            if (snapshot.connectionState != ConnectionState.done) ...[
-              const SizedBox(
-                height: 50,
-                child: Center(child: CircularProgressIndicator()),
-              ),
-            ] else ...[
-              if (data != null) ...[
-                if (data.isEmpty) ...[
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      'No Missing Manga <-> Tag Detected',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                  ),
-                ] else ...[
-                  for (final value in data)
-                    ListTile(
-                      title: Text(
-                        'Manga ID: ${value.manga?.title} - ${value.manga?.source}',
-                      ),
-                      subtitle: Text(
-                        'Tag Name: ${value.tag?.name} - ${value.tag?.source}',
-                      ),
-                      trailing: IconButton(
-                        onPressed: () {
-                          final manga = value.manga;
-                          final tag = value.tag;
-
-                          if (manga == null) {
-                            context.showSnackBar(
-                              message: '${tag?.id} missing link to manga',
-                            );
-                            return;
-                          }
-
-                          if (tag == null) {
-                            context.showSnackBar(
-                              message: '${manga.id} missing link to tag',
-                            );
-                            return;
-                          }
-                        },
-                        icon: Icon(Icons.delete),
-                      ),
                     ),
                 ],
               ] else ...[
@@ -255,7 +180,6 @@ class AdvancedScreen extends StatelessWidget {
           _buildDatabaseInspector(context),
           _buildBrowserTester(context),
           _buildDuplicateMangaDetector(context),
-          _buildMissingMangaTagRelationshipDetector(context),
         ],
       ),
     );
