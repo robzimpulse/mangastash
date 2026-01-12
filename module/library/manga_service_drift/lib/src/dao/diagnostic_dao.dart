@@ -50,78 +50,84 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
     with _$DiagnosticDaoMixin {
   DiagnosticDao(super.db);
 
-  Future<DuplicatedMangaResult> get duplicateManga async {
-    final result = await duplicatedMangaQuery().get().then(
+  Stream<DuplicatedMangaResult> get duplicateManga {
+    final result = duplicatedMangaQuery().watch().map(
       (e) => e.groupListsBy((e) => (e.title, e.source)),
     );
     return result.map(
-      (key, value) => MapEntry(key, [
-        ...value.map(
-          (e) => MangaDrift(
-            createdAt: e.createdAt,
-            updatedAt: e.updatedAt,
-            id: e.id,
-            title: e.title,
-            coverUrl: e.coverUrl,
-            author: e.author,
-            status: e.status,
-            webUrl: e.webUrl,
-            description: e.description,
-            source: e.source,
+      (e) => e.map(
+        (key, value) => MapEntry(key, [
+          ...value.map(
+            (e) => MangaDrift(
+              createdAt: e.createdAt,
+              updatedAt: e.updatedAt,
+              id: e.id,
+              title: e.title,
+              coverUrl: e.coverUrl,
+              author: e.author,
+              status: e.status,
+              webUrl: e.webUrl,
+              description: e.description,
+              source: e.source,
+            ),
           ),
-        ),
-      ]),
+        ]),
+      ),
     );
   }
 
-  Future<DuplicatedChapterResult> get duplicateChapter async {
-    final result = await duplicatedChapterQuery().get().then(
+  Stream<DuplicatedChapterResult> get duplicateChapter {
+    final result = duplicatedChapterQuery().watch().map(
       (e) => e.groupListsBy((e) => (e.mangaId, e.chapter)),
     );
     return result.map(
-      (key, value) => MapEntry(key, [
-        ...value.map(
-          (e) => ChapterDrift(
-            createdAt: e.createdAt,
-            updatedAt: e.updatedAt,
-            id: e.id,
-            mangaId: e.mangaId,
-            title: e.title,
-            volume: e.volume,
-            chapter: e.chapter,
-            translatedLanguage: e.translatedLanguage,
-            scanlationGroup: e.scanlationGroup,
-            webUrl: e.webUrl,
-            readableAt: e.readableAt,
-            publishAt: e.publishAt,
-            lastReadAt: e.lastReadAt,
+      (e) => e.map(
+        (key, value) => MapEntry(key, [
+          ...value.map(
+            (e) => ChapterDrift(
+              createdAt: e.createdAt,
+              updatedAt: e.updatedAt,
+              id: e.id,
+              mangaId: e.mangaId,
+              title: e.title,
+              volume: e.volume,
+              chapter: e.chapter,
+              translatedLanguage: e.translatedLanguage,
+              scanlationGroup: e.scanlationGroup,
+              webUrl: e.webUrl,
+              readableAt: e.readableAt,
+              publishAt: e.publishAt,
+              lastReadAt: e.lastReadAt,
+            ),
           ),
-        ),
-      ]),
+        ]),
+      ),
     );
   }
 
-  Future<DuplicatedTagResult> get duplicateTag async {
-    final result = await duplicatedTagQuery().get().then(
+  Stream<DuplicatedTagResult> get duplicateTag {
+    final result = duplicatedTagQuery().watch().map(
       (e) => e.groupListsBy((e) => (e.name, e.source)),
     );
     return result.map(
-      (key, value) => MapEntry(key, [
-        ...value.map(
-          (e) => TagDrift(
-            createdAt: e.createdAt,
-            updatedAt: e.updatedAt,
-            id: e.id,
-            tagId: e.tagId,
-            name: e.name,
-            source: e.source,
+      (e) => e.map(
+        (key, value) => MapEntry(key, [
+          ...value.map(
+            (e) => TagDrift(
+              createdAt: e.createdAt,
+              updatedAt: e.updatedAt,
+              id: e.id,
+              tagId: e.tagId,
+              name: e.name,
+              source: e.source,
+            ),
           ),
-        ),
-      ]),
+        ]),
+      ),
     );
   }
 
-  Future<List<ChapterDrift>> get orphanChapter async {
+  Stream<List<ChapterDrift>> get orphanChapter {
     final selector = select(chapterTables).join([
       leftOuterJoin(
         mangaTables,
@@ -131,7 +137,7 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
 
     final query = selector..where(mangaTables.id.isNull());
 
-    return query.get().then((e) {
+    return query.watch().map((e) {
       return [...e.map((e) => e.readTableOrNull(chapterTables)).nonNulls];
     });
   }

@@ -104,8 +104,8 @@ class AdvancedScreen extends StatelessWidget {
   }
 
   Widget _buildDuplicateMangaDetector(BuildContext context) {
-    return FutureBuilder(
-      future: diagnosticDao.duplicateManga,
+    return StreamBuilder(
+      stream: diagnosticDao.duplicateManga,
       builder: (context, snapshot) {
         final data = snapshot.data;
 
@@ -168,8 +168,8 @@ class AdvancedScreen extends StatelessWidget {
   }
 
   Widget _buildDuplicateChapterDetector(BuildContext context) {
-    return FutureBuilder(
-      future: diagnosticDao.duplicateChapter,
+    return StreamBuilder(
+      stream: diagnosticDao.duplicateChapter,
       builder: (context, snapshot) {
         final data = snapshot.data;
 
@@ -232,8 +232,8 @@ class AdvancedScreen extends StatelessWidget {
   }
 
   Widget _buildDuplicateTagDetector(BuildContext context) {
-    return FutureBuilder(
-      future: diagnosticDao.duplicateTag,
+    return StreamBuilder(
+      stream: diagnosticDao.duplicateTag,
       builder: (context, snapshot) {
         final data = snapshot.data;
 
@@ -289,8 +289,8 @@ class AdvancedScreen extends StatelessWidget {
   }
 
   Widget _buildOrphanChapterDetector(BuildContext context) {
-    return FutureBuilder(
-      future: diagnosticDao.orphanChapter,
+    return StreamBuilder(
+      stream: diagnosticDao.orphanChapter,
       builder: (context, snapshot) {
         final data = snapshot.data;
 
