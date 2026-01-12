@@ -7,8 +7,10 @@ import 'package:flutter/material.dart';
 class MangaTileWidget extends StatelessWidget {
   const MangaTileWidget({
     super.key,
-    required this.manga,
-    this.padding = const EdgeInsets.all(0),
+    this.title,
+    this.sourceIconUrl,
+    this.coverUrl,
+    this.padding = EdgeInsets.zero,
     this.onTap,
     this.isOnLibrary = false,
     this.isPrefetching = false,
@@ -16,7 +18,33 @@ class MangaTileWidget extends StatelessWidget {
     this.cacheManager,
   });
 
-  final Manga manga;
+  factory MangaTileWidget.manga({
+    required Manga manga,
+    Key? key,
+    VoidCallback? onTap,
+    bool isOnLibrary = false,
+    bool isPrefetching = false,
+    BaseCacheManager? cacheManager,
+    EdgeInsetsGeometry padding = EdgeInsets.zero,
+    VoidCallback? onLongPress,
+  }) {
+    return MangaTileWidget(
+      title: manga.title,
+      coverUrl: manga.coverUrl,
+      sourceIconUrl: manga.source?.let(SourceEnum.fromName)?.icon,
+      key: key,
+      padding: padding,
+      onTap: onTap,
+      isOnLibrary: isOnLibrary,
+      isPrefetching: isPrefetching,
+      cacheManager: cacheManager,
+      onLongPress: onLongPress,
+    );
+  }
+
+  final String? sourceIconUrl;
+  final String? title;
+  final String? coverUrl;
   final bool isOnLibrary;
   final bool isPrefetching;
   final BaseCacheManager? cacheManager;
@@ -26,8 +54,7 @@ class MangaTileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sourceIconUrl = manga.source?.let(SourceEnum.fromName);
-    final title = manga.title;
+    final title = this.title;
 
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
@@ -38,9 +65,7 @@ class MangaTileWidget extends StatelessWidget {
             CachedNetworkImage(
               fit: BoxFit.cover,
               cacheManager: cacheManager,
-              imageUrl: manga.coverUrl.or(
-                'https://placehold.co/400?text=Cover+Url',
-              ),
+              imageUrl: coverUrl ?? 'https://placehold.co/400?text=Cover+Url',
               width: 50,
               height: 50,
               errorWidget: (context, url, error) {
@@ -76,7 +101,9 @@ class MangaTileWidget extends StatelessWidget {
                   padding: const EdgeInsets.all(4),
                   child: CachedNetworkImage(
                     cacheManager: cacheManager,
-                    imageUrl: sourceIconUrl.icon,
+                    imageUrl: sourceIconUrl.or(
+                      'https://placehold.co/200?text=Source+Icon+Url',
+                    ),
                     fit: BoxFit.contain,
                     errorWidget: (context, url, error) {
                       return const Center(child: Icon(Icons.error));

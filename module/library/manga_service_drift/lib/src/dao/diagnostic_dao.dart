@@ -50,7 +50,7 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
     with _$DiagnosticDaoMixin {
   DiagnosticDao(super.db);
 
-  Stream<DuplicatedMangaResult> get duplicateManga {
+  Stream<DuplicatedResult<MangaDrift>> get duplicateManga {
     final result = duplicatedMangaQuery().watch().map(
       (e) => e.groupListsBy((e) => (e.title, e.source)),
     );
@@ -76,7 +76,7 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  Stream<DuplicatedChapterResult> get duplicateChapter {
+  Stream<DuplicatedResult<ChapterDrift>> get duplicateChapter {
     final result = duplicatedChapterQuery().watch().map(
       (e) => e.groupListsBy((e) => (e.mangaId, e.chapter)),
     );
@@ -105,7 +105,7 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  Stream<DuplicatedTagResult> get duplicateTag {
+  Stream<DuplicatedResult<TagDrift>> get duplicateTag {
     final result = duplicatedTagQuery().watch().map(
       (e) => e.groupListsBy((e) => (e.name, e.source)),
     );
