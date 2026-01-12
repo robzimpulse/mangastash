@@ -74,6 +74,53 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
+  Future<DuplicatedChapterResult> get duplicateChapter async {
+    final result = await duplicatedChapterQuery().get().then(
+      (e) => e.groupListsBy((e) => (e.mangaId, e.chapter)),
+    );
+    return result.map(
+      (key, value) => MapEntry(key, [
+        ...value.map(
+          (e) => ChapterDrift(
+            createdAt: e.createdAt,
+            updatedAt: e.updatedAt,
+            id: e.id,
+            mangaId: e.mangaId,
+            title: e.title,
+            volume: e.volume,
+            chapter: e.chapter,
+            translatedLanguage: e.translatedLanguage,
+            scanlationGroup: e.scanlationGroup,
+            webUrl: e.webUrl,
+            readableAt: e.readableAt,
+            publishAt: e.publishAt,
+            lastReadAt: e.lastReadAt,
+          ),
+        ),
+      ]),
+    );
+  }
+
+  Future<DuplicatedTagResult> get duplicateTag async {
+    final result = await duplicatedTagQuery().get().then(
+      (e) => e.groupListsBy((e) => (e.name, e.source)),
+    );
+    return result.map(
+      (key, value) => MapEntry(key, [
+        ...value.map(
+          (e) => TagDrift(
+            createdAt: e.createdAt,
+            updatedAt: e.updatedAt,
+            id: e.id,
+            tagId: e.tagId,
+            name: e.name,
+            source: e.source,
+          ),
+        ),
+      ]),
+    );
+  }
+
   // Future<DiagnosticModel> get execute async {
   //   final manga = await duplicatedMangaQuery().get().then(
   //     (e) => e.groupListsBy((e) => (e.title, e.source)),

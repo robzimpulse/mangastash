@@ -16,5 +16,5 @@ typedef LoggerCallback =
     });
 
 typedef DuplicatedMangaResult = Map<(String?, String?), List<MangaDrift>>;
-typedef DuplicatedChapterResult = Map<(String?, String?), List<MangaDrift>>;
-typedef DuplicatedTagResult = Map<(String?, String?), List<MangaDrift>>;
+typedef DuplicatedChapterResult = Map<(String?, String?), List<ChapterDrift>>;
+typedef DuplicatedTagResult = Map<(String?, String?), List<TagDrift>>;
