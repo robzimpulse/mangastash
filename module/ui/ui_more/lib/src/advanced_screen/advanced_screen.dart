@@ -2,6 +2,7 @@ import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -14,6 +15,7 @@ class AdvancedScreen extends StatelessWidget {
   final AppDatabase database;
   final HeadlessWebviewUseCase webview;
   final DiagnosticDao diagnosticDao;
+  final ImagesCacheManager imagesCacheManager;
 
   const AdvancedScreen({
     super.key,
@@ -22,6 +24,7 @@ class AdvancedScreen extends StatelessWidget {
     required this.database,
     required this.webview,
     required this.diagnosticDao,
+    required this.imagesCacheManager,
   });
 
   static Widget create({required ServiceLocator locator}) {
@@ -33,6 +36,7 @@ class AdvancedScreen extends StatelessWidget {
         viewer: locator(),
         webview: locator(),
         diagnosticDao: locator(),
+        imagesCacheManager: locator(),
       ),
     );
   }
@@ -113,7 +117,7 @@ class AdvancedScreen extends StatelessWidget {
           title: const Text('Duplicated Manga Record'),
           subtitle: const Text('List based on title and source'),
           children: [
-            if (snapshot.connectionState != ConnectionState.done) ...[
+            if (snapshot.connectionState == ConnectionState.waiting) ...[
               const SizedBox(
                 height: 50,
                 child: Center(child: CircularProgressIndicator()),
@@ -135,17 +139,14 @@ class AdvancedScreen extends StatelessWidget {
                       subtitle: Text('Source: ${value.key.$2}'),
                       children: [
                         for (final child in value.value)
-                          ListTile(
-                            title: Text(child.id),
-                            subtitle: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(child.webUrl ?? ''),
-                                Text(
-                                  'Updated At: ${child.updatedAt.readableFormat}',
-                                ),
-                              ],
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            child: MangaTileWidget(
+                              manga: Manga.fromDrift(child),
+                              cacheManager: imagesCacheManager,
                             ),
                           ),
                       ],
@@ -177,7 +178,7 @@ class AdvancedScreen extends StatelessWidget {
           title: const Text('Duplicated Chapter Record'),
           subtitle: const Text('List based on manga id and chapter name'),
           children: [
-            if (snapshot.connectionState != ConnectionState.done) ...[
+            if (snapshot.connectionState == ConnectionState.waiting) ...[
               const SizedBox(
                 height: 50,
                 child: Center(child: CircularProgressIndicator()),
@@ -241,7 +242,7 @@ class AdvancedScreen extends StatelessWidget {
           title: const Text('Duplicated Tag Record'),
           subtitle: const Text('List based on name and source'),
           children: [
-            if (snapshot.connectionState != ConnectionState.done) ...[
+            if (snapshot.connectionState == ConnectionState.waiting) ...[
               const SizedBox(
                 height: 50,
                 child: Center(child: CircularProgressIndicator()),
@@ -298,7 +299,7 @@ class AdvancedScreen extends StatelessWidget {
           title: const Text('Orphan Chapter Record'),
           subtitle: const Text('List based on chapter that have no manga'),
           children: [
-            if (snapshot.connectionState != ConnectionState.done) ...[
+            if (snapshot.connectionState == ConnectionState.waiting) ...[
               const SizedBox(
                 height: 50,
                 child: Center(child: CircularProgressIndicator()),
