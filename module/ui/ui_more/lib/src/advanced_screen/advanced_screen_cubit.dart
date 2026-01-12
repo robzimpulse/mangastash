@@ -7,14 +7,17 @@ class AdvancedScreenCubit extends Cubit<AdvancedScreenState>
     with AutoSubscriptionMixin {
   final MangaDao _mangaDao;
   final ChapterDao _chapterDao;
+  final TagDao _tagDao;
 
   AdvancedScreenCubit({
     AdvancedScreenState initialState = const AdvancedScreenState(),
     required DiagnosticDao diagnosticDao,
     required MangaDao mangaDao,
     required ChapterDao chapterDao,
+    required TagDao tagDao,
   }) : _mangaDao = mangaDao,
        _chapterDao = chapterDao,
+       _tagDao = tagDao,
        super(initialState) {
     addSubscription(
       diagnosticDao.duplicateManga.listen(
@@ -52,5 +55,17 @@ class AdvancedScreenCubit extends Cubit<AdvancedScreenState>
 
   void showOrphanedChapter(bool isExpanded) {
     emit(state.copyWith(isOrphanedExpanded: isExpanded));
+  }
+
+  Future<void> deleteMangas(List<MangaDrift> mangas) async {
+    await _mangaDao.remove(ids: [...mangas.map((e) => e.id)]);
+  }
+
+  Future<void> deleteChapters(List<ChapterDrift> chapters) async {
+    await _chapterDao.remove(ids: [...chapters.map((e) => e.id)]);
+  }
+
+  Future<void> deleteTags(List<TagDrift> tags) async {
+    await _tagDao.remove(ids: [...tags.map((e) => e.id)]);
   }
 }

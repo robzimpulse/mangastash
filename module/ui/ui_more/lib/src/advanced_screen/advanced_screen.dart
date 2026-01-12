@@ -33,6 +33,7 @@ class AdvancedScreen extends StatelessWidget {
           diagnosticDao: locator(),
           mangaDao: locator(),
           chapterDao: locator(),
+          tagDao: locator(),
         );
       },
       child: AdvancedScreen(
@@ -240,6 +241,7 @@ class AdvancedScreen extends StatelessWidget {
       },
       builder: (context, state) {
         return MultiSliver(
+          pushPinnedChildren: true,
           children: [
             SliverPinnedHeader(
               child: DecoratedBox(
@@ -535,21 +537,27 @@ class AdvancedScreen extends StatelessWidget {
   void _deleteDuplicateMangas({
     required BuildContext context,
     required List<MangaDrift> mangas,
-  }) {
+  }) async {
+    await _cubit(context).deleteMangas(mangas);
+    if (!context.mounted) return;
     context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
 
   void _deleteDuplicateChapters({
     required BuildContext context,
     required List<ChapterDrift> chapters,
-  }) {
+  }) async {
+    await _cubit(context).deleteChapters(chapters);
+    if (!context.mounted) return;
     context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
 
   void _deleteDuplicateTags({
     required BuildContext context,
     required List<TagDrift> tags,
-  }) {
+  }) async {
+    await _cubit(context).deleteTags(tags);
+    if (!context.mounted) return;
     context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
 }
