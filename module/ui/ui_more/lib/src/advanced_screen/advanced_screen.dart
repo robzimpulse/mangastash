@@ -170,6 +170,127 @@ class AdvancedScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildDuplicateChapterDetector(BuildContext context) {
+    return FutureBuilder(
+      future: diagnosticDao.duplicateChapter,
+      builder: (context, snapshot) {
+        final data = snapshot.data;
+
+        return ExpansionTile(
+          title: const Text('Duplicated Chapter Record'),
+          subtitle: const Text('List based on manga id and chapter name'),
+          children: [
+            if (snapshot.connectionState != ConnectionState.done) ...[
+              const SizedBox(
+                height: 50,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ] else ...[
+              if (data != null) ...[
+                if (data.isEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      'No Duplicate Detected',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                ] else ...[
+                  for (final value in data.entries)
+                    ExpansionTile(
+                      title: Text('Manga ID: ${value.key.$1}'),
+                      subtitle: Text('Chapter: ${value.key.$2}'),
+                      children: [
+                        for (final child in value.value)
+                          ListTile(
+                            title: Text(child.id),
+                            subtitle: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(child.webUrl ?? ''),
+                                Text(
+                                  'Updated At: ${child.updatedAt.readableFormat}',
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                ],
+              ] else ...[
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    'Error: ${snapshot.error}',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+              ],
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildDuplicateTagDetector(BuildContext context) {
+    return FutureBuilder(
+      future: diagnosticDao.duplicateTag,
+      builder: (context, snapshot) {
+        final data = snapshot.data;
+
+        return ExpansionTile(
+          title: const Text('Duplicated Tag Record'),
+          subtitle: const Text('List based on name and source'),
+          children: [
+            if (snapshot.connectionState != ConnectionState.done) ...[
+              const SizedBox(
+                height: 50,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ] else ...[
+              if (data != null) ...[
+                if (data.isEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      'No Duplicate Detected',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                ] else ...[
+                  for (final value in data.entries)
+                    ExpansionTile(
+                      title: Text('Name: ${value.key.$1}'),
+                      subtitle: Text('Source: ${value.key.$2}'),
+                      children: [
+                        for (final child in value.value)
+                          ListTile(
+                            title: Text(child.tagId ?? ''),
+                            subtitle: Text(
+                              'Updated At: ${child.updatedAt.readableFormat}',
+                            ),
+                          ),
+                      ],
+                    ),
+                ],
+              ] else ...[
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    'Error: ${snapshot.error}',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+              ],
+            ],
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
@@ -180,6 +301,8 @@ class AdvancedScreen extends StatelessWidget {
           _buildDatabaseInspector(context),
           _buildBrowserTester(context),
           _buildDuplicateMangaDetector(context),
+          _buildDuplicateChapterDetector(context),
+          _buildDuplicateTagDetector(context),
         ],
       ),
     );
