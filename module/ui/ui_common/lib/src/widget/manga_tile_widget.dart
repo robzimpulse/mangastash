@@ -60,66 +60,69 @@ class MangaTileWidget extends StatelessWidget {
       color: Theme.of(context).scaffoldBackgroundColor,
       child: InkWell(
         onTap: onTap,
-        child: Row(
-          children: [
-            CachedNetworkImage(
-              fit: BoxFit.cover,
-              cacheManager: cacheManager,
-              imageUrl: coverUrl ?? 'https://placehold.co/400?text=Cover+Url',
-              width: 50,
-              height: 50,
-              errorWidget: (context, url, error) {
-                return const Center(child: Icon(Icons.error));
-              },
-              progressIndicatorBuilder: (context, url, progress) {
-                return Center(
-                  child: CircularProgressIndicator(value: progress.progress),
-                );
-              },
-            ),
-            if (title != null)
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Text(title),
-                ),
+        child: Padding(
+          padding: padding,
+          child: Row(
+            children: [
+              CachedNetworkImage(
+                fit: BoxFit.cover,
+                cacheManager: cacheManager,
+                imageUrl: coverUrl ?? 'https://placehold.co/400?text=Cover+Url',
+                width: 50,
+                height: 50,
+                errorWidget: (context, url, error) {
+                  return const Center(child: Icon(Icons.error));
+                },
+                progressIndicatorBuilder: (context, url, progress) {
+                  return Center(
+                    child: CircularProgressIndicator(value: progress.progress),
+                  );
+                },
               ),
-            if (isPrefetching) ...[
-              const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(),
-              ),
-              SizedBox(width: 8),
-            ],
-            if (isOnLibrary) const Icon(Icons.bookmark),
-            if (sourceIconUrl != null) ...[
-              SizedBox(
-                width: 24,
-                height: 24,
-                child: Padding(
-                  padding: const EdgeInsets.all(4),
-                  child: CachedNetworkImage(
-                    cacheManager: cacheManager,
-                    imageUrl: sourceIconUrl.or(
-                      'https://placehold.co/200?text=Source+Icon+Url',
-                    ),
-                    fit: BoxFit.contain,
-                    errorWidget: (context, url, error) {
-                      return const Center(child: Icon(Icons.error));
-                    },
-                    progressIndicatorBuilder: (context, url, progress) {
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: progress.progress,
-                        ),
-                      );
-                    },
+              if (title != null)
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Text(title),
                   ),
                 ),
-              ),
+              if (isPrefetching) ...[
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(),
+                ),
+                SizedBox(width: 8),
+              ],
+              if (isOnLibrary) const Icon(Icons.bookmark),
+              if (sourceIconUrl != null) ...[
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: CachedNetworkImage(
+                      cacheManager: cacheManager,
+                      imageUrl: sourceIconUrl.or(
+                        'https://placehold.co/200?text=Source+Icon+Url',
+                      ),
+                      fit: BoxFit.contain,
+                      errorWidget: (context, url, error) {
+                        return const Center(child: Icon(Icons.error));
+                      },
+                      progressIndicatorBuilder: (context, url, progress) {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: progress.progress,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
