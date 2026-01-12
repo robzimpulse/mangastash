@@ -121,74 +121,18 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  // Future<DiagnosticModel> get execute async {
-  //   final manga = await duplicatedMangaQuery().get().then(
-  //     (e) => e.groupListsBy((e) => (e.title, e.source)),
-  //   );
-  //   final tag = await duplicatedTagQuery().get().then(
-  //     (e) => e.groupListsBy((e) => (e.name, e.source)),
-  //   );
-  //   final chapter = await duplicatedChapterQuery().get().then(
-  //     (e) => e.groupListsBy((e) => (e.mangaId, e.chapter)),
-  //   );
-  //
-  //   return DiagnosticModel(
-  //     duplicatedManga: {
-  //       for (final e in manga.entries)
-  //         e.key: [
-  //           ...e.value.map(
-  //             (e) => MangaDrift(
-  //               createdAt: e.createdAt,
-  //               updatedAt: e.updatedAt,
-  //               id: e.id,
-  //               title: e.title,
-  //               coverUrl: e.coverUrl,
-  //               author: e.author,
-  //               status: e.status,
-  //               webUrl: e.webUrl,
-  //               description: e.description,
-  //               source: e.source,
-  //             ),
-  //           ),
-  //         ],
-  //     },
-  //     duplicatedTag: {
-  //       for (final e in tag.entries)
-  //         e.key: [
-  //           ...e.value.map(
-  //             (e) => TagDrift(
-  //               createdAt: e.createdAt,
-  //               updatedAt: e.updatedAt,
-  //               id: e.id,
-  //               tagId: e.tagId,
-  //               name: e.name,
-  //               source: e.source,
-  //             ),
-  //           ),
-  //         ],
-  //     },
-  //     duplicatedChapter: {
-  //       for (final e in chapter.entries)
-  //         e.key: [
-  //           ...e.value.map(
-  //             (e) => ChapterDrift(
-  //               createdAt: e.createdAt,
-  //               updatedAt: e.updatedAt,
-  //               id: e.id,
-  //               mangaId: e.mangaId,
-  //               title: e.title,
-  //               volume: e.volume,
-  //               chapter: e.chapter,
-  //               translatedLanguage: e.translatedLanguage,
-  //               scanlationGroup: e.scanlationGroup,
-  //               webUrl: e.webUrl,
-  //               readableAt: e.readableAt,
-  //               publishAt: e.publishAt,
-  //               lastReadAt: e.lastReadAt,
-  //             ),
-  //           ),
-  //         ],
-  //     },
-  //   );
-  // }
+  Future<List<ChapterDrift>> get orphanChapter async {
+    final selector = select(chapterTables).join([
+      leftOuterJoin(
+        mangaTables,
+        mangaTables.id.equalsExp(chapterTables.mangaId),
+      ),
+    ]);
+
+    final query = selector..where(mangaTables.id.isNull());
+
+    return query.get().then((e) {
+      return [...e.map((e) => e.readTableOrNull(chapterTables)).nonNulls];
+    });
+  }
 }

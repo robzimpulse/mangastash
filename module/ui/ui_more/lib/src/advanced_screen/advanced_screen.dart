@@ -12,7 +12,6 @@ class AdvancedScreen extends StatelessWidget {
   final LogBox logBox;
   final DatabaseViewer viewer;
   final AppDatabase database;
-  final ImagesCacheManager imagesCacheManager;
   final HeadlessWebviewUseCase webview;
   final DiagnosticDao diagnosticDao;
 
@@ -21,7 +20,6 @@ class AdvancedScreen extends StatelessWidget {
     required this.logBox,
     required this.viewer,
     required this.database,
-    required this.imagesCacheManager,
     required this.webview,
     required this.diagnosticDao,
   });
@@ -33,7 +31,6 @@ class AdvancedScreen extends StatelessWidget {
         logBox: locator(),
         database: locator(),
         viewer: locator(),
-        imagesCacheManager: locator(),
         webview: locator(),
         diagnosticDao: locator(),
       ),
@@ -291,6 +288,60 @@ class AdvancedScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildOrphanChapterDetector(BuildContext context) {
+    return FutureBuilder(
+      future: diagnosticDao.orphanChapter,
+      builder: (context, snapshot) {
+        final data = snapshot.data;
+
+        return ExpansionTile(
+          title: const Text('Orphan Chapter Record'),
+          subtitle: const Text('List based on chapter that have no manga'),
+          children: [
+            if (snapshot.connectionState != ConnectionState.done) ...[
+              const SizedBox(
+                height: 50,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ] else ...[
+              if (data != null) ...[
+                if (data.isEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      'No Orphan Chapter Detected',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                ] else ...[
+                  for (final value in data)
+                    ChapterTileWidget(
+                      title: [
+                        'Chapter ${value.chapter}',
+                        value.title,
+                      ].nonNulls.join(' - '),
+                      language: Language.fromCode(value.translatedLanguage),
+                      uploadedAt: value.readableAt,
+                      groups: value.scanlationGroup,
+                      lastReadAt: value.lastReadAt,
+                    ),
+                ],
+              ] else ...[
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    'Error: ${snapshot.error}',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+              ],
+            ],
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
@@ -303,6 +354,7 @@ class AdvancedScreen extends StatelessWidget {
           _buildDuplicateMangaDetector(context),
           _buildDuplicateChapterDetector(context),
           _buildDuplicateTagDetector(context),
+          _buildOrphanChapterDetector(context),
         ],
       ),
     );
