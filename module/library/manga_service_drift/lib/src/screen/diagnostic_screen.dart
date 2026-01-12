@@ -42,8 +42,8 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
               final value = data.elementAtOrNull(index);
 
               return ExpansionTile(
-                title: Text('${value?.key.$1}'),
-                subtitle: Text('${value?.key.$2}'),
+                title: Text('Title: ${value?.key.$1}'),
+                subtitle: Text('Source: ${value?.key.$2}'),
                 children: [
                   for (final child in value?.value ?? <MangaDrift>[])
                     ListTile(title: Text(child.id)),
@@ -55,13 +55,111 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
       );
     },
     'Duplicated Chapter': (context) {
-      return Container();
+      return StreamBuilder(
+        stream: _diagnosticDao.duplicateChapter,
+        builder: (context, snapshot) {
+          final data = snapshot.data?.entries;
+          final error = snapshot.error;
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (error != null) {
+            return Center(child: Text(error.toString()));
+          }
+
+          if (data == null || data.isEmpty) {
+            return Center(child: Text('No Data'));
+          }
+
+          return ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              final value = data.elementAtOrNull(index);
+
+              return ExpansionTile(
+                title: Text('Manga ID: ${value?.key.$1}'),
+                subtitle: Text('Chapter: ${value?.key.$2}'),
+                children: [
+                  for (final child in value?.value ?? <ChapterDrift>[])
+                    ListTile(title: Text(child.id)),
+                ],
+              );
+            },
+          );
+        },
+      );
     },
     'Duplicated Tag': (context) {
-      return Container();
+      return StreamBuilder(
+        stream: _diagnosticDao.duplicateTag,
+        builder: (context, snapshot) {
+          final data = snapshot.data?.entries;
+          final error = snapshot.error;
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (error != null) {
+            return Center(child: Text(error.toString()));
+          }
+
+          if (data == null || data.isEmpty) {
+            return Center(child: Text('No Data'));
+          }
+
+          return ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              final value = data.elementAtOrNull(index);
+
+              return ExpansionTile(
+                title: Text('Name: ${value?.key.$1}'),
+                subtitle: Text('Source: ${value?.key.$2}'),
+                children: [
+                  for (final child in value?.value ?? <TagDrift>[])
+                    ListTile(title: Text(child.tagId ?? '-')),
+                ],
+              );
+            },
+          );
+        },
+      );
     },
     'Orphaned Chapter': (context) {
-      return Container();
+      return StreamBuilder(
+        stream: _diagnosticDao.orphanChapter,
+        builder: (context, snapshot) {
+          final data = snapshot.data;
+          final error = snapshot.error;
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (error != null) {
+            return Center(child: Text(error.toString()));
+          }
+
+          if (data == null || data.isEmpty) {
+            return Center(child: Text('No Data'));
+          }
+
+          return ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              final value = data.elementAtOrNull(index);
+
+              return ListTile(
+                title: Text('Chapter: ${value?.chapter}'),
+                subtitle: Text('Source: ${value?.webUrl}'),
+              );
+            },
+          );
+        },
+      );
     },
   };
 
