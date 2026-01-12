@@ -126,7 +126,9 @@ class AdvancedScreen extends StatelessWidget {
       buildWhen: (prev, curr) => prev.duplicatedManga != curr.duplicatedManga,
       builder: (context, state) {
         return ExpansionTile(
-          title: const Text('Duplicated Manga Record'),
+          title: Text(
+            'Duplicated Manga Record (${state.duplicatedManga.length})',
+          ),
           subtitle: const Text('List based on title and source'),
           children: [
             if (state.duplicatedManga.isEmpty)
@@ -168,7 +170,9 @@ class AdvancedScreen extends StatelessWidget {
       },
       builder: (context, state) {
         return ExpansionTile(
-          title: const Text('Duplicated Chapter Record'),
+          title: Text(
+            'Duplicated Chapter Record (${state.duplicatedChapter.length})',
+          ),
           subtitle: const Text('List based on manga id and chapter name'),
           children: [
             if (state.duplicatedChapter.isEmpty)
@@ -207,7 +211,7 @@ class AdvancedScreen extends StatelessWidget {
       buildWhen: (prev, curr) => prev.duplicatedTag != curr.duplicatedTag,
       builder: (context, state) {
         return ExpansionTile(
-          title: const Text('Duplicated Tag Record'),
+          title: Text('Duplicated Tag Record (${state.duplicatedTag.length})'),
           subtitle: const Text('List based on name and source'),
           children: [
             if (state.duplicatedTag.isEmpty)
@@ -245,7 +249,9 @@ class AdvancedScreen extends StatelessWidget {
       buildWhen: (prev, curr) => prev.orphanedChapter != curr.orphanedChapter,
       builder: (context, state) {
         return ExpansionTile(
-          title: const Text('Orphan Chapter Record'),
+          title: Text(
+            'Orphan Chapter Record (${state.orphanedChapter.length})',
+          ),
           subtitle: const Text('List based on chapter that have no manga'),
           children: [
             if (state.orphanedChapter.isEmpty)
