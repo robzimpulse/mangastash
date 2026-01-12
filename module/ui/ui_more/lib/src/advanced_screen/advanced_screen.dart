@@ -46,68 +46,68 @@ class AdvancedScreen extends StatelessWidget {
   }
 
   Widget _buildLogInspector(BuildContext context) {
-    return ListTile(
-      title: const Text('Log Inspector'),
-      onTap: () => logBox.dashboard(context: context),
-      leading: const SizedBox(
-        height: double.infinity,
-        child: Icon(Icons.wrap_text),
+    return SliverToBoxAdapter(
+      child: ListTile(
+        title: const Text('Log Inspector'),
+        onTap: () => logBox.dashboard(context: context),
+        leading: const SizedBox(
+          height: double.infinity,
+          child: Icon(Icons.wrap_text),
+        ),
+        trailing: Icon(Icons.chevron_right),
       ),
     );
   }
 
   Widget _buildDatabaseInspector(BuildContext context) {
-    return ListTile(
-      title: const Text('Database Inspector'),
-      onTap: () => viewer.navigateToViewer(database: database),
-      leading: const SizedBox(
-        height: double.infinity,
-        child: Icon(Icons.storage),
-      ),
-      trailing: IconButton(
-        onPressed: () async {
-          await database.clear();
-          if (!context.mounted) return;
-          context.showSnackBar(message: 'Success Clear Database & Cache');
-        },
-        icon: const Icon(Icons.delete_forever),
+    return SliverToBoxAdapter(
+      child: ListTile(
+        title: const Text('Database Inspector'),
+        onTap: () => viewer.navigateToViewer(database: database),
+        leading: const SizedBox(
+          height: double.infinity,
+          child: Icon(Icons.storage),
+        ),
+        trailing: Icon(Icons.chevron_right),
       ),
     );
   }
 
   Widget _buildBrowserTester(BuildContext context) {
-    return ExpansionTile(
-      title: const Text('Browser Tester'),
-      subtitle: const Text('Cloudflare Challenge Tester and Browser'),
-      leading: Icon(Icons.web),
-      children: [
-        ListTile(
-          title: TextField(
-            decoration: InputDecoration(
-              hintText: 'eg: https://www.google.com',
-              border: OutlineInputBorder(),
+    return SliverToBoxAdapter(
+      child: ExpansionTile(
+        title: const Text('Browser Tester'),
+        subtitle: const Text('Cloudflare Challenge Tester and Browser'),
+        leading: Icon(Icons.web),
+        children: [
+          ListTile(
+            title: TextField(
+              decoration: InputDecoration(
+                hintText: 'eg: https://www.google.com',
+                border: OutlineInputBorder(),
+              ),
+              onSubmitted: (text) async {
+                final uri = Uri.tryParse(text);
+                if (uri == null) return;
+                await logBox.webview(context: context, uri: uri);
+              },
             ),
-            onSubmitted: (text) async {
-              final uri = Uri.tryParse(text);
+            leading: Icon(Icons.web_asset),
+            trailing: Icon(Icons.chevron_right),
+          ),
+          ListTile(
+            title: const Text('Cloudflare Challenge'),
+            leading: Icon(Icons.cloud_circle),
+            onTap: () async {
+              final uri = Uri.tryParse(
+                'https://www.scrapingcourse.com/cloudflare-challenge',
+              );
               if (uri == null) return;
               await logBox.webview(context: context, uri: uri);
             },
           ),
-          leading: Icon(Icons.web_asset),
-          trailing: Icon(Icons.chevron_right),
-        ),
-        ListTile(
-          title: const Text('Cloudflare Challenge'),
-          leading: Icon(Icons.cloud_circle),
-          onTap: () async {
-            final uri = Uri.tryParse(
-              'https://www.scrapingcourse.com/cloudflare-challenge',
-            );
-            if (uri == null) return;
-            await logBox.webview(context: context, uri: uri);
-          },
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -121,42 +121,109 @@ class AdvancedScreen extends StatelessWidget {
     );
   }
 
+  AdvancedScreenCubit _cubit(BuildContext context) => context.read();
+
   Widget _buildDuplicateMangaDetector(BuildContext context) {
     return _builder(
-      buildWhen: (prev, curr) => prev.duplicatedManga != curr.duplicatedManga,
+      buildWhen: (prev, curr) {
+        return [
+          prev.duplicatedManga != curr.duplicatedManga,
+          prev.isDuplicatedMangaExpanded != curr.isDuplicatedMangaExpanded,
+        ].contains(true);
+      },
       builder: (context, state) {
-        return ExpansionTile(
-          title: Text(
-            'Duplicated Manga Record (${state.duplicatedManga.length})',
-          ),
-          subtitle: const Text('List based on title and source'),
+        return MultiSliver(
+          pushPinnedChildren: true,
           children: [
-            if (state.duplicatedManga.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  'No Record',
-                  style: Theme.of(context).textTheme.bodyLarge,
+            SliverPinnedHeader(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
                 ),
-              )
-            else ...[
-              for (final value in state.duplicatedManga.entries)
-                ExpansionTile(
-                  title: Text('Title: ${value.key.$1}'),
-                  subtitle: Text('Source: ${value.key.$2}'),
-                  children: [
-                    for (final child in value.value)
-                      MangaTileWidget.manga(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+                child: ListTile(
+                  title: Text(
+                    'Duplicated Manga (${state.duplicatedManga.length})',
+                  ),
+                  subtitle: const Text('List based on title and source'),
+                  trailing: Icon(
+                    state.isDuplicatedMangaExpanded
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                  ),
+                  onTap: () {
+                    _cubit(
+                      context,
+                    ).showDuplicateManga(!state.isDuplicatedMangaExpanded);
+                  },
+                ),
+              ),
+            ),
+
+            if (state.isDuplicatedMangaExpanded)
+              if (state.duplicatedManga.isEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      'No Record',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                )
+              else ...[
+                for (final value in state.duplicatedManga.entries)
+                  SliverPadding(
+                    padding: EdgeInsets.only(left: 16),
+                    sliver: MultiSliver(
+                      pushPinnedChildren: true,
+                      children: [
+                        SliverPinnedHeader(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                            ),
+                            child: ListTile(
+                              title: Text('Title: ${value.key.$1}'),
+                              subtitle: Text('Source: ${value.key.$2}'),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text('(${value.value.length})'),
+                                  SizedBox(width: 8),
+                                  IconButton(
+                                    onPressed: () {
+                                      _deleteDuplicateMangas(
+                                        context: context,
+                                        mangas: value.value,
+                                      );
+                                    },
+                                    icon: Icon(Icons.delete),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                        manga: Manga.fromDrift(child),
-                        cacheManager: imagesCacheManager,
-                      ),
-                  ],
-                ),
-            ],
+                        SliverList.separated(
+                          itemCount: value.value.length,
+                          itemBuilder: (context, index) {
+                            final data = value.value.elementAtOrNull(index);
+                            if (data == null) return null;
+
+                            return MangaTileWidget.manga(
+                              padding: EdgeInsets.only(left: 16, right: 32),
+                              manga: Manga.fromDrift(data),
+                              cacheManager: imagesCacheManager,
+                            );
+                          },
+                          separatorBuilder: (_, __) {
+                            return const SizedBox(height: 8);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
           ],
         );
       },
@@ -166,114 +233,258 @@ class AdvancedScreen extends StatelessWidget {
   Widget _buildDuplicateChapterDetector(BuildContext context) {
     return _builder(
       buildWhen: (prev, curr) {
-        return prev.duplicatedChapter != curr.duplicatedChapter;
+        return [
+          prev.duplicatedChapter != curr.duplicatedChapter,
+          prev.isDuplicatedChapterExpanded != curr.isDuplicatedChapterExpanded,
+        ].contains(true);
       },
       builder: (context, state) {
-        return ExpansionTile(
-          title: Text(
-            'Duplicated Chapter Record (${state.duplicatedChapter.length})',
-          ),
-          subtitle: const Text('List based on manga id and chapter name'),
+        return MultiSliver(
           children: [
-            if (state.duplicatedChapter.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  'No Record',
-                  style: Theme.of(context).textTheme.bodyLarge,
+            SliverPinnedHeader(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
                 ),
-              )
-            else ...[
-              for (final value in state.duplicatedChapter.entries)
-                ExpansionTile(
-                  title: Text('Manga ID: ${value.key.$1}'),
-                  subtitle: Text('Chapter: ${value.key.$2}'),
-                  children: [
-                    for (final child in value.value)
-                      ChapterTileWidget.chapter(
-                        chapter: Chapter.fromDrift(child),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+                child: ListTile(
+                  title: Text(
+                    'Duplicated Chapter (${state.duplicatedChapter.length})',
+                  ),
+                  subtitle: const Text(
+                    'List based on manga id and chapter name',
+                  ),
+                  trailing: Icon(
+                    state.isDuplicatedChapterExpanded
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                  ),
+                  onTap: () {
+                    _cubit(
+                      context,
+                    ).showDuplicateChapter(!state.isDuplicatedChapterExpanded);
+                  },
+                ),
+              ),
+            ),
+
+            if (state.isDuplicatedChapterExpanded)
+              if (state.duplicatedChapter.isEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      'No Record',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                )
+              else ...[
+                for (final value in state.duplicatedChapter.entries)
+                  SliverPadding(
+                    padding: EdgeInsets.only(left: 16),
+                    sliver: MultiSliver(
+                      pushPinnedChildren: true,
+                      children: [
+                        SliverPinnedHeader(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                            ),
+                            child: ListTile(
+                              title: Text('Manga ID: ${value.key.$1}'),
+                              subtitle: Text('Chapter: ${value.key.$2}'),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text('(${value.value.length})'),
+                                  SizedBox(width: 8),
+                                  IconButton(
+                                    onPressed: () {
+                                      _deleteDuplicateChapters(
+                                        context: context,
+                                        chapters: value.value,
+                                      );
+                                    },
+                                    icon: Icon(Icons.delete),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                  ],
-                ),
-            ],
+                        SliverList.separated(
+                          itemCount: value.value.length,
+                          itemBuilder: (context, index) {
+                            final data = value.value.elementAtOrNull(index);
+                            if (data == null) return null;
+
+                            return ChapterTileWidget.chapter(
+                              chapter: Chapter.fromDrift(data),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                            );
+                          },
+                          separatorBuilder: (_, __) {
+                            return const SizedBox(height: 8);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
           ],
         );
+
+        // return ExpansionTile(
+        //   title: Text(
+        //     'Duplicated Chapter Record (${state.duplicatedChapter.length})',
+        //   ),
+        //   subtitle: const Text('List based on manga id and chapter name'),
+        //   children: [
+        //     if (state.duplicatedChapter.isEmpty)
+        //       Padding(
+        //         padding: const EdgeInsets.all(16),
+        //         child: Text(
+        //           'No Record',
+        //           style: Theme.of(context).textTheme.bodyLarge,
+        //         ),
+        //       )
+        //     else ...[
+        //       for (final value in state.duplicatedChapter.entries)
+        //         ExpansionTile(
+        //           title: Text('Manga ID: ${value.key.$1}'),
+        //           subtitle: Text('Chapter: ${value.key.$2}'),
+        //           children: [
+        //             for (final child in value.value)
+        //               ChapterTileWidget.chapter(
+        //                 chapter: Chapter.fromDrift(child),
+        //                 padding: const EdgeInsets.symmetric(
+        //                   horizontal: 16,
+        //                   vertical: 8,
+        //                 ),
+        //               ),
+        //           ],
+        //         ),
+        //     ],
+        //   ],
+        // );
       },
     );
   }
 
-  Widget _buildDuplicateTagDetector(BuildContext context) {
-    return _builder(
-      buildWhen: (prev, curr) => prev.duplicatedTag != curr.duplicatedTag,
-      builder: (context, state) {
-        return ExpansionTile(
-          title: Text('Duplicated Tag Record (${state.duplicatedTag.length})'),
-          subtitle: const Text('List based on name and source'),
-          children: [
-            if (state.duplicatedTag.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  'No Record',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              )
-            else ...[
-              for (final value in state.duplicatedTag.entries)
-                ExpansionTile(
-                  title: Text('Name: ${value.key.$1}'),
-                  subtitle: Text('Source: ${value.key.$2}'),
-                  children: [
-                    for (final child in value.value)
-                      ListTile(
-                        title: Text(child.tagId ?? ''),
-                        subtitle: Text(
-                          'Updated At: ${child.updatedAt.readableFormat}',
-                        ),
-                      ),
-                  ],
-                ),
-            ],
-          ],
-        );
-      },
-    );
-  }
+  // Widget _buildDuplicateTagDetector(BuildContext context) {
+  //   return _builder(
+  //     buildWhen: (prev, curr) {
+  //       return [
+  //         prev.duplicatedTag != curr.duplicatedTag,
+  //         prev.isDuplicatedTagExpanded != curr.isDuplicatedTagExpanded,
+  //       ].contains(true);
+  //     },
+  //     builder: (context, state) {
+  //       return ExpansionTile(
+  //         title: Text('Duplicated Tag Record (${state.duplicatedTag.length})'),
+  //         subtitle: const Text('List based on name and source'),
+  //         children: [
+  //           if (state.duplicatedTag.isEmpty)
+  //             Padding(
+  //               padding: const EdgeInsets.all(16),
+  //               child: Text(
+  //                 'No Record',
+  //                 style: Theme.of(context).textTheme.bodyLarge,
+  //               ),
+  //             )
+  //           else ...[
+  //             for (final value in state.duplicatedTag.entries)
+  //               ExpansionTile(
+  //                 title: Text('Name: ${value.key.$1}'),
+  //                 subtitle: Text('Source: ${value.key.$2}'),
+  //                 children: [
+  //                   for (final child in value.value)
+  //                     ListTile(
+  //                       title: Text(child.tagId ?? ''),
+  //                       subtitle: Text(
+  //                         'Updated At: ${child.updatedAt.readableFormat}',
+  //                       ),
+  //                     ),
+  //                 ],
+  //               ),
+  //           ],
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   Widget _buildOrphanChapterDetector(BuildContext context) {
     return _builder(
-      buildWhen: (prev, curr) => prev.orphanedChapter != curr.orphanedChapter,
+      buildWhen: (prev, curr) {
+        return [
+          prev.orphanedChapter != curr.orphanedChapter,
+          prev.isOrphanedExpanded != curr.isOrphanedExpanded,
+        ].contains(true);
+      },
       builder: (context, state) {
-        return ExpansionTile(
-          title: Text(
-            'Orphan Chapter Record (${state.orphanedChapter.length})',
-          ),
-          subtitle: const Text('List based on chapter that have no manga'),
+        return MultiSliver(
+          pushPinnedChildren: true,
           children: [
-            if (state.orphanedChapter.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  'No Record',
-                  style: Theme.of(context).textTheme.bodyLarge,
+            SliverPinnedHeader(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
                 ),
-              )
-            else ...[
-              for (final value in state.orphanedChapter)
-                ChapterTileWidget.chapter(
-                  chapter: Chapter.fromDrift(value),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+                child: ListTile(
+                  title: Text(
+                    'Orphan Chapter Record (${state.orphanedChapter.length})',
                   ),
+                  subtitle: const Text(
+                    'List based on chapter that have no manga',
+                  ),
+                  trailing: Icon(
+                    state.isOrphanedExpanded
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                  ),
+                  onTap: () {
+                    _cubit(
+                      context,
+                    ).showOrphanedChapter(!state.isOrphanedExpanded);
+                  },
                 ),
-            ],
+              ),
+            ),
+
+
+
           ],
         );
+        //       return ExpansionTile(
+        //         title: Text(
+        //           'Orphan Chapter Record (${state.orphanedChapter.length})',
+        //         ),
+        //         subtitle: const Text('List based on chapter that have no manga'),
+        //         children: [
+        //           if (state.orphanedChapter.isEmpty)
+        //             Padding(
+        //               padding: const EdgeInsets.all(16),
+        //               child: Text(
+        //                 'No Record',
+        //                 style: Theme.of(context).textTheme.bodyLarge,
+        //               ),
+        //             )
+        //           else ...[
+        //             for (final value in state.orphanedChapter)
+        //               ChapterTileWidget.chapter(
+        //                 chapter: Chapter.fromDrift(value),
+        //                 padding: const EdgeInsets.symmetric(
+        //                   horizontal: 16,
+        //                   vertical: 8,
+        //                 ),
+        //               ),
+        //           ],
+        //         ],
+        //       );
       },
     );
   }
@@ -282,17 +493,38 @@ class AdvancedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScaffoldScreen(
       appBar: AppBar(title: const Text('Advanced Screen')),
-      body: AdaptivePhysicListView(
-        children: [
+      body: CustomScrollView(
+        slivers: [
           _buildLogInspector(context),
           _buildDatabaseInspector(context),
           _buildBrowserTester(context),
           _buildDuplicateMangaDetector(context),
           _buildDuplicateChapterDetector(context),
-          _buildDuplicateTagDetector(context),
-          _buildOrphanChapterDetector(context),
+          // _buildDuplicateTagDetector(context),
+          // _buildOrphanChapterDetector(context),
         ],
       ),
     );
+  }
+
+  void _deleteDuplicateMangas({
+    required BuildContext context,
+    required List<MangaDrift> mangas,
+  }) {
+    context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+  }
+
+  void _deleteDuplicateChapters({
+    required BuildContext context,
+    required List<ChapterDrift> chapters,
+  }) {
+    context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+  }
+
+  void _deleteDuplicateTags({
+    required BuildContext context,
+    required List<TagDrift> tags,
+  }) {
+    context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
   }
 }

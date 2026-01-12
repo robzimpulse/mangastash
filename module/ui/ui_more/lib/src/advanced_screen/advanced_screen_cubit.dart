@@ -38,4 +38,19 @@ class AdvancedScreenCubit extends Cubit<AdvancedScreenState>
     );
   }
 
+  void showDuplicateManga(bool isExpanded) {
+    emit(state.copyWith(isDuplicatedMangaExpanded: isExpanded));
+  }
+
+  void showDuplicateChapter(bool isExpanded) {
+    emit(state.copyWith(isDuplicatedChapterExpanded: isExpanded));
+  }
+
+  void showDuplicateTag(bool isExpanded) {
+    emit(state.copyWith(isDuplicatedTagExpanded: isExpanded));
+  }
+
+  void showOrphanedChapter(bool isExpanded) {
+    emit(state.copyWith(isOrphanedExpanded: isExpanded));
+  }
 }
