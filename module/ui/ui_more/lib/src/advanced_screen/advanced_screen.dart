@@ -28,7 +28,13 @@ class AdvancedScreen extends StatelessWidget {
 
   static Widget create({required ServiceLocator locator}) {
     return BlocProvider(
-      create: (_) => AdvancedScreenCubit(diagnosticDao: locator()),
+      create: (_) {
+        return AdvancedScreenCubit(
+          diagnosticDao: locator(),
+          mangaDao: locator(),
+          chapterDao: locator(),
+        );
+      },
       child: AdvancedScreen(
         logBox: locator(),
         database: locator(),

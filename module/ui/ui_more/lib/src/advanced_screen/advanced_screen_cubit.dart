@@ -5,10 +5,17 @@ import 'advanced_screen_state.dart';
 
 class AdvancedScreenCubit extends Cubit<AdvancedScreenState>
     with AutoSubscriptionMixin {
+  final MangaDao _mangaDao;
+  final ChapterDao _chapterDao;
+
   AdvancedScreenCubit({
     AdvancedScreenState initialState = const AdvancedScreenState(),
     required DiagnosticDao diagnosticDao,
-  }) : super(initialState) {
+    required MangaDao mangaDao,
+    required ChapterDao chapterDao,
+  }) : _mangaDao = mangaDao,
+       _chapterDao = chapterDao,
+       super(initialState) {
     addSubscription(
       diagnosticDao.duplicateManga.listen(
         (e) => emit(state.copyWith(duplicatedManga: e)),
@@ -30,4 +37,5 @@ class AdvancedScreenCubit extends Cubit<AdvancedScreenState>
       ),
     );
   }
+
 }
