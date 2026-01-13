@@ -19,7 +19,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
   late final _menus = <String, WidgetBuilder>{
     'Duplicated Manga': (context) {
       return StreamBuilder(
-        stream: _diagnosticDao.duplicateManga,
+        stream: _diagnosticDao.duplicateMangaStream,
         builder: (context, snapshot) {
           final data = snapshot.data?.entries;
           final error = snapshot.error;

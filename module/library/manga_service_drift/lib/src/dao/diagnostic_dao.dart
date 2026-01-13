@@ -50,30 +50,36 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
     with _$DiagnosticDaoMixin {
   DiagnosticDao(super.db);
 
-  Stream<DuplicatedResult<MangaDrift>> get duplicateManga {
-    final result = duplicatedMangaQuery().watch().map(
-      (e) => e.groupListsBy((e) => (e.title, e.source)),
-    );
-    return result.map(
-      (e) => e.map(
-        (key, value) => MapEntry(key, [
-          ...value.map(
-            (e) => MangaDrift(
-              createdAt: e.createdAt,
-              updatedAt: e.updatedAt,
-              id: e.id,
-              title: e.title,
-              coverUrl: e.coverUrl,
-              author: e.author,
-              status: e.status,
-              webUrl: e.webUrl,
-              description: e.description,
-              source: e.source,
-            ),
+  DuplicatedResult<MangaDrift> _parseDuplicateManga(
+    List<DuplicatedMangaQueryResult> result,
+  ) {
+    final groups = result.groupListsBy((e) => (e.title, e.source));
+    return groups.map(
+      (key, value) => MapEntry(key, [
+        ...value.map(
+          (e) => MangaDrift(
+            createdAt: e.createdAt,
+            updatedAt: e.updatedAt,
+            id: e.id,
+            title: e.title,
+            coverUrl: e.coverUrl,
+            author: e.author,
+            status: e.status,
+            webUrl: e.webUrl,
+            description: e.description,
+            source: e.source,
           ),
-        ]),
-      ),
+        ),
+      ]),
     );
+  }
+
+  Stream<DuplicatedResult<MangaDrift>> get duplicateMangaStream {
+    return duplicatedMangaQuery().watch().map(_parseDuplicateManga);
+  }
+
+  Future<DuplicatedResult<MangaDrift>> get duplicateManga async {
+    return duplicatedMangaQuery().get().then(_parseDuplicateManga);
   }
 
   Stream<DuplicatedResult<ChapterDrift>> get duplicateChapter {
