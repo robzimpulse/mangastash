@@ -16,10 +16,11 @@ class DatabaseViewer {
   }) {
     navigatorObserver.navigator?.push(
       MaterialPageRoute<dynamic>(
-        builder: (context) => Theme(
-          data: theme ?? Theme.of(context),
-          child: DriftDbViewer(database),
-        ),
+        builder:
+            (context) => Theme(
+              data: theme ?? Theme.of(context),
+              child: DriftDbViewer(database),
+            ),
       ),
     );
   }

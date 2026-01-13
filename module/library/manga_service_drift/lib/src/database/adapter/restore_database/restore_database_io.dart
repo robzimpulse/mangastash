@@ -25,7 +25,9 @@ Future<void> restoreDatabase({
   /// Vacuum it into a another file in the temporary location first
   /// to make sure it's working.
   final temporary = directory.childFile('temp.sqlite');
-  backup..execute('VACUUM INTO ?', [temporary.path])..dispose();
+  backup
+    ..execute('VACUUM INTO ?', [temporary.path])
+    ..dispose();
 
   /// Then replace the existing database file with it.
   await temporary.copy((await executor.databaseFile()).path);

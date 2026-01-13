@@ -1,4 +1,3 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/src/manga.dart';
 
 import 'base/manga_list_html_parser.dart';
@@ -17,7 +16,7 @@ class AsuraScanMangaListHtmlParser extends MangaListHtmlParser {
         title: title,
         coverUrl: coverUrl,
         webUrl: webUrl,
-        status: toBeginningOfSentenceCase(status?.toLowerCase()),
+        status: status,
       );
     }).toList();
   }
@@ -40,8 +39,5 @@ class AsuraScanMangaListHtmlParser extends MangaListHtmlParser {
     return region?.attributes['style'] == 'pointer-events:auto';
   }
 
-  AsuraScanMangaListHtmlParser({
-    required super.root,
-    required super.converterCacheManager,
-  });
+  AsuraScanMangaListHtmlParser({required super.root});
 }

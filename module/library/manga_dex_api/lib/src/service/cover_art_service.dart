@@ -1,15 +1,11 @@
 import 'package:dio/dio.dart' hide Headers;
-import 'package:flutter/foundation.dart';
 import 'package:retrofit/retrofit.dart';
 
 import '../model/cover_art/cover_art_response.dart';
 
 part 'cover_art_service.g.dart';
 
-@RestApi(
-  baseUrl: 'https://api.mangadex.org',
-  parser: Parser.FlutterCompute,
-)
+@RestApi(baseUrl: 'https://api.mangadex.org')
 abstract class CoverArtService {
   factory CoverArtService(
     Dio dio, {

@@ -469,17 +469,11 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           builder: (context, state) {
             return ListWidget(
               itemBuilder: (context, data) {
-                return ChapterTileWidget(
+                return ChapterTileWidget.chapter(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   onTap: () => widget.onTapChapter?.call(data),
+                  chapter: data,
                   opacity: data.lastReadAt != null ? 0.5 : 1,
-                  title: [
-                    'Chapter ${data.chapter}',
-                    data.title,
-                  ].nonNulls.join(' - '),
-                  language: Language.fromCode(data.translatedLanguage),
-                  uploadedAt: data.readableAt,
-                  groups: data.scanlationGroup,
                   isPrefetching: state.prefetchedChapterIds.contains(data.id),
                   lastReadAt: data.lastReadAt,
                 );

@@ -5,9 +5,8 @@ import 'package:entity_manga/entity_manga.dart';
 class RemoveFromLibraryUseCase {
   final LibraryDao _libraryDao;
 
-  RemoveFromLibraryUseCase({
-    required LibraryDao libraryDao,
-  }) : _libraryDao = libraryDao;
+  RemoveFromLibraryUseCase({required LibraryDao libraryDao})
+    : _libraryDao = libraryDao;
 
   Future<Result<bool>> execute({required Manga manga}) async {
     final mangaId = manga.id;

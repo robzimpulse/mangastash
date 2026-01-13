@@ -1,4 +1,3 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -50,7 +49,7 @@ class MangaHistoryScreen extends StatelessWidget {
   }
 
   Widget _manga({required BuildContext context, required Manga manga}) {
-    return MangaTileWidget(
+    return MangaTileWidget.manga(
       padding: const EdgeInsets.all(8),
       manga: manga,
       onTap: () => onTapManga?.call(manga),
@@ -63,13 +62,10 @@ class MangaHistoryScreen extends StatelessWidget {
     required Manga manga,
     required Chapter chapter,
   }) {
-    return ChapterTileWidget(
+    return ChapterTileWidget.chapter(
       padding: const EdgeInsets.all(8),
-      title: ['Chapter ${chapter.chapter}', chapter.title].nonNulls.join(' - '),
-      language: Language.fromCode(chapter.translatedLanguage),
-      uploadedAt: chapter.createdAt,
+      chapter: chapter,
       lastReadAt: chapter.lastReadAt,
-      groups: chapter.scanlationGroup,
       onTap: () => onTapChapter?.call(manga, chapter),
     );
   }

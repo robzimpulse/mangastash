@@ -26,8 +26,6 @@ enum SourceEnum {
   const SourceEnum({required this.icon, required this.name, required this.url});
 
   static SourceEnum? fromName(String name) {
-    return values.firstWhereOrNull(
-      (e) => e.name == name,
-    );
+    return values.firstWhereOrNull((e) => e.name == name);
   }
 }

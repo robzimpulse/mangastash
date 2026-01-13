@@ -1,4 +1,3 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -61,7 +60,7 @@ class MangaUpdatesScreen extends StatelessWidget {
     required Manga manga,
     bool isPrefetching = false,
   }) {
-    return MangaTileWidget(
+    return MangaTileWidget.manga(
       padding: const EdgeInsets.all(8),
       manga: manga,
       onTap: () => onTapManga?.call(manga),
@@ -76,12 +75,9 @@ class MangaUpdatesScreen extends StatelessWidget {
     required Chapter chapter,
     bool isPrefetching = false,
   }) {
-    return ChapterTileWidget(
+    return ChapterTileWidget.chapter(
       padding: const EdgeInsets.all(8),
-      title: ['Chapter ${chapter.chapter}', chapter.title].nonNulls.join(' - '),
-      language: Language.fromCode(chapter.translatedLanguage),
-      uploadedAt: chapter.readableAt,
-      groups: chapter.scanlationGroup,
+      chapter: chapter,
       isPrefetching: isPrefetching,
       onTap: () => onTapChapter?.call(manga, chapter),
     );

@@ -12,7 +12,6 @@ class GetChapterUseCase with SyncChaptersMixin {
   final ChapterRepository _chapterRepository;
   final AtHomeRepository _atHomeRepository;
   final HeadlessWebviewUseCase _webview;
-  final ConverterCacheManager _converterCacheManager;
   final ChapterDao _chapterDao;
   final LogBox _logBox;
 
@@ -20,12 +19,10 @@ class GetChapterUseCase with SyncChaptersMixin {
     required ChapterRepository chapterRepository,
     required AtHomeRepository atHomeRepository,
     required HeadlessWebviewUseCase webview,
-    required ConverterCacheManager converterCacheManager,
     required ChapterDao chapterDao,
     required LogBox logBox,
   }) : _chapterRepository = chapterRepository,
        _atHomeRepository = atHomeRepository,
-       _converterCacheManager = converterCacheManager,
        _chapterDao = chapterDao,
        _logBox = logBox,
        _webview = webview;
@@ -88,7 +85,6 @@ class GetChapterUseCase with SyncChaptersMixin {
     final parser = ChapterImageHtmlParser.forSource(
       root: document,
       source: source,
-      converterCacheManager: _converterCacheManager,
     );
 
     return parser.images;

@@ -6,10 +6,7 @@ class HistoryModel extends Equatable {
   final MangaDrift? manga;
   final ChapterDrift? chapter;
 
-  const HistoryModel({
-    this.manga,
-    this.chapter,
-  });
+  const HistoryModel({this.manga, this.chapter});
 
   @override
   List<Object?> get props => [manga, chapter];

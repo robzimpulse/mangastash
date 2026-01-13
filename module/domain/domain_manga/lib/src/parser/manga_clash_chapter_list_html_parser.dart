@@ -1,17 +1,13 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 
 import 'base/chapter_list_html_parser.dart';
 
 class MangaClashChapterListHtmlParser extends ChapterListHtmlParser {
-  MangaClashChapterListHtmlParser({
-    required super.root,
-    required super.converterCacheManager,
-  });
+  MangaClashChapterListHtmlParser({required super.root});
 
   @override
-  Future<List<Chapter>> get chapters async {
-    final List<Chapter> data = [];
+  Future<List<ChapterScrapped>> get chapters async {
+    final List<ChapterScrapped> data = [];
 
     for (final element in root.querySelectorAll('li.wp-manga-chapter')) {
       final url = element.querySelector('a')?.attributes['href'];
@@ -31,12 +27,10 @@ class MangaClashChapterListHtmlParser extends ChapterListHtmlParser {
       final chapter = text?.nonNulls.firstOrNull;
 
       data.add(
-        Chapter(
+        ChapterScrapped(
           title: title?.trim(),
           chapter: chapter != null ? '$chapter' : null,
-          readableAt: await releaseDate?.asDateTime(
-            manager: converterCacheManager,
-          ),
+          readableAtRaw: releaseDate,
           webUrl: url,
         ),
       );

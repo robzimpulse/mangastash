@@ -14,33 +14,23 @@ import 'tag_dao.dart';
 
 part 'manga_dao.g.dart';
 
-@DriftAccessor(
-  tables: [
-    MangaTables,
-    TagTables,
-    RelationshipTables,
-  ],
-)
+@DriftAccessor(tables: [MangaTables, TagTables, RelationshipTables])
 class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
   MangaDao(super.db);
 
   late final TagDao _tagDao = TagDao(db);
 
   JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
-    return select(mangaTables).join(
-      [
-        leftOuterJoin(
-          relationshipTables,
-          relationshipTables.mangaId.equalsExp(
-            mangaTables.id,
-          ),
-        ),
-        leftOuterJoin(
-          tagTables,
-          relationshipTables.tagId.equalsExp(tagTables.id),
-        ),
-      ],
-    );
+    return select(mangaTables).join([
+      leftOuterJoin(
+        relationshipTables,
+        relationshipTables.mangaId.equalsExp(mangaTables.id),
+      ),
+      leftOuterJoin(
+        tagTables,
+        relationshipTables.tagId.equalsExp(tagTables.id),
+      ),
+    ]);
   }
 
   List<MangaModel> _parse(List<TypedResult> rows) {
@@ -192,9 +182,7 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
         }
 
         final value = entry.key.copyWith(
-          id: Value.absentIfNull(
-            entry.key.id.valueOrNull ?? manga?.manga?.id,
-          ),
+          id: Value.absentIfNull(entry.key.id.valueOrNull ?? manga?.manga?.id),
           title: Value.absentIfNull(
             entry.key.title.valueOrNull ?? manga?.manga?.title,
           ),

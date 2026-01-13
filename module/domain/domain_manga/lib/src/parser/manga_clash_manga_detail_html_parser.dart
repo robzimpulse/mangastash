@@ -1,13 +1,9 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
 
 import 'base/manga_detail_html_parser.dart';
 
 class MangaClashMangaDetailHtmlParser extends MangaDetailHtmlParser {
-  MangaClashMangaDetailHtmlParser({
-    required super.root,
-    required super.converterCacheManager,
-  });
+  MangaClashMangaDetailHtmlParser({required super.root});
 
   @override
   Future<Manga> get manga async {
@@ -40,10 +36,7 @@ class MangaClashMangaDetailHtmlParser extends MangaDetailHtmlParser {
       description: description,
       tags: [
         ...?tags?.map(
-          (e) => Tag(
-            name: toBeginningOfSentenceCase(e.trim()),
-            source: SourceEnum.mangaclash.name,
-          ),
+          (e) => Tag(name: e.trim(), source: SourceEnum.mangaclash.name),
         ),
       ],
     );
