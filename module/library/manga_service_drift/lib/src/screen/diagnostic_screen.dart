@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
-
+import '../dao/chapter_dao.dart';
 import '../dao/diagnostic_dao.dart';
+import '../dao/manga_dao.dart';
+import '../dao/tag_dao.dart';
 import '../database/database.dart';
 
 class DiagnosticScreen extends StatefulWidget {
@@ -15,6 +17,9 @@ class DiagnosticScreen extends StatefulWidget {
 
 class _DiagnosticScreenState extends State<DiagnosticScreen> {
   late final DiagnosticDao _diagnosticDao = DiagnosticDao(widget.database);
+  late final MangaDao _mangaDao = MangaDao(widget.database);
+  late final ChapterDao _chapterDao = ChapterDao(widget.database);
+  late final TagDao _tagDao = TagDao(widget.database);
 
   late final _menus = <String, WidgetBuilder>{
     'Duplicated Manga': (context) {
@@ -56,7 +61,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
     },
     'Duplicated Chapter': (context) {
       return StreamBuilder(
-        stream: _diagnosticDao.duplicateChapter,
+        stream: _diagnosticDao.duplicateChapterStream,
         builder: (context, snapshot) {
           final data = snapshot.data?.entries;
           final error = snapshot.error;
@@ -93,7 +98,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
     },
     'Duplicated Tag': (context) {
       return StreamBuilder(
-        stream: _diagnosticDao.duplicateTag,
+        stream: _diagnosticDao.duplicateTagStream,
         builder: (context, snapshot) {
           final data = snapshot.data?.entries;
           final error = snapshot.error;
@@ -130,7 +135,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
     },
     'Orphaned Chapter': (context) {
       return StreamBuilder(
-        stream: _diagnosticDao.orphanChapter,
+        stream: _diagnosticDao.orphanChapterStream,
         builder: (context, snapshot) {
           final data = snapshot.data;
           final error = snapshot.error;
@@ -175,6 +180,36 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
             tabAlignment: TabAlignment.start,
             tabs: [..._menus.entries.map((e) => Tab(text: e.key))],
           ),
+          actions: [
+            IconButton(
+              onPressed: () async {
+                final mangas = await _diagnosticDao.duplicateManga.then(
+                  (e) => e.values.expand((e) => e.map((e) => e.id)),
+                );
+
+                await _mangaDao.remove(ids: [...mangas]);
+
+                final chapters = await _diagnosticDao.duplicateChapter.then(
+                  (e) => e.values.expand((e) => e.map((e) => e.id)),
+                );
+
+                await _chapterDao.remove(ids: [...chapters]);
+
+                final tags = await _diagnosticDao.duplicateTag.then(
+                  (e) => e.values.expand((e) => e.map((e) => e.id)),
+                );
+
+                await _tagDao.remove(ids: [...tags]);
+
+                final orphan = await _diagnosticDao.orphanChapter.then(
+                  (e) => e.map((e) => e.id),
+                );
+
+                await _chapterDao.remove(ids: [...orphan]);
+              },
+              icon: Icon(Icons.delete),
+            ),
+          ],
         ),
         body: TabBarView(
           children: [..._menus.entries.map((e) => e.value(context))],

@@ -1,7 +1,7 @@
-import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 
 import '../database/database.dart';
+import '../extension/parse_extension.dart';
 import '../tables/chapter_tables.dart';
 import '../tables/image_tables.dart';
 import '../tables/manga_tables.dart';
@@ -50,90 +50,7 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
     with _$DiagnosticDaoMixin {
   DiagnosticDao(super.db);
 
-  DuplicatedResult<MangaDrift> _parseDuplicateManga(
-    List<DuplicatedMangaQueryResult> result,
-  ) {
-    final groups = result.groupListsBy((e) => (e.title, e.source));
-    return groups.map(
-      (key, value) => MapEntry(key, [
-        ...value.map(
-          (e) => MangaDrift(
-            createdAt: e.createdAt,
-            updatedAt: e.updatedAt,
-            id: e.id,
-            title: e.title,
-            coverUrl: e.coverUrl,
-            author: e.author,
-            status: e.status,
-            webUrl: e.webUrl,
-            description: e.description,
-            source: e.source,
-          ),
-        ),
-      ]),
-    );
-  }
-
-  Stream<DuplicatedResult<MangaDrift>> get duplicateMangaStream {
-    return duplicatedMangaQuery().watch().map(_parseDuplicateManga);
-  }
-
-  Future<DuplicatedResult<MangaDrift>> get duplicateManga async {
-    return duplicatedMangaQuery().get().then(_parseDuplicateManga);
-  }
-
-  Stream<DuplicatedResult<ChapterDrift>> get duplicateChapter {
-    final result = duplicatedChapterQuery().watch().map(
-      (e) => e.groupListsBy((e) => (e.mangaId, e.chapter)),
-    );
-    return result.map(
-      (e) => e.map(
-        (key, value) => MapEntry(key, [
-          ...value.map(
-            (e) => ChapterDrift(
-              createdAt: e.createdAt,
-              updatedAt: e.updatedAt,
-              id: e.id,
-              mangaId: e.mangaId,
-              title: e.title,
-              volume: e.volume,
-              chapter: e.chapter,
-              translatedLanguage: e.translatedLanguage,
-              scanlationGroup: e.scanlationGroup,
-              webUrl: e.webUrl,
-              readableAt: e.readableAt,
-              publishAt: e.publishAt,
-              lastReadAt: e.lastReadAt,
-            ),
-          ),
-        ]),
-      ),
-    );
-  }
-
-  Stream<DuplicatedResult<TagDrift>> get duplicateTag {
-    final result = duplicatedTagQuery().watch().map(
-      (e) => e.groupListsBy((e) => (e.name, e.source)),
-    );
-    return result.map(
-      (e) => e.map(
-        (key, value) => MapEntry(key, [
-          ...value.map(
-            (e) => TagDrift(
-              createdAt: e.createdAt,
-              updatedAt: e.updatedAt,
-              id: e.id,
-              tagId: e.tagId,
-              name: e.name,
-              source: e.source,
-            ),
-          ),
-        ]),
-      ),
-    );
-  }
-
-  Stream<List<ChapterDrift>> get orphanChapter {
+  JoinedSelectStatement<HasResultSet, dynamic> get orphanChapterQuery {
     final selector = select(chapterTables).join([
       leftOuterJoin(
         mangaTables,
@@ -141,10 +58,42 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
       ),
     ]);
 
-    final query = selector..where(mangaTables.id.isNull());
+    return selector..where(mangaTables.id.isNull());
+  }
 
-    return query.watch().map((e) {
-      return [...e.map((e) => e.readTableOrNull(chapterTables)).nonNulls];
-    });
+  List<ChapterDrift> _parseOrphanChapter(List<TypedResult> result) {
+    return [...result.map((e) => e.readTableOrNull(chapterTables)).nonNulls];
+  }
+
+  Stream<DuplicatedResult<MangaDrift>> get duplicateMangaStream {
+    return duplicatedMangaQuery().watch().map((e) => e.parse());
+  }
+
+  Future<DuplicatedResult<MangaDrift>> get duplicateManga async {
+    return duplicatedMangaQuery().get().then((e) => e.parse());
+  }
+
+  Stream<DuplicatedResult<ChapterDrift>> get duplicateChapterStream {
+    return duplicatedChapterQuery().watch().map((e) => e.parse());
+  }
+
+  Future<DuplicatedResult<ChapterDrift>> get duplicateChapter {
+    return duplicatedChapterQuery().get().then((e) => e.parse());
+  }
+
+  Stream<DuplicatedResult<TagDrift>> get duplicateTagStream {
+    return duplicatedTagQuery().watch().map((e) => e.parse());
+  }
+
+  Future<DuplicatedResult<TagDrift>> get duplicateTag {
+    return duplicatedTagQuery().get().then((e) => e.parse());
+  }
+
+  Stream<List<ChapterDrift>> get orphanChapterStream {
+    return orphanChapterQuery.watch().map(_parseOrphanChapter);
+  }
+
+  Future<List<ChapterDrift>> get orphanChapter {
+    return orphanChapterQuery.get().then(_parseOrphanChapter);
   }
 }
