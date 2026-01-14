@@ -294,7 +294,7 @@ class JobManager
 
   @override
   void cancelJob({required int id}) {
-    if (_ongoingJobId.valueOrNull != null) return;
+    if (id == _ongoingJobId.valueOrNull) return;
     _jobDao.remove(id);
   }
 

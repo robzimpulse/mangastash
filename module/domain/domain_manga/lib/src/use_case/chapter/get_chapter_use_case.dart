@@ -102,7 +102,7 @@ class GetChapterUseCase with SyncChaptersMixin {
         (e) => e.chapter?.let((d) => Chapter.fromDrift(d, images: e.images)),
       );
 
-      if (chapter != null && chapter.images.or([]).isNotEmpty && useCache) {
+      if (chapter != null && chapter.images.or([]).isNotEmpty) {
         return Success(chapter);
       }
 
