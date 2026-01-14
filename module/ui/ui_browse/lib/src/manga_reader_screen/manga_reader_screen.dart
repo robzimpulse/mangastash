@@ -48,10 +48,9 @@ class MangaReaderScreen extends StatelessWidget {
           getChapterUseCase: locator(),
           updateChapterUseCase: locator(),
           listenSearchParameterUseCase: locator(),
-          getAllChapterUseCase: locator(),
           recrawlUseCase: locator(),
-          listenPrefetchChapterConfig: locator(),
           prefetchChapterUseCase: locator(),
+          getNeighbourChapterUseCase: locator(),
         )..init();
       },
       child: MangaReaderScreen(
@@ -132,7 +131,7 @@ class MangaReaderScreen extends StatelessWidget {
           prev.chapter?.images != curr.chapter?.images,
           prev.previousChapterId != curr.previousChapterId,
           prev.nextChapterId != curr.nextChapterId,
-          prev.isLoadingChapterIds != curr.isLoadingChapterIds,
+          prev.isLoadingNeighbourChapters != curr.isLoadingNeighbourChapters,
         ].contains(true);
       },
       builder: (context, state) {
@@ -214,7 +213,7 @@ class MangaReaderScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (state.isLoadingChapterIds) ...[
+                  if (state.isLoadingNeighbourChapters) ...[
                     SizedBox(
                       width: 32,
                       height: 32,
@@ -235,7 +234,7 @@ class MangaReaderScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (state.isLoadingChapterIds) ...[
+                  if (state.isLoadingNeighbourChapters) ...[
                     SizedBox(
                       width: 32,
                       height: 32,
@@ -252,11 +251,11 @@ class MangaReaderScreen extends StatelessWidget {
             );
           },
           onStartEdgeDrag: () {
-            if (state.isLoadingChapterIds || prevId == null) return;
+            if (state.isLoadingNeighbourChapters || prevId == null) return;
             onTapShortcut?.call(prevId);
           },
           onEndEdgeDrag: () {
-            if (state.isLoadingChapterIds || nextId == null) return;
+            if (state.isLoadingNeighbourChapters || nextId == null) return;
             onTapShortcut?.call(nextId);
           },
         );

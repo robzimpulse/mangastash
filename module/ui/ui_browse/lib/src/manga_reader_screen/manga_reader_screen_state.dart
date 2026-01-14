@@ -1,4 +1,3 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
@@ -12,8 +11,9 @@ class MangaReaderScreenState extends Equatable {
     this.chapterId,
     this.source,
     this.parameter = const SearchChapterParameter(),
-    this.chapterIds = const [],
-    this.isLoadingChapterIds = false,
+    this.isLoadingNeighbourChapters = false,
+    this.previousChapterId,
+    this.nextChapterId,
   });
 
   final bool isLoading;
@@ -30,23 +30,11 @@ class MangaReaderScreenState extends Equatable {
 
   final SearchChapterParameter parameter;
 
-  final List<String> chapterIds;
+  final bool isLoadingNeighbourChapters;
 
-  final bool isLoadingChapterIds;
+  final String? previousChapterId;
 
-  String? get previousChapterId {
-    return chapterId?.let((id) {
-      final index = chapterIds.indexOf(id);
-      return index > 0 ? chapterIds.elementAtOrNull(index - 1) : null;
-    });
-  }
-
-  String? get nextChapterId {
-    return chapterId?.let((id) {
-      final index = chapterIds.indexOf(id);
-      return index >= 0 ? chapterIds.elementAtOrNull(index + 1) : null;
-    });
-  }
+  final String? nextChapterId;
 
   @override
   List<Object?> get props {
@@ -58,8 +46,9 @@ class MangaReaderScreenState extends Equatable {
       error,
       source,
       parameter,
-      chapterIds,
-      isLoadingChapterIds,
+      previousChapterId,
+      nextChapterId,
+      isLoadingNeighbourChapters,
     ];
   }
 
@@ -71,8 +60,9 @@ class MangaReaderScreenState extends Equatable {
     Exception? Function()? error,
     SourceEnum? source,
     SearchChapterParameter? parameter,
-    List<String>? chapterIds,
-    bool? isLoadingChapterIds,
+    bool? isLoadingNeighbourChapters,
+    String? previousChapterId,
+    String? nextChapterId,
   }) {
     return MangaReaderScreenState(
       mangaId: mangaId ?? this.mangaId,
@@ -82,8 +72,10 @@ class MangaReaderScreenState extends Equatable {
       error: error != null ? error() : this.error,
       source: source ?? this.source,
       parameter: parameter ?? this.parameter,
-      chapterIds: chapterIds ?? this.chapterIds,
-      isLoadingChapterIds: isLoadingChapterIds ?? this.isLoadingChapterIds,
+      isLoadingNeighbourChapters:
+          isLoadingNeighbourChapters ?? this.isLoadingNeighbourChapters,
+      previousChapterId: previousChapterId ?? this.previousChapterId,
+      nextChapterId: nextChapterId ?? this.nextChapterId,
     );
   }
 }
