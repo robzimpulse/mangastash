@@ -90,63 +90,64 @@ class ChapterTileWidget extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if (coverUrl != null)
+                if (coverUrl != null) ...[
                   CachedNetworkImage(
                     fit: BoxFit.cover,
                     cacheManager: cacheManager,
                     imageUrl: coverUrl,
-                    width: 50,
-                    height: 50,
+                    width: 84,
                     errorWidget: (context, url, error) {
                       return const Center(child: Icon(Icons.error));
                     },
                     progressIndicatorBuilder: (context, url, progress) {
                       return Center(
-                        child:
-                            CircularProgressIndicator(value: progress.progress),
+                        child: CircularProgressIndicator(
+                          value: progress.progress,
+                        ),
                       );
                     },
                   ),
+                  SizedBox(width: 8),
+                ],
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      if (mangaTitle != null)
-                        Expanded(
-                          child: Text(
-                            mangaTitle,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                    children:
+                        <Widget>[
+                          if (mangaTitle != null)
+                            Text(
+                              mangaTitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          IconWithTextWidget(
+                            icon: language?.flag(width: 20, height: 10),
+                            text: Expanded(
+                              child: Text(
+                                title ?? ' - ',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ),
-                        ),
-                      IconWithTextWidget(
-                        icon: language?.flag(width: 20, height: 10),
-                        text: Expanded(
-                          child: Text(
-                            title ?? ' - ',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          IconWithTextWidget(
+                            icon: const Icon(Icons.people, size: 20),
+                            text: Text(groups ?? ' - '),
                           ),
-                        ),
-                      ),
-                      IconWithTextWidget(
-                        icon: const Icon(Icons.people, size: 20),
-                        text: Text(groups ?? ' - '),
-                      ),
-                      IconWithTextWidget(
-                        icon: const Icon(Icons.access_time, size: 20),
-                        text: Text(uploadedAt?.readableFormat ?? ' - '),
-                      ),
-                      if (lastReadAt != null)
-                        IconWithTextWidget(
-                          icon: const Icon(
-                            Icons.menu_book_outlined,
-                            size: 20,
+                          IconWithTextWidget(
+                            icon: const Icon(Icons.access_time, size: 20),
+                            text: Text(uploadedAt?.readableFormat ?? ' - '),
                           ),
-                          text: Text(lastReadAt?.readableFormat ?? '-'),
-                        ),
-                    ].intersperse(const SizedBox(height: 4)).toList(),
+                          if (lastReadAt != null)
+                            IconWithTextWidget(
+                              icon: const Icon(
+                                Icons.menu_book_outlined,
+                                size: 20,
+                              ),
+                              text: Text(lastReadAt?.readableFormat ?? '-'),
+                            ),
+                        ].intersperse(const SizedBox(height: 4)).toList(),
                   ),
                 ),
                 if (isPrefetching)

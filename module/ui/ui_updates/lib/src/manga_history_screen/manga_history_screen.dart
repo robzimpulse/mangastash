@@ -82,6 +82,7 @@ class MangaHistoryScreen extends StatelessWidget {
               final manga = value?.manga;
               if (chapter == null || manga == null) return null;
               return ChapterTileWidget.chapter(
+                padding: EdgeInsets.all(8),
                 manga: manga,
                 chapter: chapter,
                 lastReadAt: chapter.lastReadAt,
