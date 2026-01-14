@@ -48,79 +48,48 @@ class MangaHistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _manga({required BuildContext context, required Manga manga}) {
-    return MangaTileWidget.manga(
-      padding: const EdgeInsets.all(8),
-      manga: manga,
-      onTap: () => onTapManga?.call(manga),
-      cacheManager: imagesCacheManager,
-    );
-  }
-
-  Widget _chapter({
-    required BuildContext context,
-    required Manga manga,
-    required Chapter chapter,
-  }) {
-    return ChapterTileWidget.chapter(
-      padding: const EdgeInsets.all(8),
-      chapter: chapter,
-      lastReadAt: chapter.lastReadAt,
-      onTap: () => onTapChapter?.call(manga, chapter),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
       appBar: AppBar(centerTitle: false, title: const Text('Histories')),
       body: _builder(
         builder: (context, state) {
-          return CustomScrollView(
-            slivers: [
-              if (state.histories.isEmpty)
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            EmojiAsciiEnum.crying.ascii,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.displayMedium,
-                          ),
-                          Text(
-                            'Empty Data',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                        ],
-                      ),
-                    ),
+          if (state.histories.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    EmojiAsciiEnum.crying.ascii,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.displayMedium,
                   ),
-                )
-              else
-                for (final history in state.histories.entries)
-                  MultiSliver(
-                    pushPinnedChildren: true,
-                    children: [
-                      SliverPinnedHeader(
-                        child: _manga(context: context, manga: history.key),
-                      ),
-                      for (final item in history.value)
-                        SliverToBoxAdapter(
-                          child: _chapter(
-                            context: context,
-                            manga: history.key,
-                            chapter: item,
-                          ),
-                        ),
-                    ],
+                  Text(
+                    'Empty Data',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
-            ],
+                ],
+              ),
+            );
+          }
+
+          return ListView.separated(
+            itemCount: state.histories.length,
+            itemBuilder: (context, index) {
+              final value = state.histories.elementAtOrNull(index);
+              final chapter = value?.chapter;
+              final manga = value?.manga;
+              if (chapter == null || manga == null) return null;
+              return ChapterTileWidget.chapter(
+                manga: manga,
+                chapter: chapter,
+                lastReadAt: chapter.lastReadAt,
+                cacheManager: imagesCacheManager,
+                onTap: () => onTapChapter?.call(manga, chapter),
+              );
+            },
+            separatorBuilder: (context, _) => SizedBox(height: 8),
           );
         },
       ),
