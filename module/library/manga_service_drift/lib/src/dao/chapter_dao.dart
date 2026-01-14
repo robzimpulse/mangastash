@@ -9,6 +9,7 @@ import '../extension/value_or_null_extension.dart';
 import '../model/chapter_model.dart';
 import '../tables/chapter_tables.dart';
 import '../tables/image_tables.dart';
+import '../util/next_chapter_direction_enum.dart';
 import 'image_dao.dart';
 
 part 'chapter_dao.g.dart';
@@ -218,5 +219,49 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
 
       return data;
     });
+  }
+
+  Future<List<ChapterModel>> getNeighbourChapters({
+    required String chapterId,
+    required int count,
+    NextChapterDirection direction = NextChapterDirection.next,
+  }) async {
+    final a = select(chapterTables)..where((t) => t.id.equals(chapterId));
+    final current = await a.getSingle();
+    final chapter = current.chapter;
+    final mId = current.mangaId;
+    final value = double.tryParse(chapter ?? '0') ?? 0;
+
+    if (mId == null) return [];
+
+    final query = select(chapterTables).join([
+      leftOuterJoin(
+        imageTables,
+        imageTables.chapterId.equalsExp(chapterTables.id),
+      ),
+    ]);
+
+    query.where(chapterTables.mangaId.equals(mId));
+
+    switch (direction) {
+      case NextChapterDirection.previous:
+        query.where(
+          chapterTables.chapter.cast<double>().isSmallerThanValue(value),
+        );
+        query.orderBy([
+          OrderingTerm.desc(chapterTables.chapter.cast<double>()),
+          OrderingTerm.asc(imageTables.order),
+        ]);
+      case NextChapterDirection.next:
+        query.where(
+          chapterTables.chapter.cast<double>().isBiggerThanValue(value),
+        );
+        query.orderBy([
+          OrderingTerm.asc(chapterTables.chapter.cast<double>()),
+          OrderingTerm.asc(imageTables.order),
+        ]);
+    }
+
+    return query.get().then(_parse).then((e) => e.take(count).toList());
   }
 }
