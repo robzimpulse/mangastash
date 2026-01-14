@@ -61,8 +61,23 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
     return selector..where(mangaTables.id.isNull());
   }
 
+  JoinedSelectStatement<HasResultSet, dynamic> get orphanImageQuery {
+    final selector = select(imageTables).join([
+      leftOuterJoin(
+        chapterTables,
+        chapterTables.id.equalsExp(imageTables.chapterId),
+      ),
+    ]);
+
+    return selector..where(chapterTables.id.isNull());
+  }
+
   List<ChapterDrift> _parseOrphanChapter(List<TypedResult> result) {
     return [...result.map((e) => e.readTableOrNull(chapterTables)).nonNulls];
+  }
+
+  List<ImageDrift> _parseOrphanImage(List<TypedResult> result) {
+    return [...result.map((e) => e.readTableOrNull(imageTables)).nonNulls];
   }
 
   Stream<DuplicatedResult<MangaDrift>> get duplicateMangaStream {
@@ -95,5 +110,13 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<ChapterDrift>> get orphanChapter {
     return orphanChapterQuery.get().then(_parseOrphanChapter);
+  }
+
+  Stream<List<ImageDrift>> get orphanImageStream {
+    return orphanChapterQuery.watch().map(_parseOrphanImage);
+  }
+
+  Future<List<ImageDrift>> get orphanImage {
+    return orphanChapterQuery.get().then(_parseOrphanImage);
   }
 }
