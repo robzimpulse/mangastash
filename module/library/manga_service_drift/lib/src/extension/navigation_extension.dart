@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../dao/chapter_dao.dart';
 import '../database/database.dart';
 import '../screen/diagnostic_screen.dart';
 import '../util/typedef.dart';

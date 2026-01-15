@@ -1,5 +1,4 @@
 import 'package:domain_manga/domain_manga.dart';
-import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import 'manga_history_screen_state.dart';
@@ -11,11 +10,9 @@ class MangaHistoryScreenCubit extends Cubit<MangaHistoryScreenState>
     MangaHistoryScreenState initialState = const MangaHistoryScreenState(),
   }) : super(initialState) {
     addSubscription(
-      listenReadHistoryUseCase.readHistoryStream.distinct().listen(_onUpdate),
+      listenReadHistoryUseCase.readHistoryStream.distinct().listen(
+        (e) => emit(state.copyWith(histories: e)),
+      ),
     );
-  }
-
-  void _onUpdate(List<History> histories) {
-    emit(state.copyWith(histories: histories));
   }
 }
