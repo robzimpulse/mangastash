@@ -76,10 +76,10 @@ packages:
     dependency: transitive
     description:
       name: equatable
-      sha256: "567c64b3cb4cf82397aac55f4f0cbd3ca20d77c6c03bedbc4ceaddc08904aef7"
+      sha256: "3e0141505477fd8ad55d6eb4e7776d3fe8430be8e497ccb1521370c3f21a3e2b"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.7"
+    version: "2.0.8"
   fake_async:
     dependency: transitive
     description:
@@ -92,10 +92,10 @@ packages:
     dependency: transitive
     description:
       name: ffi
-      sha256: "289279317b4b16eb2bb7e271abccd4bf84ec9bdcbe999e278a94b804f5630418"
+      sha256: d07d37192dbf97461359c1518788f203b0c9102cfd2c35a716b823741219542c
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.4"
+    version: "2.1.5"
   fixnum:
     dependency: transitive
     description:
@@ -276,7 +276,7 @@ packages:
     description:
       path: "packages/log_box"
       ref: master
-      resolved-ref: f60a64da052e9cdda8e6bff726765f43b363be99
+      resolved-ref: "7f56060283421eb94874875f28c59c387acf556d"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -285,7 +285,7 @@ packages:
     description:
       path: "packages/log_box_dio_logger"
       ref: master
-      resolved-ref: f60a64da052e9cdda8e6bff726765f43b363be99
+      resolved-ref: "7f56060283421eb94874875f28c59c387acf556d"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -294,7 +294,7 @@ packages:
     description:
       path: "packages/log_box_in_app_webview_logger"
       ref: master
-      resolved-ref: f60a64da052e9cdda8e6bff726765f43b363be99
+      resolved-ref: "7f56060283421eb94874875f28c59c387acf556d"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -303,7 +303,7 @@ packages:
     description:
       path: "packages/log_box_navigation_logger"
       ref: master
-      resolved-ref: f60a64da052e9cdda8e6bff726765f43b363be99
+      resolved-ref: "7f56060283421eb94874875f28c59c387acf556d"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
