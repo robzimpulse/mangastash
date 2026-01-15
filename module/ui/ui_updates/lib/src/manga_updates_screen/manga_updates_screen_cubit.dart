@@ -49,7 +49,7 @@ class MangaUpdatesScreenCubit extends Cubit<MangaUpdatesScreenState>
     );
   }
 
-  void _onUpdate(List<History> histories) {
+  void _onUpdate(List<MangaChapter> histories) {
     final group = histories.groupListsBy((e) => e.manga);
     emit(
       state.copyWith(
