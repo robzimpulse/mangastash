@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
+import 'package:eval_annotation/eval_annotation.dart';
 
+@Bind()
 class ChapterScrapped extends Equatable {
   final String? id;
 
@@ -11,11 +13,11 @@ class ChapterScrapped extends Equatable {
 
   final String? chapter;
 
-  final String? readableAtRaw;
+  final String? readableAt;
 
-  final String? publishAtRaw;
+  final String? publishAt;
 
-  final String? lastReadAtRaw;
+  final String? lastReadAt;
 
   final List<String>? images;
 
@@ -25,9 +27,9 @@ class ChapterScrapped extends Equatable {
 
   final String? webUrl;
 
-  final String? createdAtRaw;
+  final String? createdAt;
 
-  final String? updatedAtRaw;
+  final String? updatedAt;
 
   const ChapterScrapped({
     this.id,
@@ -35,15 +37,15 @@ class ChapterScrapped extends Equatable {
     this.title,
     this.volume,
     this.chapter,
-    this.readableAtRaw,
-    this.publishAtRaw,
+    this.readableAt,
+    this.publishAt,
     this.images,
     this.translatedLanguage,
     this.scanlationGroup,
     this.webUrl,
-    this.lastReadAtRaw,
-    this.createdAtRaw,
-    this.updatedAtRaw,
+    this.lastReadAt,
+    this.createdAt,
+    this.updatedAt,
   });
 
   @override
@@ -53,14 +55,14 @@ class ChapterScrapped extends Equatable {
     title,
     volume,
     chapter,
-    readableAtRaw,
-    publishAtRaw,
+    readableAt,
+    publishAt,
     images,
     translatedLanguage,
     scanlationGroup,
     webUrl,
-    lastReadAtRaw,
-    createdAtRaw,
-    updatedAtRaw,
+    lastReadAt,
+    createdAt,
+    updatedAt,
   ];
 }

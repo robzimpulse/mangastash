@@ -4,19 +4,23 @@ import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 
+import '../../extension/data_scrapped_extension.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../parser/base/manga_detail_html_parser.dart';
 
 class GetMangaFromUrlUseCase with SyncMangasMixin {
   final HeadlessWebviewUseCase _webview;
+  final ConverterCacheManager _converterCacheManager;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   GetMangaFromUrlUseCase({
     required HeadlessWebviewUseCase webview,
+    required ConverterCacheManager converterCacheManager,
     required MangaDao mangaDao,
     required LogBox logBox,
   }) : _mangaDao = mangaDao,
+       _converterCacheManager = converterCacheManager,
        _logBox = logBox,
        _webview = webview;
 
@@ -53,9 +57,15 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
       source: source,
     );
 
-    final manga = await parser.manga;
+    final manga = await parser.manga.then(
+      (e) => e.convert(manager: _converterCacheManager),
+    );
 
-    return manga.copyWith(source: source.name, webUrl: url);
+    return manga.copyWith(
+      source: source.name,
+      webUrl: url,
+      tags: manga.tags?.map((e) => e.copyWith(source: source.name)).toList(),
+    );
   }
 
   Future<Result<Manga>> execute({

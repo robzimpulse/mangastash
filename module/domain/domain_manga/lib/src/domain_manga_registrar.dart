@@ -123,6 +123,7 @@ class DomainMangaRegistrar extends Registrar {
         webview: locator(),
         mangaDao: locator(),
         mangaService: locator(),
+        converterCacheManager: locator(),
       ),
     );
     locator.registerFactory(
@@ -130,6 +131,7 @@ class DomainMangaRegistrar extends Registrar {
         webview: locator(),
         mangaDao: locator(),
         logBox: locator(),
+        converterCacheManager: locator(),
       ),
     );
     locator.registerFactory(

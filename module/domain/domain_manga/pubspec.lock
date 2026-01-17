@@ -196,6 +196,13 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  entity_manga_external:
+    dependency: "direct main"
+    description:
+      path: "../../library/entity_manga_external"
+      relative: true
+    source: path
+    version: "0.0.1"
   equatable:
     dependency: transitive
     description:
@@ -204,6 +211,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.7"
+  eval_annotation:
+    dependency: transitive
+    description:
+      name: eval_annotation
+      sha256: "8a1f7bd1b6cf004a4b045ed8a24bc7faa8dd88e9deb8899689c0ab26ac6234a4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.8.1"
   fake_async:
     dependency: transitive
     description:
