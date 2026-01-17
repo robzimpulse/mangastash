@@ -14,9 +14,10 @@ dependencies:
   eval_annotation: ^0.8.1
   equatable: ^2.0.5
   collection: ^1.16.0
+  html: ^0.15.5
+  dart_eval: ^0.8.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-  dart_eval: ^0.8.3

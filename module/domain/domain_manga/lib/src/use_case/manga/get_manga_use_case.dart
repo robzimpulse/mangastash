@@ -2,6 +2,7 @@ import 'package:core_analytics/core_analytics.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../extension/data_scrapped_extension.dart';
@@ -78,7 +79,7 @@ class GetMangaUseCase with SyncMangasMixin {
     );
 
     final parser = MangaDetailHtmlParser.forSource(
-      root: document,
+      root: HtmlDocument()..nodes.addAll(document.nodes),
       source: source,
     );
 
