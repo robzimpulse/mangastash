@@ -7,6 +7,7 @@ import '../dao/manga_dao.dart';
 import '../dao/tag_dao.dart';
 import '../database/database.dart';
 import '../extension/nullable_generic.dart';
+import '../model/diagnostic_model.dart';
 import '../util/typedef.dart';
 
 class DiagnosticScreen extends StatefulWidget {
@@ -22,9 +23,9 @@ class DiagnosticScreen extends StatefulWidget {
 
   final AppDatabase database;
 
-  final DiagnosticWidgetBuilder<MangaDrift>? mangaBuilder;
-  final DiagnosticWidgetBuilder<ChapterDrift>? chapterBuilder;
-  final DiagnosticWidgetBuilder<TagDrift>? tagBuilder;
+  final DiagnosticWidgetBuilder<DuplicatedMangaKey, MangaDrift>? mangaBuilder;
+  final DiagnosticWidgetBuilder<DuplicatedChapterKey, ChapterDrift>? chapterBuilder;
+  final DiagnosticWidgetBuilder<DuplicatedTagKey, TagDrift>? tagBuilder;
   final DriftWidgetBuilder<ChapterDrift>? orphanChapterBuilder;
   final DriftWidgetBuilder<ImageDrift>? orphanImageBuilder;
 
@@ -67,8 +68,8 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
               final view = widget.mangaBuilder?.call(value);
               return view?.or(
                 ExpansionTile(
-                  title: Text('Title: ${value.key.$1}'),
-                  subtitle: Text('Source: ${value.key.$2}'),
+                  title: Text('Title: ${value.key.title}'),
+                  subtitle: Text('Source: ${value.key.source}'),
                   children: [
                     for (final child in value.value)
                       ListTile(title: Text(child.id)),
@@ -107,8 +108,8 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
               final view = widget.chapterBuilder?.call(value);
               return view?.or(
                 ExpansionTile(
-                  title: Text('Manga ID: ${value.key.$1}'),
-                  subtitle: Text('Chapter: ${value.key.$2}'),
+                  title: Text('Manga ID: ${value.key.mangaId}'),
+                  subtitle: Text('Chapter: ${value.key.chapter}'),
                   children: [
                     for (final child in value.value)
                       ListTile(title: Text(child.id)),
@@ -147,8 +148,8 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
               final view = widget.tagBuilder?.call(value);
               return view?.or(
                 ExpansionTile(
-                  title: Text('Name: ${value.key.$1}'),
-                  subtitle: Text('Source: ${value.key.$2}'),
+                  title: Text('Name: ${value.key.name}'),
+                  subtitle: Text('Source: ${value.key.source}'),
                   children: [
                     for (final child in value.value)
                       ListTile(title: Text(child.tagId ?? '-')),

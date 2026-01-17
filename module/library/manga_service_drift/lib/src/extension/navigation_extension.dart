@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../database/database.dart';
+import '../model/diagnostic_model.dart';
 import '../screen/diagnostic_screen.dart';
 import '../util/typedef.dart';
 
@@ -8,9 +9,9 @@ extension NavigationExtension on AppDatabase {
   void diagnostic({
     required BuildContext context,
     ThemeData? theme,
-    DiagnosticWidgetBuilder<MangaDrift>? mangaBuilder,
-    DiagnosticWidgetBuilder<ChapterDrift>? chapterBuilder,
-    DiagnosticWidgetBuilder<TagDrift>? tagBuilder,
+    DiagnosticWidgetBuilder<DuplicatedMangaKey, MangaDrift>? mangaBuilder,
+    DiagnosticWidgetBuilder<DuplicatedChapterKey, ChapterDrift>? chapterBuilder,
+    DiagnosticWidgetBuilder<DuplicatedTagKey, TagDrift>? tagBuilder,
     DriftWidgetBuilder<ChapterDrift>? orphanChapterBuilder,
     DriftWidgetBuilder<ImageDrift>? orphanImageBuilder,
   }) {

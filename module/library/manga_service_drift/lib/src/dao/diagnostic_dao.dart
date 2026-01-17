@@ -2,12 +2,12 @@ import 'package:drift/drift.dart';
 
 import '../database/database.dart';
 import '../extension/parse_extension.dart';
+import '../model/diagnostic_model.dart';
 import '../tables/chapter_tables.dart';
 import '../tables/image_tables.dart';
 import '../tables/manga_tables.dart';
 import '../tables/relationship_tables.dart';
 import '../tables/tag_tables.dart';
-import '../util/typedef.dart';
 
 part 'diagnostic_dao.g.dart';
 
@@ -80,27 +80,27 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
     return [...result.map((e) => e.readTableOrNull(imageTables)).nonNulls];
   }
 
-  Stream<DuplicatedResult<MangaDrift>> get duplicateMangaStream {
+  Stream<Map<DuplicatedMangaKey, List<MangaDrift>>> get duplicateMangaStream {
     return duplicatedMangaQuery().watch().map((e) => e.parse());
   }
 
-  Future<DuplicatedResult<MangaDrift>> get duplicateManga async {
+  Future<Map<DuplicatedMangaKey, List<MangaDrift>>>get duplicateManga async {
     return duplicatedMangaQuery().get().then((e) => e.parse());
   }
 
-  Stream<DuplicatedResult<ChapterDrift>> get duplicateChapterStream {
+  Stream<Map<DuplicatedChapterKey, List<ChapterDrift>>> get duplicateChapterStream {
     return duplicatedChapterQuery().watch().map((e) => e.parse());
   }
 
-  Future<DuplicatedResult<ChapterDrift>> get duplicateChapter {
+  Future<Map<DuplicatedChapterKey, List<ChapterDrift>>> get duplicateChapter {
     return duplicatedChapterQuery().get().then((e) => e.parse());
   }
 
-  Stream<DuplicatedResult<TagDrift>> get duplicateTagStream {
+  Stream<Map<DuplicatedTagKey, List<TagDrift>>> get duplicateTagStream {
     return duplicatedTagQuery().watch().map((e) => e.parse());
   }
 
-  Future<DuplicatedResult<TagDrift>> get duplicateTag {
+  Future<Map<DuplicatedTagKey, List<TagDrift>>> get duplicateTag {
     return duplicatedTagQuery().get().then((e) => e.parse());
   }
 

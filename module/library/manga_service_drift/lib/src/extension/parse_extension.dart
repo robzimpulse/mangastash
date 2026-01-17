@@ -2,11 +2,11 @@ import 'package:collection/collection.dart';
 
 import '../dao/diagnostic_dao.dart';
 import '../database/database.dart';
-import '../util/typedef.dart';
+import '../model/diagnostic_model.dart';
 
 extension ParseMangaExtension on List<DuplicatedMangaQueryResult> {
-  DuplicatedResult<MangaDrift> parse() {
-    return groupListsBy((e) => (e.title, e.source)).map(
+  Map<DuplicatedMangaKey, List<MangaDrift>> parse() {
+    return groupListsBy(DuplicatedMangaKey.from).map(
       (key, value) => MapEntry(key, [
         ...value.map(
           (e) => MangaDrift(
@@ -28,8 +28,8 @@ extension ParseMangaExtension on List<DuplicatedMangaQueryResult> {
 }
 
 extension ParseChapterExtension on List<DuplicatedChapterQueryResult> {
-  DuplicatedResult<ChapterDrift> parse() {
-    return groupListsBy((e) => (e.mangaId, e.chapter)).map(
+  Map<DuplicatedChapterKey, List<ChapterDrift>> parse() {
+    return groupListsBy(DuplicatedChapterKey.from).map(
       (key, value) => MapEntry(key, [
         ...value.map(
           (e) => ChapterDrift(
@@ -54,8 +54,8 @@ extension ParseChapterExtension on List<DuplicatedChapterQueryResult> {
 }
 
 extension ParseTagExtension on List<DuplicatedTagQueryResult> {
-  DuplicatedResult<TagDrift> parse() {
-    return groupListsBy((e) => (e.name, e.source)).map(
+  Map<DuplicatedTagKey, List<TagDrift>> parse() {
+    return groupListsBy(DuplicatedTagKey.from).map(
       (key, value) => MapEntry(key, [
         ...value.map(
           (e) => TagDrift(

@@ -14,7 +14,6 @@ typedef LoggerCallback = void Function(
   StackTrace? stackTrace,
 });
 
-typedef DuplicatedResult<V> = Map<(String?, String?), List<V>>;
-typedef EntryDuplicatedResult<V> = MapEntry<(String?, String?), List<V>>;
-typedef DiagnosticWidgetBuilder<V> = Widget? Function(EntryDuplicatedResult<V>);
+typedef EntryDuplicatedResult<K, V> = MapEntry<K, List<V>>;
+typedef DiagnosticWidgetBuilder<K, V> = Widget? Function(EntryDuplicatedResult<K, V>);
 typedef DriftWidgetBuilder<V> = Widget? Function(V);
