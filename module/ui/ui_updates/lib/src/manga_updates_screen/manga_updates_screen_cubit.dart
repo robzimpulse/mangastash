@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -23,14 +24,17 @@ class MangaUpdatesScreenCubit extends Cubit<MangaUpdatesScreenState>
         listenUnreadHistoryUseCase.unreadHistoryStream.distinct(),
         listenMangaFromLibraryUseCase.libraryStateStream.distinct(),
         (histories, libraries) => [
-          ...histories.where(
-            (e) => [
-              libraries.map((e) => e.id).contains(e.manga?.id),
-              e.chapter?.readableAt?.let(
-                (d) => DateTime.now().difference(d) < const Duration(days: 7),
-              ),
-            ].nonNulls.every((e) => e),
-          ),
+          ...histories
+              .where(
+                (e) => [
+                  libraries.map((e) => e.id).contains(e.manga?.id),
+                  e.chapter?.readableAt?.let((d) {
+                    final maxAge = const Duration(days: 7);
+                    return DateTime.now().difference(d) < maxAge;
+                  }),
+                ].nonNulls.every((e) => e),
+              )
+              .sortedBy((e) => e.chapter?.createdAt ?? DateTime.timestamp()),
         ],
       ).listen((e) => emit(state.copyWith(updates: e))),
     );
