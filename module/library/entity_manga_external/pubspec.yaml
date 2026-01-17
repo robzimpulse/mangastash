@@ -17,6 +17,9 @@ dependencies:
   html: ^0.15.5
   dart_eval: ^0.8.3
 
+  manga_dex_api:
+    path: ../manga_dex_api
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
