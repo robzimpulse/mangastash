@@ -32,14 +32,7 @@ class $MangaScrapped implements $Instance {
 
   /// Compile-time class declaration of [$MangaScrapped]
   static const $declaration = BridgeClassDef(
-    BridgeClassType(
-      $type,
-
-      $extends: BridgeTypeRef(
-        BridgeTypeSpec('package:equatable/src/equatable.dart', 'Equatable'),
-        [],
-      ),
-    ),
+    BridgeClassType($type),
     constructors: {
       '': BridgeConstructorDef(
         BridgeFunctionDef(
@@ -154,6 +147,17 @@ class $MangaScrapped implements $Instance {
                 nullable: true,
               ),
             ]),
+          ),
+          namedParams: [],
+          params: [],
+        ),
+      ),
+
+      'stringify': BridgeMethodDef(
+        BridgeFunctionDef(
+          returns: BridgeTypeAnnotation(
+            BridgeTypeRef(CoreTypes.bool, []),
+            nullable: true,
           ),
           namedParams: [],
           params: [],
