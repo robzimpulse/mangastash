@@ -5,10 +5,9 @@
 
 import 'package:dart_eval/dart_eval.dart';
 import 'package:dart_eval/dart_eval_bridge.dart';
-import 'package:dart_eval/stdlib/core.dart';
-import 'package:equatable/equatable.dart';
-
 import 'manga_scrapped.dart';
+import 'package:equatable/equatable.dart';
+import 'package:dart_eval/stdlib/core.dart';
 
 /// dart_eval wrapper binding for [MangaScrapped]
 class $MangaScrapped implements $Instance {
