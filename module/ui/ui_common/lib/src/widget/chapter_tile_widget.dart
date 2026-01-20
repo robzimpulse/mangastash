@@ -111,6 +111,7 @@ class ChapterTileWidget extends StatelessWidget {
                 ],
                 Expanded(
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children:
