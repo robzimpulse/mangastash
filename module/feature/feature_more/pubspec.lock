@@ -597,7 +597,7 @@ packages:
     description:
       path: "packages/log_box"
       ref: master
-      resolved-ref: fe2c986cb3cba7cbf01e1199663def3540ae2dab
+      resolved-ref: c1ef02a7c49f43ec9035375cb973c86df91985e5
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -606,7 +606,7 @@ packages:
     description:
       path: "packages/log_box_dio_logger"
       ref: master
-      resolved-ref: fe2c986cb3cba7cbf01e1199663def3540ae2dab
+      resolved-ref: c1ef02a7c49f43ec9035375cb973c86df91985e5
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -615,7 +615,7 @@ packages:
     description:
       path: "packages/log_box_in_app_webview_logger"
       ref: master
-      resolved-ref: fe2c986cb3cba7cbf01e1199663def3540ae2dab
+      resolved-ref: c1ef02a7c49f43ec9035375cb973c86df91985e5
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -624,7 +624,7 @@ packages:
     description:
       path: "packages/log_box_navigation_logger"
       ref: master
-      resolved-ref: fe2c986cb3cba7cbf01e1199663def3540ae2dab
+      resolved-ref: c1ef02a7c49f43ec9035375cb973c86df91985e5
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -633,7 +633,7 @@ packages:
     description:
       path: "packages/log_box_persistent_storage_drift"
       ref: master
-      resolved-ref: fe2c986cb3cba7cbf01e1199663def3540ae2dab
+      resolved-ref: c1ef02a7c49f43ec9035375cb973c86df91985e5
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
