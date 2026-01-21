@@ -21,17 +21,13 @@ class GetNeighbourChapterUseCase {
     NextChapterDirection direction = NextChapterDirection.next,
   }) async {
     final config = _listenPrefetchChapterConfig;
+    final next = config.numOfPrefetchedPrevChapter.valueOrNull;
+    final prev = config.numOfPrefetchedNextChapter.valueOrNull;
     final result = await _chapterDao.getNeighbourChapters(
       chapterId: chapterId,
       count: switch (direction) {
-        NextChapterDirection.previous => max(
-          config.numOfPrefetchedPrevChapter.valueOrNull.or(0),
-          1,
-        ),
-        NextChapterDirection.next => max(
-          config.numOfPrefetchedNextChapter.valueOrNull.or(0),
-          1,
-        ),
+        NextChapterDirection.previous => prev.or(0),
+        NextChapterDirection.next => next.or(0),
       },
       direction: direction,
     );
