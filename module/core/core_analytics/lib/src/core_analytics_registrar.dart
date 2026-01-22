@@ -25,6 +25,7 @@ class CoreAnalyticsRegistrar extends Registrar {
           ),
         ),
       ),
+      dispose: (e) => e.dispose(),
     );
     // TODO: add analytics dependency here
     final end = DateTime.timestamp();
