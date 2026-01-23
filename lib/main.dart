@@ -9,7 +9,6 @@ import 'package:domain_manga/domain_manga.dart';
 import 'package:flutter/foundation.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
-import 'package:universal_io/universal_io.dart';
 
 import 'firebase_options.dart';
 import 'screen/apps_screen.dart';
