@@ -66,7 +66,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
               final value = data.elementAtOrNull(index);
               if (value == null) return null;
               final view = widget.mangaBuilder?.call(value);
-              return view?.or(
+              return view.or(
                 ExpansionTile(
                   title: Text('Title: ${value.key.title}'),
                   subtitle: Text('Source: ${value.key.source}'),
@@ -106,7 +106,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
               final value = data.elementAtOrNull(index);
               if (value == null) return null;
               final view = widget.chapterBuilder?.call(value);
-              return view?.or(
+              return view.or(
                 ExpansionTile(
                   title: Text('Manga ID: ${value.key.mangaId}'),
                   subtitle: Text('Chapter: ${value.key.chapter}'),
@@ -146,7 +146,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
               final value = data.elementAtOrNull(index);
               if (value == null) return null;
               final view = widget.tagBuilder?.call(value);
-              return view?.or(
+              return view.or(
                 ExpansionTile(
                   title: Text('Name: ${value.key.name}'),
                   subtitle: Text('Source: ${value.key.source}'),
@@ -222,7 +222,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
                 final value = data.elementAtOrNull(index);
                 if (value == null) return null;
                 final view = widget.orphanImageBuilder?.call(value);
-                return view?.or(
+                return view.or(
                   ListTile(
                     title: Text('Chapter ID: ${value.chapterId}'),
                     subtitle: Text('Source: ${value.webUrl}'),
