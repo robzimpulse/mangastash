@@ -236,6 +236,8 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return DefaultTabController(
       length: _menus.length,
       child: Scaffold(
@@ -244,6 +246,8 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
           bottom: TabBar(
             isScrollable: true,
             tabAlignment: TabAlignment.start,
+            labelColor: theme.appBarTheme.foregroundColor,
+            unselectedLabelColor: theme.appBarTheme.foregroundColor,
             tabs: [..._menus.entries.map((e) => Tab(text: e.key))],
           ),
           actions: [
