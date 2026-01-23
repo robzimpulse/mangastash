@@ -20,6 +20,7 @@ import 'package:shared_preferences_platform_interface/shared_preferences_async_p
 import 'package:universal_io/universal_io.dart';
 
 import '../fake/fake_directory.dart';
+import '../fake/fake_file.dart';
 import '../fake/fake_io_override.dart';
 import '../fake/fake_method_channel.dart';
 import '../mock/mock_storage_manager.dart';
@@ -90,6 +91,8 @@ void testScreen(
         switch (method.method) {
           case 'getApplicationDocumentsDirectory':
             return '/getApplicationDocumentsDirectory';
+          case 'getTemporaryDirectory':
+            return '/getTemporaryDirectory';
         }
 
         throw Exception(
@@ -156,7 +159,7 @@ void testScreen(
       await $.pumpAndTrySettle();
       await onRunTest.call(locator, $);
       await $.pumpAndTrySettle();
-    }, FakeIOOverride(directory: FakeDirectory()));
+    }, FakeIOOverride(directory: FakeDirectory(), file: FakeFile()));
     await $.tester.runAsync(() => locator.reset());
     debugDefaultTargetPlatformOverride = null;
   });

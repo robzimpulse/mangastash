@@ -24,9 +24,7 @@ void main() async {
   // Ignore bad certificate for development purpose,
   // - enable proxy for development
   // - enable https api call without certificate validation
-  if (kDebugMode) {
-    HttpOverrides.global = BadCertificateHttpOverrides();
-  }
+  ignoreBadCertificate();
 
   final locator = ServiceLocator.asNewInstance();
   runApp(

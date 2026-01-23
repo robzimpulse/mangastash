@@ -1,0 +1,3 @@
+void ignoreBadCertificate() {
+  throw UnimplementedError();
+}
