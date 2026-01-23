@@ -4,7 +4,6 @@ import '../extension/patrol_tester_extension.dart';
 
 void main() {
   group('test screen size', () {
-    // TODO: @robzimpulse - fix this test caused by filesystem
     testScreen(
       'open apps with screen size 400 x 800',
       width: 400,

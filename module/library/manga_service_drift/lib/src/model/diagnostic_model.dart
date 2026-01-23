@@ -1,0 +1,45 @@
+import 'package:equatable/equatable.dart';
+
+import '../../manga_service_drift.dart';
+
+class DuplicatedMangaKey extends Equatable {
+  final String? title;
+  final String? source;
+
+  const DuplicatedMangaKey({this.title, this.source});
+
+  factory DuplicatedMangaKey.from(DuplicatedMangaQueryResult e) {
+    return DuplicatedMangaKey(title: e.title, source: e.source);
+  }
+
+  @override
+  List<Object?> get props => [title, source];
+}
+
+class DuplicatedChapterKey extends Equatable {
+  final String? mangaId;
+  final String? chapter;
+
+  const DuplicatedChapterKey({this.mangaId, this.chapter});
+
+  factory DuplicatedChapterKey.from(DuplicatedChapterQueryResult e) {
+    return DuplicatedChapterKey(mangaId: e.mangaId, chapter: e.chapter);
+  }
+
+  @override
+  List<Object?> get props => [mangaId, chapter];
+}
+
+class DuplicatedTagKey extends Equatable {
+  final String? name;
+  final String? source;
+
+  const DuplicatedTagKey({this.name, this.source});
+
+  factory DuplicatedTagKey.from(DuplicatedTagQueryResult e) {
+    return DuplicatedTagKey(name: e.name, source: e.source);
+  }
+
+  @override
+  List<Object?> get props => [name, source];
+}

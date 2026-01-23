@@ -6,4 +6,14 @@ part of 'chapter_dao.dart';
 mixin _$ChapterDaoMixin on DatabaseAccessor<AppDatabase> {
   $ChapterTablesTable get chapterTables => attachedDatabase.chapterTables;
   $ImageTablesTable get imageTables => attachedDatabase.imageTables;
+  ChapterDaoManager get managers => ChapterDaoManager(this);
+}
+
+class ChapterDaoManager {
+  final _$ChapterDaoMixin _db;
+  ChapterDaoManager(this._db);
+  $$ChapterTablesTableTableManager get chapterTables =>
+      $$ChapterTablesTableTableManager(_db.attachedDatabase, _db.chapterTables);
+  $$ImageTablesTableTableManager get imageTables =>
+      $$ImageTablesTableTableManager(_db.attachedDatabase, _db.imageTables);
 }

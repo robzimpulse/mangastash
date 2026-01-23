@@ -8,4 +8,19 @@ mixin _$MangaDaoMixin on DatabaseAccessor<AppDatabase> {
   $TagTablesTable get tagTables => attachedDatabase.tagTables;
   $RelationshipTablesTable get relationshipTables =>
       attachedDatabase.relationshipTables;
+  MangaDaoManager get managers => MangaDaoManager(this);
+}
+
+class MangaDaoManager {
+  final _$MangaDaoMixin _db;
+  MangaDaoManager(this._db);
+  $$MangaTablesTableTableManager get mangaTables =>
+      $$MangaTablesTableTableManager(_db.attachedDatabase, _db.mangaTables);
+  $$TagTablesTableTableManager get tagTables =>
+      $$TagTablesTableTableManager(_db.attachedDatabase, _db.tagTables);
+  $$RelationshipTablesTableTableManager get relationshipTables =>
+      $$RelationshipTablesTableTableManager(
+        _db.attachedDatabase,
+        _db.relationshipTables,
+      );
 }

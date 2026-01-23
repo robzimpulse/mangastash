@@ -9,6 +9,11 @@ ide:
     enabled: false
 
 scripts:
+
+  refresh:
+    description: Refresh all packages dependencies.
+    run: melos clean && melos clean:flutter && melos clean:coverage && melos bs && melos get
+
   clean:coverage:
     description: Clean coverage folders for all packages.
     run: rm -rf coverage

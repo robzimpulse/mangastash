@@ -86,7 +86,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     emit(state.copyWith(prefetchedMangaIds: prefetchedMangaIds));
   }
 
-  void _updateHistories(List<History> histories) {
+  void _updateHistories(List<MangaChapter> histories) {
     final Map<String, Chapter> map = {};
     final data = histories.where((e) => e.manga?.id == state.mangaId);
     for (final history in data) {

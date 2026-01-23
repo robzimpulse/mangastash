@@ -74,6 +74,26 @@ mixin _$DiagnosticDaoMixin on DatabaseAccessor<AppDatabase> {
       ),
     );
   }
+
+  DiagnosticDaoManager get managers => DiagnosticDaoManager(this);
+}
+
+class DiagnosticDaoManager {
+  final _$DiagnosticDaoMixin _db;
+  DiagnosticDaoManager(this._db);
+  $$MangaTablesTableTableManager get mangaTables =>
+      $$MangaTablesTableTableManager(_db.attachedDatabase, _db.mangaTables);
+  $$TagTablesTableTableManager get tagTables =>
+      $$TagTablesTableTableManager(_db.attachedDatabase, _db.tagTables);
+  $$RelationshipTablesTableTableManager get relationshipTables =>
+      $$RelationshipTablesTableTableManager(
+        _db.attachedDatabase,
+        _db.relationshipTables,
+      );
+  $$ChapterTablesTableTableManager get chapterTables =>
+      $$ChapterTablesTableTableManager(_db.attachedDatabase, _db.chapterTables);
+  $$ImageTablesTableTableManager get imageTables =>
+      $$ImageTablesTableTableManager(_db.attachedDatabase, _db.imageTables);
 }
 
 class DuplicatedMangaQueryResult {
