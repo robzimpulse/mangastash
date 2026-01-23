@@ -9,6 +9,7 @@ import 'package:domain_manga/domain_manga.dart';
 import 'package:flutter/foundation.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
+import 'package:universal_io/universal_io.dart';
 
 import 'firebase_options.dart';
 import 'screen/apps_screen.dart';
@@ -19,6 +20,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Service locator/dependency injector code here
   ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
+
+  // Ignore bad certificate for development purpose,
+  // - enable proxy for development
+  // - enable https api call without certificate validation
+  if (kDebugMode) {
+    HttpOverrides.global = BadCertificateHttpOverrides();
+  }
 
   final locator = ServiceLocator.asNewInstance();
   runApp(
