@@ -4,6 +4,7 @@ import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
+import 'package:drift/drift.dart';
 import 'package:feature_common/feature_common.dart';
 import 'package:firebase_core_platform_interface/test.dart';
 import 'package:flutter/foundation.dart';
@@ -43,6 +44,7 @@ void testScreen(
   ServiceLocatorInitiator.setServiceLocatorFactory(
     () => GetItServiceLocator()..setAllowReassignment(true),
   );
+  driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
 
   patrolWidgetTest(description, ($) async {
     $.tester.view.physicalSize = Size(width * dpi, height * dpi);
