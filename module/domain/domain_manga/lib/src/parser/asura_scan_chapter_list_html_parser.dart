@@ -1,5 +1,6 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:html/dom.dart';
 
 import 'base/chapter_list_html_parser.dart';
@@ -68,7 +69,7 @@ class AsuraScanChapterListHtmlParser extends ChapterListHtmlParser {
         ChapterScrapped(
           title: title?.isNotEmpty == true ? title : null,
           chapter: '${chapter ?? url?.split('/').lastOrNull}',
-          readableAtRaw: releaseDate,
+          readableAt: releaseDate,
           webUrl: ['https://asuracomic.net', 'series', url].join('/'),
           scanlationGroup: SourceEnum.asurascan.label,
         ),

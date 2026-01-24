@@ -2,7 +2,6 @@ library;
 
 export 'src/base/pagination.dart';
 export 'src/chapter.dart';
-export 'src/chapter_scrapped.dart';
 export 'src/enum/chapter_display_enum.dart';
 export 'src/enum/chapter_sort_option_enum.dart';
 export 'src/enum/chapter_sort_order_enum.dart';
