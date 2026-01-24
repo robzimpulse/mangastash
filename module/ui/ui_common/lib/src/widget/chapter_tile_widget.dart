@@ -88,6 +88,7 @@ class ChapterTileWidget extends StatelessWidget {
           child: Padding(
             padding: padding,
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 if (coverUrl != null) ...[
