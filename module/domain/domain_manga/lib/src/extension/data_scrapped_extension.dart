@@ -5,7 +5,10 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
 
 extension MangaScrappedExtension on MangaScrapped {
-  Future<Manga> convert({ConverterCacheManager? manager}) async {
+  Future<Manga> convert({
+    required LogBox logbox,
+    ConverterCacheManager? manager,
+  }) async {
     return Manga(
       id: id,
       title: title,
@@ -15,8 +18,8 @@ extension MangaScrappedExtension on MangaScrapped {
       description: description,
       tags: tags?.map((e) => Tag(name: e)).toList(),
       webUrl: webUrl,
-      createdAt: await createdAt?.asDateTime(manager: manager),
-      updatedAt: await updatedAt?.asDateTime(manager: manager)
+      createdAt: await createdAt?.asDateTime(logbox: logbox, manager: manager),
+      updatedAt: await updatedAt?.asDateTime(logbox: logbox, manager: manager),
     );
   }
 }
@@ -36,10 +39,7 @@ extension ChapterScrappedExtension on ChapterScrapped {
         logbox: logbox,
         manager: manager,
       ),
-      publishAt: await publishAt?.asDateTime(
-        logbox: logbox,
-        manager: manager,
-      ),
+      publishAt: await publishAt?.asDateTime(logbox: logbox, manager: manager),
       images: images,
       translatedLanguage: translatedLanguage,
       scanlationGroup: scanlationGroup,
@@ -48,14 +48,8 @@ extension ChapterScrappedExtension on ChapterScrapped {
         logbox: logbox,
         manager: manager,
       ),
-      createdAt: await createdAt?.asDateTime(
-        logbox: logbox,
-        manager: manager,
-      ),
-      updatedAt: await updatedAt?.asDateTime(
-        logbox: logbox,
-        manager: manager,
-      ),
+      createdAt: await createdAt?.asDateTime(logbox: logbox, manager: manager),
+      updatedAt: await updatedAt?.asDateTime(logbox: logbox, manager: manager),
     );
   }
 }

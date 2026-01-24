@@ -84,7 +84,7 @@ class GetMangaUseCase with SyncMangasMixin {
     );
 
     final manga = await parser.manga.then(
-      (e) => e.convert(manager: _converterCacheManager),
+      (e) => e.convert(logbox: _logBox, manager: _converterCacheManager),
     );
 
     return manga.copyWith(

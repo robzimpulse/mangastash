@@ -5,9 +5,10 @@
 
 import 'package:dart_eval/dart_eval.dart';
 import 'package:dart_eval/dart_eval_bridge.dart';
-import 'html_document.dart';
-import 'package:html/dom.dart';
 import 'package:dart_eval/stdlib/core.dart';
+import 'package:html/dom.dart';
+
+import 'html_document.dart';
 
 /// dart_eval wrapper binding for [HtmlDocument]
 class $HtmlDocument implements $Instance {

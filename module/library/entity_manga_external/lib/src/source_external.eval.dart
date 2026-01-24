@@ -5,16 +5,17 @@
 
 import 'package:dart_eval/dart_eval.dart';
 import 'package:dart_eval/dart_eval_bridge.dart';
-import 'source_external.dart';
+import 'package:dart_eval/stdlib/async.dart';
+import 'package:dart_eval/stdlib/core.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
+
 import 'chapter_scrapped.dart';
+import 'chapter_scrapped.eval.dart';
 import 'html_document.dart';
 import 'manga_scrapped.dart';
-import 'package:dart_eval/stdlib/core.dart';
-import 'package:entity_manga_external/src/source_external.eval.dart';
-import 'package:dart_eval/stdlib/async.dart';
-import 'package:entity_manga_external/src/manga_scrapped.eval.dart';
-import 'package:entity_manga_external/src/chapter_scrapped.eval.dart';
+import 'manga_scrapped.eval.dart';
+import 'source_external.dart';
+import 'source_external.eval.dart';
 
 /// dart_eval wrapper binding for [SourceExternal]
 class $SourceExternal implements $Instance {

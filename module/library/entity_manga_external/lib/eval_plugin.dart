@@ -1,8 +1,9 @@
 import 'package:dart_eval/dart_eval_bridge.dart';
-import 'src/html_document.eval.dart';
-import 'src/source_external.eval.dart';
+
 import 'src/chapter_scrapped.eval.dart';
+import 'src/html_document.eval.dart';
 import 'src/manga_scrapped.eval.dart';
+import 'src/source_external.eval.dart';
 
 /// [EvalPlugin] for entity_manga_external
 class EntityMangaExternalPlugin implements EvalPlugin {
