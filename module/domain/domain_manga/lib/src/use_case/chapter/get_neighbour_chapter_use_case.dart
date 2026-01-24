@@ -1,8 +1,6 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 
-import '../prefetch/listen_prefetch_chapter_config.dart';
 
 class GetNeighbourChapterUseCase {
   final ChapterDao _chapterDao;

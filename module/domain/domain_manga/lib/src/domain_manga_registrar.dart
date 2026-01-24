@@ -119,10 +119,7 @@ class DomainMangaRegistrar extends Registrar {
       () => GetAllChapterUseCase(searchChapterUseCase: locator()),
     );
     locator.registerFactory(
-      () => GetNeighbourChapterUseCase(
-        chapterDao: locator(),
-        listenPrefetchChapterConfig: locator(),
-      ),
+      () => GetNeighbourChapterUseCase(chapterDao: locator()),
     );
     locator.registerFactory(
       () => GetMangaUseCase(
