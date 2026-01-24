@@ -1,5 +1,5 @@
 import 'package:entity_manga/entity_manga.dart';
 
 abstract class ListenUnreadHistoryUseCase {
-  Stream<List<History>> get unreadHistoryStream;
+  Stream<List<MangaChapter>> get unreadHistoryStream;
 }

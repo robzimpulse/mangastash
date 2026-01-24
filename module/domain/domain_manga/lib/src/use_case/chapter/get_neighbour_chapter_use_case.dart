@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -21,17 +19,13 @@ class GetNeighbourChapterUseCase {
     NextChapterDirection direction = NextChapterDirection.next,
   }) async {
     final config = _listenPrefetchChapterConfig;
+    final next = config.numOfPrefetchedNextChapter.valueOrNull;
+    final prev = config.numOfPrefetchedPrevChapter.valueOrNull;
     final result = await _chapterDao.getNeighbourChapters(
       chapterId: chapterId,
       count: switch (direction) {
-        NextChapterDirection.previous => max(
-          config.numOfPrefetchedPrevChapter.valueOrNull.or(0),
-          1,
-        ),
-        NextChapterDirection.next => max(
-          config.numOfPrefetchedNextChapter.valueOrNull.or(0),
-          1,
-        ),
+        NextChapterDirection.previous => prev.or(0),
+        NextChapterDirection.next => next.or(0),
       },
       direction: direction,
     );

@@ -65,9 +65,11 @@ class SearchChapterUseCase
           Chapter.from(data: value).copyWith(
             mangaId: parameter.mangaId,
             readableAt: await value.attributes?.readableAt?.asDateTime(
+              logbox: _logBox,
               manager: _converterCacheManager,
             ),
             publishAt: await value.attributes?.publishAt?.asDateTime(
+              logbox: _logBox,
               manager: _converterCacheManager,
             ),
           ),
@@ -124,7 +126,7 @@ class SearchChapterUseCase
       return Future.wait(
         e.map(
           (e) => e
-              .convert(manager: _converterCacheManager)
+              .convert(logbox: _logBox, manager: _converterCacheManager)
               .then((e) => e.copyWith(mangaId: parameter.mangaId)),
         ),
       );

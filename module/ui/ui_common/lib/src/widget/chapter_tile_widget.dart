@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core_environment/core_environment.dart';
+import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:intersperse/intersperse.dart';
@@ -18,9 +20,14 @@ class ChapterTileWidget extends StatelessWidget {
     this.lastReadAt,
     this.opacity = 1,
     this.onTapLongPress,
+    this.cacheManager,
+    this.mangaTitle,
+    this.sourceIconUrl,
+    this.coverUrl,
   });
 
   factory ChapterTileWidget.chapter({
+    Manga? manga,
     required Chapter chapter,
     Key? key,
     VoidCallback? onTap,
@@ -29,9 +36,13 @@ class ChapterTileWidget extends StatelessWidget {
     double opacity = 1,
     bool isPrefetching = false,
     DateTime? lastReadAt,
+    BaseCacheManager? cacheManager,
   }) {
     return ChapterTileWidget(
       key: key,
+      mangaTitle: manga?.title,
+      coverUrl: manga?.coverUrl,
+      sourceIconUrl: manga?.source?.let(SourceEnum.fromName)?.icon,
       title: ['Chapter ${chapter.chapter}', chapter.title].nonNulls.join(' - '),
       language: Language.fromCode(chapter.translatedLanguage),
       uploadedAt: chapter.readableAt,
@@ -42,6 +53,7 @@ class ChapterTileWidget extends StatelessWidget {
       opacity: opacity,
       isPrefetching: isPrefetching,
       lastReadAt: lastReadAt,
+      cacheManager: cacheManager,
     );
   }
 
@@ -55,9 +67,17 @@ class ChapterTileWidget extends StatelessWidget {
   final DateTime? lastReadAt;
   final bool isPrefetching;
   final double opacity;
+  final String? sourceIconUrl;
+  final String? mangaTitle;
+  final String? coverUrl;
+  final BaseCacheManager? cacheManager;
 
   @override
   Widget build(BuildContext context) {
+    final coverUrl = this.coverUrl;
+    final mangaTitle = this.mangaTitle;
+    final sourceIconUrl = this.sourceIconUrl;
+
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
       child: InkWell(
@@ -70,12 +90,38 @@ class ChapterTileWidget extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                if (coverUrl != null) ...[
+                  CachedNetworkImage(
+                    fit: BoxFit.cover,
+                    cacheManager: cacheManager,
+                    imageUrl: coverUrl,
+                    width: 84,
+                    errorWidget: (context, url, error) {
+                      return const Center(child: Icon(Icons.error));
+                    },
+                    progressIndicatorBuilder: (context, url, progress) {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: progress.progress,
+                        ),
+                      );
+                    },
+                  ),
+                  SizedBox(width: 8),
+                ],
                 Expanded(
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children:
                         <Widget>[
+                          if (mangaTitle != null)
+                            Text(
+                              mangaTitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           IconWithTextWidget(
                             icon: language?.flag(width: 20, height: 10),
                             text: Expanded(
@@ -112,6 +158,29 @@ class ChapterTileWidget extends StatelessWidget {
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(),
+                    ),
+                  ),
+                if (sourceIconUrl != null)
+                  SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: CachedNetworkImage(
+                        cacheManager: cacheManager,
+                        imageUrl: sourceIconUrl,
+                        fit: BoxFit.contain,
+                        errorWidget: (context, url, error) {
+                          return const Center(child: Icon(Icons.error));
+                        },
+                        progressIndicatorBuilder: (context, url, progress) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: progress.progress,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
               ],

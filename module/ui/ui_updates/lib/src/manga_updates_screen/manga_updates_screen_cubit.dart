@@ -24,69 +24,45 @@ class MangaUpdatesScreenCubit extends Cubit<MangaUpdatesScreenState>
         listenUnreadHistoryUseCase.unreadHistoryStream.distinct(),
         listenMangaFromLibraryUseCase.libraryStateStream.distinct(),
         (histories, libraries) => [
-          ...histories.where(
-            (e) => [
-              libraries.map((e) => e.id).contains(e.manga?.id),
-              e.chapter?.readableAt?.let(
-                (d) => DateTime.now().difference(d) < const Duration(days: 7),
-              ),
-            ].nonNulls.every((e) => e),
-          ),
+          ...histories
+              .where(
+                (e) => [
+                  libraries.map((e) => e.id).contains(e.manga?.id),
+                  e.chapter?.readableAt?.let((d) {
+                    final maxAge = const Duration(days: 7);
+                    return DateTime.now().difference(d) < maxAge;
+                  }),
+                ].nonNulls.every((e) => e),
+              )
+              .sortedBy((e) => e.chapter?.createdAt ?? DateTime.timestamp()),
         ],
-      ).listen(_onUpdate),
+      ).listen((e) => emit(state.copyWith(updates: e))),
     );
 
     addSubscription(
       listenPrefetchUseCase.chapterIdsStream.distinct().listen(
-        _updatePrefetchChapterState,
+        (e) => emit(state.copyWith(prefetchedChapterIds: e)),
       ),
     );
 
     addSubscription(
       listenPrefetchUseCase.mangaIdsStream.distinct().listen(
-        _updatePrefetchMangaState,
+        (e) => emit(state.copyWith(prefetchedMangaIds: e)),
       ),
     );
   }
 
-  void _onUpdate(List<History> histories) {
-    final group = histories.groupListsBy((e) => e.manga);
-    emit(
-      state.copyWith(
-        updates: {
-          for (final key in group.keys.nonNulls)
-            key: sortChapters(
-              chapters: [...?group[key]?.map((e) => e.chapter).nonNulls],
-              parameter: const SearchChapterParameter(
-                orders: {ChapterOrders.chapter: OrderDirections.descending},
-              ),
-            ),
-        },
-      ),
-    );
-  }
-
-  void _updatePrefetchChapterState(Set<String> prefetchedChapterIds) {
-    emit(state.copyWith(prefetchedChapterIds: prefetchedChapterIds));
-  }
-
-  void _updatePrefetchMangaState(Set<String> prefetchedMangaIds) {
-    emit(state.copyWith(prefetchedMangaIds: prefetchedMangaIds));
-  }
-
-  Future<void> prefetch() async {
-    for (final entry in state.updates.entries) {
-      for (final chapter in entry.value) {
-        final mangaId = entry.key.id;
-        final chapterId = chapter.id;
-        final source = entry.key.source.let(SourceEnum.fromName);
-        if (mangaId == null || source == null || chapterId == null) continue;
-        _prefetchChapterUseCase.prefetchChapter(
-          mangaId: mangaId,
-          source: source,
-          chapterId: chapterId,
-        );
-      }
+  void prefetch() {
+    for (final update in state.updates) {
+      final mangaId = update.manga?.id;
+      final chapterId = update.chapter?.id;
+      final source = update.manga?.source.let(SourceEnum.fromName);
+      if (mangaId == null || source == null || chapterId == null) continue;
+      _prefetchChapterUseCase.prefetchChapter(
+        mangaId: mangaId,
+        source: source,
+        chapterId: chapterId,
+      );
     }
   }
 }

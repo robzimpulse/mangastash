@@ -55,34 +55,6 @@ class MangaUpdatesScreen extends StatelessWidget {
     );
   }
 
-  Widget _manga({
-    required BuildContext context,
-    required Manga manga,
-    bool isPrefetching = false,
-  }) {
-    return MangaTileWidget.manga(
-      padding: const EdgeInsets.all(8),
-      manga: manga,
-      onTap: () => onTapManga?.call(manga),
-      cacheManager: imagesCacheManager,
-      isPrefetching: isPrefetching,
-    );
-  }
-
-  Widget _chapter({
-    required BuildContext context,
-    required Manga manga,
-    required Chapter chapter,
-    bool isPrefetching = false,
-  }) {
-    return ChapterTileWidget.chapter(
-      padding: const EdgeInsets.all(8),
-      chapter: chapter,
-      isPrefetching: isPrefetching,
-      onTap: () => onTapChapter?.call(manga, chapter),
-    );
-  }
-
   Widget _layoutRefresh({required BuildContext context}) {
     return _builder(
       buildWhen: (prev, curr) => prev.updates != curr.updates,
@@ -109,64 +81,43 @@ class MangaUpdatesScreen extends StatelessWidget {
       ),
       body: _builder(
         builder: (context, state) {
-          return CustomScrollView(
-            slivers: [
-              if (state.updates.values.every((e) => e.isEmpty))
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            EmojiAsciiEnum.crying.ascii,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.displayMedium,
-                          ),
-                          Text(
-                            'Empty Data',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                        ],
-                      ),
-                    ),
+          if (state.updates.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    EmojiAsciiEnum.crying.ascii,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.displayMedium,
                   ),
-                )
-              else
-                for (final history in state.updates.entries)
-                  if (history.value.isNotEmpty)
-                    MultiSliver(
-                      pushPinnedChildren: true,
-                      children: [
-                        SliverPinnedHeader(
-                          child: _manga(
-                            context: context,
-                            manga: history.key,
-                            isPrefetching: state.prefetchedMangaIds.contains(
-                              history.key.id,
-                            ),
-                          ),
-                        ),
-                        SliverList.builder(
-                          itemBuilder: (context, index) {
-                            final item = history.value.elementAtOrNull(index);
-                            if (item == null) return null;
-                            final ids = state.prefetchedChapterIds;
-                            return _chapter(
-                              context: context,
-                              manga: history.key,
-                              chapter: item,
-                              isPrefetching: ids.contains(item.id),
-                            );
-                          },
-                          itemCount: history.value.length,
-                        ),
-                      ],
-                    ),
-            ],
+                  Text(
+                    'Empty Data',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return ListView.separated(
+            itemCount: state.updates.length,
+            itemBuilder: (context, index) {
+              final value = state.updates.elementAtOrNull(index);
+              final chapter = value?.chapter;
+              final manga = value?.manga;
+              if (chapter == null || manga == null) return null;
+              return ChapterTileWidget.chapter(
+                padding: EdgeInsets.all(8),
+                manga: manga,
+                chapter: chapter,
+                lastReadAt: chapter.lastReadAt,
+                cacheManager: imagesCacheManager,
+                onTap: () => onTapChapter?.call(manga, chapter),
+              );
+            },
+            separatorBuilder: (context, _) => SizedBox(height: 8),
           );
         },
       ),

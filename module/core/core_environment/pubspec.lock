@@ -25,6 +25,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
+  cancellation_token:
+    dependency: transitive
+    description:
+      name: cancellation_token
+      sha256: ad95acf9d4b2f3563e25dc937f63587e46a70ce534e910b65d10e115490f1027
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   change_case:
     dependency: "direct main"
     description:
@@ -162,10 +170,10 @@ packages:
     dependency: transitive
     description:
       name: drift
-      sha256: "3669e1b68d7bffb60192ac6ba9fd2c0306804d7a00e5879f6364c69ecde53a7f"
+      sha256: "5ea2f718558c0b31d4b8c36a3d8e5b7016f1265f46ceb5a5920e16117f0c0d6a"
       url: "https://pub.dev"
     source: hosted
-    version: "2.30.0"
+    version: "2.30.1"
   drift_db_viewer:
     dependency: transitive
     description:
@@ -186,10 +194,10 @@ packages:
     dependency: "direct main"
     description:
       name: equatable
-      sha256: "567c64b3cb4cf82397aac55f4f0cbd3ca20d77c6c03bedbc4ceaddc08904aef7"
+      sha256: "3e0141505477fd8ad55d6eb4e7776d3fe8430be8e497ccb1521370c3f21a3e2b"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.7"
+    version: "2.0.8"
   fake_async:
     dependency: transitive
     description:
@@ -202,10 +210,10 @@ packages:
     dependency: transitive
     description:
       name: ffi
-      sha256: "289279317b4b16eb2bb7e271abccd4bf84ec9bdcbe999e278a94b804f5630418"
+      sha256: d07d37192dbf97461359c1518788f203b0c9102cfd2c35a716b823741219542c
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.4"
+    version: "2.1.5"
   file:
     dependency: transitive
     description:
@@ -341,6 +349,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  freezed_annotation:
+    dependency: transitive
+    description:
+      name: freezed_annotation
+      sha256: c2e2d632dd9b8a2b7751117abcfc2b4888ecfe181bd9fca7170d9ef02e595fe2
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.4"
   get_it:
     dependency: transitive
     description:
@@ -458,7 +474,7 @@ packages:
     description:
       path: "packages/log_box"
       ref: master
-      resolved-ref: f60a64da052e9cdda8e6bff726765f43b363be99
+      resolved-ref: "355722aec7b5380fc0f32a341d1948f192b345a5"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -467,7 +483,7 @@ packages:
     description:
       path: "packages/log_box_dio_logger"
       ref: master
-      resolved-ref: f60a64da052e9cdda8e6bff726765f43b363be99
+      resolved-ref: "355722aec7b5380fc0f32a341d1948f192b345a5"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -476,7 +492,7 @@ packages:
     description:
       path: "packages/log_box_in_app_webview_logger"
       ref: master
-      resolved-ref: f60a64da052e9cdda8e6bff726765f43b363be99
+      resolved-ref: "355722aec7b5380fc0f32a341d1948f192b345a5"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -485,10 +501,27 @@ packages:
     description:
       path: "packages/log_box_navigation_logger"
       ref: master
-      resolved-ref: f60a64da052e9cdda8e6bff726765f43b363be99
+      resolved-ref: "355722aec7b5380fc0f32a341d1948f192b345a5"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
+  log_box_persistent_storage_drift:
+    dependency: transitive
+    description:
+      path: "packages/log_box_persistent_storage_drift"
+      ref: master
+      resolved-ref: "355722aec7b5380fc0f32a341d1948f192b345a5"
+      url: "https://github.com/robzimpulse/log_box.git"
+    source: git
+    version: "0.0.1"
+  logging:
+    dependency: transitive
+    description:
+      name: logging
+      sha256: c8245ada5f1717ed44271ed1c26b8ce85ca3228fd2ffdb75468ab01979309d61
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.3.0"
   manga_service_drift:
     dependency: "direct overridden"
     description:
@@ -860,6 +893,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
+  super_paging:
+    dependency: transitive
+    description:
+      name: super_paging
+      sha256: "34c484d6487f649851ab0139cd0f6d67535c79f76de8c10c9fc45d1a090b39dc"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
   synchronized:
     dependency: transitive
     description:

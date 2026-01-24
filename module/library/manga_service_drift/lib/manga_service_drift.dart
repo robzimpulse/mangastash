@@ -17,6 +17,7 @@ export 'src/extension/file_system_entity_extension.dart';
 export 'src/extension/navigation_extension.dart';
 export 'src/extension/value_or_null_extension.dart';
 export 'src/model/chapter_model.dart';
+export 'src/model/diagnostic_model.dart';
 export 'src/model/history_model.dart';
 export 'src/model/job_model.dart';
 export 'src/model/manga_model.dart';

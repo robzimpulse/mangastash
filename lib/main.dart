@@ -20,6 +20,11 @@ void main() async {
   // Service locator/dependency injector code here
   ServiceLocatorInitiator.setServiceLocatorFactory(() => GetItServiceLocator());
 
+  // Ignore bad certificate for development purpose,
+  // - enable proxy for development
+  // - enable https api call without certificate validation
+  ignoreBadCertificate();
+
   final locator = ServiceLocator.asNewInstance();
   runApp(
     WrapperScreen(
