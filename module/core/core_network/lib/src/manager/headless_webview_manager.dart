@@ -280,7 +280,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
         Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
       ]).timeout(const Duration(seconds: 15));
     } on TimeoutException catch (e, st) {
-      delegate.set(error: e, stackTrace: st);
+      delegate.set(error: e, stackTrace: st, loading: false);
       _instances.remove(webview.hashCode);
       await webview.dispose();
       rethrow;
@@ -298,7 +298,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       try {
         await signalComplete.timeout(const Duration(seconds: 15));
       } on TimeoutException catch (e, st) {
-        delegate.set(error: e, stackTrace: st);
+        delegate.set(error: e, stackTrace: st, loading: false);
         _instances.remove(webview.hashCode);
         await webview.dispose();
         rethrow;
