@@ -279,13 +279,12 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
         onLoadStartCompleter.future,
         Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
       ]).timeout(const Duration(seconds: 15));
-    } on TimeoutException catch (e, st) {
+    } catch (e, st) {
       delegate.set(error: e, stackTrace: st, loading: false);
       _instances.remove(webview.hashCode);
       await webview.dispose();
       rethrow;
     }
-
 
     for (final script in scripts) {
       if (script.isEmpty) continue;
@@ -297,7 +296,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     if (signalComplete != null) {
       try {
         await signalComplete.timeout(const Duration(seconds: 15));
-      } on TimeoutException catch (e, st) {
+      } catch (e, st) {
         delegate.set(error: e, stackTrace: st, loading: false);
         _instances.remove(webview.hashCode);
         await webview.dispose();
