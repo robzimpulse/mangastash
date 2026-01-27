@@ -24,6 +24,7 @@ dependencies:
   universal_io: ^2.2.2
   http_cache_core: ^1.1.1
   file: ^7.0.0
+  meta: ^1.8.0
 
 dev_dependencies:
   flutter_test:

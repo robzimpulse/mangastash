@@ -16,6 +16,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
   final UpdateChapterUseCase _updateChapterUseCase;
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final GetNeighbourChapterUseCase _getNeighbourChapterUseCase;
+  final ListenPrefetchChapterConfig _listenPrefetchChapterConfig;
 
   MangaReaderScreenCubit({
     required GetChapterUseCase getChapterUseCase,
@@ -25,11 +26,13 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     required RecrawlUseCase recrawlUseCase,
     required PrefetchChapterUseCase prefetchChapterUseCase,
     required GetNeighbourChapterUseCase getNeighbourChapterUseCase,
+    required ListenPrefetchChapterConfig listenPrefetchChapterConfig,
   }) : _getChapterUseCase = getChapterUseCase,
        _updateChapterUseCase = updateChapterUseCase,
        _recrawlUseCase = recrawlUseCase,
        _prefetchChapterUseCase = prefetchChapterUseCase,
        _getNeighbourChapterUseCase = getNeighbourChapterUseCase,
+       _listenPrefetchChapterConfig = listenPrefetchChapterConfig,
        super(
          initialState.copyWith(
            parameter: listenSearchParameterUseCase
@@ -52,34 +55,54 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     emit(state.copyWith(error: () => null));
     await Future.wait([
       _fetchChapter(useCache: useCache),
-      _fetchPreviousAndNextChapter(),
+      _fetchNeighbourChapter(),
+      _prefetchNeighbourChapter(),
     ]);
   }
 
-  Future<void> _fetchPreviousAndNextChapter() async {
+  Future<void> _fetchNeighbourChapter() async {
     final chapterId = state.chapterId;
     if (chapterId == null) return;
 
     emit(state.copyWith(isLoadingNeighbourChapters: true));
 
-    final next = await _getNeighbourChapterUseCase.execute(
+    final nextChapter = await _getNeighbourChapterUseCase.execute(
       chapterId: chapterId,
+      count: 1,
       direction: NextChapterDirection.next,
     );
-    final previous = await _getNeighbourChapterUseCase.execute(
+    final prevChapter = await _getNeighbourChapterUseCase.execute(
       chapterId: chapterId,
+      count: 1,
       direction: NextChapterDirection.previous,
     );
 
     emit(
       state.copyWith(
-        previousChapterId: previous.firstOrNull?.id,
-        nextChapterId: next.firstOrNull?.id,
+        previousChapterId: prevChapter.firstOrNull?.id,
+        nextChapterId: nextChapter.firstOrNull?.id,
         isLoadingNeighbourChapters: false,
       ),
     );
+  }
 
-    for (final chapter in [...previous, ...next]) {
+  Future<void> _prefetchNeighbourChapter() async {
+    final chapterId = state.chapterId;
+    if (chapterId == null) return;
+
+    final config = _listenPrefetchChapterConfig;
+    final next = await _getNeighbourChapterUseCase.execute(
+      chapterId: chapterId,
+      count: config.numOfPrefetchedNextChapter.valueOrNull ?? 0,
+      direction: NextChapterDirection.next,
+    );
+    final prev = await _getNeighbourChapterUseCase.execute(
+      chapterId: chapterId,
+      count: config.numOfPrefetchedPrevChapter.valueOrNull ?? 0,
+      direction: NextChapterDirection.previous,
+    );
+
+    for (final chapter in [...next, ...prev]) {
       final chapterId = chapter.id;
       final mangaId = state.mangaId;
       final source = state.source;

@@ -273,11 +273,19 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
 
     _instances[webview.hashCode] = webview;
 
-    await Future.wait([
-      webview.run(),
-      onLoadStartCompleter.future,
-      Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
-    ]).timeout(const Duration(seconds: 15));
+    try {
+      await Future.wait([
+        webview.run(),
+        onLoadStartCompleter.future,
+        Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
+      ]).timeout(const Duration(seconds: 15));
+    } on TimeoutException catch (e, st) {
+      delegate.set(error: e, stackTrace: st, loading: false);
+      _instances.remove(webview.hashCode);
+      await webview.dispose();
+      rethrow;
+    }
+
 
     for (final script in scripts) {
       if (script.isEmpty) continue;
@@ -287,7 +295,14 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     }
 
     if (signalComplete != null) {
-      await signalComplete.timeout(const Duration(seconds: 15));
+      try {
+        await signalComplete.timeout(const Duration(seconds: 15));
+      } on TimeoutException catch (e, st) {
+        delegate.set(error: e, stackTrace: st, loading: false);
+        _instances.remove(webview.hashCode);
+        await webview.dispose();
+        rethrow;
+      }
     }
 
     final html = await webview.webViewController?.getHtml();

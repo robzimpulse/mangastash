@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
+import 'package:meta/meta.dart';
 
 import '../database/database.dart';
 import '../extension/companion_equality.dart';
@@ -52,8 +53,7 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     return data;
   }
 
-  Stream<List<MangaModel>> get stream => _aggregate.watch().map(_parse);
-
+  @visibleForTesting
   Future<List<MangaModel>> get all => _aggregate.get().then(_parse);
 
   Future<List<MangaModel>> search({
