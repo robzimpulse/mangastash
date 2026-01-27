@@ -26,6 +26,12 @@ dependencies:
   file: ^7.0.0
   meta: ^1.8.0
 
+  log_box_persistent_storage_drift:
+    git:
+      url: https://github.com/robzimpulse/log_box.git
+      ref: master
+      path: packages/log_box_persistent_storage_drift
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
