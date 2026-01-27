@@ -10,9 +10,9 @@ class MoreScreenCubit extends Cubit<MoreScreenState>
     required ListenJobUseCase listenJobUseCase,
   }) : super(initialState) {
     addSubscription(
-      listenJobUseCase.jobsStream
-          .distinct()
-          .listen((jobs) => emit(state.copyWith(jobCount: jobs.length))),
+      listenJobUseCase.jobLength.distinct().listen(
+        (count) => emit(state.copyWith(jobCount: count)),
+      ),
     );
   }
 }

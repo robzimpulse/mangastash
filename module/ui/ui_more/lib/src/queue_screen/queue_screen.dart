@@ -61,7 +61,7 @@ class QueueScreen extends StatelessWidget {
       ),
       body: StreamBuilder(
         stream: CombineLatestStream.combine2(
-          listenJobUseCase.jobsStream,
+          listenJobUseCase.jobs,
           listenJobUseCase.ongoingJobId,
           (a, b) => (a, b),
         ),
