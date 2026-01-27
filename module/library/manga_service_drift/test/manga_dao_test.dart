@@ -37,10 +37,8 @@ void main() {
       values: {for (final (manga, tags) in mangas) manga: tags},
     );
     expect((await dao.all).length, equals(results.length));
-    expect(dao.stream, emits(await dao.all));
 
     await dao.remove(ids: results.map((e) => e.manga?.id).nonNulls.toList());
-    expect(dao.stream, emits([]));
     expect((await dao.all).length, equals(0));
   });
 
@@ -105,7 +103,6 @@ void main() {
         await dao.adds(values: {manga: tags});
         expect((await dao.all).length, equals(mangas.length + 1));
         expect((await tagDao.all).length, equals((mangas.length + 1) * 10));
-        expect(dao.stream, emits(await dao.all));
       });
 
       group('Search Value', () {
@@ -154,7 +151,6 @@ void main() {
         await dao.adds(values: {manga: tags});
         expect((await dao.all).length, equals(mangas.length));
         expect((await tagDao.all).length, equals(mangas.length * 10));
-        expect(dao.stream, emits(await dao.all));
       });
 
       group('Search Value', () {

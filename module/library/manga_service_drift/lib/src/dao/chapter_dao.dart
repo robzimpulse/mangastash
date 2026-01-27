@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
+import 'package:meta/meta.dart';
 
 import '../database/database.dart';
 import '../extension/companion_equality.dart';
@@ -50,8 +51,7 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
     return data;
   }
 
-  Stream<List<ChapterModel>> get stream => _aggregate.watch().map(_parse);
-
+  @visibleForTesting
   Future<List<ChapterModel>> get all => _aggregate.get().then(_parse);
 
   Future<List<ChapterModel>> search({

@@ -18,7 +18,16 @@ class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
         chapterTables,
         chapterTables.mangaId.equalsExp(mangaTables.id),
       ),
-    ]);
+    ])..orderBy(_order);
+  }
+
+  List<OrderingTerm> get _order {
+    return [
+      OrderingTerm(
+        expression: chapterTables.lastReadAt,
+        mode: OrderingMode.desc,
+      ),
+    ];
   }
 
   List<HistoryModel> _parse(List<TypedResult> rows) {
@@ -32,34 +41,12 @@ class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
   }
 
   Stream<List<HistoryModel>> get history {
-    final order = [
-      OrderingTerm(
-        expression: chapterTables.lastReadAt,
-        mode: OrderingMode.desc,
-      ),
-    ];
-
-    final selector =
-        _aggregate
-          ..where(chapterTables.lastReadAt.isNotNull())
-          ..orderBy(order);
-
+    final selector = _aggregate..where(chapterTables.lastReadAt.isNotNull());
     return selector.watch().map(_parse);
   }
 
   Stream<List<HistoryModel>> get unread {
-    final order = [
-      OrderingTerm(
-        expression: chapterTables.lastReadAt,
-        mode: OrderingMode.desc,
-      ),
-    ];
-
-    final selector =
-        _aggregate
-          ..where(chapterTables.lastReadAt.isNull())
-          ..orderBy(order);
-
+    final selector = _aggregate..where(chapterTables.lastReadAt.isNull());
     return selector.watch().map(_parse);
   }
 }

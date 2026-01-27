@@ -50,9 +50,7 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
     ];
   }
 
-  Stream<List<MangaModel>> get stream {
-    return _aggregate.watch().map((rows) => _parse(rows));
-  }
+  Stream<List<MangaModel>> get stream => _aggregate.watch().map(_parse);
 
   Future<void> add(String mangaId) {
     return transaction(
@@ -65,9 +63,5 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
   Future<void> remove(String mangaId) {
     final s = delete(libraryTables)..where((f) => f.mangaId.equals(mangaId));
     return transaction(() => s.go());
-  }
-
-  Future<List<MangaModel>> get() {
-    return _aggregate.get().then((rows) => _parse(rows));
   }
 }

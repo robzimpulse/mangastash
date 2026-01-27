@@ -38,11 +38,9 @@ void main() {
       values: {for (final chapter in chapters) chapter.$1: chapter.$2},
     );
     expect((await dao.all).length, equals(results.length));
-    expect(dao.stream, emits(await dao.all));
     expect((await imageDao.all).length, equals((results.length) * 10));
 
     await dao.remove(ids: results.map((e) => e.chapter?.id).nonNulls.toList());
-    expect(dao.stream, emits([]));
     expect((await dao.all).length, equals(0));
     expect((await imageDao.all).length, equals(0));
   });
@@ -79,21 +77,18 @@ void main() {
 
         await dao.adds(values: {chapter.$1: chapter.$2});
         expect((await dao.all).length, equals(chapters.length + 1));
-        expect(dao.stream, emits(await dao.all));
 
         final a = await dao.search(ids: [chapter.$1.id.value]);
         expect(a.first.chapter?.lastReadAt == null, isTrue);
 
         await dao.adds(values: {chapterUpdated.$1: chapterUpdated.$2});
         expect((await dao.all).length, equals(chapters.length + 1));
-        expect(dao.stream, emits(await dao.all));
 
         final b = await dao.search(ids: [chapter.$1.id.value]);
         expect(b.first.chapter?.lastReadAt == null, isFalse);
 
         await dao.adds(values: {chapter.$1: chapter.$2});
         expect((await dao.all).length, equals(chapters.length + 1));
-        expect(dao.stream, emits(await dao.all));
 
         final c = await dao.search(ids: [chapter.$1.id.value]);
         expect(c.first.chapter?.lastReadAt == null, isFalse);
@@ -120,7 +115,6 @@ void main() {
         await dao.adds(values: {chapter.$1: chapter.$2});
         expect((await dao.all).length, equals(chapters.length + 1));
         expect((await imageDao.all).length, equals((chapters.length + 1) * 10));
-        expect(dao.stream, emits(await dao.all));
       });
 
       group('Search Value', () {
@@ -182,7 +176,6 @@ void main() {
         await dao.adds(values: {chapter.$1: chapter.$2});
         expect((await dao.all).length, equals(chapters.length));
         expect((await imageDao.all).length, equals((chapters.length) * 10));
-        expect(dao.stream, emits(await dao.all));
       });
 
       group('Search Value', () {

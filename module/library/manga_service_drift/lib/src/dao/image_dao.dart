@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
+import 'package:meta/meta.dart';
 
 import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
@@ -36,6 +37,7 @@ class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
     ].fold(const Constant(false), (a, b) => a | b);
   }
 
+  @visibleForTesting
   Future<List<ImageDrift>> get all => _selector.get();
 
   Future<List<ImageDrift>> search({
