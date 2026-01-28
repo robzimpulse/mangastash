@@ -29,7 +29,7 @@ class FilePickerUseCase {
       if (!isGranted.contains(true)) return null;
     }
 
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       dialogTitle: 'Select file',
       initialDirectory: initialDirectory,
       type: FileType.custom,
