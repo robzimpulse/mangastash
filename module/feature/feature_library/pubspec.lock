@@ -596,7 +596,7 @@ packages:
     description:
       path: "packages/log_box"
       ref: master
-      resolved-ref: "754f1ebcdc20f404f53dc14c5ae99d737cf58559"
+      resolved-ref: "6579359cfac0c5196028582337cef8af4251a45f"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -605,7 +605,7 @@ packages:
     description:
       path: "packages/log_box_dio_logger"
       ref: master
-      resolved-ref: "754f1ebcdc20f404f53dc14c5ae99d737cf58559"
+      resolved-ref: "6579359cfac0c5196028582337cef8af4251a45f"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -614,7 +614,7 @@ packages:
     description:
       path: "packages/log_box_in_app_webview_logger"
       ref: master
-      resolved-ref: "754f1ebcdc20f404f53dc14c5ae99d737cf58559"
+      resolved-ref: "6579359cfac0c5196028582337cef8af4251a45f"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -623,7 +623,7 @@ packages:
     description:
       path: "packages/log_box_navigation_logger"
       ref: master
-      resolved-ref: "754f1ebcdc20f404f53dc14c5ae99d737cf58559"
+      resolved-ref: "6579359cfac0c5196028582337cef8af4251a45f"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -632,7 +632,7 @@ packages:
     description:
       path: "packages/log_box_persistent_storage_drift"
       ref: master
-      resolved-ref: "754f1ebcdc20f404f53dc14c5ae99d737cf58559"
+      resolved-ref: "6579359cfac0c5196028582337cef8af4251a45f"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -1088,10 +1088,11 @@ packages:
   super_paging:
     dependency: transitive
     description:
-      name: super_paging
-      sha256: "34c484d6487f649851ab0139cd0f6d67535c79f76de8c10c9fc45d1a090b39dc"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: fix_error_when_no_listener
+      resolved-ref: ca7f3483329b406b831cb4d49fc0408fb1d34fe0
+      url: "https://github.com/robzimpulse/super_paging"
+    source: git
     version: "0.2.0"
   synchronized:
     dependency: transitive
