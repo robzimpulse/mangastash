@@ -1,8 +1,4 @@
 import 'package:log_box/log_box.dart';
-import 'package:log_box_dio_logger/log_box_dio_logger.dart';
-import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
-import 'package:log_box_navigation_logger/log_box_navigation_logger.dart';
-import 'package:log_box_persistent_storage_drift/log_box_persistent_storage_drift.dart';
 import 'package:service_locator/service_locator.dart';
 
 class CoreAnalyticsRegistrar extends Registrar {
@@ -12,22 +8,26 @@ class CoreAnalyticsRegistrar extends Registrar {
     locator.registerSingleton(
       LogBox(
         storage: Storage(
-          liveDataStorage: MemoryStorage(capacity: 100),
-          persistentDataStorage: DriftPersistentStorage(
-            executor: await Executor.adaptive(),
-            decoder: {
-              (LogEntryModel).toString(): LogEntryModel.fromJson,
-              (WebviewEntryModel).toString(): WebviewEntryModel.fromJson,
-              (NavigationEntryModel).toString(): NavigationEntryModel.fromJson,
-              (TraceLogEntryModel).toString(): TraceLogEntryModel.fromJson,
-              (NetworkEntryModel).toString(): NetworkEntryModel.fromJson,
-            },
-          ),
+          liveDataStorage: MemoryStorage(capacity: 10000),
+          // TODO: Disable persistent storage
+          // persistentDataStorage: DriftPersistentStorage(
+          //   executor: await Executor.adaptive(),
+          //   decoder: {
+          //     (LogEntryModel).toString(): LogEntryModel.fromJson,
+          //     (WebviewEntryModel).toString(): WebviewEntryModel.fromJson,
+          //     (NavigationEntryModel).toString(): NavigationEntryModel.fromJson,
+          //     (TraceLogEntryModel).toString(): TraceLogEntryModel.fromJson,
+          //     (NetworkEntryModel).toString(): NetworkEntryModel.fromJson,
+          //   },
+          // ),
         ),
       ),
       dispose: (e) => e.dispose(),
     );
-    locator.registerFactory(() => locator<LogBox>().queryInterceptor);
+
+    // TODO: disable query interceptor
+    // locator.registerFactory(() => locator<LogBox>().queryInterceptor);
+
     // TODO: add analytics dependency here
     final end = DateTime.timestamp();
     locator<LogBox>().log(

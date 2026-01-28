@@ -18,7 +18,7 @@ class CoreStorageRegistrar extends Registrar {
   Future<void> register(ServiceLocator locator) async {
     final start = DateTime.timestamp();
 
-    locator.registerFactory(() => Executor());
+    locator.registerFactory(() => Executor(interceptor: locator.getOrNull()));
     locator.registerLazySingleton(
       () => AppDatabase(executor: locator()),
       dispose: (e) => e.close(),
