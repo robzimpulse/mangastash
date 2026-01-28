@@ -22,7 +22,7 @@ class FileSaverUseCase {
       if (!isGranted.contains(true)) return;
     }
 
-    await FilePicker.saveFile(
+    await FilePicker.platform.saveFile(
       dialogTitle: 'Save to file',
       fileName: filename,
       initialDirectory:
