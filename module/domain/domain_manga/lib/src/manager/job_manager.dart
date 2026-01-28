@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:collection/collection.dart';
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
@@ -30,9 +29,8 @@ class JobManager
         ListenPrefetchUseCase,
         CancelJobUseCase,
         ListenJobUseCase {
-  final _jobs = BehaviorSubject<List<JobModel>>.seeded([]);
-  final _ongoingJobId = BehaviorSubject<int?>.seeded(null);
-  final _upcomingJob = BehaviorSubject<int>.seeded(0);
+  final _ongoingJob = BehaviorSubject<JobModel?>.seeded(null);
+  final _upcomingJobCount = BehaviorSubject<int>.seeded(0);
   final ValueGetter<GetChapterUseCase> _getChapterUseCase;
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
   final ValueGetter<GetAllChapterUseCase> _getAllChapterUseCase;
@@ -66,10 +64,10 @@ class JobManager
        _getAllChapterUseCase = getAllChapterUseCase,
        _listenSearchParameterUseCase = listenSearchParameterUseCase {
     _subscriptions.addAll([
-      _jobs.distinct().listen(_onData),
       manager.deleteFileEvent.listen(_onDeleteFile),
+      _ongoingJob.listen(_onData),
     ]);
-    _jobs.addStream(jobDao.stream);
+    _ongoingJob.addStream(_jobDao.single);
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -81,11 +79,15 @@ class JobManager
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.resumed) {
-      _log.log('Resume executing jobs', name: runtimeType.toString());
-      for (final subscription in _subscriptions) {
-        subscription.resume();
-      }
+
+    switch (state) {
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.resumed:
+        _log.log('Resume executing jobs', name: runtimeType.toString());
+      case AppLifecycleState.inactive:
+        _log.log('Pause executing jobs', name: runtimeType.toString());
     }
   }
 
@@ -103,11 +105,8 @@ class JobManager
     );
   }
 
-  void _onData(List<JobModel> jobs) async {
-    final job = jobs.firstOrNull;
-    if (job == null || _ongoingJobId.valueOrNull != null) return;
-
-    _ongoingJobId.add(job.id);
+  void _onData(JobModel? job) async {
+    if (job == null) return;
 
     try {
       switch (job.type) {
@@ -122,6 +121,12 @@ class JobManager
         case JobTypeEnum.persistentImage:
           await _persistentImage(job);
       }
+
+      _log.log(
+        'Success execute job ${job.id} - ${job.type}',
+        extra: job.toExtra(),
+        name: runtimeType.toString(),
+      );
     } catch (error, stackTrace) {
       _log.log(
         'Failed execute job ${job.id} - ${job.type}',
@@ -132,12 +137,6 @@ class JobManager
       );
     } finally {
       await _jobDao.remove(job.id);
-      _ongoingJobId.add(null);
-      _log.log(
-        'Success execute job ${job.id} - ${job.type}',
-        extra: job.toExtra(),
-        name: runtimeType.toString(),
-      );
     }
   }
 
@@ -241,11 +240,11 @@ class JobManager
 
   void _ensureExecuted({required Future<void> future}) {
     final id = Uuid().v4();
-    _upcomingJob.add(_ongoingFuture.length);
     _ongoingFuture[id] = future.whenComplete(() {
       _ongoingFuture.remove(id);
-      _upcomingJob.add(_ongoingFuture.length);
+      _upcomingJobCount.add(_ongoingFuture.length);
     });
+    _upcomingJobCount.add(_ongoingFuture.length);
   }
 
   @override
@@ -294,26 +293,33 @@ class JobManager
 
   @override
   void cancelJob({required int id}) {
-    if (id == _ongoingJobId.valueOrNull) return;
+    if (id == _ongoingJob.valueOrNull?.id) return;
     _jobDao.remove(id);
   }
 
   @override
   Stream<Set<String>> get chapterIdsStream {
-    return _jobs.map((data) => {...data.map((e) => e.chapter?.id).nonNulls});
+    return _jobDao.streamChapterIds.map(
+      (e) => {...e.map((e) => e.chapter?.id).nonNulls},
+    );
   }
 
   @override
   Stream<Set<String>> get mangaIdsStream {
-    return _jobs.map((data) => {...data.map((e) => e.manga?.id).nonNulls});
+    return _jobDao.streamMangaIds.map(
+      (e) => {...e.map((e) => e.manga?.id).nonNulls},
+    );
   }
 
   @override
-  Stream<List<JobModel>> get jobsStream => _jobs.stream;
+  Stream<List<JobModel>> get jobs => _jobDao.stream;
 
   @override
-  Stream<int> get upcomingJobLength => _upcomingJob.stream;
+  Stream<int> get jobLength => _jobDao.count;
 
   @override
-  Stream<int?> get ongoingJobId => _ongoingJobId.stream;
+  Stream<int> get upcomingJobLength => _upcomingJobCount.stream;
+
+  @override
+  Stream<int?> get ongoingJobId => _ongoingJob.stream.map((e) => e?.id);
 }

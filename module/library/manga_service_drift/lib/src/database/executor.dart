@@ -1,9 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:file/file.dart';
+import 'package:log_box_persistent_storage_drift/log_box_persistent_storage_drift.dart';
 
-import '../interceptor/log_interceptor.dart';
-import '../util/typedef.dart';
 import 'adapter/filesystem/filesystem_adapter.dart'
     if (dart.library.js_interop) 'adapter/filesystem/filesystem_web.dart'
     if (dart.library.io) 'adapter/filesystem/filesystem_io.dart'
@@ -13,7 +12,7 @@ import 'adapter/query_executor/query_executor_adapter.dart'
     if (dart.library.io) 'adapter/query_executor/query_executor_io.dart';
 
 class Executor {
-  final LoggerCallback? _logger;
+  final DriftQueryInterceptor? _interceptor;
   final String _name;
 
   static Uint8List? _backup;
@@ -28,25 +27,21 @@ class Executor {
     return data;
   }
 
-  const Executor({LoggerCallback? logger, String name = 'mangastash-local'})
-    : _logger = logger,
+  const Executor({DriftQueryInterceptor? interceptor, String name = 'mangastash-local'})
+    : _interceptor = interceptor,
       _name = name;
 
   QueryExecutor build() {
-    return queryExecutor(
+    final executor = queryExecutor(
       name: databaseName,
       restoredDb: getBackup(),
       ioOptions: DriftNativeOptions(
-        databaseDirectory: () async {
-          final directory = await databaseDirectory();
-          _logger?.call(
-            'Database location: $directory',
-            name: runtimeType.toString(),
-          );
-          return directory;
-        },
+        databaseDirectory: () => databaseDirectory(),
       ),
-    ).interceptWith(LogInterceptor(logger: _logger));
+    );
+    final interceptor = _interceptor;
+    if (interceptor != null) return executor.interceptWith(interceptor);
+    return executor;
   }
 
   Future<Directory> databaseDirectory() async {

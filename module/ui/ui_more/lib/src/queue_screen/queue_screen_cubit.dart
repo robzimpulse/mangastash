@@ -10,12 +10,10 @@ class QueueScreenCubit extends Cubit<QueueScreenState>
     QueueScreenState initialState = const QueueScreenState(),
   }) : super(initialState) {
     addSubscription(
-      listenJobUseCase.jobsStream.distinct().listen(
-        (jobs) => emit(state.copyWith(jobs: jobs)),
-      ),
+      listenJobUseCase.jobs.listen((jobs) => emit(state.copyWith(jobs: jobs))),
     );
     addSubscription(
-      listenJobUseCase.ongoingJobId.distinct().listen(
+      listenJobUseCase.ongoingJobId.listen(
         (id) => emit(state.copyWith(ongoingJobId: id)),
       ),
     );
