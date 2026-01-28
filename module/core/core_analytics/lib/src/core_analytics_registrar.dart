@@ -1,4 +1,5 @@
 import 'package:log_box/log_box.dart';
+import 'package:log_box_persistent_storage_drift/log_box_persistent_storage_drift.dart';
 import 'package:service_locator/service_locator.dart';
 
 class CoreAnalyticsRegistrar extends Registrar {
@@ -24,10 +25,7 @@ class CoreAnalyticsRegistrar extends Registrar {
       ),
       dispose: (e) => e.dispose(),
     );
-
-    // TODO: disable query interceptor
-    // locator.registerFactory(() => locator<LogBox>().queryInterceptor);
-
+    locator.registerFactory(() => locator<LogBox>().queryInterceptor);
     // TODO: add analytics dependency here
     final end = DateTime.timestamp();
     locator<LogBox>().log(
