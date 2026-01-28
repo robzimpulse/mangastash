@@ -27,6 +27,7 @@ class CoreAnalyticsRegistrar extends Registrar {
       ),
       dispose: (e) => e.dispose(),
     );
+    locator.registerFactory(() => locator<LogBox>().queryInterceptor);
     // TODO: add analytics dependency here
     final end = DateTime.timestamp();
     locator<LogBox>().log(
