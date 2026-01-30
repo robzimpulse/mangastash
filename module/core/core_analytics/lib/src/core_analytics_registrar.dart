@@ -1,5 +1,4 @@
 import 'package:log_box/log_box.dart';
-import 'package:log_box_persistent_storage_drift/log_box_persistent_storage_drift.dart';
 import 'package:service_locator/service_locator.dart';
 
 class CoreAnalyticsRegistrar extends Registrar {

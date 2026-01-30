@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
@@ -14,12 +15,29 @@ import '../exception/failed_parsing_html_exception.dart';
 import '../mixin/user_agent_mixin.dart';
 import '../usecase/headless_webview_use_case.dart';
 
+class _Key extends Equatable {
+  final String url;
+  final List<String> scripts;
+  final bool useCache;
+  final Map<String, String> headers;
+
+  const _Key({
+    required this.url,
+    this.scripts = const [],
+    required this.useCache,
+    this.headers = const {},
+  });
+
+  @override
+  List<Object?> get props => [url, scripts, useCache, headers];
+}
+
 class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   final LogBox _log;
   final HtmlCacheManager _htmlCacheManager;
 
-  final Map<(String, List<String>, bool), Future<Document>> _cDocument = {};
-  final Map<(String, Map<String, String>?, bool), Future<String>> _cImage = {};
+  final Map<_Key, Future<Document>> _cDocument = {};
+  final Map<_Key, Future<String>> _cImage = {};
   final Map<int, HeadlessInAppWebView> _instances = {};
 
   final _imgExt = ['jpeg', 'jpg', 'gif', 'webp', 'png', 'ico', 'bmp', 'wbmp'];
@@ -42,11 +60,14 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     List<String> scripts = const [],
     bool useCache = true,
   }) {
+    final key = _Key(url: url, useCache: useCache, scripts: scripts);
     return _cDocument.putIfAbsent(
-      (url, scripts, useCache),
-      () => _open(url, scripts: scripts, useCache: useCache).whenComplete(() {
-        _cDocument.remove((url, scripts, useCache));
-      }),
+      key,
+      () => _open(
+        url,
+        scripts: scripts,
+        useCache: useCache,
+      ).whenComplete(() => _cDocument.remove(key)),
     );
   }
 
@@ -56,11 +77,14 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     bool useCache = true,
     Map<String, String>? headers,
   }) {
+    final key = _Key(url: url, useCache: useCache, headers: headers ?? {});
     return _cImage.putIfAbsent(
-      (url, headers, useCache),
-      () => _image(url, headers: headers, useCache: useCache).whenComplete(() {
-        _cImage.remove((url, headers, useCache));
-      }),
+      key,
+      () => _image(
+        url,
+        headers: headers,
+        useCache: useCache,
+      ).whenComplete(() => _cImage.remove(key)),
     );
   }
 
