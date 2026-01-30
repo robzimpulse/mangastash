@@ -35,7 +35,7 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
         chapterTables,
         chapterTables.id.equalsExp(jobTables.chapterId),
       ),
-    ]);
+    ])..orderBy([OrderingTerm.asc(jobTables.id)]);
   }
 
   List<JobModel> _parse(List<TypedResult> rows) {
