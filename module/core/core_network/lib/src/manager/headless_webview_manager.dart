@@ -67,7 +67,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
         url,
         scripts: scripts,
         useCache: useCache,
-      ).whenComplete(() => _cDocument.remove(key)),
+      ).whenComplete(() {_cDocument.remove(key);}),
     );
   }
 
@@ -84,7 +84,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
         url,
         headers: headers,
         useCache: useCache,
-      ).whenComplete(() => _cImage.remove(key)),
+      ).whenComplete(() { _cImage.remove(key) ;}),
     );
   }
 
