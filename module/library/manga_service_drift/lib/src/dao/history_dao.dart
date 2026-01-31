@@ -19,7 +19,7 @@ class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
     return select(chapterTables).join([
       innerJoin(mangaTables, mangaTables.id.equalsExp(chapterTables.mangaId)),
       innerJoin(libraryTables, libraryTables.mangaId.equalsExp(mangaTables.id)),
-    ])..orderBy([OrderingTerm.desc(chapterTables.lastReadAt)]);
+    ]);
   }
 
   List<HistoryModel> _parse(List<TypedResult> rows) {
@@ -33,12 +33,26 @@ class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
   }
 
   Stream<List<HistoryModel>> get history {
-    final selector = _aggregate..where(chapterTables.lastReadAt.isNotNull());
+    final selector =
+        _aggregate
+          ..orderBy([OrderingTerm.desc(chapterTables.lastReadAt)])
+          ..where(chapterTables.lastReadAt.isNotNull());
     return selector.watch().map(_parse);
   }
 
   Stream<List<HistoryModel>> get unread {
-    final selector = _aggregate..where(chapterTables.lastReadAt.isNull());
+    // 1. Calculate the timestamp for 7 days ago
+    final oneWeekAgo = DateTime.now().subtract(const Duration(days: 7));
+
+    final selector =
+        _aggregate
+          ..orderBy([
+            OrderingTerm.desc(chapterTables.createdAt),
+            OrderingTerm.desc(chapterTables.readableAt),
+          ])
+          ..where(chapterTables.readableAt.isBiggerOrEqualValue(oneWeekAgo))
+          ..where(chapterTables.lastReadAt.isNull());
+
     return selector.watch().map(_parse);
   }
 }
