@@ -50,6 +50,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
         builder: (context, snapshot) {
           final data = snapshot.data;
           final error = snapshot.error;
+          final theme = Theme.of(context);
 
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -71,15 +72,30 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
               final view = widget.chapterGapBuilder?.call(value);
               return view.or(
                 ListTile(
-                  title: Text('Title: ${value.mangaTitle}'),
+                  title: Text(
+                    'Title: ${value.mangaTitle}',
+                    style: theme.textTheme.titleMedium,
+                  ),
                   subtitle: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Source: ${value.mangaSource}'),
-                      Text('Chapter Start: ${value.chapterStart}'),
-                      Text('Chapter End: ${value.chapterEnd}'),
-                      Text('Estimated Missing: ${value.estimatedMissingCount}'),
+                      Text(
+                        'Source: ${value.mangaSource}',
+                        style: theme.textTheme.labelSmall,
+                      ),
+                      Text(
+                        'Chapter Start: ${value.chapterStart}',
+                        style: theme.textTheme.labelSmall,
+                      ),
+                      Text(
+                        'Chapter End: ${value.chapterEnd}',
+                        style: theme.textTheme.labelSmall,
+                      ),
+                      Text(
+                        'Estimated Missing: ${value.estimatedMissingCount}',
+                        style: theme.textTheme.labelSmall,
+                      ),
                     ],
                   ),
                 ),

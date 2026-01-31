@@ -75,6 +75,32 @@ mixin _$DiagnosticDaoMixin on DatabaseAccessor<AppDatabase> {
     );
   }
 
+  Selectable<ChapterGapQueryResult> chapterGapQuery() {
+    return customSelect(
+      'SELECT m.*, gaps.gap_starts_after, gaps.gap_ends_at,(gaps.next_val - gaps.current_val - 1)AS missing_count_estimate FROM (SELECT manga_id, chapter AS gap_starts_after, next_chapter_num AS gap_ends_at, current_val, next_val FROM (SELECT manga_id, chapter, CAST(chapter AS REAL) AS current_val, LEAD(CAST(chapter AS REAL))OVER (PARTITION BY manga_id ORDER BY CAST(chapter AS REAL) ASC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS next_val, LEAD(chapter)OVER (PARTITION BY manga_id ORDER BY CAST(chapter AS REAL) ASC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS next_chapter_num FROM chapter_tables) AS sequence WHERE(next_val - current_val)> 1.1) AS gaps JOIN manga_tables AS m ON m.id = gaps.manga_id ORDER BY m.title ASC, gaps.current_val ASC',
+      variables: [],
+      readsFrom: {chapterTables, mangaTables},
+    ).map(
+      (QueryRow row) => ChapterGapQueryResult(
+        createdAt: row.read<DateTime>('created_at'),
+        updatedAt: row.read<DateTime>('updated_at'),
+        id: row.read<String>('id'),
+        title: row.readNullable<String>('title'),
+        coverUrl: row.readNullable<String>('cover_url'),
+        author: row.readNullable<String>('author'),
+        status: row.readNullable<String>('status'),
+        description: row.readNullable<String>('description'),
+        webUrl: row.readNullable<String>('web_url'),
+        source: row.readNullable<String>('source'),
+        gapStartsAfter: row.readNullable<String>('gap_starts_after'),
+        gapEndsAt: row.readNullable<String>('gap_ends_at'),
+        missingCountEstimate: row.readNullable<double>(
+          'missing_count_estimate',
+        ),
+      ),
+    );
+  }
+
   DiagnosticDaoManager get managers => DiagnosticDaoManager(this);
 }
 
@@ -172,5 +198,36 @@ class DuplicatedChapterQueryResult {
     this.publishAt,
     this.lastReadAt,
     required this.counter,
+  });
+}
+
+class ChapterGapQueryResult {
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String id;
+  final String? title;
+  final String? coverUrl;
+  final String? author;
+  final String? status;
+  final String? description;
+  final String? webUrl;
+  final String? source;
+  final String? gapStartsAfter;
+  final String? gapEndsAt;
+  final double? missingCountEstimate;
+  ChapterGapQueryResult({
+    required this.createdAt,
+    required this.updatedAt,
+    required this.id,
+    this.title,
+    this.coverUrl,
+    this.author,
+    this.status,
+    this.description,
+    this.webUrl,
+    this.source,
+    this.gapStartsAfter,
+    this.gapEndsAt,
+    this.missingCountEstimate,
   });
 }
