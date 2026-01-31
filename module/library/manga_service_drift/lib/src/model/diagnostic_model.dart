@@ -43,3 +43,38 @@ class DuplicatedTagKey extends Equatable {
   @override
   List<Object?> get props => [name, source];
 }
+
+class IncompleteManga extends Equatable {
+  final String? mangaTitle;
+  final String? mangaSource;
+  final String? chapterStart;
+  final String? chapterEnd;
+  final double? estimatedMissingCount;
+
+  const IncompleteManga({
+    this.mangaTitle,
+    this.mangaSource,
+    this.chapterStart,
+    this.chapterEnd,
+    this.estimatedMissingCount,
+  });
+
+  @override
+  List<Object?> get props => [
+    mangaTitle,
+    mangaSource,
+    chapterStart,
+    chapterEnd,
+    estimatedMissingCount,
+  ];
+
+  factory IncompleteManga.from(ChapterGapQueryResult e) {
+    return IncompleteManga(
+      mangaTitle: e.title,
+      mangaSource: e.source,
+      chapterStart: e.gapStartsAfter,
+      chapterEnd: e.gapEndsAt,
+      estimatedMissingCount: e.missingCountEstimate,
+    );
+  }
+}

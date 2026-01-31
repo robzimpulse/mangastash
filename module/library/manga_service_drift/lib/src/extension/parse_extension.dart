@@ -71,3 +71,7 @@ extension ParseTagExtension on List<DuplicatedTagQueryResult> {
     );
   }
 }
+
+extension ParseIncompleteMangaExtension on List<ChapterGapQueryResult> {
+  List<IncompleteManga> parse() => [...map(IncompleteManga.from)];
+}

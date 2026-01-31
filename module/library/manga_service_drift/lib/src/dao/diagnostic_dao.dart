@@ -44,6 +44,39 @@ part 'diagnostic_dao.g.dart';
       WHERE counter > 1
       ORDER BY manga_id, chapter;
       ''',
+    'chapterGapQuery': '''
+      SELECT 
+          m.*, 
+          gaps.gap_starts_after, 
+          gaps.gap_ends_at,
+          (gaps.next_val - gaps.current_val - 1) AS missing_count_estimate
+      FROM (
+          SELECT 
+              manga_id, 
+              chapter AS gap_starts_after, 
+              next_chapter_num AS gap_ends_at,
+              current_val,
+              next_val
+          FROM (
+              SELECT 
+                  manga_id, 
+                  chapter, 
+                  CAST(chapter AS REAL) AS current_val,
+                  LEAD(CAST(chapter AS REAL)) OVER (
+                      PARTITION BY manga_id 
+                      ORDER BY CAST(chapter AS REAL) ASC
+                  ) AS next_val,
+                  LEAD(chapter) OVER (
+                      PARTITION BY manga_id 
+                      ORDER BY CAST(chapter AS REAL) ASC
+                  ) AS next_chapter_num
+              FROM chapter_tables
+          ) AS sequence
+          WHERE (next_val - current_val) > 1.1
+      ) AS gaps
+      JOIN manga_tables m ON m.id = gaps.manga_id
+      ORDER BY m.title ASC, gaps.current_val ASC;
+    ''',
   },
 )
 class DiagnosticDao extends DatabaseAccessor<AppDatabase>
@@ -84,11 +117,12 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
     return duplicatedMangaQuery().watch().map((e) => e.parse());
   }
 
-  Future<Map<DuplicatedMangaKey, List<MangaDrift>>>get duplicateManga async {
+  Future<Map<DuplicatedMangaKey, List<MangaDrift>>> get duplicateManga async {
     return duplicatedMangaQuery().get().then((e) => e.parse());
   }
 
-  Stream<Map<DuplicatedChapterKey, List<ChapterDrift>>> get duplicateChapterStream {
+  Stream<Map<DuplicatedChapterKey, List<ChapterDrift>>>
+  get duplicateChapterStream {
     return duplicatedChapterQuery().watch().map((e) => e.parse());
   }
 
@@ -118,5 +152,13 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<ImageDrift>> get orphanImage {
     return orphanChapterQuery.get().then(_parseOrphanImage);
+  }
+
+  Stream<List<IncompleteManga>> get chapterGapStream {
+    return chapterGapQuery().watch().map((e) => e.parse());
+  }
+
+  Future<List<IncompleteManga>> get chapterGap {
+    return chapterGapQuery().get().then((e) => e.parse());
   }
 }
