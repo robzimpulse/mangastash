@@ -3,31 +3,23 @@ import 'package:drift/drift.dart';
 import '../database/database.dart';
 import '../model/history_model.dart';
 import '../tables/chapter_tables.dart';
+import '../tables/library_tables.dart';
 import '../tables/manga_tables.dart';
 import '../tables/relationship_tables.dart';
 
 part 'history_dao.g.dart';
 
-@DriftAccessor(tables: [MangaTables, RelationshipTables, ChapterTables])
+@DriftAccessor(
+  tables: [LibraryTables, MangaTables, RelationshipTables, ChapterTables],
+)
 class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
   HistoryDao(super.db);
 
   JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
-    return select(mangaTables).join([
-      leftOuterJoin(
-        chapterTables,
-        chapterTables.mangaId.equalsExp(mangaTables.id),
-      ),
-    ])..orderBy(_order);
-  }
-
-  List<OrderingTerm> get _order {
-    return [
-      OrderingTerm(
-        expression: chapterTables.lastReadAt,
-        mode: OrderingMode.desc,
-      ),
-    ];
+    return select(chapterTables).join([
+      innerJoin(mangaTables, mangaTables.id.equalsExp(chapterTables.mangaId)),
+      innerJoin(libraryTables, libraryTables.mangaId.equalsExp(mangaTables.id)),
+    ])..orderBy([OrderingTerm.desc(chapterTables.lastReadAt)]);
   }
 
   List<HistoryModel> _parse(List<TypedResult> rows) {
