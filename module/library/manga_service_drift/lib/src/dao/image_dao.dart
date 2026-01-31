@@ -12,12 +12,8 @@ part 'image_dao.g.dart';
 class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
   ImageDao(super.db);
 
-  List<OrderingTerm Function($ImageTablesTable)> get _clauses {
-    return [(o) => OrderingTerm(expression: o.order, mode: OrderingMode.asc)];
-  }
-
   SimpleSelectStatement<$ImageTablesTable, ImageDrift> get _selector {
-    return select(imageTables)..orderBy(_clauses);
+    return select(imageTables)..orderBy([(o) => OrderingTerm.asc(o.order)]);
   }
 
   DeleteStatement<$ImageTablesTable, ImageDrift> get _deleter {
