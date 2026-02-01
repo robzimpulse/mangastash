@@ -67,7 +67,7 @@ class JobManager
       manager.deleteFileEvent.listen(_onDeleteFile),
       _ongoingJob.listen(_onData),
     ]);
-    _ongoingJob.addStream(_jobDao.single);
+    _ongoingJob.addStream(_jobDao.single.distinct());
     WidgetsBinding.instance.addObserver(this);
   }
 
