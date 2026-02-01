@@ -118,13 +118,12 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
               final view = widget.mangaBuilder?.call(value);
               return view.or(
                 ExpansionTile(
-                  title: Text('Title: ${value.key.title}'),
-                  subtitle: Text('Source: ${value.key.source}'),
+                  title: Text('${value.key.title}'),
+                  subtitle: Text('${value.key.source}'),
                   children: [
                     for (final child in value.value)
                       ListTile(
-                        title: Text(child.id),
-                        subtitle: Text(child.webUrl ?? '-'),
+                        title: Text(child.webUrl ?? '-'),
                       ),
                   ],
                 ),
