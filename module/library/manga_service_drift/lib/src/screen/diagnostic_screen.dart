@@ -50,7 +50,6 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
         builder: (context, snapshot) {
           final data = snapshot.data;
           final error = snapshot.error;
-          final theme = Theme.of(context);
 
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -72,8 +71,8 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
               final view = widget.chapterGapBuilder?.call(value);
               return view.or(
                 ExpansionTile(
-                  title: Text('${value.mangaTitle}'),
-                  subtitle: Text('${value.mangaSource}'),
+                  title: Text('${value.manga?.title}'),
+                  subtitle: Text('${value.manga?.source}'),
                   children: [
                     for (final range in value.ranges)
                       ListTile(

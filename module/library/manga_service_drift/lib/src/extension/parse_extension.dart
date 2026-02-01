@@ -72,15 +72,31 @@ extension ParseTagExtension on List<DuplicatedTagQueryResult> {
   }
 }
 
+extension ChapterGapQueryResultToMangaDrift on ChapterGapQueryResult {
+  MangaDrift get toMangaDrift {
+    return MangaDrift(
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      id: id,
+      title: title,
+      coverUrl: coverUrl,
+      author: author,
+      status: status,
+      webUrl: webUrl,
+      description: description,
+      source: source,
+    );
+  }
+}
+
 extension ParseIncompleteMangaExtension on List<ChapterGapQueryResult> {
   List<IncompleteManga> parse() {
-    final groups = groupListsBy((e) => (e.title, e.source));
+    final groups = groupListsBy((e) => e.toMangaDrift);
 
     return [
       for (final group in groups.entries)
         IncompleteManga(
-          mangaTitle: group.key.$1,
-          mangaSource: group.key.$2,
+          manga: group.key,
           ranges: [
             for (final value in group.value)
               IncompleteMangaRange(
