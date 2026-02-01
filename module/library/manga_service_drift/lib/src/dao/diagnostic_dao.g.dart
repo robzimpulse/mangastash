@@ -4,6 +4,7 @@ part of 'diagnostic_dao.dart';
 
 // ignore_for_file: type=lint
 mixin _$DiagnosticDaoMixin on DatabaseAccessor<AppDatabase> {
+  $LibraryTablesTable get libraryTables => attachedDatabase.libraryTables;
   $MangaTablesTable get mangaTables => attachedDatabase.mangaTables;
   $TagTablesTable get tagTables => attachedDatabase.tagTables;
   $RelationshipTablesTable get relationshipTables =>
@@ -52,11 +53,13 @@ mixin _$DiagnosticDaoMixin on DatabaseAccessor<AppDatabase> {
 
   Selectable<DuplicatedChapterQueryResult> duplicatedChapterQuery() {
     return customSelect(
-      'SELECT * FROM (SELECT *, COUNT(*)OVER (PARTITION BY manga_id, chapter RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS counter FROM chapter_tables) WHERE counter > 1 ORDER BY manga_id, chapter',
+      'SELECT m.title AS manga_title, m.source AS manga_source, dupes.* FROM (SELECT *, COUNT(*)OVER (PARTITION BY manga_id, chapter RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS counter FROM chapter_tables) AS dupes JOIN manga_tables AS m ON m.id = dupes.manga_id WHERE dupes.counter > 1 ORDER BY m.source, m.title, CAST(dupes.chapter AS REAL)',
       variables: [],
-      readsFrom: {chapterTables},
+      readsFrom: {mangaTables, chapterTables},
     ).map(
       (QueryRow row) => DuplicatedChapterQueryResult(
+        mangaTitle: row.readNullable<String>('manga_title'),
+        mangaSource: row.readNullable<String>('manga_source'),
         createdAt: row.read<DateTime>('created_at'),
         updatedAt: row.read<DateTime>('updated_at'),
         id: row.read<String>('id'),
@@ -79,7 +82,7 @@ mixin _$DiagnosticDaoMixin on DatabaseAccessor<AppDatabase> {
     return customSelect(
       'SELECT m.*, gaps.gap_starts_after, gaps.gap_ends_at,(gaps.next_val - gaps.current_val - 1)AS missing_count_estimate FROM (SELECT manga_id, chapter AS gap_starts_after, next_chapter_num AS gap_ends_at, current_val, next_val FROM (SELECT manga_id, chapter, CAST(chapter AS REAL) AS current_val, LEAD(CAST(chapter AS REAL))OVER (PARTITION BY manga_id ORDER BY CAST(chapter AS REAL) ASC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS next_val, LEAD(chapter)OVER (PARTITION BY manga_id ORDER BY CAST(chapter AS REAL) ASC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS next_chapter_num FROM chapter_tables WHERE manga_id IN (SELECT manga_id FROM library_tables)) AS sequence WHERE(next_val - current_val)> 1.1) AS gaps JOIN manga_tables AS m ON m.id = gaps.manga_id ORDER BY m.title ASC',
       variables: [],
-      readsFrom: {chapterTables, mangaTables},
+      readsFrom: {chapterTables, libraryTables, mangaTables},
     ).map(
       (QueryRow row) => ChapterGapQueryResult(
         createdAt: row.read<DateTime>('created_at'),
@@ -107,6 +110,8 @@ mixin _$DiagnosticDaoMixin on DatabaseAccessor<AppDatabase> {
 class DiagnosticDaoManager {
   final _$DiagnosticDaoMixin _db;
   DiagnosticDaoManager(this._db);
+  $$LibraryTablesTableTableManager get libraryTables =>
+      $$LibraryTablesTableTableManager(_db.attachedDatabase, _db.libraryTables);
   $$MangaTablesTableTableManager get mangaTables =>
       $$MangaTablesTableTableManager(_db.attachedDatabase, _db.mangaTables);
   $$TagTablesTableTableManager get tagTables =>
@@ -169,6 +174,8 @@ class DuplicatedTagQueryResult {
 }
 
 class DuplicatedChapterQueryResult {
+  final String? mangaTitle;
+  final String? mangaSource;
   final DateTime createdAt;
   final DateTime updatedAt;
   final String id;
@@ -184,6 +191,8 @@ class DuplicatedChapterQueryResult {
   final DateTime? lastReadAt;
   final int counter;
   DuplicatedChapterQueryResult({
+    this.mangaTitle,
+    this.mangaSource,
     required this.createdAt,
     required this.updatedAt,
     required this.id,

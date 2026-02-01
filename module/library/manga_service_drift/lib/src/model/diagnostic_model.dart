@@ -18,12 +18,24 @@ class DuplicatedMangaKey extends Equatable {
 
 class DuplicatedChapterKey extends Equatable {
   final String? mangaId;
+  final String? mangaTitle;
+  final String? mangaSource;
   final String? chapter;
 
-  const DuplicatedChapterKey({this.mangaId, this.chapter});
+  const DuplicatedChapterKey({
+    this.mangaTitle,
+    this.mangaId,
+    this.chapter,
+    this.mangaSource,
+  });
 
   factory DuplicatedChapterKey.from(DuplicatedChapterQueryResult e) {
-    return DuplicatedChapterKey(mangaId: e.mangaId, chapter: e.chapter);
+    return DuplicatedChapterKey(
+      mangaId: e.mangaId,
+      mangaTitle: e.mangaTitle,
+      mangaSource: e.mangaSource,
+      chapter: e.chapter,
+    );
   }
 
   @override

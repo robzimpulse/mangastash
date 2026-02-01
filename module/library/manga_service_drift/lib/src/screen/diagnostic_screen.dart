@@ -122,9 +122,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
                   subtitle: Text('${value.key.source}'),
                   children: [
                     for (final child in value.value)
-                      ListTile(
-                        title: Text(child.webUrl ?? '-'),
-                      ),
+                      ListTile(title: Text(child.webUrl ?? '-')),
                   ],
                 ),
               );
@@ -160,8 +158,15 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
               final view = widget.chapterBuilder?.call(value);
               return view.or(
                 ExpansionTile(
-                  title: Text('Manga ID: ${value.key.mangaId}'),
-                  subtitle: Text('Chapter: ${value.key.chapter}'),
+                  title: Text('${value.key.mangaTitle}'),
+                  subtitle: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Chapter: ${value.key.chapter}'),
+                      Text('Source: ${value.key.mangaSource}'),
+                    ],
+                  ),
                   children: [
                     for (final child in value.value)
                       ListTile(title: Text(child.id)),

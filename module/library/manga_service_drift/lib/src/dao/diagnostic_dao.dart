@@ -5,6 +5,7 @@ import '../extension/parse_extension.dart';
 import '../model/diagnostic_model.dart';
 import '../tables/chapter_tables.dart';
 import '../tables/image_tables.dart';
+import '../tables/library_tables.dart';
 import '../tables/manga_tables.dart';
 import '../tables/relationship_tables.dart';
 import '../tables/tag_tables.dart';
@@ -13,6 +14,7 @@ part 'diagnostic_dao.g.dart';
 
 @DriftAccessor(
   tables: [
+    LibraryTables,
     MangaTables,
     TagTables,
     RelationshipTables,
@@ -37,12 +39,18 @@ part 'diagnostic_dao.g.dart';
       ORDER BY name, source;
       ''',
     'duplicatedChapterQuery': '''
-      SELECT * FROM (
-        SELECT *, COUNT(*) OVER (PARTITION BY manga_id, chapter) as counter 
-        FROM chapter_tables
-      ) 
-      WHERE counter > 1
-      ORDER BY manga_id, chapter;
+      SELECT 
+          m.title AS manga_title,
+          m.source AS manga_source,
+          dupes.*
+      FROM (
+          SELECT *, 
+                 COUNT(*) OVER (PARTITION BY manga_id, chapter) as counter
+          FROM chapter_tables
+      ) AS dupes
+      JOIN manga_tables m ON m.id = dupes.manga_id
+      WHERE dupes.counter > 1
+      ORDER BY m.source, m.title, CAST(dupes.chapter AS REAL);
       ''',
     'chapterGapQuery': '''
       SELECT 
