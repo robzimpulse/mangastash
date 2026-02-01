@@ -71,11 +71,12 @@ part 'diagnostic_dao.g.dart';
                       ORDER BY CAST(chapter AS REAL) ASC
                   ) AS next_chapter_num
               FROM chapter_tables
+              WHERE manga_id IN (SELECT manga_id FROM library_tables)
           ) AS sequence
           WHERE (next_val - current_val) > 1.1
       ) AS gaps
       JOIN manga_tables m ON m.id = gaps.manga_id
-      ORDER BY m.title ASC, gaps.current_val ASC;
+      ORDER BY m.title ASC;
     ''',
   },
 )
