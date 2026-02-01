@@ -71,33 +71,20 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
               if (value == null) return null;
               final view = widget.chapterGapBuilder?.call(value);
               return view.or(
-                ListTile(
-                  title: Text(
-                    'Title: ${value.mangaTitle}',
-                    style: theme.textTheme.titleMedium,
-                  ),
-                  subtitle: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Source: ${value.mangaSource}',
-                        style: theme.textTheme.labelSmall,
+                ExpansionTile(
+                  title: Text('${value.mangaTitle}'),
+                  subtitle: Text('${value.mangaSource}'),
+                  children: [
+                    for (final range in value.ranges)
+                      ListTile(
+                        title: Text(
+                          'Range: ${range.chapterStart} - ${range.chapterEnd}',
+                        ),
+                        subtitle: Text(
+                          'Estimated Missing Count: ${range.estimatedMissingCount}',
+                        ),
                       ),
-                      Text(
-                        'Chapter Start: ${value.chapterStart}',
-                        style: theme.textTheme.labelSmall,
-                      ),
-                      Text(
-                        'Chapter End: ${value.chapterEnd}',
-                        style: theme.textTheme.labelSmall,
-                      ),
-                      Text(
-                        'Estimated Missing: ${value.estimatedMissingCount}',
-                        style: theme.textTheme.labelSmall,
-                      ),
-                    ],
-                  ),
+                  ],
                 ),
               );
             },

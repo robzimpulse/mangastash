@@ -73,5 +73,23 @@ extension ParseTagExtension on List<DuplicatedTagQueryResult> {
 }
 
 extension ParseIncompleteMangaExtension on List<ChapterGapQueryResult> {
-  List<IncompleteManga> parse() => [...map(IncompleteManga.from)];
+  List<IncompleteManga> parse() {
+    final groups = groupListsBy((e) => (e.title, e.source));
+
+    return [
+      for (final group in groups.entries)
+        IncompleteManga(
+          mangaTitle: group.key.$1,
+          mangaSource: group.key.$2,
+          ranges: [
+            for (final value in group.value)
+              IncompleteMangaRange(
+                chapterStart: value.gapStartsAfter,
+                chapterEnd: value.gapEndsAt,
+                estimatedMissingCount: value.missingCountEstimate,
+              ),
+          ],
+        ),
+    ];
+  }
 }
