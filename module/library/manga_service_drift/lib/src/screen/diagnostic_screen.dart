@@ -122,7 +122,10 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
                   subtitle: Text('Source: ${value.key.source}'),
                   children: [
                     for (final child in value.value)
-                      ListTile(title: Text(child.id)),
+                      ListTile(
+                        title: Text(child.id),
+                        subtitle: Text(child.webUrl ?? '-'),
+                      ),
                   ],
                 ),
               );
