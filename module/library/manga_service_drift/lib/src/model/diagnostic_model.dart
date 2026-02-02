@@ -17,29 +17,31 @@ class DuplicatedMangaKey extends Equatable {
 }
 
 class DuplicatedChapterKey extends Equatable {
-  final String? mangaId;
-  final String? mangaTitle;
-  final String? mangaSource;
+  final MangaDrift? manga;
   final String? chapter;
 
-  const DuplicatedChapterKey({
-    this.mangaTitle,
-    this.mangaId,
-    this.chapter,
-    this.mangaSource,
-  });
+  const DuplicatedChapterKey({this.manga, this.chapter});
 
   factory DuplicatedChapterKey.from(DuplicatedChapterQueryResult e) {
     return DuplicatedChapterKey(
-      mangaId: e.mangaId,
-      mangaTitle: e.mangaTitle,
-      mangaSource: e.mangaSource,
-      chapter: e.chapter,
+      manga: MangaDrift(
+        createdAt: e.mangaCreatedAt,
+        updatedAt: e.mangaUpdatedAt,
+        id: e.mangaId,
+        title: e.mangaTitle,
+        coverUrl: e.mangaCoverUrl,
+        author: e.mangaAuthor,
+        status: e.mangaStatus,
+        description: e.mangaDescription,
+        webUrl: e.mangaWebUrl,
+        source: e.mangaSource,
+      ),
+      chapter: e.chapterNumber,
     );
   }
 
   @override
-  List<Object?> get props => [mangaId, chapter];
+  List<Object?> get props => [manga, chapter];
 }
 
 class DuplicatedTagKey extends Equatable {

@@ -39,18 +39,42 @@ part 'diagnostic_dao.g.dart';
       ORDER BY name, source;
       ''',
     'duplicatedChapterQuery': '''
-      SELECT 
+      SELECT
+          -- Manga Metadata
+          m.id AS manga_id,
           m.title AS manga_title,
           m.source AS manga_source,
-          dupes.*
+          m.web_url AS manga_web_url,
+          m.author AS manga_author,
+          m.cover_url AS manga_cover_url,
+          m.status AS manga_status,
+          m.description AS manga_description,
+          m.created_at AS manga_created_at,
+          m.updated_at AS manga_updated_at,
+      
+          -- Duplicate Chapter Data
+          dupes.id AS chapter_id,
+          dupes.chapter AS chapter_number,
+          dupes.title AS chapter_title,
+          dupes.webUrl AS chapter_web_url,
+          dupes.created_at AS chapter_created_at,
+          dupes.updated_at AS chapter_updated_at,
+          dupes.readable_at AS chapter_readable_at,
+          dupes.publish_at AS chapter_publish_at,
+          dupes.last_read_at AS chapter_last_read_at,
+          dupes.volume AS chapter_volume,
+          dupes.translated_language AS chapter_translated_language,
+          dupes.scanlation_group AS chapter_scanlation_group,
+          
+          -- Diagnostic Info
+          dupes.counter AS total_duplicates_found
       FROM (
-          SELECT *, 
-                 COUNT(*) OVER (PARTITION BY manga_id, chapter) as counter
+          SELECT *, COUNT(*) OVER (PARTITION BY manga_id, chapter) as counter
           FROM chapter_tables
       ) AS dupes
       JOIN manga_tables m ON m.id = dupes.manga_id
       WHERE dupes.counter > 1
-      ORDER BY m.source, m.title, CAST(dupes.chapter AS REAL);
+      ORDER BY m.source, m.title, CAST(dupes.chapter AS REAL), dupes.created_at DESC;
       ''',
     'chapterGapQuery': '''
       SELECT 

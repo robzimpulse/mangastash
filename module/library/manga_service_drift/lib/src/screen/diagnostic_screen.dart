@@ -158,13 +158,13 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
               final view = widget.chapterBuilder?.call(value);
               return view.or(
                 ExpansionTile(
-                  title: Text('${value.key.mangaTitle}'),
+                  title: Text('${value.key.manga?.title}'),
                   subtitle: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Chapter: ${value.key.chapter}'),
-                      Text('Source: ${value.key.mangaSource}'),
+                      Text('Source: ${value.key.manga?.source}'),
                     ],
                   ),
                   children: [

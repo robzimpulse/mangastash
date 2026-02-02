@@ -53,27 +53,38 @@ mixin _$DiagnosticDaoMixin on DatabaseAccessor<AppDatabase> {
 
   Selectable<DuplicatedChapterQueryResult> duplicatedChapterQuery() {
     return customSelect(
-      'SELECT m.title AS manga_title, m.source AS manga_source, dupes.* FROM (SELECT *, COUNT(*)OVER (PARTITION BY manga_id, chapter RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS counter FROM chapter_tables) AS dupes JOIN manga_tables AS m ON m.id = dupes.manga_id WHERE dupes.counter > 1 ORDER BY m.source, m.title, CAST(dupes.chapter AS REAL)',
+      'SELECT m.id AS manga_id, m.title AS manga_title, m.source AS manga_source, m.web_url AS manga_web_url, m.author AS manga_author, m.cover_url AS manga_cover_url, m.status AS manga_status, m.description AS manga_description, m.created_at AS manga_created_at, m.updated_at AS manga_updated_at, dupes.id AS chapter_id, dupes.chapter AS chapter_number, dupes.title AS chapter_title, dupes.webUrl AS chapter_web_url, dupes.created_at AS chapter_created_at, dupes.updated_at AS chapter_updated_at, dupes.readable_at AS chapter_readable_at, dupes.publish_at AS chapter_publish_at, dupes.last_read_at AS chapter_last_read_at, dupes.volume AS chapter_volume, dupes.translated_language AS chapter_translated_language, dupes.scanlation_group AS chapter_scanlation_group, dupes.counter AS total_duplicates_found FROM (SELECT *, COUNT(*)OVER (PARTITION BY manga_id, chapter RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE NO OTHERS) AS counter FROM chapter_tables) AS dupes JOIN manga_tables AS m ON m.id = dupes.manga_id WHERE dupes.counter > 1 ORDER BY m.source, m.title, CAST(dupes.chapter AS REAL), dupes.created_at DESC',
       variables: [],
       readsFrom: {mangaTables, chapterTables},
     ).map(
       (QueryRow row) => DuplicatedChapterQueryResult(
+        mangaId: row.read<String>('manga_id'),
         mangaTitle: row.readNullable<String>('manga_title'),
         mangaSource: row.readNullable<String>('manga_source'),
-        createdAt: row.read<DateTime>('created_at'),
-        updatedAt: row.read<DateTime>('updated_at'),
-        id: row.read<String>('id'),
-        mangaId: row.readNullable<String>('manga_id'),
-        title: row.readNullable<String>('title'),
-        volume: row.readNullable<String>('volume'),
-        chapter: row.readNullable<String>('chapter'),
-        translatedLanguage: row.readNullable<String>('translated_language'),
-        scanlationGroup: row.readNullable<String>('scanlation_group'),
-        webUrl: row.readNullable<String>('webUrl'),
-        readableAt: row.readNullable<DateTime>('readable_at'),
-        publishAt: row.readNullable<DateTime>('publish_at'),
-        lastReadAt: row.readNullable<DateTime>('last_read_at'),
-        counter: row.read<int>('counter'),
+        mangaWebUrl: row.readNullable<String>('manga_web_url'),
+        mangaAuthor: row.readNullable<String>('manga_author'),
+        mangaCoverUrl: row.readNullable<String>('manga_cover_url'),
+        mangaStatus: row.readNullable<String>('manga_status'),
+        mangaDescription: row.readNullable<String>('manga_description'),
+        mangaCreatedAt: row.read<DateTime>('manga_created_at'),
+        mangaUpdatedAt: row.read<DateTime>('manga_updated_at'),
+        chapterId: row.read<String>('chapter_id'),
+        chapterNumber: row.readNullable<String>('chapter_number'),
+        chapterTitle: row.readNullable<String>('chapter_title'),
+        chapterWebUrl: row.readNullable<String>('chapter_web_url'),
+        chapterCreatedAt: row.read<DateTime>('chapter_created_at'),
+        chapterUpdatedAt: row.read<DateTime>('chapter_updated_at'),
+        chapterReadableAt: row.readNullable<DateTime>('chapter_readable_at'),
+        chapterPublishAt: row.readNullable<DateTime>('chapter_publish_at'),
+        chapterLastReadAt: row.readNullable<DateTime>('chapter_last_read_at'),
+        chapterVolume: row.readNullable<String>('chapter_volume'),
+        chapterTranslatedLanguage: row.readNullable<String>(
+          'chapter_translated_language',
+        ),
+        chapterScanlationGroup: row.readNullable<String>(
+          'chapter_scanlation_group',
+        ),
+        totalDuplicatesFound: row.read<int>('total_duplicates_found'),
       ),
     );
   }
@@ -174,39 +185,53 @@ class DuplicatedTagQueryResult {
 }
 
 class DuplicatedChapterQueryResult {
+  final String mangaId;
   final String? mangaTitle;
   final String? mangaSource;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final String id;
-  final String? mangaId;
-  final String? title;
-  final String? volume;
-  final String? chapter;
-  final String? translatedLanguage;
-  final String? scanlationGroup;
-  final String? webUrl;
-  final DateTime? readableAt;
-  final DateTime? publishAt;
-  final DateTime? lastReadAt;
-  final int counter;
+  final String? mangaWebUrl;
+  final String? mangaAuthor;
+  final String? mangaCoverUrl;
+  final String? mangaStatus;
+  final String? mangaDescription;
+  final DateTime mangaCreatedAt;
+  final DateTime mangaUpdatedAt;
+  final String chapterId;
+  final String? chapterNumber;
+  final String? chapterTitle;
+  final String? chapterWebUrl;
+  final DateTime chapterCreatedAt;
+  final DateTime chapterUpdatedAt;
+  final DateTime? chapterReadableAt;
+  final DateTime? chapterPublishAt;
+  final DateTime? chapterLastReadAt;
+  final String? chapterVolume;
+  final String? chapterTranslatedLanguage;
+  final String? chapterScanlationGroup;
+  final int totalDuplicatesFound;
   DuplicatedChapterQueryResult({
+    required this.mangaId,
     this.mangaTitle,
     this.mangaSource,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.id,
-    this.mangaId,
-    this.title,
-    this.volume,
-    this.chapter,
-    this.translatedLanguage,
-    this.scanlationGroup,
-    this.webUrl,
-    this.readableAt,
-    this.publishAt,
-    this.lastReadAt,
-    required this.counter,
+    this.mangaWebUrl,
+    this.mangaAuthor,
+    this.mangaCoverUrl,
+    this.mangaStatus,
+    this.mangaDescription,
+    required this.mangaCreatedAt,
+    required this.mangaUpdatedAt,
+    required this.chapterId,
+    this.chapterNumber,
+    this.chapterTitle,
+    this.chapterWebUrl,
+    required this.chapterCreatedAt,
+    required this.chapterUpdatedAt,
+    this.chapterReadableAt,
+    this.chapterPublishAt,
+    this.chapterLastReadAt,
+    this.chapterVolume,
+    this.chapterTranslatedLanguage,
+    this.chapterScanlationGroup,
+    required this.totalDuplicatesFound,
   });
 }
 
