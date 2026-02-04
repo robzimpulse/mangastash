@@ -33,19 +33,19 @@ extension ParseChapterExtension on List<DuplicatedChapterQueryResult> {
       (key, value) => MapEntry(key, [
         ...value.map(
           (e) => ChapterDrift(
-            createdAt: e.createdAt,
-            updatedAt: e.updatedAt,
-            id: e.id,
+            createdAt: e.chapterCreatedAt,
+            updatedAt: e.chapterUpdatedAt,
+            id: e.chapterId,
             mangaId: e.mangaId,
-            title: e.title,
-            volume: e.volume,
-            chapter: e.chapter,
-            translatedLanguage: e.translatedLanguage,
-            scanlationGroup: e.scanlationGroup,
-            webUrl: e.webUrl,
-            readableAt: e.readableAt,
-            publishAt: e.publishAt,
-            lastReadAt: e.lastReadAt,
+            title: e.chapterTitle,
+            volume: e.chapterVolume,
+            chapter: e.chapterNumber,
+            translatedLanguage: e.chapterTranslatedLanguage,
+            scanlationGroup: e.chapterScanlationGroup,
+            webUrl: e.chapterWebUrl,
+            readableAt: e.chapterReadableAt,
+            publishAt: e.chapterPublishAt,
+            lastReadAt: e.chapterLastReadAt,
           ),
         ),
       ]),
@@ -69,5 +69,43 @@ extension ParseTagExtension on List<DuplicatedTagQueryResult> {
         ),
       ]),
     );
+  }
+}
+
+extension ChapterGapQueryResultToMangaDrift on ChapterGapQueryResult {
+  MangaDrift get toMangaDrift {
+    return MangaDrift(
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      id: id,
+      title: title,
+      coverUrl: coverUrl,
+      author: author,
+      status: status,
+      webUrl: webUrl,
+      description: description,
+      source: source,
+    );
+  }
+}
+
+extension ParseIncompleteMangaExtension on List<ChapterGapQueryResult> {
+  List<IncompleteManga> parse() {
+    final groups = groupListsBy((e) => e.toMangaDrift);
+
+    return [
+      for (final group in groups.entries)
+        IncompleteManga(
+          manga: group.key,
+          ranges: [
+            for (final value in group.value)
+              IncompleteMangaRange(
+                chapterStart: value.gapStartsAfter,
+                chapterEnd: value.gapEndsAt,
+                estimatedMissingCount: value.missingCountEstimate,
+              ),
+          ],
+        ),
+    ];
   }
 }

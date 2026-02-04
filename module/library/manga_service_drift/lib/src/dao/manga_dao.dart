@@ -141,6 +141,8 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
       final mangas = await search(
         ids: [...values.keys.map((e) => e.id.valueOrNull).nonNulls],
         webUrls: [...values.keys.map((e) => e.webUrl.valueOrNull).nonNulls],
+        titles: [...values.keys.map((e) => e.title.valueOrNull).nonNulls],
+        sources: [...values.keys.map((e) => e.source.valueOrNull).nonNulls],
       );
 
       final data = <MangaModel>[];
@@ -152,8 +154,15 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
         final byWebUrl = entry.key.webUrl.valueOrNull?.let(
           (webUrl) => mangas.firstWhereOrNull((e) => e.manga?.webUrl == webUrl),
         );
+        final byTitleAndSource = entry.key.title.valueOrNull?.let(
+          (title) => entry.key.source.valueOrNull.let(
+            (source) => mangas.firstWhereOrNull(
+              (e) => e.manga?.title == title && e.manga?.source == source,
+            ),
+          ),
+        );
 
-        final manga = (byId ?? byWebUrl);
+        final manga = (byId ?? byWebUrl ?? byTitleAndSource);
 
         if (manga != null) {
           final companion = manga.manga?.toCompanion(true);

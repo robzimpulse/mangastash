@@ -10,10 +10,7 @@ class FileSaverUseCase {
   const FileSaverUseCase({required GetRootPathUseCase getRootPathUseCase})
     : _getRootPathUseCase = getRootPathUseCase;
 
-  Future<void> execute({
-    String? filename,
-    required Uint8List data,
-  }) async {
+  Future<void> execute({String? filename, required Uint8List data}) async {
     if (!kIsWeb) {
       await [Permission.manageExternalStorage, Permission.storage].request();
 

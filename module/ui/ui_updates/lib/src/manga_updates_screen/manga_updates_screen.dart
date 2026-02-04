@@ -24,7 +24,6 @@ class MangaUpdatesScreen extends StatelessWidget {
       create: (context) {
         return MangaUpdatesScreenCubit(
           listenUnreadHistoryUseCase: locator(),
-          listenMangaFromLibraryUseCase: locator(),
           listenPrefetchUseCase: locator(),
           prefetchChapterUseCase: locator(),
         );
@@ -114,6 +113,7 @@ class MangaUpdatesScreen extends StatelessWidget {
                 chapter: chapter,
                 lastReadAt: chapter.lastReadAt,
                 cacheManager: imagesCacheManager,
+                isPrefetching: state.prefetchedChapterIds.contains(chapter.id),
                 onTap: () => onTapChapter?.call(manga, chapter),
               );
             },

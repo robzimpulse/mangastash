@@ -69,10 +69,10 @@ packages:
     dependency: transitive
     description:
       name: dio
-      sha256: d90ee57923d1828ac14e492ca49440f65477f4bb1263575900be731a3dac66a9
+      sha256: b9d46faecab38fc8cc286f80bc4d61a3bb5d4ac49e51ed877b4d6706efe57b25
       url: "https://pub.dev"
     source: hosted
-    version: "5.9.0"
+    version: "5.9.1"
   dio_web_adapter:
     dependency: transitive
     description:
@@ -309,7 +309,7 @@ packages:
     description:
       path: "packages/log_box"
       ref: master
-      resolved-ref: b1984700b8cccbadd9b83484c2fcfdca39a5cf8d
+      resolved-ref: "895100ce056428753e181f867e696d29ec52710d"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -318,7 +318,7 @@ packages:
     description:
       path: "packages/log_box_dio_logger"
       ref: master
-      resolved-ref: b1984700b8cccbadd9b83484c2fcfdca39a5cf8d
+      resolved-ref: "895100ce056428753e181f867e696d29ec52710d"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -327,7 +327,7 @@ packages:
     description:
       path: "packages/log_box_in_app_webview_logger"
       ref: master
-      resolved-ref: b1984700b8cccbadd9b83484c2fcfdca39a5cf8d
+      resolved-ref: "895100ce056428753e181f867e696d29ec52710d"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -336,7 +336,7 @@ packages:
     description:
       path: "packages/log_box_navigation_logger"
       ref: master
-      resolved-ref: b1984700b8cccbadd9b83484c2fcfdca39a5cf8d
+      resolved-ref: "895100ce056428753e181f867e696d29ec52710d"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -345,7 +345,7 @@ packages:
     description:
       path: "packages/log_box_persistent_storage_drift"
       ref: master
-      resolved-ref: b1984700b8cccbadd9b83484c2fcfdca39a5cf8d
+      resolved-ref: "895100ce056428753e181f867e696d29ec52710d"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -548,10 +548,11 @@ packages:
   super_paging:
     dependency: transitive
     description:
-      name: super_paging
-      sha256: "34c484d6487f649851ab0139cd0f6d67535c79f76de8c10c9fc45d1a090b39dc"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: fix_error_when_no_listener
+      resolved-ref: ca7f3483329b406b831cb4d49fc0408fb1d34fe0
+      url: "https://github.com/robzimpulse/super_paging"
+    source: git
     version: "0.2.0"
   term_glyph:
     dependency: transitive

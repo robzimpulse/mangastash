@@ -5,6 +5,7 @@ import '../extension/parse_extension.dart';
 import '../model/diagnostic_model.dart';
 import '../tables/chapter_tables.dart';
 import '../tables/image_tables.dart';
+import '../tables/library_tables.dart';
 import '../tables/manga_tables.dart';
 import '../tables/relationship_tables.dart';
 import '../tables/tag_tables.dart';
@@ -13,6 +14,7 @@ part 'diagnostic_dao.g.dart';
 
 @DriftAccessor(
   tables: [
+    LibraryTables,
     MangaTables,
     TagTables,
     RelationshipTables,
@@ -37,13 +39,77 @@ part 'diagnostic_dao.g.dart';
       ORDER BY name, source;
       ''',
     'duplicatedChapterQuery': '''
-      SELECT * FROM (
-        SELECT *, COUNT(*) OVER (PARTITION BY manga_id, chapter) as counter 
-        FROM chapter_tables
-      ) 
-      WHERE counter > 1
-      ORDER BY manga_id, chapter;
+      SELECT
+          -- Manga Metadata
+          m.id AS manga_id,
+          m.title AS manga_title,
+          m.source AS manga_source,
+          m.web_url AS manga_web_url,
+          m.author AS manga_author,
+          m.cover_url AS manga_cover_url,
+          m.status AS manga_status,
+          m.description AS manga_description,
+          m.created_at AS manga_created_at,
+          m.updated_at AS manga_updated_at,
+      
+          -- Duplicate Chapter Data
+          dupes.id AS chapter_id,
+          dupes.chapter AS chapter_number,
+          dupes.title AS chapter_title,
+          dupes.webUrl AS chapter_web_url,
+          dupes.created_at AS chapter_created_at,
+          dupes.updated_at AS chapter_updated_at,
+          dupes.readable_at AS chapter_readable_at,
+          dupes.publish_at AS chapter_publish_at,
+          dupes.last_read_at AS chapter_last_read_at,
+          dupes.volume AS chapter_volume,
+          dupes.translated_language AS chapter_translated_language,
+          dupes.scanlation_group AS chapter_scanlation_group,
+          
+          -- Diagnostic Info
+          dupes.counter AS total_duplicates_found
+      FROM (
+          SELECT *, COUNT(*) OVER (PARTITION BY manga_id, chapter) as counter
+          FROM chapter_tables
+      ) AS dupes
+      JOIN manga_tables m ON m.id = dupes.manga_id
+      WHERE dupes.counter > 1
+      ORDER BY m.source, m.title, CAST(dupes.chapter AS REAL), dupes.created_at DESC;
       ''',
+    'chapterGapQuery': '''
+      SELECT 
+          m.*, 
+          gaps.gap_starts_after, 
+          gaps.gap_ends_at,
+          (gaps.next_val - gaps.current_val - 1) AS missing_count_estimate
+      FROM (
+          SELECT 
+              manga_id, 
+              chapter AS gap_starts_after, 
+              next_chapter_num AS gap_ends_at,
+              current_val,
+              next_val
+          FROM (
+              SELECT 
+                  manga_id, 
+                  chapter, 
+                  CAST(chapter AS REAL) AS current_val,
+                  LEAD(CAST(chapter AS REAL)) OVER (
+                      PARTITION BY manga_id 
+                      ORDER BY CAST(chapter AS REAL) ASC
+                  ) AS next_val,
+                  LEAD(chapter) OVER (
+                      PARTITION BY manga_id 
+                      ORDER BY CAST(chapter AS REAL) ASC
+                  ) AS next_chapter_num
+              FROM chapter_tables
+              WHERE manga_id IN (SELECT manga_id FROM library_tables)
+          ) AS sequence
+          WHERE (next_val - current_val) > 1.1
+      ) AS gaps
+      JOIN manga_tables m ON m.id = gaps.manga_id
+      ORDER BY m.title ASC;
+    ''',
   },
 )
 class DiagnosticDao extends DatabaseAccessor<AppDatabase>
@@ -84,11 +150,12 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
     return duplicatedMangaQuery().watch().map((e) => e.parse());
   }
 
-  Future<Map<DuplicatedMangaKey, List<MangaDrift>>>get duplicateManga async {
+  Future<Map<DuplicatedMangaKey, List<MangaDrift>>> get duplicateManga async {
     return duplicatedMangaQuery().get().then((e) => e.parse());
   }
 
-  Stream<Map<DuplicatedChapterKey, List<ChapterDrift>>> get duplicateChapterStream {
+  Stream<Map<DuplicatedChapterKey, List<ChapterDrift>>>
+  get duplicateChapterStream {
     return duplicatedChapterQuery().watch().map((e) => e.parse());
   }
 
@@ -118,5 +185,13 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<ImageDrift>> get orphanImage {
     return orphanChapterQuery.get().then(_parseOrphanImage);
+  }
+
+  Stream<List<IncompleteManga>> get chapterGapStream {
+    return chapterGapQuery().watch().map((e) => e.parse());
+  }
+
+  Future<List<IncompleteManga>> get chapterGap {
+    return chapterGapQuery().get().then((e) => e.parse());
   }
 }

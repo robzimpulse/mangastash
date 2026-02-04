@@ -17,15 +17,8 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
   LibraryDao(super.db);
 
   JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
-    final order = [
-      OrderingTerm(expression: mangaTables.title, mode: OrderingMode.asc),
-    ];
-
     return select(libraryTables).join([
-      leftOuterJoin(
-        mangaTables,
-        mangaTables.id.equalsExp(libraryTables.mangaId),
-      ),
+      innerJoin(mangaTables, mangaTables.id.equalsExp(libraryTables.mangaId)),
       leftOuterJoin(
         relationshipTables,
         relationshipTables.mangaId.equalsExp(libraryTables.mangaId),
@@ -34,7 +27,7 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
         tagTables,
         tagTables.id.equalsExp(relationshipTables.tagId),
       ),
-    ])..orderBy(order);
+    ])..orderBy([OrderingTerm.asc(mangaTables.title)]);
   }
 
   List<MangaModel> _parse(List<TypedResult> rows) {
@@ -53,11 +46,8 @@ class LibraryDao extends DatabaseAccessor<AppDatabase> with _$LibraryDaoMixin {
   Stream<List<MangaModel>> get stream => _aggregate.watch().map(_parse);
 
   Future<void> add(String mangaId) {
-    return transaction(
-      () => into(
-        libraryTables,
-      ).insert(LibraryTablesCompanion.insert(mangaId: mangaId)),
-    );
+    final data = LibraryTablesCompanion.insert(mangaId: mangaId);
+    return transaction(() => into(libraryTables).insert(data));
   }
 
   Future<void> remove(String mangaId) {

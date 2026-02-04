@@ -27,7 +27,7 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
         imageTables,
         imageTables.chapterId.equalsExp(chapterTables.id),
       ),
-    ]);
+    ])..orderBy([OrderingTerm.asc(imageTables.order)]);
   }
 
   List<ChapterModel> _parse(List<TypedResult> rows) {
@@ -262,6 +262,6 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
         ]);
     }
 
-    return query.get().then(_parse).then((e) => e.take(count).toList());
+    return query.get().then(_parse).then((e) => [...e.take(count)]);
   }
 }
