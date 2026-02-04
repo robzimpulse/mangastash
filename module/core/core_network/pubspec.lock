@@ -106,10 +106,10 @@ packages:
     dependency: transitive
     description:
       name: cross_file
-      sha256: "701dcfc06da0882883a2657c445103380e53e647060ad8d9dfb710c100996608"
+      sha256: "28bb3ae56f117b5aec029d702a90f57d285cd975c3c5c281eaca38dbc47c5937"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.5+1"
+    version: "0.3.5+2"
   crypto:
     dependency: transitive
     description:
@@ -474,7 +474,7 @@ packages:
     description:
       path: "packages/log_box"
       ref: master
-      resolved-ref: "71179b8f0cdf70a65eecc6b22da654dfced84130"
+      resolved-ref: "895100ce056428753e181f867e696d29ec52710d"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -483,7 +483,7 @@ packages:
     description:
       path: "packages/log_box_dio_logger"
       ref: master
-      resolved-ref: "71179b8f0cdf70a65eecc6b22da654dfced84130"
+      resolved-ref: "895100ce056428753e181f867e696d29ec52710d"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -492,7 +492,7 @@ packages:
     description:
       path: "packages/log_box_in_app_webview_logger"
       ref: master
-      resolved-ref: "71179b8f0cdf70a65eecc6b22da654dfced84130"
+      resolved-ref: "895100ce056428753e181f867e696d29ec52710d"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -501,7 +501,7 @@ packages:
     description:
       path: "packages/log_box_navigation_logger"
       ref: master
-      resolved-ref: "71179b8f0cdf70a65eecc6b22da654dfced84130"
+      resolved-ref: "895100ce056428753e181f867e696d29ec52710d"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -510,7 +510,7 @@ packages:
     description:
       path: "packages/log_box_persistent_storage_drift"
       ref: master
-      resolved-ref: "71179b8f0cdf70a65eecc6b22da654dfced84130"
+      resolved-ref: "895100ce056428753e181f867e696d29ec52710d"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
