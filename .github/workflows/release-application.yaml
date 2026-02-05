@@ -23,15 +23,15 @@ jobs:
             path: build/web
             arguments: '--base-href=/mangastash/ --wasm'
             deploy: github
-          - platform: macos
-            os: macos-15
-            path: build/macos/Build/Products/Release/mangastash.app
-          - platform: windows
-            os: windows-latest
-            path: build/windows/x64/runner/Release/mangastash.exe
-          - platform: linux
-            os: ubuntu-latest
-            path: build/linux/x64/release/bundle/mangastash
+#          - platform: macos
+#            os: macos-15
+#            path: build/macos/Build/Products/Release/mangastash.app
+#          - platform: windows
+#            os: windows-latest
+#            path: build/windows/x64/runner/Release/mangastash.exe
+#          - platform: linux
+#            os: ubuntu-latest
+#            path: build/linux/x64/release/bundle/mangastash
 #          - platform: ipa
 #            os: macos-latest
 #            path: build/ios/ipa
