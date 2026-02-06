@@ -64,7 +64,7 @@ jobs:
             | Item | Details |
             | :--- | :--- |
             | **Build Status** | ${{ job.status == 'success' && '✅ Passed' || '❌ Failed' }} |
-            | ** Event ** | ${{ github.event_name }} |
+            | **Event** | ${{ github.event_name }} |
             | **Run ID** | [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) |
             | **Download Artifacts** | [📂 Click Here to Download](${{ steps.upload_artifact.outputs.artifact-url }}) |
       - name: 'Send Report to Telegram'
