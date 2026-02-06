@@ -1,0 +1,81 @@
+name: Web Pipeline
+
+on:
+  # ref: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request
+  pull_request:
+    types: [opened, reopened, synchronize]
+  # ref: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#push
+  push:
+    branches:
+      - 'master'
+    tags:
+      - 'v*.*.*'
+jobs:
+  build:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: github
+            arguments: '--base-href=/mangastash/ --wasm'
+          - target: firebase
+            arguments: '--wasm'
+    steps:
+      - name: 'Git Checkout'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: ${{ github.ref }}
+      - name: 'Install Ubuntu Dependency'
+        run: sudo apt-get update -y && sudo apt-get install -y ninja-build libgtk-3-dev
+      - name: 'Install Flutter'
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.8'
+          # ref: https://github.com/subosito/flutter-action/issues/350
+          cache: true
+      - name: 'Install Melos'
+        run: dart pub global activate melos 6.2.0
+      - name: 'Install Dependency'
+        run: melos get
+      - name: 'Build Application'
+        run: dart build web ${{ matrix.arguments }}
+      - name: 'Compress Directory'
+        uses: somaz94/compress-decompress@v1
+        with:
+          command: compress
+          source: build/web
+          format: zip
+          dest: build
+          destfilename: web-${{ matrix.target }}
+      - name: 'Save Artifact'
+        id: upload_artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-web-${{ matrix.target }}
+          path: web-${{ matrix.target }}.zip
+      - name: 'Attach artifact to release'
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-web-${{ matrix.target }}.zip
+      - name: 'Deploy to Firebase'
+        if: ${{ matrix.deploy == 'firebase'}}
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MANGASTASH_4BF38 }}
+          channelId: live
+          projectId: mangastash-4bf38
+      - name: 'Deploy to Github Page'
+        if: ${{ matrix.deploy == 'github' }}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/web
+          force_orphan: true
+          user_name: 'robzimpulse'
+          user_email: 'kugelfang.killaruna@gmail.com'
+          commit_message: 'Publish to gh-pages'
