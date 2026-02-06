@@ -41,7 +41,7 @@ jobs:
       - name: 'Install Dependency'
         run: melos get
       - name: 'Build Application'
-        run: dart build web ${{ matrix.arguments }}
+        run: flutter build web ${{ matrix.arguments }}
       - name: 'Compress Directory'
         uses: somaz94/compress-decompress@v1
         with:
