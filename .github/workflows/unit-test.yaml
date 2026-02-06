@@ -26,8 +26,8 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.32.8'
-          # disable cache, ref: https://github.com/subosito/flutter-action/issues/350
-          cache: false
+          # ref: https://github.com/subosito/flutter-action/issues/350
+          cache: true
 
       - name: 'Install Melos'
         run: flutter pub global activate melos 6.2.0
@@ -39,7 +39,7 @@ jobs:
         run: brew install lcov
 
       - name: 'Bootstrap Workspace'
-        run: melos bootstrap --verbose
+        run: melos get
 
       - name: 'Run Merged Code Coverage'
         run: melos coverage:merged
@@ -49,3 +49,10 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage/merged.cobertura.xml
+
+      - name: Setup LCOV Report
+        uses: romeovs/lcov-reporter-action@v0.3.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lcov-file: ./coverage/renamed.lcov.info
+          filter-changed-files: true
