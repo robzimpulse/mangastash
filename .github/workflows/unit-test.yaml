@@ -38,21 +38,45 @@ jobs:
       - name: 'Install Lcov'
         run: brew install lcov
 
-      - name: 'Bootstrap Workspace'
+      - name: 'Install Dependency'
         run: melos get
 
-      - name: 'Run Merged Code Coverage'
+      - name: 'Generate Code Coverage'
         run: melos coverage:merged
 
-      - name: Upload coverage reports to Codecov
+      - name: 'Upload coverage reports'
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage/merged.cobertura.xml
 
-      - name: Setup LCOV Report
+      - name: 'Coverage Report'
         uses: romeovs/lcov-reporter-action@v0.3.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           lcov-file: ./coverage/renamed.lcov.info
           filter-changed-files: true
+          delete-old-comments: true
+          title: Coverage Report
+
+      - name: 'Extract Coverage Percentage'
+        id: coverage
+        run: |
+          PERCENTAGE=$(lcov --summary coverage/lcov.info | grep "lines......" | cut -d ' ' -f 4 | cut -d '%' -f 1)
+          echo "percentage=$PERCENTAGE" >> $GITHUB_OUTPUT
+
+      - name: 'Send Report to Telegram'
+        uses: appleboy/telegram-action@master
+        if: always()
+        with:
+          to: ${{ secrets.TELEGRAM_GROUP_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: html
+          disable_web_page_preview: true
+          message: |
+            <b>🚀 Coverage Report: ${{ github.repository }}</b>
+
+            <b>Status:</b> ${{ job.status == 'success' && '✅ Success' || '❌ Failed' }}
+            <b>Branch or Tag:</b> ${{ github.ref }}
+            <b>Run ID:</b> <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">${{ github.run_id }}</a>
+            <b>Coverage:</b> ${{ steps.coverage.outputs.percentage }}%
