@@ -67,7 +67,6 @@ jobs:
             | ** Event ** | ${{ github.event_name }} |
             | **Run ID** | [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) |
             | **Download Artifacts** | [📂 Click Here to Download](${{ steps.upload_artifact.outputs.artifact-url }}) |
-
       - name: 'Send Report to Telegram'
         uses: appleboy/telegram-action@master
         if: always()

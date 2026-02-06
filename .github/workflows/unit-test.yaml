@@ -61,8 +61,9 @@ jobs:
 
       - name: 'Extract Coverage Percentage'
         id: coverage
+        working-directory: coverage
         run: |
-          PERCENTAGE=$(lcov --summary coverage/lcov.info | grep "lines......" | cut -d ' ' -f 4 | cut -d '%' -f 1)
+          PERCENTAGE=$(lcov --summary renamed.lcov.info | grep "lines......" | cut -d ' ' -f 4 | cut -d '%' -f 1)
           echo "percentage=$PERCENTAGE" >> $GITHUB_OUTPUT
 
       - name: 'Send Report to Telegram'
