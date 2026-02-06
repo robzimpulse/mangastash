@@ -55,7 +55,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-web-${{ matrix.target }}
-          path: web-${{ matrix.target }}.zip
+          path: build/web-${{ matrix.target }}.zip
       - name: 'Attach artifact to release'
         if: github.ref_type == 'tag'
         uses: softprops/action-gh-release@v2
