@@ -30,13 +30,13 @@ jobs:
           cache: true
 
       - name: 'Install Melos'
-        run: flutter pub global activate melos 6.2.0
+        run: dart pub global activate melos 6.2.0
 
       - name: 'Install Cobertura'
         run: dart pub global activate cobertura
 
       - name: 'Install Lcov'
-        run: sudo apt-get install -lcov
+        run: sudo apt-get update && sudo apt-get install -y lcov
 
       - name: 'Install Dependency'
         run: melos get
