@@ -32,7 +32,7 @@ jobs:
       - name: 'Install Dependency'
         run: melos get
       - name: 'Build Application'
-        run: flutter build macos --release --no-codesign
+        run: flutter build macos --release
       - name: 'Create Installer'
         run: |
           create-dmg \
