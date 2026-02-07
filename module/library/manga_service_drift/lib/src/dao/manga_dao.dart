@@ -213,6 +213,12 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
           source: Value.absentIfNull(
             entry.key.source.valueOrNull ?? manga?.manga?.source,
           ),
+          createdAt: Value.absentIfNull(
+            entry.key.createdAt.valueOrNull ?? manga?.manga?.createdAt,
+          ),
+          updatedAt: Value.absentIfNull(
+            entry.key.updatedAt.valueOrNull ?? manga?.manga?.updatedAt,
+          ),
         );
 
         final result = await into(mangaTables).insertReturning(

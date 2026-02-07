@@ -199,6 +199,12 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
                     : oldLastReadAt
                 : newLastReadAt ?? oldLastReadAt,
           ),
+          createdAt: Value.absentIfNull(
+            entry.key.createdAt.valueOrNull ?? chapter?.chapter?.createdAt,
+          ),
+          updatedAt: Value.absentIfNull(
+            entry.key.updatedAt.valueOrNull ?? chapter?.chapter?.updatedAt,
+          ),
         );
 
         final result = await into(chapterTables).insertReturning(
