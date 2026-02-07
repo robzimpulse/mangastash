@@ -70,7 +70,7 @@ jobs:
           channelId: live
           projectId: mangastash-4bf38
       - name: 'Deploy to Github Page'
-        if: ${{ matrix.deploy == 'github' }}
+        if: ${{ matrix.target == 'github' }}
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
