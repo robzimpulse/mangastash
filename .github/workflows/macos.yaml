@@ -21,6 +21,8 @@ jobs:
         with:
           fetch-depth: 1
           ref: ${{ github.ref }}
+      - name: 'Install create-dmg'
+        run: brew install create-dmg
       - name: 'Install Flutter'
         uses: subosito/flutter-action@v2
         with:
@@ -33,6 +35,12 @@ jobs:
         run: melos get
       - name: 'Build Application'
         run: flutter build macos --release
+      - name: 'Force Ad-Hoc Signing'
+        run: |
+          sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' macos/Runner.xcodeproj/project.pbxproj
+          sed -i '' 's/DEVELOPMENT_TEAM = .*/DEVELOPMENT_TEAM = "";/g' macos/Runner.xcodeproj/project.pbxproj
+          sed -i '' 's/CODE_SIGN_IDENTITY = .*/CODE_SIGN_IDENTITY = "-";/g' macos/Runner.xcodeproj/project.pbxproj
+          sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = .*/PROVISIONING_PROFILE_SPECIFIER = "";/g' macos/Runner.xcodeproj/project.pbxproj
       - name: 'Create Installer'
         run: |
           create-dmg \
