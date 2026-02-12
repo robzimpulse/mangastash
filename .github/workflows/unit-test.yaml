@@ -9,14 +9,14 @@ jobs:
 
   test-baseline:
     if: github.event_name == 'pull_request'
-    uses: ./.github/workflows/jobs/coverage_baseline.yml
+    uses: ./.github/workflows/reusable_coverage_baseline.yml
     with:
       ref: 'master'
       flutter_version: '3.32.8'
       melos_version: '6.2.0'
 
   test:
-    uses: ./.github/workflows/jobs/coverage_baseline.yml
+    uses: ./.github/workflows/reusable_coverage_baseline.yml
     with:
       ref: ${{ github.ref }}
       flutter_version: '3.32.8'
