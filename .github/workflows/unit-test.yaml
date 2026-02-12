@@ -116,53 +116,52 @@ jobs:
       - name: 'Calculate & Format Report'
         id: report
         run: |
-          # 1. Define Calculation Function (using awk for speed & accuracy)
+          # 1. Define Helper Function
           get_coverage() {
               local file=$1
-              if [ ! -f "$file" ]; then
-                  echo "0"
-                  return
-              fi
-              # Sums Lines Hit (LH) and Lines Found (LF) -> (LH / LF) * 100
+              if [ ! -f "$file" ]; then echo "0"; return; fi
               awk -F: '$1=="LF"{t+=$2} $1=="LH"{h+=$2} END {if (t==0) print 0; else printf "%.2f", h/t*100}' "$file"
           }
           
-          # 2. Calculate Values
-          BASE_VAL=$(get_coverage baseline/renamed.lcov.info)
-          PR_VAL=$(get_coverage pr/renamed.lcov.info)
+          # 2. Get Raw Values
+          BASE_VAL=$(get_coverage baseline/lcov.info)
+          PR_VAL=$(get_coverage pr/lcov.info)
           
-          echo "Baseline: $BASE_VAL%"
-          echo "PR:       $PR_VAL%"
+          echo "Debug: Baseline=$BASE_VAL, PR=$PR_VAL"
           
-          # 3. Calculate Diff
-          DIFF=$(awk "BEGIN {print $PR_VAL - $BASE_VAL}")
+          # 3. Calculate Logic (The Robust Fix)
+          # We use awk to generate the formatted string directly.
+          # Output format: "ICON|STATUS|DIFF_VAL"
+          STATS=$(awk -v base="$BASE_VAL" -v curr="$PR_VAL" 'BEGIN {
+            diff = curr - base;
+            if (diff < 0) {
+              printf "📉|Coverage Decreased|%.2f", diff
+            } else if (diff > 0) {
+              printf "📈|Coverage Increased|+%.2f", diff
+            } else {
+              printf "➖|No Change|0"
+            }
+          }')
           
-          # 4. Determine Status Icon
-          if (( $(echo "$DIFF < 0" | bc -l 2>/dev/null || awk "BEGIN {print ($DIFF < 0)}") )); then
-            ICON="📉"
-            STATUS="Coverage Decreased"
-          elif (( $(echo "$DIFF > 0" | bc -l 2>/dev/null || awk "BEGIN {print ($DIFF > 0)}") )); then
-            ICON="📈"
-            STATUS="Coverage Increased"
-            DIFF="+$DIFF" # Add plus sign for positive numbers
-          else
-            ICON="➖"
-            STATUS="No Change"
-          fi
+          # 4. Parse the result
+          ICON=$(echo "$STATS" | cut -d'|' -f1)
+          STATUS=$(echo "$STATS" | cut -d'|' -f2)
+          DIFF_VAL=$(echo "$STATS" | cut -d'|' -f3)
           
+          # 5. Export Outputs (for Telegram/Next Steps)
           echo "base_val=$BASE_VAL" >> $GITHUB_OUTPUT
           echo "pr_val=$PR_VAL"     >> $GITHUB_OUTPUT
           echo "diff_val=$DIFF_VAL" >> $GITHUB_OUTPUT
           echo "icon=$ICON"         >> $GITHUB_OUTPUT
+          echo "status=$STATUS"     >> $GITHUB_OUTPUT
           
-          # 5. Generate Markdown Table
-          # We write this to a file first to handle multiline content easily
+          # 6. Generate Markdown Table (for PR Comment)
           cat <<EOF > comment.md
           ### Code Coverage Report
           
           | Metric | Baseline (Main) | Current (PR) | Diff |
           |:---|:---:|:---:|:---:|
-          | **Coverage** | $BASE_VAL% | $PR_VAL% | $ICON **$DIFF%** |
+          | **Coverage** | $BASE_VAL% | $PR_VAL% | $ICON **$DIFF_VAL%** |
           
           _$STATUS_
           EOF
