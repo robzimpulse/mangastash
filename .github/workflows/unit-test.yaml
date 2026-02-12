@@ -124,8 +124,8 @@ jobs:
           }
           
           # 2. Get Raw Values
-          BASE_VAL=$(get_coverage baseline/lcov.info)
-          PR_VAL=$(get_coverage pr/lcov.info)
+          BASE_VAL=$(get_coverage baseline/renamed.lcov.info)
+          PR_VAL=$(get_coverage pr/renamed.lcov.info)
           
           echo "Debug: Baseline=$BASE_VAL, PR=$PR_VAL"
           
