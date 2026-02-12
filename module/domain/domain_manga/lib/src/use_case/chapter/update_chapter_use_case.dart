@@ -35,9 +35,7 @@ class UpdateChapterUseCase with SyncChaptersMixin {
   Future<void> updateLastRead({required String chapterId}) async {
     await _execute(
       chapterId: chapterId,
-      updater: (chapter) async {
-        return chapter.copyWith(lastReadAt: DateTime.now());
-      },
+      updater: (e) async => e.copyWith(lastReadAt: DateTime.now()),
     );
   }
 
@@ -50,12 +48,8 @@ class UpdateChapterUseCase with SyncChaptersMixin {
       (e) => e.chapter?.let((d) => Chapter.fromDrift(d, images: e.images)),
     );
     if (chapter == null) return;
-    await sync(
-      dao: _chapterDao,
-      values: [
-        ...[await updater(chapter)].nonNulls,
-      ],
-      logBox: _logBox,
-    );
+    final updated = await updater(chapter);
+    if (updated == null) return;
+    await sync(dao: _chapterDao, values: [updated], logBox: _logBox);
   }
 }
