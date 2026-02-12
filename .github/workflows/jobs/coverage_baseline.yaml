@@ -1,0 +1,75 @@
+name: Code Coverage Percentage
+
+on:
+  workflow_call:
+    # 1. Define Inputs (Variables passed from caller)
+    inputs:
+      ref:
+        required: true
+        type: string
+        default: 'master'
+      flutter_version:
+        required: true
+        type: string
+        default: '3.32.8'
+      melos_version:
+        required: true
+        type: string
+        default: '6.2.0'
+
+    # 3. Define Outputs (Data sent back to caller)
+    outputs:
+      coverage_percentage:
+        description: "The calculated coverage percentage"
+        value: ${{ jobs.test.outputs.percentage }}
+
+jobs:
+  test:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    outputs:
+      percentage: ${{ steps.coverage.outputs.result }}
+    steps:
+      - name: 'Git Checkout'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: ${{ inputs.ref }}
+
+      - name: 'Install Flutter'
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ inputs.flutter_version }}
+          # ref: https://github.com/subosito/flutter-action/issues/350
+          cache: true
+
+      - name: 'Install Melos'
+        run: dart pub global activate melos ${{ inputs.melos_version }}
+
+      - name: 'Install Cobertura'
+        run: dart pub global activate cobertura
+
+      - name: 'Install Lcov'
+        run: sudo apt-get update && sudo apt-get install -y lcov
+
+      - name: 'Install Dependency'
+        run: melos get
+
+      - name: 'Generate Code Coverage'
+        run: melos coverage:merged
+
+      - name: Calculate Coverage
+        id: coverage
+        # Ensure we are in the directory where lcov.info exists
+        working-directory: coverage
+        run: |
+          # Verify file exists before awk to prevent crash
+          if [ ! -f "renamed.lcov.info" ]; then
+             echo "Error: renamed.lcov.info not found in $(pwd)"
+             echo "result=0" >> $GITHUB_OUTPUT
+             exit 0
+          fi
+          
+          PCT=$(awk -F: '$1=="LF"{t+=$2} $1=="LH"{h+=$2} END {if (t==0) print 0; else printf "%.2f", h/t*100}' renamed.lcov.info)
+          echo "Calculated: $PCT%"
+          echo "result=$PCT" >> $GITHUB_OUTPUT
