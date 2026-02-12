@@ -12,6 +12,46 @@ on:
       - 'v*.*.*'
 
 jobs:
+
+  test-baseline:
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Git Checkout'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: main
+
+      - name: 'Install Flutter'
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.8'
+          # ref: https://github.com/subosito/flutter-action/issues/350
+          cache: true
+
+      - name: 'Install Melos'
+        run: dart pub global activate melos 6.2.0
+
+      - name: 'Install Cobertura'
+        run: dart pub global activate cobertura
+
+      - name: 'Install Lcov'
+        run: sudo apt-get update && sudo apt-get install -y lcov
+
+      - name: 'Install Dependency'
+        run: melos get
+
+      - name: 'Generate Code Coverage'
+        run: melos coverage:merged
+
+      - name: 'Upload Coverage'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-baseline
+          path: coverage/renamed.lcov.info
+
   test:
     timeout-minutes: 30
     runs-on: ubuntu-latest
@@ -44,40 +84,121 @@ jobs:
       - name: 'Generate Code Coverage'
         run: melos coverage:merged
 
-      - name: 'Upload coverage reports'
+      - name: 'Upload Coverage to CodeCov'
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage/merged.cobertura.xml
 
-      - name: 'Coverage Report'
-        uses: romeovs/lcov-reporter-action@v0.3.1
+      - name: 'Upload Coverage'
+        uses: actions/upload-artifact@v4
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          lcov-file: ./coverage/renamed.lcov.info
-          filter-changed-files: true
-          delete-old-comments: true
-          title: Coverage Report
+          name: coverage-pr
+          path: coverage/renamed.lcov.info
 
-      - name: 'Extract Coverage Percentage'
-        id: coverage
-        working-directory: coverage
+  report-coverage:
+    needs: [ test-baseline, test ]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: 'Download Baseline Coverage'
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-baseline
+          path: baseline
+
+      - name: 'Download PR Coverage'
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-pr
+          path: pr
+
+      - name: 'Calculate & Format Report'
+        id: report
         run: |
-          PERCENTAGE=$(lcov --summary renamed.lcov.info | grep "lines......" | cut -d ' ' -f 4 | cut -d '%' -f 1)
-          echo "percentage=$PERCENTAGE" >> $GITHUB_OUTPUT
+          # 1. Define Calculation Function (using awk for speed & accuracy)
+          get_coverage() {
+              local file=$1
+              if [ ! -f "$file" ]; then
+                  echo "0"
+                  return
+              fi
+              # Sums Lines Hit (LH) and Lines Found (LF) -> (LH / LF) * 100
+              awk -F: '$1=="LF"{t+=$2} $1=="LH"{h+=$2} END {if (t==0) print 0; else printf "%.2f", h/t*100}' "$file"
+          }
+          
+          # 2. Calculate Values
+          BASE_VAL=$(get_coverage baseline/renamed.lcov.info)
+          PR_VAL=$(get_coverage pr/renamed.lcov.info)
+          
+          echo "Baseline: $BASE_VAL%"
+          echo "PR:       $PR_VAL%"
+          
+          # 3. Calculate Diff
+          DIFF=$(awk "BEGIN {print $PR_VAL - $BASE_VAL}")
+          
+          # 4. Determine Status Icon
+          if (( $(echo "$DIFF < 0" | bc -l 2>/dev/null || awk "BEGIN {print ($DIFF < 0)}") )); then
+            ICON="📉"
+            STATUS="Coverage Decreased"
+          elif (( $(echo "$DIFF > 0" | bc -l 2>/dev/null || awk "BEGIN {print ($DIFF > 0)}") )); then
+            ICON="📈"
+            STATUS="Coverage Increased"
+            DIFF="+$DIFF" # Add plus sign for positive numbers
+          else
+            ICON="➖"
+            STATUS="No Change"
+          fi
+          
+          echo "base_val=$BASE_VAL" >> $GITHUB_OUTPUT
+          echo "pr_val=$PR_VAL"     >> $GITHUB_OUTPUT
+          echo "diff_val=$DIFF_VAL" >> $GITHUB_OUTPUT
+          echo "icon=$ICON"         >> $GITHUB_OUTPUT
+          
+          # 5. Generate Markdown Table
+          # We write this to a file first to handle multiline content easily
+          cat <<EOF > comment.md
+          ### Code Coverage Report
+          
+          | Metric | Baseline (Main) | Current (PR) | Diff |
+          |:---|:---:|:---:|:---:|
+          | **Coverage** | $BASE_VAL% | $PR_VAL% | $ICON **$DIFF%** |
+          
+          _$STATUS_
+          EOF
 
-      - name: 'Send Report to Telegram'
-        uses: appleboy/telegram-action@master
-        if: always()
+      - name: 'Find Previous Comment'
+        uses: peter-evans/find-comment@v3
+        id: find_comment
         with:
-          to: ${{ secrets.TELEGRAM_GROUP_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          format: html
-          disable_web_page_preview: true
-          message: |
-            <b>🚀 Coverage Report: ${{ github.repository }}</b>
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Code Coverage Report
 
-            <b>Status:</b> ${{ job.status == 'success' && '✅ Success' || '❌ Failed' }}
-            <b>Branch or Tag:</b> ${{ github.ref }}
-            <b>Run ID:</b> <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">${{ github.run_id }}</a>
-            <b>Coverage:</b> ${{ steps.coverage.outputs.percentage }}%
+      - name: 'Post Comment'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body-path: comment.md
+
+      - name: 'Send Telegram Notification'
+        if: always()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            📊 *Code Coverage Report*
+            
+            Repository: *${{ github.repository }}*
+            PR: *#${{ github.event.pull_request.number }}*
+            
+            🔹 Baseline: *${{ steps.report.outputs.base_val }}%*
+            🔸 Current: *${{ steps.report.outputs.pr_val }}%*
+            
+            Status: ${{ steps.report.outputs.icon }} *${{ steps.report.outputs.diff_val }}%*
+            
+            [View Action Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
