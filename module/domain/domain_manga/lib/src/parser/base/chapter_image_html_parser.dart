@@ -1,5 +1,5 @@
 import 'package:entity_manga/entity_manga.dart';
-import 'package:html/dom.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 
 import '../asura_scan_chapter_image_html_parser.dart';
 import '../manga_clash_chapter_image_html_parser.dart';
@@ -10,7 +10,7 @@ abstract class ChapterImageHtmlParser extends BaseHtmlParser {
   ChapterImageHtmlParser({required super.root});
 
   factory ChapterImageHtmlParser.forSource({
-    required Document root,
+    required HtmlDocument root,
     required SourceEnum source,
   }) {
     if (SourceEnum.asurascan == source) {

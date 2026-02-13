@@ -1,0 +1,26 @@
+name: entity_manga_external
+description: "A new Flutter project."
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ">=3.7.2 <4.0.0"
+  flutter: ">=3.29.3"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  eval_annotation: ^0.8.1
+  source_span: ^1.10.1
+  html: ^0.15.5
+  dart_eval: ^0.8.3
+  equatable: ^2.0.5
+
+  manga_dex_api:
+    path: ../manga_dex_api
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0

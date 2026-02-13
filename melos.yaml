@@ -58,6 +58,16 @@ scripts:
     packageFilters:
       dependsOn: "drift_dev"
 
+  generate:dart_eval_bind:
+    description: Generate dart_eval bind files for dynamic linking packages.
+    run: flutter pub run dart_eval bind
+    exec:
+      concurrency: 5
+      failFast: true
+      orderDependents: true
+    packageFilters:
+      dependsOn: "dart_eval"
+
   upgrade:
     description: Upgrade dependencies for all packages.
     run: flutter pub upgrade
