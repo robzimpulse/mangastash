@@ -7,99 +7,117 @@ on:
 
 jobs:
 
-  test-baseline:
+  baseline:
     if: github.event_name == 'pull_request'
-    uses: ./.github/workflows/reusable_coverage_baseline
-    with:
-      ref: 'master'
-      flutter_version: '3.32.8'
-      melos_version: '6.2.0'
-
-  test:
-    uses: ./.github/workflows/reusable_coverage_baseline
-    with:
-      ref: ${{ github.ref }}
-      flutter_version: '3.32.8'
-      melos_version: '6.2.0'
-
-  report-coverage:
-    needs: [ test-baseline, test ]
     runs-on: ubuntu-latest
-    if: always() && github.event_name == 'pull_request'
+    timeout-minutes: 60
     steps:
-      - name: 'Calculate Comparison'
-        id: compare
-        env:
-          # Retrieve outputs from the 'needs' context
-          # Note: We use the output name defined in your reusable workflow ('coverage_percentage')
-          BASE_VAL: ${{ needs.test-baseline.outputs.coverage_percentage }}
-          PR_VAL: ${{ needs.test.outputs.coverage_percentage }}
-        run: |
-          # 1. Sanitize Inputs (Default to 0 if empty/skipped)
-          # This prevents the script from crashing if a job failed
-          BASE=${BASE_VAL:-0}
-          PR=${PR_VAL:-0}
-          
-          echo "Debug: Base=$BASE, PR=$PR"
-          
-          # 2. Calculate Diff & Status using AWK (Single pass)
-          # Returns: ICON|STATUS_TEXT|DIFF_VALUE
-          STATS=$(awk -v base="$BASE" -v curr="$PR" 'BEGIN {
-            diff = curr - base;
-            if (diff < 0) {
-              printf "📉|Coverage Decreased|%.2f", diff
-            } else if (diff > 0) {
-              printf "📈|Coverage Increased|+%.2f", diff
-            } else {
-              printf "➖|No Change|0"
-            }
-          }')
-          
-          # 3. Parse the result string
-          ICON=$(echo "$STATS" | cut -d'|' -f1)
-          STATUS=$(echo "$STATS" | cut -d'|' -f2)
-          DIFF_VAL=$(echo "$STATS" | cut -d'|' -f3)
-          
-          # 4. Export to Step Outputs
-          echo "base_val=$BASE"      >> $GITHUB_OUTPUT
-          echo "pr_val=$PR"          >> $GITHUB_OUTPUT
-          echo "diff_val=$DIFF_VAL"  >> $GITHUB_OUTPUT
-          echo "icon=$ICON"      >> $GITHUB_OUTPUT
-          echo "status=$STATUS"  >> $GITHUB_OUTPUT
-
-      - name: 'Find Previous Comment'
-        uses: peter-evans/find-comment@v3
-        id: find_comment
+      - name: 'Git Checkout'
+        uses: actions/checkout@v4
         with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
-          body-includes: Code Coverage Report
-
-      - name: 'Post Comment'
-        uses: peter-evans/create-or-update-comment@v4
+          fetch-depth: 1
+          ref: master
+      - name: 'Calculate Coverage'
+        id: 'calculation'
+        uses: ./.github/workflows/reusable_coverage_baseline.yaml
         with:
-          comment-id: ${{ steps.find_comment.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
-          edit-mode: replace
-          body-path: comment.md
+          flutter_version: '3.32.8'
+          melos_version: '6.2.0'
 
-      - name: 'Send Telegram Notification'
-        if: always()
-        uses: appleboy/telegram-action@master
+  current:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: 'Git Checkout'
+        uses: actions/checkout@v4
         with:
-          to: ${{ secrets.TELEGRAM_GROUP_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          format: markdown
-          message: |
-            📊 *Code Coverage Report*
-            
-            Repository: *${{ github.repository }}*
-            PR: *#${{ github.event.pull_request.number }}*
-            
-            🔹 Baseline: *${{ steps.compare.outputs.base_val }}%*
-            🔸 Current: *${{ steps.compare.outputs.pr_val }}%*
-            
-            Status: ${{ steps.compare.outputs.icon }} *${{ steps.compare.outputs.diff_val }}%*
-            _${{ steps.compare.outputs.status }}_
-            
-            [View Action Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          fetch-depth: 1
+          ref: ${{ inputs.ref }}
+      - name: 'Calculate Coverage'
+        id: 'calculation'
+        uses: ./.github/workflows/reusable_coverage_baseline.yaml
+        with:
+          flutter_version: '3.32.8'
+          melos_version: '6.2.0'
+
+#  report-coverage:
+#    needs: [ baseline, current ]
+#    runs-on: ubuntu-latest
+#    if: always() && github.event_name == 'pull_request'
+#    steps:
+#      - name: 'Calculate Comparison'
+#        id: compare
+#        env:
+#          # Retrieve outputs from the 'needs' context
+#          # Note: We use the output name defined in your reusable workflow ('coverage_percentage')
+#          BASE_VAL: ${{ needs.test-baseline.outputs.coverage_percentage }}
+#          PR_VAL: ${{ needs.test.outputs.coverage_percentage }}
+#        run: |
+#          # 1. Sanitize Inputs (Default to 0 if empty/skipped)
+#          # This prevents the script from crashing if a job failed
+#          BASE=${BASE_VAL:-0}
+#          PR=${PR_VAL:-0}
+#
+#          echo "Debug: Base=$BASE, PR=$PR"
+#
+#          # 2. Calculate Diff & Status using AWK (Single pass)
+#          # Returns: ICON|STATUS_TEXT|DIFF_VALUE
+#          STATS=$(awk -v base="$BASE" -v curr="$PR" 'BEGIN {
+#            diff = curr - base;
+#            if (diff < 0) {
+#              printf "📉|Coverage Decreased|%.2f", diff
+#            } else if (diff > 0) {
+#              printf "📈|Coverage Increased|+%.2f", diff
+#            } else {
+#              printf "➖|No Change|0"
+#            }
+#          }')
+#
+#          # 3. Parse the result string
+#          ICON=$(echo "$STATS" | cut -d'|' -f1)
+#          STATUS=$(echo "$STATS" | cut -d'|' -f2)
+#          DIFF_VAL=$(echo "$STATS" | cut -d'|' -f3)
+#
+#          # 4. Export to Step Outputs
+#          echo "base_val=$BASE"      >> $GITHUB_OUTPUT
+#          echo "pr_val=$PR"          >> $GITHUB_OUTPUT
+#          echo "diff_val=$DIFF_VAL"  >> $GITHUB_OUTPUT
+#          echo "icon=$ICON"      >> $GITHUB_OUTPUT
+#          echo "status=$STATUS"  >> $GITHUB_OUTPUT
+#
+#      - name: 'Find Previous Comment'
+#        uses: peter-evans/find-comment@v3
+#        id: find_comment
+#        with:
+#          issue-number: ${{ github.event.pull_request.number }}
+#          comment-author: 'github-actions[bot]'
+#          body-includes: Code Coverage Report
+#
+#      - name: 'Post Comment'
+#        uses: peter-evans/create-or-update-comment@v4
+#        with:
+#          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+#          issue-number: ${{ github.event.pull_request.number }}
+#          edit-mode: replace
+#          body-path: comment.md
+#
+#      - name: 'Send Telegram Notification'
+#        if: always()
+#        uses: appleboy/telegram-action@master
+#        with:
+#          to: ${{ secrets.TELEGRAM_GROUP_CHAT_ID }}
+#          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+#          format: markdown
+#          message: |
+#            📊 *Code Coverage Report*
+#
+#            Repository: *${{ github.repository }}*
+#            PR: *#${{ github.event.pull_request.number }}*
+#
+#            🔹 Baseline: *${{ steps.compare.outputs.base_val }}%*
+#            🔸 Current: *${{ steps.compare.outputs.pr_val }}%*
+#
+#            Status: ${{ steps.compare.outputs.icon }} *${{ steps.compare.outputs.diff_val }}%*
+#            _${{ steps.compare.outputs.status }}_
+#
+#            [View Action Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})

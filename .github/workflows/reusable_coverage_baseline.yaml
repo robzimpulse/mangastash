@@ -4,10 +4,6 @@ on:
   workflow_call:
     # 1. Define Inputs (Variables passed from caller)
     inputs:
-      ref:
-        required: true
-        type: string
-        default: 'master'
       flutter_version:
         required: true
         type: string
@@ -30,12 +26,6 @@ jobs:
     outputs:
       percentage: ${{ steps.coverage.outputs.result }}
     steps:
-      - name: 'Git Checkout'
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-          ref: ${{ inputs.ref }}
-
       - name: 'Install Flutter'
         uses: subosito/flutter-action@v2
         with:
