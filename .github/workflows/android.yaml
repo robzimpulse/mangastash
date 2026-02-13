@@ -1,0 +1,87 @@
+name: Android Pipeline
+
+on:
+  # ref: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request
+  pull_request:
+    types: [opened, reopened, synchronize]
+  # ref: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#push
+  push:
+    branches:
+      - 'master'
+    tags:
+      - 'v*.*.*'
+jobs:
+  build:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Git Checkout'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: ${{ github.ref }}
+      - name: 'Install Java'
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      - name: 'Install Flutter'
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.8'
+          # ref: https://github.com/subosito/flutter-action/issues/350
+          cache: true
+      - name: 'Install Melos'
+        run: flutter pub global activate melos 6.2.0
+      - name: 'Install Dependency'
+        run: melos get
+      - name: 'Build Application'
+        run: flutter build apk
+      - name: 'Save Artifact'
+        id: upload_artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-apk
+          path: build/app/outputs/apk/release/app-release.apk
+      - name: 'Find Comment'
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/find-comment@v3
+        id: find_comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Android Build Report
+      - name: 'Create or Update Comment'
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            ## 🚀 Android Build Report
+
+            | Item | Details |
+            | :--- | :--- |
+            | **Build Status** | ${{ job.status == 'success' && '✅ Passed' || '❌ Failed' }} |
+            | **Event** | ${{ github.event_name }} |
+            | **Run ID** | [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) |
+            | **Download Artifacts** | [📂 Click Here to Download](${{ steps.upload_artifact.outputs.artifact-url }}) |
+      - name: 'Send Report to Telegram'
+        uses: appleboy/telegram-action@master
+        if: always()
+        with:
+          to: ${{ secrets.TELEGRAM_GROUP_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: html
+          disable_web_page_preview: true
+          message: |
+            <b> 🚀 Android Build Report: </b>
+            
+            <b>Repository:</b> ${{ github.repository }}
+            <b>Status:</b> ${{ job.status == 'success' && '✅ Success' || '❌ Failed' }}
+            <b>Event:</b> ${{ github.event_name }}
+            <b>Branch or Tag:</b> ${{ github.ref }}
+            <b>Run ID:</b> <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">${{ github.run_id }}</a>
+
+            <b>📦 Artifacts:</b> <a href="${{ steps.upload_artifact.outputs.artifact-url }}">Download Here</a>

@@ -67,10 +67,7 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<ListenJobUseCase, JobManager>();
     locator.alias<CancelJobUseCase, JobManager>();
 
-    locator.registerLazySingleton(
-      () => HistoryManager(historyDao: locator()),
-      dispose: (e) => e.dispose(),
-    );
+    locator.registerLazySingleton(() => HistoryManager(historyDao: locator()));
     locator.alias<ListenReadHistoryUseCase, HistoryManager>();
     locator.alias<ListenUnreadHistoryUseCase, HistoryManager>();
 
@@ -119,10 +116,7 @@ class DomainMangaRegistrar extends Registrar {
       () => GetAllChapterUseCase(searchChapterUseCase: locator()),
     );
     locator.registerFactory(
-      () => GetNeighbourChapterUseCase(
-        chapterDao: locator(),
-        listenPrefetchChapterConfig: locator(),
-      ),
+      () => GetNeighbourChapterUseCase(chapterDao: locator()),
     );
     locator.registerFactory(
       () => GetMangaUseCase(

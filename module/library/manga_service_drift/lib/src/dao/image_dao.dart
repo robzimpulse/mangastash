@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
+import 'package:meta/meta.dart';
 
 import '../database/database.dart';
 import '../extension/non_empty_string_list_extension.dart';
@@ -11,12 +12,8 @@ part 'image_dao.g.dart';
 class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
   ImageDao(super.db);
 
-  List<OrderingTerm Function($ImageTablesTable)> get _clauses {
-    return [(o) => OrderingTerm(expression: o.order, mode: OrderingMode.asc)];
-  }
-
   SimpleSelectStatement<$ImageTablesTable, ImageDrift> get _selector {
-    return select(imageTables)..orderBy(_clauses);
+    return select(imageTables)..orderBy([(o) => OrderingTerm.asc(o.order)]);
   }
 
   DeleteStatement<$ImageTablesTable, ImageDrift> get _deleter {
@@ -36,6 +33,7 @@ class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
     ].fold(const Constant(false), (a, b) => a | b);
   }
 
+  @visibleForTesting
   Future<List<ImageDrift>> get all => _selector.get();
 
   Future<List<ImageDrift>> search({

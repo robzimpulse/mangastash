@@ -3,21 +3,22 @@ import 'package:drift/drift.dart';
 import '../database/database.dart';
 import '../model/history_model.dart';
 import '../tables/chapter_tables.dart';
+import '../tables/library_tables.dart';
 import '../tables/manga_tables.dart';
 import '../tables/relationship_tables.dart';
 
 part 'history_dao.g.dart';
 
-@DriftAccessor(tables: [MangaTables, RelationshipTables, ChapterTables])
+@DriftAccessor(
+  tables: [LibraryTables, MangaTables, RelationshipTables, ChapterTables],
+)
 class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
   HistoryDao(super.db);
 
   JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
-    return select(mangaTables).join([
-      leftOuterJoin(
-        chapterTables,
-        chapterTables.mangaId.equalsExp(mangaTables.id),
-      ),
+    return select(chapterTables).join([
+      innerJoin(mangaTables, mangaTables.id.equalsExp(chapterTables.mangaId)),
+      innerJoin(libraryTables, libraryTables.mangaId.equalsExp(mangaTables.id)),
     ]);
   }
 
@@ -32,33 +33,25 @@ class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
   }
 
   Stream<List<HistoryModel>> get history {
-    final order = [
-      OrderingTerm(
-        expression: chapterTables.lastReadAt,
-        mode: OrderingMode.desc,
-      ),
-    ];
-
     final selector =
         _aggregate
-          ..where(chapterTables.lastReadAt.isNotNull())
-          ..orderBy(order);
-
+          ..orderBy([OrderingTerm.desc(chapterTables.lastReadAt)])
+          ..where(chapterTables.lastReadAt.isNotNull());
     return selector.watch().map(_parse);
   }
 
   Stream<List<HistoryModel>> get unread {
-    final order = [
-      OrderingTerm(
-        expression: chapterTables.lastReadAt,
-        mode: OrderingMode.desc,
-      ),
-    ];
+    // 1. Calculate the timestamp for 7 days ago
+    final oneWeekAgo = DateTime.now().subtract(const Duration(days: 7));
 
     final selector =
         _aggregate
-          ..where(chapterTables.lastReadAt.isNull())
-          ..orderBy(order);
+          ..orderBy([
+            OrderingTerm.desc(chapterTables.createdAt),
+            OrderingTerm.desc(chapterTables.readableAt),
+          ])
+          ..where(chapterTables.readableAt.isBiggerOrEqualValue(oneWeekAgo))
+          ..where(chapterTables.lastReadAt.isNull());
 
     return selector.watch().map(_parse);
   }

@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
+import 'package:meta/meta.dart';
 
 import '../database/database.dart';
 import '../extension/companion_equality.dart';
@@ -52,8 +53,7 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
     return data;
   }
 
-  Stream<List<MangaModel>> get stream => _aggregate.watch().map(_parse);
-
+  @visibleForTesting
   Future<List<MangaModel>> get all => _aggregate.get().then(_parse);
 
   Future<List<MangaModel>> search({
@@ -141,6 +141,8 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
       final mangas = await search(
         ids: [...values.keys.map((e) => e.id.valueOrNull).nonNulls],
         webUrls: [...values.keys.map((e) => e.webUrl.valueOrNull).nonNulls],
+        titles: [...values.keys.map((e) => e.title.valueOrNull).nonNulls],
+        sources: [...values.keys.map((e) => e.source.valueOrNull).nonNulls],
       );
 
       final data = <MangaModel>[];
@@ -152,8 +154,15 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
         final byWebUrl = entry.key.webUrl.valueOrNull?.let(
           (webUrl) => mangas.firstWhereOrNull((e) => e.manga?.webUrl == webUrl),
         );
+        final byTitleAndSource = entry.key.title.valueOrNull?.let(
+          (title) => entry.key.source.valueOrNull.let(
+            (source) => mangas.firstWhereOrNull(
+              (e) => e.manga?.title == title && e.manga?.source == source,
+            ),
+          ),
+        );
 
-        final manga = (byId ?? byWebUrl);
+        final manga = (byId ?? byWebUrl ?? byTitleAndSource);
 
         if (manga != null) {
           final companion = manga.manga?.toCompanion(true);
@@ -203,6 +212,12 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
           ),
           source: Value.absentIfNull(
             entry.key.source.valueOrNull ?? manga?.manga?.source,
+          ),
+          createdAt: Value.absentIfNull(
+            entry.key.createdAt.valueOrNull ?? manga?.manga?.createdAt,
+          ),
+          updatedAt: Value.absentIfNull(
+            entry.key.updatedAt.valueOrNull ?? manga?.manga?.updatedAt,
           ),
         );
 

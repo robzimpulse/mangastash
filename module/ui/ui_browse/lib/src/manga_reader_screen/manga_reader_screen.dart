@@ -51,6 +51,7 @@ class MangaReaderScreen extends StatelessWidget {
           recrawlUseCase: locator(),
           prefetchChapterUseCase: locator(),
           getNeighbourChapterUseCase: locator(),
+          listenPrefetchChapterConfig: locator(),
         )..init();
       },
       child: MangaReaderScreen(
@@ -110,13 +111,17 @@ class MangaReaderScreen extends StatelessWidget {
       child: Column(
         children: [
           Text(error.toString(), textAlign: TextAlign.center),
-          if (error is FailedParsingHtmlException) ...[
-            const SizedBox(height: 16),
-            OutlinedButton(
-              onPressed: () => _onTapRecrawl(context: context, url: error.url),
-              child: const Text('Open Debug Browser'),
-            ),
-          ],
+          const SizedBox(height: 16),
+          OutlinedButton(
+            onPressed: () {
+              if (error is FailedParsingHtmlException) {
+                _onTapRecrawl(context: context, url: error.url);
+              } else {
+                _cubit(context).init();
+              }
+            },
+            child: const Text('Open Debug Browser'),
+          ),
         ],
       ),
     );
@@ -155,13 +160,17 @@ class MangaReaderScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text('Images Empty'),
-                if (url != null) ...[
-                  const SizedBox(height: 16),
-                  OutlinedButton(
-                    onPressed: () => _onTapRecrawl(context: context, url: url),
-                    child: const Text('Open Debug Browser'),
-                  ),
-                ],
+                const SizedBox(height: 16),
+                OutlinedButton(
+                  onPressed: () {
+                    if (url != null) {
+                      _onTapRecrawl(context: context, url: url);
+                    } else {
+                      _cubit(context).init();
+                    }
+                  },
+                  child: const Text('Open Debug Browser'),
+                ),
               ],
             ),
           );

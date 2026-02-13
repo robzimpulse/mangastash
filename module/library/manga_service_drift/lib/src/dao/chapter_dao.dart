@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
+import 'package:meta/meta.dart';
 
 import '../database/database.dart';
 import '../extension/companion_equality.dart';
@@ -26,7 +27,7 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
         imageTables,
         imageTables.chapterId.equalsExp(chapterTables.id),
       ),
-    ]);
+    ])..orderBy([OrderingTerm.asc(imageTables.order)]);
   }
 
   List<ChapterModel> _parse(List<TypedResult> rows) {
@@ -50,8 +51,7 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
     return data;
   }
 
-  Stream<List<ChapterModel>> get stream => _aggregate.watch().map(_parse);
-
+  @visibleForTesting
   Future<List<ChapterModel>> get all => _aggregate.get().then(_parse);
 
   Future<List<ChapterModel>> search({
@@ -199,6 +199,12 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
                     : oldLastReadAt
                 : newLastReadAt ?? oldLastReadAt,
           ),
+          createdAt: Value.absentIfNull(
+            entry.key.createdAt.valueOrNull ?? chapter?.chapter?.createdAt,
+          ),
+          updatedAt: Value.absentIfNull(
+            entry.key.updatedAt.valueOrNull ?? chapter?.chapter?.updatedAt,
+          ),
         );
 
         final result = await into(chapterTables).insertReturning(
@@ -262,6 +268,6 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
         ]);
     }
 
-    return query.get().then(_parse).then((e) => e.take(count).toList());
+    return query.get().then(_parse).then((e) => [...e.take(count)]);
   }
 }

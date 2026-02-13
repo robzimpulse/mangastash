@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
+import 'package:meta/meta.dart';
 
 import '../../manga_service_drift.dart';
 import '../extension/companion_equality.dart';
@@ -37,6 +38,7 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
     ].fold(const Constant(false), (a, b) => a | b);
   }
 
+  @visibleForTesting
   Future<List<TagDrift>> get all => _selector.get();
 
   Future<List<TagDrift>> search({

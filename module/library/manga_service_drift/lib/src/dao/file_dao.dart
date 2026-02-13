@@ -38,7 +38,7 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     ].fold(const Constant(false), (a, b) => a | b);
   }
 
-  Future<List<FileDrift>> get all => _selector.get();
+  Future<List<FileDrift>> get _all => _selector.get();
 
   Future<List<FileDrift>> search({
     List<String> ids = const [],
@@ -55,32 +55,6 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
       ),
     );
     return transaction(() => selector.get());
-  }
-
-  Future<FileDrift> addFromData({
-    required String webUrl,
-    required Uint8List data,
-    String? extension,
-  }) async {
-    return transaction(() async {
-      final filename = '${Uuid().v4()}.$extension';
-      final destination = (await directory()).childFile(filename);
-      await destination.create(recursive: true);
-      await destination.writeAsBytes(data);
-
-      final value = FileTablesCompanion.insert(
-        webUrl: webUrl,
-        relativePath: filename,
-      );
-
-      return into(fileTables).insertReturning(
-        value,
-        mode: InsertMode.insertOrReplace,
-        onConflict: DoUpdate(
-          (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
-        ),
-      );
-    });
   }
 
   Future<FileDrift> addFromFile({
@@ -134,7 +108,7 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     /// remove [FileDrift] record that file not exists on storage
     await remove(
       ids: [
-        for (final result in await all)
+        for (final result in await _all)
           if (!(await file(result, checkFile: false).then((e) => e.exists())))
             result.id,
       ],

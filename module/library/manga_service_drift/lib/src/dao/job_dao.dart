@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
+import 'package:rxdart/transformers.dart';
 
 import '../database/database.dart';
 import '../model/job_model.dart';
@@ -34,7 +35,7 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
         chapterTables,
         chapterTables.id.equalsExp(jobTables.chapterId),
       ),
-    ]);
+    ])..orderBy([OrderingTerm.asc(jobTables.id)]);
   }
 
   List<JobModel> _parse(List<TypedResult> rows) {
@@ -62,8 +63,29 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
     return data;
   }
 
-  Stream<List<JobModel>> get stream {
-    return _aggregate.watch().map((e) => _parse(e));
+  Stream<List<JobModel>> get streamChapterIds {
+    final selector = _aggregate..where(jobTables.chapterId.isNotNull());
+    return selector.watch().map(_parse);
+  }
+
+  Stream<List<JobModel>> get streamMangaIds {
+    final selector = _aggregate..where(jobTables.mangaId.isNotNull());
+    return selector.watch().map(_parse);
+  }
+
+  Stream<JobModel?> get single {
+    final selector = _aggregate..limit(1);
+    return selector.watchSingleOrNull().map(
+      (e) => _parse([e].nonNulls.toList()).firstOrNull,
+    );
+  }
+
+  Stream<List<JobModel>> get stream => _aggregate.watch().map(_parse);
+
+  Stream<int> get count {
+    final counts = jobTables.id.count();
+    final query = selectOnly(jobTables)..addColumns([counts]);
+    return query.watchSingle().map((e) => e.read(counts)).whereNotNull();
   }
 
   Future<void> add(JobTablesCompanion value) {

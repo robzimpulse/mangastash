@@ -1,32 +1,23 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 
-import '../prefetch/listen_prefetch_chapter_config.dart';
 
 class GetNeighbourChapterUseCase {
   final ChapterDao _chapterDao;
-  final ListenPrefetchChapterConfig _listenPrefetchChapterConfig;
 
-  GetNeighbourChapterUseCase({
-    required ChapterDao chapterDao,
-    required ListenPrefetchChapterConfig listenPrefetchChapterConfig,
-  }) : _chapterDao = chapterDao,
-       _listenPrefetchChapterConfig = listenPrefetchChapterConfig;
+  GetNeighbourChapterUseCase({required ChapterDao chapterDao})
+    : _chapterDao = chapterDao;
 
   Future<List<Chapter>> execute({
     required String chapterId,
+    required int count,
     NextChapterDirection direction = NextChapterDirection.next,
   }) async {
-    final config = _listenPrefetchChapterConfig;
-    final next = config.numOfPrefetchedNextChapter.valueOrNull;
-    final prev = config.numOfPrefetchedPrevChapter.valueOrNull;
+    if (count < 1) return [];
+
     final result = await _chapterDao.getNeighbourChapters(
       chapterId: chapterId,
-      count: switch (direction) {
-        NextChapterDirection.previous => prev.or(0),
-        NextChapterDirection.next => next.or(0),
-      },
+      count: count,
       direction: direction,
     );
 

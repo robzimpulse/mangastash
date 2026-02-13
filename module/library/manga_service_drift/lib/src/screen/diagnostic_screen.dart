@@ -19,15 +19,18 @@ class DiagnosticScreen extends StatefulWidget {
     this.tagBuilder,
     this.orphanChapterBuilder,
     this.orphanImageBuilder,
+    this.chapterGapBuilder,
   });
 
   final AppDatabase database;
 
   final DiagnosticWidgetBuilder<DuplicatedMangaKey, MangaDrift>? mangaBuilder;
-  final DiagnosticWidgetBuilder<DuplicatedChapterKey, ChapterDrift>? chapterBuilder;
+  final DiagnosticWidgetBuilder<DuplicatedChapterKey, ChapterDrift>?
+  chapterBuilder;
   final DiagnosticWidgetBuilder<DuplicatedTagKey, TagDrift>? tagBuilder;
   final DriftWidgetBuilder<ChapterDrift>? orphanChapterBuilder;
   final DriftWidgetBuilder<ImageDrift>? orphanImageBuilder;
+  final DriftWidgetBuilder<IncompleteManga>? chapterGapBuilder;
 
   @override
   State<DiagnosticScreen> createState() => _DiagnosticScreenState();
@@ -41,6 +44,53 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
   late final ImageDao _imageDao = ImageDao(widget.database);
 
   late final _menus = <String, WidgetBuilder>{
+    'Chapter Gap': (context) {
+      return StreamBuilder(
+        stream: _diagnosticDao.chapterGapStream,
+        builder: (context, snapshot) {
+          final data = snapshot.data;
+          final error = snapshot.error;
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (error != null) {
+            return Center(child: Text(error.toString()));
+          }
+
+          if (data == null || data.isEmpty) {
+            return Center(child: Text('No Data'));
+          }
+
+          return ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              final value = data.elementAtOrNull(index);
+              if (value == null) return null;
+              final view = widget.chapterGapBuilder?.call(value);
+              return view.or(
+                ExpansionTile(
+                  title: Text('${value.manga?.title}'),
+                  subtitle: Text('${value.manga?.source}'),
+                  children: [
+                    for (final range in value.ranges)
+                      ListTile(
+                        title: Text(
+                          'Range: ${range.chapterStart} - ${range.chapterEnd}',
+                        ),
+                        subtitle: Text(
+                          'Estimated Missing Count: ${range.estimatedMissingCount}',
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      );
+    },
     'Duplicated Manga': (context) {
       return StreamBuilder(
         stream: _diagnosticDao.duplicateMangaStream,
@@ -68,11 +118,11 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
               final view = widget.mangaBuilder?.call(value);
               return view.or(
                 ExpansionTile(
-                  title: Text('Title: ${value.key.title}'),
-                  subtitle: Text('Source: ${value.key.source}'),
+                  title: Text('${value.key.title}'),
+                  subtitle: Text('${value.key.source}'),
                   children: [
                     for (final child in value.value)
-                      ListTile(title: Text(child.id)),
+                      ListTile(title: Text(child.webUrl ?? '-')),
                   ],
                 ),
               );
@@ -108,8 +158,15 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
               final view = widget.chapterBuilder?.call(value);
               return view.or(
                 ExpansionTile(
-                  title: Text('Manga ID: ${value.key.mangaId}'),
-                  subtitle: Text('Chapter: ${value.key.chapter}'),
+                  title: Text('${value.key.manga?.title}'),
+                  subtitle: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Chapter: ${value.key.chapter}'),
+                      Text('Source: ${value.key.manga?.source}'),
+                    ],
+                  ),
                   children: [
                     for (final child in value.value)
                       ListTile(title: Text(child.id)),
@@ -199,39 +256,40 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
     },
     'Orphaned Image': (context) {
       return StreamBuilder(
-          stream: _diagnosticDao.orphanImageStream,
-          builder: (context, snapshot) {
-            final data = snapshot.data;
-            final error = snapshot.error;
+        stream: _diagnosticDao.orphanImageStream,
+        builder: (context, snapshot) {
+          final data = snapshot.data;
+          final error = snapshot.error;
 
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
 
-            if (error != null) {
-              return Center(child: Text(error.toString()));
-            }
+          if (error != null) {
+            return Center(child: Text(error.toString()));
+          }
 
-            if (data == null || data.isEmpty) {
-              return Center(child: Text('No Data'));
-            }
+          if (data == null || data.isEmpty) {
+            return Center(child: Text('No Data'));
+          }
 
-            return ListView.builder(
-              itemCount: data.length,
-              itemBuilder: (context, index) {
-                final value = data.elementAtOrNull(index);
-                if (value == null) return null;
-                final view = widget.orphanImageBuilder?.call(value);
-                return view.or(
-                  ListTile(
-                    title: Text('Chapter ID: ${value.chapterId}'),
-                    subtitle: Text('Source: ${value.webUrl}'),
-                  ),
-                );
-              },
-            );
-          });
-    }
+          return ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              final value = data.elementAtOrNull(index);
+              if (value == null) return null;
+              final view = widget.orphanImageBuilder?.call(value);
+              return view.or(
+                ListTile(
+                  title: Text('Chapter ID: ${value.chapterId}'),
+                  subtitle: Text('Source: ${value.webUrl}'),
+                ),
+              );
+            },
+          );
+        },
+      );
+    },
   };
 
   @override
