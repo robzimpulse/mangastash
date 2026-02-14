@@ -5,14 +5,20 @@ import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 
 import '../../mixin/sync_chapters_mixin.dart';
+import '../parameter/listen_setting_incognito_use_case.dart';
 
 class UpdateChapterUseCase with SyncChaptersMixin {
+  final ListenSettingIncognitoUseCase _listenSettingIncognitoUseCase;
   final ChapterDao _chapterDao;
   final LogBox _logBox;
 
-  UpdateChapterUseCase({required ChapterDao chapterDao, required LogBox logBox})
-    : _chapterDao = chapterDao,
-      _logBox = logBox;
+  UpdateChapterUseCase({
+    required ChapterDao chapterDao,
+    required LogBox logBox,
+    required ListenSettingIncognitoUseCase listenSettingIncognitoUseCase,
+  }) : _chapterDao = chapterDao,
+       _logBox = logBox,
+       _listenSettingIncognitoUseCase = listenSettingIncognitoUseCase;
 
   Future<void> removeImage({
     required String chapterId,
@@ -33,6 +39,9 @@ class UpdateChapterUseCase with SyncChaptersMixin {
   }
 
   Future<void> updateLastRead({required String chapterId}) async {
+    if (_listenSettingIncognitoUseCase.incognitoState.valueOrNull ?? false) {
+      return;
+    }
     await _execute(
       chapterId: chapterId,
       updater: (e) async => e.copyWith(lastReadAt: DateTime.now()),

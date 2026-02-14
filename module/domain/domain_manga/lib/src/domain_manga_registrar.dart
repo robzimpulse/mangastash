@@ -156,7 +156,11 @@ class DomainMangaRegistrar extends Registrar {
       () => RemoveFromLibraryUseCase(libraryDao: locator()),
     );
     locator.registerFactory(
-      () => UpdateChapterUseCase(chapterDao: locator(), logBox: locator()),
+      () => UpdateChapterUseCase(
+        chapterDao: locator(),
+        logBox: locator(),
+        listenSettingIncognitoUseCase: locator(),
+      ),
     );
     locator.registerFactory(
       () => GetTagsUseCase(
