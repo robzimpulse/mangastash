@@ -34,6 +34,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required GetAllChapterUseCase getAllChapterUseCase,
     required RecrawlUseCase recrawlUseCase,
+    required ListenDownloadedChapterUseCase listenDownloadedChapterUseCase,
   }) : _getMangaUseCase = getMangaUseCase,
        _searchMangaUseCase = searchMangaUseCase,
        _searchChapterUseCase = searchChapterUseCase,
@@ -70,6 +71,22 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     addSubscription(
       listenReadHistoryUseCase.readHistoryStream.distinct().listen(
         _updateHistories,
+      ),
+    );
+    state.mangaId.let((id) {
+      addSubscription(
+        listenDownloadedChapterUseCase
+            .execute(mangaId: id)
+            .distinct()
+            .listen((_updateDownloadedChapterIds)),
+      );
+    });
+  }
+
+  void _updateDownloadedChapterIds(List<Chapter> chapters) {
+    emit(
+      state.copyWith(
+        downloadedChapterIds: chapters.map((e) => e.id).nonNulls.toSet(),
       ),
     );
   }

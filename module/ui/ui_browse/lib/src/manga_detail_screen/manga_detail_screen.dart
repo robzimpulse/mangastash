@@ -68,6 +68,7 @@ class MangaDetailScreen extends StatefulWidget {
           getAllChapterUseCase: locator(),
           searchMangaUseCase: locator(),
           recrawlUseCase: locator(),
+          listenDownloadedChapterUseCase: locator(),
         )..init();
       },
       child: MangaDetailScreen(
@@ -463,6 +464,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               prev.totalChapter != curr.totalChapter,
               prev.hasNextPageChapter != curr.hasNextPageChapter,
               prev.prefetchedChapterIds != curr.prefetchedChapterIds,
+              prev.downloadedChapterIds != curr.downloadedChapterIds,
               prev.config != curr.config,
             ].contains(true);
           },
@@ -475,6 +477,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   chapter: data,
                   opacity: data.lastReadAt != null ? 0.5 : 1,
                   isPrefetching: state.prefetchedChapterIds.contains(data.id),
+                  isDownloaded: state.downloadedChapterIds.contains(data.id),
                   lastReadAt: data.lastReadAt,
                 );
               },

@@ -17,6 +17,7 @@ class ChapterTileWidget extends StatelessWidget {
     this.uploadedAt,
     this.groups,
     this.isPrefetching = false,
+    this.isDownloaded = false,
     this.lastReadAt,
     this.opacity = 1,
     this.onTapLongPress,
@@ -35,6 +36,7 @@ class ChapterTileWidget extends StatelessWidget {
     EdgeInsetsGeometry padding = EdgeInsets.zero,
     double opacity = 1,
     bool isPrefetching = false,
+    bool isDownloaded = false,
     DateTime? lastReadAt,
     BaseCacheManager? cacheManager,
   }) {
@@ -52,6 +54,7 @@ class ChapterTileWidget extends StatelessWidget {
       padding: padding,
       opacity: opacity,
       isPrefetching: isPrefetching,
+      isDownloaded: isDownloaded,
       lastReadAt: lastReadAt,
       cacheManager: cacheManager,
     );
@@ -66,6 +69,7 @@ class ChapterTileWidget extends StatelessWidget {
   final DateTime? uploadedAt;
   final DateTime? lastReadAt;
   final bool isPrefetching;
+  final bool isDownloaded;
   final double opacity;
   final String? sourceIconUrl;
   final String? mangaTitle;
@@ -88,7 +92,7 @@ class ChapterTileWidget extends StatelessWidget {
           child: Padding(
             padding: padding,
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 if (coverUrl != null) ...[
@@ -152,6 +156,15 @@ class ChapterTileWidget extends StatelessWidget {
                         ].intersperse(const SizedBox(height: 4)).toList(),
                   ),
                 ),
+                if (isDownloaded)
+                  const Padding(
+                    padding: EdgeInsets.all(12.0),
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: Icon(Icons.save),
+                    ),
+                  ),
                 if (isPrefetching)
                   const Padding(
                     padding: EdgeInsets.all(12.0),
