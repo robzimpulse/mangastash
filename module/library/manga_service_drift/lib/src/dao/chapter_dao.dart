@@ -272,9 +272,9 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
     return query.get().then(_parse).then((e) => [...e.take(count)]);
   }
 
-  Future<List<ChapterDrift>> getDownloadedChapterId({
+  Stream<List<ChapterDrift>> listenDownloadedChapterId({
     required String mangaId,
-  }) async {
+  }) {
     // Define the "Fully Downloaded" condition
     final imageCount = imageTables.id.count();
     final fileCount = fileTables.id.count();
@@ -307,6 +307,6 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
     final query = select(chapterTables)
       ..where((t) => t.id.isInQuery(downloadedIdsQuery));
 
-    return query.get();
+    return query.watch();
   }
 }

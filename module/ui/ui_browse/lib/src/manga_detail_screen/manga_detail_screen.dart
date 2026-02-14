@@ -68,6 +68,7 @@ class MangaDetailScreen extends StatefulWidget {
           getAllChapterUseCase: locator(),
           searchMangaUseCase: locator(),
           recrawlUseCase: locator(),
+          listenDownloadedChapterUseCase: locator(),
         )..init();
       },
       child: MangaDetailScreen(

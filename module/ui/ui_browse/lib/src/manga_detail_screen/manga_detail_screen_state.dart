@@ -32,7 +32,7 @@ class MangaDetailScreenState extends Equatable {
   final Set<String> prefetchedChapterIds;
   final Set<String> prefetchedMangaIds;
   final Map<String, Chapter> histories;
-  final Map<String, bool> downloadedChapterIds;
+  final Set<String> downloadedChapterIds;
 
   bool get isOnLibrary => libraryMangaIds.contains(mangaId);
 
@@ -56,10 +56,10 @@ class MangaDetailScreenState extends Equatable {
 
         if (config.downloaded == null)
           // filter chapter that hasn't been downloaded
-          !downloadedChapterIds.keys.contains(data.id)
+          !downloadedChapterIds.contains(data.id)
         else if (config.downloaded == true)
           // filter chapter that has been downloaded
-          downloadedChapterIds.keys.contains(data.id)
+          downloadedChapterIds.contains(data.id)
         else if (config.downloaded == false)
           // ignore filter downloaded
           true,
@@ -159,7 +159,7 @@ class MangaDetailScreenState extends Equatable {
     List<Manga>? similarManga,
     ValueGetter<String?>? sourceUrlSimilarManga,
     SearchMangaParameter? similarMangaParameter,
-    Map<String, bool>? downloadedChapterIds,
+    Set<String>? downloadedChapterIds,
   }) {
     return MangaDetailScreenState(
       config: config ?? this.config,
