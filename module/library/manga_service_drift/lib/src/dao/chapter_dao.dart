@@ -9,13 +9,14 @@ import '../extension/nullable_generic.dart';
 import '../extension/value_or_null_extension.dart';
 import '../model/chapter_model.dart';
 import '../tables/chapter_tables.dart';
+import '../tables/file_tables.dart';
 import '../tables/image_tables.dart';
 import '../util/next_chapter_direction_enum.dart';
 import 'image_dao.dart';
 
 part 'chapter_dao.g.dart';
 
-@DriftAccessor(tables: [ChapterTables, ImageTables])
+@DriftAccessor(tables: [ChapterTables, ImageTables, FileTables])
 class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
   ChapterDao(super.db);
 
@@ -269,5 +270,22 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
     }
 
     return query.get().then(_parse).then((e) => [...e.take(count)]);
+  }
+
+  Future<bool> isDownloaded({required String chapterId}) {
+    final query = customSelect(
+      'SELECT (COUNT(i.id) > 0 AND COUNT(i.id) = COUNT(f.id)) AS is_downloaded '
+      'FROM image_tables i '
+      'LEFT JOIN file_tables f ON i.web_url = f.web_url '
+      'WHERE i.chapter_id = ?',
+      variables: [Variable.withString(chapterId)],
+      // Watching these tables ensures the boolean flips to true
+      // the moment the last file is downloaded.
+      readsFrom: {imageTables, fileTables},
+    );
+
+    return query.getSingleOrNull().then(
+      (e) => e?.readNullable<bool>('is_downloaded') ?? false,
+    );
   }
 }
