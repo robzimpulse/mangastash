@@ -1,4 +1,3 @@
-import 'package:core_environment/core_environment.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:equatable/equatable.dart';
@@ -33,6 +32,7 @@ class MangaDetailScreenState extends Equatable {
   final Set<String> prefetchedChapterIds;
   final Set<String> prefetchedMangaIds;
   final Map<String, Chapter> histories;
+  final Map<String, bool> downloadedChapterIds;
 
   bool get isOnLibrary => libraryMangaIds.contains(mangaId);
 
@@ -44,15 +44,28 @@ class MangaDetailScreenState extends Equatable {
       final data = history ?? chapter;
 
       final criteria = [
-        if (config.unread == null) // filter chapter that has been read
+        if (config.unread == null)
+          // filter chapter that has been read
           data.lastReadAt != null
-        else if (config.unread == true) // filter chapter that as been unread
+        else if (config.unread == true)
+          // filter chapter that as been unread
           data.lastReadAt == null
-        else if (config.unread == false) // ignore filter unread
+        else if (config.unread == false)
+          // ignore filter unread
+          true,
+
+        if (config.downloaded == null)
+          // filter chapter that hasn't been downloaded
+          !downloadedChapterIds.keys.contains(data.id)
+        else if (config.downloaded == true)
+          // filter chapter that has been downloaded
+          downloadedChapterIds.keys.contains(data.id)
+        else if (config.downloaded == false)
+          // ignore filter downloaded
           true,
       ];
 
-      if (criteria.contains(true)) {
+      if (criteria.every((e) => e)) {
         result.add(data.copyWith(lastReadAt: history?.lastReadAt));
       }
     }
@@ -86,6 +99,7 @@ class MangaDetailScreenState extends Equatable {
     this.similarManga = const [],
     this.sourceUrlSimilarManga,
     this.similarMangaParameter,
+    this.downloadedChapterIds = const {},
   });
 
   @override
@@ -115,6 +129,7 @@ class MangaDetailScreenState extends Equatable {
     similarManga,
     sourceUrlSimilarManga,
     similarMangaParameter,
+    downloadedChapterIds,
   ];
 
   MangaDetailScreenState copyWith({
@@ -144,6 +159,7 @@ class MangaDetailScreenState extends Equatable {
     List<Manga>? similarManga,
     ValueGetter<String?>? sourceUrlSimilarManga,
     SearchMangaParameter? similarMangaParameter,
+    Map<String, bool>? downloadedChapterIds,
   }) {
     return MangaDetailScreenState(
       config: config ?? this.config,
@@ -184,6 +200,7 @@ class MangaDetailScreenState extends Equatable {
           sourceUrlSimilarManga != null
               ? sourceUrlSimilarManga()
               : this.sourceUrlSimilarManga,
+      downloadedChapterIds: downloadedChapterIds ?? this.downloadedChapterIds,
     );
   }
 }
