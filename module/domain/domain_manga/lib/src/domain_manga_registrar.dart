@@ -22,7 +22,9 @@ import 'use_case/manga/get_manga_from_url_use_case.dart';
 import 'use_case/manga/get_manga_use_case.dart';
 import 'use_case/manga/search_manga_use_case.dart';
 import 'use_case/parameter/listen_search_parameter_use_case.dart';
+import 'use_case/parameter/listen_setting_downloaded_only_use_case.dart';
 import 'use_case/parameter/update_search_parameter_use_case.dart';
+import 'use_case/parameter/update_setting_downloaded_only_use_case.dart';
 import 'use_case/prefetch/listen_job_use_case.dart';
 import 'use_case/prefetch/listen_prefetch_chapter_config.dart';
 import 'use_case/prefetch/listen_prefetch_use_case.dart';
@@ -46,6 +48,8 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<ListenSourcesUseCase, GlobalOptionsManager>();
     locator.alias<UpdateSourcesUseCase, GlobalOptionsManager>();
     locator.alias<ListenPrefetchChapterConfig, GlobalOptionsManager>();
+    locator.alias<ListenSettingDownloadedOnlyUseCase, GlobalOptionsManager>();
+    locator.alias<UpdateSettingDownloadedOnlyUseCase, GlobalOptionsManager>();
 
     locator.registerLazySingleton(
       () => JobManager(

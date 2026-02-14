@@ -34,7 +34,12 @@ class MoreScreen extends StatelessWidget {
     VoidCallback? onTapHelp,
   }) {
     return BlocProvider(
-      create: (context) => MoreScreenCubit(listenJobUseCase: locator()),
+      create:
+          (context) => MoreScreenCubit(
+            listenJobUseCase: locator(),
+            listenSettingDownloadedOnlyUseCase: locator(),
+            updateSettingDownloadedOnlyUseCase: locator(),
+          ),
       child: MoreScreen(
         onTapSetting: onTapSetting,
         onTapStatistic: onTapStatistic,
@@ -54,6 +59,8 @@ class MoreScreen extends StatelessWidget {
       builder: builder,
     );
   }
+
+  MoreScreenCubit _cubit(BuildContext context) => context.read();
 
   @override
   Widget build(BuildContext context) {
@@ -91,20 +98,26 @@ class MoreScreen extends StatelessWidget {
             child: AdaptivePhysicListView(
               padding: EdgeInsets.zero,
               children: [
-                SwitchListTile(
-                  title: const Text('Downloaded Only'),
-                  subtitle: const Text('Filters all entries in your library'),
-                  value: true,
-                  // TODO: implement this
-                  onChanged: (value) {
-                    context.showSnackBar(
-                      message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+                _builder(
+                  buildWhen: (prev, curr) {
+                    return prev.isDownloadedOnly != curr.isDownloadedOnly;
+                  },
+                  builder: (context, state) {
+                    return SwitchListTile(
+                      title: const Text('Downloaded Only'),
+                      subtitle: const Text(
+                        'Filters all entries in your library',
+                      ),
+                      value: state.isDownloadedOnly,
+                      onChanged: (_) {
+                        _cubit(context).toggleIsDownloadedOnly();
+                      },
+                      secondary: const SizedBox(
+                        height: double.infinity,
+                        child: Icon(Icons.cloud_off),
+                      ),
                     );
                   },
-                  secondary: const SizedBox(
-                    height: double.infinity,
-                    child: Icon(Icons.cloud_off),
-                  ),
                 ),
                 SwitchListTile(
                   title: const Text('Incognito Mode'),
