@@ -37,24 +37,27 @@ class MangaDetailScreenState extends Equatable {
   bool get isOnLibrary => libraryMangaIds.contains(mangaId);
 
   List<Chapter> get filtered {
-    return [
-      ...chapters
-          .where((data) {
-            final chapter = histories[data.id].or(data);
+    final List<Chapter> result = [];
 
-            final shouldAdd = [
-              if (config.unread == true)
-                chapter.lastReadAt == null
-              else if (config.unread == null)
-                chapter.lastReadAt != null
-              else
-                true,
-            ];
+    for (final chapter in chapters) {
+      final history = histories[chapter.id];
+      final data = history ?? chapter;
 
-            return shouldAdd.contains(true);
-          })
-          .map((e) => e.copyWith(lastReadAt: histories[e.id]?.lastReadAt)),
-    ];
+      final criteria = [
+        if (config.unread == null) // filter chapter that has been read
+          data.lastReadAt != null
+        else if (config.unread == true) // filter chapter that as been unread
+          data.lastReadAt == null
+        else if (config.unread == false) // ignore filter unread
+          true,
+      ];
+
+      if (criteria.contains(true)) {
+        result.add(data.copyWith(lastReadAt: history?.lastReadAt));
+      }
+    }
+
+    return result;
   }
 
   const MangaDetailScreenState({
