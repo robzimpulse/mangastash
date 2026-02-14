@@ -1,7 +1,6 @@
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 
-
 class GetNeighbourChapterUseCase {
   final ChapterDao _chapterDao;
 

@@ -272,20 +272,41 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
     return query.get().then(_parse).then((e) => [...e.take(count)]);
   }
 
-  Future<bool> isDownloaded({required String chapterId}) {
-    final query = customSelect(
-      'SELECT (COUNT(i.id) > 0 AND COUNT(i.id) = COUNT(f.id)) AS is_downloaded '
-      'FROM image_tables i '
-      'LEFT JOIN file_tables f ON i.web_url = f.web_url '
-      'WHERE i.chapter_id = ?',
-      variables: [Variable.withString(chapterId)],
-      // Watching these tables ensures the boolean flips to true
-      // the moment the last file is downloaded.
-      readsFrom: {imageTables, fileTables},
-    );
+  Future<List<ChapterDrift>> getDownloadedChapterId({
+    required String mangaId,
+  }) async {
+    // Define the "Fully Downloaded" condition
+    final imageCount = imageTables.id.count();
+    final fileCount = fileTables.id.count();
 
-    return query.getSingleOrNull().then(
-      (e) => e?.readNullable<bool>('is_downloaded') ?? false,
-    );
+    // Define the Subquery (The Logic)
+    // This part calculates which IDs are fully downloaded.
+    final downloadedIdsQuery =
+        selectOnly(chapterTables)
+          ..addColumns([chapterTables.id])
+          ..join([
+            innerJoin(
+              imageTables,
+              imageTables.chapterId.equalsExp(chapterTables.id),
+            ),
+            leftOuterJoin(
+              fileTables,
+              fileTables.webUrl.equalsExp(imageTables.webUrl),
+            ),
+          ])
+          ..where(chapterTables.mangaId.equals(mangaId))
+          ..groupBy(
+            [chapterTables.id],
+            having:
+                imageCount.isBiggerThanValue(0) &
+                imageCount.equalsExp(fileCount),
+          );
+
+    // 2. Define the Main Query (The Fetch)
+    // This selects the actual full rows based on the subquery above.
+    final query = select(chapterTables)
+      ..where((t) => t.id.isInQuery(downloadedIdsQuery));
+
+    return query.get();
   }
 }

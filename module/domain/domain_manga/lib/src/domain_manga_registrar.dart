@@ -9,6 +9,7 @@ import 'manager/library_manager.dart';
 import 'use_case/cancel_job_use_case.dart';
 import 'use_case/chapter/get_all_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
+import 'use_case/chapter/get_downloaded_chapter_id_use_case.dart';
 import 'use_case/chapter/get_neighbour_chapter_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
 import 'use_case/chapter/update_chapter_use_case.dart';
@@ -163,6 +164,10 @@ class DomainMangaRegistrar extends Registrar {
     );
     locator.registerFactory(
       () => RecrawlUseCase(logBox: locator(), htmlCacheManager: locator()),
+    );
+
+    locator.registerFactory(
+      () => GetDownloadedChapterIdUseCase(chapterDao: locator()),
     );
 
     locator.registerLazySingleton(

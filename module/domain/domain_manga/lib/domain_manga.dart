@@ -9,6 +9,7 @@ export 'src/mixin/sort_chapters_mixin.dart';
 export 'src/use_case/cancel_job_use_case.dart';
 export 'src/use_case/chapter/get_all_chapter_use_case.dart';
 export 'src/use_case/chapter/get_chapter_use_case.dart';
+export 'src/use_case/chapter/get_downloaded_chapter_id_use_case.dart';
 export 'src/use_case/chapter/get_neighbour_chapter_use_case.dart';
 export 'src/use_case/chapter/search_chapter_use_case.dart';
 export 'src/use_case/chapter/update_chapter_use_case.dart';
