@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -51,10 +52,14 @@ class MangaDetailScreen extends StatefulWidget {
   }) {
     return BlocProvider(
       create: (context) {
+        final ListenSettingDownloadedOnlyUseCase isDownloaded = locator();
         return MangaDetailScreenCubit(
           initialState: MangaDetailScreenState(
             mangaId: mangaId,
             source: source?.let(SourceEnum.fromName),
+            config: ChapterConfig(
+              downloaded: isDownloaded.downloadedOnlyState.valueOrNull,
+            ),
           ),
           getMangaUseCase: locator(),
           searchChapterUseCase: locator(),
