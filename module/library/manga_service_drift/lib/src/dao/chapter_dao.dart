@@ -9,13 +9,14 @@ import '../extension/nullable_generic.dart';
 import '../extension/value_or_null_extension.dart';
 import '../model/chapter_model.dart';
 import '../tables/chapter_tables.dart';
+import '../tables/file_tables.dart';
 import '../tables/image_tables.dart';
 import '../util/next_chapter_direction_enum.dart';
 import 'image_dao.dart';
 
 part 'chapter_dao.g.dart';
 
-@DriftAccessor(tables: [ChapterTables, ImageTables])
+@DriftAccessor(tables: [ChapterTables, ImageTables, FileTables])
 class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
   ChapterDao(super.db);
 
@@ -269,5 +270,43 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
     }
 
     return query.get().then(_parse).then((e) => [...e.take(count)]);
+  }
+
+  Stream<List<ChapterDrift>> listenDownloadedChapterId({
+    required String mangaId,
+  }) {
+    // Define the "Fully Downloaded" condition
+    final imageCount = imageTables.id.count();
+    final fileCount = fileTables.id.count();
+
+    // Define the Subquery (The Logic)
+    // This part calculates which IDs are fully downloaded.
+    final downloadedIdsQuery =
+        selectOnly(chapterTables)
+          ..addColumns([chapterTables.id])
+          ..join([
+            innerJoin(
+              imageTables,
+              imageTables.chapterId.equalsExp(chapterTables.id),
+            ),
+            leftOuterJoin(
+              fileTables,
+              fileTables.webUrl.equalsExp(imageTables.webUrl),
+            ),
+          ])
+          ..where(chapterTables.mangaId.equals(mangaId))
+          ..groupBy(
+            [chapterTables.id],
+            having:
+                imageCount.isBiggerThanValue(0) &
+                imageCount.equalsExp(fileCount),
+          );
+
+    // 2. Define the Main Query (The Fetch)
+    // This selects the actual full rows based on the subquery above.
+    final query = select(chapterTables)
+      ..where((t) => t.id.isInQuery(downloadedIdsQuery));
+
+    return query.watch();
   }
 }

@@ -18,14 +18,14 @@ class MangaMiscScreen extends StatefulWidget {
     ScrollController? controller,
   }) {
     return BlocProvider(
-      create: (context) => MangaMiscScreenCubit(
-        initialState: MangaMiscScreenState(
-          config: config ?? const ChapterConfig(),
-        ),
-      ),
-      child: MangaMiscScreen(
-        controller: controller,
-      ),
+      create: (context) {
+        return MangaMiscScreenCubit(
+          initialState: MangaMiscScreenState(
+            config: config ?? const ChapterConfig(),
+          ),
+        );
+      },
+      child: MangaMiscScreen(controller: controller),
     );
   }
 
@@ -73,13 +73,15 @@ class _MangaMiscScreenState extends State<MangaMiscScreen> {
                   padding: const EdgeInsets.all(8.0),
                   child: _builder(
                     buildWhen: (prev, curr) => prev.config != curr.config,
-                    builder: (context, state) => OutlinedButton(
-                      onPressed: () => context.pop(state.config),
-                      child: Text(
-                        'Apply',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ),
+                    builder: (context, state) {
+                      return OutlinedButton(
+                        onPressed: () => context.pop(state.config),
+                        child: Text(
+                          'Apply',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -107,43 +109,28 @@ class _MangaMiscScreenState extends State<MangaMiscScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         _builder(
-          buildWhen: (prev, curr) => [
-            prev.config?.downloaded != curr.config?.downloaded,
-          ].contains(true),
-          builder: (context, state) => CheckboxListTile(
-            tristate: true,
-            value: state.config?.downloaded,
-            onChanged: (value) => _cubit(context).update(
-              downloaded: () => value,
-            ),
-            title: const Text('Downloaded'),
-          ),
+          buildWhen: (prev, curr) {
+            return prev.config?.downloaded != curr.config?.downloaded;
+          },
+          builder: (context, state) {
+            return CheckboxListTile(
+              tristate: true,
+              value: state.config?.downloaded,
+              onChanged: (e) => _cubit(context).update(downloaded: () => e),
+              title: const Text('Downloaded'),
+            );
+          },
         ),
         _builder(
-          buildWhen: (prev, curr) => [
-            prev.config?.unread != curr.config?.unread,
-          ].contains(true),
-          builder: (context, state) => CheckboxListTile(
-            tristate: true,
-            value: state.config?.unread,
-            onChanged: (value) => _cubit(context).update(
-              unread: () => value,
-            ),
-            title: const Text('Unread'),
-          ),
-        ),
-        _builder(
-          buildWhen: (prev, curr) => [
-            prev.config?.bookmarked != curr.config?.bookmarked,
-          ].contains(true),
-          builder: (context, state) => CheckboxListTile(
-            tristate: true,
-            value: state.config?.bookmarked,
-            onChanged: (value) => _cubit(context).update(
-              bookmarked: () => value,
-            ),
-            title: const Text('Bookmarked'),
-          ),
+          buildWhen: (prev, curr) => prev.config?.unread != curr.config?.unread,
+          builder: (context, state) {
+            return CheckboxListTile(
+              tristate: true,
+              value: state.config?.unread,
+              onChanged: (e) => _cubit(context).update(unread: () => e),
+              title: const Text('Unread'),
+            );
+          },
         ),
       ],
     );
@@ -155,31 +142,42 @@ class _MangaMiscScreenState extends State<MangaMiscScreen> {
       children: [
         for (final options in ChapterSortOptionEnum.values)
           _builder(
-            buildWhen: (prev, curr) => [
-              prev.config?.sortOption != curr.config?.sortOption,
-              prev.config?.sortOrder != curr.config?.sortOrder,
-            ].contains(true),
-            builder: (context, state) => ListTile(
-              leading: (state.config?.sortOption == options)
-                  ? (state.config?.sortOrder == ChapterSortOrderEnum.desc)
-                      ? const Icon(Icons.arrow_downward)
-                      : const Icon(Icons.arrow_upward)
-                  : SizedBox.fromSize(
-                      size: Size(
-                        IconTheme.of(context).size ?? 0,
-                        IconTheme.of(context).size ?? 0,
-                      ),
-                    ),
-              title: Text(options.value),
-              onTap: () => _cubit(context).update(
-                sortOption: options,
-                sortOrder: (state.config?.sortOption == options)
-                    ? (state.config?.sortOrder == ChapterSortOrderEnum.asc)
-                        ? ChapterSortOrderEnum.desc
-                        : ChapterSortOrderEnum.asc
-                    : null,
-              ),
-            ),
+            buildWhen: (prev, curr) {
+              return [
+                prev.config?.sortOption != curr.config?.sortOption,
+                prev.config?.sortOrder != curr.config?.sortOrder,
+              ].contains(true);
+            },
+            builder: (context, state) {
+              final Widget leading;
+              final ChapterSortOrderEnum? order;
+
+              if (state.config?.sortOption == options) {
+                if (state.config?.sortOrder == ChapterSortOrderEnum.desc) {
+                  leading = Icon(Icons.arrow_downward);
+                  order = ChapterSortOrderEnum.desc;
+                } else {
+                  leading = Icon(Icons.arrow_upward);
+                  order = ChapterSortOrderEnum.asc;
+                }
+              } else {
+                leading = SizedBox.fromSize(
+                  size: Size(
+                    IconTheme.of(context).size ?? 0,
+                    IconTheme.of(context).size ?? 0,
+                  ),
+                );
+                order = null;
+              }
+
+              return ListTile(
+                leading: leading,
+                title: Text(options.value),
+                onTap: () {
+                  _cubit(context).update(sortOption: options, sortOrder: order);
+                },
+              );
+            },
           ),
       ],
     );
@@ -191,17 +189,17 @@ class _MangaMiscScreenState extends State<MangaMiscScreen> {
       children: [
         for (final display in ChapterDisplayEnum.values)
           _builder(
-            buildWhen: (prev, curr) => [
-              prev.config?.display != curr.config?.display,
-            ].contains(true),
-            builder: (context, state) => RadioListTile<ChapterDisplayEnum>(
-              title: Text(display.value),
-              value: display,
-              groupValue: state.config?.display,
-              onChanged: (value) => _cubit(context).update(
-                display: value,
-              ),
-            ),
+            buildWhen: (prev, curr) {
+              return prev.config?.display != curr.config?.display;
+            },
+            builder: (context, state) {
+              return RadioListTile<ChapterDisplayEnum>(
+                title: Text(display.value),
+                value: display,
+                groupValue: state.config?.display,
+                onChanged: (value) => _cubit(context).update(display: value),
+              );
+            },
           ),
       ],
     );
