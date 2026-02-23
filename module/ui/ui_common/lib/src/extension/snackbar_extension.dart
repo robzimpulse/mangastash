@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 extension SnackbarExtension on BuildContext {
+  void showOnProgressSnackBar() {
+    showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+  }
+
   void showSnackBar({required String message, List<Widget>? actions}) {
     ScaffoldMessenger.of(this).showSnackBar(
       SnackBar(

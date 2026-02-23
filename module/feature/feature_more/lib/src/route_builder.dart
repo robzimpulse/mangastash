@@ -25,9 +25,8 @@ class MoreRouteBuilder extends BaseRouteBuilder {
             onTapDataStorage: () => context.push(MoreRoutePath.dataStorage),
             onTapQueue: () => context.push(MoreRoutePath.queue),
             onTapAbout: () => context.push(MoreRoutePath.aboutUs),
-            onTapHelp: () {
-              context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
-            },
+            // TODO: implement this
+            onTapHelp: () => context.showOnProgressSnackBar(),
           ),
         );
       },
