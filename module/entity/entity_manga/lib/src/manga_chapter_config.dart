@@ -9,7 +9,6 @@ class ChapterConfig extends Equatable {
   const ChapterConfig({
     this.downloaded = false,
     this.unread = false,
-    this.bookmarked = false,
     this.display = ChapterDisplayEnum.title,
     this.sortOption = ChapterSortOptionEnum.chapterNumber,
     this.sortOrder = ChapterSortOrderEnum.desc,
@@ -17,20 +16,18 @@ class ChapterConfig extends Equatable {
 
   final bool? downloaded;
   final bool? unread;
-  final bool? bookmarked;
   final ChapterDisplayEnum display;
   final ChapterSortOptionEnum sortOption;
   final ChapterSortOrderEnum sortOrder;
 
   @override
   List<Object?> get props {
-    return [downloaded, unread, bookmarked, display, sortOption, sortOrder];
+    return [downloaded, unread, display, sortOption, sortOrder];
   }
 
   ChapterConfig copyWith({
     ValueGetter<bool?>? downloaded,
     ValueGetter<bool?>? unread,
-    ValueGetter<bool?>? bookmarked,
     ChapterDisplayEnum? display,
     ChapterSortOptionEnum? sortOption,
     ChapterSortOrderEnum? sortOrder,
@@ -38,7 +35,6 @@ class ChapterConfig extends Equatable {
     return ChapterConfig(
       downloaded: downloaded != null ? downloaded() : this.downloaded,
       unread: unread != null ? unread() : this.unread,
-      bookmarked: bookmarked != null ? bookmarked() : this.bookmarked,
       display: display ?? this.display,
       sortOption: sortOption ?? this.sortOption,
       sortOrder: sortOrder ?? this.sortOrder,

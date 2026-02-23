@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -51,10 +52,14 @@ class MangaDetailScreen extends StatefulWidget {
   }) {
     return BlocProvider(
       create: (context) {
+        final ListenSettingDownloadedOnlyUseCase isDownloaded = locator();
         return MangaDetailScreenCubit(
           initialState: MangaDetailScreenState(
             mangaId: mangaId,
             source: source?.let(SourceEnum.fromName),
+            config: ChapterConfig(
+              downloaded: isDownloaded.downloadedOnlyState.valueOrNull,
+            ),
           ),
           getMangaUseCase: locator(),
           searchChapterUseCase: locator(),
@@ -68,6 +73,7 @@ class MangaDetailScreen extends StatefulWidget {
           getAllChapterUseCase: locator(),
           searchMangaUseCase: locator(),
           recrawlUseCase: locator(),
+          listenDownloadedChapterUseCase: locator(),
         )..init();
       },
       child: MangaDetailScreen(
@@ -463,6 +469,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               prev.totalChapter != curr.totalChapter,
               prev.hasNextPageChapter != curr.hasNextPageChapter,
               prev.prefetchedChapterIds != curr.prefetchedChapterIds,
+              prev.downloadedChapterIds != curr.downloadedChapterIds,
               prev.config != curr.config,
             ].contains(true);
           },
@@ -475,6 +482,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   chapter: data,
                   opacity: data.lastReadAt != null ? 0.5 : 1,
                   isPrefetching: state.prefetchedChapterIds.contains(data.id),
+                  isDownloaded: state.downloadedChapterIds.contains(data.id),
                   lastReadAt: data.lastReadAt,
                 );
               },
