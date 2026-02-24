@@ -1,6 +1,7 @@
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 import 'next_page_notification_widget.dart';
@@ -62,6 +63,14 @@ class _GridWidgetState<T> extends State<GridWidget<T>> {
     }
   }
 
+  int _crossAxisCount(BuildContext context) {
+    final breakpoint = ResponsiveBreakpoints.of(context);
+    if (breakpoint.isMobile) return 3;
+    if (breakpoint.isTablet) return 5;
+    if (breakpoint.isDesktop) return 8;
+    return 12;
+  }
+
   @override
   void dispose() {
     offset.dispose();
@@ -90,7 +99,7 @@ class _GridWidgetState<T> extends State<GridWidget<T>> {
                 SliverGrid.count(
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
-                  crossAxisCount: 3,
+                  crossAxisCount: _crossAxisCount(context),
                   childAspectRatio: 100 / 140,
                   children: List.generate(
                     20,
@@ -160,7 +169,7 @@ class _GridWidgetState<T> extends State<GridWidget<T>> {
                 SliverGrid.count(
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
-                  crossAxisCount: 3,
+                  crossAxisCount: _crossAxisCount(context),
                   childAspectRatio: 100 / 140,
                   children: [
                     for (final data in widget.data)
