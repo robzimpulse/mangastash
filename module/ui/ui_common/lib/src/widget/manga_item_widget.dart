@@ -48,6 +48,8 @@ class MangaItemWidget extends StatelessWidget {
                   child: CachedNetworkImage(
                     cacheManager: cacheManager,
                     fit: BoxFit.fill,
+                    memCacheWidth: 300,
+                    memCacheHeight: 420,
                     imageUrl: manga.coverUrl.or(
                       'https://placehold.co/400?text=Cover+Url',
                     ),
