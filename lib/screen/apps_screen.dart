@@ -32,6 +32,14 @@ class _AppsScreenState extends State<AppsScreen> {
 
   late final RouterConfig<Object> _routerConfig;
 
+  late final ThemeData _lightTheme = _themeLight().copyWith(
+    pageTransitionsTheme: _transition(),
+  );
+
+  late final ThemeData _darkTheme = _themeDark().copyWith(
+    pageTransitionsTheme: _transition(),
+  );
+
   @override
   void initState() {
     super.initState();
@@ -127,8 +135,8 @@ class _AppsScreenState extends State<AppsScreen> {
           title: 'Manga Stash',
           debugShowCheckedModeBanner: false,
           routerConfig: _routerConfig,
-          theme: _themeLight().copyWith(pageTransitionsTheme: _transition()),
-          darkTheme: _themeDark().copyWith(pageTransitionsTheme: _transition()),
+          theme: _lightTheme,
+          darkTheme: _darkTheme,
           themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
           builder: (context, child) {
             return ResponsiveBreakpoints.builder(
