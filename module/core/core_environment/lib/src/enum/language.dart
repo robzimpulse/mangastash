@@ -223,5 +223,5 @@ enum Language {
   }
 
   static List<Language> get sorted =>
-      values..sorted((a, b) => a.name.compareTo(b.name));
+      values.sorted((a, b) => a.name.compareTo(b.name));
 }

@@ -96,14 +96,16 @@ class _GridWidgetState<T> extends State<GridWidget<T>> {
           sliver: MultiSliver(
             children: [
               if (widget.isLoading)
-                SliverGrid.count(
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  crossAxisCount: _crossAxisCount(context),
-                  childAspectRatio: 100 / 140,
-                  children: List.generate(
-                    20,
-                    (e) => LayoutBuilder(
+                SliverGrid.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    crossAxisCount: _crossAxisCount(context),
+                    childAspectRatio: 100 / 140,
+                  ),
+                  itemCount: 20,
+                  itemBuilder: (context, index) {
+                    return LayoutBuilder(
                       builder: (context, constraint) {
                         return ConstrainedBox(
                           constraints: constraint,
@@ -115,8 +117,8 @@ class _GridWidgetState<T> extends State<GridWidget<T>> {
                           ),
                         );
                       },
-                    ),
-                  ),
+                    );
+                  },
                 )
               else if (error != null)
                 SliverFillRemaining(
@@ -166,15 +168,19 @@ class _GridWidgetState<T> extends State<GridWidget<T>> {
                   ),
                 )
               else ...[
-                SliverGrid.count(
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  crossAxisCount: _crossAxisCount(context),
-                  childAspectRatio: 100 / 140,
-                  children: [
-                    for (final data in widget.data)
-                      widget.itemBuilder.call(context, data),
-                  ],
+                SliverGrid.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    crossAxisCount: _crossAxisCount(context),
+                    childAspectRatio: 100 / 140,
+                  ),
+                  itemCount: widget.data.length,
+                  itemBuilder: (context, index) {
+                    final value = widget.data.elementAtOrNull(index);
+                    if (value == null) return null;
+                    return widget.itemBuilder.call(context, value);
+                  },
                 ),
                 if (widget.hasNext)
                   const SliverToBoxAdapter(

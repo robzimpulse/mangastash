@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:core_route/core_route.dart';
 import 'package:feature_browse/feature_browse.dart';
 import 'package:feature_common/feature_common.dart';
@@ -12,6 +14,16 @@ import 'screen/error_screen.dart';
 import 'screen/main_screen.dart';
 
 class MainRouteBuilder extends BaseRouteBuilder {
+  final _rootBuilder = [
+    LibraryRouteBuilder(),
+    UpdatesRouteBuilder(),
+    HistoryRouteBuilder(),
+    BrowseRouteBuilder(),
+    MoreRouteBuilder(),
+  ];
+
+  late final _builders = [CommonRouteBuilder(), ..._rootBuilder];
+
   @override
   List<RouteBase> routes({
     required ServiceLocator locator,
@@ -32,27 +44,7 @@ class MainRouteBuilder extends BaseRouteBuilder {
           return ErrorScreen(text: state.extra as String? ?? '');
         },
       ),
-      ...CommonRouteBuilder().routes(
-        locator: locator,
-        rootNavigatorKey: rootNavigatorKey,
-      ),
-      ...LibraryRouteBuilder().routes(
-        locator: locator,
-        rootNavigatorKey: rootNavigatorKey,
-      ),
-      ...UpdatesRouteBuilder().routes(
-        locator: locator,
-        rootNavigatorKey: rootNavigatorKey,
-      ),
-      ...HistoryRouteBuilder().routes(
-        locator: locator,
-        rootNavigatorKey: rootNavigatorKey,
-      ),
-      ...BrowseRouteBuilder().routes(
-        locator: locator,
-        rootNavigatorKey: rootNavigatorKey,
-      ),
-      ...MoreRouteBuilder().routes(
+      ..._builders.aggregatedRoutes(
         locator: locator,
         rootNavigatorKey: rootNavigatorKey,
       ),
@@ -86,37 +78,28 @@ class MainRouteBuilder extends BaseRouteBuilder {
         );
       },
       branches: [
-        StatefulShellBranch(
-          observers: observers?.call(),
-          routes: [
-            LibraryRouteBuilder().root(locator: locator, observers: observers),
-          ],
-        ),
-        StatefulShellBranch(
-          observers: observers?.call(),
-          routes: [
-            UpdatesRouteBuilder().root(locator: locator, observers: observers),
-          ],
-        ),
-        StatefulShellBranch(
-          observers: observers?.call(),
-          routes: [
-            HistoryRouteBuilder().root(locator: locator, observers: observers),
-          ],
-        ),
-        StatefulShellBranch(
-          observers: observers?.call(),
-          routes: [
-            BrowseRouteBuilder().root(locator: locator, observers: observers),
-          ],
-        ),
-        StatefulShellBranch(
-          observers: observers?.call(),
-          routes: [
-            MoreRouteBuilder().root(locator: locator, observers: observers),
-          ],
+        ..._rootBuilder.map(
+          (e) => StatefulShellBranch(
+            observers: observers?.call(),
+            routes: [e.root(locator: locator, observers: observers)],
+          ),
         ),
       ],
+    );
+  }
+
+  @override
+  FutureOr<OnEnterResult?> onEnter({
+    required BuildContext context,
+    required GoRouterState current,
+    required GoRouterState next,
+    required GoRouter router,
+  }) async {
+    return _builders.aggregatedOnEnter(
+      context: context,
+      current: current,
+      next: next,
+      router: router,
     );
   }
 }
