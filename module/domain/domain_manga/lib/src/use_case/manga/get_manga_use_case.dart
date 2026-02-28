@@ -93,7 +93,7 @@ class GetMangaUseCase with SyncMangasMixin {
       final raw = await _mangaDao.search(ids: [mangaId]);
       final manga = Manga.fromDatabase(raw.firstOrNull);
 
-      if (manga != null && manga.propertiesFilled) {
+      if (manga != null && manga.propertiesFilled && useCache) {
         return Success(manga);
       }
 
