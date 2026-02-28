@@ -47,16 +47,26 @@ class _AppsScreenState extends State<AppsScreen> {
     final rootNavigatorKey = GlobalKey<NavigatorState>();
     final LogBox logBox = widget.locator();
     final DatabaseViewer viewer = widget.locator();
+    final routes = MainRouteBuilder();
     _routerConfig = GoRouter(
       navigatorKey: rootNavigatorKey,
       initialLocation: MainPath.main,
+      onEnter: (context, current, next, router) async {
+        final result = await routes.onEnter(
+          context: context,
+          current: current,
+          next: next,
+          router: router,
+        );
+        return result ?? Allow();
+      },
       onException: (context, state, router) {
         router.push(
           MainPath.notFound,
           extra: 'Path Not Found (${state.uri.toString()})',
         );
       },
-      routes: MainRouteBuilder().allRoutes(
+      routes: routes.allRoutes(
         locator: widget.locator,
         rootNavigatorKey: rootNavigatorKey,
         // TODO: add observer here
