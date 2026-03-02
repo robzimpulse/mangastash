@@ -121,7 +121,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     required BuildContext context,
     required DownloadOption option,
   }) async {
-    return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+    // TODO: implement this
+    return context.showOnProgressSnackBar();
   }
 
   void _onTapFilter({

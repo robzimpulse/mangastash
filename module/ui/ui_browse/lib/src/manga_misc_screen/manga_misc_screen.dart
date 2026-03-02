@@ -155,10 +155,10 @@ class _MangaMiscScreenState extends State<MangaMiscScreen> {
               if (state.config?.sortOption == options) {
                 if (state.config?.sortOrder == ChapterSortOrderEnum.desc) {
                   leading = Icon(Icons.arrow_downward);
-                  order = ChapterSortOrderEnum.desc;
+                  order = ChapterSortOrderEnum.asc;
                 } else {
                   leading = Icon(Icons.arrow_upward);
-                  order = ChapterSortOrderEnum.asc;
+                  order = ChapterSortOrderEnum.desc;
                 }
               } else {
                 leading = SizedBox.fromSize(

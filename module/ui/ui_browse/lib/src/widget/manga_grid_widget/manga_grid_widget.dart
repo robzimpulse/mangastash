@@ -104,7 +104,6 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
           prev.parameter != curr.parameter,
           prev.prefetchedMangaIds != curr.prefetchedMangaIds,
           prev.hasNextPage != curr.hasNextPage,
-          prev.parameter != curr.parameter,
         ].contains(true);
       },
       builder: (context, state) {

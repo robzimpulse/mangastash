@@ -16,7 +16,6 @@ import 'use_case/chapter/update_chapter_use_case.dart';
 import 'use_case/history/listen_read_history_use_case.dart';
 import 'use_case/history/listen_unread_history_use_case.dart';
 import 'use_case/library/add_to_library_use_case.dart';
-import 'use_case/library/get_manga_from_library_use_case.dart';
 import 'use_case/library/listen_manga_from_library_use_case.dart';
 import 'use_case/library/remove_from_library_use_case.dart';
 import 'use_case/manga/get_manga_from_url_use_case.dart';
@@ -178,11 +177,7 @@ class DomainMangaRegistrar extends Registrar {
       () => ListenDownloadedChapterUseCase(chapterDao: locator()),
     );
 
-    locator.registerLazySingleton(
-      () => LibraryManager(libraryDao: locator()),
-      dispose: (e) => e.dispose(),
-    );
-    locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
+    locator.registerLazySingleton(() => LibraryManager(libraryDao: locator()));
     locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
 
     final end = DateTime.timestamp();
