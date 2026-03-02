@@ -14,6 +14,7 @@ class MangaReaderScreenState extends Equatable {
     this.isLoadingNeighbourChapters = false,
     this.previousChapterId,
     this.nextChapterId,
+    this.progress,
   });
 
   final bool isLoading;
@@ -36,6 +37,8 @@ class MangaReaderScreenState extends Equatable {
 
   final String? nextChapterId;
 
+  final double? progress;
+
   @override
   List<Object?> get props {
     return [
@@ -49,6 +52,7 @@ class MangaReaderScreenState extends Equatable {
       previousChapterId,
       nextChapterId,
       isLoadingNeighbourChapters,
+      progress,
     ];
   }
 
@@ -63,6 +67,7 @@ class MangaReaderScreenState extends Equatable {
     bool? isLoadingNeighbourChapters,
     String? previousChapterId,
     String? nextChapterId,
+    double? progress,
   }) {
     return MangaReaderScreenState(
       mangaId: mangaId ?? this.mangaId,
@@ -76,6 +81,7 @@ class MangaReaderScreenState extends Equatable {
           isLoadingNeighbourChapters ?? this.isLoadingNeighbourChapters,
       previousChapterId: previousChapterId ?? this.previousChapterId,
       nextChapterId: nextChapterId ?? this.nextChapterId,
+      progress: progress ?? this.progress,
     );
   }
 }

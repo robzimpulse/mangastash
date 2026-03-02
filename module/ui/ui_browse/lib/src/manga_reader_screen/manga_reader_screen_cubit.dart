@@ -154,6 +154,10 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     await init(useCache: false);
   }
 
+  void set({double? progress}) {
+    emit(state.copyWith(progress: progress));
+  }
+
   Future<void> removeImage({required String url}) async {
     final chapterId = state.chapterId;
     if (chapterId == null) return;
