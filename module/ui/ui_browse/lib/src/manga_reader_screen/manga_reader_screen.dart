@@ -79,7 +79,12 @@ class MangaReaderScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScaffoldScreen(
       appBar: AppBar(title: _title(), actions: [_recrawlButton()]),
-      body: _content(context: context),
+      body: Column(
+        children: [
+          _indicator(context: context),
+          Expanded(child: _content(context: context)),
+        ],
+      ),
     );
   }
 
@@ -127,167 +132,164 @@ class MangaReaderScreen extends StatelessWidget {
     );
   }
 
+  Widget _indicator({required BuildContext context}) {
+    return _builder(
+      buildWhen: (prev, curr) {
+        return [
+          prev.progress != curr.progress,
+          prev.isLoading != curr.isLoading,
+        ].contains(true);
+      },
+      builder: (context, state) {
+        if (state.isLoading) return SizedBox.shrink();
+        return LinearProgressIndicator(value: state.progress);
+      },
+    );
+  }
+
   Widget _content({required BuildContext context}) {
-    return Column(
-      children: [
-        _builder(
-          buildWhen: (prev, curr) => prev.progress != curr.progress,
-          builder: (context, state) {
-            return LinearProgressIndicator(value: state.progress);
-          },
-        ),
-        Expanded(
-          child: _builder(
-            buildWhen: (prev, curr) {
-              return [
-                prev.isLoading != curr.isLoading,
-                prev.error != curr.error,
-                prev.chapter?.images != curr.chapter?.images,
-                prev.previousChapterId != curr.previousChapterId,
-                prev.nextChapterId != curr.nextChapterId,
-                prev.isLoadingNeighbourChapters !=
-                    curr.isLoadingNeighbourChapters,
-              ].contains(true);
-            },
-            builder: (context, state) {
-              final error = state.error;
-              final images = state.chapter?.images ?? [];
-              final url = state.chapter?.webUrl;
-              final prevId = state.previousChapterId;
-              final nextId = state.nextChapterId;
+    return _builder(
+      buildWhen: (prev, curr) {
+        return [
+          prev.isLoading != curr.isLoading,
+          prev.error != curr.error,
+          prev.chapter?.images != curr.chapter?.images,
+          prev.previousChapterId != curr.previousChapterId,
+          prev.nextChapterId != curr.nextChapterId,
+          prev.isLoadingNeighbourChapters != curr.isLoadingNeighbourChapters,
+        ].contains(true);
+      },
+      builder: (context, state) {
+        final error = state.error;
+        final images = state.chapter?.images ?? [];
+        final url = state.chapter?.webUrl;
+        final prevId = state.previousChapterId;
+        final nextId = state.nextChapterId;
 
-              if (error != null) {
-                return _errorContent(context: context, error: error);
-              }
+        if (error != null) {
+          return _errorContent(context: context, error: error);
+        }
 
-              if (state.isLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
+        if (state.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-              if (images.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text('Images Empty'),
-                      const SizedBox(height: 16),
-                      OutlinedButton(
-                        onPressed: () {
-                          if (url != null) {
-                            _onTapRecrawl(context: context, url: url);
-                          } else {
-                            _cubit(context).init();
-                          }
-                        },
-                        child: const Text('Open Debug Browser'),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              return MangaPageView(
-                mode: MangaPageViewMode.continuous,
-                direction: MangaPageViewDirection.down,
-                pageCount: images.length,
-                onProgressChange: (e) => _cubit(context).set(progress: e),
-                options: MangaPageViewOptions(
-                  crossAxisOverscroll: false,
-                  precacheAhead: 1,
-                  precacheBehind: 1,
-                  maxZoomLevel: 4,
-                  minZoomLevel: 1,
-                  edgeIndicatorContainerSize: 100,
+        if (images.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('Images Empty'),
+                const SizedBox(height: 16),
+                OutlinedButton(
+                  onPressed: () {
+                    if (url != null) {
+                      _onTapRecrawl(context: context, url: url);
+                    } else {
+                      _cubit(context).init();
+                    }
+                  },
+                  child: const Text('Open Debug Browser'),
                 ),
-                pageBuilder: (context, index) {
-                  return InkWell(
-                    onLongPress: () {
-                      _onTapMenu(
-                        context: context,
-                        url: images.elementAt(index),
-                      );
-                    },
-                    child: CachedNetworkImage(
-                      imageUrl: images.elementAt(index),
-                      cacheManager: imagesCacheManager,
-                      errorWidget: (context, url, error) {
-                        return SizedBox(
-                          width: 100,
-                          height: 100,
-                          child: const Center(child: Icon(Icons.error)),
-                        );
-                      },
-                      progressIndicatorBuilder: (context, url, progress) {
-                        return SizedBox(
-                          width: 100,
-                          height: 100,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              value: progress.progress,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
-                startEdgeDragIndicatorBuilder: (context, info) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (state.isLoadingNeighbourChapters) ...[
-                          SizedBox(
-                            width: 32,
-                            height: 32,
-                            child: CircularProgressIndicator(),
-                          ),
-                        ] else if (prevId != null) ...[
-                          Icon(Icons.arrow_upward),
-                          Text('Previous Chapter'),
-                        ] else ...[
-                          Text('No Previous Chapter'),
-                        ],
-                      ],
-                    ),
-                  );
-                },
-                endEdgeDragIndicatorBuilder: (context, info) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (state.isLoadingNeighbourChapters) ...[
-                          SizedBox(
-                            width: 32,
-                            height: 32,
-                            child: CircularProgressIndicator(),
-                          ),
-                        ] else if (nextId != null) ...[
-                          Icon(Icons.arrow_downward),
-                          Text('Next Chapter'),
-                        ] else ...[
-                          Text('No Next Chapter'),
-                        ],
-                      ],
-                    ),
-                  );
-                },
-                onStartEdgeDrag: () {
-                  if (state.isLoadingNeighbourChapters || prevId == null)
-                    return;
-                  onTapShortcut?.call(prevId);
-                },
-                onEndEdgeDrag: () {
-                  if (state.isLoadingNeighbourChapters || nextId == null)
-                    return;
-                  onTapShortcut?.call(nextId);
-                },
-              );
-            },
+              ],
+            ),
+          );
+        }
+
+        return MangaPageView(
+          mode: MangaPageViewMode.continuous,
+          direction: MangaPageViewDirection.down,
+          pageCount: images.length,
+          onProgressChange: (e) => _cubit(context).set(progress: e),
+          options: MangaPageViewOptions(
+            crossAxisOverscroll: false,
+            precacheAhead: 1,
+            precacheBehind: 1,
+            maxZoomLevel: 4,
+            minZoomLevel: 1,
+            edgeIndicatorContainerSize: 100,
           ),
-        ),
-      ],
+          pageBuilder: (context, index) {
+            return InkWell(
+              onLongPress: () {
+                _onTapMenu(context: context, url: images.elementAt(index));
+              },
+              child: CachedNetworkImage(
+                imageUrl: images.elementAt(index),
+                cacheManager: imagesCacheManager,
+                errorWidget: (context, url, error) {
+                  return SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: const Center(child: Icon(Icons.error)),
+                  );
+                },
+                progressIndicatorBuilder: (context, url, progress) {
+                  return SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: progress.progress,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+          startEdgeDragIndicatorBuilder: (context, info) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (state.isLoadingNeighbourChapters) ...[
+                    SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: CircularProgressIndicator(),
+                    ),
+                  ] else if (prevId != null) ...[
+                    Icon(Icons.arrow_upward),
+                    Text('Previous Chapter'),
+                  ] else ...[
+                    Text('No Previous Chapter'),
+                  ],
+                ],
+              ),
+            );
+          },
+          endEdgeDragIndicatorBuilder: (context, info) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (state.isLoadingNeighbourChapters) ...[
+                    SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: CircularProgressIndicator(),
+                    ),
+                  ] else if (nextId != null) ...[
+                    Icon(Icons.arrow_downward),
+                    Text('Next Chapter'),
+                  ] else ...[
+                    Text('No Next Chapter'),
+                  ],
+                ],
+              ),
+            );
+          },
+          onStartEdgeDrag: () {
+            if (state.isLoadingNeighbourChapters || prevId == null) return;
+            onTapShortcut?.call(prevId);
+          },
+          onEndEdgeDrag: () {
+            if (state.isLoadingNeighbourChapters || nextId == null) return;
+            onTapShortcut?.call(nextId);
+          },
+        );
+      },
     );
   }
 
