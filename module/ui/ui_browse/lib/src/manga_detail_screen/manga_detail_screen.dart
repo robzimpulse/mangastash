@@ -111,10 +111,12 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
-  MangaDetailScreenCubit _cubit(BuildContext context) => context.read();
+  MangaDetailScreenCubit? _cubit(BuildContext context) {
+    return context.mounted ? context.read() : null;
+  }
 
   void _onTapRecrawl({required BuildContext context, required String url}) {
-    _cubit(context).recrawl(context: context, url: url);
+    _cubit(context)?.recrawl(context: context, url: url);
   }
 
   void _onTapDownload({
@@ -131,7 +133,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }) async {
     final result = await widget.onTapSort?.call(config);
     if (!context.mounted || result == null) return;
-    _cubit(context).initChapter(config: result);
+    _cubit(context)?.initChapter(config: result);
   }
 
   void _onLongPressManga({
@@ -155,7 +157,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   void _onTapAddToLibrary({required BuildContext context, Manga? manga}) {
     if (manga == null) return;
-    _cubit(context).addToLibrary(manga: manga);
+    _cubit(context)?.addToLibrary(manga: manga);
   }
 
   @override
@@ -359,7 +361,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           onPressed: () {
             final manga = state.manga;
             if (manga == null) return;
-            _cubit(context).addToLibrary(manga: manga);
+            _cubit(context)?.addToLibrary(manga: manga);
           },
         );
       },
@@ -491,8 +493,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(
                 context,
               ),
-              onLoadNextPage: () => _cubit(context).nextChapter(),
-              onRefresh: () => _cubit(context).initChapter(refresh: true),
+              onLoadNextPage: () => _cubit(context)?.nextChapter(),
+              onRefresh: () => _cubit(context)?.initChapter(refresh: true),
               onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
               onTapDownload: (option) {
                 _onTapDownload(context: context, option: option);
@@ -500,7 +502,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               onTapFilter: () {
                 _onTapFilter(context: context, config: state.config);
               },
-              onTapPrefetch: () => _cubit(context).prefetch(),
+              onTapPrefetch: () => _cubit(context)?.prefetch(),
               error: state.errorChapters,
               isLoading: state.isLoadingChapters || state.isLoadingManga,
               hasNext: state.hasNextPageChapter,
@@ -563,8 +565,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(
                 context,
               ),
-              onRefresh: () => _cubit(context).initSimilarManga(refresh: true),
-              onLoadNextPage: () => _cubit(context).nextSimilarManga(),
+              onRefresh: () => _cubit(context)?.initSimilarManga(refresh: true),
+              onLoadNextPage: () => _cubit(context)?.nextSimilarManga(),
               onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
               error: state.errorSimilarManga,
               isLoading: state.isLoadingSimilarManga || state.isLoadingManga,

@@ -64,7 +64,9 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
 
   final FocusNode _searchFocusNode = FocusNode();
 
-  LibraryMangaScreenCubit _cubit(BuildContext context) => context.read();
+  LibraryMangaScreenCubit? _cubit(BuildContext context) {
+    return context.mounted ? context.read() : null;
+  }
 
   BlocBuilder _builder({
     required BlocWidgetBuilder<LibraryMangaScreenState> builder,
@@ -124,11 +126,11 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
 
     switch (result) {
       case MangaMenu.download:
-        _cubit(context).download(manga: manga);
+        _cubit(context)?.download(manga: manga);
       case MangaMenu.library:
-        _cubit(context).remove(manga: manga);
+        _cubit(context)?.remove(manga: manga);
       case MangaMenu.prefetch:
-        _cubit(context).prefetch(mangas: [manga]);
+        _cubit(context)?.prefetch(mangas: [manga]);
     }
   }
 
@@ -155,8 +157,8 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
             ),
             cursorColor: DefaultTextStyle.of(context).style.color,
             style: DefaultTextStyle.of(context).style,
-            onChanged: (value) => _cubit(context).update(mangaTitle: value),
-            onSubmitted: (value) => _cubit(context).update(mangaTitle: value),
+            onChanged: (value) => _cubit(context)?.update(mangaTitle: value),
+            onSubmitted: (value) => _cubit(context)?.update(mangaTitle: value),
           ),
         );
       },
@@ -173,7 +175,7 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
 
         return IconButton(
           icon: const Icon(Icons.cloud_download),
-          onPressed: () => _cubit(context).prefetch(mangas: state.mangas),
+          onPressed: () => _cubit(context)?.prefetch(mangas: state.mangas),
         );
       },
     );
@@ -186,7 +188,7 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
         return IconButton(
           icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
           onPressed: () {
-            _cubit(context).update(isSearchActive: !state.isSearchActive);
+            _cubit(context)?.update(isSearchActive: !state.isSearchActive);
           },
         );
       },
@@ -199,7 +201,7 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
       onPressed: () async {
         final result = await widget.onTapAddManga?.call();
         if (!context.mounted || result == null) return;
-        _cubit(context).add(url: result);
+        _cubit(context)?.add(url: result);
       },
     );
   }
