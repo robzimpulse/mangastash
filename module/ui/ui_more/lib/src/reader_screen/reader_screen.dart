@@ -18,9 +18,9 @@ class ReaderScreen extends StatelessWidget {
         SliverPinnedHeader(
           child: Container(
             color: Theme.of(context).cardColor,
-            child: ListTile(
-              title: const Text('Prefetch Chapter'),
-              subtitle: const Text(
+            child: const ListTile(
+              title: Text('Prefetch Chapter'),
+              subtitle: Text(
                 'How many chapter should be fetched around current chapter',
               ),
             ),

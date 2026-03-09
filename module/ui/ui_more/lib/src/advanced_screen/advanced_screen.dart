@@ -40,7 +40,7 @@ class AdvancedScreen extends StatelessWidget {
               height: double.infinity,
               child: Icon(Icons.wrap_text),
             ),
-            trailing: Icon(Icons.chevron_right),
+            trailing: const Icon(Icons.chevron_right),
           ),
           ListTile(
             title: const Text('Database Inspector'),
@@ -49,7 +49,7 @@ class AdvancedScreen extends StatelessWidget {
               height: double.infinity,
               child: Icon(Icons.storage),
             ),
-            trailing: Icon(Icons.chevron_right),
+            trailing: const Icon(Icons.chevron_right),
           ),
           ListTile(
             title: const Text('Database Diagnostic'),
@@ -58,16 +58,16 @@ class AdvancedScreen extends StatelessWidget {
               height: double.infinity,
               child: Icon(Icons.healing),
             ),
-            trailing: Icon(Icons.chevron_right),
+            trailing: const Icon(Icons.chevron_right),
           ),
           ExpansionTile(
             title: const Text('Browser Tester'),
             subtitle: const Text('Cloudflare Challenge Tester and Browser'),
-            leading: Icon(Icons.web),
+            leading: const Icon(Icons.web),
             children: [
               ListTile(
                 title: TextField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'eg: https://www.google.com',
                     border: OutlineInputBorder(),
                   ),
@@ -77,12 +77,12 @@ class AdvancedScreen extends StatelessWidget {
                     await logBox.webview(context: context, uri: uri);
                   },
                 ),
-                leading: Icon(Icons.web_asset),
-                trailing: Icon(Icons.chevron_right),
+                leading: const Icon(Icons.web_asset),
+                trailing: const Icon(Icons.chevron_right),
               ),
               ListTile(
                 title: const Text('Cloudflare Challenge'),
-                leading: Icon(Icons.cloud_circle),
+                leading: const Icon(Icons.cloud_circle),
                 onTap: () async {
                   final uri = Uri.tryParse(
                     'https://www.scrapingcourse.com/cloudflare-challenge',

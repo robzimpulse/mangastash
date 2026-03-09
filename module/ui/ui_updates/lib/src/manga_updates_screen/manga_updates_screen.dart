@@ -42,7 +42,9 @@ class MangaUpdatesScreen extends StatelessWidget {
 
   final Function(Manga, Chapter)? onTapChapter;
 
-  MangaUpdatesScreenCubit _cubit(BuildContext context) => context.read();
+  MangaUpdatesScreenCubit? _cubit(BuildContext context) {
+    return context.mounted ? context.read() : null;
+  }
 
   BlocBuilder _builder({
     required BlocWidgetBuilder<MangaUpdatesScreenState> builder,
@@ -64,7 +66,7 @@ class MangaUpdatesScreen extends StatelessWidget {
 
         return IconButton(
           icon: const Icon(Icons.cloud_download),
-          onPressed: () => _cubit(context).prefetch(),
+          onPressed: () => _cubit(context)?.prefetch(),
         );
       },
     );
@@ -108,7 +110,7 @@ class MangaUpdatesScreen extends StatelessWidget {
               final manga = value?.manga;
               if (chapter == null || manga == null) return null;
               return ChapterTileWidget.chapter(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 manga: manga,
                 chapter: chapter,
                 lastReadAt: chapter.lastReadAt,
@@ -117,7 +119,7 @@ class MangaUpdatesScreen extends StatelessWidget {
                 onTap: () => onTapChapter?.call(manga, chapter),
               );
             },
-            separatorBuilder: (context, _) => SizedBox(height: 8),
+            separatorBuilder: (context, _) => const SizedBox(height: 8),
           );
         },
       ),

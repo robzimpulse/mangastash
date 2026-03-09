@@ -20,7 +20,9 @@ class AppearanceScreen extends StatelessWidget {
     );
   }
 
-  AppearanceScreenCubit _cubit(BuildContext context) => context.read();
+  AppearanceScreenCubit? _cubit(BuildContext context) {
+    return context.mounted ? context.read() : null;
+  }
 
   BlocBuilder _builder({
     required BlocWidgetBuilder<AppearanceScreenState> builder,
@@ -53,7 +55,7 @@ class AppearanceScreen extends StatelessWidget {
               return SwitchListTile(
                 title: Text('${state.isDarkMode ? 'Lights' : 'Dark'} Mode'),
                 value: state.isDarkMode,
-                onChanged: (value) => _cubit(context).changeDarkMode(value),
+                onChanged: (value) => _cubit(context)?.changeDarkMode(value),
                 secondary: SizedBox(
                   height: double.infinity,
                   child: Icon(
