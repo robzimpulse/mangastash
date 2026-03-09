@@ -2,6 +2,7 @@ import 'package:core_analytics/core_analytics.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../mixin/sync_tags_mixin.dart';
@@ -74,7 +75,10 @@ class GetTagsUseCase with SyncTagsMixin {
       useCache: useCache,
     );
 
-    final parser = TagListHtmlParser.forSource(root: document, source: source);
+    final parser = TagListHtmlParser.forSource(
+      root: HtmlDocument()..nodes.addAll(document.nodes),
+      source: source,
+    );
 
     final tags = await parser.tags;
 

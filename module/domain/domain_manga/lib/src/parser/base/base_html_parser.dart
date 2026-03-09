@@ -1,6 +1,6 @@
-import 'package:html/dom.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 
 class BaseHtmlParser {
-  final Document root;
+  final HtmlDocument root;
   BaseHtmlParser({required this.root});
 }

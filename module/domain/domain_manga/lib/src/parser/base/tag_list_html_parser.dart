@@ -1,5 +1,5 @@
 import 'package:entity_manga/entity_manga.dart';
-import 'package:html/dom.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 
 import '../asura_scan_tag_list_html_parser.dart';
 import '../mangaclash_tag_list_html_parser.dart';
@@ -11,7 +11,7 @@ abstract class TagListHtmlParser extends BaseHtmlParser {
   TagListHtmlParser({required super.root});
 
   factory TagListHtmlParser.forSource({
-    required Document root,
+    required HtmlDocument root,
     required SourceEnum source,
   }) {
     if (SourceEnum.asurascan == source) {

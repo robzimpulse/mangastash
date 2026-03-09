@@ -2,6 +2,7 @@ import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 
 extension MangaScrappedExtension on MangaScrapped {
   Future<Manga> convert({

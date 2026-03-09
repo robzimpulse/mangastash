@@ -1,5 +1,4 @@
-import 'package:core_environment/core_environment.dart';
-import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 
 import 'base/manga_detail_html_parser.dart';
 
@@ -7,7 +6,7 @@ class AsuraScanMangaDetailHtmlParser extends MangaDetailHtmlParser {
   AsuraScanMangaDetailHtmlParser({required super.root});
 
   @override
-  Future<Manga> get manga async {
+  Future<MangaScrapped> get manga async {
     final query = ['div', 'float-left', 'relative', 'z-0'].join('.');
     final region = root.querySelector(query);
 
@@ -38,16 +37,12 @@ class AsuraScanMangaDetailHtmlParser extends MangaDetailHtmlParser {
             ?.querySelector('img')
             ?.attributes['src'];
 
-    return Manga(
+    return MangaScrapped(
       title: title,
       author: author,
       description: description,
       coverUrl: coverUrl,
-      tags: [
-        ...?genres?.map(
-          (e) => Tag(name: e, source: SourceEnum.mangaclash.label),
-        ),
-      ],
+      tags: genres?.toList(),
     );
   }
 }

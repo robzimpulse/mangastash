@@ -1,4 +1,4 @@
-import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 
 import 'base/chapter_list_html_parser.dart';
 

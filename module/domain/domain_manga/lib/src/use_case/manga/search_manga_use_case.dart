@@ -5,6 +5,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../mixin/sync_mangas_mixin.dart';
@@ -94,7 +95,7 @@ class SearchMangaUseCase with SyncMangasMixin {
     );
 
     final parser = MangaListHtmlParser.forSource(
-      root: document,
+      root: HtmlDocument()..nodes.addAll(document.nodes),
       source: parameter.source,
     );
 
