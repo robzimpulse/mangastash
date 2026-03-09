@@ -24,26 +24,6 @@ extension MangaScrappedExtension on MangaScrapped {
   }
 }
 
-extension MangaScrappedExtension on MangaScrapped {
-  Future<Manga> convert({
-    required LogBox logbox,
-    ConverterCacheManager? manager,
-  }) async {
-    return Manga(
-      id: id,
-      title: title,
-      coverUrl: coverUrl,
-      author: author,
-      status: status,
-      description: description,
-      tags: tags?.map((e) => Tag(name: e)).toList(),
-      webUrl: webUrl,
-      createdAt: await createdAt?.asDateTime(logbox: logbox, manager: manager),
-      updatedAt: await updatedAt?.asDateTime(logbox: logbox, manager: manager),
-    );
-  }
-}
-
 extension ChapterScrappedExtension on ChapterScrapped {
   Future<Chapter> convert({
     required LogBox logbox,
