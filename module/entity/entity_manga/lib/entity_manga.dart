@@ -16,6 +16,7 @@ export 'src/headless_webview_key.dart';
 export 'src/manga.dart';
 export 'src/manga_chapter.dart';
 export 'src/manga_chapter_config.dart';
+export 'src/manga_scrapped.dart';
 export 'src/source_search_chapter_parameter.dart';
 export 'src/source_search_manga_parameter.dart';
 export 'src/tag.dart';
