@@ -129,7 +129,7 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
             );
           },
           onLoadNextPage: () => _cubit(context)?.next(),
-          onRefresh: () => _cubit(context)?.init(refresh: true),
+          onRefresh: () async => await _cubit(context)?.init(refresh: true),
           onTapRecrawl: (url) {
             _cubit(context)?.recrawl(context: context, url: url);
           },
