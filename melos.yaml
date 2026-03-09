@@ -38,7 +38,7 @@ scripts:
       failFast: true
       orderDependents: true
 
-  generate:
+  gen:build_runner:
     description: Generate files for all packages.
     run: flutter pub run build_runner build --delete-conflicting-outputs
     exec:
@@ -48,7 +48,7 @@ scripts:
     packageFilters:
       dependsOn: "build_runner"
 
-  generate:migration:
+  gen:migration:
     description: Generate migration files for drift packages.
     run: flutter pub run drift_dev make-migrations
     exec:
@@ -58,7 +58,7 @@ scripts:
     packageFilters:
       dependsOn: "drift_dev"
 
-  generate:dart_eval_bind:
+  gen:dart_eval_bind:
     description: Generate dart_eval bind files for dynamic linking packages.
     run: flutter pub run dart_eval bind
     exec:
