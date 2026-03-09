@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -51,10 +52,14 @@ class MangaDetailScreen extends StatefulWidget {
   }) {
     return BlocProvider(
       create: (context) {
+        final ListenSettingDownloadedOnlyUseCase isDownloaded = locator();
         return MangaDetailScreenCubit(
           initialState: MangaDetailScreenState(
             mangaId: mangaId,
             source: source?.let(SourceEnum.fromName),
+            config: ChapterConfig(
+              downloaded: isDownloaded.downloadedOnlyState.valueOrNull,
+            ),
           ),
           getMangaUseCase: locator(),
           searchChapterUseCase: locator(),
@@ -68,6 +73,7 @@ class MangaDetailScreen extends StatefulWidget {
           getAllChapterUseCase: locator(),
           searchMangaUseCase: locator(),
           recrawlUseCase: locator(),
+          listenDownloadedChapterUseCase: locator(),
         )..init();
       },
       child: MangaDetailScreen(
@@ -105,17 +111,20 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     );
   }
 
-  MangaDetailScreenCubit _cubit(BuildContext context) => context.read();
+  MangaDetailScreenCubit? _cubit(BuildContext context) {
+    return context.mounted ? context.read() : null;
+  }
 
   void _onTapRecrawl({required BuildContext context, required String url}) {
-    _cubit(context).recrawl(context: context, url: url);
+    _cubit(context)?.recrawl(context: context, url: url);
   }
 
   void _onTapDownload({
     required BuildContext context,
     required DownloadOption option,
   }) async {
-    return context.showSnackBar(message: '🚧🚧🚧 Under Construction 🚧🚧🚧');
+    // TODO: implement this
+    return context.showOnProgressSnackBar();
   }
 
   void _onTapFilter({
@@ -124,7 +133,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   }) async {
     final result = await widget.onTapSort?.call(config);
     if (!context.mounted || result == null) return;
-    _cubit(context).initChapter(config: result);
+    _cubit(context)?.initChapter(config: result);
   }
 
   void _onLongPressManga({
@@ -148,7 +157,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
 
   void _onTapAddToLibrary({required BuildContext context, Manga? manga}) {
     if (manga == null) return;
-    _cubit(context).addToLibrary(manga: manga);
+    _cubit(context)?.addToLibrary(manga: manga);
   }
 
   @override
@@ -352,7 +361,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           onPressed: () {
             final manga = state.manga;
             if (manga == null) return;
-            _cubit(context).addToLibrary(manga: manga);
+            _cubit(context)?.addToLibrary(manga: manga);
           },
         );
       },
@@ -463,6 +472,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               prev.totalChapter != curr.totalChapter,
               prev.hasNextPageChapter != curr.hasNextPageChapter,
               prev.prefetchedChapterIds != curr.prefetchedChapterIds,
+              prev.downloadedChapterIds != curr.downloadedChapterIds,
               prev.config != curr.config,
             ].contains(true);
           },
@@ -475,6 +485,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   chapter: data,
                   opacity: data.lastReadAt != null ? 0.5 : 1,
                   isPrefetching: state.prefetchedChapterIds.contains(data.id),
+                  isDownloaded: state.downloadedChapterIds.contains(data.id),
                   lastReadAt: data.lastReadAt,
                 );
               },
@@ -482,8 +493,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(
                 context,
               ),
-              onLoadNextPage: () => _cubit(context).nextChapter(),
-              onRefresh: () => _cubit(context).initChapter(refresh: true),
+              onLoadNextPage: () => _cubit(context)?.nextChapter(),
+              onRefresh: () async {
+                await _cubit(context)?.initChapter(refresh: true);
+              },
               onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
               onTapDownload: (option) {
                 _onTapDownload(context: context, option: option);
@@ -491,7 +504,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               onTapFilter: () {
                 _onTapFilter(context: context, config: state.config);
               },
-              onTapPrefetch: () => _cubit(context).prefetch(),
+              onTapPrefetch: () => _cubit(context)?.prefetch(),
               error: state.errorChapters,
               isLoading: state.isLoadingChapters || state.isLoadingManga,
               hasNext: state.hasNextPageChapter,
@@ -554,8 +567,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(
                 context,
               ),
-              onRefresh: () => _cubit(context).initSimilarManga(refresh: true),
-              onLoadNextPage: () => _cubit(context).nextSimilarManga(),
+              onRefresh: () async {
+                await _cubit(context)?.initSimilarManga(refresh: true);
+              },
+              onLoadNextPage: () => _cubit(context)?.nextSimilarManga(),
               onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
               error: state.errorSimilarManga,
               isLoading: state.isLoadingSimilarManga || state.isLoadingManga,

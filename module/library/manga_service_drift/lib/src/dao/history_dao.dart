@@ -15,10 +15,16 @@ part 'history_dao.g.dart';
 class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
   HistoryDao(super.db);
 
-  JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
+  JoinedSelectStatement<HasResultSet, dynamic> _aggregate({
+    bool onlyLibrary = true,
+  }) {
     return select(chapterTables).join([
       innerJoin(mangaTables, mangaTables.id.equalsExp(chapterTables.mangaId)),
-      innerJoin(libraryTables, libraryTables.mangaId.equalsExp(mangaTables.id)),
+      if (onlyLibrary)
+        innerJoin(
+          libraryTables,
+          libraryTables.mangaId.equalsExp(mangaTables.id),
+        ),
     ]);
   }
 
@@ -34,7 +40,7 @@ class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
 
   Stream<List<HistoryModel>> get history {
     final selector =
-        _aggregate
+        _aggregate(onlyLibrary: false)
           ..orderBy([OrderingTerm.desc(chapterTables.lastReadAt)])
           ..where(chapterTables.lastReadAt.isNotNull());
     return selector.watch().map(_parse);
@@ -45,7 +51,7 @@ class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
     final oneWeekAgo = DateTime.now().subtract(const Duration(days: 7));
 
     final selector =
-        _aggregate
+        _aggregate(onlyLibrary: true)
           ..orderBy([
             OrderingTerm.desc(chapterTables.createdAt),
             OrderingTerm.desc(chapterTables.readableAt),

@@ -6,23 +6,23 @@ import 'appearance_screen_cubit.dart';
 import 'appearance_screen_state.dart';
 
 class AppearanceScreen extends StatelessWidget {
-  const AppearanceScreen({
-    super.key,
-  });
+  const AppearanceScreen({super.key});
 
-  static Widget create({
-    required ServiceLocator locator,
-  }) {
+  static Widget create({required ServiceLocator locator}) {
     return BlocProvider(
-      create: (_) => AppearanceScreenCubit(
-        updateThemeUseCase: locator(),
-        listenThemeUseCase: locator(),
-      ),
+      create: (_) {
+        return AppearanceScreenCubit(
+          updateThemeUseCase: locator(),
+          listenThemeUseCase: locator(),
+        );
+      },
       child: const AppearanceScreen(),
     );
   }
 
-  AppearanceScreenCubit _cubit(BuildContext context) => context.read();
+  AppearanceScreenCubit? _cubit(BuildContext context) {
+    return context.mounted ? context.read() : null;
+  }
 
   BlocBuilder _builder({
     required BlocWidgetBuilder<AppearanceScreenState> builder,
@@ -51,19 +51,21 @@ class AppearanceScreen extends StatelessWidget {
         SliverToBoxAdapter(
           child: _builder(
             buildWhen: (prev, curr) => prev.isDarkMode != curr.isDarkMode,
-            builder: (_, state) => SwitchListTile(
-              title: Text('${state.isDarkMode ? 'Lights' : 'Dark'} Mode'),
-              value: state.isDarkMode,
-              onChanged: (value) => _cubit(context).changeDarkMode(value),
-              secondary: SizedBox(
-                height: double.infinity,
-                child: Icon(
-                  state.isDarkMode
-                      ? Icons.lightbulb_outline
-                      : Icons.lightbulb_sharp,
+            builder: (_, state) {
+              return SwitchListTile(
+                title: Text('${state.isDarkMode ? 'Lights' : 'Dark'} Mode'),
+                value: state.isDarkMode,
+                onChanged: (value) => _cubit(context)?.changeDarkMode(value),
+                secondary: SizedBox(
+                  height: double.infinity,
+                  child: Icon(
+                    state.isDarkMode
+                        ? Icons.lightbulb_outline
+                        : Icons.lightbulb_sharp,
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ),
       ],
@@ -89,9 +91,7 @@ class AppearanceScreen extends StatelessWidget {
             title: const Text('Relative timestamps'),
             trailing: const Text('Short (Today, Yesterday)'),
             // TODO: implement this
-            onTap: () => context.showSnackBar(
-              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-            ),
+            onTap: () => context.showOnProgressSnackBar(),
           ),
         ),
         SliverToBoxAdapter(
@@ -99,9 +99,7 @@ class AppearanceScreen extends StatelessWidget {
             title: const Text('Date format'),
             trailing: const Text('Default (MM/dd/yy)'),
             // TODO: implement this
-            onTap: () => context.showSnackBar(
-              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-            ),
+            onTap: () => context.showOnProgressSnackBar(),
           ),
         ),
       ],
@@ -109,6 +107,8 @@ class AppearanceScreen extends StatelessWidget {
   }
 
   Widget _buildDisplayMenu(BuildContext context) {
+    final resolution = MediaQuery.sizeOf(context);
+    final breakpoint = ResponsiveBreakpoints.of(context).breakpoint;
     return MultiSliver(
       pushPinnedChildren: true,
       children: [
@@ -127,9 +127,14 @@ class AppearanceScreen extends StatelessWidget {
             title: const Text('Tablet UI'),
             trailing: const Text('Automatic'),
             // TODO: implement this
-            onTap: () => context.showSnackBar(
-              message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
-            ),
+            onTap: () => context.showOnProgressSnackBar(),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: ListTile(
+            title: const Text('Current Resolution'),
+            subtitle: Text('${breakpoint.name}'),
+            trailing: Text('${resolution.width} x ${resolution.height}'),
           ),
         ),
       ],
@@ -139,9 +144,7 @@ class AppearanceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScaffoldScreen(
-      appBar: AppBar(
-        title: const Text('Appearance Screen'),
-      ),
+      appBar: AppBar(title: const Text('Appearance Screen')),
       body: CustomScrollView(
         slivers: [
           _buildThemeMenu(context),

@@ -21,8 +21,9 @@ class LocaleManager implements ListenLocaleUseCase, UpdateLocaleUseCase {
   }) async {
     await initializeDateFormatting();
     final value = await storage.getString(_key) ?? await findSystemLocale();
-    final language = value.split('_').firstOrNull ?? 'en';
-    final country = value.split('_').lastOrNull;
+    final parts = value.split('_');
+    final language = parts.firstOrNull ?? 'en';
+    final country = parts.length > 1 ? parts.last : null;
     return LocaleManager._(
       storage: storage,
       initialLocale: Locale(language, country),

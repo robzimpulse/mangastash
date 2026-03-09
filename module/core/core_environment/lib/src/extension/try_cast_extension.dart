@@ -12,7 +12,11 @@ extension NullableGeneric<T> on T? {
     return self != null ? applicator(self) : null;
   }
 
-  R? castOrNull<R>() => this as R?;
+  R? castOrNull<R>() {
+    final self = this;
+    if (self == null) return null;
+    return self is R ? self as R : null;
+  }
 
   R castOrFallback<R>(R fallback) => castOrNull() ?? fallback;
 }

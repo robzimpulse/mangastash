@@ -10,19 +10,23 @@ import 'use_case/cancel_job_use_case.dart';
 import 'use_case/chapter/get_all_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
 import 'use_case/chapter/get_neighbour_chapter_use_case.dart';
+import 'use_case/chapter/listen_downloaded_chapter_use_case.dart';
 import 'use_case/chapter/search_chapter_use_case.dart';
 import 'use_case/chapter/update_chapter_use_case.dart';
 import 'use_case/history/listen_read_history_use_case.dart';
 import 'use_case/history/listen_unread_history_use_case.dart';
 import 'use_case/library/add_to_library_use_case.dart';
-import 'use_case/library/get_manga_from_library_use_case.dart';
 import 'use_case/library/listen_manga_from_library_use_case.dart';
 import 'use_case/library/remove_from_library_use_case.dart';
 import 'use_case/manga/get_manga_from_url_use_case.dart';
 import 'use_case/manga/get_manga_use_case.dart';
 import 'use_case/manga/search_manga_use_case.dart';
 import 'use_case/parameter/listen_search_parameter_use_case.dart';
+import 'use_case/parameter/listen_setting_downloaded_only_use_case.dart';
+import 'use_case/parameter/listen_setting_incognito_use_case.dart';
 import 'use_case/parameter/update_search_parameter_use_case.dart';
+import 'use_case/parameter/update_setting_downloaded_only_use_case.dart';
+import 'use_case/parameter/update_setting_incognito_use_case.dart';
 import 'use_case/prefetch/listen_job_use_case.dart';
 import 'use_case/prefetch/listen_prefetch_chapter_config.dart';
 import 'use_case/prefetch/listen_prefetch_use_case.dart';
@@ -46,6 +50,10 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<ListenSourcesUseCase, GlobalOptionsManager>();
     locator.alias<UpdateSourcesUseCase, GlobalOptionsManager>();
     locator.alias<ListenPrefetchChapterConfig, GlobalOptionsManager>();
+    locator.alias<ListenSettingDownloadedOnlyUseCase, GlobalOptionsManager>();
+    locator.alias<UpdateSettingDownloadedOnlyUseCase, GlobalOptionsManager>();
+    locator.alias<ListenSettingIncognitoUseCase, GlobalOptionsManager>();
+    locator.alias<UpdateSettingIncognitoUseCase, GlobalOptionsManager>();
 
     locator.registerLazySingleton(
       () => JobManager(
@@ -149,7 +157,11 @@ class DomainMangaRegistrar extends Registrar {
       () => RemoveFromLibraryUseCase(libraryDao: locator()),
     );
     locator.registerFactory(
-      () => UpdateChapterUseCase(chapterDao: locator(), logBox: locator()),
+      () => UpdateChapterUseCase(
+        chapterDao: locator(),
+        logBox: locator(),
+        listenSettingIncognitoUseCase: locator(),
+      ),
     );
     locator.registerFactory(
       () => GetTagsUseCase(
@@ -163,11 +175,11 @@ class DomainMangaRegistrar extends Registrar {
       () => RecrawlUseCase(logBox: locator(), htmlCacheManager: locator()),
     );
 
-    locator.registerLazySingleton(
-      () => LibraryManager(libraryDao: locator()),
-      dispose: (e) => e.dispose(),
+    locator.registerFactory(
+      () => ListenDownloadedChapterUseCase(chapterDao: locator()),
     );
-    locator.alias<GetMangaFromLibraryUseCase, LibraryManager>();
+
+    locator.registerLazySingleton(() => LibraryManager(libraryDao: locator()));
     locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
 
     final end = DateTime.timestamp();

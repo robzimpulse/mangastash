@@ -367,5 +367,5 @@ enum Country {
   }
 
   static List<Country> get sorted =>
-      values..sorted((a, b) => a.name.compareTo(b.name));
+      values.sorted((a, b) => a.name.compareTo(b.name));
 }

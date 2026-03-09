@@ -2,6 +2,7 @@ import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:feature_common/feature_common.dart';
+import 'package:flutter/material.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 
@@ -61,7 +62,9 @@ class MangaGridWidget extends StatefulWidget {
 }
 
 class _MangaGridWidgetState extends State<MangaGridWidget> {
-  MangaGridWidgetCubit _cubit(BuildContext context) => context.read();
+  MangaGridWidgetCubit? _cubit(BuildContext context) {
+    return context.mounted ? context.read() : null;
+  }
 
   BlocBuilder _builder({
     required BlocWidgetBuilder<MangaGridWidgetState> builder,
@@ -84,11 +87,11 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
 
     switch (result) {
       case MangaMenu.download:
-        _cubit(context).download(manga: manga);
+        _cubit(context)?.download(manga: manga);
       case MangaMenu.library:
-        _cubit(context).addToLibrary(manga: manga);
+        _cubit(context)?.addToLibrary(manga: manga);
       case MangaMenu.prefetch:
-        _cubit(context).prefetch(mangas: [manga]);
+        _cubit(context)?.prefetch(mangas: [manga]);
     }
   }
 
@@ -104,7 +107,6 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
           prev.parameter != curr.parameter,
           prev.prefetchedMangaIds != curr.prefetchedMangaIds,
           prev.hasNextPage != curr.hasNextPage,
-          prev.parameter != curr.parameter,
         ].contains(true);
       },
       builder: (context, state) {
@@ -126,10 +128,10 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
               },
             );
           },
-          onLoadNextPage: () => _cubit(context).next(),
-          onRefresh: () => _cubit(context).init(refresh: true),
+          onLoadNextPage: () => _cubit(context)?.next(),
+          onRefresh: () async => await _cubit(context)?.init(refresh: true),
           onTapRecrawl: (url) {
-            _cubit(context).recrawl(context: context, url: url);
+            _cubit(context)?.recrawl(context: context, url: url);
           },
           error: state.error,
           isLoading: state.isLoading,

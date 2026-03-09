@@ -25,7 +25,9 @@ class BrowseScreen extends StatelessWidget {
     );
   }
 
-  BrowseScreenCubit _cubit(BuildContext context) => context.read();
+  BrowseScreenCubit? _cubit(BuildContext context) {
+    return context.mounted ? context.read() : null;
+  }
 
   BlocBuilder _builder({
     required BlocWidgetBuilder<BrowseScreenState> builder,
@@ -47,7 +49,7 @@ class BrowseScreen extends StatelessWidget {
           buildWhen: (prev, curr) => prev.parameter != curr.parameter,
           builder: (context, state) => MangaParameterWidget(
             parameter: state.parameter,
-            onChanged: (parameter) => _cubit(context).update(
+            onChanged: (parameter) => _cubit(context)?.update(
               parameter: parameter,
             ),
           ),
@@ -72,7 +74,7 @@ class BrowseScreen extends StatelessWidget {
                 if (value == null) return;
                 final values = [...state.sources];
                 value ? values.add(source) : values.remove(source);
-                _cubit(context).update(sources: values);
+                _cubit(context)?.update(sources: values);
               },
             ),
           ),

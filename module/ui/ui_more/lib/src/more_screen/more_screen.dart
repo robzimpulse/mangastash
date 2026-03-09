@@ -34,7 +34,15 @@ class MoreScreen extends StatelessWidget {
     VoidCallback? onTapHelp,
   }) {
     return BlocProvider(
-      create: (context) => MoreScreenCubit(listenJobUseCase: locator()),
+      create: (context) {
+        return MoreScreenCubit(
+          listenJobUseCase: locator(),
+          listenSettingDownloadedOnlyUseCase: locator(),
+          updateSettingDownloadedOnlyUseCase: locator(),
+          listenSettingIncognitoUseCase: locator(),
+          updateSettingIncognitoUseCase: locator(),
+        );
+      },
       child: MoreScreen(
         onTapSetting: onTapSetting,
         onTapStatistic: onTapStatistic,
@@ -53,6 +61,10 @@ class MoreScreen extends StatelessWidget {
       buildWhen: buildWhen,
       builder: builder,
     );
+  }
+
+  MoreScreenCubit? _cubit(BuildContext context) {
+    return context.mounted ? context.read() : null;
   }
 
   @override
@@ -91,35 +103,43 @@ class MoreScreen extends StatelessWidget {
             child: AdaptivePhysicListView(
               padding: EdgeInsets.zero,
               children: [
-                SwitchListTile(
-                  title: const Text('Downloaded Only'),
-                  subtitle: const Text('Filters all entries in your library'),
-                  value: true,
-                  // TODO: implement this
-                  onChanged: (value) {
-                    context.showSnackBar(
-                      message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+                _builder(
+                  buildWhen: (prev, curr) {
+                    return prev.isDownloadedOnly != curr.isDownloadedOnly;
+                  },
+                  builder: (context, state) {
+                    return SwitchListTile(
+                      title: const Text('Downloaded Only'),
+                      subtitle: const Text(
+                        'Filters all entries in your library',
+                      ),
+                      value: state.isDownloadedOnly,
+                      onChanged: (_) {
+                        _cubit(context)?.toggleIsDownloadedOnly();
+                      },
+                      secondary: const SizedBox(
+                        height: double.infinity,
+                        child: Icon(Icons.cloud_off),
+                      ),
                     );
                   },
-                  secondary: const SizedBox(
-                    height: double.infinity,
-                    child: Icon(Icons.cloud_off),
-                  ),
                 ),
-                SwitchListTile(
-                  title: const Text('Incognito Mode'),
-                  subtitle: const Text('Pause reading history'),
-                  value: true,
-                  // TODO: implement this
-                  onChanged: (value) {
-                    context.showSnackBar(
-                      message: '🚧🚧🚧 Under Construction 🚧🚧🚧',
+                _builder(
+                  buildWhen: (prev, curr) {
+                    return prev.isIncognito != curr.isIncognito;
+                  },
+                  builder: (context, state) {
+                    return SwitchListTile(
+                      title: const Text('Incognito Mode'),
+                      subtitle: const Text('Pause reading history'),
+                      value: state.isIncognito,
+                      onChanged: (_) => _cubit(context)?.toggleIsIncognito(),
+                      secondary: const SizedBox(
+                        height: double.infinity,
+                        child: Icon(Icons.disabled_visible),
+                      ),
                     );
                   },
-                  secondary: const SizedBox(
-                    height: double.infinity,
-                    child: Icon(Icons.disabled_visible),
-                  ),
                 ),
                 const Divider(height: 1, thickness: 1),
                 _builder(

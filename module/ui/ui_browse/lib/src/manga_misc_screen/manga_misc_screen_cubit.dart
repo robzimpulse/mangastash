@@ -13,7 +13,6 @@ class MangaMiscScreenCubit extends Cubit<MangaMiscScreenState>
   void update({
     ValueGetter<bool?>? downloaded,
     ValueGetter<bool?>? unread,
-    ValueGetter<bool?>? bookmarked,
     ChapterDisplayEnum? display,
     ChapterSortOptionEnum? sortOption,
     ChapterSortOrderEnum? sortOrder,
@@ -23,7 +22,6 @@ class MangaMiscScreenCubit extends Cubit<MangaMiscScreenState>
         config: state.config?.copyWith(
           downloaded: downloaded,
           unread: unread,
-          bookmarked: bookmarked,
           display: display,
           sortOption: sortOption,
           sortOrder: sortOrder,
