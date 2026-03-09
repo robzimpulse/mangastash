@@ -64,10 +64,10 @@ class MangaHistoryScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
-                  Text(
+                  const Text(
                     'Empty Data',
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyLarge,
+                    style: TextStyle(fontSize: 18), // BodyLarge might be different per theme
                   ),
                 ],
               ),
@@ -82,7 +82,7 @@ class MangaHistoryScreen extends StatelessWidget {
               final manga = value?.manga;
               if (chapter == null || manga == null) return null;
               return ChapterTileWidget.chapter(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 manga: manga,
                 chapter: chapter,
                 lastReadAt: chapter.lastReadAt,
@@ -90,7 +90,7 @@ class MangaHistoryScreen extends StatelessWidget {
                 onTap: () => onTapChapter?.call(manga, chapter),
               );
             },
-            separatorBuilder: (context, _) => SizedBox(height: 8),
+            separatorBuilder: (context, _) => const SizedBox(height: 8),
           );
         },
       ),
