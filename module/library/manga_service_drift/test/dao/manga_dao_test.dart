@@ -82,6 +82,16 @@ void main() {
         );
         expect((await dao.search(tags: [newTag])).length, equals(1));
       });
+
+      test('Update existing manga', () async {
+        final (manga, tags) = ([...mangas]..shuffle()).first;
+        final updatedManga = manga.copyWith(title: Value('${manga.title.value}_updated'));
+
+        await dao.adds(values: {updatedManga: tags});
+
+        final result = await dao.search(ids: [manga.id.value]);
+        expect(result.first.manga?.title, equals('${manga.title.value}_updated'));
+      });
     });
 
     group('With New Value', () {

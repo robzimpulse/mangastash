@@ -8,7 +8,7 @@ extension NullableGeneric<T> on T? {
     return self != null ? applicator(self) : null;
   }
 
-  R? castOrNull<R>() => this as R?;
+  R? castOrNull<R>() => this is R ? this as R : null;
 
   R castOrFallback<R>(R fallback) => castOrNull() ?? fallback;
 }
