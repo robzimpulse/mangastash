@@ -63,7 +63,9 @@ class MoreScreen extends StatelessWidget {
     );
   }
 
-  MoreScreenCubit _cubit(BuildContext context) => context.read();
+  MoreScreenCubit? _cubit(BuildContext context) {
+    return context.mounted ? context.read() : null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +115,7 @@ class MoreScreen extends StatelessWidget {
                       ),
                       value: state.isDownloadedOnly,
                       onChanged: (_) {
-                        _cubit(context).toggleIsDownloadedOnly();
+                        _cubit(context)?.toggleIsDownloadedOnly();
                       },
                       secondary: const SizedBox(
                         height: double.infinity,
@@ -131,7 +133,7 @@ class MoreScreen extends StatelessWidget {
                       title: const Text('Incognito Mode'),
                       subtitle: const Text('Pause reading history'),
                       value: state.isIncognito,
-                      onChanged: (_) => _cubit(context).toggleIsIncognito(),
+                      onChanged: (_) => _cubit(context)?.toggleIsIncognito(),
                       secondary: const SizedBox(
                         height: double.infinity,
                         child: Icon(Icons.disabled_visible),

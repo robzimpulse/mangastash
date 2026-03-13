@@ -19,19 +19,20 @@ class LoginScreen extends StatelessWidget {
     String? onFinishPath,
   }) {
     return BlocProvider(
-      create: (context) => LoginScreenCubit(
-        loginUseCase: locator(),
-        listenAuthUseCase: locator(),
-        loginAnonymouslyUseCase: locator(),
-      ),
-      child: LoginScreen(
-        onTapRegister: onTapRegister,
-      ),
+      create: (context) {
+        return LoginScreenCubit(
+          loginUseCase: locator(),
+          listenAuthUseCase: locator(),
+          loginAnonymouslyUseCase: locator(),
+        );
+      },
+      child: LoginScreen(onTapRegister: onTapRegister),
     );
   }
 
-  LoginScreenCubit? _cubit(BuildContext context) =>
-      context.mounted ? context.read() : null;
+  LoginScreenCubit? _cubit(BuildContext context) {
+    return context.mounted ? context.read() : null;
+  }
 
   BlocBuilder _builder({
     required BlocWidgetBuilder<LoginScreenState> builder,
@@ -51,12 +52,8 @@ class LoginScreen extends StatelessWidget {
           border: OutlineInputBorder(),
           prefixIcon: Icon(Icons.email),
         ),
-        onChanged: (value) => _cubit(context)?.update(
-          email: value,
-        ),
-        onSubmitted: (value) => _cubit(context)?.update(
-          email: value,
-        ),
+        onChanged: (value) => _cubit(context)?.update(email: value),
+        onSubmitted: (value) => _cubit(context)?.update(email: value),
       ),
       const SizedBox(height: 8),
       TextField(
@@ -66,38 +63,34 @@ class LoginScreen extends StatelessWidget {
           border: OutlineInputBorder(),
           prefixIcon: Icon(Icons.password),
         ),
-        onChanged: (value) => _cubit(context)?.update(
-          password: value,
-        ),
-        onSubmitted: (value) => _cubit(context)?.update(
-          password: value,
-        ),
+        onChanged: (value) => _cubit(context)?.update(password: value),
+        onSubmitted: (value) => _cubit(context)?.update(password: value),
       ),
       const SizedBox(height: 8),
       _builder(
         buildWhen: (prev, curr) => prev.error != curr.error,
         builder: (context, state) {
           final error = state.error;
-          return error != null
-              ? Text(
-                  error.toString(),
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelSmall
-                      ?.copyWith(color: Colors.red),
-                )
-              : const SizedBox.shrink();
+          final labelSmall = Theme.of(context).textTheme.labelSmall;
+
+          if (error == null) return const SizedBox.shrink();
+
+          return Text(
+            error.toString(),
+            style: labelSmall?.copyWith(color: Colors.red),
+          );
         },
       ),
       const SizedBox(height: 8),
       OutlinedButton(
         onPressed: () => _cubit(context)?.login(),
-        child: isLoading
-            ? const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: CircularProgressIndicator(),
-              )
-            : const Text('Login'),
+        child:
+            isLoading
+                ? const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(),
+                )
+                : const Text('Login'),
       ),
       const SizedBox(height: 16),
       Text(
@@ -128,10 +121,7 @@ class LoginScreen extends StatelessWidget {
           TextButton.icon(
             onPressed: null,
             icon: const Icon(Icons.apple),
-            label: Text(
-              'Apple',
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
+            label: Text('Apple', style: Theme.of(context).textTheme.labelSmall),
           ),
           TextButton.icon(
             onPressed: () => _cubit(context)?.loginAnonymously(),
@@ -144,10 +134,7 @@ class LoginScreen extends StatelessWidget {
           TextButton.icon(
             onPressed: onTapRegister,
             icon: const Icon(Icons.email),
-            label: Text(
-              'Email',
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
+            label: Text('Email', style: Theme.of(context).textTheme.labelSmall),
           ),
         ],
       ),
@@ -172,27 +159,29 @@ class LoginScreen extends StatelessWidget {
       ],
       child: _builder(
         buildWhen: (prev, curr) => prev.isLoading != curr.isLoading,
-        builder: (context, state) => PopScope(
-          canPop: !state.isLoading,
-          child: FocusDetector(
-            onVisibilityGained: () => _cubit(context)?.update(isVisible: true),
-            onVisibilityLost: () => _cubit(context)?.update(isVisible: false),
-            child: Scaffold(
-              appBar: AppBar(
-                title: const Text('Login Screen'),
-              ),
-              body: Padding(
-                padding: const EdgeInsets.all(16),
-                child: CustomScrollView(
-                  slivers: [
-                    for (final child in _content(context, state.isLoading))
-                      SliverToBoxAdapter(child: child),
-                  ],
+        builder: (context, state) {
+          return PopScope(
+            canPop: !state.isLoading,
+            child: FocusDetector(
+              onVisibilityGained: () {
+                _cubit(context)?.update(isVisible: true);
+              },
+              onVisibilityLost: () => _cubit(context)?.update(isVisible: false),
+              child: Scaffold(
+                appBar: AppBar(title: const Text('Login Screen')),
+                body: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: CustomScrollView(
+                    slivers: [
+                      for (final child in _content(context, state.isLoading))
+                        SliverToBoxAdapter(child: child),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

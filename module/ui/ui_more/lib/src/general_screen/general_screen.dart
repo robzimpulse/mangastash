@@ -33,7 +33,9 @@ class GeneralScreen extends StatelessWidget {
     );
   }
 
-  GeneralScreenCubit _cubit(BuildContext context) => context.read();
+  GeneralScreenCubit? _cubit(BuildContext context) {
+    return context.mounted ? context.read() : null;
+  }
 
   BlocBuilder _builder({
     required BlocWidgetBuilder<GeneralScreenState> builder,
@@ -68,7 +70,7 @@ class GeneralScreen extends StatelessWidget {
                     state.locale?.language,
                   );
                   if (result == null || !context.mounted) return;
-                  _cubit(context).changeLanguage(result);
+                  _cubit(context)?.changeLanguage(result);
                 },
               ),
             ),
@@ -88,7 +90,7 @@ class GeneralScreen extends StatelessWidget {
                     state.locale?.country,
                   );
                   if (result == null || !context.mounted) return;
-                  _cubit(context).changeCountry(result);
+                  _cubit(context)?.changeCountry(result);
                 },
               ),
             ),

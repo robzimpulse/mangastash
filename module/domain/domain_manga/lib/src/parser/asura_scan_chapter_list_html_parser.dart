@@ -68,7 +68,7 @@ class AsuraScanChapterListHtmlParser extends ChapterListHtmlParser {
         ChapterScrapped(
           title: title?.isNotEmpty == true ? title : null,
           chapter: '${chapter ?? url?.split('/').lastOrNull}',
-          readableAtRaw: releaseDate,
+          readableAt: releaseDate,
           webUrl: ['https://asuracomic.net', 'series', url].join('/'),
           scanlationGroup: SourceEnum.asurascan.label,
         ),

@@ -63,7 +63,10 @@ class MangaReaderScreen extends StatelessWidget {
     );
   }
 
-  MangaReaderScreenCubit _cubit(BuildContext context) => context.read();
+  MangaReaderScreenCubit? _cubit(BuildContext context) {
+    if (!context.mounted) return null;
+    return context.read();
+  }
 
   BlocBuilder _builder({
     required BlocWidgetBuilder<MangaReaderScreenState> builder,
@@ -122,7 +125,7 @@ class MangaReaderScreen extends StatelessWidget {
               if (error is FailedParsingHtmlException) {
                 _onTapRecrawl(context: context, url: error.url);
               } else {
-                _cubit(context).init();
+                _cubit(context)?.init();
               }
             },
             child: const Text('Open Debug Browser'),
@@ -141,8 +144,11 @@ class MangaReaderScreen extends StatelessWidget {
         ].contains(true);
       },
       builder: (context, state) {
-        if (state.isLoading) return SizedBox.shrink();
-        return LinearProgressIndicator(value: state.progress);
+        if (state.isLoading) return const SizedBox.shrink();
+        return LinearProgressIndicator(
+          value: state.progress,
+          color: Colors.grey,
+        );
       },
     );
   }
@@ -186,7 +192,7 @@ class MangaReaderScreen extends StatelessWidget {
                     if (url != null) {
                       _onTapRecrawl(context: context, url: url);
                     } else {
-                      _cubit(context).init();
+                      _cubit(context)?.init();
                     }
                   },
                   child: const Text('Open Debug Browser'),
@@ -200,8 +206,8 @@ class MangaReaderScreen extends StatelessWidget {
           mode: MangaPageViewMode.continuous,
           direction: MangaPageViewDirection.down,
           pageCount: images.length,
-          onProgressChange: (e) => _cubit(context).set(progress: e),
-          options: MangaPageViewOptions(
+          onProgressChange: (e) => _cubit(context)?.set(progress: e),
+          options: const MangaPageViewOptions(
             crossAxisOverscroll: false,
             precacheAhead: 1,
             precacheBehind: 1,
@@ -218,10 +224,10 @@ class MangaReaderScreen extends StatelessWidget {
                 imageUrl: images.elementAt(index),
                 cacheManager: imagesCacheManager,
                 errorWidget: (context, url, error) {
-                  return SizedBox(
+                  return const SizedBox(
                     width: 100,
                     height: 100,
-                    child: const Center(child: Icon(Icons.error)),
+                    child: Center(child: Icon(Icons.error)),
                   );
                 },
                 progressIndicatorBuilder: (context, url, progress) {
@@ -244,16 +250,16 @@ class MangaReaderScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (state.isLoadingNeighbourChapters) ...[
-                    SizedBox(
+                    const SizedBox(
                       width: 32,
                       height: 32,
                       child: CircularProgressIndicator(),
                     ),
                   ] else if (prevId != null) ...[
-                    Icon(Icons.arrow_upward),
-                    Text('Previous Chapter'),
+                    const Icon(Icons.arrow_upward),
+                    const Text('Previous Chapter'),
                   ] else ...[
-                    Text('No Previous Chapter'),
+                    const Text('No Previous Chapter'),
                   ],
                 ],
               ),
@@ -265,16 +271,16 @@ class MangaReaderScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (state.isLoadingNeighbourChapters) ...[
-                    SizedBox(
+                    const SizedBox(
                       width: 32,
                       height: 32,
                       child: CircularProgressIndicator(),
                     ),
                   ] else if (nextId != null) ...[
-                    Icon(Icons.arrow_downward),
-                    Text('Next Chapter'),
+                    const Icon(Icons.arrow_downward),
+                    const Text('Next Chapter'),
                   ] else ...[
-                    Text('No Next Chapter'),
+                    const Text('No Next Chapter'),
                   ],
                 ],
               ),
@@ -311,12 +317,12 @@ class MangaReaderScreen extends StatelessWidget {
   }
 
   void _onTapRecrawl({required BuildContext context, required String url}) {
-    _cubit(context).recrawl(context: context, url: url);
+    _cubit(context)?.recrawl(context: context, url: url);
   }
 
   void _onTapMenu({required BuildContext context, required String url}) async {
     final result = await onTapImageMenu?.call();
     if (!context.mounted || result == null) return;
-    await _cubit(context).removeImage(url: url);
+    await _cubit(context)?.removeImage(url: url);
   }
 }

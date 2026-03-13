@@ -33,7 +33,7 @@ class QueueScreen extends StatelessWidget {
           cancellable
               ? IconButton(
                 onPressed: () => cancelJobUseCase.cancelJob(id: job.id),
-                icon: Icon(Icons.cancel_outlined),
+                icon: const Icon(Icons.cancel_outlined),
               )
               : null,
     );
@@ -51,7 +51,7 @@ class QueueScreen extends StatelessWidget {
               stream: listenJobUseCase.upcomingJobLength,
               builder: (context, snapshot) {
                 return IconWithTextWidget(
-                  icon: Icon(Icons.pending_actions, size: 16),
+                  icon: const Icon(Icons.pending_actions, size: 16),
                   text: Text('${snapshot.data ?? 0}'),
                 );
               },

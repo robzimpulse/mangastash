@@ -52,7 +52,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
           final error = snapshot.error;
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (error != null) {
@@ -60,7 +60,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
           }
 
           if (data == null || data.isEmpty) {
-            return Center(child: Text('No Data'));
+            return const Center(child: Text('No Data'));
           }
 
           return ListView.builder(
@@ -99,7 +99,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
           final error = snapshot.error;
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (error != null) {
@@ -107,7 +107,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
           }
 
           if (data == null || data.isEmpty) {
-            return Center(child: Text('No Data'));
+            return const Center(child: Text('No Data'));
           }
 
           return ListView.builder(
@@ -139,7 +139,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
           final error = snapshot.error;
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (error != null) {
@@ -147,7 +147,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
           }
 
           if (data == null || data.isEmpty) {
-            return Center(child: Text('No Data'));
+            return const Center(child: Text('No Data'));
           }
 
           return ListView.builder(
@@ -186,7 +186,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
           final error = snapshot.error;
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (error != null) {
@@ -194,7 +194,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
           }
 
           if (data == null || data.isEmpty) {
-            return Center(child: Text('No Data'));
+            return const Center(child: Text('No Data'));
           }
 
           return ListView.builder(
@@ -226,7 +226,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
           final error = snapshot.error;
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (error != null) {
@@ -234,7 +234,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
           }
 
           if (data == null || data.isEmpty) {
-            return Center(child: Text('No Data'));
+            return const Center(child: Text('No Data'));
           }
 
           return ListView.builder(
@@ -262,7 +262,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
           final error = snapshot.error;
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (error != null) {
@@ -270,7 +270,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
           }
 
           if (data == null || data.isEmpty) {
-            return Center(child: Text('No Data'));
+            return const Center(child: Text('No Data'));
           }
 
           return ListView.builder(
@@ -341,7 +341,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
 
                 await _imageDao.remove(ids: [...orphanImage]);
               },
-              icon: Icon(Icons.delete),
+              icon: const Icon(Icons.delete),
             ),
           ],
         ),

@@ -92,7 +92,9 @@ class _MangaMiscScreenState extends State<MangaMiscScreen> {
     );
   }
 
-  MangaMiscScreenCubit _cubit(BuildContext context) => context.read();
+  MangaMiscScreenCubit? _cubit(BuildContext context) {
+    return context.mounted ? context.read() : null;
+  }
 
   Widget _builder({
     required BlocWidgetBuilder<MangaMiscScreenState> builder,
@@ -116,7 +118,7 @@ class _MangaMiscScreenState extends State<MangaMiscScreen> {
             return CheckboxListTile(
               tristate: true,
               value: state.config?.downloaded,
-              onChanged: (e) => _cubit(context).update(downloaded: () => e),
+              onChanged: (e) => _cubit(context)?.update(downloaded: () => e),
               title: const Text('Downloaded'),
             );
           },
@@ -127,7 +129,7 @@ class _MangaMiscScreenState extends State<MangaMiscScreen> {
             return CheckboxListTile(
               tristate: true,
               value: state.config?.unread,
-              onChanged: (e) => _cubit(context).update(unread: () => e),
+              onChanged: (e) => _cubit(context)?.update(unread: () => e),
               title: const Text('Unread'),
             );
           },
@@ -154,10 +156,10 @@ class _MangaMiscScreenState extends State<MangaMiscScreen> {
 
               if (state.config?.sortOption == options) {
                 if (state.config?.sortOrder == ChapterSortOrderEnum.desc) {
-                  leading = Icon(Icons.arrow_downward);
+                  leading = const Icon(Icons.arrow_downward);
                   order = ChapterSortOrderEnum.asc;
                 } else {
-                  leading = Icon(Icons.arrow_upward);
+                  leading = const Icon(Icons.arrow_upward);
                   order = ChapterSortOrderEnum.desc;
                 }
               } else {
@@ -174,7 +176,7 @@ class _MangaMiscScreenState extends State<MangaMiscScreen> {
                 leading: leading,
                 title: Text(options.value),
                 onTap: () {
-                  _cubit(context).update(sortOption: options, sortOrder: order);
+                  _cubit(context)?.update(sortOption: options, sortOrder: order);
                 },
               );
             },
@@ -197,7 +199,7 @@ class _MangaMiscScreenState extends State<MangaMiscScreen> {
                 title: Text(display.value),
                 value: display,
                 groupValue: state.config?.display,
-                onChanged: (value) => _cubit(context).update(display: value),
+                onChanged: (value) => _cubit(context)?.update(display: value),
               );
             },
           ),

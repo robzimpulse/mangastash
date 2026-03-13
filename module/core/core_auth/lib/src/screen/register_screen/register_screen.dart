@@ -10,19 +10,21 @@ import 'register_screen_state.dart';
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
-  static Widget create({
-    required ServiceLocator locator,
-  }) {
+  static Widget create({required ServiceLocator locator}) {
     return BlocProvider(
-      create: (context) => RegisterScreenCubit(
-        registerUseCase: locator(),
-        listenAuthUseCase: locator(),
-      ),
+      create: (context) {
+        return RegisterScreenCubit(
+          registerUseCase: locator(),
+          listenAuthUseCase: locator(),
+        );
+      },
       child: const RegisterScreen(),
     );
   }
 
-  RegisterScreenCubit _cubit(BuildContext context) => context.read();
+  RegisterScreenCubit? _cubit(BuildContext context) {
+    return context.mounted ? context.read() : null;
+  }
 
   BlocBuilder _builder({
     required BlocWidgetBuilder<RegisterScreenState> builder,
@@ -42,12 +44,8 @@ class RegisterScreen extends StatelessWidget {
           border: OutlineInputBorder(),
           prefixIcon: Icon(Icons.email),
         ),
-        onChanged: (value) => _cubit(context).update(
-          email: value,
-        ),
-        onSubmitted: (value) => _cubit(context).update(
-          email: value,
-        ),
+        onChanged: (value) => _cubit(context)?.update(email: value),
+        onSubmitted: (value) => _cubit(context)?.update(email: value),
       ),
       const SizedBox(height: 8),
       TextField(
@@ -57,35 +55,31 @@ class RegisterScreen extends StatelessWidget {
           border: OutlineInputBorder(),
           prefixIcon: Icon(Icons.password),
         ),
-        onChanged: (value) => _cubit(context).update(
-          password: value,
-        ),
-        onSubmitted: (value) => _cubit(context).update(
-          password: value,
-        ),
+        onChanged: (value) => _cubit(context)?.update(password: value),
+        onSubmitted: (value) => _cubit(context)?.update(password: value),
       ),
       const SizedBox(height: 8),
       _builder(
         buildWhen: (prev, curr) => prev.error != curr.error,
         builder: (context, state) {
           final error = state.error;
-          return error != null
-              ? Text(
-                  error.toString(),
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelSmall
-                      ?.copyWith(color: Colors.red),
-                )
-              : const SizedBox.shrink();
+          final labelSmall = Theme.of(context).textTheme.labelSmall;
+
+          if (error == null) return const SizedBox.shrink();
+
+          return Text(
+            error.toString(),
+            style: labelSmall?.copyWith(color: Colors.red),
+          );
         },
       ),
       const SizedBox(height: 8),
       OutlinedButton(
-        onPressed: () => _cubit(context).registerWithEmail(),
-        child: isLoading
-            ? const CircularProgressIndicator()
-            : const Text('Register'),
+        onPressed: () => _cubit(context)?.registerWithEmail(),
+        child:
+            isLoading
+                ? const CircularProgressIndicator()
+                : const Text('Register'),
       ),
     ];
   }
@@ -105,21 +99,21 @@ class RegisterScreen extends StatelessWidget {
       ],
       child: _builder(
         buildWhen: (prev, curr) => prev.isLoading != curr.isLoading,
-        builder: (context, state) => PopScope(
-          canPop: !state.isLoading,
-          child: Scaffold(
-            appBar: AppBar(
-              title: const Text('Register Screen'),
-            ),
-            body: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: _content(context, state.isLoading),
+        builder: (context, state) {
+          return PopScope(
+            canPop: !state.isLoading,
+            child: Scaffold(
+              appBar: AppBar(title: const Text('Register Screen')),
+              body: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: _content(context, state.isLoading),
+                ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

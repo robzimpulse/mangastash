@@ -47,8 +47,9 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
     );
   }
 
-  MangaSearchParamConfiguratorScreenCubit _cubit(BuildContext context) =>
-      context.read();
+  MangaSearchParamConfiguratorScreenCubit? _cubit(BuildContext context) {
+    return context.mounted ? context.read() : null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +64,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 OutlinedButton(
-                  onPressed: () => _cubit(context).reset,
+                  onPressed: () => _cubit(context)?.reset(),
                   child: const Text('Reset'),
                 ),
                 _builder(
@@ -81,7 +82,7 @@ class MangaSearchParamConfiguratorScreen extends StatelessWidget {
           child: _builder(
             builder: (context, state) => MangaParameterWidget(
               parameter: state.modified ?? const SearchMangaParameter(),
-              onChanged: (parameter) => _cubit(context).update(
+              onChanged: (parameter) => _cubit(context)?.update(
                 modified: parameter,
               ),
               availableTags: {...state.tags},

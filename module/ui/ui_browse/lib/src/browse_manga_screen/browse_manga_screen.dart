@@ -88,7 +88,9 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     super.dispose();
   }
 
-  BrowseMangaScreenCubit _cubit(BuildContext context) => context.read();
+  BrowseMangaScreenCubit? _cubit(BuildContext context) {
+    return context.mounted ? context.read() : null;
+  }
 
   BlocBuilder _builder({
     required BlocWidgetBuilder<BrowseMangaScreenState> builder,
@@ -125,16 +127,16 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
 
     switch (result) {
       case MangaMenu.download:
-        _cubit(context).download(manga: manga);
+        _cubit(context)?.download(manga: manga);
       case MangaMenu.library:
-        _cubit(context).addToLibrary(manga: manga);
+        _cubit(context)?.addToLibrary(manga: manga);
       case MangaMenu.prefetch:
-        _cubit(context).prefetch(manga: manga);
+        _cubit(context)?.prefetch(manga: manga);
     }
   }
 
   void _onTapRecrawl({required BuildContext context, required String url}) {
-    _cubit(context).recrawl(context: context, url: url);
+    _cubit(context)?.recrawl(context: context, url: url);
   }
 
   Widget _menuSource({required BuildContext context}) {
@@ -170,7 +172,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         return IconButton(
           icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
           onPressed: () {
-            _cubit(context).update(isSearchActive: !state.isSearchActive);
+            _cubit(context)?.update(isSearchActive: !state.isSearchActive);
           },
         );
       },
@@ -229,7 +231,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             ),
             icon: Icon(Icons.favorite, color: color),
             onPressed: () {
-              _cubit(context).init(
+              _cubit(context)?.init(
                 parameter: state.parameter.copyWith(
                   orders: Map.fromEntries([
                     MapEntry(
@@ -262,7 +264,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
             ),
             icon: Icon(Icons.update, color: color),
             onPressed: () {
-              _cubit(context).init(
+              _cubit(context)?.init(
                 parameter: state.parameter.copyWith(
                   orders: Map.fromEntries([
                     MapEntry(
@@ -302,7 +304,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
                 state.tags,
               );
               if (context.mounted && result != null) {
-                _cubit(context).init(parameter: result);
+                _cubit(context)?.init(parameter: result);
               }
             },
           );
@@ -325,7 +327,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         state.isSearchActive
             ? _searchFocusNode.requestFocus()
             : _searchFocusNode.unfocus();
-        _cubit(context).init(
+        _cubit(context)?.init(
           parameter: state.parameter.copyWith(
             title: state.isSearchActive ? _searchController.text : '',
           ),
@@ -355,7 +357,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               style: DefaultTextStyle.of(context).style,
               onSubmitted: (value) {
                 final parameter = state.parameter.copyWith(title: value);
-                _cubit(context).init(parameter: parameter);
+                _cubit(context)?.init(parameter: parameter);
               },
             ),
           );
@@ -397,8 +399,8 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               isPrefetching: state.prefetchedMangaIds.contains(data.id),
             );
           },
-          onLoadNextPage: () => _cubit(context).next(),
-          onRefresh: () => _cubit(context).init(refresh: true),
+          onLoadNextPage: () async => await _cubit(context)?.next(),
+          onRefresh: () async => await _cubit(context)?.init(refresh: true),
           onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
           error: state.error,
           isLoading: state.isLoading,

@@ -71,7 +71,9 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
     super.dispose();
   }
 
-  SearchMangaScreenCubit _cubit(BuildContext context) => context.read();
+  SearchMangaScreenCubit? _cubit(BuildContext context) {
+    return context.mounted ? context.read() : null;
+  }
 
   BlocBuilder _builder({
     required BlocWidgetBuilder<SearchMangaScreenState> builder,
@@ -112,7 +114,7 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
                   style: theme.textTheme.titleLarge?.copyWith(
                     color: Colors.white,
                   ),
-                  onSubmitted: (value) => _cubit(context).set(keyword: value),
+                  onSubmitted: (value) => _cubit(context)?.set(keyword: value),
                 ),
               ),
               bottom: TabBar(
@@ -130,7 +132,7 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
                             height: 16,
                             width: 16,
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
                             source.name,
                             style: theme.textTheme.titleSmall?.copyWith(
@@ -154,10 +156,10 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
                         );
 
                         if (context.mounted && result != null) {
-                          _cubit(context).set(parameter: result);
+                          _cubit(context)?.set(parameter: result);
                         }
                       },
-                      icon: Icon(Icons.filter_list),
+                      icon: const Icon(Icons.filter_list),
                     );
                   },
                 ),
@@ -166,7 +168,11 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
             body: TabBarView(
               children: [
                 ...state.sources.map(
-                  (source) => widget.widgetBuilder(source, _cubit(context)),
+                  (source) {
+                    final cubit = _cubit(context);
+                    if (cubit == null) return const SizedBox.shrink();
+                    return widget.widgetBuilder(source, cubit);
+                  },
                 ),
               ],
             ),
