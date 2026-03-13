@@ -229,5 +229,30 @@ void main() {
         });
       });
     });
+
+    group('More Methods', () {
+      test('getNeighbourChapters', () async {
+        final current = chapters.first;
+        final next = await dao.getNeighbourChapters(
+          chapterId: current.$1.id.value,
+          count: 1,
+          direction: NextChapterDirection.next,
+        );
+        final prev = await dao.getNeighbourChapters(
+          chapterId: current.$1.id.value,
+          count: 1,
+          direction: NextChapterDirection.previous,
+        );
+        expect(next, isNotNull);
+        expect(prev, isNotNull);
+      });
+
+      test('listenDownloadedChapterId', () async {
+        final firstMangaId = chapters.first.$1.mangaId.value!;
+        final stream = dao.listenDownloadedChapterId(mangaId: firstMangaId);
+        final result = await stream.first;
+        expect(result, isNotNull);
+      });
+    });
   });
 }

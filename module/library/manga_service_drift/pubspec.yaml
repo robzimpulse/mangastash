@@ -44,3 +44,5 @@ dev_dependencies:
   build_runner: ^2.3.3
   flutter_lints: ^5.0.0
   drift_dev: ^2.19.1
+  path_provider_platform_interface: ^2.1.2
+  plugin_platform_interface: ^2.1.8
