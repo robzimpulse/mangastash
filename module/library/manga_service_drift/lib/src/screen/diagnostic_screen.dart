@@ -243,7 +243,7 @@ class _DiagnosticScreenState extends State<DiagnosticScreen> {
               final value = data.elementAtOrNull(index);
               if (value == null) return null;
               final view = widget.orphanChapterBuilder?.call(value);
-              return view?.or(
+              return view.or(
                 ListTile(
                   title: Text('Chapter: ${value.chapter}'),
                   subtitle: Text('Url: ${value.webUrl}'),
