@@ -57,6 +57,11 @@ jobs:
         with:
           name: Mangastash-unsigned
           path: mangastash.dmg
+      - name: 'Attach artifact to release tag'
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: mangastash.dmg
       - name: 'Find Comment'
         if: always() && github.event_name == 'pull_request'
         uses: peter-evans/find-comment@v3
