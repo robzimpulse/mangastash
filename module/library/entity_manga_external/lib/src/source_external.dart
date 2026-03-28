@@ -9,31 +9,32 @@ abstract class SourceExternal {
   String get iconUrl;
   String get baseUrl;
 
-  GetMangaParser get getMangaUseCase;
-  GetChapterImageParser get getChapterImageUseCase;
-  SearchMangaParser get searchMangaUseCase;
-  SearchChapterParser get searchChapterUseCase;
+  GetMangaUseCase get getMangaUseCase;
+  GetChapterUseCase get getChapterImageUseCase;
+  SearchMangaUseCase get searchMangaUseCase;
+  SearchChapterUseCase get searchChapterUseCase;
+
   SearchMangaUrl get searchMangaUrl;
 }
 
-abstract class GetMangaParser {
+abstract class GetMangaUseCase {
   List<String> get scripts;
   Future<MangaScrapped> parse({required Document root});
 }
 
-abstract class GetChapterImageParser {
+abstract class GetChapterUseCase {
   List<String> get scripts;
   Future<List<String>> parse({required Document root});
 }
 
-abstract class SearchMangaParser {
+abstract class SearchMangaUseCase {
   List<String> get scripts;
   String url({required SearchMangaParameter parameter});
   Future<List<MangaScrapped>> parse({required Document root});
   Future<bool?> haveNextPage({required Document root});
 }
 
-abstract class SearchChapterParser {
+abstract class SearchChapterUseCase {
   List<String> get scripts;
   Future<List<ChapterScrapped>> parse({required Document root});
 }
