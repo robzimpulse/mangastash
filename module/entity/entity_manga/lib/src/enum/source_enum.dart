@@ -7,14 +7,14 @@ enum SourceEnum {
     url: 'https://www.mangadex.org',
   ),
   mangaclash(
-    icon: 'https://toonclash.com/wp-content/uploads/2020/03/cropped-22.jpg',
+    icon: 'https://mangaclash.com/wp-content/uploads/2020/03/cropped-22.jpg',
     name: 'Manga Clash',
-    url: 'https://toonclash.com',
+    url: 'https://mangaclash.com',
   ),
   asurascan(
     name: 'Asura Scans',
-    url: 'https://asuracomic.net',
-    icon: 'https://asuracomic.net/images/logo.webp',
+    url: 'https://asurascans.com',
+    icon: 'https://asurascans.com/images/logo.webp',
   );
 
   final String icon;
