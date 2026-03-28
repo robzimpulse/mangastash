@@ -346,6 +346,13 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  entity_manga_external:
+    dependency: "direct overridden"
+    description:
+      path: "module/library/entity_manga_external"
+      relative: true
+    source: path
+    version: "0.0.1"
   equatable:
     dependency: transitive
     description:
