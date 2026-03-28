@@ -13,8 +13,6 @@ abstract class SourceExternal {
   GetChapterUseCase get getChapterImageUseCase;
   SearchMangaUseCase get searchMangaUseCase;
   SearchChapterUseCase get searchChapterUseCase;
-
-  SearchMangaUrl get searchMangaUrl;
 }
 
 abstract class GetMangaUseCase {
@@ -37,8 +35,4 @@ abstract class SearchMangaUseCase {
 abstract class SearchChapterUseCase {
   List<String> get scripts;
   Future<List<ChapterScrapped>> parse({required Document root});
-}
-
-abstract class SearchMangaUrl {
-  String url({required SearchMangaParameter parameter});
 }
