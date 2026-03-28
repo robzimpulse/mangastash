@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:html/dom.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
-import 'package:manga_dex_api/src/model/manga/search_manga_parameter.dart';
 
 class AsuraScanSourceExternal implements SourceExternal {
   @override
