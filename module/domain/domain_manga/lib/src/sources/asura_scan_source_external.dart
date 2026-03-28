@@ -14,19 +14,27 @@ class AsuraScanSourceExternal implements SourceExternal {
   String get name => 'Asura Scans';
 
   @override
-  GetChapterUseCase get getChapterImageUseCase => _GetChapterUseCase();
+  bool get builtIn => false;
 
   @override
-  GetMangaUseCase get getMangaUseCase => _GetMangaUseCase();
+  GetChapterSourceExternalUseCase get getChapterImageUseCase =>
+      _GetChapterSourceExternalUseCase();
 
   @override
-  SearchChapterUseCase get searchChapterUseCase => _SearchChapterUseCase(name);
+  GetMangaSourceExternalUseCase get getMangaUseCase =>
+      _GetMangaSourceExternalUseCase();
 
   @override
-  SearchMangaUseCase get searchMangaUseCase => _SearchMangaUseCase(baseUrl);
+  SearchChapterSourceExternalUseCase get searchChapterUseCase =>
+      _SearchChapterSourceExternalUseCase(name);
+
+  @override
+  SearchMangaSourceExternalUseCase get searchMangaUseCase =>
+      _SearchMangaSourceExternalUseCase(baseUrl);
 }
 
-class _GetChapterUseCase implements GetChapterUseCase {
+class _GetChapterSourceExternalUseCase
+    implements GetChapterSourceExternalUseCase {
   @override
   Future<List<String>> parse({required Document root}) async {
     final region = root.querySelector(
@@ -65,7 +73,7 @@ class _GetChapterUseCase implements GetChapterUseCase {
   }
 }
 
-class _GetMangaUseCase implements GetMangaUseCase {
+class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
   @override
   Future<MangaScrapped> parse({required Document root}) async {
     final query = ['div', 'float-left', 'relative', 'z-0'].join('.');
@@ -127,10 +135,11 @@ class _GetMangaUseCase implements GetMangaUseCase {
   }
 }
 
-class _SearchChapterUseCase implements SearchChapterUseCase {
+class _SearchChapterSourceExternalUseCase
+    implements SearchChapterSourceExternalUseCase {
   final String _name;
 
-  const _SearchChapterUseCase(this._name);
+  const _SearchChapterSourceExternalUseCase(this._name);
 
   @override
   Future<List<ChapterScrapped>> parse({required Document root}) async {
@@ -223,10 +232,11 @@ class _SearchChapterUseCase implements SearchChapterUseCase {
   }
 }
 
-class _SearchMangaUseCase implements SearchMangaUseCase {
+class _SearchMangaSourceExternalUseCase
+    implements SearchMangaSourceExternalUseCase {
   final String _baseUrl;
 
-  const _SearchMangaUseCase(this._baseUrl);
+  const _SearchMangaSourceExternalUseCase(this._baseUrl);
 
   @override
   Future<bool?> haveNextPage({required Document root}) async {
