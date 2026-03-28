@@ -60,7 +60,7 @@ jobs:
         if: github.ref_type == 'tag'
         uses: softprops/action-gh-release@v2
         with:
-          files: release-web-${{ matrix.target }}.zip
+          files: build/release-web-${{ matrix.target }}.zip
       - name: 'Deploy to Firebase'
         if: ${{ matrix.target == 'firebase'}}
         uses: FirebaseExtended/action-hosting-deploy@v0
