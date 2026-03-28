@@ -56,7 +56,7 @@ jobs:
         with:
           name: release-web-${{ matrix.target }}
           path: build/web-${{ matrix.target }}.zip
-      - name: 'Attach artifact to release'
+      - name: 'Attach artifact to release tag'
         if: github.ref_type == 'tag'
         uses: softprops/action-gh-release@v2
         with:

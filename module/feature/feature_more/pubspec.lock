@@ -200,10 +200,10 @@ packages:
     dependency: transitive
     description:
       name: dio
-      sha256: b9d46faecab38fc8cc286f80bc4d61a3bb5d4ac49e51ed877b4d6706efe57b25
+      sha256: aff32c08f92787a557dd5c0145ac91536481831a01b4648136373cddb0e64f8c
       url: "https://pub.dev"
     source: hosted
-    version: "5.9.1"
+    version: "5.9.2"
   dio_smart_retry:
     dependency: transitive
     description:
@@ -216,10 +216,10 @@ packages:
     dependency: transitive
     description:
       name: dio_web_adapter
-      sha256: "7586e476d70caecaf1686d21eee7247ea43ef5c345eab9e0cc3583ff13378d78"
+      sha256: "2f9e64323a7c3c7ef69567d5c800424a11f8337b8b228bad02524c9fb3c1f340"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.1"
+    version: "2.1.2"
   domain_manga:
     dependency: "direct overridden"
     description:
@@ -255,6 +255,13 @@ packages:
     dependency: "direct overridden"
     description:
       path: "../../entity/entity_manga"
+      relative: true
+    source: path
+    version: "0.0.1"
+  entity_manga_external:
+    dependency: "direct overridden"
+    description:
+      path: "../../library/entity_manga_external"
       relative: true
     source: path
     version: "0.0.1"
@@ -597,7 +604,7 @@ packages:
     description:
       path: "packages/log_box"
       ref: master
-      resolved-ref: d75d410bae5cb0c7750d0a1bf3fa24c6e5f01a2e
+      resolved-ref: "39cc9236e3e68d9404e63112a2c9a837032041b6"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -606,7 +613,7 @@ packages:
     description:
       path: "packages/log_box_dio_logger"
       ref: master
-      resolved-ref: d75d410bae5cb0c7750d0a1bf3fa24c6e5f01a2e
+      resolved-ref: "39cc9236e3e68d9404e63112a2c9a837032041b6"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -615,7 +622,7 @@ packages:
     description:
       path: "packages/log_box_in_app_webview_logger"
       ref: master
-      resolved-ref: d75d410bae5cb0c7750d0a1bf3fa24c6e5f01a2e
+      resolved-ref: "39cc9236e3e68d9404e63112a2c9a837032041b6"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -624,7 +631,7 @@ packages:
     description:
       path: "packages/log_box_navigation_logger"
       ref: master
-      resolved-ref: d75d410bae5cb0c7750d0a1bf3fa24c6e5f01a2e
+      resolved-ref: "39cc9236e3e68d9404e63112a2c9a837032041b6"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -633,7 +640,7 @@ packages:
     description:
       path: "packages/log_box_persistent_storage_drift"
       ref: master
-      resolved-ref: d75d410bae5cb0c7750d0a1bf3fa24c6e5f01a2e
+      resolved-ref: "39cc9236e3e68d9404e63112a2c9a837032041b6"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -1050,10 +1057,10 @@ packages:
     dependency: transitive
     description:
       name: sqlite3_flutter_libs
-      sha256: "1e800ebe7f85a80a66adacaa6febe4d5f4d8b75f244e9838a27cb2ffc7aec08d"
+      sha256: eeb9e3a45207649076b808f8a5a74d68770d0b7f26ccef6d5f43106eee5375ad
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.41"
+    version: "0.5.42"
   stack_trace:
     dependency: transitive
     description:

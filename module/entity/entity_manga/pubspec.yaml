@@ -23,6 +23,8 @@ dependencies:
     path: ../../library/manga_dex_api
   manga_service_drift:
     path: ../../library/manga_service_drift
+  entity_manga_external:
+    path: ../../library/entity_manga_external
 
 dev_dependencies:
   flutter_test:
