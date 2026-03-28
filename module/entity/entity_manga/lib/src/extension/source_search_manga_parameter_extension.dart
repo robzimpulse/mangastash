@@ -14,7 +14,7 @@ extension SearchUrlExtension on SourceSearchMangaParameter {
         return null;
       case SourceEnum.mangaclash:
         return [
-          ['https://mangaclash.com', 'page', '${parameter.page}'].join('/'),
+          [source.url, 'page', '${parameter.page}'].join('/'),
           [
             const MapEntry('post_type', 'wp-manga'),
             MapEntry('s', parameter.title ?? ''),
@@ -40,7 +40,7 @@ extension SearchUrlExtension on SourceSearchMangaParameter {
         ].join('?');
       case SourceEnum.asurascan:
         return [
-          ['https://asurascans.com', 'series'].join('/'),
+          [source.url, 'series'].join('/'),
           [
             MapEntry('name', parameter.title ?? ''),
             MapEntry('page', parameter.page),
