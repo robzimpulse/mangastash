@@ -1,10 +1,10 @@
 import 'package:domain_manga/domain_manga.dart';
-import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:equatable/equatable.dart';
 
 class SearchMangaScreenState extends Equatable {
   final SearchMangaParameter parameter;
-  final Set<SourceEnum> sources;
+  final Set<SourceExternal> sources;
 
   const SearchMangaScreenState({
     this.parameter = const SearchMangaParameter(),
@@ -19,7 +19,7 @@ class SearchMangaScreenState extends Equatable {
 
   SearchMangaScreenState copyWith({
     SearchMangaParameter? parameter,
-    Set<SourceEnum>? sources,
+    Set<SourceExternal>? sources,
   }) {
     return SearchMangaScreenState(
       parameter: parameter ?? this.parameter,

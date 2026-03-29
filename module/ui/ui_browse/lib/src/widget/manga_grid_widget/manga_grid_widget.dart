@@ -1,6 +1,7 @@
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:feature_common/feature_common.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -14,7 +15,7 @@ class MangaGridWidget extends StatefulWidget {
     Key? key,
     required ServiceLocator locator,
     required SearchMangaScreenCubit parent,
-    SourceEnum? source,
+    SourceExternal? source,
     void Function(Manga, SearchMangaParameter)? onTapManga,
     Future<MangaMenu?> Function(bool)? onTapMangaMenu,
   }) {

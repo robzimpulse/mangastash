@@ -214,7 +214,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     await _searchMangaUseCase.clear(
       parameter: SourceSearchMangaParameter(
-        source: source,
+        source: source.name,
         parameter: parameter,
       ),
     );
@@ -228,7 +228,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     final result = await _searchMangaUseCase.execute(
       parameter: SourceSearchMangaParameter(
-        source: source,
+        source: source.name,
         parameter: parameter,
       ),
       useCache: useCache,
@@ -283,7 +283,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     await _searchChapterUseCase.clear(
       parameter: SourceSearchChapterParameter(
-        source: source,
+        source: source.name,
         parameter: state.chapterParameter,
         mangaId: id,
       ),
@@ -297,7 +297,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     final result = await _searchChapterUseCase.execute(
       parameter: SourceSearchChapterParameter(
-        source: source,
+        source: source.name,
         parameter: state.chapterParameter,
         mangaId: id,
       ),
@@ -361,7 +361,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
   Future<void> prefetch() async {
     final mangaId = state.manga?.id;
-    final source = state.manga?.source?.let(SourceEnum.fromName);
+    final source = state.manga?.source?.let(Sources.fromName);
     if (mangaId == null || source == null) return;
     final chapters = await _getAllChapterUseCase.execute(
       source: source,

@@ -17,24 +17,28 @@ class MangaClashSourceExternal extends SourceExternal {
   bool get builtIn => false;
 
   @override
-  GetChapterSourceExternalUseCase get getChapterImageUseCase =>
-      _GetChapterSourceExternalUseCase();
+  GetChapterImageSourceExternalUseCase get getChapterImageUseCase =>
+      _GetChapterImageSourceExternalUseCase();
 
   @override
   GetMangaSourceExternalUseCase get getMangaUseCase =>
       _GetMangaSourceExternalUseCase();
 
   @override
-  SearchChapterSourceExternalUseCase get searchChapterUseCase =>
-      _SearchChapterSourceExternalUseCase();
+  ListChapterSourceExternalUseCase get listChapterUseCase =>
+      _ListChapterSourceExternalUseCase();
 
   @override
   SearchMangaSourceExternalUseCase get searchMangaUseCase =>
       _SearchMangaSourceExternalUseCase(baseUrl);
+
+  @override
+  ListTagSourceExternalUseCase get listTagUseCase =>
+      _ListTagSourceExternalUseCase();
 }
 
-class _GetChapterSourceExternalUseCase
-    implements GetChapterSourceExternalUseCase {
+class _GetChapterImageSourceExternalUseCase
+    implements GetChapterImageSourceExternalUseCase {
   @override
   Future<List<String>> parse({required Document root}) async {
     final region = root.querySelector('.reading-content');
@@ -95,8 +99,8 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
   List<String> get scripts => [];
 }
 
-class _SearchChapterSourceExternalUseCase
-    implements SearchChapterSourceExternalUseCase {
+class _ListChapterSourceExternalUseCase
+    implements ListChapterSourceExternalUseCase {
   @override
   Future<List<ChapterScrapped>> parse({required Document root}) async {
     final List<ChapterScrapped> data = [];
@@ -229,4 +233,23 @@ class _SearchMangaSourceExternalUseCase
       ].nonNulls.map((e) => '${e.key}=${e.value}').join('&'),
     ].join('?');
   }
+}
+
+class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
+  @override
+  Future<List<TagScrapped>> parse({required Document root}) async {
+    final region = root.querySelector('div.form-group.checkbox-group.row');
+
+    return [
+      for (final child in [...?region?.children])
+        TagScrapped(
+          id: child.querySelector('input')?.attributes['value'],
+          name: child.text.trim(),
+        ),
+    ];
+  }
+
+  @override
+  // TODO: implement scripts
+  List<String> get scripts => [];
 }

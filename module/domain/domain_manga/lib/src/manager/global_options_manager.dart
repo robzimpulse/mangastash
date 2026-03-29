@@ -1,9 +1,10 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
-import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../sources/sources.dart';
 import '../use_case/parameter/listen_search_parameter_use_case.dart';
 import '../use_case/parameter/listen_setting_downloaded_only_use_case.dart';
 import '../use_case/parameter/listen_setting_incognito_use_case.dart';
@@ -26,7 +27,7 @@ class GlobalOptionsManager
         ListenSettingIncognitoUseCase,
         UpdateSettingIncognitoUseCase {
   final BehaviorSubject<SearchMangaParameter> _searchMangaParameter;
-  final BehaviorSubject<List<SourceEnum>> _sources;
+  final BehaviorSubject<List<SourceExternal>> _sources;
   final BehaviorSubject<int> _numOfPrefetchedPrevChapter;
   final BehaviorSubject<int> _numOfPrefetchedNextChapter;
   final BehaviorSubject<bool> _downloadedOnlyChapter;
@@ -66,8 +67,8 @@ class GlobalOptionsManager
             ),
           ),
       initialSources: sources
-          .let((e) => [...e.map(SourceEnum.fromName).nonNulls])
-          .or(SourceEnum.values),
+          .let((e) => [...e.map(Sources.fromName).nonNulls])
+          .or([]),
       numOfPrefetchedPrevChapter: numOfPrefetchedPrevChapter ?? 0,
       numOfPrefetchedNextChapter: numOfPrefetchedNextChapter ?? 0,
       downloadedOnlyChapter: downloadedOnly ?? false,
@@ -78,7 +79,7 @@ class GlobalOptionsManager
   GlobalOptionsManager._({
     required SharedPreferencesAsync storage,
     required SearchMangaParameter initialParameter,
-    required List<SourceEnum> initialSources,
+    required List<SourceExternal> initialSources,
     int numOfPrefetchedPrevChapter = 0,
     int numOfPrefetchedNextChapter = 0,
     bool downloadedOnlyChapter = false,
@@ -108,10 +109,10 @@ class GlobalOptionsManager
   }
 
   @override
-  ValueStream<List<SourceEnum>> get sourceStateStream => _sources.stream;
+  ValueStream<List<SourceExternal>> get sourceStateStream => _sources.stream;
 
   @override
-  Future<void> updateSources({required List<SourceEnum> sources}) async {
+  Future<void> updateSources({required List<SourceExternal> sources}) async {
     await _storage.setStringList(_sourcesKey, [...sources.map((e) => e.name)]);
     _sources.add(sources);
   }

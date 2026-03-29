@@ -5,12 +5,14 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:file/file.dart';
 import 'package:flutter/widgets.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
 
+import '../sources/sources.dart';
 import '../use_case/cancel_job_use_case.dart';
 import '../use_case/chapter/get_all_chapter_use_case.dart';
 import '../use_case/chapter/get_chapter_use_case.dart';
@@ -142,7 +144,7 @@ class JobManager
 
   Future<void> _fetchManga(JobModel job) async {
     final mangaId = job.manga?.id;
-    final source = job.manga?.source?.let(SourceEnum.fromName);
+    final source = job.manga?.source?.let(Sources.fromName);
 
     if (mangaId == null || source == null) {
       throw Exception('No Manga ID or Source Url');
@@ -162,7 +164,7 @@ class JobManager
   Future<void> _fetchChapter(JobModel job) async {
     final mangaId = job.manga?.id;
     final chapterId = job.chapter?.id;
-    final source = job.manga?.source?.let(SourceEnum.fromName);
+    final source = job.manga?.source?.let(Sources.fromName);
 
     if (mangaId == null || chapterId == null || source == null) {
       throw Exception('No Manga ID or Chapter ID or Source');
@@ -195,7 +197,7 @@ class JobManager
 
   Future<void> _fetchAllChapter(JobModel job) async {
     final mangaId = job.manga?.id;
-    final source = job.manga?.source?.let(SourceEnum.fromName);
+    final source = job.manga?.source?.let(Sources.fromName);
 
     if (mangaId == null || source == null) {
       throw Exception('No Manga ID or Source');
@@ -248,7 +250,10 @@ class JobManager
   }
 
   @override
-  void prefetchChapters({required String mangaId, required SourceEnum source}) {
+  void prefetchChapters({
+    required String mangaId,
+    required SourceExternal source,
+  }) {
     _ensureExecuted(
       future: _jobDao.add(
         JobTablesCompanion.insert(
@@ -264,7 +269,7 @@ class JobManager
   void prefetchChapter({
     required String mangaId,
     required String chapterId,
-    required SourceEnum source,
+    required SourceExternal source,
   }) {
     _ensureExecuted(
       future: _jobDao.add(
@@ -279,7 +284,10 @@ class JobManager
   }
 
   @override
-  void prefetchManga({required String mangaId, required SourceEnum source}) {
+  void prefetchManga({
+    required String mangaId,
+    required SourceExternal source,
+  }) {
     _ensureExecuted(
       future: _jobDao.add(
         JobTablesCompanion.insert(

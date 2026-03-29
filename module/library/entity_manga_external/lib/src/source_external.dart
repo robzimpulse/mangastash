@@ -3,6 +3,7 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 
 import 'chapter_scrapped.dart';
 import 'manga_scrapped.dart';
+import 'tag_scrapped.dart';
 
 abstract class SourceExternal {
   String get name;
@@ -11,9 +12,10 @@ abstract class SourceExternal {
   bool get builtIn => false;
 
   GetMangaSourceExternalUseCase get getMangaUseCase;
-  GetChapterSourceExternalUseCase get getChapterImageUseCase;
+  GetChapterImageSourceExternalUseCase get getChapterImageUseCase;
   SearchMangaSourceExternalUseCase get searchMangaUseCase;
-  SearchChapterSourceExternalUseCase get searchChapterUseCase;
+  ListChapterSourceExternalUseCase get listChapterUseCase;
+  ListTagSourceExternalUseCase get listTagUseCase;
 }
 
 abstract class GetMangaSourceExternalUseCase {
@@ -21,7 +23,7 @@ abstract class GetMangaSourceExternalUseCase {
   Future<MangaScrapped> parse({required Document root});
 }
 
-abstract class GetChapterSourceExternalUseCase {
+abstract class GetChapterImageSourceExternalUseCase {
   List<String> get scripts;
   Future<List<String>> parse({required Document root});
 }
@@ -33,7 +35,12 @@ abstract class SearchMangaSourceExternalUseCase {
   Future<bool?> haveNextPage({required Document root});
 }
 
-abstract class SearchChapterSourceExternalUseCase {
+abstract class ListChapterSourceExternalUseCase {
   List<String> get scripts;
   Future<List<ChapterScrapped>> parse({required Document root});
+}
+
+abstract class ListTagSourceExternalUseCase {
+  List<String> get scripts;
+  Future<List<TagScrapped>> parse({required Document root});
 }

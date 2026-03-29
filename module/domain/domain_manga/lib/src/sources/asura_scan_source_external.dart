@@ -17,24 +17,28 @@ class AsuraScanSourceExternal implements SourceExternal {
   bool get builtIn => false;
 
   @override
-  GetChapterSourceExternalUseCase get getChapterImageUseCase =>
-      _GetChapterSourceExternalUseCase();
+  GetChapterImageSourceExternalUseCase get getChapterImageUseCase =>
+      _GetChapterImageSourceExternalUseCase();
 
   @override
   GetMangaSourceExternalUseCase get getMangaUseCase =>
       _GetMangaSourceExternalUseCase();
 
   @override
-  SearchChapterSourceExternalUseCase get searchChapterUseCase =>
-      _SearchChapterSourceExternalUseCase(name);
+  ListChapterSourceExternalUseCase get listChapterUseCase =>
+      _ListChapterSourceExternalUseCase(name);
 
   @override
   SearchMangaSourceExternalUseCase get searchMangaUseCase =>
       _SearchMangaSourceExternalUseCase(baseUrl);
+
+  @override
+  ListTagSourceExternalUseCase get listTagUseCase =>
+      _ListTagSourceExternalUseCase();
 }
 
-class _GetChapterSourceExternalUseCase
-    implements GetChapterSourceExternalUseCase {
+class _GetChapterImageSourceExternalUseCase
+    implements GetChapterImageSourceExternalUseCase {
   @override
   Future<List<String>> parse({required Document root}) async {
     final region = root.querySelector(
@@ -135,11 +139,11 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
   }
 }
 
-class _SearchChapterSourceExternalUseCase
-    implements SearchChapterSourceExternalUseCase {
+class _ListChapterSourceExternalUseCase
+    implements ListChapterSourceExternalUseCase {
   final String _name;
 
-  const _SearchChapterSourceExternalUseCase(this._name);
+  const _ListChapterSourceExternalUseCase(this._name);
 
   @override
   Future<List<ChapterScrapped>> parse({required Document root}) async {
@@ -308,5 +312,43 @@ class _SearchMangaSourceExternalUseCase
           MapEntry('genres', [...?parameter.includedTags].join(',')),
       ].map((e) => '${e.key}=${e.value}').join('&'),
     ].join('?');
+  }
+}
+
+class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
+  @override
+  Future<List<TagScrapped>> parse({required Document root}) async {
+    final region = root.querySelector('form#hook-form');
+
+    final elements = region?.querySelectorAll(
+      'div.flex.flex-row.items-start.space-x-1.space-y-0',
+    );
+
+    return [
+      for (final (index, element) in [...?elements].indexed)
+        TagScrapped(
+          id: (index + 1).toString(),
+          name: element.querySelector('label')?.text.trim(),
+        ),
+    ];
+  }
+
+  @override
+  List<String> get scripts {
+    final selector = [
+      'button',
+      'inline-flex',
+      'items-center',
+      'whitespace-nowrap',
+      'px-4',
+      'py-2',
+      'w-full',
+      'justify-center',
+      'font-normal',
+      'align-middle',
+      'border-solid',
+    ].join('.');
+
+    return ['window.document.querySelectorAll(\'$selector\')[0].click()'];
   }
 }

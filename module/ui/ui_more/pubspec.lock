@@ -259,7 +259,7 @@ packages:
     source: path
     version: "0.0.1"
   entity_manga_external:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       path: "../../library/entity_manga_external"
       relative: true

@@ -5,15 +5,17 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
+import '../../extension/data_scrapped_extension.dart';
 import '../../mixin/sync_mangas_mixin.dart';
-import '../../parser/base/manga_list_html_parser.dart';
+import '../../sources/sources.dart';
 
 class SearchMangaUseCase with SyncMangasMixin {
   final MangaRepository _mangaRepository;
   final HeadlessWebviewUseCase _webview;
-
+  final ConverterCacheManager _converterCacheManager;
   final HtmlCacheManager _htmlCacheManager;
   final SearchMangaCacheManager _searchMangaCacheManager;
   final MangaDao _mangaDao;
@@ -22,13 +24,13 @@ class SearchMangaUseCase with SyncMangasMixin {
   const SearchMangaUseCase({
     required MangaRepository mangaRepository,
     required HeadlessWebviewUseCase webview,
-
+    required ConverterCacheManager converterCacheManager,
     required HtmlCacheManager htmlCacheManager,
     required SearchMangaCacheManager searchMangaCacheManager,
     required MangaDao mangaDao,
     required LogBox logBox,
   }) : _mangaRepository = mangaRepository,
-
+       _converterCacheManager = converterCacheManager,
        _htmlCacheManager = htmlCacheManager,
        _searchMangaCacheManager = searchMangaCacheManager,
        _mangaDao = mangaDao,
@@ -36,24 +38,16 @@ class SearchMangaUseCase with SyncMangasMixin {
        _logBox = logBox;
 
   Future<Pagination<Manga>> _mangadex({
-    required SourceSearchMangaParameter parameter,
+    required SearchMangaParameter parameter,
   }) async {
     final result = await _mangaRepository.search(
-      parameter: parameter.parameter.copyWith(
-        includes: [
-          ...?parameter.parameter.includes,
-          Include.author,
-          Include.coverArt,
-        ],
+      parameter: parameter.copyWith(
+        includes: [...?parameter.includes, Include.author, Include.coverArt],
       ),
     );
 
     return Pagination(
-      data: [
-        ...?result.data?.map(
-          (e) => Manga.from(data: e).copyWith(source: parameter.source.name),
-        ),
-      ],
+      data: [...?result.data?.map((e) => Manga.from(data: e))],
       offset: result.offset?.toInt(),
       limit: result.limit?.toInt() ?? 0,
       total: result.total?.toInt() ?? 0,
@@ -61,60 +55,44 @@ class SearchMangaUseCase with SyncMangasMixin {
   }
 
   Future<Pagination<Manga>> _scrapping({
-    required SourceSearchMangaParameter parameter,
+    required SourceExternal source,
+    required SearchMangaParameter parameter,
     bool useCache = true,
   }) async {
-    final url = parameter.url;
-
-    if (url == null) {
-      throw DataNotFoundException();
-    }
-
-    final selector = [
-      'button',
-      'inline-flex',
-      'items-center',
-      'whitespace-nowrap',
-      'px-4',
-      'py-2',
-      'w-full',
-      'justify-center',
-      'font-normal',
-      'align-middle',
-      'border-solid',
-    ].join('.');
+    final url = source.searchMangaUseCase.url(parameter: parameter);
 
     final document = await _webview.open(
       url,
-      scripts: [
-        if (parameter.source == SourceEnum.asurascan)
-          'window.document.querySelectorAll(\'$selector\')[0].click()',
-      ],
+      scripts: source.searchMangaUseCase.scripts,
       useCache: useCache,
     );
 
-    final parser = MangaListHtmlParser.forSource(
-      root: document,
-      source: parameter.source,
+    final data = await source.searchMangaUseCase.parse(root: document);
+    final mangas = await Future.wait(
+      data.map(
+        (e) => e.convert(logbox: _logBox, manager: _converterCacheManager),
+      ),
     );
 
-    final mangas = await parser.mangas;
-
     return Pagination(
-      data: [...mangas.map((e) => e.copyWith(source: parameter.source.name))],
-      page: parameter.parameter.page,
+      data: mangas,
+      page: parameter.page,
       limit: mangas.length,
       total: mangas.length,
-      hasNextPage: await parser.haveNextPage,
-      sourceUrl: parameter.url,
+      hasNextPage: await source.searchMangaUseCase.haveNextPage(root: document),
+      sourceUrl: url,
     );
   }
 
   Future<void> clear({required SourceSearchMangaParameter parameter}) async {
     final data = await _searchMangaCacheManager.keys;
+    final source = Sources.fromName(parameter.source);
+    if (source == null) return;
+
     final List<Future<void>> promises = [
-      _htmlCacheManager.removeFile(parameter.source.icon),
+      _htmlCacheManager.removeFile(source.iconUrl),
     ];
+
     for (final value in data) {
       final key = SourceSearchMangaParameter.fromJsonString(value);
       if (key == null) continue;
@@ -126,7 +104,8 @@ class SearchMangaUseCase with SyncMangasMixin {
       );
       if (paramIgnorePagination != key.parameter) continue;
       promises.add(_searchMangaCacheManager.removeFile(value));
-      final url = key.url?.let((url) => Uri.tryParse(url).toString());
+      final source = Sources.fromName(parameter.source);
+      final url = source?.searchMangaUseCase.url(parameter: key.parameter);
       if (url == null) continue;
       promises.add(_htmlCacheManager.removeFile(url));
     }
@@ -150,12 +129,19 @@ class SearchMangaUseCase with SyncMangasMixin {
     if (data != null && useCache) return Success(data);
 
     try {
-      final Pagination<Manga> data;
-      if (parameter.source == SourceEnum.mangadex) {
-        data = await _mangadex(parameter: parameter);
-      } else {
-        data = await _scrapping(parameter: parameter, useCache: useCache);
+      final source = Sources.fromName(parameter.source);
+      if (source == null) {
+        throw DataNotFoundException();
       }
+
+      final data =
+          source.builtIn
+              ? await _mangadex(parameter: parameter.parameter)
+              : await _scrapping(
+                source: source,
+                parameter: parameter.parameter,
+                useCache: useCache,
+              );
 
       final result = data.copyWith(
         data: await sync(

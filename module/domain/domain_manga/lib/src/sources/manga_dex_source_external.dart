@@ -15,7 +15,7 @@ class MangaDexSourceExternal extends SourceExternal {
 
   @override
   // TODO: implement getChapterImageUseCase
-  GetChapterSourceExternalUseCase get getChapterImageUseCase =>
+  GetChapterImageSourceExternalUseCase get getChapterImageUseCase =>
       throw UnimplementedError();
 
   @override
@@ -25,11 +25,15 @@ class MangaDexSourceExternal extends SourceExternal {
 
   @override
   // TODO: implement searchChapterUseCase
-  SearchChapterSourceExternalUseCase get searchChapterUseCase =>
+  ListChapterSourceExternalUseCase get listChapterUseCase =>
       throw UnimplementedError();
 
   @override
   // TODO: implement searchMangaUseCase
   SearchMangaSourceExternalUseCase get searchMangaUseCase =>
       throw UnimplementedError();
+
+  @override
+  // TODO: implement listTagUseCase
+  ListTagSourceExternalUseCase get listTagUseCase => throw UnimplementedError();
 }

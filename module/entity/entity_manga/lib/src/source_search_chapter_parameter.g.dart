@@ -9,7 +9,7 @@ part of 'source_search_chapter_parameter.dart';
 SourceSearchChapterParameter _$SourceSearchChapterParameterFromJson(
   Map<String, dynamic> json,
 ) => SourceSearchChapterParameter(
-  source: $enumDecode(_$SourceEnumEnumMap, json['source']),
+  source: json['source'] as String,
   parameter: SearchChapterParameter.fromJson(
     json['parameter'] as Map<String, dynamic>,
   ),
@@ -19,13 +19,7 @@ SourceSearchChapterParameter _$SourceSearchChapterParameterFromJson(
 Map<String, dynamic> _$SourceSearchChapterParameterToJson(
   SourceSearchChapterParameter instance,
 ) => <String, dynamic>{
-  'source': _$SourceEnumEnumMap[instance.source]!,
+  'source': instance.source,
   'manga_id': instance.mangaId,
   'parameter': instance.parameter.toJson(),
-};
-
-const _$SourceEnumEnumMap = {
-  SourceEnum.mangadex: 'mangadex',
-  SourceEnum.mangaclash: 'mangaclash',
-  SourceEnum.asurascan: 'asurascan',
 };

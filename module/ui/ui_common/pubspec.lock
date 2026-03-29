@@ -220,6 +220,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
+  domain_manga:
+    dependency: "direct main"
+    description:
+      path: "../../domain/domain_manga"
+      relative: true
+    source: path
+    version: "0.0.1"
   drift:
     dependency: transitive
     description:
@@ -248,6 +255,13 @@ packages:
     dependency: "direct main"
     description:
       path: "../../entity/entity_manga"
+      relative: true
+    source: path
+    version: "0.0.1"
+  entity_manga_external:
+    dependency: "direct overridden"
+    description:
+      path: "../../library/entity_manga_external"
       relative: true
     source: path
     version: "0.0.1"

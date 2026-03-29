@@ -2,6 +2,7 @@ import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/foundation.dart';
 import 'package:manga_page_view/manga_page_view.dart';
@@ -43,7 +44,7 @@ class MangaReaderScreen extends StatelessWidget {
           initialState: MangaReaderScreenState(
             mangaId: mangaId,
             chapterId: chapterId,
-            source: source?.let(SourceEnum.fromName),
+            source: source?.let(Sources.fromName),
           ),
           getChapterUseCase: locator(),
           updateChapterUseCase: locator(),

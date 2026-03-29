@@ -9,7 +9,7 @@ part of 'source_search_manga_parameter.dart';
 SourceSearchMangaParameter _$SourceSearchMangaParameterFromJson(
   Map<String, dynamic> json,
 ) => SourceSearchMangaParameter(
-  source: $enumDecode(_$SourceEnumEnumMap, json['source']),
+  source: json['source'] as String,
   parameter: SearchMangaParameter.fromJson(
     json['parameter'] as Map<String, dynamic>,
   ),
@@ -18,12 +18,6 @@ SourceSearchMangaParameter _$SourceSearchMangaParameterFromJson(
 Map<String, dynamic> _$SourceSearchMangaParameterToJson(
   SourceSearchMangaParameter instance,
 ) => <String, dynamic>{
-  'source': _$SourceEnumEnumMap[instance.source]!,
+  'source': instance.source,
   'parameter': instance.parameter.toJson(),
-};
-
-const _$SourceEnumEnumMap = {
-  SourceEnum.mangadex: 'mangadex',
-  SourceEnum.mangaclash: 'mangaclash',
-  SourceEnum.asurascan: 'asurascan',
 };

@@ -6,13 +6,13 @@ import 'manga_clash_source_external.dart';
 import 'manga_dex_source_external.dart';
 
 class Sources {
-  static List<SourceExternal> all = [
+  static List<SourceExternal> values = [
     MangaDexSourceExternal(),
     AsuraScanSourceExternal(),
     MangaClashSourceExternal(),
   ];
 
   static SourceExternal? fromName(String name) {
-    return all.firstWhereOrNull((e) => e.name == name);
+    return values.firstWhereOrNull((e) => e.name == name);
   }
 }

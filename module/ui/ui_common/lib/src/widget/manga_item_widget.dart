@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 
@@ -27,8 +28,8 @@ class MangaItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final source = manga.source?.let(SourceEnum.fromName);
-    final sourceIconUrl = source?.icon;
+    final source = manga.source?.let(Sources.fromName);
+    final sourceIconUrl = source?.iconUrl;
     final title = manga.title;
 
     return Material(

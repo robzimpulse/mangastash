@@ -3,63 +3,50 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 
+import '../../extension/data_scrapped_extension.dart';
 import '../../mixin/sync_mangas_mixin.dart';
-import '../../parser/base/manga_detail_html_parser.dart';
 
 class GetMangaFromUrlUseCase with SyncMangasMixin {
   final HeadlessWebviewUseCase _webview;
   final MangaDao _mangaDao;
   final LogBox _logBox;
+  final ConverterCacheManager _converterCacheManager;
 
   GetMangaFromUrlUseCase({
     required HeadlessWebviewUseCase webview,
     required MangaDao mangaDao,
     required LogBox logBox,
+    required ConverterCacheManager converterCacheManager,
   }) : _mangaDao = mangaDao,
        _logBox = logBox,
-       _webview = webview;
+       _webview = webview,
+       _converterCacheManager = converterCacheManager;
 
   Future<Manga> _scrapping({
-    required SourceEnum source,
+    required SourceExternal source,
     required String url,
     bool useCache = true,
   }) async {
-    final selector = [
-      'button',
-      'inline-flex',
-      'items-center',
-      'whitespace-nowrap',
-      'px-4',
-      'py-2',
-      'w-full',
-      'justify-center',
-      'font-normal',
-      'align-middle',
-      'border-solid',
-    ].join('.');
-
     final document = await _webview.open(
       url,
-      scripts: [
-        if (source == SourceEnum.asurascan)
-          'window.document.querySelectorAll(\'$selector\')[0].click()',
-      ],
+      scripts: source.getMangaUseCase.scripts,
       useCache: useCache,
     );
 
-    final parser = MangaDetailHtmlParser.forSource(
-      root: document,
-      source: source,
-    );
+    final scrapped = await source.getMangaUseCase.parse(root: document);
 
-    final manga = await parser.manga;
+    final manga = await scrapped.convert(
+      logbox: _logBox,
+      manager: _converterCacheManager,
+    );
 
     return manga.copyWith(source: source.name, webUrl: url);
   }
 
   Future<Result<Manga>> execute({
-    required SourceEnum source,
+    required SourceExternal source,
     required String url,
     bool useCache = true,
   }) async {

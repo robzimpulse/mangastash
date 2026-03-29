@@ -85,7 +85,7 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
 
     await _searchMangaUseCase.clear(
       parameter: SourceSearchMangaParameter(
-        source: source,
+        source: source.name,
         parameter: state.parameter,
       ),
     );
@@ -98,7 +98,7 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
 
     final result = await _searchMangaUseCase.execute(
       parameter: SourceSearchMangaParameter(
-        source: source,
+        source: source.name,
         parameter: state.parameter,
       ),
     );
@@ -159,7 +159,7 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
   void prefetch({required List<Manga> mangas}) {
     for (final manga in mangas) {
       final id = manga.id;
-      final source = manga.source?.let(SourceEnum.fromName);
+      final source = manga.source?.let(Sources.fromName);
       if (id == null || source == null) continue;
       _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
       _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);

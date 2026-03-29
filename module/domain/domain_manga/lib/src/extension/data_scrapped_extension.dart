@@ -54,6 +54,10 @@ extension ChapterScrappedExtension on ChapterScrapped {
   }
 }
 
+extension TagScrappedExtension on TagScrapped {
+  Tag convert() => Tag(id: id, name: name);
+}
+
 extension MangaExtension on Manga {
   Manga adjust() {
     return copyWith(status: toBeginningOfSentenceCase(status?.toLowerCase()));

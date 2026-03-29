@@ -28,7 +28,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         _prefetchChapterUseCase = prefetchChapterUseCase,
         _getMangaFromUrlUseCase = getMangaFromUrlUseCase,
-        super(initialState.copyWith(sources: SourceEnum.values)) {
+        super(initialState.copyWith(sources: Sources.values)) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
           .distinct()
@@ -52,7 +52,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
   void prefetch({required List<Manga> mangas}) {
     for (final manga in mangas) {
       final id = manga.id;
-      final source = manga.source?.let(SourceEnum.fromName);
+      final source = manga.source?.let(Sources.fromName);
       if (id == null || source == null) continue;
       _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
       _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);
