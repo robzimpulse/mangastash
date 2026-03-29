@@ -263,20 +263,42 @@ class _SearchMangaSourceExternalUseCase
 
   @override
   Future<List<MangaScrapped>> parse({required Document root}) async {
-    final queries = ['div', 'grid', 'grid-cols-2', 'gap-3', 'p-4'].join('.');
-    final region = root.querySelector(queries)?.querySelectorAll('a');
-    return (region ?? []).map((e) {
-      final webUrl = ['https://asuracomic.net', e.attributes['href']].join('/');
-      final status = e.querySelector('span.status.bg-blue-700')?.text.trim();
-      final coverUrl = e.querySelector('img.rounded-md')?.attributes['src'];
-      final title = e.querySelector('span.block.font-bold')?.text.trim();
+    final queries = [
+      'div',
+      'series-card',
+      'group',
+      'rounded-lg',
+      'overflow-hidden',
+      'transition-all',
+      'duration-200',
+    ].join('.');
+
+    final region = root.querySelectorAll(queries);
+
+    final mangas = region.map((e) {
+      final container = e.querySelector('div.p-3');
+      final link = container?.querySelector('a');
+
+      final coverUrl =
+          e.querySelector('a')?.querySelector('img')?.attributes['src'];
+      final webUrl = link.let((e) => [_baseUrl, e.attributes['href']].join(''));
+      final status = container
+          ?.querySelector('div.flex.items-center.gap-2.mt-2')
+          .let(
+            (e) => e.querySelector(
+              'span.text-xs.font-medium.px-2.py-1.rounded.capitalize',
+            ),
+          );
+
       return MangaScrapped(
-        title: title,
+        title: link?.text.trim(),
         coverUrl: coverUrl,
         webUrl: webUrl,
-        status: status,
+        status: status?.text.trim(),
       );
-    }).toList();
+    });
+
+    return mangas.nonNulls.toList();
   }
 
   @override
