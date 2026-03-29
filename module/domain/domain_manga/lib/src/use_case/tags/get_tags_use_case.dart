@@ -50,7 +50,9 @@ class GetTagsUseCase with SyncTagsMixin {
       useCache: useCache,
     );
 
-    final tags = await source.listTagUseCase.parse(root: document);
+    final tags = await source.listTagUseCase.parse(
+      root: HtmlDocument()..nodes.addAll(document.nodes),
+    );
 
     return [...tags.map((e) => e.convert())];
   }

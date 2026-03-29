@@ -1,4 +1,10 @@
+export 'eval_plugin.dart';
 export 'src/chapter_scrapped.dart';
+export 'src/chapter_scrapped.eval.dart';
+export 'src/html_document.dart';
+export 'src/html_document.eval.dart';
 export 'src/manga_scrapped.dart';
+export 'src/manga_scrapped.eval.dart';
 export 'src/source_external.dart';
+export 'src/source_external.eval.dart';
 export 'src/tag_scrapped.dart';
