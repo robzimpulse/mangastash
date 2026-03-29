@@ -246,19 +246,21 @@ class _SearchMangaSourceExternalUseCase
   @override
   Future<bool?> haveNextPage({required Document root}) async {
     final queries = [
-      'a',
+      'nav',
       'flex',
       'items-center',
-      'bg-themecolor',
-      'text-white',
-      'px-8',
-      'text-center',
-      'cursor-pointer',
+      'justify-center',
+      'mt-8',
+      'pb-8',
     ].join('.');
 
     final region = root.querySelector(queries);
+    final buttons = region?.querySelectorAll('button');
+    final nextButton = buttons?.firstWhereOrNull(
+      (e) => e.attributes['aria-label'] == 'Next page',
+    );
 
-    return region?.attributes['style'] == 'pointer-events:auto';
+    return nextButton != null && !nextButton.attributes.containsKey('disabled');
   }
 
   @override
