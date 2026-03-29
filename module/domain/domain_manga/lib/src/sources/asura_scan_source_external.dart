@@ -59,23 +59,7 @@ class _GetChapterImageSourceExternalUseCase
   }
 
   @override
-  List<String> get scripts {
-    final selector = [
-      'button',
-      'inline-flex',
-      'items-center',
-      'whitespace-nowrap',
-      'px-4',
-      'py-2',
-      'w-full',
-      'justify-center',
-      'font-normal',
-      'align-middle',
-      'border-solid',
-    ].join('.');
-
-    return ['window.document.querySelectorAll(\'$selector\')[0].click()'];
-  }
+  List<String> get scripts => [];
 }
 
 class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
@@ -121,23 +105,7 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
   }
 
   @override
-  List<String> get scripts {
-    final selector = [
-      'button',
-      'inline-flex',
-      'items-center',
-      'whitespace-nowrap',
-      'px-4',
-      'py-2',
-      'w-full',
-      'justify-center',
-      'font-normal',
-      'align-middle',
-      'border-solid',
-    ].join('.');
-
-    return ['window.document.querySelectorAll(\'$selector\')[0].click()'];
-  }
+  List<String> get scripts => [];
 }
 
 class _ListChapterSourceExternalUseCase
@@ -218,23 +186,7 @@ class _ListChapterSourceExternalUseCase
   }
 
   @override
-  List<String> get scripts {
-    final selector = [
-      'button',
-      'inline-flex',
-      'items-center',
-      'whitespace-nowrap',
-      'px-4',
-      'py-2',
-      'w-full',
-      'justify-center',
-      'font-normal',
-      'align-middle',
-      'border-solid',
-    ].join('.');
-
-    return ['window.document.querySelectorAll(\'$selector\')[0].click()'];
-  }
+  List<String> get scripts => [];
 }
 
 class _SearchMangaSourceExternalUseCase
@@ -304,23 +256,7 @@ class _SearchMangaSourceExternalUseCase
   }
 
   @override
-  List<String> get scripts {
-    final selector = [
-      'button',
-      'inline-flex',
-      'items-center',
-      'whitespace-nowrap',
-      'px-4',
-      'py-2',
-      'w-full',
-      'justify-center',
-      'font-normal',
-      'align-middle',
-      'border-solid',
-    ].join('.');
-
-    return ['window.document.querySelectorAll(\'$selector\')[0].click()'];
-  }
+  List<String> get scripts => [];
 
   @override
   String url({required SearchMangaParameter parameter}) {
@@ -379,21 +315,5 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
   }
 
   @override
-  List<String> get scripts {
-    final selector = [
-      'button',
-      'inline-flex',
-      'items-center',
-      'whitespace-nowrap',
-      'px-4',
-      'py-2',
-      'w-full',
-      'justify-center',
-      'font-normal',
-      'align-middle',
-      'border-solid',
-    ].join('.');
-
-    return ['window.document.querySelectorAll(\'$selector\')[0].click()'];
-  }
+  List<String> get scripts => [];
 }
