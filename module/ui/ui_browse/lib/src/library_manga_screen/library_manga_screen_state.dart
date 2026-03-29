@@ -1,4 +1,5 @@
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ui_common/ui_common.dart';
 
@@ -13,7 +14,7 @@ class LibraryMangaScreenState extends Equatable {
 
   final String? mangaTitle;
 
-  final List<SourceEnum> sources;
+  final List<SourceExternal> sources;
 
   final Set<String> prefetchedMangaIds;
 
@@ -55,7 +56,7 @@ class LibraryMangaScreenState extends Equatable {
     ValueGetter<Exception?>? error,
     List<Manga>? mangas,
     Set<String>? prefetchedMangaIds,
-    List<SourceEnum>? sources,
+    List<SourceExternal>? sources,
     bool? isSearchActive,
     String? mangaTitle,
   }) {

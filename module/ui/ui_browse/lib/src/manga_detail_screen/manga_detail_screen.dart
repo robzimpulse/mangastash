@@ -56,7 +56,7 @@ class MangaDetailScreen extends StatefulWidget {
         return MangaDetailScreenCubit(
           initialState: MangaDetailScreenState(
             mangaId: mangaId,
-            source: source?.let(SourceEnum.fromName),
+            source: source?.let(Sources.fromName),
             config: ChapterConfig(
               downloaded: isDownloaded.downloadedOnlyState.valueOrNull,
             ),

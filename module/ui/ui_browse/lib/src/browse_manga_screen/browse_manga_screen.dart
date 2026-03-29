@@ -46,7 +46,7 @@ class BrowseMangaScreen extends StatefulWidget {
       create: (context) {
         return BrowseMangaScreenCubit(
           initialState: BrowseMangaScreenState(
-            source: source?.let(SourceEnum.fromName),
+            source: source?.let(Sources.fromName),
             parameter: SearchMangaParameter(
               includedTags: tagId.let((e) => [e]),
             ),
@@ -148,11 +148,11 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         ].contains(true);
       },
       builder: (context, state) {
-        final url = state.source?.let((source) {
-          return SourceSearchMangaParameter(
-            source: source,
+        final url = state.source?.let((e) {
+          if (e.builtIn) return null;
+          return e.searchMangaUseCase.url(
             parameter: state.parameter.copyWith(page: 1),
-          ).url;
+          );
         });
 
         if (url == null) return const SizedBox.shrink();

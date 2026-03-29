@@ -1,10 +1,11 @@
-import 'package:core_environment/core_environment.dart';
-import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
+
+import '../sources/sources.dart';
 
 extension SourceOfUri on Uri {
-  SourceEnum? get source {
-    for (final source in SourceEnum.values) {
-      if (source.url.let(Uri.tryParse)?.host == host) {
+  SourceExternal? get source {
+    for (final source in Sources.values) {
+      if (Uri.tryParse(source.baseUrl)?.host == host) {
         return source;
       }
     }

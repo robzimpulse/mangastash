@@ -3,10 +3,10 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../mixin/sync_chapters_mixin.dart';
-import '../../parser/base/chapter_image_html_parser.dart';
 
 class GetChapterUseCase with SyncChaptersMixin {
   final ChapterRepository _chapterRepository;
@@ -52,46 +52,24 @@ class GetChapterUseCase with SyncChaptersMixin {
 
   Future<List<String>> _scrapping({
     required String? url,
-    required SourceEnum source,
+    required SourceExternal source,
     bool useCache = true,
   }) async {
     if (url == null) {
       throw DataNotFoundException();
     }
 
-    final selector = [
-      'button',
-      'inline-flex',
-      'items-center',
-      'whitespace-nowrap',
-      'px-4',
-      'py-2',
-      'w-full',
-      'justify-center',
-      'font-normal',
-      'align-middle',
-      'border-solid',
-    ].join('.');
-
     final document = await _webview.open(
       url,
-      scripts: [
-        if (source == SourceEnum.asurascan)
-          'window.document.querySelectorAll(\'$selector\')[0].click()',
-      ],
+      scripts: source.getChapterImageUseCase.scripts,
       useCache: useCache,
     );
 
-    final parser = ChapterImageHtmlParser.forSource(
-      root: document,
-      source: source,
-    );
-
-    return parser.images;
+    return source.getChapterImageUseCase.parse(root: document);
   }
 
   Future<Result<Chapter>> execute({
-    required SourceEnum source,
+    required SourceExternal source,
     required String mangaId,
     required String chapterId,
     bool useCache = true,
@@ -106,22 +84,19 @@ class GetChapterUseCase with SyncChaptersMixin {
         return Success(chapter);
       }
 
-      final data = await switch (source) {
-        SourceEnum.mangadex => _mangadex(
-          mangaId: mangaId,
-          chapterId: chapterId,
-        ),
-        _ => _scrapping(
-          url: chapter?.webUrl,
-          source: source,
-          useCache: useCache,
-        ).then((e) => chapter?.copyWith(images: e)),
-      };
+      final data =
+          source.builtIn
+              ? _mangadex(mangaId: mangaId, chapterId: chapterId)
+              : _scrapping(
+                url: chapter?.webUrl,
+                source: source,
+                useCache: useCache,
+              ).then((e) => chapter?.copyWith(images: e));
 
       final results = await sync(
         dao: _chapterDao,
         values: [
-          ...[data].nonNulls,
+          ...[await data].nonNulls,
         ],
         logBox: _logBox,
       );

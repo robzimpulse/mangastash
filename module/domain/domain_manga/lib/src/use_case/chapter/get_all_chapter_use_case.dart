@@ -1,6 +1,7 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import 'search_chapter_use_case.dart';
@@ -12,7 +13,7 @@ class GetAllChapterUseCase {
     : _searchChapterUseCase = searchChapterUseCase;
 
   Future<List<Chapter>> execute({
-    required SourceEnum source,
+    required SourceExternal source,
     required String mangaId,
     SearchChapterParameter? parameter,
     bool useCache = true,
@@ -23,7 +24,7 @@ class GetAllChapterUseCase {
 
     final result = await _searchChapterUseCase.execute(
       parameter: SourceSearchChapterParameter(
-        source: source,
+        source: source.name,
         parameter: param,
         mangaId: mangaId,
       ),
@@ -41,7 +42,7 @@ class GetAllChapterUseCase {
             /// force other source to use cache on the next page since only
             /// mangadex use true pagination, while other source provide all
             /// chapter on the first fetch
-            useCache: source == SourceEnum.mangadex ? useCache : true,
+            useCache: source.builtIn ? useCache : true,
             parameter: param.copyWith(
               offset: param.offset + param.limit,
               page: param.page + 1,

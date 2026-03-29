@@ -1,5 +1,6 @@
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:equatable/equatable.dart';
 
 class MangaReaderScreenState extends Equatable {
@@ -27,7 +28,7 @@ class MangaReaderScreenState extends Equatable {
 
   final String? chapterId;
 
-  final SourceEnum? source;
+  final SourceExternal? source;
 
   final SearchChapterParameter parameter;
 
@@ -62,7 +63,7 @@ class MangaReaderScreenState extends Equatable {
     bool? isLoading,
     Chapter? chapter,
     Exception? Function()? error,
-    SourceEnum? source,
+    SourceExternal? source,
     SearchChapterParameter? parameter,
     bool? isLoadingNeighbourChapters,
     String? previousChapterId,

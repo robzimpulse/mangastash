@@ -1,5 +1,6 @@
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ui_common/ui_common.dart';
 
@@ -8,7 +9,7 @@ class MangaDetailScreenState extends Equatable {
   final Exception? errorManga;
   final String? mangaId;
   final Manga? manga;
-  final SourceEnum? source;
+  final SourceExternal? source;
 
   final bool isLoadingChapters;
   final Exception? errorChapters;
@@ -141,7 +142,7 @@ class MangaDetailScreenState extends Equatable {
     Manga? manga,
     List<Chapter>? chapters,
     String? sourceId,
-    SourceEnum? source,
+    SourceExternal? source,
     ChapterConfig? config,
     Set<String>? libraryMangaIds,
     Set<String>? prefetchedChapterIds,

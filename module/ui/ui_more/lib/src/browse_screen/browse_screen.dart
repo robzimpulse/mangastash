@@ -1,4 +1,4 @@
-import 'package:entity_manga/entity_manga.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -66,7 +66,7 @@ class BrowseScreen extends StatelessWidget {
         subtitle: const Text('Available Sources for Manga'),
         leading: const Icon(Icons.source),
         children: [
-          ...SourceEnum.values.map(
+          ...Sources.values.map(
             (source) => CheckboxListTile(
               title: Text(source.name),
               value: state.sources.contains(source) == true,

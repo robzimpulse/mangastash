@@ -1,11 +1,11 @@
 import 'package:domain_manga/domain_manga.dart';
-import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:equatable/equatable.dart';
 
 class BrowseScreenState extends Equatable {
   final SearchMangaParameter parameter;
 
-  final List<SourceEnum> sources;
+  final List<SourceExternal> sources;
 
   const BrowseScreenState({
     this.parameter = const SearchMangaParameter(),
@@ -17,7 +17,7 @@ class BrowseScreenState extends Equatable {
 
   BrowseScreenState copyWith({
     SearchMangaParameter? parameter,
-    List<SourceEnum>? sources,
+    List<SourceExternal>? sources,
   }) {
     return BrowseScreenState(
       parameter: parameter ?? this.parameter,

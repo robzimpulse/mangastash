@@ -1,5 +1,6 @@
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ui_common/ui_common.dart';
 
@@ -10,7 +11,7 @@ class BrowseMangaScreenState extends Equatable {
 
   final List<Manga> mangas;
 
-  final SourceEnum? source;
+  final SourceExternal? source;
 
   final bool hasNextPage;
 
@@ -91,7 +92,7 @@ class BrowseMangaScreenState extends Equatable {
     bool? isPagingNextPage,
     bool? isSearchActive,
     ValueGetter<Exception?>? error,
-    SourceEnum? source,
+    SourceExternal? source,
     List<Manga>? mangas,
     Set<String>? libraryMangaIds,
     SearchMangaParameter? parameter,

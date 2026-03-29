@@ -37,6 +37,10 @@ dependencies:
   core_network:
     path: ../../core/core_network
 
+  # domain
+  domain_manga:
+    path: ../../domain/domain_manga
+
   # library
   safe_bloc:
     path: ../../library/safe_bloc

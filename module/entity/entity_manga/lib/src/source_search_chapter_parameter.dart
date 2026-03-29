@@ -4,13 +4,11 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-import 'enum/source_enum.dart';
-
 part 'source_search_chapter_parameter.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class SourceSearchChapterParameter extends Equatable {
-  final SourceEnum source;
+  final String source;
 
   final String mangaId;
 
