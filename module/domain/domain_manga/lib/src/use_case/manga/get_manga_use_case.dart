@@ -82,8 +82,8 @@ class GetMangaUseCase with SyncMangasMixin {
 
       final data =
           source.builtIn
-              ? _mangadex(mangaId: mangaId)
-              : _scrapping(
+              ? await _mangadex(mangaId: mangaId)
+              : await _scrapping(
                 url: manga?.webUrl,
                 source: source,
                 useCache: useCache,
@@ -91,7 +91,7 @@ class GetMangaUseCase with SyncMangasMixin {
 
       final results = await sync(
         dao: _mangaDao,
-        values: [await data],
+        values: [data.copyWith(source: source.name)],
         logBox: _logBox,
       );
 

@@ -187,7 +187,9 @@ class SearchChapterUseCase
       final result = data.copyWith(
         data: await sync(
           dao: _chapterDao,
-          values: [...?data.data],
+          values: [
+            ...?data.data?.map((e) => e.copyWith(mangaId: parameter.mangaId)),
+          ],
           logBox: _logBox,
         ),
       );

@@ -71,7 +71,7 @@ class GetTagsUseCase with SyncTagsMixin {
 
       final result = await sync(
         dao: _tagDao,
-        values: data.map((e) => e.copyWith(source: source.name)).toList(),
+        values: [...data.map((e) => e.copyWith(source: source.name))],
         logBox: _logBox,
       );
 
