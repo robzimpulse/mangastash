@@ -59,6 +59,7 @@ class _GetChapterImageSourceExternalUseCase
   }
 
   @override
+  // TODO: implement scripts
   List<String> get scripts => [];
 }
 
@@ -105,6 +106,7 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
   }
 
   @override
+  // TODO: implement scripts
   List<String> get scripts => [];
 }
 
@@ -186,6 +188,7 @@ class _ListChapterSourceExternalUseCase
   }
 
   @override
+  // TODO: implement scripts
   List<String> get scripts => [];
 }
 
@@ -256,6 +259,7 @@ class _SearchMangaSourceExternalUseCase
   }
 
   @override
+  // TODO: implement scripts
   List<String> get scripts => [];
 
   @override
@@ -315,5 +319,6 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
   }
 
   @override
+  // TODO: implement scripts
   List<String> get scripts => [];
 }
