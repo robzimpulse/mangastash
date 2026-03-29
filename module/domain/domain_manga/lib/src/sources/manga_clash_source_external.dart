@@ -83,7 +83,8 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
         .querySelector('div.genres-content')
         ?.text
         .trim()
-        .split(',');
+        .split(',')
+        .map((e) => e.trim());
 
     return MangaScrapped(
       title: title,
@@ -180,7 +181,8 @@ class _SearchMangaSourceExternalUseCase
           .querySelector('div.post-content_item.mg_genres')
           ?.querySelector('div.summary-content')
           ?.text
-          .split(',');
+          .split(',')
+          .map((e) => e.trim());
       final status =
           element
               .querySelector('div.post-content_item.mg_status')

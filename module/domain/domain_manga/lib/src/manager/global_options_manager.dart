@@ -68,7 +68,7 @@ class GlobalOptionsManager
           ),
       initialSources: sources
           .let((e) => [...e.map(Sources.fromName).nonNulls])
-          .or([]),
+          .or(Sources.values),
       numOfPrefetchedPrevChapter: numOfPrefetchedPrevChapter ?? 0,
       numOfPrefetchedNextChapter: numOfPrefetchedNextChapter ?? 0,
       downloadedOnlyChapter: downloadedOnly ?? false,
