@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:core_environment/core_environment.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:html/dom.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
@@ -299,17 +300,34 @@ class _SearchMangaSourceExternalUseCase
 
   @override
   String url({required SearchMangaParameter parameter}) {
+    final order = parameter.orders?.entries.firstOrNull.let(
+      (entry) => switch (entry.key) {
+        SearchOrders.title => [
+          const MapEntry('sort', 'name'),
+          MapEntry('order', entry.value.rawValue),
+        ],
+        SearchOrders.relevance => [
+          const MapEntry('sort', 'popular'),
+          MapEntry('order', entry.value.rawValue),
+        ],
+        SearchOrders.rating => [
+          const MapEntry('sort', 'rating'),
+          MapEntry('order', entry.value.rawValue),
+        ],
+        _ => [MapEntry('order', entry.value.rawValue)],
+      },
+    );
+
     return [
-      [_baseUrl, 'series'].join('/'),
+      [_baseUrl, 'browse'].join('/'),
       [
-        MapEntry('name', parameter.title ?? ''),
+        MapEntry('q', parameter.title ?? ''),
         MapEntry('page', parameter.page),
-        if (parameter.orders?.containsKey(SearchOrders.rating) == true)
-          const MapEntry('order', 'rating'),
-        if (parameter.orders?.containsKey(SearchOrders.updatedAt) == true)
-          const MapEntry('order', 'update'),
+        if (order != null) ...order,
         if (parameter.includedTags?.isNotEmpty == true)
           MapEntry('genres', [...?parameter.includedTags].join(',')),
+        if (parameter.status?.isNotEmpty == true)
+          MapEntry('status', [...?parameter.status].join(',')),
       ].map((e) => '${e.key}=${e.value}').join('&'),
     ].join('?');
   }
