@@ -35,7 +35,9 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
       useCache: useCache,
     );
 
-    final scrapped = await source.getMangaUseCase.parse(root: HtmlDocument()..nodes.addAll(document.nodes));
+    final scrapped = await source.getMangaUseCase.parse(
+      root: HtmlDocument()..nodes.addAll(document.nodes),
+    );
 
     final manga = await scrapped.convert(
       logbox: _logBox,

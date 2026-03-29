@@ -49,5 +49,5 @@ abstract class ListChapterSourceExternalUseCase {
 @Bind()
 abstract class ListTagSourceExternalUseCase {
   List<String> get scripts;
-  Future<List<TagScrapped>> parse({required Document root});
+  Future<List<TagScrapped>> parse({required HtmlDocument root});
 }

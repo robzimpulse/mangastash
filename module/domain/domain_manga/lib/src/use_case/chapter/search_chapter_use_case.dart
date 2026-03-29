@@ -102,7 +102,9 @@ class SearchChapterUseCase
       useCache: useCache,
     );
 
-    final scraps = source.listChapterUseCase.parse(root: HtmlDocument()..nodes.addAll(document.nodes));
+    final scraps = source.listChapterUseCase.parse(
+      root: HtmlDocument()..nodes.addAll(document.nodes),
+    );
 
     final chapters = await scraps.then((scraps) {
       return Future.wait(

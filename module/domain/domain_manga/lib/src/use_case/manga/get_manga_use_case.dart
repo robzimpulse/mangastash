@@ -57,7 +57,9 @@ class GetMangaUseCase with SyncMangasMixin {
       useCache: useCache,
     );
 
-    final data = await source.getMangaUseCase.parse(root: HtmlDocument()..nodes.addAll(document.nodes));
+    final data = await source.getMangaUseCase.parse(
+      root: HtmlDocument()..nodes.addAll(document.nodes),
+    );
 
     final manga = await data.convert(
       logbox: _logBox,

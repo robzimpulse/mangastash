@@ -14,10 +14,13 @@ class EntityMangaExternalPlugin implements EvalPlugin {
   void configureForCompile(BridgeDeclarationRegistry registry) {
     registry.defineBridgeClass($HtmlDocument.$declaration);
     registry.defineBridgeClass($SourceExternal.$declaration);
-    registry.defineBridgeClass($GetMangaUseCase.$declaration);
-    registry.defineBridgeClass($GetChapterImageUseCase.$declaration);
-    registry.defineBridgeClass($SearchMangaExternalUseCase.$declaration);
-    registry.defineBridgeClass($SearchChapterExternalUseCase.$declaration);
+    registry.defineBridgeClass($GetMangaSourceExternalUseCase.$declaration);
+    registry.defineBridgeClass(
+      $GetChapterImageSourceExternalUseCase.$declaration,
+    );
+    registry.defineBridgeClass($SearchMangaSourceExternalUseCase.$declaration);
+    registry.defineBridgeClass($ListChapterSourceExternalUseCase.$declaration);
+    registry.defineBridgeClass($ListTagSourceExternalUseCase.$declaration);
     registry.defineBridgeClass($ChapterScrapped.$declaration);
     registry.defineBridgeClass($MangaScrapped.$declaration);
   }
@@ -26,10 +29,11 @@ class EntityMangaExternalPlugin implements EvalPlugin {
   void configureForRuntime(Runtime runtime) {
     $HtmlDocument.configureForRuntime(runtime);
     $SourceExternal.configureForRuntime(runtime);
-    $GetMangaUseCase.configureForRuntime(runtime);
-    $GetChapterImageUseCase.configureForRuntime(runtime);
-    $SearchMangaExternalUseCase.configureForRuntime(runtime);
-    $SearchChapterExternalUseCase.configureForRuntime(runtime);
+    $GetMangaSourceExternalUseCase.configureForRuntime(runtime);
+    $GetChapterImageSourceExternalUseCase.configureForRuntime(runtime);
+    $SearchMangaSourceExternalUseCase.configureForRuntime(runtime);
+    $ListChapterSourceExternalUseCase.configureForRuntime(runtime);
+    $ListTagSourceExternalUseCase.configureForRuntime(runtime);
     $ChapterScrapped.configureForRuntime(runtime);
     $MangaScrapped.configureForRuntime(runtime);
   }

@@ -16,6 +16,7 @@ import 'manga_scrapped.dart';
 import 'manga_scrapped.eval.dart';
 import 'source_external.dart';
 import 'source_external.eval.dart';
+import 'tag_scrapped.dart';
 
 /// dart_eval wrapper binding for [SourceExternal]
 class $SourceExternal implements $Instance {
@@ -71,13 +72,21 @@ class $SourceExternal implements $Instance {
         ),
       ),
 
+      'builtIn': BridgeMethodDef(
+        BridgeFunctionDef(
+          returns: BridgeTypeAnnotation(BridgeTypeRef(CoreTypes.bool, [])),
+          namedParams: [],
+          params: [],
+        ),
+      ),
+
       'getMangaUseCase': BridgeMethodDef(
         BridgeFunctionDef(
           returns: BridgeTypeAnnotation(
             BridgeTypeRef(
               BridgeTypeSpec(
                 'package:entity_manga_external/src/source_external.dart',
-                'GetMangaUseCase',
+                'GetMangaSourceExternalUseCase',
               ),
               [],
             ),
@@ -93,7 +102,7 @@ class $SourceExternal implements $Instance {
             BridgeTypeRef(
               BridgeTypeSpec(
                 'package:entity_manga_external/src/source_external.dart',
-                'GetChapterImageUseCase',
+                'GetChapterImageSourceExternalUseCase',
               ),
               [],
             ),
@@ -109,7 +118,7 @@ class $SourceExternal implements $Instance {
             BridgeTypeRef(
               BridgeTypeSpec(
                 'package:entity_manga_external/src/source_external.dart',
-                'SearchMangaExternalUseCase',
+                'SearchMangaSourceExternalUseCase',
               ),
               [],
             ),
@@ -119,13 +128,29 @@ class $SourceExternal implements $Instance {
         ),
       ),
 
-      'searchChapterUseCase': BridgeMethodDef(
+      'listChapterUseCase': BridgeMethodDef(
         BridgeFunctionDef(
           returns: BridgeTypeAnnotation(
             BridgeTypeRef(
               BridgeTypeSpec(
                 'package:entity_manga_external/src/source_external.dart',
-                'SearchChapterExternalUseCase',
+                'ListChapterSourceExternalUseCase',
+              ),
+              [],
+            ),
+          ),
+          namedParams: [],
+          params: [],
+        ),
+      ),
+
+      'listTagUseCase': BridgeMethodDef(
+        BridgeFunctionDef(
+          returns: BridgeTypeAnnotation(
+            BridgeTypeRef(
+              BridgeTypeSpec(
+                'package:entity_manga_external/src/source_external.dart',
+                'ListTagSourceExternalUseCase',
               ),
               [],
             ),
@@ -170,21 +195,31 @@ class $SourceExternal implements $Instance {
         final _baseUrl = $value.baseUrl;
         return $String(_baseUrl);
 
+      case 'builtIn':
+        final _builtIn = $value.builtIn;
+        return $bool(_builtIn);
+
       case 'getMangaUseCase':
         final _getMangaUseCase = $value.getMangaUseCase;
-        return $GetMangaUseCase.wrap(_getMangaUseCase);
+        return $GetMangaSourceExternalUseCase.wrap(_getMangaUseCase);
 
       case 'getChapterImageUseCase':
         final _getChapterImageUseCase = $value.getChapterImageUseCase;
-        return $GetChapterImageUseCase.wrap(_getChapterImageUseCase);
+        return $GetChapterImageSourceExternalUseCase.wrap(
+          _getChapterImageUseCase,
+        );
 
       case 'searchMangaUseCase':
         final _searchMangaUseCase = $value.searchMangaUseCase;
-        return $SearchMangaExternalUseCase.wrap(_searchMangaUseCase);
+        return $SearchMangaSourceExternalUseCase.wrap(_searchMangaUseCase);
 
-      case 'searchChapterUseCase':
-        final _searchChapterUseCase = $value.searchChapterUseCase;
-        return $SearchChapterExternalUseCase.wrap(_searchChapterUseCase);
+      case 'listChapterUseCase':
+        final _listChapterUseCase = $value.listChapterUseCase;
+        return $ListChapterSourceExternalUseCase.wrap(_listChapterUseCase);
+
+      case 'listTagUseCase':
+        final _listTagUseCase = $value.listTagUseCase;
+        return $ListTagSourceExternalUseCase.wrap(_listTagUseCase);
     }
     return _superclass.$getProperty(runtime, identifier);
   }
@@ -195,21 +230,21 @@ class $SourceExternal implements $Instance {
   }
 }
 
-/// dart_eval wrapper binding for [GetMangaUseCase]
-class $GetMangaUseCase implements $Instance {
+/// dart_eval wrapper binding for [GetMangaSourceExternalUseCase]
+class $GetMangaSourceExternalUseCase implements $Instance {
   /// Configure this class for use in a [Runtime]
   static void configureForRuntime(Runtime runtime) {}
 
-  /// Compile-time type specification of [$GetMangaUseCase]
+  /// Compile-time type specification of [$GetMangaSourceExternalUseCase]
   static const $spec = BridgeTypeSpec(
     'package:entity_manga_external/src/source_external.dart',
-    'GetMangaUseCase',
+    'GetMangaSourceExternalUseCase',
   );
 
-  /// Compile-time type declaration of [$GetMangaUseCase]
+  /// Compile-time type declaration of [$GetMangaSourceExternalUseCase]
   static const $type = BridgeTypeRef($spec);
 
-  /// Compile-time class declaration of [$GetMangaUseCase]
+  /// Compile-time class declaration of [$GetMangaSourceExternalUseCase]
   static const $declaration = BridgeClassDef(
     BridgeClassType($type, isAbstract: true),
     constructors: {
@@ -280,13 +315,14 @@ class $GetMangaUseCase implements $Instance {
   final $Instance _superclass;
 
   @override
-  final GetMangaUseCase $value;
+  final GetMangaSourceExternalUseCase $value;
 
   @override
-  GetMangaUseCase get $reified => $value;
+  GetMangaSourceExternalUseCase get $reified => $value;
 
-  /// Wrap a [GetMangaUseCase] in a [$GetMangaUseCase]
-  $GetMangaUseCase.wrap(this.$value) : _superclass = $Object($value);
+  /// Wrap a [GetMangaSourceExternalUseCase] in a [$GetMangaSourceExternalUseCase]
+  $GetMangaSourceExternalUseCase.wrap(this.$value)
+    : _superclass = $Object($value);
 
   @override
   int $getRuntimeType(Runtime runtime) => runtime.lookupType($spec);
@@ -305,7 +341,7 @@ class $GetMangaUseCase implements $Instance {
 
   static const $Function __parse = $Function(_parse);
   static $Value? _parse(Runtime runtime, $Value? target, List<$Value?> args) {
-    final self = target! as $GetMangaUseCase;
+    final self = target! as $GetMangaSourceExternalUseCase;
     final result = self.$value.parse(root: args[0]!.$value);
     return $Future.wrap(result.then((e) => $MangaScrapped.wrap(e)));
   }
@@ -316,21 +352,21 @@ class $GetMangaUseCase implements $Instance {
   }
 }
 
-/// dart_eval wrapper binding for [GetChapterImageUseCase]
-class $GetChapterImageUseCase implements $Instance {
+/// dart_eval wrapper binding for [GetChapterImageSourceExternalUseCase]
+class $GetChapterImageSourceExternalUseCase implements $Instance {
   /// Configure this class for use in a [Runtime]
   static void configureForRuntime(Runtime runtime) {}
 
-  /// Compile-time type specification of [$GetChapterImageUseCase]
+  /// Compile-time type specification of [$GetChapterImageSourceExternalUseCase]
   static const $spec = BridgeTypeSpec(
     'package:entity_manga_external/src/source_external.dart',
-    'GetChapterImageUseCase',
+    'GetChapterImageSourceExternalUseCase',
   );
 
-  /// Compile-time type declaration of [$GetChapterImageUseCase]
+  /// Compile-time type declaration of [$GetChapterImageSourceExternalUseCase]
   static const $type = BridgeTypeRef($spec);
 
-  /// Compile-time class declaration of [$GetChapterImageUseCase]
+  /// Compile-time class declaration of [$GetChapterImageSourceExternalUseCase]
   static const $declaration = BridgeClassDef(
     BridgeClassType($type, isAbstract: true),
     constructors: {
@@ -397,13 +433,14 @@ class $GetChapterImageUseCase implements $Instance {
   final $Instance _superclass;
 
   @override
-  final GetChapterImageUseCase $value;
+  final GetChapterImageSourceExternalUseCase $value;
 
   @override
-  GetChapterImageUseCase get $reified => $value;
+  GetChapterImageSourceExternalUseCase get $reified => $value;
 
-  /// Wrap a [GetChapterImageUseCase] in a [$GetChapterImageUseCase]
-  $GetChapterImageUseCase.wrap(this.$value) : _superclass = $Object($value);
+  /// Wrap a [GetChapterImageSourceExternalUseCase] in a [$GetChapterImageSourceExternalUseCase]
+  $GetChapterImageSourceExternalUseCase.wrap(this.$value)
+    : _superclass = $Object($value);
 
   @override
   int $getRuntimeType(Runtime runtime) => runtime.lookupType($spec);
@@ -422,7 +459,7 @@ class $GetChapterImageUseCase implements $Instance {
 
   static const $Function __parse = $Function(_parse);
   static $Value? _parse(Runtime runtime, $Value? target, List<$Value?> args) {
-    final self = target! as $GetChapterImageUseCase;
+    final self = target! as $GetChapterImageSourceExternalUseCase;
     final result = self.$value.parse(root: args[0]!.$value);
     return $Future.wrap(result.then((e) => $List.view(e, (e) => $String(e))));
   }
@@ -433,21 +470,21 @@ class $GetChapterImageUseCase implements $Instance {
   }
 }
 
-/// dart_eval wrapper binding for [SearchMangaExternalUseCase]
-class $SearchMangaExternalUseCase implements $Instance {
+/// dart_eval wrapper binding for [SearchMangaSourceExternalUseCase]
+class $SearchMangaSourceExternalUseCase implements $Instance {
   /// Configure this class for use in a [Runtime]
   static void configureForRuntime(Runtime runtime) {}
 
-  /// Compile-time type specification of [$SearchMangaExternalUseCase]
+  /// Compile-time type specification of [$SearchMangaSourceExternalUseCase]
   static const $spec = BridgeTypeSpec(
     'package:entity_manga_external/src/source_external.dart',
-    'SearchMangaExternalUseCase',
+    'SearchMangaSourceExternalUseCase',
   );
 
-  /// Compile-time type declaration of [$SearchMangaExternalUseCase]
+  /// Compile-time type declaration of [$SearchMangaSourceExternalUseCase]
   static const $type = BridgeTypeRef($spec);
 
-  /// Compile-time class declaration of [$SearchMangaExternalUseCase]
+  /// Compile-time class declaration of [$SearchMangaSourceExternalUseCase]
   static const $declaration = BridgeClassDef(
     BridgeClassType($type, isAbstract: true),
     constructors: {
@@ -573,13 +610,14 @@ class $SearchMangaExternalUseCase implements $Instance {
   final $Instance _superclass;
 
   @override
-  final SearchMangaExternalUseCase $value;
+  final SearchMangaSourceExternalUseCase $value;
 
   @override
-  SearchMangaExternalUseCase get $reified => $value;
+  SearchMangaSourceExternalUseCase get $reified => $value;
 
-  /// Wrap a [SearchMangaExternalUseCase] in a [$SearchMangaExternalUseCase]
-  $SearchMangaExternalUseCase.wrap(this.$value) : _superclass = $Object($value);
+  /// Wrap a [SearchMangaSourceExternalUseCase] in a [$SearchMangaSourceExternalUseCase]
+  $SearchMangaSourceExternalUseCase.wrap(this.$value)
+    : _superclass = $Object($value);
 
   @override
   int $getRuntimeType(Runtime runtime) => runtime.lookupType($spec);
@@ -604,14 +642,14 @@ class $SearchMangaExternalUseCase implements $Instance {
 
   static const $Function __url = $Function(_url);
   static $Value? _url(Runtime runtime, $Value? target, List<$Value?> args) {
-    final self = target! as $SearchMangaExternalUseCase;
+    final self = target! as $SearchMangaSourceExternalUseCase;
     final result = self.$value.url(parameter: args[0]!.$value);
     return $String(result);
   }
 
   static const $Function __parse = $Function(_parse);
   static $Value? _parse(Runtime runtime, $Value? target, List<$Value?> args) {
-    final self = target! as $SearchMangaExternalUseCase;
+    final self = target! as $SearchMangaSourceExternalUseCase;
     final result = self.$value.parse(root: args[0]!.$value);
     return $Future.wrap(
       result.then((e) => $List.view(e, (e) => $MangaScrapped.wrap(e))),
@@ -624,7 +662,7 @@ class $SearchMangaExternalUseCase implements $Instance {
     $Value? target,
     List<$Value?> args,
   ) {
-    final self = target! as $SearchMangaExternalUseCase;
+    final self = target! as $SearchMangaSourceExternalUseCase;
     final result = self.$value.haveNextPage(root: args[0]!.$value);
     return $Future.wrap(
       result.then((e) => e == null ? const $null() : $bool(e)),
@@ -637,21 +675,21 @@ class $SearchMangaExternalUseCase implements $Instance {
   }
 }
 
-/// dart_eval wrapper binding for [SearchChapterExternalUseCase]
-class $SearchChapterExternalUseCase implements $Instance {
+/// dart_eval wrapper binding for [ListChapterSourceExternalUseCase]
+class $ListChapterSourceExternalUseCase implements $Instance {
   /// Configure this class for use in a [Runtime]
   static void configureForRuntime(Runtime runtime) {}
 
-  /// Compile-time type specification of [$SearchChapterExternalUseCase]
+  /// Compile-time type specification of [$ListChapterSourceExternalUseCase]
   static const $spec = BridgeTypeSpec(
     'package:entity_manga_external/src/source_external.dart',
-    'SearchChapterExternalUseCase',
+    'ListChapterSourceExternalUseCase',
   );
 
-  /// Compile-time type declaration of [$SearchChapterExternalUseCase]
+  /// Compile-time type declaration of [$ListChapterSourceExternalUseCase]
   static const $type = BridgeTypeRef($spec);
 
-  /// Compile-time class declaration of [$SearchChapterExternalUseCase]
+  /// Compile-time class declaration of [$ListChapterSourceExternalUseCase]
   static const $declaration = BridgeClassDef(
     BridgeClassType($type, isAbstract: true),
     constructors: {
@@ -726,13 +764,13 @@ class $SearchChapterExternalUseCase implements $Instance {
   final $Instance _superclass;
 
   @override
-  final SearchChapterExternalUseCase $value;
+  final ListChapterSourceExternalUseCase $value;
 
   @override
-  SearchChapterExternalUseCase get $reified => $value;
+  ListChapterSourceExternalUseCase get $reified => $value;
 
-  /// Wrap a [SearchChapterExternalUseCase] in a [$SearchChapterExternalUseCase]
-  $SearchChapterExternalUseCase.wrap(this.$value)
+  /// Wrap a [ListChapterSourceExternalUseCase] in a [$ListChapterSourceExternalUseCase]
+  $ListChapterSourceExternalUseCase.wrap(this.$value)
     : _superclass = $Object($value);
 
   @override
@@ -752,10 +790,138 @@ class $SearchChapterExternalUseCase implements $Instance {
 
   static const $Function __parse = $Function(_parse);
   static $Value? _parse(Runtime runtime, $Value? target, List<$Value?> args) {
-    final self = target! as $SearchChapterExternalUseCase;
+    final self = target! as $ListChapterSourceExternalUseCase;
     final result = self.$value.parse(root: args[0]!.$value);
     return $Future.wrap(
       result.then((e) => $List.view(e, (e) => $ChapterScrapped.wrap(e))),
+    );
+  }
+
+  @override
+  void $setProperty(Runtime runtime, String identifier, $Value value) {
+    return _superclass.$setProperty(runtime, identifier, value);
+  }
+}
+
+/// dart_eval wrapper binding for [ListTagSourceExternalUseCase]
+class $ListTagSourceExternalUseCase implements $Instance {
+  /// Configure this class for use in a [Runtime]
+  static void configureForRuntime(Runtime runtime) {}
+
+  /// Compile-time type specification of [$ListTagSourceExternalUseCase]
+  static const $spec = BridgeTypeSpec(
+    'package:entity_manga_external/src/source_external.dart',
+    'ListTagSourceExternalUseCase',
+  );
+
+  /// Compile-time type declaration of [$ListTagSourceExternalUseCase]
+  static const $type = BridgeTypeRef($spec);
+
+  /// Compile-time class declaration of [$ListTagSourceExternalUseCase]
+  static const $declaration = BridgeClassDef(
+    BridgeClassType($type, isAbstract: true),
+    constructors: {
+      '': BridgeConstructorDef(
+        BridgeFunctionDef(
+          returns: BridgeTypeAnnotation($type),
+          namedParams: [],
+          params: [],
+        ),
+        isFactory: false,
+      ),
+    },
+
+    methods: {
+      'parse': BridgeMethodDef(
+        BridgeFunctionDef(
+          returns: BridgeTypeAnnotation(
+            BridgeTypeRef(CoreTypes.future, [
+              BridgeTypeAnnotation(
+                BridgeTypeRef(CoreTypes.list, [
+                  BridgeTypeAnnotation(
+                    BridgeTypeRef(
+                      BridgeTypeSpec(
+                        'package:entity_manga_external/src/tag_scrapped.dart',
+                        'TagScrapped',
+                      ),
+                      [],
+                    ),
+                  ),
+                ]),
+              ),
+            ]),
+          ),
+          namedParams: [
+            BridgeParameter(
+              'root',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(
+                  BridgeTypeSpec(
+                    'package:entity_manga_external/src/html_document.dart',
+                    'HtmlDocument',
+                  ),
+                  [],
+                ),
+              ),
+              false,
+            ),
+          ],
+          params: [],
+        ),
+      ),
+    },
+    getters: {
+      'scripts': BridgeMethodDef(
+        BridgeFunctionDef(
+          returns: BridgeTypeAnnotation(
+            BridgeTypeRef(CoreTypes.list, [
+              BridgeTypeAnnotation(BridgeTypeRef(CoreTypes.string, [])),
+            ]),
+          ),
+          namedParams: [],
+          params: [],
+        ),
+      ),
+    },
+    setters: {},
+    fields: {},
+    wrap: true,
+    bridge: false,
+  );
+
+  final $Instance _superclass;
+
+  @override
+  final ListTagSourceExternalUseCase $value;
+
+  @override
+  ListTagSourceExternalUseCase get $reified => $value;
+
+  /// Wrap a [ListTagSourceExternalUseCase] in a [$ListTagSourceExternalUseCase]
+  $ListTagSourceExternalUseCase.wrap(this.$value)
+    : _superclass = $Object($value);
+
+  @override
+  int $getRuntimeType(Runtime runtime) => runtime.lookupType($spec);
+
+  @override
+  $Value? $getProperty(Runtime runtime, String identifier) {
+    switch (identifier) {
+      case 'scripts':
+        final _scripts = $value.scripts;
+        return $List.view(_scripts, (e) => $String(e));
+      case 'parse':
+        return __parse;
+    }
+    return _superclass.$getProperty(runtime, identifier);
+  }
+
+  static const $Function __parse = $Function(_parse);
+  static $Value? _parse(Runtime runtime, $Value? target, List<$Value?> args) {
+    final self = target! as $ListTagSourceExternalUseCase;
+    final result = self.$value.parse(root: args[0]!.$value);
+    return $Future.wrap(
+      result.then((e) => $List.view(e, (e) => runtime.wrapAlways(e))),
     );
   }
 
