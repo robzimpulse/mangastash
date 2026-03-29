@@ -180,11 +180,11 @@ class DiagnosticDao extends DatabaseAccessor<AppDatabase>
   }
 
   Stream<List<ImageDrift>> get orphanImageStream {
-    return orphanChapterQuery.watch().map(_parseOrphanImage);
+    return orphanImageQuery.watch().map(_parseOrphanImage);
   }
 
   Future<List<ImageDrift>> get orphanImage {
-    return orphanChapterQuery.get().then(_parseOrphanImage);
+    return orphanImageQuery.get().then(_parseOrphanImage);
   }
 
   Stream<List<IncompleteManga>> get chapterGapStream {

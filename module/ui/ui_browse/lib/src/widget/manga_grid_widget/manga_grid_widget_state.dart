@@ -1,5 +1,6 @@
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
@@ -7,7 +8,7 @@ class MangaGridWidgetState extends Equatable {
   final bool isLoading;
   final Exception? error;
   final List<Manga> mangas;
-  final SourceEnum? source;
+  final SourceExternal? source;
   final bool hasNextPage;
   final bool isPagingNextPage;
   final SearchMangaParameter parameter;
@@ -43,7 +44,7 @@ class MangaGridWidgetState extends Equatable {
     bool? isLoading,
     ValueGetter<Exception?>? error,
     List<Manga>? mangas,
-    SourceEnum? source,
+    SourceExternal? source,
     bool? hasNextPage,
     bool? isPagingNextPage,
     SearchMangaParameter? parameter,

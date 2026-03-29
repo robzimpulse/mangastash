@@ -106,6 +106,7 @@ class DomainMangaRegistrar extends Registrar {
         mangaRepository: locator(),
         htmlCacheManager: locator(),
         searchMangaCacheManager: locator(),
+        converterCacheManager: locator(),
       ),
     );
     locator.registerFactory(

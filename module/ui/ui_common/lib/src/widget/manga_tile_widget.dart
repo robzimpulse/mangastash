@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 
@@ -31,7 +32,7 @@ class MangaTileWidget extends StatelessWidget {
     return MangaTileWidget(
       title: manga.title,
       coverUrl: manga.coverUrl,
-      sourceIconUrl: manga.source?.let(SourceEnum.fromName)?.icon,
+      sourceIconUrl: manga.source?.let(Sources.fromName)?.iconUrl,
       key: key,
       padding: padding,
       onTap: onTap,

@@ -109,7 +109,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
     await _searchMangaUseCase.clear(
       parameter: SourceSearchMangaParameter(
-        source: source,
+        source: source.name,
         parameter: state.parameter,
       ),
     );
@@ -122,7 +122,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
     final result = await _searchMangaUseCase.execute(
       parameter: SourceSearchMangaParameter(
-        source: source,
+        source: source.name,
         parameter: state.parameter,
       ),
     );
@@ -189,7 +189,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
   void prefetch({required Manga manga}) {
     final id = manga.id;
-    final source = manga.source?.let(SourceEnum.fromName);
+    final source = manga.source?.let(Sources.fromName);
     if (id == null || source == null) return;
     _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
     _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);

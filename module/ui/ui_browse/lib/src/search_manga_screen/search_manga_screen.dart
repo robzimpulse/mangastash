@@ -1,6 +1,7 @@
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:feature_common/feature_common.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -19,7 +20,7 @@ class SearchMangaScreen extends StatefulWidget {
 
   final ImagesCacheManager imagesCacheManager;
 
-  final Widget Function(SourceEnum, SearchMangaScreenCubit) widgetBuilder;
+  final Widget Function(SourceExternal, SearchMangaScreenCubit) widgetBuilder;
 
   final Future<SearchMangaParameter?>? Function(SearchMangaParameter? value)?
   onTapFilter;
@@ -127,7 +128,7 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           CachedNetworkImage(
-                            imageUrl: source.icon,
+                            imageUrl: source.iconUrl,
                             cacheManager: widget.imagesCacheManager,
                             height: 16,
                             width: 16,

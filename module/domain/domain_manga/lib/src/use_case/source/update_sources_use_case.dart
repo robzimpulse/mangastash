@@ -1,5 +1,5 @@
-import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 
 abstract class UpdateSourcesUseCase {
-  Future<void> updateSources({required List<SourceEnum> sources});
+  Future<void> updateSources({required List<SourceExternal> sources});
 }

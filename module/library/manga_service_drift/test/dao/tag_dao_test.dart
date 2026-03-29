@@ -114,5 +114,47 @@ void main() {
         });
       });
     });
+
+    group('Attach and Detach', () {
+      test('attach and detach', () async {
+        final manga = MangaTablesCompanion(
+          id: const Value('m1'),
+          title: const Value('title'),
+          source: const Value('src'),
+          createdAt: Value(DateTime.now()),
+          updatedAt: Value(DateTime.now()),
+        );
+        await db.into(db.mangaTables).insert(manga);
+
+        final tag = TagTablesCompanion(
+          id: const Value(99),
+          tagId: const Value('tag1'),
+          name: const Value('Name'),
+          source: const Value('src'),
+          createdAt: Value(DateTime.now()),
+          updatedAt: Value(DateTime.now()),
+        );
+        await dao.adds(values: [tag]);
+
+        await dao.attach(mangaId: 'm1', tagId: 99);
+        
+        await dao.attach(mangaId: 'm1', tagId: 99);
+
+        await dao.detach(mangaId: 'm1', tagId: 99);
+        await dao.detach(mangaId: 'm1');
+      });
+      
+      test('adds with tagId and source fallback', () async {
+        final tag = TagTablesCompanion(
+          tagId: const Value('tag2'),
+          name: const Value('Name2'),
+          source: const Value('src2'),
+          createdAt: Value(DateTime.now()),
+          updatedAt: Value(DateTime.now()),
+        );
+        await dao.adds(values: [tag]);
+        await dao.adds(values: [tag.copyWith(name: const Value('Name3'))]);
+      });
+    });
   });
 }

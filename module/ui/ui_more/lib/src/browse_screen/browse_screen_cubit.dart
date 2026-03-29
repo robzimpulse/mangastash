@@ -1,6 +1,6 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:domain_manga/domain_manga.dart';
-import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import 'browse_screen_state.dart';
@@ -27,7 +27,7 @@ class BrowseScreenCubit extends Cubit<BrowseScreenState> {
 
   void update({
     SearchMangaParameter? parameter,
-    List<SourceEnum>? sources,
+    List<SourceExternal>? sources,
   }) {
     emit(state.copyWith(parameter: parameter, sources: sources));
     parameter?.let(

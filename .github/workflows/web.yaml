@@ -56,11 +56,11 @@ jobs:
         with:
           name: release-web-${{ matrix.target }}
           path: build/web-${{ matrix.target }}.zip
-      - name: 'Attach artifact to release'
+      - name: 'Attach artifact to release tag'
         if: github.ref_type == 'tag'
         uses: softprops/action-gh-release@v2
         with:
-          files: release-web-${{ matrix.target }}.zip
+          files: build/release-web-${{ matrix.target }}.zip
       - name: 'Deploy to Firebase'
         if: ${{ matrix.target == 'firebase'}}
         uses: FirebaseExtended/action-hosting-deploy@v0

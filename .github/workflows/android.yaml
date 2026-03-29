@@ -43,6 +43,11 @@ jobs:
         with:
           name: build-apk
           path: build/app/outputs/apk/release/app-release.apk
+      - name: 'Attach artifact to release tag'
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/app/outputs/apk/release/app-release.apk
       - name: 'Find Comment'
         if: always() && github.event_name == 'pull_request'
         uses: peter-evans/find-comment@v3

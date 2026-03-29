@@ -5,8 +5,8 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
+import '../../extension/data_scrapped_extension.dart';
 import '../../mixin/sync_tags_mixin.dart';
-import '../../parser/base/tag_list_html_parser.dart';
 
 class GetTagsUseCase with SyncTagsMixin {
   final HeadlessWebviewUseCase _webview;
@@ -24,7 +24,7 @@ class GetTagsUseCase with SyncTagsMixin {
        _webview = webview,
        _logBox = logBox;
 
-  Future<List<Tag>> _mangadex({required SourceEnum source}) async {
+  Future<List<Tag>> _mangadex() async {
     final result = await _mangaService.tags();
 
     final tags = result.data;
@@ -33,60 +33,30 @@ class GetTagsUseCase with SyncTagsMixin {
       throw DataNotFoundException();
     }
 
-    return [
-      ...tags.map((e) => Tag.from(data: e).copyWith(source: source.name)),
-    ];
+    return [...tags.map((e) => Tag.from(data: e))];
   }
 
   Future<List<Tag>> _scrapping({
-    required SourceEnum source,
+    required SourceExternal source,
     bool useCache = true,
   }) async {
-    final param = SourceSearchMangaParameter(
-      source: source,
+    final url = source.searchMangaUseCase.url(
       parameter: const SearchMangaParameter(page: 1),
     );
-    final url = param.url;
-
-    if (url == null) {
-      throw DataNotFoundException();
-    }
-
-    final selector = [
-      'button',
-      'inline-flex',
-      'items-center',
-      'whitespace-nowrap',
-      'px-4',
-      'py-2',
-      'w-full',
-      'justify-center',
-      'font-normal',
-      'align-middle',
-      'border-solid',
-    ].join('.');
 
     final document = await _webview.open(
       url,
-      scripts: [
-        if (source == SourceEnum.asurascan)
-          'window.document.querySelectorAll(\'$selector\')[0].click()',
-      ],
+      scripts: source.listTagUseCase.scripts,
       useCache: useCache,
     );
 
-    final parser = TagListHtmlParser.forSource(
-      root: HtmlDocument()..nodes.addAll(document.nodes),
-      source: source,
-    );
+    final tags = await source.listTagUseCase.parse(root: HtmlDocument()..nodes.addAll(document.nodes));
 
-    final tags = await parser.tags;
-
-    return [...tags.map((e) => e.copyWith(source: source.name))];
+    return [...tags.map((e) => e.convert())];
   }
 
   Future<Result<List<Tag>>> execute({
-    required SourceEnum source,
+    required SourceExternal source,
     bool useCache = true,
   }) async {
     try {
@@ -94,12 +64,16 @@ class GetTagsUseCase with SyncTagsMixin {
       final tags = [...cache.map(Tag.fromDrift)];
       if (tags.isNotEmpty && useCache) return Success(tags);
 
-      final data = await switch (source) {
-        SourceEnum.mangadex => _mangadex(source: source),
-        _ => _scrapping(source: source, useCache: useCache),
-      };
+      final data =
+          source.builtIn
+              ? await _mangadex()
+              : await _scrapping(source: source, useCache: useCache);
 
-      final result = await sync(dao: _tagDao, values: data, logBox: _logBox);
+      final result = await sync(
+        dao: _tagDao,
+        values: [...data.map((e) => e.copyWith(source: source.name))],
+        logBox: _logBox,
+      );
 
       return Success(result);
     } catch (e) {

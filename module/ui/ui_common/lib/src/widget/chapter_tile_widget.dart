@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:intersperse/intersperse.dart';
@@ -44,7 +45,7 @@ class ChapterTileWidget extends StatelessWidget {
       key: key,
       mangaTitle: manga?.title,
       coverUrl: manga?.coverUrl,
-      sourceIconUrl: manga?.source?.let(SourceEnum.fromName)?.icon,
+      sourceIconUrl: manga?.source?.let(Sources.fromName)?.iconUrl,
       title: ['Chapter ${chapter.chapter}', chapter.title].nonNulls.join(' - '),
       language: Language.fromCode(chapter.translatedLanguage),
       uploadedAt: chapter.readableAt,

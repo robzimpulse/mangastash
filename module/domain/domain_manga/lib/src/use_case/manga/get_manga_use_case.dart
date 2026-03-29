@@ -7,14 +7,13 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../extension/data_scrapped_extension.dart';
 import '../../mixin/sync_mangas_mixin.dart';
-import '../../parser/base/manga_detail_html_parser.dart';
 
 class GetMangaUseCase with SyncMangasMixin {
   final HeadlessWebviewUseCase _webview;
-  final ConverterCacheManager _converterCacheManager;
   final MangaService _mangaService;
   final MangaDao _mangaDao;
   final LogBox _logBox;
+  final ConverterCacheManager _converterCacheManager;
 
   GetMangaUseCase({
     required HeadlessWebviewUseCase webview,
@@ -23,15 +22,12 @@ class GetMangaUseCase with SyncMangasMixin {
     required MangaDao mangaDao,
     required LogBox logBox,
   }) : _mangaService = mangaService,
-       _converterCacheManager = converterCacheManager,
        _mangaDao = mangaDao,
        _logBox = logBox,
-       _webview = webview;
+       _webview = webview,
+       _converterCacheManager = converterCacheManager;
 
-  Future<Manga> _mangadex({
-    required SourceEnum source,
-    required String mangaId,
-  }) async {
+  Future<Manga> _mangadex({required String mangaId}) async {
     final result = await _mangaService.detail(
       id: mangaId,
       includes: [Include.author.rawValue, Include.coverArt.rawValue],
@@ -43,11 +39,11 @@ class GetMangaUseCase with SyncMangasMixin {
       throw DataNotFoundException();
     }
 
-    return Manga.from(data: manga).copyWith(source: source.name);
+    return Manga.from(data: manga);
   }
 
   Future<Manga> _scrapping({
-    required SourceEnum source,
+    required SourceExternal source,
     required String? url,
     bool useCache = true,
   }) async {
@@ -55,47 +51,24 @@ class GetMangaUseCase with SyncMangasMixin {
       throw DataNotFoundException();
     }
 
-    final selector = [
-      'button',
-      'inline-flex',
-      'items-center',
-      'whitespace-nowrap',
-      'px-4',
-      'py-2',
-      'w-full',
-      'justify-center',
-      'font-normal',
-      'align-middle',
-      'border-solid',
-    ].join('.');
-
     final document = await _webview.open(
       url,
-      scripts: [
-        if (source == SourceEnum.asurascan)
-          'window.document.querySelectorAll(\'$selector\')[0].click()',
-      ],
+      scripts: source.getMangaUseCase.scripts,
       useCache: useCache,
     );
 
-    final parser = MangaDetailHtmlParser.forSource(
-      root: HtmlDocument()..nodes.addAll(document.nodes),
-      source: source,
+    final data = await source.getMangaUseCase.parse(root: HtmlDocument()..nodes.addAll(document.nodes));
+
+    final manga = await data.convert(
+      logbox: _logBox,
+      manager: _converterCacheManager,
     );
 
-    final manga = await parser.manga.then(
-      (e) => e.convert(logbox: _logBox, manager: _converterCacheManager),
-    );
-
-    return manga.copyWith(
-      source: source.name,
-      webUrl: url,
-      tags: manga.tags?.map((e) => e.copyWith(source: source.name)).toList(),
-    );
+    return manga.copyWith(source: source.name, webUrl: url);
   }
 
   Future<Result<Manga>> execute({
-    required SourceEnum source,
+    required SourceExternal source,
     required String mangaId,
     bool useCache = true,
   }) async {
@@ -107,14 +80,18 @@ class GetMangaUseCase with SyncMangasMixin {
         return Success(manga);
       }
 
-      final data = await switch (source) {
-        SourceEnum.mangadex => _mangadex(source: source, mangaId: mangaId),
-        _ => _scrapping(url: manga?.webUrl, source: source, useCache: useCache),
-      };
+      final data =
+          source.builtIn
+              ? await _mangadex(mangaId: mangaId)
+              : await _scrapping(
+                url: manga?.webUrl,
+                source: source,
+                useCache: useCache,
+              );
 
       final results = await sync(
         dao: _mangaDao,
-        values: [data],
+        values: [data.copyWith(source: source.name)],
         logBox: _logBox,
       );
 

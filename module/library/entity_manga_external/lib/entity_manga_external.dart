@@ -6,4 +6,6 @@ export 'src/html_document.eval.dart';
 export 'src/manga_scrapped.dart';
 export 'src/manga_scrapped.eval.dart';
 export 'src/source_external.dart';
+export 'src/tag_scrapped.dart';
+
 export 'src/source_external.eval.dart';
