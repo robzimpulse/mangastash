@@ -327,7 +327,10 @@ class _SearchMangaSourceExternalUseCase
         if (parameter.includedTags?.isNotEmpty == true)
           MapEntry('genres', [...?parameter.includedTags].join(',')),
         if (parameter.status?.isNotEmpty == true)
-          MapEntry('status', [...?parameter.status].join(',')),
+          MapEntry(
+            'status',
+            [...?parameter.status?.map((e) => e.rawValue)].join(','),
+          ),
       ].map((e) => '${e.key}=${e.value}').join('&'),
     ].join('?');
   }
