@@ -27,7 +27,7 @@ class AsuraScanSourceExternal implements SourceExternal {
 
   @override
   ListChapterSourceExternalUseCase get listChapterUseCase =>
-      _ListChapterSourceExternalUseCase(name);
+      _ListChapterSourceExternalUseCase(baseUrl, name);
 
   @override
   SearchMangaSourceExternalUseCase get searchMangaUseCase =>
@@ -90,7 +90,6 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
       'div.flex.flex-wrap.gap-2.text-xs.mt-4',
     );
 
-
     return MangaScrapped(
       title: title?.text.trim(),
       author: rows?.nonNulls.firstOrNull?.value,
@@ -126,76 +125,41 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
 class _ListChapterSourceExternalUseCase
     implements ListChapterSourceExternalUseCase {
   final String _name;
+  final String _baseUrl;
 
-  const _ListChapterSourceExternalUseCase(this._name);
+  const _ListChapterSourceExternalUseCase(this._baseUrl, this._name);
 
   @override
   Future<List<ChapterScrapped>> parse({required Document root}) async {
-    final region = root.querySelector(
-      [
-        'div',
-        'pl-4',
-        'pr-2',
-        'pb-4',
-        'overflow-y-auto',
-        'scrollbar-thumb-themecolor',
-        'scrollbar-track-transparent',
-        'scrollbar-thin',
-        'mr-3',
-      ].join('.'),
+    final regions = root.querySelectorAll(
+      'a.group.flex.items-center.justify-between.px-4.py-4.transition-colors',
     );
 
-    final List<ChapterScrapped> data = [];
-    for (final element in region?.children ?? <Element>[]) {
-      final url = element.querySelector('a')?.attributes['href'];
+    final chapters = regions.map((e) {
+      final isLocked = e.attributes['class']?.contains(
+        'bg-gradient-to-r from-amber-500/5 to-transparent',
+      );
+      if (isLocked == true) return null;
 
-      final container = element.querySelector(
+      final title = e.querySelector(
         [
-          'h3',
-          'text-sm',
-          'text-white',
-          'font-medium',
-          'flex',
-          'flex-row',
-        ].join('.'),
+          'div.flex.items-center.gap-3.min-w-0.flex-1',
+          'div.min-w-0.flex-1',
+          'div.flex.items-center.gap-2',
+        ].join(' > '),
       );
+      final date = e.querySelector('div.flex-shrink-0.ml-3.text-right');
 
-      final spans = container?.querySelectorAll('span');
-      final title = spans?.firstOrNull?.text.trim();
-      final isNotPublished = spans?.lastOrNull?.hasChildNodes() == true;
-
-      if (isNotPublished) continue;
-
-      final chapterData = container?.nodes.firstOrNull?.text?.trim().split(' ');
-      final chapter =
-          chapterData?.map((text) {
-            final value = double.tryParse(text);
-            if (value != null) {
-              final fraction = value - value.truncate();
-              if (fraction > 0.0) return value;
-            }
-            return int.tryParse(text);
-          }).lastOrNull;
-
-      final releaseDate = element
-          .querySelector('h3.text-xs')
-          ?.text
-          .trim()
-          .replaceAll('st', '')
-          .replaceAll('nd', '')
-          .replaceAll('rd', '')
-          .replaceAll('th', '');
-
-      data.add(
-        ChapterScrapped(
-          title: title?.isNotEmpty == true ? title : null,
-          chapter: '${chapter ?? url?.split('/').lastOrNull}',
-          readableAt: releaseDate,
-          webUrl: ['https://asuracomic.net', 'series', url].join('/'),
-          scanlationGroup: _name,
-        ),
+      return ChapterScrapped(
+        title: title?.text.trim(),
+        chapter: title?.text.trim().split(' ').lastOrNull,
+        readableAt: date?.text.trim(),
+        webUrl: e.attributes['href'].let((e) => [_baseUrl, e].join('')),
+        scanlationGroup: _name,
       );
-    }
+    });
+
+    final data = chapters.nonNulls.toList();
 
     return data;
   }
