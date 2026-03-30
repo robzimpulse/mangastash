@@ -277,22 +277,67 @@ class _SearchMangaSourceExternalUseCase
 class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
   @override
   Future<List<TagScrapped>> parse({required Document root}) async {
-    final region = root.querySelector('form#hook-form');
-
-    final elements = region?.querySelectorAll(
-      'div.flex.flex-row.items-start.space-x-1.space-y-0',
-    );
-
-    return [
-      for (final (index, element) in [...?elements].indexed)
-        TagScrapped(
-          id: (index + 1).toString(),
-          name: element.querySelector('label')?.text.trim(),
-        ),
-    ];
+    // final genreQuery = [
+    //   'div.flex-1.overflow-y-auto',
+    //   'div',
+    //   'div',
+    //   'button',
+    //   'div',
+    //   'span',
+    // ].join(' > ');
+    //
+    // final regions = root.querySelectorAll(genreQuery);
+    //
+    // final tags = regions.map(
+    //   (e) => TagScrapped(id: e.text.trim().toLowerCase(), name: e.text.trim()),
+    // );
+    //
+    // return tags.nonNulls.toList();
+    return []
   }
 
   @override
-  // TODO: implement scripts
-  List<String> get scripts => [];
+  List<String> get scripts {
+    final filterQuery = [
+      'div.flex.flex-col.gap-3',
+      'div',
+      [
+        'button',
+        'cursor-pointer',
+        'transition-colors',
+        'gap-2',
+        'justify-center',
+        'items-center',
+        'flex',
+        'rounded-md',
+        'text-white',
+        'border',
+        'px-4',
+        'w-full',
+      ].join('.'),
+    ].join(' > ');
+
+    final genreQuery = [
+      'div.flex-1.overflow-y-auto',
+      'div',
+      'div',
+      'button',
+    ].join(' > ');
+
+    final tapFilter = [
+      'window',
+      'document',
+      'querySelectorAll(\'$filterQuery\')[0]',
+      'click()',
+    ].join('.');
+
+    final tapGenre = [
+      'window',
+      'document',
+      'querySelectorAll(\'$genreQuery\')[3]',
+      'click()',
+    ].join('.');
+
+    return [tapFilter, tapGenre];
+  }
 }
