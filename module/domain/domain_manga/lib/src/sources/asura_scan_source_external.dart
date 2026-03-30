@@ -293,7 +293,7 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
     // );
     //
     // return tags.nonNulls.toList();
-    return []
+    return [];
   }
 
   @override
