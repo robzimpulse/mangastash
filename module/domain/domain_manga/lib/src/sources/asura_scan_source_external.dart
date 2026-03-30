@@ -82,6 +82,17 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
     ].join('.');
     final description = region?.querySelector(descQuery);
 
+    // final rowQuery = [
+    //   'div',
+    //   'flex',
+    //   'items-center',
+    //   'justify-between',
+    //   'rounded',
+    //   'px-4',
+    //   'py-2.5',
+    // ].join('.');
+    // final rows = region?.querySelectorAll(rowQuery);
+
     // final titleROI = root.querySelector('h2.font-bold.text-base.line-clamp-2');
     // final title = titleROI?.let((e) => e.text.trim());
     // final query = ['div', 'float-left', 'relative', 'z-0'].join('.');
