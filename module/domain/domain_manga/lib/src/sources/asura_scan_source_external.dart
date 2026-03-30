@@ -277,23 +277,36 @@ class _SearchMangaSourceExternalUseCase
 class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
   @override
   Future<List<TagScrapped>> parse({required Document root}) async {
-    // final genreQuery = [
-    //   'div.flex-1.overflow-y-auto',
-    //   'div',
-    //   'div',
-    //   'button',
-    //   'div',
-    //   'span',
-    // ].join(' > ');
-    //
-    // final regions = root.querySelectorAll(genreQuery);
-    //
-    // final tags = regions.map(
-    //   (e) => TagScrapped(id: e.text.trim().toLowerCase(), name: e.text.trim()),
-    // );
-    //
-    // return tags.nonNulls.toList();
-    return [];
+    final genreQuery = [
+      'div.flex-1.overflow-y-auto',
+      'div',
+      'div',
+      [
+        'div',
+        'absolute',
+        'top-full',
+        'left-0',
+        'right-0',
+        'mt-2',
+        'border',
+        'rounded-md',
+        'shadow-lg',
+        'z-50',
+      ].join('.'),
+
+      'div.p-1',
+      'div.space-y-1.px-1.py-1.overflow-y-auto',
+      'div',
+      'span',
+    ].join(' > ');
+
+    final regions = root.querySelectorAll(genreQuery);
+
+    final tags = regions.map(
+      (e) => TagScrapped(id: e.text.trim().toLowerCase(), name: e.text.trim()),
+    );
+
+    return tags.nonNulls.toList();
   }
 
   @override
