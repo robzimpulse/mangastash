@@ -42,20 +42,17 @@ class _GetChapterImageSourceExternalUseCase
     implements GetChapterImageSourceExternalUseCase {
   @override
   Future<List<String>> parse({required Document root}) async {
-    final region = root.querySelector(
-      'div.py-8.-mx-5.flex.flex-col.items-center.justify-center',
+    final regions = root.querySelectorAll(
+      [
+        'div.min-h-screen.bg-black',
+        'div.select-none',
+        'div.max-w-full.mx-auto.overflow-hidden.flex.flex-col',
+        'div.relative.w-full',
+        'img.w-full.block.relative.z-10',
+      ].join(' > '),
     );
-    final containers = region?.querySelectorAll('img') ?? [];
-    final List<(num, String)> data = [];
-    for (final image in containers) {
-      final id = image.attributes['alt']?.split(' ').lastOrNull;
-      if (id == null) continue;
-      final url = image.attributes['src'];
-      final index = int.tryParse(id);
-      if (index == null || url == null) continue;
-      data.add((index, url.trim()));
-    }
-    return data.sortedBy((e) => e.$1).map((e) => e.$2).toList();
+
+    return regions.map((e) => e.attributes['src']).nonNulls.toList();
   }
 
   @override
