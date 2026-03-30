@@ -40,6 +40,9 @@ class MangaClashSourceExternal extends SourceExternal {
 class _GetChapterImageSourceExternalUseCase
     implements GetChapterImageSourceExternalUseCase {
   @override
+  bool get forceLoad => false;
+
+  @override
   Future<List<String>> parse({required Document root}) async {
     final region = root.querySelector('.reading-content');
     final containers = region?.querySelectorAll('img') ?? [];
