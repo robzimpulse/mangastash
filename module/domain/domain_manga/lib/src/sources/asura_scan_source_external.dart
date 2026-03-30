@@ -71,67 +71,34 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
     final area = region?.querySelector('div.flex.gap-3.mb-4');
     final coverUrl = area?.querySelector('img')?.attributes['src'];
     final title = area?.querySelector('h2.font-bold.text-base.line-clamp-2');
+    final description = region?.querySelector(
+      'div.text-xs.leading-relaxed.prose.prose-invert.max-w-full',
+    );
 
-    final descQuery = [
-      'div',
-      'text-xs',
-      'leading-relaxed',
-      'prose',
-      'prose-invert',
-      'max-w-full',
-    ].join('.');
-    final description = region?.querySelector(descQuery);
+    final attributes = region?.querySelectorAll(
+      'div.flex.items-center.justify-between.rounded.px-4',
+    );
 
-    // final rowQuery = [
-    //   'div',
-    //   'flex',
-    //   'items-center',
-    //   'justify-between',
-    //   'rounded',
-    //   'px-4',
-    //   'py-2.5',
-    // ].join('.');
-    // final rows = region?.querySelectorAll(rowQuery);
+    final rows = attributes?.map((e) {
+      final key = e.querySelector('div.flex.items-center.gap-2')?.text.trim();
+      final value = e.querySelector('span.text-sm.font-medium')?.text.trim();
+      if (key == null || value == null) return null;
+      return MapEntry(key, value);
+    });
 
-    // final titleROI = root.querySelector('h2.font-bold.text-base.line-clamp-2');
-    // final title = titleROI?.let((e) => e.text.trim());
-    // final query = ['div', 'float-left', 'relative', 'z-0'].join('.');
-    // final region = root.querySelector(query);
-    //
-    // final title = region?.querySelector('span.text-xl.font-bold')?.text.trim();
-    //
-    // final description =
-    //     region?.querySelector('span.font-medium.text-sm')?.text.trim();
-    //
-    // final mQuery = ['div.grid', 'grid-cols-1', 'gap-5', 'mt-8'].join('.');
-    // final metas = region?.querySelector(mQuery)?.children.map((e) {
-    //   final first = e.querySelector('h3.font-medium.text-sm');
-    //   return MapEntry(
-    //     first?.text.trim(),
-    //     first?.nextElementSibling?.text.trim(),
-    //   );
-    // });
-    // final metadata = Map.fromEntries(metas ?? <MapEntry<String?, String>>[]);
-    // final author = metadata['Author'];
-    // final genres = region
-    //     ?.querySelector('div.space-y-1.pt-4')
-    //     ?.querySelector('div.flex.flex-row.flex-wrap.gap-3')
-    //     ?.children
-    //     .map((e) => e.text.trim());
-    //
-    // final coverUrl =
-    //     region
-    //         ?.querySelector('div.relative.col-span-full.space-y-3.px-6')
-    //         ?.querySelector('img')
-    //         ?.attributes['src'];
-    //
-    return MangaScrapped(
+    final genres = region?.querySelector(
+      'div.flex.flex-wrap.gap-2.text-xs.mt-4',
+    );
+
+    final data = MangaScrapped(
       title: title?.text.trim(),
-      // author: author,
+      author: rows?.nonNulls.firstOrNull?.value,
       description: description?.text.trim(),
       coverUrl: coverUrl,
-      // tags: genres?.toList(),
+      tags: genres?.children.map((e) => e.text.trim()).toList(),
     );
+
+    return data;
   }
 
   @override
