@@ -90,15 +90,14 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
       'div.flex.flex-wrap.gap-2.text-xs.mt-4',
     );
 
-    final data = MangaScrapped(
+
+    return MangaScrapped(
       title: title?.text.trim(),
       author: rows?.nonNulls.firstOrNull?.value,
       description: description?.text.trim(),
       coverUrl: coverUrl,
       tags: genres?.children.map((e) => e.text.trim()).toList(),
     );
-
-    return data;
   }
 
   @override
