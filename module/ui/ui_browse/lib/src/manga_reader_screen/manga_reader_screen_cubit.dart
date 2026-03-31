@@ -150,11 +150,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
   }
 
   void recrawl({required BuildContext context, required String url}) async {
-    await _recrawlUseCase.execute(
-      context: context,
-      url: url,
-      forceLoad: state.source?.getChapterImageUseCase.forceLoad ?? false,
-    );
+    await _recrawlUseCase.execute(context: context, url: url);
     await init(useCache: false);
   }
 

@@ -41,9 +41,6 @@ class AsuraScanSourceExternal implements SourceExternal {
 class _GetChapterImageSourceExternalUseCase
     implements GetChapterImageSourceExternalUseCase {
   @override
-  bool get forceLoad => true;
-
-  @override
   Future<List<String>> parse({required Document root}) async {
     final regions = root.querySelectorAll(
       [

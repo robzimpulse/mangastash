@@ -19,14 +19,12 @@ class _Key extends Equatable {
   final String url;
   final List<String> scripts;
   final bool useCache;
-  final bool forceLoad;
   final Map<String, String> headers;
 
   const _Key({
     required this.url,
     this.scripts = const [],
     required this.useCache,
-    required this.forceLoad,
     this.headers = const {},
   });
 
@@ -61,22 +59,11 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     String url, {
     List<String> scripts = const [],
     bool useCache = true,
-    bool forceLoad = false,
   }) {
-    final key = _Key(
-      url: url,
-      useCache: useCache,
-      scripts: scripts,
-      forceLoad: forceLoad,
-    );
+    final key = _Key(url: url, useCache: useCache, scripts: scripts);
     return _cDocument.putIfAbsent(
       key,
-      () => _open(
-        url,
-        scripts: scripts,
-        useCache: useCache,
-        forceLoad: forceLoad,
-      ).whenComplete(() {
+      () => _open(url, scripts: scripts, useCache: useCache).whenComplete(() {
         _cDocument.remove(key);
       }),
     );
@@ -86,23 +73,12 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   Future<String> image(
     String url, {
     bool useCache = true,
-    bool forceLoad = false,
     Map<String, String>? headers,
   }) {
-    final key = _Key(
-      url: url,
-      useCache: useCache,
-      headers: headers ?? {},
-      forceLoad: forceLoad,
-    );
+    final key = _Key(url: url, useCache: useCache, headers: headers ?? {});
     return _cImage.putIfAbsent(
       key,
-      () => _image(
-        url,
-        headers: headers,
-        useCache: useCache,
-        forceLoad: forceLoad,
-      ).whenComplete(() {
+      () => _image(url, headers: headers, useCache: useCache).whenComplete(() {
         _cImage.remove(key);
       }),
     );
@@ -112,7 +88,6 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     String url, {
     List<String> scripts = const [],
     bool useCache = true,
-    bool forceLoad = false,
   }) async {
     return parse(
       await _fetch(
@@ -128,7 +103,6 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   Future<String> _image(
     String url, {
     bool useCache = true,
-    bool forceLoad = false,
     Map<String, String>? headers,
   }) async {
     final Completer<String> completer = Completer();
@@ -143,7 +117,6 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       uri: WebUri(url),
       delegate: _log.inAppWebviewObserver,
       useCache: useCache,
-      forceLoad: forceLoad,
       scripts: [
         '''
         const toDataURL = url => fetch(url $stringHeaders)
@@ -218,7 +191,6 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     Map<String, JavaScriptHandlerCallback>? javascriptHandlers,
     List<String> scripts = const [],
     bool useCache = true,
-    bool forceLoad = false,
     Future? signalComplete,
   }) async {
     delegate.set(uri: uri, loading: true);
@@ -332,21 +304,6 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       _instances.remove(webview.hashCode);
       await webview.dispose();
       rethrow;
-    }
-
-    final controller = webview.webViewController;
-    if (forceLoad && controller != null) {
-      int? height = await controller.getContentHeight();
-      while (height != null && height > 0) {
-        await controller.scrollTo(x: 0, y: height);
-        await Future.delayed(const Duration(seconds: 1));
-        final newHeight = await controller.getContentHeight();
-        if (newHeight != height) {
-          height = newHeight;
-        } else {
-          break;
-        }
-      }
     }
 
     for (final script in scripts) {
