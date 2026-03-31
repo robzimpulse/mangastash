@@ -63,11 +63,9 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     final key = _Key(url: url, useCache: useCache, scripts: scripts);
     return _cDocument.putIfAbsent(
       key,
-      () => _open(
-        url,
-        scripts: scripts,
-        useCache: useCache,
-      ).whenComplete(() {_cDocument.remove(key);}),
+      () => _open(url, scripts: scripts, useCache: useCache).whenComplete(() {
+        _cDocument.remove(key);
+      }),
     );
   }
 
@@ -80,11 +78,9 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     final key = _Key(url: url, useCache: useCache, headers: headers ?? {});
     return _cImage.putIfAbsent(
       key,
-      () => _image(
-        url,
-        headers: headers,
-        useCache: useCache,
-      ).whenComplete(() { _cImage.remove(key) ;}),
+      () => _image(url, headers: headers, useCache: useCache).whenComplete(() {
+        _cImage.remove(key);
+      }),
     );
   }
 
