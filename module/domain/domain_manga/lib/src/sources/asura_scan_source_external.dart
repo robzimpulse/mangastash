@@ -56,8 +56,18 @@ class _GetChapterImageSourceExternalUseCase
   }
 
   @override
-  // TODO: implement scripts
-  List<String> get scripts => [];
+  List<String> get scripts {
+    final query = [
+      'div.min-h-screen.bg-black',
+      'div.select-none',
+      'div.max-w-full.mx-auto.overflow-hidden.flex.flex-col',
+      'div.relative.w-full',
+    ].join(' > ');
+
+    return [
+      '[...document.querySelectorAll(\'$query\')].at(-1).scrollIntoView()',
+    ];
+  }
 }
 
 class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
