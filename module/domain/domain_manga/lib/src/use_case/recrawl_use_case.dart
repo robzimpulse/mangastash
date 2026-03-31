@@ -17,14 +17,12 @@ class RecrawlUseCase {
   Future<void> execute({
     required BuildContext context,
     required String url,
-    bool forceLoad = false,
   }) async {
     final uri = Uri.tryParse(url);
     if (uri == null) return;
     await _logBox.webview(
       context: context,
       uri: uri,
-      forceLoad: forceLoad,
       onTapSnapshot: (url, html) async {
         if (url == null || html == null) return;
 

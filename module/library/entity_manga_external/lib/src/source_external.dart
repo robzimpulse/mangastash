@@ -25,7 +25,6 @@ abstract class GetMangaSourceExternalUseCase {
 
 abstract class GetChapterImageSourceExternalUseCase {
   List<String> get scripts;
-  bool get forceLoad;
   Future<List<String>> parse({required Document root});
 }
 
