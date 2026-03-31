@@ -65,7 +65,9 @@ class _GetChapterImageSourceExternalUseCase
     ].join(' > ');
 
     return [
-      '[...document.querySelectorAll(\'$query\')].at(-1).scrollIntoView()',
+      'var elements = document.querySelectorAll(\'$query\');',
+      'var element = elements[elements.length - 1];',
+      'element.scrollIntoView();',
     ];
   }
 }
