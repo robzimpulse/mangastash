@@ -338,7 +338,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     if (forceLoad && controller != null) {
       int? height = await controller.getContentHeight();
       while (height != null && height > 0) {
-        await controller.scrollTo(x: height, y: 0);
+        await controller.scrollTo(x: 0, y: height);
         await Future.delayed(const Duration(seconds: 1));
         final newHeight = await controller.getContentHeight();
         if (newHeight != height) {
