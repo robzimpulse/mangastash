@@ -67,7 +67,9 @@ class SearchMangaUseCase with SyncMangasMixin {
       useCache: useCache,
     );
 
-    final data = await source.searchMangaUseCase.parse(root: document);
+    final data = await source.searchMangaUseCase.parse(
+      root: HtmlDocument()..nodes.addAll(document.nodes),
+    );
     final mangas = await Future.wait(
       data.map(
         (e) => e.convert(logbox: _logBox, manager: _converterCacheManager),
@@ -79,7 +81,9 @@ class SearchMangaUseCase with SyncMangasMixin {
       page: parameter.page,
       limit: mangas.length,
       total: mangas.length,
-      hasNextPage: await source.searchMangaUseCase.haveNextPage(root: document),
+      hasNextPage: await source.searchMangaUseCase.haveNextPage(
+        root: HtmlDocument()..nodes.addAll(document.nodes),
+      ),
       sourceUrl: url,
     );
   }

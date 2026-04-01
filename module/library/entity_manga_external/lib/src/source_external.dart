@@ -1,10 +1,12 @@
-import 'package:html/dom.dart';
+import 'package:eval_annotation/eval_annotation.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import 'chapter_scrapped.dart';
+import 'html_document.dart';
 import 'manga_scrapped.dart';
 import 'tag_scrapped.dart';
 
+@Bind()
 abstract class SourceExternal {
   String get name;
   String get iconUrl;
@@ -18,29 +20,34 @@ abstract class SourceExternal {
   ListTagSourceExternalUseCase get listTagUseCase;
 }
 
+@Bind()
 abstract class GetMangaSourceExternalUseCase {
   List<String> get scripts;
-  Future<MangaScrapped> parse({required Document root});
+  Future<MangaScrapped> parse({required HtmlDocument root});
 }
 
+@Bind()
 abstract class GetChapterImageSourceExternalUseCase {
   List<String> get scripts;
-  Future<List<String>> parse({required Document root});
+  Future<List<String>> parse({required HtmlDocument root});
 }
 
+@Bind()
 abstract class SearchMangaSourceExternalUseCase {
   List<String> get scripts;
   String url({required SearchMangaParameter parameter});
-  Future<List<MangaScrapped>> parse({required Document root});
-  Future<bool?> haveNextPage({required Document root});
+  Future<List<MangaScrapped>> parse({required HtmlDocument root});
+  Future<bool?> haveNextPage({required HtmlDocument root});
 }
 
+@Bind()
 abstract class ListChapterSourceExternalUseCase {
   List<String> get scripts;
-  Future<List<ChapterScrapped>> parse({required Document root});
+  Future<List<ChapterScrapped>> parse({required HtmlDocument root});
 }
 
+@Bind()
 abstract class ListTagSourceExternalUseCase {
   List<String> get scripts;
-  Future<List<TagScrapped>> parse({required Document root});
+  Future<List<TagScrapped>> parse({required HtmlDocument root});
 }

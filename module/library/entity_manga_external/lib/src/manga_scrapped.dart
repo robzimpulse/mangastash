@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
+import 'package:eval_annotation/eval_annotation.dart';
 
+@Bind(implicitSupers: true)
 class MangaScrapped extends Equatable {
   final String? id;
   final String? title;
