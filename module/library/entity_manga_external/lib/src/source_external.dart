@@ -19,16 +19,19 @@ abstract class SourceExternal {
 }
 
 abstract class GetMangaSourceExternalUseCase {
+  Duration? get timeout;
   List<String> get scripts;
   Future<MangaScrapped> parse({required Document root});
 }
 
 abstract class GetChapterImageSourceExternalUseCase {
+  Duration? get timeout;
   List<String> get scripts;
   Future<List<String>> parse({required Document root});
 }
 
 abstract class SearchMangaSourceExternalUseCase {
+  Duration? get timeout;
   List<String> get scripts;
   String url({required SearchMangaParameter parameter});
   Future<List<MangaScrapped>> parse({required Document root});
@@ -36,11 +39,13 @@ abstract class SearchMangaSourceExternalUseCase {
 }
 
 abstract class ListChapterSourceExternalUseCase {
+  Duration? get timeout;
   List<String> get scripts;
   Future<List<ChapterScrapped>> parse({required Document root});
 }
 
 abstract class ListTagSourceExternalUseCase {
+  Duration? get timeout;
   List<String> get scripts;
   Future<List<TagScrapped>> parse({required Document root});
 }

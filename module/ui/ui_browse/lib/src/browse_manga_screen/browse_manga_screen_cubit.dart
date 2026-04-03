@@ -81,7 +81,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
     if (refresh) await _clearMangaCache();
 
-    await Future.wait([_fetchManga(), _fetchTags(useCache: refresh)]);
+    await Future.wait([_fetchManga(), _fetchTags(useCache: !refresh)]);
 
     emit(state.copyWith(isLoading: false));
   }
