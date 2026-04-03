@@ -81,7 +81,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
     if (refresh) await _clearMangaCache();
 
-    await Future.wait([_fetchManga(), _fetchTags(useCache: refresh)]);
+    await Future.wait([_fetchManga(), _fetchTags(useCache: !refresh)]);
 
     emit(state.copyWith(isLoading: false));
   }
@@ -206,7 +206,11 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   }
 
   void recrawl({required BuildContext context, required String url}) async {
-    await _recrawlUseCase.execute(context: context, url: url);
+    await _recrawlUseCase.execute(
+      context: context,
+      url: url,
+      scripts: state.source?.searchMangaUseCase.scripts ?? [],
+    );
     await init(refresh: true);
   }
 }

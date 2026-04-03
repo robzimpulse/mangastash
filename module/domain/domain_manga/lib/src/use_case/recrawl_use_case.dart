@@ -17,27 +17,31 @@ class RecrawlUseCase {
   Future<void> execute({
     required BuildContext context,
     required String url,
+    List<String> scripts = const [],
   }) async {
     final uri = Uri.tryParse(url);
     if (uri == null) return;
     await _logBox.webview(
       context: context,
       uri: uri,
-      onTapSnapshot: (url, html) async {
-        if (url == null || html == null) return;
+      scripts: scripts,
+      onTapSnapshot: (url, html) => _snapshot(url, html, uri),
+    );
+  }
 
-        await _htmlCacheManager.putFile(
-          url,
-          utf8.encode(html),
-          fileExtension: 'html',
-          maxAge: const Duration(minutes: 30),
-        );
+  void _snapshot(String? url, String? html, Uri uri) async {
+    if (url == null || html == null) return;
 
-        _logBox.log(
-          name: runtimeType.toString(),
-          'Finish caching html for url [$uri]',
-        );
-      },
+    await _htmlCacheManager.putFile(
+      url,
+      utf8.encode(html),
+      fileExtension: 'html',
+      maxAge: const Duration(minutes: 30),
+    );
+
+    _logBox.log(
+      name: runtimeType.toString(),
+      'Finish caching html for url [$uri]',
     );
   }
 }
