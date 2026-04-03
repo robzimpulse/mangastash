@@ -20,16 +20,18 @@ class _Key extends Equatable {
   final List<String> scripts;
   final bool useCache;
   final Map<String, String> headers;
+  final Duration? timeout;
 
   const _Key({
     required this.url,
     this.scripts = const [],
     required this.useCache,
     this.headers = const {},
+    this.timeout,
   });
 
   @override
-  List<Object?> get props => [url, scripts, useCache, headers];
+  List<Object?> get props => [url, scripts, useCache, headers, timeout];
 }
 
 class HeadlessWebviewManager implements HeadlessWebviewUseCase {
@@ -59,11 +61,22 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     String url, {
     List<String> scripts = const [],
     bool useCache = true,
+    Duration? timeout,
   }) {
-    final key = _Key(url: url, useCache: useCache, scripts: scripts);
+    final key = _Key(
+      url: url,
+      useCache: useCache,
+      scripts: scripts,
+      timeout: timeout,
+    );
     return _cDocument.putIfAbsent(
       key,
-      () => _open(url, scripts: scripts, useCache: useCache).whenComplete(() {
+      () => _open(
+        url,
+        scripts: scripts,
+        useCache: useCache,
+        timeout: timeout,
+      ).whenComplete(() {
         _cDocument.remove(key);
       }),
     );
@@ -74,11 +87,22 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     String url, {
     bool useCache = true,
     Map<String, String>? headers,
+    Duration? timeout,
   }) {
-    final key = _Key(url: url, useCache: useCache, headers: headers ?? {});
+    final key = _Key(
+      url: url,
+      useCache: useCache,
+      headers: headers ?? {},
+      timeout: timeout,
+    );
     return _cImage.putIfAbsent(
       key,
-      () => _image(url, headers: headers, useCache: useCache).whenComplete(() {
+      () => _image(
+        url,
+        headers: headers,
+        useCache: useCache,
+        timeout: timeout,
+      ).whenComplete(() {
         _cImage.remove(key);
       }),
     );
@@ -88,6 +112,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     String url, {
     List<String> scripts = const [],
     bool useCache = true,
+    Duration? timeout,
   }) async {
     return parse(
       await _fetch(
@@ -95,6 +120,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
         scripts: scripts,
         delegate: _log.inAppWebviewObserver,
         useCache: useCache,
+        timeout: timeout,
       ),
       sourceUrl: url,
     );
@@ -104,6 +130,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     String url, {
     bool useCache = true,
     Map<String, String>? headers,
+    Duration? timeout,
   }) async {
     final Completer<String> completer = Completer();
 
@@ -117,6 +144,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       uri: WebUri(url),
       delegate: _log.inAppWebviewObserver,
       useCache: useCache,
+      timeout: timeout,
       scripts: [
         '''
         const toDataURL = url => fetch(url $stringHeaders)
@@ -192,6 +220,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     List<String> scripts = const [],
     bool useCache = true,
     Future? signalComplete,
+    Duration? timeout,
   }) async {
     delegate.set(uri: uri, loading: true);
     final key = [uri.toString(), ...scripts].join('|');
@@ -294,11 +323,19 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     _instances[webview.hashCode] = webview;
 
     try {
-      await Future.wait([
-        webview.run(),
-        onLoadStartCompleter.future,
-        Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
-      ]).timeout(const Duration(seconds: 15));
+      if (timeout != null) {
+        await Future.wait([
+          webview.run(),
+          onLoadStartCompleter.future,
+          Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
+        ]).timeout(const Duration(seconds: 15));
+      } else {
+        await Future.wait([
+          webview.run(),
+          onLoadStartCompleter.future,
+          Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
+        ]);
+      }
     } catch (e, st) {
       delegate.set(error: e, stackTrace: st, loading: false);
       _instances.remove(webview.hashCode);
@@ -318,13 +355,17 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     }
 
     if (signalComplete != null) {
-      try {
-        await signalComplete.timeout(const Duration(seconds: 15));
-      } catch (e, st) {
-        delegate.set(error: e, stackTrace: st, loading: false);
-        _instances.remove(webview.hashCode);
-        await webview.dispose();
-        rethrow;
+      if (timeout != null) {
+        try {
+          await signalComplete.timeout(const Duration(seconds: 15));
+        } catch (e, st) {
+          delegate.set(error: e, stackTrace: st, loading: false);
+          _instances.remove(webview.hashCode);
+          await webview.dispose();
+          rethrow;
+        }
+      } else {
+        await signalComplete;
       }
     }
 
