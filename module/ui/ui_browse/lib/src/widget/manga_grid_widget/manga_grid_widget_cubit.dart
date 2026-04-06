@@ -152,7 +152,11 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
   }
 
   void recrawl({required BuildContext context, required String url}) async {
-    await _recrawlUseCase.execute(context: context, url: url);
+    await _recrawlUseCase.execute(
+      context: context,
+      url: url,
+      scripts: state.source?.searchMangaUseCase.scripts ?? [],
+    );
     await init(refresh: true);
   }
 

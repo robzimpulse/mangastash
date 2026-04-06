@@ -40,6 +40,10 @@ class AsuraScanSourceExternal implements SourceExternal {
 
 class _GetChapterImageSourceExternalUseCase
     implements GetChapterImageSourceExternalUseCase {
+
+  @override
+  Duration? get timeout => Duration(seconds: 30);
+
   @override
   Future<List<String>> parse({required Document root}) async {
     final regions = root.querySelectorAll(
@@ -68,7 +72,7 @@ class _GetChapterImageSourceExternalUseCase
       'var elements = document.querySelectorAll(\'$query\');',
       '''
       for (let i = 0; i < elements.length; i++) {
-        setTimeout(() => elements[i].scrollIntoView(), 100 * i);
+        setTimeout(() => elements[i].scrollIntoView(), 500 * i);
       }
       ''',
     ];
@@ -76,6 +80,10 @@ class _GetChapterImageSourceExternalUseCase
 }
 
 class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
+
+  @override
+  Duration? get timeout => Duration(seconds: 20);
+
   @override
   Future<MangaScrapped> parse({required Document root}) async {
     final region = root.querySelector('div.px-4.py-5');
@@ -142,6 +150,9 @@ class _ListChapterSourceExternalUseCase
   const _ListChapterSourceExternalUseCase(this._baseUrl, this._name);
 
   @override
+  Duration? get timeout => Duration(seconds: 15);
+
+  @override
   Future<List<ChapterScrapped>> parse({required Document root}) async {
     final regions = root.querySelectorAll(
       'a.group.flex.items-center.justify-between.px-4.py-4.transition-colors',
@@ -186,6 +197,9 @@ class _SearchMangaSourceExternalUseCase
   final String _baseUrl;
 
   const _SearchMangaSourceExternalUseCase(this._baseUrl);
+
+  @override
+  Duration? get timeout => Duration(seconds: 15);
 
   @override
   Future<bool?> haveNextPage({required Document root}) async {
@@ -290,6 +304,10 @@ class _SearchMangaSourceExternalUseCase
 }
 
 class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
+
+  @override
+  Duration? get timeout => Duration(seconds: 20);
+
   @override
   Future<List<TagScrapped>> parse({required Document root}) async {
     final genreQuery = [

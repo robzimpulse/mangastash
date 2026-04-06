@@ -39,6 +39,10 @@ class MangaClashSourceExternal extends SourceExternal {
 
 class _GetChapterImageSourceExternalUseCase
     implements GetChapterImageSourceExternalUseCase {
+
+  @override
+  Duration? get timeout => Duration(seconds: 15);
+
   @override
   Future<List<String>> parse({required Document root}) async {
     final region = root.querySelector('.reading-content');
@@ -61,6 +65,10 @@ class _GetChapterImageSourceExternalUseCase
 }
 
 class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
+
+  @override
+  Duration? get timeout => Duration(seconds: 15);
+
   @override
   Future<MangaScrapped> parse({required Document root}) async {
     final description = root
@@ -102,6 +110,10 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
 
 class _ListChapterSourceExternalUseCase
     implements ListChapterSourceExternalUseCase {
+
+  @override
+  Duration? get timeout => Duration(seconds: 15);
+
   @override
   Future<List<ChapterScrapped>> parse({required Document root}) async {
     final List<ChapterScrapped> data = [];
@@ -145,6 +157,9 @@ class _SearchMangaSourceExternalUseCase
   final String _baseUrl;
 
   const _SearchMangaSourceExternalUseCase(this._baseUrl);
+
+  @override
+  Duration? get timeout => Duration(seconds: 15);
 
   @override
   Future<bool?> haveNextPage({required Document root}) async {
@@ -238,6 +253,10 @@ class _SearchMangaSourceExternalUseCase
 }
 
 class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
+
+  @override
+  Duration? get timeout => Duration(seconds: 15);
+
   @override
   Future<List<TagScrapped>> parse({required Document root}) async {
     final region = root.querySelector('div.form-group.checkbox-group.row');

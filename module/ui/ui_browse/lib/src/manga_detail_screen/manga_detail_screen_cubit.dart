@@ -378,7 +378,11 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   }
 
   void recrawl({required BuildContext context, required String url}) async {
-    _recrawlUseCase.execute(context: context, url: url);
+    _recrawlUseCase.execute(
+      context: context,
+      url: url,
+      scripts: state.source?.getMangaUseCase.scripts ?? [],
+    );
     await init(useCache: false);
   }
 }
