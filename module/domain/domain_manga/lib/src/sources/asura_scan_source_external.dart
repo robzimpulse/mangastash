@@ -72,7 +72,7 @@ class _GetChapterImageSourceExternalUseCase
       'var elements = document.querySelectorAll(\'$query\');',
       '''
       for (let i = 0; i < elements.length; i++) {
-        setTimeout(() => elements[i].scrollIntoView(), 100 * i);
+        setTimeout(() => elements[i].scrollIntoView(), 500 * i);
       }
       ''',
     ];
