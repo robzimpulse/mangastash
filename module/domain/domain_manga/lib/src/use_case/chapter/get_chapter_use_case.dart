@@ -65,7 +65,9 @@ class GetChapterUseCase with SyncChaptersMixin {
       useCache: useCache,
     );
 
-    return source.getChapterImageUseCase.parse(root: document);
+    return source.getChapterImageUseCase.parse(
+      root: HtmlDocument()..nodes.addAll(document.nodes),
+    );
   }
 
   Future<Result<Chapter>> execute({
