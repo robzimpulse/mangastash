@@ -105,9 +105,10 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
 
         if (tag != null) {
           final companion = tag.toCompanion(true);
-          // final id = tag.id;
-          // final source = manga.manga?.source;
-          if (companion.shouldUpdate(entry) == false) {
+          final tagId = tag.tagId;
+          final source = tag.source;
+          final shouldUpdate = companion.shouldUpdate(entry) == true;
+          if (!shouldUpdate && tagId != null && source != null) {
             data.add(tag);
             continue;
           }
