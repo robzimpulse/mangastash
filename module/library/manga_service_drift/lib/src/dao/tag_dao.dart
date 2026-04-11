@@ -125,6 +125,7 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
           mode: InsertMode.insertOrReplace,
           onConflict: DoUpdate(
             (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
+            target: [tagTables.tagId, tagTables.name],
           ),
         );
 
