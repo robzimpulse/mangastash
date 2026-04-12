@@ -120,9 +120,12 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
           name: Value.absentIfNull(entry.name.valueOrNull ?? tag?.name),
         );
 
-        final result = await into(
-          tagTables,
-        ).insertReturning(value, mode: InsertMode.insertOrReplace);
+        final clause = into(tagTables);
+
+        final result = await clause.insertReturning(
+          value,
+          mode: InsertMode.insertOrReplace,
+        );
 
         data.add(result);
       }
