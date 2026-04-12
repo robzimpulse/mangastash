@@ -83,9 +83,6 @@ class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
             return into(imageTables).insertReturning(
               entry,
               mode: InsertMode.insertOrReplace,
-              onConflict: DoUpdate(
-                (old) => entry.copyWith(updatedAt: Value(DateTime.timestamp())),
-              ),
             );
           }),
         ),

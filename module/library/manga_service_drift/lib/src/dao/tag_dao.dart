@@ -120,14 +120,9 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
           name: Value.absentIfNull(entry.name.valueOrNull ?? tag?.name),
         );
 
-        final result = await into(tagTables).insertReturning(
-          value,
-          mode: InsertMode.insertOrReplace,
-          onConflict: DoUpdate(
-            (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
-            target: [tagTables.tagId, tagTables.name],
-          ),
-        );
+        final result = await into(
+          tagTables,
+        ).insertReturning(value, mode: InsertMode.insertOrReplace);
 
         data.add(result);
       }
@@ -176,10 +171,6 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
           updatedAt: Value(DateTime.timestamp()),
         ),
         mode: InsertMode.insertOrReplace,
-        onConflict: DoUpdate(
-          target: [relationshipTables.mangaId, relationshipTables.tagId],
-          (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
-        ),
       ),
     );
   }
