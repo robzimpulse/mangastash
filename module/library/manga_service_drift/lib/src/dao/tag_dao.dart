@@ -160,19 +160,16 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
   }
 
   Future<void> attach({required String mangaId, required int tagId}) {
-    final value = RelationshipTablesCompanion(
-      mangaId: Value(mangaId),
-      tagId: Value(tagId),
-    );
-    return transaction(
-      () => into(relationshipTables).insert(
-        value.copyWith(
-          createdAt: Value(DateTime.timestamp()),
-          updatedAt: Value(DateTime.timestamp()),
-        ),
-        mode: InsertMode.insertOrReplace,
-      ),
-    );
+    return transaction(() {
+      final value = RelationshipTablesCompanion(
+        mangaId: Value(mangaId),
+        tagId: Value(tagId),
+      );
+
+      final clause = into(relationshipTables);
+
+      return clause.insert(value, mode: InsertMode.insertOrReplace);
+    });
   }
 
   Future<void> detach({required String mangaId, int? tagId}) async {
