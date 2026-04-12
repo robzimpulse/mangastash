@@ -120,13 +120,11 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
           name: Value.absentIfNull(entry.name.valueOrNull ?? tag?.name),
         );
 
-        final result = await into(tagTables).insertReturning(
+        final clause = into(tagTables);
+
+        final result = await clause.insertReturning(
           value,
           mode: InsertMode.insertOrReplace,
-          onConflict: DoUpdate(
-            (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
-            target: [tagTables.tagId, tagTables.name],
-          ),
         );
 
         data.add(result);
@@ -165,23 +163,16 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
   }
 
   Future<void> attach({required String mangaId, required int tagId}) {
-    final value = RelationshipTablesCompanion(
-      mangaId: Value(mangaId),
-      tagId: Value(tagId),
-    );
-    return transaction(
-      () => into(relationshipTables).insert(
-        value.copyWith(
-          createdAt: Value(DateTime.timestamp()),
-          updatedAt: Value(DateTime.timestamp()),
-        ),
-        mode: InsertMode.insertOrReplace,
-        onConflict: DoUpdate(
-          target: [relationshipTables.mangaId, relationshipTables.tagId],
-          (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
-        ),
-      ),
-    );
+    return transaction(() {
+      final value = RelationshipTablesCompanion(
+        mangaId: Value(mangaId),
+        tagId: Value(tagId),
+      );
+
+      final clause = into(relationshipTables);
+
+      return clause.insert(value, mode: InsertMode.insertOrReplace);
+    });
   }
 
   Future<void> detach({required String mangaId, int? tagId}) async {

@@ -13,7 +13,11 @@ void main() {
 
   final values = List.generate(
     10,
-    (index) => TagTablesCompanion(id: Value(index), name: Value('name_$index')),
+    (index) => TagTablesCompanion(
+      id: Value(index),
+      tagId: Value('tag_id_$index'),
+      name: Value('name_$index'),
+    ),
   );
 
   tearDown(() => db.close());
@@ -26,7 +30,11 @@ void main() {
     tearDown(() async => await db.clear());
 
     group('With New Value', () {
-      const value = TagTablesCompanion(id: Value(11), name: Value('name_new'));
+      const value = TagTablesCompanion(
+        id: Value(11),
+        tagId: Value('tag_id_new'),
+        name: Value('name_new'),
+      );
 
       group('Search Value', () {
         test('By Name', () async {
@@ -96,17 +104,26 @@ void main() {
       });
 
       group('Add Value', () {
-        test('With Conflicting Value', () async {
+        test('With same value', () async {
           await dao.adds(values: [value]);
           expect((await dao.all).length, equals(values.length));
         });
 
-        test('With Conflicting Name', () async {
-          await dao.adds(values: [value.copyWith(id: const Value(11))]);
-          expect((await dao.all).length, equals(values.length + 1));
+        test('With different id', () async {
+          await dao.adds(
+            values: [value.copyWith(id: const Value(11))],
+          );
+          expect((await dao.all).length, equals(values.length));
         });
 
-        test('With Conflicting Id', () async {
+        test('With different tag id', () async {
+          await dao.adds(
+            values: [value.copyWith(tagId: const Value('tag_id_new'))],
+          );
+          expect((await dao.all).length, equals(values.length));
+        });
+
+        test('With different name', () async {
           await dao.adds(
             values: [value.copyWith(name: const Value('name_new'))],
           );
@@ -137,13 +154,13 @@ void main() {
         await dao.adds(values: [tag]);
 
         await dao.attach(mangaId: 'm1', tagId: 99);
-        
+
         await dao.attach(mangaId: 'm1', tagId: 99);
 
         await dao.detach(mangaId: 'm1', tagId: 99);
         await dao.detach(mangaId: 'm1');
       });
-      
+
       test('adds with tagId and source fallback', () async {
         final tag = TagTablesCompanion(
           tagId: const Value('tag2'),

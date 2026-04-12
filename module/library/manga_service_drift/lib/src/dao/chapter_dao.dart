@@ -211,9 +211,6 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
         final result = await into(chapterTables).insertReturning(
           value,
           mode: InsertMode.insertOrReplace,
-          onConflict: DoUpdate(
-            (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
-          ),
         );
 
         data.add(
