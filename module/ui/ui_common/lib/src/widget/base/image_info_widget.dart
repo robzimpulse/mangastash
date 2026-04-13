@@ -12,35 +12,30 @@ class ImageInfoWidget extends StatelessWidget {
   }) {
     return ImageInfoWidget(
       child: (context) {
-        return Center(
-          child: LayoutBuilder(
-            builder: (context, constraint) {
-              if (constraint.maxWidth > 200 && constraint.hasInfiniteHeight) {
-                return Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '$error ($url)',
-                        maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      if (onTapRefresh != null) ...[
-                        const SizedBox(height: 16),
-                        OutlinedButton(
-                          onPressed: onTapRefresh,
-                          child: Text('Refresh'),
-                        ),
-                      ],
-                    ],
+        return LayoutBuilder(
+          builder: (context, constraint) {
+            if (constraint.maxWidth > 200 && !constraint.hasBoundedHeight) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '$error ($url)',
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                );
-              }
+                  if (onTapRefresh != null) ...[
+                    const SizedBox(height: 16),
+                    OutlinedButton(
+                      onPressed: onTapRefresh,
+                      child: Text('Refresh'),
+                    ),
+                  ],
+                ],
+              );
+            }
 
-              return Icon(Icons.error);
-            },
-          ),
+            return Icon(Icons.error);
+          },
         );
       },
     );
@@ -49,19 +44,14 @@ class ImageInfoWidget extends StatelessWidget {
   factory ImageInfoWidget.loading({required String url, double? progress}) {
     return ImageInfoWidget(
       child: (context) {
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: 8,
-                minWidth: 8,
-                maxWidth: 32,
-                maxHeight: 32,
-              ),
-              child: CircularProgressIndicator(value: progress),
-            ),
+        return ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: 8,
+            minWidth: 8,
+            maxWidth: 32,
+            maxHeight: 32,
           ),
+          child: CircularProgressIndicator(value: progress),
         );
       },
     );
@@ -69,6 +59,9 @@ class ImageInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Builder(builder: child);
+    return Center(child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Builder(builder: child),
+    ));
   }
 }
