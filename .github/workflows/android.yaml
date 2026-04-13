@@ -48,6 +48,13 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: build/app/outputs/apk/release/app-release.apk
+      - name: 'Upload to Firebase Distribution'
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{secrets.FIREBASE_APP_ID}}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DISTRIBUTION }}
+          groups: owner
+          file: build/app/outputs/apk/release/app-release.apk
       - name: 'Find Comment'
         if: always() && github.event_name == 'pull_request'
         uses: peter-evans/find-comment@v3
