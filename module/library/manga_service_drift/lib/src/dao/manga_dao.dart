@@ -224,9 +224,6 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
         final result = await into(mangaTables).insertReturning(
           value,
           mode: InsertMode.insertOrReplace,
-          onConflict: DoUpdate(
-            (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
-          ),
         );
 
         data.add(

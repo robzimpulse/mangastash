@@ -5,6 +5,8 @@ import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 
+import 'base/image_info_widget.dart';
+
 class MangaTileWidget extends StatelessWidget {
   const MangaTileWidget({
     super.key,
@@ -109,13 +111,15 @@ class MangaTileWidget extends StatelessWidget {
                       ),
                       fit: BoxFit.contain,
                       errorWidget: (context, url, error) {
-                        return const Center(child: Icon(Icons.error));
+                        return ImageInfoWidget.error(
+                          url: url,
+                          error: error,
+                        );
                       },
                       progressIndicatorBuilder: (context, url, progress) {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            value: progress.progress,
-                          ),
+                        return ImageInfoWidget.loading(
+                          url: url,
+                          progress: progress.progress,
                         );
                       },
                     ),

@@ -265,11 +265,12 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             cacheManager: widget.imagesCacheManager,
             imageUrl: url,
             errorWidget: (context, url, error) {
-              return const Center(child: Icon(Icons.error));
+              return ImageInfoWidget.error(url: url, error: error);
             },
             progressIndicatorBuilder: (context, url, progress) {
-              return Center(
-                child: CircularProgressIndicator(value: progress.progress),
+              return ImageInfoWidget.loading(
+                url: url,
+                progress: progress.progress,
               );
             },
           );

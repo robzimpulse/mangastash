@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:intersperse/intersperse.dart';
 
 import 'base/icon_with_text_widget.dart';
+import 'base/image_info_widget.dart';
 
 class ChapterTileWidget extends StatelessWidget {
   const ChapterTileWidget({
@@ -186,13 +187,15 @@ class ChapterTileWidget extends StatelessWidget {
                         imageUrl: sourceIconUrl,
                         fit: BoxFit.contain,
                         errorWidget: (context, url, error) {
-                          return const Center(child: Icon(Icons.error));
+                          return ImageInfoWidget.error(
+                            url: url,
+                            error: error,
+                          );
                         },
                         progressIndicatorBuilder: (context, url, progress) {
-                          return Center(
-                            child: CircularProgressIndicator(
-                              value: progress.progress,
-                            ),
+                          return ImageInfoWidget.loading(
+                            url: url,
+                            progress: progress.progress,
                           );
                         },
                       ),

@@ -75,9 +75,6 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
       return into(fileTables).insertReturning(
         value,
         mode: InsertMode.insertOrReplace,
-        onConflict: DoUpdate(
-          (old) => value.copyWith(updatedAt: Value(DateTime.timestamp())),
-        ),
       );
     });
   }

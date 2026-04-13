@@ -5,6 +5,8 @@ import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 
+import 'base/image_info_widget.dart';
+
 class MangaItemWidget extends StatelessWidget {
   const MangaItemWidget({
     super.key,
@@ -55,13 +57,15 @@ class MangaItemWidget extends StatelessWidget {
                       'https://placehold.co/400?text=Cover+Url',
                     ),
                     errorWidget: (context, url, error) {
-                      return const Center(child: Icon(Icons.error));
+                      return ImageInfoWidget.error(
+                        url: url,
+                        error: error,
+                      );
                     },
                     progressIndicatorBuilder: (context, url, progress) {
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: progress.progress,
-                        ),
+                      return ImageInfoWidget.loading(
+                        url: url,
+                        progress: progress.progress,
                       );
                     },
                   ),
