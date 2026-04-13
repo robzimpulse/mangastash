@@ -228,7 +228,6 @@ class MangaReaderScreen extends StatelessWidget {
                   return ImageInfoWidget.error(
                     url: url,
                     error: error,
-                    onTapRefresh: () => imagesCacheManager.removeFile(url),
                   );
                 },
                 progressIndicatorBuilder: (context, url, progress) {
@@ -236,9 +235,6 @@ class MangaReaderScreen extends StatelessWidget {
                     url: url,
                     progress: progress.progress,
                   );
-                },
-                placeholder: (context, url) {
-                  return ImageInfoWidget.loading(url: url);
                 },
               ),
             );

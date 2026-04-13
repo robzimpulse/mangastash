@@ -132,6 +132,18 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
                             cacheManager: widget.imagesCacheManager,
                             height: 16,
                             width: 16,
+                            errorWidget: (context, url, error) {
+                              return ImageInfoWidget.error(
+                                url: url,
+                                error: error,
+                              );
+                            },
+                            progressIndicatorBuilder: (context, url, progress) {
+                              return ImageInfoWidget.loading(
+                                url: url,
+                                progress: progress.progress,
+                              );
+                            },
                           ),
                           const SizedBox(width: 8),
                           Text(

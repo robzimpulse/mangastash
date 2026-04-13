@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:flutter/material.dart';
 
+import 'base/image_info_widget.dart';
 import 'base/shimmer_loading_widget.dart';
 
 class SourceTileWidget extends StatelessWidget {
@@ -41,15 +42,15 @@ class SourceTileWidget extends StatelessWidget {
             width: 16,
             height: 16,
             errorWidget: (context, url, error) {
-              return const Center(child: Icon(Icons.error));
+              return ImageInfoWidget.error(
+                url: url,
+                error: error,
+              );
             },
             progressIndicatorBuilder: (context, url, progress) {
-              return Center(
-                child: SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(value: progress.progress),
-                ),
+              return ImageInfoWidget.loading(
+                url: url,
+                progress: progress.progress,
               );
             },
           ),
