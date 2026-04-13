@@ -225,22 +225,20 @@ class MangaReaderScreen extends StatelessWidget {
                 imageUrl: images.elementAt(index),
                 cacheManager: imagesCacheManager,
                 errorWidget: (context, url, error) {
-                  return const SizedBox(
-                    width: 100,
-                    height: 100,
-                    child: Center(child: Icon(Icons.error)),
+                  return ImageInfoWidget.error(
+                    url: url,
+                    error: error,
+                    onTapRefresh: () => imagesCacheManager.removeFile(url),
                   );
                 },
                 progressIndicatorBuilder: (context, url, progress) {
-                  return SizedBox(
-                    width: 100,
-                    height: 100,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        value: progress.progress,
-                      ),
-                    ),
+                  return ImageInfoWidget.loading(
+                    url: url,
+                    progress: progress.progress,
                   );
+                },
+                placeholder: (context, url) {
+                  return ImageInfoWidget.loading(url: url);
                 },
               ),
             );
