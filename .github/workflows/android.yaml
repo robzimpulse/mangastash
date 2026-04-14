@@ -33,6 +33,10 @@ jobs:
           cache: true
       - name: 'Install Melos'
         run: flutter pub global activate melos 6.2.0
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
       - name: 'Install Bundler'
         working-directory: android
         run: bundle install
