@@ -27,6 +27,8 @@ dependencies:
     path: module/library/manga_service_firebase
   manga_service_drift:
     path: module/library/manga_service_drift
+  eval_bridge:
+    path: module/library/eval_bridge
 
   # core
   core_analytics:
