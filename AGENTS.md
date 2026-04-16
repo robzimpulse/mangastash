@@ -7,7 +7,13 @@ This is the root directory of the MangaStash monorepo, a multi-platform manga re
 * **pubspec.yaml**: Manages top-level dependencies and serves as the manifest for all internal modules, linking them via path references.
 * **melos.yaml**: Configures the Melos monorepo tool, defining workspace-wide scripts for code generation, testing, and dependency synchronization.
 * **lib/**: Contains the main application entry points (`main.dart`), routing configurations, and top-level screen orchestration.
-* **module/**: The core of the sharded architecture, containing sub-directories for `entity`, `domain`, `feature`, `ui`, `core`, and `library` layers.
+* **module/**: The core of the sharded architecture.
+    * **module/entity/**: Low-level domain data models and value objects (e.g., `Manga`, `Chapter`).
+    * **module/domain/**: Business logic, use cases, and repository interfaces. This layer is independent of UI and external services.
+    * **module/core/**: Infrastructure and cross-cutting concerns (e.g., `core_network`, `core_storage`, `core_analytics`).
+    * **module/library/**: Specialized internal libraries or wrappers around 3rd-party packages (e.g., `manga_service_drift`, `service_locator`).
+    * **module/ui/**: UI implementations, screens, and reusable widgets. These modules should generally avoid direct navigation logic.
+    * **module/feature/**: High-level feature orchestration, aggregation of UI, and routing. This layer bridges UI with Domain and Core.
 * **analysis_options.yaml**: Defines the static analysis and linting rules enforced across the entire monorepo to ensure code quality and consistency.
 * **.fvmrc**: Specifies the Flutter version management configuration to ensure a consistent development environment.
 
@@ -38,6 +44,14 @@ To get the MangaStash project running locally, follow these steps:
 3.  **Bootstrap Workspace**: Run `melos run refresh` (or `melos bootstrap`) from the root to install dependencies across all modules and link them correctly.
 4.  **Code Generation**: Many modules rely on `build_runner`. Generate the necessary code by running `melos run generate`.
 5.  **Run Application**: Once bootstrapped, you can run the main application from `lib/main.dart` using your preferred IDE or command line (`fvm flutter run`).
+
+## Dependency Management:
+When adding a new dependency to a module or the root app, follow these rules to ensure cross-platform compatibility:
+* **Platform Checks**: Before adding a package, verify its supported platforms on [pub.dev](https://pub.dev). The monorepo aims to support Android, iOS, macOS, Windows, Linux, and Web.
+* **Conditional Imports**: If a package is platform-specific (e.g., uses `dart:io` or `dart:html`), use conditional exports/imports or a specialized library like `universal_io` to prevent compilation errors on unsupported platforms.
+* **Internal Linking**: Always use `path` references for internal module dependencies within `pubspec.yaml` (e.g., `path: ../../core/core_network`).
+* **Melos Synchronization**: After adding or modifying dependencies in any `pubspec.yaml`, run `melos bootstrap` (or `melos run refresh`) to synchronize the workspace.
+* **Avoid Version Conflicts**: Try to keep dependency versions consistent across different modules. Melos will warn you if there are version mismatches in the workspace.
 
 ## Agent Knowledge Base & Corrections:
 This section is a living record of mistakes made by AI agents and their corresponding corrections. Future agents should review this section to avoid repeating known errors.
