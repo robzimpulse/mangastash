@@ -45,6 +45,17 @@ To get the MangaStash project running locally, follow these steps:
 4.  **Code Generation**: Many modules rely on `build_runner`. Generate the necessary code by running `melos run generate`.
 5.  **Run Application**: Once bootstrapped, you can run the main application from `lib/main.dart` using your preferred IDE or command line (`fvm flutter run`).
 
+## Melos Usage:
+Melos is the primary tool for managing the monorepo. Common commands include:
+* **`melos bootstrap` (or `melos bs`)**: Installs dependencies for all packages and connects them via path references. This is usually the first command you run after cloning or adding a new module.
+* **`melos clean`**: Cleans temporary files and `pubspec.lock` files across all modules.
+* **`melos run refresh`**: A custom project script that combines `clean`, `bootstrap`, and `get` to completely reset the workspace state.
+* **`melos run generate`**: Runs `build_runner` for all modules that have it as a dependency. Essential for generating JSON models, Drift database code, and Retrofit services.
+* **`melos run test`**: Executes all tests across all modules.
+* **`melos run coverage:merged`**: Generates a unified code coverage report for the entire project.
+* **`melos list`**: Lists all packages currently managed in the monorepo workspace.
+* **`melos exec -- [command]`**: Runs an arbitrary command in every package directory.
+
 ## Dependency Management:
 When adding a new dependency to a module or the root app, follow these rules to ensure cross-platform compatibility:
 * **Platform Checks**: Before adding a package, verify its supported platforms on [pub.dev](https://pub.dev). The monorepo aims to support Android, iOS, macOS, Windows, Linux, and Web.
