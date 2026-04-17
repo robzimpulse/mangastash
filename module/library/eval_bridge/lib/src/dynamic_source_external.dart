@@ -31,16 +31,77 @@ class DynamicSourceExternal implements SourceExternal {
       _DynamicSearchMangaUseCase(runtime);
 
   @override
-  GetChapterImageSourceExternalUseCase get getChapterImageUseCase => throw UnimplementedError();
+  GetChapterImageSourceExternalUseCase get getChapterImageUseCase => _DynamicGetChapterImageUseCase(runtime);
 
   @override
-  GetMangaSourceExternalUseCase get getMangaUseCase => throw UnimplementedError();
+  GetMangaSourceExternalUseCase get getMangaUseCase => _DynamicGetMangaUseCase(runtime);
 
   @override
-  ListChapterSourceExternalUseCase get listChapterUseCase => throw UnimplementedError();
+  ListChapterSourceExternalUseCase get listChapterUseCase => _DynamicListChapterUseCase(runtime);
 
   @override
   ListTagSourceExternalUseCase get listTagUseCase => throw UnimplementedError();
+}
+
+class _DynamicGetMangaUseCase implements GetMangaSourceExternalUseCase {
+  final Runtime runtime;
+
+  _DynamicGetMangaUseCase(this.runtime);
+
+  @override
+  Duration? get timeout => const Duration(seconds: 20);
+
+  @override
+  List<String> get scripts {
+    final result = runtime.executeLib('package:provider/main.dart', 'getMangaScripts');
+    return (result.$value as List).cast<String>();
+  }
+
+  @override
+  Future<MangaScrapped> parse({required Document root}) async {
+    final result = runtime.executeLib('package:provider/main.dart', 'parseManga', [$Document.wrap(root)]);
+    return (result as $MangaScrapped).$value;
+  }
+}
+
+class _DynamicGetChapterImageUseCase implements GetChapterImageSourceExternalUseCase {
+  final Runtime runtime;
+
+  _DynamicGetChapterImageUseCase(this.runtime);
+
+  @override
+  Duration? get timeout => const Duration(seconds: 30);
+
+  @override
+  List<String> get scripts {
+    final result = runtime.executeLib('package:provider/main.dart', 'getChapterImageScripts');
+    return (result.$value as List).cast<String>();
+  }
+
+  @override
+  Future<List<String>> parse({required Document root}) async {
+    final result = runtime.executeLib('package:provider/main.dart', 'parseChapterImages', [$Document.wrap(root)]);
+    return (result as Iterable).cast<String>().toList();
+  }
+}
+
+class _DynamicListChapterUseCase implements ListChapterSourceExternalUseCase {
+  final Runtime runtime;
+
+  _DynamicListChapterUseCase(this.runtime);
+
+  @override
+  Duration? get timeout => const Duration(seconds: 15);
+
+  @override
+  List<String> get scripts => [];
+
+  @override
+  Future<List<ChapterScrapped>> parse({required Document root}) async {
+    final result = runtime.executeLib('package:provider/main.dart', 'parseChapters', [$Document.wrap(root)]);
+    final list = result as Iterable;
+    return list.map((e) => (e as $ChapterScrapped).$value).toList();
+  }
 }
 
 class _DynamicSearchMangaUseCase implements SearchMangaSourceExternalUseCase {

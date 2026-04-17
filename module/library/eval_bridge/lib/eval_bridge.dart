@@ -18,6 +18,7 @@ class EvalBridge {
       $Document.$declaration,
       $Element.$declaration,
       $MangaScrapped.$declaration,
+      $ChapterScrapped.$declaration,
     ]);
 
     final program = compiler.compile({
@@ -33,6 +34,7 @@ class EvalBridge {
     runtime.registerBridgeFunc('package:html/dom.dart', 'Element.querySelector', (runtime, target, args) => (target as $Element).$getProperty(runtime, 'querySelector')!);
     runtime.registerBridgeFunc('package:html/dom.dart', 'Element.querySelectorAll', (runtime, target, args) => (target as $Element).$getProperty(runtime, 'querySelectorAll')!);
     runtime.registerBridgeFunc('package:entity_manga_external/entity_manga_external.dart', 'MangaScrapped.', $MangaScrapped.$new);
+    runtime.registerBridgeFunc('package:entity_manga_external/entity_manga_external.dart', 'ChapterScrapped.', $ChapterScrapped.$new);
 
     return runtime;
   }
