@@ -18,7 +18,7 @@ jobs:
       - name: 'Git Checkout'
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 5
           ref: ${{ github.ref }}
       - name: 'Install Java'
         uses: actions/setup-java@v2
@@ -33,6 +33,13 @@ jobs:
           cache: true
       - name: 'Install Melos'
         run: flutter pub global activate melos 6.2.0
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7.1'
+          bundler-cache: true
+      - name: 'Install Bundler'
+        working-directory: android
+        run: bundle install
       - name: 'Install Dependency'
         run: melos get
       - name: 'Build Application'
@@ -48,13 +55,15 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: build/app/outputs/apk/release/app-release.apk
-      - name: 'Upload to Firebase Distribution'
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
-        with:
-          appId: ${{secrets.FIREBASE_APP_ID}}
-          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DISTRIBUTION }}
-          groups: owner
-          file: build/app/outputs/apk/release/app-release.apk
+      - name: 'Distribute to Firebase'
+        working-directory: android
+        if: github.ref_type == 'tag'
+        env:
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_CLI_TOKEN: ${{ secrets.FIREBASE_CLI_TOKEN }}
+          FIREBASE_DISTRIBUTION_SERVICE_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DISTRIBUTION }}
+          ARTIFACT_PATH: '../build/app/outputs/apk/release/app-release.apk'
+        run: bundle exec fastlane distribute_firebase
       - name: 'Find Comment'
         if: always() && github.event_name == 'pull_request'
         uses: peter-evans/find-comment@v3

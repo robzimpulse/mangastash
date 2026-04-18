@@ -1,0 +1,34 @@
+default_platform(:android)
+
+platform :android do
+  desc 'Send APK Debug file to Firebase'
+    lane :distribute_firebase do |options|
+      android_artifact_path = ENV['ARTIFACT_PATH'].to_s
+
+      puts("android_artifact_path:#{android_artifact_path}")
+      release_notes = options[:changelog] || changelog_from_git_commits(
+        commits_count: 5,
+        pretty: '- %ae (%ad): %s',
+        date_format: 'short',
+        match_lightweight_tag: false,
+        merge_commit_filtering: 'exclude_merges'
+      )
+
+      firebase_cli_token = ENV['FIREBASE_CLI_TOKEN'].to_s
+      UI.user_error!('Firebase CLI token is empty!') if firebase_cli_token.strip.empty?
+
+      firebase_app_id = ENV['FIREBASE_APP_ID'].to_s
+      UI.user_error!('Firebase APP ID is empty!') if firebase_app_id.strip.empty?
+
+      service_credentials_json = ENV['FIREBASE_DISTRIBUTION_SERVICE_JSON'].to_s
+      UI.user_error!('service_credentials_json is empty!') if service_credentials_json.strip.empty?
+      firebase_app_distribution(
+        app: firebase_app_id,
+        android_artifact_path: android_artifact_path,
+        firebase_cli_token: firebase_cli_token,
+        release_notes: release_notes,
+        groups: 'owner',
+        service_credentials_json_data: service_credentials_json
+      )
+    end
+end
