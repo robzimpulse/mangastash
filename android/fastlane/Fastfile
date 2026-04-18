@@ -3,8 +3,7 @@ default_platform(:android)
 platform :android do
   desc 'Send APK Debug file to Firebase'
     lane :distribute_firebase do |options|
-      type = options[:type] || 'profile'
-      android_artifact_path = "../build/app/outputs/apk/#{type}/app-#{type}.apk"
+      android_artifact_path = ENV['ARTIFACT_PATH'].to_s
 
       puts("android_artifact_path:#{android_artifact_path}")
       release_notes = options[:changelog] || changelog_from_git_commits(
