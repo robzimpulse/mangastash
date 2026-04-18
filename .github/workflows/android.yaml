@@ -59,6 +59,7 @@ jobs:
         working-directory: android
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_CLI_TOKEN: ${{ secrets.FIREBASE_CLI_TOKEN }}
           FIREBASE_DISTRIBUTION_SERVICE_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DISTRIBUTION }}
         run: bundle exec fastlane distribute_firebase
       - name: 'Find Comment'
