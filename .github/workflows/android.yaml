@@ -57,6 +57,7 @@ jobs:
           files: build/app/outputs/apk/release/app-release.apk
       - name: 'Distribute to Firebase'
         working-directory: android
+        if: github.ref_type == 'tag'
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_CLI_TOKEN: ${{ secrets.FIREBASE_CLI_TOKEN }}
