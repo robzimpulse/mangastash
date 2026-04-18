@@ -137,15 +137,26 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
   Future<List<MangaModel>> adds({
     required Map<MangaTablesCompanion, List<String>> values,
   }) {
+    if (values.isEmpty) return Future.value([]);
+
     return transaction(() async {
+      final ids = values.keys.map((e) => e.id.valueOrNull).nonNulls.toList();
+      final webUrls =
+          values.keys.map((e) => e.webUrl.valueOrNull).nonNulls.toList();
+      final titles =
+          values.keys.map((e) => e.title.valueOrNull).nonNulls.toList();
+      final sources =
+          values.keys.map((e) => e.source.valueOrNull).nonNulls.toList();
+
       final mangas = await search(
-        ids: [...values.keys.map((e) => e.id.valueOrNull).nonNulls],
-        webUrls: [...values.keys.map((e) => e.webUrl.valueOrNull).nonNulls],
-        titles: [...values.keys.map((e) => e.title.valueOrNull).nonNulls],
-        sources: [...values.keys.map((e) => e.source.valueOrNull).nonNulls],
+        ids: ids,
+        webUrls: webUrls,
+        titles: titles,
+        sources: sources,
       );
 
-      final data = <MangaModel>[];
+      final toInsert = <MangaTablesCompanion>[];
+      final tagReattaches = <String, List<String>>{};
 
       for (final entry in values.entries) {
         final byId = entry.key.id.valueOrNull?.let(
@@ -155,7 +166,7 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
           (webUrl) => mangas.firstWhereOrNull((e) => e.manga?.webUrl == webUrl),
         );
         final byTitleAndSource = entry.key.title.valueOrNull?.let(
-          (title) => entry.key.source.valueOrNull.let(
+          (title) => entry.key.source.valueOrNull?.let(
             (source) => mangas.firstWhereOrNull(
               (e) => e.manga?.title == title && e.manga?.source == source,
             ),
@@ -169,29 +180,20 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
           final id = manga.manga?.id;
           final source = manga.manga?.source;
           final shouldUpdate = companion?.shouldUpdate(entry.key) == true;
-          if (!shouldUpdate && id != null && source != null) {
-            data.add(
-              MangaModel(
-                manga: manga.manga,
-                tags: await _tagDao.reattach(
-                  mangaId: id,
-                  source: source,
-                  values: [
-                    ...{
-                      ...entry.value,
-                      ...manga.tags.map((e) => e.name).nonNulls,
-                    },
-                  ],
-                ),
-              ),
-            );
 
+          if (!shouldUpdate && id != null && source != null) {
+            tagReattaches[id] = [
+              ...{...entry.value, ...manga.tags.map((e) => e.name).nonNulls},
+            ];
             continue;
           }
         }
 
+        final mangaId = entry.key.id.valueOrNull ?? manga?.manga?.id;
+        if (mangaId == null) continue;
+
         final value = entry.key.copyWith(
-          id: Value.absentIfNull(entry.key.id.valueOrNull ?? manga?.manga?.id),
+          id: Value(mangaId),
           title: Value.absentIfNull(
             entry.key.title.valueOrNull ?? manga?.manga?.title,
           ),
@@ -221,29 +223,43 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
           ),
         );
 
-        final result = await into(mangaTables).insertReturning(
-          value,
-          mode: InsertMode.insertOrReplace,
-        );
+        toInsert.add(value);
+        tagReattaches[mangaId] = [
+          ...{...entry.value, ...?manga?.tags.map((e) => e.name).nonNulls},
+        ];
+      }
 
-        data.add(
-          MangaModel(
-            manga: result,
-            tags: await _tagDao.reattach(
-              mangaId: result.id,
-              source: result.source,
-              values: [
-                ...{
-                  ...entry.value,
-                  ...?manga?.tags.map((e) => e.name).nonNulls,
-                },
-              ],
-            ),
+      if (toInsert.isNotEmpty) {
+        await batch((batch) {
+          batch.insertAll(
+            mangaTables,
+            toInsert,
+            mode: InsertMode.insertOrReplace,
+          );
+        });
+      }
+
+      if (tagReattaches.isNotEmpty) {
+        await _tagDao.reattachMultiple(
+          values: tagReattaches.map(
+            (key, value) => MapEntry(key, (
+              source:
+                  values.keys
+                      .firstWhereOrNull((e) => e.id.valueOrNull == key)
+                      ?.source
+                      .valueOrNull,
+              tags: value,
+            )),
           ),
         );
       }
 
-      return data;
+      return search(
+        ids: ids,
+        webUrls: webUrls,
+        titles: titles,
+        sources: sources,
+      );
     });
   }
 }

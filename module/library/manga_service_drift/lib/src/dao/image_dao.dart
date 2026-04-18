@@ -64,29 +64,49 @@ class ImageDao extends DatabaseAccessor<AppDatabase> with _$ImageDaoMixin {
     String chapterId, {
     List<String> values = const [],
   }) {
-    if (values.isEmpty) return Future.value([]);
+    return addsMultiple({
+      chapterId: values,
+    }).then((map) => map[chapterId] ?? []);
+  }
+
+  Future<Map<String, List<ImageDrift>>> addsMultiple(
+    Map<String, List<String>> values,
+  ) {
+    if (values.isEmpty) return Future.value({});
 
     return transaction(() async {
-      final existing = await remove(chapterIds: [chapterId]);
+      final chapterIds = values.keys.toList();
+      await (delete(imageTables)
+        ..where((t) => t.chapterId.isIn(chapterIds))).go();
 
-      return [
-        ...await Future.wait(
-          values.mapIndexed((index, value) {
-            final old = existing.firstWhereOrNull((e) => e.webUrl == value);
-            final data = old?.toCompanion(true) ?? const ImageTablesCompanion();
-            final entry = data.copyWith(
-              chapterId: Value(chapterId),
-              webUrl: Value(value),
-              order: Value(index),
-            );
+      final companions = <ImageTablesCompanion>[];
+      for (final entry in values.entries) {
+        final chapterId = entry.key;
+        final images = entry.value;
+        for (var i = 0; i < images.length; i++) {
+          companions.add(
+            ImageTablesCompanion.insert(
+              chapterId: chapterId,
+              webUrl: images[i],
+              order: i,
+            ),
+          );
+        }
+      }
 
-            return into(imageTables).insertReturning(
-              entry,
-              mode: InsertMode.insertOrReplace,
-            );
-          }),
-        ),
-      ];
+      await batch((batch) {
+        batch.insertAll(
+          imageTables,
+          companions,
+          mode: InsertMode.insertOrReplace,
+        );
+      });
+
+      final results =
+          await (select(imageTables)
+            ..where((t) => t.chapterId.isIn(chapterIds))).get();
+
+      return results.groupListsBy((e) => e.chapterId);
     });
   }
 }

@@ -124,13 +124,17 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
   Future<List<ChapterModel>> adds({
     required Map<ChapterTablesCompanion, List<String>> values,
   }) {
-    return transaction(() async {
-      final data = <ChapterModel>[];
+    if (values.isEmpty) return Future.value([]);
 
-      final chapters = await search(
-        ids: [...values.keys.map((e) => e.id.valueOrNull).nonNulls],
-        webUrls: [...values.keys.map((e) => e.webUrl.valueOrNull).nonNulls],
-      );
+    return transaction(() async {
+      final ids = values.keys.map((e) => e.id.valueOrNull).nonNulls.toList();
+      final webUrls =
+          values.keys.map((e) => e.webUrl.valueOrNull).nonNulls.toList();
+
+      final chapters = await search(ids: ids, webUrls: webUrls);
+
+      final toInsert = <ChapterTablesCompanion>[];
+      final imageAdds = <String, List<String>>{};
 
       for (final entry in values.entries) {
         final byId = entry.key.id.valueOrNull.let(
@@ -147,23 +151,19 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
           final companion = chapter.chapter?.toCompanion(true);
           final id = chapter.chapter?.id;
           if (companion?.shouldUpdate(entry.key) == false && id != null) {
-            data.add(
-              ChapterModel(
-                chapter: chapter.chapter,
-                images: await _imageDao.adds(id, values: entry.value),
-              ),
-            );
+            imageAdds[id] = entry.value;
             continue;
           }
         }
+
+        final chapterId = entry.key.id.valueOrNull ?? chapter?.chapter?.id;
+        if (chapterId == null) continue;
 
         final oldLastReadAt = chapter?.chapter?.lastReadAt;
         final newLastReadAt = entry.key.lastReadAt.valueOrNull;
 
         final value = entry.key.copyWith(
-          id: Value.absentIfNull(
-            entry.key.id.valueOrNull ?? chapter?.chapter?.id,
-          ),
+          id: Value(chapterId),
           title: Value.absentIfNull(
             entry.key.title.valueOrNull ?? chapter?.chapter?.title,
           ),
@@ -208,20 +208,25 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
           ),
         );
 
-        final result = await into(chapterTables).insertReturning(
-          value,
-          mode: InsertMode.insertOrReplace,
-        );
-
-        data.add(
-          ChapterModel(
-            chapter: result,
-            images: await _imageDao.adds(result.id, values: entry.value),
-          ),
-        );
+        toInsert.add(value);
+        imageAdds[chapterId] = entry.value;
       }
 
-      return data;
+      if (toInsert.isNotEmpty) {
+        await batch((batch) {
+          batch.insertAll(
+            chapterTables,
+            toInsert,
+            mode: InsertMode.insertOrReplace,
+          );
+        });
+      }
+
+      if (imageAdds.isNotEmpty) {
+        await _imageDao.addsMultiple(imageAdds);
+      }
+
+      return search(ids: ids, webUrls: webUrls);
     });
   }
 
