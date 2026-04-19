@@ -1,0 +1,19 @@
+name: eval_bridge
+description: A bridge between dart_eval and the manga reader app for dynamic providers.
+version: 0.0.1
+publish_to: 'none'
+
+environment:
+  sdk: ">=3.7.2 <4.0.0"
+
+dependencies:
+  dart_eval: ^0.7.8
+  html: ^0.15.4
+  entity_manga_external:
+    path: ../entity_manga_external
+  manga_dex_api:
+    path: ../manga_dex_api
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
