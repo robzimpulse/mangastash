@@ -80,20 +80,14 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
   }
 
   Future<List<TagDrift>> adds({required List<TagTablesCompanion> values}) {
-    if (values.isEmpty) return Future.value([]);
-
     return transaction(() async {
-      final tagIds = values.map((e) => e.tagId.valueOrNull).nonNulls.toList();
-      final names = values.map((e) => e.name.valueOrNull).nonNulls.toList();
-      final sources = values.map((e) => e.source.valueOrNull).nonNulls.toList();
-
       final tags = await search(
-        tagIds: tagIds,
-        names: names,
-        sources: sources,
+        tagIds: [...values.map((e) => e.tagId.valueOrNull).nonNulls],
+        names: [...values.map((e) => e.name.valueOrNull).nonNulls],
+        sources: [...values.map((e) => e.source.valueOrNull).nonNulls],
       );
 
-      final toInsert = <TagTablesCompanion>[];
+      final data = <TagDrift>[];
 
       for (final entry in values) {
         final byTagId = entry.tagId.valueOrNull?.let(
@@ -111,85 +105,32 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
 
         if (tag != null) {
           final companion = tag.toCompanion(true);
+          final tagId = tag.tagId;
+          final source = tag.source;
           final shouldUpdate = companion.shouldUpdate(entry) == true;
-          if (!shouldUpdate) {
+          if (!shouldUpdate && tagId != null && source != null) {
+            data.add(tag);
             continue;
           }
         }
 
-        toInsert.add(
-          entry.copyWith(
-            id: Value.absentIfNull(entry.id.valueOrNull ?? tag?.id),
-            tagId: Value.absentIfNull(entry.tagId.valueOrNull ?? tag?.tagId),
-            name: Value.absentIfNull(entry.name.valueOrNull ?? tag?.name),
-          ),
+        final value = entry.copyWith(
+          id: Value.absentIfNull(entry.id.valueOrNull ?? tag?.id),
+          tagId: Value.absentIfNull(entry.tagId.valueOrNull ?? tag?.tagId),
+          name: Value.absentIfNull(entry.name.valueOrNull ?? tag?.name),
         );
+
+        final clause = into(tagTables);
+
+        final result = await clause.insertReturning(
+          value,
+          mode: InsertMode.insertOrReplace,
+        );
+
+        data.add(result);
       }
 
-      if (toInsert.isNotEmpty) {
-        await batch((batch) {
-          batch.insertAll(
-            tagTables,
-            toInsert,
-            mode: InsertMode.insertOrReplace,
-          );
-        });
-      }
-
-      return search(tagIds: tagIds, names: names, sources: sources);
-    });
-  }
-
-  Future<void> reattachMultiple({
-    required Map<String, ({String? source, List<String> tags})> values,
-  }) async {
-    if (values.isEmpty) return;
-
-    return transaction(() async {
-      final mangaIds = values.keys.toList();
-      await detachMultiple(mangaIds: mangaIds);
-
-      final toAdd = <({String? source, String name})>{};
-      for (final entry in values.values) {
-        for (final name in entry.tags) {
-          toAdd.add((source: entry.source, name: name));
-        }
-      }
-
-      final tags = await adds(
-        values: [
-          for (final item in toAdd)
-            TagTablesCompanion.insert(
-              name: item.name,
-              source: Value.absentIfNull(item.source),
-            ),
-        ],
-      );
-
-      final tagMap = <({String? source, String name}), int>{};
-      for (final t in tags) {
-        tagMap[(source: t.source, name: t.name)] = t.id;
-      }
-
-      await batch((batch) {
-        for (final entry in values.entries) {
-          final mangaId = entry.key;
-          final source = entry.value.source;
-          for (final tagName in entry.value.tags) {
-            final tagId = tagMap[(source: source, name: tagName)];
-            if (tagId != null) {
-              batch.insert(
-                relationshipTables,
-                RelationshipTablesCompanion.insert(
-                  mangaId: mangaId,
-                  tagId: tagId,
-                ),
-                mode: InsertMode.insertOrReplace,
-              );
-            }
-          }
-        }
-      });
+      return data;
     });
   }
 
@@ -198,12 +139,27 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
     String? source,
     List<String> values = const [],
   }) async {
-    await reattachMultiple(
-      values: {
-        mangaId: (source: source, tags: values),
-      },
-    );
-    return search(names: values, sources: [if (source != null) source]);
+    if (values.isEmpty) return Future.value([]);
+
+    return transaction(() async {
+      await detach(mangaId: mangaId);
+
+      final tags = await adds(
+        values: [
+          for (final name in values)
+            TagTablesCompanion.insert(
+              name: name,
+              source: Value.absentIfNull(source),
+            ),
+        ],
+      );
+
+      for (final tag in tags) {
+        await attach(mangaId: mangaId, tagId: tag.id);
+      }
+
+      return tags;
+    });
   }
 
   Future<void> attach({required String mangaId, required int tagId}) {
@@ -220,22 +176,12 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
   }
 
   Future<void> detach({required String mangaId, int? tagId}) async {
-    return detachMultiple(mangaId: mangaId, tagId: tagId);
-  }
-
-  Future<void> detachMultiple({
-    String? mangaId,
-    List<String> mangaIds = const [],
-    int? tagId,
-  }) async {
-    final selector =
-        delete(relationshipTables)..where(
-          (f) => [
-            if (mangaId != null) f.mangaId.equals(mangaId),
-            if (mangaIds.isNotEmpty) f.mangaId.isIn(mangaIds),
-            if (tagId != null) f.tagId.equals(tagId),
-          ].reduce((a, b) => a & b),
-        );
+    final selector = delete(relationshipTables)..where(
+      (f) => [
+        f.mangaId.equals(mangaId),
+        if (tagId != null) f.tagId.equals(tagId),
+      ].reduce((a, b) => a & b),
+    );
 
     return transaction(() => selector.go());
   }
