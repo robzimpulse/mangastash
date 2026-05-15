@@ -11,8 +11,11 @@ on:
     tags:
       - 'v*.*.*'
 
-jobs:
+concurrency:
+  group: unit-test-coverage-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 
+jobs:
   pr-check:
     timeout-minutes: 30
     runs-on: ubuntu-latest
@@ -46,10 +49,10 @@ jobs:
     outputs:
       pct: ${{ steps.calc.outputs.pct }}
     steps:
-      - name: 'Git Checkout Baseline (Main)'
+      - name: 'Git Checkout Baseline (Master)'
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: master
           clean: true
 
       - name: 'Install Flutter'
@@ -170,7 +173,7 @@ jobs:
           body: |
             # CI/CD Pipeline Results 🧪
 
-            | Metric | Main (Base) | PR (Current) | Diff |
+            | Metric | Master (Base) | PR (Current) | Diff |
             |:---:|:---:|:---:|:---|
             | **Total Coverage** | ${{ steps.compare.outputs.base_val }}% | ${{ steps.compare.outputs.pr_val }}% | ${{ steps.compare.outputs.icon }} **${{ steps.compare.outputs.diff }}%** |
 
