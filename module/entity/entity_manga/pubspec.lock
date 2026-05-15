@@ -467,6 +467,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.3"
+  go_router:
+    dependency: transitive
+    description:
+      name: go_router
+      sha256: c92d18e1fe994cb06d48aa786c46b142a5633067e8297cff6b5a3ac742620104
+      url: "https://pub.dev"
+    source: hosted
+    version: "17.0.0"
   graphs:
     dependency: transitive
     description:
@@ -608,7 +616,7 @@ packages:
     description:
       path: "packages/log_box"
       ref: master
-      resolved-ref: a5bfc2b1fc8312b9126919e807e9d9778501d78f
+      resolved-ref: "550868b54195fab3bdc2259ec25a480361ddfd04"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -617,7 +625,7 @@ packages:
     description:
       path: "packages/log_box_dio_logger"
       ref: master
-      resolved-ref: a5bfc2b1fc8312b9126919e807e9d9778501d78f
+      resolved-ref: "550868b54195fab3bdc2259ec25a480361ddfd04"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -626,7 +634,7 @@ packages:
     description:
       path: "packages/log_box_in_app_webview_logger"
       ref: master
-      resolved-ref: a5bfc2b1fc8312b9126919e807e9d9778501d78f
+      resolved-ref: "550868b54195fab3bdc2259ec25a480361ddfd04"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -635,7 +643,7 @@ packages:
     description:
       path: "packages/log_box_navigation_logger"
       ref: master
-      resolved-ref: a5bfc2b1fc8312b9126919e807e9d9778501d78f
+      resolved-ref: "550868b54195fab3bdc2259ec25a480361ddfd04"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -644,7 +652,7 @@ packages:
     description:
       path: "packages/log_box_persistent_storage_drift"
       ref: master
-      resolved-ref: a5bfc2b1fc8312b9126919e807e9d9778501d78f
+      resolved-ref: "550868b54195fab3bdc2259ec25a480361ddfd04"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
