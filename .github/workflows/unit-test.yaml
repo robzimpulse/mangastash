@@ -68,6 +68,9 @@ jobs:
       - name: 'Install Dependency'
         run: melos get
 
+      - name: 'Install Lcov'
+        run: sudo apt-get update && sudo apt-get install -y lcov
+
       - name: 'Generate Code Coverage'
         run: melos coverage:merged
 
@@ -107,11 +110,23 @@ jobs:
       - name: 'Install Melos'
         run: dart pub global activate melos 6.2.0
 
+      - name: 'Install Cobertura'
+        run: dart pub global activate cobertura
+
       - name: 'Install Dependency'
         run: melos get
 
+      - name: 'Install Lcov'
+        run: sudo apt-get update && sudo apt-get install -y lcov
+
       - name: 'Generate Code Coverage'
         run: melos coverage:merged
+
+      - name: 'Upload coverage reports'
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage/merged.cobertura.xml
 
       - name: 'Extract Percentage'
         id: calc
