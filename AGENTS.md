@@ -1,71 +1,61 @@
-# mangastash Context
+# AI SYSTEM CONTEXT
 
-## Purpose:
-This is the root directory of the MangaStash monorepo, a multi-platform manga reader. It serves as the central orchestration point for managing multiple Flutter/Dart packages, defining project-wide configurations, and hosting the main application entry point that aggregates all modular components.
+## 1. Tech Stack & Environment
+- **Framework**: Flutter (version managed by FVM in `.fvmrc`)
+- **Language**: Dart (SDK specified in `pubspec.yaml`)
+- **Monorepo Management**: [Melos](https://melos.invertase.dev/) for package orchestration.
+- **State Management**: BLoC (via internal `safe_bloc` module), Provider, and RxDart.
+- **Dependency Injection**: Custom `Registrar` pattern built on top of `GetIt` (abstracted in `service_locator` module).
+- **Database**: [Drift](https://drift.simonbinder.eu/) (SQLite) for local persistence in `manga_service_drift`.
+- **Networking**: [Dio](https://pub.dev/packages/dio) for API requests in `core_network`.
+- **Routing**: [go_router](https://pub.dev/packages/go_router) in `core_route`.
+- **Linting**: Rules enforced via `analysis_options.yaml`.
 
-## Key Components:
-* **pubspec.yaml**: Manages top-level dependencies and serves as the manifest for all internal modules, linking them via path references.
-* **melos.yaml**: Configures the Melos monorepo tool, defining workspace-wide scripts for code generation, testing, and dependency synchronization.
-* **lib/**: Contains the main application entry points (`main.dart`), routing configurations, and top-level screen orchestration.
-* **module/**: The core of the sharded architecture.
-    * **module/entity/**: Low-level domain data models and value objects (e.g., `Manga`, `Chapter`).
-    * **module/domain/**: Business logic, use cases, and repository interfaces. This layer is independent of UI and external services.
-    * **module/core/**: Infrastructure and cross-cutting concerns (e.g., `core_network`, `core_storage`, `core_analytics`).
-    * **module/library/**: Specialized internal libraries or wrappers around 3rd-party packages (e.g., `manga_service_drift`, `service_locator`).
-    * **module/ui/**: UI implementations, screens, and reusable widgets. These modules should generally avoid direct navigation logic.
-    * **module/feature/**: High-level feature orchestration, aggregation of UI, and routing. This layer bridges UI with Domain and Core.
-* **analysis_options.yaml**: Defines the static analysis and linting rules enforced across the entire monorepo to ensure code quality and consistency.
-* **.fvmrc**: Specifies the Flutter version management configuration to ensure a consistent development environment.
+## 2. Architecture & Directory Structure
+The project follows a **Modular Clean Architecture** pattern with a sharded directory structure in `module/`:
+- **root (`/`)**: Main entry point (`lib/main.dart`), routing aggregation, and monorepo config (`melos.yaml`).
+- **`module/entity/`**: Pure data models and value objects (no dependencies).
+- **`module/domain/`**: Business logic, use cases, and repository interfaces.
+- **`module/core/`**: Infrastructure and cross-cutting concerns (Auth, Route, Network, Storage, Analytics, Environment).
+- **`module/library/`**: Internal utility libraries and 3rd-party wrappers (Drift service, Service Locator, BLoC).
+- **`module/ui/`**: Reusable UI components, themes, and shared widgets (`ui_common`).
+- **`module/feature/`**: High-level feature orchestration (Browse, History, Library, More, Updates). Bridges UI with Domain and Core.
 
-## Dependencies:
-* **Melos**: Used for workspace management and multi-package command execution.
-* **Flutter SDK**: The primary framework for building the multi-platform application.
-* **Internal Modules**: Aggregates all modules found in the `module/` directory (e.g., `core_route`, `domain_manga`, `ui_common`, etc.).
+## 3. Implementation Rules
+- **Consistency**: Match existing style and patterns.
+- **Code Style**: Single quotes for strings, mandatory trailing commas.
+- **Imports**: Grouped (Dart, Package, Relative) and sorted alphabetically. Use relative imports within the same package.
+- **Type Safety**: Always declare return types for functions and methods.
+- **DI Registration**: Every module MUST provide a `Registrar` (or `Initiator`) that registers its services into the `ServiceLocator`.
+- **Generated Code**: Run `melos run generate` after modifying models, tables, or API interfaces to update `.g.dart` files.
 
-## Local Conventions:
-* **Monorepo Management**: Uses Melos for managing inter-package dependencies and running unified scripts (e.g., `melos run generate`).
-* **Modular Clean Architecture**: Adheres to a strict layered architecture where dependencies flow inwards (UI/Feature -> Domain -> Entity).
-* **Dependency Injection**: Utilizes a `Registrar` pattern where each module is responsible for registering its own services into a central `ServiceLocator`.
-* **Centralized Configuration**: Global settings like Firebase options, routing foundations, and environment setups are orchestrated from the root `lib/` directory.
+## 4. Testing Conventions
+- **Framework**: Standard `flutter_test`.
+- **Mocks**: Use `mocktail` for behavior-driven testing.
+- **E2E**: Use `patrol` for integration and finders.
+- **Commands**:
+    - `melos run test`: Runs all tests across all modules.
+    - `melos run coverage:merged`: Generates a unified code coverage report.
 
-## Code Style:
-This project follows the official [Dart Style Guide](https://dart.dev/guides/language/effective-dart/style) with specific enforcements defined in `analysis_options.yaml`:
-* **Single Quotes**: Prefer single quotes for strings unless the string contains a single quote.
-* **Trailing Commas**: Required for function parameters, arguments, and collection literals to ensure clean diffs and consistent formatting.
-* **Relative Imports**: Prefer relative imports for files within the same package to maintain modularity.
-* **Type Safety**: Always declare return types for functions and methods.
-* **Ordering**: Directives (imports/exports) must be ordered alphabetically and grouped (dart, package, then relative).
-* **Generated Code**: Files ending in `.g.dart` are excluded from analysis as they are managed by `build_runner`.
+## 5. Known Blockers & Troubleshooting (Self-Learning)
+> **⚠️ DIRECTIVE FOR ALL FUTURE AI AGENTS:** If you encounter a new architectural blocker, undocumented workaround, or persistent bug while working in this codebase, you MUST append it to this section with troubleshooting steps before completing your task.
 
-## Setup Guidance:
-To get the MangaStash project running locally, follow these steps:
-1.  **Flutter Version Management**: This project uses FVM. Ensure FVM is installed and run `fvm use` in the root directory to switch to the required Flutter version (specified in `.fvmrc`).
-2.  **Melos Installation**: Install Melos globally if you haven't already: `dart pub global activate melos`.
-3.  **Bootstrap Workspace**: Run `melos run refresh` (or `melos bootstrap`) from the root to install dependencies across all modules and link them correctly.
-4.  **Code Generation**: Many modules rely on `build_runner`. Generate the necessary code by running `melos run generate`.
-5.  **Run Application**: Once bootstrapped, you can run the main application from `lib/main.dart` using your preferred IDE or command line (`fvm flutter run`).
+- **Monorepo Dependency Synchronization**
+  - **Location**: Project Root / `pubspec.yaml`
+  - **Context**: Updating a package's dependencies or adding a new module requires a workspace-wide refresh to link everything correctly.
+  - **Troubleshooting**: Run `melos run refresh` (or `melos bootstrap`) to synchronize `pubspec.lock` files and path references.
 
-## Melos Usage:
-Melos is the primary tool for managing the monorepo. Common commands include:
-* **`melos bootstrap` (or `melos bs`)**: Installs dependencies for all packages and connects them via path references. This is usually the first command you run after cloning or adding a new module.
-* **`melos clean`**: Cleans temporary files and `pubspec.lock` files across all modules.
-* **`melos run refresh`**: A custom project script that combines `clean`, `bootstrap`, and `get` to completely reset the workspace state.
-* **`melos run generate`**: Runs `build_runner` for all modules that have it as a dependency. Essential for generating JSON models, Drift database code, and Retrofit services.
-* **`melos run test`**: Executes all tests across all modules.
-* **`melos run coverage:merged`**: Generates a unified code coverage report for the entire project.
-* **`melos list`**: Lists all packages currently managed in the monorepo workspace.
-* **`melos exec -- [command]`**: Runs an arbitrary command in every package directory.
+- **Drift DAO & Code Generation**
+  - **Location**: `module/library/manga_service_drift/`
+  - **Context**: The database uses many DAOs and split table definitions. Code generation is required for `part 'filename.g.dart';`.
+  - **Troubleshooting**: If you change a table or add a DAO, run `melos run generate`. If migrations are needed, use `melos run generate:migration`.
 
-## Dependency Management:
-When adding a new dependency to a module or the root app, follow these rules to ensure cross-platform compatibility:
-* **Platform Checks**: Before adding a package, verify its supported platforms on [pub.dev](https://pub.dev). The monorepo aims to support Android, iOS, macOS, Windows, Linux, and Web.
-* **Conditional Imports**: If a package is platform-specific (e.g., uses `dart:io` or `dart:html`), use conditional exports/imports or a specialized library like `universal_io` to prevent compilation errors on unsupported platforms.
-* **Internal Linking**: Always use `path` references for internal module dependencies within `pubspec.yaml` (e.g., `path: ../../core/core_network`).
-* **Melos Synchronization**: After adding or modifying dependencies in any `pubspec.yaml`, run `melos bootstrap` (or `melos run refresh`) to synchronize the workspace.
-* **Avoid Version Conflicts**: Try to keep dependency versions consistent across different modules. Melos will warn you if there are version mismatches in the workspace.
+- **Registrar Initialization Order**
+  - **Location**: `lib/main.dart`
+  - **Context**: Modules are registered in a specific order. Circular dependencies between registrars will cause app startup failures.
+  - **Troubleshooting**: Check the `WrapperScreen` locator builder in `main.dart` if services are not found or injection fails.
 
-## Agent Knowledge Base & Corrections:
-This section is a living record of mistakes made by AI agents and their corresponding corrections. Future agents should review this section to avoid repeating known errors.
-
-- **Mistake**: [Describe the mistake here]
-- **Correction**: [Describe the correct instruction or behavior here]
+- **Merged Coverage Script Complexity**
+  - **Location**: `melos.yaml` (`coverage:merged`)
+  - **Context**: The merged coverage script uses complex `sed` commands and `lcov` to unify reports.
+  - **Troubleshooting**: Ensure `lcov` and `cobertura` tools are installed on the system if this script fails.
