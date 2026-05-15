@@ -198,73 +198,18 @@ jobs:
 
             [View Detailed Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
-#  test:
-#    timeout-minutes: 30
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: 'Git Checkout'
-#        uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 1
-#          ref: ${{ github.ref }}
-#
-#      - name: 'Install Flutter'
-#        uses: subosito/flutter-action@v2
-#        with:
-#          flutter-version: '3.32.8'
-#          # ref: https://github.com/subosito/flutter-action/issues/350
-#          cache: true
-#
-#      - name: 'Install Melos'
-#        run: dart pub global activate melos 6.2.0
-#
-#      - name: 'Install Cobertura'
-#        run: dart pub global activate cobertura
-#
-#      - name: 'Install Lcov'
-#        run: sudo apt-get update && sudo apt-get install -y lcov
-#
-#      - name: 'Install Dependency'
-#        run: melos get
-#
-#      - name: 'Generate Code Coverage'
-#        run: melos coverage:merged
-#
-#      - name: 'Upload coverage reports'
-#        uses: codecov/codecov-action@v5
-#        with:
-#          token: ${{ secrets.CODECOV_TOKEN }}
-#          files: coverage/merged.cobertura.xml
-#
-#      - name: 'Coverage Report'
-#        uses: romeovs/lcov-reporter-action@v0.3.1
-#        if: always() && github.event_name == 'pull_request'
-#        with:
-#          github-token: ${{ secrets.GITHUB_TOKEN }}
-#          lcov-file: ./coverage/renamed.lcov.info
-#          filter-changed-files: true
-#          delete-old-comments: true
-#          title: Coverage Report
-#
-#      - name: 'Extract Coverage Percentage'
-#        id: coverage
-#        working-directory: coverage
-#        run: |
-#          PERCENTAGE=$(lcov --summary renamed.lcov.info | grep "lines......" | cut -d ' ' -f 4 | cut -d '%' -f 1)
-#          echo "percentage=$PERCENTAGE" >> $GITHUB_OUTPUT
-#
-#      - name: 'Send Report to Telegram'
-#        uses: appleboy/telegram-action@master
-#        if: always()
-#        with:
-#          to: ${{ secrets.TELEGRAM_GROUP_CHAT_ID }}
-#          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-#          format: html
-#          disable_web_page_preview: true
-#          message: |
-#            <b>🚀 Coverage Report: ${{ github.repository }}</b>
-#
-#            <b>Status:</b> ${{ job.status == 'success' && '✅ Success' || '❌ Failed' }}
-#            <b>Branch or Tag:</b> ${{ github.ref }}
-#            <b>Run ID:</b> <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">${{ github.run_id }}</a>
-#            <b>Coverage:</b> ${{ steps.coverage.outputs.percentage }}%
+      - name: 'Send Report to Telegram'
+        uses: appleboy/telegram-action@master
+        if: always()
+        with:
+          to: ${{ secrets.TELEGRAM_GROUP_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: html
+          disable_web_page_preview: true
+          message: |
+            <b>🚀 Coverage Report: ${{ github.repository }}</b>
+
+            <b>Status:</b> ${{ job.status == 'success' && '✅ Success' || '❌ Failed' }}
+            <b>Branch or Tag:</b> ${{ github.ref }}
+            <b>Run ID:</b> <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">${{ github.run_id }}</a>
+            <b>Coverage:</b> ${{ steps.compare.outputs.pr_val }}%
