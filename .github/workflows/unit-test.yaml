@@ -143,9 +143,8 @@ jobs:
   report:
     needs: [ pr-check, baseline-coverage, unit-test ]
     if: always() && github.event_name == 'pull_request'
-    runs-on: allofresh-docker
-    container:
-      image: asia.gcr.io/tri-omnichannel-prd/gudang-images/apps/linter:3.32.8-sdk-35
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: 'Compare Results'
         id: compare
