@@ -365,6 +365,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.7.0"
+  go_router:
+    dependency: transitive
+    description:
+      name: go_router
+      sha256: c92d18e1fe994cb06d48aa786c46b142a5633067e8297cff6b5a3ac742620104
+      url: "https://pub.dev"
+    source: hosted
+    version: "17.0.0"
   html:
     dependency: transitive
     description:
@@ -474,7 +482,7 @@ packages:
     description:
       path: "packages/log_box"
       ref: master
-      resolved-ref: "1b562f29be787fa37aa110854770aecc0b2f4982"
+      resolved-ref: "550868b54195fab3bdc2259ec25a480361ddfd04"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.1.0"
@@ -483,7 +491,7 @@ packages:
     description:
       path: "packages/log_box_dio_logger"
       ref: master
-      resolved-ref: "1b562f29be787fa37aa110854770aecc0b2f4982"
+      resolved-ref: "550868b54195fab3bdc2259ec25a480361ddfd04"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -492,7 +500,7 @@ packages:
     description:
       path: "packages/log_box_in_app_webview_logger"
       ref: master
-      resolved-ref: "1b562f29be787fa37aa110854770aecc0b2f4982"
+      resolved-ref: "550868b54195fab3bdc2259ec25a480361ddfd04"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -501,7 +509,7 @@ packages:
     description:
       path: "packages/log_box_navigation_logger"
       ref: master
-      resolved-ref: "1b562f29be787fa37aa110854770aecc0b2f4982"
+      resolved-ref: "550868b54195fab3bdc2259ec25a480361ddfd04"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -510,7 +518,7 @@ packages:
     description:
       path: "packages/log_box_persistent_storage_drift"
       ref: master
-      resolved-ref: "1b562f29be787fa37aa110854770aecc0b2f4982"
+      resolved-ref: "550868b54195fab3bdc2259ec25a480361ddfd04"
       url: "https://github.com/robzimpulse/log_box.git"
     source: git
     version: "0.0.1"
@@ -565,10 +573,10 @@ packages:
     dependency: "direct dev"
     description:
       name: mocktail
-      sha256: "890df3f9688106f25755f26b1c60589a92b3ab91a22b8b224947ad041bf172d8"
+      sha256: "5e1bf53cc7baa8062a33b84424deb61513858ea05c601b8509e683815b5914aa"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.4"
+    version: "1.0.5"
   mutex:
     dependency: transitive
     description:
