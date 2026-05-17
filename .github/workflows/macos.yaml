@@ -11,6 +11,10 @@ on:
     tags:
       - 'v*.*.*'
 
+concurrency:
+  group: macos-pipeline-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     timeout-minutes: 60

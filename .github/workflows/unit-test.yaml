@@ -11,8 +11,12 @@ on:
     tags:
       - 'v*.*.*'
 
+concurrency:
+  group: unit-test-coverage-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  pr-check:
     timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
@@ -32,14 +36,88 @@ jobs:
       - name: 'Install Melos'
         run: dart pub global activate melos 6.2.0
 
-      - name: 'Install Cobertura'
-        run: dart pub global activate cobertura
+      - name: 'Install Dependency'
+        run: melos get
+
+      - name: 'Analyze'
+        run: melos analyze
+
+  baseline-coverage:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      pct: ${{ steps.calc.outputs.pct }}
+    steps:
+      - name: 'Git Checkout Baseline (Master)'
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          clean: true
+
+      - name: 'Install Flutter'
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.8'
+          # ref: https://github.com/subosito/flutter-action/issues/350
+          cache: true
+
+      - name: 'Install Melos'
+        run: dart pub global activate melos 6.2.0
+
+      - name: 'Install Dependency'
+        run: melos get
 
       - name: 'Install Lcov'
         run: sudo apt-get update && sudo apt-get install -y lcov
 
+      - name: 'Generate Code Coverage'
+        run: melos coverage:merged
+
+      - name: 'Extract Percentage'
+        id: calc
+        run: |
+          FILE="coverage/html/lcov.info"
+          if [ -f "$FILE" ]; then
+            # Parse weighted total (LH: Lines Hit / LF: Lines Found)
+            VAL=$(awk -F: '/^LH/ {hit += $2} /^LF/ {found += $2} END {if (found > 0) printf "%.2f", (hit/found)*100; else print "0.00"}' "$FILE")
+            echo "pct=$VAL" >> $GITHUB_OUTPUT
+            echo "Successfully extracted Baseline: $VAL%"
+          else
+            echo "pct=0.00" >> $GITHUB_OUTPUT
+            echo "Warning: LCOV file not found at $FILE"
+          fi
+
+  unit-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      pct: ${{ steps.calc.outputs.pct }}
+    steps:
+      - name: 'Git Checkout PR'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: ${{ github.ref }}
+
+      - name: 'Install Flutter'
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.8'
+          # ref: https://github.com/subosito/flutter-action/issues/350
+          cache: true
+
+      - name: 'Install Melos'
+        run: dart pub global activate melos 6.2.0
+
+      - name: 'Install Cobertura'
+        run: dart pub global activate cobertura
+
       - name: 'Install Dependency'
         run: melos get
+
+      - name: 'Install Lcov'
+        run: sudo apt-get update && sudo apt-get install -y lcov
 
       - name: 'Generate Code Coverage'
         run: melos coverage:merged
@@ -50,22 +128,74 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage/merged.cobertura.xml
 
-      - name: 'Coverage Report'
-        uses: romeovs/lcov-reporter-action@v0.3.1
-        if: always() && github.event_name == 'pull_request'
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          lcov-file: ./coverage/renamed.lcov.info
-          filter-changed-files: true
-          delete-old-comments: true
-          title: Coverage Report
-
-      - name: 'Extract Coverage Percentage'
-        id: coverage
-        working-directory: coverage
+      - name: 'Extract Percentage'
+        id: calc
         run: |
-          PERCENTAGE=$(lcov --summary renamed.lcov.info | grep "lines......" | cut -d ' ' -f 4 | cut -d '%' -f 1)
-          echo "percentage=$PERCENTAGE" >> $GITHUB_OUTPUT
+          FILE="coverage/html/lcov.info"
+          if [ -f "$FILE" ]; then
+            VAL=$(awk -F: '/^LH/ {hit += $2} /^LF/ {found += $2} END {if (found > 0) printf "%.2f", (hit/found)*100; else print "0.00"}' "$FILE")
+            echo "pct=$VAL" >> $GITHUB_OUTPUT
+            echo "Successfully extracted PR: $VAL%"
+          else
+            echo "pct=0.00" >> $GITHUB_OUTPUT
+          fi
+
+  report:
+    needs: [ pr-check, baseline-coverage, unit-test ]
+    if: always() && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: 'Compare Results'
+        id: compare
+        run: |
+          # Fallback to 0.00 if outputs are missing or null
+          BASE=${{ needs.baseline-coverage.outputs.pct || '0.00' }}
+          PR=${{ needs.unit-test.outputs.pct || '0.00' }}
+
+          # Floating point math via awk
+          DIFF=$(awk "BEGIN {print $PR - $BASE}")
+
+          if (( $(echo "$DIFF < 0" | bc -l) )); then
+            ICON="📉"
+          elif (( $(echo "$DIFF > 0" | bc -l) )); then
+            ICON="📈"
+            DIFF="+$DIFF"
+          else
+            ICON="➖"
+          fi
+
+          echo "base_val=$BASE" >> $GITHUB_OUTPUT
+          echo "pr_val=$PR" >> $GITHUB_OUTPUT
+          echo "diff=$DIFF" >> $GITHUB_OUTPUT
+          echo "icon=$ICON" >> $GITHUB_OUTPUT
+
+      - name: 'Find Previous Results'
+        uses: peter-evans/find-comment@v3
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: 'CI/CD Pipeline Results'
+
+      - name: 'Create or Update Comment'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            # CI/CD Pipeline Results 🧪
+
+            | Metric | Master (Base) | PR (Current) | Diff |
+            |:---:|:---:|:---:|:---|
+            | **Total Coverage** | ${{ steps.compare.outputs.base_val }}% | ${{ steps.compare.outputs.pr_val }}% | ${{ steps.compare.outputs.icon }} **${{ steps.compare.outputs.diff }}%** |
+
+            ### Status Summary
+            * **Static Analysis**: ${{ needs.pr-check.result == 'success' && '✅ Clean' || '❌ Issues Found' }}
+            * **Unit Tests**: ${{ needs.unit-test.result == 'success' && '✅ Passed' || '❌ Failed' }}
+
+            [View Detailed Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
       - name: 'Send Report to Telegram'
         uses: appleboy/telegram-action@master
@@ -81,4 +211,4 @@ jobs:
             <b>Status:</b> ${{ job.status == 'success' && '✅ Success' || '❌ Failed' }}
             <b>Branch or Tag:</b> ${{ github.ref }}
             <b>Run ID:</b> <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">${{ github.run_id }}</a>
-            <b>Coverage:</b> ${{ steps.coverage.outputs.percentage }}%
+            <b>Coverage:</b> ${{ steps.compare.outputs.pr_val }}%

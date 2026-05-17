@@ -27,9 +27,11 @@ class Executor {
     return data;
   }
 
-  const Executor({DriftQueryInterceptor? interceptor, String name = 'mangastash-local'})
-    : _interceptor = interceptor,
-      _name = name;
+  const Executor({
+    DriftQueryInterceptor? interceptor,
+    String name = 'mangastash-local',
+  }) : _interceptor = interceptor,
+       _name = name;
 
   QueryExecutor build() {
     final executor = queryExecutor(

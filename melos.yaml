@@ -30,6 +30,14 @@ scripts:
       failFast: true
       orderDependents: true
 
+  analyze:
+    description: flutter analyze for all packages.
+    run: flutter analyze
+    exec:
+      concurrency: 5
+      failFast: true
+      orderDependents: true
+
   get:
     description: Get dependencies for all packages.
     run: flutter pub get

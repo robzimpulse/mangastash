@@ -10,6 +10,11 @@ on:
       - 'master'
     tags:
       - 'v*.*.*'
+
+concurrency:
+  group: web-pipeline-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     timeout-minutes: 60
