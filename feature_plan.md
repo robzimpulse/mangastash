@@ -1,72 +1,63 @@
 # Implementation Plan: Dynamic Source Feature
 
 ## 1. System Impact
-*   **`module/library/manga_service_drift`**: Local persistence for dynamic source code and metadata.
+*   **`module/library/manga_service_drift`**: Local persistence for dynamic source code, metadata, and compiled EVC bytecode.
 *   **`module/library/entity_manga_external`**: Definition of `DynamicSource` entity.
-*   **`module/core/core_runtime` (New Module)**: Integration with `dart_eval` and bridging logic for `html` and `entity_manga_external` packages.
+*   **`module/core/core_runtime` (New Module)**: Integration with `dart_eval`. Manages `Program` caching and `Runtime` execution.
 *   **`module/domain/domain_manga`**:
-    *   `DynamicSourceExternal`: A wrapper implementation of `SourceExternal` that delegates to the `dart_eval` runtime.
-    *   `GlobalOptionsManager`: Updated to load and merge dynamic sources from the database.
-    *   `DynamicSourceManager`: New manager for CRUD operations on dynamic sources.
-*   **`module/ui/ui_settings`**: UI components for managing dynamic sources.
+    *   **`SourceManager` (New)**: The central authority for all sources (built-in + dynamic).
+    *   `DynamicSourceExternal`: A wrapper implementation of `SourceExternal` that delegates to `core_runtime`.
+    *   `GlobalOptionsManager`: Updated to depend on `SourceManager` instead of static `Sources.values`.
+*   **`module/ui/ui_settings`**: UI for managing sources and a dedicated code editor.
 
-## 2. Data & State Flow
-1.  **Persistence**: User-provided Dart/EVC code is stored in SQLite via `DynamicSourceDao`.
-2.  **Initialization**: On app startup, `GlobalOptionsManager` queries `DynamicSourceDao`. It instantiates `DynamicSourceExternal` for each record and combines them with built-in sources.
-3.  **Execution**: When a user selects a dynamic source:
-    *   `DynamicSourceExternal` initializes a `dart_eval` `Runtime`.
-    *   It passes the HTML `Document` (from the crawler) to the dynamic `parse` method.
-    *   The `dart_eval` bridge translates between the host's `html` objects and the dynamic environment.
-    *   Results (`MangaScrapped`, etc.) are returned to the domain layer.
+## 2. Architecture & Performance Strategy
+*   **Uniformity**: Built-in sources and Dynamic sources both implement `SourceExternal`. `SourceManager` provides a unified stream.
+*   **Execution**:
+    *   **Compilation**: Raw Dart strings are compiled to `Program` objects.
+    *   **Caching**: Compiled EVC bytecode is stored in the database to avoid re-compilation on startup.
+    *   **Lifecycle**: `Program` objects are cached in memory. A fresh `Runtime` is instantiated per execution request (parse/search) to ensure isolation and prevent memory leaks.
+*   **Bridging**: Minimal `html` package bridging (CSS selectors, text, attributes) and `entity_manga_external` models.
 
-## 3. Execution Checklist
+## 3. Phased Implementation
 
-### [ ] Dependencies & Interfaces
-*   **New Module**: Create `module/core/core_runtime`.
-*   **Dependencies**:
-    *   Add `dart_eval: ^0.7.0` to `core_runtime/pubspec.yaml`.
-    *   Add `entity_manga_external` and `html` to `core_runtime`.
-*   **Entity**: Add `DynamicSource` model to `entity_manga_external/lib/src/dynamic_source.dart`.
+### Phase 1: Foundation & Refactoring (Sources)
+*   [ ] **Built-In Cleanup**: Move `Sources.values` logic to a `BuiltInSourceProvider`.
+*   [ ] **SourceManager**: Create `SourceManager` in `domain_manga`.
+    *   Combines built-in sources and (placeholder) dynamic sources.
+    *   Provides `watchAllSources()` and `getSource(name)`.
+*   [ ] **GlobalOptionsManager**: 
+    *   Remove dependency on `Sources.values`.
+    *   Inject `SourceManager` and use it to resolve source objects from stored names.
+*   [ ] **Verification**: App runs as normal using the new `SourceManager` for existing built-in sources.
 
-### [ ] Core Logic/Backend (Storage)
-*   **Table**: Create `DynamicSourceTables` in `manga_service_drift/lib/src/tables/dynamic_source_tables.dart`.
-    *   Fields: `id`, `name`, `baseUrl`, `iconUrl`, `code` (Text/Blob), `createdAt`.
-*   **DAO**: Implement `DynamicSourceDao` with `watchAllDynamicSources()`, `insertSource()`, `deleteSource()`.
-*   **Migration**:
-    *   Update `AppDatabase` in `database.dart`.
-    *   Increment `schemaVersion` to `3`.
-    *   Implement `from2To3` migration in `MigrationStrategy`.
-
-### [ ] Execution Engine (Core Runtime)
-*   **Bridge Generation**:
+### Phase 2: Core Runtime & Execution (The Engine)
+*   [ ] **Module Setup**: Create `module/core/core_runtime` with `dart_eval`.
+*   [ ] **Bridges**:
     *   Implement `dart_eval` bridges for `MangaScrapped`, `ChapterScrapped`, `TagScrapped`.
-    *   Implement minimal bridges for `html` classes: `Document`, `Element`, `Attributes`.
-*   **Runtime Wrapper**: Create `SourceRuntime` class to manage `Compiler` (for raw Dart strings) and `Runtime` (for EVC execution).
+    *   Implement bridges for `html` (`Document`, `Element`).
+*   [ ] **SourceRuntime**:
+    *   Logic for `Compiler` (Dart -> Bytecode/Program).
+    *   Logic for `Runtime` (Program + Input -> Output).
+    *   Memory caching for `Program` instances.
+*   [ ] **DynamicSourceExternal**: Implement `SourceExternal` by invoking `SourceRuntime`.
+*   [ ] **Verification**: Unit test `SourceRuntime` with a hardcoded script string and a sample HTML snippet.
 
-### [ ] Domain Integration
-*   **Wrapper Implementation**: Create `DynamicSourceExternal` in `domain_manga/lib/src/sources/dynamic_source_external.dart`.
-    *   It must implement all `SourceExternal` interfaces by invoking the corresponding functions in the `dart_eval` environment.
-*   **Manager**: Create `DynamicSourceManager` for high-level management.
-*   **GlobalOptionsManager**:
-    *   Update `create()` to fetch from `DynamicSourceDao`.
-    *   Use `Rx.combineLatest2` to merge built-in `Sources.values` with dynamic sources from the DAO's stream.
-*   **DI**: Register new services in `DomainMangaRegistrar`.
+### Phase 3: Persistence & Integration
+*   [ ] **Storage**: 
+    *   Add `DynamicSourceTables` (id, name, baseUrl, code, bytecode, isActive).
+    *   Implement `DynamicSourceDao`.
+*   [ ] **Sync**: Update `SourceManager` to merge `DynamicSourceDao.watch()` into the main sources stream.
+*   [ ] **Verification**: Manually insert a record into the DB and verify it appears in the "Sources" selection UI.
 
-### [ ] Presentation/UI
-*   **Settings Integration**: Add "Dynamic Sources" entry in Settings.
-*   **Management Screen**: List all installed dynamic sources.
-*   **Editor Screen**:
-    *   Add text editor for Dart code.
-    *   Add "Validate/Test" button that runs the code against a sample URL.
+### Phase 4: Management UI & Code Editor
+*   [ ] **Source Management**: Screen to list, toggle, and delete dynamic sources.
+*   [ ] **Editor Screen**:
+    *   Integrated Dart code editor.
+    *   "Run/Test" functionality: Takes a sample URL, fetches HTML, and runs the current code against it, showing a preview of results.
+    *   "Save" logic: Triggers compilation and saves both source code and bytecode.
+*   [ ] **Verification**: Successfully add a new source via the app UI and use it to browse manga.
 
-### [ ] Testing
-*   **Unit Tests**: Create a mock dynamic source script (as a string) and verify `SourceRuntime` can parse a sample HTML `Document`.
-*   **Persistence Tests**: Verify `DynamicSourceDao` correctly handles large code blobs.
-
-## 4. Architecture Questions
-*   **Performance**: Compiling Dart strings on-device can be slow. Should we mandate pre-compiled `.evc` bytecode for production-ready sources?
-*   **Bridge Scope**: How much of the `html` package needs to be bridged? (Recommendation: Start with `querySelector`, `querySelectorAll`, `text`, and `attributes`).
-*   **Sources Refactoring**: `Sources.values` is currently a static list. How should we refactor the system to treat built-in and dynamic sources uniformly? (Proposed: move source discovery to `SourceManager`).
-*   **Async Bridging**: How will we handle `Future` returns from the dynamic `parse` methods within `dart_eval`?
-*   **Runtime Lifecycle**: Should we keep a long-lived `Runtime` instance per `DynamicSource` or instantiate one per request?
-*   **GlobalOptionsManager Dependencies**: `GlobalOptionsManager` currently only depends on `SharedPreferences`. Adding `DynamicSourceDao` creates a dependency on the database. Is this acceptable or should we use a middle-man use case?
+## 4. Open Questions & Risks
+*   **Editor UX**: Writing code on a mobile device is difficult. Should we support importing scripts via URL/File?
+*   **Security**: `dart_eval` is a sandbox, but we should define clear boundaries on what host APIs the scripts can access.
+*   **Dependency Bloat**: `dart_eval` and the compiler might increase APK size. Monitor the `core_runtime` footprint.
