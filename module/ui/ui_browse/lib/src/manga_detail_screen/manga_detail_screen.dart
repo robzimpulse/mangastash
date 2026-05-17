@@ -53,10 +53,11 @@ class MangaDetailScreen extends StatefulWidget {
     return BlocProvider(
       create: (context) {
         final ListenSettingDownloadedOnlyUseCase isDownloaded = locator();
+        final SourceManager sourceManager = locator();
         return MangaDetailScreenCubit(
           initialState: MangaDetailScreenState(
             mangaId: mangaId,
-            source: source?.let(Sources.fromName),
+            source: source?.let(sourceManager.getSource),
             config: ChapterConfig(
               downloaded: isDownloaded.downloadedOnlyState.valueOrNull,
             ),
@@ -74,6 +75,7 @@ class MangaDetailScreen extends StatefulWidget {
           searchMangaUseCase: locator(),
           recrawlUseCase: locator(),
           listenDownloadedChapterUseCase: locator(),
+          sourceManager: locator(),
         )..init();
       },
       child: MangaDetailScreen(
@@ -488,6 +490,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   isPrefetching: state.prefetchedChapterIds.contains(data.id),
                   isDownloaded: state.downloadedChapterIds.contains(data.id),
                   lastReadAt: data.lastReadAt,
+                  source: state.source,
                 );
               },
               pageStorageKey: PageStorageKey('chapter-list-${state.mangaId}'),
@@ -562,6 +565,9 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   },
                   isOnLibrary: state.libraryMangaIds.contains(data.id),
                   isPrefetching: state.prefetchedMangaIds.contains(data.id),
+                  source: state.sources.containsKey(data.source)
+                      ? state.sources[data.source]
+                      : null,
                 );
               },
               pageStorageKey: PageStorageKey('similar-manga-${state.mangaId}'),

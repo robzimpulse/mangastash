@@ -13,6 +13,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
   final GetMangaFromUrlUseCase _getMangaFromUrlUseCase;
   final AddToLibraryUseCase _addToLibraryUseCase;
+  final SourceManager _sourceManager;
 
   LibraryMangaScreenCubit({
     LibraryMangaScreenState initialState = const LibraryMangaScreenState(),
@@ -23,12 +24,14 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     required PrefetchChapterUseCase prefetchChapterUseCase,
     required GetMangaFromUrlUseCase getMangaFromUrlUseCase,
     required AddToLibraryUseCase addToLibraryUseCase,
+    required SourceManager sourceManager,
   })  : _prefetchMangaUseCase = prefetchMangaUseCase,
         _addToLibraryUseCase = addToLibraryUseCase,
         _removeFromLibraryUseCase = removeFromLibraryUseCase,
         _prefetchChapterUseCase = prefetchChapterUseCase,
         _getMangaFromUrlUseCase = getMangaFromUrlUseCase,
-        super(initialState.copyWith(sources: Sources.values)) {
+        _sourceManager = sourceManager,
+        super(initialState.copyWith(sources: sourceManager.currentSources)) {
     addSubscription(
       listenMangaFromLibraryUseCase.libraryStateStream
           .distinct()
@@ -52,7 +55,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
   void prefetch({required List<Manga> mangas}) {
     for (final manga in mangas) {
       final id = manga.id;
-      final source = manga.source?.let(Sources.fromName);
+      final source = manga.source?.let(_sourceManager.getSource);
       if (id == null || source == null) continue;
       _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
       _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);
@@ -72,7 +75,7 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
 
   void add({required String url}) async {
     final uri = Uri.tryParse(url);
-    final source = uri?.source;
+    final source = uri?.let(_sourceManager.getSourceByUri);
     if (uri != null && source != null) {
       final result = await _getMangaFromUrlUseCase.execute(
         source: source,

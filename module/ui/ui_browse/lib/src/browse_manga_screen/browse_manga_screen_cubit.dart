@@ -16,6 +16,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final GetTagsUseCase _getTagsUseCase;
   final RecrawlUseCase _recrawlUseCase;
+  final SourceManager _sourceManager;
 
   BrowseMangaScreenCubit({
     required BrowseMangaScreenState initialState,
@@ -29,6 +30,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required GetTagsUseCase getTagsUseCase,
     required RecrawlUseCase recrawlUseCase,
+    required SourceManager sourceManager,
   }) : _searchMangaUseCase = searchMangaUseCase,
        _addToLibraryUseCase = addToLibraryUseCase,
        _removeFromLibraryUseCase = removeFromLibraryUseCase,
@@ -36,6 +38,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
        _prefetchChapterUseCase = prefetchChapterUseCase,
        _getTagsUseCase = getTagsUseCase,
        _recrawlUseCase = recrawlUseCase,
+       _sourceManager = sourceManager,
        super(
          initialState.copyWith(
            parameter: initialState.parameter.merge(
@@ -192,7 +195,7 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
   void prefetch({required Manga manga}) {
     final id = manga.id;
-    final source = manga.source?.let(Sources.fromName);
+    final source = manga.source?.let(_sourceManager.getSource);
     if (id == null || source == null) return;
     _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
     _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);

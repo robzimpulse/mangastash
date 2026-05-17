@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:feature_common/feature_common.dart';
@@ -42,6 +43,7 @@ class LibraryMangaScreen extends StatefulWidget {
           prefetchChapterUseCase: locator(),
           getMangaFromUrlUseCase: locator(),
           addToLibraryUseCase: locator(),
+          sourceManager: locator(),
         );
       },
       child: LibraryMangaScreen(
@@ -226,6 +228,7 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
               onLongPress: () {
                 _onTapMenu(context: context, manga: data, isOnLibrary: true);
               },
+              source: state.sources.firstWhereOrNull((e) => e.name == data.source),
             );
           },
           error: state.error,

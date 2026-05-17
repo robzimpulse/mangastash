@@ -6,6 +6,8 @@ import 'manager/global_options_manager.dart';
 import 'manager/history_manager.dart';
 import 'manager/job_manager.dart';
 import 'manager/library_manager.dart';
+import 'manager/source_manager.dart';
+import 'sources/built_in_source_provider.dart';
 import 'use_case/cancel_job_use_case.dart';
 import 'use_case/chapter/get_all_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
@@ -42,8 +44,18 @@ class DomainMangaRegistrar extends Registrar {
   Future<void> register(ServiceLocator locator) async {
     final start = DateTime.timestamp();
 
+    locator.registerLazySingleton<BuiltInSourceProvider>(
+      () => BuiltInSourceProviderImpl(),
+    );
+    locator.registerLazySingleton<SourceManager>(
+      () => SourceManagerImpl(builtInSourceProvider: locator()),
+    );
+
     locator.registerLazySingletonAsync(
-      () => GlobalOptionsManager.create(storage: locator()),
+      () => GlobalOptionsManager.create(
+        storage: locator(),
+        sourceManager: locator(),
+      ),
     );
     locator.alias<ListenSearchParameterUseCase, GlobalOptionsManager>();
     locator.alias<UpdateSearchParameterUseCase, GlobalOptionsManager>();
@@ -62,6 +74,7 @@ class DomainMangaRegistrar extends Registrar {
         fileDao: locator(),
         getRootPathUseCase: locator(),
         manager: locator(),
+        sourceManager: locator(),
         getChapterUseCase: () => locator(),
         getMangaUseCase: () => locator(),
         getAllChapterUseCase: () => locator(),
@@ -107,6 +120,7 @@ class DomainMangaRegistrar extends Registrar {
         htmlCacheManager: locator(),
         searchMangaCacheManager: locator(),
         converterCacheManager: locator(),
+        sourceManager: locator(),
       ),
     );
     locator.registerFactory(
@@ -119,6 +133,7 @@ class DomainMangaRegistrar extends Registrar {
         searchChapterCacheManager: locator(),
         converterCacheManager: locator(),
         htmlCacheManager: locator(),
+        sourceManager: locator(),
       ),
     );
     locator.registerFactory(

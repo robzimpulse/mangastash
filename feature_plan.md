@@ -23,14 +23,14 @@
 ## 3. Phased Implementation
 
 ### Phase 1: Foundation & Refactoring (Sources)
-*   [ ] **Built-In Cleanup**: Move `Sources.values` logic to a `BuiltInSourceProvider`.
-*   [ ] **SourceManager**: Create `SourceManager` in `domain_manga`.
+*   [x] **Built-In Cleanup**: Move `Sources.values` logic to a `BuiltInSourceProvider`.
+*   [x] **SourceManager**: Create `SourceManager` in `domain_manga`.
     *   Combines built-in sources and (placeholder) dynamic sources.
     *   Provides `watchAllSources()` and `getSource(name)`.
-*   [ ] **GlobalOptionsManager**: 
+*   [x] **GlobalOptionsManager**: 
     *   Remove dependency on `Sources.values`.
     *   Inject `SourceManager` and use it to resolve source objects from stored names.
-*   [ ] **Verification**: App runs as normal using the new `SourceManager` for existing built-in sources.
+*   [x] **Verification**: App runs as normal using the new `SourceManager` for existing built-in sources.
 
 ### Phase 2: Core Runtime & Execution (The Engine)
 *   [ ] **Module Setup**: Create `module/core/core_runtime` with `dart_eval`.
