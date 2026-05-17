@@ -34,7 +34,6 @@ class GlobalOptionsManager
   final BehaviorSubject<bool> _isIncognito;
 
   final SharedPreferencesAsync _storage;
-  final SourceManager _sourceManager;
 
   static const String _mangaParameterKey = 'manga_parameter';
   static const String _sourcesKey = 'sources';
@@ -65,7 +64,6 @@ class GlobalOptionsManager
 
     return GlobalOptionsManager._(
       storage: storage,
-      sourceManager: sourceManager,
       initialParameter: parameter
           .let(SearchMangaParameter.fromJsonString)
           .or(
@@ -87,7 +85,6 @@ class GlobalOptionsManager
 
   GlobalOptionsManager._({
     required SharedPreferencesAsync storage,
-    required SourceManager sourceManager,
     required SearchMangaParameter initialParameter,
     required List<SourceExternal> initialSources,
     int numOfPrefetchedPrevChapter = 0,
@@ -95,7 +92,6 @@ class GlobalOptionsManager
     bool downloadedOnlyChapter = false,
     bool incognito = false,
   }) : _storage = storage,
-       _sourceManager = sourceManager,
        _sources = BehaviorSubject.seeded(initialSources),
        _searchMangaParameter = BehaviorSubject.seeded(initialParameter),
        _numOfPrefetchedNextChapter = BehaviorSubject.seeded(
