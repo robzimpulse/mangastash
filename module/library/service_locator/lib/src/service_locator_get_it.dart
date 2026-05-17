@@ -234,6 +234,7 @@ class GetItServiceLocator implements ServiceLocator {
   /// than one instance of one type. Its highly not recommended
   ///
   /// example:
+  ///    ignore: unintended_html_in_doc_comment
   ///    getIt.registerFactoryParam<TestClassParam,String,int>((s,i)
   ///        => TestClassParam(param1:s, param2: i));
   ///
@@ -265,6 +266,7 @@ class GetItServiceLocator implements ServiceLocator {
   /// than one instance of one type. Its highly not recommended
   ///
   /// example:
+  ///    ignore: unintended_html_in_doc_comment
   ///    getIt.registerFactoryParam<TestClassParam,String,int>((s,i) async
   ///        => TestClassParam(param1:s, param2: i));
   ///

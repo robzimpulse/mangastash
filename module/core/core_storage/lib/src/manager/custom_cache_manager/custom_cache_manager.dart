@@ -134,6 +134,7 @@ class CustomCacheManager implements BaseCacheManager {
     String? key,
     Map<String, String>? headers,
   }) {
+    // ignore: deprecated_member_use
     return _cache.getFile(url, key: key ?? url, headers: headers ?? {});
   }
 
