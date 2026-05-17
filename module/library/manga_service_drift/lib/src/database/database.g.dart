@@ -3724,6 +3724,576 @@ class FileTablesCompanion extends UpdateCompanion<FileDrift> {
   }
 }
 
+class $DynamicSourceTablesTable extends DynamicSourceTables
+    with TableInfo<$DynamicSourceTablesTable, DynamicSourceDrift> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DynamicSourceTablesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: () => const Uuid().v4(),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _baseUrlMeta = const VerificationMeta(
+    'baseUrl',
+  );
+  @override
+  late final GeneratedColumn<String> baseUrl = GeneratedColumn<String>(
+    'base_url',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _iconUrlMeta = const VerificationMeta(
+    'iconUrl',
+  );
+  @override
+  late final GeneratedColumn<String> iconUrl = GeneratedColumn<String>(
+    'icon_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sourceCodeMeta = const VerificationMeta(
+    'sourceCode',
+  );
+  @override
+  late final GeneratedColumn<String> sourceCode = GeneratedColumn<String>(
+    'source_code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bytecodeMeta = const VerificationMeta(
+    'bytecode',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> bytecode = GeneratedColumn<Uint8List>(
+    'bytecode',
+    aliasedName,
+    false,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    createdAt,
+    updatedAt,
+    id,
+    name,
+    baseUrl,
+    iconUrl,
+    sourceCode,
+    bytecode,
+    isActive,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'dynamic_source_tables';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DynamicSourceDrift> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('base_url')) {
+      context.handle(
+        _baseUrlMeta,
+        baseUrl.isAcceptableOrUnknown(data['base_url']!, _baseUrlMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_baseUrlMeta);
+    }
+    if (data.containsKey('icon_url')) {
+      context.handle(
+        _iconUrlMeta,
+        iconUrl.isAcceptableOrUnknown(data['icon_url']!, _iconUrlMeta),
+      );
+    }
+    if (data.containsKey('source_code')) {
+      context.handle(
+        _sourceCodeMeta,
+        sourceCode.isAcceptableOrUnknown(data['source_code']!, _sourceCodeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceCodeMeta);
+    }
+    if (data.containsKey('bytecode')) {
+      context.handle(
+        _bytecodeMeta,
+        bytecode.isAcceptableOrUnknown(data['bytecode']!, _bytecodeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bytecodeMeta);
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {name},
+    {baseUrl},
+  ];
+  @override
+  DynamicSourceDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DynamicSourceDrift(
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      name:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}name'],
+          )!,
+      baseUrl:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}base_url'],
+          )!,
+      iconUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}icon_url'],
+      ),
+      sourceCode:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}source_code'],
+          )!,
+      bytecode:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.blob,
+            data['${effectivePrefix}bytecode'],
+          )!,
+      isActive:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}is_active'],
+          )!,
+    );
+  }
+
+  @override
+  $DynamicSourceTablesTable createAlias(String alias) {
+    return $DynamicSourceTablesTable(attachedDatabase, alias);
+  }
+}
+
+class DynamicSourceDrift extends DataClass
+    implements Insertable<DynamicSourceDrift> {
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String id;
+  final String name;
+  final String baseUrl;
+  final String? iconUrl;
+  final String sourceCode;
+  final Uint8List bytecode;
+  final bool isActive;
+  const DynamicSourceDrift({
+    required this.createdAt,
+    required this.updatedAt,
+    required this.id,
+    required this.name,
+    required this.baseUrl,
+    this.iconUrl,
+    required this.sourceCode,
+    required this.bytecode,
+    required this.isActive,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['base_url'] = Variable<String>(baseUrl);
+    if (!nullToAbsent || iconUrl != null) {
+      map['icon_url'] = Variable<String>(iconUrl);
+    }
+    map['source_code'] = Variable<String>(sourceCode);
+    map['bytecode'] = Variable<Uint8List>(bytecode);
+    map['is_active'] = Variable<bool>(isActive);
+    return map;
+  }
+
+  DynamicSourceTablesCompanion toCompanion(bool nullToAbsent) {
+    return DynamicSourceTablesCompanion(
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      id: Value(id),
+      name: Value(name),
+      baseUrl: Value(baseUrl),
+      iconUrl:
+          iconUrl == null && nullToAbsent
+              ? const Value.absent()
+              : Value(iconUrl),
+      sourceCode: Value(sourceCode),
+      bytecode: Value(bytecode),
+      isActive: Value(isActive),
+    );
+  }
+
+  factory DynamicSourceDrift.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DynamicSourceDrift(
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      baseUrl: serializer.fromJson<String>(json['baseUrl']),
+      iconUrl: serializer.fromJson<String?>(json['iconUrl']),
+      sourceCode: serializer.fromJson<String>(json['sourceCode']),
+      bytecode: serializer.fromJson<Uint8List>(json['bytecode']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'baseUrl': serializer.toJson<String>(baseUrl),
+      'iconUrl': serializer.toJson<String?>(iconUrl),
+      'sourceCode': serializer.toJson<String>(sourceCode),
+      'bytecode': serializer.toJson<Uint8List>(bytecode),
+      'isActive': serializer.toJson<bool>(isActive),
+    };
+  }
+
+  DynamicSourceDrift copyWith({
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? id,
+    String? name,
+    String? baseUrl,
+    Value<String?> iconUrl = const Value.absent(),
+    String? sourceCode,
+    Uint8List? bytecode,
+    bool? isActive,
+  }) => DynamicSourceDrift(
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    id: id ?? this.id,
+    name: name ?? this.name,
+    baseUrl: baseUrl ?? this.baseUrl,
+    iconUrl: iconUrl.present ? iconUrl.value : this.iconUrl,
+    sourceCode: sourceCode ?? this.sourceCode,
+    bytecode: bytecode ?? this.bytecode,
+    isActive: isActive ?? this.isActive,
+  );
+  DynamicSourceDrift copyWithCompanion(DynamicSourceTablesCompanion data) {
+    return DynamicSourceDrift(
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      baseUrl: data.baseUrl.present ? data.baseUrl.value : this.baseUrl,
+      iconUrl: data.iconUrl.present ? data.iconUrl.value : this.iconUrl,
+      sourceCode:
+          data.sourceCode.present ? data.sourceCode.value : this.sourceCode,
+      bytecode: data.bytecode.present ? data.bytecode.value : this.bytecode,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DynamicSourceDrift(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('baseUrl: $baseUrl, ')
+          ..write('iconUrl: $iconUrl, ')
+          ..write('sourceCode: $sourceCode, ')
+          ..write('bytecode: $bytecode, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    createdAt,
+    updatedAt,
+    id,
+    name,
+    baseUrl,
+    iconUrl,
+    sourceCode,
+    $driftBlobEquality.hash(bytecode),
+    isActive,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DynamicSourceDrift &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.baseUrl == this.baseUrl &&
+          other.iconUrl == this.iconUrl &&
+          other.sourceCode == this.sourceCode &&
+          $driftBlobEquality.equals(other.bytecode, this.bytecode) &&
+          other.isActive == this.isActive);
+}
+
+class DynamicSourceTablesCompanion extends UpdateCompanion<DynamicSourceDrift> {
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String> baseUrl;
+  final Value<String?> iconUrl;
+  final Value<String> sourceCode;
+  final Value<Uint8List> bytecode;
+  final Value<bool> isActive;
+  final Value<int> rowid;
+  const DynamicSourceTablesCompanion({
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.baseUrl = const Value.absent(),
+    this.iconUrl = const Value.absent(),
+    this.sourceCode = const Value.absent(),
+    this.bytecode = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DynamicSourceTablesCompanion.insert({
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.id = const Value.absent(),
+    required String name,
+    required String baseUrl,
+    this.iconUrl = const Value.absent(),
+    required String sourceCode,
+    required Uint8List bytecode,
+    this.isActive = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : name = Value(name),
+       baseUrl = Value(baseUrl),
+       sourceCode = Value(sourceCode),
+       bytecode = Value(bytecode);
+  static Insertable<DynamicSourceDrift> custom({
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? baseUrl,
+    Expression<String>? iconUrl,
+    Expression<String>? sourceCode,
+    Expression<Uint8List>? bytecode,
+    Expression<bool>? isActive,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (baseUrl != null) 'base_url': baseUrl,
+      if (iconUrl != null) 'icon_url': iconUrl,
+      if (sourceCode != null) 'source_code': sourceCode,
+      if (bytecode != null) 'bytecode': bytecode,
+      if (isActive != null) 'is_active': isActive,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DynamicSourceTablesCompanion copyWith({
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<String>? id,
+    Value<String>? name,
+    Value<String>? baseUrl,
+    Value<String?>? iconUrl,
+    Value<String>? sourceCode,
+    Value<Uint8List>? bytecode,
+    Value<bool>? isActive,
+    Value<int>? rowid,
+  }) {
+    return DynamicSourceTablesCompanion(
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      id: id ?? this.id,
+      name: name ?? this.name,
+      baseUrl: baseUrl ?? this.baseUrl,
+      iconUrl: iconUrl ?? this.iconUrl,
+      sourceCode: sourceCode ?? this.sourceCode,
+      bytecode: bytecode ?? this.bytecode,
+      isActive: isActive ?? this.isActive,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (baseUrl.present) {
+      map['base_url'] = Variable<String>(baseUrl.value);
+    }
+    if (iconUrl.present) {
+      map['icon_url'] = Variable<String>(iconUrl.value);
+    }
+    if (sourceCode.present) {
+      map['source_code'] = Variable<String>(sourceCode.value);
+    }
+    if (bytecode.present) {
+      map['bytecode'] = Variable<Uint8List>(bytecode.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DynamicSourceTablesCompanion(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('baseUrl: $baseUrl, ')
+          ..write('iconUrl: $iconUrl, ')
+          ..write('sourceCode: $sourceCode, ')
+          ..write('bytecode: $bytecode, ')
+          ..write('isActive: $isActive, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3736,6 +4306,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $RelationshipTablesTable(this);
   late final $JobTablesTable jobTables = $JobTablesTable(this);
   late final $FileTablesTable fileTables = $FileTablesTable(this);
+  late final $DynamicSourceTablesTable dynamicSourceTables =
+      $DynamicSourceTablesTable(this);
   late final MangaDao mangaDao = MangaDao(this as AppDatabase);
   late final ChapterDao chapterDao = ChapterDao(this as AppDatabase);
   late final LibraryDao libraryDao = LibraryDao(this as AppDatabase);
@@ -3744,6 +4316,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final TagDao tagDao = TagDao(this as AppDatabase);
   late final HistoryDao historyDao = HistoryDao(this as AppDatabase);
   late final FileDao fileDao = FileDao(this as AppDatabase);
+  late final DynamicSourceDao dynamicSourceDao = DynamicSourceDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3757,6 +4332,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     relationshipTables,
     jobTables,
     fileTables,
+    dynamicSourceTables,
   ];
 }
 
@@ -5735,6 +6311,310 @@ typedef $$FileTablesTableProcessedTableManager =
       FileDrift,
       PrefetchHooks Function()
     >;
+typedef $$DynamicSourceTablesTableCreateCompanionBuilder =
+    DynamicSourceTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<String> id,
+      required String name,
+      required String baseUrl,
+      Value<String?> iconUrl,
+      required String sourceCode,
+      required Uint8List bytecode,
+      Value<bool> isActive,
+      Value<int> rowid,
+    });
+typedef $$DynamicSourceTablesTableUpdateCompanionBuilder =
+    DynamicSourceTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<String> id,
+      Value<String> name,
+      Value<String> baseUrl,
+      Value<String?> iconUrl,
+      Value<String> sourceCode,
+      Value<Uint8List> bytecode,
+      Value<bool> isActive,
+      Value<int> rowid,
+    });
+
+class $$DynamicSourceTablesTableFilterComposer
+    extends Composer<_$AppDatabase, $DynamicSourceTablesTable> {
+  $$DynamicSourceTablesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get baseUrl => $composableBuilder(
+    column: $table.baseUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get iconUrl => $composableBuilder(
+    column: $table.iconUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceCode => $composableBuilder(
+    column: $table.sourceCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get bytecode => $composableBuilder(
+    column: $table.bytecode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DynamicSourceTablesTableOrderingComposer
+    extends Composer<_$AppDatabase, $DynamicSourceTablesTable> {
+  $$DynamicSourceTablesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get baseUrl => $composableBuilder(
+    column: $table.baseUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get iconUrl => $composableBuilder(
+    column: $table.iconUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceCode => $composableBuilder(
+    column: $table.sourceCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get bytecode => $composableBuilder(
+    column: $table.bytecode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DynamicSourceTablesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DynamicSourceTablesTable> {
+  $$DynamicSourceTablesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get baseUrl =>
+      $composableBuilder(column: $table.baseUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get iconUrl =>
+      $composableBuilder(column: $table.iconUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get sourceCode => $composableBuilder(
+    column: $table.sourceCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<Uint8List> get bytecode =>
+      $composableBuilder(column: $table.bytecode, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+}
+
+class $$DynamicSourceTablesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DynamicSourceTablesTable,
+          DynamicSourceDrift,
+          $$DynamicSourceTablesTableFilterComposer,
+          $$DynamicSourceTablesTableOrderingComposer,
+          $$DynamicSourceTablesTableAnnotationComposer,
+          $$DynamicSourceTablesTableCreateCompanionBuilder,
+          $$DynamicSourceTablesTableUpdateCompanionBuilder,
+          (
+            DynamicSourceDrift,
+            BaseReferences<
+              _$AppDatabase,
+              $DynamicSourceTablesTable,
+              DynamicSourceDrift
+            >,
+          ),
+          DynamicSourceDrift,
+          PrefetchHooks Function()
+        > {
+  $$DynamicSourceTablesTableTableManager(
+    _$AppDatabase db,
+    $DynamicSourceTablesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$DynamicSourceTablesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$DynamicSourceTablesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$DynamicSourceTablesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> baseUrl = const Value.absent(),
+                Value<String?> iconUrl = const Value.absent(),
+                Value<String> sourceCode = const Value.absent(),
+                Value<Uint8List> bytecode = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DynamicSourceTablesCompanion(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                name: name,
+                baseUrl: baseUrl,
+                iconUrl: iconUrl,
+                sourceCode: sourceCode,
+                bytecode: bytecode,
+                isActive: isActive,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                required String name,
+                required String baseUrl,
+                Value<String?> iconUrl = const Value.absent(),
+                required String sourceCode,
+                required Uint8List bytecode,
+                Value<bool> isActive = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DynamicSourceTablesCompanion.insert(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                name: name,
+                baseUrl: baseUrl,
+                iconUrl: iconUrl,
+                sourceCode: sourceCode,
+                bytecode: bytecode,
+                isActive: isActive,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DynamicSourceTablesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DynamicSourceTablesTable,
+      DynamicSourceDrift,
+      $$DynamicSourceTablesTableFilterComposer,
+      $$DynamicSourceTablesTableOrderingComposer,
+      $$DynamicSourceTablesTableAnnotationComposer,
+      $$DynamicSourceTablesTableCreateCompanionBuilder,
+      $$DynamicSourceTablesTableUpdateCompanionBuilder,
+      (
+        DynamicSourceDrift,
+        BaseReferences<
+          _$AppDatabase,
+          $DynamicSourceTablesTable,
+          DynamicSourceDrift
+        >,
+      ),
+      DynamicSourceDrift,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5755,4 +6635,6 @@ class $AppDatabaseManager {
       $$JobTablesTableTableManager(_db, _db.jobTables);
   $$FileTablesTableTableManager get fileTables =>
       $$FileTablesTableTableManager(_db, _db.fileTables);
+  $$DynamicSourceTablesTableTableManager get dynamicSourceTables =>
+      $$DynamicSourceTablesTableTableManager(_db, _db.dynamicSourceTables);
 }

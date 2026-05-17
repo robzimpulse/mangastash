@@ -46,11 +46,11 @@
 *   [x] **Verification**: Unit test `SourceRuntime` with a hardcoded script string and a sample HTML snippet.
 
 ### Phase 3: Persistence & Integration
-*   [ ] **Storage**: 
+*   [x] **Storage**: 
     *   Add `DynamicSourceTables` (id, name, baseUrl, code, bytecode, isActive).
     *   Implement `DynamicSourceDao`.
-*   [ ] **Sync**: Update `SourceManager` to merge `DynamicSourceDao.watch()` into the main sources stream.
-*   [ ] **Verification**: Manually insert a record into the DB and verify it appears in the "Sources" selection UI.
+*   [x] **Sync**: Update `SourceManager` to merge `DynamicSourceDao.watch()` into the main sources stream.
+*   [x] **Verification**: Unit tested `SourceManager` to verify it correctly merges built-in sources and dynamic sources from the database.
 
 ### Phase 4: Management UI & Code Editor
 *   [ ] **Source Management**: Screen to list, toggle, and delete dynamic sources.

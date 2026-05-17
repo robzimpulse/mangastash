@@ -48,7 +48,12 @@ class DomainMangaRegistrar extends Registrar {
       () => BuiltInSourceProviderImpl(),
     );
     locator.registerLazySingleton<SourceManager>(
-      () => SourceManagerImpl(builtInSourceProvider: locator()),
+      () => SourceManagerImpl(
+        builtInSourceProvider: locator(),
+        dynamicSourceDao: locator(),
+        sourceRuntime: locator(),
+      ),
+      dispose: (e) => (e as SourceManagerImpl).dispose(),
     );
 
     locator.registerLazySingletonAsync(

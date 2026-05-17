@@ -4,6 +4,7 @@ export 'package:drift/src/runtime/data_class.dart';
 
 export 'src/dao/chapter_dao.dart';
 export 'src/dao/diagnostic_dao.dart';
+export 'src/dao/dynamic_source_dao.dart';
 export 'src/dao/file_dao.dart';
 export 'src/dao/history_dao.dart';
 export 'src/dao/image_dao.dart';

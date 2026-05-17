@@ -1,6 +1,11 @@
+import 'package:collection/collection.dart';
+import 'package:core_runtime/core_runtime.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
+import 'package:manga_service_drift/manga_service_drift.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../sources/built_in_source_provider.dart';
+import '../sources/dynamic_source_external.dart';
 
 abstract class SourceManager {
   Stream<List<SourceExternal>> watchAllSources();
@@ -11,24 +16,52 @@ abstract class SourceManager {
 
 class SourceManagerImpl implements SourceManager {
   final BuiltInSourceProvider _builtInSourceProvider;
+  final DynamicSourceDao _dynamicSourceDao;
+  final SourceRuntime _sourceRuntime;
+
+  final BehaviorSubject<List<SourceExternal>> _allSourcesSubject = BehaviorSubject();
 
   SourceManagerImpl({
     required BuiltInSourceProvider builtInSourceProvider,
-  }) : _builtInSourceProvider = builtInSourceProvider;
+    required DynamicSourceDao dynamicSourceDao,
+    required SourceRuntime sourceRuntime,
+  }) : _builtInSourceProvider = builtInSourceProvider,
+       _dynamicSourceDao = dynamicSourceDao,
+       _sourceRuntime = sourceRuntime {
+    _init();
+  }
 
-  @override
-  Stream<List<SourceExternal>> watchAllSources() {
-    // For now, it's just a static list from the built-in provider.
-    // In Phase 3, this will combine with dynamic sources from the database.
-    return Stream.value(_builtInSourceProvider.sources);
+  void _init() {
+    Rx.combineLatest2(
+      Stream.value(_builtInSourceProvider.sources),
+      _dynamicSourceDao.watchAll(),
+      (builtIn, dynamicDrift) {
+        final dynamicSources = dynamicDrift
+            .where((e) => e.isActive)
+            .map(
+              (e) => DynamicSourceExternal(
+                name: e.name,
+                baseUrl: e.baseUrl,
+                iconUrl: e.iconUrl ?? '',
+                bytecode: e.bytecode,
+                runtime: _sourceRuntime,
+              ),
+            )
+            .toList();
+        return [...builtIn, ...dynamicSources];
+      },
+    ).listen(_allSourcesSubject.add);
   }
 
   @override
-  List<SourceExternal> get currentSources => _builtInSourceProvider.sources;
+  Stream<List<SourceExternal>> watchAllSources() => _allSourcesSubject.stream;
+
+  @override
+  List<SourceExternal> get currentSources => _allSourcesSubject.valueOrNull ?? _builtInSourceProvider.sources;
 
   @override
   SourceExternal? getSource(String name) {
-    return _builtInSourceProvider.fromName(name);
+    return currentSources.firstWhereOrNull((e) => e.name == name);
   }
 
   @override
@@ -39,5 +72,9 @@ class SourceManagerImpl implements SourceManager {
       }
     }
     return null;
+  }
+
+  void dispose() {
+    _allSourcesSubject.close();
   }
 }
