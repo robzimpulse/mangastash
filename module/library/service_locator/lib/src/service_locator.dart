@@ -141,6 +141,7 @@ abstract class ServiceLocator {
   /// than one instance of one type. Its highly not recommended
   ///
   /// example:
+  ///    ignore: unintended_html_in_doc_comment
   ///    locator.registerFactoryParam<TestClassParam,String,int>((s,i) async
   ///        => TestClassParam(param1:s, param2: i));
   ///

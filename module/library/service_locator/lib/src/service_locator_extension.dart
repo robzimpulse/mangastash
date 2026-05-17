@@ -41,6 +41,7 @@ extension ServiceLocatorX on ServiceLocator {
         locator(instanceName: instanceName, param1: param1, param2: param2);
   }
 
+  // ignore: unintended_html_in_doc_comment
   /// Returns the instance of a registered type wrapped in a FactoryAsync<T>.
   FactoryAsync<T> factoryAsync<T extends Object>({
     String? instanceName,
@@ -55,6 +56,7 @@ extension ServiceLocatorX on ServiceLocator {
     );
   }
 
+  // ignore: unintended_html_in_doc_comment
   /// Returns the instance of a registered type [T] wrapped in a Lazy<T>.
   Lazy<T> lazy<T extends Object>({
     String? instanceName,
@@ -66,6 +68,7 @@ extension ServiceLocatorX on ServiceLocator {
     );
   }
 
+  // ignore: unintended_html_in_doc_comment
   /// Returns the instance of a registered type wrapped in a Lazy<Future<T>>.
   Lazy<Future<T>> lazyAsync<T extends Object>({
     String? instanceName,
