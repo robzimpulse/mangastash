@@ -65,6 +65,9 @@ jobs:
       - name: 'Install Melos'
         run: dart pub global activate melos 6.2.0
 
+      - name: 'Install Cobertura'
+        run: dart pub global activate cobertura
+
       - name: 'Install Dependency'
         run: melos get
 
