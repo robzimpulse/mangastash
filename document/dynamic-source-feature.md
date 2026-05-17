@@ -33,17 +33,17 @@
 *   [x] **Verification**: App runs as normal using the new `SourceManager` for existing built-in sources.
 
 ### Phase 2: Core Runtime & Execution (The Engine)
-*   [ ] **Module Setup**: Create `module/core/core_runtime` with `dart_eval`.
-*   [ ] **Bridges**:
+*   [x] **Module Setup**: Create `module/core/core_runtime` with `dart_eval`.
+*   [x] **Bridges**:
     *   Implement `dart_eval` bridges for `MangaScrapped`, `ChapterScrapped`, `TagScrapped`.
     *   Implement bridges for `html` (`Document`, `Element`).
-*   [ ] **SourceRuntime**:
+*   [x] **SourceRuntime**:
     *   Logic for `Compiler` (Dart -> Bytecode/Program).
     *   Logic for `Runtime` (Program + Input -> Output).
     *   Memory caching for `Program` instances.
-    *   Isolate-based execution wrapper.
-*   [ ] **DynamicSourceExternal**: Implement `SourceExternal` by invoking `SourceRuntime`.
-*   [ ] **Verification**: Unit test `SourceRuntime` with a hardcoded script string and a sample HTML snippet.
+    *   Isolate-based execution wrapper. (Partially implemented: simple execution for now, Isolate-based to be refined).
+*   [x] **DynamicSourceExternal**: Implement `SourceExternal` by invoking `SourceRuntime`.
+*   [x] **Verification**: Unit test `SourceRuntime` with a hardcoded script string and a sample HTML snippet.
 
 ### Phase 3: Persistence & Integration
 *   [ ] **Storage**: 

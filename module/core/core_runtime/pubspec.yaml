@@ -1,0 +1,25 @@
+name: core_runtime
+description: A module for executing dynamic Dart code using dart_eval.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ">=3.7.2 <4.0.0"
+  flutter: ">=3.29.3"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  dart_eval: ^0.7.8
+  html: ^0.15.5
+
+  # library
+  entity_manga_external:
+    path: ../../library/entity_manga_external
+  service_locator:
+    path: ../../library/service_locator
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
