@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:collection/collection.dart';
 import 'package:core_runtime/core_runtime.dart';
 import 'package:domain_manga/src/manager/source_manager.dart';
 import 'package:domain_manga/src/sources/built_in_source_provider.dart';
@@ -9,7 +8,6 @@ import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:rxdart/rxdart.dart';
 
 class MockBuiltInSourceProvider extends Mock implements BuiltInSourceProvider {}
 class MockDynamicSourceDao extends Mock implements DynamicSourceDao {}

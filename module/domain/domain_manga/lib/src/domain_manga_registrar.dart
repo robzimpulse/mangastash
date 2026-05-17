@@ -35,7 +35,11 @@ import 'use_case/prefetch/listen_prefetch_use_case.dart';
 import 'use_case/prefetch/prefetch_chapter_use_case.dart';
 import 'use_case/prefetch/prefetch_manga_use_case.dart';
 import 'use_case/recrawl_use_case.dart';
+import 'use_case/source/add_dynamic_source_use_case.dart';
+import 'use_case/source/delete_dynamic_source_use_case.dart';
+import 'use_case/source/import_dynamic_source_use_case.dart';
 import 'use_case/source/listen_sources_use_case.dart';
+import 'use_case/source/toggle_dynamic_source_use_case.dart';
 import 'use_case/source/update_sources_use_case.dart';
 import 'use_case/tags/get_tags_use_case.dart';
 
@@ -71,6 +75,23 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<UpdateSettingDownloadedOnlyUseCase, GlobalOptionsManager>();
     locator.alias<ListenSettingIncognitoUseCase, GlobalOptionsManager>();
     locator.alias<UpdateSettingIncognitoUseCase, GlobalOptionsManager>();
+
+    locator.registerFactory<AddDynamicSourceUseCase>(
+      () => AddDynamicSourceUseCaseImpl(dynamicSourceDao: locator()),
+    );
+    locator.registerFactory<DeleteDynamicSourceUseCase>(
+      () => DeleteDynamicSourceUseCaseImpl(dynamicSourceDao: locator()),
+    );
+    locator.registerFactory<ToggleDynamicSourceUseCase>(
+      () => ToggleDynamicSourceUseCaseImpl(dynamicSourceDao: locator()),
+    );
+    locator.registerFactory<ImportDynamicSourceUseCase>(
+      () => ImportDynamicSourceUseCaseImpl(
+        dio: locator(),
+        sourceRuntime: locator(),
+        addDynamicSourceUseCase: locator(),
+      ),
+    );
 
     locator.registerLazySingleton(
       () => JobManager(

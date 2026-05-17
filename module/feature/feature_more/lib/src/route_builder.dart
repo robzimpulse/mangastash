@@ -109,7 +109,30 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         parentNavigatorKey: rootNavigatorKey,
         path: MoreRoutePath.browse,
         name: MoreRoutePath.browse,
-        builder: (context, state) => BrowseScreen.create(locator: locator),
+        builder: (context, state) => BrowseScreen.create(
+          locator: locator,
+          onTapManageDynamicSource: () => context.push(MoreRoutePath.dynamicSource),
+        ),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MoreRoutePath.dynamicSource,
+        name: MoreRoutePath.dynamicSource,
+        builder: (context, state) => SourceManagementScreen.create(
+          locator: locator,
+          onTapEdit: (source) => context.pushNamed(MoreRoutePath.dynamicSourceEditor, extra: source),
+        ),
+        routes: [
+          GoRoute(
+            parentNavigatorKey: rootNavigatorKey,
+            path: 'editor',
+            name: MoreRoutePath.dynamicSourceEditor,
+            builder: (context, state) => SourceEditorScreen.create(
+              locator: locator,
+              initialSource: state.extra?.castOrNull(),
+            ),
+          ),
+        ],
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,

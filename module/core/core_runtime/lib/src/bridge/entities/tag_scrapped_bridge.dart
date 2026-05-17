@@ -1,4 +1,3 @@
-import 'package:dart_eval/dart_eval.dart';
 import 'package:dart_eval/dart_eval_bridge.dart';
 import 'package:dart_eval/stdlib/core.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
@@ -30,7 +29,6 @@ class $TagScrapped extends $Value implements $Instance {
 
   $TagScrapped.wrap(this.value) : _superclass = $Object(value);
 
-  @override
   final TagScrapped value;
 
   final $Instance _superclass;

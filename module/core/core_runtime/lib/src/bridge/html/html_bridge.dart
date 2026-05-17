@@ -1,8 +1,6 @@
-import 'package:dart_eval/dart_eval.dart';
 import 'package:dart_eval/dart_eval_bridge.dart';
 import 'package:dart_eval/stdlib/core.dart';
 import 'package:html/dom.dart' as dom;
-import 'package:html/parser.dart' as parser;
 
 class $Document extends $Value implements $Instance {
   static const $type = BridgeTypeRef(
@@ -35,7 +33,6 @@ class $Document extends $Value implements $Instance {
 
   $Document.wrap(this.value) : _superclass = $Object(value);
 
-  @override
   final dom.Document value;
 
   final $Instance _superclass;
@@ -111,7 +108,6 @@ class $Element extends $Value implements $Instance {
 
   $Element.wrap(this.value) : _superclass = $Object(value);
 
-  @override
   final dom.Element value;
 
   final $Instance _superclass;

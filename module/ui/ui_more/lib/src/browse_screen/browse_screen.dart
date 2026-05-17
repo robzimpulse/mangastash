@@ -6,12 +6,16 @@ import 'browse_screen_cubit.dart';
 import 'browse_screen_state.dart';
 
 class BrowseScreen extends StatelessWidget {
+  final VoidCallback? onTapManageDynamicSource;
+
   const BrowseScreen({
     super.key,
+    this.onTapManageDynamicSource,
   });
 
   static Widget create({
     required ServiceLocator locator,
+    VoidCallback? onTapManageDynamicSource,
   }) {
     return BlocProvider(
       create: (context) => BrowseScreenCubit(
@@ -21,7 +25,7 @@ class BrowseScreen extends StatelessWidget {
         listenSourcesUseCase: locator(),
         sourceManager: locator(),
       ),
-      child: const BrowseScreen(),
+      child: BrowseScreen(onTapManageDynamicSource: onTapManageDynamicSource),
     );
   }
 
@@ -102,6 +106,12 @@ class BrowseScreen extends StatelessWidget {
         children: [
           _buildSearchMangaOption(context: context),
           _buildSourceOption(context: context),
+          ListTile(
+            title: const Text('Manage Dynamic Sources'),
+            subtitle: const Text('Add or remove custom sources'),
+            leading: const Icon(Icons.settings_applications),
+            onTap: onTapManageDynamicSource,
+          ),
         ],
       ),
     );

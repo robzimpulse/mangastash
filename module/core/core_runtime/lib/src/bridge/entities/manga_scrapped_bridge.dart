@@ -1,4 +1,3 @@
-import 'package:dart_eval/dart_eval.dart';
 import 'package:dart_eval/dart_eval_bridge.dart';
 import 'package:dart_eval/stdlib/core.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
@@ -46,7 +45,6 @@ class $MangaScrapped extends $Value implements $Instance {
 
   $MangaScrapped.wrap(this.value) : _superclass = $Object(value);
 
-  @override
   final MangaScrapped value;
 
   final $Instance _superclass;

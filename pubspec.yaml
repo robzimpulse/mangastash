@@ -39,6 +39,8 @@ dependencies:
     path: module/core/core_route
   core_storage:
     path: module/core/core_storage
+  core_runtime:
+    path: module/core/core_runtime
 
   # domain
   domain_manga:
