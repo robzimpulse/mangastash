@@ -26,8 +26,12 @@ The project follows a **Modular Clean Architecture** pattern with a sharded dire
 - **Code Style**: Single quotes for strings, mandatory trailing commas.
 - **Imports**: Grouped (Dart, Package, Relative) and sorted alphabetically. Use relative imports within the same package.
 - **Type Safety**: Always declare return types for functions and methods.
-- **DI Registration**: Every module MUST provide a `Registrar` (or `Initiator`) that registers its services into the `ServiceLocator`.
-- **Generated Code**: Run `melos run generate` after modifying models, tables, or API interfaces to update `.g.dart` files.
+- **DI Registration**: Every module MUST provide a Registrar (or Initiator) that registers its services into the ServiceLocator.
+- **Generated Code**: Run melos run generate after modifying models, tables, or API interfaces to update .g.dart files.
+- **Result Wrappers**: Network operations (especially in core_network) should return a Result type for explicit error handling.
+- **Path Abstraction**: Avoid direct file system access; use PathManager or dedicated use cases in core_storage.
+- **Naming Conventions**: Models in entity_manga_external should be suffixed with Scrapped to distinguish them from official API entities.
+- **Action Delegation**: UI components should delegate navigation and high-level actions via callbacks to remain agnostic of the routing table.
 
 ## 4. Testing Conventions
 - **Framework**: Standard `flutter_test`.
