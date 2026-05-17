@@ -15,8 +15,10 @@
 *   **Execution**:
     *   **Compilation**: Raw Dart strings are compiled to `Program` objects.
     *   **Caching**: Compiled EVC bytecode is stored in the database to avoid re-compilation on startup.
-    *   **Lifecycle**: `Program` objects are cached in memory. A fresh `Runtime` is instantiated per execution request (parse/search) to ensure isolation and prevent memory leaks.
+    *   **Lifecycle**: `Program` objects are cached in memory. A fresh `Runtime` is instantiated per execution request (parse/search).
+    *   **Isolation**: Runtimes are executed within a separate **Isolate** to prevent infinite loops or memory leaks from affecting the main thread.
 *   **Bridging**: Minimal `html` package bridging (CSS selectors, text, attributes) and `entity_manga_external` models.
+*   **Security**: Use `dart_eval`'s `Runtime.grant()` to explicitly allow only required permissions (e.g., no filesystem access, restricted network).
 
 ## 3. Phased Implementation
 
@@ -39,6 +41,7 @@
     *   Logic for `Compiler` (Dart -> Bytecode/Program).
     *   Logic for `Runtime` (Program + Input -> Output).
     *   Memory caching for `Program` instances.
+    *   Isolate-based execution wrapper.
 *   [ ] **DynamicSourceExternal**: Implement `SourceExternal` by invoking `SourceRuntime`.
 *   [ ] **Verification**: Unit test `SourceRuntime` with a hardcoded script string and a sample HTML snippet.
 
@@ -51,13 +54,16 @@
 
 ### Phase 4: Management UI & Code Editor
 *   [ ] **Source Management**: Screen to list, toggle, and delete dynamic sources.
+*   [ ] **Importing**:
+    *   Add "Import from URL" functionality.
+    *   Add "Import from File" functionality.
 *   [ ] **Editor Screen**:
     *   Integrated Dart code editor.
     *   "Run/Test" functionality: Takes a sample URL, fetches HTML, and runs the current code against it, showing a preview of results.
     *   "Save" logic: Triggers compilation and saves both source code and bytecode.
 *   [ ] **Verification**: Successfully add a new source via the app UI and use it to browse manga.
 
-## 4. Open Questions & Risks
-*   **Editor UX**: Writing code on a mobile device is difficult. Should we support importing scripts via URL/File?
-*   **Security**: `dart_eval` is a sandbox, but we should define clear boundaries on what host APIs the scripts can access.
-*   **Dependency Bloat**: `dart_eval` and the compiler might increase APK size. Monitor the `core_runtime` footprint.
+## 4. Risks & Mitigations (Resolved)
+*   **Editor UX**: Addressed by supporting URL/File imports for easier script distribution.
+*   **Security**: Addressed via `dart_eval` granular permissions and Isolate isolation for the runtime.
+*   **Dependency Bloat**: Accepted as necessary for the dynamic feature set.
