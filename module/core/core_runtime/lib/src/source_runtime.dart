@@ -27,19 +27,34 @@ class SourceRuntime {
     return bytecode;
   }
 
+  dynamic executeSync({
+    required Uint8List bytecode,
+    required String functionName,
+    List<dynamic> args = const [],
+  }) {
+    final runtime = Runtime(bytecode.buffer.asByteData());
+    RuntimeBridge.configure(runtime);
+
+    final wrappedArgs = args.map((e) => runtime.wrap(e)).toList();
+    final result = runtime.executeLib(
+      'package:dynamic_source/main.dart',
+      functionName,
+      wrappedArgs,
+    );
+
+    return _unwrap(result);
+  }
+
   Future<dynamic> execute({
     required Uint8List bytecode,
     required String functionName,
     List<dynamic> args = const [],
   }) async {
-    // TODO: Implement Isolate-based execution for safety and performance
-    final runtime = Runtime(bytecode.buffer.asByteData());
-    RuntimeBridge.configure(runtime);
-    
-    final wrappedArgs = args.map((e) => runtime.wrap(e)).toList();
-    final result = runtime.executeLib('package:dynamic_source/main.dart', functionName, wrappedArgs);
-    
-    return _unwrap(result);
+    return executeSync(
+      bytecode: bytecode,
+      functionName: functionName,
+      args: args,
+    );
   }
 
   dynamic _unwrap(dynamic value) {

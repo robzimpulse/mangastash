@@ -50,9 +50,28 @@ class _DynamicGetMangaUseCase implements GetMangaSourceExternalUseCase {
   _DynamicGetMangaUseCase(this.bytecode, this.runtime);
 
   @override
-  Duration? get timeout => null;
+  Duration? get timeout {
+    try {
+      final t = runtime.executeSync(
+        bytecode: bytecode,
+        functionName: 'getMangaTimeout',
+      );
+      if (t is int) return Duration(milliseconds: t);
+    } catch (_) {}
+    return null;
+  }
+
   @override
-  List<String> get scripts => [];
+  List<String> get scripts {
+    try {
+      final s = runtime.executeSync(
+        bytecode: bytecode,
+        functionName: 'getMangaScripts',
+      );
+      if (s is List) return s.cast<String>();
+    } catch (_) {}
+    return [];
+  }
 
   @override
   Future<MangaScrapped> parse({required Document root}) async {
@@ -71,9 +90,28 @@ class _DynamicGetChapterImageUseCase implements GetChapterImageSourceExternalUse
   _DynamicGetChapterImageUseCase(this.bytecode, this.runtime);
 
   @override
-  Duration? get timeout => null;
+  Duration? get timeout {
+    try {
+      final t = runtime.executeSync(
+        bytecode: bytecode,
+        functionName: 'getChapterImageTimeout',
+      );
+      if (t is int) return Duration(milliseconds: t);
+    } catch (_) {}
+    return null;
+  }
+
   @override
-  List<String> get scripts => [];
+  List<String> get scripts {
+    try {
+      final s = runtime.executeSync(
+        bytecode: bytecode,
+        functionName: 'getChapterImageScripts',
+      );
+      if (s is List) return s.cast<String>();
+    } catch (_) {}
+    return [];
+  }
 
   @override
   Future<List<String>> parse({required Document root}) async {
@@ -92,9 +130,28 @@ class _DynamicSearchMangaUseCase implements SearchMangaSourceExternalUseCase {
   _DynamicSearchMangaUseCase(this.bytecode, this.runtime);
 
   @override
-  Duration? get timeout => null;
+  Duration? get timeout {
+    try {
+      final t = runtime.executeSync(
+        bytecode: bytecode,
+        functionName: 'searchMangaTimeout',
+      );
+      if (t is int) return Duration(milliseconds: t);
+    } catch (_) {}
+    return null;
+  }
+
   @override
-  List<String> get scripts => [];
+  List<String> get scripts {
+    try {
+      final s = runtime.executeSync(
+        bytecode: bytecode,
+        functionName: 'searchMangaScripts',
+      );
+      if (s is List) return s.cast<String>();
+    } catch (_) {}
+    return [];
+  }
 
   @override
   String url({required SearchMangaParameter parameter}) {
@@ -131,9 +188,28 @@ class _DynamicListChapterUseCase implements ListChapterSourceExternalUseCase {
   _DynamicListChapterUseCase(this.bytecode, this.runtime);
 
   @override
-  Duration? get timeout => null;
+  Duration? get timeout {
+    try {
+      final t = runtime.executeSync(
+        bytecode: bytecode,
+        functionName: 'listChapterTimeout',
+      );
+      if (t is int) return Duration(milliseconds: t);
+    } catch (_) {}
+    return null;
+  }
+
   @override
-  List<String> get scripts => [];
+  List<String> get scripts {
+    try {
+      final s = runtime.executeSync(
+        bytecode: bytecode,
+        functionName: 'listChapterScripts',
+      );
+      if (s is List) return s.cast<String>();
+    } catch (_) {}
+    return [];
+  }
 
   @override
   Future<List<ChapterScrapped>> parse({required Document root}) async {
@@ -152,9 +228,28 @@ class _DynamicListTagUseCase implements ListTagSourceExternalUseCase {
   _DynamicListTagUseCase(this.bytecode, this.runtime);
 
   @override
-  Duration? get timeout => null;
+  Duration? get timeout {
+    try {
+      final t = runtime.executeSync(
+        bytecode: bytecode,
+        functionName: 'listTagTimeout',
+      );
+      if (t is int) return Duration(milliseconds: t);
+    } catch (_) {}
+    return null;
+  }
+
   @override
-  List<String> get scripts => [];
+  List<String> get scripts {
+    try {
+      final s = runtime.executeSync(
+        bytecode: bytecode,
+        functionName: 'listTagScripts',
+      );
+      if (s is List) return s.cast<String>();
+    } catch (_) {}
+    return [];
+  }
 
   @override
   Future<List<TagScrapped>> parse({required Document root}) async {
