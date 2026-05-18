@@ -74,6 +74,6 @@ The project follows a **Modular Clean Architecture** pattern with a sharded dire
   - **Context**: Screens and their business logic (Cubits) are often colocated in the same UI module rather than separate feature modules.
   - **Troubleshooting**: When looking for logic related to a specific screen, check the same directory as the screen widget for `*_cubit.dart` and `*_state.dart` files.
 
-- **Dynamic Source Management (Phase 1 Complete)**
-  - **Context**: The legacy static `Sources` class has been removed. All source resolution MUST happen via `SourceManager`.
-  - **Troubleshooting**: If a UI component needs a `SourceExternal` object from a name, it should be provided via the Cubit's state. The Cubit should have `SourceManager` injected and resolve the source during data loading.
+- **Dynamic Source Management (Phase 3 Complete, Phase 2 Refinements Pending)**
+  - **Context**: The legacy static `Sources` class has been removed. All source resolution MUST happen via `SourceManager`. Dynamic sources are supported but require further bridging for full search functionality and isolate-based execution for safety.
+  - **Troubleshooting**: If search functionality fails for dynamic sources, ensure the `SearchMangaParameter` bridge is implemented in `core_runtime`. Check `SourceRuntime` for execution errors.

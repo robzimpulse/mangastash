@@ -37,12 +37,15 @@
 *   [x] **Bridges**:
     *   Implement `dart_eval` bridges for `MangaScrapped`, `ChapterScrapped`, `TagScrapped`.
     *   Implement bridges for `html` (`Document`, `Element`).
-*   [x] **SourceRuntime**:
-    *   Logic for `Compiler` (Dart -> Bytecode/Program).
-    *   Logic for `Runtime` (Program + Input -> Output).
-    *   Memory caching for `Program` instances.
-    *   Isolate-based execution wrapper. (Partially implemented: simple execution for now, Isolate-based to be refined).
-*   [x] **DynamicSourceExternal**: Implement `SourceExternal` by invoking `SourceRuntime`.
+    *   [ ] **TODO**: Implement bridges for `SearchMangaParameter` and its associated Enums from `manga_dex_api`.
+*   [ ] **SourceRuntime**:
+    *   [x] Logic for `Compiler` (Dart -> Bytecode/Program).
+    *   [x] Logic for `Runtime` (Program + Input -> Output).
+    *   [x] Memory caching for `Program` instances.
+    *   [ ] **Refinement**: Implement `Isolate`-based execution in `execute` to prevent main-thread blocking during long-running scripts.
+*   [ ] **DynamicSourceExternal**:
+    *   [x] Implement basic `SourceExternal` interface.
+    *   [ ] **TODO**: Implement `searchMangaUseCase.url` by delegating to runtime `searchUrl` function.
 *   [x] **Verification**: Unit test `SourceRuntime` with a hardcoded script string and a sample HTML snippet.
 
 ### Phase 3: Persistence & Integration
