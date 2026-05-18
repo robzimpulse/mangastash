@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:dart_eval/dart_eval.dart';
@@ -12,16 +13,14 @@ class SourceRuntime {
     if (_bytecodeCache.containsKey(id)) {
       return _bytecodeCache[id]!;
     }
-    
+
     final compiler = Compiler();
     RuntimeBridge.register(compiler);
-    
+
     final program = compiler.compile({
-      'dynamic_source': {
-        'main.dart': sourceCode,
-      }
+      'dynamic_source': {'main.dart': sourceCode},
     });
-    
+
     final bytecode = program.write();
     _bytecodeCache[id] = bytecode;
     return bytecode;
@@ -35,7 +34,8 @@ class SourceRuntime {
     final runtime = Runtime(bytecode.buffer.asByteData());
     RuntimeBridge.configure(runtime);
 
-    final wrappedArgs = args.map((e) => runtime.wrap(e)).toList();
+    final wrappedArgs =
+        args.map((e) => RuntimeBridge.wrap(runtime, e)).toList();
     final result = runtime.executeLib(
       'package:dynamic_source/main.dart',
       functionName,
@@ -50,14 +50,23 @@ class SourceRuntime {
     required String functionName,
     List<dynamic> args = const [],
   }) async {
-    return executeSync(
-      bytecode: bytecode,
-      functionName: functionName,
-      args: args,
-    );
+    return Isolate.run(() {
+      final runtime = Runtime(bytecode.buffer.asByteData());
+      RuntimeBridge.configure(runtime);
+
+      final wrappedArgs =
+          args.map((e) => RuntimeBridge.wrap(runtime, e)).toList();
+      final result = runtime.executeLib(
+        'package:dynamic_source/main.dart',
+        functionName,
+        wrappedArgs,
+      );
+
+      return _unwrap(result);
+    });
   }
 
-  dynamic _unwrap(dynamic value) {
+  static dynamic _unwrap(dynamic value) {
     if (value is $Value) {
       return value.$value;
     }

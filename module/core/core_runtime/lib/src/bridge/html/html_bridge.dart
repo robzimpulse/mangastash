@@ -13,17 +13,34 @@ class $Document extends $Value implements $Instance {
     methods: {
       'querySelector': BridgeMethodDef(
         BridgeFunctionDef(
-          returns: BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('package:html/dom.dart', 'Element')), nullable: true),
+          returns: BridgeTypeAnnotation(
+            BridgeTypeRef(BridgeTypeSpec('package:html/dom.dart', 'Element')),
+            nullable: true,
+          ),
           params: [
-            BridgeParameter('selector', BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String'))), false),
+            BridgeParameter(
+              'selector',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+              ),
+              false,
+            ),
           ],
         ),
       ),
       'querySelectorAll': BridgeMethodDef(
         BridgeFunctionDef(
-          returns: BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'List'))),
+          returns: BridgeTypeAnnotation(
+            BridgeTypeRef(BridgeTypeSpec('dart:core', 'List')),
+          ),
           params: [
-            BridgeParameter('selector', BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String'))), false),
+            BridgeParameter(
+              'selector',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+              ),
+              false,
+            ),
           ],
         ),
       ),
@@ -80,25 +97,53 @@ class $Element extends $Value implements $Instance {
     BridgeClassType($type),
     constructors: {},
     fields: {
-      'text': BridgeFieldDef(BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')))),
-      'innerHtml': BridgeFieldDef(BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')))),
-      'outerHtml': BridgeFieldDef(BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')))),
-      'attributes': BridgeFieldDef(BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'Map')))),
+      'text': BridgeFieldDef(
+        BridgeTypeAnnotation(
+          BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+        ),
+      ),
+      'innerHtml': BridgeFieldDef(
+        BridgeTypeAnnotation(
+          BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+        ),
+      ),
+      'outerHtml': BridgeFieldDef(
+        BridgeTypeAnnotation(
+          BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+        ),
+      ),
+      'attributes': BridgeFieldDef(
+        BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'Map'))),
+      ),
     },
     methods: {
       'querySelector': BridgeMethodDef(
         BridgeFunctionDef(
           returns: BridgeTypeAnnotation($type, nullable: true),
           params: [
-            BridgeParameter('selector', BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String'))), false),
+            BridgeParameter(
+              'selector',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+              ),
+              false,
+            ),
           ],
         ),
       ),
       'querySelectorAll': BridgeMethodDef(
         BridgeFunctionDef(
-          returns: BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'List'))),
+          returns: BridgeTypeAnnotation(
+            BridgeTypeRef(BridgeTypeSpec('dart:core', 'List')),
+          ),
           params: [
-            BridgeParameter('selector', BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String'))), false),
+            BridgeParameter(
+              'selector',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+              ),
+              false,
+            ),
           ],
         ),
       ),
@@ -166,9 +211,17 @@ class HtmlParserBridge {
     methods: {
       'parse': BridgeMethodDef(
         BridgeFunctionDef(
-          returns: BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('package:html/dom.dart', 'Document'))),
+          returns: BridgeTypeAnnotation(
+            BridgeTypeRef(BridgeTypeSpec('package:html/dom.dart', 'Document')),
+          ),
           params: [
-            BridgeParameter('html', BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String'))), false),
+            BridgeParameter(
+              'html',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+              ),
+              false,
+            ),
           ],
         ),
       ),

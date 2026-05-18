@@ -155,11 +155,15 @@ class _DynamicSearchMangaUseCase implements SearchMangaSourceExternalUseCase {
 
   @override
   String url({required SearchMangaParameter parameter}) {
-    // This might need a separate bridge or just handle it if it doesn't need HTML
-    // For now, we'll assume the script has a 'searchUrl' function
-    // But wait, SearchMangaParameter is from manga_dex_api. We might need a bridge for it too.
-    // Or just pass its JSON.
-    return ''; 
+    try {
+      final result = runtime.executeSync(
+        bytecode: bytecode,
+        functionName: 'searchUrl',
+        args: [parameter],
+      );
+      if (result is String) return result;
+    } catch (_) {}
+    return '';
   }
 
   @override

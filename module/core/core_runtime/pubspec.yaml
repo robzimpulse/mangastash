@@ -18,6 +18,8 @@ dependencies:
     path: ../../library/entity_manga_external
   service_locator:
     path: ../../library/service_locator
+  manga_dex_api:
+    path: ../../library/manga_dex_api
 
 dev_dependencies:
   flutter_test:

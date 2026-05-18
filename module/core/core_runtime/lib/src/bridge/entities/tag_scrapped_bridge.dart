@@ -4,7 +4,10 @@ import 'package:entity_manga_external/entity_manga_external.dart';
 
 class $TagScrapped extends $Value implements $Instance {
   static const $type = BridgeTypeRef(
-    BridgeTypeSpec('package:entity_manga_external/src/tag_scrapped.dart', 'TagScrapped'),
+    BridgeTypeSpec(
+      'package:entity_manga_external/src/tag_scrapped.dart',
+      'TagScrapped',
+    ),
   );
 
   static const $declaration = BridgeClassDef(
@@ -14,15 +17,37 @@ class $TagScrapped extends $Value implements $Instance {
         BridgeFunctionDef(
           returns: BridgeTypeAnnotation($type),
           namedParams: [
-            BridgeParameter('id', BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String'))), true),
-            BridgeParameter('name', BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String'))), true),
+            BridgeParameter(
+              'id',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+              ),
+              true,
+            ),
+            BridgeParameter(
+              'name',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+              ),
+              true,
+            ),
           ],
         ),
       ),
     },
     fields: {
-      'id': BridgeFieldDef(BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')), nullable: true)),
-      'name': BridgeFieldDef(BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')), nullable: true)),
+      'id': BridgeFieldDef(
+        BridgeTypeAnnotation(
+          BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+          nullable: true,
+        ),
+      ),
+      'name': BridgeFieldDef(
+        BridgeTypeAnnotation(
+          BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+          nullable: true,
+        ),
+      ),
     },
     wrap: true,
   );
@@ -40,10 +65,9 @@ class $TagScrapped extends $Value implements $Instance {
   TagScrapped get $reified => value;
 
   static $Value $new(Runtime runtime, $Value? thisValue, List<$Value?> args) {
-    return $TagScrapped.wrap(TagScrapped(
-      id: args[0]?.$value,
-      name: args[1]?.$value,
-    ));
+    return $TagScrapped.wrap(
+      TagScrapped(id: args[0]?.$value, name: args[1]?.$value),
+    );
   }
 
   @override

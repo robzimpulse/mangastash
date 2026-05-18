@@ -4,7 +4,10 @@ import 'package:entity_manga_external/entity_manga_external.dart';
 
 class $MangaScrapped extends $Value implements $Instance {
   static const $type = BridgeTypeRef(
-    BridgeTypeSpec('package:entity_manga_external/src/manga_scrapped.dart', 'MangaScrapped'),
+    BridgeTypeSpec(
+      'package:entity_manga_external/src/manga_scrapped.dart',
+      'MangaScrapped',
+    ),
   );
 
   static const $declaration = BridgeClassDef(
@@ -14,31 +17,141 @@ class $MangaScrapped extends $Value implements $Instance {
         BridgeFunctionDef(
           returns: BridgeTypeAnnotation($type),
           namedParams: [
-            BridgeParameter('id', BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String'))), true),
-            BridgeParameter('title', BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String'))), true),
-            BridgeParameter('coverUrl', BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String'))), true),
-            BridgeParameter('author', BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String'))), true),
-            BridgeParameter('status', BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String'))), true),
-            BridgeParameter('description', BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String'))), true),
-            BridgeParameter('tags', BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'List'))), true),
-            BridgeParameter('webUrl', BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String'))), true),
-            BridgeParameter('createdAt', BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String'))), true),
-            BridgeParameter('updatedAt', BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String'))), true),
+            BridgeParameter(
+              'id',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+              ),
+              true,
+            ),
+            BridgeParameter(
+              'title',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+              ),
+              true,
+            ),
+            BridgeParameter(
+              'coverUrl',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+              ),
+              true,
+            ),
+            BridgeParameter(
+              'author',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+              ),
+              true,
+            ),
+            BridgeParameter(
+              'status',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+              ),
+              true,
+            ),
+            BridgeParameter(
+              'description',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+              ),
+              true,
+            ),
+            BridgeParameter(
+              'tags',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(BridgeTypeSpec('dart:core', 'List')),
+              ),
+              true,
+            ),
+            BridgeParameter(
+              'webUrl',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+              ),
+              true,
+            ),
+            BridgeParameter(
+              'createdAt',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+              ),
+              true,
+            ),
+            BridgeParameter(
+              'updatedAt',
+              BridgeTypeAnnotation(
+                BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+              ),
+              true,
+            ),
           ],
         ),
       ),
     },
     fields: {
-      'id': BridgeFieldDef(BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')), nullable: true)),
-      'title': BridgeFieldDef(BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')), nullable: true)),
-      'coverUrl': BridgeFieldDef(BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')), nullable: true)),
-      'author': BridgeFieldDef(BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')), nullable: true)),
-      'status': BridgeFieldDef(BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')), nullable: true)),
-      'description': BridgeFieldDef(BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')), nullable: true)),
-      'tags': BridgeFieldDef(BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'List')), nullable: true)),
-      'webUrl': BridgeFieldDef(BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')), nullable: true)),
-      'createdAt': BridgeFieldDef(BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')), nullable: true)),
-      'updatedAt': BridgeFieldDef(BridgeTypeAnnotation(BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')), nullable: true)),
+      'id': BridgeFieldDef(
+        BridgeTypeAnnotation(
+          BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+          nullable: true,
+        ),
+      ),
+      'title': BridgeFieldDef(
+        BridgeTypeAnnotation(
+          BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+          nullable: true,
+        ),
+      ),
+      'coverUrl': BridgeFieldDef(
+        BridgeTypeAnnotation(
+          BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+          nullable: true,
+        ),
+      ),
+      'author': BridgeFieldDef(
+        BridgeTypeAnnotation(
+          BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+          nullable: true,
+        ),
+      ),
+      'status': BridgeFieldDef(
+        BridgeTypeAnnotation(
+          BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+          nullable: true,
+        ),
+      ),
+      'description': BridgeFieldDef(
+        BridgeTypeAnnotation(
+          BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+          nullable: true,
+        ),
+      ),
+      'tags': BridgeFieldDef(
+        BridgeTypeAnnotation(
+          BridgeTypeRef(BridgeTypeSpec('dart:core', 'List')),
+          nullable: true,
+        ),
+      ),
+      'webUrl': BridgeFieldDef(
+        BridgeTypeAnnotation(
+          BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+          nullable: true,
+        ),
+      ),
+      'createdAt': BridgeFieldDef(
+        BridgeTypeAnnotation(
+          BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+          nullable: true,
+        ),
+      ),
+      'updatedAt': BridgeFieldDef(
+        BridgeTypeAnnotation(
+          BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+          nullable: true,
+        ),
+      ),
     },
     wrap: true,
   );
@@ -56,18 +169,20 @@ class $MangaScrapped extends $Value implements $Instance {
   MangaScrapped get $reified => value;
 
   static $Value $new(Runtime runtime, $Value? thisValue, List<$Value?> args) {
-    return $MangaScrapped.wrap(MangaScrapped(
-      id: args[0]?.$value,
-      title: args[1]?.$value,
-      coverUrl: args[2]?.$value,
-      author: args[3]?.$value,
-      status: args[4]?.$value,
-      description: args[5]?.$value,
-      tags: (args[6]?.$value as List?)?.cast<String>(),
-      webUrl: args[7]?.$value,
-      createdAt: args[8]?.$value,
-      updatedAt: args[9]?.$value,
-    ));
+    return $MangaScrapped.wrap(
+      MangaScrapped(
+        id: args[0]?.$value,
+        title: args[1]?.$value,
+        coverUrl: args[2]?.$value,
+        author: args[3]?.$value,
+        status: args[4]?.$value,
+        description: args[5]?.$value,
+        tags: (args[6]?.$value as List?)?.cast<String>(),
+        webUrl: args[7]?.$value,
+        createdAt: args[8]?.$value,
+        updatedAt: args[9]?.$value,
+      ),
+    );
   }
 
   @override
