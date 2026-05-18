@@ -13,14 +13,18 @@ class SourceEditorScreen extends StatefulWidget {
 
   const SourceEditorScreen({super.key, this.initialSource});
 
-  static Widget create({required ServiceLocator locator, DynamicSourceDrift? initialSource}) {
+  static Widget create({
+    required ServiceLocator locator,
+    DynamicSourceDrift? initialSource,
+  }) {
     return BlocProvider(
-      create: (context) => SourceEditorScreenCubit(
-        importDynamicSourceUseCase: locator(),
-        sourceRuntime: locator(),
-        dio: locator(),
-        initialSource: initialSource,
-      ),
+      create:
+          (context) => SourceEditorScreenCubit(
+            importDynamicSourceUseCase: locator(),
+            sourceRuntime: locator(),
+            dio: locator(),
+            initialSource: initialSource,
+          ),
       child: SourceEditorScreen(initialSource: initialSource),
     );
   }
@@ -156,7 +160,9 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
   Widget build(BuildContext context) {
     return ScaffoldScreen(
       appBar: AppBar(
-        title: Text(widget.initialSource == null ? 'New Source' : 'Edit Source'),
+        title: Text(
+          widget.initialSource == null ? 'New Source' : 'Edit Source',
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.play_arrow),
@@ -173,45 +179,53 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
       ),
       body: BlocBuilder<SourceEditorScreenCubit, SourceEditorScreenState>(
         builder: (context, state) {
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  decoration: const InputDecoration(labelText: 'Source Name'),
-                  onChanged: (v) => _cubit(context)?.updateName(v),
-                  controller: TextEditingController(text: state.name)..selection = TextSelection.collapsed(offset: state.name.length),
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    decoration: const InputDecoration(labelText: 'Source Name'),
+                    onChanged: (v) => _cubit(context)?.updateName(v),
+                    controller: TextEditingController(text: state.name)
+                      ..selection = TextSelection.collapsed(
+                        offset: state.name.length,
+                      ),
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  decoration: const InputDecoration(labelText: 'Base URL'),
-                  onChanged: (v) => _cubit(context)?.updateBaseUrl(v),
-                  controller: TextEditingController(text: state.baseUrl)..selection = TextSelection.collapsed(offset: state.baseUrl.length),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    decoration: const InputDecoration(labelText: 'Base URL'),
+                    onChanged: (v) => _cubit(context)?.updateBaseUrl(v),
+                    controller: TextEditingController(text: state.baseUrl)
+                      ..selection = TextSelection.collapsed(
+                        offset: state.baseUrl.length,
+                      ),
+                  ),
                 ),
-              ),
-              Expanded(
-                child: CodeField(
-                  controller: _codeController,
-                  textStyle: const TextStyle(fontFamily: 'monospace'),
+                Expanded(
+                  child: CodeField(
+                    controller: _codeController,
+                    textStyle: const TextStyle(fontFamily: 'monospace'),
+                  ),
                 ),
-              ),
-              if (state.testResult != null)
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  color: Colors.grey[200],
-                  width: double.infinity,
-                  child: Text('Test Result: ${state.testResult}'),
-                ),
-              if (state.error != null)
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  color: Colors.red[100],
-                  width: double.infinity,
-                  child: Text('Error: ${state.error}'),
-                ),
-            ],
+                if (state.testResult != null)
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    color: Colors.grey[200],
+                    width: double.infinity,
+                    child: Text('Test Result: ${state.testResult}'),
+                  ),
+                if (state.error != null)
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    color: Colors.red[100],
+                    width: double.infinity,
+                    child: Text('Error: ${state.error}'),
+                  ),
+              ],
+            ),
           );
         },
       ),
@@ -222,27 +236,31 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
     final controller = TextEditingController();
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Test with URL'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(hintText: 'Enter sample manga URL'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Test with URL'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              hintText: 'Enter sample manga URL',
+            ),
           ),
-          TextButton(
-            onPressed: () {
-              _cubit(context)?.updateSourceCode(_codeController.text);
-              _cubit(context)?.runTest(controller.text);
-              Navigator.pop(dialogContext);
-            },
-            child: const Text('Run Test'),
-          ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _cubit(context)?.updateSourceCode(_codeController.text);
+                _cubit(context)?.runTest(controller.text);
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Run Test'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
