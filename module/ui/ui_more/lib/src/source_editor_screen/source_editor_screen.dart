@@ -36,10 +36,111 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
   void initState() {
     super.initState();
     _codeController = CodeController(
-      text: widget.initialSource?.sourceCode ?? '',
+      text: widget.initialSource?.sourceCode ?? _defaultSourceCode,
       language: dart,
     );
   }
+
+  static const String _defaultSourceCode = '''
+  import 'package:html/parser.dart';
+  import 'package:entity_manga_external/src/manga_scrapped.dart';
+  import 'package:entity_manga_external/src/chapter_scrapped.dart';
+  import 'package:entity_manga_external/src/tag_scrapped.dart';
+  
+  /**
+   * PARSE MANGA DETAILS
+   */
+  MangaScrapped getManga(String html) {
+    final doc = parse(html);
+    final title = doc.querySelector('h1.entry-title')?.text;
+    final cover = doc.querySelector('img.wp-post-image')?.attributes['src'];
+    final description = doc.querySelector('.entry-content p')?.text;
+    
+    return MangaScrapped(
+      title: title?.trim(),
+      coverUrl: cover,
+      description: description?.trim(),
+    );
+  }
+  
+  int getMangaTimeout() => 10000;
+  List<String> getMangaScripts() => [];
+  
+  /**
+   * LIST CHAPTERS
+   */
+  List<ChapterScrapped> listChapters(String html) {
+    final doc = parse(html);
+    final rows = doc.querySelectorAll('.chapter-list li');
+    
+    return rows.map((row) {
+      final link = row.querySelector('a');
+      return ChapterScrapped(
+        title: link?.text.trim(),
+        webUrl: link?.attributes['href'],
+      );
+    }).toList();
+  }
+  
+  int listChapterTimeout() => 10000;
+  List<String> listChapterScripts() => [];
+  
+  /**
+   * SEARCH MANGA
+   */
+  List<MangaScrapped> searchManga(String html) {
+    final doc = parse(html);
+    final items = doc.querySelectorAll('.search-item');
+    
+    return items.map((item) {
+      return MangaScrapped(
+        title: item.querySelector('.title')?.text.trim(),
+        webUrl: item.querySelector('a')?.attributes['href'],
+        coverUrl: item.querySelector('img')?.attributes['src'],
+      );
+    }).toList();
+  }
+  
+  bool searchHaveNextPage(String html) {
+    final doc = parse(html);
+    return doc.querySelector('.next-page') != null;
+  }
+  
+  int searchMangaTimeout() => 10000;
+  List<String> searchMangaScripts() => [];
+  
+  /**
+   * GET CHAPTER IMAGES
+   */
+  List<String> getChapterImages(String html) {
+    final doc = parse(html);
+    final images = doc.querySelectorAll('#readerarea img');
+    
+    return images.map((img) {
+      return img.attributes['src'] ?? '';
+    }).where((src) => src.isNotEmpty).toList();
+  }
+  
+  int getChapterImageTimeout() => 20000;
+  List<String> getChapterImageScripts() => [];
+  
+  /**
+   * LIST TAGS
+   */
+  List<TagScrapped> listTags(String html) {
+    final doc = parse(html);
+    final tags = doc.querySelectorAll('.genre-list a');
+    
+    return tags.map((tag) {
+      return TagScrapped(
+        name: tag.text.trim(),
+      );
+    }).toList();
+  }
+  
+  int listTagTimeout() => 5000;
+  List<String> listTagScripts() => [];
+  ''';
 
   @override
   void dispose() {
