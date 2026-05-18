@@ -35,6 +35,8 @@ class SourceEditorScreen extends StatefulWidget {
 
 class _SourceEditorScreenState extends State<SourceEditorScreen> {
   late CodeController _codeController;
+  late TextEditingController _nameController;
+  late TextEditingController _baseUrlController;
 
   @override
   void initState() {
@@ -43,6 +45,10 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
       text: widget.initialSource?.sourceCode ?? _defaultSourceCode,
       language: dart,
     );
+    _nameController =
+        TextEditingController(text: widget.initialSource?.name ?? '');
+    _baseUrlController =
+        TextEditingController(text: widget.initialSource?.baseUrl ?? '');
   }
 
   static const String _defaultSourceCode = '''
@@ -149,6 +155,8 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
   @override
   void dispose() {
     _codeController.dispose();
+    _nameController.dispose();
+    _baseUrlController.dispose();
     super.dispose();
   }
 
@@ -181,16 +189,14 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
         builder: (context, state) {
           return SingleChildScrollView(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
                     decoration: const InputDecoration(labelText: 'Source Name'),
                     onChanged: (v) => _cubit(context)?.updateName(v),
-                    controller: TextEditingController(text: state.name)
-                      ..selection = TextSelection.collapsed(
-                        offset: state.name.length,
-                      ),
+                    controller: _nameController,
                   ),
                 ),
                 Padding(
@@ -198,20 +204,16 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
                   child: TextField(
                     decoration: const InputDecoration(labelText: 'Base URL'),
                     onChanged: (v) => _cubit(context)?.updateBaseUrl(v),
-                    controller: TextEditingController(text: state.baseUrl)
-                      ..selection = TextSelection.collapsed(
-                        offset: state.baseUrl.length,
-                      ),
+                    controller: _baseUrlController,
                   ),
                 ),
-                Expanded(
-                  child: CodeField(
-                    controller: _codeController,
-                    textStyle: const TextStyle(fontFamily: 'monospace'),
-                  ),
+                CodeField(
+                  controller: _codeController,
+                  textStyle: const TextStyle(fontFamily: 'monospace'),
                 ),
                 if (state.testResult != null)
                   Container(
+                    constraints: const BoxConstraints(maxHeight: 150),
                     padding: const EdgeInsets.all(8),
                     color: Colors.grey[200],
                     width: double.infinity,
@@ -219,6 +221,7 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
                   ),
                 if (state.error != null)
                   Container(
+                    constraints: const BoxConstraints(maxHeight: 100),
                     padding: const EdgeInsets.all(8),
                     color: Colors.red[100],
                     width: double.infinity,
