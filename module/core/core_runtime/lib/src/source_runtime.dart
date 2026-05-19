@@ -9,8 +9,12 @@ import 'bridge/runtime_bridge.dart';
 class SourceRuntime {
   final Map<String, Uint8List> _bytecodeCache = {};
 
-  Uint8List getOrCreateBytecode(String id, String sourceCode) {
-    if (_bytecodeCache.containsKey(id)) {
+  Uint8List getOrCreateBytecode(
+    String id,
+    String sourceCode, {
+    useCache = true,
+  }) {
+    if (_bytecodeCache.containsKey(id) && useCache) {
       return _bytecodeCache[id]!;
     }
 

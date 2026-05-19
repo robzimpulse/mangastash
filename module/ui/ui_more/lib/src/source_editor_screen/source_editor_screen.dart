@@ -56,6 +56,7 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
   import 'package:entity_manga_external/src/manga_scrapped.dart';
   import 'package:entity_manga_external/src/chapter_scrapped.dart';
   import 'package:entity_manga_external/src/tag_scrapped.dart';
+  import 'package:manga_dex_api/manga_dex_api.dart';
   
   /**
    * PARSE MANGA DETAILS
@@ -98,6 +99,10 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
   /**
    * SEARCH MANGA
    */
+  String searchUrl(SearchMangaParameter parameter) {
+    return 'https://example.com/search?q=\${parameter.title}&page=\${parameter.page}';
+  }
+
   List<MangaScrapped> searchManga(String html) {
     final doc = parse(html);
     final items = doc.querySelectorAll('.search-item');
@@ -237,31 +242,58 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
 
   void _showTestDialog(BuildContext context) {
     final controller = TextEditingController();
+    SourceTestType selectedType = SourceTestType.getManga;
+
     showDialog(
       context: context,
       builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Test with URL'),
-          content: TextField(
-            controller: controller,
-            decoration: const InputDecoration(
-              hintText: 'Enter sample manga URL',
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                _cubit(context)?.updateSourceCode(_codeController.text);
-                _cubit(context)?.runTest(controller.text);
-                Navigator.pop(dialogContext);
-              },
-              child: const Text('Run Test'),
-            ),
-          ],
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Test Source'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DropdownButtonFormField<SourceTestType>(
+                    value: selectedType,
+                    onChanged: (v) {
+                      if (v != null) setState(() => selectedType = v);
+                    },
+                    items: SourceTestType.values.map((e) {
+                      return DropdownMenuItem(
+                        value: e,
+                        child: Text(e.name),
+                      );
+                    }).toList(),
+                    decoration: const InputDecoration(labelText: 'Function to Test'),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: controller,
+                    decoration: InputDecoration(
+                      hintText: selectedType == SourceTestType.searchUrl
+                          ? 'Enter search query'
+                          : 'Enter sample URL',
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    _cubit(context)?.updateSourceCode(_codeController.text);
+                    _cubit(context)?.runTest(controller.text, type: selectedType);
+                    // Navigator.pop(dialogContext);
+                  },
+                  child: const Text('Run Test'),
+                ),
+              ],
+            );
+          },
         );
       },
     );

@@ -6,6 +6,15 @@ import 'package:safe_bloc/safe_bloc.dart';
 
 import 'source_editor_screen_state.dart';
 
+enum SourceTestType {
+  getManga,
+  searchManga,
+  listChapters,
+  getChapterImages,
+  listTags,
+  searchUrl,
+}
+
 class SourceEditorScreenCubit extends Cubit<SourceEditorScreenState> {
   final ImportDynamicSourceUseCase _importDynamicSourceUseCase;
   final SourceRuntime _sourceRuntime;
@@ -19,13 +28,15 @@ class SourceEditorScreenCubit extends Cubit<SourceEditorScreenState> {
   }) : _importDynamicSourceUseCase = importDynamicSourceUseCase,
        _sourceRuntime = sourceRuntime,
        _dio = dio,
-       super(SourceEditorScreenState(
-         id: initialSource?.id,
-         name: initialSource?.name ?? '',
-         baseUrl: initialSource?.baseUrl ?? '',
-         iconUrl: initialSource?.iconUrl,
-         sourceCode: initialSource?.sourceCode ?? '',
-       ));
+       super(
+         SourceEditorScreenState(
+           id: initialSource?.id,
+           name: initialSource?.name ?? '',
+           baseUrl: initialSource?.baseUrl ?? '',
+           iconUrl: initialSource?.iconUrl,
+           sourceCode: initialSource?.sourceCode ?? '',
+         ),
+       );
 
   void updateName(String name) => emit(state.copyWith(name: name));
   void updateBaseUrl(String url) => emit(state.copyWith(baseUrl: url));
@@ -47,20 +58,37 @@ class SourceEditorScreenCubit extends Cubit<SourceEditorScreenState> {
     }
   }
 
-  Future<void> runTest(String sampleUrl) async {
+  Future<void> runTest(
+    String input, {
+    SourceTestType type = SourceTestType.getManga,
+  }) async {
     emit(state.copyWith(isTesting: true, testResult: null, error: null));
     try {
-      final response = await _dio.get(sampleUrl);
+      final bytecode = _sourceRuntime.getOrCreateBytecode(
+        'test',
+        state.sourceCode,
+        useCache: false,
+      );
+
+      if (type == SourceTestType.searchUrl) {
+        final result = await _sourceRuntime.execute(
+          bytecode: bytecode,
+          functionName: 'searchUrl',
+          args: [SearchMangaParameter(title: input, page: 1)],
+        );
+        emit(state.copyWith(testResult: result.toString()));
+        return;
+      }
+
+      final response = await _dio.get(input);
       final html = response.data as String;
-      
-      final bytecode = _sourceRuntime.getOrCreateBytecode('test', state.sourceCode);
-      // Try to run 'getManga' as a test
+
       final result = await _sourceRuntime.execute(
         bytecode: bytecode,
-        functionName: 'getManga',
+        functionName: type.name,
         args: [html],
       );
-      
+
       emit(state.copyWith(testResult: result.toString()));
     } catch (e) {
       emit(state.copyWith(error: 'Test failed: $e'));
