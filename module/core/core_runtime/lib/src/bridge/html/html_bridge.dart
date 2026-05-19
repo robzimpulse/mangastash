@@ -31,7 +31,9 @@ class $Document extends $Value implements $Instance {
       'querySelectorAll': BridgeMethodDef(
         BridgeFunctionDef(
           returns: BridgeTypeAnnotation(
-            BridgeTypeRef(BridgeTypeSpec('dart:core', 'List')),
+            BridgeTypeRef(CoreTypes.list, [
+              BridgeTypeRef(BridgeTypeSpec('package:html/dom.dart', 'Element')),
+            ]),
           ),
           params: [
             BridgeParameter(
@@ -134,7 +136,7 @@ class $Element extends $Value implements $Instance {
       'querySelectorAll': BridgeMethodDef(
         BridgeFunctionDef(
           returns: BridgeTypeAnnotation(
-            BridgeTypeRef(BridgeTypeSpec('dart:core', 'List')),
+            BridgeTypeRef(CoreTypes.list, [$type]),
           ),
           params: [
             BridgeParameter(

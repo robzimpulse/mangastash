@@ -47,31 +47,52 @@ class $SearchMangaParameter extends $Value implements $Instance {
       ),
       'includedTags': BridgeFieldDef(
         BridgeTypeAnnotation(
-          BridgeTypeRef(BridgeTypeSpec('dart:core', 'List')),
+          BridgeTypeRef(CoreTypes.list, [
+            BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+          ]),
           nullable: true,
         ),
       ),
       'status': BridgeFieldDef(
         BridgeTypeAnnotation(
-          BridgeTypeRef(BridgeTypeSpec('dart:core', 'List')),
+          BridgeTypeRef(CoreTypes.list, [
+            BridgeTypeRef(
+              BridgeTypeSpec('package:manga_dex_api/manga_dex_api.dart', 'MangaStatus'),
+            ),
+          ]),
           nullable: true,
         ),
       ),
       'contentRating': BridgeFieldDef(
         BridgeTypeAnnotation(
-          BridgeTypeRef(BridgeTypeSpec('dart:core', 'List')),
+          BridgeTypeRef(CoreTypes.list, [
+            BridgeTypeRef(
+              BridgeTypeSpec('package:manga_dex_api/manga_dex_api.dart', 'ContentRating'),
+            ),
+          ]),
           nullable: true,
         ),
       ),
       'publicationDemographic': BridgeFieldDef(
         BridgeTypeAnnotation(
-          BridgeTypeRef(BridgeTypeSpec('dart:core', 'List')),
+          BridgeTypeRef(CoreTypes.list, [
+            BridgeTypeRef(
+              BridgeTypeSpec('package:manga_dex_api/manga_dex_api.dart', 'PublicDemographic'),
+            ),
+          ]),
           nullable: true,
         ),
       ),
       'orders': BridgeFieldDef(
         BridgeTypeAnnotation(
-          BridgeTypeRef(BridgeTypeSpec('dart:core', 'Map')),
+          BridgeTypeRef(CoreTypes.map, [
+            BridgeTypeRef(
+              BridgeTypeSpec('package:manga_dex_api/manga_dex_api.dart', 'SearchOrders'),
+            ),
+            BridgeTypeRef(
+              BridgeTypeSpec('package:manga_dex_api/manga_dex_api.dart', 'OrderDirections'),
+            ),
+          ]),
           nullable: true,
         ),
       ),
@@ -87,13 +108,17 @@ class $SearchMangaParameter extends $Value implements $Instance {
       ),
       'authors': BridgeFieldDef(
         BridgeTypeAnnotation(
-          BridgeTypeRef(BridgeTypeSpec('dart:core', 'List')),
+          BridgeTypeRef(CoreTypes.list, [
+            BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+          ]),
           nullable: true,
         ),
       ),
       'artists': BridgeFieldDef(
         BridgeTypeAnnotation(
-          BridgeTypeRef(BridgeTypeSpec('dart:core', 'List')),
+          BridgeTypeRef(CoreTypes.list, [
+            BridgeTypeRef(BridgeTypeSpec('dart:core', 'String')),
+          ]),
           nullable: true,
         ),
       ),

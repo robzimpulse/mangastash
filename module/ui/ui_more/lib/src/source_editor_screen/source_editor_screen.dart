@@ -233,7 +233,7 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
                     padding: const EdgeInsets.all(8),
                     color: Colors.grey[200],
                     width: double.infinity,
-                    child: Text('Test Result: ${state.testResult}'),
+                    child: SelectableText('Test Result: ${state.testResult}'),
                   ),
                 if (state.error != null)
                   Container(
@@ -241,7 +241,7 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
                     padding: const EdgeInsets.all(8),
                     color: Colors.red[100],
                     width: double.infinity,
-                    child: Text('Error: ${state.error}'),
+                    child: SelectableText('Error: ${state.error}'),
                   ),
               ],
             ),
