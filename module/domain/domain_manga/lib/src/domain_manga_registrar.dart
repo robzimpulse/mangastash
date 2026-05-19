@@ -6,6 +6,8 @@ import 'manager/global_options_manager.dart';
 import 'manager/history_manager.dart';
 import 'manager/job_manager.dart';
 import 'manager/library_manager.dart';
+import 'manager/source_manager.dart';
+import 'sources/built_in_source_provider.dart';
 import 'use_case/cancel_job_use_case.dart';
 import 'use_case/chapter/get_all_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
@@ -33,7 +35,11 @@ import 'use_case/prefetch/listen_prefetch_use_case.dart';
 import 'use_case/prefetch/prefetch_chapter_use_case.dart';
 import 'use_case/prefetch/prefetch_manga_use_case.dart';
 import 'use_case/recrawl_use_case.dart';
+import 'use_case/source/add_dynamic_source_use_case.dart';
+import 'use_case/source/delete_dynamic_source_use_case.dart';
+import 'use_case/source/import_dynamic_source_use_case.dart';
 import 'use_case/source/listen_sources_use_case.dart';
+import 'use_case/source/toggle_dynamic_source_use_case.dart';
 import 'use_case/source/update_sources_use_case.dart';
 import 'use_case/tags/get_tags_use_case.dart';
 
@@ -42,8 +48,23 @@ class DomainMangaRegistrar extends Registrar {
   Future<void> register(ServiceLocator locator) async {
     final start = DateTime.timestamp();
 
+    locator.registerLazySingleton<BuiltInSourceProvider>(
+      () => BuiltInSourceProviderImpl(),
+    );
+    locator.registerLazySingleton<SourceManager>(
+      () => SourceManagerImpl(
+        builtInSourceProvider: locator(),
+        dynamicSourceDao: locator(),
+        sourceRuntime: locator(),
+      ),
+      dispose: (e) => (e as SourceManagerImpl).dispose(),
+    );
+
     locator.registerLazySingletonAsync(
-      () => GlobalOptionsManager.create(storage: locator()),
+      () => GlobalOptionsManager.create(
+        storage: locator(),
+        sourceManager: locator(),
+      ),
     );
     locator.alias<ListenSearchParameterUseCase, GlobalOptionsManager>();
     locator.alias<UpdateSearchParameterUseCase, GlobalOptionsManager>();
@@ -55,6 +76,23 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<ListenSettingIncognitoUseCase, GlobalOptionsManager>();
     locator.alias<UpdateSettingIncognitoUseCase, GlobalOptionsManager>();
 
+    locator.registerFactory<AddDynamicSourceUseCase>(
+      () => AddDynamicSourceUseCaseImpl(dynamicSourceDao: locator()),
+    );
+    locator.registerFactory<DeleteDynamicSourceUseCase>(
+      () => DeleteDynamicSourceUseCaseImpl(dynamicSourceDao: locator()),
+    );
+    locator.registerFactory<ToggleDynamicSourceUseCase>(
+      () => ToggleDynamicSourceUseCaseImpl(dynamicSourceDao: locator()),
+    );
+    locator.registerFactory<ImportDynamicSourceUseCase>(
+      () => ImportDynamicSourceUseCaseImpl(
+        dio: locator(),
+        sourceRuntime: locator(),
+        addDynamicSourceUseCase: locator(),
+      ),
+    );
+
     locator.registerLazySingleton(
       () => JobManager(
         log: locator(),
@@ -62,6 +100,7 @@ class DomainMangaRegistrar extends Registrar {
         fileDao: locator(),
         getRootPathUseCase: locator(),
         manager: locator(),
+        sourceManager: locator(),
         getChapterUseCase: () => locator(),
         getMangaUseCase: () => locator(),
         getAllChapterUseCase: () => locator(),
@@ -107,6 +146,7 @@ class DomainMangaRegistrar extends Registrar {
         htmlCacheManager: locator(),
         searchMangaCacheManager: locator(),
         converterCacheManager: locator(),
+        sourceManager: locator(),
       ),
     );
     locator.registerFactory(
@@ -119,6 +159,7 @@ class DomainMangaRegistrar extends Registrar {
         searchChapterCacheManager: locator(),
         converterCacheManager: locator(),
         htmlCacheManager: locator(),
+        sourceManager: locator(),
       ),
     );
     locator.registerFactory(

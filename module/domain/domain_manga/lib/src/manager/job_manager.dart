@@ -12,7 +12,6 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
 
-import '../sources/sources.dart';
 import '../use_case/cancel_job_use_case.dart';
 import '../use_case/chapter/get_all_chapter_use_case.dart';
 import '../use_case/chapter/get_chapter_use_case.dart';
@@ -22,6 +21,7 @@ import '../use_case/prefetch/listen_job_use_case.dart';
 import '../use_case/prefetch/listen_prefetch_use_case.dart';
 import '../use_case/prefetch/prefetch_chapter_use_case.dart';
 import '../use_case/prefetch/prefetch_manga_use_case.dart';
+import 'source_manager.dart';
 
 class JobManager
     with UserAgentMixin, WidgetsBindingObserver
@@ -40,6 +40,7 @@ class JobManager
   final ImagesCacheManager _manager;
   final JobDao _jobDao;
   final FileDao _fileDao;
+  final SourceManager _sourceManager;
   final LogBox _log;
   final GetRootPathUseCase _getRootPathUseCase;
 
@@ -51,6 +52,7 @@ class JobManager
     required JobDao jobDao,
     required FileDao fileDao,
     required ImagesCacheManager manager,
+    required SourceManager sourceManager,
     required GetRootPathUseCase getRootPathUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
@@ -60,6 +62,7 @@ class JobManager
        _jobDao = jobDao,
        _fileDao = fileDao,
        _manager = manager,
+       _sourceManager = sourceManager,
        _getRootPathUseCase = getRootPathUseCase,
        _getMangaUseCase = getMangaUseCase,
        _getChapterUseCase = getChapterUseCase,
@@ -144,7 +147,7 @@ class JobManager
 
   Future<void> _fetchManga(JobModel job) async {
     final mangaId = job.manga?.id;
-    final source = job.manga?.source?.let(Sources.fromName);
+    final source = job.manga?.source?.let(_sourceManager.getSource);
 
     if (mangaId == null || source == null) {
       throw Exception('No Manga ID or Source Url');
@@ -164,7 +167,7 @@ class JobManager
   Future<void> _fetchChapter(JobModel job) async {
     final mangaId = job.manga?.id;
     final chapterId = job.chapter?.id;
-    final source = job.manga?.source?.let(Sources.fromName);
+    final source = job.manga?.source?.let(_sourceManager.getSource);
 
     if (mangaId == null || chapterId == null || source == null) {
       throw Exception('No Manga ID or Chapter ID or Source');
@@ -197,7 +200,7 @@ class JobManager
 
   Future<void> _fetchAllChapter(JobModel job) async {
     final mangaId = job.manga?.id;
-    final source = job.manga?.source?.let(Sources.fromName);
+    final source = job.manga?.source?.let(_sourceManager.getSource);
 
     if (mangaId == null || source == null) {
       throw Exception('No Manga ID or Source');

@@ -73,3 +73,7 @@ The project follows a **Modular Clean Architecture** pattern with a sharded dire
   - **Location**: `module/ui/` (e.g., `ui_browse/lib/src/browse_manga_screen/`)
   - **Context**: Screens and their business logic (Cubits) are often colocated in the same UI module rather than separate feature modules.
   - **Troubleshooting**: When looking for logic related to a specific screen, check the same directory as the screen widget for `*_cubit.dart` and `*_state.dart` files.
+
+- **Dynamic Source Management (Phase 3 Complete, Phase 2 Complete)**
+  - **Context**: The legacy static `Sources` class has been removed. All source resolution MUST happen via `SourceManager`. Dynamic sources are fully supported with isolate-based execution and search parameter bridging.
+  - **Troubleshooting**: If search functionality fails for dynamic sources, verify the script implements `searchUrl` correctly. Check `SourceRuntime` for execution errors.

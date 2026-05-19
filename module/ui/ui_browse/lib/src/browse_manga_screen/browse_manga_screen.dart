@@ -44,9 +44,10 @@ class BrowseMangaScreen extends StatefulWidget {
   }) {
     return BlocProvider(
       create: (context) {
+        final SourceManager sourceManager = locator();
         return BrowseMangaScreenCubit(
           initialState: BrowseMangaScreenState(
-            source: source?.let(Sources.fromName),
+            source: source?.let(sourceManager.getSource),
             parameter: SearchMangaParameter(
               includedTags: tagId.let((e) => [e]),
             ),
@@ -61,6 +62,7 @@ class BrowseMangaScreen extends StatefulWidget {
           listenSearchParameterUseCase: locator(),
           getTagsUseCase: locator(),
           recrawlUseCase: locator(),
+          sourceManager: locator(),
         )..init();
       },
       child: BrowseMangaScreen(
@@ -397,6 +399,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
               },
               isOnLibrary: state.libraryMangaIds.contains(data.id),
               isPrefetching: state.prefetchedMangaIds.contains(data.id),
+              source: state.source,
             );
           },
           onLoadNextPage: () async => await _cubit(context)?.next(),

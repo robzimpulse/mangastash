@@ -14,6 +14,7 @@ class BrowseScreenCubit extends Cubit<BrowseScreenState> {
     required UpdateSourcesUseCase updateSourcesUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required ListenSourcesUseCase listenSourcesUseCase,
+    required SourceManager sourceManager,
     BrowseScreenState initialState = const BrowseScreenState(),
   })  : _updateSearchParameterUseCase = updateSearchParameterUseCase,
         _updateSourcesUseCase = updateSourcesUseCase,
@@ -22,6 +23,7 @@ class BrowseScreenCubit extends Cubit<BrowseScreenState> {
             parameter:
                 listenSearchParameterUseCase.searchParameterState.valueOrNull,
             sources: listenSourcesUseCase.sourceStateStream.valueOrNull,
+            allSources: sourceManager.currentSources,
           ),
         );
 

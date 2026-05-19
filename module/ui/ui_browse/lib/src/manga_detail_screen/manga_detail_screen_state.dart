@@ -34,6 +34,7 @@ class MangaDetailScreenState extends Equatable {
   final Set<String> prefetchedMangaIds;
   final Map<String, Chapter> histories;
   final Set<String> downloadedChapterIds;
+  final Map<String, SourceExternal?> sources;
 
   bool get isOnLibrary => libraryMangaIds.contains(mangaId);
 
@@ -101,6 +102,7 @@ class MangaDetailScreenState extends Equatable {
     this.sourceUrlSimilarManga,
     this.similarMangaParameter,
     this.downloadedChapterIds = const {},
+    this.sources = const {},
   });
 
   @override
@@ -131,6 +133,7 @@ class MangaDetailScreenState extends Equatable {
     sourceUrlSimilarManga,
     similarMangaParameter,
     downloadedChapterIds,
+    sources,
   ];
 
   MangaDetailScreenState copyWith({
@@ -161,6 +164,7 @@ class MangaDetailScreenState extends Equatable {
     ValueGetter<String?>? sourceUrlSimilarManga,
     SearchMangaParameter? similarMangaParameter,
     Set<String>? downloadedChapterIds,
+    Map<String, SourceExternal?>? sources,
   }) {
     return MangaDetailScreenState(
       config: config ?? this.config,
@@ -202,6 +206,7 @@ class MangaDetailScreenState extends Equatable {
               ? sourceUrlSimilarManga()
               : this.sourceUrlSimilarManga,
       downloadedChapterIds: downloadedChapterIds ?? this.downloadedChapterIds,
+      sources: sources ?? this.sources,
     );
   }
 }

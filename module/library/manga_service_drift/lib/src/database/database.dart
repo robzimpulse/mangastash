@@ -5,6 +5,7 @@ import 'package:file/file.dart';
 import 'package:uuid/uuid.dart';
 
 import '../dao/chapter_dao.dart';
+import '../dao/dynamic_source_dao.dart';
 import '../dao/file_dao.dart';
 import '../dao/history_dao.dart';
 import '../dao/image_dao.dart';
@@ -13,6 +14,7 @@ import '../dao/library_dao.dart';
 import '../dao/manga_dao.dart';
 import '../dao/tag_dao.dart';
 import '../tables/chapter_tables.dart';
+import '../tables/dynamic_source_tables.dart';
 import '../tables/file_tables.dart';
 import '../tables/image_tables.dart';
 import '../tables/job_tables.dart';
@@ -42,6 +44,7 @@ part 'database.g.dart';
     RelationshipTables,
     JobTables,
     FileTables,
+    DynamicSourceTables,
   ],
   daos: [
     MangaDao,
@@ -52,6 +55,7 @@ part 'database.g.dart';
     TagDao,
     HistoryDao,
     FileDao,
+    DynamicSourceDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -65,7 +69,7 @@ class AppDatabase extends _$AppDatabase {
       super(executor.build());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration {
@@ -73,6 +77,9 @@ class AppDatabase extends _$AppDatabase {
       onUpgrade: stepByStep(
         from1To2: (m, schema) async {
           await m.addColumn(jobTables, jobTables.path);
+        },
+        from2To3: (m, schema) async {
+          await m.createTable(dynamicSourceTables);
         },
       ),
     );

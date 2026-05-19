@@ -26,6 +26,8 @@ dependencies:
     path: ../../core/core_environment
   core_storage:
     path: ../../core/core_storage
+  core_runtime:
+    path: ../../core/core_runtime
 
   # entity
   entity_manga:
@@ -38,8 +40,11 @@ dependencies:
     path: ../../library/manga_dex_api
   entity_manga_external:
     path: ../../library/entity_manga_external
+  manga_service_drift:
+    path: ../../library/manga_service_drift
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  mocktail: ^1.0.4

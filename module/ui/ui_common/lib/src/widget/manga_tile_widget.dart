@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
-import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:flutter/material.dart';
 
 import 'base/image_info_widget.dart';
@@ -30,11 +30,12 @@ class MangaTileWidget extends StatelessWidget {
     BaseCacheManager? cacheManager,
     EdgeInsetsGeometry padding = EdgeInsets.zero,
     VoidCallback? onLongPress,
+    SourceExternal? source,
   }) {
     return MangaTileWidget(
       title: manga.title,
       coverUrl: manga.coverUrl,
-      sourceIconUrl: manga.source?.let(Sources.fromName)?.iconUrl,
+      sourceIconUrl: source?.iconUrl,
       key: key,
       padding: padding,
       onTap: onTap,

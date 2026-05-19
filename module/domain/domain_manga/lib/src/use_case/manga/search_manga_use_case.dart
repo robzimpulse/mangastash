@@ -9,8 +9,8 @@ import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../extension/data_scrapped_extension.dart';
+import '../../manager/source_manager.dart';
 import '../../mixin/sync_mangas_mixin.dart';
-import '../../sources/sources.dart';
 
 class SearchMangaUseCase with SyncMangasMixin {
   final MangaRepository _mangaRepository;
@@ -19,6 +19,7 @@ class SearchMangaUseCase with SyncMangasMixin {
   final HtmlCacheManager _htmlCacheManager;
   final SearchMangaCacheManager _searchMangaCacheManager;
   final MangaDao _mangaDao;
+  final SourceManager _sourceManager;
   final LogBox _logBox;
 
   const SearchMangaUseCase({
@@ -28,12 +29,14 @@ class SearchMangaUseCase with SyncMangasMixin {
     required HtmlCacheManager htmlCacheManager,
     required SearchMangaCacheManager searchMangaCacheManager,
     required MangaDao mangaDao,
+    required SourceManager sourceManager,
     required LogBox logBox,
   }) : _mangaRepository = mangaRepository,
        _converterCacheManager = converterCacheManager,
        _htmlCacheManager = htmlCacheManager,
        _searchMangaCacheManager = searchMangaCacheManager,
        _mangaDao = mangaDao,
+       _sourceManager = sourceManager,
        _webview = webview,
        _logBox = logBox;
 
@@ -86,7 +89,7 @@ class SearchMangaUseCase with SyncMangasMixin {
 
   Future<void> clear({required SourceSearchMangaParameter parameter}) async {
     final data = await _searchMangaCacheManager.keys;
-    final source = Sources.fromName(parameter.source);
+    final source = _sourceManager.getSource(parameter.source);
     if (source == null) return;
 
     final List<Future<void>> promises = [
@@ -104,7 +107,7 @@ class SearchMangaUseCase with SyncMangasMixin {
       );
       if (paramIgnorePagination != key.parameter) continue;
       promises.add(_searchMangaCacheManager.removeFile(value));
-      final source = Sources.fromName(parameter.source);
+      final source = _sourceManager.getSource(parameter.source);
       final url = source?.searchMangaUseCase.url(parameter: key.parameter);
       if (url == null) continue;
       promises.add(_htmlCacheManager.removeFile(url));
@@ -129,7 +132,7 @@ class SearchMangaUseCase with SyncMangasMixin {
     if (data != null && useCache) return Success(data);
 
     try {
-      final source = Sources.fromName(parameter.source);
+      final source = _sourceManager.getSource(parameter.source);
       if (source == null) {
         throw DataNotFoundException();
       }

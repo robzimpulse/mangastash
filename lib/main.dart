@@ -4,6 +4,7 @@ import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_route/core_route.dart';
+import 'package:core_runtime/core_runtime.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:flutter/foundation.dart';
@@ -37,6 +38,7 @@ void main() async {
           // TODO: register module registrar here
           await locator.registerRegistrar(CoreAnalyticsRegistrar());
           await locator.registerRegistrar(CoreStorageRegistrar());
+          await locator.registerRegistrar(CoreRuntimeRegistrar());
           await locator.registerRegistrar(CoreNetworkRegistrar());
           await locator.registerRegistrar(CoreEnvironmentRegistrar());
           await locator.registerRegistrar(CoreRouteRegistrar());

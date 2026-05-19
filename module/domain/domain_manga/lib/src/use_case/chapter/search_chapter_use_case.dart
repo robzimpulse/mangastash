@@ -10,10 +10,10 @@ import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../extension/data_scrapped_extension.dart';
+import '../../manager/source_manager.dart';
 import '../../mixin/filter_chapters_mixin.dart';
 import '../../mixin/sort_chapters_mixin.dart';
 import '../../mixin/sync_chapters_mixin.dart';
-import '../../sources/sources.dart';
 
 class SearchChapterUseCase
     with SyncChaptersMixin, SortChaptersMixin, FilterChaptersMixin {
@@ -24,6 +24,7 @@ class SearchChapterUseCase
   final HtmlCacheManager _htmlCacheManager;
   final ChapterDao _chapterDao;
   final MangaDao _mangaDao;
+  final SourceManager _sourceManager;
   final LogBox _logBox;
 
   const SearchChapterUseCase({
@@ -34,6 +35,7 @@ class SearchChapterUseCase
     required SearchChapterCacheManager searchChapterCacheManager,
     required ChapterDao chapterDao,
     required MangaDao mangaDao,
+    required SourceManager sourceManager,
     required LogBox logBox,
   }) : _chapterRepository = chapterRepository,
        _converterCacheManager = converterCacheManager,
@@ -41,6 +43,7 @@ class SearchChapterUseCase
        _searchChapterCacheManager = searchChapterCacheManager,
        _chapterDao = chapterDao,
        _mangaDao = mangaDao,
+       _sourceManager = sourceManager,
        _logBox = logBox,
        _webview = webview;
 
@@ -166,7 +169,7 @@ class SearchChapterUseCase
     if (data != null && useCache) return Success(data);
 
     try {
-      final source = Sources.fromName(parameter.source);
+      final source = _sourceManager.getSource(parameter.source);
       if (source == null) {
         throw DataNotFoundException();
       }

@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
-import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:flutter/material.dart';
 
 import 'base/image_info_widget.dart';
@@ -17,6 +17,7 @@ class MangaItemWidget extends StatelessWidget {
     this.isPrefetching = false,
     this.onLongPress,
     this.cacheManager,
+    this.source,
   });
 
   final Manga manga;
@@ -26,11 +27,11 @@ class MangaItemWidget extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final EdgeInsetsGeometry padding;
+  final SourceExternal? source;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final source = manga.source?.let(Sources.fromName);
     final sourceIconUrl = source?.iconUrl;
     final title = manga.title;
 

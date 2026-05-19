@@ -16,6 +16,7 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
   final PrefetchChapterUseCase _prefetchChapterUseCase;
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
   final AddToLibraryUseCase _addToLibraryUseCase;
+  final SourceManager _sourceManager;
 
   MangaGridWidgetCubit({
     MangaGridWidgetState initialState = const MangaGridWidgetState(),
@@ -29,12 +30,14 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
     required PrefetchChapterUseCase prefetchChapterUseCase,
     required RemoveFromLibraryUseCase removeFromLibraryUseCase,
     required AddToLibraryUseCase addToLibraryUseCase,
+    required SourceManager sourceManager,
   }) : _searchMangaUseCase = searchMangaUseCase,
        _recrawlUseCase = recrawlUseCase,
        _removeFromLibraryUseCase = removeFromLibraryUseCase,
        _addToLibraryUseCase = addToLibraryUseCase,
        _prefetchMangaUseCase = prefetchMangaUseCase,
        _prefetchChapterUseCase = prefetchChapterUseCase,
+       _sourceManager = sourceManager,
        super(
          initialState.copyWith(
            parameter: initialState.parameter.merge(parentCubit.state.parameter),
@@ -163,7 +166,7 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
   void prefetch({required List<Manga> mangas}) {
     for (final manga in mangas) {
       final id = manga.id;
-      final source = manga.source?.let(Sources.fromName);
+      final source = manga.source?.let(_sourceManager.getSource);
       if (id == null || source == null) continue;
       _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
       _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);

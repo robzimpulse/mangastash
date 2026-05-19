@@ -4,6 +4,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:flutter/material.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
@@ -19,6 +20,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   final GetAllChapterUseCase _getAllChapterUseCase;
   final SearchMangaUseCase _searchMangaUseCase;
   final RecrawlUseCase _recrawlUseCase;
+  final SourceManager _sourceManager;
 
   MangaDetailScreenCubit({
     required MangaDetailScreenState initialState,
@@ -35,6 +37,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     required GetAllChapterUseCase getAllChapterUseCase,
     required RecrawlUseCase recrawlUseCase,
     required ListenDownloadedChapterUseCase listenDownloadedChapterUseCase,
+    required SourceManager sourceManager,
   }) : _getMangaUseCase = getMangaUseCase,
        _searchMangaUseCase = searchMangaUseCase,
        _searchChapterUseCase = searchChapterUseCase,
@@ -43,6 +46,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
        _prefetchChapterUseCase = prefetchChapterUseCase,
        _getAllChapterUseCase = getAllChapterUseCase,
        _recrawlUseCase = recrawlUseCase,
+       _sourceManager = sourceManager,
        super(
          initialState.copyWith(
            chapterParameter: listenSearchParameterUseCase
@@ -244,6 +248,14 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
       final allMangas = [...state.similarManga, ...mangas].distinct();
 
+      final Map<String, SourceExternal?> sources = {...state.sources};
+      for (final manga in mangas) {
+        final sourceName = manga.source;
+        if (sourceName != null && !sources.containsKey(sourceName)) {
+          sources[sourceName] = _sourceManager.getSource(sourceName);
+        }
+      }
+
       emit(
         state.copyWith(
           similarManga: [...allMangas]
@@ -255,6 +267,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
             limit: limit,
           ),
           errorSimilarManga: () => null,
+          sources: sources,
         ),
       );
 
@@ -361,7 +374,7 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
   Future<void> prefetch() async {
     final mangaId = state.manga?.id;
-    final source = state.manga?.source?.let(Sources.fromName);
+    final source = state.manga?.source?.let(_sourceManager.getSource);
     if (mangaId == null || source == null) return;
     final chapters = await _getAllChapterUseCase.execute(
       source: source,

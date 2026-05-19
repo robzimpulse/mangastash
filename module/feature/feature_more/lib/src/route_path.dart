@@ -5,6 +5,8 @@ class MoreRoutePath {
   static const appearance = '$setting/appearance';
   static const dataStorage = '$setting/data_storage';
   static const browse = '$setting/browse';
+  static const dynamicSource = '$setting/dynamic_source';
+  static const dynamicSourceEditor = '$setting/dynamic_source/editor';
   static const queue = '$setting/queue';
   static const general = '$setting/general';
   static const library = '$setting/library';
@@ -12,6 +14,7 @@ class MoreRoutePath {
   static const security = '$setting/security';
   static const statistic = '$setting/statistic';
   static const tracking = '$setting/tracking';
+  static const testSource = '$setting/dynamic_source/editor/test';
   static const more = '/more';
   static const setting = '/setting';
   static const languagePicker = '$setting/language';

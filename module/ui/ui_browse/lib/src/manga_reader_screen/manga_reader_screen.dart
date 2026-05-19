@@ -40,11 +40,12 @@ class MangaReaderScreen extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (context) {
+        final SourceManager sourceManager = locator();
         return MangaReaderScreenCubit(
           initialState: MangaReaderScreenState(
             mangaId: mangaId,
             chapterId: chapterId,
-            source: source?.let(Sources.fromName),
+            source: source?.let(sourceManager.getSource),
           ),
           getChapterUseCase: locator(),
           updateChapterUseCase: locator(),

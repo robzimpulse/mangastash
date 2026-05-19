@@ -26,6 +26,7 @@ class MangaUpdatesScreen extends StatelessWidget {
           listenUnreadHistoryUseCase: locator(),
           listenPrefetchUseCase: locator(),
           prefetchChapterUseCase: locator(),
+          sourceManager: locator(),
         );
       },
       child: MangaUpdatesScreen(
@@ -117,6 +118,7 @@ class MangaUpdatesScreen extends StatelessWidget {
                 cacheManager: imagesCacheManager,
                 isPrefetching: state.prefetchedChapterIds.contains(chapter.id),
                 onTap: () => onTapChapter?.call(manga, chapter),
+                source: state.sources[manga.source],
               );
             },
             separatorBuilder: (context, _) => const SizedBox(height: 8),

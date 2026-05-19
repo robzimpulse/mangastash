@@ -4,7 +4,6 @@ import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../sources/sources.dart';
 import '../use_case/parameter/listen_search_parameter_use_case.dart';
 import '../use_case/parameter/listen_setting_downloaded_only_use_case.dart';
 import '../use_case/parameter/listen_setting_incognito_use_case.dart';
@@ -14,6 +13,7 @@ import '../use_case/parameter/update_setting_incognito_use_case.dart';
 import '../use_case/prefetch/listen_prefetch_chapter_config.dart';
 import '../use_case/source/listen_sources_use_case.dart';
 import '../use_case/source/update_sources_use_case.dart';
+import 'source_manager.dart';
 
 class GlobalOptionsManager
     implements
@@ -44,6 +44,7 @@ class GlobalOptionsManager
 
   static Future<GlobalOptionsManager> create({
     required SharedPreferencesAsync storage,
+    required SourceManager sourceManager,
   }) async {
     final incognito = await storage.getBool(_incognitoKey);
     final downloadedOnly = await storage.getBool(_downloadedOnlyChapterKey);
@@ -56,6 +57,11 @@ class GlobalOptionsManager
       _numOfPrefetchedNextChapterKey,
     );
 
+    final initialSources = sources
+        ?.map(sourceManager.getSource)
+        .nonNulls
+        .toList();
+
     return GlobalOptionsManager._(
       storage: storage,
       initialParameter: parameter
@@ -66,9 +72,10 @@ class GlobalOptionsManager
               availableTranslatedLanguage: [LanguageCodes.english],
             ),
           ),
-      initialSources: sources
-          .let((e) => [...e.map(Sources.fromName).nonNulls])
-          .or(Sources.values),
+      initialSources:
+          (initialSources?.isNotEmpty == true)
+              ? initialSources!
+              : (await sourceManager.watchAllSources().first),
       numOfPrefetchedPrevChapter: numOfPrefetchedPrevChapter ?? 0,
       numOfPrefetchedNextChapter: numOfPrefetchedNextChapter ?? 0,
       downloadedOnlyChapter: downloadedOnly ?? false,

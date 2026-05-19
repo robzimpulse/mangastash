@@ -28,7 +28,10 @@ class MangaHistoryScreen extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (context) {
-        return MangaHistoryScreenCubit(listenReadHistoryUseCase: locator());
+        return MangaHistoryScreenCubit(
+          listenReadHistoryUseCase: locator(),
+          sourceManager: locator(),
+        );
       },
       child: MangaHistoryScreen(
         imagesCacheManager: locator(),
@@ -88,6 +91,7 @@ class MangaHistoryScreen extends StatelessWidget {
                 lastReadAt: chapter.lastReadAt,
                 cacheManager: imagesCacheManager,
                 onTap: () => onTapChapter?.call(manga, chapter),
+                source: state.sources[manga.source],
               );
             },
             separatorBuilder: (context, _) => const SizedBox(height: 8),

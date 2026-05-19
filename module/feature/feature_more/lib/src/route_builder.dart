@@ -109,7 +109,48 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         parentNavigatorKey: rootNavigatorKey,
         path: MoreRoutePath.browse,
         name: MoreRoutePath.browse,
-        builder: (context, state) => BrowseScreen.create(locator: locator),
+        builder: (context, state) {
+          return BrowseScreen.create(
+            locator: locator,
+            onTapManageDynamicSource: () {
+              context.push(MoreRoutePath.dynamicSource);
+            },
+          );
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MoreRoutePath.dynamicSource,
+        name: MoreRoutePath.dynamicSource,
+        builder: (context, state) {
+          return SourceManagementScreen.create(
+            locator: locator,
+            onTapEdit: (source) {
+              return context.pushNamed(
+                MoreRoutePath.dynamicSourceEditor,
+                extra: source,
+              );
+            },
+          );
+        },
+        routes: [
+          GoRoute(
+            parentNavigatorKey: rootNavigatorKey,
+            path: 'editor',
+            name: MoreRoutePath.dynamicSourceEditor,
+            builder: (context, state) {
+              return SourceEditorScreen.create(
+                locator: locator,
+                initialSource: state.extra?.castOrNull(),
+                onShowTestMenu: () {
+                  return context.pushNamed<TestSourceResult>(
+                    MoreRoutePath.testSource,
+                  );
+                },
+              );
+            },
+          ),
+        ],
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
@@ -208,6 +249,14 @@ class MoreRouteBuilder extends BaseRouteBuilder {
             locator: locator,
             selected: state.extra?.castOrNull(),
           );
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MoreRoutePath.testSource,
+        name: MoreRoutePath.testSource,
+        pageBuilder: (context, state) {
+          return TestSourceRouteBottomSheet(locator: locator);
         },
       ),
     ];

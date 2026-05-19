@@ -33,6 +33,7 @@ class MangaGridWidget extends StatefulWidget {
           prefetchMangaUseCase: locator(),
           removeFromLibraryUseCase: locator(),
           addToLibraryUseCase: locator(),
+          sourceManager: locator(),
         )..init();
       },
       child: MangaGridWidget._(
@@ -126,6 +127,7 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
                   isOnLibrary: state.libraryMangaIds.contains(data.id),
                 );
               },
+              source: state.source,
             );
           },
           onLoadNextPage: () => _cubit(context)?.next(),
