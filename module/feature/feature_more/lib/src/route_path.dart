@@ -14,6 +14,7 @@ class MoreRoutePath {
   static const security = '$setting/security';
   static const statistic = '$setting/statistic';
   static const tracking = '$setting/tracking';
+  static const testSource = '$setting/dynamic_source/editor/test';
   static const more = '/more';
   static const setting = '/setting';
   static const languagePicker = '$setting/language';

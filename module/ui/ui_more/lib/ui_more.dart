@@ -13,6 +13,8 @@ export 'src/reader_screen/reader_screen.dart';
 export 'src/security_screen/security_screen.dart';
 export 'src/setting_screen/setting_screen.dart';
 export 'src/source_editor_screen/source_editor_screen.dart';
+export 'src/source_editor_screen/test_source_route_bottom_sheet.dart';
+export 'src/source_editor_screen/widget/test_source_widget.dart';
 export 'src/source_management_screen/source_management_screen.dart';
 export 'src/statistic_screen/statistic_screen.dart';
 export 'src/tracking_screen/tracking_screen.dart';

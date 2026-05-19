@@ -7,15 +7,22 @@ import 'package:ui_common/ui_common.dart';
 
 import 'source_editor_screen_cubit.dart';
 import 'source_editor_screen_state.dart';
+import 'widget/test_source_widget.dart';
 
 class SourceEditorScreen extends StatefulWidget {
   final DynamicSourceDrift? initialSource;
+  final Future<TestSourceResult?> Function() onShowTestMenu;
 
-  const SourceEditorScreen({super.key, this.initialSource});
+  const SourceEditorScreen({
+    super.key,
+    this.initialSource,
+    required this.onShowTestMenu,
+  });
 
   static Widget create({
     required ServiceLocator locator,
     DynamicSourceDrift? initialSource,
+    required Future<TestSourceResult?> Function() onShowTestMenu,
   }) {
     return BlocProvider(
       create:
@@ -25,7 +32,10 @@ class SourceEditorScreen extends StatefulWidget {
             dio: locator(),
             initialSource: initialSource,
           ),
-      child: SourceEditorScreen(initialSource: initialSource),
+      child: SourceEditorScreen(
+        initialSource: initialSource,
+        onShowTestMenu: onShowTestMenu,
+      ),
     );
   }
 
@@ -179,7 +189,7 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.play_arrow),
-            onPressed: () => _showTestDialog(context),
+            onPressed: () => _showTestBottomSheet(context),
           ),
           IconButton(
             icon: const Icon(Icons.save),
@@ -240,62 +250,11 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
     );
   }
 
-  void _showTestDialog(BuildContext context) {
-    final controller = TextEditingController();
-    SourceTestType selectedType = SourceTestType.getManga;
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Text('Test Source'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  DropdownButtonFormField<SourceTestType>(
-                    value: selectedType,
-                    onChanged: (v) {
-                      if (v != null) setState(() => selectedType = v);
-                    },
-                    items: SourceTestType.values.map((e) {
-                      return DropdownMenuItem(
-                        value: e,
-                        child: Text(e.name),
-                      );
-                    }).toList(),
-                    decoration: const InputDecoration(labelText: 'Function to Test'),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: controller,
-                    decoration: InputDecoration(
-                      hintText: selectedType == SourceTestType.searchUrl
-                          ? 'Enter search query'
-                          : 'Enter sample URL',
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(dialogContext),
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    _cubit(context)?.updateSourceCode(_codeController.text);
-                    _cubit(context)?.runTest(controller.text, type: selectedType);
-                    // Navigator.pop(dialogContext);
-                  },
-                  child: const Text('Run Test'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
+  void _showTestBottomSheet(BuildContext context) async {
+    _cubit(context)?.updateSourceCode(_codeController.text);
+    final result = await widget.onShowTestMenu();
+    if (result != null && context.mounted) {
+      _cubit(context)?.runTest(result.input, type: result.type);
+    }
   }
 }
