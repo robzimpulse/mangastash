@@ -63,6 +63,7 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
 
   static const String _defaultSourceCode = '''
   import 'package:html/parser.dart';
+  import 'package:html/dom.dart';
   import 'package:entity_manga_external/src/manga_scrapped.dart';
   import 'package:entity_manga_external/src/chapter_scrapped.dart';
   import 'package:entity_manga_external/src/tag_scrapped.dart';

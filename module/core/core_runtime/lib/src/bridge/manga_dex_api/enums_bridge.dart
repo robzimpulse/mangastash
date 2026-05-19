@@ -10,12 +10,16 @@ class $MangaStatus extends $Value implements $Instance {
   static const $declaration = BridgeEnumDef(
     $type,
     values: ['ongoing', 'completed', 'hiatus', 'cancelled'],
+    fields: {
+      'rawValue': BridgeFieldDef(
+        BridgeTypeAnnotation(BridgeTypeRef(CoreTypes.string)),
+      ),
+    },
   );
 
   $MangaStatus.wrap(this.value) : _superclass = $Object(value);
 
   final MangaStatus value;
-
   final $Instance _superclass;
 
   @override
@@ -50,12 +54,16 @@ class $ContentRating extends $Value implements $Instance {
   static const $declaration = BridgeEnumDef(
     $type,
     values: ['safe', 'suggestive', 'erotica', 'pornographic'],
+    fields: {
+      'rawValue': BridgeFieldDef(
+        BridgeTypeAnnotation(BridgeTypeRef(CoreTypes.string)),
+      ),
+    },
   );
 
   $ContentRating.wrap(this.value) : _superclass = $Object(value);
 
   final ContentRating value;
-
   final $Instance _superclass;
 
   @override
@@ -100,12 +108,16 @@ class $LanguageCodes extends $Value implements $Instance {
       'romanizedKorean',
       'romanizedChinese',
     ],
+    fields: {
+      'rawValue': BridgeFieldDef(
+        BridgeTypeAnnotation(BridgeTypeRef(CoreTypes.string)),
+      ),
+    },
   );
 
   $LanguageCodes.wrap(this.value) : _superclass = $Object(value);
 
   final LanguageCodes value;
-
   final $Instance _superclass;
 
   @override
@@ -143,12 +155,16 @@ class $PublicDemographic extends $Value implements $Instance {
   static const $declaration = BridgeEnumDef(
     $type,
     values: ['shounen', 'shoujo', 'josei', 'seinen'],
+    fields: {
+      'rawValue': BridgeFieldDef(
+        BridgeTypeAnnotation(BridgeTypeRef(CoreTypes.string)),
+      ),
+    },
   );
 
   $PublicDemographic.wrap(this.value) : _superclass = $Object(value);
 
   final PublicDemographic value;
-
   final $Instance _superclass;
 
   @override
@@ -180,12 +196,19 @@ class $TagsMode extends $Value implements $Instance {
     BridgeTypeSpec('package:manga_dex_api/manga_dex_api.dart', 'TagsMode'),
   );
 
-  static const $declaration = BridgeEnumDef($type, values: ['and', 'or']);
+  static const $declaration = BridgeEnumDef(
+    $type,
+    values: ['and', 'or'],
+    fields: {
+      'rawValue': BridgeFieldDef(
+        BridgeTypeAnnotation(BridgeTypeRef(CoreTypes.string)),
+      ),
+    },
+  );
 
   $TagsMode.wrap(this.value) : _superclass = $Object(value);
 
   final TagsMode value;
-
   final $Instance _superclass;
 
   @override
@@ -229,12 +252,16 @@ class $SearchOrders extends $Value implements $Instance {
       'relevance',
       'rating',
     ],
+    fields: {
+      'rawValue': BridgeFieldDef(
+        BridgeTypeAnnotation(BridgeTypeRef(CoreTypes.string)),
+      ),
+    },
   );
 
   $SearchOrders.wrap(this.value) : _superclass = $Object(value);
 
   final SearchOrders value;
-
   final $Instance _superclass;
 
   @override
@@ -272,12 +299,16 @@ class $OrderDirections extends $Value implements $Instance {
   static const $declaration = BridgeEnumDef(
     $type,
     values: ['ascending', 'descending'],
+    fields: {
+      'rawValue': BridgeFieldDef(
+        BridgeTypeAnnotation(BridgeTypeRef(CoreTypes.string)),
+      ),
+    },
   );
 
   $OrderDirections.wrap(this.value) : _superclass = $Object(value);
 
   final OrderDirections value;
-
   final $Instance _superclass;
 
   @override
@@ -321,12 +352,16 @@ class $Include extends $Value implements $Instance {
       'manga',
       'user',
     ],
+    fields: {
+      'rawValue': BridgeFieldDef(
+        BridgeTypeAnnotation(BridgeTypeRef(CoreTypes.string)),
+      ),
+    },
   );
 
   $Include.wrap(this.value) : _superclass = $Object(value);
 
   final Include value;
-
   final $Instance _superclass;
 
   @override

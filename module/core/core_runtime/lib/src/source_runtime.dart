@@ -12,22 +12,28 @@ class SourceRuntime {
   Uint8List getOrCreateBytecode(
     String id,
     String sourceCode, {
-    useCache = true,
+    bool useCache = true,
   }) {
-    if (_bytecodeCache.containsKey(id) && useCache) {
+    if (useCache && _bytecodeCache.containsKey(id)) {
       return _bytecodeCache[id]!;
     }
 
-    final compiler = Compiler();
-    RuntimeBridge.register(compiler);
+    try {
+      final compiler = Compiler();
+      RuntimeBridge.register(compiler);
 
-    final program = compiler.compile({
-      'dynamic_source': {'main.dart': sourceCode},
-    });
+      final program = compiler.compile({
+        'dynamic_source': {'main.dart': sourceCode},
+      });
 
-    final bytecode = program.write();
-    _bytecodeCache[id] = bytecode;
-    return bytecode;
+      final bytecode = program.write();
+      if (useCache) {
+        _bytecodeCache[id] = bytecode;
+      }
+      return bytecode;
+    } catch (e) {
+      throw Exception('Compilation failed: $e');
+    }
   }
 
   dynamic executeSync({
@@ -38,8 +44,7 @@ class SourceRuntime {
     final runtime = Runtime(bytecode.buffer.asByteData());
     RuntimeBridge.configure(runtime);
 
-    final wrappedArgs =
-        args.map((e) => RuntimeBridge.wrap(runtime, e)).toList();
+    final wrappedArgs = args.map((e) => RuntimeBridge.wrap(runtime, e)).toList();
     final result = runtime.executeLib(
       'package:dynamic_source/main.dart',
       functionName,
@@ -54,20 +59,31 @@ class SourceRuntime {
     required String functionName,
     List<dynamic> args = const [],
   }) async {
-    return Isolate.run(() {
-      final runtime = Runtime(bytecode.buffer.asByteData());
-      RuntimeBridge.configure(runtime);
+    // If args contains non-sendable objects, we must run on main thread
+    // For now, we assume simple args for editor testing.
+    try {
+      return await Isolate.run(() {
+        final runtime = Runtime(bytecode.buffer.asByteData());
+        RuntimeBridge.configure(runtime);
 
-      final wrappedArgs =
-          args.map((e) => RuntimeBridge.wrap(runtime, e)).toList();
-      final result = runtime.executeLib(
-        'package:dynamic_source/main.dart',
-        functionName,
-        wrappedArgs,
+        final wrappedArgs =
+            args.map((e) => RuntimeBridge.wrap(runtime, e)).toList();
+        final result = runtime.executeLib(
+          'package:dynamic_source/main.dart',
+          functionName,
+          wrappedArgs,
+        );
+
+        return _unwrap(result);
+      });
+    } catch (e) {
+      // Fallback to sync execution if isolate fails or for debugging
+      return executeSync(
+        bytecode: bytecode,
+        functionName: functionName,
+        args: args,
       );
-
-      return _unwrap(result);
-    });
+    }
   }
 
   static dynamic _unwrap(dynamic value) {

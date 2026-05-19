@@ -33,6 +33,22 @@ class RuntimePlugin implements EvalPlugin {
     registry.defineBridgeEnum($Include.$declaration);
     registry.defineBridgeClass($SearchMangaParameter.$declaration);
 
+    // Help the compiler with HTML types
+    registry.addSource(DartSource('package:html/dom.dart', '''
+      class Document {
+        Element? querySelector(String selector);
+        List<Element> querySelectorAll(String selector);
+      }
+      class Element {
+        String get text;
+        String get innerHtml;
+        String get outerHtml;
+        Map get attributes;
+        Element? querySelector(String selector);
+        List<Element> querySelectorAll(String selector);
+      }
+    '''));
+
     registry.defineBridgeTopLevelFunction(
       BridgeFunctionDeclaration(
         'package:html/parser.dart',
@@ -154,6 +170,7 @@ class RuntimeBridge {
   }
 
   static $Value wrap(Runtime runtime, dynamic e) {
+    if (e == null) return runtime.wrap(null);
     if (e is MangaScrapped) return $MangaScrapped.wrap(e);
     if (e is ChapterScrapped) return $ChapterScrapped.wrap(e);
     if (e is TagScrapped) return $TagScrapped.wrap(e);
