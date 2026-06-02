@@ -8,13 +8,16 @@ The application will allow users to side-load custom manga sources by providing 
 ### 2.1 Execution Engine
 A dedicated `CustomScriptExecutor` will be created to manage the `dart_eval` runtime environment. It will compile the downloaded scripts and bridge communication between the native app and the sandboxed code.
 
-### 2.2 `package:html` Bindings
-To allow script authors to traverse the DOM easily, the executor will register bindings for core `package:html` classes:
-*   **Functions**: `parse(String html)`
-*   **Classes**: `Document`, `Element`
-*   **Methods/Properties**: `querySelector`, `querySelectorAll`, `text`, `attributes`.
+### 2.2 `package:html` and `package:collection` Bindings
+To allow script authors to traverse the DOM easily and manipulate collections, the executor will register bindings for core classes and extensions:
+*   **`package:html` Bindings**:
+    *   **Functions**: `parse(String html)`
+    *   **Classes**: `Document`, `Element`
+    *   **Methods/Properties**: `querySelector`, `querySelectorAll`, `text`, `attributes`.
+*   **`package:collection` Bindings**:
+    *   Iterable and List extensions like `firstWhereOrNull`, `sortedBy`, `mapIndexed`, etc.
 
-This enables scripts to use standard Dart DOM traversal syntax.
+This enables scripts to use standard Dart DOM traversal syntax and powerful collection utilities natively.
 
 ### 2.3 Executable Function Interface
 The downloaded Dart scripts must act as a library of pure functions. The app's executor will invoke these functions by name. Note that HTML content is passed directly as a parsed `Document` object to avoid redundant parsing inside the script:
