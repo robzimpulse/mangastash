@@ -78,3 +78,15 @@ The project follows a **Modular Clean Architecture** pattern with a sharded dire
   - **Location**: `module/library/manga_service_drift/lib/src/tables/`
   - **Context**: When creating new drift tables, using the `AutoIntegerIdTable` mixin (which provides `IntColumn get id => integer().named('id').autoIncrement()();`) inherently sets the primary key. Drift prevents defining an explicit `primaryKey` override if `autoIncrement()` is used on a column. Also, ensure the correct mixin `AutoIntegerIdTable` is used (not `AutoIntIdTable`).
   - **Troubleshooting**: If `melos run generate` fails with "Tables can't override primaryKey and use autoIncrement()", remove the `@override Set<Column<Object>>? get primaryKey => {id};` from the table definition.
+
+- **dart_eval Bridge Interface Changes**
+  - **Location**: Bridge classes implementing `$Instance`
+  - **Context**: In newer versions of `dart_eval` (0.7.11+), bridge classes must implement `int $getRuntimeType(Runtime runtime)` instead of `int get $runtimeType`, and must provide a `dynamic get $reified` getter.
+  - **Troubleshooting**: If a compilation error mentions missing implementations for `$getRuntimeType` or `$reified`, update the bridge class to override them as follows:
+    `@override int $getRuntimeType(Runtime runtime) => runtime.lookupType($type.spec!);`
+    `@override dynamic get $reified => $value;`
+
+- **Dependency Injection (DI) Missing for New DAOs**
+  - **Location**: `module/core/core_storage/lib/src/core_storage_registrar.dart`
+  - **Context**: When a new Drift DAO is created (e.g., `CustomSourceDao`), it must be explicitly registered in `CoreStorageRegistrar`. Otherwise, dependent classes will throw DI lookup errors during app startup.
+  - **Troubleshooting**: Always ensure `locator.registerFactory(() => NewDao(locator()));` is added to the registrar whenever a new DAO is introduced.

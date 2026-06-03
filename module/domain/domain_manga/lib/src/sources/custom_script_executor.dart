@@ -13,7 +13,7 @@ import 'package:dart_eval/dart_eval.dart';
 import 'package:dart_eval/dart_eval_bridge.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
-
+import 'package:dart_eval/stdlib/core.dart';
 /// Evaluates and executes Dart scripts with HTML bridging capabilities.
 class CustomScriptExecutor {
   /// The sandboxed runtime environment.
@@ -135,7 +135,10 @@ class $Document implements $Instance {
   void $setProperty(Runtime runtime, String identifier, $Value value) {}
 
   @override
-  int get $runtimeType => runtimeType.hashCode;
+  int $getRuntimeType(Runtime runtime) => runtime.lookupType($type.spec!);
+
+  @override
+  dynamic get $reified => $value;
 }
 
 /// Bridge class for [Element] from the `html` package.
@@ -208,7 +211,10 @@ class $Element implements $Instance {
   void $setProperty(Runtime runtime, String identifier, $Value value) {}
 
   @override
-  int get $runtimeType => runtimeType.hashCode;
+  int $getRuntimeType(Runtime runtime) => runtime.lookupType($type.spec!);
+
+  @override
+  dynamic get $reified => $value;
 }
 
 /// Helper function to create an evaluated function value.
