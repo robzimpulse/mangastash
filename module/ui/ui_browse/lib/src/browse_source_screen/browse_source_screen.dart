@@ -28,13 +28,57 @@ class BrowseSourceScreen extends StatelessWidget {
   }) {
     return BlocProvider(
       create: (context) {
-        return BrowseSourceScreenCubit(listenSourceUseCase: locator());
+        return BrowseSourceScreenCubit(
+          listenSourceUseCase: locator(),
+          updateSourceUseCase: locator(),
+          customSourceDao: locator(),
+        );
       },
       child: BrowseSourceScreen(
         onTapSearchManga: onTapSearchManga,
         onTapSource: onTapSource,
         imagesCacheManager: locator(),
       ),
+    );
+  }
+
+  /// **Purpose:**
+  /// Presents a dialog to side-load a custom manga source script.
+  /// 
+  /// **Usage:**
+  /// Called when the user taps the floating action button. Submitting a URL 
+  /// triggers [BrowseSourceScreenCubit.addCustomSource].
+  void _showAddSourceDialog(BuildContext context) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Add Custom Source'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              hintText: 'Enter script URL',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                final url = controller.text;
+                if (url.isNotEmpty) {
+                  context.read<BrowseSourceScreenCubit>().addCustomSource(url);
+                }
+                Navigator.pop(context);
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -50,6 +94,10 @@ class BrowseSourceScreen extends StatelessWidget {
             onPressed: () => onTapSearchManga?.call(),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddSourceDialog(context),
+        child: const Icon(Icons.add),
       ),
       body: BlocBuilder<BrowseSourceScreenCubit, BrowseSourceScreenState>(
         builder: (context, state) {

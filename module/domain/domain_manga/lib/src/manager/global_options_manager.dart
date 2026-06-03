@@ -4,6 +4,7 @@ import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../sources/custom_source_external.dart';
 import '../sources/sources.dart';
 import '../use_case/parameter/listen_search_parameter_use_case.dart';
 import '../use_case/parameter/listen_setting_downloaded_only_use_case.dart';
@@ -42,8 +43,17 @@ class GlobalOptionsManager
   static const String _downloadedOnlyChapterKey = 'downloaded_only_chapter';
   static const String _incognitoKey = 'is_incognito';
 
+  /// **Purpose:**
+  /// Initializes the [GlobalOptionsManager] and its streams.
+  /// It reads previous preferences from [storage].
+  /// 
+  /// **Usage:**
+  /// This is called internally during module registration. It also loads 
+  /// custom scraper scripts from [customSourceDao] and appends them to 
+  /// [Sources.values] so that they are available dynamically.
   static Future<GlobalOptionsManager> create({
     required SharedPreferencesAsync storage,
+    required CustomSourceDao customSourceDao,
   }) async {
     final incognito = await storage.getBool(_incognitoKey);
     final downloadedOnly = await storage.getBool(_downloadedOnlyChapterKey);
@@ -55,6 +65,22 @@ class GlobalOptionsManager
     final numOfPrefetchedNextChapter = await storage.getInt(
       _numOfPrefetchedNextChapterKey,
     );
+
+    try {
+      final customSourcesDrift = await customSourceDao.getAllSources();
+      for (final s in customSourcesDrift) {
+        try {
+          final ext = CustomSourceExternal.fromScript(s.scriptCode);
+          if (!Sources.values.any((e) => e.name == ext.name)) {
+            Sources.values.add(ext);
+          }
+        } catch (e) {
+          // Ignore script parse errors
+        }
+      }
+    } catch (e) {
+      // Ignore DB errors
+    }
 
     return GlobalOptionsManager._(
       storage: storage,

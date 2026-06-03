@@ -43,7 +43,10 @@ class DomainMangaRegistrar extends Registrar {
     final start = DateTime.timestamp();
 
     locator.registerLazySingletonAsync(
-      () => GlobalOptionsManager.create(storage: locator()),
+      () => GlobalOptionsManager.create(
+        storage: locator(),
+        customSourceDao: locator(),
+      ),
     );
     locator.alias<ListenSearchParameterUseCase, GlobalOptionsManager>();
     locator.alias<UpdateSearchParameterUseCase, GlobalOptionsManager>();
