@@ -3724,6 +3724,514 @@ class FileTablesCompanion extends UpdateCompanion<FileDrift> {
   }
 }
 
+class $CustomSourceTablesTable extends CustomSourceTables
+    with TableInfo<$CustomSourceTablesTable, CustomSourceDrift> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CustomSourceTablesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _baseUrlMeta = const VerificationMeta(
+    'baseUrl',
+  );
+  @override
+  late final GeneratedColumn<String> baseUrl = GeneratedColumn<String>(
+    'base_url',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _iconUrlMeta = const VerificationMeta(
+    'iconUrl',
+  );
+  @override
+  late final GeneratedColumn<String> iconUrl = GeneratedColumn<String>(
+    'icon_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _scriptUrlMeta = const VerificationMeta(
+    'scriptUrl',
+  );
+  @override
+  late final GeneratedColumn<String> scriptUrl = GeneratedColumn<String>(
+    'script_url',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _scriptCodeMeta = const VerificationMeta(
+    'scriptCode',
+  );
+  @override
+  late final GeneratedColumn<String> scriptCode = GeneratedColumn<String>(
+    'script_code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    createdAt,
+    updatedAt,
+    id,
+    name,
+    baseUrl,
+    iconUrl,
+    scriptUrl,
+    scriptCode,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'custom_source_tables';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CustomSourceDrift> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('base_url')) {
+      context.handle(
+        _baseUrlMeta,
+        baseUrl.isAcceptableOrUnknown(data['base_url']!, _baseUrlMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_baseUrlMeta);
+    }
+    if (data.containsKey('icon_url')) {
+      context.handle(
+        _iconUrlMeta,
+        iconUrl.isAcceptableOrUnknown(data['icon_url']!, _iconUrlMeta),
+      );
+    }
+    if (data.containsKey('script_url')) {
+      context.handle(
+        _scriptUrlMeta,
+        scriptUrl.isAcceptableOrUnknown(data['script_url']!, _scriptUrlMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_scriptUrlMeta);
+    }
+    if (data.containsKey('script_code')) {
+      context.handle(
+        _scriptCodeMeta,
+        scriptCode.isAcceptableOrUnknown(data['script_code']!, _scriptCodeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_scriptCodeMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CustomSourceDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CustomSourceDrift(
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      name:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}name'],
+          )!,
+      baseUrl:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}base_url'],
+          )!,
+      iconUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}icon_url'],
+      ),
+      scriptUrl:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}script_url'],
+          )!,
+      scriptCode:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}script_code'],
+          )!,
+    );
+  }
+
+  @override
+  $CustomSourceTablesTable createAlias(String alias) {
+    return $CustomSourceTablesTable(attachedDatabase, alias);
+  }
+}
+
+class CustomSourceDrift extends DataClass
+    implements Insertable<CustomSourceDrift> {
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final int id;
+  final String name;
+  final String baseUrl;
+  final String? iconUrl;
+  final String scriptUrl;
+  final String scriptCode;
+  const CustomSourceDrift({
+    required this.createdAt,
+    required this.updatedAt,
+    required this.id,
+    required this.name,
+    required this.baseUrl,
+    this.iconUrl,
+    required this.scriptUrl,
+    required this.scriptCode,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['base_url'] = Variable<String>(baseUrl);
+    if (!nullToAbsent || iconUrl != null) {
+      map['icon_url'] = Variable<String>(iconUrl);
+    }
+    map['script_url'] = Variable<String>(scriptUrl);
+    map['script_code'] = Variable<String>(scriptCode);
+    return map;
+  }
+
+  CustomSourceTablesCompanion toCompanion(bool nullToAbsent) {
+    return CustomSourceTablesCompanion(
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      id: Value(id),
+      name: Value(name),
+      baseUrl: Value(baseUrl),
+      iconUrl:
+          iconUrl == null && nullToAbsent
+              ? const Value.absent()
+              : Value(iconUrl),
+      scriptUrl: Value(scriptUrl),
+      scriptCode: Value(scriptCode),
+    );
+  }
+
+  factory CustomSourceDrift.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CustomSourceDrift(
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      baseUrl: serializer.fromJson<String>(json['baseUrl']),
+      iconUrl: serializer.fromJson<String?>(json['iconUrl']),
+      scriptUrl: serializer.fromJson<String>(json['scriptUrl']),
+      scriptCode: serializer.fromJson<String>(json['scriptCode']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'baseUrl': serializer.toJson<String>(baseUrl),
+      'iconUrl': serializer.toJson<String?>(iconUrl),
+      'scriptUrl': serializer.toJson<String>(scriptUrl),
+      'scriptCode': serializer.toJson<String>(scriptCode),
+    };
+  }
+
+  CustomSourceDrift copyWith({
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    int? id,
+    String? name,
+    String? baseUrl,
+    Value<String?> iconUrl = const Value.absent(),
+    String? scriptUrl,
+    String? scriptCode,
+  }) => CustomSourceDrift(
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    id: id ?? this.id,
+    name: name ?? this.name,
+    baseUrl: baseUrl ?? this.baseUrl,
+    iconUrl: iconUrl.present ? iconUrl.value : this.iconUrl,
+    scriptUrl: scriptUrl ?? this.scriptUrl,
+    scriptCode: scriptCode ?? this.scriptCode,
+  );
+  CustomSourceDrift copyWithCompanion(CustomSourceTablesCompanion data) {
+    return CustomSourceDrift(
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      baseUrl: data.baseUrl.present ? data.baseUrl.value : this.baseUrl,
+      iconUrl: data.iconUrl.present ? data.iconUrl.value : this.iconUrl,
+      scriptUrl: data.scriptUrl.present ? data.scriptUrl.value : this.scriptUrl,
+      scriptCode:
+          data.scriptCode.present ? data.scriptCode.value : this.scriptCode,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CustomSourceDrift(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('baseUrl: $baseUrl, ')
+          ..write('iconUrl: $iconUrl, ')
+          ..write('scriptUrl: $scriptUrl, ')
+          ..write('scriptCode: $scriptCode')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    createdAt,
+    updatedAt,
+    id,
+    name,
+    baseUrl,
+    iconUrl,
+    scriptUrl,
+    scriptCode,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CustomSourceDrift &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.baseUrl == this.baseUrl &&
+          other.iconUrl == this.iconUrl &&
+          other.scriptUrl == this.scriptUrl &&
+          other.scriptCode == this.scriptCode);
+}
+
+class CustomSourceTablesCompanion extends UpdateCompanion<CustomSourceDrift> {
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> id;
+  final Value<String> name;
+  final Value<String> baseUrl;
+  final Value<String?> iconUrl;
+  final Value<String> scriptUrl;
+  final Value<String> scriptCode;
+  const CustomSourceTablesCompanion({
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.baseUrl = const Value.absent(),
+    this.iconUrl = const Value.absent(),
+    this.scriptUrl = const Value.absent(),
+    this.scriptCode = const Value.absent(),
+  });
+  CustomSourceTablesCompanion.insert({
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.id = const Value.absent(),
+    required String name,
+    required String baseUrl,
+    this.iconUrl = const Value.absent(),
+    required String scriptUrl,
+    required String scriptCode,
+  }) : name = Value(name),
+       baseUrl = Value(baseUrl),
+       scriptUrl = Value(scriptUrl),
+       scriptCode = Value(scriptCode);
+  static Insertable<CustomSourceDrift> custom({
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<String>? baseUrl,
+    Expression<String>? iconUrl,
+    Expression<String>? scriptUrl,
+    Expression<String>? scriptCode,
+  }) {
+    return RawValuesInsertable({
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (baseUrl != null) 'base_url': baseUrl,
+      if (iconUrl != null) 'icon_url': iconUrl,
+      if (scriptUrl != null) 'script_url': scriptUrl,
+      if (scriptCode != null) 'script_code': scriptCode,
+    });
+  }
+
+  CustomSourceTablesCompanion copyWith({
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? id,
+    Value<String>? name,
+    Value<String>? baseUrl,
+    Value<String?>? iconUrl,
+    Value<String>? scriptUrl,
+    Value<String>? scriptCode,
+  }) {
+    return CustomSourceTablesCompanion(
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      id: id ?? this.id,
+      name: name ?? this.name,
+      baseUrl: baseUrl ?? this.baseUrl,
+      iconUrl: iconUrl ?? this.iconUrl,
+      scriptUrl: scriptUrl ?? this.scriptUrl,
+      scriptCode: scriptCode ?? this.scriptCode,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (baseUrl.present) {
+      map['base_url'] = Variable<String>(baseUrl.value);
+    }
+    if (iconUrl.present) {
+      map['icon_url'] = Variable<String>(iconUrl.value);
+    }
+    if (scriptUrl.present) {
+      map['script_url'] = Variable<String>(scriptUrl.value);
+    }
+    if (scriptCode.present) {
+      map['script_code'] = Variable<String>(scriptCode.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CustomSourceTablesCompanion(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('baseUrl: $baseUrl, ')
+          ..write('iconUrl: $iconUrl, ')
+          ..write('scriptUrl: $scriptUrl, ')
+          ..write('scriptCode: $scriptCode')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3736,6 +4244,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $RelationshipTablesTable(this);
   late final $JobTablesTable jobTables = $JobTablesTable(this);
   late final $FileTablesTable fileTables = $FileTablesTable(this);
+  late final $CustomSourceTablesTable customSourceTables =
+      $CustomSourceTablesTable(this);
   late final MangaDao mangaDao = MangaDao(this as AppDatabase);
   late final ChapterDao chapterDao = ChapterDao(this as AppDatabase);
   late final LibraryDao libraryDao = LibraryDao(this as AppDatabase);
@@ -3744,6 +4254,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final TagDao tagDao = TagDao(this as AppDatabase);
   late final HistoryDao historyDao = HistoryDao(this as AppDatabase);
   late final FileDao fileDao = FileDao(this as AppDatabase);
+  late final CustomSourceDao customSourceDao = CustomSourceDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3757,6 +4270,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     relationshipTables,
     jobTables,
     fileTables,
+    customSourceTables,
   ];
 }
 
@@ -5735,6 +6249,285 @@ typedef $$FileTablesTableProcessedTableManager =
       FileDrift,
       PrefetchHooks Function()
     >;
+typedef $$CustomSourceTablesTableCreateCompanionBuilder =
+    CustomSourceTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> id,
+      required String name,
+      required String baseUrl,
+      Value<String?> iconUrl,
+      required String scriptUrl,
+      required String scriptCode,
+    });
+typedef $$CustomSourceTablesTableUpdateCompanionBuilder =
+    CustomSourceTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> id,
+      Value<String> name,
+      Value<String> baseUrl,
+      Value<String?> iconUrl,
+      Value<String> scriptUrl,
+      Value<String> scriptCode,
+    });
+
+class $$CustomSourceTablesTableFilterComposer
+    extends Composer<_$AppDatabase, $CustomSourceTablesTable> {
+  $$CustomSourceTablesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get baseUrl => $composableBuilder(
+    column: $table.baseUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get iconUrl => $composableBuilder(
+    column: $table.iconUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get scriptUrl => $composableBuilder(
+    column: $table.scriptUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get scriptCode => $composableBuilder(
+    column: $table.scriptCode,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CustomSourceTablesTableOrderingComposer
+    extends Composer<_$AppDatabase, $CustomSourceTablesTable> {
+  $$CustomSourceTablesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get baseUrl => $composableBuilder(
+    column: $table.baseUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get iconUrl => $composableBuilder(
+    column: $table.iconUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get scriptUrl => $composableBuilder(
+    column: $table.scriptUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get scriptCode => $composableBuilder(
+    column: $table.scriptCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CustomSourceTablesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CustomSourceTablesTable> {
+  $$CustomSourceTablesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get baseUrl =>
+      $composableBuilder(column: $table.baseUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get iconUrl =>
+      $composableBuilder(column: $table.iconUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get scriptUrl =>
+      $composableBuilder(column: $table.scriptUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get scriptCode => $composableBuilder(
+    column: $table.scriptCode,
+    builder: (column) => column,
+  );
+}
+
+class $$CustomSourceTablesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CustomSourceTablesTable,
+          CustomSourceDrift,
+          $$CustomSourceTablesTableFilterComposer,
+          $$CustomSourceTablesTableOrderingComposer,
+          $$CustomSourceTablesTableAnnotationComposer,
+          $$CustomSourceTablesTableCreateCompanionBuilder,
+          $$CustomSourceTablesTableUpdateCompanionBuilder,
+          (
+            CustomSourceDrift,
+            BaseReferences<
+              _$AppDatabase,
+              $CustomSourceTablesTable,
+              CustomSourceDrift
+            >,
+          ),
+          CustomSourceDrift,
+          PrefetchHooks Function()
+        > {
+  $$CustomSourceTablesTableTableManager(
+    _$AppDatabase db,
+    $CustomSourceTablesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$CustomSourceTablesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$CustomSourceTablesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$CustomSourceTablesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> baseUrl = const Value.absent(),
+                Value<String?> iconUrl = const Value.absent(),
+                Value<String> scriptUrl = const Value.absent(),
+                Value<String> scriptCode = const Value.absent(),
+              }) => CustomSourceTablesCompanion(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                name: name,
+                baseUrl: baseUrl,
+                iconUrl: iconUrl,
+                scriptUrl: scriptUrl,
+                scriptCode: scriptCode,
+              ),
+          createCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> id = const Value.absent(),
+                required String name,
+                required String baseUrl,
+                Value<String?> iconUrl = const Value.absent(),
+                required String scriptUrl,
+                required String scriptCode,
+              }) => CustomSourceTablesCompanion.insert(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                name: name,
+                baseUrl: baseUrl,
+                iconUrl: iconUrl,
+                scriptUrl: scriptUrl,
+                scriptCode: scriptCode,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CustomSourceTablesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CustomSourceTablesTable,
+      CustomSourceDrift,
+      $$CustomSourceTablesTableFilterComposer,
+      $$CustomSourceTablesTableOrderingComposer,
+      $$CustomSourceTablesTableAnnotationComposer,
+      $$CustomSourceTablesTableCreateCompanionBuilder,
+      $$CustomSourceTablesTableUpdateCompanionBuilder,
+      (
+        CustomSourceDrift,
+        BaseReferences<
+          _$AppDatabase,
+          $CustomSourceTablesTable,
+          CustomSourceDrift
+        >,
+      ),
+      CustomSourceDrift,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5755,4 +6548,6 @@ class $AppDatabaseManager {
       $$JobTablesTableTableManager(_db, _db.jobTables);
   $$FileTablesTableTableManager get fileTables =>
       $$FileTablesTableTableManager(_db, _db.fileTables);
+  $$CustomSourceTablesTableTableManager get customSourceTables =>
+      $$CustomSourceTablesTableTableManager(_db, _db.customSourceTables);
 }

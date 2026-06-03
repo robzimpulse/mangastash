@@ -73,3 +73,8 @@ The project follows a **Modular Clean Architecture** pattern with a sharded dire
   - **Location**: `module/ui/` (e.g., `ui_browse/lib/src/browse_manga_screen/`)
   - **Context**: Screens and their business logic (Cubits) are often colocated in the same UI module rather than separate feature modules.
   - **Troubleshooting**: When looking for logic related to a specific screen, check the same directory as the screen widget for `*_cubit.dart` and `*_state.dart` files.
+
+- **Drift Table Auto-Increment Primary Key Conflict**
+  - **Location**: `module/library/manga_service_drift/lib/src/tables/`
+  - **Context**: When creating new drift tables, using the `AutoIntegerIdTable` mixin (which provides `IntColumn get id => integer().named('id').autoIncrement()();`) inherently sets the primary key. Drift prevents defining an explicit `primaryKey` override if `autoIncrement()` is used on a column. Also, ensure the correct mixin `AutoIntegerIdTable` is used (not `AutoIntIdTable`).
+  - **Troubleshooting**: If `melos run generate` fails with "Tables can't override primaryKey and use autoIncrement()", remove the `@override Set<Column<Object>>? get primaryKey => {id};` from the table definition.

@@ -12,6 +12,7 @@ import '../dao/job_dao.dart';
 import '../dao/library_dao.dart';
 import '../dao/manga_dao.dart';
 import '../dao/tag_dao.dart';
+import '../dao/custom_source_dao.dart';
 import '../tables/chapter_tables.dart';
 import '../tables/file_tables.dart';
 import '../tables/image_tables.dart';
@@ -20,6 +21,7 @@ import '../tables/library_tables.dart';
 import '../tables/manga_tables.dart';
 import '../tables/relationship_tables.dart';
 import '../tables/tag_tables.dart';
+import '../tables/custom_source_tables.dart';
 import '../util/job_type_enum.dart';
 import 'adapter/backup_database/backup_database_adapter.dart'
     if (dart.library.js_interop) 'adapter/backup_database/backup_database_web.dart'
@@ -42,6 +44,7 @@ part 'database.g.dart';
     RelationshipTables,
     JobTables,
     FileTables,
+    CustomSourceTables,
   ],
   daos: [
     MangaDao,
@@ -52,6 +55,7 @@ part 'database.g.dart';
     TagDao,
     HistoryDao,
     FileDao,
+    CustomSourceDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
