@@ -69,7 +69,7 @@ class AppDatabase extends _$AppDatabase {
       super(executor.build());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration {
@@ -77,6 +77,9 @@ class AppDatabase extends _$AppDatabase {
       onUpgrade: stepByStep(
         from1To2: (m, schema) async {
           await m.addColumn(jobTables, jobTables.path);
+        },
+        from2To3: (m, schema) async {
+          await m.createTable(customSourceTables);
         },
       ),
     );
