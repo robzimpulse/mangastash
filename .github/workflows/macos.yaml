@@ -50,7 +50,7 @@ jobs:
         run: |
           FILE="$HOME/.pub-cache/hosted/pub.dev/flutter_inappwebview_macos-1.1.2/macos/Classes/WebAuthenticationSession/WebAuthenticationSession.swift"
           perl -0pi -e 's/\@available\(macOS 10\.15, \*\)\n    public func presentationAnchor/\@available(macOS 10.14, *)\n    public func presentationAnchor/' "$FILE"
-          grep -n '@available(macOS 10.14, *)' "$FILE"
+          grep -Fn '@available(macOS 10.14, *)' "$FILE"
       - name: 'Build Application'
         run: flutter build macos --release
       - name: 'Create Installer'
