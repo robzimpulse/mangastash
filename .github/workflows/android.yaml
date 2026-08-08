@@ -1,9 +1,6 @@
 name: Android Pipeline
 
 on:
-  # ref: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request
-  pull_request:
-    types: [opened, reopened, synchronize]
   # ref: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#push
   push:
     tags:
@@ -68,30 +65,6 @@ jobs:
           FIREBASE_DISTRIBUTION_SERVICE_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DISTRIBUTION }}
           ARTIFACT_PATH: '../build/app/outputs/apk/release/app-release.apk'
         run: bundle exec fastlane distribute_firebase
-      - name: 'Find Comment'
-        if: always() && github.event_name == 'pull_request'
-        uses: peter-evans/find-comment@v3
-        id: find_comment
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
-          body-includes: Android Build Report
-      - name: 'Create or Update Comment'
-        if: always() && github.event_name == 'pull_request'
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          comment-id: ${{ steps.find_comment.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
-          edit-mode: replace
-          body: |
-            ## 🚀 Android Build Report
-
-            | Item | Details |
-            | :--- | :--- |
-            | **Build Status** | ${{ job.status == 'success' && '✅ Passed' || '❌ Failed' }} |
-            | **Event** | ${{ github.event_name }} |
-            | **Run ID** | [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) |
-            | **Download Artifacts** | [📂 Click Here to Download](${{ steps.upload_artifact.outputs.artifact-url }}) |
       - name: 'Send Report to Telegram'
         uses: appleboy/telegram-action@master
         if: always()
