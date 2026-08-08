@@ -2,6 +2,7 @@ import 'package:domain_manga/src/sources/weeb_central_source_external.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:html/parser.dart' as html_parser;
+import 'package:manga_dex_api/manga_dex_api.dart';
 
 /// Search-results fixture (one <article class="bg-base-300 flex gap-4 p-4">),
 /// trimmed to the nodes the parser reads. Mirrors weebcentral.com /search/data.
@@ -102,5 +103,25 @@ void main() {
     expect(chapters.first.chapter, '1190');
     expect(chapters.first.webUrl, 'https://weebcentral.com/chapters/01KZECDZH06AWDQEJZAAQA9C2P');
     expect(chapters.first.publishAt, '2026-08-07T15:10:56.544424Z');
+  });
+
+  test('search url maps sort, order, status, tags', () {
+    final url = source.searchMangaUseCase.url(
+      parameter: const SearchMangaParameter(
+        title: 'One Piece',
+        limit: 32,
+        page: 1,
+        orders: {SearchOrders.rating: OrderDirections.descending},
+        status: [MangaStatus.ongoing],
+        includedTags: ['Action', 'Adventure'],
+      ),
+    );
+    expect(
+      url,
+      'https://weebcentral.com/search/data'
+      '?text=One%20Piece&limit=32&offset=0&display_mode=Full%20Display'
+      '&sort=Popularity&order=Descending&included_status=Ongoing'
+      '&included_tags=Action&included_tags=Adventure',
+    );
   });
 }

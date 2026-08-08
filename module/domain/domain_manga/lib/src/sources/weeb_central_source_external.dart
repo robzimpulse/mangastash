@@ -215,6 +215,32 @@ class _SearchMangaSourceExternalUseCase
 
   @override
   String url({required SearchMangaParameter parameter}) {
+    final order = parameter.orders?.entries.firstOrNull;
+    final sort = order.let(
+      (entry) => switch (entry.key) {
+        SearchOrders.title => 'Alphabet',
+        SearchOrders.relevance => 'Best Match',
+        SearchOrders.followedCount => 'Subscribers',
+        SearchOrders.createdAt => 'Recently Added',
+        SearchOrders.latestUploadedChapter => 'Latest Updates',
+        SearchOrders.rating => 'Popularity',
+        _ => null,
+      },
+    );
+
+    final status = parameter.status?.firstOrNull.let(
+      (e) => switch (e) {
+        MangaStatus.ongoing => 'Ongoing',
+        MangaStatus.completed => 'Complete',
+        MangaStatus.hiatus => 'Hiatus',
+        MangaStatus.cancelled => 'Canceled',
+      },
+    );
+
+    final orderDirection = order?.value.let(
+      (d) => d == OrderDirections.ascending ? 'Ascending' : 'Descending',
+    );
+
     return [
       [_baseUrl, 'search', 'data'].join('/'),
       [
@@ -222,7 +248,12 @@ class _SearchMangaSourceExternalUseCase
         MapEntry('limit', '${parameter.limit}'),
         MapEntry('offset', '${(parameter.page - 1) * parameter.limit}'),
         const MapEntry('display_mode', 'Full Display'),
-      ].map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}').join('&'),
+        if (sort != null) MapEntry('sort', sort),
+        if (orderDirection != null) MapEntry('order', orderDirection),
+        if (status != null) MapEntry('included_status', status),
+        for (final tag in parameter.includedTags ?? <String>[])
+          MapEntry('included_tags', tag),
+      ].map((e) => '${e.key}=${Uri.encodeFull(e.value)}').join('&'),
     ].join('?');
   }
 }
