@@ -133,6 +133,23 @@ const _detailHtml = '''
 </body></html>
 ''';
 
+/// Series-detail fixture using the alternate Madara `div.summary-meta` status
+/// layout: no `post-content_item` Status row, status lives in
+/// `span.status`.
+const _detailSummaryMetaHtml = '''
+<html><body>
+  <div class="post-content">
+    <div class="post-content_item">
+      <div class="summary-heading"><h5>Author(s)</h5></div>
+      <div class="summary-content author-content">ODA Eiichiro</div>
+    </div>
+  </div>
+  <div class="summary-meta">
+    <span class="summary-meta-item status">Ongoing</span>
+  </div>
+</body></html>
+''';
+
 /// Reader fixture (isekaiscans.org /manga/one-piece/chapter-1100/): page
 /// <img>s inside `div.reading-content` with lazyload `data-src`.
 const _readerHtml = '''
@@ -230,6 +247,13 @@ void main() {
       root: html_parser.parse(_nextPageHtml),
     );
     expect(next, isTrue);
+  });
+
+  test('detail falls back to summary-meta for status', () async {
+    final manga = await source.getMangaUseCase.parse(
+      root: html_parser.parse(_detailSummaryMetaHtml),
+    );
+    expect(manga.status, 'Ongoing');
   });
 
   test('detail parses series page', () async {

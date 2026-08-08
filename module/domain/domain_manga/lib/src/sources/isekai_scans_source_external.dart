@@ -98,7 +98,7 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
       title: _title(root),
       author: root.querySelector('div.author-content a')?.text.trim(),
       description: _summary(root),
-      status: _infoValue(root, 'Status'),
+      status: _status(root),
       tags:
           root
               .querySelectorAll('div.genres-content a')
@@ -126,6 +126,14 @@ String? _title(Document root) {
   final clone = h1.clone(true);
   clone.querySelectorAll('.manga-title-badges').forEach((e) => e.remove());
   return clone.text.trim();
+}
+
+/// Reads the series status from the `div.post-content_item` Status row,
+/// falling back to the alternate Madara `div.summary-meta span.status` layout
+/// (used when a site drops the `post-content_item` Status row).
+String? _status(Document root) {
+  return _infoValue(root, 'Status') ??
+      root.querySelector('div.summary-meta span.status')?.text.trim();
 }
 
 /// Reads a `div.post-content_item` value by heading label, e.g. "Ongoing"
