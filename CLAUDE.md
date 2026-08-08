@@ -110,3 +110,8 @@ The project follows a **Modular Clean Architecture** pattern with a sharded dire
   - **Location**: `module/ui/` (e.g., `ui_browse/lib/src/browse_manga_screen/`)
   - **Context**: Screens and their business logic (Cubits) are often colocated in the same UI module rather than separate feature modules.
   - **Troubleshooting**: When looking for logic related to a specific screen, check the same directory as the screen widget for `*_cubit.dart` and `*_state.dart` files.
+
+- **External Source Reader Selectors Drift with Site Redesigns**
+  - **Location**: `module/domain/domain_manga/lib/src/sources/` (e.g. `asura_scan_source_external.dart`)
+  - **Context**: AsuraScans (and other scraped sources) rebuilt their site on Astro; the chapter reader DOM changed from `div.relative.w-full > img.w-full.block.relative.z-10` to `<div data-page="n" class="w-full"><img data-page-index="n" class="w-full block">`. The old hardcoded Tailwind-class chain matched **0** images, so the reader silently showed no/incomplete pages while the web version showed all.
+  - **Troubleshooting**: Symptom "app reader has fewer/missing images than the site" → the source's `getChapterImageUseCase` selector is stale. Fetch a live chapter page (`curl -A '<mobile UA>' https://asurascans.com/comics/<slug>/chapter/<n>`), inspect the reader `<img>` attributes, and update `parse`/`scripts`. Prefer stable attributes (`data-page-index`, `data-page`) over Tailwind classes — they survive redesigns. The reader also relies on the injected scroll script (`scrollIntoView`) to trigger lazy `src` population before `getHtml()` snapshots; keep that timing in sync with the container it queries.

@@ -44,35 +44,30 @@ class _GetChapterImageSourceExternalUseCase
   @override
   Duration? get timeout => Duration(seconds: 30);
 
+  /// Reader container chain — the Astro-rebuilt site wraps each page in
+  /// <div data-page="n" class="w-full"> under the `select-none` reader; the
+  /// page <img> carries `data-page-index`. Matching on that stable attribute
+  /// (instead of Tailwind classes that drift with redesigns) keeps the parse
+  /// working without touching this file again.
+  static final _readerQuery = [
+    'div.select-none',
+    'img[data-page-index]',
+  ].join(' ');
+
   @override
   Future<List<String>> parse({required Document root}) async {
-    final regions = root.querySelectorAll(
-      [
-        'div.min-h-screen.bg-black',
-        'div.select-none',
-        'div.max-w-full.mx-auto.overflow-hidden.flex.flex-col',
-        'div.relative.w-full',
-        'img.w-full.block.relative.z-10',
-      ].join(' > '),
-    );
+    final regions = root.querySelectorAll(_readerQuery);
 
     return regions.map((e) => e.attributes['src']).nonNulls.toList();
   }
 
   @override
   List<String> get scripts {
-    final query = [
-      'div.min-h-screen.bg-black',
-      'div.select-none',
-      'div.max-w-full.mx-auto.overflow-hidden.flex.flex-col',
-      'div.relative.w-full',
-    ].join(' > ');
-
     return [
-      'var elements = document.querySelectorAll(\'$query\');',
+      'var elements = document.querySelectorAll(\'$_readerQuery\');',
       '''
       for (let i = 0; i < elements.length; i++) {
-        setTimeout(() => elements[i].scrollIntoView(), 500 * i);
+        setTimeout(() => elements[i].scrollIntoView(), 100 * i);
       }
       ''',
     ];
