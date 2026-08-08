@@ -40,6 +40,7 @@ pubspec_overrides.yaml
 .codegraph/
 .claude/
 docs/
+.superpowers
 
 # Symbolication related
 app.*.symbols
