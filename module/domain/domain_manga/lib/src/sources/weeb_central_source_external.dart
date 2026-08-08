@@ -253,7 +253,7 @@ class _SearchMangaSourceExternalUseCase
         if (status != null) MapEntry('included_status', status),
         for (final tag in parameter.includedTags ?? <String>[])
           MapEntry('included_tags', tag),
-      ].map((e) => '${e.key}=${Uri.encodeFull(e.value)}').join('&'),
+      ].map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}').join('&'),
     ].join('?');
   }
 }

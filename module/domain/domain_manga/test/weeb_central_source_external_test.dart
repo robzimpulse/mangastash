@@ -119,7 +119,7 @@ void main() {
     expect(
       url,
       'https://weebcentral.com/search/data'
-      '?text=One%20Piece&limit=32&offset=0&display_mode=Full%20Display'
+      '?text=One+Piece&limit=32&offset=0&display_mode=Full+Display'
       '&sort=Popularity&order=Descending&included_status=Ongoing'
       '&included_tags=Action&included_tags=Adventure',
     );
