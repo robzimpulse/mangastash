@@ -41,6 +41,7 @@ pubspec_overrides.yaml
 .claude/
 docs/
 .superpowers
+.worktrees/
 
 # Symbolication related
 app.*.symbols
