@@ -94,7 +94,9 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
               .map((e) => e.text.trim())
               .where((e) => e.isNotEmpty)
               .toList(),
-      coverUrl: root.querySelector('div.tab-summary img')?.attributes['src'],
+      coverUrl:
+          root.querySelector('div.tab-summary img')?.attributes['data-src'] ??
+          root.querySelector('div.tab-summary img')?.attributes['src'],
     );
   }
 
@@ -119,7 +121,7 @@ String? _infoValue(Document root, String label) {
   for (final item in root.querySelectorAll('div.post-content_item')) {
     final heading = item.querySelector('.summary-heading, h5')?.text.trim();
     if (heading == null || !heading.contains(label)) continue;
-    return item.querySelectorAll('.summary-content').last.text.trim();
+    return item.querySelectorAll('.summary-content').lastOrNull?.text.trim();
   }
   return null;
 }
@@ -226,6 +228,9 @@ class _SearchMangaSourceExternalUseCase
   @override
   String url({required SearchMangaParameter parameter}) {
     final q = Uri.encodeQueryComponent(parameter.title ?? '');
+    if (parameter.page > 1) {
+      return '$_baseUrl/search/$q/page/${parameter.page}/';
+    }
     return '$_baseUrl/?s=$q&post_type=wp-manga';
   }
 }

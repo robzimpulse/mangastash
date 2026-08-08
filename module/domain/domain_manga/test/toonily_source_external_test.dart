@@ -169,11 +169,14 @@ void main() {
       ),
       'https://toonily.com/?s=One+Piece&post_type=wp-manga',
     );
+  });
+
+  test('search url maps page 2 to paginated search path', () {
     expect(
       source.searchMangaUseCase.url(
         parameter: const SearchMangaParameter(title: 'One Piece', page: 2),
       ),
-      'https://toonily.com/?s=One+Piece&post_type=wp-manga',
+      'https://toonily.com/search/One+Piece/page/2/',
     );
   });
 
