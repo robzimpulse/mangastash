@@ -6,6 +6,11 @@ cmake_minimum_required(VERSION 3.14)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 project(mangastash LANGUAGES CXX)
 
+# VS 2026 ships MSVC 14.51, which hard-errors on /await + <experimental/coroutine>
+# (STL1011) unless silenced. flutter_inappwebview_windows' transitive WebView2
+# wrapper still uses them; define this project-wide so every plugin target inherits it.
+add_compile_definitions(_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
+
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
 set(BINARY_NAME "mangastash")
