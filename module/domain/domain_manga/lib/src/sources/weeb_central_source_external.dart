@@ -49,10 +49,45 @@ class _GetChapterImageSourceExternalUseCase
   Duration? get timeout => Duration(seconds: 30);
 
   @override
-  Future<List<String>> parse({required Document root}) async => [];
+  Future<List<String>> parse({required Document root}) async {
+    final region = root.querySelector('section#chapter-images');
+    final images = region?.querySelectorAll('img') ?? [];
+
+    return [
+      for (final image in images)
+        if (!(image.attributes['src']?.contains('broken_image') ?? false))
+          image.attributes['src'],
+    ].nonNulls.toList();
+  }
 
   @override
-  List<String> get scripts => [];
+  List<String> get scripts {
+    return [
+      // The source class does not know the chapter id (the use case receives
+      // only the Document), so the script derives it from the page URL:
+      // /chapters/{id}. It then triggers the same htmx ajax the reader's
+      // Alpine singlePageNavigation init performs. reading_style=long_strip
+      // injects all page <img>s into #chapter-images before getHtml().
+      '''
+      (function() {
+        const el = document.getElementById('chapter-images');
+        if (!el || typeof htmx === 'undefined') return;
+        const segments = location.pathname.split('/').filter(Boolean);
+        const chapterId = segments[segments.length - 1];
+        if (!chapterId) return;
+        const url = location.origin + '/chapters/' + chapterId +
+          '/images?is_prev=False&current_page=1&reading_style=long_strip';
+        htmx.ajax('GET', url, {
+          target: el,
+          swap: 'outerHTML',
+          values: { reading_style: 'long_strip' },
+        });
+      })();
+      ''',
+      // Allow the ajax to resolve and inject the <img>s before getHtml().
+      'setTimeout(function(){}, 2500);',
+    ];
+  }
 }
 
 class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
@@ -264,8 +299,16 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
 
   @override
   Future<List<TagScrapped>> parse({required Document root}) async {
-    // Task 3 fills this in.
-    return const [];
+    final labels = root
+        .querySelectorAll('label.fieldset-label input[name="included_tags"]')
+        .map((input) => input.parent?.querySelector('span.ml-2')?.text.trim())
+        .where((e) => e != null && e.isNotEmpty)
+        .toSet();
+
+    return [
+      for (final name in labels)
+        TagScrapped(id: name, name: name),
+    ];
   }
 
   @override

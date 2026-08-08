@@ -51,6 +51,46 @@ const _seriesHtml = '''
 </body></html>
 ''';
 
+/// Chapter-images fixture: htmx injects page <img>s into
+/// #chapter-images before HTML capture; one image is a broken-image
+/// placeholder that must be skipped.
+const _imagesHtml = '''
+<html><body>
+<section id="chapter-images" class="w-full flex-1 flex flex-col pb-4">
+  <img src="https://temp.compsci88.com/manga/One-Piece/1190-001.png" alt="Page 1">
+  <img src="https://temp.compsci88.com/manga/One-Piece/1190-002.png" alt="Page 2">
+  <img src="/static/images/broken_image.jpg" alt="broken">
+</section>
+</body></html>
+''';
+
+/// Tag-panel fixture: genre checkboxes live in <input name="included_tags">
+/// inside a fieldset-label; the sort radio and other rows must be ignored.
+const _tagPanelHtml = '''
+<html><body>
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+  <fieldset class="fieldset text-base mt-2">
+    <label class="fieldset-label">
+      <input type="radio" class="radio" name="sort" value="Best Match" checked>
+      <span class="ml-2 cursor-pointer">Best Match</span>
+    </label>
+  </fieldset>
+  <fieldset class="fieldset text-base mt-2">
+    <label class="fieldset-label">
+      <input type="checkbox" class="checkbox" name="included_tags" value="Action">
+      <span class="ml-2 cursor-pointer">Action</span>
+    </label>
+  </fieldset>
+  <fieldset class="fieldset text-base mt-2">
+    <label class="fieldset-label">
+      <input type="checkbox" class="checkbox" name="included_tags" value="Adventure">
+      <span class="ml-2 cursor-pointer">Adventure</span>
+    </label>
+  </fieldset>
+</section>
+</body></html>
+''';
+
 void main() {
   final source = WeebCentralSourceExternal();
 
@@ -123,5 +163,25 @@ void main() {
       '&sort=Popularity&order=Descending&included_status=Ongoing'
       '&included_tags=Action&included_tags=Adventure',
     );
+  });
+
+  test('chapter images parse orders srcs and skips broken', () async {
+    final images = await source.getChapterImageUseCase
+        .parse(root: html_parser.parse(_imagesHtml));
+    expect(
+      images,
+      [
+        'https://temp.compsci88.com/manga/One-Piece/1190-001.png',
+        'https://temp.compsci88.com/manga/One-Piece/1190-002.png',
+      ],
+    );
+  });
+
+  test('tags parse genre checkboxes', () async {
+    final tags = await source.listTagUseCase
+        .parse(root: html_parser.parse(_tagPanelHtml));
+    expect(tags, hasLength(2));
+    expect(tags.first.id, 'Action');
+    expect(tags.first.name, 'Action');
   });
 }
