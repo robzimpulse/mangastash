@@ -46,6 +46,7 @@ class ManganatoSourceExternal implements SourceExternal {
 /// Prefixes a URL with the source base URL when it is a root-relative path.
 String _absolute(String baseUrl, String url) {
   if (url.startsWith('http')) return url;
+  if (url.startsWith('//')) return 'https:$url';
   if (url.startsWith('/')) return '$baseUrl$url';
   return url;
 }
@@ -96,7 +97,11 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
               .map((e) => e.text.trim())
               .where((e) => e.isNotEmpty)
               .toList(),
-      coverUrl: root.querySelector('div.manga-info-pic img')?.attributes['src'],
+      coverUrl:
+          root
+              .querySelector('div.manga-info-pic img')
+              ?.attributes['data-src'] ??
+          root.querySelector('div.manga-info-pic img')?.attributes['src'],
     );
   }
 
@@ -184,7 +189,7 @@ class _ListChapterSourceExternalUseCase
       (async () => {
         const el = document.querySelector('#chapter-list-container');
         if (!el) return;
-        const slug = el.getAttribute('data-comic-slug') || (el.getAttribute('data-api-url')||'').split('/')[4];
+        const slug = el.getAttribute('data-comic-slug') || (el.getAttribute('data-api-url')||'').split('/')[3];
         const api = el.getAttribute('data-api-url').replace('__SLUG__', slug);
         const chapTpl = el.getAttribute('data-chapter-url-template');
         const r = await fetch(api);
@@ -284,7 +289,7 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
     // tag. Dedupe by name.
     final tags = <String, String>{};
 
-    for (final link in root.querySelectorAll('a[href^="/genre/"]')) {
+    for (final link in root.querySelectorAll('a[href*="/genre/"]')) {
       final name = link.text.trim();
       if (name.isEmpty) continue;
       final slug =

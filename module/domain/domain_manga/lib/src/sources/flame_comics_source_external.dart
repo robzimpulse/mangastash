@@ -49,6 +49,7 @@ class FlameComicsSourceExternal implements SourceExternal {
 /// Prefixes a URL with the source base URL when it is a root-relative path.
 String _absolute(String baseUrl, String url) {
   if (url.startsWith('http')) return url;
+  if (url.startsWith('//')) return 'https:$url';
   if (url.startsWith('/')) return '$baseUrl$url';
   return url;
 }
@@ -109,8 +110,8 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
               .where((e) => e.isNotEmpty)
               .toList(),
       coverUrl:
-          root.querySelector('div.summary_image img')?.attributes['src'] ??
-          root.querySelector('div.summary_image img')?.attributes['data-src'],
+          root.querySelector('div.summary_image img')?.attributes['data-src'] ??
+          root.querySelector('div.summary_image img')?.attributes['src'],
     );
   }
 
@@ -198,9 +199,19 @@ class _SearchMangaSourceExternalUseCase
 
   @override
   Future<bool?> haveNextPage({required Document root}) async {
-    // Pagination renders once more results exist as a link containing "page"
-    // (e.g. `/page/2/?s=...`). Default false when no such link is present.
-    return root.querySelector('a[href*="page"]') != null;
+    // Pagination renders once more results exist as a `.next` link or a
+    // `/page/{n}/` (n > 1) URL. A bare `page` substring is too broad — it
+    // matches slugs and nav links.
+    if (root.querySelector('a.next') != null) return true;
+    if (root.querySelector('.wp-pagenavi .next') != null) return true;
+
+    for (final link in root.querySelectorAll('a[href*="/page/"]')) {
+      final page = RegExp(
+        r'/page/(\d+)/',
+      ).firstMatch(link.attributes['href'] ?? '')?.group(1);
+      if (page != null && (int.tryParse(page) ?? 0) > 1) return true;
+    }
+    return false;
   }
 
   @override
@@ -251,7 +262,7 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
     // inline on detail pages; any such link is a valid tag. Dedupe by name.
     final tags = <String, String>{};
 
-    for (final link in root.querySelectorAll('a[href^="/genre/"]')) {
+    for (final link in root.querySelectorAll('a[href*="/genre/"]')) {
       final name = link.text.trim();
       if (name.isEmpty) continue;
       final slug =

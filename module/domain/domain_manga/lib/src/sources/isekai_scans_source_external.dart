@@ -47,6 +47,7 @@ class IsekaiScansSourceExternal implements SourceExternal {
 /// Prefixes a URL with the source base URL when it is a root-relative path.
 String _absolute(String baseUrl, String url) {
   if (url.startsWith('http')) return url;
+  if (url.startsWith('//')) return 'https:$url';
   if (url.startsWith('/')) return '$baseUrl$url';
   return url;
 }

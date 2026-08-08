@@ -8,7 +8,6 @@ import 'manga_dex_source_external.dart';
 import 'mangakatana_source_external.dart';
 import 'manganato_source_external.dart';
 import 'manhua_plus_source_external.dart';
-import 'reaper_scans_source_external.dart';
 import 'toonily_source_external.dart';
 import 'weeb_central_source_external.dart';
 
@@ -23,7 +22,6 @@ class Sources {
     ManhuaPlusSourceExternal(),
     IsekaiScansSourceExternal(),
     FlameComicsSourceExternal(),
-    ReaperScansSourceExternal(),
   ];
 
   static SourceExternal? fromName(String name) {

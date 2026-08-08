@@ -47,6 +47,7 @@ class ManhuaPlusSourceExternal implements SourceExternal {
 /// Prefixes a URL with the source base URL when it is a root-relative path.
 String _absolute(String baseUrl, String url) {
   if (url.startsWith('http')) return url;
+  if (url.startsWith('//')) return 'https:$url';
   if (url.startsWith('/')) return '$baseUrl$url';
   return url;
 }
@@ -250,7 +251,7 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
     // and inline on detail pages; any such link is a valid tag. Dedupe by name.
     final tags = <String, String>{};
 
-    for (final link in root.querySelectorAll('a[href^="/manga-genre/"]')) {
+    for (final link in root.querySelectorAll('a[href*="/manga-genre/"]')) {
       final name = link.text.trim();
       if (name.isEmpty) continue;
       final slug =

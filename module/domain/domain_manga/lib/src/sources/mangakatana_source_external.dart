@@ -48,6 +48,7 @@ class MangakatanaSourceExternal implements SourceExternal {
 /// Prefixes a URL with the source base URL when it is a root-relative path.
 String _absolute(String baseUrl, String url) {
   if (url.startsWith('http')) return url;
+  if (url.startsWith('//')) return 'https:$url';
   if (url.startsWith('/')) return '$baseUrl$url';
   return url;
 }
@@ -114,7 +115,9 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
               .map((e) => e.text.trim())
               .where((e) => e.isNotEmpty)
               .toList(),
-      coverUrl: root.querySelector('div.wrap_img img')?.attributes['data-src'],
+      coverUrl:
+          root.querySelector('div.wrap_img img')?.attributes['data-src'] ??
+          root.querySelector('div.wrap_img img')?.attributes['src'],
     );
   }
 
@@ -149,20 +152,28 @@ class _ListChapterSourceExternalUseCase
 
   @override
   Future<List<ChapterScrapped>> parse({required Document root}) async {
-    return root.querySelectorAll('table tr').map((row) {
+    final chapters = <ChapterScrapped>[];
+
+    for (final row in root.querySelectorAll('table tr')) {
       final link = row.querySelector('td div.chapter a');
-      final title = link?.text.trim();
-      final href = link?.attributes['href'];
+      if (link == null) continue;
+
+      final title = link.text.trim();
+      final href = link.attributes['href'];
       final updateTime = row.querySelector('td div.update_time')?.text.trim();
 
-      return ChapterScrapped(
-        title: title,
-        chapter: _chapterNumber(title),
-        readableAt: updateTime,
-        publishAt: updateTime,
-        webUrl: href == null ? null : _absolute(_baseUrl, href),
+      chapters.add(
+        ChapterScrapped(
+          title: title,
+          chapter: _chapterNumber(title),
+          readableAt: updateTime,
+          publishAt: updateTime,
+          webUrl: href == null ? null : _absolute(_baseUrl, href),
+        ),
       );
-    }).toList();
+    }
+
+    return chapters;
   }
 
   @override
@@ -249,7 +260,7 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
     // inline on detail pages; any such link is a valid tag. Dedupe by name.
     final tags = <String, String>{};
 
-    for (final link in root.querySelectorAll('a[href^="/genre/"]')) {
+    for (final link in root.querySelectorAll('a[href*="/genre/"]')) {
       final name = link.text.trim();
       if (name.isEmpty) continue;
       final slug =

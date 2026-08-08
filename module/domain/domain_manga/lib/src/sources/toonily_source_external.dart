@@ -45,6 +45,7 @@ class ToonilySourceExternal implements SourceExternal {
 /// Prefixes a URL with the source base URL when it is a root-relative path.
 String _absolute(String baseUrl, String url) {
   if (url.startsWith('http')) return url;
+  if (url.startsWith('//')) return 'https:$url';
   if (url.startsWith('/')) return '$baseUrl$url';
   return url;
 }
@@ -229,7 +230,7 @@ class _SearchMangaSourceExternalUseCase
   String url({required SearchMangaParameter parameter}) {
     final q = Uri.encodeQueryComponent(parameter.title ?? '');
     if (parameter.page > 1) {
-      return '$_baseUrl/search/$q/page/${parameter.page}/';
+      return '$_baseUrl/page/${parameter.page}/?s=$q&post_type=wp-manga';
     }
     return '$_baseUrl/?s=$q&post_type=wp-manga';
   }
@@ -245,7 +246,7 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
     // inline on detail pages; any such link is a valid tag. Dedupe by name.
     final tags = <String, String>{};
 
-    for (final link in root.querySelectorAll('a[href^="/genre/"]')) {
+    for (final link in root.querySelectorAll('a[href*="/genre/"]')) {
       final name = link.text.trim();
       if (name.isEmpty) continue;
       final slug =

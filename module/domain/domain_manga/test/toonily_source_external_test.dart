@@ -176,7 +176,7 @@ void main() {
       source.searchMangaUseCase.url(
         parameter: const SearchMangaParameter(title: 'One Piece', page: 2),
       ),
-      'https://toonily.com/search/One+Piece/page/2/',
+      'https://toonily.com/page/2/?s=One+Piece&post_type=wp-manga',
     );
   });
 
