@@ -1,6 +1,15 @@
 # Project-level configuration.
 cmake_minimum_required(VERSION 3.14)
+# VS 2026 bundles CMake 4.x, which errors on subprojects declaring
+# cmake_minimum_required(VERSION < 3.5) (firebase_cpp_sdk uses 3.1). Set the
+# policy version minimum to 3.5 so CMake 4 accepts them.
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 project(mangastash LANGUAGES CXX)
+
+# VS 2026 ships MSVC 14.51, which hard-errors on /await + <experimental/coroutine>
+# (STL1011) unless silenced. flutter_inappwebview_windows' transitive WebView2
+# wrapper still uses them; define this project-wide so every plugin target inherits it.
+add_compile_definitions(_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.

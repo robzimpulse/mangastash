@@ -36,6 +36,11 @@ migrate_working_dir/
 coverage/
 pubspec_overrides.yaml
 
+# Agent/index artifacts
+.codegraph/
+.claude/
+docs/
+
 # Symbolication related
 app.*.symbols
 
