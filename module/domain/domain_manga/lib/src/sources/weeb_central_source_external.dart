@@ -54,9 +54,7 @@ class _GetChapterImageSourceExternalUseCase
     final images = region?.querySelectorAll('img') ?? [];
 
     return [
-      for (final image in images)
-        if (!(image.attributes['src']?.contains('broken_image') ?? false))
-          image.attributes['src'],
+      for (final image in images) image.attributes['src'],
     ].nonNulls.toList();
   }
 
@@ -192,7 +190,10 @@ class _SearchMangaSourceExternalUseCase
 
   @override
   Future<bool?> haveNextPage({required Document root}) async {
-    return root.querySelector('button[hx-get*="/search/data"]') != null;
+    // The server always renders a "View More Results…" button; a real next
+    // page is present only when that button carries an `offset` param.
+    final button = root.querySelector('button[hx-get*="/search/data"]');
+    return button?.attributes['hx-get']?.contains('offset=') ?? false;
   }
 
   @override
@@ -276,18 +277,22 @@ class _SearchMangaSourceExternalUseCase
       (d) => d == OrderDirections.ascending ? 'Ascending' : 'Descending',
     );
 
+    // The server clamps the batch to 32 and ignores `limit`, and the app
+    // forces limit:20; hardcode 32 so offset-based pagination stays correct.
+    const pageSize = 32;
+
     return [
       [_baseUrl, 'search', 'data'].join('/'),
       [
         MapEntry('text', parameter.title ?? ''),
-        MapEntry('limit', '${parameter.limit}'),
-        MapEntry('offset', '${(parameter.page - 1) * parameter.limit}'),
+        const MapEntry('limit', '$pageSize'),
+        MapEntry('offset', '${(parameter.page - 1) * pageSize}'),
         const MapEntry('display_mode', 'Full Display'),
         if (sort != null) MapEntry('sort', sort),
         if (orderDirection != null) MapEntry('order', orderDirection),
         if (status != null) MapEntry('included_status', status),
         for (final tag in parameter.includedTags ?? <String>[])
-          MapEntry('included_tags', tag),
+          MapEntry('included_tag', tag),
       ].map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}').join('&'),
     ].join('?');
   }
@@ -299,8 +304,11 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
 
   @override
   Future<List<TagScrapped>> parse({required Document root}) async {
+    // Genre checkboxes live only on /search, shaped id="tag-{Name}" inside
+    // label.fieldset-label; the human-readable name sits in the sibling
+    // <span class="ml-2">.
     final labels = root
-        .querySelectorAll('label.fieldset-label input[name="included_tags"]')
+        .querySelectorAll('input[type="checkbox"][id^="tag-"]')
         .map((input) => input.parent?.querySelector('span.ml-2')?.text.trim())
         .where((e) => e != null && e.isNotEmpty)
         .toSet();
@@ -312,5 +320,22 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
   }
 
   @override
-  List<String> get scripts => [];
+  List<String> get scripts {
+    // The filter panel is hidden behind the Alpine `show_filter` flag; the
+    // section carries x-show="show_filter", so force it visible and let the
+    // panel settle before HTML capture.
+    return [
+      '''
+
+      (function() {
+        document
+          .querySelectorAll('section[x-show="show_filter"]')
+          .forEach((el) => { el.style.display = 'block'; });
+      })();
+
+      ''',
+      // Allow the Alpine x-show transition to settle before getHtml().
+      'setTimeout(function(){}, 2500);',
+    ];
+  }
 }

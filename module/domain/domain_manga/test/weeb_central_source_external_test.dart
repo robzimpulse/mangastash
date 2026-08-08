@@ -51,24 +51,63 @@ const _seriesHtml = '''
 </body></html>
 ''';
 
-/// Chapter-images fixture: htmx injects page <img>s into
-/// #chapter-images before HTML capture; one image is a broken-image
-/// placeholder that must be skipped.
+/// Search-results fixture with a "View More Results…" button carrying an
+/// offset param, mirroring a real next page of /search/data.
+const _nextPageHtml = '''
+<div>
+  <article class="bg-base-300 flex gap-4 p-4">
+    <section class="w-full lg:w-[25%] xl:w-[20%]">
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">
+        <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+      </a>
+    </section>
+    <section class="hidden lg:block lg:w-[75%] xl:w-[80%]">
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece"
+         class="line-clamp-1 link link-hover">One Piece</a>
+      <div class="opacity-70"><strong>Status:</strong><span>Ongoing</span></div>
+    </section>
+  </article>
+  <button hx-get="/search/data?limit=32&offset=32&text=One+Piece"
+          hx-swap="innerHTML" hx-target="#search_results" class="btn btn-primary btn-wide btn-lg">
+    View More Results…
+  </button>
+</div>
+''';
+
+/// Search-results fixture with a view-more button that carries NO offset
+/// param (last page — the server renders the button even when there is no
+/// further batch); must report no next page.
+const _lastPageHtml = '''
+<div>
+  <button hx-get="/search/data?limit=32&text=One+Piece"
+          hx-swap="innerHTML" hx-target="#search_results" class="btn btn-primary btn-wide btn-lg">
+    View More Results…
+  </button>
+</div>
+''';
+
+/// Chapter-images fixture: htmx injects page <img>s into #chapter-images
+/// before HTML capture; one image carries an onerror handler (as real pages
+/// do) and must still be returned.
 const _imagesHtml = '''
 <html><body>
 <section id="chapter-images" class="w-full flex-1 flex flex-col pb-4">
   <img src="https://temp.compsci88.com/manga/One-Piece/1190-001.png" alt="Page 1">
-  <img src="https://temp.compsci88.com/manga/One-Piece/1190-002.png" alt="Page 2">
-  <img src="/static/images/broken_image.jpg" alt="broken">
+  <img src="https://temp.compsci88.com/manga/One-Piece/1190-002.png" alt="Page 2" onerror="this.onerror=null;this.src='https://temp.compsci88.com/manga/One-Piece/1190-002.png';">
+  <img src="https://temp.compsci88.com/manga/One-Piece/1190-003.png" alt="Page 3">
 </section>
 </body></html>
 ''';
 
-/// Tag-panel fixture: genre checkboxes live in <input name="included_tags">
-/// inside a fieldset-label; the sort radio and other rows must be ignored.
+/// Tag-panel fixture: genre checkboxes live only on /search, inside the
+/// filter panel hidden behind the Alpine `show_filter` flag. Each is shaped
+/// <input type="checkbox" form="advanced-search-form" id="tag-{Name}"> with
+/// the name in the label's <span class="ml-2">. The sort radio row must be
+/// ignored.
 const _tagPanelHtml = '''
 <html><body>
-<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4"
+         x-show="show_filter" x-transition>
   <fieldset class="fieldset text-base mt-2">
     <label class="fieldset-label">
       <input type="radio" class="radio" name="sort" value="Best Match" checked>
@@ -77,13 +116,15 @@ const _tagPanelHtml = '''
   </fieldset>
   <fieldset class="fieldset text-base mt-2">
     <label class="fieldset-label">
-      <input type="checkbox" class="checkbox" name="included_tags" value="Action">
+      <input type="checkbox" class="checkbox " form="advanced-search-form"
+             id="tag-Action" value="0">
       <span class="ml-2 cursor-pointer">Action</span>
     </label>
   </fieldset>
   <fieldset class="fieldset text-base mt-2">
     <label class="fieldset-label">
-      <input type="checkbox" class="checkbox" name="included_tags" value="Adventure">
+      <input type="checkbox" class="checkbox " form="advanced-search-form"
+             id="tag-Adventure" value="0">
       <span class="ml-2 cursor-pointer">Adventure</span>
     </label>
   </fieldset>
@@ -161,11 +202,26 @@ void main() {
       'https://weebcentral.com/search/data'
       '?text=One+Piece&limit=32&offset=0&display_mode=Full+Display'
       '&sort=Popularity&order=Descending&included_status=Ongoing'
-      '&included_tags=Action&included_tags=Adventure',
+      '&included_tag=Action&included_tag=Adventure',
     );
   });
 
-  test('chapter images parse orders srcs and skips broken', () async {
+  test('search url hardcodes the server page size', () {
+    final url = source.searchMangaUseCase.url(
+      parameter: const SearchMangaParameter(
+        title: 'One Piece',
+        limit: 20,
+        page: 2,
+      ),
+    );
+    expect(
+      url,
+      'https://weebcentral.com/search/data'
+      '?text=One+Piece&limit=32&offset=32&display_mode=Full+Display',
+    );
+  });
+
+  test('chapter images parse orders srcs and keeps onerror', () async {
     final images = await source.getChapterImageUseCase
         .parse(root: html_parser.parse(_imagesHtml));
     expect(
@@ -173,8 +229,21 @@ void main() {
       [
         'https://temp.compsci88.com/manga/One-Piece/1190-001.png',
         'https://temp.compsci88.com/manga/One-Piece/1190-002.png',
+        'https://temp.compsci88.com/manga/One-Piece/1190-003.png',
       ],
     );
+  });
+
+  test('search haveNextPage true when the view-more button carries an offset', () async {
+    final next = await source.searchMangaUseCase
+        .haveNextPage(root: html_parser.parse(_nextPageHtml));
+    expect(next, isTrue);
+  });
+
+  test('search haveNextPage false when the view-more button has no offset', () async {
+    final next = await source.searchMangaUseCase
+        .haveNextPage(root: html_parser.parse(_lastPageHtml));
+    expect(next, isFalse);
   });
 
   test('tags parse genre checkboxes', () async {
@@ -183,5 +252,12 @@ void main() {
     expect(tags, hasLength(2));
     expect(tags.first.id, 'Action');
     expect(tags.first.name, 'Action');
+  });
+
+  test('tags use case serves the filter-panel reveal scripts', () {
+    final scripts = source.listTagUseCase.scripts;
+    expect(scripts, isNotEmpty);
+    expect(scripts.first, contains('show_filter'));
+    expect(scripts.length, greaterThan(1));
   });
 }
