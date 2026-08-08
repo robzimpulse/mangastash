@@ -42,17 +42,16 @@ jobs:
       - name: 'Install Dependency'
         run: melos get
       # Patch vendored plugin source before pod install: flutter_inappwebview_macos 1.1.2
-      # conforms to ASWebAuthenticationPresentationContextProviding but its method
-      # presentationAnchor(for:) takes ASWebAuthenticationSession (macOS 10.15-only).
-      # Lowering the method's @available to 10.14 breaks the parameter type; instead gate
-      # the whole class at @available(macOS 10.15, *) so the conformance is consistent.
-      # The package lands in ~/.pub-cache during `melos get`; flutter build macos copies
-      # it into macos/Pods at pod install time, so patch before building.
-      - name: 'Patch flutter_inappwebview_macos availability'
+      # declares ASWebAuthenticationSession APIs (macOS 10.15-only) but its podspec pins
+      # s.platform = :osx, '10.14'. Built at 10.14 the 10.15-only types/conformances are
+      # hard errors. Bump the podspec deployment target to 10.15 so all references compile.
+      # The package lands in ~/.pub-cache during `melos get`; flutter build macos reads the
+      # podspec and compiles the pod in place at pod install time, so patch before building.
+      - name: 'Patch flutter_inappwebview_macos deployment target'
         run: |
-          FILE="$HOME/.pub-cache/hosted/pub.dev/flutter_inappwebview_macos-1.1.2/macos/Classes/WebAuthenticationSession/WebAuthenticationSession.swift"
-          perl -0pi -e 's/public class WebAuthenticationSession:/\@available(macOS 10.15, *) public class WebAuthenticationSession:/' "$FILE"
-          grep -Fn '@available(macOS 10.15, *) public class WebAuthenticationSession' "$FILE"
+          PODSPEC="$HOME/.pub-cache/hosted/pub.dev/flutter_inappwebview_macos-1.1.2/macos/flutter_inappwebview_macos.podspec"
+          perl -0pi -e "s/s\.platform = :osx, '10\.14'/s.platform = :osx, '10.15'/" "$PODSPEC"
+          grep -Fn "s.platform = :osx, '10.15'" "$PODSPEC"
       - name: 'Build Application'
         run: flutter build macos --release
       - name: 'Create Installer'
