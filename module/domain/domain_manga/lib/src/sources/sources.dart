@@ -3,6 +3,7 @@ import 'package:entity_manga_external/entity_manga_external.dart';
 
 import 'asura_scan_source_external.dart';
 import 'manga_dex_source_external.dart';
+import 'manganato_source_external.dart';
 import 'weeb_central_source_external.dart';
 
 class Sources {
@@ -10,6 +11,7 @@ class Sources {
     MangaDexSourceExternal(),
     AsuraScanSourceExternal(),
     WeebCentralSourceExternal(),
+    ManganatoSourceExternal(),
   ];
 
   static SourceExternal? fromName(String name) {
