@@ -1,0 +1,106 @@
+import 'package:domain_manga/src/sources/weeb_central_source_external.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:html/parser.dart' as html_parser;
+
+/// Search-results fixture (one <article class="bg-base-300 flex gap-4 p-4">),
+/// trimmed to the nodes the parser reads. Mirrors weebcentral.com /search/data.
+const _searchHtml = '''
+<div>
+  <article class="bg-base-300 flex gap-4 p-4">
+    <section class="w-full lg:w-[25%] xl:w-[20%]">
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">
+        <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+      </a>
+    </section>
+    <section class="hidden lg:block lg:w-[75%] xl:w-[80%]">
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece"
+         class="line-clamp-1 link link-hover">One Piece</a>
+      <div class="opacity-70"><strong>Status:</strong><span>Ongoing</span></div>
+      <div class="opacity-70"><strong>Author(s):</strong><a class="link link-info link-hover">ODA Eiichiro</a></div>
+      <div class="opacity-70"><strong>Tag(s):</strong><span>Action</span><span>Adventure</span></div>
+    </section>
+  </article>
+</div>
+''';
+
+/// Series-detail fixture (weebcentral.com /series/{id}/{slug}).
+const _seriesHtml = '''
+<html><body>
+  <h1 class="hidden md:block text-2xl font-bold">One Piece</h1>
+  <p class="whitespace-pre-wrap break-words">A pirate adventure.</p>
+  <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+  <div class="opacity-70"><strong>Author(s): </strong><a>ODA Eiichiro</a></div>
+  <div class="opacity-70"><strong>Tags(s): </strong><span>Action</span><span>Adventure</span></div>
+  <div class="opacity-70"><strong>Status: </strong><span>Ongoing</span></div>
+  <div id="chapter-list" class="flex flex-col mt-2 divide-y divide-slate-500">
+    <div class="flex items-center" x-data="{ new_chapter: checkNewChapter('2026-08-07T15:10:56.544424Z') }">
+      <a href="/chapters/01KZECDZH06AWDQEJZAAQA9C2P" class="hover:bg-base-300 flex-1 flex items-center p-2">
+        <span class="grow flex items-center gap-2"><span class="">Chapter 1190</span></span>
+        <time class="text-datetime opacity-50" datetime="2026-08-07T15:10:56.544Z">2026-08-07T15:10:56.544424Z</time>
+      </a>
+    </div>
+    <div class="flex items-center" x-data="{ new_chapter: checkNewChapter('2026-07-24T17:48:43.166298Z') }">
+      <a href="/chapters/01KYAKWT8Y9JFC21GGD0X3KG9C" class="hover:bg-base-300 flex-1 flex items-center p-2">
+        <span class="grow flex items-center gap-2"><span class="">Chapter 1189</span></span>
+        <time class="text-datetime opacity-50" datetime="2026-07-24T17:48:43.166Z">2026-07-24T17:48:43.166298Z</time>
+      </a>
+    </div>
+  </div>
+</body></html>
+''';
+
+void main() {
+  final source = WeebCentralSourceExternal();
+
+  test('identity and registration shape', () {
+    expect(source.name, 'Weeb Central');
+    expect(source.baseUrl, 'https://weebcentral.com');
+    expect(source.builtIn, isFalse);
+    expect(source.getMangaUseCase, isA<GetMangaSourceExternalUseCase>());
+    expect(source.getChapterImageUseCase, isA<GetChapterImageSourceExternalUseCase>());
+    expect(source.searchMangaUseCase, isA<SearchMangaSourceExternalUseCase>());
+    expect(source.listChapterUseCase, isA<ListChapterSourceExternalUseCase>());
+    expect(source.listTagUseCase, isA<ListTagSourceExternalUseCase>());
+  });
+
+  test('search parses a result block', () async {
+    final results = await source.searchMangaUseCase
+        .parse(root: html_parser.parse(_searchHtml));
+    expect(results, hasLength(1));
+    expect(results.single.title, 'One Piece');
+    expect(
+      results.single.webUrl,
+      'https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece',
+    );
+    expect(results.single.status, 'Ongoing');
+    expect(results.single.author, 'ODA Eiichiro');
+    expect(results.single.tags, ['Action', 'Adventure']);
+  });
+
+  test('search haveNextPage false when no view-more button', () async {
+    final next = await source.searchMangaUseCase
+        .haveNextPage(root: html_parser.parse(_searchHtml));
+    expect(next, isFalse);
+  });
+
+  test('detail parses series page', () async {
+    final manga = await source.getMangaUseCase
+        .parse(root: html_parser.parse(_seriesHtml));
+    expect(manga.title, 'One Piece');
+    expect(manga.author, 'ODA Eiichiro');
+    expect(manga.description, 'A pirate adventure.');
+    expect(manga.status, 'Ongoing');
+    expect(manga.tags, ['Action', 'Adventure']);
+  });
+
+  test('chapter list parses rows in order', () async {
+    final chapters = await source.listChapterUseCase
+        .parse(root: html_parser.parse(_seriesHtml));
+    expect(chapters, hasLength(2));
+    expect(chapters.first.title, 'Chapter 1190');
+    expect(chapters.first.chapter, '1190');
+    expect(chapters.first.webUrl, 'https://weebcentral.com/chapters/01KZECDZH06AWDQEJZAAQA9C2P');
+    expect(chapters.first.publishAt, '2026-08-07T15:10:56.544424Z');
+  });
+}
