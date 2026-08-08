@@ -2,7 +2,6 @@ import 'package:domain_manga/src/sources/asura_scan_source_external.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:html/parser.dart' as html_parser;
-import 'package:manga_dex_api/manga_dex_api.dart';
 
 /// Reader fixture trimmed to the nodes the parser reads. Mirrors the current
 /// asurascans.com chapter reader (Astro rebuild): images live inside
