@@ -90,11 +90,12 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
       author: _infoValue(root, 'Author(s)'),
       description: _summary(root),
       status: _infoValue(root, 'Status'),
-      tags: root
-          .querySelectorAll('li.genres a[href^="/genre/"]')
-          .map((e) => e.text.trim())
-          .where((e) => e.isNotEmpty)
-          .toList(),
+      tags:
+          root
+              .querySelectorAll('li.genres a[href^="/genre/"]')
+              .map((e) => e.text.trim())
+              .where((e) => e.isNotEmpty)
+              .toList(),
       coverUrl: root.querySelector('div.manga-info-pic img')?.attributes['src'],
     );
   }
@@ -123,9 +124,9 @@ String? _summary(Document root) {
   final box = root.querySelector('#contentBox');
   if (box == null) return null;
 
-  final heading = box.querySelectorAll('h2, h3, h4').firstWhereOrNull(
-    (e) => e.text.toLowerCase().contains('summary'),
-  );
+  final heading = box
+      .querySelectorAll('h2, h3, h4')
+      .firstWhereOrNull((e) => e.text.toLowerCase().contains('summary'));
   if (heading == null) return null;
 
   final parts = <String>[];
@@ -286,10 +287,11 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
     for (final link in root.querySelectorAll('a[href^="/genre/"]')) {
       final name = link.text.trim();
       if (name.isEmpty) continue;
-      final slug = (link.attributes['href'] ?? '')
-          .split('/')
-          .where((e) => e.isNotEmpty)
-          .lastOrNull;
+      final slug =
+          (link.attributes['href'] ?? '')
+              .split('/')
+              .where((e) => e.isNotEmpty)
+              .lastOrNull;
       tags[name] = slug ?? name.toLowerCase();
     }
 

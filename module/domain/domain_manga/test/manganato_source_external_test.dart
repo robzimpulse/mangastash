@@ -118,7 +118,10 @@ void main() {
     expect(source.baseUrl, 'https://manganato.gg');
     expect(source.builtIn, isFalse);
     expect(source.getMangaUseCase, isA<GetMangaSourceExternalUseCase>());
-    expect(source.getChapterImageUseCase, isA<GetChapterImageSourceExternalUseCase>());
+    expect(
+      source.getChapterImageUseCase,
+      isA<GetChapterImageSourceExternalUseCase>(),
+    );
     expect(source.searchMangaUseCase, isA<SearchMangaSourceExternalUseCase>());
     expect(source.listChapterUseCase, isA<ListChapterSourceExternalUseCase>());
     expect(source.listTagUseCase, isA<ListTagSourceExternalUseCase>());
@@ -140,14 +143,12 @@ void main() {
   });
 
   test('search parses a result block with absolute webUrl', () async {
-    final results = await source.searchMangaUseCase
-        .parse(root: html_parser.parse(_searchHtml));
+    final results = await source.searchMangaUseCase.parse(
+      root: html_parser.parse(_searchHtml),
+    );
     expect(results, hasLength(1));
     expect(results.single.title, 'One Piece');
-    expect(
-      results.single.webUrl,
-      'https://manganato.gg/manga/op001/',
-    );
+    expect(results.single.webUrl, 'https://manganato.gg/manga/op001/');
     expect(
       results.single.coverUrl,
       'https://avt.mkklcdnv6temp.com/one-piece-cover.jpg',
@@ -156,20 +157,23 @@ void main() {
   });
 
   test('search haveNextPage false when no pagination link', () async {
-    final next = await source.searchMangaUseCase
-        .haveNextPage(root: html_parser.parse(_searchHtml));
+    final next = await source.searchMangaUseCase.haveNextPage(
+      root: html_parser.parse(_searchHtml),
+    );
     expect(next, isFalse);
   });
 
   test('search haveNextPage true when a ?page= link is present', () async {
-    final next = await source.searchMangaUseCase
-        .haveNextPage(root: html_parser.parse(_nextPageHtml));
+    final next = await source.searchMangaUseCase.haveNextPage(
+      root: html_parser.parse(_nextPageHtml),
+    );
     expect(next, isTrue);
   });
 
   test('detail parses series page', () async {
-    final manga = await source.getMangaUseCase
-        .parse(root: html_parser.parse(_detailHtml));
+    final manga = await source.getMangaUseCase.parse(
+      root: html_parser.parse(_detailHtml),
+    );
     expect(manga.title, 'One Piece');
     expect(manga.author, 'ODA Eiichiro');
     expect(manga.status, 'Ongoing');
@@ -178,15 +182,13 @@ void main() {
       'Monkey D. Luffy sets sail to find the One Piece in a pirate adventure.',
     );
     expect(manga.tags, ['Action', 'Adventure']);
-    expect(
-      manga.coverUrl,
-      'https://avt.mkklcdnv6temp.com/one-piece-cover.jpg',
-    );
+    expect(manga.coverUrl, 'https://avt.mkklcdnv6temp.com/one-piece-cover.jpg');
   });
 
   test('chapter list parses injected rows in order', () async {
-    final chapters = await source.listChapterUseCase
-        .parse(root: html_parser.parse(_chaptersHtml));
+    final chapters = await source.listChapterUseCase.parse(
+      root: html_parser.parse(_chaptersHtml),
+    );
     expect(chapters, hasLength(2));
     expect(chapters.first.title, 'Chapter 1');
     expect(chapters.first.chapter, '1');
@@ -202,21 +204,20 @@ void main() {
   });
 
   test('reader parses and dedupes image srcs', () async {
-    final images = await source.getChapterImageUseCase
-        .parse(root: html_parser.parse(_readerHtml));
-    expect(
-      images,
-      [
-        'https://2xstorage.gg/op001/ch1/1.jpg',
-        'https://2xstorage.gg/op001/ch1/2.jpg',
-        'https://2xstorage.gg/op001/ch1/3.jpg',
-      ],
+    final images = await source.getChapterImageUseCase.parse(
+      root: html_parser.parse(_readerHtml),
     );
+    expect(images, [
+      'https://2xstorage.gg/op001/ch1/1.jpg',
+      'https://2xstorage.gg/op001/ch1/2.jpg',
+      'https://2xstorage.gg/op001/ch1/3.jpg',
+    ]);
   });
 
   test('tags parse genre page links', () async {
-    final tags = await source.listTagUseCase
-        .parse(root: html_parser.parse(_genreHtml));
+    final tags = await source.listTagUseCase.parse(
+      root: html_parser.parse(_genreHtml),
+    );
     expect(tags, hasLength(3));
     expect(tags.first.id, 'action');
     expect(tags.first.name, 'Action');
