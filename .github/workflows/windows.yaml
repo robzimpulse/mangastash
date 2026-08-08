@@ -59,27 +59,3 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: build-windows.zip
-      - name: 'Find Comment'
-        if: always() && github.event_name == 'pull_request'
-        uses: peter-evans/find-comment@v3
-        id: find_comment
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
-          body-includes: Windows Build Report
-      - name: 'Create or Update Comment'
-        if: always() && github.event_name == 'pull_request'
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          comment-id: ${{ steps.find_comment.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
-          edit-mode: replace
-          body: |
-            ## 🚀 Windows Build Report
-
-            | Item | Details |
-            | :--- | :--- |
-            | **Build Status** | ${{ job.status == 'success' && '✅ Passed' || '❌ Failed' }} |
-            | **Event** | ${{ github.event_name }} |
-            | **Run ID** | [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) |
-            | **Download Artifacts** | [📂 Click Here to Download](${{ steps.upload_artifact.outputs.artifact-url }}) |
