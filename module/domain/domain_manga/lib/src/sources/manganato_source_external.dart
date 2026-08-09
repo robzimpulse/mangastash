@@ -43,12 +43,20 @@ class ManganatoSourceExternal implements SourceExternal {
       _ListTagSourceExternalUseCase();
 }
 
-/// Prefixes a URL with the source base URL when it is a root-relative path.
+/// Prefixes URL with source base URL when root-relative, and rewrites
+/// `www.`-prefixed absolute URLs to the source's bare host so stored URLs
+/// match [baseUrl] (live site 301-redirects `www.` but serves both forms).
 String _absolute(String baseUrl, String url) {
-  if (url.startsWith('http')) return url;
-  if (url.startsWith('//')) return 'https:$url';
-  if (url.startsWith('/')) return '$baseUrl$url';
-  return url;
+  final absolute = url.startsWith('//')
+      ? 'https:$url'
+      : url.startsWith('/')
+          ? '$baseUrl$url'
+          : url;
+  final bareHost = baseUrl.replaceFirst(RegExp(r'^https?://'), '');
+  final wwwOrigin = 'https://www.$bareHost';
+  return absolute.startsWith(wwwOrigin)
+      ? absolute.replaceFirst(wwwOrigin, baseUrl)
+      : absolute;
 }
 
 class _GetChapterImageSourceExternalUseCase

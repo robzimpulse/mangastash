@@ -44,9 +44,9 @@ const _nextPageHtml = '''
 
 /// Browse fixture (manganato.gg /manga-list/latest-manga): carousel
 /// `div.item` with `img[src]` + `h3 > a[href="/manga/<slug>"]` (no
-/// searchstory_name). The hrefs are root-relative (as the real page emits
-/// `www.`-prefixed absolute links, this fixture keeps the app's canonical
-/// `manganato.gg` host).
+/// searchstory_name). The real site 301-redirects to `www.` and emits
+/// absolute `https://www.manganato.gg/...` hrefs; `_absolute` normalizes
+/// them to the app's canonical `manganato.gg` host.
 const _browseHtml = '''
 <html><body>
   <div class="item">
@@ -54,10 +54,10 @@ const _browseHtml = '''
         loading="lazy" alt="My Aggravating Sovereign">
     <div class="slide-caption">
       <h3>
-        <a href="https://manganato.gg/manga/my-aggravating-sovereign"
+        <a href="https://www.manganato.gg/manga/my-aggravating-sovereign"
             title="My Aggravating Sovereign">My Aggravating Sovereign</a>
       </h3>
-      <a href="https://manganato.gg/manga/my-aggravating-sovereign/chapter-114"
+      <a href="https://www.manganato.gg/manga/my-aggravating-sovereign/chapter-114"
           title="Chapter 114">Chapter 114</a>
     </div>
   </div>
@@ -65,7 +65,7 @@ const _browseHtml = '''
     <img data-src="https://storage.waitst.com/thumb/lord-preston.webp" alt="Lord Preston">
     <div class="slide-caption">
       <h3>
-        <a href="https://manganato.gg/manga/lord-preston-s-secret-tutor"
+        <a href="https://www.manganato.gg/manga/lord-preston-s-secret-tutor"
             title="Lord Preston&#039;s Secret Tutor">Lord Preston's Secret Tutor</a>
       </h3>
     </div>
@@ -245,6 +245,13 @@ void main() {
       results.last.coverUrl,
       'https://storage.waitst.com/thumb/lord-preston.webp',
     );
+  });
+
+  test('search normalizes www.manganato.gg webUrls to canonical host', () async {
+    final results = await source.searchMangaUseCase.parse(
+      root: html_parser.parse(_browseHtml),
+    );
+    expect(results.first.webUrl, 'https://manganato.gg/manga/my-aggravating-sovereign');
   });
 
   test('detail parses series page', () async {
