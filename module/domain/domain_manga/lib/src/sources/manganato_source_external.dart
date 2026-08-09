@@ -223,7 +223,10 @@ class _SearchMangaSourceExternalUseCase
 
   @override
   Future<bool?> haveNextPage({required Document root}) async {
-    // Manganato appends ?page=N once more results exist.
+    // Browse (empty title) pages are JS carousels with no server pagination.
+    // Only the search path appends ?page=N once more results exist.
+    final searchActive = root.querySelector('div.panel-search-story') != null;
+    if (!searchActive) return false;
     return root.querySelector('a[href*="?page="]') != null;
   }
 
@@ -241,7 +244,9 @@ class _SearchMangaSourceExternalUseCase
       mangas.add(
         MangaScrapped(
           title: link.text.trim(),
-          coverUrl: item.querySelector('img')?.attributes['src'],
+          coverUrl:
+              item.querySelector('img')?.attributes['data-src'] ??
+              item.querySelector('img')?.attributes['src'],
           webUrl: href == null ? null : _absolute(_baseUrl, href),
           author: _itemLabel(item.text, 'Author(s)'),
         ),
@@ -257,7 +262,15 @@ class _SearchMangaSourceExternalUseCase
 
   @override
   String url({required SearchMangaParameter parameter}) {
-    final q = (parameter.title ?? '').toLowerCase().replaceAll(' ', '_');
+    final title = parameter.title ?? '';
+    final tagId = parameter.includedTags?.firstOrNull;
+    if (title.isEmpty && tagId != null) {
+      return '$_baseUrl/genre/$tagId';
+    }
+    if (title.isEmpty) {
+      return '$_baseUrl/manga-list/latest-manga';
+    }
+    final q = title.toLowerCase().replaceAll(' ', '_');
     final page = parameter.page;
     final base = '$_baseUrl/search/story/$q';
     return page > 1 ? '$base?page=$page' : base;

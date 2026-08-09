@@ -42,6 +42,37 @@ const _nextPageHtml = '''
 </div>
 ''';
 
+/// Browse fixture (manganato.gg /manga-list/latest-manga): carousel
+/// `div.item` with `img[src]` + `h3 > a[href="/manga/<slug>"]` (no
+/// searchstory_name). The hrefs are root-relative (as the real page emits
+/// `www.`-prefixed absolute links, this fixture keeps the app's canonical
+/// `manganato.gg` host).
+const _browseHtml = '''
+<html><body>
+  <div class="item">
+    <img src="https://storage.waitst.com/thumb/my-aggravating-sovereign.webp"
+        loading="lazy" alt="My Aggravating Sovereign">
+    <div class="slide-caption">
+      <h3>
+        <a href="https://manganato.gg/manga/my-aggravating-sovereign"
+            title="My Aggravating Sovereign">My Aggravating Sovereign</a>
+      </h3>
+      <a href="https://manganato.gg/manga/my-aggravating-sovereign/chapter-114"
+          title="Chapter 114">Chapter 114</a>
+    </div>
+  </div>
+  <div class="item">
+    <img data-src="https://storage.waitst.com/thumb/lord-preston.webp" alt="Lord Preston">
+    <div class="slide-caption">
+      <h3>
+        <a href="https://manganato.gg/manga/lord-preston-s-secret-tutor"
+            title="Lord Preston&#039;s Secret Tutor">Lord Preston's Secret Tutor</a>
+      </h3>
+    </div>
+  </div>
+</body></html>
+''';
+
 /// Series-detail fixture (manganato.gg /manga/op001/).
 const _detailHtml = '''
 <html><body>
@@ -168,6 +199,52 @@ void main() {
       root: html_parser.parse(_nextPageHtml),
     );
     expect(next, isTrue);
+  });
+
+  test('browse url maps empty title to latest-manga list', () {
+    expect(
+      source.searchMangaUseCase.url(
+        parameter: const SearchMangaParameter(),
+      ),
+      'https://manganato.gg/manga-list/latest-manga',
+    );
+  });
+
+  test('browse url maps empty title + tag to genre page', () {
+    expect(
+      source.searchMangaUseCase.url(
+        parameter: const SearchMangaParameter(includedTags: ['action']),
+      ),
+      'https://manganato.gg/genre/action',
+    );
+  });
+
+  test('search haveNextPage false for browse page (no ?page= links)', () async {
+    final next = await source.searchMangaUseCase.haveNextPage(
+      root: html_parser.parse(_browseHtml),
+    );
+    expect(next, isFalse);
+  });
+
+  test('search parses carousel browse items (src and data-src covers)', () async {
+    final results = await source.searchMangaUseCase.parse(
+      root: html_parser.parse(_browseHtml),
+    );
+    expect(results, hasLength(2));
+    expect(results.first.title, 'My Aggravating Sovereign');
+    expect(
+      results.first.webUrl,
+      'https://manganato.gg/manga/my-aggravating-sovereign',
+    );
+    expect(
+      results.first.coverUrl,
+      'https://storage.waitst.com/thumb/my-aggravating-sovereign.webp',
+    );
+    expect(results.last.title, "Lord Preston's Secret Tutor");
+    expect(
+      results.last.coverUrl,
+      'https://storage.waitst.com/thumb/lord-preston.webp',
+    );
   });
 
   test('detail parses series page', () async {
