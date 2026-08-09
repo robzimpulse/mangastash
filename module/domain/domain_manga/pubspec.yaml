@@ -43,3 +43,5 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  manga_service_drift:
+    path: ../../library/manga_service_drift

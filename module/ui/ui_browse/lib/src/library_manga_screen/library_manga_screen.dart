@@ -36,6 +36,7 @@ class LibraryMangaScreen extends StatefulWidget {
       create: (context) {
         return LibraryMangaScreenCubit(
           listenMangaFromLibraryUseCase: locator(),
+          listenSourcesUseCase: locator(),
           prefetchMangaUseCase: locator(),
           listenPrefetchMangaUseCase: locator(),
           removeFromLibraryUseCase: locator(),

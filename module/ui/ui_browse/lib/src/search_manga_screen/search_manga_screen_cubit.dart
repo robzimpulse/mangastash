@@ -11,6 +11,10 @@ class SearchMangaScreenCubit extends Cubit<SearchMangaScreenState>
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
   }) : super(
          initialState.copyWith(
+           // Seed from the current value so the first frame shows real
+           // sources (or the true empty state) instead of a one-frame
+           // `const {}` flash of the "No sources enabled" branch.
+           sources: {...?listenSourceUseCase.sourceStateStream.valueOrNull},
            parameter:
                listenSearchParameterUseCase.searchParameterState.valueOrNull,
          ),
