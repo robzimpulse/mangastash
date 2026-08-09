@@ -158,9 +158,17 @@ class DomainMangaRegistrar extends Registrar {
         chapterRepository: locator(),
       ),
     );
-    locator.registerFactory(() => AddToLibraryUseCase(libraryDao: locator()));
     locator.registerFactory(
-      () => RemoveFromLibraryUseCase(libraryDao: locator()),
+      () => AddToLibraryUseCase(
+        libraryDao: locator(),
+        listenSourcesUseCase: locator(),
+      ),
+    );
+    locator.registerFactory(
+      () => RemoveFromLibraryUseCase(
+        libraryDao: locator(),
+        listenSourcesUseCase: locator(),
+      ),
     );
     locator.registerFactory(
       () => UpdateChapterUseCase(

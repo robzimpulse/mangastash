@@ -25,6 +25,9 @@ class LibraryManager implements ListenMangaFromLibraryUseCase {
       _libraryDao.stream,
       _listenSourcesUseCase.sourceStateStream,
       (models, sources) {
+        // The enabled set is keyed by SourceExternal.name; a rename of a
+        // source's name string would silently hide its rows (pre-existing
+        // coupling, not refactored here).
         final enabled = {...sources.map((e) => e.name)};
         return [
           for (final model in models)

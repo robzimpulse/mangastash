@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/src/manga_chapter.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../use_case/history/listen_read_history_use_case.dart';
@@ -24,9 +25,13 @@ class HistoryManager
        _listenSourcesUseCase = listenSourcesUseCase;
 
   Stream<List<MangaChapter>> _filter(Stream<List<HistoryModel>> source) {
-    return source.withLatestFrom(
+    return Rx.combineLatest2<List<HistoryModel>, List<SourceExternal>, List<MangaChapter>>(
+      source,
       _listenSourcesUseCase.sourceStateStream,
       (histories, sources) {
+        // The enabled set is keyed by SourceExternal.name; a rename of a
+        // source's name string would silently hide its rows (pre-existing
+        // coupling, not refactored here).
         final enabled = {...sources.map((e) => e.name)};
         return [
           for (final model in histories)
