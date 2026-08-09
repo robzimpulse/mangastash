@@ -180,7 +180,12 @@ class DomainMangaRegistrar extends Registrar {
       () => ListenDownloadedChapterUseCase(chapterDao: locator()),
     );
 
-    locator.registerLazySingleton(() => LibraryManager(libraryDao: locator()));
+    locator.registerLazySingleton(
+      () => LibraryManager(
+        libraryDao: locator(),
+        listenSourcesUseCase: locator(),
+      ),
+    );
     locator.alias<ListenMangaFromLibraryUseCase, LibraryManager>();
 
     final end = DateTime.timestamp();
