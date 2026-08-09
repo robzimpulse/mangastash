@@ -215,13 +215,12 @@ class _SearchMangaSourceExternalUseCase
       final link = item.querySelector('h3.title a');
       if (link == null) continue;
 
+      final img = item.querySelector('img');
       final href = link.attributes['href'];
       mangas.add(
         MangaScrapped(
           title: link.text.trim(),
-          coverUrl:
-              item.querySelector('img')?.attributes['data-src'] ??
-              item.querySelector('img')?.attributes['src'],
+          coverUrl: img?.attributes['data-src'] ?? img?.attributes['src'],
           webUrl: href == null ? null : _absolute(_baseUrl, href),
           status: item.querySelector('div.status.ongoing')?.text.trim(),
           tags: _dataGenre(item),
