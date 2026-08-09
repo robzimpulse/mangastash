@@ -14,19 +14,34 @@
 - Lint (via `analysis_options.yaml`): strict trailing commas (`require_trailing_commas`), single quotes, grouped/sorted imports (Dart → Package → Relative), always declare return types.
 - `ValueStream` is from `package:rxdart/rxdart.dart`. `distinct()` must be called on subscriptions that emit list values, matching existing cubits.
 - Follow the exact existing stream shapes: `ListenSourcesUseCase.sourceStateStream` returns `ValueStream<List<SourceExternal>>`; `LibraryDao.stream` yields `Stream<List<MangaModel>>`; `HistoryDao.history` / `.unread` yield `Stream<List<HistoryModel>>`.
-- Tests use real in-memory DB: `AppDatabase(executor: MemoryExecutor())` from `package:manga_service_drift/manga_service_drift.dart` (exported) or `package:manga_service_drift/src/database/memory_executor.dart`. Do not mock DAOs.
+- Tests use real in-memory DB: `AppDatabase(executor: MemoryExecutor())`. `AppDatabase`, DAOs, and table companions are re-exported to `domain_manga` transitively through `package:core_storage/core_storage.dart`; `MemoryExecutor` lives at `package:manga_service_drift/src/database/memory_executor.dart` and is NOT re-exported, so **Task 1 must first add `manga_service_drift` (path `../../library/manga_service_drift`) to `domain_manga`'s `dev_dependencies`** and run `melos run get`. Do not mock DAOs.
 
 ---
 
 ### Task 1: `LibraryManager` filters disabled sources
 
 **Files:**
+- Modify: `module/domain/domain_manga/pubspec.yaml` (add `manga_service_drift` dev-dependency)
 - Modify: `module/domain/domain_manga/lib/src/manager/library_manager.dart`
 - Test: `module/domain/domain_manga/test/manager/library_manager_test.dart`
 
 **Interfaces:**
 - Consumes: `ListenSourcesUseCase` (from `../use_case/source/listen_sources_use_case.dart`), `LibraryDao` (from `package:core_storage/core_storage.dart`), `Sources` (from `../sources/sources.dart`), `BehaviorSubject` / `combineLatest` (rxdart), `SourceExternal` (from `package:entity_manga_external/entity_manga_external.dart`).
 - Produces: `LibraryManager` constructor now takes `required ListenSourcesUseCase listenSourcesUseCase`. Streams `libraryStateStream` / `libraryMangaIds` filter out rows whose `Manga.source` is not in the enabled set. Test harness uses a `BehaviorSubject<List<SourceExternal>>` for the enabled list.
+
+- [ ] **Step 0: Add `manga_service_drift` dev-dependency**
+
+In `module/domain/domain_manga/pubspec.yaml`, add to `dev_dependencies`:
+
+```yaml
+dev_dependencies:
+  # (existing entries…)
+  manga_service_drift:
+    path: ../../library/manga_service_drift
+```
+
+Run from repo root: `melos run get`
+Expected: resolves cleanly (the package already depends on `core_storage` which depends on `manga_service_drift`; this only exposes it to tests).
 
 - [ ] **Step 1: Write the failing test**
 
@@ -180,9 +195,11 @@ Expected: PASS
 - [ ] **Step 5: Commit**
 
 ```bash
-git add module/domain/domain_manga/lib/src/manager/library_manager.dart module/domain/domain_manga/test/manager/library_manager_test.dart
+git add module/domain/domain_manga/pubspec.yaml module/domain/domain_manga/pubspec.lock module/domain/domain_manga/lib/src/manager/library_manager.dart module/domain/domain_manga/test/manager/library_manager_test.dart
 git commit -m "feat(domain_manga): filter LibraryManager rows by enabled sources"
 ```
+
+> If `melos run get` produced no `pubspec.lock` for `domain_manga` (workspace lockfile layout varies), omit it from the `git add` — the other three paths must still be staged.
 
 ---
 
