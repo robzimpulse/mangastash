@@ -43,12 +43,20 @@ class ManganatoSourceExternal implements SourceExternal {
       _ListTagSourceExternalUseCase();
 }
 
-/// Prefixes a URL with the source base URL when it is a root-relative path.
+/// Prefixes URL with source base URL when root-relative, and rewrites
+/// `www.`-prefixed absolute URLs to the source's bare host so stored URLs
+/// match [baseUrl] (live site 301-redirects `www.` but serves both forms).
 String _absolute(String baseUrl, String url) {
-  if (url.startsWith('http')) return url;
-  if (url.startsWith('//')) return 'https:$url';
-  if (url.startsWith('/')) return '$baseUrl$url';
-  return url;
+  final absolute = url.startsWith('//')
+      ? 'https:$url'
+      : url.startsWith('/')
+          ? '$baseUrl$url'
+          : url;
+  final bareHost = baseUrl.replaceFirst(RegExp(r'^https?://'), '');
+  final wwwOrigin = 'https://www.$bareHost';
+  return absolute.startsWith(wwwOrigin)
+      ? absolute.replaceFirst(wwwOrigin, baseUrl)
+      : absolute;
 }
 
 class _GetChapterImageSourceExternalUseCase
@@ -223,7 +231,10 @@ class _SearchMangaSourceExternalUseCase
 
   @override
   Future<bool?> haveNextPage({required Document root}) async {
-    // Manganato appends ?page=N once more results exist.
+    // Browse (empty title) pages are JS carousels with no server pagination.
+    // Only the search path appends ?page=N once more results exist.
+    final searchActive = root.querySelector('div.panel-search-story') != null;
+    if (!searchActive) return false;
     return root.querySelector('a[href*="?page="]') != null;
   }
 
@@ -237,11 +248,12 @@ class _SearchMangaSourceExternalUseCase
           item.querySelector('a[href*="/manga/"]');
       if (link == null) continue;
 
+      final img = item.querySelector('img');
       final href = link.attributes['href'];
       mangas.add(
         MangaScrapped(
           title: link.text.trim(),
-          coverUrl: item.querySelector('img')?.attributes['src'],
+          coverUrl: img?.attributes['data-src'] ?? img?.attributes['src'],
           webUrl: href == null ? null : _absolute(_baseUrl, href),
           author: _itemLabel(item.text, 'Author(s)'),
         ),
@@ -257,7 +269,15 @@ class _SearchMangaSourceExternalUseCase
 
   @override
   String url({required SearchMangaParameter parameter}) {
-    final q = (parameter.title ?? '').toLowerCase().replaceAll(' ', '_');
+    final title = parameter.title ?? '';
+    final tagId = parameter.includedTags?.firstOrNull;
+    if (title.isEmpty && tagId != null) {
+      return '$_baseUrl/genre/$tagId';
+    }
+    if (title.isEmpty) {
+      return '$_baseUrl/manga-list/latest-manga';
+    }
+    final q = title.toLowerCase().replaceAll(' ', '_');
     final page = parameter.page;
     final base = '$_baseUrl/search/story/$q';
     return page > 1 ? '$base?page=$page' : base;
