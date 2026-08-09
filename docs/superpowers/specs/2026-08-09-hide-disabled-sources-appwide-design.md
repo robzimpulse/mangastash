@@ -24,7 +24,8 @@ then disabled still leaks its content through every read surface:
   reader images) when reached directly.
 
 Goal: "hidden" means **disabled sources — and their saved content — are hidden across
-the whole app**.
+every discovery surface in the app** (Search, Browse, Library, Updates, History).
+Direct deep links into a disabled source's page are intentionally exempt (decision 4).
 
 ## Decisions (confirmed with user)
 
@@ -85,9 +86,12 @@ the enabled source names derived from it.
 - Pass `listenSourcesUseCase: locator()` into `LibraryManager` and `HistoryManager`.
 
 ### `module/ui/ui_browse/lib/src/library_manga_screen/library_manga_screen_cubit.dart`
-- Fix the `Sources.values` seed: initial `sources` comes from
-  `listenSourcesUseCase.sourceStateStream.valueOrNull` (or add a subscription). Rows
-  already filtered upstream, so `filteredMangas` is unchanged.
+- Fix the `Sources.values` seed by subscribing to
+  `listenSourcesUseCase.sourceStateStream.distinct()` (same pattern as
+  `SearchMangaScreenCubit` / `BrowseSourceScreenCubit`) and emitting `sources` in state.
+  Constructor gains `required ListenSourcesUseCase listenSourcesUseCase` (wired in
+  `LibraryMangaScreen.create`). Rows are already filtered upstream, so
+  `filteredMangas` is unchanged.
 
 ### `module/ui/ui_browse/lib/src/search_manga_screen/search_manga_screen.dart`
 - When `state.sources.isEmpty`, render the empty state instead of the tab bar:
