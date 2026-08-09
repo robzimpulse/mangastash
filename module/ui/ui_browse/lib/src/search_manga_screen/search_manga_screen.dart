@@ -16,6 +16,7 @@ class SearchMangaScreen extends StatefulWidget {
     required this.imagesCacheManager,
     required this.widgetBuilder,
     this.onTapFilter,
+    this.onTapBrowseSources,
   });
 
   final ImagesCacheManager imagesCacheManager;
@@ -25,12 +26,15 @@ class SearchMangaScreen extends StatefulWidget {
   final Future<SearchMangaParameter?>? Function(SearchMangaParameter? value)?
   onTapFilter;
 
+  final VoidCallback? onTapBrowseSources;
+
   static Widget create({
     required ServiceLocator locator,
     void Function(Manga, SearchMangaParameter)? onTapManga,
     Future<MangaMenu?> Function(bool)? onTapMangaMenu,
     Future<SearchMangaParameter?>? Function(SearchMangaParameter? value)?
     onTapFilter,
+    VoidCallback? onTapBrowseSources,
   }) {
     return BlocProvider(
       create: (context) {
@@ -42,6 +46,7 @@ class SearchMangaScreen extends StatefulWidget {
       child: SearchMangaScreen(
         imagesCacheManager: locator(),
         onTapFilter: onTapFilter,
+        onTapBrowseSources: onTapBrowseSources,
         widgetBuilder: (source, cubit) {
           return MangaGridWidget.create(
             locator: locator,
@@ -92,6 +97,28 @@ class _SearchMangaScreenState extends State<SearchMangaScreen> {
       buildWhen: (prev, curr) => prev.sources != curr.sources,
       builder: (context, state) {
         final theme = Theme.of(context);
+
+        if (state.sources.isEmpty) {
+          return ScaffoldScreen(
+            appBar: AppBar(
+              title: const Text('Search Manga'),
+              centerTitle: false,
+            ),
+            body: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('No sources enabled'),
+                  const SizedBox(height: 16),
+                  OutlinedButton(
+                    onPressed: widget.onTapBrowseSources,
+                    child: const Text('Open Source List'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
 
         return DefaultTabController(
           length: state.sources.length,
