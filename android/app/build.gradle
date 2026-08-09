@@ -6,22 +6,6 @@ plugins {
 }
 
 android {
-    def flutterVersionCode = {
-        def properties = new Properties()
-        rootProject.file("local.properties").withInputStream { properties.load(it) }
-        def value = properties.getProperty("flutter.versionCode")
-        assert value != null, "flutter.versionCode not set in local.properties"
-        return value
-    }()
-
-    def flutterVersionName = {
-        def properties = new Properties()
-        rootProject.file("local.properties").withInputStream { properties.load(it) }
-        def value = properties.getProperty("flutter.versionName")
-        assert value != null, "flutter.versionName not set in local.properties"
-        return value
-    }()
-
     compileSdkVersion Math.max(flutter.compileSdkVersion, 34)
     ndkVersion "27.0.12077973"
     namespace "com.robzimpulse.mangastash.mangastash"
@@ -47,8 +31,8 @@ android {
         applicationId "com.robzimpulse.mangastash.mangastash"
         minSdkVersion 24
         targetSdkVersion flutter.targetSdkVersion
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        versionCode flutter.versionCode.toInteger()
+        versionName flutter.versionName
         ndk {
             // exclude x86 as it is not supported by flutter
             // https://docs.flutter.dev/deployment/android#what-are-the-supported-target-architectures
