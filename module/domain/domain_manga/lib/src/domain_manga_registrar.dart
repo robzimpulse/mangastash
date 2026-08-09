@@ -75,7 +75,12 @@ class DomainMangaRegistrar extends Registrar {
     locator.alias<ListenJobUseCase, JobManager>();
     locator.alias<CancelJobUseCase, JobManager>();
 
-    locator.registerLazySingleton(() => HistoryManager(historyDao: locator()));
+    locator.registerLazySingleton(
+      () => HistoryManager(
+        historyDao: locator(),
+        listenSourcesUseCase: locator(),
+      ),
+    );
     locator.alias<ListenReadHistoryUseCase, HistoryManager>();
     locator.alias<ListenUnreadHistoryUseCase, HistoryManager>();
 
