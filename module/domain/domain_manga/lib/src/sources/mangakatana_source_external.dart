@@ -207,8 +207,12 @@ class _SearchMangaSourceExternalUseCase
   Future<List<MangaScrapped>> parse({required Document root}) async {
     final mangas = <MangaScrapped>[];
 
+    // Both the `.d-cell` search-route template and the `.media` root-search
+    // template share the shape: `div.item[data-id]` → `h3.title a` link +
+    // an `img` cover + an optional `div.status.ongoing`. Query by those
+    // stable pieces instead of the layout-specific `d-cell` classes.
     for (final item in root.querySelectorAll('div.item[data-id]')) {
-      final link = item.querySelector('div.d-cell.text h3.title a');
+      final link = item.querySelector('h3.title a');
       if (link == null) continue;
 
       final href = link.attributes['href'];
@@ -216,9 +220,8 @@ class _SearchMangaSourceExternalUseCase
         MangaScrapped(
           title: link.text.trim(),
           coverUrl:
-              item
-                  .querySelector('div.d-cell.media div.wrap_img img')
-                  ?.attributes['data-src'],
+              item.querySelector('img')?.attributes['data-src'] ??
+              item.querySelector('img')?.attributes['src'],
           webUrl: href == null ? null : _absolute(_baseUrl, href),
           status: item.querySelector('div.status.ongoing')?.text.trim(),
           tags: _dataGenre(item),
@@ -235,7 +238,9 @@ class _SearchMangaSourceExternalUseCase
   @override
   String url({required SearchMangaParameter parameter}) {
     final q = Uri.encodeQueryComponent(parameter.title ?? '');
-    return '$_baseUrl/search?keyword=$q';
+    // The site's search form posts to the root path; `/search` is a 404.
+    // `search_by=m_name` makes the query match against manga names.
+    return '$_baseUrl/?search=$q&search_by=m_name';
   }
 }
 

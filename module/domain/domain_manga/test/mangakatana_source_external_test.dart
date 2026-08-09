@@ -25,6 +25,30 @@ const _searchHtml = '''
 </div>
 ''';
 
+/// Search-results fixture using the root-search `.media` template
+/// (mangakatana.com/?search=one+piece&search_by=m_name real results block):
+/// `div.item[data-id]` → `.media .wrap_img img[src]` cover + `h3.title a` link.
+const _searchRootHtml = '''
+<div class="widget-body"></div>
+<div id="book_list">
+  <div class="item" data-genre=",14,15,2,3,24,17,45,21," data-id="49">
+    <div class="media">
+      <div class="wrap_img">
+        <a href="https://mangakatana.com/manga/one-piece.49">
+          <picture><img src="https://mangakatana.com/imgs/cover/04e/01/dc9fd.jpg" alt="[Cover]"></picture>
+        </a>
+      </div>
+      <div class="status ongoing"><i class="uk-icon-tasks"></i> Ongoing</div>
+    </div>
+    <div class="text">
+      <h3 class="title">
+        <a href="https://mangakatana.com/manga/one-piece.49" target="_blank">One Piece</a><span> - Update chapter 1190</span>
+      </h3>
+    </div>
+  </div>
+</div>
+''';
+
 /// Series-detail fixture (mangakatana.com /manga/one-piece.123): `h1` title,
 /// `li.d-row` info rows, `div.summary > p` description, and a chapter
 /// `<table>` with `div.chapter` + `div.update_time` cells.
@@ -118,19 +142,51 @@ void main() {
     expect(source.listTagUseCase, isA<ListTagSourceExternalUseCase>());
   });
 
-  test('search url maps title to keyword and ignores page', () {
+  test('search url maps title to root path and ignores page', () {
     expect(
       source.searchMangaUseCase.url(
         parameter: const SearchMangaParameter(title: 'One Piece'),
       ),
-      'https://mangakatana.com/search?keyword=One+Piece',
+      'https://mangakatana.com/?search=One+Piece&search_by=m_name',
     );
     expect(
       source.searchMangaUseCase.url(
         parameter: const SearchMangaParameter(title: 'One Piece', page: 2),
       ),
-      'https://mangakatana.com/search?keyword=One+Piece',
+      'https://mangakatana.com/?search=One+Piece&search_by=m_name',
     );
+  });
+
+  test('search url maps title to root path with search_by', () {
+    expect(
+      source.searchMangaUseCase.url(
+        parameter: const SearchMangaParameter(title: 'One Piece'),
+      ),
+      'https://mangakatana.com/?search=One+Piece&search_by=m_name',
+    );
+    expect(
+      source.searchMangaUseCase.url(
+        parameter: const SearchMangaParameter(),
+      ),
+      'https://mangakatana.com/?search=&search_by=m_name',
+    );
+  });
+
+  test('search parses root-search .media template items', () async {
+    final results = await source.searchMangaUseCase.parse(
+      root: html_parser.parse(_searchRootHtml),
+    );
+    expect(results, hasLength(1));
+    expect(results.single.title, 'One Piece');
+    expect(
+      results.single.webUrl,
+      'https://mangakatana.com/manga/one-piece.49',
+    );
+    expect(
+      results.single.coverUrl,
+      'https://mangakatana.com/imgs/cover/04e/01/dc9fd.jpg',
+    );
+    expect(results.single.status, 'Ongoing');
   });
 
   test('search parses a result block with absolute webUrl', () async {
