@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:html/dom.dart';
@@ -5,13 +7,12 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 
 /// Flame Comics (https://flamecomics.xyz) external manga source.
 ///
-/// The site is a custom Next.js/Mantine SPA. Search/homepage render `.item__wrap`
-/// cards with a lazy `data-src` cover; the detail and reader pages mirror
-/// Madara-class markup. Only the search card covers and the reader images are
-/// lazy, so both use cases inject a `data-src` resolution script.
-/// ponytail: flamecomics is a Mantine SPA; search card selectors come from the
-/// live homepage, detail/reader use Madara conventions — a live smoke test is
-/// required before shipping.
+/// The site is a custom Next.js/Mantine SPA. All browse/detail/reader content
+/// is server-rendered into a `#__NEXT_DATA__` JSON script tag (SSG), so every
+/// use case parses that JSON directly — no injected scripts. The browse page
+/// serves the full series list; typed search is client-side on the site, so
+/// the app filters the embedded series array in Dart using the searchTerm
+/// threaded through SearchMangaSourceExternalUseCase.parse.
 class FlameComicsSourceExternal implements SourceExternal {
   @override
   String get baseUrl => 'https://flamecomics.xyz';
@@ -27,7 +28,7 @@ class FlameComicsSourceExternal implements SourceExternal {
 
   @override
   GetChapterImageSourceExternalUseCase get getChapterImageUseCase =>
-      _GetChapterImageSourceExternalUseCase(baseUrl);
+      _GetChapterImageSourceExternalUseCase();
 
   @override
   GetMangaSourceExternalUseCase get getMangaUseCase =>
@@ -46,146 +47,51 @@ class FlameComicsSourceExternal implements SourceExternal {
       _ListTagSourceExternalUseCase();
 }
 
-/// Prefixes a URL with the source base URL when it is a root-relative path.
-String _absolute(String baseUrl, String url) {
-  if (url.startsWith('http')) return url;
-  if (url.startsWith('//')) return 'https:$url';
-  if (url.startsWith('/')) return '$baseUrl$url';
-  return url;
-}
-
-/// Resolves the lazyload `data-src` into `src` for every <img> matched by
-/// [selector] before getHtml() snapshots the DOM.
-List<String> _lazyloadScript(String selector) {
-  return [
-    '''
-    document.querySelectorAll('$selector[data-src]').forEach(i => {
-      i.src = i.getAttribute('data-src');
-    });
-    ''',
-  ];
-}
-
-class _GetChapterImageSourceExternalUseCase
-    implements GetChapterImageSourceExternalUseCase {
-  final String _baseUrl;
-
-  const _GetChapterImageSourceExternalUseCase(this._baseUrl);
-
-  @override
-  Duration? get timeout => Duration(seconds: 30);
-
-  @override
-  Future<List<String>> parse({required Document root}) async {
-    // Each reader page <img> carries its real CDN URL in `src` once the
-    // lazyload `data-src` has been resolved by the injected script.
-    final images = root.querySelectorAll('div.reading-content img');
-
-    return images
-        .map((e) => e.attributes['src'])
-        .nonNulls
-        .map((src) => _absolute(_baseUrl, src))
-        .toList();
+/// Parses `#__NEXT_DATA__` JSON script tag [root].
+Map<String, dynamic> _nextData(Document root) {
+  final script = root.querySelector('#__NEXT_DATA__');
+  if (script == null) return const {};
+  final raw = script.text.trim();
+  if (raw.isEmpty) return const {};
+  try {
+    final decoded = jsonDecode(raw);
+    return decoded is Map<String, dynamic>
+        ? (decoded['props']?['pageProps'] as Map<String, dynamic>? ?? const {})
+        : const {};
+  } catch (_) {
+    return const {};
   }
-
-  @override
-  List<String> get scripts => _lazyloadScript('div.reading-content img');
 }
 
-class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
-  @override
-  Duration? get timeout => Duration(seconds: 15);
+/// Builds CDN cover URL for a [series], honoring the `?t=` cache-buster.
+String _coverUrl(String baseUrl, dynamic series) {
+  if (series is! Map) return '';
+  final id = series['series_id'];
+  final cover = series['cover'];
+  final lastEdit = series['last_edit'];
+  if (id == null || cover == null) return '';
+  final base = '$baseUrl/uploads/images/series/$id/$cover';
+  final t = lastEdit;
+  return t is int && t > 0 ? '$base?t=$t' : base;
+}
 
-  @override
-  Future<MangaScrapped> parse({required Document root}) async {
-    return MangaScrapped(
-      title: _title(root),
-      author: root.querySelector('div.author-content a')?.text.trim(),
-      description: _summary(root),
-      status: _infoValue(root, 'Status'),
-      tags:
-          root
-              .querySelectorAll('div.genres-content a')
-              .map((e) => e.text.trim())
-              .where((e) => e.isNotEmpty)
-              .toList(),
-      coverUrl:
-          root.querySelector('div.summary_image img')?.attributes['data-src'] ??
-          root.querySelector('div.summary_image img')?.attributes['src'],
-    );
+/// Joins a list field (e.g. author) into a comma-separated string, or null
+/// when the value is an empty list.
+String? _join(dynamic value) {
+  if (value is List) {
+    final joined = value.map((e) => e.toString()).join(', ');
+    return joined.isEmpty ? null : joined;
   }
-
-  @override
-  List<String> get scripts => [];
+  return value?.toString();
 }
 
-/// Extracts the `h1` title, stripping Madara badge spans (e.g. "New", "Hot")
-/// that the theme appends to the heading.
-String? _title(Document root) {
-  final h1 = root.querySelector('h1');
-  if (h1 == null) return null;
-
-  final clone = h1.clone(true);
-  clone.querySelectorAll('.manga-title-badges').forEach((e) => e.remove());
-  return clone.text.trim();
-}
-
-/// Reads a `div.post-content_item` value by heading label, e.g. "OnGoing"
-/// for the block whose heading says "Status".
-String? _infoValue(Document root, String label) {
-  for (final item in root.querySelectorAll('div.post-content_item')) {
-    final heading = item.querySelector('.summary-heading, h5')?.text.trim();
-    if (heading == null || !heading.contains(label)) continue;
-    return item.querySelectorAll('.summary-content').lastOrNull?.text.trim();
-  }
-  return null;
-}
-
-/// Extracts the series synopsis from the Madara `div.summary__content` block,
-/// falling back to `.description-summary`.
-String? _summary(Document root) {
-  return root.querySelector('div.summary__content')?.text.trim() ??
-      root.querySelector('.description-summary')?.text.trim();
-}
-
-class _ListChapterSourceExternalUseCase
-    implements ListChapterSourceExternalUseCase {
-  final String _baseUrl;
-
-  const _ListChapterSourceExternalUseCase(this._baseUrl);
-
-  @override
-  Duration? get timeout => Duration(seconds: 15);
-
-  @override
-  Future<List<ChapterScrapped>> parse({required Document root}) async {
-    return root.querySelectorAll('li.wp-manga-chapter').map((row) {
-      final link = row.querySelector('a');
-      final title = link?.text.trim();
-      final href = link?.attributes['href'];
-      final date =
-          row.querySelector('span.chapter-release-date i')?.text.trim();
-
-      return ChapterScrapped(
-        title: title,
-        chapter: _chapterNumber(title),
-        readableAt: date,
-        publishAt: date,
-        webUrl: href == null ? null : _absolute(_baseUrl, href),
-      );
-    }).toList();
-  }
-
-  @override
-  List<String> get scripts => [];
-}
-
-/// Extracts the first numeric run from a chapter title (e.g. "1100" from
-/// "Chapter 1100"), falling back to the last space-delimited token.
-String? _chapterNumber(String? title) {
-  if (title == null) return null;
-  return RegExp(r'\d+(\.\d+)?').firstMatch(title)?.group(0) ??
-      title.split(' ').lastOrNull;
+/// Removes HTML tags from the series description (stored as HTML in the JSON).
+String? _stripHtml(String? html) {
+  if (html == null) return null;
+  return html
+      .replaceAll(RegExp(r'<[^>]*>'), ' ')
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .trim();
 }
 
 class _SearchMangaSourceExternalUseCase
@@ -195,87 +101,175 @@ class _SearchMangaSourceExternalUseCase
   const _SearchMangaSourceExternalUseCase(this._baseUrl);
 
   @override
-  Duration? get timeout => Duration(seconds: 15);
+  Duration? get timeout => const Duration(seconds: 15);
 
   @override
-  Future<bool?> haveNextPage({required Document root}) async {
-    // Pagination renders once more results exist as a `.next` link or a
-    // `/page/{n}/` (n > 1) URL. A bare `page` substring is too broad — it
-    // matches slugs and nav links.
-    if (root.querySelector('a.next') != null) return true;
-    if (root.querySelector('.wp-pagenavi .next') != null) return true;
-
-    for (final link in root.querySelectorAll('a[href*="/page/"]')) {
-      final page = RegExp(
-        r'/page/(\d+)/',
-      ).firstMatch(link.attributes['href'] ?? '')?.group(1);
-      if (page != null && (int.tryParse(page) ?? 0) > 1) return true;
-    }
-    return false;
-  }
+  Future<bool?> haveNextPage({required Document root}) async => false;
 
   @override
   Future<List<MangaScrapped>> parse({
     required Document root,
     String? searchTerm,
   }) async {
+    final page = _nextData(root);
+    final list = page['series'];
+    if (list is! List) return const [];
+    final term = searchTerm?.toLowerCase();
     final mangas = <MangaScrapped>[];
-
-    for (final item in root.querySelectorAll('div.item__wrap')) {
-      final link =
-          item.querySelector('div.post-title h4 a') ??
-          item.querySelector('div.post-title h3 a') ??
-          item.querySelector('a[href*="/manga/"]');
-      if (link == null) continue;
-
-      final href = link.attributes['href'];
-      final cover = item.querySelector('div.slider__thumb .c-image-hover img');
+    for (final raw in list) {
+      final series = raw is Map ? raw : null;
+      if (series == null) continue;
+      final title = series['title']?.toString() ?? '';
+      if (term != null && !title.toLowerCase().contains(term)) continue;
+      final id = series['series_id'];
+      final webUrl = id == null ? null : '$_baseUrl/series/$id';
       mangas.add(
         MangaScrapped(
-          title: link.text.trim(),
-          coverUrl: cover?.attributes['data-src'] ?? cover?.attributes['src'],
-          webUrl: href == null ? null : _absolute(_baseUrl, href),
+          title: title,
+          coverUrl: _coverUrl('https://cdn.flamecomics.xyz', series),
+          webUrl: webUrl,
+          author: _join(series['author']),
+          status: series['status']?.toString(),
+          tags: (series['categories'] is List)
+              ? (series['categories'] as List).map((e) => e.toString()).toList()
+              : null,
         ),
       );
     }
-
     return mangas;
   }
 
   @override
-  List<String> get scripts => _lazyloadScript('div.slider__thumb img');
+  List<String> get scripts => const [];
 
   @override
   String url({required SearchMangaParameter parameter}) {
-    final q = Uri.encodeQueryComponent(parameter.title ?? '');
-    if (parameter.page > 1) {
-      return '$_baseUrl/page/${parameter.page}/?s=$q';
+    final tagId = parameter.includedTags?.firstOrNull;
+    if ((parameter.title ?? '').isEmpty && tagId != null) {
+      return '$_baseUrl/genre/$tagId';
     }
-    return '$_baseUrl/?s=$q';
+    return '$_baseUrl/browse';
   }
+}
+
+class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
+  const _GetMangaSourceExternalUseCase();
+
+  @override
+  Duration? get timeout => const Duration(seconds: 15);
+
+  @override
+  Future<MangaScrapped> parse({required Document root}) async {
+    final page = _nextData(root);
+    final series = page['series'];
+    if (series is! Map) {
+      return const MangaScrapped();
+    }
+    return MangaScrapped(
+      title: series['title']?.toString(),
+      author: _join(series['author']),
+      description: _stripHtml(series['description']?.toString()),
+      status: series['status']?.toString(),
+      tags: (series['categories'] is List)
+          ? (series['categories'] as List).map((e) => e.toString()).toList()
+          : null,
+      coverUrl: _coverUrl('https://cdn.flamecomics.xyz', series),
+    );
+  }
+
+  @override
+  List<String> get scripts => const [];
+}
+
+class _ListChapterSourceExternalUseCase
+    implements ListChapterSourceExternalUseCase {
+  final String _baseUrl;
+
+  const _ListChapterSourceExternalUseCase(this._baseUrl);
+
+  @override
+  Duration? get timeout => const Duration(seconds: 15);
+
+  @override
+  Future<List<ChapterScrapped>> parse({required Document root}) async {
+    final page = _nextData(root);
+    final list = page['chapters'];
+    if (list is! List) return const [];
+    final chapters = <ChapterScrapped>[];
+    for (final raw in list) {
+      final c = raw is Map ? raw : null;
+      if (c == null) continue;
+      final id = c['series_id'];
+      final token = c['token'];
+      final webUrl = (id == null || token == null)
+          ? null
+          : '$_baseUrl/series/$id/$token';
+      final release = c['release_date'];
+      chapters.add(
+        ChapterScrapped(
+          title: 'Chapter ${c['chapter']}',
+          chapter: c['chapter']?.toString(),
+          readableAt: release?.toString(),
+          publishAt: release?.toString(),
+          webUrl: webUrl,
+        ),
+      );
+    }
+    return chapters;
+  }
+
+  @override
+  List<String> get scripts => const [];
+}
+
+class _GetChapterImageSourceExternalUseCase
+    implements GetChapterImageSourceExternalUseCase {
+  const _GetChapterImageSourceExternalUseCase();
+
+  @override
+  Duration? get timeout => const Duration(seconds: 30);
+
+  @override
+  Future<List<String>> parse({required Document root}) async {
+    final page = _nextData(root);
+    final chapter = page['chapter'];
+    if (chapter is! Map) return const [];
+    final images = chapter['images'];
+    final seriesId = chapter['series_id'];
+    final token = chapter['token'];
+    final release = chapter['release_date'];
+    if (images is! Map || seriesId == null || token == null) return const [];
+    final urls = <String>[];
+    for (final meta in images.values) {
+      final name = meta is Map ? meta['name']?.toString() : null;
+      if (name == null) continue;
+      final base =
+          'https://cdn.flamecomics.xyz/uploads/images/series/$seriesId/$token/$name';
+      urls.add(release == null ? base : '$base?$release');
+    }
+    return urls;
+  }
+
+  @override
+  List<String> get scripts => const [];
 }
 
 class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
   @override
-  Duration? get timeout => Duration(seconds: 15);
+  Duration? get timeout => const Duration(seconds: 15);
 
   @override
   Future<List<TagScrapped>> parse({required Document root}) async {
-    // Genres appear as <a href="/genre/{slug}"> links on the genre index and
-    // inline on detail pages; any such link is a valid tag. Dedupe by name.
     final tags = <String, String>{};
-
-    for (final link in root.querySelectorAll('a[href*="/genre/"]')) {
+    for (final link in root.querySelectorAll('a[href^="/genre/"]')) {
       final name = link.text.trim();
       if (name.isEmpty) continue;
-      final slug =
-          (link.attributes['href'] ?? '')
-              .split('/')
-              .where((e) => e.isNotEmpty)
-              .lastOrNull;
+      final slug = (link.attributes['href'] ?? '')
+          .split('/')
+          .where((e) => e.isNotEmpty)
+          .lastOrNull;
       tags[name] = slug ?? name.toLowerCase();
     }
-
     return [
       for (final entry in tags.entries)
         TagScrapped(id: entry.value, name: entry.key),
@@ -283,5 +277,5 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
   }
 
   @override
-  List<String> get scripts => [];
+  List<String> get scripts => const [];
 }
