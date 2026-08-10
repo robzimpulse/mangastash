@@ -206,20 +206,42 @@ class _SearchMangaSourceExternalUseCase
   @override
   Future<List<MangaScrapped>> parse({required Document root}) async {
     final mangas = <MangaScrapped>[];
+    final seen = <String>{};
 
-    for (final item in root.querySelectorAll('div.page-item-detail.manga')) {
+    // Search/homepage cards: div.slider__item > div.item__wrap.
+    for (final item in root.querySelectorAll(
+      'div.slider__item div.item__wrap',
+    )) {
       final link =
-          item.querySelector('div.item-summary > div.post-title h3 a') ??
+          item.querySelector('div.post-title h4 a') ??
           item.querySelector('a[href*="/manga/"]');
       if (link == null) continue;
-
       final href = link.attributes['href'];
-      final cover = item.querySelector('div.item-thumb img');
+      if (href == null || !seen.add(href)) continue;
+      final cover = item.querySelector('div.slider__thumb img');
       mangas.add(
         MangaScrapped(
           title: link.text.trim(),
           coverUrl: cover?.attributes['data-src'] ?? cover?.attributes['src'],
-          webUrl: href == null ? null : _absolute(_baseUrl, href),
+          webUrl: _absolute(_baseUrl, href),
+        ),
+      );
+    }
+
+    // Archive/genre cards: div.page-item-detail (no .manga class on this theme).
+    for (final item in root.querySelectorAll('div.page-item-detail')) {
+      final link =
+          item.querySelector('div.item-summary div.post-title h4 a') ??
+          item.querySelector('div.item-thumb a[title]');
+      if (link == null) continue;
+      final href = link.attributes['href'];
+      if (href == null || !seen.add(href)) continue;
+      final cover = item.querySelector('div.item-thumb img');
+      mangas.add(
+        MangaScrapped(
+          title: link.attributes['title']?.trim() ?? link.text.trim(),
+          coverUrl: cover?.attributes['data-src'] ?? cover?.attributes['src'],
+          webUrl: _absolute(_baseUrl, href),
         ),
       );
     }
