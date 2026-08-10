@@ -204,7 +204,10 @@ class _SearchMangaSourceExternalUseCase
   }
 
   @override
-  Future<List<MangaScrapped>> parse({required Document root}) async {
+  Future<List<MangaScrapped>> parse({
+    required Document root,
+    String? searchTerm,
+  }) async {
     final mangas = <MangaScrapped>[];
     final seen = <String>{};
 
