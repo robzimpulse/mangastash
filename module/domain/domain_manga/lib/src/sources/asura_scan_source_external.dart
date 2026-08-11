@@ -217,7 +217,10 @@ class _SearchMangaSourceExternalUseCase
   }
 
   @override
-  Future<List<MangaScrapped>> parse({required Document root}) async {
+  Future<List<MangaScrapped>> parse({
+    required Document root,
+    String? searchTerm,
+  }) async {
     final queries = [
       'div',
       'series-card',

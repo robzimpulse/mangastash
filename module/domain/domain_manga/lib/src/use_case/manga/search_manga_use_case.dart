@@ -67,7 +67,10 @@ class SearchMangaUseCase with SyncMangasMixin {
       useCache: useCache,
     );
 
-    final data = await source.searchMangaUseCase.parse(root: document);
+    final data = await source.searchMangaUseCase.parse(
+      root: document,
+      searchTerm: parameter.title,
+    );
     final mangas = await Future.wait(
       data.map(
         (e) => e.convert(logbox: _logBox, manager: _converterCacheManager),

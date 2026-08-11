@@ -34,7 +34,7 @@ abstract class SearchMangaSourceExternalUseCase {
   Duration? get timeout;
   List<String> get scripts;
   String url({required SearchMangaParameter parameter});
-  Future<List<MangaScrapped>> parse({required Document root});
+  Future<List<MangaScrapped>> parse({required Document root, String? searchTerm});
   Future<bool?> haveNextPage({required Document root});
 }
 

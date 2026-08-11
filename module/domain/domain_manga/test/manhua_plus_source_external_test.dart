@@ -4,23 +4,24 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-/// Search-results fixture (one `div.page-item-detail.manga`), mirroring
-/// manhuaplus.com /?s=one+piece.
+/// Search-results fixture (one `div.slider__item > div.item__wrap` card),
+/// mirroring the manhuaplus.com /?s=martial+peak search/homepage card shape.
 const _searchHtml = '''
-<div class="page-item-detail manga">
-  <div class="item-thumb">
-    <a href="https://manhuaplus.com/manga/one-piece/">
-      <img data-src="https://cdn.mhpcdn.com/wp-content/uploads/2025/01/one-piece.jpg"
-           src="https://manhuaplus.com/wp-content/uploads/2025/01/one-piece-lazy.jpg"
-           alt="cover">
-    </a>
-  </div>
-  <div class="item-summary">
-    <div class="post-title">
-      <h3><a href="https://manhuaplus.com/manga/one-piece/">One Piece</a></h3>
+<div class="slider__item">
+  <div class="item__wrap">
+    <div class="slider__thumb">
+      <div class="slider__thumb_item c-image-hover">
+        <a href="https://manhuaplus.com/manga/martial-peak/">
+          <img data-src="https://manhuaplus.com/wp-content/uploads/2020/07/thumbbbbb-125x180.jpg" alt="Martial Peak">
+        </a>
+      </div>
     </div>
-    <div class="chapter-item">
-      <a href="https://manhuaplus.com/manga/one-piece/chapter-1100/">Chapter 1100</a>
+    <div class="slider__content">
+      <div class="slider__content_item">
+        <div class="post-title font-title">
+          <h4><a href="https://manhuaplus.com/manga/martial-peak/">Martial Peak</a></h4>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -176,16 +177,50 @@ void main() {
     );
   });
 
-  test('search parses a result block with absolute webUrl', () async {
+  test(
+    'search parses a slider__item result block with absolute webUrl',
+    () async {
+      final results = await source.searchMangaUseCase.parse(
+        root: html_parser.parse(_searchHtml),
+      );
+      expect(results, hasLength(1));
+      expect(results.single.title, 'Martial Peak');
+      expect(
+        results.single.webUrl,
+        'https://manhuaplus.com/manga/martial-peak/',
+      );
+      expect(
+        results.single.coverUrl,
+        'https://manhuaplus.com/wp-content/uploads/2020/07/thumbbbbb-125x180.jpg',
+      );
+    },
+  );
+
+  test('search parses archive page-item-detail cards', () async {
+    const archiveHtml = '''
+    <div class="page-listing-item">
+      <div class="page-item-detail text">
+        <div class="item-thumb c-image-hover" data-post-id="28594">
+          <a href="https://manhuaplus.com/manga/i-am-the-fated-villain/" title="I Am the Fated Villain">
+            <img data-src="https://manhuaplus.com/wp-content/uploads/2024/01/3-1-175x238.jpg" alt="3 (1)">
+          </a>
+        </div>
+        <div class="item-summary">
+          <div class="post-title font-title">
+            <h4><a href="https://manhuaplus.com/manga/i-am-the-fated-villain/">I Am the Fated Villain</a></h4>
+          </div>
+        </div>
+      </div>
+    </div>
+    ''';
     final results = await source.searchMangaUseCase.parse(
-      root: html_parser.parse(_searchHtml),
+      root: html_parser.parse(archiveHtml),
     );
     expect(results, hasLength(1));
-    expect(results.single.title, 'One Piece');
-    expect(results.single.webUrl, 'https://manhuaplus.com/manga/one-piece/');
+    expect(results.single.title, 'I Am the Fated Villain');
     expect(
-      results.single.coverUrl,
-      'https://cdn.mhpcdn.com/wp-content/uploads/2025/01/one-piece.jpg',
+      results.single.webUrl,
+      'https://manhuaplus.com/manga/i-am-the-fated-villain/',
     );
   });
 
