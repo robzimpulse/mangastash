@@ -197,7 +197,10 @@ class _SearchMangaSourceExternalUseCase
   }
 
   @override
-  Future<List<MangaScrapped>> parse({required Document root}) async {
+  Future<List<MangaScrapped>> parse({
+    required Document root,
+    String? searchTerm,
+  }) async {
     final mangas = <MangaScrapped>[];
     for (final article in root.querySelectorAll('article.bg-base-300.flex.gap-4.p-4')) {
       // The cover <a> also matches "/series/" but is empty; the title link

@@ -4,135 +4,54 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-/// Search-results fixture (one `.item__wrap` card), mirroring the
-/// flamecomics.xyz homepage/search markup.
-const _searchHtml = '''
-<div class="item__wrap">
-  <div class="slider__thumb">
-    <div class="c-image-hover">
-      <a href="https://flamecomics.xyz/manga/one-piece/">
-        <img data-src="https://cdn.flamecomics.xyz/uploads/2025/01/one-piece.jpg"
-             src="https://flamecomics.xyz/wp-content/uploads/2025/01/one-piece-lazy.jpg"
-             alt="cover">
-      </a>
-    </div>
-  </div>
-  <div class="post-title">
-    <h4><a href="https://flamecomics.xyz/manga/one-piece/">One Piece</a></h4>
-  </div>
-</div>
+/// Browse-page fixture: the full series list is server-rendered into the
+/// `#__NEXT_DATA__` JSON script tag (SSG).
+const _browseHtml = '''
+<html><head>
+<script id="__NEXT_DATA__" type="application/json">{"props":{"__N_SSG":true,"pageProps":{"series":[
+{"series_id":83,"title":"The Novel's Extra (Remake)","description":"<p>Waking up...</p>","language":"English","type":"Manhwa","categories":["Action","Fantasy"],"country":"KR","author":["Jee Gab Song"],"artist":["Carrotoon"],"publisher":["Kakao"],"year":2022,"status":"Ongoing","likes":304,"cover":"thumbnail.png","last_edit":1770648760},
+{"series_id":165,"title":"Solo Leveling","description":"<p>...</p>","language":"English","type":"Manhwa","categories":["Action"],"country":"KR","author":["Chugong"],"artist":[],"publisher":[],"year":2018,"status":"Ongoing","likes":100,"cover":"thumbnail.webp","last_edit":0}
+]}}}</script>
+</head><body>
+  <a class="DescSeriesCard_imageLink__abc123" href="/series/83"><img alt="The Novel's Extra (Remake)" src="/_next/image?url=..."></a>
+  <a class="DescSeriesCard_imageLink__abc124" href="/series/165"><img alt="Solo Leveling" src="/_next/image?url=..."></a>
+</body></html>
 ''';
 
-/// Search-results fixture without a pagination link: `haveNextPage` is false.
-const _noNextPageHtml = '''
-<div class="item__wrap">
-  <div class="slider__thumb">
-    <div class="c-image-hover">
-      <a href="https://flamecomics.xyz/manga/one-piece/">
-        <img src="https://flamecomics.xyz/wp-content/uploads/2025/01/one-piece.jpg" alt="cover">
-      </a>
-    </div>
-  </div>
-  <div class="post-title">
-    <h4><a href="https://flamecomics.xyz/manga/one-piece/">One Piece</a></h4>
-  </div>
-</div>
-''';
-
-/// Search-results fixture with a `a[href*="page"]` link: `haveNextPage` is
-/// true.
-const _nextPageHtml = '''
-<div class="item__wrap">
-  <div class="post-title">
-    <h4><a href="https://flamecomics.xyz/manga/one-piece/">One Piece</a></h4>
-  </div>
-</div>
-<div class="pagination">
-  <a href="https://flamecomics.xyz/page/2/?s=one+piece">Next</a>
-</div>
-''';
-
-/// Series-detail fixture (flamecomics.xyz /manga/one-piece/): Madara
-/// `div.post-content_item` info rows, `div.summary__content` synopsis,
-/// `div.summary_image` cover, and `li.wp-manga-chapter` rows.
+/// Series-detail fixture: `pageProps.series` plus `pageProps.chapters`.
 const _detailHtml = '''
-<html><body>
-  <div class="tab-summary">
-    <div class="summary_image">
-      <img src="https://flamecomics.xyz/wp-content/uploads/2025/01/one-piece.jpg" alt="cover">
-    </div>
-  </div>
-  <div class="post-title">
-    <h1>One Piece <span class="manga-title-badges">New</span></h1>
-  </div>
-  <div class="summary__content">
-    <p>Monkey D. Luffy sets sail to find the One Piece in a pirate adventure.</p>
-  </div>
-  <div class="post-content">
-    <div class="post-content_item">
-      <div class="summary-heading"><h5>Rating</h5></div>
-      <div class="summary-content">4.5</div>
-    </div>
-    <div class="post-content_item">
-      <div class="summary-heading"><h5>Status</h5></div>
-      <div class="summary-content">OnGoing</div>
-    </div>
-    <div class="post-content_item">
-      <div class="summary-heading"><h5>Author(s)</h5></div>
-      <div class="summary-content author-content">
-        <a href="https://flamecomics.xyz/author/oda-eiichiro/">ODA Eiichiro</a>
-      </div>
-    </div>
-    <div class="post-content_item">
-      <div class="summary-heading"><h5>Genres</h5></div>
-      <div class="summary-content genres-content">
-        <a href="https://flamecomics.xyz/genre/action/">Action</a>,
-        <a href="https://flamecomics.xyz/genre/adventure/">Adventure</a>
-      </div>
-    </div>
-  </div>
-  <div class="listing-chapters_wrap">
-    <ul class="main version-chap">
-      <li class="wp-manga-chapter">
-        <a href="https://flamecomics.xyz/manga/one-piece/chapter-1100/">Chapter 1100</a>
-        <span class="chapter-release-date"><i>August 7, 2026</i></span>
-      </li>
-      <li class="wp-manga-chapter">
-        <a href="https://flamecomics.xyz/manga/one-piece/chapter-1099/">Chapter 1099</a>
-        <span class="chapter-release-date"><i>August 1, 2026</i></span>
-      </li>
-    </ul>
-  </div>
+<html><head>
+<script id="__NEXT_DATA__" type="application/json">{"props":{"__N_SSG":true,"pageProps":{"series":{
+"series_id":83,"title":"The Novel's Extra (Remake)","description":"<p>Waking up...</p>","language":"English","type":"Manhwa","categories":["Action","Fantasy"],"country":"KR","author":["Jee Gab Song"],"artist":["Carrotoon"],"publisher":["Kakao"],"year":2022,"status":"Ongoing","likes":304,"cover":"thumbnail.png","last_edit":1770648760},
+"chapters":[
+{"chapter_id":12085,"series_id":83,"chapter":"168.00","title":"","cover":1,"release_date":1786371624,"token":"9d98b865a4d0531d"},
+{"chapter_id":12084,"series_id":83,"chapter":"167.00","title":"","cover":1,"release_date":1786285224,"token":"ab12cd34ef567890"}
+]}}}</script>
+</head><body>
+  <a class="ChapterCard_chapterWrapper__xyz" href="/series/83/9d98b865a4d0531d">
+    <p class="mantine-Text-root">Chapter 168</p>
+  </a>
 </body></html>
 ''';
 
-/// Reader fixture (flamecomics.xyz /manga/one-piece/chapter-1100/): page
-/// <img>s inside `div.reading-content`. The real CDN URL is in `data-src`
-/// (lazyload) and `src` (resolved by the injected script before capture).
+/// Reader fixture: `pageProps.chapter.images` is a dict keyed by page index.
 const _readerHtml = '''
-<html><body>
-  <div class="reading-content">
-    <div class="page-break no-gap">
-      <img class="wp-manga-chapter-img" data-src="https://cdn.flamecomics.xyz/op/1100/1.jpg" src="https://cdn.flamecomics.xyz/op/1100/1.jpg" alt="Page 1">
-    </div>
-    <div class="page-break no-gap">
-      <img class="wp-manga-chapter-img" data-src="https://cdn.flamecomics.xyz/op/1100/2.jpg" src="https://cdn.flamecomics.xyz/op/1100/2.jpg" alt="Page 2">
-    </div>
-    <div class="page-break no-gap">
-      <img class="wp-manga-chapter-img" data-src="https://cdn.flamecomics.xyz/op/1100/3.jpg" src="https://cdn.flamecomics.xyz/op/1100/3.jpg" alt="Page 3">
-    </div>
-  </div>
+<html><head>
+<script id="__NEXT_DATA__" type="application/json">{"props":{"__N_SSG":true,"pageProps":{"chapter":{
+"series_id":83,"chapter_id":12085,"chapter":"168.00","token":"9d98b865a4d0531d","release_date":1786371624,
+"images":{"0":{"size":494766,"type":"image/jpeg","name":"TNE-168-00.jpg","width":1778,"height":1000},
+"1":{"size":1797715,"type":"image/jpeg","name":"TNE-168-01.jpg","width":800,"height":12040}}
+}}}}</script>
+</head><body>
+  <img alt="TNE-168-00.jpg" src="https://cdn.flamecomics.xyz/uploads/images/series/83/9d98b865a4d0531d/TNE-168-00.jpg?1786371624">
 </body></html>
 ''';
 
-/// Genre-index fixture (flamecomics.xyz /genre/): `a` links grouped by genre.
+/// Genre-nav fixture: `a[href="/genre/{Name}"]` links.
 const _genreHtml = '''
 <html><body>
-  <div class="genres">
-    <a href="/genre/action/">Action</a>
-    <a href="/genre/adventure/">Adventure</a>
-    <a href="/genre/comedy/">Comedy</a>
-  </div>
+  <a href="/genre/Action">Action</a>
+  <a href="/genre/Fantasy">Fantasy</a>
 </body></html>
 ''';
 
@@ -153,107 +72,101 @@ void main() {
     expect(source.listTagUseCase, isA<ListTagSourceExternalUseCase>());
   });
 
-  test('search url maps title to query', () {
+  test('search url with empty title maps to browse', () {
     expect(
       source.searchMangaUseCase.url(
-        parameter: const SearchMangaParameter(title: 'One Piece'),
+        parameter: const SearchMangaParameter(),
       ),
-      'https://flamecomics.xyz/?s=One+Piece',
+      'https://flamecomics.xyz/browse',
     );
   });
 
-  test('search url maps page 2 to paginated query', () {
+  test('search url with includedTags maps to genre', () {
     expect(
       source.searchMangaUseCase.url(
-        parameter: const SearchMangaParameter(title: 'One Piece', page: 2),
+        parameter: const SearchMangaParameter(includedTags: ['Action']),
       ),
-      'https://flamecomics.xyz/page/2/?s=One+Piece',
+      'https://flamecomics.xyz/genre/Action',
     );
   });
 
-  test('search parses a result block with absolute webUrl', () async {
+  test('search url with title maps to browse (client-side filter)', () {
+    expect(
+      source.searchMangaUseCase.url(
+        parameter: const SearchMangaParameter(title: 'Solo Leveling'),
+      ),
+      'https://flamecomics.xyz/browse',
+    );
+  });
+
+  test('search parses the embedded series array', () async {
     final results = await source.searchMangaUseCase.parse(
-      root: html_parser.parse(_searchHtml),
+      root: html_parser.parse(_browseHtml),
+    );
+    expect(results, hasLength(2));
+    expect(results.first.title, "The Novel's Extra (Remake)");
+    expect(
+      results.first.coverUrl,
+      'https://cdn.flamecomics.xyz/uploads/images/series/83/thumbnail.png?t=1770648760',
+    );
+    expect(results.first.webUrl, 'https://flamecomics.xyz/series/83');
+    expect(results.first.tags, ['Action', 'Fantasy']);
+    expect(results.last.title, 'Solo Leveling');
+  });
+
+  test('search parse filters by searchTerm case-insensitively', () async {
+    final results = await source.searchMangaUseCase.parse(
+      root: html_parser.parse(_browseHtml),
+      searchTerm: 'solo',
     );
     expect(results, hasLength(1));
-    expect(results.single.title, 'One Piece');
-    expect(results.single.webUrl, 'https://flamecomics.xyz/manga/one-piece/');
-    expect(
-      results.single.coverUrl,
-      'https://cdn.flamecomics.xyz/uploads/2025/01/one-piece.jpg',
-    );
+    expect(results.single.title, 'Solo Leveling');
   });
 
-  test('search haveNextPage false without a pagination link', () async {
+  test('search haveNextPage is always false', () async {
     final next = await source.searchMangaUseCase.haveNextPage(
-      root: html_parser.parse(_noNextPageHtml),
+      root: html_parser.parse(_browseHtml),
     );
     expect(next, isFalse);
   });
 
-  test('search haveNextPage true when a page link is present', () async {
-    final next = await source.searchMangaUseCase.haveNextPage(
-      root: html_parser.parse(_nextPageHtml),
-    );
-    expect(next, isTrue);
-  });
-
-  test('detail parses series page', () async {
+  test('detail parses series and chapters from NEXT_DATA', () async {
     final manga = await source.getMangaUseCase.parse(
       root: html_parser.parse(_detailHtml),
     );
-    expect(manga.title, 'One Piece');
-    expect(manga.author, 'ODA Eiichiro');
-    expect(manga.status, 'OnGoing');
-    expect(
-      manga.description,
-      'Monkey D. Luffy sets sail to find the One Piece in a pirate adventure.',
-    );
-    expect(manga.tags, ['Action', 'Adventure']);
-    expect(
-      manga.coverUrl,
-      'https://flamecomics.xyz/wp-content/uploads/2025/01/one-piece.jpg',
-    );
-  });
+    expect(manga.title, "The Novel's Extra (Remake)");
+    expect(manga.status, 'Ongoing');
+    expect(manga.tags, ['Action', 'Fantasy']);
 
-  test('chapter list parses rows in order', () async {
     final chapters = await source.listChapterUseCase.parse(
       root: html_parser.parse(_detailHtml),
     );
     expect(chapters, hasLength(2));
-    expect(chapters.first.title, 'Chapter 1100');
-    expect(chapters.first.chapter, '1100');
     expect(
       chapters.first.webUrl,
-      'https://flamecomics.xyz/manga/one-piece/chapter-1100/',
+      'https://flamecomics.xyz/series/83/9d98b865a4d0531d',
     );
-    expect(chapters.first.publishAt, 'August 7, 2026');
+    expect(chapters.first.chapter, '168.00');
+    expect(chapters.first.title, 'Chapter 168.00');
   });
 
-  test(
-    'reader parses lazy srcs and serves a lazyload-resolving script',
-    () async {
-      final images = await source.getChapterImageUseCase.parse(
-        root: html_parser.parse(_readerHtml),
-      );
-      expect(images, [
-        'https://cdn.flamecomics.xyz/op/1100/1.jpg',
-        'https://cdn.flamecomics.xyz/op/1100/2.jpg',
-        'https://cdn.flamecomics.xyz/op/1100/3.jpg',
-      ]);
-      expect(
-        source.getChapterImageUseCase.scripts.join('\n'),
-        contains('data-src'),
-      );
-    },
-  );
+  test('reader parses ordered CDN urls and serves no scripts', () async {
+    final images = await source.getChapterImageUseCase.parse(
+      root: html_parser.parse(_readerHtml),
+    );
+    expect(images, [
+      'https://cdn.flamecomics.xyz/uploads/images/series/83/9d98b865a4d0531d/TNE-168-00.jpg?1786371624',
+      'https://cdn.flamecomics.xyz/uploads/images/series/83/9d98b865a4d0531d/TNE-168-01.jpg?1786371624',
+    ]);
+    expect(source.getChapterImageUseCase.scripts, isEmpty);
+  });
 
-  test('tags parse genre page links', () async {
+  test('tags parse genre links', () async {
     final tags = await source.listTagUseCase.parse(
       root: html_parser.parse(_genreHtml),
     );
-    expect(tags, hasLength(3));
-    expect(tags.first.id, 'action');
+    expect(tags, hasLength(2));
+    expect(tags.first.id, 'Action');
     expect(tags.first.name, 'Action');
   });
 }
