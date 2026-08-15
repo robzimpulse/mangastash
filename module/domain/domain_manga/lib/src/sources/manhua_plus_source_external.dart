@@ -9,7 +9,10 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 /// HTML. Search, detail, chapter list, and genre pages are static DOM, so
 /// every use case parses directly. Only the reader injects a script: chapter
 /// page <img>s lazily swap `data-src` into `src`, and the script performs
-/// that swap before getHtml() snapshots the DOM.
+/// that swap before getHtml() snapshots the DOM. Browsing with an empty query
+/// uses the homepage: `?s=` renders WordPress's "You searched for" page with
+/// zero manga cards, while the homepage lists manga in `div.page-item-detail`
+/// / `div.slider__item` cards.
 class ManhuaPlusSourceExternal implements SourceExternal {
   @override
   String get baseUrl => 'https://manhuaplus.com';
@@ -259,6 +262,14 @@ class _SearchMangaSourceExternalUseCase
   @override
   String url({required SearchMangaParameter parameter}) {
     final q = Uri.encodeQueryComponent(parameter.title ?? '');
+    if (q.isEmpty) {
+      // Browse (empty query): `?s=` renders WordPress's "You searched for"
+      // page with zero cards, so fall back to the homepage (or its paginated
+      // form), which lists manga in `div.page-item-detail` /
+      // `div.slider__item` cards.
+      if (parameter.page > 1) return '$_baseUrl/page/${parameter.page}/';
+      return '$_baseUrl/';
+    }
     if (parameter.page > 1) {
       return '$_baseUrl/page/${parameter.page}/?s=$q';
     }

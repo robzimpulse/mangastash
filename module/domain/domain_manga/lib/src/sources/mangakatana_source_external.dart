@@ -10,7 +10,11 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 /// inline JS (`var thzq = ['url1', ...]`) while the reader <img>s carry
 /// `data-src="#"` placeholders, so the reader use case injects a script that
 /// copies each real URL into the matching placeholder's `data-src` before
-/// HTML capture.
+/// HTML capture. Browsing with an empty query uses the homepage: the root
+/// search route renders "Not found any results" and the site's small-viewport
+/// JS empties the Hot Manga widget (it only repopulates from `#hot_update`,
+/// which exists on the homepage alone), so the search page's post-JS DOM has
+/// zero `div.item[data-id]` cards.
 class MangakatanaSourceExternal implements SourceExternal {
   @override
   String get baseUrl => 'https://mangakatana.com';
@@ -240,6 +244,14 @@ class _SearchMangaSourceExternalUseCase
   @override
   String url({required SearchMangaParameter parameter}) {
     final q = Uri.encodeQueryComponent(parameter.title ?? '');
+    if (q.isEmpty) {
+      // Browse (empty query): the root search route renders "Not found any
+      // results" in `#book_list`, and on viewports < 768px the site's JS
+      // empties the Hot Manga widget, leaving zero `div.item[data-id]` cards
+      // in the DOM. Serve the homepage instead, whose `#book_list` lists
+      // latest manga in the same `.media` card template.
+      return '$_baseUrl/';
+    }
     // The site's search form posts to the root path; `/search` is a 404.
     // `search_by=m_name` makes the query match against manga names.
     return '$_baseUrl/?search=$q&search_by=m_name';

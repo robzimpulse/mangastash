@@ -177,6 +177,21 @@ void main() {
     );
   });
 
+  test('browse url maps empty title to homepage (search page is empty)', () {
+    expect(
+      source.searchMangaUseCase.url(
+        parameter: const SearchMangaParameter(),
+      ),
+      'https://manhuaplus.com/',
+    );
+    expect(
+      source.searchMangaUseCase.url(
+        parameter: const SearchMangaParameter(page: 2),
+      ),
+      'https://manhuaplus.com/page/2/',
+    );
+  });
+
   test(
     'search parses a slider__item result block with absolute webUrl',
     () async {

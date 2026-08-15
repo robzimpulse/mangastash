@@ -157,18 +157,21 @@ void main() {
     );
   });
 
+  test('browse url maps empty title to homepage (search page is empty after JS)', () {
+    expect(
+      source.searchMangaUseCase.url(
+        parameter: const SearchMangaParameter(),
+      ),
+      'https://mangakatana.com/',
+    );
+  });
+
   test('search url maps title to root path with search_by', () {
     expect(
       source.searchMangaUseCase.url(
         parameter: const SearchMangaParameter(title: 'One Piece'),
       ),
       'https://mangakatana.com/?search=One+Piece&search_by=m_name',
-    );
-    expect(
-      source.searchMangaUseCase.url(
-        parameter: const SearchMangaParameter(),
-      ),
-      'https://mangakatana.com/?search=&search_by=m_name',
     );
   });
 
