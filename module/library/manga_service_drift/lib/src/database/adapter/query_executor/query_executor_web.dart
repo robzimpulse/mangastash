@@ -14,15 +14,17 @@ QueryExecutor queryExecutor({
       driftWorkerUri: Uri.parse('drift_worker.js'),
     );
 
-    // If Database exist -> Delete it
-    for (final database in probeResult.existingDatabases) {
-      if (database.$1 == WebStorageApi.indexedDb && database.$2 == name) {
-        probeResult.deleteDatabase(database);
-        break;
+    // A pending restore only seeds a newly created database, so the
+    // existing one must be deleted first. Normal launches keep it.
+    if (restoredDb != null) {
+      for (final database in probeResult.existingDatabases) {
+        if (database.$1 == WebStorageApi.indexedDb && database.$2 == name) {
+          await probeResult.deleteDatabase(database);
+          break;
+        }
       }
     }
 
-    // MAKE NEW DB
     if (!probeResult.availableStorages.contains(
       WasmStorageImplementation.sharedIndexedDb,
     )) {
