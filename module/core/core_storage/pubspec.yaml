@@ -15,7 +15,7 @@ dependencies:
   path_provider: ^2.1.4
   # see https://github.com/miguelpruivo/flutter_file_picker/issues/1952
   file_picker: 10.3.8
-  rxdart: ^0.27.7
+  rxdart: ^0.28.0
   file: ^7.0.0
   path: ^1.9.0
   dio: ^5.7.0
