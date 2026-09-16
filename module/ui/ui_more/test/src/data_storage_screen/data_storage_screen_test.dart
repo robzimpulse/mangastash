@@ -1,6 +1,8 @@
 /// Widget tests for DataStorageScreen error surfacing: failed backup and
 /// restore actions must show a failure snackbar instead of crashing the
-/// handler or reporting success.
+/// handler or reporting success, and an in-flight restore must surface a
+/// blocking indicator while it runs.
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:core_storage/core_storage.dart';
@@ -95,7 +97,77 @@ void main() {
     await pumpFrames(tester);
   }
 
-  testWidgets('restore failure shows failure snackbar, not success', (
+  /// Pumps [DataStorageScreen] on top of a base page on a real route, so the
+  /// app bar back button exists and pop-blocking can be exercised.
+  Future<void> pumpScreenOnRoute(WidgetTester tester) async {
+    final filesDir = MemoryFileSystem().directory(
+      '/files',
+    )..createSync(recursive: true);
+    when(() => fileDao.directory()).thenAnswer((_) async => filesDir);
+    when(() => imageCacheManager.getSize()).thenAnswer((_) async => 0);
+
+    final navigatorKey = GlobalKey<NavigatorState>();
+    await tester.pumpWidget(
+      MaterialApp(
+        navigatorKey: navigatorKey,
+        home: const Scaffold(body: Center(child: Text('More'))),
+      ),
+    );
+    navigatorKey.currentState!.push(
+      MaterialPageRoute(
+        builder: (context) => BlocProvider<DataStorageScreenCubit>.value(
+          value: cubit,
+          child: DataStorageScreen(
+            imageCacheManager: imageCacheManager,
+            fileSaverUseCase: fileSaverUseCase,
+            filePickerUseCase: filePickerUseCase,
+            fileDao: fileDao,
+            onRestoreBackupConfirmation: () async => true,
+          ),
+        ),
+      ),
+    );
+    await pumpFrames(tester);
+    await tester.tap(find.text('Backup and Restore'));
+    await pumpFrames(tester);
+  }
+
+  testWidgets('in-flight restore shows indicator and blocks back navigation', (
+    tester,
+  ) async {
+    backupDir.childFile('1000.sqlite').writeAsStringSync('backup');
+    await cubit.refreshListBackup();
+    final restoreDone = Completer<void>();
+    when(
+      () => database.restore(data: any(named: 'data')),
+    ).thenAnswer((_) => restoreDone.future);
+    await pumpScreenOnRoute(tester);
+
+    await tester.tap(find.byIcon(Icons.more_vert));
+    await pumpFrames(tester);
+    await tester.tap(find.text('Restore'));
+    await pumpFrames(tester);
+
+    expect(find.text('Restoring backup data...'), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+    await tester.tap(find.byType(BackButton));
+    await pumpFrames(tester);
+    expect(find.text('Data and Storage'), findsOneWidget);
+
+    restoreDone.complete();
+    await pumpFrames(tester);
+
+    expect(find.text('Restoring backup data...'), findsNothing);
+    expect(find.text('Success restore backup'), findsOneWidget);
+
+    await tester.tap(find.byType(BackButton));
+    await pumpFrames(tester);
+    expect(find.text('More'), findsOneWidget);
+    expect(find.text('Data and Storage'), findsNothing);
+  });
+
+  testWidgets('restore failure shows failure snackbar and clears the indicator', (
     tester,
   ) async {
     backupDir.childFile('1000.sqlite').writeAsStringSync('backup');
@@ -112,6 +184,7 @@ void main() {
 
     expect(find.text('Failed restore backup'), findsOneWidget);
     expect(find.text('Success restore backup'), findsNothing);
+    expect(find.text('Restoring backup data...'), findsNothing);
   });
 
   testWidgets('backup-now failure shows failure snackbar, not success', (

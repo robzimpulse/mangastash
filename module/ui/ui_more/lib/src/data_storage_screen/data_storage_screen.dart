@@ -76,15 +76,52 @@ class DataStorageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScaffoldScreen(
-      appBar: AppBar(title: const Text('Data and Storage')),
-      body: ListView(
-        children: [
-          _buildImageCacheSize(context),
-          _buildImageStorageSize(context),
-          _buildBackupRestoreSection(context),
-        ],
-      ),
+    return _builder(
+      buildWhen: (prev, curr) => prev.isRestoring != curr.isRestoring,
+      builder: (context, state) {
+        return ScaffoldScreen(
+          appBar: AppBar(title: const Text('Data and Storage')),
+          canPop: !state.isRestoring,
+          body: Stack(
+            children: [
+              ListView(
+                children: [
+                  _buildImageCacheSize(context),
+                  _buildImageStorageSize(context),
+                  _buildBackupRestoreSection(context),
+                ],
+              ),
+              if (state.isRestoring) _buildRestoringOverlay(),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// Covers the body and blocks back navigation ([ScaffoldScreen.canPop]) while
+  /// a restore is running, so the user cannot leave the screen or trigger
+  /// other storage actions mid-restore.
+  Widget _buildRestoringOverlay() {
+    return const Stack(
+      children: [
+        ModalBarrier(color: Colors.black54),
+        Center(
+          child: Card(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Restoring backup data...'),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
