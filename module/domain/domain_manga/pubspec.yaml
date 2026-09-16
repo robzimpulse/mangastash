@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   collection: ^1.16.0
-  rxdart: ^0.27.7
+  rxdart: ^0.28.0
   html: ^0.15.5
   universal_io: ^2.2.2
   file: ^7.0.0
