@@ -93,6 +93,24 @@ void main() {
         final c = await dao.search(ids: [chapter.$1.id.value]);
         expect(c.first.chapter?.lastReadAt == null, isFalse);
       });
+
+      test('Re-sync with absent mangaId preserves existing mangaId (#101)', () async {
+        const reSync = ChapterTablesCompanion(
+          id: Value('id_0'),
+          title: Value('title_0_updated'),
+          webUrl: Value('web_url_0'),
+        );
+
+        await dao.adds(values: {reSync: const []});
+
+        final stored = await dao.search(ids: ['id_0']);
+        expect(stored.single.chapter?.mangaId, equals('manga_id_1'));
+        expect(stored.single.chapter?.title, equals('title_0_updated'));
+
+        final byManga = await dao.search(mangaIds: ['manga_id_1']);
+        expect(byManga.length, equals(chapters.length));
+        expect(byManga.map((e) => e.chapter?.id), contains('id_0'));
+      });
     });
 
     group('With New Value', () {

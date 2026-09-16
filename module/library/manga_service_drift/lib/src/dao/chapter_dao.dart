@@ -168,7 +168,7 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
             entry.key.title.valueOrNull ?? chapter?.chapter?.title,
           ),
           mangaId: Value.absentIfNull(
-            entry.key.mangaId.valueOrNull ?? chapter?.chapter?.id,
+            entry.key.mangaId.valueOrNull ?? chapter?.chapter?.mangaId,
           ),
           volume: Value.absentIfNull(
             entry.key.volume.valueOrNull ?? chapter?.chapter?.volume,
