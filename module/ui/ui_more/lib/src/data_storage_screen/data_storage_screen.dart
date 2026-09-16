@@ -316,23 +316,47 @@ class DataStorageScreen extends StatelessWidget {
     context.showSnackBar(message: 'Success save backup to file');
   }
 
+  /// Restores [file] after confirmation: failure shows a snackbar and the
+  /// session keeps running; success shows a snackbar and restarts the app
+  /// so the restored database is picked up.
   void _onTapRestoreBackup(BuildContext context, File file) async {
     final confirm = await onRestoreBackupConfirmation?.call();
     if (!context.mounted || confirm != true) return;
-    await _cubit(context)?.restoreBackup(file);
+    try {
+      await _cubit(context)?.restoreBackup(file);
+    } catch (_) {
+      if (!context.mounted) return;
+      context.showSnackBar(message: 'Failed restore backup');
+      return;
+    }
     if (!context.mounted) return;
     context.showSnackBar(message: 'Success restore backup');
     WrapperScreen.restart(context);
   }
 
+  /// Imports [filePickerUseCase]-picked bytes as a backup; failure shows a
+  /// snackbar instead of leaving a stuck loading state.
   void _onTapAddBackupFromExternal(BuildContext context) async {
     final data = await filePickerUseCase.execute(allowedExtensions: ['sqlite']);
     if (!context.mounted || data == null) return;
-    _cubit(context)?.addBackupFromData(data: data);
+    try {
+      await _cubit(context)?.addBackupFromData(data: data);
+    } catch (_) {
+      if (!context.mounted) return;
+      context.showSnackBar(message: 'Failed adding backup');
+    }
   }
 
+  /// Backs the database up now; failure shows a snackbar instead of
+  /// reporting success.
   void _onTapBackupNow(BuildContext context) async {
-    await _cubit(context)?.addBackupFromDatabase();
+    try {
+      await _cubit(context)?.addBackupFromDatabase();
+    } catch (_) {
+      if (!context.mounted) return;
+      context.showSnackBar(message: 'Failed adding backup');
+      return;
+    }
     if (!context.mounted) return;
     context.showSnackBar(message: 'Success adding backup');
   }

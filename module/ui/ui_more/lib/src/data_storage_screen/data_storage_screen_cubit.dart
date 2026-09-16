@@ -9,6 +9,8 @@ import 'data_storage_screen_state.dart';
 
 class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
     with AutoSubscriptionMixin {
+  static const _maxBackups = 10;
+
   final GetBackupPathUseCase _getBackupPathUseCase;
   final AppDatabase _database;
 
@@ -24,13 +26,33 @@ class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
     await addBackupFromData(data: await _database.backup());
   }
 
+  /// Writes [data] as a new timestamped backup file, prunes old backups past
+  /// the cap of 10, then refreshes the list.
+  ///
+  /// Throws when writing fails; [isLoadingBackup] is always reset.
   Future<void> addBackupFromData({required Uint8List data}) async {
     final filename = '${DateTime.timestamp().microsecondsSinceEpoch}.sqlite';
     final dir = _getBackupPathUseCase.backupPath;
     emit(state.copyWith(isLoadingBackup: true));
-    await dir.childFile(filename).writeAsBytes(data);
-    emit(state.copyWith(isLoadingBackup: false));
+    try {
+      await dir.childFile(filename).writeAsBytes(data);
+      await _pruneOldBackups(dir);
+    } finally {
+      emit(state.copyWith(isLoadingBackup: false));
+    }
     refreshListBackup();
+  }
+
+  /// Keeps only the newest [_maxBackups] files (timestamp names sort
+  /// chronologically) and deletes the rest.
+  Future<void> _pruneOldBackups(Directory dir) async {
+    final files =
+        (await dir.list().toList()).whereType<File>().toList()
+          ..sort((a, b) => a.path.compareTo(b.path));
+    if (files.length <= _maxBackups) return;
+    for (final file in files.take(files.length - _maxBackups)) {
+      await file.delete();
+    }
   }
 
   Future<void> refreshListBackup() async {
@@ -50,7 +72,16 @@ class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
     await refreshListBackup();
   }
 
+  /// Restores the database from [file].
+  ///
+  /// Throws when reading or restoring fails; [isRestoring] is always reset.
+  /// The caller must restart the app afterwards to pick up the new data.
   Future<void> restoreBackup(File file) async {
-    await _database.restore(data: await file.readAsBytes());
+    emit(state.copyWith(isRestoring: true));
+    try {
+      await _database.restore(data: await file.readAsBytes());
+    } finally {
+      emit(state.copyWith(isRestoring: false));
+    }
   }
 }
