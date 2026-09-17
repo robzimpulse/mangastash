@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:file/file.dart';
@@ -76,15 +78,52 @@ class DataStorageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScaffoldScreen(
-      appBar: AppBar(title: const Text('Data and Storage')),
-      body: ListView(
-        children: [
-          _buildImageCacheSize(context),
-          _buildImageStorageSize(context),
-          _buildBackupRestoreSection(context),
-        ],
-      ),
+    return _builder(
+      buildWhen: (prev, curr) => prev.isRestoring != curr.isRestoring,
+      builder: (context, state) {
+        return ScaffoldScreen(
+          appBar: AppBar(title: const Text('Data and Storage')),
+          canPop: !state.isRestoring,
+          body: Stack(
+            children: [
+              ListView(
+                children: [
+                  _buildImageCacheSize(context),
+                  _buildImageStorageSize(context),
+                  _buildBackupRestoreSection(context),
+                ],
+              ),
+              if (state.isRestoring) _buildRestoringOverlay(),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// Covers the body and blocks back navigation ([ScaffoldScreen.canPop]) while
+  /// a restore is running, so the user cannot leave the screen or trigger
+  /// other storage actions mid-restore.
+  Widget _buildRestoringOverlay() {
+    return const Stack(
+      children: [
+        ModalBarrier(color: Colors.black54),
+        Center(
+          child: Card(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Restoring backup data...'),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -316,23 +355,50 @@ class DataStorageScreen extends StatelessWidget {
     context.showSnackBar(message: 'Success save backup to file');
   }
 
+  /// Restores [file] after confirmation: failure shows a snackbar and the
+  /// session keeps running; success shows a snackbar and restarts the app
+  /// so the restored database is picked up.
   void _onTapRestoreBackup(BuildContext context, File file) async {
     final confirm = await onRestoreBackupConfirmation?.call();
     if (!context.mounted || confirm != true) return;
-    await _cubit(context)?.restoreBackup(file);
+    try {
+      await _cubit(context)?.restoreBackup(file);
+    } catch (error) {
+      log('restore backup failed', error: error);
+      if (!context.mounted) return;
+      context.showSnackBar(message: 'Failed restore backup');
+      return;
+    }
     if (!context.mounted) return;
     context.showSnackBar(message: 'Success restore backup');
     WrapperScreen.restart(context);
   }
 
+  /// Imports [filePickerUseCase]-picked bytes as a backup; failure shows a
+  /// snackbar instead of leaving a stuck loading state.
   void _onTapAddBackupFromExternal(BuildContext context) async {
     final data = await filePickerUseCase.execute(allowedExtensions: ['sqlite']);
     if (!context.mounted || data == null) return;
-    _cubit(context)?.addBackupFromData(data: data);
+    try {
+      await _cubit(context)?.addBackupFromData(data: data);
+    } catch (error) {
+      log('adding backup from external file failed', error: error);
+      if (!context.mounted) return;
+      context.showSnackBar(message: 'Failed adding backup');
+    }
   }
 
+  /// Backs the database up now; failure shows a snackbar instead of
+  /// reporting success.
   void _onTapBackupNow(BuildContext context) async {
-    await _cubit(context)?.addBackupFromDatabase();
+    try {
+      await _cubit(context)?.addBackupFromDatabase();
+    } catch (error) {
+      log('backup now failed', error: error);
+      if (!context.mounted) return;
+      context.showSnackBar(message: 'Failed adding backup');
+      return;
+    }
     if (!context.mounted) return;
     context.showSnackBar(message: 'Success adding backup');
   }

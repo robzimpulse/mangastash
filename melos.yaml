@@ -68,7 +68,7 @@ scripts:
 
   upgrade:
     description: Upgrade dependencies for all packages.
-    run: flutter pub upgrade
+    run: rm -f pubspec.lock && flutter pub upgrade
     exec:
       concurrency: 5
       failFast: true
