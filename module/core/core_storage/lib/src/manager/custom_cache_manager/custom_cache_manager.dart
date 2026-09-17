@@ -9,8 +9,11 @@ class CustomCacheManager implements BaseCacheManager {
 
   late final CustomCacheStore _cacheStore;
 
-  CustomCacheManager(Config config) {
-    _cacheStore = CustomCacheStore(config);
+  CustomCacheManager(Config config, {bool deleteFileOnEviction = true}) {
+    _cacheStore = CustomCacheStore(
+      config,
+      deleteFileOnEviction: deleteFileOnEviction,
+    );
 
     /// ignore: invalid_use_of_visible_for_testing_member
     _cache = CacheManager.custom(

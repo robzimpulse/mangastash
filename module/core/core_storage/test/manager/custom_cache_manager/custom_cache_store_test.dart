@@ -1,12 +1,17 @@
+import 'package:core_storage/src/manager/custom_cache_manager/custom_cache_manager.dart';
 import 'package:core_storage/src/manager/custom_cache_manager/custom_cache_store.dart';
 import 'package:fake_async/fake_async.dart';
-import 'package:file/file.dart' show File;
+import 'package:file/file.dart' show File, FileSystemException;
 import 'package:file/memory.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _MockCacheInfoRepository extends Mock implements CacheInfoRepository {}
+
+class _MockFile extends Mock implements File {}
+
+class _MockFileSystem extends Mock implements FileSystem {}
 
 /// Delegates flutter_cache_manager's [FileSystem] abstraction to an
 /// in-memory [MemoryFileSystem] so tests never touch real disk.
@@ -69,6 +74,13 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(Duration.zero);
+    registerFallbackValue(
+      CacheObject(
+        '',
+        relativePath: '',
+        validTill: DateTime.fromMillisecondsSinceEpoch(0),
+      ),
+    );
   });
 
   setUp(() {
@@ -178,6 +190,97 @@ void main() {
 
         expect(file.existsSync(), isFalse);
         verify(() => repo.deleteAll([1])).called(1);
+      });
+    });
+
+    test(
+      'when deleteFileOnEviction is false the file survives and the event fires',
+      () async {
+        final store = CustomCacheStore(
+          _FakeConfig(repo: repo, fileSystem: fileSystem),
+          deleteFileOnEviction: false,
+        );
+        final object = _object(id: 1, key: 'a');
+        final file = fs.file('a.html')
+          ..createSync(recursive: true)
+          ..writeAsStringSync('data');
+        final events = <DeletedFileData>[];
+        final subscription = store.deleteFileEvent.listen(events.add);
+
+        await store.removeCachedFile(object);
+        await Future<void>.delayed(Duration.zero);
+
+        expect(file.existsSync(), isTrue);
+        verify(() => repo.deleteAll([1])).called(1);
+        expect(events, hasLength(1));
+        final (eventObject, eventFile) = events.single;
+        expect(eventObject.key, 'a');
+        expect(eventFile.path, file.path);
+
+        await subscription.cancel();
+        await store.dispose();
+      },
+    );
+
+    test(
+      'a FileSystemException during deletion is swallowed and rows are still removed',
+      () async {
+        final mockFile = _MockFile();
+        final mockFs = _MockFileSystem();
+        final object = _object(id: 1, key: 'a');
+        when(
+          () => mockFs.createFile(any()),
+        ).thenAnswer((_) async => mockFile);
+        when(() => mockFile.existsSync()).thenReturn(true);
+        when(
+          () => mockFile.delete(),
+        ).thenThrow(const FileSystemException('boom'));
+
+        final store = CustomCacheStore(
+          _FakeConfig(repo: repo, fileSystem: mockFs),
+        );
+
+        await store.removeCachedFile(object);
+
+        verify(() => mockFile.delete()).called(1);
+        verify(() => repo.deleteAll([1])).called(1);
+
+        await store.dispose();
+      },
+    );
+  });
+
+  group('CustomCacheManager', () {
+    test('threads deleteFileOnEviction to the store', () {
+      fakeAsync((async) {
+        final object = _object(id: 1, key: 'a');
+        fs.file('a.html')
+          ..createSync(recursive: true)
+          ..writeAsStringSync('data');
+        when(() => repo.get(any())).thenAnswer((_) async => object);
+        when(() => repo.updateOrInsert(any())).thenAnswer((_) async => object);
+        when(
+          () => repo.getObjectsOverCapacity(any()),
+        ).thenAnswer((_) async => <CacheObject>[]);
+        when(
+          () => repo.getOldObjects(any()),
+        ).thenAnswer((_) async => <CacheObject>[]);
+
+        final manager = CustomCacheManager(
+          _FakeConfig(repo: repo, fileSystem: fileSystem),
+          deleteFileOnEviction: false,
+        );
+        final events = <DeletedFileData>[];
+        final subscription = manager.deleteFileEvent.listen(events.add);
+
+        manager.removeFile('a');
+        async.flushTimers();
+
+        expect(events, hasLength(1));
+        expect(fs.file('a.html').existsSync(), isTrue);
+        verify(() => repo.deleteAll([1])).called(1);
+
+        subscription.cancel();
       });
     });
   });
