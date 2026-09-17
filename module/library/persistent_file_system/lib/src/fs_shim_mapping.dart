@@ -58,11 +58,11 @@ Future<T> guardFs<T>(Future<T> Function() body) async {
 }
 
 /// Maps fs_shim stream errors to dart:io exceptions.
+///
+/// Implemented with [Stream.handleError] rather than `Stream.transform`:
+/// fs_shim list streams have a private runtime element type, and a
+/// transformer built for the public supertype fails the covariant
+/// parameter check of `Stream.transform` at runtime.
 Stream<S> guardFsStream<S>(Stream<S> stream) {
-  return stream.transform(
-    StreamTransformer.fromHandlers(
-      handleError: (error, stackTrace, sink) =>
-          sink.addError(mapFsError(error), stackTrace),
-    ),
-  );
+  return stream.handleError((Object error) => throw mapFsError(error));
 }
