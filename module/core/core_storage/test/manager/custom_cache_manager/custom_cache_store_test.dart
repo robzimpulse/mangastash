@@ -1,4 +1,5 @@
 import 'package:core_storage/src/manager/custom_cache_manager/custom_cache_store.dart';
+import 'package:fake_async/fake_async.dart';
 import 'package:file/file.dart' show File;
 import 'package:file/memory.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -66,6 +67,10 @@ void main() {
   late MemoryFileSystem fs;
   late _MemoryFileSystem fileSystem;
 
+  setUpAll(() {
+    registerFallbackValue(Duration.zero);
+  });
+
   setUp(() {
     repo = _MockCacheInfoRepository();
     fs = MemoryFileSystem();
@@ -125,5 +130,55 @@ void main() {
         await store.dispose();
       },
     );
+
+    test('scheduled cleanup deletes files of over-capacity objects', () {
+      fakeAsync((async) {
+        final object = _object(id: 1, key: 'a');
+        final file = fs.file('a.html')
+          ..createSync(recursive: true)
+          ..writeAsStringSync('data');
+        when(() => repo.get(any())).thenAnswer((_) async => null);
+        when(
+          () => repo.getObjectsOverCapacity(any()),
+        ).thenAnswer((_) async => [object]);
+        when(
+          () => repo.getOldObjects(any()),
+        ).thenAnswer((_) async => <CacheObject>[]);
+
+        final store = CustomCacheStore(_FakeConfig(repo: repo, fileSystem: fileSystem))
+          ..cleanupRunMinInterval = Duration.zero;
+
+        store.retrieveCacheData('a');
+        async.flushTimers();
+
+        expect(file.existsSync(), isFalse);
+        verify(() => repo.deleteAll([1])).called(1);
+      });
+    });
+
+    test('scheduled cleanup deletes files of stale objects', () {
+      fakeAsync((async) {
+        final object = _object(id: 1, key: 'a');
+        final file = fs.file('a.html')
+          ..createSync(recursive: true)
+          ..writeAsStringSync('data');
+        when(() => repo.get(any())).thenAnswer((_) async => null);
+        when(
+          () => repo.getObjectsOverCapacity(any()),
+        ).thenAnswer((_) async => <CacheObject>[]);
+        when(
+          () => repo.getOldObjects(any()),
+        ).thenAnswer((_) async => [object]);
+
+        final store = CustomCacheStore(_FakeConfig(repo: repo, fileSystem: fileSystem))
+          ..cleanupRunMinInterval = Duration.zero;
+
+        store.retrieveCacheData('a');
+        async.flushTimers();
+
+        expect(file.existsSync(), isFalse);
+        verify(() => repo.deleteAll([1])).called(1);
+      });
+    });
   });
 }

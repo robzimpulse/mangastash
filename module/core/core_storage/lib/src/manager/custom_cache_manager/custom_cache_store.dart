@@ -172,17 +172,19 @@ class CustomCacheStore implements CacheStore {
   Future<void> _cleanupCache() async {
     final toRemove = <int>[];
     final provider = await _cacheInfoRepository;
+    final futures = <Future<void>>[];
 
     final overCapacity = await provider.getObjectsOverCapacity(_capacity);
     for (final cacheObject in overCapacity) {
-      _removeCachedFile(cacheObject, toRemove);
+      futures.add(_removeCachedFile(cacheObject, toRemove));
     }
 
     final oldObjects = await provider.getOldObjects(_maxAge);
     for (final cacheObject in oldObjects) {
-      _removeCachedFile(cacheObject, toRemove);
+      futures.add(_removeCachedFile(cacheObject, toRemove));
     }
 
+    await Future.wait(futures);
     await provider.deleteAll(toRemove);
   }
 
