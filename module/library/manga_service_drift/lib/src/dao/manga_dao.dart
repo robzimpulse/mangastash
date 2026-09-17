@@ -11,6 +11,9 @@ import '../model/manga_model.dart';
 import '../tables/manga_tables.dart';
 import '../tables/relationship_tables.dart';
 import '../tables/tag_tables.dart';
+import 'chapter_dao.dart';
+import 'file_dao.dart';
+import 'library_dao.dart';
 import 'tag_dao.dart';
 
 part 'manga_dao.g.dart';
@@ -20,6 +23,9 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
   MangaDao(super.db);
 
   late final TagDao _tagDao = TagDao(db);
+  late final ChapterDao _chapterDao = ChapterDao(db);
+  late final LibraryDao _libraryDao = LibraryDao(db);
+  late final FileDao _fileDao = FileDao(db);
 
   JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
     return select(mangaTables).join([
@@ -129,6 +135,19 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
         final old = olds.firstWhereOrNull((e) => e.manga?.id == result.id);
         data.add(MangaModel(manga: result, tags: [...?old?.tags]));
       }
+
+      final removedChapters = await _chapterDao.remove(
+        mangaIds: [for (final result in results) result.id],
+      );
+      for (final result in results) {
+        await _libraryDao.remove(result.id);
+      }
+      await _fileDao.remove(
+        webUrls: [
+          for (final chapter in removedChapters)
+            ...chapter.images.map((e) => e.webUrl),
+        ],
+      );
 
       return data;
     });

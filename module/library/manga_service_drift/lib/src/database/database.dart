@@ -78,8 +78,14 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
-  Future<void> clear() async {
-    await Future.wait([for (final table in allTables) delete(table).go()]);
+  Future<void> clear() {
+    return transaction(() async {
+      await batch((batch) {
+        for (final table in allTables) {
+          batch.deleteAll(table);
+        }
+      });
+    });
   }
 
   Future<Uint8List> backup() {

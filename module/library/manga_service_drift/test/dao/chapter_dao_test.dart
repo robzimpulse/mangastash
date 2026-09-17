@@ -45,6 +45,30 @@ void main() {
     expect((await imageDao.all).length, equals(0));
   });
 
+  group('Cascade Images on Remove (#102)', () {
+    setUp(() async {
+      await dao.adds(
+        values: {for (final (chapter, images) in chapters) chapter: images},
+      );
+    });
+
+    tearDown(() => db.clear());
+
+    test('remove by mangaIds deletes the manga chapters images', () async {
+      await dao.remove(mangaIds: ['manga_id_1']);
+
+      expect((await dao.all).length, equals(0));
+      expect((await imageDao.all).length, equals(0));
+    });
+
+    test('remove by webUrls deletes the chapters images', () async {
+      await dao.remove(webUrls: ['web_url_0']);
+
+      expect((await dao.all).length, equals(chapters.length - 1));
+      expect((await imageDao.all).length, equals((chapters.length - 1) * 10));
+    });
+  });
+
   group('Chapter Dao Test', () {
     setUp(() async {
       await dao.adds(
