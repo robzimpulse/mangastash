@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:file/file.dart' show FileSystemException;
 import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_cache_manager/src/cache_store.dart';
@@ -44,10 +45,15 @@ class CustomCacheStore implements CacheStore {
 
   Stream<DeletedFileData> get deleteFileEvent => _controller.stream;
 
-  CustomCacheStore(Config config)
-    : _config = config,
-      fileSystem = config.fileSystem,
-      _cacheInfoRepository = config.repo.open().then((value) => config.repo);
+  final bool _deleteFileOnEviction;
+
+  CustomCacheStore(
+    Config config, {
+    bool deleteFileOnEviction = true,
+  }) : _config = config,
+       _deleteFileOnEviction = deleteFileOnEviction,
+       fileSystem = config.fileSystem,
+       _cacheInfoRepository = config.repo.open().then((value) => config.repo);
 
   @override
   Future<FileInfo?> getFile(String key, {bool ignoreMemCache = false}) async {
@@ -223,7 +229,19 @@ class CustomCacheStore implements CacheStore {
     final file = await fileSystem.createFile(cacheObject.relativePath);
 
     if (file.existsSync()) {
-      _controller.add((cacheObject, file));
+      if (_deleteFileOnEviction) {
+        try {
+          await file.delete();
+        } on FileSystemException catch (e) {
+          cacheLogger.log(
+            'CacheManager: Failed to delete cached file '
+            '${cacheObject.relativePath}: $e',
+            CacheManagerLogLevel.warning,
+          );
+        }
+      } else {
+        _controller.add((cacheObject, file));
+      }
     }
   }
 
