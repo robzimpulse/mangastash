@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:file/file.dart';
 import 'package:safe_bloc/safe_bloc.dart';
@@ -43,12 +42,11 @@ class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
     refreshListBackup();
   }
 
-  /// Keeps only the newest [_maxBackups] files (timestamp names sort
-  /// chronologically) and deletes the rest.
+  /// Keeps only the newest [_maxBackups] backups (timestamp names sort
+  /// chronologically) and deletes the rest. Files that are not backups
+  /// (anything not named `*.sqlite`) are left alone.
   Future<void> _pruneOldBackups(Directory dir) async {
-    final files =
-        (await dir.list().toList()).whereType<File>().toList()
-          ..sort((a, b) => a.path.compareTo(b.path));
+    final files = await _listBackupFiles(dir);
     if (files.length <= _maxBackups) return;
     for (final file in files.take(files.length - _maxBackups)) {
       await file.delete();
@@ -58,13 +56,20 @@ class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
   Future<void> refreshListBackup() async {
     final dir = _getBackupPathUseCase.backupPath;
     emit(state.copyWith(isLoadingListBackup: true));
-    final files = await dir.list().toList();
+    final files = await _listBackupFiles(dir);
     emit(
-      state.copyWith(
-        listBackup: [...files.map((e) => e.castOrNull<File>()).nonNulls],
-        isLoadingListBackup: false,
-      ),
+      state.copyWith(listBackup: files, isLoadingListBackup: false),
     );
+  }
+
+  /// Backup files of [dir] named `*.sqlite`, sorted oldest-first — the same
+  /// set the rotation prunes, so the list and the cap stay consistent.
+  Future<List<File>> _listBackupFiles(Directory dir) async {
+    return (await dir.list().toList())
+        .whereType<File>()
+        .where((file) => file.path.endsWith('.sqlite'))
+        .toList()
+      ..sort((a, b) => a.path.compareTo(b.path));
   }
 
   Future<void> deleteBackup(File file) async {

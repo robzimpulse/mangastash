@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:file/file.dart';
@@ -361,7 +363,8 @@ class DataStorageScreen extends StatelessWidget {
     if (!context.mounted || confirm != true) return;
     try {
       await _cubit(context)?.restoreBackup(file);
-    } catch (_) {
+    } catch (error) {
+      log('restore backup failed', error: error);
       if (!context.mounted) return;
       context.showSnackBar(message: 'Failed restore backup');
       return;
@@ -378,7 +381,8 @@ class DataStorageScreen extends StatelessWidget {
     if (!context.mounted || data == null) return;
     try {
       await _cubit(context)?.addBackupFromData(data: data);
-    } catch (_) {
+    } catch (error) {
+      log('adding backup from external file failed', error: error);
       if (!context.mounted) return;
       context.showSnackBar(message: 'Failed adding backup');
     }
@@ -389,7 +393,8 @@ class DataStorageScreen extends StatelessWidget {
   void _onTapBackupNow(BuildContext context) async {
     try {
       await _cubit(context)?.addBackupFromDatabase();
-    } catch (_) {
+    } catch (error) {
+      log('backup now failed', error: error);
       if (!context.mounted) return;
       context.showSnackBar(message: 'Failed adding backup');
       return;

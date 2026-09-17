@@ -65,6 +65,31 @@ void main() {
       expect(cubit.state.isLoadingBackup, isFalse);
     });
 
+    test('rotation ignores non-backup files in the directory', () async {
+      backupDir.childFile('notes.txt').writeAsStringSync('not a backup');
+      for (var i = 0; i < 12; i++) {
+        backupDir
+            .childFile('${1000000000000000 + i}.sqlite')
+            .writeAsStringSync('old-$i');
+      }
+      when(
+        () => database.backup(),
+      ).thenAnswer((_) async => Uint8List.fromList([1, 2, 3]));
+
+      await cubit.addBackupFromDatabase();
+
+      expect(backupDir.childFile('notes.txt').existsSync(), isTrue);
+      final names =
+          backupDir
+              .listSync()
+              .whereType<File>()
+              .map((file) => file.uri.pathSegments.last)
+              .where((name) => name.endsWith('.sqlite'))
+              .toList()
+            ..sort();
+      expect(names, hasLength(10));
+    });
+
     test('resets isLoadingBackup and rethrows when writing fails', () async {
       final mockDir = _MockDirectory();
       final mockFile = _MockFile();
@@ -77,6 +102,21 @@ void main() {
         throwsA(isA<Exception>()),
       );
       expect(cubit.state.isLoadingBackup, isFalse);
+    });
+  });
+
+  group('refreshListBackup', () {
+    test('lists only .sqlite backup files', () async {
+      backupDir.childFile('1000.sqlite').writeAsStringSync('backup');
+      backupDir.childFile('notes.txt').writeAsStringSync('stray');
+
+      await cubit.refreshListBackup();
+
+      expect(
+        cubit.state.listBackup.map((file) => file.uri.pathSegments.last),
+        equals(['1000.sqlite']),
+      );
+      expect(cubit.state.isLoadingListBackup, isFalse);
     });
   });
 

@@ -39,6 +39,39 @@ void main() {
       File('${tempDir.path}/testdb.sqlite.restored').existsSync(),
       isFalse,
     );
+    expect(
+      File('${tempDir.path}/testdb.sqlite.preRestore').existsSync(),
+      isFalse,
+    );
+  });
+
+  test('failed swap puts the old database back and rethrows', () async {
+    final data = Uint8List.fromList(List.generate(32, (i) => i));
+    File('${tempDir.path}/testdb.sqlite').writeAsStringSync('old-live');
+
+    await expectLater(
+      seedRestoredDatabase(
+        data: data,
+        directoryPath: tempDir.path,
+        name: 'testdb',
+        rename: (file, newPath) async {
+          if (newPath.endsWith('.sqlite')) {
+            throw const FileSystemException('rename failed');
+          }
+          return file.rename(newPath);
+        },
+      ),
+      throwsA(isA<FileSystemException>()),
+    );
+
+    expect(
+      File('${tempDir.path}/testdb.sqlite').readAsStringSync(),
+      equals('old-live'),
+    );
+    expect(
+      File('${tempDir.path}/testdb.sqlite.preRestore').existsSync(),
+      isFalse,
+    );
   });
 
   test('queryExecutor opens the seeded file and reads restored rows', () async {
