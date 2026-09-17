@@ -110,7 +110,9 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
     final a = delete(chapterTables)..where(filter);
     return transaction(() async {
       final chapters = await a.goAndReturn();
-      final images = await _imageDao.remove(chapterIds: ids);
+      final images = await _imageDao.remove(
+        chapterIds: [for (final chapter in chapters) chapter.id],
+      );
       return [
         for (final chapter in chapters)
           ChapterModel(

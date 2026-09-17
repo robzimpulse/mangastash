@@ -1,11 +1,33 @@
+import 'dart:convert';
+
+import 'package:file/file.dart';
+import 'package:file/local.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_drift/src/database/memory_executor.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+
+class MockPathProviderPlatform extends PathProviderPlatform
+    with MockPlatformInterfaceMixin {
+  final String path;
+  MockPathProviderPlatform(this.path);
+
+  @override
+  Future<String?> getApplicationSupportPath() async => path;
+}
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   late AppDatabase db;
   late MangaDao dao;
   late TagDao tagDao;
+  late ChapterDao chapterDao;
+  late ImageDao imageDao;
+  late LibraryDao libraryDao;
+  late FileDao fileDao;
+  late Directory supportDir;
 
   final mangas = List.generate(
     10,
@@ -24,10 +46,18 @@ void main() {
     ),
   );
 
-  setUp(() {
+  setUp(() async {
+    supportDir = await const LocalFileSystem().systemTempDirectory
+        .createTemp('manga_dao_test');
+    PathProviderPlatform.instance = MockPathProviderPlatform(supportDir.path);
     db = AppDatabase(executor: MemoryExecutor());
     dao = MangaDao(db);
     tagDao = TagDao(db);
+    chapterDao = ChapterDao(db);
+    imageDao = ImageDao(db);
+    libraryDao = LibraryDao(db);
+    fileDao = FileDao(db);
+    await (await db.databaseDirectory()).create(recursive: true);
   });
 
   tearDown(() => db.close());
@@ -40,6 +70,72 @@ void main() {
 
     await dao.remove(ids: results.map((e) => e.manga?.id).nonNulls.toList());
     expect((await dao.all).length, equals(0));
+  });
+
+  test('Remove cascades children (#102)', () async {
+    final (manga, tags) = mangas.first;
+    const otherMangaId = 'manga_other';
+
+    await dao.adds(values: {manga: tags});
+    await dao.adds(values: {
+      mangas[1].$1.copyWith(id: const Value(otherMangaId)): [],
+    });
+
+    final chapter = ChapterTablesCompanion(
+      id: const Value('chapter_1'),
+      mangaId: Value(manga.id.value),
+      title: const Value('chapter_title'),
+      webUrl: const Value('chapter_web_url'),
+    );
+
+    final otherChapter = ChapterTablesCompanion(
+      id: const Value('chapter_other'),
+      mangaId: const Value(otherMangaId),
+      title: const Value('chapter_title_other'),
+      webUrl: const Value('chapter_web_url_other'),
+    );
+
+    await chapterDao.adds(values: {chapter: ['image_url_a', 'image_url_b']});
+    await chapterDao.adds(values: {otherChapter: ['image_url_other']});
+
+    await libraryDao.add(manga.id.value);
+    await libraryDao.add(otherMangaId);
+
+    final source = await supportDir.createTemp('src');
+    await fileDao.addFromFile(
+      webUrl: 'image_url_a',
+      file: source.childFile('a.bin')..writeAsBytes(utf8.encode('a')),
+    );
+    await fileDao.addFromFile(
+      webUrl: 'image_url_other',
+      file: source.childFile('other.bin')..writeAsBytes(utf8.encode('other')),
+    );
+
+    await dao.remove(ids: [manga.id.value]);
+
+    expect(
+      (await dao.all).map((e) => e.manga?.id),
+      equals([otherMangaId]),
+    );
+    expect(
+      (await chapterDao.all).map((e) => e.chapter?.id),
+      equals(['chapter_other']),
+    );
+    expect(
+      (await imageDao.all).map((e) => e.chapterId),
+      equals(['chapter_other']),
+    );
+    expect(
+      (await db.select(db.fileTables).get()).map((e) => e.webUrl),
+      equals(['image_url_other']),
+    );
+
+    final libraryMangaIds = await libraryDao.stream.first;
+    expect(libraryMangaIds.map((e) => e.manga?.id), equals([otherMangaId]));
+    expect(
+      (await db.select(db.libraryTables).get()).map((e) => e.mangaId),
+      equals([otherMangaId]),
+    );
   });
 
   group('Manga Dao Test', () {
