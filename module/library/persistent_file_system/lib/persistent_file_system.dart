@@ -8,3 +8,4 @@ export 'src/fs_shim_file_system.dart';
 export 'src/fs_shim_io_sink.dart';
 export 'src/fs_shim_link.dart';
 export 'src/fs_shim_mapping.dart';
+export 'src/persistent_web_file_system.dart';
