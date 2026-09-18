@@ -1,6 +1,6 @@
 import 'package:file/file.dart';
-import 'package:file/memory.dart';
 
-Future<Directory> databaseDirectory() {
-  return MemoryFileSystem().systemTempDirectory.createTemp('database');
-}
+import 'package:persistent_file_system/persistent_file_system.dart';
+
+Future<Directory> databaseDirectory() async =>
+    persistentFileSystem.directory('/database');
