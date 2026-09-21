@@ -6,6 +6,7 @@ import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
@@ -35,6 +36,8 @@ class _Key extends Equatable {
 }
 
 class HeadlessWebviewManager implements HeadlessWebviewUseCase {
+  static const Duration defaultTimeout = Duration(seconds: 15);
+
   final LogBox _log;
   final HtmlCacheManager _htmlCacheManager;
 
@@ -163,53 +166,77 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
         ''',
       ],
       javascriptHandlers: {
-        'resolved': (args) {
-          if (args.isEmpty) return;
-          final data = args.first;
-          if (data is! String) {
-            _log.log(
-              'Failed to download image [$url]',
-              extra: {'url': url, 'args': args},
-              name: runtimeType.toString(),
-            );
-            return;
-          }
-
-          final values = data.split(RegExp(r'[:;,]+'));
-          final ext = values[1].split('/').lastOrNull;
-
-          if (_imgExt.contains(ext)) {
-            _log.log(
-              'Success download image [$url]',
-              name: runtimeType.toString(),
-              extra: {'url': url, 'data': data},
-            );
-            completer.safeComplete(data);
-          } else {
-            _log.log(
-              'Failed download image [$url]',
-              name: runtimeType.toString(),
-              error: Exception('Image format $ext not supported'),
-              extra: {'url': url, 'args': args},
-            );
-            completer.safeCompleteError(
-              Exception('Image format $ext not supported'),
-            );
-          }
-        },
-        'reject': (args) {
-          _log.log(
-            'Failed to download image [$url]',
-            name: runtimeType.toString(),
-            extra: {'url': url, 'error': args.toString()},
-          );
-          completer.safeCompleteError(Exception('Error fetch image'));
-        },
+        'resolved': (args) => handleResolved(completer, args: args, url: url),
+        'reject': (args) => handleRejected(completer, args: args, url: url),
       },
       signalComplete: completer.future,
     );
 
     return completer.future;
+  }
+
+  @visibleForTesting
+  void handleResolved(
+    Completer<String> completer, {
+    required List<dynamic> args,
+    required String url,
+  }) {
+    if (args.isEmpty) {
+      _log.log(
+        'Failed to download image [$url]',
+        extra: {'url': url, 'args': args},
+        name: runtimeType.toString(),
+      );
+      completer.safeCompleteError(Exception('Empty response'));
+      return;
+    }
+
+    final data = args.first;
+    if (data is! String) {
+      _log.log(
+        'Failed to download image [$url]',
+        extra: {'url': url, 'args': args},
+        name: runtimeType.toString(),
+      );
+      completer.safeCompleteError(Exception('Invalid response'));
+      return;
+    }
+
+    final values = data.split(RegExp(r'[:;,]+'));
+    final ext = values[1].split('/').lastOrNull;
+
+    if (_imgExt.contains(ext)) {
+      _log.log(
+        'Success download image [$url]',
+        name: runtimeType.toString(),
+        extra: {'url': url, 'data': data},
+      );
+      completer.safeComplete(data);
+    } else {
+      _log.log(
+        'Failed download image [$url]',
+        name: runtimeType.toString(),
+        error: Exception('Image format $ext not supported'),
+        extra: {'url': url, 'args': args},
+      );
+      completer.safeCompleteError(
+        Exception('Image format $ext not supported'),
+      );
+    }
+  }
+
+  @visibleForTesting
+  void handleRejected(
+    Completer<String> completer, {
+    required List<dynamic> args,
+    required String url,
+  }) {
+    _log.log(
+      'Failed to download image [$url]',
+      name: runtimeType.toString(),
+      extra: {'url': url, 'error': args.toString()},
+    );
+    completer.safeCompleteError(Exception('Error fetch image'));
   }
 
   Future<String> _fetch({
@@ -223,6 +250,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     Duration? timeout,
   }) async {
     delegate.set(uri: uri, loading: true);
+    final effectiveTimeout = timeout ?? defaultTimeout;
     final key = [uri.toString(), ...scripts].join('|');
     final cache = await _htmlCacheManager.getFileFromCache(key);
     final data = await cache?.file.readAsString(encoding: utf8);
@@ -323,19 +351,11 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     _instances[webview.hashCode] = webview;
 
     try {
-      if (timeout != null) {
-        await Future.wait([
-          webview.run(),
-          onLoadStartCompleter.future,
-          Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
-        ]).timeout(const Duration(seconds: 15));
-      } else {
-        await Future.wait([
-          webview.run(),
-          onLoadStartCompleter.future,
-          Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
-        ]);
-      }
+      await Future.wait([
+        webview.run(),
+        onLoadStartCompleter.future,
+        Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
+      ]).timeout(effectiveTimeout);
     } catch (e, st) {
       delegate.set(error: e, stackTrace: st, loading: false);
       _instances.remove(webview.hashCode);
@@ -355,17 +375,13 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     }
 
     if (signalComplete != null) {
-      if (timeout != null) {
-        try {
-          await signalComplete.timeout(const Duration(seconds: 15));
-        } catch (e, st) {
-          delegate.set(error: e, stackTrace: st, loading: false);
-          _instances.remove(webview.hashCode);
-          await webview.dispose();
-          rethrow;
-        }
-      } else {
-        await signalComplete;
+      try {
+        await signalComplete.timeout(effectiveTimeout);
+      } catch (e, st) {
+        delegate.set(error: e, stackTrace: st, loading: false);
+        _instances.remove(webview.hashCode);
+        await webview.dispose();
+        rethrow;
       }
     }
 

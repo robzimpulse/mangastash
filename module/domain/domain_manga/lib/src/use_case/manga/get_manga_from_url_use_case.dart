@@ -33,6 +33,7 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
       url,
       scripts: source.getMangaUseCase.scripts,
       useCache: useCache,
+      timeout: source.getMangaUseCase.timeout,
     );
 
     final scrapped = await source.getMangaUseCase.parse(root: document);
