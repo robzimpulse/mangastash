@@ -88,10 +88,36 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
     return query.watchSingle().map((e) => e.read(counts)).whereNotNull();
   }
 
-  Future<void> add(JobTablesCompanion value) {
-    return transaction(
-      () => _inserter.insert(value, mode: InsertMode.insertOrIgnore),
-    );
+  Future<void> add(JobTablesCompanion value) async {
+    await transaction(() async {
+      final type = value.type.present ? value.type.value : null;
+      if (type == null) {
+        await _inserter.insert(value, mode: InsertMode.insertOrIgnore);
+        return;
+      }
+
+      final selector = _selector
+        ..where(
+          (f) =>
+              f.type.equals(type.name) &
+              _nullableEquals(f.source, _read(value.source)) &
+              _nullableEquals(f.mangaId, _read(value.mangaId)) &
+              _nullableEquals(f.chapterId, _read(value.chapterId)) &
+              _nullableEquals(f.imageUrl, _read(value.imageUrl)) &
+              _nullableEquals(f.path, _read(value.path)),
+        );
+
+      final existing = await selector.get();
+      if (existing.isNotEmpty) return;
+
+      await _inserter.insert(value, mode: InsertMode.insertOrIgnore);
+    });
+  }
+
+  String? _read(Value<String?> field) => field.present ? field.value : null;
+
+  Expression<bool> _nullableEquals(Column<String> column, String? value) {
+    return value == null ? column.isNull() : column.equals(value);
   }
 
   Future<void> remove(int id) async {
