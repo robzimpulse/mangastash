@@ -9,10 +9,10 @@ class CustomCacheManager implements BaseCacheManager {
 
   late final CustomCacheStore _cacheStore;
 
-  CustomCacheManager(Config config, {bool deleteFileOnEviction = true}) {
+  CustomCacheManager(Config config, {RescueEvictedFile? rescueEvictedFile}) {
     _cacheStore = CustomCacheStore(
       config,
-      deleteFileOnEviction: deleteFileOnEviction,
+      rescueEvictedFile: rescueEvictedFile,
     );
 
     /// ignore: invalid_use_of_visible_for_testing_member
@@ -21,8 +21,6 @@ class CustomCacheManager implements BaseCacheManager {
       cacheStore: _cacheStore,
     );
   }
-
-  Stream<DeletedFileData> get deleteFileEvent => _cacheStore.deleteFileEvent;
 
   Future<Set<String>> get keys => _cacheStore.keys;
 

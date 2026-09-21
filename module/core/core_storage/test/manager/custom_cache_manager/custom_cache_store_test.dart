@@ -93,55 +93,37 @@ void main() {
   });
 
   group('CustomCacheStore', () {
-    test(
-      'removeCachedFile deletes the file and index row by default and emits no event',
-      () async {
-        final store = CustomCacheStore(_FakeConfig(repo: repo, fileSystem: fileSystem));
-        final object = _object(id: 1, key: 'a');
-        final file = fs.file('a.html')
-          ..createSync(recursive: true)
-          ..writeAsStringSync('data');
-        final events = <DeletedFileData>[];
-        final subscription = store.deleteFileEvent.listen(events.add);
+    test('removeCachedFile deletes the file and index row', () async {
+      final store = CustomCacheStore(_FakeConfig(repo: repo, fileSystem: fileSystem));
+      final object = _object(id: 1, key: 'a');
+      final file = fs.file('a.html')
+        ..createSync(recursive: true)
+        ..writeAsStringSync('data');
 
-        await store.removeCachedFile(object);
+      await store.removeCachedFile(object);
 
+      expect(file.existsSync(), isFalse);
+      verify(() => repo.deleteAll([1])).called(1);
+    });
+
+    test('emptyCache deletes every file and index row', () async {
+      final store = CustomCacheStore(_FakeConfig(repo: repo, fileSystem: fileSystem));
+      final objects = [_object(id: 1, key: 'a'), _object(id: 2, key: 'b')];
+      final files = [
+        for (final object in objects)
+          fs.file('${object.key}.html')
+            ..createSync(recursive: true)
+            ..writeAsStringSync('data'),
+      ];
+      when(() => repo.getAllObjects()).thenAnswer((_) async => objects);
+
+      await store.emptyCache();
+
+      for (final file in files) {
         expect(file.existsSync(), isFalse);
-        verify(() => repo.deleteAll([1])).called(1);
-        expect(events, isEmpty);
-
-        await subscription.cancel();
-        await store.dispose();
-      },
-    );
-
-    test(
-      'emptyCache deletes every file and index row by default and emits no event',
-      () async {
-        final store = CustomCacheStore(_FakeConfig(repo: repo, fileSystem: fileSystem));
-        final objects = [_object(id: 1, key: 'a'), _object(id: 2, key: 'b')];
-        final files = [
-          for (final object in objects)
-            fs.file('${object.key}.html')
-              ..createSync(recursive: true)
-              ..writeAsStringSync('data'),
-        ];
-        when(() => repo.getAllObjects()).thenAnswer((_) async => objects);
-        final events = <DeletedFileData>[];
-        final subscription = store.deleteFileEvent.listen(events.add);
-
-        await store.emptyCache();
-
-        for (final file in files) {
-          expect(file.existsSync(), isFalse);
-        }
-        verify(() => repo.deleteAll([1, 2])).called(1);
-        expect(events, isEmpty);
-
-        await subscription.cancel();
-        await store.dispose();
-      },
-    );
+      }
+      verify(() => repo.deleteAll([1, 2])).called(1);
+    });
 
     test('scheduled cleanup deletes files of over-capacity objects', () {
       fakeAsync((async) {
@@ -193,32 +175,48 @@ void main() {
       });
     });
 
+    test('rescueEvictedFile runs before the file is deleted', () async {
+      final events = <String>[];
+      Future<void> rescue(CacheObject object, File file) async {
+        events.add('rescue:${object.key}');
+      }
+
+      final store = CustomCacheStore(
+        _FakeConfig(repo: repo, fileSystem: fileSystem),
+        rescueEvictedFile: rescue,
+      );
+      final object = _object(id: 1, key: 'a');
+      final file = fs.file('a.html')
+        ..createSync(recursive: true)
+        ..writeAsStringSync('data');
+
+      await store.removeCachedFile(object);
+
+      expect(events, ['rescue:a']);
+      expect(file.existsSync(), isFalse);
+      verify(() => repo.deleteAll([1])).called(1);
+    });
+
     test(
-      'when deleteFileOnEviction is false the file survives and the event fires',
+      'a rescue failure is logged and the file is still deleted',
       () async {
+        Future<void> rescue(CacheObject object, File file) async {
+          throw Exception('rescue boom');
+        }
+
         final store = CustomCacheStore(
           _FakeConfig(repo: repo, fileSystem: fileSystem),
-          deleteFileOnEviction: false,
+          rescueEvictedFile: rescue,
         );
         final object = _object(id: 1, key: 'a');
-        final file = fs.file('a.html')
+        fs.file('a.html')
           ..createSync(recursive: true)
           ..writeAsStringSync('data');
-        final events = <DeletedFileData>[];
-        final subscription = store.deleteFileEvent.listen(events.add);
 
         await store.removeCachedFile(object);
-        await Future<void>.delayed(Duration.zero);
 
-        expect(file.existsSync(), isTrue);
+        expect(fs.file('a.html').existsSync(), isFalse);
         verify(() => repo.deleteAll([1])).called(1);
-        expect(events, hasLength(1));
-        final (eventObject, eventFile) = events.single;
-        expect(eventObject.key, 'a');
-        expect(eventFile.path, file.path);
-
-        await subscription.cancel();
-        await store.dispose();
       },
     );
 
@@ -232,13 +230,9 @@ void main() {
           () => mockFs.createFile(any()),
         ).thenAnswer((_) async => mockFile);
         when(() => mockFile.existsSync()).thenReturn(true);
-        when(
-          () => mockFile.delete(),
-        ).thenThrow(const FileSystemException('boom'));
+        when(() => mockFile.delete()).thenThrow(const FileSystemException('boom'));
 
-        final store = CustomCacheStore(
-          _FakeConfig(repo: repo, fileSystem: mockFs),
-        );
+        final store = CustomCacheStore(_FakeConfig(repo: repo, fileSystem: mockFs));
 
         await store.removeCachedFile(object);
 
@@ -251,12 +245,13 @@ void main() {
   });
 
   group('CustomCacheManager', () {
-    test('threads deleteFileOnEviction to the store', () {
+    test('threads rescueEvictedFile to the store', () {
       fakeAsync((async) {
         final object = _object(id: 1, key: 'a');
         fs.file('a.html')
           ..createSync(recursive: true)
           ..writeAsStringSync('data');
+        final rescued = <String>[];
         when(() => repo.get(any())).thenAnswer((_) async => object);
         when(() => repo.updateOrInsert(any())).thenAnswer((_) async => object);
         when(
@@ -268,19 +263,17 @@ void main() {
 
         final manager = CustomCacheManager(
           _FakeConfig(repo: repo, fileSystem: fileSystem),
-          deleteFileOnEviction: false,
+          rescueEvictedFile: (object, file) async {
+            rescued.add(object.key);
+          },
         );
-        final events = <DeletedFileData>[];
-        final subscription = manager.deleteFileEvent.listen(events.add);
 
         manager.removeFile('a');
         async.flushTimers();
 
-        expect(events, hasLength(1));
-        expect(fs.file('a.html').existsSync(), isTrue);
+        expect(rescued, ['a']);
+        expect(fs.file('a.html').existsSync(), isFalse);
         verify(() => repo.deleteAll([1])).called(1);
-
-        subscription.cancel();
       });
     });
   });

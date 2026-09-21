@@ -5,7 +5,14 @@ import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_cache_manager/src/cache_store.dart';
 
-typedef DeletedFileData = (CacheObject object, File file);
+/// Invoked before an evicted cache file is deleted, giving caches a chance
+/// to persist its content elsewhere. Runs to completion (failures are logged
+/// and swallowed) — the file is deleted afterwards either way, so a failed
+/// rescue can never leak a file no index row points at.
+typedef RescueEvictedFile = Future<void> Function(
+  CacheObject object,
+  File file,
+);
 
 class CustomCacheStore implements CacheStore {
   @override
@@ -41,17 +48,13 @@ class CustomCacheStore implements CacheStore {
   DateTime lastCleanupRun = DateTime.now();
   Timer? _scheduledCleanup;
 
-  final _controller = StreamController<DeletedFileData>.broadcast();
-
-  Stream<DeletedFileData> get deleteFileEvent => _controller.stream;
-
-  final bool _deleteFileOnEviction;
+  final RescueEvictedFile? _rescueEvictedFile;
 
   CustomCacheStore(
     Config config, {
-    bool deleteFileOnEviction = true,
+    RescueEvictedFile? rescueEvictedFile,
   }) : _config = config,
-       _deleteFileOnEviction = deleteFileOnEviction,
+       _rescueEvictedFile = rescueEvictedFile,
        fileSystem = config.fileSystem,
        _cacheInfoRepository = config.repo.open().then((value) => config.repo);
 
@@ -231,18 +234,26 @@ class CustomCacheStore implements CacheStore {
     final file = await fileSystem.createFile(cacheObject.relativePath);
 
     if (file.existsSync()) {
-      if (_deleteFileOnEviction) {
+      final rescue = _rescueEvictedFile;
+      if (rescue != null) {
         try {
-          await file.delete();
-        } on FileSystemException catch (e) {
+          await rescue(cacheObject, file);
+        } catch (e) {
           cacheLogger.log(
-            'CacheManager: Failed to delete cached file '
+            'CacheManager: Failed to rescue evicted file '
             '${cacheObject.relativePath}: $e',
             CacheManagerLogLevel.warning,
           );
         }
-      } else {
-        _controller.add((cacheObject, file));
+      }
+      try {
+        await file.delete();
+      } on FileSystemException catch (e) {
+        cacheLogger.log(
+          'CacheManager: Failed to delete cached file '
+          '${cacheObject.relativePath}: $e',
+          CacheManagerLogLevel.warning,
+        );
       }
     }
   }
@@ -256,7 +267,6 @@ class CustomCacheStore implements CacheStore {
   Future<void> dispose() async {
     final provider = await _cacheInfoRepository;
     await provider.close();
-    await _controller.close();
   }
 
   @override
