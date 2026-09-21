@@ -4,6 +4,7 @@ import 'package:file/local.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_drift/src/database/memory_executor.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
@@ -14,6 +15,8 @@ class MockPathProviderPlatform extends PathProviderPlatform with MockPlatformInt
   @override
   Future<String?> getApplicationSupportPath() async => path;
 }
+
+class MockFile extends Mock implements File {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -146,6 +149,37 @@ void main() {
       
       final searchResult = await dao.search(ids: [added.id]);
       expect(searchResult.isEmpty, isTrue);
+    });
+
+    test('addFromFile flushes the copy before the row inserts', () async {
+      final tempDir = await fs.systemTempDirectory.createTemp('test_flush');
+      final input = tempDir.childFile('big.png');
+      final bytes = List<int>.generate(1024 * 1024, (i) => i % 251);
+      await input.writeAsBytes(bytes, flush: true);
+
+      final added = await dao.addFromFile(
+        webUrl: 'http://test.com/big.png',
+        file: input,
+      );
+
+      final loaded = await dao.file(added, checkFile: true);
+      expect(await loaded.readAsBytes(), bytes);
+    });
+
+    test('addFromFile deletes the destination when the copy fails', () async {
+      final mockFile = MockFile();
+      when(() => mockFile.path).thenReturn('/tmp/input.png');
+      when(() => mockFile.openRead()).thenThrow(Exception('read failed'));
+
+      await expectLater(
+        dao.addFromFile(webUrl: 'http://test.com/fail.png', file: mockFile),
+        throwsA(isA<Exception>()),
+      );
+
+      expect(await dao.search(webUrls: ['http://test.com/fail.png']), isEmpty);
+
+      final directory = await dao.directory();
+      expect(await directory.list().toList(), isEmpty);
     });
   });
 }
