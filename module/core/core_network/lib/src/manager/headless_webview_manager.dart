@@ -6,7 +6,6 @@ import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
@@ -35,6 +34,88 @@ class _Key extends Equatable {
   List<Object?> get props => [url, scripts, useCache, headers, timeout];
 }
 
+const List<String> _imgExt = [
+  'jpeg',
+  'jpg',
+  'gif',
+  'webp',
+  'png',
+  'ico',
+  'bmp',
+  'wbmp',
+];
+
+/// Completes [completer] from a `resolved` JS-handler call carrying a
+/// data-url payload in [args]; every malformed shape (empty args, non-string
+/// data, missing mime segment, unsupported extension) completes with an
+/// error instead of leaving the caller hanging.
+void handleResolvedImage(
+  LogBox log,
+  Completer<String> completer, {
+  required List<dynamic> args,
+  required String url,
+}) {
+  if (args.isEmpty) {
+    log.log(
+      'Failed to download image [$url]',
+      extra: {'url': url, 'args': args},
+      name: 'HeadlessWebviewManager',
+    );
+    completer.safeCompleteError(Exception('Empty response'));
+    return;
+  }
+
+  final data = args.first;
+  if (data is! String) {
+    log.log(
+      'Failed to download image [$url]',
+      extra: {'url': url, 'args': args},
+      name: 'HeadlessWebviewManager',
+    );
+    completer.safeCompleteError(Exception('Invalid response'));
+    return;
+  }
+
+  final values = data.split(RegExp(r'[:;,]+'));
+  // A malformed reader result (empty or non-data url) has no mime
+  // segment; treat it as unsupported instead of crashing the handler.
+  final ext = values.length > 1 ? values[1].split('/').lastOrNull : null;
+
+  if (ext != null && _imgExt.contains(ext)) {
+    log.log(
+      'Success download image [$url]',
+      name: 'HeadlessWebviewManager',
+      extra: {'url': url, 'data': data},
+    );
+    completer.safeComplete(data);
+  } else {
+    log.log(
+      'Failed download image [$url]',
+      name: 'HeadlessWebviewManager',
+      error: Exception('Image format $ext not supported'),
+      extra: {'url': url, 'args': args},
+    );
+    completer.safeCompleteError(
+      Exception('Image format $ext not supported'),
+    );
+  }
+}
+
+/// Completes [completer] with an error from a `reject` JS-handler call.
+void handleRejectedImage(
+  LogBox log,
+  Completer<String> completer, {
+  required List<dynamic> args,
+  required String url,
+}) {
+  log.log(
+    'Failed to download image [$url]',
+    name: 'HeadlessWebviewManager',
+    extra: {'url': url, 'error': args.toString()},
+  );
+  completer.safeCompleteError(Exception('Error fetch image'));
+}
+
 class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   static const Duration defaultTimeout = Duration(seconds: 15);
 
@@ -44,8 +125,6 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   final Map<_Key, Future<Document>> _cDocument = {};
   final Map<_Key, Future<String>> _cImage = {};
   final Map<int, HeadlessInAppWebView> _instances = {};
-
-  final _imgExt = ['jpeg', 'jpg', 'gif', 'webp', 'png', 'ico', 'bmp', 'wbmp'];
 
   HeadlessWebviewManager({
     required LogBox log,
@@ -166,8 +245,10 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
         ''',
       ],
       javascriptHandlers: {
-        'resolved': (args) => handleResolved(completer, args: args, url: url),
-        'reject': (args) => handleRejected(completer, args: args, url: url),
+        'resolved': (args) =>
+            handleResolvedImage(_log, completer, args: args, url: url),
+        'reject': (args) =>
+            handleRejectedImage(_log, completer, args: args, url: url),
       },
       signalComplete: completer.future,
     );
@@ -175,79 +256,14 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     return completer.future;
   }
 
-  @visibleForTesting
-  void handleResolved(
-    Completer<String> completer, {
-    required List<dynamic> args,
-    required String url,
-  }) {
-    if (args.isEmpty) {
-      _log.log(
-        'Failed to download image [$url]',
-        extra: {'url': url, 'args': args},
-        name: runtimeType.toString(),
-      );
-      completer.safeCompleteError(Exception('Empty response'));
-      return;
-    }
-
-    final data = args.first;
-    if (data is! String) {
-      _log.log(
-        'Failed to download image [$url]',
-        extra: {'url': url, 'args': args},
-        name: runtimeType.toString(),
-      );
-      completer.safeCompleteError(Exception('Invalid response'));
-      return;
-    }
-
-    final values = data.split(RegExp(r'[:;,]+'));
-    // A malformed reader result (empty or non-data url) has no mime
-    // segment; treat it as unsupported instead of crashing the handler.
-    final ext = values.length > 1 ? values[1].split('/').lastOrNull : null;
-
-    if (ext != null && _imgExt.contains(ext)) {
-      _log.log(
-        'Success download image [$url]',
-        name: runtimeType.toString(),
-        extra: {'url': url, 'data': data},
-      );
-      completer.safeComplete(data);
-    } else {
-      _log.log(
-        'Failed download image [$url]',
-        name: runtimeType.toString(),
-        error: Exception('Image format $ext not supported'),
-        extra: {'url': url, 'args': args},
-      );
-      completer.safeCompleteError(
-        Exception('Image format $ext not supported'),
-      );
-    }
-  }
-
-  @visibleForTesting
-  void handleRejected(
-    Completer<String> completer, {
-    required List<dynamic> args,
-    required String url,
-  }) {
-    _log.log(
-      'Failed to download image [$url]',
-      name: runtimeType.toString(),
-      extra: {'url': url, 'error': args.toString()},
-    );
-    completer.safeCompleteError(Exception('Error fetch image'));
-  }
-
   /// Loads [uri] in a headless webview, returning its post-JS HTML or the
   /// value of [signalComplete].
   ///
-  /// [timeout] bounds each awaited stage independently (page load, then
-  /// signalComplete); the per-script delays and settle wait between them are
-  /// untimed, so worst-case wall time is up to `timeout × 2 + (scripts + 1)s`
-  /// — an upper bound on liveness, not on total duration.
+  /// [timeout] bounds both awaited stages independently — the page load,
+  /// then the script/snapshot tail (script loop, [signalComplete] wait,
+  /// getHtml/getTitle) — so worst-case wall time is `timeout × 2`; the
+  /// per-script delays run inside the tail's budget. An upper bound on
+  /// liveness, not on total duration.
   Future<String> _fetch({
     required WebUri uri,
     required InAppWebviewObserver delegate,
@@ -372,31 +388,40 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       rethrow;
     }
 
-    for (final script in scripts) {
-      if (script.isEmpty) continue;
-      await Future.delayed(const Duration(seconds: 1));
-      await webview.webViewController?.evaluateJavascript(source: script);
-      delegate.onRunJavascript(script: script);
-    }
-
-    if (scripts.isNotEmpty) {
-      await Future.delayed(const Duration(seconds: 1));
-    }
-
-    if (signalComplete != null) {
-      try {
-        await signalComplete.timeout(effectiveTimeout);
-      } catch (e, st) {
-        delegate.set(error: e, stackTrace: st, loading: false);
-        _instances.remove(webview.hashCode);
-        await webview.dispose();
-        rethrow;
+    // Everything after the load stage runs under one bounded wait: a wedged
+    // renderer that never answers evaluateJavascript/getHtml/getTitle would
+    // otherwise hang here forever and, via the dedupe maps' whenComplete,
+    // poison every concurrent caller for this URL.
+    Future<(String?, String?)> snapshot() async {
+      for (final script in scripts) {
+        if (script.isEmpty) continue;
+        await Future.delayed(const Duration(seconds: 1));
+        await webview.webViewController?.evaluateJavascript(source: script);
+        delegate.onRunJavascript(script: script);
       }
+
+      if (scripts.isNotEmpty) {
+        await Future.delayed(const Duration(seconds: 1));
+      }
+
+      await signalComplete;
+
+      return (
+        await webview.webViewController?.getHtml(),
+        await webview.webViewController?.getTitle(),
+      );
     }
 
-    final html = await webview.webViewController?.getHtml();
-
-    final title = await webview.webViewController?.getTitle();
+    String? html;
+    String? title;
+    try {
+      (html, title) = await snapshot().timeout(effectiveTimeout);
+    } catch (e, st) {
+      delegate.set(error: e, stackTrace: st, loading: false);
+      _instances.remove(webview.hashCode);
+      await webview.dispose();
+      rethrow;
+    }
 
     await webview.dispose();
 

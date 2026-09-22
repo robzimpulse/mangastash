@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_network/src/manager/headless_webview_manager.dart';
-import 'package:core_storage/core_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -10,25 +9,20 @@ class FakeLogBox extends Mock implements LogBox {}
 
 class FakeStorage extends Mock implements Storage {}
 
-class MockHtmlCacheManager extends Mock implements HtmlCacheManager {}
-
 void main() {
-  late HeadlessWebviewManager manager;
+  late FakeLogBox log;
 
   setUp(() {
-    final logBox = FakeLogBox();
-    when(() => logBox.storage).thenReturn(FakeStorage());
-    manager = HeadlessWebviewManager(
-      log: logBox,
-      htmlCacheManager: MockHtmlCacheManager(),
-    );
+    log = FakeLogBox();
+    when(() => log.storage).thenReturn(FakeStorage());
   });
 
-  group('handleResolved', () {
+  group('handleResolvedImage', () {
     test('completes with error when args is empty', () {
       final completer = Completer<String>();
 
-      manager.handleResolved(
+      handleResolvedImage(
+        log,
         completer,
         args: [],
         url: 'https://example.com/image.png',
@@ -40,7 +34,8 @@ void main() {
     test('completes with error when data is not a string', () {
       final completer = Completer<String>();
 
-      manager.handleResolved(
+      handleResolvedImage(
+        log,
         completer,
         args: [42],
         url: 'https://example.com/image.png',
@@ -52,7 +47,8 @@ void main() {
     test('completes with error for unsupported extension', () {
       final completer = Completer<String>();
 
-      manager.handleResolved(
+      handleResolvedImage(
+        log,
         completer,
         args: ['data:image/tiff;base64,AAAA'],
         url: 'https://example.com/image.tiff',
@@ -61,13 +57,13 @@ void main() {
       expect(completer.future, throwsA(isA<Exception>()));
     });
 
-    test('completes with error, does not throw, for empty data url',
-        () async {
+    test('completes with error, does not throw, for empty data url', () async {
       final completer = Completer<String>();
 
       // '' splits to a length-1 list, so values[1] used to RangeError
       // inside the JS handler callback.
-      manager.handleResolved(
+      handleResolvedImage(
+        log,
         completer,
         args: [''],
         url: 'https://example.com/image.png',
@@ -80,7 +76,8 @@ void main() {
         () async {
       final completer = Completer<String>();
 
-      manager.handleResolved(
+      handleResolvedImage(
+        log,
         completer,
         args: ['not-a-data-url'],
         url: 'https://example.com/image.png',
@@ -93,7 +90,8 @@ void main() {
       final completer = Completer<String>();
       const data = 'data:image/png;base64,AAAA';
 
-      manager.handleResolved(
+      handleResolvedImage(
+        log,
         completer,
         args: [data],
         url: 'https://example.com/image.png',
@@ -103,11 +101,12 @@ void main() {
     });
   });
 
-  group('handleRejected', () {
+  group('handleRejectedImage', () {
     test('completes with error', () {
       final completer = Completer<String>();
 
-      manager.handleRejected(
+      handleRejectedImage(
+        log,
         completer,
         args: [Exception('boom')],
         url: 'https://example.com/image.png',
