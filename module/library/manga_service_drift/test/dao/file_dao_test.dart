@@ -181,5 +181,27 @@ void main() {
       final directory = await dao.directory();
       expect(await directory.list().toList(), isEmpty);
     });
+
+    test('addFromFile closes the sink and deletes the partial copy when the '
+        'source stream errors mid-copy', () async {
+      final mockFile = MockFile();
+      when(() => mockFile.path).thenReturn('/tmp/input.png');
+      when(() => mockFile.openRead()).thenAnswer(
+        (_) async* {
+          yield [1, 2, 3];
+          throw Exception('stream failed mid-copy');
+        },
+      );
+
+      await expectLater(
+        dao.addFromFile(webUrl: 'http://test.com/fail-mid.png', file: mockFile),
+        throwsA(isA<Exception>()),
+      );
+
+      expect(await dao.search(webUrls: ['http://test.com/fail-mid.png']), isEmpty);
+
+      final directory = await dao.directory();
+      expect(await directory.list().toList(), isEmpty);
+    });
   });
 }
