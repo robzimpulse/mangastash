@@ -88,6 +88,15 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
     return query.watchSingle().map((e) => e.read(counts)).whereNotNull();
   }
 
+  /// Inserts [value], skipping the row when an identical pending job already
+  /// exists (same type plus equal payload columns, NULL == NULL).
+  ///
+  /// The dedup is row-based, not in-flight: once the executor picks a job up
+  /// and its row is removed, a re-enqueue of the same payload inserts again
+  /// and may duplicate the work. The downstream layers already tolerate a
+  /// double-run (webview fetch de-dupes by URL; `FileDao.addFromFile` writes
+  /// a fresh UUID destination), so the residual cost is one orphan file
+  /// until `sync()` — a known boundary, not a correctness bug.
   Future<void> add(JobTablesCompanion value) async {
     await transaction(() async {
       final type = value.type.present ? value.type.value : null;
