@@ -61,6 +61,34 @@ void main() {
       expect(completer.future, throwsA(isA<Exception>()));
     });
 
+    test('completes with error, does not throw, for empty data url',
+        () async {
+      final completer = Completer<String>();
+
+      // '' splits to a length-1 list, so values[1] used to RangeError
+      // inside the JS handler callback.
+      manager.handleResolved(
+        completer,
+        args: [''],
+        url: 'https://example.com/image.png',
+      );
+
+      await expectLater(completer.future, throwsA(isA<Exception>()));
+    });
+
+    test('completes with error, does not throw, for non-data url string',
+        () async {
+      final completer = Completer<String>();
+
+      manager.handleResolved(
+        completer,
+        args: ['not-a-data-url'],
+        url: 'https://example.com/image.png',
+      );
+
+      await expectLater(completer.future, throwsA(isA<Exception>()));
+    });
+
     test('completes with the data url for supported extension', () {
       final completer = Completer<String>();
       const data = 'data:image/png;base64,AAAA';

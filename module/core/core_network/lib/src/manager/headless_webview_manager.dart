@@ -203,9 +203,11 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     }
 
     final values = data.split(RegExp(r'[:;,]+'));
-    final ext = values[1].split('/').lastOrNull;
+    // A malformed reader result (empty or non-data url) has no mime
+    // segment; treat it as unsupported instead of crashing the handler.
+    final ext = values.length > 1 ? values[1].split('/').lastOrNull : null;
 
-    if (_imgExt.contains(ext)) {
+    if (ext != null && _imgExt.contains(ext)) {
       _log.log(
         'Success download image [$url]',
         name: runtimeType.toString(),
@@ -239,6 +241,13 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     completer.safeCompleteError(Exception('Error fetch image'));
   }
 
+  /// Loads [uri] in a headless webview, returning its post-JS HTML or the
+  /// value of [signalComplete].
+  ///
+  /// [timeout] bounds each awaited stage independently (page load, then
+  /// signalComplete); the per-script delays and settle wait between them are
+  /// untimed, so worst-case wall time is up to `timeout × 2 + (scripts + 1)s`
+  /// — an upper bound on liveness, not on total duration.
   Future<String> _fetch({
     required WebUri uri,
     required InAppWebviewObserver delegate,
