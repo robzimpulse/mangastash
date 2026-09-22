@@ -88,8 +88,15 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
     return query.watchSingle().map((e) => e.read(counts)).whereNotNull();
   }
 
-  /// Inserts [value], skipping the row when an identical pending job already
-  /// exists (same type plus equal payload columns, NULL == NULL).
+  /// Inserts [value], skipping the row when an identical one is still in
+  /// the queue (same type plus equal payload columns, NULL == NULL).
+  ///
+  /// Rows leave the table only in `JobManager`'s `finally`, so a live row
+  /// may be queued or mid-execution — either suppresses a re-enqueue. The
+  /// check and insert are atomic because drift serializes `transaction()`s
+  /// on the single [AppDatabase] connection; moving the SELECT outside the
+  /// transaction or introducing a second connection/isolate would let two
+  /// concurrent `add`s of the same payload both pass the check.
   ///
   /// The dedup is row-based, not in-flight: once the executor picks a job up
   /// and its row is removed, a re-enqueue of the same payload inserts again
@@ -114,7 +121,8 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
               _nullableEquals(f.chapterId, _read(value.chapterId)) &
               _nullableEquals(f.imageUrl, _read(value.imageUrl)) &
               _nullableEquals(f.path, _read(value.path)),
-        );
+        )
+        ..limit(1);
 
       final existing = await selector.get();
       if (existing.isNotEmpty) return;

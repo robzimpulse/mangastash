@@ -193,7 +193,7 @@ void main() {
       await jobDao.add(
         const JobTablesCompanion(
           type: Value(JobTypeEnum.prefetchChapters),
-          source: Value('m1'),
+          source: Value('Asura Scans'),
           mangaId: Value('m1'),
         ),
       );
