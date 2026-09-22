@@ -10,14 +10,23 @@ import 'fs_shim_mapping.dart';
 ///
 /// The delegate is typed as a plain `StreamSink<List<int>>` because
 /// fs_shim 2.4.0's [fs.File.openWrite] returns that; strings are encoded
-/// with the immutable [encoding] captured at open time. fs_shim sinks
-/// flush pending writes on `add`/`close`, so [flush] only forwards to the
-/// sink's own `flush()` when the runtime type has one.
+/// with the immutable [encoding] captured at open time.
 class FsShimIOSink implements IOSink {
-  FsShimIOSink(this._delegate, this._encoding);
+  FsShimIOSink(this._delegate, this._encoding) {
+    // fs_shim's write sinks persist on `add`/`close`; the idb backend
+    // additionally exposes a real `flush()`. Probe for the tear-off once so
+    // an error thrown *inside* a real flush propagates instead of being
+    // mistaken for a missing method.
+    try {
+      _flush = (_delegate as dynamic).flush as Future<void> Function()?;
+    } on NoSuchMethodError {
+      _flush = null;
+    }
+  }
 
   final StreamSink<List<int>> _delegate;
   final Encoding _encoding;
+  Future<void> Function()? _flush;
 
   @override
   Encoding get encoding => _encoding;
@@ -40,12 +49,8 @@ class FsShimIOSink implements IOSink {
 
   @override
   Future flush() async {
-    final sink = _delegate as dynamic;
-    try {
-      await sink.flush();
-    } on NoSuchMethodError {
-      // Nothing to force: writes are already accepted by the sink.
-    }
+    final flush = _flush;
+    if (flush != null) await flush();
   }
 
   @override
