@@ -18,6 +18,26 @@ void main() {
       expect(await fs.directory('/root/sub/dir').exists(), isTrue);
     });
 
+    test(
+      'non-recursive create on a fresh root throws (#104) — FileDao pattern needs a created root',
+      () async {
+        // The web backend starts completely empty: a non-recursive create
+        // more than one level deep throws, which is why the database root
+        // must be created before FileDao.directory() runs.
+        final dir = fs.directory('/database/mangastash-local/file');
+        await expectLater(dir.create(), throwsA(isA<FileSystemException>()));
+      },
+    );
+
+    test('non-recursive create succeeds when only the parent is missing', () async {
+      // What FileDao.directory() does after Executor.databaseDirectory()
+      // created `/database/mangastash-local` recursively.
+      await fs.directory('/database/mangastash-local').create(recursive: true);
+      final dir = fs.directory('/database/mangastash-local/file');
+      await dir.create();
+      expect(await dir.exists(), isTrue);
+    });
+
     test('list() returns wrapped File and Directory children', () async {
       await fs.directory('/root').create();
       await fs.file('/root/a.txt').writeAsString('a');

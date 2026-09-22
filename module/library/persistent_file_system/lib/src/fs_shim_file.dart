@@ -147,7 +147,7 @@ class FsShimFile implements File {
 
   @override
   Stream<List<int>> openRead([int? start, int? end]) =>
-      _delegate.openRead(start, end);
+      guardFsStream(_delegate.openRead(start, end));
 
   @override
   io.IOSink openWrite({

@@ -69,6 +69,15 @@ void main() {
       );
     });
 
+    test('openRead() stream errors are dart:io FileSystemException', () async {
+      // FileDao.addFromFile consumes exactly this stream; an unmapped
+      // fs_shim error would leak IdbFileSystemException across the boundary.
+      await expectLater(
+        fs.file('/missing.bin').openRead().drain<void>(),
+        throwsA(isA<FileSystemException>()),
+      );
+    });
+
     test('length() and lastModified() derive from stat()', () async {
       final file = fs.file('/stat.bin');
       await file.writeAsBytes([1, 2, 3]);

@@ -25,11 +25,17 @@ io.FileSystemEntityType mapEntityType(fs.FileSystemEntityType? type) {
 }
 
 /// Maps a dart:io open mode to its fs_shim equivalent.
+///
+/// fs_shim has no write-only variants; they map to the writable equivalents
+/// so callers opening a sink never land on `read` (which the backend rejects
+/// with an unrelated ArgumentError).
 fs.FileMode mapFileMode(io.FileMode mode) {
-  if (identical(mode, io.FileMode.append)) {
+  if (identical(mode, io.FileMode.append) ||
+      identical(mode, io.FileMode.writeOnlyAppend)) {
     return fs.FileMode.append;
   }
-  if (identical(mode, io.FileMode.write)) {
+  if (identical(mode, io.FileMode.write) ||
+      identical(mode, io.FileMode.writeOnly)) {
     return fs.FileMode.write;
   }
   return fs.FileMode.read;

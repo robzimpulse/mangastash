@@ -37,6 +37,16 @@ void main() {
       expect(mapFileMode(FileMode.write), same(fs.FileMode.write));
       expect(mapFileMode(FileMode.append), same(fs.FileMode.append));
     });
+
+    test('maps writeOnly modes to writable fs_shim modes, never read', () {
+      // fs_shim has no writeOnly; mapping it to read would make openWrite
+      // throw a confusing ArgumentError deep in the backend.
+      expect(mapFileMode(FileMode.writeOnly), same(fs.FileMode.write));
+      expect(
+        mapFileMode(FileMode.writeOnlyAppend),
+        same(fs.FileMode.append),
+      );
+    });
   });
 
   group('FsShimFileStat', () {
