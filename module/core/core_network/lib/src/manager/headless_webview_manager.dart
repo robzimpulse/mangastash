@@ -12,9 +12,11 @@ import 'package:html/parser.dart';
 import 'package:universal_io/io.dart';
 
 import '../exception/failed_parsing_html_exception.dart';
+import '../exception/script_evaluation_exception.dart';
 import '../mixin/user_agent_mixin.dart';
 import '../usecase/headless_webview_use_case.dart';
 import 'cloudflare_detector.dart';
+import 'script_wrapper.dart';
 
 class _Key extends Equatable {
   final String url;
@@ -159,6 +161,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   Future<Document> open(
     String url, {
     List<String> scripts = const [],
+    List<String> readyWhenSelectors = const [],
     bool useCache = true,
     Duration? timeout,
   }) {
@@ -173,6 +176,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       () => _open(
         url,
         scripts: scripts,
+        readyWhenSelectors: readyWhenSelectors,
         useCache: useCache,
         timeout: timeout,
       ).whenComplete(() {
@@ -210,6 +214,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   Future<Document> _open(
     String url, {
     List<String> scripts = const [],
+    List<String> readyWhenSelectors = const [],
     bool useCache = true,
     Duration? timeout,
   }) async {
@@ -217,6 +222,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       await _fetch(
         uri: WebUri(url),
         scripts: scripts,
+        readyWhenSelectors: readyWhenSelectors,
         delegate: _log.inAppWebviewObserver,
         useCache: useCache,
         timeout: timeout,
@@ -289,6 +295,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     UnmodifiableListView<UserScript>? initialUserScripts,
     Map<String, JavaScriptHandlerCallback>? javascriptHandlers,
     List<String> scripts = const [],
+    List<String> readyWhenSelectors = const [],
     bool useCache = true,
     Future? signalComplete,
     Duration? timeout,
@@ -315,6 +322,39 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       final onLoadStopCompleter = Completer();
       final onLoadErrorCompleter = Completer();
 
+      // Script errors and readiness reports arrive over the bridge —
+      // evaluateJavascript neither awaits JS Promises nor reliably surfaces
+      // uncaught JS errors. The bridge message can land shortly AFTER
+      // evaluateJavascript resolves, so error checks race a short grace
+      // window instead of trusting call ordering. Fresh per attempt: a
+      // Cloudflare retry re-runs the scripts with clean state.
+      ScriptEvaluationException? scriptError;
+      final scriptErrorCompleter = Completer<void>();
+      final scriptReadyCompleter = Completer<void>();
+
+      final handlers = {
+        ...?javascriptHandlers,
+        'scriptError': (List<dynamic> args) {
+          final report = args.firstOrNull;
+          final index = report is Map ? report['script'] : '?';
+          final error = report is Map ? report['error'] : args;
+          _log.log(
+            'Injected script #$index threw: $error',
+            name: 'HeadlessWebviewManager',
+            extra: {'url': uri.toString(), 'script': index, 'error': error},
+          );
+          scriptError = ScriptEvaluationException(
+            scriptIndex: index is int ? index : -1,
+            error: error.toString(),
+            url: uri.toString(),
+          );
+          scriptErrorCompleter.safeComplete();
+        },
+        'scriptReady': (_) {
+          scriptReadyCompleter.safeComplete();
+        },
+      };
+
       final webview = HeadlessInAppWebView(
         initialUserScripts: initialUserScripts,
         initialUrlRequest: URLRequest(
@@ -330,9 +370,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
         ),
         onWebViewCreated: (controller) {
           delegate.onWebViewCreated(uri: uri, scripts: scripts);
-          final handlers = javascriptHandlers?.entries ?? [];
-          if (handlers.isEmpty) return;
-          for (final handler in handlers) {
+          for (final handler in handlers.entries) {
             controller.addJavaScriptHandler(
               handlerName: handler.key,
               callback: handler.value,
@@ -422,15 +460,32 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       // otherwise hang here forever and, via the dedupe maps' whenComplete,
       // poison every concurrent caller for this URL.
       Future<(String?, String?)> snapshot() async {
-        for (final script in scripts) {
+        for (final (index, script) in scripts.indexed) {
           if (script.isEmpty) continue;
-          await Future.delayed(const Duration(seconds: 1));
-          await webview.webViewController?.evaluateJavascript(source: script);
+          await Future.delayed(const Duration(milliseconds: 250));
+          // Wrapped so JS errors are reported over the bridge (scriptError)
+          // instead of vanishing. The bridge call can land just after
+          // evaluateJavascript resolves, hence the grace window.
+          await webview.webViewController?.evaluateJavascript(
+            source: wrapScript(script, index: index),
+          );
           delegate.onRunJavascript(script: script);
+          await Future.any([
+            scriptErrorCompleter.future,
+            Future.delayed(const Duration(milliseconds: 500)),
+          ]);
+          if (scriptError != null) {
+            throw scriptError!;
+          }
         }
 
-        if (scripts.isNotEmpty) {
-          await Future.delayed(const Duration(seconds: 1));
+        if (readyWhenSelectors.isNotEmpty) {
+          await webview.webViewController?.evaluateJavascript(
+            source: readinessBeaconScript(readyWhenSelectors),
+          );
+          // Beacons report over the bridge; the snapshot timeout bounds this
+          // wait if the beacon never fires.
+          await scriptReadyCompleter.future;
         }
 
         await signalComplete;
@@ -476,6 +531,18 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       },
       attempt: attempt,
     );
+
+    // A page whose declared readiness selectors never matched is broken for
+    // the caller's purposes — fail instead of caching it for 30 minutes.
+    if (!readinessSatisfied(html, readyWhenSelectors)) {
+      delegate.set(
+        error: Exception(
+          'Readiness selectors never matched: $readyWhenSelectors',
+        ),
+        loading: false,
+      );
+      throw FailedParsingHtmlException(uri.toString());
+    }
 
     if (cacheAllowed) {
       await _htmlCacheManager.putFile(
