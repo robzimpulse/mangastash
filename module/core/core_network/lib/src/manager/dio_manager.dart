@@ -8,10 +8,19 @@ import '../interceptor/dio_throttler_interceptor.dart';
 import '../mixin/user_agent_mixin.dart';
 
 class DioManager {
+  /// A stalled server must not block requests indefinitely; receiveTimeout
+  /// is between data chunks, so slow-but-progressing downloads still pass.
+  static const Duration connectTimeout = Duration(seconds: 15);
+  static const Duration receiveTimeout = Duration(seconds: 30);
+  static const Duration sendTimeout = Duration(seconds: 15);
+
   static Dio create({required LogBox log}) {
     final dio = Dio(
       BaseOptions(
         headers: {HttpHeaders.userAgentHeader: UserAgentMixin.staticUserAgent},
+        connectTimeout: connectTimeout,
+        receiveTimeout: receiveTimeout,
+        sendTimeout: sendTimeout,
       ),
     );
 
