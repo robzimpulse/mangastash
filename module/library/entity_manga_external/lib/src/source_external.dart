@@ -21,18 +21,29 @@ abstract class SourceExternal {
 abstract class GetMangaSourceExternalUseCase {
   Duration? get timeout;
   List<String> get scripts;
+
+  /// CSS selectors that must each match at least one element before the
+  /// HTML snapshot is cached; the fetch fails instead of caching a broken
+  /// page. Empty (default) means no readiness requirement.
+  List<String> get readyWhenSelectors => [];
   Future<MangaScrapped> parse({required Document root});
 }
 
 abstract class GetChapterImageSourceExternalUseCase {
   Duration? get timeout;
   List<String> get scripts;
+
+  /// See [GetMangaSourceExternalUseCase.readyWhenSelectors].
+  List<String> get readyWhenSelectors => [];
   Future<List<String>> parse({required Document root});
 }
 
 abstract class SearchMangaSourceExternalUseCase {
   Duration? get timeout;
   List<String> get scripts;
+
+  /// See [GetMangaSourceExternalUseCase.readyWhenSelectors].
+  List<String> get readyWhenSelectors => [];
   String url({required SearchMangaParameter parameter});
   Future<List<MangaScrapped>> parse({required Document root, String? searchTerm});
   Future<bool?> haveNextPage({required Document root});
@@ -41,11 +52,17 @@ abstract class SearchMangaSourceExternalUseCase {
 abstract class ListChapterSourceExternalUseCase {
   Duration? get timeout;
   List<String> get scripts;
+
+  /// See [GetMangaSourceExternalUseCase.readyWhenSelectors].
+  List<String> get readyWhenSelectors => [];
   Future<List<ChapterScrapped>> parse({required Document root});
 }
 
 abstract class ListTagSourceExternalUseCase {
   Duration? get timeout;
   List<String> get scripts;
+
+  /// See [GetMangaSourceExternalUseCase.readyWhenSelectors].
+  List<String> get readyWhenSelectors => [];
   Future<List<TagScrapped>> parse({required Document root});
 }

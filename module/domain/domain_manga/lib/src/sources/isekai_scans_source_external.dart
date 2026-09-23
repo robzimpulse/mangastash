@@ -59,6 +59,9 @@ class _GetChapterImageSourceExternalUseCase
   const _GetChapterImageSourceExternalUseCase(this._baseUrl);
 
   @override
+  List<String> get readyWhenSelectors => [];
+
+  @override
   Duration? get timeout => Duration(seconds: 30);
 
   @override
@@ -90,6 +93,9 @@ class _GetChapterImageSourceExternalUseCase
 }
 
 class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
+  @override
+  List<String> get readyWhenSelectors => [];
+
   @override
   Duration? get timeout => Duration(seconds: 15);
 
@@ -162,6 +168,9 @@ class _ListChapterSourceExternalUseCase
   const _ListChapterSourceExternalUseCase(this._baseUrl);
 
   @override
+  List<String> get readyWhenSelectors => [];
+
+  @override
   Duration? get timeout => Duration(seconds: 15);
 
   @override
@@ -198,6 +207,9 @@ class _SearchMangaSourceExternalUseCase
   final String _baseUrl;
 
   const _SearchMangaSourceExternalUseCase(this._baseUrl);
+
+  @override
+  List<String> get readyWhenSelectors => [];
 
   @override
   Duration? get timeout => Duration(seconds: 15);
@@ -279,6 +291,9 @@ class _SearchMangaSourceExternalUseCase
 }
 
 class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
+  @override
+  List<String> get readyWhenSelectors => [];
+
   @override
   Duration? get timeout => Duration(seconds: 15);
 

@@ -55,6 +55,9 @@ class _GetChapterImageSourceExternalUseCase
   ].join(' ');
 
   @override
+  List<String> get readyWhenSelectors => [_readerQuery];
+
+  @override
   Future<List<String>> parse({required Document root}) async {
     final regions = root.querySelectorAll(_readerQuery);
 
@@ -75,6 +78,9 @@ class _GetChapterImageSourceExternalUseCase
 }
 
 class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
+
+  @override
+  List<String> get readyWhenSelectors => [];
 
   @override
   Duration? get timeout => Duration(seconds: 20);
@@ -116,24 +122,21 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
 
   @override
   List<String> get scripts {
-    final selector = [
-      'div',
-      'flex',
-      'z-10',
-      'relative',
-      'mt-2',
-      'justify-end',
-    ].join('.');
-
-    final script = [
-      'window',
-      'document',
-      'querySelectorAll(\'$selector\')[0]',
-      'querySelector(\'button\')',
-      'click()',
-    ].join('.');
-
-    return [script];
+    // Expand the chapter list ("Show more" toggle) before the snapshot.
+    // Matched by visible text instead of the old positional
+    // querySelectorAll('div.flex.z-10...')[0] chain — Tailwind classes and
+    // button order drift with redesigns, the label does not.
+    return [
+      '''
+      (() => {
+        const buttons = [...document.querySelectorAll('button')];
+        const target = buttons.find(b =>
+          (b.textContent || '').trim().toLowerCase().startsWith('show more'),
+        );
+        if (target) target.click();
+      })();
+      ''',
+    ];
   }
 }
 
@@ -143,6 +146,9 @@ class _ListChapterSourceExternalUseCase
   final String _baseUrl;
 
   const _ListChapterSourceExternalUseCase(this._baseUrl, this._name);
+
+  @override
+  List<String> get readyWhenSelectors => [];
 
   @override
   Duration? get timeout => Duration(seconds: 15);
@@ -192,6 +198,9 @@ class _SearchMangaSourceExternalUseCase
   final String _baseUrl;
 
   const _SearchMangaSourceExternalUseCase(this._baseUrl);
+
+  @override
+  List<String> get readyWhenSelectors => [];
 
   @override
   Duration? get timeout => Duration(seconds: 15);
@@ -303,35 +312,36 @@ class _SearchMangaSourceExternalUseCase
 
 class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
 
+  /// Genre option rows inside the opened "Genres" dropdown. Shared by
+  /// [parse] and [readyWhenSelectors].
+  static final String _genreQuery = [
+    'div.flex-1.overflow-y-auto',
+    'div',
+    'div',
+    [
+      'div',
+      'absolute',
+      'top-full',
+      'left-0',
+      'right-0',
+      'mt-2',
+      'border',
+      'rounded-md',
+      'shadow-lg',
+      'z-50',
+    ].join('.'),
+    'div.p-1',
+    'div.space-y-1.px-1.py-1.overflow-y-auto',
+    'div',
+    'span',
+  ].join(' > ');
+
   @override
   Duration? get timeout => Duration(seconds: 20);
 
   @override
   Future<List<TagScrapped>> parse({required Document root}) async {
-    final genreQuery = [
-      'div.flex-1.overflow-y-auto',
-      'div',
-      'div',
-      [
-        'div',
-        'absolute',
-        'top-full',
-        'left-0',
-        'right-0',
-        'mt-2',
-        'border',
-        'rounded-md',
-        'shadow-lg',
-        'z-50',
-      ].join('.'),
-
-      'div.p-1',
-      'div.space-y-1.px-1.py-1.overflow-y-auto',
-      'div',
-      'span',
-    ].join(' > ');
-
-    final regions = root.querySelectorAll(genreQuery);
+    final regions = root.querySelectorAll(_genreQuery);
 
     final tags = regions.map(
       (e) => TagScrapped(id: e.text.trim().toLowerCase(), name: e.text.trim()),
@@ -341,47 +351,26 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
   }
 
   @override
+  List<String> get readyWhenSelectors {
+    // The genre option rows are client-rendered after the dropdown opens;
+    // a snapshot taken earlier parses zero tags.
+    return [_genreQuery];
+  }
+
+  @override
   List<String> get scripts {
-    final filterQuery = [
-      'div.flex.flex-col.gap-3',
-      'div',
-      [
-        'button',
-        'cursor-pointer',
-        'transition-colors',
-        'gap-2',
-        'justify-center',
-        'items-center',
-        'flex',
-        'rounded-md',
-        'text-white',
-        'border',
-        'px-4',
-        'w-full',
-      ].join('.'),
-    ].join(' > ');
-
-    final genreQuery = [
-      'div.flex-1.overflow-y-auto',
-      'div',
-      'div',
-      'button',
-    ].join(' > ');
-
-    final tapFilter = [
-      'window',
-      'document',
-      'querySelectorAll(\'$filterQuery\')[0]',
-      'click()',
-    ].join('.');
-
-    final tapGenre = [
-      'window',
-      'document',
-      'querySelectorAll(\'$genreQuery\')[3]',
-      'click()',
-    ].join('.');
-
-    return [tapFilter, tapGenre];
+    // Open the "Genres" filter dropdown (labeled button, not a positional
+    // index), then the genre list renders for `parse` to read.
+    return [
+      '''
+      (() => {
+        const buttons = [...document.querySelectorAll('button')];
+        const target = buttons.find(b =>
+          (b.textContent || '').trim().toLowerCase().startsWith('genres'),
+        );
+        if (target) target.click();
+      })();
+      ''',
+    ];
   }
 }
