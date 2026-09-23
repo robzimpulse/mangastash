@@ -8,4 +8,9 @@ class LibraryTables extends Table with AutoTimestampTable {
 
   @override
   Set<Column<Object>>? get primaryKey => {mangaId};
+
+  @override
+  List<String> get customConstraints => [
+    'FOREIGN KEY (manga_id) REFERENCES manga_tables (id) ON DELETE CASCADE',
+  ];
 }

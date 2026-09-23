@@ -39,4 +39,12 @@ class ChapterTables extends Table with AutoTimestampTable, AutoTextIdTable {
     {webUrl, title},
     {webUrl},
   ];
+
+  /// manga_id is nullable (legacy syncs wrote chapters with no manga row);
+  /// the FK only constrains rows where it is set. ON DELETE CASCADE lets the
+  /// DB do the child cleanup #136 implemented at app level.
+  @override
+  List<String> get customConstraints => [
+    'FOREIGN KEY (manga_id) REFERENCES manga_tables (id) ON DELETE CASCADE',
+  ];
 }

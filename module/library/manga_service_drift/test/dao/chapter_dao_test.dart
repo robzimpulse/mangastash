@@ -7,10 +7,22 @@ void main() {
   late ChapterDao dao;
   late ImageDao imageDao;
 
-  setUp(() {
+  setUp(() async {
     db = AppDatabase(executor: MemoryExecutor());
     dao = ChapterDao(db);
     imageDao = ImageDao(db);
+
+    // v3 FK: the chapter fixtures reference these manga ids.
+    await db.mangaDao.adds(values: {
+      const MangaTablesCompanion(
+        id: Value('manga_id_1'),
+        title: Value('manga_id_1'),
+      ): const [],
+      const MangaTablesCompanion(
+        id: Value('manga_id_new'),
+        title: Value('manga_id_new'),
+      ): const [],
+    });
   });
 
   final chapters = List.generate(

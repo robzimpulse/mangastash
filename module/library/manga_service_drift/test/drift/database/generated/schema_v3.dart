@@ -129,6 +129,7 @@ class ImageTables extends Table with TableInfo<ImageTables, ImageTablesData> {
     'UNIQUE(chapter_id, web_url)',
     'UNIQUE(web_url, "order")',
     'UNIQUE(chapter_id, "order")',
+    'FOREIGN KEY(chapter_id)REFERENCES chapter_tables(id)ON DELETE CASCADE',
   ];
   @override
   bool get dontWriteConstraints => true;
@@ -583,6 +584,7 @@ class ChapterTables extends Table
     'UNIQUE(manga_id, webUrl)',
     'UNIQUE(webUrl, title)',
     'UNIQUE(webUrl)',
+    'FOREIGN KEY(manga_id)REFERENCES manga_tables(id)ON DELETE CASCADE',
   ];
   @override
   bool get dontWriteConstraints => true;
@@ -1037,241 +1039,6 @@ class ChapterTablesCompanion extends UpdateCompanion<ChapterTablesData> {
           ..write('readableAt: $readableAt, ')
           ..write('publishAt: $publishAt, ')
           ..write('lastReadAt: $lastReadAt, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class LibraryTables extends Table
-    with TableInfo<LibraryTables, LibraryTablesData> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  LibraryTables(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
-    'created_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL',
-  );
-  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
-    'updated_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL',
-  );
-  late final GeneratedColumn<String> mangaId = GeneratedColumn<String>(
-    'manga_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL',
-  );
-  @override
-  List<GeneratedColumn> get $columns => [createdAt, updatedAt, mangaId];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'library_tables';
-  @override
-  Set<GeneratedColumn> get $primaryKey => {mangaId};
-  @override
-  LibraryTablesData map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return LibraryTablesData(
-      createdAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.int,
-            data['${effectivePrefix}created_at'],
-          )!,
-      updatedAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.int,
-            data['${effectivePrefix}updated_at'],
-          )!,
-      mangaId:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}manga_id'],
-          )!,
-    );
-  }
-
-  @override
-  LibraryTables createAlias(String alias) {
-    return LibraryTables(attachedDatabase, alias);
-  }
-
-  @override
-  List<String> get customConstraints => const ['PRIMARY KEY(manga_id)'];
-  @override
-  bool get dontWriteConstraints => true;
-}
-
-class LibraryTablesData extends DataClass
-    implements Insertable<LibraryTablesData> {
-  final int createdAt;
-  final int updatedAt;
-  final String mangaId;
-  const LibraryTablesData({
-    required this.createdAt,
-    required this.updatedAt,
-    required this.mangaId,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['created_at'] = Variable<int>(createdAt);
-    map['updated_at'] = Variable<int>(updatedAt);
-    map['manga_id'] = Variable<String>(mangaId);
-    return map;
-  }
-
-  LibraryTablesCompanion toCompanion(bool nullToAbsent) {
-    return LibraryTablesCompanion(
-      createdAt: Value(createdAt),
-      updatedAt: Value(updatedAt),
-      mangaId: Value(mangaId),
-    );
-  }
-
-  factory LibraryTablesData.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return LibraryTablesData(
-      createdAt: serializer.fromJson<int>(json['createdAt']),
-      updatedAt: serializer.fromJson<int>(json['updatedAt']),
-      mangaId: serializer.fromJson<String>(json['mangaId']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'createdAt': serializer.toJson<int>(createdAt),
-      'updatedAt': serializer.toJson<int>(updatedAt),
-      'mangaId': serializer.toJson<String>(mangaId),
-    };
-  }
-
-  LibraryTablesData copyWith({
-    int? createdAt,
-    int? updatedAt,
-    String? mangaId,
-  }) => LibraryTablesData(
-    createdAt: createdAt ?? this.createdAt,
-    updatedAt: updatedAt ?? this.updatedAt,
-    mangaId: mangaId ?? this.mangaId,
-  );
-  LibraryTablesData copyWithCompanion(LibraryTablesCompanion data) {
-    return LibraryTablesData(
-      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
-      mangaId: data.mangaId.present ? data.mangaId.value : this.mangaId,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('LibraryTablesData(')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt, ')
-          ..write('mangaId: $mangaId')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(createdAt, updatedAt, mangaId);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is LibraryTablesData &&
-          other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt &&
-          other.mangaId == this.mangaId);
-}
-
-class LibraryTablesCompanion extends UpdateCompanion<LibraryTablesData> {
-  final Value<int> createdAt;
-  final Value<int> updatedAt;
-  final Value<String> mangaId;
-  final Value<int> rowid;
-  const LibraryTablesCompanion({
-    this.createdAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
-    this.mangaId = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  LibraryTablesCompanion.insert({
-    required int createdAt,
-    required int updatedAt,
-    required String mangaId,
-    this.rowid = const Value.absent(),
-  }) : createdAt = Value(createdAt),
-       updatedAt = Value(updatedAt),
-       mangaId = Value(mangaId);
-  static Insertable<LibraryTablesData> custom({
-    Expression<int>? createdAt,
-    Expression<int>? updatedAt,
-    Expression<String>? mangaId,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (createdAt != null) 'created_at': createdAt,
-      if (updatedAt != null) 'updated_at': updatedAt,
-      if (mangaId != null) 'manga_id': mangaId,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  LibraryTablesCompanion copyWith({
-    Value<int>? createdAt,
-    Value<int>? updatedAt,
-    Value<String>? mangaId,
-    Value<int>? rowid,
-  }) {
-    return LibraryTablesCompanion(
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      mangaId: mangaId ?? this.mangaId,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (createdAt.present) {
-      map['created_at'] = Variable<int>(createdAt.value);
-    }
-    if (updatedAt.present) {
-      map['updated_at'] = Variable<int>(updatedAt.value);
-    }
-    if (mangaId.present) {
-      map['manga_id'] = Variable<String>(mangaId.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('LibraryTablesCompanion(')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt, ')
-          ..write('mangaId: $mangaId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1806,6 +1573,244 @@ class MangaTablesCompanion extends UpdateCompanion<MangaTablesData> {
   }
 }
 
+class LibraryTables extends Table
+    with TableInfo<LibraryTables, LibraryTablesData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  LibraryTables(this.attachedDatabase, [this._alias]);
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  late final GeneratedColumn<String> mangaId = GeneratedColumn<String>(
+    'manga_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [createdAt, updatedAt, mangaId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'library_tables';
+  @override
+  Set<GeneratedColumn> get $primaryKey => {mangaId};
+  @override
+  LibraryTablesData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LibraryTablesData(
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      mangaId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}manga_id'],
+          )!,
+    );
+  }
+
+  @override
+  LibraryTables createAlias(String alias) {
+    return LibraryTables(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'PRIMARY KEY(manga_id)',
+    'FOREIGN KEY(manga_id)REFERENCES manga_tables(id)ON DELETE CASCADE',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class LibraryTablesData extends DataClass
+    implements Insertable<LibraryTablesData> {
+  final int createdAt;
+  final int updatedAt;
+  final String mangaId;
+  const LibraryTablesData({
+    required this.createdAt,
+    required this.updatedAt,
+    required this.mangaId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    map['manga_id'] = Variable<String>(mangaId);
+    return map;
+  }
+
+  LibraryTablesCompanion toCompanion(bool nullToAbsent) {
+    return LibraryTablesCompanion(
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      mangaId: Value(mangaId),
+    );
+  }
+
+  factory LibraryTablesData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LibraryTablesData(
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      mangaId: serializer.fromJson<String>(json['mangaId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+      'mangaId': serializer.toJson<String>(mangaId),
+    };
+  }
+
+  LibraryTablesData copyWith({
+    int? createdAt,
+    int? updatedAt,
+    String? mangaId,
+  }) => LibraryTablesData(
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    mangaId: mangaId ?? this.mangaId,
+  );
+  LibraryTablesData copyWithCompanion(LibraryTablesCompanion data) {
+    return LibraryTablesData(
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      mangaId: data.mangaId.present ? data.mangaId.value : this.mangaId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LibraryTablesData(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('mangaId: $mangaId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(createdAt, updatedAt, mangaId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LibraryTablesData &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.mangaId == this.mangaId);
+}
+
+class LibraryTablesCompanion extends UpdateCompanion<LibraryTablesData> {
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<String> mangaId;
+  final Value<int> rowid;
+  const LibraryTablesCompanion({
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.mangaId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LibraryTablesCompanion.insert({
+    required int createdAt,
+    required int updatedAt,
+    required String mangaId,
+    this.rowid = const Value.absent(),
+  }) : createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       mangaId = Value(mangaId);
+  static Insertable<LibraryTablesData> custom({
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<String>? mangaId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (mangaId != null) 'manga_id': mangaId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LibraryTablesCompanion copyWith({
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<String>? mangaId,
+    Value<int>? rowid,
+  }) {
+    return LibraryTablesCompanion(
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      mangaId: mangaId ?? this.mangaId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (mangaId.present) {
+      map['manga_id'] = Variable<String>(mangaId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LibraryTablesCompanion(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('mangaId: $mangaId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class TagTables extends Table with TableInfo<TagTables, TagTablesData> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -2238,7 +2243,11 @@ class RelationshipTables extends Table
   }
 
   @override
-  List<String> get customConstraints => const ['UNIQUE(tag_id, manga_id)'];
+  List<String> get customConstraints => const [
+    'UNIQUE(tag_id, manga_id)',
+    'FOREIGN KEY(tag_id)REFERENCES tag_tables(id)ON DELETE CASCADE',
+    'FOREIGN KEY(manga_id)REFERENCES manga_tables(id)ON DELETE CASCADE',
+  ];
   @override
   bool get dontWriteConstraints => true;
 }
@@ -3218,12 +3227,12 @@ class FileTablesCompanion extends UpdateCompanion<FileTablesData> {
   }
 }
 
-class DatabaseAtV2 extends GeneratedDatabase {
-  DatabaseAtV2(QueryExecutor e) : super(e);
+class DatabaseAtV3 extends GeneratedDatabase {
+  DatabaseAtV3(QueryExecutor e) : super(e);
   late final ImageTables imageTables = ImageTables(this);
   late final ChapterTables chapterTables = ChapterTables(this);
-  late final LibraryTables libraryTables = LibraryTables(this);
   late final MangaTables mangaTables = MangaTables(this);
+  late final LibraryTables libraryTables = LibraryTables(this);
   late final TagTables tagTables = TagTables(this);
   late final RelationshipTables relationshipTables = RelationshipTables(this);
   late final JobTables jobTables = JobTables(this);
@@ -3235,13 +3244,51 @@ class DatabaseAtV2 extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     imageTables,
     chapterTables,
-    libraryTables,
     mangaTables,
+    libraryTables,
     tagTables,
     relationshipTables,
     jobTables,
     fileTables,
   ];
   @override
-  int get schemaVersion => 2;
+  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'chapter_tables',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('image_tables', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'manga_tables',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('chapter_tables', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'manga_tables',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('library_tables', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'tag_tables',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('relationship_tables', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'manga_tables',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('relationship_tables', kind: UpdateKind.delete)],
+    ),
+  ]);
+  @override
+  int get schemaVersion => 3;
 }

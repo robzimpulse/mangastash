@@ -13,7 +13,6 @@ import '../tables/relationship_tables.dart';
 import '../tables/tag_tables.dart';
 import 'chapter_dao.dart';
 import 'file_dao.dart';
-import 'library_dao.dart';
 import 'tag_dao.dart';
 
 part 'manga_dao.g.dart';
@@ -24,7 +23,6 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
 
   late final TagDao _tagDao = TagDao(db);
   late final ChapterDao _chapterDao = ChapterDao(db);
-  late final LibraryDao _libraryDao = LibraryDao(db);
   late final FileDao _fileDao = FileDao(db);
 
   JoinedSelectStatement<HasResultSet, dynamic> get _aggregate {
@@ -127,25 +125,30 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
         sources: sources,
       );
 
+      // Collect children BEFORE the delete: the v3 FK cascades
+      // (chapter → image, relationship, library) remove those rows at the
+      // DB level, so they can't be read afterwards. file_tables has no FK
+      // (webUrl-keyed) and stays app-managed.
+      final chapters = await _chapterDao.search(
+        mangaIds: [for (final e in olds) e.manga?.id].nonNulls.toList(),
+      );
+      final removedMangaIds = [
+        for (final e in olds) e.manga?.id,
+      ].nonNulls.toSet();
+
       final results = await selector.goAndReturn();
 
       final data = <MangaModel>[];
       for (final result in results) {
-        await _tagDao.detach(mangaId: result.id);
         final old = olds.firstWhereOrNull((e) => e.manga?.id == result.id);
         data.add(MangaModel(manga: result, tags: [...?old?.tags]));
       }
 
-      final removedChapters = await _chapterDao.remove(
-        mangaIds: [for (final result in results) result.id],
-      );
-      for (final result in results) {
-        await _libraryDao.remove(result.id);
-      }
       await _fileDao.remove(
         webUrls: [
-          for (final chapter in removedChapters)
-            ...chapter.images.map((e) => e.webUrl),
+          for (final chapter in chapters)
+            if (removedMangaIds.contains(chapter.chapter?.mangaId))
+              ...chapter.images.map((e) => e.webUrl),
         ],
       );
 

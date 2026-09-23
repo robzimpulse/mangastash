@@ -29,6 +29,14 @@ void main() {
 
   group('Image Dao Test', () {
     setUp(() async {
+      // v3 FK: images need their chapter rows to exist first.
+      await db.chapterDao.adds(values: {
+        for (final entry in values.entries)
+          ChapterTablesCompanion(
+            id: Value(entry.key),
+            title: Value(entry.key),
+          ): const [],
+      });
       for (final entry in values.entries) {
         await dao.adds(entry.key, values: entry.value);
       }
@@ -52,6 +60,14 @@ void main() {
       );
 
       setUp(() async {
+        // v3 FK: images need their chapter rows to exist first.
+        await db.chapterDao.adds(values: {
+          for (final entry in newValues.entries)
+            ChapterTablesCompanion(
+              id: Value(entry.key),
+              title: Value(entry.key),
+            ): const [],
+        });
         for (final entry in newValues.entries) {
           await dao.adds(entry.key, values: entry.value);
         }
