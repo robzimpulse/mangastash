@@ -48,6 +48,7 @@ class GetTagsUseCase with SyncTagsMixin {
       url,
       scripts: source.listTagUseCase.scripts,
       useCache: useCache,
+      timeout: source.listTagUseCase.timeout,
     );
 
     final tags = await source.listTagUseCase.parse(root: document);

@@ -63,6 +63,7 @@ class GetChapterUseCase with SyncChaptersMixin {
       url,
       scripts: source.getChapterImageUseCase.scripts,
       useCache: useCache,
+      timeout: source.getChapterImageUseCase.timeout,
     );
 
     return source.getChapterImageUseCase.parse(root: document);

@@ -65,6 +65,7 @@ class SearchMangaUseCase with SyncMangasMixin {
       url,
       scripts: source.searchMangaUseCase.scripts,
       useCache: useCache,
+      timeout: source.searchMangaUseCase.timeout,
     );
 
     final data = await source.searchMangaUseCase.parse(

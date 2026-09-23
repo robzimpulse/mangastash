@@ -100,6 +100,7 @@ class SearchChapterUseCase
       url,
       scripts: source.listChapterUseCase.scripts,
       useCache: useCache,
+      timeout: source.listChapterUseCase.timeout,
     );
 
     final scraps = source.listChapterUseCase.parse(root: document);
