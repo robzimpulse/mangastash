@@ -116,9 +116,109 @@ void main() {
       expect(all.length, 1);
       
       await jobDao.remove(all.first.id);
-      
+
       final count = await jobDao.count.first;
       expect(count, 0);
+    });
+
+    test('add skips duplicate prefetchManga job', () async {
+      const job = JobTablesCompanion(
+        type: Value(JobTypeEnum.prefetchManga),
+        source: Value('Asura Scans'),
+        mangaId: Value('m1'),
+      );
+
+      await jobDao.add(job);
+      await jobDao.add(job);
+
+      final count = await jobDao.count.first;
+      expect(count, 1);
+    });
+
+    test('add skips duplicate prefetchChapter job', () async {
+      const job = JobTablesCompanion(
+        type: Value(JobTypeEnum.prefetchChapter),
+        source: Value('Asura Scans'),
+        mangaId: Value('m1'),
+        chapterId: Value('c1'),
+      );
+
+      await jobDao.add(job);
+      await jobDao.add(job);
+
+      final count = await jobDao.count.first;
+      expect(count, 1);
+    });
+
+    test('add skips duplicate prefetchImage job', () async {
+      const job = JobTablesCompanion(
+        type: Value(JobTypeEnum.prefetchImage),
+        mangaId: Value('m1'),
+        chapterId: Value('c1'),
+        imageUrl: Value('https://example.com/page-1.png'),
+      );
+
+      await jobDao.add(job);
+      await jobDao.add(job);
+
+      final count = await jobDao.count.first;
+      expect(count, 1);
+    });
+
+    test('add keeps jobs with different imageUrl', () async {
+      Future<void> enqueue(String url) => jobDao.add(
+        JobTablesCompanion(
+          type: const Value(JobTypeEnum.prefetchImage),
+          mangaId: const Value('m1'),
+          chapterId: const Value('c1'),
+          imageUrl: Value(url),
+        ),
+      );
+
+      await enqueue('https://example.com/page-1.png');
+      await enqueue('https://example.com/page-2.png');
+
+      final count = await jobDao.count.first;
+      expect(count, 2);
+    });
+
+    test('add keeps same manga with different type', () async {
+      await jobDao.add(
+        const JobTablesCompanion(
+          type: Value(JobTypeEnum.prefetchManga),
+          source: Value('Asura Scans'),
+          mangaId: Value('m1'),
+        ),
+      );
+      await jobDao.add(
+        const JobTablesCompanion(
+          type: Value(JobTypeEnum.prefetchChapters),
+          source: Value('Asura Scans'),
+          mangaId: Value('m1'),
+        ),
+      );
+
+      final count = await jobDao.count.first;
+      expect(count, 2);
+    });
+
+    test('add treats absent and explicit-null fields as equal', () async {
+      await jobDao.add(
+        const JobTablesCompanion(
+          type: Value(JobTypeEnum.prefetchManga),
+          mangaId: Value('m1'),
+        ),
+      );
+      await jobDao.add(
+        const JobTablesCompanion(
+          type: Value(JobTypeEnum.prefetchManga),
+          mangaId: Value('m1'),
+          source: Value(null),
+        ),
+      );
+
+      final count = await jobDao.count.first;
+      expect(count, 1);
     });
   });
 }
