@@ -116,6 +116,15 @@ void handleRejectedImage(
   completer.safeCompleteError(Exception('Error fetch image'));
 }
 
+/// Canonical cache key for the HTML cache: pages loaded with different
+/// injected scripts produce different DOMs, so the scripts are part of the
+/// key. Both the cache read and write in [_fetch] must go through this —
+/// diverging keys mean scripted pages never hit the cache.
+String htmlCacheKey(String url, {List<String> scripts = const []}) {
+  if (scripts.isEmpty) return url;
+  return [url, ...scripts].join('|');
+}
+
 class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   static const Duration defaultTimeout = Duration(seconds: 15);
 
@@ -276,7 +285,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   }) async {
     delegate.set(uri: uri, loading: true);
     final effectiveTimeout = timeout ?? defaultTimeout;
-    final key = [uri.toString(), ...scripts].join('|');
+    final key = htmlCacheKey(uri.toString(), scripts: scripts);
     final cache = await _htmlCacheManager.getFileFromCache(key);
     final data = await cache?.file.readAsString(encoding: utf8);
     if (data != null && useCache) {
@@ -438,7 +447,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     }
 
     await _htmlCacheManager.putFile(
-      uri.toString(),
+      key,
       utf8.encode(html),
       fileExtension: 'html',
       maxAge: const Duration(minutes: 30),
