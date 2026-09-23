@@ -109,16 +109,25 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
 
     final a = delete(chapterTables)..where(filter);
     return transaction(() async {
-      final chapters = await a.goAndReturn();
-      final images = await _imageDao.remove(
-        chapterIds: [for (final chapter in chapters) chapter.id],
+      // Images are read BEFORE the delete — the v3 FK cascade removes them
+      // at the DB level, so they can't be read afterwards.
+      final doomed = await search(
+        ids: ids,
+        mangaIds: mangaIds,
+        titles: titles,
+        volumes: volumes,
+        chapters: chapters,
+        translatedLanguages: translatedLanguages,
+        scanlationGroups: scanlationGroups,
+        webUrls: webUrls,
       );
+      final removed = await a.goAndReturn();
       return [
-        for (final chapter in chapters)
-          ChapterModel(
-            chapter: chapter,
-            images: [...images.where((e) => e.chapterId == chapter.id)],
-          ),
+        for (final chapter in removed)
+          doomed.firstWhereOrNull(
+            (e) => e.chapter?.id == chapter.id,
+          ) ??
+          ChapterModel(chapter: chapter, images: const []),
       ];
     });
   }
