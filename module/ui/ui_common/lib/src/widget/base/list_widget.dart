@@ -184,11 +184,11 @@ class _ListWidgetState<T> extends State<ListWidget<T>> {
                       child: Column(
                         children: [
                           Text(error.toString(), textAlign: TextAlign.center),
-                          if (error is FailedParsingHtmlException) ...[
+                          if (isRecrawlableError(error)) ...[
                             const SizedBox(height: 16),
                             OutlinedButton(
                               onPressed: () => widget.onTapRecrawl?.call(
-                                error.url,
+                                recrawlUrlOf(error)!,
                               ),
                               child: const Text('Open Debug Browser'),
                             ),
