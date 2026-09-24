@@ -8,10 +8,20 @@ import '../interceptor/dio_throttler_interceptor.dart';
 import '../mixin/user_agent_mixin.dart';
 
 class DioManager {
+  /// In dio 5.11.1, receiveTimeout bounds the wait for the response HEADERS
+  /// (time-to-first-byte, `request.close()` in `io_adapter.dart`) and then
+  /// each gap between body chunks. A server that takes >30s to first byte —
+  /// or stalls >30s mid-body — fails with `DioException.receiveTimeout` and
+  /// `CustomFileService` falls back to the heavyweight headless-webview path.
+  static const Duration connectTimeout = Duration(seconds: 15);
+  static const Duration receiveTimeout = Duration(seconds: 30);
+
   static Dio create({required LogBox log}) {
     final dio = Dio(
       BaseOptions(
         headers: {HttpHeaders.userAgentHeader: UserAgentMixin.staticUserAgent},
+        connectTimeout: connectTimeout,
+        receiveTimeout: receiveTimeout,
       ),
     );
 
