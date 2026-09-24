@@ -8,11 +8,13 @@ import '../interceptor/dio_throttler_interceptor.dart';
 import '../mixin/user_agent_mixin.dart';
 
 class DioManager {
-  /// A stalled server must not block requests indefinitely; receiveTimeout
-  /// is between data chunks, so slow-but-progressing downloads still pass.
+  /// In dio 5.11.1, receiveTimeout bounds the wait for the response HEADERS
+  /// (time-to-first-byte, `request.close()` in `io_adapter.dart`) and then
+  /// each gap between body chunks. A server that takes >30s to first byte —
+  /// or stalls >30s mid-body — fails with `DioException.receiveTimeout` and
+  /// `CustomFileService` falls back to the heavyweight headless-webview path.
   static const Duration connectTimeout = Duration(seconds: 15);
   static const Duration receiveTimeout = Duration(seconds: 30);
-  static const Duration sendTimeout = Duration(seconds: 15);
 
   static Dio create({required LogBox log}) {
     final dio = Dio(
@@ -20,7 +22,6 @@ class DioManager {
         headers: {HttpHeaders.userAgentHeader: UserAgentMixin.staticUserAgent},
         connectTimeout: connectTimeout,
         receiveTimeout: receiveTimeout,
-        sendTimeout: sendTimeout,
       ),
     );
 
