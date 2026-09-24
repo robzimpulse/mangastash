@@ -76,6 +76,38 @@ void main() {
     });
   });
 
+  group('isRecrawlableError', () {
+    test('is true for FailedParsingHtmlException', () {
+      expect(
+        isRecrawlableError(FailedParsingHtmlException('https://x.com/page')),
+        isTrue,
+      );
+    });
+
+    test('is true for CloudflareChallengeException', () {
+      expect(
+        isRecrawlableError(CloudflareChallengeException('https://x.com/page')),
+        isTrue,
+      );
+    });
+
+    test('is false for any other error', () {
+      expect(isRecrawlableError(Exception('boom')), isFalse);
+    });
+
+    test('recrawlUrlOf returns the url for both recrawlable types', () {
+      expect(
+        recrawlUrlOf(FailedParsingHtmlException('https://x.com/a')),
+        'https://x.com/a',
+      );
+      expect(
+        recrawlUrlOf(CloudflareChallengeException('https://x.com/b')),
+        'https://x.com/b',
+      );
+      expect(recrawlUrlOf(Exception('boom')), isNull);
+    });
+  });
+
   group('fetchWithCloudflareRetry', () {
     test('returns the first attempt when it is not a challenge', () async {
       final delays = <Duration>[];
