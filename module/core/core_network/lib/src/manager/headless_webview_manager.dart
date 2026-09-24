@@ -125,6 +125,15 @@ String htmlCacheKey(String url, {List<String> scripts = const []}) {
   return [url, ...scripts].join('|');
 }
 
+/// Whether this [_fetch] caller may be served from (and written to) the
+/// HTML cache. Callers that signal completion over the JS bridge
+/// (`image()`, via [signalComplete]) resolve from a bridge payload, not
+/// from the HTML string — a cache hit would return before any script runs,
+/// so their completer would never fire and the pending future would hang.
+bool shouldUseHtmlCache({required bool useCache, Future? signalComplete}) {
+  return useCache && signalComplete == null;
+}
+
 class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   static const Duration defaultTimeout = Duration(seconds: 15);
 
@@ -286,9 +295,13 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     delegate.set(uri: uri, loading: true);
     final effectiveTimeout = timeout ?? defaultTimeout;
     final key = htmlCacheKey(uri.toString(), scripts: scripts);
+    final cacheAllowed = shouldUseHtmlCache(
+      useCache: useCache,
+      signalComplete: signalComplete,
+    );
     final cache = await _htmlCacheManager.getFileFromCache(key);
     final data = await cache?.file.readAsString(encoding: utf8);
-    if (data != null && useCache) {
+    if (data != null && cacheAllowed) {
       delegate.set(uri: uri, html: data, loading: false);
       return data;
     }
@@ -446,12 +459,14 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       throw FailedParsingHtmlException(uri.toString());
     }
 
-    await _htmlCacheManager.putFile(
-      key,
-      utf8.encode(html),
-      fileExtension: 'html',
-      maxAge: const Duration(minutes: 30),
-    );
+    if (cacheAllowed) {
+      await _htmlCacheManager.putFile(
+        key,
+        utf8.encode(html),
+        fileExtension: 'html',
+        maxAge: const Duration(minutes: 30),
+      );
+    }
 
     delegate.set(html: html, loading: false);
     return html;
