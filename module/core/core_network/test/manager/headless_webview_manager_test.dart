@@ -115,4 +115,47 @@ void main() {
       expect(completer.future, throwsA(isA<Exception>()));
     });
   });
+
+  group('htmlCacheKey', () {
+    test('is the bare url when no scripts are injected', () {
+      expect(
+        htmlCacheKey('https://example.com/page', scripts: const []),
+        'https://example.com/page',
+      );
+    });
+
+    test('includes the scripts so a scripted page never matches a plain one', () {
+      final plain = htmlCacheKey('https://example.com/page', scripts: const []);
+      final scripted = htmlCacheKey('https://example.com/page', scripts: const [
+        'document.title = "x";',
+      ]);
+
+      expect(plain, isNot(equals(scripted)));
+    });
+
+    test('distinguishes different scripts on the same url', () {
+      final a = htmlCacheKey('https://example.com/page', scripts: const [
+        'a();',
+      ]);
+      final b = htmlCacheKey('https://example.com/page', scripts: const [
+        'b();',
+      ]);
+
+      expect(a, isNot(equals(b)));
+    });
+  });
+
+  group('shouldUseHtmlCache', () {
+    test('is false for bridge-signalled callers (image path)', () {
+      expect(
+        shouldUseHtmlCache(useCache: true, signalComplete: Future.value('')),
+        isFalse,
+      );
+    });
+
+    test('passes useCache through for document callers', () {
+      expect(shouldUseHtmlCache(useCache: true), isTrue);
+      expect(shouldUseHtmlCache(useCache: false), isFalse);
+    });
+  });
 }
