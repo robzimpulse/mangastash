@@ -7,10 +7,22 @@ void main() {
   late ChapterDao dao;
   late ImageDao imageDao;
 
-  setUp(() {
+  setUp(() async {
     db = AppDatabase(executor: MemoryExecutor());
     dao = ChapterDao(db);
     imageDao = ImageDao(db);
+
+    // v3 FK: the chapter fixtures reference these manga ids.
+    await db.mangaDao.adds(values: {
+      const MangaTablesCompanion(
+        id: Value('manga_id_1'),
+        title: Value('manga_id_1'),
+      ): const [],
+      const MangaTablesCompanion(
+        id: Value('manga_id_new'),
+        title: Value('manga_id_new'),
+      ): const [],
+    });
   });
 
   final chapters = List.generate(
@@ -134,6 +146,25 @@ void main() {
         final byManga = await dao.search(mangaIds: ['manga_id_1']);
         expect(byManga.length, equals(chapters.length));
         expect(byManga.map((e) => e.chapter?.id), contains('id_0'));
+      });
+
+      test('Upserting an existing chapter keeps its images (#137)', () async {
+        final (chapter, images) = chapters.first;
+
+        // A changed field + const [] image list — the REPLACE path used to
+        // wipe the chapter row and cascade its images away.
+        final updated = chapter.copyWith(
+          title: Value('${chapter.title.value}_updated'),
+        );
+        await dao.adds(values: {updated: const []});
+
+        final stored = await dao.search(ids: [chapter.id.value]);
+        expect(stored.single.chapter?.title, equals('title_0_updated'));
+
+        final storedImages = await imageDao.search(
+          chapterIds: [chapter.id.value],
+        );
+        expect(storedImages, hasLength(images.length));
       });
     });
 

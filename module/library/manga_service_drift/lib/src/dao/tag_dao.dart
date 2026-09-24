@@ -122,9 +122,13 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
 
         final clause = into(tagTables);
 
+        // DoUpdate, not insertOrReplace: REPLACE would delete the tag row
+        // and cascade its relationship rows away across all manga (FK ON).
+        // Empty target matches any uniqueness violation (id, tagId+name, …)
+        // as an UPDATE.
         final result = await clause.insertReturning(
           value,
-          mode: InsertMode.insertOrReplace,
+          onConflict: DoUpdate((_) => value, target: const []),
         );
 
         data.add(result);
@@ -171,7 +175,13 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
 
       final clause = into(relationshipTables);
 
-      return clause.insert(value, mode: InsertMode.insertOrReplace);
+      // Upsert (never REPLACE): re-attaching a tag must not delete the
+      // relationship row — REPLACE on a no-FK-parent conflict is harmless
+      // here, but the uniform DoUpdate keeps every write FK-safe.
+      return clause.insert(
+        value,
+        onConflict: DoUpdate((_) => value, target: const []),
+      );
     });
   }
 

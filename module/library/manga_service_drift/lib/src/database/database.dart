@@ -65,14 +65,49 @@ class AppDatabase extends _$AppDatabase {
       super(executor.build());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration {
     return MigrationStrategy(
+      beforeOpen: (details) async {
+        // FK enforcement is per-connection in SQLite (off by default).
+        // Both the IO and web executors go through this hook.
+        await customStatement('PRAGMA foreign_keys = ON');
+      },
       onUpgrade: stepByStep(
         from1To2: (m, schema) async {
           await m.addColumn(jobTables, jobTables.path);
+        },
+        from2To3: (m, schema) async {
+          // Legacy installs may hold rows whose parent was deleted before
+          // #136's app-level cascades existed; enabling FK enforcement on
+          // dirty data would turn routine deletes into constraint errors.
+          await customStatement(
+            'DELETE FROM image_tables WHERE chapter_id NOT IN '
+            '(SELECT id FROM chapter_tables)',
+          );
+          await customStatement(
+            'DELETE FROM chapter_tables WHERE manga_id IS NOT NULL AND '
+            'manga_id NOT IN (SELECT id FROM manga_tables)',
+          );
+          await customStatement(
+            'DELETE FROM library_tables WHERE manga_id NOT IN '
+            '(SELECT id FROM manga_tables)',
+          );
+          await customStatement(
+            'DELETE FROM relationship_tables WHERE manga_id NOT IN '
+            '(SELECT id FROM manga_tables) OR tag_id NOT IN '
+            '(SELECT id FROM tag_tables)',
+          );
+
+          // SQLite cannot ALTER-add FK constraints: recreate each child
+          // table from the v3 definitions (alterTable with an empty
+          // TableMigration copies rows into the rebuilt table).
+          await m.alterTable(TableMigration(chapterTables));
+          await m.alterTable(TableMigration(imageTables));
+          await m.alterTable(TableMigration(libraryTables));
+          await m.alterTable(TableMigration(relationshipTables));
         },
       ),
     );

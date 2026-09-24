@@ -27,8 +27,12 @@ void main() {
       group('from $fromVersion', () {
         for (final toVersion in versions.skip(i + 1)) {
           test('to $toVersion', () async {
+            // Start from a real old-version database — a fresh AppDatabase
+            // would run onCreate at the latest schema instead.
             final schema = await verifier.schemaAt(fromVersion);
-            final db = AppDatabase(executor: MemoryExecutor());
+            final db = AppDatabase(
+              executor: MemoryExecutor(executor: schema.newConnection()),
+            );
             await verifier.migrateAndValidate(db, toVersion);
             await db.close();
           });
