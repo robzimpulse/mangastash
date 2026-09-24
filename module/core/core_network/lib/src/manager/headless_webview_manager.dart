@@ -21,6 +21,7 @@ import 'script_wrapper.dart';
 class _Key extends Equatable {
   final String url;
   final List<String> scripts;
+  final List<String> readyWhenSelectors;
   final bool useCache;
   final Map<String, String> headers;
   final Duration? timeout;
@@ -28,13 +29,21 @@ class _Key extends Equatable {
   const _Key({
     required this.url,
     this.scripts = const [],
+    this.readyWhenSelectors = const [],
     required this.useCache,
     this.headers = const {},
     this.timeout,
   });
 
   @override
-  List<Object?> get props => [url, scripts, useCache, headers, timeout];
+  List<Object?> get props => [
+    url,
+    scripts,
+    readyWhenSelectors,
+    useCache,
+    headers,
+    timeout,
+  ];
 }
 
 const List<String> _imgExt = [
@@ -121,9 +130,23 @@ void handleRejectedImage(
 /// injected scripts produce different DOMs, so the scripts are part of the
 /// key. Both the cache read and write in [_fetch] must go through this —
 /// diverging keys mean scripted pages never hit the cache.
-String htmlCacheKey(String url, {List<String> scripts = const []}) {
-  if (scripts.isEmpty) return url;
-  return [url, ...scripts].join('|');
+///
+/// [readyWhenSelectors] also feeds the key: a page whose source declared
+/// readiness must never match an entry written by a build that didn't gate
+/// on it — such a stale entry is exactly the broken snapshot the gate
+/// exists to reject. An empty list keeps the key identical to older builds
+/// (nothing was declared, so nothing can be stale about it).
+String htmlCacheKey(
+  String url, {
+  List<String> scripts = const [],
+  List<String> readyWhenSelectors = const [],
+}) {
+  if (scripts.isEmpty && readyWhenSelectors.isEmpty) return url;
+  return [
+    url,
+    ...scripts,
+    if (readyWhenSelectors.isNotEmpty) ...['ready', ...readyWhenSelectors],
+  ].join('|');
 }
 
 /// Whether this [_fetch] caller may be served from (and written to) the
@@ -169,6 +192,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       url: url,
       useCache: useCache,
       scripts: scripts,
+      readyWhenSelectors: readyWhenSelectors,
       timeout: timeout,
     );
     return _cDocument.putIfAbsent(
@@ -302,7 +326,11 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   }) async {
     delegate.set(uri: uri, loading: true);
     final effectiveTimeout = timeout ?? defaultTimeout;
-    final key = htmlCacheKey(uri.toString(), scripts: scripts);
+    final key = htmlCacheKey(
+      uri.toString(),
+      scripts: scripts,
+      readyWhenSelectors: readyWhenSelectors,
+    );
     final cacheAllowed = shouldUseHtmlCache(
       useCache: useCache,
       signalComplete: signalComplete,
