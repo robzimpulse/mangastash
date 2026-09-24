@@ -14,6 +14,7 @@ import 'package:universal_io/io.dart';
 import '../exception/failed_parsing_html_exception.dart';
 import '../mixin/user_agent_mixin.dart';
 import '../usecase/headless_webview_use_case.dart';
+import 'cloudflare_detector.dart';
 
 class _Key extends Equatable {
   final String url;
@@ -95,9 +96,7 @@ void handleResolvedImage(
       error: Exception('Image format $ext not supported'),
       extra: {'url': url, 'args': args},
     );
-    completer.safeCompleteError(
-      Exception('Image format $ext not supported'),
-    );
+    completer.safeCompleteError(Exception('Image format $ext not supported'));
   }
 }
 
@@ -263,10 +262,12 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
         ''',
       ],
       javascriptHandlers: {
-        'resolved': (args) =>
-            handleResolvedImage(_log, completer, args: args, url: url),
-        'reject': (args) =>
-            handleRejectedImage(_log, completer, args: args, url: url),
+        'resolved':
+            (args) =>
+                handleResolvedImage(_log, completer, args: args, url: url),
+        'reject':
+            (args) =>
+                handleRejectedImage(_log, completer, args: args, url: url),
       },
       signalComplete: completer.future,
     );
@@ -306,158 +307,175 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       return data;
     }
 
-    final onLoadStartCompleter = Completer();
-    final onLoadStopCompleter = Completer();
-    final onLoadErrorCompleter = Completer();
+    // A Cloudflare challenge sometimes clears on a plain reload, so a
+    // challenge-shaped snapshot is retried once in a fresh webview; anything
+    // else (null html, timeouts) propagates as before.
+    Future<(String, String?)> attempt() async {
+      final onLoadStartCompleter = Completer();
+      final onLoadStopCompleter = Completer();
+      final onLoadErrorCompleter = Completer();
 
-    final webview = HeadlessInAppWebView(
-      initialUserScripts: initialUserScripts,
-      initialUrlRequest: URLRequest(
-        url: uri,
-        headers: {HttpHeaders.userAgentHeader: UserAgentMixin.staticUserAgent},
-      ),
-      initialSettings: InAppWebViewSettings(
-        isInspectable: true,
-        javaScriptEnabled: true,
-        supportZoom: false,
-      ),
-      onWebViewCreated: (controller) {
-        delegate.onWebViewCreated(uri: uri, scripts: scripts);
-        final handlers = javascriptHandlers?.entries ?? [];
-        if (handlers.isEmpty) return;
-        for (final handler in handlers) {
-          controller.addJavaScriptHandler(
-            handlerName: handler.key,
-            callback: handler.value,
+      final webview = HeadlessInAppWebView(
+        initialUserScripts: initialUserScripts,
+        initialUrlRequest: URLRequest(
+          url: uri,
+          headers: {
+            HttpHeaders.userAgentHeader: UserAgentMixin.staticUserAgent,
+          },
+        ),
+        initialSettings: InAppWebViewSettings(
+          isInspectable: true,
+          javaScriptEnabled: true,
+          supportZoom: false,
+        ),
+        onWebViewCreated: (controller) {
+          delegate.onWebViewCreated(uri: uri, scripts: scripts);
+          final handlers = javascriptHandlers?.entries ?? [];
+          if (handlers.isEmpty) return;
+          for (final handler in handlers) {
+            controller.addJavaScriptHandler(
+              handlerName: handler.key,
+              callback: handler.value,
+            );
+          }
+        },
+        onTitleChanged: (_, name) {
+          delegate.onTitleChanged(title: name);
+        },
+        onLoadStart: (_, uri) {
+          delegate.onLoadStart(uri: uri?.uriValue);
+          onLoadStartCompleter.safeComplete();
+        },
+        onLoadStop: (_, uri) {
+          delegate.onLoadStop(uri: uri?.uriValue);
+          onLoadStopCompleter.safeComplete();
+        },
+        onProgressChanged: (controller, progress) {
+          delegate.onProgressChanged(progress: progress);
+        },
+        onReceivedError: (_, request, error) {
+          delegate.onReceivedError(
+            request: request.toMap(),
+            error: error.toMap(),
           );
-        }
-      },
-      onTitleChanged: (_, name) {
-        delegate.onTitleChanged(title: name);
-      },
-      onLoadStart: (_, uri) {
-        delegate.onLoadStart(uri: uri?.uriValue);
-        onLoadStartCompleter.safeComplete();
-      },
-      onLoadStop: (_, uri) {
-        delegate.onLoadStop(uri: uri?.uriValue);
-        onLoadStopCompleter.safeComplete();
-      },
-      onProgressChanged: (controller, progress) {
-        delegate.onProgressChanged(progress: progress);
-      },
-      onReceivedError: (_, request, error) {
-        delegate.onReceivedError(
-          request: request.toMap(),
-          error: error.toMap(),
-        );
-        onLoadErrorCompleter.safeComplete();
-      },
-      onContentSizeChanged: (_, prev, curr) {
-        delegate.onContentSizeChanged(previous: prev, current: curr);
-      },
-      onReceivedHttpError: (_, request, response) {
-        delegate.onReceivedHttpError(
-          request: request.toMap(),
-          response: response.toMap(),
-        );
-      },
-      onLoadResource: (_, resource) {
-        delegate.onLoadResource(resource: resource.toMap());
-      },
-      onConsoleMessage: (controller, message) {
-        delegate.onConsoleMessage(message: message.toMap());
-      },
-      shouldOverrideUrlLoading: (_, action) async {
-        final destination = action.request.url;
-        final isCloudFlare = action.isCloudFlare(uri);
-        delegate.shouldOverrideUrlLoading(
-          action: action.toMap(),
-          extra: {'is_cloudflare': isCloudFlare},
-        );
+          onLoadErrorCompleter.safeComplete();
+        },
+        onContentSizeChanged: (_, prev, curr) {
+          delegate.onContentSizeChanged(previous: prev, current: curr);
+        },
+        onReceivedHttpError: (_, request, response) {
+          delegate.onReceivedHttpError(
+            request: request.toMap(),
+            response: response.toMap(),
+          );
+        },
+        onLoadResource: (_, resource) {
+          delegate.onLoadResource(resource: resource.toMap());
+        },
+        onConsoleMessage: (controller, message) {
+          delegate.onConsoleMessage(message: message.toMap());
+        },
+        shouldOverrideUrlLoading: (_, action) async {
+          final destination = action.request.url;
+          final isCloudFlare = action.isCloudFlare(uri);
+          delegate.shouldOverrideUrlLoading(
+            action: action.toMap(),
+            extra: {'is_cloudflare': isCloudFlare},
+          );
 
-        if (destination == null) {
-          return NavigationActionPolicy.CANCEL;
-        }
+          if (destination == null) {
+            return NavigationActionPolicy.CANCEL;
+          }
 
-        final isSame = [
-          destination.scheme == uri.scheme,
-          destination.host == uri.host,
-        ].every((e) => e);
+          final isSame = [
+            destination.scheme == uri.scheme,
+            destination.host == uri.host,
+          ].every((e) => e);
 
-        if (isCloudFlare) {
-          return NavigationActionPolicy.ALLOW;
-        }
+          if (isCloudFlare) {
+            return NavigationActionPolicy.ALLOW;
+          }
 
-        return isSame
-            ? NavigationActionPolicy.ALLOW
-            : NavigationActionPolicy.CANCEL;
-      },
-    );
-
-    _instances[webview.hashCode] = webview;
-
-    try {
-      await Future.wait([
-        webview.run(),
-        onLoadStartCompleter.future,
-        Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
-      ]).timeout(effectiveTimeout);
-    } catch (e, st) {
-      delegate.set(error: e, stackTrace: st, loading: false);
-      _instances.remove(webview.hashCode);
-      await webview.dispose();
-      rethrow;
-    }
-
-    // Everything after the load stage runs under one bounded wait: a wedged
-    // renderer that never answers evaluateJavascript/getHtml/getTitle would
-    // otherwise hang here forever and, via the dedupe maps' whenComplete,
-    // poison every concurrent caller for this URL.
-    Future<(String?, String?)> snapshot() async {
-      for (final script in scripts) {
-        if (script.isEmpty) continue;
-        await Future.delayed(const Duration(seconds: 1));
-        await webview.webViewController?.evaluateJavascript(source: script);
-        delegate.onRunJavascript(script: script);
-      }
-
-      if (scripts.isNotEmpty) {
-        await Future.delayed(const Duration(seconds: 1));
-      }
-
-      await signalComplete;
-
-      return (
-        await webview.webViewController?.getHtml(),
-        await webview.webViewController?.getTitle(),
+          return isSame
+              ? NavigationActionPolicy.ALLOW
+              : NavigationActionPolicy.CANCEL;
+        },
       );
-    }
 
-    String? html;
-    String? title;
-    try {
-      (html, title) = await snapshot().timeout(effectiveTimeout);
-    } catch (e, st) {
-      delegate.set(error: e, stackTrace: st, loading: false);
-      _instances.remove(webview.hashCode);
+      _instances[webview.hashCode] = webview;
+
+      try {
+        await Future.wait([
+          webview.run(),
+          onLoadStartCompleter.future,
+          Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
+        ]).timeout(effectiveTimeout);
+      } catch (e, st) {
+        delegate.set(error: e, stackTrace: st, loading: false);
+        _instances.remove(webview.hashCode);
+        await webview.dispose();
+        rethrow;
+      }
+
+      // Everything after the load stage runs under one bounded wait: a wedged
+      // renderer that never answers evaluateJavascript/getHtml/getTitle would
+      // otherwise hang here forever and, via the dedupe maps' whenComplete,
+      // poison every concurrent caller for this URL.
+      Future<(String?, String?)> snapshot() async {
+        for (final script in scripts) {
+          if (script.isEmpty) continue;
+          await Future.delayed(const Duration(seconds: 1));
+          await webview.webViewController?.evaluateJavascript(source: script);
+          delegate.onRunJavascript(script: script);
+        }
+
+        if (scripts.isNotEmpty) {
+          await Future.delayed(const Duration(seconds: 1));
+        }
+
+        await signalComplete;
+
+        return (
+          await webview.webViewController?.getHtml(),
+          await webview.webViewController?.getTitle(),
+        );
+      }
+
+      String? html;
+      String? title;
+      try {
+        (html, title) = await snapshot().timeout(effectiveTimeout);
+      } catch (e, st) {
+        delegate.set(error: e, stackTrace: st, loading: false);
+        _instances.remove(webview.hashCode);
+        await webview.dispose();
+        rethrow;
+      }
+
       await webview.dispose();
-      rethrow;
+
+      _instances.remove(webview.hashCode);
+
+      if (html == null) {
+        delegate.set(error: Exception('Null Html'), loading: false);
+        throw FailedParsingHtmlException(uri.toString());
+      }
+
+      return (html, title);
     }
 
-    await webview.dispose();
-
-    _instances.remove(webview.hashCode);
-
-    if (html == null) {
-      delegate.set(error: Exception('Null Html'), loading: false);
-      throw FailedParsingHtmlException(uri.toString());
-    }
-
-    if (title == 'Just a moment...') {
-      delegate.set(error: Exception('Cloudflare Challenge'), loading: false);
-      throw FailedParsingHtmlException(uri.toString());
-    }
+    final (html, _) = await fetchWithCloudflareRetry(
+      url: uri.toString(),
+      attemptCount: 2,
+      delay: (duration) async {
+        _log.log(
+          'Cloudflare challenge page detected, retrying in $duration',
+          name: 'HeadlessWebviewManager',
+        );
+        await Future.delayed(duration);
+      },
+      attempt: attempt,
+    );
 
     if (cacheAllowed) {
       await _htmlCacheManager.putFile(
