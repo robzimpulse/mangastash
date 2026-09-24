@@ -64,6 +64,7 @@ class SearchMangaUseCase with SyncMangasMixin {
     final document = await _webview.open(
       url,
       scripts: source.searchMangaUseCase.scripts,
+      readyWhenSelectors: source.searchMangaUseCase.readyWhenSelectors,
       useCache: useCache,
       timeout: source.searchMangaUseCase.timeout,
     );

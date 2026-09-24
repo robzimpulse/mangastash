@@ -59,6 +59,13 @@ class _GetChapterImageSourceExternalUseCase
   }
 
   @override
+  List<String> get readyWhenSelectors {
+    // The htmx swap replaces #chapter-images wholesale; the snapshot is
+    // only valid once it holds the page <img>s.
+    return ['section#chapter-images img'];
+  }
+
+  @override
   List<String> get scripts {
     return [
       // The source class does not know the chapter id (the use case receives
@@ -82,13 +89,17 @@ class _GetChapterImageSourceExternalUseCase
         });
       })();
       ''',
-      // Allow the ajax to resolve and inject the <img>s before getHtml().
-      'setTimeout(function(){}, 2500);',
+      // The readiness beacon (readyWhenSelectors above) replaced the old
+      // fixed `setTimeout(function(){}, 2500)` sleep: it polls until the
+      // injected <img>s actually exist instead of hoping 2.5s was enough.
     ];
   }
 }
 
 class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
+  @override
+  List<String> get readyWhenSelectors => [];
+
   @override
   Duration? get timeout => Duration(seconds: 15);
 
@@ -152,6 +163,9 @@ class _ListChapterSourceExternalUseCase
   const _ListChapterSourceExternalUseCase(this._baseUrl);
 
   @override
+  List<String> get readyWhenSelectors => [];
+
+  @override
   Duration? get timeout => Duration(seconds: 15);
 
   @override
@@ -184,6 +198,9 @@ class _SearchMangaSourceExternalUseCase
   final String _baseUrl;
 
   const _SearchMangaSourceExternalUseCase(this._baseUrl);
+
+  @override
+  List<String> get readyWhenSelectors => [];
 
   @override
   Duration? get timeout => Duration(seconds: 15);
@@ -302,6 +319,9 @@ class _SearchMangaSourceExternalUseCase
 }
 
 class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
+  @override
+  List<String> get readyWhenSelectors => [];
+
   @override
   Duration? get timeout => Duration(seconds: 15);
 

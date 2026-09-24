@@ -143,6 +143,39 @@ void main() {
 
       expect(a, isNot(equals(b)));
     });
+
+    test('distinguishes readiness-declared pages from older cache entries',
+        () {
+      final legacy = htmlCacheKey('https://example.com/page', scripts: const [
+        'a();',
+      ]);
+      final gated = htmlCacheKey(
+        'https://example.com/page',
+        scripts: const ['a();'],
+        readyWhenSelectors: const ['div[data-page]'],
+      );
+      final ungated = htmlCacheKey(
+        'https://example.com/page',
+        scripts: const ['a();'],
+        readyWhenSelectors: const [],
+      );
+
+      expect(gated, isNot(equals(legacy)));
+      expect(ungated, equals(legacy));
+    });
+
+    test('distinguishes different readiness selectors on the same url', () {
+      final a = htmlCacheKey(
+        'https://example.com/page',
+        readyWhenSelectors: const ['div.a'],
+      );
+      final b = htmlCacheKey(
+        'https://example.com/page',
+        readyWhenSelectors: const ['div.b'],
+      );
+
+      expect(a, isNot(equals(b)));
+    });
   });
 
   group('shouldUseHtmlCache', () {

@@ -62,6 +62,7 @@ class GetChapterUseCase with SyncChaptersMixin {
     final document = await _webview.open(
       url,
       scripts: source.getChapterImageUseCase.scripts,
+      readyWhenSelectors: source.getChapterImageUseCase.readyWhenSelectors,
       useCache: useCache,
       timeout: source.getChapterImageUseCase.timeout,
     );
