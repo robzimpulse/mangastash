@@ -144,4 +144,18 @@ void main() {
       expect(a, isNot(equals(b)));
     });
   });
+
+  group('shouldUseHtmlCache', () {
+    test('is false for bridge-signalled callers (image path)', () {
+      expect(
+        shouldUseHtmlCache(useCache: true, signalComplete: Future.value('')),
+        isFalse,
+      );
+    });
+
+    test('passes useCache through for document callers', () {
+      expect(shouldUseHtmlCache(useCache: true), isTrue);
+      expect(shouldUseHtmlCache(useCache: false), isFalse);
+    });
+  });
 }
