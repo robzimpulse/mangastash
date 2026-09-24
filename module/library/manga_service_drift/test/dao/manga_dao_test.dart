@@ -188,6 +188,46 @@ void main() {
         final result = await dao.search(ids: [manga.id.value]);
         expect(result.first.manga?.title, equals('${manga.title.value}_updated'));
       });
+
+      test('Upserting an existing manga keeps its children (#137)', () async {
+        final (manga, tags) = mangas.first;
+        final mangaId = manga.id.value;
+
+        final chapter = ChapterTablesCompanion(
+          id: const Value('chapter_upsert'),
+          mangaId: Value(mangaId),
+          title: const Value('chapter_title'),
+          webUrl: const Value('chapter_web_url'),
+        );
+        await chapterDao.adds(values: {
+          chapter: ['image_url_upsert_a', 'image_url_upsert_b'],
+        });
+        await libraryDao.add(mangaId);
+
+        // Any non-timestamp field change makes shouldUpdate true, which
+        // used to run INSERT OR REPLACE — with FK cascades ON that deleted
+        // and re-inserted the row, cascading away every child.
+        final updated = manga.copyWith(
+          status: const Value('status_updated'),
+        );
+        await dao.adds(values: {updated: tags});
+
+        final stored = await dao.search(ids: [mangaId]);
+        expect(stored.first.manga?.status, equals('status_updated'));
+
+        final chapters = await chapterDao.search(mangaIds: [mangaId]);
+        expect(chapters.map((e) => e.chapter?.id), equals(['chapter_upsert']));
+        expect(chapters.first.images, hasLength(2));
+
+        expect(
+          (await db.select(db.libraryTables).get()).map((e) => e.mangaId),
+          equals([mangaId]),
+        );
+        expect(
+          (await tagDao.search(names: [...tags])).map((e) => e.name),
+          containsAll(tags),
+        );
+      });
     });
 
     group('With New Value', () {

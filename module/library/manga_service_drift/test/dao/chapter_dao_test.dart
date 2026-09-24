@@ -147,6 +147,25 @@ void main() {
         expect(byManga.length, equals(chapters.length));
         expect(byManga.map((e) => e.chapter?.id), contains('id_0'));
       });
+
+      test('Upserting an existing chapter keeps its images (#137)', () async {
+        final (chapter, images) = chapters.first;
+
+        // A changed field + const [] image list — the REPLACE path used to
+        // wipe the chapter row and cascade its images away.
+        final updated = chapter.copyWith(
+          title: Value('${chapter.title.value}_updated'),
+        );
+        await dao.adds(values: {updated: const []});
+
+        final stored = await dao.search(ids: [chapter.id.value]);
+        expect(stored.single.chapter?.title, equals('title_0_updated'));
+
+        final storedImages = await imageDao.search(
+          chapterIds: [chapter.id.value],
+        );
+        expect(storedImages, hasLength(images.length));
+      });
     });
 
     group('With New Value', () {

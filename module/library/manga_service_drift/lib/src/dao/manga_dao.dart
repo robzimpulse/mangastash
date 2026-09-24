@@ -243,9 +243,14 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
           ),
         );
 
+        // DoUpdate, not insertOrReplace: with FK cascades ON, REPLACE
+        // deletes the conflicting row first and cascades every child away
+        // (chapters, library membership, tag relationships). An empty
+        // target lets any uniqueness violation (id, webUrl, …) resolve
+        // into an UPDATE — no row is ever deleted.
         final result = await into(mangaTables).insertReturning(
           value,
-          mode: InsertMode.insertOrReplace,
+          onConflict: DoUpdate((_) => value, target: const []),
         );
 
         data.add(
