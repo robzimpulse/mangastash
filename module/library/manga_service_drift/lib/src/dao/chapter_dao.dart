@@ -219,9 +219,12 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
           ),
         );
 
+        // DoUpdate, not insertOrReplace: REPLACE would delete the chapter
+        // row and cascade its images away (FK ON). Empty target matches any
+        // uniqueness violation (id, webUrl, …) as an UPDATE.
         final result = await into(chapterTables).insertReturning(
           value,
-          mode: InsertMode.insertOrReplace,
+          onConflict: DoUpdate((_) => value, target: const []),
         );
 
         data.add(
