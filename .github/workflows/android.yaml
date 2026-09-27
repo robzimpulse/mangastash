@@ -19,7 +19,10 @@ jobs:
       - name: 'Git Checkout'
         uses: actions/checkout@v4
         with:
-          fetch-depth: 5
+          # Full history: distribute_firebase derives release notes via
+          # `git describe` + `git log <previous_tag>..HEAD`, which a shallow
+          # fetch severs whenever the previous tag is >= fetch-depth commits back.
+          fetch-depth: 0
           fetch-tags: true
           ref: ${{ github.ref }}
       - name: 'Install Java'
