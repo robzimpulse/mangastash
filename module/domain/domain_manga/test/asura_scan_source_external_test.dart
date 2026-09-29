@@ -61,6 +61,19 @@ void main() {
     expect(scripts.join(), contains('select-none'));
   });
 
+  test('reader scripts are one self-contained entry', () {
+    // wrapScript evaluates every entry inside its own async IIFE, so `var`
+    // declarations do NOT leak between entries — an entry reading an
+    // identifier declared by an earlier one throws ReferenceError, which
+    // fails the whole chapter read. Scripts sharing state must be merged
+    // into a single entry.
+    final scripts = source.getChapterImageUseCase.scripts;
+
+    expect(scripts, hasLength(1));
+    expect(scripts.first, contains('querySelectorAll'));
+    expect(scripts.first, contains('scrollIntoView'));
+  });
+
   test('reader declares readiness on the page-image selector', () {
     expect(
       source.getChapterImageUseCase.readyWhenSelectors,

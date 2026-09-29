@@ -67,8 +67,8 @@ class _GetChapterImageSourceExternalUseCase
   @override
   List<String> get scripts {
     return [
-      'var elements = document.querySelectorAll(\'$_readerQuery\');',
       '''
+      var elements = document.querySelectorAll('$_readerQuery');
       for (let i = 0; i < elements.length; i++) {
         setTimeout(() => elements[i].scrollIntoView(), 100 * i);
       }
