@@ -21,7 +21,39 @@ void main() {
         isCloudflareChallenge(title: 'Attention Required! | Cloudflare'),
         isTrue,
       );
-      expect(isCloudflareChallenge(title: 'Access denied'), isTrue);
+    });
+
+    test('does not match generic titles without challenge markers', () {
+      // Redirect interstitials on aggregator sites are often titled
+      // "Please wait…"/"Access denied" while carrying no challenge
+      // markers — classifying them would make the page unfetchable.
+      expect(isCloudflareChallenge(title: 'Access denied'), isFalse);
+      expect(isCloudflareChallenge(title: 'Please wait...'), isFalse);
+      expect(
+        isCloudflareChallenge(
+          title: 'Please wait...',
+          html: '<html><body>redirecting…</body></html>',
+        ),
+        isFalse,
+      );
+    });
+
+    test('matches generic titles when an html marker confirms them', () {
+      expect(
+        isCloudflareChallenge(
+          title: 'Access denied',
+          html: '<script src="/cdn-cgi/challenge-platform/h/g/orchestrate/'
+              'jsch/v1"></script>',
+        ),
+        isTrue,
+      );
+      expect(
+        isCloudflareChallenge(
+          title: 'Please wait...',
+          html: '<script>var cf_chl_opt = {};</script>',
+        ),
+        isTrue,
+      );
     });
 
     test('matches challenge-platform markers in the html', () {
@@ -161,6 +193,42 @@ void main() {
       );
 
       expect(calls, 2);
+    });
+
+    test('notifies onExhausted with the exception when attempts run out',
+        () async {
+      Object? notified;
+
+      await expectLater(
+        fetchWithCloudflareRetry(
+          url: 'https://x.com/page',
+          attemptCount: 2,
+          delay: (_) async {},
+          onExhausted: (error) => notified = error,
+          attempt: () async => ('<html>challenge</html>', 'Just a moment...'),
+        ),
+        throwsA(isA<CloudflareChallengeException>()),
+      );
+
+      expect(notified, isA<CloudflareChallengeException>());
+    });
+
+    test('does not notify onExhausted when an attempt fails outright',
+        () async {
+      Object? notified;
+
+      await expectLater(
+        fetchWithCloudflareRetry(
+          url: 'https://x.com/page',
+          attemptCount: 2,
+          delay: (_) async {},
+          onExhausted: (error) => notified = error,
+          attempt: () async => throw FailedParsingHtmlException('https://x.com'),
+        ),
+        throwsA(isA<FailedParsingHtmlException>()),
+      );
+
+      expect(notified, isNull);
     });
 
     test('does not swallow non-challenge failures', () async {

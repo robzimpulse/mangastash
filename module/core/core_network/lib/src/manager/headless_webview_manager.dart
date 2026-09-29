@@ -479,6 +479,10 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
         );
         await Future.delayed(duration);
       },
+      // Parity with the other failure paths: the observer (diagnostics
+      // screen) must see the terminal error state when attempts run out,
+      // not only the per-attempt ones.
+      onExhausted: (error) => delegate.set(error: error, loading: false),
       attempt: attempt,
     );
 

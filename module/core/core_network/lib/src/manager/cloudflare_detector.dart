@@ -2,14 +2,17 @@ import '../exception/cloudflare_challenge_exception.dart';
 
 /// Cloudflare challenge/block pages seen instead of the requested content.
 /// Detection matches on title and content markers — Cloudflare ships several
-/// variants ("Just a moment...", "Attention Required!", "Access denied",
-/// managed/JS challenges) and a single exact title match misses them all.
+/// variants ("Just a moment...", "Attention Required!", managed/JS
+/// challenges) and a single exact title match misses them all.
+///
+/// Deliberately excluded: generic titles a legitimate page can carry
+/// ("access denied", "please wait" — redirect interstitials on aggregator
+/// sites use both). Those pages are only classified as challenges through
+/// [_challengeHtmlMarkers], which real challenge pages always hit.
 const List<String> _challengeTitles = [
   'just a moment',
   'attention required',
-  'access denied',
   'checking your browser',
-  'please wait',
   'ddos protection by',
 ];
 
@@ -47,11 +50,15 @@ bool isCloudflareChallenge({String? title, String? html}) {
 /// Runs [attempt] until it yields a non-challenge page or [attemptCount] is
 /// exhausted, waiting [delay] between attempts — a challenge page sometimes
 /// clears on a plain reload. Non-challenge failures propagate untouched.
+/// [onExhausted] fires with the terminal [CloudflareChallengeException]
+/// right before it is thrown, so callers can observe the terminal state
+/// (e.g. mark the webview observer's entry as errored).
 Future<(String, String?)> fetchWithCloudflareRetry({
   required String url,
   required int attemptCount,
   required Future<void> Function(Duration) delay,
   required Future<(String, String?)> Function() attempt,
+  void Function(Object error)? onExhausted,
 }) async {
   for (var i = 0; i < attemptCount; i++) {
     if (i > 0) await delay(Duration(seconds: 2));
@@ -62,5 +69,7 @@ Future<(String, String?)> fetchWithCloudflareRetry({
     }
   }
 
-  throw CloudflareChallengeException(url);
+  final error = CloudflareChallengeException(url);
+  onExhausted?.call(error);
+  throw error;
 }
