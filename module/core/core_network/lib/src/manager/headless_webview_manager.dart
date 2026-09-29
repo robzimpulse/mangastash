@@ -299,11 +299,16 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
       useCache: useCache,
       signalComplete: signalComplete,
     );
-    final cache = await _htmlCacheManager.getFileFromCache(key);
-    final data = await cache?.file.readAsString(encoding: utf8);
-    if (data != null && cacheAllowed) {
-      delegate.set(uri: uri, html: data, loading: false);
-      return data;
+    // Bridge-signalled callers resolve from the JS payload, never from the
+    // cached HTML — skip the read entirely instead of decoding and then
+    // discarding the file on every image fetch.
+    if (cacheAllowed) {
+      final cache = await _htmlCacheManager.getFileFromCache(key);
+      final data = await cache?.file.readAsString(encoding: utf8);
+      if (data != null) {
+        delegate.set(uri: uri, html: data, loading: false);
+        return data;
+      }
     }
 
     final onLoadStartCompleter = Completer();
