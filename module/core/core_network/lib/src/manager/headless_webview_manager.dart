@@ -384,6 +384,10 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
           scriptErrorCompleter.safeComplete();
         },
         'scriptReady': (_) {
+          // The beacon's reported boolean is deliberately ignored: the
+          // readinessSatisfied() gate over the snapshotted html is the
+          // authority on whether the page may be cached — don't "fix" this
+          // into an early pass/fail branch.
           scriptReadyCompleter.safeComplete();
         },
       };
