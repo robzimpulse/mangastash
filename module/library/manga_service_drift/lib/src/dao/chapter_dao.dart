@@ -86,7 +86,6 @@ class ChapterDao extends DatabaseAccessor<AppDatabase> with _$ChapterDaoMixin {
   Future<List<ChapterModel>> remove({
     List<String> ids = const [],
     List<String> mangaIds = const [],
-    List<String> mangaTitles = const [],
     List<String> titles = const [],
     List<String> volumes = const [],
     List<String> chapters = const [],

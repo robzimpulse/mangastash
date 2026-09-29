@@ -34,7 +34,11 @@ void main() {
         'INSERT INTO image_tables (id, chapter_id, web_url, "order", '
         'created_at, updated_at) VALUES '
         "('image_ok', 'chapter_ok', 'https://ok/img', 0, 0, 0), "
-        "('image_orphan', 'chapter_gone', 'https://gone/img', 0, 0, 0)",
+        "('image_orphan', 'chapter_gone', 'https://gone/img', 0, 0, 0), "
+        // Attached to a chapter that EXISTS but whose manga is dangling —
+        // the image pass must also catch images orphaned by the chapter
+        // cleanup itself, so chapters are deleted before images.
+        "('image_of_orphan', 'chapter_orphan', 'https://x/img', 0, 0, 0)",
       );
       await legacy.customStatement(
         'INSERT INTO library_tables (manga_id, created_at, updated_at) '
@@ -71,6 +75,8 @@ void main() {
         isNot(contains('chapter_orphan')),
       );
 
+      // Only image_ok survives: image_orphan's chapter never existed, and
+      // image_of_orphan's chapter was removed by the cleanup itself.
       expect(await db.imageDao.all, hasLength(1));
       expect(await db.select(db.libraryTables).get(), hasLength(1));
       expect(await db.select(db.relationshipTables).get(), hasLength(1));

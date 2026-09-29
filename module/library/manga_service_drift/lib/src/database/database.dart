@@ -83,13 +83,16 @@ class AppDatabase extends _$AppDatabase {
           // Legacy installs may hold rows whose parent was deleted before
           // #136's app-level cascades existed; enabling FK enforcement on
           // dirty data would turn routine deletes into constraint errors.
-          await customStatement(
-            'DELETE FROM image_tables WHERE chapter_id NOT IN '
-            '(SELECT id FROM chapter_tables)',
-          );
+          // Chapters are removed FIRST so the image pass also catches
+          // images of chapters deleted here (images-first would strand
+          // them — unreachable by any cascade once their parent is gone).
           await customStatement(
             'DELETE FROM chapter_tables WHERE manga_id IS NOT NULL AND '
             'manga_id NOT IN (SELECT id FROM manga_tables)',
+          );
+          await customStatement(
+            'DELETE FROM image_tables WHERE chapter_id NOT IN '
+            '(SELECT id FROM chapter_tables)',
           );
           await customStatement(
             'DELETE FROM library_tables WHERE manga_id NOT IN '
