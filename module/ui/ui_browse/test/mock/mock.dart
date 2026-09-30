@@ -8,6 +8,7 @@
 // Keep this file free of test logic — it only declares types and default
 // stubs (empty streams, sealed BehaviorSubjects).
 import 'package:domain_manga/domain_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -113,6 +114,15 @@ MockListenPrefetchChapterConfig mockListenPrefetchChapterConfig() {
   );
   when(() => mock.numOfPrefetchedNextChapter).thenAnswer(
     (_) => BehaviorSubject<int>(),
+  );
+  return mock;
+}
+
+/// Stubbed [ListenSourcesUseCase] (sealed ValueStream: valueOrNull is null).
+MockListenSourcesUseCase mockListenSourcesUseCase() {
+  final mock = MockListenSourcesUseCase();
+  when(() => mock.sourceStateStream).thenAnswer(
+    (_) => BehaviorSubject<List<SourceExternal>>(),
   );
   return mock;
 }
