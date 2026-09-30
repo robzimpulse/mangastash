@@ -109,10 +109,13 @@ class SearchMangaUseCase with SyncMangasMixin {
       );
       if (paramIgnorePagination != key.parameter) continue;
       promises.add(_searchMangaCacheManager.removeFile(value));
-      final source = Sources.fromName(parameter.source);
-      final url = source?.searchMangaUseCase.url(parameter: key.parameter);
-      if (url == null) continue;
-      promises.add(_htmlCacheManager.removeFile(url));
+      // Built-in sources have no scraping use cases (their getters throw
+      // UnimplementedError by design) and never cache scraped html pages, so
+      // only scraped sources resolve a URL to evict from the html cache.
+      if (!source.builtIn) {
+        final url = source.searchMangaUseCase.url(parameter: key.parameter);
+        promises.add(_htmlCacheManager.removeFile(url));
+      }
     }
     await Future.wait(promises);
   }
