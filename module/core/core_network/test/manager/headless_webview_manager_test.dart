@@ -1,0 +1,222 @@
+import 'dart:async';
+
+import 'package:core_analytics/core_analytics.dart';
+import 'package:core_network/src/manager/headless_webview_manager.dart';
+import 'package:core_storage/core_storage.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+
+class FakeLogBox extends Mock implements LogBox {}
+
+class FakeStorage extends Mock implements Storage {}
+
+class FakeHtmlCacheManager extends Mock implements HtmlCacheManager {}
+
+void main() {
+  late FakeLogBox log;
+
+  setUp(() {
+    log = FakeLogBox();
+    when(() => log.storage).thenReturn(FakeStorage());
+  });
+
+  group('handleResolvedImage', () {
+    test('completes with error when args is empty', () {
+      final completer = Completer<String>();
+
+      handleResolvedImage(
+        log,
+        completer,
+        args: [],
+        url: 'https://example.com/image.png',
+      );
+
+      expect(completer.future, throwsA(isA<Exception>()));
+    });
+
+    test('completes with error when data is not a string', () {
+      final completer = Completer<String>();
+
+      handleResolvedImage(
+        log,
+        completer,
+        args: [42],
+        url: 'https://example.com/image.png',
+      );
+
+      expect(completer.future, throwsA(isA<Exception>()));
+    });
+
+    test('completes with error for unsupported extension', () {
+      final completer = Completer<String>();
+
+      handleResolvedImage(
+        log,
+        completer,
+        args: ['data:image/tiff;base64,AAAA'],
+        url: 'https://example.com/image.tiff',
+      );
+
+      expect(completer.future, throwsA(isA<Exception>()));
+    });
+
+    test('completes with error, does not throw, for empty data url', () async {
+      final completer = Completer<String>();
+
+      // '' splits to a length-1 list, so values[1] used to RangeError
+      // inside the JS handler callback.
+      handleResolvedImage(
+        log,
+        completer,
+        args: [''],
+        url: 'https://example.com/image.png',
+      );
+
+      await expectLater(completer.future, throwsA(isA<Exception>()));
+    });
+
+    test('completes with error, does not throw, for non-data url string',
+        () async {
+      final completer = Completer<String>();
+
+      handleResolvedImage(
+        log,
+        completer,
+        args: ['not-a-data-url'],
+        url: 'https://example.com/image.png',
+      );
+
+      await expectLater(completer.future, throwsA(isA<Exception>()));
+    });
+
+    test('completes with the data url for supported extension', () {
+      final completer = Completer<String>();
+      const data = 'data:image/png;base64,AAAA';
+
+      handleResolvedImage(
+        log,
+        completer,
+        args: [data],
+        url: 'https://example.com/image.png',
+      );
+
+      expect(completer.future, completion(data));
+    });
+  });
+
+  group('handleRejectedImage', () {
+    test('completes with error', () {
+      final completer = Completer<String>();
+
+      handleRejectedImage(
+        log,
+        completer,
+        args: [Exception('boom')],
+        url: 'https://example.com/image.png',
+      );
+
+      expect(completer.future, throwsA(isA<Exception>()));
+    });
+  });
+
+  group('htmlCacheKey', () {
+    test('is the bare url when no scripts are injected', () {
+      expect(
+        htmlCacheKey('https://example.com/page', scripts: const []),
+        'https://example.com/page',
+      );
+    });
+
+    test('includes the scripts so a scripted page never matches a plain one', () {
+      final plain = htmlCacheKey('https://example.com/page', scripts: const []);
+      final scripted = htmlCacheKey('https://example.com/page', scripts: const [
+        'document.title = "x";',
+      ]);
+
+      expect(plain, isNot(equals(scripted)));
+    });
+
+    test('distinguishes different scripts on the same url', () {
+      final a = htmlCacheKey('https://example.com/page', scripts: const [
+        'a();',
+      ]);
+      final b = htmlCacheKey('https://example.com/page', scripts: const [
+        'b();',
+      ]);
+
+      expect(a, isNot(equals(b)));
+    });
+
+    test('distinguishes readiness-declared pages from older cache entries',
+        () {
+      final legacy = htmlCacheKey('https://example.com/page', scripts: const [
+        'a();',
+      ]);
+      final gated = htmlCacheKey(
+        'https://example.com/page',
+        scripts: const ['a();'],
+        readyWhenSelectors: const ['div[data-page]'],
+      );
+      final ungated = htmlCacheKey(
+        'https://example.com/page',
+        scripts: const ['a();'],
+        readyWhenSelectors: const [],
+      );
+
+      expect(gated, isNot(equals(legacy)));
+      expect(ungated, equals(legacy));
+    });
+
+    test('distinguishes different readiness selectors on the same url', () {
+      final a = htmlCacheKey(
+        'https://example.com/page',
+        readyWhenSelectors: const ['div.a'],
+      );
+      final b = htmlCacheKey(
+        'https://example.com/page',
+        readyWhenSelectors: const ['div.b'],
+      );
+
+      expect(a, isNot(equals(b)));
+    });
+  });
+
+  group('shouldUseHtmlCache', () {
+    test('is false for bridge-signalled callers (image path)', () {
+      expect(
+        shouldUseHtmlCache(useCache: true, signalComplete: Future.value('')),
+        isFalse,
+      );
+    });
+
+    test('passes useCache through for document callers', () {
+      expect(shouldUseHtmlCache(useCache: true), isTrue);
+      expect(shouldUseHtmlCache(useCache: false), isFalse);
+    });
+  });
+
+  group('HeadlessWebviewManager.image', () {
+    test('never reads the HTML cache for bridge-signalled fetches', () async {
+      final cache = FakeHtmlCacheManager();
+      when(() => cache.getFileFromCache(any())).thenAnswer((_) async => null);
+      final manager = HeadlessWebviewManager(
+        log: log,
+        htmlCacheManager: cache,
+      );
+
+      // Fire-and-forget: no webview ever loads in a unit test, so the
+      // fetch fails at the platform channel — irrelevant here. Only the
+      // cache read matters: a bridge-signalled caller resolves from the
+      // JS bridge, so consulting (and decoding) the HTML cache first is
+      // wasted I/O that must not happen.
+      unawaited(
+        manager.image('https://example.com/image.png').catchError((_) => ''),
+      );
+
+      await Future<void>.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
+
+      verifyNever(() => cache.getFileFromCache(any()));
+    });
+  });
+}

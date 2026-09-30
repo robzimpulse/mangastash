@@ -99,7 +99,9 @@ class SearchChapterUseCase
     final document = await _webview.open(
       url,
       scripts: source.listChapterUseCase.scripts,
+      readyWhenSelectors: source.listChapterUseCase.readyWhenSelectors,
       useCache: useCache,
+      timeout: source.listChapterUseCase.timeout,
     );
 
     final scraps = source.listChapterUseCase.parse(root: document);

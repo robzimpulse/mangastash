@@ -64,18 +64,49 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
     return transaction(() async {
       final filename = '${Uuid().v4()}.${file.ext}';
       final destination = (await directory()).childFile(filename);
-      await destination.create(recursive: true);
-      await destination.openWrite().addStream(file.openRead());
+
+      IOSink? sink;
+      var sinkClosed = false;
+
+      Future<void> cleanup() async {
+        final open = sink;
+        if (open != null && !sinkClosed) {
+          try {
+            await open.close();
+          } catch (_) {}
+        }
+        try {
+          await destination.delete();
+        } catch (_) {}
+      }
+
+      try {
+        await destination.create(recursive: true);
+        final openSink = destination.openWrite();
+        sink = openSink;
+        await openSink.addStream(file.openRead());
+        await openSink.flush();
+        await openSink.close();
+        sinkClosed = true;
+      } catch (e) {
+        await cleanup();
+        rethrow;
+      }
 
       final value = FileTablesCompanion.insert(
         webUrl: webUrl,
         relativePath: filename,
       );
 
-      return into(fileTables).insertReturning(
-        value,
-        mode: InsertMode.insertOrReplace,
-      );
+      try {
+        return into(fileTables).insertReturning(
+          value,
+          mode: InsertMode.insertOrReplace,
+        );
+      } catch (e) {
+        await cleanup();
+        rethrow;
+      }
     });
   }
 

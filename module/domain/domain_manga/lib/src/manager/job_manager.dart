@@ -6,7 +6,6 @@ import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
-import 'package:file/file.dart';
 import 'package:flutter/widgets.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
@@ -66,7 +65,6 @@ class JobManager
        _getAllChapterUseCase = getAllChapterUseCase,
        _listenSearchParameterUseCase = listenSearchParameterUseCase {
     _subscriptions.addAll([
-      manager.deleteFileEvent.listen(_onDeleteFile),
       _ongoingJob.listen(_onData),
     ]);
     _ongoingJob.addStream(_jobDao.single.distinct());
@@ -91,20 +89,6 @@ class JobManager
       case AppLifecycleState.inactive:
         _log.log('Pause executing jobs', name: runtimeType.toString());
     }
-  }
-
-  void _onDeleteFile((CacheObject object, File file) event) {
-    final (object, file) = event;
-
-    _ensureExecuted(
-      future: _jobDao.add(
-        JobTablesCompanion.insert(
-          imageUrl: Value(object.url),
-          path: Value(file.path),
-          type: JobTypeEnum.persistentImage,
-        ),
-      ),
-    );
   }
 
   void _onData(JobModel? job) async {

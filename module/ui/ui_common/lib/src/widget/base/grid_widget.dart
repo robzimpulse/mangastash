@@ -129,11 +129,13 @@ class _GridWidgetState<T> extends State<GridWidget<T>> {
                       child: Column(
                         children: [
                           Text(error.toString(), textAlign: TextAlign.center),
-                          if (error is FailedParsingHtmlException) ...[
+                          if (isRecrawlableError(error)) ...[
                             const SizedBox(height: 16),
                             OutlinedButton(
                               onPressed: () {
-                                widget.onTapRecrawl?.call(error.url);
+                                widget.onTapRecrawl?.call(
+                                  recrawlUrlOf(error)!,
+                                );
                               },
                               child: const Text('Open Debug Browser'),
                             ),

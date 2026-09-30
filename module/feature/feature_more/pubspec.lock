@@ -471,6 +471,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.4"
+  fs_shim:
+    dependency: transitive
+    description:
+      name: fs_shim
+      sha256: ad309627c6fee0622a38073ce41a8b7eb065963d1c83bf5124f3408f77dd1888
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.0"
   get_it:
     dependency: transitive
     description:
@@ -519,6 +527,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+  idb_shim:
+    dependency: transitive
+    description:
+      name: idb_shim
+      sha256: ee391deb010143823d25db15f8b002945e19dcb5f2dd5b696a98cb6db7644012
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.6.7"
   intersperse:
     dependency: transitive
     description:
@@ -842,6 +858,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.2"
+  persistent_file_system:
+    dependency: transitive
+    description:
+      path: "../../library/persistent_file_system"
+      relative: true
+    source: path
+    version: "0.0.1"
   petitparser:
     dependency: transitive
     description:
@@ -905,6 +928,14 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  sembast:
+    dependency: transitive
+    description:
+      name: sembast
+      sha256: "7119cf6f79bd1d48c8ec7943f4facd96c15ab26823021ed0792a487c7cd34441"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.8.5+1"
   service_locator:
     dependency: "direct main"
     description:

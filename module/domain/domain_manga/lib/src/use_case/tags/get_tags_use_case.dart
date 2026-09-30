@@ -47,7 +47,9 @@ class GetTagsUseCase with SyncTagsMixin {
     final document = await _webview.open(
       url,
       scripts: source.listTagUseCase.scripts,
+      readyWhenSelectors: source.listTagUseCase.readyWhenSelectors,
       useCache: useCache,
+      timeout: source.listTagUseCase.timeout,
     );
 
     final tags = await source.listTagUseCase.parse(root: document);

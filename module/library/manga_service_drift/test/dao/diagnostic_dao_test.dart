@@ -106,6 +106,10 @@ void main() {
     });
 
     test('orphanChapter', () async {
+      // v3 FKs prevent orphans through normal writes; a dirty restored
+      // file (raw swap, bypassing drift) can still hold them, which is
+      // what this diagnostic watches for. Seed one with the pragma off.
+      await db.customStatement('PRAGMA foreign_keys = OFF');
       final c1 = ChapterTablesCompanion(
         id: const Value('c1'),
         mangaId: const Value('m1_missing'),
@@ -114,15 +118,18 @@ void main() {
         updatedAt: Value(DateTime.now()),
       );
       await db.into(db.chapterTables).insert(c1);
+      await db.customStatement('PRAGMA foreign_keys = ON');
 
       final result1 = await dao.orphanChapterStream.first;
       expect(result1.length, 1);
-      
+
       final result2 = await dao.orphanChapter;
       expect(result2.length, 1);
     });
 
     test('orphanImage', () async {
+      // See orphanChapter for why the pragma is toggled.
+      await db.customStatement('PRAGMA foreign_keys = OFF');
       final i1 = ImageTablesCompanion(
         id: const Value('i1'),
         chapterId: const Value('c1_missing'),
@@ -132,10 +139,11 @@ void main() {
         updatedAt: Value(DateTime.now()),
       );
       await db.into(db.imageTables).insert(i1);
+      await db.customStatement('PRAGMA foreign_keys = ON');
 
       final result1 = await dao.orphanImageStream.first;
       expect(result1.length, 1);
-      
+
       final result2 = await dao.orphanImage;
       expect(result2.length, 1);
     });

@@ -21,4 +21,9 @@ class ImageTables extends Table with AutoTimestampTable, AutoTextIdTable {
     {webUrl, order},
     {chapterId, order},
   ];
+
+  @override
+  List<String> get customConstraints => [
+    'FOREIGN KEY (chapter_id) REFERENCES chapter_tables (id) ON DELETE CASCADE',
+  ];
 }

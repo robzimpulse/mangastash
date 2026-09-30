@@ -7,6 +7,7 @@ export 'src/adapter/ignore_bad_certificate_adapter.dart'
 if (dart.library.js_interop) 'src/adapter/ignore_bad_certificate_web.dart'
 if (dart.library.io) 'src/adapter/ignore_bad_certificate_io.dart';
 export 'src/core_network_registrar.dart';
+export 'src/exception/cloudflare_challenge_exception.dart';
 export 'src/exception/data_not_found_exception.dart';
 export 'src/exception/failed_parsing_html_exception.dart';
 export 'src/mixin/user_agent_mixin.dart';

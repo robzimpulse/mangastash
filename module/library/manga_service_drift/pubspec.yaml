@@ -26,6 +26,9 @@ dependencies:
   file: ^7.0.0
   meta: ^1.8.0
 
+  persistent_file_system:
+    path: ../../library/persistent_file_system
+
   log_box:
     git:
       url: https://github.com/robzimpulse/log_box.git

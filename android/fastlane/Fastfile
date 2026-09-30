@@ -6,7 +6,16 @@ platform :android do
       android_artifact_path = ENV['ARTIFACT_PATH'].to_s
 
       puts("android_artifact_path:#{android_artifact_path}")
-      previous_tag = options[:previous_tag] || `git describe --tags --abbrev=0 HEAD~1`.strip
+      previous_tag = options[:previous_tag].to_s.strip
+      if previous_tag.empty?
+        previous_tag = `git describe --tags --abbrev=0 HEAD~1`.strip
+        # A shallow checkout (fetch-depth < distance to the previous tag) makes
+        # git describe fail; backticks swallow that and yield '' — abort loudly
+        # instead of uploading a release with no notes.
+        UI.user_error!(
+          'Failed to resolve previous tag via git describe — the checkout is likely shallow (use fetch-depth: 0) or no prior tag exists; pass previous_tag: explicitly'
+        ) if previous_tag.empty?
+      end
       release_notes = options[:changelog] || changelog_from_git_commits(
         between: [previous_tag, 'HEAD'],
         pretty: '- %ae (%ad): %s',

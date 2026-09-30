@@ -46,8 +46,16 @@ class Executor {
     return executor;
   }
 
+  /// The database root, created (recursively) before it is handed out.
+  ///
+  /// On IO, drift's `NativeDatabase` creates missing parent directories
+  /// itself; the web query executor never opens `ioOptions`, so this method
+  /// must guarantee the directory exists or `FileDao.directory()`'s
+  /// non-recursive `create()` throws on first use (issue #104).
   Future<Directory> databaseDirectory() async {
-    return (await fs.databaseDirectory()).childDirectory(_name);
+    return (await fs.databaseDirectory())
+        .childDirectory(_name)
+        .create(recursive: true);
   }
 
   Future<File> databaseFile() async {

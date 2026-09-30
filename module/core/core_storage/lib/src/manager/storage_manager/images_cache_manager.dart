@@ -18,7 +18,12 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
     required LogBox logBox,
   }) : _fileDao = fileDao,
        _logbox = logBox,
-       super(Config('image', fileService: fileService));
+       super(
+         Config('image', fileService: fileService),
+         rescueEvictedFile: (object, file) async {
+           await fileDao.addFromFile(webUrl: object.url, file: file);
+         },
+       );
 
   Future<File> _getFromDatabase({required String url}) {
     return _fileDao

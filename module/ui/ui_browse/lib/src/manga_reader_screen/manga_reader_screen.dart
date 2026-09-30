@@ -123,8 +123,9 @@ class MangaReaderScreen extends StatelessWidget {
           const SizedBox(height: 16),
           OutlinedButton(
             onPressed: () {
-              if (error is FailedParsingHtmlException) {
-                _onTapRecrawl(context: context, url: error.url);
+              final recrawlUrl = recrawlUrlOf(error);
+              if (recrawlUrl != null) {
+                _onTapRecrawl(context: context, url: recrawlUrl);
               } else {
                 _cubit(context)?.init();
               }
