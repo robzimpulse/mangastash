@@ -1,0 +1,83 @@
+# Release Pipeline — manual version bump and tag creation from the default branch
+#
+# Purpose: replaces the manual "edit pubspec version, commit, git tag, git push"
+# release ritual with one dispatchable pipeline. Given a bump level (patch /
+# minor / major) it bumps the root pubspec.yaml version via
+# scripts/bump_version.sh, commits the change, and pushes an annotated tag
+# vX.Y.Z to the default branch. The tag push then triggers the existing build
+# pipelines (Android, Web, Linux, macOS, Windows), which create the GitHub
+# release and attach artifacts themselves.
+#
+# Usage: Actions tab -> Release Pipeline -> Run workflow -> pick bump level ->
+# run from the default branch (master). Runs from other branches are rejected.
+#
+# Requires: repo secret RELEASE_PAT — a fine-grained PAT with Contents read &
+# write on this repository. The push MUST use the PAT, not GITHUB_TOKEN:
+# GitHub suppresses workflow runs triggered by GITHUB_TOKEN, so a tag pushed
+# with it would never fire the build pipelines.
+
+name: Release Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump level'
+        type: choice
+        required: true
+        default: 'patch'
+        options:
+          - 'patch'
+          - 'minor'
+          - 'major'
+
+concurrency:
+  group: release-bump
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  bump-and-tag:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Git Checkout'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: ${{ github.ref }}
+      - name: 'Verify default branch'
+        run: |
+          DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
+          if [ "$GITHUB_REF_NAME" != "$DEFAULT_BRANCH" ]; then
+            echo "::error::Dispatched from '$GITHUB_REF_NAME', but this pipeline must run from the default branch '$DEFAULT_BRANCH'."
+            exit 1
+          fi
+      - name: 'Compute and apply version bump'
+        id: bump
+        run: |
+          NEXT="$(bash scripts/bump_version.sh pubspec.yaml "${{ inputs.bump }}")"
+          if git ls-remote --exit-code --tags origin "refs/tags/v$NEXT" >/dev/null 2>&1; then
+            echo "::error::Tag v$NEXT already exists on the remote — refusing to overwrite."
+            exit 1
+          fi
+          echo "next_version=$NEXT" >> "$GITHUB_OUTPUT"
+      - name: 'Commit, tag, and push'
+        env:
+          RELEASE_PAT: ${{ secrets.RELEASE_PAT }}
+        run: |
+          # Fail fast with a clear message if the PAT secret was never added —
+          # otherwise the push fails later with a generic auth error.
+          [ -n "${RELEASE_PAT:-}" ] || { echo "::error::RELEASE_PAT secret is not set — see the pipeline header comment / PR description for setup."; exit 1; }
+          NEXT="${{ steps.bump.outputs.next_version }}"
+          TAG="v$NEXT"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git remote set-url origin "https://x-access-token:${RELEASE_PAT}@github.com/${{ github.repository }}.git"
+          git add pubspec.yaml
+          git commit -m "chore(release): bump version to $TAG"
+          git tag -a "$TAG" -m "Release $TAG"
+          git push origin "$GITHUB_REF_NAME" "$TAG"
+          echo "Pushed $TAG — build pipelines triggered by the tag push."
