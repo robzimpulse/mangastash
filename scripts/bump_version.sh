@@ -28,7 +28,7 @@ case "$LEVEL" in
   *) die "unknown bump level: $LEVEL (expected major, minor, or patch)" ;;
 esac
 
-VERSION="$(grep -E '^version: ' "$PUBSPEC" | head -n 1 | sed 's/^version: //')"
+VERSION="$(grep -E '^version: ' "$PUBSPEC" | head -n 1 | sed 's/^version: //' || true)"
 [ -n "$VERSION" ] || die "no 'version:' line found in $PUBSPEC"
 [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] ||
   die "unsupported version '$VERSION' (expected plain major.minor.patch, e.g. 0.2.1)"
@@ -36,9 +36,10 @@ VERSION="$(grep -E '^version: ' "$PUBSPEC" | head -n 1 | sed 's/^version: //')"
 IFS='.' read -r MAJOR MINOR PATCH <<<"$VERSION"
 NEXT="$MAJOR.$MINOR.$PATCH"
 case "$LEVEL" in
-  major) NEXT="$((MAJOR + 1)).0.0" ;;
-  minor) NEXT="$MAJOR.$((MINOR + 1)).0" ;;
-  patch) NEXT="$MAJOR.$MINOR.$((PATCH + 1))" ;;
+  # 10# forces base 10: without it 08/09 components parse as (invalid) octal.
+  major) NEXT="$((10#$MAJOR + 1)).0.0" ;;
+  minor) NEXT="$MAJOR.$((10#$MINOR + 1)).0" ;;
+  patch) NEXT="$MAJOR.$MINOR.$((10#$PATCH + 1))" ;;
 esac
 
 TMP="$(mktemp)"

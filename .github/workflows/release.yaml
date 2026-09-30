@@ -68,6 +68,9 @@ jobs:
         env:
           RELEASE_PAT: ${{ secrets.RELEASE_PAT }}
         run: |
+          # Fail fast with a clear message if the PAT secret was never added —
+          # otherwise the push fails later with a generic auth error.
+          [ -n "${RELEASE_PAT:-}" ] || { echo "::error::RELEASE_PAT secret is not set — see the pipeline header comment / PR description for setup."; exit 1; }
           NEXT="${{ steps.bump.outputs.next_version }}"
           TAG="v$NEXT"
           git config user.name 'github-actions[bot]'

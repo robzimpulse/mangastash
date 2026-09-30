@@ -74,6 +74,12 @@ assert_output major 0.2.1 1.0.0
 assert_output patch 1.0.0 1.0.1
 assert_output major 9.9.9 10.0.0
 
+# Leading-zero components must be added in base 10, not octal (08/09 would
+# otherwise abort the arithmetic and silently print the unchanged version.
+assert_output minor 0.08.1 0.9.0
+assert_output patch 0.2.08 0.2.9
+assert_output major 1.09.3 2.0.0
+
 assert_rewritten patch 0.2.1 0.2.2
 assert_rewritten major 0.2.9 1.0.0
 
@@ -81,6 +87,20 @@ assert_rejected pre 0.2.1
 assert_rejected patch 0.2.1+5
 assert_rejected patch 0.2
 assert_rejected patch 0.2.x
+
+# A pubspec without a version: line must fail with the friendly die() message
+# (set -e must not abort on the empty grep pipeline before die runs).
+NO_VERSION_FIXTURE="$(mktemp -t pubspec.noversion.XXXXXX)"
+printf 'name: mangastash\ndescription: no version here\n' >"$NO_VERSION_FIXTURE"
+STDERR_NOV="$(bash "$SUBJECT" "$NO_VERSION_FIXTURE" patch 2>&1 >/dev/null)"
+RC_NOV=$?
+if [ "$RC_NOV" -ne 0 ] && printf '%s' "$STDERR_NOV" | grep -q "no 'version:' line"; then
+  PASS=$((PASS + 1))
+else
+  FAIL=$((FAIL + 1))
+  printf 'FAIL missing version line: rc=%d, stderr=%q (expected friendly message)\n' "$RC_NOV" "$STDERR_NOV"
+fi
+rm -f "$NO_VERSION_FIXTURE"
 
 printf '\n%d passed, %d failed\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ]
