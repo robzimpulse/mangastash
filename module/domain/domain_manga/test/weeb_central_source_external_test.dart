@@ -260,4 +260,14 @@ void main() {
     expect(scripts.first, contains('show_filter'));
     expect(scripts.length, greaterThan(1));
   });
+
+  test('reader waits for injected page images instead of a fixed sleep', () {
+    final scripts = source.getChapterImageUseCase.scripts.join();
+
+    expect(scripts, isNot(contains('setTimeout(function(){}, 2500)')));
+    expect(
+      source.getChapterImageUseCase.readyWhenSelectors,
+      contains('section#chapter-images img'),
+    );
+  });
 }
