@@ -173,5 +173,39 @@ void main() {
         await dao.adds(values: [tag.copyWith(name: const Value('Name3'))]);
       });
     });
+
+    group('Upsert Keeps Relationships (#137)', () {
+      test('renaming a tag keeps its manga relationships', () async {
+        final manga = MangaTablesCompanion(
+          id: const Value('m1'),
+          title: const Value('title'),
+          createdAt: Value(DateTime.now()),
+          updatedAt: Value(DateTime.now()),
+        );
+        await db.into(db.mangaTables).insert(manga);
+
+        const tag = TagTablesCompanion(
+          id: Value(99),
+          tagId: Value('tag1'),
+          name: Value('Name'),
+        );
+        final added = await dao.adds(values: [tag]);
+        await dao.attach(mangaId: 'm1', tagId: added.single.id);
+
+        // A name change used to REPLACE the tag row and cascade-delete
+        // its relationship rows across all manga.
+        await dao.adds(values: [tag.copyWith(name: const Value('Renamed'))]);
+
+        final relationships = await db.select(db.relationshipTables).get();
+        expect(
+          relationships.map((e) => e.mangaId),
+          equals(['m1']),
+        );
+        expect(
+          (await dao.search(names: ['Renamed'])).single.id,
+          equals(added.single.id),
+        );
+      });
+    });
   });
 }

@@ -11,4 +11,10 @@ class RelationshipTables extends Table with AutoTimestampTable {
   List<Set<Column<Object>>>? get uniqueKeys => [
     {tagId, mangaId},
   ];
+
+  @override
+  List<String> get customConstraints => [
+    'FOREIGN KEY (tag_id) REFERENCES tag_tables (id) ON DELETE CASCADE',
+    'FOREIGN KEY (manga_id) REFERENCES manga_tables (id) ON DELETE CASCADE',
+  ];
 }

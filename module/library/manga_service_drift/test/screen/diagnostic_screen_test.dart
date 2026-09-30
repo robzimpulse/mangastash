@@ -297,12 +297,16 @@ void main() {
     testWidgets('Orphaned Chapter: shows data and custom builder', (
       tester,
     ) async {
+      // v3 FKs block orphan inserts; the diagnostic targets dirty restored
+      // files, so seed with the pragma off (see diagnostic_dao_test).
+      await db.customStatement('PRAGMA foreign_keys = OFF');
       await insertChapter(
         id: 'c1',
         chapter: '1',
         webUrl: 'url1',
         mangaId: 'ghost',
       );
+      await db.customStatement('PRAGMA foreign_keys = ON');
 
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
@@ -323,7 +327,10 @@ void main() {
     testWidgets('Orphaned Image: shows data and custom builder', (
       tester,
     ) async {
+      // See Orphaned Chapter above for the pragma toggle.
+      await db.customStatement('PRAGMA foreign_keys = OFF');
       await insertImage(id: 'i1', chapterId: 'ghost', webUrl: 'url1');
+      await db.customStatement('PRAGMA foreign_keys = ON');
 
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
@@ -345,7 +352,9 @@ void main() {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
 
-      // Force SQL errors by dropping tables
+      // Force SQL errors by dropping tables. FKs must be off first —
+      // dropping a parent while a child table still references it fails.
+      await db.customStatement('PRAGMA foreign_keys = OFF');
       await db.customStatement('DROP TABLE manga_tables;');
       await db.customStatement('DROP TABLE chapter_tables;');
       await db.customStatement('DROP TABLE tag_tables;');
@@ -380,6 +389,9 @@ void main() {
       await insertChapter(id: 'c2', mangaId: mid, chapter: '1');
       await insertTag(tagId: 't1', name: 'T', source: 'S');
       await insertTag(tagId: 't2', name: 'T', source: 'S');
+      // v3 FKs block orphan inserts; the delete action targets them, so
+      // seed with the pragma off (see Orphaned Chapter above).
+      await db.customStatement('PRAGMA foreign_keys = OFF');
       await insertChapter(id: 'oc', mangaId: 'ghost', chapter: '2');
       await insertImage(id: 'oi', chapterId: 'ghost', webUrl: 'u');
 
