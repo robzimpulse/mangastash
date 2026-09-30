@@ -153,7 +153,13 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
     await _recrawlUseCase.execute(
       context: context,
       url: url,
-      scripts: state.source?.getChapterImageUseCase.scripts ?? [],
+      // Built-in sources (MangaDex) have no scraping use cases — their
+      // getters throw UnimplementedError — so pass no scripts for them.
+      scripts:
+          state.source?.let(
+            (e) => e.builtIn ? null : e.getChapterImageUseCase.scripts,
+          ) ??
+          [],
     );
     await init(useCache: false);
   }
