@@ -183,6 +183,15 @@ MockListenPrefetchChapterConfig mockListenPrefetchChapterConfig() {
   return mock;
 }
 
+/// Stubbed [ListenSourcesUseCase] (sealed ValueStream: valueOrNull is null).
+MockListenSourcesUseCase mockListenSourcesUseCase() {
+  final mock = MockListenSourcesUseCase();
+  when(() => mock.sourceStateStream).thenAnswer(
+    (_) => BehaviorSubject<List<SourceExternal>>(),
+  );
+  return mock;
+}
+
 /// Stubbed [MockSearchMangaScreenCubit] parent for grid-widget tests.
 MockSearchMangaScreenCubit mockSearchMangaScreenCubit() {
   final mock = MockSearchMangaScreenCubit();

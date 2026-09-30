@@ -80,19 +80,35 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     // TODO: add download manga
   }
 
+  /// Adds a manga from a pasted [url]. Failures (unparseable URL, unknown
+  /// source host, or a failed fetch) emit [LibraryMangaScreenState.addMangaError]
+  /// — surfaced as a snackbar by the screen — instead of being silently
+  /// swallowed.
   void add({required String url}) async {
     final uri = Uri.tryParse(url);
     final source = uri?.source;
-    if (uri != null && source != null) {
-      final result = await _getMangaFromUrlUseCase.execute(
-        source: source,
-        url: url,
+    if (uri == null || source == null) {
+      emit(
+        state.copyWith(
+          addMangaError: () => Exception('Unsupported manga url: $url'),
+        ),
       );
+      return;
+    }
 
-      if (result is Success<Manga>) {
-        if (state.mangas.map((e) => e.id).contains(result.data.id)) return;
-        _addToLibraryUseCase.execute(manga: result.data);
-      }
+    final result = await _getMangaFromUrlUseCase.execute(
+      source: source,
+      url: url,
+    );
+
+    if (result is Success<Manga>) {
+      if (state.mangas.map((e) => e.id).contains(result.data.id)) return;
+      _addToLibraryUseCase.execute(manga: result.data);
+      return;
+    }
+
+    if (result is Error<Manga>) {
+      emit(state.copyWith(addMangaError: () => result.error));
     }
   }
 
