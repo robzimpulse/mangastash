@@ -10,13 +10,11 @@ import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../extension/data_scrapped_extension.dart';
-import '../../mixin/filter_chapters_mixin.dart';
 import '../../mixin/sort_chapters_mixin.dart';
 import '../../mixin/sync_chapters_mixin.dart';
 import '../../sources/sources.dart';
 
-class SearchChapterUseCase
-    with SyncChaptersMixin, SortChaptersMixin, FilterChaptersMixin {
+class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
   final ChapterRepository _chapterRepository;
   final HeadlessWebviewUseCase _webview;
   final ConverterCacheManager _converterCacheManager;
@@ -114,17 +112,19 @@ class SearchChapterUseCase
       );
     });
 
-    final data = filterChapters(
-      chapters: sortChapters(chapters: chapters, parameter: parameter),
-      parameter: parameter,
-    );
+    // Scraped sources serve the entire chapter list in a single document —
+    // there is no second page to fetch. Hand back the complete sorted list
+    // and report hasNextPage: false so the UI's load-more (and
+    // GetAllChapterUseCase's page recursion) stops after one fetch instead
+    // of re-parsing the same document per 20-chapter slice.
+    final data = sortChapters(chapters: chapters, parameter: parameter);
 
     return Pagination(
       data: data,
       page: parameter.page,
       limit: parameter.limit,
       total: chapters.length,
-      hasNextPage: chapters.length > parameter.page * parameter.limit,
+      hasNextPage: false,
       sourceUrl: url,
     );
   }
