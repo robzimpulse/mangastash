@@ -85,4 +85,69 @@ void main() {
     verification.called(1);
     expect(verification.captured[2] as List<String>, isEmpty);
   });
+
+  test('recrawl passes the source scripts through for a scraped source', () async {
+    final recrawlUseCase = MockRecrawlUseCase();
+    final searchMangaUseCase = MockSearchMangaUseCase();
+    final getTagsUseCase = MockGetTagsUseCase();
+    when(
+      () => getTagsUseCase.execute(
+        source: any(named: 'source'),
+        useCache: any(named: 'useCache'),
+      ),
+    ).thenAnswer(
+      (_) async => Error<List<Tag>>(Exception('stubbed off in test')),
+    );
+    when(
+      () => searchMangaUseCase.clear(parameter: any(named: 'parameter')),
+    ).thenAnswer((_) async {});
+    when(
+      () => searchMangaUseCase.execute(
+        parameter: any(named: 'parameter'),
+        useCache: any(named: 'useCache'),
+      ),
+    ).thenAnswer(
+      (_) async => Error<Pagination<Manga>>(Exception('stubbed off in test')),
+    );
+    when(
+      () => recrawlUseCase.execute(
+        context: any(named: 'context'),
+        url: any(named: 'url'),
+        scripts: any(named: 'scripts'),
+      ),
+    ).thenAnswer((_) async {});
+
+    final cubit = BrowseMangaScreenCubit(
+      initialState: BrowseMangaScreenState(
+        source: FakeScrapedSourceExternal(),
+      ),
+      searchMangaUseCase: searchMangaUseCase,
+      addToLibraryUseCase: MockAddToLibraryUseCase(),
+      removeFromLibraryUseCase: MockRemoveFromLibraryUseCase(),
+      listenMangaFromLibraryUseCase: mockListenMangaFromLibraryUseCase(),
+      prefetchMangaUseCase: MockPrefetchMangaUseCase(),
+      listenPrefetchMangaUseCase: mockListenPrefetchUseCase(),
+      prefetchChapterUseCase: MockPrefetchChapterUseCase(),
+      listenSearchParameterUseCase: mockListenSearchParameterUseCase(),
+      getTagsUseCase: getTagsUseCase,
+      recrawlUseCase: recrawlUseCase,
+    );
+    addTearDown(cubit.close);
+
+    cubit.recrawl(context: _FakeBuildContext(), url: 'https://scraped.example.com/browse');
+    await pumpEventQueue();
+
+    final verification = verify(
+      () => recrawlUseCase.execute(
+        context: captureAny(named: 'context'),
+        url: captureAny(named: 'url'),
+        scripts: captureAny(named: 'scripts'),
+      ),
+    );
+    verification.called(1);
+    expect(
+      verification.captured[2] as List<String>,
+      FakeScrapedSourceExternal.searchScripts,
+    );
+  });
 }

@@ -64,6 +64,21 @@ void main() {
       ).thenAnswer((_) async => {parameter.toJsonString()});
 
       await expectLater(useCase.clear(parameter: parameter), completes);
+
+      // The cache-entry eviction still runs — the loop completed instead of
+      // throwing on the source getter.
+      verify(() => cacheManager.removeFile(any())).called(1);
+      // The source icon is evicted unconditionally; nothing else may be
+      // evicted from the html cache (resolving the search URL for MangaDex
+      // is exactly what used to throw UnimplementedError).
+      verify(
+        () => htmlCacheManager.removeFile('https://www.mangadex.org/favicon.ico'),
+      ).called(1);
+      verifyNever(
+        () => htmlCacheManager.removeFile(
+          any(that: isNot('https://www.mangadex.org/favicon.ico')),
+        ),
+      );
     });
 
     test('removes the html page for a scraped source', () async {

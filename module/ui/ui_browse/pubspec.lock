@@ -488,7 +488,7 @@ packages:
     source: hosted
     version: "17.0.0"
   html:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: html
       sha256: "43b67b8f43321ab066817dfac5619596c98bb1b61624e77203bb4351785f9699"

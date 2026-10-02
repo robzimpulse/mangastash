@@ -8,11 +8,77 @@
 // Keep this file free of test logic — it only declares types and default
 // stubs (empty streams, sealed BehaviorSubjects).
 import 'package:domain_manga/domain_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
+import 'package:html/dom.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'package:ui_browse/src/search_manga_screen/search_manga_screen_cubit.dart';
 import 'package:ui_browse/src/search_manga_screen/search_manga_screen_state.dart';
+
+/// Scraped-source double whose search scripts are non-empty. No real source
+/// ships non-empty `searchMangaUseCase.scripts` yet (all `[]`), so recrawl
+/// tests use this to prove scripts are passed through — an always-empty
+/// regression would fail against [searchScripts].
+class FakeScrapedSourceExternal implements SourceExternal {
+  static const List<String> searchScripts = ['__stub_scraped_script__'];
+
+  @override
+  String get baseUrl => 'https://scraped.example.com';
+
+  @override
+  String get iconUrl => '$baseUrl/favicon.ico';
+
+  @override
+  String get name => 'Scraped Example';
+
+  @override
+  bool get builtIn => false;
+
+  @override
+  GetChapterImageSourceExternalUseCase get getChapterImageUseCase =>
+      throw UnimplementedError();
+
+  @override
+  GetMangaSourceExternalUseCase get getMangaUseCase =>
+      throw UnimplementedError();
+
+  @override
+  ListChapterSourceExternalUseCase get listChapterUseCase =>
+      throw UnimplementedError();
+
+  @override
+  ListTagSourceExternalUseCase get listTagUseCase =>
+      throw UnimplementedError();
+
+  @override
+  SearchMangaSourceExternalUseCase get searchMangaUseCase =>
+      _StubSearchMangaUseCase();
+}
+
+class _StubSearchMangaUseCase implements SearchMangaSourceExternalUseCase {
+  @override
+  Duration? get timeout => null;
+
+  @override
+  List<String> get readyWhenSelectors => [];
+
+  @override
+  List<String> get scripts => FakeScrapedSourceExternal.searchScripts;
+
+  @override
+  String url({required SearchMangaParameter parameter}) =>
+      '${FakeScrapedSourceExternal().baseUrl}/browse';
+
+  @override
+  Future<List<MangaScrapped>> parse({
+    required Document root,
+    String? searchTerm,
+  }) async => [];
+
+  @override
+  Future<bool?> haveNextPage({required Document root}) async => false;
+}
 
 class MockSearchMangaUseCase extends Mock implements SearchMangaUseCase {}
 
