@@ -18,7 +18,7 @@ const _searchHtml = '''
       <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece"
          class="line-clamp-1 link link-hover">One Piece</a>
       <div class="opacity-70"><strong>Status:</strong><span>Ongoing</span></div>
-      <div class="opacity-70"><strong>Author(s):</strong><a class="link link-info link-hover">ODA Eiichiro</a></div>
+      <div class="opacity-70"><strong>Author(s):</strong><a href="https://weebcentral.com/search?author=ODA+Eiichiro" class="link link-info link-hover">ODA Eiichiro</a></div>
       <div class="opacity-70"><strong>Tag(s):</strong><span>Action</span><span>Adventure</span></div>
     </section>
   </article>
@@ -132,6 +132,32 @@ const _tagPanelHtml = '''
 </body></html>
 ''';
 
+/// Hardened card fixture: an article WITHOUT the Tailwind `bg-base-300 flex
+/// gap-4 p-4` chain (a redesign away from those classes must not break the
+/// parse) whose stable shape is an <a href*="/series/">. Includes the
+/// tooltip trap seen live 2026-10: a tooltip row later in the article links
+/// to a DIFFERENT series with line-clamp-1 — the title must come from the
+/// metadata link, not the first line-clamp-1 match.
+const _redesignedCardHtml = '''
+<div>
+  <article class="some-new-layout">
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">
+        <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+      </a>
+    </section>
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">One Piece</a>
+      <div><strong>Status:</strong><span>Ongoing</span></div>
+      <div><strong>Author(s):</strong><a href="https://weebcentral.com/search?author=ODA+Eiichiro">ODA Eiichiro</a></div>
+    </section>
+    <div>
+      <span class="tooltip"><a href="https://weebcentral.com/series/01J76XY7E4JCPK14V53BVQWD9Y/Bleach" class="line-clamp-1 link link-hover">Bleach</a></span>
+    </div>
+  </article>
+</div>
+''';
+
 void main() {
   final source = WeebCentralSourceExternal();
 
@@ -158,6 +184,20 @@ void main() {
     expect(results.single.status, 'Ongoing');
     expect(results.single.author, 'ODA Eiichiro');
     expect(results.single.tags, ['Action', 'Adventure']);
+  });
+
+  test('search parses a redesigned card anchored on the series link', () async {
+    final results = await source.searchMangaUseCase
+        .parse(root: html_parser.parse(_redesignedCardHtml));
+    expect(results, hasLength(1));
+    // The tooltip link to Bleach must not win over the metadata link.
+    expect(results.single.title, 'One Piece');
+    expect(
+      results.single.webUrl,
+      'https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece',
+    );
+    expect(results.single.status, 'Ongoing');
+    expect(results.single.author, 'ODA Eiichiro');
   });
 
   test('search haveNextPage false when no view-more button', () async {

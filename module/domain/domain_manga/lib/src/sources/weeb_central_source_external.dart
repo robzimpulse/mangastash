@@ -219,15 +219,36 @@ class _SearchMangaSourceExternalUseCase
     String? searchTerm,
   }) async {
     final mangas = <MangaScrapped>[];
-    for (final article in root.querySelectorAll('article.bg-base-300.flex.gap-4.p-4')) {
-      // The cover <a> also matches "/series/" but is empty; the title link
-      // carries the line-clamp-1 class.
-      final link = article.querySelector('a.line-clamp-1');
+    // Card anchor is structural: any <article> containing a series link.
+    // The old `article.bg-base-300.flex.gap-4.p-4` chain matched the live
+    // site but dies with the first Tailwind reshuffle; articles that hold
+    // no series link (nested cover wrappers) are skipped.
+    final articles = root.querySelectorAll('article').where(
+          (article) => article.querySelector('a[href*="/series/"]') != null,
+        );
+
+    for (final article in articles) {
+      // The metadata section is the one whose series link has non-empty
+      // text — the cover link and tooltip links are image-only or point at
+      // other series (seen live 2026-10: a tooltip `line-clamp-1` link to a
+      // different series inside the card).
+      final metadata = article
+          .querySelectorAll('section')
+          .where(
+            (section) =>
+                section
+                    .querySelectorAll('a[href*="/series/"]')
+                    .any((a) => a.text.trim().isNotEmpty),
+          )
+          .lastOrNull;
+      final link = metadata
+          ?.querySelectorAll('a[href*="/series/"]')
+          .firstWhereOrNull((a) => a.text.trim().isNotEmpty);
+
       final title = link?.text.trim();
       final coverUrl = article
           .querySelector('img[src*="temp.compsci88.com"]')
           ?.attributes['src'];
-      final metadata = article.querySelectorAll('section').lastOrNull;
 
       // Scan the metadata rows for the "Status:" label — Year is the first
       // .opacity-70 row, so we cannot rely on position.
@@ -241,9 +262,9 @@ class _SearchMangaSourceExternalUseCase
       }
 
       final status = metadata?.let((e) => rowValue(e, 'Status'));
-      final author = metadata?.querySelector('a.link-info')?.text.trim();
+      final author = metadata?.querySelector('a[href*="author="]')?.text.trim();
       final tags = metadata
-          ?.querySelectorAll('div.opacity-70')
+          ?.querySelectorAll('div')
           .where((e) => e.querySelector('strong')?.text.contains('Tag') ?? false)
           .firstOrNull
           ?.querySelectorAll('span')
