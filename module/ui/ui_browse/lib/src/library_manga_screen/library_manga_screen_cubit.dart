@@ -83,8 +83,10 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
   /// Adds a manga from a pasted [url]. Failures (unparseable URL, unknown
   /// source host, or a failed fetch) emit [LibraryMangaScreenState.addMangaError]
   /// — surfaced as a snackbar by the screen — instead of being silently
-  /// swallowed.
-  void add({required String url}) async {
+  /// swallowed. A successful (or duplicate) add clears any previous error so
+  /// a later equal-value failure still emits (bloc suppresses ==-equal
+  /// states and Exception compares by identity).
+  Future<void> add({required String url}) async {
     final uri = Uri.tryParse(url);
     final source = uri?.source;
     if (uri == null || source == null) {
@@ -102,14 +104,27 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     );
 
     if (result is Success<Manga>) {
-      if (state.mangas.map((e) => e.id).contains(result.data.id)) return;
-      _addToLibraryUseCase.execute(manga: result.data);
+      final alreadySaved = state.mangas
+          .map((e) => e.id)
+          .contains(result.data.id);
+      if (!alreadySaved) {
+        _addToLibraryUseCase.execute(manga: result.data);
+      }
+      _clearAddMangaError();
       return;
     }
 
     if (result is Error<Manga>) {
       emit(state.copyWith(addMangaError: () => result.error));
     }
+  }
+
+  /// Resets [LibraryMangaScreenState.addMangaError] when it is set — a stale
+  /// error would otherwise keep the snackbar listener armed against the next
+  /// identical failure.
+  void _clearAddMangaError() {
+    if (state.addMangaError == null) return;
+    emit(state.copyWith(addMangaError: () => null));
   }
 
   void update({bool? isSearchActive, String? mangaTitle}) {

@@ -4,7 +4,10 @@
 // screen wiring.
 //
 // Run with: fvm flutter test test/src/library_manga_screen/library_manga_screen_test.dart
+import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:domain_manga/src/sources/manga_dex_source_external.dart';
+import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -28,6 +31,10 @@ Future<void> pumpFrames(WidgetTester tester, [int frames = 6]) async {
 void main() {
   late MockGetMangaFromUrlUseCase getMangaFromUrlUseCase;
   late LibraryMangaScreenCubit cubit;
+
+  setUpAll(() {
+    registerFallbackValue(MangaDexSourceExternal());
+  });
 
   setUp(() {
     getMangaFromUrlUseCase = MockGetMangaFromUrlUseCase();
@@ -62,15 +69,31 @@ void main() {
     await pumpFrames(tester);
 
     expect(find.byType(SnackBar), findsOneWidget);
+    expect(
+      find.textContaining('Failed to add manga: Unsupported manga url'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('shows a snackbar when the fetch fails', (tester) async {
     await pumpScreen(tester);
+    when(
+      () => getMangaFromUrlUseCase.execute(
+        source: any(named: 'source'),
+        url: any(named: 'url'),
+        useCache: any(named: 'useCache'),
+      ),
+    ).thenAnswer((_) async => Error<Manga>(Exception('network failed')));
 
-    cubit.add(url: 'https://example.com/manga/x');
+    cubit.add(url: 'https://asurascans.com/comics/solo-swordmaster-3ec3b16f');
     await pumpFrames(tester);
 
     expect(find.byType(SnackBar), findsOneWidget);
+    // The "Exception: " prefix is stripped in the message.
+    expect(
+      find.textContaining('Failed to add manga: network failed'),
+      findsOneWidget,
+    );
   });
 }
 

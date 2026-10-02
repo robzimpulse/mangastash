@@ -112,5 +112,49 @@ void main() {
       ).called(1);
       expect(cubit.state.addMangaError, isNull);
     });
+
+    test('clears a previous error when the next add succeeds', () async {
+      cubit.add(url: 'not a url');
+      await pumpEventQueue();
+      expect(cubit.state.addMangaError, isNotNull);
+
+      when(
+        () => getMangaFromUrlUseCase.execute(
+          source: any(named: 'source'),
+          url: any(named: 'url'),
+          useCache: any(named: 'useCache'),
+        ),
+      ).thenAnswer((_) async => Success<Manga>(const Manga(id: 'm-2')));
+
+      cubit.add(url: 'https://asurascans.com/comics/solo-swordmaster-3ec3b16f');
+      await pumpEventQueue();
+
+      expect(cubit.state.addMangaError, isNull);
+    });
+
+    test('clears a previous error when the manga is already saved', () async {
+      cubit.add(url: 'not a url');
+      await pumpEventQueue();
+      expect(cubit.state.addMangaError, isNotNull);
+
+      when(
+        () => getMangaFromUrlUseCase.execute(
+          source: any(named: 'source'),
+          url: any(named: 'url'),
+          useCache: any(named: 'useCache'),
+        ),
+      ).thenAnswer((_) async => Success<Manga>(const Manga(id: 'm-1')));
+
+      cubit.emit(
+        cubit.state.copyWith(mangas: const [Manga(id: 'm-1')]),
+      );
+      cubit.add(url: 'https://asurascans.com/comics/solo-swordmaster-3ec3b16f');
+      await pumpEventQueue();
+
+      verifyNever(
+        () => addToLibraryUseCase.execute(manga: any(named: 'manga')),
+      );
+      expect(cubit.state.addMangaError, isNull);
+    });
   });
 }

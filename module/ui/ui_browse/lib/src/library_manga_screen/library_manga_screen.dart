@@ -112,7 +112,10 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
       listener: (context, state) {
         final error = state.addMangaError;
         if (error == null) return;
-        context.showSnackBar(message: 'Failed to add manga: $error');
+        // Strip the "Exception: " noise from `toString()` so the snackbar
+        // reads "Failed to add manga: Unsupported manga url: …".
+        final message = error.toString().replaceFirst('Exception: ', '');
+        context.showSnackBar(message: 'Failed to add manga: $message');
       },
       child: ScaffoldScreen(
         appBar: AppBar(
