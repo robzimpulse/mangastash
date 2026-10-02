@@ -4,6 +4,7 @@ import 'package:feature_common/feature_common.dart';
 import 'package:flutter/foundation.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
+import 'package:ui_common/ui_common.dart';
 
 import 'library_manga_screen_cubit.dart';
 import 'library_manga_screen_state.dart';
@@ -103,16 +104,30 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ScaffoldScreen(
-      appBar: AppBar(
-        title: _title(context: context),
-        actions: [
-          _layoutSearch(context: context),
-          _layoutAdd(context: context),
-          _layoutRefresh(context: context),
-        ],
+    return BlocListener<LibraryMangaScreenCubit, LibraryMangaScreenState>(
+      // A failed add-by-URL (invalid URL, unknown source, fetch error) is
+      // transient feedback about an action, not a grid state — surface it as
+      // a snackbar instead of leaving the user without any response (#121).
+      listenWhen: (prev, curr) => prev.addMangaError != curr.addMangaError,
+      listener: (context, state) {
+        final error = state.addMangaError;
+        if (error == null) return;
+        // Strip the "Exception: " noise from `toString()` so the snackbar
+        // reads "Failed to add manga: Unsupported manga url: …".
+        final message = error.toString().replaceFirst('Exception: ', '');
+        context.showSnackBar(message: 'Failed to add manga: $message');
+      },
+      child: ScaffoldScreen(
+        appBar: AppBar(
+          title: _title(context: context),
+          actions: [
+            _layoutSearch(context: context),
+            _layoutAdd(context: context),
+            _layoutRefresh(context: context),
+          ],
+        ),
+        body: _content(context),
       ),
-      body: _content(context),
     );
   }
 

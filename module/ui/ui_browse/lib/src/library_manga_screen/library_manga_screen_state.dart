@@ -8,6 +8,12 @@ class LibraryMangaScreenState extends Equatable {
 
   final Exception? error;
 
+  /// Failure of the last add-by-URL attempt (invalid URL, unknown source
+  /// host, or a failed fetch). Separate from [error] on purpose: [error] is
+  /// rendered by the grid as a full-page state, while this one only feeds a
+  /// transient snackbar.
+  final Exception? addMangaError;
+
   final List<Manga> mangas;
 
   final bool isSearchActive;
@@ -31,6 +37,7 @@ class LibraryMangaScreenState extends Equatable {
   const LibraryMangaScreenState({
     this.isLoading = false,
     this.error,
+    this.addMangaError,
     this.mangas = const [],
     this.sources = const [],
     this.prefetchedMangaIds = const {},
@@ -43,6 +50,7 @@ class LibraryMangaScreenState extends Equatable {
     return [
       isLoading,
       error,
+      addMangaError,
       mangas,
       isSearchActive,
       mangaTitle,
@@ -54,6 +62,7 @@ class LibraryMangaScreenState extends Equatable {
   LibraryMangaScreenState copyWith({
     bool? isLoading,
     ValueGetter<Exception?>? error,
+    ValueGetter<Exception?>? addMangaError,
     List<Manga>? mangas,
     Set<String>? prefetchedMangaIds,
     List<SourceExternal>? sources,
@@ -65,6 +74,9 @@ class LibraryMangaScreenState extends Equatable {
       mangas: mangas ?? this.mangas,
       sources: sources ?? this.sources,
       error: error != null ? error() : this.error,
+      addMangaError: addMangaError != null
+          ? addMangaError()
+          : this.addMangaError,
       isSearchActive: isSearchActive ?? this.isSearchActive,
       mangaTitle: mangaTitle ?? this.mangaTitle,
       prefetchedMangaIds: prefetchedMangaIds ?? this.prefetchedMangaIds,
