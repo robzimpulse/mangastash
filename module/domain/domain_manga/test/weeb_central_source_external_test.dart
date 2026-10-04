@@ -212,6 +212,28 @@ const _tooltipInSectionHtml = '''
 </div>
 ''';
 
+/// Tag row nested inside a wrapper div: the wrapper ALSO matches "has a
+/// Tag strong descendant" — picking it would drag its own spans (the
+/// badge) into the tag list. The parser must take the innermost row.
+const _nestedTagRowHtml = '''
+<div>
+  <article>
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">
+        <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+      </a>
+    </section>
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">One Piece</a>
+      <div class="wrapper">
+        <span class="badge">Hot</span>
+        <div><strong>Tag(s):</strong><span>Action</span><span>Adventure</span></div>
+      </div>
+    </section>
+  </article>
+</div>
+''';
+
 void main() {
   final source = WeebCentralSourceExternal();
 
@@ -275,6 +297,16 @@ void main() {
     expect(results, hasLength(1));
     expect(results.single.title, 'One Piece');
     expect(results.single.status, 'Ongoing');
+  });
+
+  test('search takes the innermost Tag row, not a nested wrapper', () async {
+    final results = await source.searchMangaUseCase
+        .parse(root: html_parser.parse(_nestedTagRowHtml));
+
+    // The wrapper div also matches "has a Tag strong descendant" — its
+    // badge span must not leak into the tags.
+    expect(results, hasLength(1));
+    expect(results.single.tags, ['Action', 'Adventure']);
   });
 
   test('search haveNextPage false when no view-more button', () async {

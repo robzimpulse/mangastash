@@ -275,10 +275,26 @@ class _SearchMangaSourceExternalUseCase
 
       final status = metadata?.let((e) => rowValue(e, 'Status'));
       final author = metadata?.querySelector('a[href*="author="]')?.text.trim();
-      final tags = metadata
+      // The Tag row is the div holding a "Tag" strong — but a nested
+      // wrapper CONTAINING that row matches too (its descendant strong
+      // satisfies querySelector), and the wrapper's own spans would
+      // pollute the tag list. Rows come in document order, so pick the
+      // innermost match: the first row that is not an ancestor of another.
+      final tagRows = metadata
           ?.querySelectorAll('div')
           .where((e) => e.querySelector('strong')?.text.contains('Tag') ?? false)
-          .firstOrNull
+          .toList();
+      Element? tagRow;
+      for (final row in tagRows ?? const <Element>[]) {
+        final isWrapper = (tagRows ?? const <Element>[]).any(
+          (other) => !identical(other, row) && _isAncestorOf(row, other),
+        );
+        if (!isWrapper) {
+          tagRow = row;
+          break;
+        }
+      }
+      final tags = tagRow
           ?.querySelectorAll('span')
           .map((e) => e.text.trim())
           .where((e) => e.isNotEmpty)
@@ -402,6 +418,15 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
 bool _hasArticleAncestor(Element element) {
   for (Element? node = element.parent; node != null; node = node.parent) {
     if (node.localName == 'article') return true;
+  }
+  return false;
+}
+
+/// Whether [ancestor] contains [node] anywhere below it (package:html has
+/// no deep Node.contains).
+bool _isAncestorOf(Element ancestor, Element node) {
+  for (Element? current = node.parent; current != null; current = current.parent) {
+    if (identical(current, ancestor)) return true;
   }
   return false;
 }
