@@ -136,8 +136,13 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     final ValueGetter<String?>? title;
     if (isClosing) {
       title = () => null;
-    } else if (mangaTitle != null) {
+    } else if (mangaTitle != null && mangaTitle.isNotEmpty) {
       title = () => mangaTitle;
+    } else if (mangaTitle != null) {
+      // Backspacing the field to empty fires onChanged('') — clear the
+      // filter rather than storing '' (contains('') keeps titled rows but
+      // hides null-titled ones; review on #159).
+      title = () => null;
     } else {
       title = null;
     }

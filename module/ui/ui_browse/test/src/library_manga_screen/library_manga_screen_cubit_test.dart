@@ -185,5 +185,28 @@ void main() {
         expect(cubit.state.filteredMangas, const [naruto, onePiece]);
       },
     );
+
+    test(
+      'backspacing the field to empty clears the filter while search stays open',
+      () {
+        // Review on #159: onChanged('') used to store '' (not null), and
+        // contains('') hides null-titled rows while keeping titled ones —
+        // two "show everything" gestures disagreed.
+        const untitled = Manga(id: 'm-untitled');
+        cubit.emit(
+          cubit.state.copyWith(mangas: const [naruto, untitled, onePiece]),
+        );
+
+        cubit.update(isSearchActive: true, mangaTitle: 'naruto');
+        expect(cubit.state.filteredMangas, const [naruto]);
+
+        cubit.update(mangaTitle: '');
+        expect(cubit.state.mangaTitle, isNull);
+        expect(
+          cubit.state.filteredMangas,
+          const [naruto, untitled, onePiece],
+        );
+      },
+    );
   });
 }
