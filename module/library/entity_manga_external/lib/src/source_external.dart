@@ -65,4 +65,10 @@ abstract class ListTagSourceExternalUseCase {
   /// See [GetMangaSourceExternalUseCase.readyWhenSelectors].
   List<String> get readyWhenSelectors => [];
   Future<List<TagScrapped>> parse({required Document root});
+
+  /// The page to open for the tag list, when it differs from the search
+  /// page (null = the search page, which is where most sources list their
+  /// genres — e.g. WeebCentral's checkboxes live only on /search while its
+  /// search url is a fragment endpoint).
+  String? get url => null;
 }

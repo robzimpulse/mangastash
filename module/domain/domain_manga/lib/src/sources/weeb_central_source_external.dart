@@ -40,7 +40,7 @@ class WeebCentralSourceExternal implements SourceExternal {
 
   @override
   ListTagSourceExternalUseCase get listTagUseCase =>
-      _ListTagSourceExternalUseCase();
+      _ListTagSourceExternalUseCase(baseUrl);
 }
 
 class _GetChapterImageSourceExternalUseCase
@@ -235,19 +235,28 @@ class _SearchMangaSourceExternalUseCase
 
     for (final article in articles) {
       // The metadata section is the one whose series link has non-empty
-      // text — the cover link and tooltip links are image-only or point at
-      // other series (seen live 2026-10: a tooltip `line-clamp-1` link to a
-      // different series inside the card). FIRST match wins: the card's own
-      // metadata ships before any tooltip section that may follow it.
-      final metadata = article
+      // text — but live 2026-10 cards wrap a mobile cover whose anchor
+      // carries text (an "Official" ribbon + an overlay title) inside the
+      // FIRST section, so text alone no longer identifies metadata (#162).
+      // Real metadata ships labeled rows: prefer the first text-link
+      // section that ALSO has a <strong> row; fall back to the first
+      // text-link section only when no section has rows, so a future
+      // title-only layout degrades to the old behavior instead of parsing
+      // nothing.
+      final sectionsWithTextLinks = article
           .querySelectorAll('section')
           .where(
             (section) =>
                 section
                     .querySelectorAll('a[href*="/series/"]')
                     .any((a) => a.text.trim().isNotEmpty),
-          )
-          .firstOrNull;
+          );
+      final metadata =
+          sectionsWithTextLinks
+              .firstWhereOrNull(
+                (section) => section.querySelector('strong') != null,
+              ) ??
+          sectionsWithTextLinks.firstOrNull;
       final link = metadata
           ?.querySelectorAll('a[href*="/series/"]')
           .firstWhereOrNull((a) => a.text.trim().isNotEmpty);
@@ -368,11 +377,21 @@ class _SearchMangaSourceExternalUseCase
 }
 
 class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
+  final String _baseUrl;
+
+  const _ListTagSourceExternalUseCase(this._baseUrl);
+
   @override
   List<String> get readyWhenSelectors => [];
 
   @override
   Duration? get timeout => Duration(seconds: 15);
+
+  @override
+  // The genre checkboxes live ONLY on /search; searchMangaUseCase.url()
+  // points at the /search/data htmx fragment, which ships zero checkboxes
+  // (issue #163).
+  String? get url => '$_baseUrl/search';
 
   @override
   Future<List<TagScrapped>> parse({required Document root}) async {

@@ -289,6 +289,11 @@ List<String>? _dataGenre(Element item) {
 }
 
 class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
+
+  //// Genres are listed on the search page this source already opens.
+  @override
+  String? get url => null;
+
   @override
   List<String> get readyWhenSelectors => [];
 
