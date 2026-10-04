@@ -7,6 +7,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:ui_updates/src/manga_history_screen/manga_history_screen_cubit.dart';
+import 'package:ui_updates/src/manga_history_screen/manga_history_screen_state.dart';
 
 import '../../mock/mock.dart';
 
@@ -49,6 +50,28 @@ void main() {
 
       final cubit = MangaHistoryScreenCubit(
         listenReadHistoryUseCase: listenRead,
+      );
+      addTearDown(cubit.close);
+
+      await Future<void>.delayed(Duration.zero);
+
+      expect(cubit.state.histories, isEmpty);
+    },
+  );
+
+  test(
+    'a malformed initialState is sanitized before it becomes the state',
+    () async {
+      // Review follow-up on #158: the stream filter must also cover
+      // constructor-provided initial states, or an all-malformed
+      // initialState renders blank rows instead of the Empty Data state.
+      final cubit = MangaHistoryScreenCubit(
+        initialState: MangaHistoryScreenState(
+          histories: [
+            MangaChapter(manga: null, chapter: seedChapter(id: 'c-x')),
+          ],
+        ),
+        listenReadHistoryUseCase: mockListenReadHistoryUseCase(),
       );
       addTearDown(cubit.close);
 
