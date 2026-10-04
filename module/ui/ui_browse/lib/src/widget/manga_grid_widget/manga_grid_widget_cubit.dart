@@ -70,6 +70,9 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
       state.copyWith(
         isLoading: true,
         mangas: [],
+        // A new epoch reclaims the paging flag from any superseded next()
+        // (review on #160) — the flag is per-epoch, not per-cubit-lifetime.
+        isPagingNextPage: false,
         parameter: (parameter ?? state.parameter).copyWith(
           offset: 0,
           page: 1,
@@ -171,6 +174,10 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
   }
 
   Future<void> next() async {
+    // A next() started while init() is still in flight would share its
+    // epoch — both fetches append and advance the page by +2 (review on
+    // #160; same guard shape as MangaDetailScreenCubit.nextChapter).
+    if (state.isLoading) return;
     if (!state.hasNextPage || state.isPagingNextPage) return;
     // Belongs to the current request epoch: a newer init bumps the token and
     // this fetch's response is dropped automatically.
@@ -179,9 +186,11 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
     try {
       await _fetchManga(seq: seq);
     } finally {
-      // Always reset: init never turns paging on, so this cannot clobber a
-      // newer request's state.
-      emit(state.copyWith(isPagingNextPage: false));
+      // Gated by the epoch: a superseded next() must not clear the paging
+      // flag of the newer epoch whose init reclaimed it (review on #160).
+      if (seq == _requestSeq) {
+        emit(state.copyWith(isPagingNextPage: false));
+      }
     }
   }
 

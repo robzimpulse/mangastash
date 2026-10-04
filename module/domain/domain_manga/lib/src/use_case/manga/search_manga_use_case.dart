@@ -140,7 +140,19 @@ class SearchMangaUseCase with SyncMangasMixin {
           (e) => Manga.fromJson(e.castOrNull()),
         );
       });
-    } catch (_) {
+    } catch (e, st) {
+      // The read must never break the fetch — a poisoned cache is always
+      // treated as a miss — but leave a trace, or it is undebuggable in
+      // the field (review on #160).
+      _logBox.log(
+        'Corrupt search cache treated as a miss',
+        extra: {
+          'key': key,
+          'error': e.toString(),
+          'stack': st.toString(),
+        },
+        name: runtimeType.toString(),
+      );
       cached = null;
     }
 

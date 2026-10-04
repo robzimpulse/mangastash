@@ -7,6 +7,7 @@
 import 'dart:convert';
 
 import 'package:core_analytics/core_analytics.dart';
+import 'package:core_analytics/core_analytics.dart' as analytics;
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/src/use_case/manga/search_manga_use_case.dart';
@@ -112,6 +113,13 @@ void main() {
 
   group('SearchMangaUseCase.execute (issue #122)', () {
     test('a corrupt cache file is treated as a miss and refetched', () async {
+      // LogBox.log is an extension method, so mocktail cannot intercept it
+      // — the corrupt-cache path now logs, which needs a real Storage
+      // behind the mock's field (see CLAUDE.md's LogBox entry).
+      final logBox = MockLogBox();
+      when(() => logBox.storage).thenReturn(
+        analytics.Storage(liveDataStorage: analytics.MemoryStorage()),
+      );
       final repository = MockMangaRepository();
       final useCase = SearchMangaUseCase(
         mangaRepository: repository,
@@ -120,7 +128,7 @@ void main() {
         htmlCacheManager: htmlCacheManager,
         searchMangaCacheManager: cacheManager,
         mangaDao: MockMangaDao(),
-        logBox: MockLogBox(),
+        logBox: logBox,
       );
 
       // A cache entry exists, but its file cannot be read (corrupt or

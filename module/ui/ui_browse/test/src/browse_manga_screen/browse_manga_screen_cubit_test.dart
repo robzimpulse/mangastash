@@ -247,6 +247,54 @@ void main() {
     });
 
     test(
+      'next is refused while init is still loading (review on #160)',
+      () async {
+        // A completed load leaves hasNextPage true; pull-to-refresh (init)
+        // starts and next() fires before it lands — both would share one
+        // epoch, append twice and advance the page by +2.
+        final responses = completeInCallOrder();
+        final warmup = cubit.init();
+        await pumpEventQueue();
+        responses[0].complete(
+          Success(
+            Pagination(
+              data: const [Manga(id: 'p1')],
+              page: 1,
+              limit: 20,
+              total: 60,
+              hasNextPage: true,
+            ),
+          ),
+        );
+        await warmup;
+        expect(cubit.state.hasNextPage, isTrue);
+
+        final init = cubit.init();
+        await pumpEventQueue();
+        expect(responses, hasLength(2));
+
+        cubit.next(); // same epoch as the in-flight init — must not run
+        await pumpEventQueue();
+
+        expect(cubit.state.isPagingNextPage, isFalse);
+        expect(responses, hasLength(2));
+
+        responses[1].complete(
+          Success(
+            Pagination(
+              data: const [],
+              page: 1,
+              limit: 20,
+              total: 0,
+              hasNextPage: false,
+            ),
+          ),
+        );
+        await init;
+      },
+    );
+
+    test(
       'drops a stale init response superseded by a newer init (#123)',
       () async {
         final responses = completeInCallOrder();
@@ -399,6 +447,87 @@ void main() {
         expect(cubit.state.mangas, const [Manga(id: 'fresh')]);
 
         await Future.wait([first, second]);
+      },
+    );
+
+    test(
+      "a stale next()'s finally must not clear a newer next()'s paging flag (review on #160)",
+      () async {
+        final responses = completeInCallOrder();
+
+        final warmup = cubit.init();
+        await pumpEventQueue();
+        responses[0].complete(
+          Success(
+            Pagination(
+              data: const [Manga(id: 'p1')],
+              page: 1,
+              limit: 20,
+              total: 60,
+              hasNextPage: true,
+            ),
+          ),
+        );
+        await warmup;
+
+        // next #1 starts, then init #2 supersedes (its opening emit
+        // reclaims the paging flag, as it now must).
+        final staleNext = cubit.next();
+        await pumpEventQueue();
+        expect(cubit.state.isPagingNextPage, isTrue);
+
+        final init = cubit.init();
+        await pumpEventQueue();
+        responses[2].complete(
+          Success(
+            Pagination(
+              data: const [Manga(id: 'fresh')],
+              page: 1,
+              limit: 20,
+              total: 60,
+              hasNextPage: true,
+            ),
+          ),
+        );
+        await init;
+
+        // next #2 belongs to the new epoch and is legitimately in flight.
+        final activeNext = cubit.next();
+        await pumpEventQueue();
+        expect(responses, hasLength(4));
+        expect(cubit.state.isPagingNextPage, isTrue);
+
+        // The stale next #1's fetch lands LAST — its finally must not clear
+        // the active next #2's flag.
+        responses[1].complete(
+          Success(
+            Pagination(
+              data: const [Manga(id: 'stale')],
+              page: 2,
+              limit: 20,
+              total: 60,
+            ),
+          ),
+        );
+        await pumpEventQueue();
+
+        expect(cubit.state.isPagingNextPage, isTrue);
+        expect(cubit.state.mangas, const [Manga(id: 'fresh')]);
+
+        responses[3].complete(
+          Success(
+            Pagination(
+              data: const [Manga(id: 'p2')],
+              page: 2,
+              limit: 20,
+              total: 60,
+            ),
+          ),
+        );
+        await Future.wait([staleNext, activeNext]);
+
+        expect(cubit.state.isPagingNextPage, isFalse);
+        expect(cubit.state.mangas, const [Manga(id: 'fresh'), Manga(id: 'p2')]);
       },
     );
   });
