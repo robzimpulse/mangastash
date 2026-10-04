@@ -104,6 +104,9 @@ const _detailHtml = '''
 const _detailLiveHtml = '''
 <html><body>
   <h1>A Cool Girl and a 12cm Promise</h1>
+  <ul class="sub-menu genres">
+    <li><a href="https://mangakatana.com/genre/action">Action</a></li>
+  </ul>
   <ul>
     <li class="d-row-small">
       <div class="d-cell-small label">Author(s) / Artist(s):</div>
@@ -223,6 +226,36 @@ const _browseLastPageHtml = '''
 </body></html>
 ''';
 
+/// Search page-2 fixture (captured live 2026-10 from
+/// /page/2?search=sword&search_by=m_name): same `#book_list` card shape
+/// as page 1, with the live `ul.uk-pagination` + `a.next.page-numbers`
+/// nav — pins that page-2 results parse through the shared path and the
+/// nav reports a next page (review on #168).
+const _searchPage2Html = '''
+<html><body>
+  <div id="book_list">
+    <div class="item" data-id="777" data-genre="Action,Adventure">
+      <div class="media">
+        <div class="wrap_img">
+          <a href="https://mangakatana.com/manga/sword-master.777">
+            <img src="https://mangakatana.com/imgs/cover/sword.jpg" alt="[Cover]">
+          </a>
+        </div>
+      </div>
+      <div class="text">
+        <h3 class="title"><a href="https://mangakatana.com/manga/sword-master.777">Sword Master</a></h3>
+      </div>
+    </div>
+  </div>
+  <ul class="uk-pagination">
+    <li><a class="prev page-numbers" href="https://mangakatana.com/?search=sword&search_by=m_name">&lt;</a></li>
+    <li><a class="page-numbers" href="https://mangakatana.com/?search=sword&search_by=m_name">1</a></li>
+    <li class="uk-active"><span class="page-numbers current">2</span></li>
+    <li><a class="next page-numbers" href="https://mangakatana.com/page/3?search=sword&search_by=m_name">&gt;</a></li>
+  </ul>
+</body></html>
+''';
+
 void main() {
   final source = MangakatanaSourceExternal();
 
@@ -273,6 +306,26 @@ void main() {
         ),
         'https://mangakatana.com/page/3?search=sword&search_by=m_name',
       );
+    },
+  );
+
+  test(
+    'search page 2 parses cards and reports the next page (review on #168)',
+    () async {
+      final results = await source.searchMangaUseCase.parse(
+        root: html_parser.parse(_searchPage2Html),
+      );
+      expect(results, hasLength(1));
+      expect(results.single.title, 'Sword Master');
+      expect(
+        results.single.webUrl,
+        'https://mangakatana.com/manga/sword-master.777',
+      );
+
+      final next = await source.searchMangaUseCase.haveNextPage(
+        root: html_parser.parse(_searchPage2Html),
+      );
+      expect(next, isTrue);
     },
   );
 
