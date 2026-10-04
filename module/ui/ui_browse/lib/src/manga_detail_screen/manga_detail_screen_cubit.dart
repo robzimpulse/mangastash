@@ -117,8 +117,15 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
   Future<void> init({bool useCache = true}) async {
     emit(state.copyWith(isLoadingManga: true, errorManga: () => null));
-    await _fetchManga(useCache: useCache);
-    emit(state.copyWith(isLoadingManga: false));
+    try {
+      await _fetchManga(useCache: useCache);
+    } catch (e) {
+      emit(state.copyWith(errorManga: () => _asException(e)));
+    } finally {
+      // A throw must never strand the loading flag (issue #122) — and the
+      // remaining phases still run below.
+      emit(state.copyWith(isLoadingManga: false));
+    }
 
     await Future.wait([
       initChapter(refresh: !useCache),
@@ -157,9 +164,13 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     if (refresh) await _clearChapterCache();
 
-    await _fetchChapter(useCache: !refresh);
-
-    emit(state.copyWith(isLoadingChapters: false));
+    try {
+      await _fetchChapter(useCache: !refresh);
+    } catch (e) {
+      emit(state.copyWith(errorChapters: () => _asException(e)));
+    } finally {
+      emit(state.copyWith(isLoadingChapters: false));
+    }
   }
 
   Future<void> initSimilarManga({refresh = false}) async {
@@ -179,9 +190,13 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
     if (refresh) await _clearSimilarMangaCache();
 
-    await _fetchSimilarManga(useCache: !refresh);
-
-    emit(state.copyWith(isLoadingSimilarManga: false));
+    try {
+      await _fetchSimilarManga(useCache: !refresh);
+    } catch (e) {
+      emit(state.copyWith(errorSimilarManga: () => _asException(e)));
+    } finally {
+      emit(state.copyWith(isLoadingSimilarManga: false));
+    }
   }
 
   Future<void> _fetchManga({bool useCache = true}) async {
@@ -391,4 +406,9 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     );
     await init(useCache: false);
   }
+}
+
+/// Fits any thrown object into the state's `Exception?` error field.
+Exception _asException(Object error) {
+  return error is Exception ? error : Exception(error.toString());
 }

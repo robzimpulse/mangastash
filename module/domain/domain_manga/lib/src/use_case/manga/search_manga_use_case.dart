@@ -125,16 +125,26 @@ class SearchMangaUseCase with SyncMangasMixin {
     bool useCache = true,
   }) async {
     final key = parameter.toJsonString();
-    final cache = await _searchMangaCacheManager.getFileFromCache(key);
-    final file = await cache?.file.readAsString(encoding: utf8);
-    final data = file.let((e) {
-      return Pagination.fromJsonString(
-        e,
-        (e) => Manga.fromJson(e.castOrNull()),
-      );
-    });
 
-    if (data != null && useCache) return Success(data);
+    // A corrupt or partially-written cache file must be treated as a miss
+    // (issue #122): this read happens before the fetch try below and used
+    // to escape execute() entirely, stalling the calling cubit's loading
+    // state forever.
+    Pagination<Manga>? cached;
+    try {
+      final cache = await _searchMangaCacheManager.getFileFromCache(key);
+      final file = await cache?.file.readAsString(encoding: utf8);
+      cached = file.let((e) {
+        return Pagination.fromJsonString(
+          e,
+          (e) => Manga.fromJson(e.castOrNull()),
+        );
+      });
+    } catch (_) {
+      cached = null;
+    }
+
+    if (cached != null && useCache) return Success(cached);
 
     try {
       final source = Sources.fromName(parameter.source);
