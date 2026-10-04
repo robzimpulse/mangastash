@@ -166,6 +166,74 @@ const _chapterListHtml = '''
 </body></html>
 ''';
 
+/// Chapter-scoping fixture: the same-shaped hero "continue reading" link
+/// and a related-series row live OUTSIDE the ChapterList island. The old
+/// page-global `a[data-astro-prefetch]` scan picked both up — a dup of
+/// chapter 10 and a foreign series row. The parser must scope to the
+/// island holding the most chapter anchors and dedupe by webUrl.
+const _chapterScopingHtml = '''
+<html><body>
+<a href="/comics/solo-swordmaster-3ec3b16f/chapter/10" data-astro-prefetch="hover" class="hero">
+  <span class="font-medium">Continue Reading</span>
+</a>
+<div class="related">
+  <a href="/comics/other-series-99/chapter/3" data-astro-prefetch="hover">
+    <span class="font-medium">Other Series Chapter 3</span>
+  </a>
+</div>
+<div class="mt-4">
+  <astro-island uid="ZKJYEk" component-url="/_astro/ChapterListReact.BMxpg3iO.js" ssr client="load" await-children>
+    <a href="/comics/solo-swordmaster-3ec3b16f/chapter/10" data-astro-prefetch="hover">
+      <span class="font-medium">Chapter 10</span>
+      <div class="text-right"><span>Just now</span></div>
+    </a>
+    <a href="/comics/solo-swordmaster-3ec3b16f/chapter/9" data-astro-prefetch="hover">
+      <span class="font-medium">Chapter 9</span>
+      <div class="text-right"><span>1 day ago</span></div>
+    </a>
+  </astro-island>
+</div>
+</body></html>
+''';
+
+/// Browse cards WITHOUT the `div.p-3` wrapper: the title anchor wraps the
+/// h3 directly (card 1) or the h3 is bare and the cover anchor is the only
+/// /comics/ link (card 2). The old selector required the `p-3` padding
+/// hook, which drifts with redesigns.
+const _browseRedesignedHtml = '''
+<html><body>
+<div class="grid">
+  <div class="series-card">
+    <a href="/comics/solo-swordmaster-3ec3b16f" class="cover">
+      <img src="https://cdn.asurascans.com/asura-images/covers/solo-swordmaster.467196-400.webp" alt="Solo Swordmaster">
+    </a>
+    <a href="/comics/solo-swordmaster-3ec3b16f"><h3> Solo Swordmaster </h3></a>
+    <span class="capitalize"> ongoing </span>
+  </div>
+  <div class="series-card">
+    <a href="/comics/bare-title-77" class="cover">
+      <img src="https://cdn.asurascans.com/asura-images/covers/bare-title.webp" alt="Bare Title">
+    </a>
+    <h3> Bare Title </h3>
+    <span class="capitalize"> ongoing </span>
+  </div>
+</div>
+</body></html>
+''';
+
+/// Series detail WITHOUT img#mobile-cover-img but WITH the standard
+/// og:image meta — the desktop-UA fallback path.
+const _detailNoMobileCoverHtml = '''
+<html><head>
+<meta property="og:image" content="https://cdn.asurascans.com/asura-images/covers/solo-swordmaster.467196-400.webp">
+</head><body><main>
+  <article>
+    <h1> Solo Swordmaster </h1>
+    <div id="description-text">Synopsis.</div>
+  </article>
+</main></body></html>
+''';
+
 /// Genre-filter island fixture (asurascans.com /browse): the genre list
 /// ships server-rendered in the astro-island `props` attribute as
 /// devalue-encoded `availableGenres` — no dropdown click needed.
@@ -174,6 +242,24 @@ const _genresIslandHtml = '''
 <astro-island uid="Zd5p2V" component-url="/_astro/SeriesFilters.js" component-export="default" renderer-url="/_astro/client.js" props="{&quot;initialQuery&quot;:[0,&quot;&quot;],&quot;availableGenres&quot;:[1,[[0,{&quot;id&quot;:[0,1],&quot;name&quot;:[0,&quot;Action&quot;],&quot;slug&quot;:[0,&quot;action&quot;]}],[0,{&quot;id&quot;:[0,4],&quot;name&quot;:[0,&quot;Adventure&quot;],&quot;slug&quot;:[0,&quot;adventure&quot;]}],[0,{&quot;id&quot;:[0,16],&quot;name&quot;:[0,&quot;Fantasy&quot;],&quot;slug&quot;:[0,&quot;fantasy&quot;]}]]],&quot;totalCount&quot;:[0,351]}" ssr client="load" await-children>
   <button data-dropdown="true" class="h-[45px] px-3 bg-[#1f1a2e] border"><span>Genres</span></button>
 </astro-island>
+</body></html>
+''';
+
+/// Broken-props fixture: the island's props attribute carries truncated
+/// JSON (a reshaped/truncated payload) — parse must degrade to an empty
+/// list instead of throwing a FormatException out of parse.
+const _genresBrokenPropsHtml = '''
+<html><body>
+<astro-island uid="Zd5p2V" component-url="/_astro/SeriesFilters.js" props="{&quot;availableGenres&quot;:[1,[[0,{&quot;name&quot;:[0,&quot;Act" ssr client="load" await-children></astro-island>
+</body></html>
+''';
+
+/// Flat-payload fixture: `availableGenres` is a list whose second element
+/// is a scalar — the entries guard must bail instead of throwing a
+/// TypeError while iterating.
+const _genresFlatPropsHtml = '''
+<html><body>
+<astro-island uid="Zd5p2V" component-url="/_astro/SeriesFilters.js" props="{&quot;availableGenres&quot;:[1,&quot;flat&quot;]}" ssr client="load" await-children></astro-island>
 </body></html>
 ''';
 
@@ -253,6 +339,24 @@ void main() {
       expect(results.single.status, 'ongoing');
     });
 
+    test('search parses cards without the div.p-3 wrapper', () async {
+      final results = await source.searchMangaUseCase.parse(
+        root: html_parser.parse(_browseRedesignedHtml),
+      );
+
+      // Card 1: the h3 sits inside its own /comics/ anchor. Card 2: the h3
+      // is bare, so the cover anchor is the fallback — no `p-3` hook, no
+      // null webUrl.
+      expect(results, hasLength(2));
+      expect(results.first.title, 'Solo Swordmaster');
+      expect(
+        results.first.webUrl,
+        'https://asurascans.com/comics/solo-swordmaster-3ec3b16f',
+      );
+      expect(results.last.title, 'Bare Title');
+      expect(results.last.webUrl, 'https://asurascans.com/comics/bare-title-77');
+    });
+
     test('search haveNextPage true while the next-page button is enabled', () async {
       final next = await source.searchMangaUseCase.haveNextPage(
         root: html_parser.parse(_browseHtml),
@@ -284,6 +388,19 @@ void main() {
       expect(manga.author, 'Shadowless');
       expect(manga.tags, ['Action', 'Adventure', 'Fantasy']);
     });
+
+    test('falls back to the og:image meta when the mobile cover id is gone', () async {
+      final manga = await source.getMangaUseCase.parse(
+        root: html_parser.parse(_detailNoMobileCoverHtml),
+      );
+
+      // The app webview runs a desktop UA — the mobile cover id may not
+      // ship; og:image keeps the cover parsing.
+      expect(
+        manga.coverUrl,
+        'https://cdn.asurascans.com/asura-images/covers/solo-swordmaster.467196-400.webp',
+      );
+    });
   });
 
   group('chapter list (Astro SSR fallback rows)', () {
@@ -301,6 +418,24 @@ void main() {
       );
       expect(chapters.first.readableAt, 'Just now');
     });
+
+    test('scopes to the chapter-list island and dedupes hero/related rows', () async {
+      final chapters = await source.listChapterUseCase.parse(
+        root: html_parser.parse(_chapterScopingHtml),
+      );
+
+      // The hero link (dup of chapter 10) and the related-series row sit
+      // outside the island and must not leak in.
+      expect(chapters, hasLength(2));
+      expect(chapters.map((e) => e.title), ['Chapter 10', 'Chapter 9']);
+      expect(
+        chapters.map((e) => e.webUrl),
+        [
+          'https://asurascans.com/comics/solo-swordmaster-3ec3b16f/chapter/10',
+          'https://asurascans.com/comics/solo-swordmaster-3ec3b16f/chapter/9',
+        ],
+      );
+    });
   });
 
   group('tags (astro-island props)', () {
@@ -317,9 +452,27 @@ void main() {
       ]);
     });
 
-    test('needs no injected scripts and waits only for the island', () {
+    test('needs no injected scripts and waits only for the genre island', () {
       expect(source.listTagUseCase.scripts, isEmpty);
-      expect(source.listTagUseCase.readyWhenSelectors, ['astro-island']);
+      expect(source.listTagUseCase.readyWhenSelectors, [
+        'astro-island[props*="availableGenres"]',
+      ]);
+    });
+
+    test('degrades malformed props JSON to an empty list', () async {
+      final tags = await source.listTagUseCase.parse(
+        root: html_parser.parse(_genresBrokenPropsHtml),
+      );
+
+      expect(tags, isEmpty);
+    });
+
+    test('degrades a non-list genre payload to an empty list', () async {
+      final tags = await source.listTagUseCase.parse(
+        root: html_parser.parse(_genresFlatPropsHtml),
+      );
+
+      expect(tags, isEmpty);
     });
   });
 }

@@ -158,6 +158,60 @@ const _redesignedCardHtml = '''
 </div>
 ''';
 
+/// Over-match traps: (1) a nested article pair — outer card plus an inner
+/// recommendation wrapper — must count once (nested inner is skipped and
+/// webUrls dedupe); (2) an article with a series link but NO cover image
+/// (a text row) is not a card; (3) an image-only recommendation article
+/// (no text link) ships no title and must not become a phantom entry.
+const _searchTrapsHtml = '''
+<div>
+  <article class="outer-card">
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">
+        <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+      </a>
+    </section>
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">One Piece</a>
+    </section>
+    <article class="inner-wrapper">
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">One Piece</a>
+      <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+    </article>
+  </article>
+  <article class="text-row">
+    <a href="https://weebcentral.com/series/01J76XY7E4JCPK14V53BVQWD9Y/Bleach">Bleach</a>
+  </article>
+  <article class="image-only">
+    <a href="https://weebcentral.com/series/01J76XYAAAAAAAAAAAAAAAAAAAAAA/Naruto">
+      <img src="https://temp.compsci88.com/cover/fallback/01J76XYAAAAAAAAAAAAAAAAAAAAAA.jpg" alt="cover">
+    </a>
+  </article>
+</div>
+''';
+
+/// Tooltip moved INTO a section: two sections carry non-empty-text series
+/// links; the FIRST is the card's own metadata, the second the tooltip —
+/// the title must come from the first match.
+const _tooltipInSectionHtml = '''
+<div>
+  <article>
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">
+        <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+      </a>
+    </section>
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">One Piece</a>
+      <div><strong>Status:</strong><span>Ongoing</span></div>
+    </section>
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E4JCPK14V53BVQWD9Y/Bleach">Bleach</a>
+    </section>
+  </article>
+</div>
+''';
+
 void main() {
   final source = WeebCentralSourceExternal();
 
@@ -198,6 +252,29 @@ void main() {
     );
     expect(results.single.status, 'Ongoing');
     expect(results.single.author, 'ODA Eiichiro');
+  });
+
+  test('search skips nested, text-row and image-only article traps', () async {
+    final results = await source.searchMangaUseCase
+        .parse(root: html_parser.parse(_searchTrapsHtml));
+
+    // The nested inner article, the no-cover text row and the image-only
+    // recommendation must not become cards — only the outer One Piece card.
+    expect(results, hasLength(1));
+    expect(results.single.title, 'One Piece');
+    expect(
+      results.single.webUrl,
+      'https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece',
+    );
+  });
+
+  test('search prefers the first metadata section over a later tooltip section', () async {
+    final results = await source.searchMangaUseCase
+        .parse(root: html_parser.parse(_tooltipInSectionHtml));
+
+    expect(results, hasLength(1));
+    expect(results.single.title, 'One Piece');
+    expect(results.single.status, 'Ongoing');
   });
 
   test('search haveNextPage false when no view-more button', () async {

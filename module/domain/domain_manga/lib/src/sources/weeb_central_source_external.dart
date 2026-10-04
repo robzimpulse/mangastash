@@ -219,19 +219,26 @@ class _SearchMangaSourceExternalUseCase
     String? searchTerm,
   }) async {
     final mangas = <MangaScrapped>[];
-    // Card anchor is structural: any <article> containing a series link.
-    // The old `article.bg-base-300.flex.gap-4.p-4` chain matched the live
-    // site but dies with the first Tailwind reshuffle; articles that hold
-    // no series link (nested cover wrappers) are skipped.
+    final seen = <String>{};
+    // Card anchor is structural: an <article> that IS a card — not nested
+    // inside another article (nested cover wrappers made outer and inner
+    // both parse as cards and double-counted the series), and holding BOTH
+    // a series link and a cover image (text rows / non-card articles with
+    // a bare series link produced phantoms). Cards are deduped by webUrl
+    // as a final guard.
     final articles = root.querySelectorAll('article').where(
-          (article) => article.querySelector('a[href*="/series/"]') != null,
+          (article) =>
+              !_hasArticleAncestor(article) &&
+              article.querySelector('a[href*="/series/"]') != null &&
+              article.querySelector('img') != null,
         );
 
     for (final article in articles) {
       // The metadata section is the one whose series link has non-empty
       // text — the cover link and tooltip links are image-only or point at
       // other series (seen live 2026-10: a tooltip `line-clamp-1` link to a
-      // different series inside the card).
+      // different series inside the card). FIRST match wins: the card's own
+      // metadata ships before any tooltip section that may follow it.
       final metadata = article
           .querySelectorAll('section')
           .where(
@@ -240,10 +247,15 @@ class _SearchMangaSourceExternalUseCase
                     .querySelectorAll('a[href*="/series/"]')
                     .any((a) => a.text.trim().isNotEmpty),
           )
-          .lastOrNull;
+          .firstOrNull;
       final link = metadata
           ?.querySelectorAll('a[href*="/series/"]')
           .firstWhereOrNull((a) => a.text.trim().isNotEmpty);
+
+      // No title link → not a card (image-only recommendation rows); skip
+      // instead of emitting a phantom. Also dedupes repeated webUrls.
+      final webUrl = link?.attributes['href'];
+      if (webUrl == null || !seen.add(webUrl)) continue;
 
       final title = link?.text.trim();
       final coverUrl = article
@@ -276,7 +288,7 @@ class _SearchMangaSourceExternalUseCase
         MangaScrapped(
           title: title,
           coverUrl: coverUrl,
-          webUrl: link?.attributes['href'],
+          webUrl: webUrl,
           status: status,
           author: author,
           tags: tags,
@@ -382,4 +394,14 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
       'setTimeout(function(){}, 2500);',
     ];
   }
+}
+
+/// Whether [element] sits inside another <article> — nested cover wrappers
+/// made outer and inner articles both parse as cards (package:html has no
+/// closest()).
+bool _hasArticleAncestor(Element element) {
+  for (Element? node = element.parent; node != null; node = node.parent) {
+    if (node.localName == 'article') return true;
+  }
+  return false;
 }

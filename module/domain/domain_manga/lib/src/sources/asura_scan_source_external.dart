@@ -95,9 +95,20 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
   /// `a[href^="/browse?genres="]`, status via the "Status" label cell.
   @override
   Future<MangaScrapped> parse({required Document root}) async {
-    final title = root.querySelector('h1')?.text.trim();
+    // Scope the title to the content area — a page-global `h1` would pick
+    // up a site-header heading on a redesign.
+    final title =
+        (root.querySelector('article h1') ??
+                root.querySelector('main h1') ??
+                root.querySelector('h1'))
+            ?.text
+            .trim();
+    // img#mobile-cover-img is the live cover id, but the app webview runs a
+    // DESKTOP user agent (user_agent_mixin) — if the id is renamed or only
+    // rendered on mobile layouts, fall back to the og:image meta.
     final coverUrl =
-        root.querySelector('img#mobile-cover-img')?.attributes['src'];
+        root.querySelector('img#mobile-cover-img')?.attributes['src'] ??
+        root.querySelector('meta[property="og:image"]')?.attributes['content'];
     final description = root
         .querySelector('#description-text')
         ?.text
@@ -105,6 +116,9 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
 
     // The Status/Type row pair: a small label cell reading exactly
     // "Status", whose sibling value is the capitalized status span.
+    // NOTE: `div.text-xs` + `span.capitalize` are the next hooks expected
+    // to drift — unlike the ids/labels around them they are pure styling
+    // classes. If status ever reads null, start here.
     String? status;
     for (final label in root.querySelectorAll('div.text-xs')) {
       if (label.text.trim() != 'Status') continue;
@@ -159,6 +173,11 @@ class _ListChapterSourceExternalUseCase
 
   const _ListChapterSourceExternalUseCase(this._baseUrl, this._name);
 
+  /// Chapter hrefs END in /chapter/{slug} — the `.` covers decimal
+  /// specials ("Chapter 10.5"), the `/?$` anchor excludes reader sub-pages
+  /// and fragments.
+  static final _chapterHref = RegExp(r'/chapter/[\w.-]+/?$');
+
   @override
   List<String> get readyWhenSelectors => [];
 
@@ -168,29 +187,58 @@ class _ListChapterSourceExternalUseCase
   @override
   Future<List<ChapterScrapped>> parse({required Document root}) async {
     // Chapter rows ship in the Astro SSR fallback (and after React
-    // hydration keep the same shape): anchors carrying data-astro-prefetch
-    // and a /chapter/{n} href. There is NO per-row lock marker in the
-    // current DOM — premium ("Read Offline") chapters render identically to
-    // free ones — so rows are never filtered (verified live 2026-10; the
-    // old amber-gradient check matched nothing).
-    final regions = root
-        .querySelectorAll('a[data-astro-prefetch]')
-        .where((e) => (e.attributes['href'] ?? '').contains('/chapter/'));
+    // hydration keep the same shape): anchors whose href ENDS in
+    // /chapter/{slug} — reader sub-pages and query strings do not count.
+    // The page also carries same-shaped "continue reading" hero links and
+    // related-row chapter links, so the scan scopes to the astro-island
+    // holding the most chapter anchors (the chapter list) and falls back
+    // to the whole document only when no island holds any; rows are then
+    // deduped by webUrl. There is NO per-row lock marker in the current
+    // DOM — premium ("Read Offline") chapters render identically to free
+    // ones — so rows are never filtered (verified live 2026-10; the old
+    // amber-gradient check matched nothing).
+    final candidates = root.querySelectorAll('a').where(
+      (e) => _chapterHref.hasMatch(e.attributes['href'] ?? ''),
+    );
+    if (candidates.isEmpty) return [];
 
-    final chapters = regions.map((row) {
+    final byIsland = <Element?, List<Element>>{};
+    for (final candidate in candidates) {
+      byIsland.putIfAbsent(_nearestIsland(candidate), () => []).add(candidate);
+    }
+    final islandGroups = [
+      for (final entry in byIsland.entries)
+        if (entry.key != null) entry.value,
+    ];
+    final rows = islandGroups.isNotEmpty
+        ? islandGroups.reduce(
+            (best, group) => group.length > best.length ? group : best,
+          )
+        : byIsland[null]!;
+
+    final seen = <String>{};
+    final chapters = <ChapterScrapped>[];
+    for (final row in rows) {
+      final href = row.attributes['href'];
+      // Unreachable in practice — candidates matched _chapterHref — but the
+      // type system needs the null check before joining.
+      if (href == null) continue;
+      final webUrl = [_baseUrl, href].join('');
+      if (!seen.add(webUrl)) continue;
       final title = row.querySelector('span.font-medium')?.text.trim();
       final date = row.querySelector('.text-right')?.text.trim();
 
-      return ChapterScrapped(
-        title: title,
-        chapter: title?.split(' ').lastOrNull,
-        readableAt: date,
-        webUrl: row.attributes['href'].let((e) => [_baseUrl, e].join('')),
-        scanlationGroup: _name,
+      chapters.add(
+        ChapterScrapped(
+          title: title,
+          chapter: title?.split(' ').lastOrNull,
+          readableAt: date,
+          webUrl: webUrl,
+          scanlationGroup: _name,
+        ),
       );
-    });
-
-    return chapters.toList();
+    }
+    return chapters;
   }
 
   @override
@@ -233,7 +281,13 @@ class _SearchMangaSourceExternalUseCase
 
     final mangas = region.map((card) {
       final title = card.querySelector('h3')?.text.trim();
-      final link = card.querySelector('div.p-3 a[href^="/comics/"]');
+      // Title link: the anchor wrapping the h3 when one exists, falling
+      // back to the card's first /comics/ anchor (the cover link). The old
+      // selector required the `div.p-3` wrapper — a padding hook that
+      // drifts with redesigns and silently left webUrl null (dead nav).
+      final link =
+          _enclosingAnchor(card.querySelector('h3')) ??
+          card.querySelector('a[href^="/comics/"]');
       final coverUrl = card.querySelector('img')?.attributes['src'];
       final webUrl = link?.attributes['href'].let(
         (href) => [_baseUrl, href].join(''),
@@ -301,7 +355,12 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
   Duration? get timeout => Duration(seconds: 20);
 
   @override
-  List<String> get readyWhenSelectors => ['astro-island'];
+  List<String> get readyWhenSelectors => [
+    // Readiness is the props-bearing genre island, not just any island —
+    // a bare `astro-island` matches every island on the page and proves
+    // nothing about the props being SSR'd.
+    'astro-island[props*="availableGenres"]',
+  ];
 
   /// The genre list ships server-rendered inside the browse page's filter
   /// astro-island: its `props` attribute carries devalue-encoded
@@ -322,14 +381,26 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
     }
     if (props == null) return [];
 
-    final decoded = jsonDecode(props);
+    // A truncated/reshaped props payload must degrade to "no tags", not
+    // throw a FormatException out of parse.
+    dynamic decoded;
+    try {
+      decoded = jsonDecode(props);
+    } on FormatException {
+      return [];
+    }
     if (decoded is! Map<String, dynamic>) return [];
 
     final genres = decoded['availableGenres'];
     if (genres is! List || genres.length < 2) return [];
+    final entries = genres[1];
+    // Only the OUTER list is checked above; the payload shape lives in
+    // entries, so a scalar second element must bail instead of throwing
+    // a TypeError on the loop below.
+    if (entries is! List) return [];
 
     final tags = <TagScrapped>[];
-    for (final entry in genres[1]) {
+    for (final entry in entries) {
       if (entry is! List || entry.length < 2 || entry[1] is! Map) continue;
       final name = entry[1]['name'];
       final slug = entry[1]['slug'];
@@ -353,4 +424,21 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
     // dropdown never has to open for the genre list to be readable.
     return [];
   }
+}
+
+/// Nearest `<a>` ancestor of [element] (package:html has no closest()).
+Element? _enclosingAnchor(Element? element) {
+  for (Element? node = element; node != null; node = node.parent) {
+    if (node.localName == 'a') return node;
+  }
+  return null;
+}
+
+/// Nearest `astro-island` ancestor of [element], or null when it sits
+/// outside every island.
+Element? _nearestIsland(Element element) {
+  for (Element? node = element.parent; node != null; node = node.parent) {
+    if (node.localName == 'astro-island') return node;
+  }
+  return null;
 }
