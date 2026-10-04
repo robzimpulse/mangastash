@@ -381,7 +381,13 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     _recrawlUseCase.execute(
       context: context,
       url: url,
-      scripts: state.source?.getMangaUseCase.scripts ?? [],
+      // Built-in sources (MangaDex) have no scraping use cases — their
+      // getters throw UnimplementedError — so pass no scripts for them.
+      scripts:
+          state.source?.let(
+            (e) => e.builtIn ? null : e.getMangaUseCase.scripts,
+          ) ??
+          [],
     );
     await init(useCache: false);
   }
