@@ -67,8 +67,12 @@ abstract class ListTagSourceExternalUseCase {
   Future<List<TagScrapped>> parse({required Document root});
 
   /// The page to open for the tag list, when it differs from the search
-  /// page (null = the search page, which is where most sources list their
-  /// genres — e.g. WeebCentral's checkboxes live only on /search while its
-  /// search url is a fragment endpoint).
+  /// page — null falls back to `searchMangaUseCase.url(page: 1)`, which is
+  /// where most sources list their genres. Override when the tag list
+  /// lives elsewhere: that fallback is whatever the search URL resolves
+  /// to — for WeebCentral a `/search/data` fragment with zero checkboxes,
+  /// so it points at `/search` (issue #163). Note the deliberate shape
+  /// difference from the chapter-list hook: tags are one global page
+  /// (`url` getter), chapters are per-manga (`url({webUrl})` method).
   String? get url => null;
 }

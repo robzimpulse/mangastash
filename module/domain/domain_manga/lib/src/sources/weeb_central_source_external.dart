@@ -238,11 +238,10 @@ class _SearchMangaSourceExternalUseCase
       // text — but live 2026-10 cards wrap a mobile cover whose anchor
       // carries text (an "Official" ribbon + an overlay title) inside the
       // FIRST section, so text alone no longer identifies metadata (#162).
-      // Real metadata ships labeled rows: prefer the first text-link
-      // section that ALSO has a <strong> row; fall back to the first
-      // text-link section only when no section has rows, so a future
-      // title-only layout degrades to the old behavior instead of parsing
-      // nothing.
+      // Real metadata ships LABELED rows — strongs whose text carries a
+      // colon ("Status:", "Author(s):", "Tag(s):") — which badges like a
+      // tooltip's <strong>New</strong> or a future ribbon markup lack
+      // (review on #169).
       final sectionsWithTextLinks = article
           .querySelectorAll('section')
           .where(
@@ -254,9 +253,16 @@ class _SearchMangaSourceExternalUseCase
       final metadata =
           sectionsWithTextLinks
               .firstWhereOrNull(
-                (section) => section.querySelector('strong') != null,
+                (section) => section
+                    .querySelectorAll('strong')
+                    .any((s) => s.text.contains(':')),
               ) ??
-          sectionsWithTextLinks.firstOrNull;
+          // No section carries labeled rows — degrade to the LAST text-link
+          // section: every observed layout ships the cover FIRST, so the
+          // last text-bearing section is metadata, never the cover (the
+          // pre-fix first-match fallback re-created the ribbon defect for
+          // strong-less layouts — review on #169).
+          sectionsWithTextLinks.lastOrNull;
       final link = metadata
           ?.querySelectorAll('a[href*="/series/"]')
           .firstWhereOrNull((a) => a.text.trim().isNotEmpty);

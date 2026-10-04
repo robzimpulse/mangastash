@@ -279,6 +279,52 @@ const _officialRibbonCardHtml = '''
 </div>
 ''';
 
+/// Card fixture (review on #169): a tooltip section shipping BEFORE the
+/// metadata, carrying a text link to a DIFFERENT series plus a colon-less
+/// `<strong>New</strong>` badge — a bare strong check would pick the
+/// tooltip and cross-contaminate the card with the wrong series.
+const _tooltipStrongFirstCardHtml = '''
+<div>
+  <article class="bg-base-300 flex gap-4 p-4">
+    <section class="w-full lg:w-[25%]">
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">
+        <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+      </a>
+    </section>
+    <section class="hidden lg:block">
+      <a href="https://weebcentral.com/series/01J76XY7E4JCPK14V53BVQWD9Y/Bleach">Bleach</a>
+      <strong>New</strong>
+    </section>
+    <section class="hidden lg:block lg:w-[75%]">
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">One Piece</a>
+      <div class="opacity-70"><strong>Status:</strong><span>Ongoing</span></div>
+      <div class="opacity-70"><strong>Author(s):</strong><a href="https://weebcentral.com/search?author=ODA+Eiichiro">ODA Eiichiro</a></div>
+    </section>
+  </article>
+</div>
+''';
+
+/// Card fixture (review on #169): a strong-less layout — cover section
+/// (with ribbon + overlay title text) first, text-only metadata second.
+/// The degraded fallback must still pick metadata, never the cover.
+const _stronglessCardHtml = '''
+<div>
+  <article class="bg-base-300 flex gap-4 p-4">
+    <section class="w-full lg:w-[25%]">
+      <a href="https://weebcentral.com/series/01J76XY7E2VCSR0ZCC21KGXS1K/Kobato">
+        <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E2VCSR0ZCC21KGXS1K.jpg" alt="cover">
+        <div>Official</div>
+        <div>Kobato.</div>
+      </a>
+    </section>
+    <section class="hidden lg:block lg:w-[75%]">
+      <a href="https://weebcentral.com/series/01J76XY7E2VCSR0ZCC21KGXS1K/Kobato">Kobato.</a>
+      <a href="https://weebcentral.com/search?author=CLAMP">CLAMP</a>
+    </section>
+  </article>
+</div>
+''';
+
 void main() {
   final source = WeebCentralSourceExternal();
 
@@ -370,6 +416,35 @@ void main() {
         results.single.coverUrl,
         'https://temp.compsci88.com/cover/fallback/01J76XY7E2VCSR0ZCC21KGXS1K.jpg',
       );
+    },
+  );
+
+  test(
+    'search ignores a colon-less strong badge in an earlier tooltip section (review on #169)',
+    () async {
+      final results = await source.searchMangaUseCase
+          .parse(root: html_parser.parse(_tooltipStrongFirstCardHtml));
+      expect(results, hasLength(1));
+      // The tooltip links to a different series and carries <strong>New</strong>
+      // — only labeled rows (colon-bearing strongs) identify metadata.
+      expect(results.single.title, 'One Piece');
+      expect(results.single.webUrl, contains('One-Piece'));
+      expect(results.single.status, 'Ongoing');
+      expect(results.single.author, 'ODA Eiichiro');
+    },
+  );
+
+  test(
+    'search degrades to the last text-link section, never the cover (review on #169)',
+    () async {
+      final results = await source.searchMangaUseCase
+          .parse(root: html_parser.parse(_stronglessCardHtml));
+      expect(results, hasLength(1));
+      // Strong-less layout: the cover ships first, so the degraded pick is
+      // the LAST text-link section — not the first, which is the cover
+      // anchor carrying the ribbon + overlay title.
+      expect(results.single.title, 'Kobato.');
+      expect(results.single.author, 'CLAMP');
     },
   );
 
