@@ -4,22 +4,25 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:manga_dex_api/manga_dex_api.dart';
 
-/// Search-results fixture (one `div.item`), mirroring mangakatana.com
-/// /search?keyword=one+piece.
+/// Search-results fixture (one `div.item` using the `.d-cell` card
+/// template). Verified live 2026-10: both the root-search route the app uses
+/// and the homepage list their cards inside `#book_list`.
 const _searchHtml = '''
-<div class="covers">
-  <div class="item" data-id="123" data-genre="Action, Adventure">
-    <div class="d-cell media">
-      <div class="wrap_img">
-        <a href="https://mangakatana.com/manga/one-piece.123">
-          <img data-src="https://mkcdn.mangakatana.com/cover/one-piece.jpg" alt="cover">
-        </a>
+<div id="book_list">
+  <div class="covers">
+    <div class="item" data-id="123" data-genre="Action, Adventure">
+      <div class="d-cell media">
+        <div class="wrap_img">
+          <a href="https://mangakatana.com/manga/one-piece.123">
+            <img data-src="https://mkcdn.mangakatana.com/cover/one-piece.jpg" alt="cover">
+          </a>
+        </div>
       </div>
-    </div>
-    <div class="d-cell text">
-      <h3 class="title"><a href="https://mangakatana.com/manga/one-piece.123">One Piece</a></h3>
-      <div class="status ongoing">Ongoing</div>
-      <div class="chapter"><a href="https://mangakatana.com/manga/one-piece.123/c1040">Chapter 1040</a></div>
+      <div class="d-cell text">
+        <h3 class="title"><a href="https://mangakatana.com/manga/one-piece.123">One Piece</a></h3>
+        <div class="status ongoing">Ongoing</div>
+        <div class="chapter"><a href="https://mangakatana.com/manga/one-piece.123/c1040">Chapter 1040</a></div>
+      </div>
     </div>
   </div>
 </div>
@@ -125,6 +128,72 @@ const _genreHtml = '''
 </body></html>
 ''';
 
+/// Homepage fixture (mangakatana.com /page/N): the latest-manga list sits in
+/// `#book_list`, a `ul.uk-pagination` follows it, and the `#hot_book` sidebar
+/// repeats its own `.item[data-id]` cards on every page (captured live
+/// 2026-10: /page/2 overlaps page 1 by 51 of 73 page-wide cards — all 53
+/// shared ones belong to the sidebar).
+const _browsePageHtml = '''
+<html><body>
+  <div id="book_list">
+    <div class="item" data-id="27774" data-genre="Action">
+      <div class="media">
+        <div class="wrap_img">
+          <a href="https://mangakatana.com/manga/latest-manga.27774">
+            <img src="https://mangakatana.com/imgs/cover/latest.jpg" alt="[Cover]">
+          </a>
+        </div>
+      </div>
+      <div class="text">
+        <h3 class="title"><a href="https://mangakatana.com/manga/latest-manga.27774">Latest Manga</a></h3>
+      </div>
+    </div>
+  </div>
+  <ul class="uk-pagination">
+    <li class="uk-active"><span class="page-numbers current">1</span></li>
+    <li><a class="page-numbers" href="https://mangakatana.com/page/2">2</a></li>
+    <li><a class="next page-numbers" href="https://mangakatana.com/page/2">&gt;</a></li>
+  </ul>
+  <div id="hot_book">
+    <div class="item" data-id="999">
+      <div class="media">
+        <div class="wrap_img">
+          <a href="https://mangakatana.com/manga/hot-sidebar-manga.999">
+            <img src="https://mangakatana.com/imgs/cover/hot.jpg" alt="[Cover]">
+          </a>
+        </div>
+      </div>
+      <div class="text">
+        <h3 class="title"><a href="https://mangakatana.com/manga/hot-sidebar-manga.999">Hot Sidebar Manga</a></h3>
+      </div>
+    </div>
+  </div>
+</body></html>
+''';
+
+/// Last-page variant: the pagination nav renders no `li.next` link.
+const _browseLastPageHtml = '''
+<html><body>
+  <div id="book_list">
+    <div class="item" data-id="27774" data-genre="Action">
+      <div class="media">
+        <div class="wrap_img">
+          <a href="https://mangakatana.com/manga/latest-manga.27774">
+            <img src="https://mangakatana.com/imgs/cover/latest.jpg" alt="[Cover]">
+          </a>
+        </div>
+      </div>
+      <div class="text">
+        <h3 class="title"><a href="https://mangakatana.com/manga/latest-manga.27774">Latest Manga</a></h3>
+      </div>
+    </div>
+  </div>
+  <ul class="uk-pagination">
+    <li class="uk-active"><span class="page-numbers current">1397</span></li>
+  </ul>
+</body></html>
+''';
+
 void main() {
   final source = MangakatanaSourceExternal();
 
@@ -164,6 +233,43 @@ void main() {
       ),
       'https://mangakatana.com/',
     );
+  });
+
+  test('browse url maps page 2+ of an empty query to the /page/N route', () {
+    expect(
+      source.searchMangaUseCase.url(
+        parameter: const SearchMangaParameter(page: 2),
+      ),
+      'https://mangakatana.com/page/2',
+    );
+    expect(
+      source.searchMangaUseCase.url(
+        parameter: const SearchMangaParameter(page: 7),
+      ),
+      'https://mangakatana.com/page/7',
+    );
+  });
+
+  test('browse haveNextPage true when the pagination nav has a next link', () async {
+    final next = await source.searchMangaUseCase.haveNextPage(
+      root: html_parser.parse(_browsePageHtml),
+    );
+    expect(next, isTrue);
+  });
+
+  test('browse haveNextPage false on the last page', () async {
+    final next = await source.searchMangaUseCase.haveNextPage(
+      root: html_parser.parse(_browseLastPageHtml),
+    );
+    expect(next, isFalse);
+  });
+
+  test('browse parse scopes cards to #book_list (ignores #hot_book sidebar)', () async {
+    final results = await source.searchMangaUseCase.parse(
+      root: html_parser.parse(_browsePageHtml),
+    );
+    expect(results, hasLength(1));
+    expect(results.single.title, 'Latest Manga');
   });
 
   test('search url maps title to root path with search_by', () {

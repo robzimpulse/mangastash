@@ -215,8 +215,11 @@ class _SearchMangaSourceExternalUseCase
 
   @override
   Future<bool?> haveNextPage({required Document root}) async {
-    // Results are a single batch; Katana ignores the page parameter.
-    return false;
+    // Browse (homepage /page/N) renders a `ul.uk-pagination` whose final
+    // entry is an `<a class="next …">` link to the next page; the last page
+    // has no such link. Search results are a single batch with no pagination
+    // nav, so this returns false there too.
+    return root.querySelector('ul.uk-pagination a.next') != null;
   }
 
   @override
@@ -228,9 +231,11 @@ class _SearchMangaSourceExternalUseCase
 
     // Both the `.d-cell` search-route template and the `.media` root-search
     // template share the shape: `div.item[data-id]` → `h3.title a` link +
-    // an `img` cover + an optional `div.status.ongoing`. Query by those
-    // stable pieces instead of the layout-specific `d-cell` classes.
-    for (final item in root.querySelectorAll('div.item[data-id]')) {
+    // an `img` cover + an optional `div.status.ongoing`. Scope to `#book_list`
+    // — on the homepage the `#hot_book` sidebar repeats its own `.item`
+    // cards on every page (captured live 2026-10), which would otherwise
+    // leak into every browse page.
+    for (final item in root.querySelectorAll('#book_list div.item[data-id]')) {
       final link = item.querySelector('h3.title a');
       if (link == null) continue;
 
@@ -260,12 +265,14 @@ class _SearchMangaSourceExternalUseCase
       // Browse (empty query): the root search route renders "Not found any
       // results" in `#book_list`, and on viewports < 768px the site's JS
       // empties the Hot Manga widget, leaving zero `div.item[data-id]` cards
-      // in the DOM. Serve the homepage instead, whose `#book_list` lists
-      // latest manga in the same `.media` card template.
-      return '$_baseUrl/';
+      // in the DOM. Serve the paginated latest-manga list instead — page 1
+      // is the homepage, further pages are /page/N (20 cards each).
+      final page = parameter.page;
+      return page <= 1 ? '$_baseUrl/' : '$_baseUrl/page/$page';
     }
     // The site's search form posts to the root path; `/search` is a 404.
-    // `search_by=m_name` makes the query match against manga names.
+    // `search_by=m_name` makes the query match against manga names. Results
+    // are a single batch — the site ignores any page parameter here.
     return '$_baseUrl/?search=$q&search_by=m_name';
   }
 }
