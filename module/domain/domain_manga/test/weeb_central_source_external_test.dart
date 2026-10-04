@@ -534,6 +534,19 @@ void main() {
   });
 
   test(
+    'chapter list url tolerates a trailing slash on the stored webUrl (review on #167)',
+    () {
+      // Legacy rows may store `…/series/{id}/`; suffixing blindly would
+      // request `…/series/{id}//full-chapter-list`.
+      const seriesUrl = 'https://weebcentral.com/series/01J76XY7E3JVY2XJGG8VGP46NN/';
+      expect(
+        source.listChapterUseCase.url(webUrl: seriesUrl),
+        'https://weebcentral.com/series/01J76XY7E3JVY2XJGG8VGP46NN/full-chapter-list',
+      );
+    },
+  );
+
+  test(
     'chapter list parses the full-chapter-list fragment (no #chapter-list wrapper)',
     () async {
       final chapters = await source.listChapterUseCase
@@ -546,6 +559,29 @@ void main() {
         'https://weebcentral.com/chapters/01J76XZ3HXP7R4R9NT922FEVNQ',
       );
       expect(chapters.first.publishAt, '2024-09-08T17:04:15.717343Z');
+    },
+  );
+
+  test(
+    'chapter list fallback skips anchors without a title row (review on #167)',
+    () async {
+      // The unscoped fallback fires whenever #chapter-list is missing
+      // (redesign, partial render, error page) — header/footer anchors
+      // matching the href prefix must not become null-title chapters.
+      final chapters = await source.listChapterUseCase.parse(
+        root: html_parser.parse('''
+          <div>
+            <nav><a href="/chapters/latest">Latest Updates</a></nav>
+            <a href="/chapters/01J76XZ3HXP7R4R9NT922FEVNQ">
+              <span class="grow"><span>Chapter 102</span></span>
+              <time>2024-09-08T17:04:15Z</time>
+            </a>
+            <footer><a href="/chapters/feed">RSS</a></footer>
+          </div>
+        '''),
+      );
+      expect(chapters, hasLength(1));
+      expect(chapters.single.title, 'Chapter 102');
     },
   );
 

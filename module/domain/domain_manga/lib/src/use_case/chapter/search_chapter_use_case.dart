@@ -149,7 +149,18 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
       if (paramIgnorePagination != key.parameter) continue;
       promises.add(_searchChapterCacheManager.removeFile(value));
     }
-    if (url != null) promises.add(_htmlCacheManager.removeFile(url));
+    if (url != null) {
+      // The fetch (and therefore the html cache entry) uses the
+      // source-derived URL — for WeebCentral that is the full-chapter-list
+      // endpoint, not the series page; evicting the series page would
+      // leave the stale derived entry alive (review on #167).
+      final source = Sources.fromName(parameter.source);
+      promises.add(
+        _htmlCacheManager.removeFile(
+          source?.listChapterUseCase.url(webUrl: url) ?? url,
+        ),
+      );
+    }
     await Future.wait(promises);
   }
 

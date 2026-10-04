@@ -173,7 +173,14 @@ class _ListChapterSourceExternalUseCase
   /// the endpoint the "Show All Chapters" htmx button targets — so fetch
   /// that directly (issue #161).
   @override
-  String url({required String webUrl}) => '$webUrl/full-chapter-list';
+  String url({required String webUrl}) {
+    // Stored webUrls may carry a trailing slash; suffixing blindly would
+    // request `/series/{id}//full-chapter-list` (review on #167).
+    final base = webUrl.endsWith('/')
+        ? webUrl.substring(0, webUrl.length - 1)
+        : webUrl;
+    return '$base/full-chapter-list';
+  }
 
   @override
   Future<List<ChapterScrapped>> parse({required Document root}) async {
@@ -188,13 +195,21 @@ class _ListChapterSourceExternalUseCase
     final chapters = <ChapterScrapped>[];
     for (final row in rows) {
       final url = row.attributes['href'];
-      final title = row.querySelector('span.grow')?.querySelector('span')?.text.trim();
+      final title = row
+          .querySelector('span.grow')
+          ?.querySelector('span')
+          ?.text
+          .trim();
+      // The unscoped fallback can see header/footer anchors that match the
+      // href prefix — a row without its title cell is not a chapter row
+      // (review on #167).
+      if (url == null || title == null || title.isEmpty) continue;
       final time = row.querySelector('time');
       chapters.add(
         ChapterScrapped(
           title: title,
-          chapter: title?.split(' ').lastOrNull,
-          webUrl: url?.let((e) => [_baseUrl, e].join('')),
+          chapter: title.split(' ').lastOrNull,
+          webUrl: [_baseUrl, url].join(''),
           readableAt: time?.text.trim(),
           publishAt: time?.text.trim(),
         ),

@@ -63,6 +63,7 @@ String chapterListHtml(int count) {
 
 void main() {
   late MockSearchChapterCacheManager cacheManager;
+  late MockHtmlCacheManager htmlCacheManager;
   late MockChapterDao chapterDao;
   late MockMangaDao mangaDao;
   late MockHeadlessWebviewUseCase webview;
@@ -79,6 +80,7 @@ void main() {
 
   setUp(() {
     cacheManager = MockSearchChapterCacheManager();
+    htmlCacheManager = MockHtmlCacheManager();
     chapterDao = MockChapterDao();
     mangaDao = MockMangaDao();
     webview = MockHeadlessWebviewUseCase();
@@ -92,7 +94,7 @@ void main() {
       chapterRepository: MockChapterRepository(),
       webview: webview,
       converterCacheManager: MockConverterCacheManager(),
-      htmlCacheManager: MockHtmlCacheManager(),
+      htmlCacheManager: htmlCacheManager,
       searchChapterCacheManager: cacheManager,
       chapterDao: chapterDao,
       mangaDao: mangaDao,
@@ -271,6 +273,47 @@ void main() {
       // must fetch the dedicated full-chapter-list endpoint.
       expect(openedUrls, ['$seriesUrl/full-chapter-list']);
       expect((result as Success<Pagination<Chapter>>).data.total, 2);
+    },
+  );
+
+  test(
+    'clear evicts the html entry the fetch actually uses (review on #167)',
+    () async {
+      // WeebCentral's chapter fetch (and therefore its html cache entry)
+      // uses the derived full-chapter-list URL, not the series page —
+      // evicting the series page would leave the stale entry alive.
+      const seriesUrl =
+          'https://weebcentral.com/series/01J76XY7E3JVY2XJGG8VGP46NN';
+      when(() => mangaDao.search(ids: any(named: 'ids'))).thenAnswer(
+        (_) async => [
+          MangaModel(
+            manga: MangaDrift(
+              id: _mangaId,
+              webUrl: seriesUrl,
+              createdAt: DateTime(2026),
+              updatedAt: DateTime(2026),
+            ),
+          ),
+        ],
+      );
+      when(() => cacheManager.keys).thenAnswer((_) async => {});
+
+      final evicted = <String>[];
+      when(
+        () => htmlCacheManager.removeFile(captureAny()),
+      ).thenAnswer((invocation) async {
+        evicted.add(invocation.positionalArguments.first as String);
+      });
+
+      await useCase.clear(
+        parameter: SourceSearchChapterParameter(
+          source: WeebCentralSourceExternal().name,
+          parameter: const SearchChapterParameter(page: 1, limit: 20),
+          mangaId: _mangaId,
+        ),
+      );
+
+      expect(evicted, ['$seriesUrl/full-chapter-list']);
     },
   );
 }
