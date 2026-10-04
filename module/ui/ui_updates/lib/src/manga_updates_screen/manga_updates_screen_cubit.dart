@@ -16,9 +16,15 @@ class MangaUpdatesScreenCubit extends Cubit<MangaUpdatesScreenState>
   }) : _prefetchChapterUseCase = prefetchChapterUseCase,
        super(initialState) {
     addSubscription(
-      listenUnreadHistoryUseCase.unreadHistoryStream.distinct().listen(
-        (e) => emit(state.copyWith(updates: e)),
-      ),
+      listenUnreadHistoryUseCase.unreadHistoryStream.distinct().listen((e) {
+        // Malformed pairs (null manga or chapter) would make the list's
+        // itemBuilder return null, which truncates the list at that row
+        // (issue #125) — drop them instead.
+        final updates = e
+            .where((update) => update.manga != null && update.chapter != null)
+            .toList();
+        emit(state.copyWith(updates: updates));
+      }),
     );
 
     addSubscription(

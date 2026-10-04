@@ -10,9 +10,15 @@ class MangaHistoryScreenCubit extends Cubit<MangaHistoryScreenState>
     MangaHistoryScreenState initialState = const MangaHistoryScreenState(),
   }) : super(initialState) {
     addSubscription(
-      listenReadHistoryUseCase.readHistoryStream.distinct().listen(
-        (e) => emit(state.copyWith(histories: e)),
-      ),
+      listenReadHistoryUseCase.readHistoryStream.distinct().listen((e) {
+        // Malformed pairs (null manga or chapter) would make the list's
+        // itemBuilder return null, which truncates the list at that row
+        // (issue #125) — drop them instead.
+        final histories = e
+            .where((history) => history.manga != null && history.chapter != null)
+            .toList();
+        emit(state.copyWith(histories: histories));
+      }),
     );
   }
 }
