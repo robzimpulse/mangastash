@@ -168,10 +168,25 @@ class _ListChapterSourceExternalUseCase
   @override
   Duration? get timeout => Duration(seconds: 15);
 
+  /// The series page's #chapter-list only carries ~9 latest chapters; the
+  /// complete list (102 rows for Beck, verified live 2026-10) is served by
+  /// the endpoint the "Show All Chapters" htmx button targets — so fetch
+  /// that directly (issue #161).
+  @override
+  String url({required String webUrl}) => '$webUrl/full-chapter-list';
+
   @override
   Future<List<ChapterScrapped>> parse({required Document root}) async {
+    // The full-chapter-list endpoint returns the htmx fragment that
+    // REPLACES #chapter-list's inner HTML — no #chapter-list wrapper — so
+    // fall back to every chapter anchor when the wrapper is absent.
+    var rows = root.querySelectorAll('#chapter-list a[href^="/chapters/"]');
+    if (rows.isEmpty) {
+      rows = root.querySelectorAll('a[href^="/chapters/"]');
+    }
+
     final chapters = <ChapterScrapped>[];
-    for (final row in root.querySelectorAll('#chapter-list a[href^="/chapters/"]')) {
+    for (final row in rows) {
       final url = row.attributes['href'];
       final title = row.querySelector('span.grow')?.querySelector('span')?.text.trim();
       final time = row.querySelector('time');

@@ -168,6 +168,11 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
 
 class _ListChapterSourceExternalUseCase
     implements ListChapterSourceExternalUseCase {
+
+  //// The series page itself carries the full chapter list.
+  @override
+  String url({required String webUrl}) => webUrl;
+
   final String _name;
   final String _baseUrl;
 

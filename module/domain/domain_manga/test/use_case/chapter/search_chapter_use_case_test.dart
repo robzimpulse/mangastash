@@ -12,6 +12,7 @@ import 'package:core_analytics/core_analytics.dart' as analytics;
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/src/sources/mangakatana_source_external.dart';
+import 'package:domain_manga/src/sources/weeb_central_source_external.dart';
 import 'package:domain_manga/src/use_case/chapter/search_chapter_use_case.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:file/file.dart';
@@ -214,6 +215,62 @@ void main() {
           parameter: any(named: 'parameter'),
         ),
       ).called(1);
+    },
+  );
+
+  test(
+    'fetches the source chapter-list URL (WeebCentral full-chapter-list, #161)',
+    () async {
+      const seriesUrl =
+          'https://weebcentral.com/series/01J76XY7E3JVY2XJGG8VGP46NN';
+      when(() => mangaDao.search(ids: any(named: 'ids'))).thenAnswer(
+        (_) async => [
+          MangaModel(
+            manga: MangaDrift(
+              id: _mangaId,
+              webUrl: seriesUrl,
+              createdAt: DateTime(2026),
+              updatedAt: DateTime(2026),
+            ),
+          ),
+        ],
+      );
+
+      final openedUrls = <String>[];
+      when(
+        () => webview.open(
+          any(),
+          scripts: any(named: 'scripts'),
+          readyWhenSelectors: any(named: 'readyWhenSelectors'),
+          useCache: any(named: 'useCache'),
+          timeout: any(named: 'timeout'),
+        ),
+      ).thenAnswer((invocation) async {
+        openedUrls.add(invocation.positionalArguments.first as String);
+        return html_parser.parse('''
+          <div>
+            <a href="/chapters/c1"><span class="grow"><span>Chapter 3</span></span><time>2026-01-03T00:00:00Z</time></a>
+            <a href="/chapters/c2"><span class="grow"><span>Chapter 2</span></span><time>2026-01-02T00:00:00Z</time></a>
+          </div>
+        ''');
+      });
+      when(
+        () => chapterDao.adds(values: any(named: 'values')),
+      ).thenAnswer((_) async => []);
+
+      final result = await useCase.execute(
+        parameter: SourceSearchChapterParameter(
+          source: WeebCentralSourceExternal().name,
+          parameter: const SearchChapterParameter(page: 1, limit: 20),
+          mangaId: _mangaId,
+        ),
+      );
+
+      expect(result, isA<Success<Pagination<Chapter>>>());
+      // The series page itself only carries ~9 latest rows — the use case
+      // must fetch the dedicated full-chapter-list endpoint.
+      expect(openedUrls, ['$seriesUrl/full-chapter-list']);
+      expect((result as Success<Pagination<Chapter>>).data.total, 2);
     },
   );
 }

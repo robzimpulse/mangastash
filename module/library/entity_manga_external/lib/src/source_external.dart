@@ -56,6 +56,11 @@ abstract class ListChapterSourceExternalUseCase {
   /// See [GetMangaSourceExternalUseCase.readyWhenSelectors].
   List<String> get readyWhenSelectors => [];
   Future<List<ChapterScrapped>> parse({required Document root});
+
+  /// The page to open for the chapter list. Defaults to the series
+  /// [webUrl]; sources whose full list lives elsewhere (e.g. WeebCentral
+  /// serves it from a dedicated fragment endpoint) override this.
+  String url({required String webUrl}) => webUrl;
 }
 
 abstract class ListTagSourceExternalUseCase {

@@ -340,6 +340,35 @@ const _stronglessCardHtml = '''
 </div>
 ''';
 
+/// Fragment served by the full-chapter-list endpoint (captured live
+/// 2026-10, trimmed to three rows): the series page's #chapter-list only
+/// holds ~9 latest chapters and the complete list (102 rows for Beck)
+/// arrives as this htmx fragment — which has NO #chapter-list wrapper (it
+/// replaces that element's inner HTML), so parsing must not require the
+/// wrapper (issue #161).
+const _fullChapterListFragmentHtml = '''
+<div>
+  <div class="flex items-center">
+    <a href="/chapters/01J76XZ3HXP7R4R9NT922FEVNQ" class="hover:bg-base-300 flex-1 flex items-center p-2">
+      <span class="grow flex items-center gap-2"><span class="">Chapter 102</span></span>
+      <time class="text-datetime opacity-50" datetime="2024-09-08T17:04:15.544Z">2024-09-08T17:04:15.717343Z</time>
+    </a>
+  </div>
+  <div class="flex items-center">
+    <a href="/chapters/01J76XZ3HXP7R4R9NT922FEVNPC" class="hover:bg-base-300 flex-1 flex items-center p-2">
+      <span class="grow flex items-center gap-2"><span class="">Chapter 101.5</span></span>
+      <time class="text-datetime opacity-50" datetime="2024-09-07T17:04:15.544Z">2024-09-07T17:04:15.717343Z</time>
+    </a>
+  </div>
+  <div class="flex items-center">
+    <a href="/chapters/01J76XZ3HXP7R4R9NT922FEVNPP" class="hover:bg-base-300 flex-1 flex items-center p-2">
+      <span class="grow flex items-center gap-2"><span class="">Chapter 101</span></span>
+      <time class="text-datetime opacity-50" datetime="2024-09-06T17:04:15.544Z">2024-09-06T17:04:15.717343Z</time>
+    </a>
+  </div>
+</div>
+''';
+
 void main() {
   final source = WeebCentralSourceExternal();
 
@@ -492,6 +521,33 @@ void main() {
     expect(chapters.first.webUrl, 'https://weebcentral.com/chapters/01KZECDZH06AWDQEJZAAQA9C2P');
     expect(chapters.first.publishAt, '2026-08-07T15:10:56.544424Z');
   });
+
+  test('chapter list url points at the full-chapter-list endpoint', () {
+    // The series page renders only ~9 latest chapters; the complete list
+    // (102 rows for Beck, verified live 2026-10) is served from this
+    // endpoint — the series page's "Show All Chapters" button targets it.
+    const seriesUrl = 'https://weebcentral.com/series/01J76XY7E3JVY2XJGG8VGP46NN';
+    expect(
+      source.listChapterUseCase.url(webUrl: seriesUrl),
+      '$seriesUrl/full-chapter-list',
+    );
+  });
+
+  test(
+    'chapter list parses the full-chapter-list fragment (no #chapter-list wrapper)',
+    () async {
+      final chapters = await source.listChapterUseCase
+          .parse(root: html_parser.parse(_fullChapterListFragmentHtml));
+      expect(chapters, hasLength(3));
+      expect(chapters.first.title, 'Chapter 102');
+      expect(chapters.first.chapter, '102');
+      expect(
+        chapters.first.webUrl,
+        'https://weebcentral.com/chapters/01J76XZ3HXP7R4R9NT922FEVNQ',
+      );
+      expect(chapters.first.publishAt, '2024-09-08T17:04:15.717343Z');
+    },
+  );
 
   test('search url maps sort, order, status, tags', () {
     final url = source.searchMangaUseCase.url(

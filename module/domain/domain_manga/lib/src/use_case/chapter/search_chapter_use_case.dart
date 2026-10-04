@@ -95,7 +95,9 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
     }
 
     final document = await _webview.open(
-      url,
+      // Sources can redirect the chapter list away from the series page
+      // (WeebCentral's full-chapter-list endpoint, issue #161).
+      source.listChapterUseCase.url(webUrl: url),
       scripts: source.listChapterUseCase.scripts,
       readyWhenSelectors: source.listChapterUseCase.readyWhenSelectors,
       useCache: useCache,
