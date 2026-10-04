@@ -219,15 +219,48 @@ class _SearchMangaSourceExternalUseCase
     String? searchTerm,
   }) async {
     final mangas = <MangaScrapped>[];
-    for (final article in root.querySelectorAll('article.bg-base-300.flex.gap-4.p-4')) {
-      // The cover <a> also matches "/series/" but is empty; the title link
-      // carries the line-clamp-1 class.
-      final link = article.querySelector('a.line-clamp-1');
+    final seen = <String>{};
+    // Card anchor is structural: an <article> that IS a card — not nested
+    // inside another article (nested cover wrappers made outer and inner
+    // both parse as cards and double-counted the series), and holding BOTH
+    // a series link and a cover image (text rows / non-card articles with
+    // a bare series link produced phantoms). Cards are deduped by webUrl
+    // as a final guard.
+    final articles = root.querySelectorAll('article').where(
+          (article) =>
+              !_hasArticleAncestor(article) &&
+              article.querySelector('a[href*="/series/"]') != null &&
+              article.querySelector('img') != null,
+        );
+
+    for (final article in articles) {
+      // The metadata section is the one whose series link has non-empty
+      // text — the cover link and tooltip links are image-only or point at
+      // other series (seen live 2026-10: a tooltip `line-clamp-1` link to a
+      // different series inside the card). FIRST match wins: the card's own
+      // metadata ships before any tooltip section that may follow it.
+      final metadata = article
+          .querySelectorAll('section')
+          .where(
+            (section) =>
+                section
+                    .querySelectorAll('a[href*="/series/"]')
+                    .any((a) => a.text.trim().isNotEmpty),
+          )
+          .firstOrNull;
+      final link = metadata
+          ?.querySelectorAll('a[href*="/series/"]')
+          .firstWhereOrNull((a) => a.text.trim().isNotEmpty);
+
+      // No title link → not a card (image-only recommendation rows); skip
+      // instead of emitting a phantom. Also dedupes repeated webUrls.
+      final webUrl = link?.attributes['href'];
+      if (webUrl == null || !seen.add(webUrl)) continue;
+
       final title = link?.text.trim();
       final coverUrl = article
           .querySelector('img[src*="temp.compsci88.com"]')
           ?.attributes['src'];
-      final metadata = article.querySelectorAll('section').lastOrNull;
 
       // Scan the metadata rows for the "Status:" label — Year is the first
       // .opacity-70 row, so we cannot rely on position.
@@ -241,11 +274,27 @@ class _SearchMangaSourceExternalUseCase
       }
 
       final status = metadata?.let((e) => rowValue(e, 'Status'));
-      final author = metadata?.querySelector('a.link-info')?.text.trim();
-      final tags = metadata
-          ?.querySelectorAll('div.opacity-70')
+      final author = metadata?.querySelector('a[href*="author="]')?.text.trim();
+      // The Tag row is the div holding a "Tag" strong — but a nested
+      // wrapper CONTAINING that row matches too (its descendant strong
+      // satisfies querySelector), and the wrapper's own spans would
+      // pollute the tag list. Rows come in document order, so pick the
+      // innermost match: the first row that is not an ancestor of another.
+      final tagRows = metadata
+          ?.querySelectorAll('div')
           .where((e) => e.querySelector('strong')?.text.contains('Tag') ?? false)
-          .firstOrNull
+          .toList();
+      Element? tagRow;
+      for (final row in tagRows ?? const <Element>[]) {
+        final isWrapper = (tagRows ?? const <Element>[]).any(
+          (other) => !identical(other, row) && _isAncestorOf(row, other),
+        );
+        if (!isWrapper) {
+          tagRow = row;
+          break;
+        }
+      }
+      final tags = tagRow
           ?.querySelectorAll('span')
           .map((e) => e.text.trim())
           .where((e) => e.isNotEmpty)
@@ -255,7 +304,7 @@ class _SearchMangaSourceExternalUseCase
         MangaScrapped(
           title: title,
           coverUrl: coverUrl,
-          webUrl: link?.attributes['href'],
+          webUrl: webUrl,
           status: status,
           author: author,
           tags: tags,
@@ -361,4 +410,23 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
       'setTimeout(function(){}, 2500);',
     ];
   }
+}
+
+/// Whether [element] sits inside another <article> — nested cover wrappers
+/// made outer and inner articles both parse as cards (package:html has no
+/// closest()).
+bool _hasArticleAncestor(Element element) {
+  for (Element? node = element.parent; node != null; node = node.parent) {
+    if (node.localName == 'article') return true;
+  }
+  return false;
+}
+
+/// Whether [ancestor] contains [node] anywhere below it (package:html has
+/// no deep Node.contains).
+bool _isAncestorOf(Element ancestor, Element node) {
+  for (Element? current = node.parent; current != null; current = current.parent) {
+    if (identical(current, ancestor)) return true;
+  }
+  return false;
 }

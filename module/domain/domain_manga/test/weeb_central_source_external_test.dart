@@ -18,7 +18,7 @@ const _searchHtml = '''
       <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece"
          class="line-clamp-1 link link-hover">One Piece</a>
       <div class="opacity-70"><strong>Status:</strong><span>Ongoing</span></div>
-      <div class="opacity-70"><strong>Author(s):</strong><a class="link link-info link-hover">ODA Eiichiro</a></div>
+      <div class="opacity-70"><strong>Author(s):</strong><a href="https://weebcentral.com/search?author=ODA+Eiichiro" class="link link-info link-hover">ODA Eiichiro</a></div>
       <div class="opacity-70"><strong>Tag(s):</strong><span>Action</span><span>Adventure</span></div>
     </section>
   </article>
@@ -132,6 +132,108 @@ const _tagPanelHtml = '''
 </body></html>
 ''';
 
+/// Hardened card fixture: an article WITHOUT the Tailwind `bg-base-300 flex
+/// gap-4 p-4` chain (a redesign away from those classes must not break the
+/// parse) whose stable shape is an <a href*="/series/">. Includes the
+/// tooltip trap seen live 2026-10: a tooltip row later in the article links
+/// to a DIFFERENT series with line-clamp-1 — the title must come from the
+/// metadata link, not the first line-clamp-1 match.
+const _redesignedCardHtml = '''
+<div>
+  <article class="some-new-layout">
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">
+        <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+      </a>
+    </section>
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">One Piece</a>
+      <div><strong>Status:</strong><span>Ongoing</span></div>
+      <div><strong>Author(s):</strong><a href="https://weebcentral.com/search?author=ODA+Eiichiro">ODA Eiichiro</a></div>
+    </section>
+    <div>
+      <span class="tooltip"><a href="https://weebcentral.com/series/01J76XY7E4JCPK14V53BVQWD9Y/Bleach" class="line-clamp-1 link link-hover">Bleach</a></span>
+    </div>
+  </article>
+</div>
+''';
+
+/// Over-match traps: (1) a nested article pair — outer card plus an inner
+/// recommendation wrapper — must count once (nested inner is skipped and
+/// webUrls dedupe); (2) an article with a series link but NO cover image
+/// (a text row) is not a card; (3) an image-only recommendation article
+/// (no text link) ships no title and must not become a phantom entry.
+const _searchTrapsHtml = '''
+<div>
+  <article class="outer-card">
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">
+        <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+      </a>
+    </section>
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">One Piece</a>
+    </section>
+    <article class="inner-wrapper">
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">One Piece</a>
+      <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+    </article>
+  </article>
+  <article class="text-row">
+    <a href="https://weebcentral.com/series/01J76XY7E4JCPK14V53BVQWD9Y/Bleach">Bleach</a>
+  </article>
+  <article class="image-only">
+    <a href="https://weebcentral.com/series/01J76XYAAAAAAAAAAAAAAAAAAAAAA/Naruto">
+      <img src="https://temp.compsci88.com/cover/fallback/01J76XYAAAAAAAAAAAAAAAAAAAAAA.jpg" alt="cover">
+    </a>
+  </article>
+</div>
+''';
+
+/// Tooltip moved INTO a section: two sections carry non-empty-text series
+/// links; the FIRST is the card's own metadata, the second the tooltip —
+/// the title must come from the first match.
+const _tooltipInSectionHtml = '''
+<div>
+  <article>
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">
+        <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+      </a>
+    </section>
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">One Piece</a>
+      <div><strong>Status:</strong><span>Ongoing</span></div>
+    </section>
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E4JCPK14V53BVQWD9Y/Bleach">Bleach</a>
+    </section>
+  </article>
+</div>
+''';
+
+/// Tag row nested inside a wrapper div: the wrapper ALSO matches "has a
+/// Tag strong descendant" — picking it would drag its own spans (the
+/// badge) into the tag list. The parser must take the innermost row.
+const _nestedTagRowHtml = '''
+<div>
+  <article>
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">
+        <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+      </a>
+    </section>
+    <section>
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">One Piece</a>
+      <div class="wrapper">
+        <span class="badge">Hot</span>
+        <div><strong>Tag(s):</strong><span>Action</span><span>Adventure</span></div>
+      </div>
+    </section>
+  </article>
+</div>
+''';
+
 void main() {
   final source = WeebCentralSourceExternal();
 
@@ -157,6 +259,53 @@ void main() {
     );
     expect(results.single.status, 'Ongoing');
     expect(results.single.author, 'ODA Eiichiro');
+    expect(results.single.tags, ['Action', 'Adventure']);
+  });
+
+  test('search parses a redesigned card anchored on the series link', () async {
+    final results = await source.searchMangaUseCase
+        .parse(root: html_parser.parse(_redesignedCardHtml));
+    expect(results, hasLength(1));
+    // The tooltip link to Bleach must not win over the metadata link.
+    expect(results.single.title, 'One Piece');
+    expect(
+      results.single.webUrl,
+      'https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece',
+    );
+    expect(results.single.status, 'Ongoing');
+    expect(results.single.author, 'ODA Eiichiro');
+  });
+
+  test('search skips nested, text-row and image-only article traps', () async {
+    final results = await source.searchMangaUseCase
+        .parse(root: html_parser.parse(_searchTrapsHtml));
+
+    // The nested inner article, the no-cover text row and the image-only
+    // recommendation must not become cards — only the outer One Piece card.
+    expect(results, hasLength(1));
+    expect(results.single.title, 'One Piece');
+    expect(
+      results.single.webUrl,
+      'https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece',
+    );
+  });
+
+  test('search prefers the first metadata section over a later tooltip section', () async {
+    final results = await source.searchMangaUseCase
+        .parse(root: html_parser.parse(_tooltipInSectionHtml));
+
+    expect(results, hasLength(1));
+    expect(results.single.title, 'One Piece');
+    expect(results.single.status, 'Ongoing');
+  });
+
+  test('search takes the innermost Tag row, not a nested wrapper', () async {
+    final results = await source.searchMangaUseCase
+        .parse(root: html_parser.parse(_nestedTagRowHtml));
+
+    // The wrapper div also matches "has a Tag strong descendant" — its
+    // badge span must not leak into the tags.
+    expect(results, hasLength(1));
     expect(results.single.tags, ['Action', 'Adventure']);
   });
 
