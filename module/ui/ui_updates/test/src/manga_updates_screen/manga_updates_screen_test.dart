@@ -12,7 +12,6 @@ import 'package:safe_bloc/safe_bloc.dart';
 import 'package:ui_common/ui_common.dart';
 import 'package:ui_updates/src/manga_updates_screen/manga_updates_screen.dart';
 import 'package:ui_updates/src/manga_updates_screen/manga_updates_screen_cubit.dart';
-import 'package:ui_updates/src/manga_updates_screen/manga_updates_screen_state.dart';
 
 import '../../mock/mock.dart';
 
@@ -31,16 +30,23 @@ void main() {
     final good1 = seedMangaChapter(mangaId: 'm-1', chapterId: 'c-1');
     final good2 = seedMangaChapter(mangaId: 'm-2', chapterId: 'c-2');
     final cubit = MangaUpdatesScreenCubit(
-      initialState: MangaUpdatesScreenState(
+      listenUnreadHistoryUseCase: mockListenUnreadHistoryUseCase(),
+      listenPrefetchUseCase: mockListenPrefetchUseCase(),
+      prefetchChapterUseCase: MockPrefetchChapterUseCase(),
+    );
+    // Inject the malformed entry POST-construction: the constructor
+    // sanitizes initialState (review on #158), so only a raw copyWith
+    // gets a malformed pair past the filter and into the builder —
+    // reverting the builder fallback to `return null` must fail this
+    // test, not pass vacuously.
+    cubit.emit(
+      cubit.state.copyWith(
         updates: [
           good1,
           MangaChapter(manga: null, chapter: seedChapter(id: 'c-x')),
           good2,
         ],
       ),
-      listenUnreadHistoryUseCase: mockListenUnreadHistoryUseCase(),
-      listenPrefetchUseCase: mockListenPrefetchUseCase(),
-      prefetchChapterUseCase: MockPrefetchChapterUseCase(),
     );
     addTearDown(cubit.close);
 

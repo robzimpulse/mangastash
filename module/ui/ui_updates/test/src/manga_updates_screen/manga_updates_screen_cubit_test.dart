@@ -34,7 +34,7 @@ void main() {
       );
       addTearDown(cubit.close);
 
-      await Future<void>.delayed(Duration.zero);
+      await pumpEventQueue();
 
       expect(cubit.state.updates, [good1, good2]);
     },
@@ -58,7 +58,7 @@ void main() {
       );
       addTearDown(cubit.close);
 
-      await Future<void>.delayed(Duration.zero);
+      await pumpEventQueue();
 
       expect(cubit.state.updates, isEmpty);
     },
@@ -83,7 +83,7 @@ void main() {
       );
       addTearDown(cubit.close);
 
-      await Future<void>.delayed(Duration.zero);
+      await pumpEventQueue();
 
       expect(cubit.state.updates, isEmpty);
     },
