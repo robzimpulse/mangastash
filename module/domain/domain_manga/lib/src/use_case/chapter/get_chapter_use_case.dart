@@ -6,6 +6,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
+import '../../extension/scrapped_validation_extension.dart';
 import '../../mixin/sync_chapters_mixin.dart';
 
 class GetChapterUseCase with SyncChaptersMixin {
@@ -67,7 +68,12 @@ class GetChapterUseCase with SyncChaptersMixin {
       timeout: source.getChapterImageUseCase.timeout,
     );
 
-    return source.getChapterImageUseCase.parse(root: document);
+    // Zero images is selector drift, not an empty reader — fail here with
+    // context instead of syncing an image-less chapter that explodes as a
+    // DataNotFoundException on the next open (issue #114).
+    return source.getChapterImageUseCase.parse(root: document).then(
+      (images) => requireChapterImages(images, source: source.name, url: url),
+    );
   }
 
   Future<Result<Chapter>> execute({
