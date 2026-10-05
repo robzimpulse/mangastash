@@ -67,7 +67,7 @@ class LibraryMangaScreenState extends Equatable {
     Set<String>? prefetchedMangaIds,
     List<SourceExternal>? sources,
     bool? isSearchActive,
-    String? mangaTitle,
+    ValueGetter<String?>? mangaTitle,
   }) {
     return LibraryMangaScreenState(
       isLoading: isLoading ?? this.isLoading,
@@ -78,7 +78,9 @@ class LibraryMangaScreenState extends Equatable {
           ? addMangaError()
           : this.addMangaError,
       isSearchActive: isSearchActive ?? this.isSearchActive,
-      mangaTitle: mangaTitle ?? this.mangaTitle,
+      // ValueGetter sentinel so callers can reset the title to null — a plain
+      // String? parameter cannot (issue #124).
+      mangaTitle: mangaTitle != null ? mangaTitle() : this.mangaTitle,
       prefetchedMangaIds: prefetchedMangaIds ?? this.prefetchedMangaIds,
     );
   }
