@@ -377,8 +377,8 @@ class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
   /// `availableGenres` ([1, [[0, {name: [0, "Action"], slug: [0,
   /// "action"]}], …]]). The html package decodes the entities, so plain
   /// [jsonDecode] walks it — no dropdown click, no client-rendered DOM, no
-  /// Tailwind chain (same approach as the Flame Comics `__NEXT_DATA__`
-  /// parser; see CLAUDE.md).
+  /// Tailwind chain (the same parse-embedded-JSON approach the removed
+  /// Flame Comics source used for `__NEXT_DATA__`; see CLAUDE.md).
   @override
   Future<List<TagScrapped>> parse({required Document root}) async {
     String? props;
