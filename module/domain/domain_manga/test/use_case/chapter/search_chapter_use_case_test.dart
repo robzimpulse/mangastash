@@ -322,6 +322,52 @@ void main() {
   );
 
   test(
+    'an empty chapter parse reports the URL that was actually fetched (review on #178)',
+    () async {
+      // WeebCentral serves the chapter list from a dedicated
+      // full-chapter-list endpoint, not the series page — the parse error
+      // must carry that endpoint or recrawling reopens the wrong page.
+      const seriesUrl =
+          'https://weebcentral.com/series/01J76XY7E3JVY2XJGG8VGP46NN';
+      when(() => mangaDao.search(ids: any(named: 'ids'))).thenAnswer(
+        (_) async => [
+          MangaModel(
+            manga: MangaDrift(
+              id: _mangaId,
+              webUrl: seriesUrl,
+              createdAt: DateTime(2026),
+              updatedAt: DateTime(2026),
+            ),
+          ),
+        ],
+      );
+      when(
+        () => webview.open(
+          any(),
+          scripts: any(named: 'scripts'),
+          readyWhenSelectors: any(named: 'readyWhenSelectors'),
+          useCache: any(named: 'useCache'),
+          timeout: any(named: 'timeout'),
+        ),
+      ).thenAnswer((_) async => html_parser.parse('<html><body></body></html>'));
+
+      final result = await useCase.execute(
+        parameter: SourceSearchChapterParameter(
+          source: WeebCentralSourceExternal().name,
+          parameter: const SearchChapterParameter(page: 1, limit: 20),
+          mangaId: _mangaId,
+        ),
+      );
+
+      expect(result, isA<Error<Pagination<Chapter>>>());
+      final error = (result as Error<Pagination<Chapter>>).error
+          as FailedParsingHtmlException;
+      expect(error.url, '$seriesUrl/full-chapter-list');
+      expect(error.source, 'Weeb Central');
+    },
+  );
+
+  test(
     'clear evicts the html entry the fetch actually uses (review on #167)',
     () async {
       // WeebCentral's chapter fetch (and therefore its html cache entry)

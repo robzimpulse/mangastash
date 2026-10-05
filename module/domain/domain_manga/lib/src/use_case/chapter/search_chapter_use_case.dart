@@ -95,10 +95,14 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
       throw DataNotFoundException();
     }
 
+    // Sources can redirect the chapter list away from the series page
+    // (WeebCentral's full-chapter-list endpoint, issue #161) — resolve the
+    // fetch URL once and use it for both the open and the parse-error
+    // context, or recrawling reopens the series page instead of the
+    // endpoint that actually failed to parse (review on #178).
+    final fetchUrl = source.listChapterUseCase.url(webUrl: url);
     final document = await _webview.open(
-      // Sources can redirect the chapter list away from the series page
-      // (WeebCentral's full-chapter-list endpoint, issue #161).
-      source.listChapterUseCase.url(webUrl: url),
+      fetchUrl,
       scripts: source.listChapterUseCase.scripts,
       readyWhenSelectors: source.listChapterUseCase.readyWhenSelectors,
       useCache: useCache,
@@ -112,7 +116,7 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
     // (issue #114). Fail before the sync/cache writes persist it.
     final valid = scraps.requireChapterFields(
       source: source.name,
-      url: url,
+      url: fetchUrl,
       logBox: _logBox,
     );
 
