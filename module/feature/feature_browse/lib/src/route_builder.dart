@@ -1,10 +1,12 @@
 import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:feature_common/feature_common.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_browse/ui_browse.dart';
 
+import 'chapter_config_query.dart';
 import 'route_path.dart';
 
 class BrowseRouteBuilder extends BaseRouteBuilder {
@@ -108,8 +110,14 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
               );
             },
             onTapSort: (config) {
+              // Encode the config into the URL as well as `extra` so the
+              // sheet keeps its config when rebuilt from a URL (deep link,
+              // restoration) where `extra` is lost (#130).
+              final location = config.let(
+                (e) => chapterConfigLocation(BrowseRoutePath.chapterConfig, e),
+              );
               return context.push<ChapterConfig>(
-                BrowseRoutePath.chapterConfig,
+                location ?? BrowseRoutePath.chapterConfig,
                 extra: config,
               );
             },
@@ -180,9 +188,14 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         path: BrowseRoutePath.chapterConfig,
         name: BrowseRoutePath.chapterConfig,
         pageBuilder: (context, state) {
+          // `extra` is null when the route is rebuilt from a URL (deep
+          // link, restoration) — fall back to the query-encoded config
+          // (#130).
           return MangaMiscBottomSheetRoute(
             locator: locator,
-            config: state.extra.castOrNull(),
+            config:
+                state.extra.castOrNull() ??
+                chapterConfigFromQueryParameters(state.uri.queryParameters),
           );
         },
       ),
@@ -191,9 +204,20 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
         path: BrowseRoutePath.searchParam,
         name: BrowseRoutePath.searchParam,
         pageBuilder: (context, state) {
+          // On a rebuilt-from-URL route `extra` is null and the sheet used
+          // to open empty with no original parameter (#130) — fall back to
+          // the globally persisted search parameter instead.
+          final extra =
+              state.extra.castOrNull() ??
+              SearchParameterExtra(
+                parameter:
+                    locator<ListenSearchParameterUseCase>()
+                        .searchParameterState
+                        .valueOrNull,
+              );
           return MangaSearchParamConfiguratorBottomSheet(
             locator: locator,
-            extra: state.extra.castOrNull(),
+            extra: extra,
           );
         },
       ),

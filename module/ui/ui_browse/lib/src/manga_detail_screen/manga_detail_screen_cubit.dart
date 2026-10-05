@@ -437,7 +437,10 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   }
 
   void recrawl({required BuildContext context, required String url}) async {
-    _recrawlUseCase.execute(
+    // Await the re-crawl before refreshing: the fetches below read the
+    // html cache the re-crawl writes, so starting them early serves the
+    // stale page (#130).
+    await _recrawlUseCase.execute(
       context: context,
       url: url,
       // Built-in sources (MangaDex) have no scraping use cases — their
