@@ -40,7 +40,7 @@ class WeebCentralSourceExternal implements SourceExternal {
 
   @override
   ListTagSourceExternalUseCase get listTagUseCase =>
-      _ListTagSourceExternalUseCase();
+      _ListTagSourceExternalUseCase(baseUrl);
 }
 
 class _GetChapterImageSourceExternalUseCase
@@ -235,19 +235,38 @@ class _SearchMangaSourceExternalUseCase
 
     for (final article in articles) {
       // The metadata section is the one whose series link has non-empty
-      // text — the cover link and tooltip links are image-only or point at
-      // other series (seen live 2026-10: a tooltip `line-clamp-1` link to a
-      // different series inside the card). FIRST match wins: the card's own
-      // metadata ships before any tooltip section that may follow it.
-      final metadata = article
+      // text — but live 2026-10 cards wrap a mobile cover whose anchor
+      // carries text (an "Official" ribbon + an overlay title) inside the
+      // FIRST section, so text alone no longer identifies metadata (#162).
+      // Real metadata ships LABELED rows — strongs whose text carries a
+      // colon ("Status:", "Author(s):", "Tag(s):") — which badges like a
+      // tooltip's <strong>New</strong> or a future ribbon markup lack
+      // (review on #169).
+      final sectionsWithTextLinks = article
           .querySelectorAll('section')
           .where(
             (section) =>
                 section
                     .querySelectorAll('a[href*="/series/"]')
                     .any((a) => a.text.trim().isNotEmpty),
-          )
-          .firstOrNull;
+          );
+      final metadata =
+          sectionsWithTextLinks
+              .firstWhereOrNull(
+                (section) => section
+                    .querySelectorAll('strong')
+                    .any((s) => s.text.contains(':')),
+              ) ??
+          // No section carries labeled rows — degrade to the last text-link
+          // section WITHOUT a cover image. Excluding img-bearing sections
+          // makes the pick order-proof (observed layouts ship the cover
+          // first, but a metadata-first card must not lose to a cover-last
+          // section) — review on #169. If every text-link section carries
+          // an image, fall back to plain last.
+          sectionsWithTextLinks
+              .where((section) => section.querySelector('img') == null)
+              .lastOrNull ??
+          sectionsWithTextLinks.lastOrNull;
       final link = metadata
           ?.querySelectorAll('a[href*="/series/"]')
           .firstWhereOrNull((a) => a.text.trim().isNotEmpty);
@@ -368,11 +387,21 @@ class _SearchMangaSourceExternalUseCase
 }
 
 class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
+  final String _baseUrl;
+
+  const _ListTagSourceExternalUseCase(this._baseUrl);
+
   @override
   List<String> get readyWhenSelectors => [];
 
   @override
   Duration? get timeout => Duration(seconds: 15);
+
+  @override
+  // The genre checkboxes live ONLY on /search; searchMangaUseCase.url()
+  // points at the /search/data htmx fragment, which ships zero checkboxes
+  // (issue #163).
+  String? get url => '$_baseUrl/search';
 
   @override
   Future<List<TagScrapped>> parse({required Document root}) async {

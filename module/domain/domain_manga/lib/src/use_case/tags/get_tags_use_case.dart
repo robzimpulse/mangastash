@@ -40,9 +40,14 @@ class GetTagsUseCase with SyncTagsMixin {
     required SourceExternal source,
     bool useCache = true,
   }) async {
-    final url = source.searchMangaUseCase.url(
-      parameter: const SearchMangaParameter(page: 1),
-    );
+    // Most sources list their genres on the search page; sources whose tag
+    // list lives elsewhere declare it via listTagUseCase.url (WeebCentral:
+    // the checkboxes are only on /search, not the /search/data fragment).
+    final url =
+        source.listTagUseCase.url ??
+        source.searchMangaUseCase.url(
+          parameter: const SearchMangaParameter(page: 1),
+        );
 
     final document = await _webview.open(
       url,
