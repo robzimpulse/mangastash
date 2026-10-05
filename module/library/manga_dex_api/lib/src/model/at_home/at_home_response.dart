@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import '../exception/at_home_server_exception.dart';
+import '../../exception/at_home_server_exception.dart';
 import 'at_home_chapter.dart';
 
 part 'at_home_response.g.dart';

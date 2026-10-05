@@ -2,6 +2,7 @@ import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga/entity_manga.dart';
 
+import '../../extension/map_network_error.dart';
 import '../source/listen_sources_use_case.dart';
 
 /// Removes a manga row from the library. Removing is refused (no DB write)
@@ -41,7 +42,7 @@ class RemoveFromLibraryUseCase {
       _libraryDao.remove(mangaId);
       return Success(true);
     } catch (e) {
-      return Error(e);
+      return Error(mapNetworkError(e));
     }
   }
 }

@@ -6,6 +6,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
 
 import '../../extension/data_scrapped_extension.dart';
+import '../../extension/map_network_error.dart';
 import '../../extension/scrapped_validation_extension.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 
@@ -82,7 +83,7 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
 
       return Success(result);
     } catch (e) {
-      return Error(e);
+      return Error(mapNetworkError(e));
     }
   }
 }
