@@ -127,6 +127,110 @@ void main() {
 
   group('MangaDetailScreenCubit.init (issue #122 hardening)', () {
     test(
+      'nextChapter resets the paging flag when the fetch throws (review on #160)',
+      () async {
+        final searchChapterUseCase = MockSearchChapterUseCase();
+        when(
+          () => searchChapterUseCase.execute(
+            parameter: any(named: 'parameter'),
+            useCache: any(named: 'useCache'),
+          ),
+        ).thenThrow(Exception('fetch failed'));
+        // The constructor subscribes to the downloaded-chapter stream as
+        // soon as the state carries a mangaId.
+        final listenDownloadedChapterUseCase = MockListenDownloadedChapterUseCase();
+        when(
+          () => listenDownloadedChapterUseCase.execute(
+            mangaId: any(named: 'mangaId'),
+          ),
+        ).thenAnswer((_) => const Stream.empty());
+
+        final cubit = MangaDetailScreenCubit(
+          initialState: MangaDetailScreenState(
+            source: MangaDexSourceExternal(),
+            mangaId: 'm-1',
+          ),
+          getMangaUseCase: MockGetMangaUseCase(),
+          searchMangaUseCase: MockSearchMangaUseCase(),
+          searchChapterUseCase: searchChapterUseCase,
+          addToLibraryUseCase: MockAddToLibraryUseCase(),
+          removeFromLibraryUseCase: MockRemoveFromLibraryUseCase(),
+          listenMangaFromLibraryUseCase: mockListenMangaFromLibraryUseCase(),
+          listenPrefetchUseCase: mockListenPrefetchUseCase(),
+          prefetchChapterUseCase: MockPrefetchChapterUseCase(),
+          listenReadHistoryUseCase: mockListenReadHistoryUseCase(),
+          listenSearchParameterUseCase: mockListenSearchParameterUseCase(),
+          getAllChapterUseCase: MockGetAllChapterUseCase(),
+          recrawlUseCase: MockRecrawlUseCase(),
+          listenDownloadedChapterUseCase: listenDownloadedChapterUseCase,
+        );
+        addTearDown(cubit.close);
+
+        cubit.emit(cubit.state.copyWith(hasNextPageChapter: true));
+
+        await cubit.nextChapter();
+
+        expect(cubit.state.isPagingNextPageChapter, isFalse);
+        expect(cubit.state.errorChapters, isA<Exception>());
+      },
+    );
+
+    test(
+      'nextSimilarManga resets the paging flag when the fetch throws (review on #160)',
+      () async {
+        final searchMangaUseCase = MockSearchMangaUseCase();
+        when(
+          () => searchMangaUseCase.execute(
+            parameter: any(named: 'parameter'),
+            useCache: any(named: 'useCache'),
+          ),
+        ).thenThrow(Exception('fetch failed'));
+        // The constructor subscribes to the downloaded-chapter stream as
+        // soon as the state carries a mangaId.
+        final listenDownloadedChapterUseCase = MockListenDownloadedChapterUseCase();
+        when(
+          () => listenDownloadedChapterUseCase.execute(
+            mangaId: any(named: 'mangaId'),
+          ),
+        ).thenAnswer((_) => const Stream.empty());
+
+        final cubit = MangaDetailScreenCubit(
+          initialState: MangaDetailScreenState(
+            source: MangaDexSourceExternal(),
+            mangaId: 'm-1',
+          ),
+          getMangaUseCase: MockGetMangaUseCase(),
+          searchMangaUseCase: searchMangaUseCase,
+          searchChapterUseCase: MockSearchChapterUseCase(),
+          addToLibraryUseCase: MockAddToLibraryUseCase(),
+          removeFromLibraryUseCase: MockRemoveFromLibraryUseCase(),
+          listenMangaFromLibraryUseCase: mockListenMangaFromLibraryUseCase(),
+          listenPrefetchUseCase: mockListenPrefetchUseCase(),
+          prefetchChapterUseCase: MockPrefetchChapterUseCase(),
+          listenReadHistoryUseCase: mockListenReadHistoryUseCase(),
+          listenSearchParameterUseCase: mockListenSearchParameterUseCase(),
+          getAllChapterUseCase: MockGetAllChapterUseCase(),
+          recrawlUseCase: MockRecrawlUseCase(),
+          listenDownloadedChapterUseCase: listenDownloadedChapterUseCase,
+        );
+        addTearDown(cubit.close);
+
+        cubit.emit(
+          cubit.state.copyWith(
+            hasNextPageSimilarManga: true,
+            // _fetchSimilarManga early-returns without a parameter.
+            similarMangaParameter: const SearchMangaParameter(page: 1),
+          ),
+        );
+
+        await cubit.nextSimilarManga();
+
+        expect(cubit.state.isPagingNextPageSimilarManga, isFalse);
+        expect(cubit.state.errorSimilarManga, isA<Exception>());
+      },
+    );
+
+    test(
       'init resets every loading flag and emits errorManga when the manga fetch throws',
       () async {
         final getMangaUseCase = MockGetMangaUseCase();

@@ -4,6 +4,7 @@
 // over an already-complete dataset (issue #116).
 //
 // Run with: fvm flutter test test/use_case/chapter/search_chapter_use_case_test.dart
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:core_analytics/core_analytics.dart';
@@ -13,6 +14,7 @@ import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/src/sources/mangakatana_source_external.dart';
 import 'package:domain_manga/src/use_case/chapter/search_chapter_use_case.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:file/file.dart';
 import 'package:file/memory.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:html/parser.dart' as html_parser;
@@ -35,6 +37,10 @@ class MockChapterDao extends Mock implements ChapterDao {}
 class MockMangaDao extends Mock implements MangaDao {}
 
 class MockLogBox extends Mock implements LogBox {}
+
+class MockFileInfo extends Mock implements FileInfo {}
+
+class MockCacheFile extends Mock implements File {}
 
 const _mangaId = 'm-1';
 const _mangaUrl = 'https://mangakatana.com/manga/one-piece.49';
@@ -66,6 +72,8 @@ void main() {
     registerFallbackValue(const <ChapterTablesCompanion, List<String>>{});
     registerFallbackValue(MangaModel(manga: null));
     registerFallbackValue(Uint8List(0));
+    registerFallbackValue(utf8);
+    registerFallbackValue(const SearchChapterParameter());
   });
 
   setUp(() {
@@ -149,4 +157,63 @@ void main() {
     // And the complete list reached the DB sync, not just the first slice.
     expect(syncedValues?.length, 25);
   });
+
+  test(
+    'a corrupt cache file is treated as a miss and refetched (review on #160)',
+    () async {
+      final repository = MockChapterRepository();
+      // LogBox.log is an extension method — the logged-as-miss path needs a
+      // real Storage behind the mock's field.
+      final logBox = MockLogBox();
+      when(() => logBox.storage).thenReturn(
+        analytics.Storage(liveDataStorage: analytics.MemoryStorage()),
+      );
+      final useCase = SearchChapterUseCase(
+        chapterRepository: repository,
+        webview: MockHeadlessWebviewUseCase(),
+        converterCacheManager: MockConverterCacheManager(),
+        htmlCacheManager: MockHtmlCacheManager(),
+        searchChapterCacheManager: cacheManager,
+        chapterDao: chapterDao,
+        mangaDao: mangaDao,
+        logBox: logBox,
+      );
+
+      // A cache entry exists, but its file cannot be read (corrupt or
+      // partially written) — readAsString throws before any JSON parsing.
+      final file = MockCacheFile();
+      when(
+        () => file.readAsString(encoding: any(named: 'encoding')),
+      ).thenAnswer((_) async => throw Exception('corrupt cache file'));
+      final info = MockFileInfo();
+      when(() => info.file).thenReturn(file);
+      when(
+        () => cacheManager.getFileFromCache(any()),
+      ).thenAnswer((_) async => info);
+      // The network fetch is reached but fails — proving the cache failure
+      // fell through to the network path instead of escaping execute().
+      when(
+        () => repository.feed(
+          mangaId: any(named: 'mangaId'),
+          parameter: any(named: 'parameter'),
+        ),
+      ).thenThrow(Exception('network failed'));
+
+      final result = await useCase.execute(
+        parameter: SourceSearchChapterParameter(
+          source: 'Manga Dex',
+          parameter: const SearchChapterParameter(page: 1, limit: 20),
+          mangaId: _mangaId,
+        ),
+      );
+
+      expect(result, isA<Error<Pagination<Chapter>>>());
+      verify(
+        () => repository.feed(
+          mangaId: any(named: 'mangaId'),
+          parameter: any(named: 'parameter'),
+        ),
+      ).called(1);
+    },
+  );
 }

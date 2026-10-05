@@ -352,8 +352,15 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     if (state.isLoadingChapters) return;
     if (!state.hasNextPageChapter || state.isPagingNextPageChapter) return;
     emit(state.copyWith(isPagingNextPageChapter: true));
-    await _fetchChapter();
-    emit(state.copyWith(isPagingNextPageChapter: false));
+    // A throw must never strand the paging flag (review on #160) — the
+    // #122 stall class in the chapter lane.
+    try {
+      await _fetchChapter();
+    } catch (e) {
+      emit(state.copyWith(errorChapters: () => _asException(e)));
+    } finally {
+      emit(state.copyWith(isPagingNextPageChapter: false));
+    }
   }
 
   Future<void> nextSimilarManga() async {
@@ -362,8 +369,13 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
       return;
     }
     emit(state.copyWith(isPagingNextPageSimilarManga: true));
-    await _fetchSimilarManga();
-    emit(state.copyWith(isPagingNextPageSimilarManga: false));
+    try {
+      await _fetchSimilarManga();
+    } catch (e) {
+      emit(state.copyWith(errorSimilarManga: () => _asException(e)));
+    } finally {
+      emit(state.copyWith(isPagingNextPageSimilarManga: false));
+    }
   }
 
   Future<void> addToLibrary({required Manga manga}) async {
