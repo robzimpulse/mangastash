@@ -35,6 +35,16 @@ class MangaDetailScreenState extends Equatable {
   final Map<String, Chapter> histories;
   final Set<String> downloadedChapterIds;
 
+  /// Manga ids whose library toggle is currently executing (issue #127) —
+  /// a repeat tap for an id in here must be a no-op (see
+  /// BrowseMangaScreenState.pendingLibraryMangaIds).
+  final Set<String> pendingLibraryMangaIds;
+
+  /// True while the "prefetch all chapters" action is between its internal
+  /// await and completion (issue #127): re-taps during that window must be
+  /// no-ops, and the app bar button renders disabled while it is set.
+  final bool isPrefetchingAll;
+
   bool get isOnLibrary => libraryMangaIds.contains(mangaId);
 
   List<Chapter> get filtered {
@@ -101,6 +111,8 @@ class MangaDetailScreenState extends Equatable {
     this.sourceUrlSimilarManga,
     this.similarMangaParameter,
     this.downloadedChapterIds = const {},
+    this.pendingLibraryMangaIds = const {},
+    this.isPrefetchingAll = false,
   });
 
   @override
@@ -131,6 +143,8 @@ class MangaDetailScreenState extends Equatable {
     sourceUrlSimilarManga,
     similarMangaParameter,
     downloadedChapterIds,
+    pendingLibraryMangaIds,
+    isPrefetchingAll,
   ];
 
   MangaDetailScreenState copyWith({
@@ -161,6 +175,8 @@ class MangaDetailScreenState extends Equatable {
     ValueGetter<String?>? sourceUrlSimilarManga,
     SearchMangaParameter? similarMangaParameter,
     Set<String>? downloadedChapterIds,
+    Set<String>? pendingLibraryMangaIds,
+    bool? isPrefetchingAll,
   }) {
     return MangaDetailScreenState(
       config: config ?? this.config,
@@ -202,6 +218,9 @@ class MangaDetailScreenState extends Equatable {
               ? sourceUrlSimilarManga()
               : this.sourceUrlSimilarManga,
       downloadedChapterIds: downloadedChapterIds ?? this.downloadedChapterIds,
+      pendingLibraryMangaIds:
+          pendingLibraryMangaIds ?? this.pendingLibraryMangaIds,
+      isPrefetchingAll: isPrefetchingAll ?? this.isPrefetchingAll,
     );
   }
 }
