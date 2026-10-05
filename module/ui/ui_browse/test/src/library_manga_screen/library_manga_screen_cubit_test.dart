@@ -251,5 +251,47 @@ void main() {
         ),
       );
     });
+
+    // Review on #175: prefetchedMangaIds only refreshes via the async
+    // mangaIdsStream hop, so two taps before the stream emits read the
+    // same state and both enqueue everything (JobDao.add is a plain
+    // insert). The enqueued ids must land in state synchronously so the
+    // second tap already sees them.
+    test('rapid double-taps do not duplicate enqueues (review on #175)', () {
+      final prefetchMangaUseCase = MockPrefetchMangaUseCase();
+      final prefetchChapterUseCase = MockPrefetchChapterUseCase();
+      final cubit = LibraryMangaScreenCubit(
+        initialState: const LibraryMangaScreenState(
+          mangas: [Manga(id: 'm-1', source: 'Manga Dex')],
+        ),
+        getMangaFromUrlUseCase: getMangaFromUrlUseCase,
+        addToLibraryUseCase: addToLibraryUseCase,
+        listenMangaFromLibraryUseCase: mockListenMangaFromLibraryUseCase(),
+        prefetchMangaUseCase: prefetchMangaUseCase,
+        // mangaIdsStream is stubbed to an empty stream — it never emits,
+        // so the state set can only update through prefetch itself.
+        listenPrefetchMangaUseCase: mockListenPrefetchUseCase(),
+        removeFromLibraryUseCase: MockRemoveFromLibraryUseCase(),
+        prefetchChapterUseCase: prefetchChapterUseCase,
+        listenSourcesUseCase: mockListenSourcesUseCase(),
+      );
+      addTearDown(cubit.close);
+
+      cubit.prefetch(mangas: cubit.state.mangas);
+      cubit.prefetch(mangas: cubit.state.mangas);
+
+      verify(
+        () => prefetchMangaUseCase.prefetchManga(
+          mangaId: 'm-1',
+          source: any(named: 'source'),
+        ),
+      ).called(1);
+      verify(
+        () => prefetchChapterUseCase.prefetchChapters(
+          mangaId: 'm-1',
+          source: any(named: 'source'),
+        ),
+      ).called(1);
+    });
   });
 }

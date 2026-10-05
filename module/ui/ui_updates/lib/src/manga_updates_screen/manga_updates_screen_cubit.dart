@@ -41,19 +41,29 @@ class MangaUpdatesScreenCubit extends Cubit<MangaUpdatesScreenState>
 
   /// Enqueues every unread chapter for prefetching. Chapters already
   /// sitting in the job queue are skipped — re-tapping the prefetch-all
-  /// button must not duplicate the workload (issue #127).
+  /// button must not duplicate the workload (issue #127). The enqueued
+  /// ids are emitted into state synchronously (review on #175): the
+  /// chapterIdsStream hop is async, so without this a second tap before
+  /// its emission reads a stale set and re-enqueues everything.
   void prefetch() {
+    final queuedIds = {...state.prefetchedChapterIds};
+    var didEnqueue = false;
     for (final update in state.updates) {
       final mangaId = update.manga?.id;
       final chapterId = update.chapter?.id;
       final source = update.manga?.source.let(Sources.fromName);
       if (mangaId == null || source == null || chapterId == null) continue;
-      if (state.prefetchedChapterIds.contains(chapterId)) continue;
+      if (queuedIds.contains(chapterId)) continue;
       _prefetchChapterUseCase.prefetchChapter(
         mangaId: mangaId,
         source: source,
         chapterId: chapterId,
       );
+      queuedIds.add(chapterId);
+      didEnqueue = true;
+    }
+    if (didEnqueue) {
+      emit(state.copyWith(prefetchedChapterIds: queuedIds));
     }
   }
 }
