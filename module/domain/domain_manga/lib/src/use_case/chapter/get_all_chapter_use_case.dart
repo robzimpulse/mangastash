@@ -1,3 +1,4 @@
+import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -7,10 +8,16 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import 'search_chapter_use_case.dart';
 
 class GetAllChapterUseCase {
-  final SearchChapterUseCase _searchChapterUseCase;
+  static const int maxPages = 10;
 
-  GetAllChapterUseCase({required SearchChapterUseCase searchChapterUseCase})
-    : _searchChapterUseCase = searchChapterUseCase;
+  final SearchChapterUseCase _searchChapterUseCase;
+  final LogBox _logBox;
+
+  GetAllChapterUseCase({
+    required SearchChapterUseCase searchChapterUseCase,
+    required LogBox logBox,
+  }) : _searchChapterUseCase = searchChapterUseCase,
+       _logBox = logBox;
 
   Future<List<Chapter>> execute({
     required SourceExternal source,
@@ -18,40 +25,55 @@ class GetAllChapterUseCase {
     SearchChapterParameter? parameter,
     bool useCache = true,
   }) async {
-    final param = parameter.or(
-      const SearchChapterParameter(offset: 0, page: 1, limit: 20),
+    var param = parameter.or(
+      const SearchChapterParameter(offset: 0, page: 1, limit: 500),
     );
 
-    final result = await _searchChapterUseCase.execute(
-      parameter: SourceSearchChapterParameter(
-        source: source.name,
-        parameter: param,
-        mangaId: mangaId,
-      ),
-      useCache: useCache,
-    );
+    /// force other source to use cache on every page since only
+    /// mangadex use true pagination, while other source provide all
+    /// chapter on the first fetch
+    final fetchCache = source.builtIn ? useCache : true;
 
-    if (result is Success<Pagination<Chapter>>) {
-      return [
-        ...?result.data.data,
-        if (result.data.hasNextPage == true)
-          ...await execute(
-            source: source,
-            mangaId: mangaId,
+    final chapters = <Chapter>[];
+    var fetchedPages = 0;
 
-            /// force other source to use cache on the next page since only
-            /// mangadex use true pagination, while other source provide all
-            /// chapter on the first fetch
-            useCache: source.builtIn ? useCache : true,
-            parameter: param.copyWith(
-              offset: param.offset + param.limit,
-              page: param.page + 1,
-              limit: param.limit,
-            ),
-          ),
-      ];
+    while (true) {
+      final result = await _searchChapterUseCase.execute(
+        parameter: SourceSearchChapterParameter(
+          source: source.name,
+          parameter: param,
+          mangaId: mangaId,
+        ),
+        useCache: fetchCache,
+      );
+
+      if (result is! Success<Pagination<Chapter>>) break;
+
+      chapters.addAll([...?result.data.data]);
+      fetchedPages++;
+
+      if (result.data.hasNextPage != true) break;
+
+      if (fetchedPages >= maxPages) {
+        _logBox.log(
+          'Get all chapters stopped after $maxPages pages',
+          extra: {
+            'source': source.name,
+            'mangaId': mangaId,
+            'fetchedPages': fetchedPages,
+          },
+          name: runtimeType.toString(),
+        );
+        break;
+      }
+
+      param = param.copyWith(
+        offset: param.offset + param.limit,
+        page: param.page + 1,
+        limit: param.limit,
+      );
     }
 
-    return [];
+    return chapters;
   }
 }
