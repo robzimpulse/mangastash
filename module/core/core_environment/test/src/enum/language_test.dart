@@ -23,6 +23,19 @@ void main() {
       expect(Language.fromName(null), equals(Language.english));
     });
 
+    // Review on #176: fromName's english fallback silently preselects a
+    // value when a garbage ?selected= deep-link param is decoded. Route
+    // lookups need the miss to stay a miss.
+    test('fromNameOrNull resolves a known name', () {
+      expect(Language.fromNameOrNull('English'), equals(Language.english));
+      expect(Language.fromNameOrNull('Indonesian'), equals(Language.indonesia));
+    });
+
+    test('fromNameOrNull resolves unknown and null names to null', () {
+      expect(Language.fromNameOrNull('Klingon'), isNull);
+      expect(Language.fromNameOrNull(null), isNull);
+    });
+
     test('flag returns CountryFlag widget', () {
       final flag = Language.english.flag();
       expect(flag, isNotNull);

@@ -36,8 +36,11 @@ void main() {
       chapterConfigToQueryParameters(config),
     );
 
+    // A round-trip always encodes the enum keys, so it never decodes to
+    // the empty-query null.
+    expect(decoded, isNotNull);
     expect(decoded, config);
-    expect(decoded.downloaded, isFalse);
+    expect(decoded!.downloaded, isFalse);
     expect(decoded.unread, isFalse);
   });
 
@@ -51,7 +54,8 @@ void main() {
       chapterConfigToQueryParameters(config),
     );
 
-    expect(decoded.downloaded, isNull);
+    expect(decoded, isNotNull);
+    expect(decoded!.downloaded, isNull);
     expect(decoded.unread, isNull);
   });
 
@@ -72,12 +76,13 @@ void main() {
     expect(decoded, expected);
   });
 
-  test('empty query parameters decode to no-filter booleans and default enums', () {
-    final expected = const ChapterConfig().copyWith(
-      downloaded: () => null,
-      unread: () => null,
-    );
-
-    expect(chapterConfigFromQueryParameters(const {}), expected);
+  // Review on #176: a bare deep link produces an empty query, and
+  // decoding it to explicit-null booleans turned "no config in the URL"
+  // into an ACTIVE read/not-downloaded filter
+  // (MangaDetailScreenState.filtered treats null unread/downloaded as
+  // filters). Empty must decode to null so the sheet falls back to its
+  // show-all `const ChapterConfig()` default.
+  test('empty query parameters decode to null (the sheet default)', () {
+    expect(chapterConfigFromQueryParameters(const {}), isNull);
   });
 }

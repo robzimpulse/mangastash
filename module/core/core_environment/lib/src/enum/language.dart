@@ -209,6 +209,18 @@ enum Language {
     );
   }
 
+  /// Null-on-unknown variant of [fromName] for lookups where a miss must
+  /// stay a miss — e.g. a garbage `?selected=` deep-link param must leave
+  /// the picker unselected instead of silently preselecting english
+  /// (review on #176).
+  static Language? fromNameOrNull(String? name) {
+    if (name == null) return null;
+    for (final language in Language.values) {
+      if (language.name == name) return language;
+    }
+    return null;
+  }
+
   CountryFlag flag({
     double? height,
     double? width,

@@ -211,12 +211,16 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         name: MoreRoutePath.languagePicker,
         pageBuilder: (context, state) {
           // `extra` is null on a rebuilt-from-URL route — fall back to the
-          // query-encoded selection (#130).
+          // query-encoded selection (#130). Unknown names resolve to null
+          // (unselected) instead of fromName's english fallback — a
+          // garbage param must not silently preselect (review on #176).
           return LanguagePickerBottomSheet(
             locator: locator,
             selected:
                 state.extra?.castOrNull() ??
-                state.uri.queryParameters['selected']?.let(Language.fromName),
+                state.uri.queryParameters['selected']?.let(
+                  Language.fromNameOrNull,
+                ),
           );
         },
       ),
@@ -225,11 +229,16 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         path: MoreRoutePath.countryPicker,
         name: MoreRoutePath.countryPicker,
         pageBuilder: (context, state) {
+          // Same null-on-unknown rule as the language picker above (review
+          // on #176): a garbage `?selected=` must leave the country picker
+          // unselected, not preselect indonesia via fromName's fallback.
           return CountryPickerBottomSheet(
             locator: locator,
             selected:
                 state.extra?.castOrNull() ??
-                state.uri.queryParameters['selected']?.let(Country.fromName),
+                state.uri.queryParameters['selected']?.let(
+                  Country.fromNameOrNull,
+                ),
           );
         },
       ),

@@ -351,6 +351,18 @@ enum Country {
     );
   }
 
+  /// Null-on-unknown variant of [fromName] for lookups where a miss must
+  /// stay a miss — e.g. a garbage `?selected=` deep-link param must leave
+  /// the picker unselected instead of silently preselecting indonesia
+  /// (review on #176).
+  static Country? fromNameOrNull(String? name) {
+    if (name == null) return null;
+    for (final country in Country.values) {
+      if (country.name == name) return country;
+    }
+    return null;
+  }
+
   CountryFlag flag({
     Shape shape = const Rectangle(),
     double? height,

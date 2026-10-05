@@ -32,7 +32,13 @@ Map<String, String> chapterConfigToQueryParameters(ChapterConfig config) {
   };
 }
 
-ChapterConfig chapterConfigFromQueryParameters(Map<String, String> queries) {
+/// Decodes a [ChapterConfig] from query parameters. An empty map (a bare
+/// deep link with no config encoded) decodes to null — the sheet's
+/// `config ?? const ChapterConfig()` show-all default must apply, because
+/// a config with null booleans is an ACTIVE read/not-downloaded filter
+/// (review on #176).
+ChapterConfig? chapterConfigFromQueryParameters(Map<String, String> queries) {
+  if (queries.isEmpty) return null;
   return ChapterConfig(
     downloaded: _readBool(queries[_keyDownloaded]),
     unread: _readBool(queries[_keyUnread]),
