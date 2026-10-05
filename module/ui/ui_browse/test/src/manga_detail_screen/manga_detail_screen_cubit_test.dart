@@ -432,5 +432,106 @@ void main() {
       expect(verification.captured, ['c-2']);
       expect(cubit.state.isPrefetchingAll, isFalse);
     });
+
+    // Issue #130: recrawl fired the use case without awaiting it before
+    // refreshing, so the refresh could serve the old cached page while the
+    // headless browser was still re-crawling.
+    test('recrawl awaits the re-crawl before refreshing (#130)', () async {
+      final recrawlUseCase = MockRecrawlUseCase();
+      final getMangaUseCase = MockGetMangaUseCase();
+      final searchChapterUseCase = MockSearchChapterUseCase();
+      final searchMangaUseCase = MockSearchMangaUseCase();
+      final listenDownloadedChapterUseCase = MockListenDownloadedChapterUseCase();
+      when(
+        () => listenDownloadedChapterUseCase.execute(
+          mangaId: any(named: 'mangaId'),
+        ),
+      ).thenAnswer((_) => const Stream.empty());
+      final gate = Completer<void>();
+      when(
+        () => recrawlUseCase.execute(
+          context: any(named: 'context'),
+          url: any(named: 'url'),
+          scripts: any(named: 'scripts'),
+        ),
+      ).thenAnswer((_) => gate.future);
+      when(
+        () => getMangaUseCase.execute(
+          mangaId: any(named: 'mangaId'),
+          source: any(named: 'source'),
+          useCache: any(named: 'useCache'),
+        ),
+      ).thenAnswer((_) async => Error<Manga>(Exception('stubbed off in test')));
+      when(
+        () => searchChapterUseCase.execute(
+          parameter: any(named: 'parameter'),
+          useCache: any(named: 'useCache'),
+        ),
+      ).thenAnswer(
+        (_) async => Error<Pagination<Chapter>>(Exception('stubbed off in test')),
+      );
+      when(
+        () => searchMangaUseCase.execute(
+          parameter: any(named: 'parameter'),
+          useCache: any(named: 'useCache'),
+        ),
+      ).thenAnswer(
+        (_) async => Error<Pagination<Manga>>(Exception('stubbed off in test')),
+      );
+      when(
+        () => searchChapterUseCase.clear(parameter: any(named: 'parameter')),
+      ).thenAnswer((_) async {});
+      when(
+        () => searchMangaUseCase.clear(parameter: any(named: 'parameter')),
+      ).thenAnswer((_) async {});
+
+      cubit = MangaDetailScreenCubit(
+        initialState: MangaDetailScreenState(
+          source: MangaDexSourceExternal(),
+          mangaId: 'm-1',
+        ),
+        getMangaUseCase: getMangaUseCase,
+        searchMangaUseCase: searchMangaUseCase,
+        searchChapterUseCase: searchChapterUseCase,
+        addToLibraryUseCase: MockAddToLibraryUseCase(),
+        removeFromLibraryUseCase: MockRemoveFromLibraryUseCase(),
+        listenMangaFromLibraryUseCase: mockListenMangaFromLibraryUseCase(),
+        listenPrefetchUseCase: mockListenPrefetchUseCase(),
+        prefetchChapterUseCase: MockPrefetchChapterUseCase(),
+        listenReadHistoryUseCase: mockListenReadHistoryUseCase(),
+        listenSearchParameterUseCase: mockListenSearchParameterUseCase(),
+        getAllChapterUseCase: MockGetAllChapterUseCase(),
+        recrawlUseCase: recrawlUseCase,
+        listenDownloadedChapterUseCase: listenDownloadedChapterUseCase,
+      );
+      addTearDown(cubit.close);
+
+      cubit.recrawl(
+        context: _FakeBuildContext(),
+        url: 'https://scraped.example.com/comics/solo',
+      );
+      await pumpEventQueue();
+
+      // While the headless browser is still re-crawling, the refresh must
+      // not have started — it would read the old cached page.
+      verifyNever(
+        () => getMangaUseCase.execute(
+          mangaId: any(named: 'mangaId'),
+          source: any(named: 'source'),
+          useCache: any(named: 'useCache'),
+        ),
+      );
+
+      gate.complete();
+      await pumpEventQueue();
+
+      verify(
+        () => getMangaUseCase.execute(
+          mangaId: any(named: 'mangaId'),
+          source: any(named: 'source'),
+          useCache: any(named: 'useCache'),
+        ),
+      ).called(1);
+    });
   });
 }

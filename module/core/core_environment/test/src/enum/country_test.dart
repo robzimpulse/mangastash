@@ -21,6 +21,19 @@ void main() {
       expect(Country.fromName('Unknown Country'), equals(Country.indonesia));
     });
 
+    // Review on #176: fromName's indonesia fallback silently preselects a
+    // value when a garbage ?selected= deep-link param is decoded. Route
+    // lookups need the miss to stay a miss.
+    test('fromNameOrNull resolves a known name', () {
+      expect(Country.fromNameOrNull('United States'), equals(Country.unitedStates));
+      expect(Country.fromNameOrNull('Indonesia'), equals(Country.indonesia));
+    });
+
+    test('fromNameOrNull resolves unknown and null names to null', () {
+      expect(Country.fromNameOrNull('Atlantis'), isNull);
+      expect(Country.fromNameOrNull(null), isNull);
+    });
+
     test('flag returns CountryFlag widget', () {
       final flag = Country.indonesia.flag();
       expect(flag, isNotNull);
