@@ -11,6 +11,7 @@ export 'src/exception/cloudflare_challenge_exception.dart';
 export 'src/exception/data_not_found_exception.dart';
 export 'src/exception/failed_parsing_html_exception.dart';
 export 'src/exception/http_status_exception.dart';
+export 'src/exception/map_dio_error.dart';
 export 'src/exception/network_exception.dart';
 export 'src/exception/rate_limit_exception.dart';
 export 'src/mixin/user_agent_mixin.dart';
