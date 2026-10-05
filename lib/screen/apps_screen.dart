@@ -51,6 +51,10 @@ class _AppsScreenState extends State<AppsScreen> {
     _routerConfig = GoRouter(
       navigatorKey: rootNavigatorKey,
       initialLocation: MainPath.main,
+      // Restores the route stack (including the active shell branch) across
+      // hot restarts and process death instead of always landing on the
+      // hardcoded `/` redirect target (#130).
+      restorationScopeId: 'rootRouter',
       onEnter: (context, current, next, router) async {
         final result = await routes.onEnter(
           context: context,
@@ -61,7 +65,9 @@ class _AppsScreenState extends State<AppsScreen> {
         return result ?? Allow();
       },
       onException: (context, state, router) {
-        router.push(
+        // `go` (not `push`) so the error page replaces the broken
+        // destination: back must leave the error, not return to it (#130).
+        router.go(
           MainPath.notFound,
           extra: 'Path Not Found (${state.uri.toString()})',
         );

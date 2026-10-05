@@ -327,11 +327,21 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         state.isSearchActive
             ? _searchFocusNode.requestFocus()
             : _searchFocusNode.unfocus();
-        _cubit(context)?.init(
-          parameter: state.parameter.copyWith(
-            title: state.isSearchActive ? _searchController.text : '',
-          ),
-        );
+        // Opening the field only focuses it — re-initialising here would
+        // wipe an active title filter with the (still empty) controller
+        // text and refetch for nothing (#128). Submitting (onSubmitted)
+        // and closing the field are the only paths that re-init; closing
+        // exits search mode, resetting the query to unfiltered browse.
+        if (!state.isSearchActive) {
+          // The field must agree with the reset query — without this the
+          // controller keeps the old text and a submit -> close -> reopen
+          // shows a populated field over unfiltered results (review on
+          // #174).
+          _searchController.clear();
+          _cubit(context)?.init(
+            parameter: state.parameter.copyWith(title: ''),
+          );
+        }
       },
       buildWhen: (prev, curr) {
         return [

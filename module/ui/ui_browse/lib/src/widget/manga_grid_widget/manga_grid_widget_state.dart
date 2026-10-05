@@ -15,6 +15,11 @@ class MangaGridWidgetState extends Equatable {
   final Set<String> prefetchedMangaIds;
   final Set<String> libraryMangaIds;
 
+  /// Manga ids whose library toggle is currently executing (issue #127) —
+  /// a repeat tap for an id in here must be a no-op (see
+  /// BrowseMangaScreenState.pendingLibraryMangaIds).
+  final Set<String> pendingLibraryMangaIds;
+
   const MangaGridWidgetState({
     this.isLoading = false,
     this.error,
@@ -25,6 +30,7 @@ class MangaGridWidgetState extends Equatable {
     this.parameter = const SearchMangaParameter(),
     this.libraryMangaIds = const {},
     this.prefetchedMangaIds = const {},
+    this.pendingLibraryMangaIds = const {},
   });
 
   @override
@@ -38,6 +44,7 @@ class MangaGridWidgetState extends Equatable {
     parameter,
     libraryMangaIds,
     prefetchedMangaIds,
+    pendingLibraryMangaIds,
   ];
 
   MangaGridWidgetState copyWith({
@@ -50,6 +57,7 @@ class MangaGridWidgetState extends Equatable {
     SearchMangaParameter? parameter,
     Set<String>? prefetchedMangaIds,
     Set<String>? libraryMangaIds,
+    Set<String>? pendingLibraryMangaIds,
   }) {
     return MangaGridWidgetState(
       isLoading: isLoading ?? this.isLoading,
@@ -61,6 +69,8 @@ class MangaGridWidgetState extends Equatable {
       parameter: parameter ?? this.parameter,
       libraryMangaIds: libraryMangaIds ?? this.libraryMangaIds,
       prefetchedMangaIds: prefetchedMangaIds ?? this.prefetchedMangaIds,
+      pendingLibraryMangaIds:
+          pendingLibraryMangaIds ?? this.pendingLibraryMangaIds,
     );
   }
 }

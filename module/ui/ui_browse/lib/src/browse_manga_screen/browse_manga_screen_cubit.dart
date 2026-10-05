@@ -235,11 +235,34 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
     emit(state.copyWith(isSearchActive: isSearchActive));
   }
 
+  /// Toggles [manga] in/out of the library. No-ops while the same manga's
+  /// toggle is already in flight: the branch below reads a snapshot of
+  /// [BrowseMangaScreenState.libraryMangaIds], so two overlapping toggles
+  /// would both read "not in library" and double-execute (issue #127).
+  /// The pending id is tracked in state so buttons can also disable.
   Future<void> addToLibrary({required Manga manga}) async {
-    if (state.libraryMangaIds.contains(manga.id)) {
-      await _removeFromLibraryUseCase.execute(manga: manga);
-    } else {
-      await _addToLibraryUseCase.execute(manga: manga);
+    final mangaId = manga.id;
+    if (mangaId == null) return;
+    if (state.pendingLibraryMangaIds.contains(mangaId)) return;
+
+    emit(
+      state.copyWith(
+        pendingLibraryMangaIds: {...state.pendingLibraryMangaIds, mangaId},
+      ),
+    );
+    try {
+      if (state.libraryMangaIds.contains(mangaId)) {
+        await _removeFromLibraryUseCase.execute(manga: manga);
+      } else {
+        await _addToLibraryUseCase.execute(manga: manga);
+      }
+    } finally {
+      emit(
+        state.copyWith(
+          pendingLibraryMangaIds:
+              {...state.pendingLibraryMangaIds}..remove(mangaId),
+        ),
+      );
     }
   }
 

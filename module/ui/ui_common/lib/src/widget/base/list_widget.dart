@@ -23,6 +23,7 @@ class ListWidget<T> extends StatefulWidget {
     this.onTapDownload,
     this.onTapFilter,
     this.onTapPrefetch,
+    this.isPrefetchingAll = false,
   });
 
   final PageStorageKey<String>? pageStorageKey;
@@ -34,6 +35,12 @@ class ListWidget<T> extends StatefulWidget {
   final VoidCallback? onTapFilter;
 
   final VoidCallback? onTapPrefetch;
+
+  /// While true the prefetch-all action is executing; the header's prefetch
+  /// button renders disabled so repeat taps cannot flood the job queue
+  /// (issue #127). Purely presentational — callers must still guard
+  /// re-entry in their cubit.
+  final bool isPrefetchingAll;
 
   final RefreshCallback? onRefresh;
 
@@ -144,7 +151,11 @@ class _ListWidgetState<T> extends State<ListWidget<T>> {
                         lines: 1,
                         child: IconButton(
                           icon: const Icon(Icons.cloud_download),
-                          onPressed: () => widget.onTapPrefetch?.call(),
+                          // Disabled while a prefetch-all run is in flight
+                          // (#127).
+                          onPressed: widget.isPrefetchingAll
+                              ? null
+                              : () => widget.onTapPrefetch?.call(),
                         ),
                       ),
                       if (widget.isLoading) const SizedBox(width: 4),

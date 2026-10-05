@@ -219,11 +219,32 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
     }
   }
 
+  /// Toggles [manga] in/out of the library. No-ops while the same manga's
+  /// toggle is already in flight (issue #127) — see
+  /// BrowseMangaScreenCubit.addToLibrary for the race this prevents.
   Future<void> addToLibrary({required Manga manga}) async {
-    if (state.libraryMangaIds.contains(manga.id)) {
-      await _removeFromLibraryUseCase.execute(manga: manga);
-    } else {
-      await _addToLibraryUseCase.execute(manga: manga);
+    final mangaId = manga.id;
+    if (mangaId == null) return;
+    if (state.pendingLibraryMangaIds.contains(mangaId)) return;
+
+    emit(
+      state.copyWith(
+        pendingLibraryMangaIds: {...state.pendingLibraryMangaIds, mangaId},
+      ),
+    );
+    try {
+      if (state.libraryMangaIds.contains(mangaId)) {
+        await _removeFromLibraryUseCase.execute(manga: manga);
+      } else {
+        await _addToLibraryUseCase.execute(manga: manga);
+      }
+    } finally {
+      emit(
+        state.copyWith(
+          pendingLibraryMangaIds:
+              {...state.pendingLibraryMangaIds}..remove(mangaId),
+        ),
+      );
     }
   }
 

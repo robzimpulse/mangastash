@@ -23,6 +23,7 @@ class _FakeBuildContext extends Fake implements BuildContext {}
 void main() {
   setUpAll(() {
     registerFallbackValue(_FakeBuildContext());
+    registerFallbackValue(const Manga());
     registerFallbackValue(
       const SourceSearchMangaParameter(source: '', parameter: SearchMangaParameter()),
     );
@@ -530,5 +531,68 @@ void main() {
         expect(cubit.state.mangas, const [Manga(id: 'fresh'), Manga(id: 'p2')]);
       },
     );
+  });
+
+  // Issue #127: the favorite toggle branches on a snapshot of
+  // libraryMangaIds while the use case is async — two quick taps both read
+  // "not in library" and double-execute. addToLibrary must no-op while the
+  // same manga's toggle is already in flight.
+  group('addToLibrary in-flight guard (#127)', () {
+    late MockAddToLibraryUseCase addToLibraryUseCase;
+    late BrowseMangaScreenCubit guardCubit;
+
+    setUp(() {
+      addToLibraryUseCase = MockAddToLibraryUseCase();
+      guardCubit = BrowseMangaScreenCubit(
+        initialState: BrowseMangaScreenState(
+          source: MangaDexSourceExternal(),
+        ),
+        searchMangaUseCase: MockSearchMangaUseCase(),
+        addToLibraryUseCase: addToLibraryUseCase,
+        removeFromLibraryUseCase: MockRemoveFromLibraryUseCase(),
+        listenMangaFromLibraryUseCase: mockListenMangaFromLibraryUseCase(),
+        prefetchMangaUseCase: MockPrefetchMangaUseCase(),
+        listenPrefetchMangaUseCase: mockListenPrefetchUseCase(),
+        prefetchChapterUseCase: MockPrefetchChapterUseCase(),
+        listenSearchParameterUseCase: mockListenSearchParameterUseCase(),
+        getTagsUseCase: MockGetTagsUseCase(),
+        recrawlUseCase: MockRecrawlUseCase(),
+      );
+      addTearDown(guardCubit.close);
+    });
+
+    test('a second tap while the first is pending is ignored', () async {
+      final gate = Completer<Result<bool>>();
+      when(
+        () => addToLibraryUseCase.execute(manga: any(named: 'manga')),
+      ).thenAnswer((_) => gate.future);
+
+      const manga = Manga(id: 'm-1', source: 'Manga Dex');
+      final first = guardCubit.addToLibrary(manga: manga);
+      await pumpEventQueue();
+      final second = guardCubit.addToLibrary(manga: manga);
+      await pumpEventQueue();
+
+      verify(
+        () => addToLibraryUseCase.execute(manga: any(named: 'manga')),
+      ).called(1);
+
+      gate.complete(Success<bool>(true));
+      await Future.wait([first, second]);
+    });
+
+    test('the guard clears once the toggle completes', () async {
+      when(
+        () => addToLibraryUseCase.execute(manga: any(named: 'manga')),
+      ).thenAnswer((_) async => Success<bool>(true));
+
+      const manga = Manga(id: 'm-1', source: 'Manga Dex');
+      await guardCubit.addToLibrary(manga: manga);
+      await guardCubit.addToLibrary(manga: manga);
+
+      verify(
+        () => addToLibraryUseCase.execute(manga: any(named: 'manga')),
+      ).called(2);
+    });
   });
 }

@@ -3,6 +3,8 @@
 // recrawl must pass an empty scripts list instead of crashing.
 //
 // Run with: fvm flutter test test/src/manga_detail_screen/manga_detail_screen_cubit_test.dart
+import 'dart:async';
+
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:domain_manga/src/sources/asura_scan_source_external.dart';
@@ -22,6 +24,7 @@ class _FakeBuildContext extends Fake implements BuildContext {}
 void main() {
   setUpAll(() {
     registerFallbackValue(_FakeBuildContext());
+    registerFallbackValue(const Manga());
     registerFallbackValue(MangaDexSourceExternal());
     registerFallbackValue(
       const SourceSearchMangaParameter(source: '', parameter: SearchMangaParameter()),
@@ -304,5 +307,231 @@ void main() {
         expect(cubit.state.isLoadingSimilarManga, isFalse);
       },
     );
+  });
+
+  // Issue #127: mutating actions on the detail screen need in-flight
+  // guards — the favorite toggle must no-op while the same manga's toggle
+  // is pending, and prefetch-all must not re-enter across its internal
+  // await nor re-enqueue chapters already sitting in the job queue.
+  group('in-flight guards (#127)', () {
+    late MockAddToLibraryUseCase addToLibraryUseCase;
+    late MockGetAllChapterUseCase getAllChapterUseCase;
+    late MockPrefetchChapterUseCase prefetchChapterUseCase;
+    late MangaDetailScreenCubit cubit;
+
+    MangaDetailScreenCubit buildCubit({MangaDetailScreenState? initialState}) {
+      return MangaDetailScreenCubit(
+        initialState:
+            initialState ??
+            MangaDetailScreenState(
+              manga: const Manga(id: 'm-1', source: 'Manga Dex'),
+            ),
+        getMangaUseCase: MockGetMangaUseCase(),
+        searchMangaUseCase: MockSearchMangaUseCase(),
+        searchChapterUseCase: MockSearchChapterUseCase(),
+        addToLibraryUseCase: addToLibraryUseCase,
+        removeFromLibraryUseCase: MockRemoveFromLibraryUseCase(),
+        listenMangaFromLibraryUseCase: mockListenMangaFromLibraryUseCase(),
+        listenPrefetchUseCase: mockListenPrefetchUseCase(),
+        prefetchChapterUseCase: prefetchChapterUseCase,
+        listenReadHistoryUseCase: mockListenReadHistoryUseCase(),
+        listenSearchParameterUseCase: mockListenSearchParameterUseCase(),
+        getAllChapterUseCase: getAllChapterUseCase,
+        recrawlUseCase: MockRecrawlUseCase(),
+        listenDownloadedChapterUseCase: MockListenDownloadedChapterUseCase(),
+      );
+    }
+
+    setUp(() {
+      addToLibraryUseCase = MockAddToLibraryUseCase();
+      getAllChapterUseCase = MockGetAllChapterUseCase();
+      prefetchChapterUseCase = MockPrefetchChapterUseCase();
+    });
+
+    test('a second favorite tap while the first is pending is ignored', () async {
+      cubit = buildCubit();
+      addTearDown(cubit.close);
+      final gate = Completer<Result<bool>>();
+      when(
+        () => addToLibraryUseCase.execute(manga: any(named: 'manga')),
+      ).thenAnswer((_) => gate.future);
+
+      const manga = Manga(id: 'm-1', source: 'Manga Dex');
+      final first = cubit.addToLibrary(manga: manga);
+      await pumpEventQueue();
+      final second = cubit.addToLibrary(manga: manga);
+      await pumpEventQueue();
+
+      verify(
+        () => addToLibraryUseCase.execute(manga: any(named: 'manga')),
+      ).called(1);
+
+      gate.complete(Success<bool>(true));
+      await Future.wait([first, second]);
+    });
+
+    test('prefetch is ignored while a prefetch-all is already running', () async {
+      cubit = buildCubit();
+      addTearDown(cubit.close);
+      final gate = Completer<List<Chapter>>();
+      when(
+        () => getAllChapterUseCase.execute(
+          source: any(named: 'source'),
+          mangaId: any(named: 'mangaId'),
+          parameter: any(named: 'parameter'),
+        ),
+      ).thenAnswer((_) => gate.future);
+
+      final first = cubit.prefetch();
+      await pumpEventQueue();
+      expect(cubit.state.isPrefetchingAll, isTrue);
+      final second = cubit.prefetch();
+      await pumpEventQueue();
+
+      verify(
+        () => getAllChapterUseCase.execute(
+          source: any(named: 'source'),
+          mangaId: any(named: 'mangaId'),
+          parameter: any(named: 'parameter'),
+        ),
+      ).called(1);
+
+      gate.complete([const Chapter(id: 'c-1')]);
+      await Future.wait([first, second]);
+      expect(cubit.state.isPrefetchingAll, isFalse);
+    });
+
+    test('prefetch skips chapters already queued in the job queue', () async {
+      cubit = buildCubit(
+        initialState: MangaDetailScreenState(
+          manga: const Manga(id: 'm-1', source: 'Manga Dex'),
+          prefetchedChapterIds: const {'c-1'},
+        ),
+      );
+      addTearDown(cubit.close);
+      when(
+        () => getAllChapterUseCase.execute(
+          source: any(named: 'source'),
+          mangaId: any(named: 'mangaId'),
+          parameter: any(named: 'parameter'),
+        ),
+      ).thenAnswer(
+        (_) async => const [Chapter(id: 'c-1'), Chapter(id: 'c-2')],
+      );
+
+      await cubit.prefetch();
+
+      final verification = verify(
+        () => prefetchChapterUseCase.prefetchChapter(
+          mangaId: any(named: 'mangaId'),
+          source: any(named: 'source'),
+          chapterId: captureAny(named: 'chapterId'),
+        ),
+      );
+      verification.called(1);
+      expect(verification.captured, ['c-2']);
+      expect(cubit.state.isPrefetchingAll, isFalse);
+    });
+
+    // Issue #130: recrawl fired the use case without awaiting it before
+    // refreshing, so the refresh could serve the old cached page while the
+    // headless browser was still re-crawling.
+    test('recrawl awaits the re-crawl before refreshing (#130)', () async {
+      final recrawlUseCase = MockRecrawlUseCase();
+      final getMangaUseCase = MockGetMangaUseCase();
+      final searchChapterUseCase = MockSearchChapterUseCase();
+      final searchMangaUseCase = MockSearchMangaUseCase();
+      final listenDownloadedChapterUseCase = MockListenDownloadedChapterUseCase();
+      when(
+        () => listenDownloadedChapterUseCase.execute(
+          mangaId: any(named: 'mangaId'),
+        ),
+      ).thenAnswer((_) => const Stream.empty());
+      final gate = Completer<void>();
+      when(
+        () => recrawlUseCase.execute(
+          context: any(named: 'context'),
+          url: any(named: 'url'),
+          scripts: any(named: 'scripts'),
+        ),
+      ).thenAnswer((_) => gate.future);
+      when(
+        () => getMangaUseCase.execute(
+          mangaId: any(named: 'mangaId'),
+          source: any(named: 'source'),
+          useCache: any(named: 'useCache'),
+        ),
+      ).thenAnswer((_) async => Error<Manga>(Exception('stubbed off in test')));
+      when(
+        () => searchChapterUseCase.execute(
+          parameter: any(named: 'parameter'),
+          useCache: any(named: 'useCache'),
+        ),
+      ).thenAnswer(
+        (_) async => Error<Pagination<Chapter>>(Exception('stubbed off in test')),
+      );
+      when(
+        () => searchMangaUseCase.execute(
+          parameter: any(named: 'parameter'),
+          useCache: any(named: 'useCache'),
+        ),
+      ).thenAnswer(
+        (_) async => Error<Pagination<Manga>>(Exception('stubbed off in test')),
+      );
+      when(
+        () => searchChapterUseCase.clear(parameter: any(named: 'parameter')),
+      ).thenAnswer((_) async {});
+      when(
+        () => searchMangaUseCase.clear(parameter: any(named: 'parameter')),
+      ).thenAnswer((_) async {});
+
+      cubit = MangaDetailScreenCubit(
+        initialState: MangaDetailScreenState(
+          source: MangaDexSourceExternal(),
+          mangaId: 'm-1',
+        ),
+        getMangaUseCase: getMangaUseCase,
+        searchMangaUseCase: searchMangaUseCase,
+        searchChapterUseCase: searchChapterUseCase,
+        addToLibraryUseCase: MockAddToLibraryUseCase(),
+        removeFromLibraryUseCase: MockRemoveFromLibraryUseCase(),
+        listenMangaFromLibraryUseCase: mockListenMangaFromLibraryUseCase(),
+        listenPrefetchUseCase: mockListenPrefetchUseCase(),
+        prefetchChapterUseCase: MockPrefetchChapterUseCase(),
+        listenReadHistoryUseCase: mockListenReadHistoryUseCase(),
+        listenSearchParameterUseCase: mockListenSearchParameterUseCase(),
+        getAllChapterUseCase: MockGetAllChapterUseCase(),
+        recrawlUseCase: recrawlUseCase,
+        listenDownloadedChapterUseCase: listenDownloadedChapterUseCase,
+      );
+      addTearDown(cubit.close);
+
+      cubit.recrawl(
+        context: _FakeBuildContext(),
+        url: 'https://scraped.example.com/comics/solo',
+      );
+      await pumpEventQueue();
+
+      // While the headless browser is still re-crawling, the refresh must
+      // not have started — it would read the old cached page.
+      verifyNever(
+        () => getMangaUseCase.execute(
+          mangaId: any(named: 'mangaId'),
+          source: any(named: 'source'),
+          useCache: any(named: 'useCache'),
+        ),
+      );
+
+      gate.complete();
+      await pumpEventQueue();
+
+      verify(
+        () => getMangaUseCase.execute(
+          mangaId: any(named: 'mangaId'),
+          source: any(named: 'source'),
+          useCache: any(named: 'useCache'),
+        ),
+      ).called(1);
+    });
   });
 }

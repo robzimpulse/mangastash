@@ -350,20 +350,29 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         return [
           prev.manga != curr.manga,
           prev.isOnLibrary != curr.isOnLibrary,
+          // Re-render while the toggle is in flight so the button can
+          // disable and block a double-tap (#127).
+          prev.pendingLibraryMangaIds != curr.pendingLibraryMangaIds,
         ].contains(true);
       },
       builder: (context, state) {
         if (state.manga == null) return const SizedBox.shrink();
+        final isToggleInFlight = state.manga?.id != null &&
+            state.pendingLibraryMangaIds.contains(state.manga?.id);
         return IconButton(
           icon: Icon(
             state.isOnLibrary ? Icons.favorite : Icons.favorite_outline,
             color: Theme.of(context).appBarTheme.iconTheme?.color,
           ),
-          onPressed: () {
-            final manga = state.manga;
-            if (manga == null) return;
-            _cubit(context)?.addToLibrary(manga: manga);
-          },
+          // Disabled while the toggle is executing — the cubit also
+          // no-ops repeat calls as a second line of defense (#127).
+          onPressed: isToggleInFlight
+              ? null
+              : () {
+                  final manga = state.manga;
+                  if (manga == null) return;
+                  _cubit(context)?.addToLibrary(manga: manga);
+                },
         );
       },
     );
@@ -475,6 +484,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               prev.prefetchedChapterIds != curr.prefetchedChapterIds,
               prev.downloadedChapterIds != curr.downloadedChapterIds,
               prev.config != curr.config,
+              prev.isPrefetchingAll != curr.isPrefetchingAll,
             ].contains(true);
           },
           builder: (context, state) {
@@ -506,6 +516,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 _onTapFilter(context: context, config: state.config);
               },
               onTapPrefetch: () => _cubit(context)?.prefetch(),
+              isPrefetchingAll: state.isPrefetchingAll,
               error: state.errorChapters,
               isLoading: state.isLoadingChapters || state.isLoadingManga,
               hasNext: state.hasNextPageChapter,
