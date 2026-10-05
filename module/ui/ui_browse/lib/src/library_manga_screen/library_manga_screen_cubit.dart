@@ -60,11 +60,15 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     emit(state.copyWith(prefetchedMangaIds: prefetchedMangaIds));
   }
 
+  /// Enqueues [mangas] (manga details + chapter list) for prefetching.
+  /// Mangas already sitting in the job queue are skipped — re-tapping the
+  /// prefetch-all button must not duplicate the workload (issue #127).
   void prefetch({required List<Manga> mangas}) {
     for (final manga in mangas) {
       final id = manga.id;
       final source = manga.source?.let(Sources.fromName);
       if (id == null || source == null) continue;
+      if (state.prefetchedMangaIds.contains(id)) continue;
       _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
       _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);
     }

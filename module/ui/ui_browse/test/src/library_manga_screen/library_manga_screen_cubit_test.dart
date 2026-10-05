@@ -11,6 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:ui_browse/src/library_manga_screen/library_manga_screen_cubit.dart';
+import 'package:ui_browse/src/library_manga_screen/library_manga_screen_state.dart';
 import '../../mock/mock.dart';
 
 void main() {
@@ -208,5 +209,47 @@ void main() {
         );
       },
     );
+  });
+
+  // Issue #127: re-tapping "prefetch all" must not re-enqueue mangas that
+  // are already sitting in the job queue — the loop skips ids present in
+  // state.prefetchedMangaIds.
+  group('LibraryMangaScreenCubit.prefetch (#127)', () {
+    test('skips mangas already queued in the job queue', () {
+      final prefetchMangaUseCase = MockPrefetchMangaUseCase();
+      final cubit = LibraryMangaScreenCubit(
+        initialState: LibraryMangaScreenState(
+          mangas: const [
+            Manga(id: 'm-1', source: 'Manga Dex'),
+            Manga(id: 'm-2', source: 'Manga Dex'),
+          ],
+          prefetchedMangaIds: const {'m-1'},
+        ),
+        getMangaFromUrlUseCase: getMangaFromUrlUseCase,
+        addToLibraryUseCase: addToLibraryUseCase,
+        listenMangaFromLibraryUseCase: mockListenMangaFromLibraryUseCase(),
+        prefetchMangaUseCase: prefetchMangaUseCase,
+        listenPrefetchMangaUseCase: mockListenPrefetchUseCase(),
+        removeFromLibraryUseCase: MockRemoveFromLibraryUseCase(),
+        prefetchChapterUseCase: MockPrefetchChapterUseCase(),
+        listenSourcesUseCase: mockListenSourcesUseCase(),
+      );
+      addTearDown(cubit.close);
+
+      cubit.prefetch(mangas: cubit.state.mangas);
+
+      verify(
+        () => prefetchMangaUseCase.prefetchManga(
+          mangaId: 'm-2',
+          source: any(named: 'source'),
+        ),
+      ).called(1);
+      verifyNever(
+        () => prefetchMangaUseCase.prefetchManga(
+          mangaId: 'm-1',
+          source: any(named: 'source'),
+        ),
+      );
+    });
   });
 }

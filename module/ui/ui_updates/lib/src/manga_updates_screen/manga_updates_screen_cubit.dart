@@ -39,12 +39,16 @@ class MangaUpdatesScreenCubit extends Cubit<MangaUpdatesScreenState>
     );
   }
 
+  /// Enqueues every unread chapter for prefetching. Chapters already
+  /// sitting in the job queue are skipped — re-tapping the prefetch-all
+  /// button must not duplicate the workload (issue #127).
   void prefetch() {
     for (final update in state.updates) {
       final mangaId = update.manga?.id;
       final chapterId = update.chapter?.id;
       final source = update.manga?.source.let(Sources.fromName);
       if (mangaId == null || source == null || chapterId == null) continue;
+      if (state.prefetchedChapterIds.contains(chapterId)) continue;
       _prefetchChapterUseCase.prefetchChapter(
         mangaId: mangaId,
         source: source,

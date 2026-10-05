@@ -23,6 +23,8 @@ class _FakeBuildContext extends Fake implements BuildContext {}
 void main() {
   setUpAll(() {
     registerFallbackValue(_FakeBuildContext());
+    registerFallbackValue(const Manga());
+    registerFallbackValue(MangaDexSourceExternal());
     registerFallbackValue(
       const SourceSearchMangaParameter(source: '', parameter: SearchMangaParameter()),
     );
@@ -251,5 +253,50 @@ void main() {
         expect(cubit.state.isLoading, isFalse);
       },
     );
+  });
+
+  // Issue #127: same double-tap race as the browse screen — the favorite
+  // toggle must no-op while the same manga's toggle is already in flight.
+  group('addToLibrary in-flight guard (#127)', () {
+    late MockAddToLibraryUseCase addToLibraryUseCase;
+    late MangaGridWidgetCubit guardCubit;
+
+    setUp(() {
+      addToLibraryUseCase = MockAddToLibraryUseCase();
+      guardCubit = MangaGridWidgetCubit(
+        initialState: MangaGridWidgetState(source: MangaDexSourceExternal()),
+        parentCubit: mockSearchMangaScreenCubit(),
+        listenMangaFromLibraryUseCase: mockListenMangaFromLibraryUseCase(),
+        listenSearchParameterUseCase: mockListenSearchParameterUseCase(),
+        listenPrefetchMangaUseCase: mockListenPrefetchUseCase(),
+        searchMangaUseCase: MockSearchMangaUseCase(),
+        recrawlUseCase: MockRecrawlUseCase(),
+        prefetchMangaUseCase: MockPrefetchMangaUseCase(),
+        prefetchChapterUseCase: MockPrefetchChapterUseCase(),
+        removeFromLibraryUseCase: MockRemoveFromLibraryUseCase(),
+        addToLibraryUseCase: addToLibraryUseCase,
+      );
+      addTearDown(guardCubit.close);
+    });
+
+    test('a second tap while the first is pending is ignored', () async {
+      final gate = Completer<Result<bool>>();
+      when(
+        () => addToLibraryUseCase.execute(manga: any(named: 'manga')),
+      ).thenAnswer((_) => gate.future);
+
+      const manga = Manga(id: 'm-1', source: 'Manga Dex');
+      final first = guardCubit.addToLibrary(manga: manga);
+      await pumpEventQueue();
+      final second = guardCubit.addToLibrary(manga: manga);
+      await pumpEventQueue();
+
+      verify(
+        () => addToLibraryUseCase.execute(manga: any(named: 'manga')),
+      ).called(1);
+
+      gate.complete(Success<bool>(true));
+      await Future.wait([first, second]);
+    });
   });
 }

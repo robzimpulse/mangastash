@@ -27,6 +27,12 @@ class BrowseMangaScreenState extends Equatable {
 
   final Set<String> libraryMangaIds;
 
+  /// Manga ids whose library toggle is currently executing (issue #127).
+  /// While an id is in here a repeat tap must be a no-op: the toggle
+  /// branches on a snapshot of [libraryMangaIds], so two in-flight toggles
+  /// for the same manga double-execute (add twice, or add then remove).
+  final Set<String> pendingLibraryMangaIds;
+
   bool get isFavoriteActive {
     return parameter.orders?.containsKey(SearchOrders.rating) == true;
   }
@@ -66,6 +72,7 @@ class BrowseMangaScreenState extends Equatable {
     this.libraryMangaIds = const {},
     this.parameter = const SearchMangaParameter(),
     this.prefetchedMangaIds = const {},
+    this.pendingLibraryMangaIds = const {},
     this.tags = const [],
   });
 
@@ -82,6 +89,7 @@ class BrowseMangaScreenState extends Equatable {
       isSearchActive,
       libraryMangaIds,
       prefetchedMangaIds,
+      pendingLibraryMangaIds,
       tags,
     ];
   }
@@ -97,6 +105,7 @@ class BrowseMangaScreenState extends Equatable {
     Set<String>? libraryMangaIds,
     SearchMangaParameter? parameter,
     Set<String>? prefetchedMangaIds,
+    Set<String>? pendingLibraryMangaIds,
     List<Tag>? tags,
   }) {
     return BrowseMangaScreenState(
@@ -106,6 +115,8 @@ class BrowseMangaScreenState extends Equatable {
       isSearchActive: isSearchActive ?? this.isSearchActive,
       mangas: mangas ?? this.mangas,
       libraryMangaIds: libraryMangaIds ?? this.libraryMangaIds,
+      pendingLibraryMangaIds:
+          pendingLibraryMangaIds ?? this.pendingLibraryMangaIds,
       error: error != null ? error() : this.error,
       source: source ?? this.source,
       parameter: parameter ?? this.parameter,

@@ -378,29 +378,61 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
   }
 
+  /// Toggles [manga] in/out of the library. No-ops while the same manga's
+  /// toggle is already in flight (issue #127) — see
+  /// BrowseMangaScreenCubit.addToLibrary for the race this prevents.
   Future<void> addToLibrary({required Manga manga}) async {
-    if (state.libraryMangaIds.contains(manga.id)) {
-      await _removeFromLibraryUseCase.execute(manga: manga);
-    } else {
-      await _addToLibraryUseCase.execute(manga: manga);
+    final mangaId = manga.id;
+    if (mangaId == null) return;
+    if (state.pendingLibraryMangaIds.contains(mangaId)) return;
+
+    emit(
+      state.copyWith(
+        pendingLibraryMangaIds: {...state.pendingLibraryMangaIds, mangaId},
+      ),
+    );
+    try {
+      if (state.libraryMangaIds.contains(mangaId)) {
+        await _removeFromLibraryUseCase.execute(manga: manga);
+      } else {
+        await _addToLibraryUseCase.execute(manga: manga);
+      }
+    } finally {
+      emit(
+        state.copyWith(
+          pendingLibraryMangaIds:
+              {...state.pendingLibraryMangaIds}..remove(mangaId),
+        ),
+      );
     }
   }
 
+  /// Enqueues every chapter of the manga for prefetching. Re-entry while a
+  /// run is already awaiting the chapter list is ignored, and chapters
+  /// already sitting in the job queue are skipped — re-tapping the button
+  /// must not duplicate the workload (issue #127).
   Future<void> prefetch() async {
+    if (state.isPrefetchingAll) return;
     final mangaId = state.manga?.id;
     final source = state.manga?.source?.let(Sources.fromName);
     if (mangaId == null || source == null) return;
-    final chapters = await _getAllChapterUseCase.execute(
-      source: source,
-      mangaId: mangaId,
-      parameter: state.chapterParameter.copyWith(offset: 0, page: 1, limit: 20),
-    );
-    for (final chapterId in chapters.map((e) => e.id).nonNulls) {
-      _prefetchChapterUseCase.prefetchChapter(
-        mangaId: mangaId,
+    emit(state.copyWith(isPrefetchingAll: true));
+    try {
+      final chapters = await _getAllChapterUseCase.execute(
         source: source,
-        chapterId: chapterId,
+        mangaId: mangaId,
+        parameter: state.chapterParameter.copyWith(offset: 0, page: 1, limit: 20),
       );
+      for (final chapterId in chapters.map((e) => e.id).nonNulls) {
+        if (state.prefetchedChapterIds.contains(chapterId)) continue;
+        _prefetchChapterUseCase.prefetchChapter(
+          mangaId: mangaId,
+          source: source,
+          chapterId: chapterId,
+        );
+      }
+    } finally {
+      emit(state.copyWith(isPrefetchingAll: false));
     }
   }
 
