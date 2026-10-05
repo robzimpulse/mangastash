@@ -8,7 +8,7 @@ plugins {
 android {
     compileSdkVersion Math.max(flutter.compileSdkVersion, 34)
     ndkVersion "27.0.12077973"
-    namespace "com.robzimpulse.mangastash.mangastash"
+    namespace "com.robzimpulse.mangastash"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
@@ -28,7 +28,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.robzimpulse.mangastash.mangastash"
+        applicationId "com.robzimpulse.mangastash"
         minSdkVersion 24
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutter.versionCode.toInteger()
@@ -45,7 +45,7 @@ android {
             signingConfig signingConfigs.debug
         }
     }
-    namespace 'com.robzimpulse.mangastash.mangastash'
+    namespace 'com.robzimpulse.mangastash'
 }
 
 flutter {

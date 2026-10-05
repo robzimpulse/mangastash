@@ -50,33 +50,31 @@ class DefaultFirebaseOptions {
     messagingSenderId: '333417519386',
     projectId: 'mangastash-4bf38',
     authDomain: 'mangastash-4bf38.firebaseapp.com',
-    storageBucket: 'mangastash-4bf38.appspot.com',
+    storageBucket: 'mangastash-4bf38.firebasestorage.app',
     measurementId: 'G-ZL4LVH17MW',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBaI12EqaLbpdpS3HfzodBTe5EGG9BwQFg',
-    appId: '1:333417519386:android:9217a7a207bde7a22474a3',
+    appId: '1:333417519386:android:5efc386bca2329572474a3',
     messagingSenderId: '333417519386',
     projectId: 'mangastash-4bf38',
-    storageBucket: 'mangastash-4bf38.appspot.com',
+    storageBucket: 'mangastash-4bf38.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDONMNBT5s2XmXWFufjxvrtaZ9MHbOYz3Q',
-    appId: '1:333417519386:ios:3325359d515cc8872474a3',
+    appId: '1:333417519386:ios:48c7b61b506db6e62474a3',
     messagingSenderId: '333417519386',
     projectId: 'mangastash-4bf38',
-    storageBucket: 'mangastash-4bf38.appspot.com',
-    iosBundleId: 'com.robzimpulse.mangastash.mangastash',
+    storageBucket: 'mangastash-4bf38.firebasestorage.app',
+    iosBundleId: 'com.robzimpulse.mangastash',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyDONMNBT5s2XmXWFufjxvrtaZ9MHbOYz3Q',
-    appId: '1:333417519386:ios:3325359d515cc8872474a3',
+    appId: '1:333417519386:ios:48c7b61b506db6e62474a3',
     messagingSenderId: '333417519386',
     projectId: 'mangastash-4bf38',
-    storageBucket: 'mangastash-4bf38.appspot.com',
-    iosBundleId: 'com.robzimpulse.mangastash.mangastash',
+    storageBucket: 'mangastash-4bf38.firebasestorage.app',
+    iosBundleId: 'com.robzimpulse.mangastash',
   );
 }

@@ -1,4 +1,4 @@
-package com.robzimpulse.mangastash.mangastash
+package com.robzimpulse.mangastash
 
 import io.flutter.embedding.android.FlutterActivity
 
