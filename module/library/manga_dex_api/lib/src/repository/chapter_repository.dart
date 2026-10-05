@@ -46,11 +46,11 @@ class ChapterRepository {
       orders: parameter?.orders?.map(
         (key, value) => MapEntry(key.rawValue, value.rawValue),
       ),
-      // TODO: include this param
-      // includeEmptyPages: 1,
-      // includeExternalUrl: 1,
-      // includeFuturePublishAt: 1,
-      // includeFutureUpdates: '1',
+      // The include* flags are NOT sent: on the live API each flag=1 is an
+      // exclusive filter (only empty-page / only external-URL / only
+      // future-publish chapters) — it zeroed every probed feed (2026-10-06,
+      // issue #118), and flag=2 is an API error. The default feed already
+      // matches the site's chapter list.
     );
   }
 }
