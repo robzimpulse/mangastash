@@ -12,6 +12,7 @@ export 'src/enums/reading_status.dart';
 export 'src/enums/tag_modes.dart';
 export 'src/enums/visibility.dart';
 export 'src/exception/server_exception.dart';
+export 'src/exception/decode_mangadex_envelope.dart';
 export 'src/model/at_home/at_home_response.dart';
 export 'src/model/author/author_data.dart';
 export 'src/model/author/author_data_attributes.dart';
