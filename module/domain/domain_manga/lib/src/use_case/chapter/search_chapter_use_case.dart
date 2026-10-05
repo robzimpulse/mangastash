@@ -95,7 +95,9 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
     }
 
     final document = await _webview.open(
-      url,
+      // Sources can redirect the chapter list away from the series page
+      // (WeebCentral's full-chapter-list endpoint, issue #161).
+      source.listChapterUseCase.url(webUrl: url),
       scripts: source.listChapterUseCase.scripts,
       readyWhenSelectors: source.listChapterUseCase.readyWhenSelectors,
       useCache: useCache,
@@ -147,7 +149,20 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
       if (paramIgnorePagination != key.parameter) continue;
       promises.add(_searchChapterCacheManager.removeFile(value));
     }
-    if (url != null) promises.add(_htmlCacheManager.removeFile(url));
+    if (url != null) {
+      // The fetch (and therefore the html cache entry) uses the
+      // source-derived URL — for WeebCentral that is the full-chapter-list
+      // endpoint, not the series page; evicting the series page would
+      // leave the stale derived entry alive (review on #167). Built-in
+      // sources have no scraping use cases (their getters throw
+      // UnimplementedError by design), so they always use the plain URL.
+      final source = Sources.fromName(parameter.source);
+      final evictUrl =
+          (source == null || source.builtIn)
+              ? url
+              : source.listChapterUseCase.url(webUrl: url);
+      promises.add(_htmlCacheManager.removeFile(evictUrl));
+    }
     await Future.wait(promises);
   }
 
