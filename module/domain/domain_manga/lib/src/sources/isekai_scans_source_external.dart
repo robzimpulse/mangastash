@@ -292,7 +292,7 @@ class _SearchMangaSourceExternalUseCase
 
 class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
 
-  //// Genres are listed on the search page this source already opens.
+  /// Genres are listed on the search page this source already opens.
   @override
   String? get url => null;
 

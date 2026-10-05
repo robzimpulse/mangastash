@@ -1,13 +1,14 @@
 // Tests for GetTagsUseCase on scraped sources: the page it opens must be
 // the one the genre list actually lives on — WeebCentral's checkboxes are
 // only on /search, while its searchMangaUseCase.url() points at the
-// /search/data htmx fragment with zero checkboxes (issue #163).
+// /search/data htmx fragment with zero checkboxes (issue #163). Sources
+// that leave the url hook null fall back to their search page.
 //
 // Run with: fvm flutter test test/use_case/tags/get_tags_use_case_test.dart
-import 'package:core_analytics/core_analytics.dart';
 import 'package:core_analytics/core_analytics.dart' as analytics;
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:domain_manga/src/sources/asura_scan_source_external.dart';
 import 'package:domain_manga/src/sources/weeb_central_source_external.dart';
 import 'package:domain_manga/src/use_case/tags/get_tags_use_case.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -22,7 +23,7 @@ class MockHeadlessWebviewUseCase extends Mock implements HeadlessWebviewUseCase 
 
 class MockTagDao extends Mock implements TagDao {}
 
-class MockLogBox extends Mock implements LogBox {}
+class MockLogBox extends Mock implements analytics.LogBox {}
 
 void main() {
   late MockHeadlessWebviewUseCase webview;
@@ -77,4 +78,35 @@ void main() {
     expect(result, isA<Success<List<Tag>>>());
     expect(openedUrls, ['https://weebcentral.com/search']);
   });
+
+  test(
+    'a null url hook falls back to the source search page (review on #169)',
+    () async {
+      // Asura leaves listTagUseCase.url null — the tags fetch must open
+      // its search URL, pinning the null-fallback branch five sources now
+      // document with `url => null`.
+      final openedUrls = <String>[];
+      when(
+        () => webview.open(
+          any(),
+          scripts: any(named: 'scripts'),
+          readyWhenSelectors: any(named: 'readyWhenSelectors'),
+          useCache: any(named: 'useCache'),
+          timeout: any(named: 'timeout'),
+        ),
+      ).thenAnswer((invocation) async {
+        openedUrls.add(invocation.positionalArguments.first as String);
+        return html_parser.parse('<html></html>');
+      });
+
+      final result = await useCase.execute(source: AsuraScanSourceExternal());
+
+      expect(result, isA<Success<List<Tag>>>());
+      expect(openedUrls, [
+        AsuraScanSourceExternal()
+            .searchMangaUseCase
+            .url(parameter: const SearchMangaParameter(page: 1)),
+      ]);
+    },
+  );
 }

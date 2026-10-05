@@ -257,11 +257,15 @@ class _SearchMangaSourceExternalUseCase
                     .querySelectorAll('strong')
                     .any((s) => s.text.contains(':')),
               ) ??
-          // No section carries labeled rows — degrade to the LAST text-link
-          // section: every observed layout ships the cover FIRST, so the
-          // last text-bearing section is metadata, never the cover (the
-          // pre-fix first-match fallback re-created the ribbon defect for
-          // strong-less layouts — review on #169).
+          // No section carries labeled rows — degrade to the last text-link
+          // section WITHOUT a cover image. Excluding img-bearing sections
+          // makes the pick order-proof (observed layouts ship the cover
+          // first, but a metadata-first card must not lose to a cover-last
+          // section) — review on #169. If every text-link section carries
+          // an image, fall back to plain last.
+          sectionsWithTextLinks
+              .where((section) => section.querySelector('img') == null)
+              .lastOrNull ??
           sectionsWithTextLinks.lastOrNull;
       final link = metadata
           ?.querySelectorAll('a[href*="/series/"]')

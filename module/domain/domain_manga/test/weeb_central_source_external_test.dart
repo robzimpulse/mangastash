@@ -306,7 +306,9 @@ const _tooltipStrongFirstCardHtml = '''
 
 /// Card fixture (review on #169): a strong-less layout — cover section
 /// (with ribbon + overlay title text) first, text-only metadata second.
-/// The degraded fallback must still pick metadata, never the cover.
+/// The degraded fallback must still pick metadata, never the cover. The
+/// second article flips the order (metadata first) — the fallback must be
+/// order-proof, not cover-first-assuming.
 const _stronglessCardHtml = '''
 <div>
   <article class="bg-base-300 flex gap-4 p-4">
@@ -320,6 +322,19 @@ const _stronglessCardHtml = '''
     <section class="hidden lg:block lg:w-[75%]">
       <a href="https://weebcentral.com/series/01J76XY7E2VCSR0ZCC21KGXS1K/Kobato">Kobato.</a>
       <a href="https://weebcentral.com/search?author=CLAMP">CLAMP</a>
+    </section>
+  </article>
+  <article class="bg-base-300 flex gap-4 p-4">
+    <section class="hidden lg:block lg:w-[75%]">
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">One Piece</a>
+      <a href="https://weebcentral.com/search?author=ODA+Eiichiro">ODA Eiichiro</a>
+    </section>
+    <section class="w-full lg:w-[25%]">
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">
+        <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+        <div>Official</div>
+        <div>One Piece</div>
+      </a>
     </section>
   </article>
 </div>
@@ -435,16 +450,20 @@ void main() {
   );
 
   test(
-    'search degrades to the last text-link section, never the cover (review on #169)',
+    'search degrades to a metadata section, never the cover (review on #169)',
     () async {
       final results = await source.searchMangaUseCase
           .parse(root: html_parser.parse(_stronglessCardHtml));
-      expect(results, hasLength(1));
+      expect(results, hasLength(2));
       // Strong-less layout: the cover ships first, so the degraded pick is
       // the LAST text-link section — not the first, which is the cover
       // anchor carrying the ribbon + overlay title.
-      expect(results.single.title, 'Kobato.');
-      expect(results.single.author, 'CLAMP');
+      expect(results.first.title, 'Kobato.');
+      expect(results.first.author, 'CLAMP');
+      // …and the fallback must be order-proof: with metadata shipping
+      // FIRST, a cover-last section must not win the pick either.
+      expect(results[1].title, 'One Piece');
+      expect(results[1].author, 'ODA Eiichiro');
     },
   );
 
