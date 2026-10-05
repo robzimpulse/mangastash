@@ -277,6 +277,51 @@ void main() {
   );
 
   test(
+    'an empty chapter parse fails as a parse error instead of syncing an empty list (#114)',
+    () async {
+      // A correctly parsed series page always carries chapter rows — zero
+      // rows means the row anchors drifted. The old behavior returned an
+      // empty list that synced into the DB, got cached for 30 minutes,
+      // and rendered as "no chapters" with no trace of the real cause.
+      when(
+        () => webview.open(
+          any(),
+          scripts: any(named: 'scripts'),
+          readyWhenSelectors: any(named: 'readyWhenSelectors'),
+          useCache: any(named: 'useCache'),
+          timeout: any(named: 'timeout'),
+        ),
+      ).thenAnswer((_) async => html_parser.parse('<html><body></body></html>'));
+
+      final result = await useCase.execute(
+        parameter: SourceSearchChapterParameter(
+          source: MangakatanaSourceExternal().name,
+          parameter: const SearchChapterParameter(page: 1, limit: 20),
+          mangaId: _mangaId,
+        ),
+      );
+
+      expect(result, isA<Error<Pagination<Chapter>>>());
+      final error = (result as Error<Pagination<Chapter>>).error;
+      expect(error, isA<FailedParsingHtmlException>());
+      expect((error as FailedParsingHtmlException).source, 'Manga Katana');
+      expect(error.parser, 'listChapter');
+      expect(error.missingFields, ['chapter rows']);
+      // The garbage never reaches the DB sync or the 30-minute cache.
+      verifyNever(() => chapterDao.adds(values: any(named: 'values')));
+      verifyNever(
+        () => cacheManager.putFile(
+          any(),
+          any(),
+          key: any(named: 'key'),
+          fileExtension: any(named: 'fileExtension'),
+          maxAge: any(named: 'maxAge'),
+        ),
+      );
+    },
+  );
+
+  test(
     'clear evicts the html entry the fetch actually uses (review on #167)',
     () async {
       // WeebCentral's chapter fetch (and therefore its html cache entry)

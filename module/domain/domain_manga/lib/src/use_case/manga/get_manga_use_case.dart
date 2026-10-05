@@ -6,6 +6,7 @@ import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../extension/data_scrapped_extension.dart';
+import '../../extension/scrapped_validation_extension.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 
 class GetMangaUseCase with SyncMangasMixin {
@@ -61,7 +62,12 @@ class GetMangaUseCase with SyncMangasMixin {
 
     final data = await source.getMangaUseCase.parse(root: document);
 
-    final manga = await data.convert(
+    // A detail page always names its series — a missing title means the
+    // detail selectors drifted. Fail before the sync writes a null-title
+    // manga into the DB (issue #114).
+    final valid = data.requireDetailFields(source: source.name, url: url);
+
+    final manga = await valid.convert(
       logbox: _logBox,
       manager: _converterCacheManager,
     );

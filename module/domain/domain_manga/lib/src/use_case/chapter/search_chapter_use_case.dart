@@ -10,6 +10,7 @@ import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../extension/data_scrapped_extension.dart';
+import '../../extension/scrapped_validation_extension.dart';
 import '../../mixin/sort_chapters_mixin.dart';
 import '../../mixin/sync_chapters_mixin.dart';
 import '../../sources/sources.dart';
@@ -104,15 +105,22 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
       timeout: source.listChapterUseCase.timeout,
     );
 
-    final scraps = source.listChapterUseCase.parse(root: document);
+    final scraps = await source.listChapterUseCase.parse(root: document);
 
-    final chapters = await scraps.then((scraps) {
-      return Future.wait(
-        scraps.map(
-          (e) => e.convert(logbox: _logBox, manager: _converterCacheManager),
-        ),
-      );
-    });
+    // A series page always carries chapter rows when parsed correctly —
+    // zero (or all-invalid) rows is selector drift, not an empty library
+    // (issue #114). Fail before the sync/cache writes persist it.
+    final valid = scraps.requireChapterFields(
+      source: source.name,
+      url: url,
+      logBox: _logBox,
+    );
+
+    final chapters = await Future.wait(
+      valid.map(
+        (e) => e.convert(logbox: _logBox, manager: _converterCacheManager),
+      ),
+    );
 
     // Scraped sources serve the entire chapter list in a single document —
     // there is no second page to fetch. Hand back the complete sorted list

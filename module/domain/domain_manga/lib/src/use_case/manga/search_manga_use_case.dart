@@ -9,6 +9,7 @@ import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../extension/data_scrapped_extension.dart';
+import '../../extension/scrapped_validation_extension.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 import '../../sources/sources.dart';
 
@@ -73,8 +74,16 @@ class SearchMangaUseCase with SyncMangasMixin {
       root: document,
       searchTerm: parameter.title,
     );
+    // Drop cards the extraction came back half-empty for, and fail fast
+    // when a page full of cards yields nothing usable — rendering "no
+    // results" for a broken parse would hide the breakage (issue #114).
+    final cards = data.requireCardFields(
+      source: source.name,
+      url: url,
+      logBox: _logBox,
+    );
     final mangas = await Future.wait(
-      data.map(
+      cards.map(
         (e) => e.convert(logbox: _logBox, manager: _converterCacheManager),
       ),
     );
