@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import '../exception/at_home_server_exception.dart';
 import 'at_home_chapter.dart';
 
 part 'at_home_response.g.dart';
@@ -16,6 +17,9 @@ class AtHomeResponse {
   late final List<String>? imagesDataSaver;
 
   AtHomeResponse(this.result, this.baseUrl, this.chapter) {
+    if (chapter?.hash != null && (baseUrl == null || baseUrl!.isEmpty)) {
+      throw AtHomeServerException();
+    }
     final hash = chapter?.hash;
     final data = chapter?.data ?? [];
     final saver = chapter?.dataSaver ?? [];
