@@ -97,6 +97,38 @@ const _detailHtml = '''
 </body></html>
 ''';
 
+/// Series-detail fixture captured live 2026-10 (mangakatana.com
+/// /manga/a-cool-girl-and-a-12cm-promise.27318): info rows are now
+/// `li.d-row-small` (not `li.d-row`), the author row's combined label is
+/// "Author(s) / Artist(s):", and genre links are ABSOLUTE hrefs.
+const _detailLiveHtml = '''
+<html><body>
+  <h1>A Cool Girl and a 12cm Promise</h1>
+  <ul class="sub-menu genres">
+    <li><a href="https://mangakatana.com/genre/action">Action</a></li>
+  </ul>
+  <ul>
+    <li class="d-row-small">
+      <div class="d-cell-small label">Author(s) / Artist(s):</div>
+      <div class="d-cell-small value authors"><a class="author" href="https://mangakatana.com/author/ziki-masaya.16612">Ziki Masaya</a></div>
+    </li>
+    <li class="d-row-small">
+      <div class="d-cell-small label">Genre(s):</div>
+      <div class="d-cell-small value">
+        <a href="https://mangakatana.com/genre/comedy" class="text_0">Comedy</a>,
+        <a href="https://mangakatana.com/genre/romance" class="text_1">Romance</a>,
+        <a href="https://mangakatana.com/genre/slice-of-life" class="text_2">Slice of Life</a>
+      </div>
+    </li>
+    <li class="d-row-small">
+      <div class="d-cell-small label">Status:</div>
+      <div class="d-cell-small value status ongoing">Ongoing</div>
+    </li>
+  </ul>
+  <div class="summary"><p>A cool girl story.</p></div>
+</body></html>
+''';
+
 /// Reader fixture (mangakatana.com /manga/one-piece.123/c1040): after the
 /// injected script resolves `thzq`, each `#imgs .wrap_img img` carries its
 /// real URL in `data-src`. One still-unresolved `#` placeholder must be
@@ -194,6 +226,36 @@ const _browseLastPageHtml = '''
 </body></html>
 ''';
 
+/// Search page-2 fixture (captured live 2026-10 from
+/// /page/2?search=sword&search_by=m_name): same `#book_list` card shape
+/// as page 1, with the live `ul.uk-pagination` + `a.next.page-numbers`
+/// nav — pins that page-2 results parse through the shared path and the
+/// nav reports a next page (review on #168).
+const _searchPage2Html = '''
+<html><body>
+  <div id="book_list">
+    <div class="item" data-id="777" data-genre="Action,Adventure">
+      <div class="media">
+        <div class="wrap_img">
+          <a href="https://mangakatana.com/manga/sword-master.777">
+            <img src="https://mangakatana.com/imgs/cover/sword.jpg" alt="[Cover]">
+          </a>
+        </div>
+      </div>
+      <div class="text">
+        <h3 class="title"><a href="https://mangakatana.com/manga/sword-master.777">Sword Master</a></h3>
+      </div>
+    </div>
+  </div>
+  <ul class="uk-pagination">
+    <li><a class="prev page-numbers" href="https://mangakatana.com/?search=sword&search_by=m_name">&lt;</a></li>
+    <li><a class="page-numbers" href="https://mangakatana.com/?search=sword&search_by=m_name">1</a></li>
+    <li class="uk-active"><span class="page-numbers current">2</span></li>
+    <li><a class="next page-numbers" href="https://mangakatana.com/page/3?search=sword&search_by=m_name">&gt;</a></li>
+  </ul>
+</body></html>
+''';
+
 void main() {
   final source = MangakatanaSourceExternal();
 
@@ -211,7 +273,7 @@ void main() {
     expect(source.listTagUseCase, isA<ListTagSourceExternalUseCase>());
   });
 
-  test('search url maps title to root path and ignores page', () {
+  test('search url maps title to root path and ignores page 1', () {
     expect(
       source.searchMangaUseCase.url(
         parameter: const SearchMangaParameter(title: 'One Piece'),
@@ -220,11 +282,52 @@ void main() {
     );
     expect(
       source.searchMangaUseCase.url(
-        parameter: const SearchMangaParameter(title: 'One Piece', page: 2),
+        parameter: const SearchMangaParameter(title: 'One Piece', page: 1),
       ),
       'https://mangakatana.com/?search=One+Piece&search_by=m_name',
     );
   });
+
+  test(
+    'search url maps page 2+ of a query to the paginated search route (#165)',
+    () {
+      // Captured live 2026-10: the search route is paginated — the nav's
+      // next link is /page/2?search=sword&search_by=m_name — so page 2+
+      // must follow that form or it re-fetches page 1 forever.
+      expect(
+        source.searchMangaUseCase.url(
+          parameter: const SearchMangaParameter(title: 'sword', page: 2),
+        ),
+        'https://mangakatana.com/page/2?search=sword&search_by=m_name',
+      );
+      expect(
+        source.searchMangaUseCase.url(
+          parameter: const SearchMangaParameter(title: 'sword', page: 3),
+        ),
+        'https://mangakatana.com/page/3?search=sword&search_by=m_name',
+      );
+    },
+  );
+
+  test(
+    'search page 2 parses cards and reports the next page (review on #168)',
+    () async {
+      final results = await source.searchMangaUseCase.parse(
+        root: html_parser.parse(_searchPage2Html),
+      );
+      expect(results, hasLength(1));
+      expect(results.single.title, 'Sword Master');
+      expect(
+        results.single.webUrl,
+        'https://mangakatana.com/manga/sword-master.777',
+      );
+
+      final next = await source.searchMangaUseCase.haveNextPage(
+        root: html_parser.parse(_searchPage2Html),
+      );
+      expect(next, isTrue);
+    },
+  );
 
   test('browse url maps empty title to homepage (search page is empty after JS)', () {
     expect(
@@ -316,7 +419,7 @@ void main() {
     expect(results.single.tags, ['Action', 'Adventure']);
   });
 
-  test('search haveNextPage is always false (single batch)', () async {
+  test('search haveNextPage false when the page has no pagination nav', () async {
     final next = await source.searchMangaUseCase.haveNextPage(
       root: html_parser.parse(_searchHtml),
     );
@@ -336,6 +439,23 @@ void main() {
     );
     expect(manga.tags, ['Action', 'Adventure']);
   });
+
+  test(
+    'detail parses the live d-row-small rows with absolute genre hrefs (#164)',
+    () async {
+      // Captured live 2026-10: rows are li.d-row-small, the author label is
+      // "Author(s) / Artist(s):" and genre links are absolute — the old
+      // selectors matched neither, leaving author/status/tags null/empty.
+      final manga = await source.getMangaUseCase.parse(
+        root: html_parser.parse(_detailLiveHtml),
+      );
+      expect(manga.title, 'A Cool Girl and a 12cm Promise');
+      expect(manga.author, 'Ziki Masaya');
+      expect(manga.status, 'Ongoing');
+      expect(manga.tags, ['Comedy', 'Romance', 'Slice of Life']);
+      expect(manga.description, 'A cool girl story.');
+    },
+  );
 
   test('chapter list parses table rows in order', () async {
     final chapters = await source.listChapterUseCase.parse(

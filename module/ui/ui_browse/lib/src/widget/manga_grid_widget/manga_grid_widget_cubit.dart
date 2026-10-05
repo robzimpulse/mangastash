@@ -17,6 +17,12 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
   final RemoveFromLibraryUseCase _removeFromLibraryUseCase;
   final AddToLibraryUseCase _addToLibraryUseCase;
 
+  /// Monotonic request token: every init() bumps it, and responses from
+  /// superseded fetches are dropped before emitting so a slow older response
+  /// can never overwrite newer results or advance the parameter
+  /// (issue #123).
+  int _requestSeq = 0;
+
   MangaGridWidgetCubit({
     MangaGridWidgetState initialState = const MangaGridWidgetState(),
     required SearchMangaScreenCubit parentCubit,
@@ -59,10 +65,14 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
     SearchMangaParameter? parameter,
     bool refresh = false,
   }) async {
+    final seq = ++_requestSeq;
     emit(
       state.copyWith(
         isLoading: true,
         mangas: [],
+        // A new epoch reclaims the paging flag from any superseded next()
+        // (review on #160) — the flag is per-epoch, not per-cubit-lifetime.
+        isPagingNextPage: false,
         parameter: (parameter ?? state.parameter).copyWith(
           offset: 0,
           page: 1,
@@ -71,11 +81,21 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
       ),
     );
 
-    if (refresh) await _clearMangaCache();
+    try {
+      if (refresh) await _clearMangaCache();
 
-    await _fetchManga();
-
-    emit(state.copyWith(isLoading: false));
+      await _fetchManga(seq: seq);
+    } catch (e) {
+      if (seq == _requestSeq) {
+        emit(state.copyWith(error: () => _asException(e)));
+      }
+    } finally {
+      // Gated by the token: an older init finishing must not clear the
+      // loading state of a newer one that is still in flight (issue #123).
+      if (seq == _requestSeq) {
+        emit(state.copyWith(isLoading: false));
+      }
+    }
   }
 
   Future<void> _clearMangaCache() async {
@@ -91,64 +111,87 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
     );
   }
 
-  Future<void> _fetchManga() async {
+  Future<void> _fetchManga({required int seq}) async {
     final source = state.source;
 
     if (source == null) return;
 
-    final result = await _searchMangaUseCase.execute(
-      parameter: SourceSearchMangaParameter(
-        source: source.name,
-        parameter: state.parameter,
-      ),
-    );
-
-    if (result is Success<Pagination<Manga>>) {
-      final offset = result.data.offset ?? 0;
-      final page = result.data.page ?? 0;
-      final limit = result.data.limit ?? 0;
-      final total = result.data.total ?? 0;
-      final mangas = result.data.data ?? [];
-      final hasNextPage = result.data.hasNextPage;
-
-      final allMangas = [...state.mangas, ...mangas].distinct();
-
-      emit(
-        state.copyWith(
-          mangas: allMangas,
-          hasNextPage: hasNextPage ?? allMangas.length < total,
-          parameter: state.parameter.copyWith(
-            page: page + 1,
-            offset: offset + limit,
-            limit: limit,
-          ),
-          error: () => null,
+    try {
+      final result = await _searchMangaUseCase.execute(
+        parameter: SourceSearchMangaParameter(
+          source: source.name,
+          parameter: state.parameter,
         ),
       );
 
-      final mangasInLibrary = mangas.where(
-        (e) => state.libraryMangaIds.contains(e.id),
-      );
-      for (final manga in mangasInLibrary) {
-        final mangaId = manga.id;
-        if (mangaId == null) continue;
-        _prefetchChapterUseCase.prefetchChapters(
-          mangaId: mangaId,
-          source: source,
-        );
-      }
-    }
+      // Drop responses superseded by a newer init before emitting (#123).
+      if (seq != _requestSeq) return;
 
-    if (result is Error<Pagination<Manga>>) {
-      emit(state.copyWith(error: () => result.error));
+      if (result is Success<Pagination<Manga>>) {
+        final offset = result.data.offset ?? 0;
+        final page = result.data.page ?? 0;
+        final limit = result.data.limit ?? 0;
+        final total = result.data.total ?? 0;
+        final mangas = result.data.data ?? [];
+        final hasNextPage = result.data.hasNextPage;
+
+        final allMangas = [...state.mangas, ...mangas].distinct();
+
+        emit(
+          state.copyWith(
+            mangas: allMangas,
+            hasNextPage: hasNextPage ?? allMangas.length < total,
+            parameter: state.parameter.copyWith(
+              page: page + 1,
+              offset: offset + limit,
+              limit: limit,
+            ),
+            error: () => null,
+          ),
+        );
+
+        final mangasInLibrary = mangas.where(
+          (e) => state.libraryMangaIds.contains(e.id),
+        );
+        for (final manga in mangasInLibrary) {
+          final mangaId = manga.id;
+          if (mangaId == null) continue;
+          _prefetchChapterUseCase.prefetchChapters(
+            mangaId: mangaId,
+            source: source,
+          );
+        }
+      }
+
+      if (result is Error<Pagination<Manga>>) {
+        emit(state.copyWith(error: () => result.error));
+      }
+    } catch (e) {
+      // A throw must never strand the loading flags (issue #122).
+      if (seq != _requestSeq) return;
+      emit(state.copyWith(error: () => _asException(e)));
     }
   }
 
   Future<void> next() async {
+    // A next() started while init() is still in flight would share its
+    // epoch — both fetches append and advance the page by +2 (review on
+    // #160; same guard shape as MangaDetailScreenCubit.nextChapter).
+    if (state.isLoading) return;
     if (!state.hasNextPage || state.isPagingNextPage) return;
+    // Belongs to the current request epoch: a newer init bumps the token and
+    // this fetch's response is dropped automatically.
+    final seq = _requestSeq;
     emit(state.copyWith(isPagingNextPage: true));
-    await _fetchManga();
-    emit(state.copyWith(isPagingNextPage: false));
+    try {
+      await _fetchManga(seq: seq);
+    } finally {
+      // Gated by the epoch: a superseded next() must not clear the paging
+      // flag of the newer epoch whose init reclaimed it (review on #160).
+      if (seq == _requestSeq) {
+        emit(state.copyWith(isPagingNextPage: false));
+      }
+    }
   }
 
   void recrawl({required BuildContext context, required String url}) async {
@@ -190,4 +233,9 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
     if (id == null || source == null) return;
     // TODO: add download manga
   }
+}
+
+/// Fits any thrown object into the state's `Exception?` error field.
+Exception _asException(Object error) {
+  return error is Exception ? error : Exception(error.toString());
 }

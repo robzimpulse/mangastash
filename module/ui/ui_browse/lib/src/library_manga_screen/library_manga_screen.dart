@@ -204,7 +204,12 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
         return IconButton(
           icon: Icon(state.isSearchActive ? Icons.close : Icons.search),
           onPressed: () {
-            _cubit(context)?.update(isSearchActive: !state.isSearchActive);
+            final next = !state.isSearchActive;
+            // Keep the field in sync with the reset filter (issue #124);
+            // clear() does not fire onChanged, so the cubit's own reset in
+            // update() is what clears the state.
+            if (!next) _searchController.clear();
+            _cubit(context)?.update(isSearchActive: next);
           },
         );
       },
