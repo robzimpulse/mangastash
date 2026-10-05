@@ -16,7 +16,7 @@ class DioManager {
   static const Duration connectTimeout = Duration(seconds: 15);
   static const Duration receiveTimeout = Duration(seconds: 30);
 
-  static Dio create({required LogBox log}) {
+  static Dio create({required LogBox log, List<Duration> retryDelays = const [Duration(milliseconds: 500), Duration(seconds: 1), Duration(seconds: 2), Duration(seconds: 4)]}) {
     final dio = Dio(
       BaseOptions(
         headers: {HttpHeaders.userAgentHeader: UserAgentMixin.staticUserAgent},
@@ -53,7 +53,8 @@ class DioManager {
     dio.interceptors.add(
       RetryInterceptor(
         dio: dio,
-        retryableExtraStatuses: {status400BadRequest},
+        retries: 4,
+        retryDelays: retryDelays,
         logPrint: (msg) => log.log(msg, name: 'DioManager'),
       ),
     );
