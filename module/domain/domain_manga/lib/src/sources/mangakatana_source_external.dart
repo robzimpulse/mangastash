@@ -119,9 +119,14 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
       author: _infoValue(root, 'Author(s)'),
       description: _summary(root),
       status: _infoValue(root, 'Status'),
+      // Captured live 2026-10: info rows are li.d-row-small and genre
+      // links carry ABSOLUTE hrefs — anchor on the row classes so the
+      // navbar's genre dropdown (plain <li>) never leaks in (#164).
       tags:
           root
-              .querySelectorAll('li.d-row a[href^="/genre/"]')
+              .querySelectorAll(
+                'li.d-row a[href*="/genre/"], li.d-row-small a[href*="/genre/"]',
+              )
               .map((e) => e.text.trim())
               .where((e) => e.isNotEmpty)
               .toList(),
@@ -135,10 +140,11 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
   List<String> get scripts => [];
 }
 
-/// Reads a `li.d-row` value by label prefix, e.g. "ODA Eiichiro" from the
-/// row whose label cell says "Author(s):".
+/// Reads a `li.d-row`/`li.d-row-small` value by label prefix, e.g.
+/// "Ziki Masaya" from the row whose label cell says "Author(s) / Artist(s):"
+/// (the row class changed to d-row-small in 2026-10 — match both).
 String? _infoValue(Document root, String label) {
-  for (final row in root.querySelectorAll('li.d-row')) {
+  for (final row in root.querySelectorAll('li.d-row, li.d-row-small')) {
     final rowLabel = row.querySelector('div.d-cell-small.label')?.text.trim();
     if (rowLabel == null || !rowLabel.contains(label)) continue;
     return row.querySelector('div.d-cell-small.value')?.text.trim();
@@ -215,10 +221,9 @@ class _SearchMangaSourceExternalUseCase
 
   @override
   Future<bool?> haveNextPage({required Document root}) async {
-    // Browse (homepage /page/N) renders a `ul.uk-pagination` whose final
-    // entry is an `<a class="next …">` link to the next page; the last page
-    // has no such link. Search results are a single batch with no pagination
-    // nav, so this returns false there too.
+    // Both browse (/page/N) and search (/page/N?search=…) render a
+    // `ul.uk-pagination` whose final entry is an `<a class="next …">` link
+    // to the next page; the last page has no such link.
     return root.querySelector('ul.uk-pagination a.next') != null;
   }
 
@@ -271,9 +276,14 @@ class _SearchMangaSourceExternalUseCase
       return page <= 1 ? '$_baseUrl/' : '$_baseUrl/page/$page';
     }
     // The site's search form posts to the root path; `/search` is a 404.
-    // `search_by=m_name` makes the query match against manga names. Results
-    // are a single batch — the site ignores any page parameter here.
-    return '$_baseUrl/?search=$q&search_by=m_name';
+    // `search_by=m_name` makes the query match against manga names. The
+    // route is paginated (captured live 2026-10: the nav's next link is
+    // /page/2?search=…&search_by=m_name), so page 2+ must follow that form
+    // or every next page re-fetches page 1 (#165).
+    final page = parameter.page;
+    return page <= 1
+        ? '$_baseUrl/?search=$q&search_by=m_name'
+        : '$_baseUrl/page/$page?search=$q&search_by=m_name';
   }
 }
 
