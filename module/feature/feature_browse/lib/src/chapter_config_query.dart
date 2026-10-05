@@ -11,8 +11,13 @@
 // - Route side: `state.extra.castOrNull<ChapterConfig>() ??
 //   chapterConfigFromQueryParameters(state.uri.queryParameters)`.
 //
-// Decoding never throws: unknown or missing values fall back to the
-// [ChapterConfig] defaults so a malformed link still opens a usable sheet.
+// Decoding never throws, and garbage stays neutral: unknown enum names
+// and present-but-unparseable booleans fall back to the [ChapterConfig]
+// defaults (null booleans are ACTIVE filters downstream, so a garbage
+// value must not decode to null), while absent tri-state keys decode to
+// null (the encoder omits nulls, so absence is the explicit-null
+// encoding). An empty query decodes to null overall — the sheet's
+// show-all default (review on #176).
 import 'package:entity_manga/entity_manga.dart';
 
 /// Query keys used by the codec. Kept short but explicit.
@@ -68,11 +73,16 @@ String chapterConfigLocation(String path, ChapterConfig config) {
   ).toString();
 }
 
+/// Reads a tri-state bool: an absent key stays null (the encoder omits
+/// nulls, so absence IS the explicit-null encoding), while a
+/// present-but-unparseable value decodes to false — the neutral
+/// [ChapterConfig] default. Garbage cannot be an intentional explicit
+/// null, and null is an ACTIVE filter downstream (review on #176).
 bool? _readBool(String? value) {
   if (value == null) return null;
   if (value.toLowerCase() == 'true') return true;
   if (value.toLowerCase() == 'false') return false;
-  return null;
+  return false;
 }
 
 T _readEnum<T extends Enum>(String? value, List<T> values, T fallback) {

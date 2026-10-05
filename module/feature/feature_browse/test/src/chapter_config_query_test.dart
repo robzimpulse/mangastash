@@ -59,9 +59,15 @@ void main() {
     expect(decoded.unread, isNull);
   });
 
-  test('unknown values fall back to no-filter booleans and default enums', () {
+  // Review on #176: a present-but-unparseable value cannot be an
+  // intentional explicit null (the encoder omits null keys), and null is
+  // an ACTIVE read/not-downloaded filter in
+  // MangaDetailScreenState.filtered — garbage must decode to the neutral
+  // constructor default (false), like garbage enums decode to theirs.
+  test('unknown values fall back to neutral booleans and default enums', () {
     final decoded = chapterConfigFromQueryParameters(const {
       'downloaded': 'yes',
+      'unread': '1',
       'display': 'hologram',
       'sortOption': '',
       'sortOrder': 'sideways',
@@ -71,9 +77,11 @@ void main() {
       display: ChapterDisplayEnum.title,
       sortOption: ChapterSortOptionEnum.chapterNumber,
       sortOrder: ChapterSortOrderEnum.desc,
-    ).copyWith(downloaded: () => null, unread: () => null);
+    );
 
     expect(decoded, expected);
+    expect(decoded!.downloaded, isFalse);
+    expect(decoded.unread, isFalse);
   });
 
   // Review on #176: a bare deep link produces an empty query, and
