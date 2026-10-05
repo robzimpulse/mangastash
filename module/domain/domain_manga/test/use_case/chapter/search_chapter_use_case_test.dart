@@ -316,4 +316,30 @@ void main() {
       expect(evicted, ['$seriesUrl/full-chapter-list']);
     },
   );
+
+  test(
+    'clear with the built-in MangaDex source evicts the plain webUrl (review on #167)',
+    () async {
+      // MangaDexSourceExternal.listChapterUseCase throws UnimplementedError
+      // by design — clear() must not touch the hook for built-in sources.
+      when(() => cacheManager.keys).thenAnswer((_) async => {});
+
+      final evicted = <String>[];
+      when(
+        () => htmlCacheManager.removeFile(captureAny()),
+      ).thenAnswer((invocation) async {
+        evicted.add(invocation.positionalArguments.first as String);
+      });
+
+      await useCase.clear(
+        parameter: SourceSearchChapterParameter(
+          source: 'Manga Dex',
+          parameter: const SearchChapterParameter(page: 1, limit: 20),
+          mangaId: _mangaId,
+        ),
+      );
+
+      expect(evicted, [_mangaUrl]);
+    },
+  );
 }
