@@ -108,7 +108,12 @@ class MangaUpdatesScreen extends StatelessWidget {
               final value = state.updates.elementAtOrNull(index);
               final chapter = value?.chapter;
               final manga = value?.manga;
-              if (chapter == null || manga == null) return null;
+              // Defensive: the cubit filters malformed pairs, but a null here
+              // would signal end-of-list and truncate the whole list
+              // (issue #125) — render a blank row instead.
+              if (chapter == null || manga == null) {
+                return const SizedBox.shrink();
+              }
               return ChapterTileWidget.chapter(
                 padding: const EdgeInsets.all(8),
                 manga: manga,

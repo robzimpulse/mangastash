@@ -95,6 +95,29 @@ void main() {
       findsOneWidget,
     );
   });
+
+  // Issue #124: closing search only flipped isSearchActive — the field kept
+  // its old text, so reopening showed an empty-looking box that still
+  // filtered by the previous query.
+  testWidgets('closing search clears the field for the next open', (
+    tester,
+  ) async {
+    await pumpScreen(tester);
+
+    await tester.tap(find.byIcon(Icons.search));
+    await pumpFrames(tester);
+    await tester.enterText(find.byType(TextField), 'naruto');
+    await pumpFrames(tester);
+
+    await tester.tap(find.byIcon(Icons.close));
+    await pumpFrames(tester);
+
+    await tester.tap(find.byIcon(Icons.search));
+    await pumpFrames(tester);
+
+    final field = tester.widget<TextField>(find.byType(TextField));
+    expect(field.controller?.text, '');
+  });
 }
 
 /// [ImagesCacheManager] stand-in that never touches the real cache; the grid

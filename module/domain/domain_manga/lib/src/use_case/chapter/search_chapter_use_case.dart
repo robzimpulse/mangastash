@@ -156,16 +156,35 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
     bool useCache = true,
   }) async {
     final key = parameter.toJsonString();
-    final cache = await _searchChapterCacheManager.getFileFromCache(key);
-    final file = await cache?.file.readAsString(encoding: utf8);
-    final data = file.let((e) {
-      return Pagination.fromJsonString(
-        e,
-        (e) => Chapter.fromJson(e.castOrNull()),
-      );
-    });
 
-    if (data != null && useCache) return Success(data);
+    // A corrupt or partially-written cache file must be treated as a miss
+    // (issue #122 sibling, review on #160): this read happens before the
+    // fetch try below and used to escape execute() entirely, stalling the
+    // calling cubit's paging flag forever.
+    Pagination<Chapter>? cached;
+    try {
+      final cache = await _searchChapterCacheManager.getFileFromCache(key);
+      final file = await cache?.file.readAsString(encoding: utf8);
+      cached = file.let((e) {
+        return Pagination.fromJsonString(
+          e,
+          (e) => Chapter.fromJson(e.castOrNull()),
+        );
+      });
+    } catch (e, st) {
+      _logBox.log(
+        'Corrupt chapter cache treated as a miss',
+        extra: {
+          'key': key,
+          'error': e.toString(),
+          'stack': st.toString(),
+        },
+        name: runtimeType.toString(),
+      );
+      cached = null;
+    }
+
+    if (cached != null && useCache) return Success(cached);
 
     try {
       final source = Sources.fromName(parameter.source);
