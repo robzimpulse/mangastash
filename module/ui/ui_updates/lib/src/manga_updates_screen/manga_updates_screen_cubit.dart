@@ -2,6 +2,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
+import '../manga_chapter_filter.dart';
 import 'manga_updates_screen_state.dart';
 
 class MangaUpdatesScreenCubit extends Cubit<MangaUpdatesScreenState>
@@ -14,11 +15,21 @@ class MangaUpdatesScreenCubit extends Cubit<MangaUpdatesScreenState>
     required ListenPrefetchUseCase listenPrefetchUseCase,
     required PrefetchChapterUseCase prefetchChapterUseCase,
   }) : _prefetchChapterUseCase = prefetchChapterUseCase,
-       super(initialState) {
+       // Initial states go through the same completeness filter as stream
+       // emissions — an all-malformed initialState must land empty so the
+       // screen shows its Empty Data state, not blank rows (review on #158).
+       super(
+         initialState.copyWith(
+           updates: onlyCompleteMangaChapters(initialState.updates),
+         ),
+       ) {
     addSubscription(
-      listenUnreadHistoryUseCase.unreadHistoryStream.distinct().listen(
-        (e) => emit(state.copyWith(updates: e)),
-      ),
+      listenUnreadHistoryUseCase.unreadHistoryStream.distinct().listen((e) {
+        // Malformed pairs (null manga or chapter) would make the list's
+        // itemBuilder return null, which truncates the list at that row
+        // (issue #125) — drop them instead.
+        emit(state.copyWith(updates: onlyCompleteMangaChapters(e)));
+      }),
     );
 
     addSubscription(

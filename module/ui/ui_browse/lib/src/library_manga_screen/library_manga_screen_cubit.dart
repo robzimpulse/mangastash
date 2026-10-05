@@ -2,6 +2,7 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:flutter/foundation.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 
 import 'library_manga_screen_state.dart';
@@ -128,8 +129,25 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
   }
 
   void update({bool? isSearchActive, String? mangaTitle}) {
+    // Closing search resets the title filter (issue #124): a stale title
+    // would otherwise re-filter the grid invisibly the next time search is
+    // opened with an empty field.
+    final isClosing = isSearchActive == false;
+    final ValueGetter<String?>? title;
+    if (isClosing) {
+      title = () => null;
+    } else if (mangaTitle != null && mangaTitle.isNotEmpty) {
+      title = () => mangaTitle;
+    } else if (mangaTitle != null) {
+      // Backspacing the field to empty fires onChanged('') — clear the
+      // filter rather than storing '' (contains('') keeps titled rows but
+      // hides null-titled ones; review on #159).
+      title = () => null;
+    } else {
+      title = null;
+    }
     emit(
-      state.copyWith(isSearchActive: isSearchActive, mangaTitle: mangaTitle),
+      state.copyWith(isSearchActive: isSearchActive, mangaTitle: title),
     );
   }
 }

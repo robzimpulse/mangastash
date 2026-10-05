@@ -168,6 +168,11 @@ class _GetMangaSourceExternalUseCase implements GetMangaSourceExternalUseCase {
 
 class _ListChapterSourceExternalUseCase
     implements ListChapterSourceExternalUseCase {
+
+  //// The series page itself carries the full chapter list.
+  @override
+  String url({required String webUrl}) => webUrl;
+
   final String _name;
   final String _baseUrl;
 
@@ -350,6 +355,11 @@ class _SearchMangaSourceExternalUseCase
 }
 
 class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
+
+  /// Genres are listed on the search page this source already opens.
+  @override
+  String? get url => null;
+
 
   @override
   Duration? get timeout => Duration(seconds: 20);

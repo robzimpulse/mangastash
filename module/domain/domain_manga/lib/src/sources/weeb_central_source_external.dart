@@ -40,7 +40,7 @@ class WeebCentralSourceExternal implements SourceExternal {
 
   @override
   ListTagSourceExternalUseCase get listTagUseCase =>
-      _ListTagSourceExternalUseCase();
+      _ListTagSourceExternalUseCase(baseUrl);
 }
 
 class _GetChapterImageSourceExternalUseCase
@@ -168,18 +168,48 @@ class _ListChapterSourceExternalUseCase
   @override
   Duration? get timeout => Duration(seconds: 15);
 
+  /// The series page's #chapter-list only carries ~9 latest chapters; the
+  /// complete list (102 rows for Beck, verified live 2026-10) is served by
+  /// the endpoint the "Show All Chapters" htmx button targets — so fetch
+  /// that directly (issue #161).
+  @override
+  String url({required String webUrl}) {
+    // Stored webUrls may carry a trailing slash; suffixing blindly would
+    // request `/series/{id}//full-chapter-list` (review on #167).
+    final base = webUrl.endsWith('/')
+        ? webUrl.substring(0, webUrl.length - 1)
+        : webUrl;
+    return '$base/full-chapter-list';
+  }
+
   @override
   Future<List<ChapterScrapped>> parse({required Document root}) async {
+    // The full-chapter-list endpoint returns the htmx fragment that
+    // REPLACES #chapter-list's inner HTML — no #chapter-list wrapper — so
+    // fall back to every chapter anchor when the wrapper is absent.
+    var rows = root.querySelectorAll('#chapter-list a[href^="/chapters/"]');
+    if (rows.isEmpty) {
+      rows = root.querySelectorAll('a[href^="/chapters/"]');
+    }
+
     final chapters = <ChapterScrapped>[];
-    for (final row in root.querySelectorAll('#chapter-list a[href^="/chapters/"]')) {
+    for (final row in rows) {
       final url = row.attributes['href'];
-      final title = row.querySelector('span.grow')?.querySelector('span')?.text.trim();
+      final title = row
+          .querySelector('span.grow')
+          ?.querySelector('span')
+          ?.text
+          .trim();
+      // The unscoped fallback can see header/footer anchors that match the
+      // href prefix — a row without its title cell is not a chapter row
+      // (review on #167).
+      if (url == null || title == null || title.isEmpty) continue;
       final time = row.querySelector('time');
       chapters.add(
         ChapterScrapped(
           title: title,
-          chapter: title?.split(' ').lastOrNull,
-          webUrl: url?.let((e) => [_baseUrl, e].join('')),
+          chapter: title.split(' ').lastOrNull,
+          webUrl: [_baseUrl, url].join(''),
           readableAt: time?.text.trim(),
           publishAt: time?.text.trim(),
         ),
@@ -235,19 +265,38 @@ class _SearchMangaSourceExternalUseCase
 
     for (final article in articles) {
       // The metadata section is the one whose series link has non-empty
-      // text — the cover link and tooltip links are image-only or point at
-      // other series (seen live 2026-10: a tooltip `line-clamp-1` link to a
-      // different series inside the card). FIRST match wins: the card's own
-      // metadata ships before any tooltip section that may follow it.
-      final metadata = article
+      // text — but live 2026-10 cards wrap a mobile cover whose anchor
+      // carries text (an "Official" ribbon + an overlay title) inside the
+      // FIRST section, so text alone no longer identifies metadata (#162).
+      // Real metadata ships LABELED rows — strongs whose text carries a
+      // colon ("Status:", "Author(s):", "Tag(s):") — which badges like a
+      // tooltip's <strong>New</strong> or a future ribbon markup lack
+      // (review on #169).
+      final sectionsWithTextLinks = article
           .querySelectorAll('section')
           .where(
             (section) =>
                 section
                     .querySelectorAll('a[href*="/series/"]')
                     .any((a) => a.text.trim().isNotEmpty),
-          )
-          .firstOrNull;
+          );
+      final metadata =
+          sectionsWithTextLinks
+              .firstWhereOrNull(
+                (section) => section
+                    .querySelectorAll('strong')
+                    .any((s) => s.text.contains(':')),
+              ) ??
+          // No section carries labeled rows — degrade to the last text-link
+          // section WITHOUT a cover image. Excluding img-bearing sections
+          // makes the pick order-proof (observed layouts ship the cover
+          // first, but a metadata-first card must not lose to a cover-last
+          // section) — review on #169. If every text-link section carries
+          // an image, fall back to plain last.
+          sectionsWithTextLinks
+              .where((section) => section.querySelector('img') == null)
+              .lastOrNull ??
+          sectionsWithTextLinks.lastOrNull;
       final link = metadata
           ?.querySelectorAll('a[href*="/series/"]')
           .firstWhereOrNull((a) => a.text.trim().isNotEmpty);
@@ -368,11 +417,21 @@ class _SearchMangaSourceExternalUseCase
 }
 
 class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
+  final String _baseUrl;
+
+  const _ListTagSourceExternalUseCase(this._baseUrl);
+
   @override
   List<String> get readyWhenSelectors => [];
 
   @override
   Duration? get timeout => Duration(seconds: 15);
+
+  @override
+  // The genre checkboxes live ONLY on /search; searchMangaUseCase.url()
+  // points at the /search/data htmx fragment, which ships zero checkboxes
+  // (issue #163).
+  String? get url => '$_baseUrl/search';
 
   @override
   Future<List<TagScrapped>> parse({required Document root}) async {

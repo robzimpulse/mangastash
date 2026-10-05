@@ -234,6 +234,141 @@ const _nestedTagRowHtml = '''
 </div>
 ''';
 
+/// Card fixture captured live 2026-10 (#162): the cover section's anchor
+/// now wraps TWO nested cover articles — the mobile one carries an
+/// "Official" ribbon and an overlay TITLE inside the anchor, so the cover
+/// link has non-empty text and used to win the "text-bearing link"
+/// metadata pick. Real metadata is the section with the labeled
+/// (<strong>) rows.
+const _officialRibbonCardHtml = '''
+<div>
+  <article class="bg-base-300 flex gap-4 p-4">
+    <section class="w-full lg:w-[25%] xl:w-[20%]">
+      <a href="https://weebcentral.com/series/01J76XY7E2VCSR0ZCC21KGXS1K/Kobato">
+        <article class="hidden lg:block w-full aspect-4/6 overflow-hidden">
+          <picture>
+            <source srcset="https://temp.compsci88.com/cover/normal/01J76XY7E2VCSR0ZCC21KGXS1K.webp" type="image/webp">
+            <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E2VCSR0ZCC21KGXS1K.jpg" alt="Kobato. cover">
+          </picture>
+        </article>
+        <article class="lg:hidden relative overflow-hidden">
+          <div class="absolute right-0 top-0 h-16 w-16">
+            <div class="absolute transform rotate-45 bg-orange-600 text-center text-white font-semibold py-1">Official</div>
+          </div>
+          <div>
+            <div class="w-full aspect-4/6 overflow-hidden">
+              <picture>
+                <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E2VCSR0ZCC21KGXS1K.jpg" alt="Kobato. cover">
+              </picture>
+            </div>
+            <div class="w-full h-16 absolute bottom-0">
+              <div class="text-ellipsis truncate text-white text-center text-lg">Kobato.</div>
+            </div>
+          </div>
+        </article>
+      </a>
+    </section>
+    <section class="hidden lg:block lg:w-[75%] xl:w-[80%]">
+      <a href="https://weebcentral.com/series/01J76XY7E2VCSR0ZCC21KGXS1K/Kobato"
+         class="line-clamp-1 link link-hover">Kobato.</a>
+      <div class="opacity-70"><strong>Status:</strong><span>Complete</span></div>
+      <div class="opacity-70"><strong>Author(s):</strong><a href="https://weebcentral.com/search?author=CLAMP" class="link link-info link-hover">CLAMP</a></div>
+      <div class="opacity-70"><strong>Tag(s):</strong><span>Comedy</span><span>Romance</span></div>
+    </section>
+  </article>
+</div>
+''';
+
+/// Card fixture (review on #169): a tooltip section shipping BEFORE the
+/// metadata, carrying a text link to a DIFFERENT series plus a colon-less
+/// `<strong>New</strong>` badge — a bare strong check would pick the
+/// tooltip and cross-contaminate the card with the wrong series.
+const _tooltipStrongFirstCardHtml = '''
+<div>
+  <article class="bg-base-300 flex gap-4 p-4">
+    <section class="w-full lg:w-[25%]">
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">
+        <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+      </a>
+    </section>
+    <section class="hidden lg:block">
+      <a href="https://weebcentral.com/series/01J76XY7E4JCPK14V53BVQWD9Y/Bleach">Bleach</a>
+      <strong>New</strong>
+    </section>
+    <section class="hidden lg:block lg:w-[75%]">
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">One Piece</a>
+      <div class="opacity-70"><strong>Status:</strong><span>Ongoing</span></div>
+      <div class="opacity-70"><strong>Author(s):</strong><a href="https://weebcentral.com/search?author=ODA+Eiichiro">ODA Eiichiro</a></div>
+    </section>
+  </article>
+</div>
+''';
+
+/// Card fixture (review on #169): a strong-less layout — cover section
+/// (with ribbon + overlay title text) first, text-only metadata second.
+/// The degraded fallback must still pick metadata, never the cover. The
+/// second article flips the order (metadata first) — the fallback must be
+/// order-proof, not cover-first-assuming.
+const _stronglessCardHtml = '''
+<div>
+  <article class="bg-base-300 flex gap-4 p-4">
+    <section class="w-full lg:w-[25%]">
+      <a href="https://weebcentral.com/series/01J76XY7E2VCSR0ZCC21KGXS1K/Kobato">
+        <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E2VCSR0ZCC21KGXS1K.jpg" alt="cover">
+        <div>Official</div>
+        <div>Kobato.</div>
+      </a>
+    </section>
+    <section class="hidden lg:block lg:w-[75%]">
+      <a href="https://weebcentral.com/series/01J76XY7E2VCSR0ZCC21KGXS1K/Kobato">Kobato.</a>
+      <a href="https://weebcentral.com/search?author=CLAMP">CLAMP</a>
+    </section>
+  </article>
+  <article class="bg-base-300 flex gap-4 p-4">
+    <section class="hidden lg:block lg:w-[75%]">
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">One Piece</a>
+      <a href="https://weebcentral.com/search?author=ODA+Eiichiro">ODA Eiichiro</a>
+    </section>
+    <section class="w-full lg:w-[25%]">
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">
+        <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+        <div>Official</div>
+        <div>One Piece</div>
+      </a>
+    </section>
+  </article>
+</div>
+''';
+
+/// Fragment served by the full-chapter-list endpoint (captured live
+/// 2026-10, trimmed to three rows): the series page's #chapter-list only
+/// holds ~9 latest chapters and the complete list (102 rows for Beck)
+/// arrives as this htmx fragment — which has NO #chapter-list wrapper (it
+/// replaces that element's inner HTML), so parsing must not require the
+/// wrapper (issue #161).
+const _fullChapterListFragmentHtml = '''
+<div>
+  <div class="flex items-center">
+    <a href="/chapters/01J76XZ3HXP7R4R9NT922FEVNQ" class="hover:bg-base-300 flex-1 flex items-center p-2">
+      <span class="grow flex items-center gap-2"><span class="">Chapter 102</span></span>
+      <time class="text-datetime opacity-50" datetime="2024-09-08T17:04:15.544Z">2024-09-08T17:04:15.717343Z</time>
+    </a>
+  </div>
+  <div class="flex items-center">
+    <a href="/chapters/01J76XZ3HXP7R4R9NT922FEVNPC" class="hover:bg-base-300 flex-1 flex items-center p-2">
+      <span class="grow flex items-center gap-2"><span class="">Chapter 101.5</span></span>
+      <time class="text-datetime opacity-50" datetime="2024-09-07T17:04:15.544Z">2024-09-07T17:04:15.717343Z</time>
+    </a>
+  </div>
+  <div class="flex items-center">
+    <a href="/chapters/01J76XZ3HXP7R4R9NT922FEVNPP" class="hover:bg-base-300 flex-1 flex items-center p-2">
+      <span class="grow flex items-center gap-2"><span class="">Chapter 101</span></span>
+      <time class="text-datetime opacity-50" datetime="2024-09-06T17:04:15.544Z">2024-09-06T17:04:15.717343Z</time>
+    </a>
+  </div>
+</div>
+''';
+
 void main() {
   final source = WeebCentralSourceExternal();
 
@@ -309,6 +444,58 @@ void main() {
     expect(results.single.tags, ['Action', 'Adventure']);
   });
 
+  test(
+    'search picks the strong-row section over the ribbon-bearing cover section (#162)',
+    () async {
+      final results = await source.searchMangaUseCase
+          .parse(root: html_parser.parse(_officialRibbonCardHtml));
+      expect(results, hasLength(1));
+      // Not "Official Kobato." — the ribbon + overlay title live inside the
+      // cover anchor, which must not be mistaken for the metadata link.
+      expect(results.single.title, 'Kobato.');
+      expect(results.single.status, 'Complete');
+      expect(results.single.author, 'CLAMP');
+      expect(results.single.tags, ['Comedy', 'Romance']);
+      expect(
+        results.single.coverUrl,
+        'https://temp.compsci88.com/cover/fallback/01J76XY7E2VCSR0ZCC21KGXS1K.jpg',
+      );
+    },
+  );
+
+  test(
+    'search ignores a colon-less strong badge in an earlier tooltip section (review on #169)',
+    () async {
+      final results = await source.searchMangaUseCase
+          .parse(root: html_parser.parse(_tooltipStrongFirstCardHtml));
+      expect(results, hasLength(1));
+      // The tooltip links to a different series and carries <strong>New</strong>
+      // — only labeled rows (colon-bearing strongs) identify metadata.
+      expect(results.single.title, 'One Piece');
+      expect(results.single.webUrl, contains('One-Piece'));
+      expect(results.single.status, 'Ongoing');
+      expect(results.single.author, 'ODA Eiichiro');
+    },
+  );
+
+  test(
+    'search degrades to a metadata section, never the cover (review on #169)',
+    () async {
+      final results = await source.searchMangaUseCase
+          .parse(root: html_parser.parse(_stronglessCardHtml));
+      expect(results, hasLength(2));
+      // Strong-less layout: the cover ships first, so the degraded pick is
+      // the LAST text-link section — not the first, which is the cover
+      // anchor carrying the ribbon + overlay title.
+      expect(results.first.title, 'Kobato.');
+      expect(results.first.author, 'CLAMP');
+      // …and the fallback must be order-proof: with metadata shipping
+      // FIRST, a cover-last section must not win the pick either.
+      expect(results[1].title, 'One Piece');
+      expect(results[1].author, 'ODA Eiichiro');
+    },
+  );
+
   test('search haveNextPage false when no view-more button', () async {
     final next = await source.searchMangaUseCase
         .haveNextPage(root: html_parser.parse(_searchHtml));
@@ -334,6 +521,69 @@ void main() {
     expect(chapters.first.webUrl, 'https://weebcentral.com/chapters/01KZECDZH06AWDQEJZAAQA9C2P');
     expect(chapters.first.publishAt, '2026-08-07T15:10:56.544424Z');
   });
+
+  test('chapter list url points at the full-chapter-list endpoint', () {
+    // The series page renders only ~9 latest chapters; the complete list
+    // (102 rows for Beck, verified live 2026-10) is served from this
+    // endpoint — the series page's "Show All Chapters" button targets it.
+    const seriesUrl = 'https://weebcentral.com/series/01J76XY7E3JVY2XJGG8VGP46NN';
+    expect(
+      source.listChapterUseCase.url(webUrl: seriesUrl),
+      '$seriesUrl/full-chapter-list',
+    );
+  });
+
+  test(
+    'chapter list url tolerates a trailing slash on the stored webUrl (review on #167)',
+    () {
+      // Legacy rows may store `…/series/{id}/`; suffixing blindly would
+      // request `…/series/{id}//full-chapter-list`.
+      const seriesUrl = 'https://weebcentral.com/series/01J76XY7E3JVY2XJGG8VGP46NN/';
+      expect(
+        source.listChapterUseCase.url(webUrl: seriesUrl),
+        'https://weebcentral.com/series/01J76XY7E3JVY2XJGG8VGP46NN/full-chapter-list',
+      );
+    },
+  );
+
+  test(
+    'chapter list parses the full-chapter-list fragment (no #chapter-list wrapper)',
+    () async {
+      final chapters = await source.listChapterUseCase
+          .parse(root: html_parser.parse(_fullChapterListFragmentHtml));
+      expect(chapters, hasLength(3));
+      expect(chapters.first.title, 'Chapter 102');
+      expect(chapters.first.chapter, '102');
+      expect(
+        chapters.first.webUrl,
+        'https://weebcentral.com/chapters/01J76XZ3HXP7R4R9NT922FEVNQ',
+      );
+      expect(chapters.first.publishAt, '2024-09-08T17:04:15.717343Z');
+    },
+  );
+
+  test(
+    'chapter list fallback skips anchors without a title row (review on #167)',
+    () async {
+      // The unscoped fallback fires whenever #chapter-list is missing
+      // (redesign, partial render, error page) — header/footer anchors
+      // matching the href prefix must not become null-title chapters.
+      final chapters = await source.listChapterUseCase.parse(
+        root: html_parser.parse('''
+          <div>
+            <nav><a href="/chapters/latest">Latest Updates</a></nav>
+            <a href="/chapters/01J76XZ3HXP7R4R9NT922FEVNQ">
+              <span class="grow"><span>Chapter 102</span></span>
+              <time>2024-09-08T17:04:15Z</time>
+            </a>
+            <footer><a href="/chapters/feed">RSS</a></footer>
+          </div>
+        '''),
+      );
+      expect(chapters, hasLength(1));
+      expect(chapters.single.title, 'Chapter 102');
+    },
+  );
 
   test('search url maps sort, order, status, tags', () {
     final url = source.searchMangaUseCase.url(
@@ -408,6 +658,13 @@ void main() {
     expect(scripts, isNotEmpty);
     expect(scripts.first, contains('show_filter'));
     expect(scripts.length, greaterThan(1));
+  });
+
+  test('tags url points at the /search page (#163)', () {
+    // The genre checkboxes live ONLY on /search; searchMangaUseCase.url()
+    // points at the /search/data htmx fragment, which ships zero
+    // checkboxes.
+    expect(source.listTagUseCase.url, 'https://weebcentral.com/search');
   });
 
   test('reader waits for injected page images instead of a fixed sleep', () {

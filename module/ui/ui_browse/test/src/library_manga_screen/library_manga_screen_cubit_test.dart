@@ -157,4 +157,56 @@ void main() {
       expect(cubit.state.addMangaError, isNull);
     });
   });
+
+  group('LibraryMangaScreenCubit.update (search)', () {
+    // Issue #124: copyWith(mangaTitle: mangaTitle ?? this.mangaTitle) can
+    // never reset the title to null and closing search only flipped
+    // isSearchActive, so reopening filtered by an invisible previous query
+    // while the fresh TextEditingController showed an empty box.
+    const naruto = Manga(id: 'm-naruto', title: 'Naruto');
+    const onePiece = Manga(id: 'm-one-piece', title: 'One Piece');
+
+    test(
+      'closing search resets the title filter so reopening shows the whole library',
+      () {
+        cubit.emit(cubit.state.copyWith(mangas: const [naruto, onePiece]));
+
+        cubit.update(isSearchActive: true, mangaTitle: 'naruto');
+        expect(cubit.state.filteredMangas, const [naruto]);
+
+        cubit.update(isSearchActive: false);
+        expect(cubit.state.mangaTitle, isNull);
+        expect(cubit.state.filteredMangas, const [naruto, onePiece]);
+
+        // Reopening passes only isSearchActive — the fresh field is empty,
+        // so the grid must not filter by the previous query.
+        cubit.update(isSearchActive: true);
+        expect(cubit.state.mangaTitle, isNull);
+        expect(cubit.state.filteredMangas, const [naruto, onePiece]);
+      },
+    );
+
+    test(
+      'backspacing the field to empty clears the filter while search stays open',
+      () {
+        // Review on #159: onChanged('') used to store '' (not null), and
+        // contains('') hides null-titled rows while keeping titled ones —
+        // two "show everything" gestures disagreed.
+        const untitled = Manga(id: 'm-untitled');
+        cubit.emit(
+          cubit.state.copyWith(mangas: const [naruto, untitled, onePiece]),
+        );
+
+        cubit.update(isSearchActive: true, mangaTitle: 'naruto');
+        expect(cubit.state.filteredMangas, const [naruto]);
+
+        cubit.update(mangaTitle: '');
+        expect(cubit.state.mangaTitle, isNull);
+        expect(
+          cubit.state.filteredMangas,
+          const [naruto, untitled, onePiece],
+        );
+      },
+    );
+  });
 }

@@ -95,7 +95,9 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
     }
 
     final document = await _webview.open(
-      url,
+      // Sources can redirect the chapter list away from the series page
+      // (WeebCentral's full-chapter-list endpoint, issue #161).
+      source.listChapterUseCase.url(webUrl: url),
       scripts: source.listChapterUseCase.scripts,
       readyWhenSelectors: source.listChapterUseCase.readyWhenSelectors,
       useCache: useCache,
@@ -147,7 +149,20 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
       if (paramIgnorePagination != key.parameter) continue;
       promises.add(_searchChapterCacheManager.removeFile(value));
     }
-    if (url != null) promises.add(_htmlCacheManager.removeFile(url));
+    if (url != null) {
+      // The fetch (and therefore the html cache entry) uses the
+      // source-derived URL — for WeebCentral that is the full-chapter-list
+      // endpoint, not the series page; evicting the series page would
+      // leave the stale derived entry alive (review on #167). Built-in
+      // sources have no scraping use cases (their getters throw
+      // UnimplementedError by design), so they always use the plain URL.
+      final source = Sources.fromName(parameter.source);
+      final evictUrl =
+          (source == null || source.builtIn)
+              ? url
+              : source.listChapterUseCase.url(webUrl: url);
+      promises.add(_htmlCacheManager.removeFile(evictUrl));
+    }
     await Future.wait(promises);
   }
 
@@ -156,16 +171,35 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
     bool useCache = true,
   }) async {
     final key = parameter.toJsonString();
-    final cache = await _searchChapterCacheManager.getFileFromCache(key);
-    final file = await cache?.file.readAsString(encoding: utf8);
-    final data = file.let((e) {
-      return Pagination.fromJsonString(
-        e,
-        (e) => Chapter.fromJson(e.castOrNull()),
-      );
-    });
 
-    if (data != null && useCache) return Success(data);
+    // A corrupt or partially-written cache file must be treated as a miss
+    // (issue #122 sibling, review on #160): this read happens before the
+    // fetch try below and used to escape execute() entirely, stalling the
+    // calling cubit's paging flag forever.
+    Pagination<Chapter>? cached;
+    try {
+      final cache = await _searchChapterCacheManager.getFileFromCache(key);
+      final file = await cache?.file.readAsString(encoding: utf8);
+      cached = file.let((e) {
+        return Pagination.fromJsonString(
+          e,
+          (e) => Chapter.fromJson(e.castOrNull()),
+        );
+      });
+    } catch (e, st) {
+      _logBox.log(
+        'Corrupt chapter cache treated as a miss',
+        extra: {
+          'key': key,
+          'error': e.toString(),
+          'stack': st.toString(),
+        },
+        name: runtimeType.toString(),
+      );
+      cached = null;
+    }
+
+    if (cached != null && useCache) return Success(cached);
 
     try {
       final source = Sources.fromName(parameter.source);

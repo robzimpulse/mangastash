@@ -163,6 +163,11 @@ String? _summary(Document root) {
 
 class _ListChapterSourceExternalUseCase
     implements ListChapterSourceExternalUseCase {
+
+  //// The series page itself carries the full chapter list.
+  @override
+  String url({required String webUrl}) => webUrl;
+
   final String _baseUrl;
 
   const _ListChapterSourceExternalUseCase(this._baseUrl);
@@ -291,6 +296,11 @@ class _SearchMangaSourceExternalUseCase
 }
 
 class _ListTagSourceExternalUseCase implements ListTagSourceExternalUseCase {
+
+  /// Genres are listed on the search page this source already opens.
+  @override
+  String? get url => null;
+
   @override
   List<String> get readyWhenSelectors => [];
 
