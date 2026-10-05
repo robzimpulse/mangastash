@@ -333,6 +333,11 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         // and closing the field are the only paths that re-init; closing
         // exits search mode, resetting the query to unfiltered browse.
         if (!state.isSearchActive) {
+          // The field must agree with the reset query — without this the
+          // controller keeps the old text and a submit -> close -> reopen
+          // shows a populated field over unfiltered results (review on
+          // #174).
+          _searchController.clear();
           _cubit(context)?.init(
             parameter: state.parameter.copyWith(title: ''),
           );

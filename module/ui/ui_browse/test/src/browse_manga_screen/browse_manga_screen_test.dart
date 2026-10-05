@@ -132,4 +132,27 @@ void main() {
     final captured = verification.captured[0] as SourceSearchMangaParameter;
     expect(captured.parameter.title, '');
   });
+
+  // Review on #174: closing resets the query to `title: ''` but the
+  // controller kept the old text, so submit -> close -> reopen showed a
+  // populated field over unfiltered results. The field must be cleared
+  // alongside the reset so it agrees with the active query.
+  testWidgets(
+    'reopening the search field after close shows an empty field (#174)', (
+    tester,
+  ) async {
+    await pumpScreen(tester);
+
+    await tester.tap(find.byIcon(Icons.search));
+    await pumpFrames(tester);
+    await tester.enterText(find.byType(TextField), 'solo leveling');
+    await pumpFrames(tester);
+    await tester.tap(find.byIcon(Icons.close));
+    await pumpFrames(tester);
+    await tester.tap(find.byIcon(Icons.search));
+    await pumpFrames(tester);
+
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.text('solo leveling'), findsNothing);
+  });
 }
