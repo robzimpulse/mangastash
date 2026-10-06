@@ -89,7 +89,27 @@ void main() {
     // Issue #131: `unread` froze its 7-day boundary at stream creation, so
     // on a long-lived stream chapters older than 7 days never dropped out.
     // The window must recompute from the (advancing) clock on refresh ticks.
+    //
+    // Waiting is condition-based, not fixed-delay: MemoryExecutor is backed
+    // by NativeDatabase.memory() (a background isolate), so fakeAsync cannot
+    // drive drift's watch re-emissions — and a loaded CI runner can land a
+    // tick late. Polling until the assertion's condition holds removes both
+    // the timing assumption and the fakeAsync hang; the timeout is a guard,
+    // not an expectation.
     test('unread stream advances its 7-day window as time passes (#131)', () async {
+      Future<void> waitUntil(
+        bool Function() condition, {
+        Duration timeout = const Duration(seconds: 5),
+      }) async {
+        final deadline = DateTime.now().add(timeout);
+        while (!condition()) {
+          if (DateTime.now().isAfter(deadline)) {
+            fail('Condition not met within $timeout');
+          }
+          await Future<void>.delayed(const Duration(milliseconds: 20));
+        }
+      }
+
       var now = DateTime.now();
       final dao = HistoryDao(
         db,
@@ -99,10 +119,9 @@ void main() {
 
       final emissions = <List<HistoryModel>>[];
       final subscription = dao.unread.listen(emissions.add);
-      // Wait for the first (immediate) emission plus a refresh tick.
-      await Future<void>.delayed(const Duration(milliseconds: 150));
-      expect(emissions, isNotEmpty);
-      // c_unread_lib is readable "now" — inside the fresh window.
+
+      // The immediate (startWith) emission includes the fresh chapter.
+      await waitUntil(() => emissions.isNotEmpty);
       expect(
         emissions.first.where((e) => e.chapter?.id == 'c_unread_lib'),
         isNotEmpty,
@@ -111,12 +130,18 @@ void main() {
       // 8 days later the chapter is outside the window; the next refresh
       // tick must rebuild the query with the moved boundary and drop it.
       now = now.add(const Duration(days: 8));
-      await Future<void>.delayed(const Duration(milliseconds: 300));
+      await waitUntil(
+        () => emissions.any(
+          (list) => list.every((m) => m.chapter?.id != 'c_unread_lib'),
+        ),
+      );
       await subscription.cancel();
 
+      // The clock only moves forward, so once an emission drops the chapter
+      // every later one does too — the last emission must exclude it.
       expect(
-        emissions.last.where((e) => e.chapter?.id == 'c_unread_lib'),
-        isEmpty,
+        emissions.last.every((m) => m.chapter?.id != 'c_unread_lib'),
+        isTrue,
       );
     });
   });
