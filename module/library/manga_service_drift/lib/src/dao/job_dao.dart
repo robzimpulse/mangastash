@@ -54,7 +54,6 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
             manga: row.readTableOrNull(mangaTables),
             chapter: row.readTableOrNull(chapterTables),
             image: row.read(jobTables.imageUrl),
-            path: row.read(jobTables.path),
           ),
         );
       }
@@ -119,8 +118,7 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
               _nullableEquals(f.source, _read(value.source)) &
               _nullableEquals(f.mangaId, _read(value.mangaId)) &
               _nullableEquals(f.chapterId, _read(value.chapterId)) &
-              _nullableEquals(f.imageUrl, _read(value.imageUrl)) &
-              _nullableEquals(f.path, _read(value.path)),
+              _nullableEquals(f.imageUrl, _read(value.imageUrl)),
         )
         ..limit(1);
 

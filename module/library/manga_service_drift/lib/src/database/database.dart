@@ -65,7 +65,7 @@ class AppDatabase extends _$AppDatabase {
       super(executor.build());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration {
@@ -77,7 +77,13 @@ class AppDatabase extends _$AppDatabase {
       },
       onUpgrade: stepByStep(
         from1To2: (m, schema) async {
-          await m.addColumn(jobTables, jobTables.path);
+          // Historical: `path` was added in v2 and dropped again in v4, so
+          // this step still has to create it for real v1 installs (from3To4
+          // removes it again). The column is gone from the Dart table, so
+          // `m.addColumn` — which needs the live definition — cannot be used.
+          await customStatement(
+            'ALTER TABLE job_tables ADD COLUMN path TEXT NULL',
+          );
         },
         from2To3: (m, schema) async {
           // Legacy installs may hold rows whose parent was deleted before
@@ -111,6 +117,15 @@ class AppDatabase extends _$AppDatabase {
           await m.alterTable(TableMigration(imageTables));
           await m.alterTable(TableMigration(libraryTables));
           await m.alterTable(TableMigration(relationshipTables));
+        },
+        from3To4: (m, schema) async {
+          // Delete first: JobDao._parse skips rows whose type has no enum
+          // value, so a surviving persistentImage row would wedge `single`
+          // on an unparsable head row that nothing ever removes.
+          await customStatement(
+            "DELETE FROM job_tables WHERE type = 'persistentImage'",
+          );
+          await m.dropColumn(jobTables, 'path');
         },
       ),
     );
