@@ -123,8 +123,19 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     required BuildContext context,
     required DownloadOption option,
   }) async {
-    // TODO: implement this
-    return context.showOnProgressSnackBar();
+    final cubit = _cubit(context);
+    if (cubit == null) return;
+    // download() returns 0 for two opposite situations: the chapter list has
+    // nothing left to queue, or its isPrefetchingAll guard rejected this tap
+    // because a bulk run is already in flight. Only the first is worth a
+    // message — saying "Nothing to download" during a running download would
+    // be false (#119).
+    if (cubit.state.isPrefetchingAll) return;
+    final enqueued = await cubit.download(option: option);
+    if (!context.mounted) return;
+    if (enqueued == 0) {
+      context.showSnackBar(message: 'Nothing to download');
+    }
   }
 
   void _onTapFilter({
@@ -145,13 +156,16 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     if (!context.mounted || result == null) return;
     switch (result) {
       case MangaMenu.download:
-      // TODO: download
-      // _cubit(context).download(manga: manga);
+        // Routed through _onTapDownload so the long-press menu and the
+        // header popup share one handler — including the empty-target
+        // snackbar, so this entry point can't silently do nothing (#119).
+        _onTapDownload(context: context, option: DownloadOption.all);
       case MangaMenu.library:
         _onTapAddToLibrary(context: context, manga: manga);
       case MangaMenu.prefetch:
-      // TODO: prefetch
-      // _cubit(context).prefetch(manga: manga);
+        // This screen's prefetch is parameterless — it prefetches the manga
+        // already in state, not the long-pressed similar-manga entry.
+        await _cubit(context)?.prefetch();
     }
   }
 
@@ -493,6 +507,11 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 return ChapterTileWidget.chapter(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   onTap: () => widget.onTapChapter?.call(data),
+                  onTapLongPress: () {
+                    final chapterId = data.id;
+                    if (chapterId == null) return;
+                    _cubit(context)?.downloadChapter(chapterId: chapterId);
+                  },
                   chapter: data,
                   opacity: data.lastReadAt != null ? 0.5 : 1,
                   isPrefetching: state.prefetchedChapterIds.contains(data.id),

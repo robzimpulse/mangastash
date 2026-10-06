@@ -490,6 +490,32 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
   }
 
+  /// Enqueues a single chapter — the chapter row's long-press action (#119).
+  /// Same path as the bulk [download] without the scoping step: one id, no
+  /// resolver.
+  ///
+  /// Stages the id into [MangaDetailScreenState.prefetchedChapterIds]
+  /// synchronously for the reason download() does — chapterIdsStream only
+  /// refreshes that set through an async hop, so a repeat long-press would
+  /// otherwise enqueue a duplicate job. The row already renders a spinner
+  /// from that set, so the user sees the tap land.
+  void downloadChapter({required String chapterId}) {
+    final mangaId = state.manga?.id;
+    final source = state.manga?.source?.let(Sources.fromName);
+    if (mangaId == null || source == null) return;
+    if (state.prefetchedChapterIds.contains(chapterId)) return;
+    _prefetchChapterUseCase.prefetchChapter(
+      mangaId: mangaId,
+      source: source,
+      chapterId: chapterId,
+    );
+    emit(
+      state.copyWith(
+        prefetchedChapterIds: {...state.prefetchedChapterIds, chapterId},
+      ),
+    );
+  }
+
   void recrawl({required BuildContext context, required String url}) async {
     // Await the re-crawl before refreshing: the fetches below read the
     // html cache the re-crawl writes, so starting them early serves the
