@@ -14,6 +14,7 @@ export 'src/use_case/chapter/get_neighbour_chapter_use_case.dart';
 export 'src/use_case/chapter/listen_downloaded_chapter_use_case.dart';
 export 'src/use_case/chapter/search_chapter_use_case.dart';
 export 'src/use_case/chapter/update_chapter_use_case.dart';
+export 'src/use_case/download/resolve_download_chapters.dart';
 export 'src/use_case/history/listen_read_history_use_case.dart';
 export 'src/use_case/history/listen_unread_history_use_case.dart';
 export 'src/use_case/library/add_to_library_use_case.dart';

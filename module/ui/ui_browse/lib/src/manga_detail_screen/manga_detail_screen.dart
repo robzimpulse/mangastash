@@ -119,12 +119,67 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     _cubit(context)?.recrawl(context: context, url: url);
   }
 
+  // [manga] targets the long-pressed similar manga instead of the one on
+  // screen; null is the header popup's Download, which always means the manga
+  // this screen was opened for.
   void _onTapDownload({
     required BuildContext context,
     required DownloadOption option,
+    Manga? manga,
   }) async {
-    // TODO: implement this
-    return context.showOnProgressSnackBar();
+    final cubit = _cubit(context);
+    if (cubit == null) return;
+    // Both cubit methods return 0 for two opposite situations: the chapter
+    // list has nothing left to queue, or their isPrefetchingAll guard
+    // rejected this tap because a bulk run is already in flight. The popup
+    // stays enabled during a run, so this handler — not the control — has to
+    // say which one it is: reporting "Nothing to download" mid-run would be
+    // false (#119). The wording stays neutral about who started the run
+    // because isPrefetchingAll is also set by prefetch(), which the app bar's
+    // cloud-download button drives — "Download already in progress" would
+    // name an action this user never started.
+    if (cubit.state.isPrefetchingAll) {
+      context.showSnackBar(message: 'A bulk download is already running');
+      return;
+    }
+    int enqueued;
+    try {
+      enqueued =
+          manga == null
+              ? await cubit.download(option: option)
+              // The long-press menu offers no Unread entry and read history
+              // is scoped to the manga on screen, so its download is always
+              // All — see MangaDetailScreenCubit.downloadManga.
+              : await cubit.downloadManga(manga: manga);
+    } catch (e, s) {
+      // Neither cubit method has a catch of its own, so without this the error
+      // escapes the void async caller and the user gets no response at all —
+      // spec §4 requires "abort + snackbar, enqueue nothing". The try also
+      // wraps the enqueue calls and their state emits, not just the
+      // chapter-list fetch, so the snackbar names the action that failed
+      // rather than the fetch step it most often fails at. Strip the
+      // "Exception: " noise so this reads like the sibling "Failed to add
+      // manga: ..." wording in library_manga_screen.
+      widget.logBox.log(
+        'Download handler failed',
+        error: e,
+        stackTrace: s,
+        extra: {
+          'option': option.name,
+          'targetMangaId':
+              manga?.id ?? cubit.state.manga?.id ?? cubit.state.mangaId,
+        },
+        name: runtimeType.toString(),
+      );
+      if (!context.mounted) return;
+      final message = e.toString().replaceFirst('Exception: ', '');
+      context.showSnackBar(message: 'Failed to download: $message');
+      return;
+    }
+    if (!context.mounted) return;
+    if (enqueued == 0) {
+      context.showSnackBar(message: 'Nothing to download');
+    }
   }
 
   void _onTapFilter({
@@ -145,13 +200,32 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     if (!context.mounted || result == null) return;
     switch (result) {
       case MangaMenu.download:
-      // TODO: download
-      // _cubit(context).download(manga: manga);
+        // Routed through _onTapDownload so the long-press menu and the
+        // header popup share one handler — including the empty-target
+        // snackbar, so this entry point can't silently do nothing (#119).
+        // The target travels with the call: this menu is only ever opened on
+        // a similar-manga tile, and without the manga argument the handler
+        // resolved the manga on screen instead (#119).
+        _onTapDownload(
+          context: context,
+          option: DownloadOption.all,
+          manga: manga,
+        );
       case MangaMenu.library:
         _onTapAddToLibrary(context: context, manga: manga);
       case MangaMenu.prefetch:
-      // TODO: prefetch
-      // _cubit(context).prefetch(manga: manga);
+        // This screen's prefetch is parameterless — it prefetches the manga
+        // already in state, not the long-pressed similar-manga entry.
+        //
+        // Deliberately silent, unlike the download case above: prefetch() is
+        // void and reports nothing back, so unlike download() there is no
+        // return value for a handler to turn into feedback. Leaving it alone
+        // keeps this case consistent with the bulk prefetch button, whose only
+        // run signal is isPrefetchingAll — ListWidget uses it to null that
+        // button's onPressed during a run, not to render a progress
+        // indicator. Do not add a count here without first deciding what
+        // prefetch() should report (#119).
+        await _cubit(context)?.prefetch();
     }
   }
 
@@ -493,6 +567,11 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 return ChapterTileWidget.chapter(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   onTap: () => widget.onTapChapter?.call(data),
+                  onTapLongPress: () {
+                    final chapterId = data.id;
+                    if (chapterId == null) return;
+                    _cubit(context)?.downloadChapter(chapterId: chapterId);
+                  },
                   chapter: data,
                   opacity: data.lastReadAt != null ? 0.5 : 1,
                   isPrefetching: state.prefetchedChapterIds.contains(data.id),

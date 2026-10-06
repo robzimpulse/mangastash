@@ -436,6 +436,167 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
   }
 
+  /// Enqueues chapters of the manga on the prefetch pipeline, scoped by
+  /// [option]: unread chapters only, or every chapter.
+  ///
+  /// "All" means every chapter the fetch below returns, and that fetch is
+  /// bounded: `state.chapterParameter` is re-pinned to `limit: 20` per page
+  /// and GetAllChapterUseCase stops after its `maxPages = 10`, so at most 200
+  /// chapters are ever considered. That bound is inherited verbatim from
+  /// [prefetch] and is deliberate (issue #118) — do not raise it here without
+  /// the product call it was deferred for: one tap would otherwise be able to
+  /// queue 500+ chapter downloads.
+  ///
+  /// The fetch also runs under `state.chapterParameter`, which carries the
+  /// global `translatedLanguage` (GlobalOptionsManager falls back to `english`
+  /// when no parameter is stored). A series whose chapters are all in another
+  /// language therefore resolves to nothing under "All" — the 200 cap is not
+  /// the only reason a run can come back empty. The on-screen unread/downloaded
+  /// toggles (ChapterConfig) are display-only and do NOT narrow these targets;
+  /// scoping is resolveDownloadChapterIds' job, over read history and the queue.
+  ///
+  /// Returns how many chapters were enqueued, so the caller can tell real
+  /// queueing from "nothing left to download" — the screen shows the
+  /// empty-target snackbar on 0 (#119).
+  ///
+  /// Reuses prefetch()'s #127 guards (one run at a time, chapters already in
+  /// the job queue skipped) and additionally stages the enqueued ids into
+  /// state *synchronously*: chapterIdsStream only refreshes
+  /// [MangaDetailScreenState.prefetchedChapterIds] through an async hop, so
+  /// without the synchronous emit a double tap re-enqueues everything before
+  /// the stream emits.
+  ///
+  /// Unlike the bulk cubits' download, no prefetchManga job is enqueued: this
+  /// screen already holds the manga, loaded and DB-synced by init(), and that
+  /// job re-fetches (useCache: false) the very record on display. Do not
+  /// "restore" the prefetchManga call here without a reason (#119).
+  Future<int> download({required DownloadOption option}) async {
+    if (state.isPrefetchingAll) return 0;
+    final mangaId = state.manga?.id ?? state.mangaId;
+    final source = state.source;
+    if (mangaId == null || mangaId.isEmpty || source == null) return 0;
+    emit(state.copyWith(isPrefetchingAll: true));
+    try {
+      final chapters = await _getAllChapterUseCase.execute(
+        source: source,
+        mangaId: mangaId,
+        parameter: state.chapterParameter.copyWith(offset: 0, page: 1, limit: 20),
+      );
+      final targets = resolveDownloadChapterIds(
+        chapters: chapters,
+        readChapterIds: state.histories.keys.toSet(),
+        queuedChapterIds: state.prefetchedChapterIds,
+        unreadOnly: option == DownloadOption.unread,
+      );
+      if (targets.isEmpty) return 0;
+      final queued = {...state.prefetchedChapterIds};
+      for (final chapterId in targets) {
+        if (queued.contains(chapterId)) continue;
+        _prefetchChapterUseCase.prefetchChapter(
+          mangaId: mangaId,
+          source: source,
+          chapterId: chapterId,
+        );
+        queued.add(chapterId);
+      }
+      emit(state.copyWith(prefetchedChapterIds: queued));
+      return targets.length;
+    } finally {
+      emit(state.copyWith(isPrefetchingAll: false));
+    }
+  }
+
+  /// Enqueues the chapters of [manga] — the similar-manga long-press menu's
+  /// Download (#119). Separate from [download] because that one is scoped to
+  /// the manga on screen: routing the menu case through it downloaded whatever
+  /// was in state while the snackbar named the long-pressed title.
+  ///
+  /// Always All semantics. Read history is filtered by manga id
+  /// ([_updateHistories]), so state.histories says nothing about [manga], and
+  /// the long-press menu offers no Unread entry — nothing is lost by pinning
+  /// the scope.
+  ///
+  /// "All" is bounded exactly as [download]'s is — `limit: 20` per page ×
+  /// GetAllChapterUseCase.maxPages = 10 over the same `state.chapterParameter`,
+  /// so the same non-English-series caveat (the global `translatedLanguage`)
+  /// applies here too. Unlike [download] there is also no in-loop dedup: an id
+  /// that repeats across the fetched pages is enqueued twice, and only
+  /// JobDao.add's row lookup collapses the duplicate into one job — a known
+  /// boundary of this path, deliberately left as-is rather than fixed here.
+  ///
+  /// Deliberately does NOT stage the enqueued ids into
+  /// [MangaDetailScreenState.prefetchedChapterIds]: that set renders the
+  /// on-screen chapter rows' spinners, and another series' ids would light up
+  /// rows that belong elsewhere. Dedup instead reads that same set, which
+  /// ListenPrefetchUseCase feeds from the whole job table, so it still covers
+  /// [manga]'s chapters.
+  ///
+  /// Shares download()'s isPrefetchingAll lane, so only one bulk run holds the
+  /// chapter list at a time and a repeat long-press re-enqueues nothing.
+  /// Returns the enqueued count, same contract as [download]; the screen's
+  /// handler checks isPrefetchingAll before it calls, so the only 0 that
+  /// reaches its snackbar is the genuine "nothing left to queue".
+  Future<int> downloadManga({required Manga manga}) async {
+    if (state.isPrefetchingAll) return 0;
+    final mangaId = manga.id;
+    // The similar list is fetched with state.source, so that is the resolver
+    // for every entry in it — [manga]'s own source string is not read.
+    final source = state.source;
+    if (mangaId == null || mangaId.isEmpty || source == null) return 0;
+    emit(state.copyWith(isPrefetchingAll: true));
+    try {
+      final chapters = await _getAllChapterUseCase.execute(
+        source: source,
+        mangaId: mangaId,
+        parameter: state.chapterParameter.copyWith(offset: 0, page: 1, limit: 20),
+      );
+      final targets = resolveDownloadChapterIds(
+        chapters: chapters,
+        readChapterIds: const {},
+        queuedChapterIds: state.prefetchedChapterIds,
+        unreadOnly: false,
+      );
+      for (final chapterId in targets) {
+        _prefetchChapterUseCase.prefetchChapter(
+          mangaId: mangaId,
+          source: source,
+          chapterId: chapterId,
+        );
+      }
+      return targets.length;
+    } finally {
+      emit(state.copyWith(isPrefetchingAll: false));
+    }
+  }
+
+  /// Enqueues a single chapter — the chapter row's long-press action (#119).
+  /// Same path as the bulk [download] without the scoping step: one id, no
+  /// resolver.
+  ///
+  /// Stages the id into [MangaDetailScreenState.prefetchedChapterIds]
+  /// synchronously for the reason download() does — chapterIdsStream only
+  /// refreshes that set through an async hop, so a repeat long-press would
+  /// otherwise enqueue a duplicate job. The chapter row renders its spinner
+  /// from that same set (manga_detail_screen.dart passes
+  /// isPrefetching: prefetchedChapterIds.contains(id)), so the user sees the
+  /// tap land and the already-queued long-press above is a no-op.
+  void downloadChapter({required String chapterId}) {
+    final mangaId = state.manga?.id ?? state.mangaId;
+    final source = state.source;
+    if (mangaId == null || mangaId.isEmpty || source == null) return;
+    if (state.prefetchedChapterIds.contains(chapterId)) return;
+    _prefetchChapterUseCase.prefetchChapter(
+      mangaId: mangaId,
+      source: source,
+      chapterId: chapterId,
+    );
+    emit(
+      state.copyWith(
+        prefetchedChapterIds: {...state.prefetchedChapterIds, chapterId},
+      ),
+    );
+  }
+
   void recrawl({required BuildContext context, required String url}) async {
     // Await the re-crawl before refreshing: the fetches below read the
     // html cache the re-crawl writes, so starting them early serves the
