@@ -6,6 +6,7 @@ import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../extension/data_scrapped_extension.dart';
+import '../../extension/map_network_error.dart';
 import '../../mixin/sync_tags_mixin.dart';
 
 class GetTagsUseCase with SyncTagsMixin {
@@ -84,7 +85,7 @@ class GetTagsUseCase with SyncTagsMixin {
 
       return Success(result);
     } catch (e) {
-      return Error(e);
+      return Error(mapNetworkError(e));
     }
   }
 }

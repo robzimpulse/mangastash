@@ -6,6 +6,7 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
+import '../../extension/map_network_error.dart';
 import '../../extension/scrapped_validation_extension.dart';
 import '../../mixin/sync_chapters_mixin.dart';
 
@@ -117,7 +118,7 @@ class GetChapterUseCase with SyncChaptersMixin {
 
       return Success(result);
     } catch (e) {
-      return Error(e);
+      return Error(mapNetworkError(e));
     }
   }
 }

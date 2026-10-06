@@ -433,4 +433,58 @@ void main() {
       expect(evicted, [_mangaUrl]);
     },
   );
+
+  test(
+    'a 429 from the chapter feed surfaces as RateLimitException (#118)',
+    () async {
+      // The MangaDex feed hit the rate limiter — execute() must map the raw
+      // DioException to a typed RateLimitException instead of leaking it.
+      final repository = MockChapterRepository();
+      // LogBox.log is an extension method — the error path needs a real
+      // Storage behind the mock's field.
+      final logBox = MockLogBox();
+      when(() => logBox.storage).thenReturn(
+        analytics.Storage(liveDataStorage: analytics.MemoryStorage()),
+      );
+      final useCase = SearchChapterUseCase(
+        chapterRepository: repository,
+        webview: MockHeadlessWebviewUseCase(),
+        converterCacheManager: MockConverterCacheManager(),
+        htmlCacheManager: MockHtmlCacheManager(),
+        searchChapterCacheManager: cacheManager,
+        chapterDao: chapterDao,
+        mangaDao: mangaDao,
+        logBox: logBox,
+      );
+
+      when(
+        () => repository.feed(
+          mangaId: any(named: 'mangaId'),
+          parameter: any(named: 'parameter'),
+        ),
+      ).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(),
+          response: Response(
+            requestOptions: RequestOptions(),
+            statusCode: 429,
+          ),
+        ),
+      );
+
+      final result = await useCase.execute(
+        parameter: SourceSearchChapterParameter(
+          source: 'Manga Dex',
+          parameter: const SearchChapterParameter(page: 1, limit: 20),
+          mangaId: _mangaId,
+        ),
+      );
+
+      expect(result, isA<Error<Pagination<Chapter>>>());
+      expect(
+        (result as Error<Pagination<Chapter>>).error,
+        isA<RateLimitException>(),
+      );
+    },
+  );
 }
