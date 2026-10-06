@@ -55,15 +55,6 @@ class _AppsScreenState extends State<AppsScreen> {
       // hot restarts and process death instead of always landing on the
       // hardcoded `/` redirect target (#130).
       restorationScopeId: 'rootRouter',
-      onEnter: (context, current, next, router) async {
-        final result = await routes.onEnter(
-          context: context,
-          current: current,
-          next: next,
-          router: router,
-        );
-        return result ?? Allow();
-      },
       onException: (context, state, router) {
         // `go` (not `push`) so the error page replaces the broken
         // destination: back must leave the error, not return to it (#130).
