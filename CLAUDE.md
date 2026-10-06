@@ -41,8 +41,8 @@ The project follows a **Modular Clean Architecture** pattern with a sharded dire
 - **root (`/`)**: Main entry point (`lib/main.dart`) where `WrapperScreen` handles global service registration.
 - **`module/entity/`**: Pure data models and value objects (`entity_manga`) plus scraped-source DTOs (`entity_manga_external`).
 - **`module/domain/`**: Business logic, use cases, and repository interfaces (`domain_manga`).
-- **`module/core/`**: Infrastructure and cross-cutting concerns (Auth, Route, Network, Storage, Analytics, Environment). `core_storage` wires the database, DAOs, and caches.
-- **`module/library/`**: Internal utility libraries and 3rd-party wrappers (Drift service, Service Locator, BLoC, MangaDex API, Firebase).
+- **`module/core/`**: Infrastructure and cross-cutting concerns (Route, Network, Storage, Analytics, Environment). `core_storage` wires the database, DAOs, and caches.
+- **`module/library/`**: Internal utility libraries and 3rd-party wrappers (Drift service, Service Locator, BLoC, MangaDex API).
 - **`module/ui/`**: Reusable UI components, themes, and shared widgets (`ui_common`). Feature-specific UI modules (e.g., `ui_browse`) contain both Screens and their colocated Cubits.
 - **`module/feature/`**: High-level feature orchestration and routing. Bridges UI with Domain and Core; the only layer that knows navigation.
 
@@ -52,7 +52,6 @@ The project follows a **Modular Clean Architecture** pattern with a sharded dire
 - **Data flow**: `core_network` (Dio + headless WebView scraping) and `manga_dex_api` (MangaDex REST) feed `domain_manga` use cases, which sync into Drift DAOs (`manga_service_drift` via `core_storage`) and cache managers. UI modules consume use cases via `locator()`, never services directly.
 - **Scraping sources**: `SourceExternal` (in `entity_manga_external`) defines a plugin contract for non-MangaDex sources (e.g. AsuraScan). Mangadex is `builtIn` and goes through `manga_dex_api`; its source use-case getters `throw UnimplementedError()`.
 - **UI convention**: `ui_*` screens are pure widgets that take `onTapX`/`onTapY` callbacks and a static `create(locator:, ...)` factory; `feature_*` route builders supply navigation via `BaseRouteBuilder` (`root()`, `routes()`, aggregated in `lib/main_route.dart`).
-- **Gotcha — orphaned auth module**: `CoreAuthRegistrar` is *not* registered in `lib/main.dart` (there is a `// TODO: register module registrar here` at `lib/main.dart:37`). Auth screens/use cases exist in `core_auth` but nothing wires them into the running app.
 - **Gotcha — download is unimplemented**: the "Download" action is a no-op TODO across `ui_browse` and `ui_more`.
 - **Web vs IO**: conditional imports select platform implementations (e.g. `PathManager` filesystem adapter — in-memory temp dir on web, app-documents dir on IO; `Executor` in `manga_service_drift`). When DB or path errors appear only on one platform, check the `adapter/` directories.
 
@@ -76,7 +75,7 @@ The project follows a **Modular Clean Architecture** pattern with a sharded dire
 - **Commands**:
     - `melos run test`: Runs all tests across all modules.
     - `melos run coverage:merged`: Generates a unified code coverage report using `lcov` and `cobertura`.
-- **Test harness**: `test/extension/patrol_tester_extension.dart` provides `testScreen(...)` — sets up a GetIt locator (allowing reassignment), in-memory DB executor, mocked caches, and registers the same registrars as `main.dart`. Note it also does not register `CoreAuthRegistrar`.
+- **Test harness**: `test/extension/patrol_tester_extension.dart` provides `testScreen(...)` — sets up a GetIt locator (allowing reassignment), in-memory DB executor, mocked caches, and registers the same registrars as `main.dart`.
 
 ## 6. Known Blockers & Troubleshooting (Self-Learning)
 > **⚠️ DIRECTIVE FOR ALL FUTURE AI AGENTS:** If you encounter a new architectural blocker, undocumented workaround, or persistent bug while working in this codebase, you MUST append it to this section with troubleshooting steps before completing your task.
