@@ -389,5 +389,31 @@ void main() {
       chapterVerification.called(1);
       expect(chapterVerification.captured, ['m-1']);
     });
+
+    // job_tables carries no unique key, so a duplicate insert is accepted and
+    // JobManager runs every row: a second prefetchChapters re-fetches the whole
+    // chapter list and each prefetchChapter re-downloads every image to disk.
+    // mangaIdsStream is stubbed to an empty stream — it never emits, so the
+    // queued set can only come from download's own synchronous emit. Without
+    // that staging the second tap reads a stale set and duplicates the work.
+    test('a double tap enqueues once', () {
+      const manga = Manga(id: 'm-1', source: 'Manga Dex');
+      downloadCubit.download(manga: manga);
+      downloadCubit.download(manga: manga);
+
+      verify(
+        () => prefetchMangaUseCase.prefetchManga(
+          mangaId: 'm-1',
+          source: any(named: 'source'),
+        ),
+      ).called(1);
+      verify(
+        () => prefetchChapterUseCase.prefetchChapters(
+          mangaId: 'm-1',
+          source: any(named: 'source'),
+        ),
+      ).called(1);
+      expect(downloadCubit.state.prefetchedMangaIds, {'m-1'});
+    });
   });
 }

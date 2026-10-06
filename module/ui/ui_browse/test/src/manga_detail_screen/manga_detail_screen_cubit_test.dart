@@ -545,8 +545,8 @@ void main() {
     late MockPrefetchChapterUseCase prefetchChapterUseCase;
     late MangaDetailScreenCubit downloadCubit;
 
-    /// Builds the subject and publishes it as [downloadCubit], closing it on
-    /// teardown. Tests assign `downloadCubit = buildCubit(...)` so a custom
+    /// Builds the subject, publishes it as [downloadCubit], and registers its
+    /// own teardown. Tests assign `downloadCubit = buildCubit(...)` so a custom
     /// initialState is one argument away.
     MangaDetailScreenCubit buildCubit({MangaDetailScreenState? initialState}) {
       downloadCubit = MangaDetailScreenCubit(
@@ -569,6 +569,10 @@ void main() {
         recrawlUseCase: MockRecrawlUseCase(),
         listenDownloadedChapterUseCase: MockListenDownloadedChapterUseCase(),
       );
+      // The constructor registers five stream subscriptions plus, when the
+      // state carries a mangaId, the downloaded-chapter listener — close() is
+      // what cancels them, so an unclosed cubit leaks every one.
+      addTearDown(downloadCubit.close);
       return downloadCubit;
     }
 
@@ -752,21 +756,71 @@ void main() {
       expect(downloadCubit.state.isPrefetchingAll, isFalse);
     });
 
-    // The detail screen already holds the synced manga, so unlike the bulk
-    // cubits download queues chapters only — no prefetchManga job, which would
-    // re-fetch (useCache: false) the record on screen.
-    test('download never enqueues a whole-manga job', () async {
-      downloadCubit = buildCubit();
-      stubChapters(const [Chapter(id: 'a')]);
+    // Downloading before the manga lands must return 0 and stop without
+    // fetching or enqueuing anything — never throw. Task 5 turns the 0 into
+    // the snackbar, so this guard is the whole "safe no-op" contract.
+    test(
+      'download returns 0 without fetching when the manga is not loaded',
+      () async {
+        downloadCubit = buildCubit(
+          initialState: const MangaDetailScreenState(),
+        );
 
-      await downloadCubit.download(option: DownloadOption.all);
+        final enqueued = await downloadCubit.download(
+          option: DownloadOption.all,
+        );
 
-      verifyNever(
-        () => prefetchChapterUseCase.prefetchChapters(
-          mangaId: any(named: 'mangaId'),
-          source: any(named: 'source'),
-        ),
-      );
-    });
+        expect(enqueued, 0);
+        verifyNever(
+          () => getAllChapterUseCase.execute(
+            source: any(named: 'source'),
+            mangaId: any(named: 'mangaId'),
+            parameter: any(named: 'parameter'),
+          ),
+        );
+        verifyNever(
+          () => prefetchChapterUseCase.prefetchChapter(
+            mangaId: any(named: 'mangaId'),
+            source: any(named: 'source'),
+            chapterId: any(named: 'chapterId'),
+          ),
+        );
+        expect(downloadCubit.state.isPrefetchingAll, isFalse);
+      },
+    );
+
+    // A source name Sources.fromName cannot resolve yields a null source, so
+    // there is nothing to fetch against — same no-op as the unloaded manga.
+    test(
+      'download returns 0 without fetching when the source is unknown',
+      () async {
+        downloadCubit = buildCubit(
+          initialState: const MangaDetailScreenState(
+            manga: Manga(id: 'm-1', source: 'Removed Source'),
+          ),
+        );
+
+        final enqueued = await downloadCubit.download(
+          option: DownloadOption.all,
+        );
+
+        expect(enqueued, 0);
+        verifyNever(
+          () => getAllChapterUseCase.execute(
+            source: any(named: 'source'),
+            mangaId: any(named: 'mangaId'),
+            parameter: any(named: 'parameter'),
+          ),
+        );
+        verifyNever(
+          () => prefetchChapterUseCase.prefetchChapter(
+            mangaId: any(named: 'mangaId'),
+            source: any(named: 'source'),
+            chapterId: any(named: 'chapterId'),
+          ),
+        );
+        expect(downloadCubit.state.isPrefetchingAll, isFalse);
+      },
+    );
   });
 }
