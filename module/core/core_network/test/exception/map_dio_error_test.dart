@@ -1,5 +1,4 @@
 import 'package:core_network/core_network.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -17,6 +16,20 @@ void main() {
       expect(result, isA<RateLimitException>());
       final rate = result as RateLimitException;
       expect(rate.retryAfter, equals(const Duration(seconds: 5)));
+    });
+
+    test('429 carries a bounded body snippet like other HTTP errors', () {
+      final dio = DioException(
+        requestOptions: RequestOptions(),
+        response: Response(
+          requestOptions: RequestOptions(),
+          statusCode: 429,
+          data: 'x' * 500,
+        ),
+      );
+      final result = mapDioError(dio) as RateLimitException;
+      expect(result.bodySnippet, isNotNull);
+      expect(result.bodySnippet!.length, 200);
     });
 
     test('429 + HTTP-date Retry-After → retryAfter null', () {

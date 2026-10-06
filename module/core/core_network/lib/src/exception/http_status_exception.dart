@@ -14,6 +14,6 @@ class HttpStatusException implements Exception {
   @override
   String toString() {
     final snippet = bodySnippet == null ? '' : ' body: $bodySnippet';
-    return '$runtimeType : $statusCode${snippet}';
+    return '$runtimeType : $statusCode$snippet';
   }
 }

@@ -13,28 +13,30 @@ Exception mapDioError(Object error) {
       final response = error.response;
       if (response != null) {
         final status = response.statusCode;
-        if (status == 429) {
-          final retryHeader = response.headers.value('Retry-After');
-          Duration? retryAfter;
-          if (retryHeader != null) {
-            final seconds = int.tryParse(retryHeader.trim());
-            if (seconds != null && seconds > 0) {
-              retryAfter = Duration(seconds: seconds);
-            }
-          }
-          return RateLimitException(
-            cause: error,
-            retryAfter: retryAfter,
-          );
-        }
         if (status != null) {
-          final snippet = response.data?.toString();
+          final raw = response.data?.toString();
+          final bodySnippet = raw == null || raw.isEmpty
+              ? null
+              : raw.substring(0, raw.length > 200 ? 200 : raw.length);
+          if (status == 429) {
+            final retryHeader = response.headers.value('Retry-After');
+            Duration? retryAfter;
+            if (retryHeader != null) {
+              final seconds = int.tryParse(retryHeader.trim());
+              if (seconds != null && seconds > 0) {
+                retryAfter = Duration(seconds: seconds);
+              }
+            }
+            return RateLimitException(
+              cause: error,
+              retryAfter: retryAfter,
+              bodySnippet: bodySnippet,
+            );
+          }
           return HttpStatusException(
             statusCode: status,
             cause: error,
-            bodySnippet: snippet == null || snippet.isEmpty
-                ? null
-                : snippet.substring(0, snippet.length > 200 ? 200 : snippet.length),
+            bodySnippet: bodySnippet,
           );
         }
       }
