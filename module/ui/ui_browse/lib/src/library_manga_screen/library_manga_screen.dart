@@ -66,6 +66,12 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
 
   final FocusNode _searchFocusNode = FocusNode();
 
+  /// Debounces the title filter: typing fires a burst of onChanged calls,
+  /// and only the last one (after 300ms of silence) re-runs the filter
+  /// (issue #131). Cancelled on submit and on search close so a pending
+  /// keystroke cannot re-apply a stale filter afterwards.
+  final _titleDebounce = Debounce();
+
   LibraryMangaScreenCubit? _cubit(BuildContext context) {
     return context.mounted ? context.read() : null;
   }
@@ -96,6 +102,7 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
 
   @override
   void dispose() {
+    _titleDebounce.dispose();
     _searchController.dispose();
     _searchFocusNode.dispose();
     _scrollController.dispose();
@@ -173,8 +180,16 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
             ),
             cursorColor: DefaultTextStyle.of(context).style.color,
             style: DefaultTextStyle.of(context).style,
-            onChanged: (value) => _cubit(context)?.update(mangaTitle: value),
-            onSubmitted: (value) => _cubit(context)?.update(mangaTitle: value),
+            // Debounced (issue #131): submitting applies the filter
+            // immediately and cancels the pending debounce.
+            onChanged:
+                (value) => _titleDebounce(
+                  () => _cubit(context)?.update(mangaTitle: value),
+                ),
+            onSubmitted: (value) {
+              _titleDebounce.cancel();
+              _cubit(context)?.update(mangaTitle: value);
+            },
           ),
         );
       },
@@ -207,8 +222,13 @@ class _LibraryMangaScreenState extends State<LibraryMangaScreen> {
             final next = !state.isSearchActive;
             // Keep the field in sync with the reset filter (issue #124);
             // clear() does not fire onChanged, so the cubit's own reset in
-            // update() is what clears the state.
-            if (!next) _searchController.clear();
+            // update() is what clears the state. A keystroke debounced just
+            // before closing must not re-apply its stale filter afterwards
+            // (issue #131).
+            if (!next) {
+              _titleDebounce.cancel();
+              _searchController.clear();
+            }
             _cubit(context)?.update(isSearchActive: next);
           },
         );

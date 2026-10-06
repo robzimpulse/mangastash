@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 
 import 'package:json_annotation/json_annotation.dart';
 
@@ -172,7 +173,15 @@ class SearchMangaParameter extends SearchParameter {
       return SearchMangaParameter.fromJson(
         json.decode(value) as Map<String, dynamic>,
       );
-    } catch (e) {
+    } catch (e, st) {
+      // Corrupt cached JSON degrades to null by design; log it so the
+      // failure is visible in DevTools instead of silent (issue #131).
+      developer.log(
+        'fromJsonString failed',
+        name: 'SearchMangaParameter',
+        error: e,
+        stackTrace: st,
+      );
       return null;
     }
   }

@@ -118,6 +118,45 @@ void main() {
     final field = tester.widget<TextField>(find.byType(TextField));
     expect(field.controller?.text, '');
   });
+
+  // Issue #131: the title filter re-ran on every keystroke. Typing now
+  // debounces (300ms) through ui_common's Debounce utility.
+  testWidgets('typing applies the title filter only after the debounce (#131)', (
+    tester,
+  ) async {
+    await pumpScreen(tester);
+
+    await tester.tap(find.byIcon(Icons.search));
+    await pumpFrames(tester);
+
+    await tester.enterText(find.byType(TextField), 'naruto');
+    // Still inside the debounce window — no filter applied yet.
+    await tester.pump(const Duration(milliseconds: 150));
+    expect(cubit.state.mangaTitle, isNull);
+
+    // Past the debounce window — the filter applies with the typed value.
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(cubit.state.mangaTitle, 'naruto');
+  });
+
+  // Submitting must apply the filter immediately (no waiting out the
+  // debounce) and cancel the pending debounce so it cannot re-fire later.
+  testWidgets('submitting applies the filter immediately (#131)', (
+    tester,
+  ) async {
+    await pumpScreen(tester);
+
+    await tester.tap(find.byIcon(Icons.search));
+    await pumpFrames(tester);
+
+    await tester.enterText(find.byType(TextField), 'naruto');
+    await tester.pump(const Duration(milliseconds: 150));
+
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pump();
+
+    expect(cubit.state.mangaTitle, 'naruto');
+  });
 }
 
 /// [ImagesCacheManager] stand-in that never touches the real cache; the grid
