@@ -127,7 +127,10 @@ class DomainMangaRegistrar extends Registrar {
       ),
     );
     locator.registerFactory(
-      () => GetAllChapterUseCase(searchChapterUseCase: locator()),
+      () => GetAllChapterUseCase(
+        searchChapterUseCase: locator(),
+        logBox: locator(),
+      ),
     );
     locator.registerFactory(
       () => GetNeighbourChapterUseCase(chapterDao: locator()),
