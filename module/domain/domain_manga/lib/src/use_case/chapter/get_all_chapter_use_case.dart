@@ -47,7 +47,23 @@ class GetAllChapterUseCase {
         useCache: fetchCache,
       );
 
-      if (result is! Success<Pagination<Chapter>>) break;
+      if (result is! Success<Pagination<Chapter>>) {
+        // The page error is already mapped by SearchChapterUseCase; dropping
+        // it here must at least be visible — otherwise a truncated list
+        // looks complete and nothing ever retries (review on #182).
+        _logBox.log(
+          'Get all chapters stopped early on a failed page; returning pages '
+          'collected so far',
+          extra: {
+            'source': source.name,
+            'mangaId': mangaId,
+            'fetchedPages': fetchedPages,
+            'error': result is Error<Pagination<Chapter>> ? result.error : result,
+          },
+          name: runtimeType.toString(),
+        );
+        break;
+      }
 
       chapters.addAll([...?result.data.data]);
       fetchedPages++;
