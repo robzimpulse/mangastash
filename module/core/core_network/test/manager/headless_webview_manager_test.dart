@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_network/src/manager/headless_webview_manager.dart';
+import 'package:core_network/src/manager/user_agent_manager.dart';
+import 'package:core_network/src/mixin/user_agent_mixin.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -217,6 +219,73 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       verifyNever(() => cache.getFileFromCache(any()));
+    });
+  });
+
+  group('publishDiscoveredUserAgent', () {
+    test('publishes a non-empty UA and reports true', () async {
+      final manager = UserAgentManager(log: log);
+
+      final published = await publishDiscoveredUserAgent(
+        manager: manager,
+        getUA: () async => 'RealPlatform/UA',
+        log: log,
+      );
+
+      expect(published, isTrue);
+      expect(manager.current, 'RealPlatform/UA');
+    });
+
+    test('does not publish an empty UA and reports false', () async {
+      final manager = UserAgentManager(log: log);
+
+      final published = await publishDiscoveredUserAgent(
+        manager: manager,
+        getUA: () async => '   ',
+        log: log,
+      );
+
+      expect(published, isFalse);
+      expect(manager.current, UserAgentMixin.staticUserAgent);
+    });
+
+    test('does not publish a null UA and reports false', () async {
+      final manager = UserAgentManager(log: log);
+
+      final published = await publishDiscoveredUserAgent(
+        manager: manager,
+        getUA: () async => null,
+        log: log,
+      );
+
+      expect(published, isFalse);
+      expect(manager.current, UserAgentMixin.staticUserAgent);
+    });
+
+    test('swallows getUA errors and reports false', () async {
+      final manager = UserAgentManager(log: log);
+
+      final published = await publishDiscoveredUserAgent(
+        manager: manager,
+        getUA: () => throw Exception('no webview'),
+        log: log,
+      );
+
+      expect(published, isFalse);
+      expect(manager.current, UserAgentMixin.staticUserAgent);
+    });
+  });
+
+  group('HeadlessWebviewManager constructor', () {
+    test('accepts an optional userAgentManager', () {
+      final cache = FakeHtmlCacheManager();
+      final manager = HeadlessWebviewManager(
+        log: log,
+        htmlCacheManager: cache,
+        userAgentManager: UserAgentManager(log: log),
+      );
+
+      expect(manager, isA<HeadlessWebviewManager>());
     });
   });
 }

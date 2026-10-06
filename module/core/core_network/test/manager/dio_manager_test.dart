@@ -2,9 +2,12 @@ import 'dart:typed_data';
 
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_network/src/manager/dio_manager.dart';
+import 'package:core_network/src/manager/user_agent_manager.dart';
+import 'package:core_network/src/mixin/user_agent_mixin.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:universal_io/io.dart';
 
 class FakeLogBox extends Mock implements LogBox {}
 
@@ -92,5 +95,38 @@ void main() {
 
     expect(response.statusCode, 200);
     expect(adapter.calls, 2);
+  });
+
+  test('uses user agent manager current header when provided', () {
+    final manager = UserAgentManager(log: log);
+
+    final dio = DioManager.create(log: log, userAgentManager: manager);
+
+    expect(
+      dio.options.headers[HttpHeaders.userAgentHeader],
+      manager.current,
+    );
+  });
+
+  test('keeps Dio header live after manager publish', () {
+    final manager = UserAgentManager(log: log);
+    final dio = DioManager.create(log: log, userAgentManager: manager);
+
+    manager.publish('X/1');
+
+    expect(dio.options.headers[HttpHeaders.userAgentHeader], 'X/1');
+  });
+
+  test('defaults to Chrome/154 user agent without manager', () {
+    final dio = DioManager.create(log: log);
+
+    expect(
+      dio.options.headers[HttpHeaders.userAgentHeader],
+      contains('Chrome/154.0.0.0'),
+    );
+    expect(
+      dio.options.headers[HttpHeaders.userAgentHeader],
+      UserAgentMixin.staticUserAgent,
+    );
   });
 }

@@ -14,6 +14,7 @@ export 'src/exception/http_status_exception.dart';
 export 'src/exception/map_dio_error.dart';
 export 'src/exception/network_exception.dart';
 export 'src/exception/rate_limit_exception.dart';
+export 'src/manager/user_agent_manager.dart';
 export 'src/mixin/user_agent_mixin.dart';
 export 'src/provider/dio_image_provider.dart';
 export 'src/response/error.dart';

@@ -3,6 +3,7 @@ import 'package:service_locator/service_locator.dart';
 
 import 'manager/dio_manager.dart';
 import 'manager/headless_webview_manager.dart';
+import 'manager/user_agent_manager.dart';
 import 'usecase/headless_webview_use_case.dart';
 
 class CoreNetworkRegistrar extends Registrar {
@@ -11,12 +12,19 @@ class CoreNetworkRegistrar extends Registrar {
     final start = DateTime.timestamp();
 
     locator.registerLazySingleton(
-      () => HeadlessWebviewManager(log: locator(), htmlCacheManager: locator()),
+      () => HeadlessWebviewManager(
+        log: locator(),
+        htmlCacheManager: locator(),
+        userAgentManager: locator(),
+      ),
       dispose: (e) => e.dispose(),
     );
     locator.alias<HeadlessWebviewUseCase, HeadlessWebviewManager>();
     locator.registerLazySingleton(
-      () => DioManager.create(log: locator()),
+      () => UserAgentManager(log: locator()),
+    );
+    locator.registerLazySingleton(
+      () => DioManager.create(log: locator(), userAgentManager: locator()),
       dispose: (e) => e.close(force: true),
     );
 

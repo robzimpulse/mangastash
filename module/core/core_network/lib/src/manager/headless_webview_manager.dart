@@ -9,14 +9,13 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
-import 'package:universal_io/io.dart';
 
 import '../exception/failed_parsing_html_exception.dart';
 import '../exception/script_evaluation_exception.dart';
-import '../mixin/user_agent_mixin.dart';
 import '../usecase/headless_webview_use_case.dart';
 import 'cloudflare_detector.dart';
 import 'script_wrapper.dart';
+import 'user_agent_manager.dart';
 
 class _Key extends Equatable {
   final String url;
@@ -158,11 +157,42 @@ bool shouldUseHtmlCache({required bool useCache, Future? signalComplete}) {
   return useCache && signalComplete == null;
 }
 
+/// Publishes the headless webview's real platform UA into [manager]
+/// (first non-empty wins, enforced by `UserAgentManager.publish`).
+///
+/// Returns whether a UA was actually published: null/empty discoveries and
+/// [getUA] failures return false (logged, never thrown) so the caller can
+/// retry discovery on a later spawn instead of staying poisoned on the
+/// static fallback for the session (review on #183).
+Future<bool> publishDiscoveredUserAgent({
+  required UserAgentManager manager,
+  required Future<String?> Function() getUA,
+  required LogBox log,
+}) async {
+  try {
+    final userAgent = await getUA();
+    if (userAgent == null || userAgent.trim().isEmpty) {
+      return false;
+    }
+    manager.publish(userAgent);
+    return true;
+  } catch (e) {
+    log.log(
+      'Failed to discover webview user agent: $e',
+      name: 'HeadlessWebviewManager',
+    );
+    return false;
+  }
+}
+
 class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   static const Duration defaultTimeout = Duration(seconds: 15);
 
   final LogBox _log;
   final HtmlCacheManager _htmlCacheManager;
+  final UserAgentManager? _userAgentManager;
+
+  bool _uaDiscoveryStarted = false;
 
   final Map<_Key, Future<Document>> _cDocument = {};
   final Map<_Key, Future<String>> _cImage = {};
@@ -171,8 +201,10 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   HeadlessWebviewManager({
     required LogBox log,
     required HtmlCacheManager htmlCacheManager,
+    UserAgentManager? userAgentManager,
   }) : _log = log,
-       _htmlCacheManager = htmlCacheManager;
+       _htmlCacheManager = htmlCacheManager,
+       _userAgentManager = userAgentManager;
 
   Future<void> dispose() async {
     await Future.wait([
@@ -394,12 +426,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
 
       final webview = HeadlessInAppWebView(
         initialUserScripts: initialUserScripts,
-        initialUrlRequest: URLRequest(
-          url: uri,
-          headers: {
-            HttpHeaders.userAgentHeader: UserAgentMixin.staticUserAgent,
-          },
-        ),
+        initialUrlRequest: URLRequest(url: uri),
         initialSettings: InAppWebViewSettings(
           isInspectable: true,
           javaScriptEnabled: true,
@@ -411,6 +438,31 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
             controller.addJavaScriptHandler(
               handlerName: handler.key,
               callback: handler.value,
+            );
+          }
+          // The headers override is gone so the webview sends its real
+          // platform UA; publish it once per manager for Dio to reuse.
+          // Fire-and-forget: discovery must never block or fail a fetch.
+          // A failed discovery (null/empty/throw) resets the once-guard so
+          // the next spawn retries instead of pinning the static fallback.
+          final userAgentManager = _userAgentManager;
+          if (userAgentManager != null && !_uaDiscoveryStarted) {
+            _uaDiscoveryStarted = true;
+            unawaited(
+              publishDiscoveredUserAgent(
+                manager: userAgentManager,
+                getUA: () async {
+                  final userAgent = await controller.evaluateJavascript(
+                    source: 'navigator.userAgent',
+                  );
+                  return userAgent?.toString();
+                },
+                log: _log,
+              ).then((published) {
+                if (!published) {
+                  _uaDiscoveryStarted = false;
+                }
+              }),
             );
           }
         },

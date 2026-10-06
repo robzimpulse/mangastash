@@ -6,6 +6,7 @@ import 'package:universal_io/io.dart';
 import '../interceptor/dio_reject_interceptor.dart';
 import '../interceptor/dio_throttler_interceptor.dart';
 import '../mixin/user_agent_mixin.dart';
+import 'user_agent_manager.dart';
 
 class DioManager {
   /// In dio 5.11.1, receiveTimeout bounds the wait for the response HEADERS
@@ -16,14 +17,19 @@ class DioManager {
   static const Duration connectTimeout = Duration(seconds: 15);
   static const Duration receiveTimeout = Duration(seconds: 30);
 
-  static Dio create({required LogBox log, List<Duration> retryDelays = const [Duration(milliseconds: 500), Duration(seconds: 1), Duration(seconds: 2), Duration(seconds: 4)]}) {
+  static Dio create({required LogBox log, List<Duration> retryDelays = const [Duration(milliseconds: 500), Duration(seconds: 1), Duration(seconds: 2), Duration(seconds: 4)], UserAgentManager? userAgentManager}) {
     final dio = Dio(
       BaseOptions(
-        headers: {HttpHeaders.userAgentHeader: UserAgentMixin.staticUserAgent},
+        headers: {HttpHeaders.userAgentHeader: userAgentManager?.current ?? UserAgentMixin.staticUserAgent},
         connectTimeout: connectTimeout,
         receiveTimeout: receiveTimeout,
       ),
     );
+
+    final manager = userAgentManager;
+    if (manager != null) {
+      manager.attach(dio);
+    }
 
     dio.interceptors.addAll([
       DioThrottlerInterceptor(
