@@ -9,7 +9,9 @@ class UserAgentManager {
 
   final LogBox _log;
 
-  Dio? _dio;
+  /// Every attached Dio is re-stamped on publish — attaching a second Dio
+  /// must not orphan the first (review on #183).
+  final Set<Dio> _dios = {};
 
   bool _published = false;
 
@@ -18,7 +20,7 @@ class UserAgentManager {
   String get current => _current;
 
   void attach(Dio dio) {
-    _dio = dio;
+    _dios.add(dio);
     dio.options.headers[HttpHeaders.userAgentHeader] = _current;
   }
 
@@ -38,8 +40,7 @@ class UserAgentManager {
       name: 'UserAgentManager',
     );
 
-    final dio = _dio;
-    if (dio != null) {
+    for (final dio in _dios) {
       dio.options.headers[HttpHeaders.userAgentHeader] = _current;
     }
   }

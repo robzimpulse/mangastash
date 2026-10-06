@@ -64,4 +64,17 @@ void main() {
 
     expect(manager.current, UserAgentMixin.staticUserAgent);
   });
+
+  test('publish re-stamps every attached Dio, not just the latest (review on #183)', () {
+    final manager = UserAgentManager(log: log);
+    final firstDio = Dio();
+    final secondDio = Dio();
+    manager.attach(firstDio);
+    manager.attach(secondDio);
+
+    manager.publish('X/1');
+
+    expect(firstDio.options.headers[HttpHeaders.userAgentHeader], 'X/1');
+    expect(secondDio.options.headers[HttpHeaders.userAgentHeader], 'X/1');
+  });
 }

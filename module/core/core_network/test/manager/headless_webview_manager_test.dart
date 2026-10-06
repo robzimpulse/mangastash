@@ -223,51 +223,55 @@ void main() {
   });
 
   group('publishDiscoveredUserAgent', () {
-    test('publishes a non-empty UA', () async {
+    test('publishes a non-empty UA and reports true', () async {
       final manager = UserAgentManager(log: log);
 
-      await publishDiscoveredUserAgent(
+      final published = await publishDiscoveredUserAgent(
         manager: manager,
         getUA: () async => 'RealPlatform/UA',
         log: log,
       );
 
+      expect(published, isTrue);
       expect(manager.current, 'RealPlatform/UA');
     });
 
-    test('does not publish an empty UA', () async {
+    test('does not publish an empty UA and reports false', () async {
       final manager = UserAgentManager(log: log);
 
-      await publishDiscoveredUserAgent(
+      final published = await publishDiscoveredUserAgent(
         manager: manager,
         getUA: () async => '   ',
         log: log,
       );
 
+      expect(published, isFalse);
       expect(manager.current, UserAgentMixin.staticUserAgent);
     });
 
-    test('does not publish a null UA', () async {
+    test('does not publish a null UA and reports false', () async {
       final manager = UserAgentManager(log: log);
 
-      await publishDiscoveredUserAgent(
+      final published = await publishDiscoveredUserAgent(
         manager: manager,
         getUA: () async => null,
         log: log,
       );
 
+      expect(published, isFalse);
       expect(manager.current, UserAgentMixin.staticUserAgent);
     });
 
-    test('swallows getUA errors without propagating', () async {
+    test('swallows getUA errors and reports false', () async {
       final manager = UserAgentManager(log: log);
 
-      await publishDiscoveredUserAgent(
+      final published = await publishDiscoveredUserAgent(
         manager: manager,
         getUA: () => throw Exception('no webview'),
         log: log,
       );
 
+      expect(published, isFalse);
       expect(manager.current, UserAgentMixin.staticUserAgent);
     });
   });

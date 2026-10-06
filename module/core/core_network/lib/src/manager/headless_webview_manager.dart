@@ -160,9 +160,11 @@ bool shouldUseHtmlCache({required bool useCache, Future? signalComplete}) {
 /// Publishes the headless webview's real platform UA into [manager]
 /// (first non-empty wins, enforced by `UserAgentManager.publish`).
 ///
-/// Null/empty discoveries are skipped without calling publish; [getUA]
-/// failures are logged and swallowed so UA discovery can never fail a fetch.
-Future<void> publishDiscoveredUserAgent({
+/// Returns whether a UA was actually published: null/empty discoveries and
+/// [getUA] failures return false (logged, never thrown) so the caller can
+/// retry discovery on a later spawn instead of staying poisoned on the
+/// static fallback for the session (review on #183).
+Future<bool> publishDiscoveredUserAgent({
   required UserAgentManager manager,
   required Future<String?> Function() getUA,
   required LogBox log,
@@ -170,14 +172,16 @@ Future<void> publishDiscoveredUserAgent({
   try {
     final userAgent = await getUA();
     if (userAgent == null || userAgent.trim().isEmpty) {
-      return;
+      return false;
     }
     manager.publish(userAgent);
+    return true;
   } catch (e) {
     log.log(
       'Failed to discover webview user agent: $e',
       name: 'HeadlessWebviewManager',
     );
+    return false;
   }
 }
 
@@ -439,6 +443,8 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
           // The headers override is gone so the webview sends its real
           // platform UA; publish it once per manager for Dio to reuse.
           // Fire-and-forget: discovery must never block or fail a fetch.
+          // A failed discovery (null/empty/throw) resets the once-guard so
+          // the next spawn retries instead of pinning the static fallback.
           final userAgentManager = _userAgentManager;
           if (userAgentManager != null && !_uaDiscoveryStarted) {
             _uaDiscoveryStarted = true;
@@ -452,7 +458,11 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
                   return userAgent?.toString();
                 },
                 log: _log,
-              ),
+              ).then((published) {
+                if (!published) {
+                  _uaDiscoveryStarted = false;
+                }
+              }),
             );
           }
         },
