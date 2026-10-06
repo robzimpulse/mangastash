@@ -435,4 +435,26 @@ void main() {
       expect(enqueuedChapterIds(), ['b']);
     });
   });
+
+  // Issue #131: artist credits display alongside author in the subtitle.
+  testWidgets('the subtitle shows the artist when present (#131)', (
+    tester,
+  ) async {
+    cubit = buildCubit(
+      initialState: MangaDetailScreenState(
+        mangaId: 'm-1',
+        manga: manga.copyWith(
+          author: 'Author One',
+          artist: 'Artist One',
+          status: 'ongoing',
+        ),
+        source: MangaDexSourceExternal(),
+        chapters: chapters,
+        totalChapter: 2,
+      ),
+    );
+    await pumpScreen(tester);
+
+    expect(find.textContaining('Artist One'), findsOneWidget);
+  });
 }

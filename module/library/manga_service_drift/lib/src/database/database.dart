@@ -65,7 +65,7 @@ class AppDatabase extends _$AppDatabase {
       super(executor.build());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration {
@@ -137,6 +137,34 @@ class AppDatabase extends _$AppDatabase {
             "DELETE FROM job_tables WHERE type = 'persistentImage'",
           );
           await m.dropColumn(jobTables, 'path');
+        },
+        from4To5: (m, schema) async {
+          // v5 (issue #131): persist artist credits and index the hot
+          // join/filter paths. `m.addColumn` works here (unlike the
+          // historical v1→v2 `path` case) because `artist` exists in the
+          // live Dart table definition. The index SQL must stay
+          // byte-identical to what drift generates for the @TableIndex
+          // annotations — migrateAndValidate compares schema entities.
+          await m.addColumn(mangaTables, mangaTables.artist);
+          await m.createIndex(
+            Index(
+              'idx_relationship_manga_id',
+              'CREATE INDEX idx_relationship_manga_id ON '
+              'relationship_tables (manga_id)',
+            ),
+          );
+          await m.createIndex(
+            Index(
+              'idx_job_chapter_id',
+              'CREATE INDEX idx_job_chapter_id ON job_tables (chapter_id)',
+            ),
+          );
+          await m.createIndex(
+            Index(
+              'idx_job_manga_id',
+              'CREATE INDEX idx_job_manga_id ON job_tables (manga_id)',
+            ),
+          );
         },
       ),
     );

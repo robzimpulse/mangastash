@@ -223,6 +223,9 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
           author: Value.absentIfNull(
             entry.key.author.valueOrNull ?? manga?.manga?.author,
           ),
+          artist: Value.absentIfNull(
+            entry.key.artist.valueOrNull ?? manga?.manga?.artist,
+          ),
           status: Value.absentIfNull(
             entry.key.status.valueOrNull ?? manga?.manga?.status,
           ),

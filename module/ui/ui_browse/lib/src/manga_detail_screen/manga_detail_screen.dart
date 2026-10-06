@@ -515,10 +515,13 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   height: lerpDouble(20, 0, progress) ?? 20,
                   lines: 1,
                   child: Text(
+                    // Artist joins the credits line when the source provides
+                    // it (issue #131).
                     [
                       state.manga?.source,
                       state.manga?.status,
                       state.manga?.author,
+                      state.manga?.artist,
                     ].nonNulls.join(' - '),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

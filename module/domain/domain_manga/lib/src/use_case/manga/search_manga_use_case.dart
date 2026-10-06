@@ -44,7 +44,12 @@ class SearchMangaUseCase with SyncMangasMixin {
   }) async {
     final result = await _mangaRepository.search(
       parameter: parameter.copyWith(
-        includes: [...?parameter.includes, Include.author, Include.coverArt],
+        includes: [
+          ...?parameter.includes,
+          Include.author,
+          Include.artist,
+          Include.coverArt,
+        ],
       ),
     );
 

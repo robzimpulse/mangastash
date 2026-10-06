@@ -11,6 +11,7 @@ Manga _$MangaFromJson(Map<String, dynamic> json) => Manga(
   title: json['title'] as String?,
   coverUrl: json['cover_url'] as String?,
   author: json['author'] as String?,
+  artist: json['artist'] as String?,
   status: json['status'] as String?,
   description: json['description'] as String?,
   tags:
@@ -34,6 +35,7 @@ Map<String, dynamic> _$MangaToJson(Manga instance) => <String, dynamic>{
   'title': instance.title,
   'cover_url': instance.coverUrl,
   'author': instance.author,
+  'artist': instance.artist,
   'status': instance.status,
   'description': instance.description,
   'tags': instance.tags?.map((e) => e.toJson()).toList(),
