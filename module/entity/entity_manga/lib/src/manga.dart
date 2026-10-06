@@ -159,6 +159,25 @@ class Manga extends Equatable {
     final titles = [data.attributes?.title, ...?data.attributes?.altTitles];
     final title = titles.nonNulls.filled;
 
+    // Author and artist relationships share the same attribute shape and
+    // both parse as Relationship<AuthorDataAttributes>; the `type` field
+    // tells them apart (issue #131). join(' | ') yields '' when no name
+    // matched — that maps to null, because Value.absentIfNull('') would
+    // persist an empty string into the column and render a trailing
+    // separator in the credits line (review on #188).
+    final credits = data.relationships
+        ?.whereType<Relationship<AuthorDataAttributes>>()
+        .toList();
+    String? names(String type) {
+      final joined = credits
+              ?.where((e) => e.type == type)
+              .map((e) => e.attributes?.name)
+              .nonNulls
+              .join(' | ') ??
+          '';
+      return joined.isEmpty ? null : joined;
+    }
+
     return Manga(
       id: data.id,
       title: title?.en ?? title?.jaRo ?? title?.zhRo,
@@ -170,21 +189,8 @@ class Manga extends Equatable {
       ),
       status: data.attributes?.status,
       tags: data.attributes?.tags?.map((e) => Tag.from(data: e)).toList(),
-      // Author and artist relationships share the same attribute shape and
-      // both parse as Relationship<AuthorDataAttributes>; the `type` field
-      // tells them apart (issue #131).
-      author: data.relationships
-          ?.whereType<Relationship<AuthorDataAttributes>>()
-          .where((e) => e.type == Include.author.rawValue)
-          .map((e) => e.attributes?.name)
-          .nonNulls
-          .join(' | '),
-      artist: data.relationships
-          ?.whereType<Relationship<AuthorDataAttributes>>()
-          .where((e) => e.type == Include.artist.rawValue)
-          .map((e) => e.attributes?.name)
-          .nonNulls
-          .join(' | '),
+      author: names(Include.author.rawValue),
+      artist: names(Include.artist.rawValue),
       webUrl: data.id?.let((id) => 'https://mangadex.org/title/$id'),
     );
   }

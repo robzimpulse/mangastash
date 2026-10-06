@@ -31,4 +31,30 @@ void main() {
     expect(manga.author, 'Author One');
     expect(manga.artist, 'Artist One');
   });
+
+  // Review on #188: `.nonNulls.join(' | ')` yields '' — not null — when no
+  // artist relationship exists. The empty string would persist into the
+  // artist column (Value.absentIfNull('') is present) and render a trailing
+  // separator in the detail credits, defeating the column's
+  // nullable-for-absent intent.
+  test('Manga.from maps a missing artist to null, not empty string (#188)', () {
+    final data = MangaData.fromJson(<String, dynamic>{
+      'id': 'm1',
+      'type': 'manga',
+      'attributes': <String, dynamic>{
+        'chapterNumbersResetOnNewVolume': false,
+      },
+      'relationships': <Map<String, dynamic>>[
+        {
+          'id': 'auth-1',
+          'type': 'author',
+          'attributes': {'name': 'Author One'},
+        },
+      ],
+    });
+
+    final manga = Manga.from(data: data);
+
+    expect(manga.artist, isNull);
+  });
 }
