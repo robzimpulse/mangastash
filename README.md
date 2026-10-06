@@ -63,7 +63,7 @@ The project follows a **Modular Clean Architecture** pattern sharded into the `m
 - **`lib/`**: The main entry point and app orchestration.
 - **`module/entity/`**: Pure data models and value objects.
 - **`module/domain/`**: Business logic, use cases, and repository interfaces.
-- **`module/core/`**: Infrastructure concerns (Auth, Route, Network, Storage, Analytics, Environment).
+- **`module/core/`**: Infrastructure concerns (Route, Network, Storage, Analytics, Environment).
 - **`module/library/`**: Internal utilities and 3rd-party wrappers (Drift service, Service Locator).
 - **`module/ui/`**: Reusable UI components and shared widgets (`ui_common`).
 - **`module/feature/`**: High-level feature orchestration (Browse, Library, History, etc.).
@@ -84,5 +84,5 @@ The project emphasizes test coverage and reliability.
 ## 🚢 Deployment
 
 The app is configured for multiple platforms (Android, iOS, Web, Desktop). 
-- **Firebase**: Uses Firebase for backend services. Configuration is managed via `firebase.json` and `firebase_options.dart`.
+- **Firebase**: Used for release distribution (App Distribution) and web hosting. Configuration is managed via `firebase.json`.
 - **CI/CD**: GitHub Actions are used for automated testing and coverage reporting to Codecov.

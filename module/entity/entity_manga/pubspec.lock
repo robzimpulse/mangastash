@@ -871,7 +871,7 @@ packages:
     source: hosted
     version: "0.2.2"
   persistent_file_system:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "../../library/persistent_file_system"
       relative: true

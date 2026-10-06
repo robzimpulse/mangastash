@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:core_route/core_route.dart';
 import 'package:feature_browse/feature_browse.dart';
 import 'package:feature_common/feature_common.dart';
@@ -85,21 +83,6 @@ class MainRouteBuilder extends BaseRouteBuilder {
           ),
         ),
       ],
-    );
-  }
-
-  @override
-  FutureOr<OnEnterResult?> onEnter({
-    required BuildContext context,
-    required GoRouterState current,
-    required GoRouterState next,
-    required GoRouter router,
-  }) async {
-    return _builders.aggregatedOnEnter(
-      context: context,
-      current: current,
-      next: next,
-      router: router,
     );
   }
 }

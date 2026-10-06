@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:service_locator/service_locator.dart';
@@ -25,13 +23,6 @@ abstract class BaseRouteBuilder {
       ...routes(locator: locator, rootNavigatorKey: rootNavigatorKey),
     ];
   }
-
-  FutureOr<OnEnterResult?> onEnter({
-    required BuildContext context,
-    required GoRouterState current,
-    required GoRouterState next,
-    required GoRouter router,
-  }) => null;
 }
 
 extension BaseRouteBuilders on List<BaseRouteBuilder> {
@@ -68,25 +59,5 @@ extension BaseRouteBuilders on List<BaseRouteBuilder> {
           observers: observers,
         ),
     ];
-  }
-
-  FutureOr<OnEnterResult?> aggregatedOnEnter({
-    required BuildContext context,
-    required GoRouterState current,
-    required GoRouterState next,
-    required GoRouter router,
-  }) async {
-    for (final route in this) {
-      final result = await route.onEnter(
-        context: context,
-        current: current,
-        next: next,
-        router: router,
-      );
-      if (result != null) {
-        return result;
-      }
-    }
-    return null;
   }
 }
