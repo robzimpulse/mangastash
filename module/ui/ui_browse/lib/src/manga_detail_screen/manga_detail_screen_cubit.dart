@@ -497,8 +497,10 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   /// Stages the id into [MangaDetailScreenState.prefetchedChapterIds]
   /// synchronously for the reason download() does — chapterIdsStream only
   /// refreshes that set through an async hop, so a repeat long-press would
-  /// otherwise enqueue a duplicate job. The row already renders a spinner
-  /// from that set, so the user sees the tap land.
+  /// otherwise enqueue a duplicate job. The chapter row renders its spinner
+  /// from that same set (manga_detail_screen.dart passes
+  /// isPrefetching: prefetchedChapterIds.contains(id)), so the user sees the
+  /// tap land and the already-queued long-press above is a no-op.
   void downloadChapter({required String chapterId}) {
     final mangaId = state.manga?.id;
     final source = state.manga?.source?.let(Sources.fromName);

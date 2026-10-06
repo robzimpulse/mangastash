@@ -131,7 +131,21 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     // message — saying "Nothing to download" during a running download would
     // be false (#119).
     if (cubit.state.isPrefetchingAll) return;
-    final enqueued = await cubit.download(option: option);
+    int enqueued;
+    try {
+      enqueued = await cubit.download(option: option);
+    } catch (e) {
+      // The chapter list is what resolves the download targets, so a failed
+      // fetch aborts the whole enqueue. download() has no catch of its own,
+      // so without this the error escapes the void async caller and the user
+      // gets no response at all — spec §4 requires "abort + snackbar, enqueue
+      // nothing". Strip the "Exception: " noise so this reads like the
+      // sibling "Failed to add manga: ..." wording in library_manga_screen.
+      if (!context.mounted) return;
+      final message = e.toString().replaceFirst('Exception: ', '');
+      context.showSnackBar(message: 'Failed to load chapters: $message');
+      return;
+    }
     if (!context.mounted) return;
     if (enqueued == 0) {
       context.showSnackBar(message: 'Nothing to download');
@@ -165,6 +179,14 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
       case MangaMenu.prefetch:
         // This screen's prefetch is parameterless — it prefetches the manga
         // already in state, not the long-pressed similar-manga entry.
+        //
+        // Deliberately silent, unlike the download case above: prefetch() is
+        // void and reports nothing back, so unlike download() there is no
+        // return value for a handler to turn into feedback. Leaving it alone
+        // keeps this case consistent with the bulk prefetch button, which has
+        // always signalled through isPrefetchingAll (the shared progress
+        // indicator) rather than a snackbar. Do not add a count here without
+        // first deciding what prefetch() should report (#119).
         await _cubit(context)?.prefetch();
     }
   }

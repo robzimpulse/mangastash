@@ -25,9 +25,9 @@ class _NullCacheManager extends Mock implements ImagesCacheManager {}
 
 class _MockLogBox extends Mock implements LogBox {}
 
-/// Tall enough that the collapsed app bar (40% of the viewport) still leaves
-/// the chapter list's action row on screen; the download menu is unreachable
-/// by hit test otherwise.
+/// Tall enough that the app bar (expandedHeight = 40% of the viewport height)
+/// still leaves the chapter list's action row inside the visible area; the
+/// download menu button is otherwise below the fold and cannot be hit-tested.
 const Size _viewport = Size(800, 2000);
 
 /// Pumps [frames] of 200ms each. ScaffoldScreen contains an always-animating
@@ -111,7 +111,8 @@ void main() {
       recrawlUseCase: MockRecrawlUseCase(),
       listenDownloadedChapterUseCase: listenDownloadedChapterUseCase,
     );
-    // The constructor registers five stream subscriptions; close() cancels
+    // The constructor registers four stream subscriptions plus, when the state
+    // carries a mangaId, the downloaded-chapter listener; close() cancels
     // them, so an unclosed cubit leaks every one.
     addTearDown(result.close);
     return result;
@@ -170,6 +171,43 @@ void main() {
   }
 
   group('download menu (#119)', () {
+    // Spec §4: "Chapter-list fetch fails -> abort + snackbar, enqueue
+    // nothing". download() has no catch, so without a handler here the error
+    // escapes through the void async caller and the user sees nothing at all.
+    testWidgets(
+      'a failed chapter-list fetch reports itself and queues nothing',
+      (tester) async {
+        when(
+          () => getAllChapterUseCase.execute(
+            source: any(named: 'source'),
+            mangaId: any(named: 'mangaId'),
+            parameter: any(named: 'parameter'),
+          ),
+        ).thenThrow(Exception('chapter fetch failed'));
+        cubit = buildCubit();
+        await pumpScreen(tester);
+
+        await tapDownloadOption(tester, 'All');
+
+        verifyNever(
+          () => prefetchChapterUseCase.prefetchChapter(
+            mangaId: any(named: 'mangaId'),
+            source: any(named: 'source'),
+            chapterId: any(named: 'chapterId'),
+          ),
+        );
+        // "Exception: " is stripped so the snackbar reads like the sibling
+        // "Failed to add manga: ..." wording in library_manga_screen.
+        expect(
+          find.text('Failed to load chapters: chapter fetch failed'),
+          findsOneWidget,
+        );
+        // download()'s finally block resets the flag on the throw, so a
+        // failed fetch must not leave the run stuck.
+        expect(cubit.state.isPrefetchingAll, isFalse);
+      },
+    );
+
     testWidgets(
       'All enqueues every chapter and drops the construction banner',
       (tester) async {
@@ -311,9 +349,9 @@ void main() {
       expect(find.text('Nothing to download'), findsOneWidget);
     });
 
-    // prefetch() is the other branch of the same menu; it reads the queued
-    // ids instead of writing them, so the state assertion above separates the
-    // two handlers.
+    // prefetch() is the other branch of the same menu. It reads the queued ids
+    // instead of writing them, so the assertion above separates it from
+    // download().
     testWidgets('Prefetch enqueues every chapter', (tester) async {
       cubit = buildCubit(
         initialState: const MangaDetailScreenState(
