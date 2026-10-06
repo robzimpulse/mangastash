@@ -6,7 +6,6 @@ import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:drift/drift.dart';
 import 'package:feature_common/feature_common.dart';
-import 'package:firebase_core_platform_interface/test.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -110,9 +109,6 @@ void testScreen(
     /// set initial values for shared preferences for legacy code
     /// ignore: invalid_use_of_visible_for_testing_member
     SharedPreferences.setMockInitialValues({});
-
-    /// mock firebase related feature
-    setupFirebaseCoreMocks();
 
     await IOOverrides.runWithIOOverrides(() async {
       await $.tester.runAsync(() async {
