@@ -119,9 +119,20 @@ class AppDatabase extends _$AppDatabase {
           await m.alterTable(TableMigration(relationshipTables));
         },
         from3To4: (m, schema) async {
-          // Delete first: JobDao._parse skips rows whose type has no enum
-          // value, so a surviving persistentImage row would wedge `single`
-          // on an unparsable head row that nothing ever removes.
+          // Delete first: 'persistentImage' is no longer a `JobTypeEnum`
+          // value, and a surviving row is NOT skippable. The generated
+          // `$JobTablesTable.map` converts `type` through
+          // `EnumNameConverter(JobTypeEnum.values)`, whose `fromSql` is
+          // `values.byName(...)` — it THROWS on an unknown stored name, and it
+          // throws while a joined query maps its rows, before `JobDao._parse`
+          // sees one: `_parse`'s `firstWhereOrNull` guard is dead code for an
+          // unknown name, not the safety net it looks like. Every joined read
+          // that maps the row then errors out (the three list streams map all
+          // rows, `single` its `limit(1)` head) and `JobManager` consumes
+          // `single` with no `onError` on the path, so it escapes as an
+          // unhandled async error every time the query re-runs. The row can
+          // never become a `JobModel`, so the `finally` calling `JobDao.remove`
+          // never runs and nothing else will ever drain it.
           await customStatement(
             "DELETE FROM job_tables WHERE type = 'persistentImage'",
           );
