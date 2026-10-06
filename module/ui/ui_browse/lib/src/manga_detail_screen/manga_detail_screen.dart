@@ -119,28 +119,43 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     _cubit(context)?.recrawl(context: context, url: url);
   }
 
+  // [manga] targets the long-pressed similar manga instead of the one on
+  // screen; null is the header popup's Download, which always means the manga
+  // this screen was opened for.
   void _onTapDownload({
     required BuildContext context,
     required DownloadOption option,
+    Manga? manga,
   }) async {
     final cubit = _cubit(context);
     if (cubit == null) return;
-    // download() returns 0 for two opposite situations: the chapter list has
-    // nothing left to queue, or its isPrefetchingAll guard rejected this tap
-    // because a bulk run is already in flight. Only the first is worth a
-    // message — saying "Nothing to download" during a running download would
-    // be false (#119).
-    if (cubit.state.isPrefetchingAll) return;
+    // Both cubit methods return 0 for two opposite situations: the chapter
+    // list has nothing left to queue, or their isPrefetchingAll guard
+    // rejected this tap because a bulk run is already in flight. The popup
+    // stays enabled during a run, so this handler — not the control — has to
+    // say which one it is: reporting "Nothing to download" mid-run would be
+    // false (#119).
+    if (cubit.state.isPrefetchingAll) {
+      context.showSnackBar(message: 'Download already in progress');
+      return;
+    }
     int enqueued;
     try {
-      enqueued = await cubit.download(option: option);
+      enqueued =
+          manga == null
+              ? await cubit.download(option: option)
+              // The long-press menu offers no Unread entry and read history
+              // is scoped to the manga on screen, so its download is always
+              // All — see MangaDetailScreenCubit.downloadManga.
+              : await cubit.downloadManga(manga: manga);
     } catch (e) {
       // The chapter list is what resolves the download targets, so a failed
-      // fetch aborts the whole enqueue. download() has no catch of its own,
-      // so without this the error escapes the void async caller and the user
-      // gets no response at all — spec §4 requires "abort + snackbar, enqueue
-      // nothing". Strip the "Exception: " noise so this reads like the
-      // sibling "Failed to add manga: ..." wording in library_manga_screen.
+      // fetch aborts the whole enqueue. Neither cubit method has a catch of
+      // its own, so without this the error escapes the void async caller and
+      // the user gets no response at all — spec §4 requires "abort +
+      // snackbar, enqueue nothing". Strip the "Exception: " noise so this
+      // reads like the sibling "Failed to add manga: ..." wording in
+      // library_manga_screen.
       if (!context.mounted) return;
       final message = e.toString().replaceFirst('Exception: ', '');
       context.showSnackBar(message: 'Failed to load chapters: $message');
@@ -173,7 +188,14 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         // Routed through _onTapDownload so the long-press menu and the
         // header popup share one handler — including the empty-target
         // snackbar, so this entry point can't silently do nothing (#119).
-        _onTapDownload(context: context, option: DownloadOption.all);
+        // The target travels with the call: this menu is only ever opened on
+        // a similar-manga tile, and without the manga argument the handler
+        // resolved the manga on screen instead (#119).
+        _onTapDownload(
+          context: context,
+          option: DownloadOption.all,
+          manga: manga,
+        );
       case MangaMenu.library:
         _onTapAddToLibrary(context: context, manga: manga);
       case MangaMenu.prefetch:

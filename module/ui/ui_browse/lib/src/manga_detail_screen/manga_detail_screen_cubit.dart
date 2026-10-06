@@ -456,9 +456,9 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   /// "restore" the prefetchManga call here without a reason (#119).
   Future<int> download({required DownloadOption option}) async {
     if (state.isPrefetchingAll) return 0;
-    final mangaId = state.manga?.id;
-    final source = state.manga?.source?.let(Sources.fromName);
-    if (mangaId == null || source == null) return 0;
+    final mangaId = state.manga?.id ?? state.mangaId;
+    final source = state.source;
+    if (mangaId == null || mangaId.isEmpty || source == null) return 0;
     emit(state.copyWith(isPrefetchingAll: true));
     try {
       final chapters = await _getAllChapterUseCase.execute(
@@ -490,6 +490,61 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
   }
 
+  /// Enqueues the chapters of [manga] — the similar-manga long-press menu's
+  /// Download (#119). Separate from [download] because that one is scoped to
+  /// the manga on screen: routing the menu case through it downloaded whatever
+  /// was in state while the snackbar named the long-pressed title.
+  ///
+  /// Always All semantics. Read history is filtered by manga id
+  /// ([_updateHistories]), so state.histories says nothing about [manga], and
+  /// the long-press menu offers no Unread entry — nothing is lost by pinning
+  /// the scope.
+  ///
+  /// Deliberately does NOT stage the enqueued ids into
+  /// [MangaDetailScreenState.prefetchedChapterIds]: that set renders the
+  /// on-screen chapter rows' spinners, and another series' ids would light up
+  /// rows that belong elsewhere. Dedup instead reads that same set, which
+  /// ListenPrefetchUseCase feeds from the whole job table, so it still covers
+  /// [manga]'s chapters.
+  ///
+  /// Shares download()'s isPrefetchingAll lane, so only one bulk run holds the
+  /// chapter list at a time and a repeat long-press re-enqueues nothing.
+  /// Returns the enqueued count, same contract as [download]; the screen's
+  /// handler checks isPrefetchingAll before it calls, so the only 0 that
+  /// reaches its snackbar is the genuine "nothing left to queue".
+  Future<int> downloadManga({required Manga manga}) async {
+    if (state.isPrefetchingAll) return 0;
+    final mangaId = manga.id;
+    // The similar list is fetched with state.source, so that is the resolver
+    // for every entry in it — [manga]'s own source string is not read.
+    final source = state.source;
+    if (mangaId == null || mangaId.isEmpty || source == null) return 0;
+    emit(state.copyWith(isPrefetchingAll: true));
+    try {
+      final chapters = await _getAllChapterUseCase.execute(
+        source: source,
+        mangaId: mangaId,
+        parameter: state.chapterParameter.copyWith(offset: 0, page: 1, limit: 20),
+      );
+      final targets = resolveDownloadChapterIds(
+        chapters: chapters,
+        readChapterIds: const {},
+        queuedChapterIds: state.prefetchedChapterIds,
+        unreadOnly: false,
+      );
+      for (final chapterId in targets) {
+        _prefetchChapterUseCase.prefetchChapter(
+          mangaId: mangaId,
+          source: source,
+          chapterId: chapterId,
+        );
+      }
+      return targets.length;
+    } finally {
+      emit(state.copyWith(isPrefetchingAll: false));
+    }
+  }
+
   /// Enqueues a single chapter — the chapter row's long-press action (#119).
   /// Same path as the bulk [download] without the scoping step: one id, no
   /// resolver.
@@ -502,9 +557,9 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   /// isPrefetching: prefetchedChapterIds.contains(id)), so the user sees the
   /// tap land and the already-queued long-press above is a no-op.
   void downloadChapter({required String chapterId}) {
-    final mangaId = state.manga?.id;
-    final source = state.manga?.source?.let(Sources.fromName);
-    if (mangaId == null || source == null) return;
+    final mangaId = state.manga?.id ?? state.mangaId;
+    final source = state.source;
+    if (mangaId == null || mangaId.isEmpty || source == null) return;
     if (state.prefetchedChapterIds.contains(chapterId)) return;
     _prefetchChapterUseCase.prefetchChapter(
       mangaId: mangaId,

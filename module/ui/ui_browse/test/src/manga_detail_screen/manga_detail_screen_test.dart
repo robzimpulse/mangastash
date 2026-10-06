@@ -46,6 +46,11 @@ void main() {
   late MangaDetailScreenCubit cubit;
 
   const manga = Manga(id: 'm-1', source: 'Manga Dex', title: 'Solo Leveling');
+  const similarManga = Manga(
+    id: 's-1',
+    source: 'Manga Dex',
+    title: 'Similar Manga',
+  );
   const chapters = [
     Chapter(id: 'a', chapter: '1'),
     Chapter(id: 'b', chapter: '2'),
@@ -91,11 +96,16 @@ void main() {
     final result = MangaDetailScreenCubit(
       initialState:
           initialState ??
-          const MangaDetailScreenState(
+          MangaDetailScreenState(
+            // The identity MangaDetailScreen.create puts in from the route
+            // params — download() resolves its target from mangaId + source,
+            // not from the loaded record (review on #119).
+            mangaId: 'm-1',
             manga: manga,
+            source: MangaDexSourceExternal(),
             chapters: chapters,
             totalChapter: 2,
-            similarManga: [Manga(id: 's-1', source: 'Manga Dex')],
+            similarManga: [similarManga],
           ),
       getMangaUseCase: MockGetMangaUseCase(),
       searchMangaUseCase: MockSearchMangaUseCase(),
@@ -170,6 +180,21 @@ void main() {
     return verification.captured.cast<String?>();
   }
 
+  /// Manga ids the chapter-list fetch was asked for, in call order. The stub
+  /// answers every id identically, so this is the only thing that separates
+  /// "downloaded the long-pressed manga" from "downloaded the one on screen".
+  List<String> fetchedMangaIds() {
+    final verification = verify(
+      () => getAllChapterUseCase.execute(
+        source: any(named: 'source'),
+        mangaId: captureAny(named: 'mangaId'),
+        parameter: any(named: 'parameter'),
+      ),
+    );
+    verification.called(greaterThan(0));
+    return verification.captured.cast<String>();
+  }
+
   group('download menu (#119)', () {
     // Spec §4: "Chapter-list fetch fails -> abort + snackbar, enqueue
     // nothing". download() has no catch, so without a handler here the error
@@ -227,11 +252,13 @@ void main() {
       tester,
     ) async {
       cubit = buildCubit(
-        initialState: const MangaDetailScreenState(
+        initialState: MangaDetailScreenState(
+          mangaId: 'm-1',
           manga: manga,
+          source: MangaDexSourceExternal(),
           chapters: chapters,
           totalChapter: 2,
-          histories: {'a': Chapter(id: 'a', lastReadAt: null)},
+          histories: const {'a': Chapter(id: 'a', lastReadAt: null)},
         ),
       );
       await pumpScreen(tester);
@@ -245,11 +272,13 @@ void main() {
       tester,
     ) async {
       cubit = buildCubit(
-        initialState: const MangaDetailScreenState(
+        initialState: MangaDetailScreenState(
+          mangaId: 'm-1',
           manga: manga,
+          source: MangaDexSourceExternal(),
           chapters: chapters,
           totalChapter: 2,
-          prefetchedChapterIds: {'a', 'b'},
+          prefetchedChapterIds: const {'a', 'b'},
         ),
       );
       await pumpScreen(tester);
@@ -267,14 +296,18 @@ void main() {
     });
 
     // download() returns 0 both for "nothing left to queue" and for "a run is
-    // already in flight". Only the first is worth a snackbar — a download is
-    // under way in the second, so saying so would be a lie.
-    testWidgets('a run already in flight shows no empty-target snackbar', (
+    // already in flight", and the popup stays enabled during a run — so the
+    // handler has to distinguish them. Claiming "Nothing to download" mid-run
+    // would be false; saying nothing at all leaves a live control that appears
+    // broken. It reports the run instead (#119).
+    testWidgets('a run already in flight says so instead of nothing to do', (
       tester,
     ) async {
       cubit = buildCubit(
-        initialState: const MangaDetailScreenState(
+        initialState: MangaDetailScreenState(
+          mangaId: 'm-1',
           manga: manga,
+          source: MangaDexSourceExternal(),
           chapters: chapters,
           totalChapter: 2,
           isPrefetchingAll: true,
@@ -291,7 +324,8 @@ void main() {
           chapterId: any(named: 'chapterId'),
         ),
       );
-      expect(find.byType(SnackBar), findsNothing);
+      expect(find.text('Download already in progress'), findsOneWidget);
+      expect(find.text('Nothing to download'), findsNothing);
     });
   });
 
@@ -303,36 +337,36 @@ void main() {
       await pumpFrames(tester);
     }
 
-    testWidgets('Download enqueues every chapter', (tester) async {
-      cubit = buildCubit(
-        initialState: const MangaDetailScreenState(
-          manga: manga,
-          similarManga: [
-            Manga(id: 's-1', source: 'Manga Dex', title: 'Similar Manga'),
-          ],
-        ),
-      );
+    testWidgets('Download enqueues every chapter of the long-pressed manga', (
+      tester,
+    ) async {
+      cubit = buildCubit();
       await pumpScreen(tester, onMangaMenu: MangaMenu.download);
 
       await longPressSimilarManga(tester);
 
       expect(enqueuedChapterIds(), ['a', 'b']);
+      // The routing assertion that matters: the getAllChapterUseCase stub
+      // answers every mangaId with the same chapters, so the enqueued ids
+      // above are identical whether the menu targeted the long-pressed manga
+      // or the one on screen. Only the requested id tells them apart.
+      expect(fetchedMangaIds(), ['s-1']);
       expect(find.textContaining('Under Construction'), findsNothing);
-      // download() stages the queued ids into state synchronously, which is
-      // what keeps a double tap from re-enqueueing (#119).
-      expect(cubit.state.prefetchedChapterIds, {'a', 'b'});
+      // The similar manga's chapters are NOT staged into the screen's set —
+      // it renders this manga's chapter rows' spinners.
+      expect(cubit.state.prefetchedChapterIds, isEmpty);
     });
 
     // The menu routes through the same handler as the header popup, so it
     // gets the same empty-target feedback instead of silently doing nothing.
     testWidgets('Download explains an empty target', (tester) async {
       cubit = buildCubit(
-        initialState: const MangaDetailScreenState(
+        initialState: MangaDetailScreenState(
+          mangaId: 'm-1',
           manga: manga,
-          prefetchedChapterIds: {'a', 'b'},
-          similarManga: [
-            Manga(id: 's-1', source: 'Manga Dex', title: 'Similar Manga'),
-          ],
+          source: MangaDexSourceExternal(),
+          prefetchedChapterIds: const {'a', 'b'},
+          similarManga: const [similarManga],
         ),
       );
       await pumpScreen(tester, onMangaMenu: MangaMenu.download);
@@ -349,23 +383,19 @@ void main() {
       expect(find.text('Nothing to download'), findsOneWidget);
     });
 
-    // prefetch() is the other branch of the same menu. It reads the queued ids
-    // instead of writing them, so the assertion above separates it from
-    // download().
+    // prefetch() is the other branch of the same menu. It prefetches the manga
+    // on screen rather than the long-pressed entry, so the fetched id asserted
+    // below is what separates it from download().
     testWidgets('Prefetch enqueues every chapter', (tester) async {
-      cubit = buildCubit(
-        initialState: const MangaDetailScreenState(
-          manga: manga,
-          similarManga: [
-            Manga(id: 's-1', source: 'Manga Dex', title: 'Similar Manga'),
-          ],
-        ),
-      );
+      cubit = buildCubit();
       await pumpScreen(tester, onMangaMenu: MangaMenu.prefetch);
 
       await longPressSimilarManga(tester);
 
       expect(enqueuedChapterIds(), ['a', 'b']);
+      // The on-screen manga, not the long-pressed one: this screen's prefetch
+      // is parameterless (see the prefetch menu case).
+      expect(fetchedMangaIds(), ['m-1']);
       expect(cubit.state.prefetchedChapterIds, isEmpty);
     });
   });

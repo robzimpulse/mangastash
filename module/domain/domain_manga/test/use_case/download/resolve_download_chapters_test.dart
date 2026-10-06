@@ -2,8 +2,10 @@
 // pure filter over a chapter list, so these cases pin the two scoping choices
 // the download button depends on: "All" keeps read chapters but still skips
 // chapters already queued (re-queuing would duplicate jobs), and "Unread"
-// additionally drops read ones. Chapters without an id cannot be queued —
-// the prefetch pipeline is keyed by chapter id — so they are dropped.
+// additionally drops read ones — falling back to All when no read history is
+// available, because an empty history is not the same as "everything read".
+// Chapters without an id cannot be queued — the prefetch pipeline is keyed by
+// chapter id — so they are dropped.
 //
 // Run with: fvm flutter test test/use_case/download/resolve_download_chapters_test.dart
 import 'package:domain_manga/src/use_case/download/resolve_download_chapters.dart';
@@ -41,6 +43,21 @@ void main() {
       unreadOnly: true,
     );
     expect(result, isEmpty);
+  });
+
+  // Spec §4: "Read-history unavailable -> fall back to All". An empty history
+  // is not "everything is read" — it is "nothing has been read yet", or the
+  // manga record failed to load and the cubit never had history for it. A
+  // guard like `if (readChapterIds.isEmpty) return []` would silently turn
+  // Unread into a no-op on every fresh series.
+  test('missing read history falls back to all', () {
+    final result = resolveDownloadChapterIds(
+      chapters: [chapter('a'), chapter('b'), chapter('c')],
+      readChapterIds: {},
+      queuedChapterIds: {},
+      unreadOnly: true,
+    );
+    expect(result, ['a', 'b', 'c']);
   });
 
   test('null ids are skipped', () {
