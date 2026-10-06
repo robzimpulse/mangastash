@@ -88,11 +88,21 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     _removeFromLibraryUseCase.execute(manga: manga);
   }
 
+  /// Enqueues [manga] and its full chapter list for prefetching — the same
+  /// two jobs prefetch() enqueues (#119). Resolves the source by name because
+  /// [Manga.source] holds the source *name*, not the SourceExternal the use
+  /// cases take; an unknown name has no source to enqueue against, so the
+  /// action no-ops.
+  ///
+  /// Unlike prefetch() this does not skip mangas already in the job queue: it
+  /// takes a single already-resolved manga from the menu action rather than a
+  /// bulk selection, so it keeps the direct enqueue.
   void download({required Manga manga}) {
     final id = manga.id;
-    final source = manga.source;
+    final source = manga.source?.let(Sources.fromName);
     if (id == null || source == null) return;
-    // TODO: add download manga
+    _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
+    _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);
   }
 
   /// Adds a manga from a pasted [url]. Failures (unparseable URL, unknown

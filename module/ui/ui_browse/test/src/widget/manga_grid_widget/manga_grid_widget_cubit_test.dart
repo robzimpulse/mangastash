@@ -299,4 +299,95 @@ void main() {
       await Future.wait([first, second]);
     });
   });
+
+  // Issue #119: the Download menu item used to be an inert stub. It now
+  // enqueues the same two jobs as prefetch() — the manga record and its full
+  // chapter list — resolving the source by name like prefetch() does, because
+  // Manga.source holds the source *name*, not the SourceExternal the use cases
+  // take.
+  group('MangaGridWidgetCubit.download (#119)', () {
+    late MockPrefetchMangaUseCase prefetchMangaUseCase;
+    late MockPrefetchChapterUseCase prefetchChapterUseCase;
+    late MangaGridWidgetCubit downloadCubit;
+
+    setUp(() {
+      prefetchMangaUseCase = MockPrefetchMangaUseCase();
+      prefetchChapterUseCase = MockPrefetchChapterUseCase();
+      downloadCubit = MangaGridWidgetCubit(
+        initialState: MangaGridWidgetState(source: MangaDexSourceExternal()),
+        parentCubit: mockSearchMangaScreenCubit(),
+        listenMangaFromLibraryUseCase: mockListenMangaFromLibraryUseCase(),
+        listenSearchParameterUseCase: mockListenSearchParameterUseCase(),
+        listenPrefetchMangaUseCase: mockListenPrefetchUseCase(),
+        searchMangaUseCase: MockSearchMangaUseCase(),
+        recrawlUseCase: MockRecrawlUseCase(),
+        prefetchMangaUseCase: prefetchMangaUseCase,
+        prefetchChapterUseCase: prefetchChapterUseCase,
+        removeFromLibraryUseCase: MockRemoveFromLibraryUseCase(),
+        addToLibraryUseCase: MockAddToLibraryUseCase(),
+      );
+      addTearDown(downloadCubit.close);
+    });
+
+    test('enqueues the manga and its chapters with the resolved source', () {
+      downloadCubit.download(
+        manga: const Manga(id: 'm-1', source: 'Manga Dex'),
+      );
+
+      final mangaVerification = verify(
+        () => prefetchMangaUseCase.prefetchManga(
+          mangaId: 'm-1',
+          source: captureAny(named: 'source'),
+        ),
+      );
+      mangaVerification.called(1);
+      expect(
+        mangaVerification.captured[0],
+        isA<MangaDexSourceExternal>(),
+      );
+      final chapterVerification = verify(
+        () => prefetchChapterUseCase.prefetchChapters(
+          mangaId: 'm-1',
+          source: captureAny(named: 'source'),
+        ),
+      );
+      chapterVerification.called(1);
+      expect(
+        chapterVerification.captured[0],
+        isA<MangaDexSourceExternal>(),
+      );
+    });
+
+    // Enqueues are all-or-nothing per manga: an unknown source name resolves to
+    // null (the job would carry no source to fetch from) and a null id cannot
+    // key the job, so neither may enqueue. The valid download first proves the
+    // path is live — otherwise these count as 0 and pass for the wrong reason.
+    test('enqueues nothing for an unknown source or a missing id', () {
+      downloadCubit.download(
+        manga: const Manga(id: 'm-1', source: 'Manga Dex'),
+      );
+      downloadCubit.download(
+        manga: const Manga(id: 'm-2', source: 'Removed Source'),
+      );
+      downloadCubit.download(manga: const Manga(source: 'Manga Dex'));
+
+      // Only the first manga's two jobs — m-2 and the id-less manga skipped.
+      final mangaVerification = verify(
+        () => prefetchMangaUseCase.prefetchManga(
+          mangaId: captureAny(named: 'mangaId'),
+          source: any(named: 'source'),
+        ),
+      );
+      mangaVerification.called(1);
+      expect(mangaVerification.captured, ['m-1']);
+      final chapterVerification = verify(
+        () => prefetchChapterUseCase.prefetchChapters(
+          mangaId: captureAny(named: 'mangaId'),
+          source: any(named: 'source'),
+        ),
+      );
+      chapterVerification.called(1);
+      expect(chapterVerification.captured, ['m-1']);
+    });
+  });
 }

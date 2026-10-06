@@ -436,6 +436,60 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
     }
   }
 
+  /// Enqueues chapters of the manga on the prefetch pipeline, scoped by
+  /// [option]: unread chapters only, or every chapter.
+  ///
+  /// Returns how many chapters were enqueued, so the caller can tell real
+  /// queueing from "nothing left to download" — the screen shows the
+  /// empty-target snackbar on 0 (#119).
+  ///
+  /// Reuses prefetch()'s #127 guards (one run at a time, chapters already in
+  /// the job queue skipped) and additionally stages the enqueued ids into
+  /// state *synchronously*: chapterIdsStream only refreshes
+  /// [MangaDetailScreenState.prefetchedChapterIds] through an async hop, so
+  /// without the synchronous emit a double tap re-enqueues everything before
+  /// the stream emits.
+  ///
+  /// Unlike the bulk cubits' download, no prefetchManga job is enqueued: this
+  /// screen already holds the manga, loaded and DB-synced by init(), and that
+  /// job re-fetches (useCache: false) the very record on display. Do not
+  /// "restore" the prefetchManga call here without a reason (#119).
+  Future<int> download({required DownloadOption option}) async {
+    if (state.isPrefetchingAll) return 0;
+    final mangaId = state.manga?.id;
+    final source = state.manga?.source?.let(Sources.fromName);
+    if (mangaId == null || source == null) return 0;
+    emit(state.copyWith(isPrefetchingAll: true));
+    try {
+      final chapters = await _getAllChapterUseCase.execute(
+        source: source,
+        mangaId: mangaId,
+        parameter: state.chapterParameter.copyWith(offset: 0, page: 1, limit: 20),
+      );
+      final targets = resolveDownloadChapterIds(
+        chapters: chapters,
+        readChapterIds: state.histories.keys.toSet(),
+        queuedChapterIds: state.prefetchedChapterIds,
+        unreadOnly: option == DownloadOption.unread,
+      );
+      if (targets.isEmpty) return 0;
+      final queued = {...state.prefetchedChapterIds};
+      for (final chapterId in targets) {
+        if (queued.contains(chapterId)) continue;
+        _prefetchChapterUseCase.prefetchChapter(
+          mangaId: mangaId,
+          source: source,
+          chapterId: chapterId,
+        );
+        queued.add(chapterId);
+      }
+      emit(state.copyWith(prefetchedChapterIds: queued));
+      return targets.length;
+    } finally {
+      emit(state.copyWith(isPrefetchingAll: false));
+    }
+  }
+
   void recrawl({required BuildContext context, required String url}) async {
     // Await the re-crawl before refreshing: the fetches below read the
     // html cache the re-crawl writes, so starting them early serves the

@@ -248,11 +248,17 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
     }
   }
 
+  /// Enqueues [manga] and its full chapter list for prefetching — the same
+  /// two jobs prefetch() enqueues (#119). Resolves the source by name because
+  /// [Manga.source] holds the source *name*, not the SourceExternal the use
+  /// cases take; an unknown name has no source to enqueue against, so the
+  /// action no-ops.
   void download({required Manga manga}) {
     final id = manga.id;
-    final source = manga.source;
+    final source = manga.source?.let(Sources.fromName);
     if (id == null || source == null) return;
-    // TODO: add download manga
+    _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
+    _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);
   }
 }
 
