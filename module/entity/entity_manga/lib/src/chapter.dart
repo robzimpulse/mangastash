@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 
 import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
@@ -202,6 +203,13 @@ class Chapter extends Equatable {
     try {
       return Chapter.fromJson(json.decode(value) as Map<String, dynamic>);
     } catch (e) {
+      // Corrupt cached JSON degrades to null by design; log it so the
+      // failure is visible in DevTools instead of silent (issue #131).
+      developer.log(
+        'fromJsonString failed',
+        name: 'Chapter',
+        error: e,
+      );
       return null;
     }
   }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -83,6 +84,13 @@ class Pagination<T extends Equatable> extends Equatable {
         fromJsonT,
       );
     } catch (e) {
+      // Corrupt cached JSON degrades to null by design; log it so the
+      // failure is visible in DevTools instead of silent (issue #131).
+      developer.log(
+        'fromJsonString failed',
+        name: 'Pagination<$T>',
+        error: e,
+      );
       return null;
     }
   }

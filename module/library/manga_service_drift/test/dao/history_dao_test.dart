@@ -85,5 +85,39 @@ void main() {
       expect(result.length, 1);
       expect(result.first.chapter?.id, 'c_unread_lib');
     });
+
+    // Issue #131: `unread` froze its 7-day boundary at stream creation, so
+    // on a long-lived stream chapters older than 7 days never dropped out.
+    // The window must recompute from the (advancing) clock on refresh ticks.
+    test('unread stream advances its 7-day window as time passes (#131)', () async {
+      var now = DateTime.now();
+      final dao = HistoryDao(
+        db,
+        clock: () => now,
+        refreshInterval: const Duration(milliseconds: 100),
+      );
+
+      final emissions = <List<HistoryModel>>[];
+      final subscription = dao.unread.listen(emissions.add);
+      // Wait for the first (immediate) emission plus a refresh tick.
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      expect(emissions, isNotEmpty);
+      // c_unread_lib is readable "now" — inside the fresh window.
+      expect(
+        emissions.first.where((e) => e.chapter?.id == 'c_unread_lib'),
+        isNotEmpty,
+      );
+
+      // 8 days later the chapter is outside the window; the next refresh
+      // tick must rebuild the query with the moved boundary and drop it.
+      now = now.add(const Duration(days: 8));
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      await subscription.cancel();
+
+      expect(
+        emissions.last.where((e) => e.chapter?.id == 'c_unread_lib'),
+        isEmpty,
+      );
+    });
   });
 }
