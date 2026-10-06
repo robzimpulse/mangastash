@@ -150,6 +150,23 @@ void main() {
       expect(count, 1);
     });
 
+    test('job type vocabulary drops the dead persistentImage type', () {
+      // `JobDao._parse` resolves a row's stored `type` through
+      // `JobTypeEnum.values`, and the v3 -> v4 migration deletes every legacy
+      // row named 'persistentImage' precisely because nothing can drain it
+      // any more. The enum and that migration have to agree, otherwise the
+      // migration only erases a name the app can still write.
+      expect(
+        JobTypeEnum.values.map((e) => e.name),
+        unorderedEquals([
+          'prefetchManga',
+          'prefetchChapters',
+          'prefetchChapter',
+          'prefetchImage',
+        ]),
+      );
+    });
+
     test('add skips duplicate prefetchImage job', () async {
       const job = JobTablesCompanion(
         type: Value(JobTypeEnum.prefetchImage),

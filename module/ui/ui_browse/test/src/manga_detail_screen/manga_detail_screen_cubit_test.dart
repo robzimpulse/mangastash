@@ -1,6 +1,16 @@
-// Tests for MangaDetailScreenCubit.recrawl: the built-in MangaDex source has
-// no scraping use cases (getters throw UnimplementedError by design), so
-// recrawl must pass an empty scripts list instead of crashing.
+// Tests for MangaDetailScreenCubit, grouped by the fix that introduced each
+// case:
+//
+//   - recrawl — the built-in MangaDex source has no scraping use cases (getters
+//     throw UnimplementedError by design), so recrawl must pass an empty scripts
+//     list instead of crashing; plus #130, recrawl must await the re-crawl
+//     before the refetches that read the html cache it writes.
+//   - init (#122) — loading/paging flags must never be stranded by a throw.
+//   - in-flight guards (#127) — repeat taps on addToLibrary and prefetch are
+//     no-ops, and chapters already in the job queue are not re-enqueued.
+//   - download (#119) — All/Unread scoping, the enqueued-count contract the
+//     screen's snackbars depend on, the synchronous staging of queued ids, the
+//     isPrefetchingAll lane, and downloadManga / downloadChapter.
 //
 // Run with: fvm flutter test test/src/manga_detail_screen/manga_detail_screen_cubit_test.dart
 import 'dart:async';
@@ -532,6 +542,528 @@ void main() {
           useCache: any(named: 'useCache'),
         ),
       ).called(1);
+    });
+  });
+
+  // Issue #119: download enqueues chapters onto the prefetch pipeline. Two
+  // contracts matter to the screen that calls it — the returned count is what
+  // separates "queued work" from "nothing to queue", and a second tap must not
+  // re-enqueue chapters whose ids are still travelling back through the async
+  // chapterIdsStream hop.
+  group('download (#119)', () {
+    late MockGetAllChapterUseCase getAllChapterUseCase;
+    late MockPrefetchChapterUseCase prefetchChapterUseCase;
+    late MangaDetailScreenCubit downloadCubit;
+
+    /// Builds the subject, publishes it as [downloadCubit], and registers its
+    /// own teardown. Tests assign `downloadCubit = buildCubit(...)` so a custom
+    /// initialState is one argument away.
+    ///
+    /// The default state carries the identity `MangaDetailScreen.create` puts
+    /// in from the route params — mangaId AND source — because download()
+    /// resolves its target from those two, not from the loaded record (see the
+    /// guard tests below).
+    MangaDetailScreenCubit buildCubit({MangaDetailScreenState? initialState}) {
+      // The constructor subscribes to the downloaded-chapter stream as soon as
+      // the state carries a mangaId; unstubbed, the mock returns null.
+      final listenDownloadedChapterUseCase = MockListenDownloadedChapterUseCase();
+      when(
+        () => listenDownloadedChapterUseCase.execute(
+          mangaId: any(named: 'mangaId'),
+        ),
+      ).thenAnswer((_) => const Stream.empty());
+      downloadCubit = MangaDetailScreenCubit(
+        initialState:
+            initialState ??
+            MangaDetailScreenState(
+              mangaId: 'm-1',
+              manga: const Manga(id: 'm-1', source: 'Manga Dex'),
+              source: MangaDexSourceExternal(),
+            ),
+        getMangaUseCase: MockGetMangaUseCase(),
+        searchMangaUseCase: MockSearchMangaUseCase(),
+        searchChapterUseCase: MockSearchChapterUseCase(),
+        addToLibraryUseCase: MockAddToLibraryUseCase(),
+        removeFromLibraryUseCase: MockRemoveFromLibraryUseCase(),
+        listenMangaFromLibraryUseCase: mockListenMangaFromLibraryUseCase(),
+        listenPrefetchUseCase: mockListenPrefetchUseCase(),
+        prefetchChapterUseCase: prefetchChapterUseCase,
+        listenReadHistoryUseCase: mockListenReadHistoryUseCase(),
+        listenSearchParameterUseCase: mockListenSearchParameterUseCase(),
+        getAllChapterUseCase: getAllChapterUseCase,
+        recrawlUseCase: MockRecrawlUseCase(),
+        listenDownloadedChapterUseCase: listenDownloadedChapterUseCase,
+      );
+      // The constructor registers four stream subscriptions plus, when the
+      // state carries a mangaId, a fifth for the downloaded-chapter listener —
+      // close() is what cancels them, so an unclosed cubit leaks every one.
+      addTearDown(downloadCubit.close);
+      return downloadCubit;
+    }
+
+    setUp(() {
+      getAllChapterUseCase = MockGetAllChapterUseCase();
+      prefetchChapterUseCase = MockPrefetchChapterUseCase();
+    });
+
+    void stubChapters(List<Chapter> chapters) {
+      when(
+        () => getAllChapterUseCase.execute(
+          source: any(named: 'source'),
+          mangaId: any(named: 'mangaId'),
+          parameter: any(named: 'parameter'),
+        ),
+      ).thenAnswer((_) async => chapters);
+    }
+
+    test('download all enqueues one job per unqueued chapter', () async {
+      downloadCubit = buildCubit(
+        initialState: MangaDetailScreenState(
+          mangaId: 'm-1',
+          manga: const Manga(id: 'm-1', source: 'Manga Dex'),
+          source: MangaDexSourceExternal(),
+          prefetchedChapterIds: const {'a'},
+        ),
+      );
+      stubChapters(const [Chapter(id: 'a'), Chapter(id: 'b')]);
+
+      final enqueued = await downloadCubit.download(
+        option: DownloadOption.all,
+      );
+
+      expect(enqueued, 1);
+      verify(
+        () => prefetchChapterUseCase.prefetchChapter(
+          mangaId: 'm-1',
+          source: any(named: 'source'),
+          chapterId: 'b',
+        ),
+      ).called(1);
+      verifyNever(
+        () => prefetchChapterUseCase.prefetchChapter(
+          mangaId: any(named: 'mangaId'),
+          source: any(named: 'source'),
+          chapterId: 'a',
+        ),
+      );
+      expect(downloadCubit.state.isPrefetchingAll, isFalse);
+    });
+
+    test('download unread with everything read enqueues nothing', () async {
+      downloadCubit = buildCubit(
+        initialState: MangaDetailScreenState(
+          mangaId: 'm-1',
+          manga: const Manga(id: 'm-1', source: 'Manga Dex'),
+          source: MangaDexSourceExternal(),
+          histories: const {'a': Chapter(id: 'a')},
+        ),
+      );
+      stubChapters(const [Chapter(id: 'a')]);
+
+      final enqueued = await downloadCubit.download(
+        option: DownloadOption.unread,
+      );
+
+      expect(enqueued, 0);
+      verifyNever(
+        () => prefetchChapterUseCase.prefetchChapter(
+          mangaId: any(named: 'mangaId'),
+          source: any(named: 'source'),
+          chapterId: any(named: 'chapterId'),
+        ),
+      );
+      expect(downloadCubit.state.isPrefetchingAll, isFalse);
+    });
+
+    // The scope only differs for read chapters: "unread" must still queue an
+    // unread one sitting next to a read sibling, otherwise the option would
+    // degrade into "enqueue nothing".
+    test('download unread still enqueues the chapters with no read history', () async {
+      downloadCubit = buildCubit(
+        initialState: MangaDetailScreenState(
+          mangaId: 'm-1',
+          manga: const Manga(id: 'm-1', source: 'Manga Dex'),
+          source: MangaDexSourceExternal(),
+          histories: const {'a': Chapter(id: 'a')},
+        ),
+      );
+      stubChapters(const [Chapter(id: 'a'), Chapter(id: 'b')]);
+
+      final enqueued = await downloadCubit.download(
+        option: DownloadOption.unread,
+      );
+
+      expect(enqueued, 1);
+      verify(
+        () => prefetchChapterUseCase.prefetchChapter(
+          mangaId: any(named: 'mangaId'),
+          source: any(named: 'source'),
+          chapterId: 'b',
+        ),
+      ).called(1);
+    });
+
+    test('download returns 0 when every chapter is already queued', () async {
+      downloadCubit = buildCubit(
+        initialState: MangaDetailScreenState(
+          mangaId: 'm-1',
+          manga: const Manga(id: 'm-1', source: 'Manga Dex'),
+          source: MangaDexSourceExternal(),
+          prefetchedChapterIds: const {'a', 'b'},
+        ),
+      );
+      stubChapters(const [Chapter(id: 'a'), Chapter(id: 'b')]);
+
+      final enqueued = await downloadCubit.download(
+        option: DownloadOption.all,
+      );
+
+      expect(enqueued, 0);
+      verifyNever(
+        () => prefetchChapterUseCase.prefetchChapter(
+          mangaId: any(named: 'mangaId'),
+          source: any(named: 'source'),
+          chapterId: any(named: 'chapterId'),
+        ),
+      );
+    });
+
+    // chapterIdsStream is stubbed to an empty stream — it never emits, so the
+    // queued set can only come from download's own synchronous emit. Without
+    // it the second tap reads the same state and re-enqueues every chapter.
+    test('a double tap enqueues once', () async {
+      downloadCubit = buildCubit();
+      stubChapters(const [Chapter(id: 'a'), Chapter(id: 'b')]);
+
+      final first = await downloadCubit.download(option: DownloadOption.all);
+      final second = await downloadCubit.download(option: DownloadOption.all);
+
+      expect(first, 2);
+      expect(second, 0);
+      final verification = verify(
+        () => prefetchChapterUseCase.prefetchChapter(
+          mangaId: any(named: 'mangaId'),
+          source: any(named: 'source'),
+          chapterId: captureAny(named: 'chapterId'),
+        ),
+      );
+      verification.called(2);
+      expect(verification.captured, ['a', 'b']);
+      expect(downloadCubit.state.prefetchedChapterIds, {'a', 'b'});
+    });
+
+    test('download is ignored while another run is already in flight', () async {
+      downloadCubit = buildCubit();
+      final gate = Completer<List<Chapter>>();
+      when(
+        () => getAllChapterUseCase.execute(
+          source: any(named: 'source'),
+          mangaId: any(named: 'mangaId'),
+          parameter: any(named: 'parameter'),
+        ),
+      ).thenAnswer((_) => gate.future);
+
+      final first = downloadCubit.download(option: DownloadOption.all);
+      await pumpEventQueue();
+      expect(downloadCubit.state.isPrefetchingAll, isTrue);
+      final second = await downloadCubit.download(option: DownloadOption.all);
+
+      expect(second, 0);
+      verify(
+        () => getAllChapterUseCase.execute(
+          source: any(named: 'source'),
+          mangaId: any(named: 'mangaId'),
+          parameter: any(named: 'parameter'),
+        ),
+      ).called(1);
+
+      gate.complete(const [Chapter(id: 'a')]);
+      expect(await first, 1);
+      verify(
+        () => prefetchChapterUseCase.prefetchChapter(
+          mangaId: any(named: 'mangaId'),
+          source: any(named: 'source'),
+          chapterId: any(named: 'chapterId'),
+        ),
+      ).called(1);
+      expect(downloadCubit.state.isPrefetchingAll, isFalse);
+    });
+
+    // Identity comes from state.manga?.id ?? state.mangaId plus state.source
+    // (same as _fetchManga), so a state carrying no id at all is the only
+    // "no manga to download" case left. Task 5 turns the 0 into the snackbar,
+    // so this guard is the whole "safe no-op" contract.
+    test(
+      'download returns 0 without fetching when the state carries no id',
+      () async {
+        downloadCubit = buildCubit(
+          initialState: const MangaDetailScreenState(),
+        );
+
+        final enqueued = await downloadCubit.download(
+          option: DownloadOption.all,
+        );
+
+        expect(enqueued, 0);
+        verifyNever(
+          () => getAllChapterUseCase.execute(
+            source: any(named: 'source'),
+            mangaId: any(named: 'mangaId'),
+            parameter: any(named: 'parameter'),
+          ),
+        );
+        verifyNever(
+          () => prefetchChapterUseCase.prefetchChapter(
+            mangaId: any(named: 'mangaId'),
+            source: any(named: 'source'),
+            chapterId: any(named: 'chapterId'),
+          ),
+        );
+        expect(downloadCubit.state.isPrefetchingAll, isFalse);
+      },
+    );
+
+    // state.source is resolved once at construction from the route param, so
+    // "no source" is the whole guard — the manga's own `source` string is no
+    // longer consulted and an unresolvable one cannot block the download.
+    test(
+      'download returns 0 without fetching when the state carries no source',
+      () async {
+        downloadCubit = buildCubit(
+          initialState: const MangaDetailScreenState(
+            mangaId: 'm-1',
+            manga: Manga(id: 'm-1', source: 'Manga Dex'),
+          ),
+        );
+
+        final enqueued = await downloadCubit.download(
+          option: DownloadOption.all,
+        );
+
+        expect(enqueued, 0);
+        verifyNever(
+          () => getAllChapterUseCase.execute(
+            source: any(named: 'source'),
+            mangaId: any(named: 'mangaId'),
+            parameter: any(named: 'parameter'),
+          ),
+        );
+        verifyNever(
+          () => prefetchChapterUseCase.prefetchChapter(
+            mangaId: any(named: 'mangaId'),
+            source: any(named: 'source'),
+            chapterId: any(named: 'chapterId'),
+          ),
+        );
+        expect(downloadCubit.state.isPrefetchingAll, isFalse);
+      },
+    );
+
+    // GetMangaUseCase returning an Error is routine on scraped sources (issue
+    // #119 review), and initChapter still populates the chapter list from the
+    // route identity. Downloading from that state must enqueue, not report
+    // "Nothing to download" for a chapter list the user can see.
+    test('download enqueues when only the manga record failed to load', () async {
+      downloadCubit = buildCubit(
+        initialState: MangaDetailScreenState(
+          mangaId: 'm-1',
+          source: MangaDexSourceExternal(),
+        ),
+      );
+      stubChapters(const [Chapter(id: 'a'), Chapter(id: 'b')]);
+
+      final enqueued = await downloadCubit.download(
+        option: DownloadOption.all,
+      );
+
+      expect(enqueued, 2);
+      verify(
+        () => prefetchChapterUseCase.prefetchChapter(
+          mangaId: 'm-1',
+          source: any(named: 'source'),
+          chapterId: any(named: 'chapterId'),
+        ),
+      ).called(2);
+    });
+
+    test('downloadChapter enqueues when the manga record failed to load', () {
+      downloadCubit = buildCubit(
+        initialState: MangaDetailScreenState(
+          mangaId: 'm-1',
+          source: MangaDexSourceExternal(),
+        ),
+      );
+
+      downloadCubit.downloadChapter(chapterId: 'a');
+
+      verify(
+        () => prefetchChapterUseCase.prefetchChapter(
+          mangaId: 'm-1',
+          source: any(named: 'source'),
+          chapterId: 'a',
+        ),
+      ).called(1);
+      // The row still shows its spinner — this chapter belongs to the manga on
+      // screen, so staging it is meaningful here (unlike downloadManga).
+      expect(downloadCubit.state.prefetchedChapterIds, {'a'});
+    });
+
+    test('downloadChapter enqueues nothing without a source', () {
+      downloadCubit = buildCubit(
+        initialState: const MangaDetailScreenState(
+          mangaId: 'm-1',
+          manga: Manga(id: 'm-1', source: 'Manga Dex'),
+        ),
+      );
+
+      downloadCubit.downloadChapter(chapterId: 'a');
+
+      verifyNever(
+        () => prefetchChapterUseCase.prefetchChapter(
+          mangaId: any(named: 'mangaId'),
+          source: any(named: 'source'),
+          chapterId: any(named: 'chapterId'),
+        ),
+      );
+      expect(downloadCubit.state.prefetchedChapterIds, isEmpty);
+    });
+
+    // The similar-manga long press. It used to route through download(), which
+    // reads state.manga — so it downloaded whatever was on screen while the
+    // snackbar named the long-pressed title.
+    group('downloadManga — the similar-manga long press (#119)', () {
+      const similar = Manga(id: 's-1', source: 'Manga Dex');
+
+      test('fetches and enqueues for the manga it was given, not the screen', () async {
+        downloadCubit = buildCubit();
+        stubChapters(const [Chapter(id: 'a'), Chapter(id: 'b')]);
+
+        final enqueued = await downloadCubit.downloadManga(manga: similar);
+
+        expect(enqueued, 2);
+        final fetched = verify(
+          () => getAllChapterUseCase.execute(
+            source: any(named: 'source'),
+            mangaId: captureAny(named: 'mangaId'),
+            parameter: any(named: 'parameter'),
+          ),
+        );
+        fetched.called(1);
+        expect(fetched.captured, ['s-1']);
+        verify(
+          () => prefetchChapterUseCase.prefetchChapter(
+            mangaId: 's-1',
+            source: any(named: 'source'),
+            chapterId: any(named: 'chapterId'),
+          ),
+        ).called(2);
+      });
+
+      // prefetchedChapterIds renders the on-screen chapter rows' spinners;
+      // this manga's ids would light up rows that belong to a different
+      // series, so they are deliberately not staged.
+      test('does not stage the enqueued ids into the screen chapter set', () async {
+        downloadCubit = buildCubit();
+        stubChapters(const [Chapter(id: 'a'), Chapter(id: 'b')]);
+
+        await downloadCubit.downloadManga(manga: similar);
+
+        expect(downloadCubit.state.prefetchedChapterIds, isEmpty);
+      });
+
+      // Dedupe still applies — chapterIdsStream is a whole-job-table feed, so
+      // this set covers the other manga's chapters too.
+      test('skips chapters already sitting in the job queue', () async {
+        downloadCubit = buildCubit(
+          initialState: MangaDetailScreenState(
+            mangaId: 'm-1',
+            manga: const Manga(id: 'm-1', source: 'Manga Dex'),
+            source: MangaDexSourceExternal(),
+            prefetchedChapterIds: const {'a'},
+          ),
+        );
+        stubChapters(const [Chapter(id: 'a'), Chapter(id: 'b')]);
+
+        final enqueued = await downloadCubit.downloadManga(manga: similar);
+
+        expect(enqueued, 1);
+        verify(
+          () => prefetchChapterUseCase.prefetchChapter(
+            mangaId: 's-1',
+            source: any(named: 'source'),
+            chapterId: 'b',
+          ),
+        ).called(1);
+      });
+
+      test('returns 0 without fetching for a manga with no id', () async {
+        downloadCubit = buildCubit();
+
+        final enqueued = await downloadCubit.downloadManga(
+          manga: const Manga(source: 'Manga Dex'),
+        );
+
+        expect(enqueued, 0);
+        verifyNever(
+          () => getAllChapterUseCase.execute(
+            source: any(named: 'source'),
+            mangaId: any(named: 'mangaId'),
+            parameter: any(named: 'parameter'),
+          ),
+        );
+        verifyNever(
+          () => prefetchChapterUseCase.prefetchChapter(
+            mangaId: any(named: 'mangaId'),
+            source: any(named: 'source'),
+            chapterId: any(named: 'chapterId'),
+          ),
+        );
+      });
+
+      test('returns 0 without fetching when the state carries no source', () async {
+        downloadCubit = buildCubit(
+          initialState: const MangaDetailScreenState(
+            mangaId: 'm-1',
+            manga: Manga(id: 'm-1', source: 'Manga Dex'),
+          ),
+        );
+
+        final enqueued = await downloadCubit.downloadManga(manga: similar);
+
+        expect(enqueued, 0);
+        verifyNever(
+          () => getAllChapterUseCase.execute(
+            source: any(named: 'source'),
+            mangaId: any(named: 'mangaId'),
+            parameter: any(named: 'parameter'),
+          ),
+        );
+      });
+
+      // One bulk run at a time, shared with download()/prefetch() — otherwise
+      // a second long press re-enqueues the same chapters.
+      test('is ignored while another run is already in flight', () async {
+        downloadCubit = buildCubit();
+        final gate = Completer<List<Chapter>>();
+        when(
+          () => getAllChapterUseCase.execute(
+            source: any(named: 'source'),
+            mangaId: any(named: 'mangaId'),
+            parameter: any(named: 'parameter'),
+          ),
+        ).thenAnswer((_) => gate.future);
+
+        final first = downloadCubit.downloadManga(manga: similar);
+        await pumpEventQueue();
+        expect(downloadCubit.state.isPrefetchingAll, isTrue);
+        final second = await downloadCubit.downloadManga(manga: similar);
+
+        expect(second, 0);
+
+        gate.complete(const [Chapter(id: 'a')]);
+        expect(await first, 1);
+        expect(downloadCubit.state.isPrefetchingAll, isFalse);
+      });
     });
   });
 }

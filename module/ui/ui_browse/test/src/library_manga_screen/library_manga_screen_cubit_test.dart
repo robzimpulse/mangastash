@@ -294,4 +294,121 @@ void main() {
       ).called(1);
     });
   });
+
+  // Issue #119: the Download menu item used to be an inert stub. It now
+  // enqueues the same two jobs as prefetch() — the manga record and its full
+  // chapter list — resolving the source by name like prefetch() does, because
+  // Manga.source holds the source *name*, not the SourceExternal the use cases
+  // take. Unlike prefetch() it takes one already-resolved manga instead of a
+  // list, but it keeps both of prefetch()'s guards: a manga already in the job
+  // queue is skipped, and the enqueued id is staged into state synchronously
+  // so a repeat tap reads the fresh set — see "a double tap enqueues once".
+  group('LibraryMangaScreenCubit.download (#119)', () {
+    late MockPrefetchMangaUseCase prefetchMangaUseCase;
+    late MockPrefetchChapterUseCase prefetchChapterUseCase;
+    late LibraryMangaScreenCubit downloadCubit;
+
+    setUp(() {
+      prefetchMangaUseCase = MockPrefetchMangaUseCase();
+      prefetchChapterUseCase = MockPrefetchChapterUseCase();
+      downloadCubit = LibraryMangaScreenCubit(
+        getMangaFromUrlUseCase: MockGetMangaFromUrlUseCase(),
+        addToLibraryUseCase: MockAddToLibraryUseCase(),
+        listenMangaFromLibraryUseCase: mockListenMangaFromLibraryUseCase(),
+        prefetchMangaUseCase: prefetchMangaUseCase,
+        listenPrefetchMangaUseCase: mockListenPrefetchUseCase(),
+        removeFromLibraryUseCase: MockRemoveFromLibraryUseCase(),
+        prefetchChapterUseCase: prefetchChapterUseCase,
+        listenSourcesUseCase: mockListenSourcesUseCase(),
+      );
+      addTearDown(downloadCubit.close);
+    });
+
+    test('enqueues the manga and its chapters with the resolved source', () {
+      downloadCubit.download(
+        manga: const Manga(id: 'm-1', source: 'Manga Dex'),
+      );
+
+      final mangaVerification = verify(
+        () => prefetchMangaUseCase.prefetchManga(
+          mangaId: 'm-1',
+          source: captureAny(named: 'source'),
+        ),
+      );
+      mangaVerification.called(1);
+      expect(
+        mangaVerification.captured[0],
+        isA<MangaDexSourceExternal>(),
+      );
+      final chapterVerification = verify(
+        () => prefetchChapterUseCase.prefetchChapters(
+          mangaId: 'm-1',
+          source: captureAny(named: 'source'),
+        ),
+      );
+      chapterVerification.called(1);
+      expect(
+        chapterVerification.captured[0],
+        isA<MangaDexSourceExternal>(),
+      );
+    });
+
+    // Enqueues are all-or-nothing per manga: an unknown source name resolves to
+    // null (the job would carry no source to fetch from) and a null id cannot
+    // key the job, so neither may enqueue. The valid download first proves the
+    // path is live — otherwise these count as 0 and pass for the wrong reason.
+    test('enqueues nothing for an unknown source or a missing id', () {
+      downloadCubit.download(
+        manga: const Manga(id: 'm-1', source: 'Manga Dex'),
+      );
+      downloadCubit.download(
+        manga: const Manga(id: 'm-2', source: 'Removed Source'),
+      );
+      downloadCubit.download(manga: const Manga(source: 'Manga Dex'));
+
+      // Only the first manga's two jobs — m-2 and the id-less manga skipped.
+      final mangaVerification = verify(
+        () => prefetchMangaUseCase.prefetchManga(
+          mangaId: captureAny(named: 'mangaId'),
+          source: any(named: 'source'),
+        ),
+      );
+      mangaVerification.called(1);
+      expect(mangaVerification.captured, ['m-1']);
+      final chapterVerification = verify(
+        () => prefetchChapterUseCase.prefetchChapters(
+          mangaId: captureAny(named: 'mangaId'),
+          source: any(named: 'source'),
+        ),
+      );
+      chapterVerification.called(1);
+      expect(chapterVerification.captured, ['m-1']);
+    });
+
+    // job_tables carries no unique key, so a duplicate insert is accepted and
+    // JobManager runs every row: a second prefetchChapters re-fetches the whole
+    // chapter list and each prefetchChapter re-downloads every image to disk.
+    // mangaIdsStream is stubbed to an empty stream — it never emits, so the
+    // queued set can only come from download's own synchronous emit. Without
+    // that staging the second tap reads a stale set and duplicates the work.
+    test('a double tap enqueues once', () {
+      const manga = Manga(id: 'm-1', source: 'Manga Dex');
+      downloadCubit.download(manga: manga);
+      downloadCubit.download(manga: manga);
+
+      verify(
+        () => prefetchMangaUseCase.prefetchManga(
+          mangaId: 'm-1',
+          source: any(named: 'source'),
+        ),
+      ).called(1);
+      verify(
+        () => prefetchChapterUseCase.prefetchChapters(
+          mangaId: 'm-1',
+          source: any(named: 'source'),
+        ),
+      ).called(1);
+      expect(downloadCubit.state.prefetchedMangaIds, {'m-1'});
+    });
+  });
 }

@@ -9,6 +9,7 @@ import 'package:manga_service_drift/src/database/memory_executor.dart';
 import 'generated/schema.dart';
 import 'generated/schema_v1.dart' as v1;
 import 'generated/schema_v2.dart' as v2;
+import 'generated/schema_v3.dart' as v3;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -130,5 +131,48 @@ void main() {
         );
       },
     );
+  });
+
+  test('v3 to v4 deletes legacy persistentImage rows and drops path', () async {
+    // The legacy rows can only be seeded with raw SQL: v4 drops `path`, so
+    // the current `JobTablesCompanion` can no longer carry the value that
+    // distinguishes a legacy row. `customInsert` returns the new rowid, which
+    // is how the surviving job is identified after the migration.
+    final schema = await verifier.schemaAt(3);
+    final legacyDb = v3.DatabaseAtV3(schema.newConnection());
+    await legacyDb.customStatement(
+      'INSERT INTO job_tables (type, image_url, path, created_at, '
+      "updated_at) VALUES ('persistentImage', 'https://example.com/a.jpg', "
+      "'staging/a.jpg', 0, 0)",
+    );
+    final prefetchId = await legacyDb.customInsert(
+      'INSERT INTO job_tables (type, image_url, created_at, updated_at) '
+      "VALUES ('prefetchImage', 'https://example.com/b.jpg', 0, 0)",
+    );
+    await legacyDb.close();
+
+    final db = AppDatabase(
+      executor: MemoryExecutor(executor: schema.newConnection()),
+    );
+    await verifier.migrateAndValidate(db, 4);
+
+    // The legacy type has to be compared as the raw string SQLite holds, read
+    // with raw SQL rather than through `JobTables.type`: that column is typed
+    // `JobTypeEnum`, and v4 removes `persistentImage` from the enum, so a
+    // surviving row would make the typed read below throw on
+    // `EnumNameConverter`'s `values.byName(...)` rather than yield a value to
+    // compare — asserting on the enum would be tautological. The name being
+    // un-representable is the point: it is why the migration deletes the rows
+    // outright instead of leaving `JobDao._parse` to skip them.
+    final types = await db
+        .customSelect('SELECT type FROM job_tables', readsFrom: {db.jobTables})
+        .get();
+    expect(types.map((e) => e.read<String>('type')), ['prefetchImage']);
+
+    final remaining = await db.select(db.jobTables).get();
+    expect(remaining.map((e) => e.id), contains(prefetchId));
+    expect(db.jobTables.$columns.map((e) => e.name), isNot(contains('path')));
+
+    await db.close();
   });
 }

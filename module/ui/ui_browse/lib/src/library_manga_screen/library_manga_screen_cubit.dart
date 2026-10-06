@@ -88,11 +88,29 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
     _removeFromLibraryUseCase.execute(manga: manga);
   }
 
+  /// Enqueues [manga] and its full chapter list for prefetching — the same
+  /// two jobs prefetch() enqueues (#119). Resolves the source by name because
+  /// [Manga.source] holds the source *name*, not the SourceExternal the use
+  /// cases take; an unknown name has no source to enqueue against, so the
+  /// action no-ops.
+  ///
+  /// Skips a manga already sitting in the job queue, and stages the enqueued
+  /// id into state synchronously — the same two guards prefetch() above uses
+  /// (issue #127 / review on #175). They are load-bearing, not cosmetic:
+  /// job_tables declares no unique key, so a duplicate insert is accepted and
+  /// JobManager runs every row — a second prefetchChapters re-fetches the
+  /// whole chapter list and each prefetchChapter re-downloads every image to
+  /// disk. And mangaIdsStream only refreshes prefetchedMangaIds through an
+  /// async hop, so without the synchronous emit a second tap before it fires
+  /// reads a stale set and duplicates the work.
   void download({required Manga manga}) {
     final id = manga.id;
-    final source = manga.source;
+    final source = manga.source?.let(Sources.fromName);
     if (id == null || source == null) return;
-    // TODO: add download manga
+    if (state.prefetchedMangaIds.contains(id)) return;
+    _prefetchMangaUseCase.prefetchManga(mangaId: id, source: source);
+    _prefetchChapterUseCase.prefetchChapters(mangaId: id, source: source);
+    emit(state.copyWith(prefetchedMangaIds: {...state.prefetchedMangaIds, id}));
   }
 
   /// Adds a manga from a pasted [url]. Failures (unparseable URL, unknown

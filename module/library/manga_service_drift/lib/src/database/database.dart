@@ -65,7 +65,7 @@ class AppDatabase extends _$AppDatabase {
       super(executor.build());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration {
@@ -77,7 +77,13 @@ class AppDatabase extends _$AppDatabase {
       },
       onUpgrade: stepByStep(
         from1To2: (m, schema) async {
-          await m.addColumn(jobTables, jobTables.path);
+          // Historical: `path` was added in v2 and dropped again in v4, so
+          // this step still has to create it for real v1 installs (from3To4
+          // removes it again). The column is gone from the Dart table, so
+          // `m.addColumn` — which needs the live definition — cannot be used.
+          await customStatement(
+            'ALTER TABLE job_tables ADD COLUMN path TEXT NULL',
+          );
         },
         from2To3: (m, schema) async {
           // Legacy installs may hold rows whose parent was deleted before
@@ -111,6 +117,26 @@ class AppDatabase extends _$AppDatabase {
           await m.alterTable(TableMigration(imageTables));
           await m.alterTable(TableMigration(libraryTables));
           await m.alterTable(TableMigration(relationshipTables));
+        },
+        from3To4: (m, schema) async {
+          // Delete first: 'persistentImage' is no longer a `JobTypeEnum`
+          // value, and a surviving row is NOT skippable. The generated
+          // `$JobTablesTable.map` converts `type` through
+          // `EnumNameConverter(JobTypeEnum.values)`, whose `fromSql` is
+          // `values.byName(...)` — it THROWS on an unknown stored name, and it
+          // throws while a joined query maps its rows, before `JobDao._parse`
+          // sees one: `_parse`'s `firstWhereOrNull` guard is dead code for an
+          // unknown name, not the safety net it looks like. Every joined read
+          // that maps the row then errors out (the three list streams map all
+          // rows, `single` its `limit(1)` head) and `JobManager` consumes
+          // `single` with no `onError` on that path, so it escapes as an
+          // unhandled async error every time the query re-runs. The row can
+          // never become a `JobModel`, so the `finally` calling `JobDao.remove`
+          // never runs and nothing else will ever drain it.
+          await customStatement(
+            "DELETE FROM job_tables WHERE type = 'persistentImage'",
+          );
+          await m.dropColumn(jobTables, 'path');
         },
       ),
     );
