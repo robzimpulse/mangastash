@@ -1,6 +1,16 @@
-// Tests for MangaDetailScreenCubit.recrawl: the built-in MangaDex source has
-// no scraping use cases (getters throw UnimplementedError by design), so
-// recrawl must pass an empty scripts list instead of crashing.
+// Tests for MangaDetailScreenCubit, grouped by the fix that introduced each
+// case:
+//
+//   - recrawl — the built-in MangaDex source has no scraping use cases (getters
+//     throw UnimplementedError by design), so recrawl must pass an empty scripts
+//     list instead of crashing; plus #130, recrawl must await the re-crawl
+//     before the refetches that read the html cache it writes.
+//   - init (#122) — loading/paging flags must never be stranded by a throw.
+//   - in-flight guards (#127) — repeat taps on addToLibrary and prefetch are
+//     no-ops, and chapters already in the job queue are not re-enqueued.
+//   - download (#119) — All/Unread scoping, the enqueued-count contract the
+//     screen's snackbars depend on, the synchronous staging of queued ids, the
+//     isPrefetchingAll lane, and downloadManga / downloadChapter.
 //
 // Run with: fvm flutter test test/src/manga_detail_screen/manga_detail_screen_cubit_test.dart
 import 'dart:async';

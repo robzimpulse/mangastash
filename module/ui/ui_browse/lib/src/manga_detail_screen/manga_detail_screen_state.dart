@@ -40,9 +40,13 @@ class MangaDetailScreenState extends Equatable {
   /// BrowseMangaScreenState.pendingLibraryMangaIds).
   final Set<String> pendingLibraryMangaIds;
 
-  /// True while the "prefetch all chapters" action is between its internal
-  /// await and completion (issue #127): re-taps during that window must be
-  /// no-ops, and the app bar button renders disabled while it is set.
+  /// True while one bulk run holds the chapter list — the app bar's prefetch
+  /// all (MangaDetailScreenCubit.prefetch), this screen's Download
+  /// (download), or the similar-manga long press's Download (downloadManga).
+  /// Set for the whole await of the chapter fetch plus its enqueue loop, so it
+  /// also serialises those three against each other: re-taps during that window
+  /// are no-ops, and the app bar's prefetch button renders disabled while it is
+  /// set (#127, #119).
   final bool isPrefetchingAll;
 
   bool get isOnLibrary => libraryMangaIds.contains(mangaId);

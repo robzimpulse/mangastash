@@ -439,6 +439,22 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   /// Enqueues chapters of the manga on the prefetch pipeline, scoped by
   /// [option]: unread chapters only, or every chapter.
   ///
+  /// "All" means every chapter the fetch below returns, and that fetch is
+  /// bounded: `state.chapterParameter` is re-pinned to `limit: 20` per page
+  /// and GetAllChapterUseCase stops after its `maxPages = 10`, so at most 200
+  /// chapters are ever considered. That bound is inherited verbatim from
+  /// [prefetch] and is deliberate (issue #118) — do not raise it here without
+  /// the product call it was deferred for: one tap would otherwise be able to
+  /// queue 500+ chapter downloads.
+  ///
+  /// The fetch also runs under `state.chapterParameter`, which carries the
+  /// global `translatedLanguage` (GlobalOptionsManager falls back to `english`
+  /// when no parameter is stored). A series whose chapters are all in another
+  /// language therefore resolves to nothing under "All" — the 200 cap is not
+  /// the only reason a run can come back empty. The on-screen unread/downloaded
+  /// toggles (ChapterConfig) are display-only and do NOT narrow these targets;
+  /// scoping is resolveDownloadChapterIds' job, over read history and the queue.
+  ///
   /// Returns how many chapters were enqueued, so the caller can tell real
   /// queueing from "nothing left to download" — the screen shows the
   /// empty-target snackbar on 0 (#119).
@@ -499,6 +515,14 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   /// ([_updateHistories]), so state.histories says nothing about [manga], and
   /// the long-press menu offers no Unread entry — nothing is lost by pinning
   /// the scope.
+  ///
+  /// "All" is bounded exactly as [download]'s is — `limit: 20` per page ×
+  /// GetAllChapterUseCase.maxPages = 10 over the same `state.chapterParameter`,
+  /// so the same non-English-series caveat (the global `translatedLanguage`)
+  /// applies here too. Unlike [download] there is also no in-loop dedup: an id
+  /// that repeats across the fetched pages is enqueued twice, and only
+  /// JobDao.add's row lookup collapses the duplicate into one job — a known
+  /// boundary of this path, deliberately left as-is rather than fixed here.
   ///
   /// Deliberately does NOT stage the enqueued ids into
   /// [MangaDetailScreenState.prefetchedChapterIds]: that set renders the

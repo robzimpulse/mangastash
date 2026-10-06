@@ -308,7 +308,8 @@ void main() {
     // already in flight", and the popup stays enabled during a run — so the
     // handler has to distinguish them. Claiming "Nothing to download" mid-run
     // would be false; saying nothing at all leaves a live control that appears
-    // broken. It reports the run instead (#119).
+    // broken. It reports the run instead (#119). The message names no action,
+    // since isPrefetchingAll is also set by the app bar's prefetch-all run.
     testWidgets('a run already in flight says so instead of nothing to do', (
       tester,
     ) async {
@@ -333,7 +334,7 @@ void main() {
           chapterId: any(named: 'chapterId'),
         ),
       );
-      expect(find.text('Download already in progress'), findsOneWidget);
+      expect(find.text('A bulk download is already running'), findsOneWidget);
       expect(find.text('Nothing to download'), findsNothing);
     });
   });

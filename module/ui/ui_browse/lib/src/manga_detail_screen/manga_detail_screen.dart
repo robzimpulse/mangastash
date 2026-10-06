@@ -134,9 +134,12 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     // rejected this tap because a bulk run is already in flight. The popup
     // stays enabled during a run, so this handler — not the control — has to
     // say which one it is: reporting "Nothing to download" mid-run would be
-    // false (#119).
+    // false (#119). The wording stays neutral about who started the run
+    // because isPrefetchingAll is also set by prefetch(), which the app bar's
+    // cloud-download button drives — "Download already in progress" would
+    // name an action this user never started.
     if (cubit.state.isPrefetchingAll) {
-      context.showSnackBar(message: 'Download already in progress');
+      context.showSnackBar(message: 'A bulk download is already running');
       return;
     }
     int enqueued;
