@@ -5,7 +5,6 @@ import 'package:drift_dev/api/migrations_native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manga_service_drift/src/database/database.dart';
 import 'package:manga_service_drift/src/database/memory_executor.dart';
-import 'package:manga_service_drift/src/util/job_type_enum.dart';
 
 import 'generated/schema.dart';
 import 'generated/schema_v1.dart' as v1;
@@ -157,11 +156,20 @@ void main() {
     );
     await verifier.migrateAndValidate(db, 4);
 
+    // The legacy type has to be compared as the raw string SQLite holds, read
+    // with raw SQL rather than through `JobTables.type`: that column is typed
+    // `JobTypeEnum`, and v4 removes `persistentImage` from the enum, so a
+    // surviving row would make the typed read below throw on
+    // `EnumNameConverter`'s `values.byName(...)` rather than yield a value to
+    // compare — asserting on the enum would be tautological. The name being
+    // un-representable is the point: it is why the migration deletes the rows
+    // outright instead of leaving `JobDao._parse` to skip them.
+    final types = await db
+        .customSelect('SELECT type FROM job_tables', readsFrom: {db.jobTables})
+        .get();
+    expect(types.map((e) => e.read<String>('type')), ['prefetchImage']);
+
     final remaining = await db.select(db.jobTables).get();
-    expect(
-      remaining.where((e) => e.type == JobTypeEnum.persistentImage),
-      isEmpty,
-    );
     expect(remaining.map((e) => e.id), contains(prefetchId));
     expect(db.jobTables.$columns.map((e) => e.name), isNot(contains('path')));
 

@@ -38,9 +38,7 @@ class JobManager
   final ListenSearchParameterUseCase _listenSearchParameterUseCase;
   final ImagesCacheManager _manager;
   final JobDao _jobDao;
-  final FileDao _fileDao;
   final LogBox _log;
-  final GetRootPathUseCase _getRootPathUseCase;
 
   final Map<String, Future> _ongoingFuture = {};
   final List<StreamSubscription> _subscriptions = [];
@@ -48,18 +46,14 @@ class JobManager
   JobManager({
     required LogBox log,
     required JobDao jobDao,
-    required FileDao fileDao,
     required ImagesCacheManager manager,
-    required GetRootPathUseCase getRootPathUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required ValueGetter<GetMangaUseCase> getMangaUseCase,
     required ValueGetter<GetAllChapterUseCase> getAllChapterUseCase,
   }) : _log = log,
        _jobDao = jobDao,
-       _fileDao = fileDao,
        _manager = manager,
-       _getRootPathUseCase = getRootPathUseCase,
        _getMangaUseCase = getMangaUseCase,
        _getChapterUseCase = getChapterUseCase,
        _getAllChapterUseCase = getAllChapterUseCase,
@@ -104,8 +98,6 @@ class JobManager
           await _fetchChapter(job);
         case JobTypeEnum.prefetchImage:
           await _fetchImage(job);
-        case JobTypeEnum.persistentImage:
-          await _persistentImage(job);
       }
 
       _log.log(
@@ -206,22 +198,6 @@ class JobManager
     }
 
     await _manager.getSingleFile(url);
-  }
-
-  Future<void> _persistentImage(JobModel job) async {
-    final url = job.image;
-    final path = job.path;
-    if (url == null || path == null) {
-      throw Exception('No Image URL or Path File');
-    }
-    final file = _getRootPathUseCase.rootPath.fileSystem.file(path);
-
-    if (!await file.exists()) {
-      throw Exception('File on $path do not exists');
-    }
-
-    await _fileDao.addFromFile(webUrl: url, file: file);
-    await file.delete();
   }
 
   void _ensureExecuted({required Future<void> future}) {
