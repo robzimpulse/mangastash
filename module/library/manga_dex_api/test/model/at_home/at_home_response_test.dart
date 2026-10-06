@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manga_dex_api/src/exception/at_home_server_exception.dart';
 import 'package:manga_dex_api/src/model/at_home/at_home_chapter.dart';
 import 'package:manga_dex_api/src/model/at_home/at_home_response.dart';
-import 'package:manga_dex_api/src/exception/at_home_server_exception.dart';
 
 void main() {
   group('AtHomeResponse guard', () {

@@ -31,5 +31,12 @@ MangadexServerException? decodeMangadexEnvelope(Object error) {
   if (parsed['result'] != 'error') return null;
   final errors = parsed['errors'];
   if (errors is! List || errors.isEmpty) return null;
-  return MangadexServerException(parsed);
+  try {
+    return MangadexServerException(parsed);
+  } catch (_) {
+    // A malformed errors entry (e.g. a non-object element) must not replace
+    // the original network error with a deserialization throw — treat the
+    // body as a non-envelope and fall through to the generic Dio mapping.
+    return null;
+  }
 }

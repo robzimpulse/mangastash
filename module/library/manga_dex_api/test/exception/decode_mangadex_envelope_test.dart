@@ -37,6 +37,22 @@ void main() {
       expect(result, isNotNull);
     });
 
+    test('malformed errors entry returns null instead of throwing', () {
+      final dio = DioException(
+        requestOptions: RequestOptions(),
+        response: Response(
+          requestOptions: RequestOptions(),
+          statusCode: 500,
+          data: {
+            'result': 'error',
+            'errors': ['not-an-object'],
+          },
+        ),
+      );
+      expect(() => decodeMangadexEnvelope(dio), returnsNormally);
+      expect(decodeMangadexEnvelope(dio), isNull);
+    });
+
     test('non-error result returns null', () {
       final dio = DioException(
         requestOptions: RequestOptions(),
