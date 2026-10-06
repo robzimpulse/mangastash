@@ -584,9 +584,9 @@ void main() {
         recrawlUseCase: MockRecrawlUseCase(),
         listenDownloadedChapterUseCase: listenDownloadedChapterUseCase,
       );
-      // The constructor registers five stream subscriptions plus, when the
-      // state carries a mangaId, the downloaded-chapter listener — close() is
-      // what cancels them, so an unclosed cubit leaks every one.
+      // The constructor registers four stream subscriptions plus, when the
+      // state carries a mangaId, a fifth for the downloaded-chapter listener —
+      // close() is what cancels them, so an unclosed cubit leaks every one.
       addTearDown(downloadCubit.close);
       return downloadCubit;
     }

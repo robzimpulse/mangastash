@@ -100,9 +100,12 @@ class JobDao extends DatabaseAccessor<AppDatabase> with _$JobDaoMixin {
   /// The dedup is row-based, not in-flight: once the executor picks a job up
   /// and its row is removed, a re-enqueue of the same payload inserts again
   /// and may duplicate the work. The downstream layers already tolerate a
-  /// double-run (webview fetch de-dupes by URL; `FileDao.addFromFile` writes
-  /// a fresh UUID destination), so the residual cost is one orphan file
-  /// until `sync()` — a known boundary, not a correctness bug.
+  /// double-run (the image fetch de-dupes by URL, and the only writer of
+  /// `file_tables` — `FileDao.addFromFile`, reached from the cache-rescue
+  /// hook in `core_storage`'s `ImagesCacheManager` rather than from a job
+  /// handler — writes a fresh UUID destination), so the residual cost is one
+  /// orphan file until `FileDao.sync()` deletes the files no row points at —
+  /// a known boundary, not a correctness bug.
   Future<void> add(JobTablesCompanion value) async {
     await transaction(() async {
       final type = value.type.present ? value.type.value : null;

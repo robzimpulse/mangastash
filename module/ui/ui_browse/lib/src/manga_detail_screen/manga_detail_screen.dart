@@ -148,17 +148,29 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               // is scoped to the manga on screen, so its download is always
               // All — see MangaDetailScreenCubit.downloadManga.
               : await cubit.downloadManga(manga: manga);
-    } catch (e) {
-      // The chapter list is what resolves the download targets, so a failed
-      // fetch aborts the whole enqueue. Neither cubit method has a catch of
-      // its own, so without this the error escapes the void async caller and
-      // the user gets no response at all — spec §4 requires "abort +
-      // snackbar, enqueue nothing". Strip the "Exception: " noise so this
-      // reads like the sibling "Failed to add manga: ..." wording in
-      // library_manga_screen.
+    } catch (e, s) {
+      // Neither cubit method has a catch of its own, so without this the error
+      // escapes the void async caller and the user gets no response at all —
+      // spec §4 requires "abort + snackbar, enqueue nothing". The try also
+      // wraps the enqueue calls and their state emits, not just the
+      // chapter-list fetch, so the snackbar names the action that failed
+      // rather than the fetch step it most often fails at. Strip the
+      // "Exception: " noise so this reads like the sibling "Failed to add
+      // manga: ..." wording in library_manga_screen.
+      widget.logBox.log(
+        'Download handler failed',
+        error: e,
+        stackTrace: s,
+        extra: {
+          'option': option.name,
+          'targetMangaId':
+              manga?.id ?? cubit.state.manga?.id ?? cubit.state.mangaId,
+        },
+        name: runtimeType.toString(),
+      );
       if (!context.mounted) return;
       final message = e.toString().replaceFirst('Exception: ', '');
-      context.showSnackBar(message: 'Failed to load chapters: $message');
+      context.showSnackBar(message: 'Failed to download: $message');
       return;
     }
     if (!context.mounted) return;
@@ -205,10 +217,11 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
         // Deliberately silent, unlike the download case above: prefetch() is
         // void and reports nothing back, so unlike download() there is no
         // return value for a handler to turn into feedback. Leaving it alone
-        // keeps this case consistent with the bulk prefetch button, which has
-        // always signalled through isPrefetchingAll (the shared progress
-        // indicator) rather than a snackbar. Do not add a count here without
-        // first deciding what prefetch() should report (#119).
+        // keeps this case consistent with the bulk prefetch button, whose only
+        // run signal is isPrefetchingAll — ListWidget uses it to null that
+        // button's onPressed during a run, not to render a progress
+        // indicator. Do not add a count here without first deciding what
+        // prefetch() should report (#119).
         await _cubit(context)?.prefetch();
     }
   }

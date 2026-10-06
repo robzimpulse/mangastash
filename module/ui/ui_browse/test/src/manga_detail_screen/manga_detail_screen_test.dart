@@ -65,6 +65,13 @@ void main() {
     prefetchChapterUseCase = MockPrefetchChapterUseCase();
     imagesCacheManager = _NullCacheManager();
     logBox = _MockLogBox();
+    // LogBox.log is an extension method, so mocktail cannot intercept it: the
+    // real body runs and calls storage.add. The download handler's catch logs,
+    // so without a real Storage behind the field that log would throw from
+    // inside the code under test and the snackbar would never appear.
+    when(
+      () => logBox.storage,
+    ).thenReturn(Storage(liveDataStorage: MemoryStorage()));
 
     // CachedNetworkImage reaches the cache manager before the network. A bare
     // mock would throw MissingStubError from inside the image loader; failing
@@ -221,10 +228,12 @@ void main() {
             chapterId: any(named: 'chapterId'),
           ),
         );
+        // The handler also wraps the enqueue calls, so the message names the
+        // action rather than the fetch step it most often fails at.
         // "Exception: " is stripped so the snackbar reads like the sibling
         // "Failed to add manga: ..." wording in library_manga_screen.
         expect(
-          find.text('Failed to load chapters: chapter fetch failed'),
+          find.text('Failed to download: chapter fetch failed'),
           findsOneWidget,
         );
         // download()'s finally block resets the flag on the throw, so a

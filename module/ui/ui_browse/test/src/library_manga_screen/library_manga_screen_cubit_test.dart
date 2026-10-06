@@ -299,9 +299,10 @@ void main() {
   // enqueues the same two jobs as prefetch() — the manga record and its full
   // chapter list — resolving the source by name like prefetch() does, because
   // Manga.source holds the source *name*, not the SourceExternal the use cases
-  // take. Unlike prefetch() it does not dedupe against the job queue: the
-  // caller passes one already-resolved manga and #119 keeps this a direct
-  // enqueue.
+  // take. Unlike prefetch() it takes one already-resolved manga instead of a
+  // list, but it keeps both of prefetch()'s guards: a manga already in the job
+  // queue is skipped, and the enqueued id is staged into state synchronously
+  // so a repeat tap reads the fresh set — see "a double tap enqueues once".
   group('LibraryMangaScreenCubit.download (#119)', () {
     late MockPrefetchMangaUseCase prefetchMangaUseCase;
     late MockPrefetchChapterUseCase prefetchChapterUseCase;

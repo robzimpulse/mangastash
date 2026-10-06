@@ -1,10 +1,13 @@
 // Decides which chapter ids a download action should enqueue, so the UI layer
-// (MangaDetailScreenCubit.download) only has to collect the inputs and hand
-// them to JobManager — it never has to re-derive the "All" vs "Unread"
-// scoping rules.
+// (MangaDetailScreenCubit.download / downloadManga) only has to collect the
+// inputs and make the enqueue call — it never has to re-derive the "All" vs
+// "Unread" scoping rules.
 //
-// Pure by design: no use cases, locator, or database, so the scoping rules are
-// unit-testable and the caller stays the single owner of queueing.
+// The flow runs caller → resolver → caller again: this function returns the
+// ids and nothing else (no queue handle, no JobManager reference, no enqueue
+// of its own), so the cubit stays the single owner of queueing. Pure by
+// design — no use cases, locator, or database — so the scoping rules are
+// unit-testable.
 import 'package:entity_manga/entity_manga.dart';
 
 /// Returns the ids of [chapters] to queue, preserving the incoming order.
