@@ -58,8 +58,17 @@ class Relationship<T extends Attribute> extends Identifier {
             ),
           );
         case Include.artist:
-          // TODO: add this relationship when artist data attribute exists
-          break;
+          // Artists carry the same attribute shape as authors (a `name`),
+          // so they reuse AuthorDataAttributes; consumers tell the
+          // relationship apart by `type` (issue #131).
+          relationships.add(
+            Relationship<AuthorDataAttributes>.fromJson(
+              data,
+              (json) => AuthorDataAttributes.fromJson(
+                json as Map<String, dynamic>,
+              ),
+            ),
+          );
         case Include.tag:
           relationships.add(
             Relationship<TagDataAttributes>.fromJson(
@@ -70,7 +79,8 @@ class Relationship<T extends Attribute> extends Identifier {
             ),
           );
         case Include.creator:
-          // TODO: add this relationship when creator data attribute exists
+          // Not emitted by the MangaDex feeds this app consumes (account
+          // endpoints only) — intentionally skipped (issue #131).
           break;
         case Include.scanlationGroup:
           relationships.add(
@@ -91,7 +101,8 @@ class Relationship<T extends Attribute> extends Identifier {
             ),
           );
         case Include.user:
-          // TODO: add this relationship when user data attribute exists
+          // Not emitted by the MangaDex feeds this app consumes (account
+          // endpoints only) — intentionally skipped (issue #131).
           break;
       }
     }

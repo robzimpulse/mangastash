@@ -72,6 +72,18 @@ void main() {
     expect((await dao.all).length, equals(0));
   });
 
+  // Issue #131: artist is a persisted column — adds() must keep it and
+  // search() must return it.
+  test('Create keeps artist (#131)', () async {
+    final (manga, tags) = mangas.first;
+    final withArtist = manga.copyWith(artist: const Value('artist_0'));
+
+    await dao.adds(values: {withArtist: tags});
+
+    final result = await dao.search(ids: [manga.id.value]);
+    expect(result.single.manga?.artist, 'artist_0');
+  });
+
   test('Remove cascades children (#102)', () async {
     final (manga, tags) = mangas.first;
     const otherMangaId = 'manga_other';

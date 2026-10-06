@@ -11,6 +11,11 @@ class MangaTables extends Table with AutoTimestampTable, AutoTextIdTable {
 
   TextColumn get author => text().named('author').nullable()();
 
+  /// Co-artist credits (MangaDex `artist` relationships), kept separate
+  /// from `author` (issue #131). Nullable for legacy rows and sources
+  /// without the concept.
+  TextColumn get artist => text().named('artist').nullable()();
+
   TextColumn get status => text().named('status').nullable()();
 
   TextColumn get description => text().named('description').nullable()();

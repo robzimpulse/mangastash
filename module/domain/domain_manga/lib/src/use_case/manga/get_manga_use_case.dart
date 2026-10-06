@@ -32,7 +32,11 @@ class GetMangaUseCase with SyncMangasMixin {
   Future<Manga> _mangadex({required String mangaId}) async {
     final result = await _mangaService.detail(
       id: mangaId,
-      includes: [Include.author.rawValue, Include.coverArt.rawValue],
+      includes: [
+        Include.author.rawValue,
+        Include.artist.rawValue,
+        Include.coverArt.rawValue,
+      ],
     );
 
     final manga = result.data;

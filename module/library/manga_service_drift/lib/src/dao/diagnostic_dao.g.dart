@@ -24,6 +24,7 @@ mixin _$DiagnosticDaoMixin on DatabaseAccessor<AppDatabase> {
         title: row.readNullable<String>('title'),
         coverUrl: row.readNullable<String>('cover_url'),
         author: row.readNullable<String>('author'),
+        artist: row.readNullable<String>('artist'),
         status: row.readNullable<String>('status'),
         description: row.readNullable<String>('description'),
         webUrl: row.readNullable<String>('web_url'),
@@ -102,6 +103,7 @@ mixin _$DiagnosticDaoMixin on DatabaseAccessor<AppDatabase> {
         title: row.readNullable<String>('title'),
         coverUrl: row.readNullable<String>('cover_url'),
         author: row.readNullable<String>('author'),
+        artist: row.readNullable<String>('artist'),
         status: row.readNullable<String>('status'),
         description: row.readNullable<String>('description'),
         webUrl: row.readNullable<String>('web_url'),
@@ -145,6 +147,7 @@ class DuplicatedMangaQueryResult {
   final String? title;
   final String? coverUrl;
   final String? author;
+  final String? artist;
   final String? status;
   final String? description;
   final String? webUrl;
@@ -157,6 +160,7 @@ class DuplicatedMangaQueryResult {
     this.title,
     this.coverUrl,
     this.author,
+    this.artist,
     this.status,
     this.description,
     this.webUrl,
@@ -242,6 +246,7 @@ class ChapterGapQueryResult {
   final String? title;
   final String? coverUrl;
   final String? author;
+  final String? artist;
   final String? status;
   final String? description;
   final String? webUrl;
@@ -256,6 +261,7 @@ class ChapterGapQueryResult {
     this.title,
     this.coverUrl,
     this.author,
+    this.artist,
     this.status,
     this.description,
     this.webUrl,

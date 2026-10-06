@@ -10,6 +10,8 @@ import 'generated/schema.dart';
 import 'generated/schema_v1.dart' as v1;
 import 'generated/schema_v2.dart' as v2;
 import 'generated/schema_v3.dart' as v3;
+import 'generated/schema_v4.dart' as v4;
+import 'generated/schema_v5.dart' as v5;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -48,35 +50,195 @@ void main() {
   // (e.g. by alterating their type or constraints). Migrations that only add
   // tables or columns typically don't need these advanced tests. For more
   // information, see https://drift.simonbinder.eu/migrations/tests/#verifying-data-integrity
-  // TODO: This generated template shows how these tests could be written. Adopt
-  // it to your own needs when testing migrations with data integrity.
+  // Issue #131: the generated placeholder was unfilled — the test inserted
+  // and validated nothing, so the v1→v2 step (ALTER TABLE job_tables ADD
+  // COLUMN path) had no real data coverage. One referentially-consistent
+  // row per table; every row must survive, and the job row gains path=null.
   test('migration from v1 to v2 does not corrupt data', () async {
-    // Add data to insert into the old database, and the expected rows after the
-    // migration.
-    // TODO: Fill these lists
-    final oldImageTablesData = <v1.ImageTablesData>[];
-    final expectedNewImageTablesData = <v2.ImageTablesData>[];
+    final oldImageTablesData = [
+      v1.ImageTablesData(
+        createdAt: 1000,
+        updatedAt: 1000,
+        id: 'image_1',
+        order: 0,
+        chapterId: 'chapter_1',
+        webUrl: 'https://example.com/image_1.jpg',
+      ),
+    ];
+    final expectedNewImageTablesData = [
+      v2.ImageTablesData(
+        createdAt: 1000,
+        updatedAt: 1000,
+        id: 'image_1',
+        order: 0,
+        chapterId: 'chapter_1',
+        webUrl: 'https://example.com/image_1.jpg',
+      ),
+    ];
 
-    final oldChapterTablesData = <v1.ChapterTablesData>[];
-    final expectedNewChapterTablesData = <v2.ChapterTablesData>[];
+    final oldChapterTablesData = [
+      v1.ChapterTablesData(
+        createdAt: 1000,
+        updatedAt: 1000,
+        id: 'chapter_1',
+        mangaId: 'manga_1',
+        title: 'Chapter 1',
+        volume: '1',
+        chapter: '1',
+        translatedLanguage: 'en',
+        scanlationGroup: null,
+        webUrl: 'https://example.com/chapter_1',
+        readableAt: 1000,
+        publishAt: 1000,
+        lastReadAt: null,
+      ),
+    ];
+    final expectedNewChapterTablesData = [
+      v2.ChapterTablesData(
+        createdAt: 1000,
+        updatedAt: 1000,
+        id: 'chapter_1',
+        mangaId: 'manga_1',
+        title: 'Chapter 1',
+        volume: '1',
+        chapter: '1',
+        translatedLanguage: 'en',
+        scanlationGroup: null,
+        webUrl: 'https://example.com/chapter_1',
+        readableAt: 1000,
+        publishAt: 1000,
+        lastReadAt: null,
+      ),
+    ];
 
-    final oldLibraryTablesData = <v1.LibraryTablesData>[];
-    final expectedNewLibraryTablesData = <v2.LibraryTablesData>[];
+    final oldLibraryTablesData = [
+      v1.LibraryTablesData(
+        createdAt: 1000,
+        updatedAt: 1000,
+        mangaId: 'manga_1',
+      ),
+    ];
+    final expectedNewLibraryTablesData = [
+      v2.LibraryTablesData(
+        createdAt: 1000,
+        updatedAt: 1000,
+        mangaId: 'manga_1',
+      ),
+    ];
 
-    final oldMangaTablesData = <v1.MangaTablesData>[];
-    final expectedNewMangaTablesData = <v2.MangaTablesData>[];
+    final oldMangaTablesData = [
+      v1.MangaTablesData(
+        createdAt: 1000,
+        updatedAt: 1000,
+        id: 'manga_1',
+        title: 'Manga 1',
+        coverUrl: 'https://example.com/cover_1.jpg',
+        author: 'Author 1',
+        status: 'ongoing',
+        description: 'Description 1',
+        webUrl: 'https://example.com/manga_1',
+        source: 'mangadex',
+      ),
+    ];
+    final expectedNewMangaTablesData = [
+      v2.MangaTablesData(
+        createdAt: 1000,
+        updatedAt: 1000,
+        id: 'manga_1',
+        title: 'Manga 1',
+        coverUrl: 'https://example.com/cover_1.jpg',
+        author: 'Author 1',
+        status: 'ongoing',
+        description: 'Description 1',
+        webUrl: 'https://example.com/manga_1',
+        source: 'mangadex',
+      ),
+    ];
 
-    final oldTagTablesData = <v1.TagTablesData>[];
-    final expectedNewTagTablesData = <v2.TagTablesData>[];
+    final oldTagTablesData = [
+      v1.TagTablesData(
+        createdAt: 1000,
+        updatedAt: 1000,
+        id: 1,
+        tagId: 'tag_1',
+        name: 'Action',
+        source: 'mangadex',
+      ),
+    ];
+    final expectedNewTagTablesData = [
+      v2.TagTablesData(
+        createdAt: 1000,
+        updatedAt: 1000,
+        id: 1,
+        tagId: 'tag_1',
+        name: 'Action',
+        source: 'mangadex',
+      ),
+    ];
 
-    final oldRelationshipTablesData = <v1.RelationshipTablesData>[];
-    final expectedNewRelationshipTablesData = <v2.RelationshipTablesData>[];
+    final oldRelationshipTablesData = [
+      v1.RelationshipTablesData(
+        createdAt: 1000,
+        updatedAt: 1000,
+        tagId: 1,
+        mangaId: 'manga_1',
+      ),
+    ];
+    final expectedNewRelationshipTablesData = [
+      v2.RelationshipTablesData(
+        createdAt: 1000,
+        updatedAt: 1000,
+        tagId: 1,
+        mangaId: 'manga_1',
+      ),
+    ];
 
-    final oldJobTablesData = <v1.JobTablesData>[];
-    final expectedNewJobTablesData = <v2.JobTablesData>[];
+    final oldJobTablesData = [
+      v1.JobTablesData(
+        createdAt: 1000,
+        updatedAt: 1000,
+        id: 1,
+        type: 'prefetchImage',
+        source: 'mangadex',
+        chapterId: 'chapter_1',
+        mangaId: 'manga_1',
+        imageUrl: 'https://example.com/image_1.jpg',
+      ),
+    ];
+    final expectedNewJobTablesData = [
+      v2.JobTablesData(
+        createdAt: 1000,
+        updatedAt: 1000,
+        id: 1,
+        type: 'prefetchImage',
+        source: 'mangadex',
+        chapterId: 'chapter_1',
+        mangaId: 'manga_1',
+        imageUrl: 'https://example.com/image_1.jpg',
+        // The v1→v2 step ALTERs job_tables to add `path`; existing rows
+        // must come back with it null.
+        path: null,
+      ),
+    ];
 
-    final oldFileTablesData = <v1.FileTablesData>[];
-    final expectedNewFileTablesData = <v2.FileTablesData>[];
+    final oldFileTablesData = [
+      v1.FileTablesData(
+        createdAt: 1000,
+        updatedAt: 1000,
+        id: 'file_1',
+        webUrl: 'https://example.com/image_1.jpg',
+        relativePath: 'file_1.jpg',
+      ),
+    ];
+    final expectedNewFileTablesData = [
+      v2.FileTablesData(
+        createdAt: 1000,
+        updatedAt: 1000,
+        id: 'file_1',
+        webUrl: 'https://example.com/image_1.jpg',
+        relativePath: 'file_1.jpg',
+      ),
+    ];
 
     await verifier.testWithDataIntegrity(
       oldVersion: 1,
@@ -174,5 +336,75 @@ void main() {
     expect(db.jobTables.$columns.map((e) => e.name), isNot(contains('path')));
 
     await db.close();
+  });
+
+  // Issue #131: v5 adds manga_tables.artist (nullable) and the three
+  // secondary indices. Rows must survive with artist null; the indices are
+  // validated by migrateAndValidate against the v5 schema.
+  test('v4 to v5 preserves rows and adds a nullable artist column', () async {
+    await verifier.testWithDataIntegrity(
+      oldVersion: 4,
+      newVersion: 5,
+      createOld: v4.DatabaseAtV4.new,
+      createNew: v5.DatabaseAtV5.new,
+      openTestedDatabase: (executor) {
+        return AppDatabase(executor: MemoryExecutor(executor: executor));
+      },
+      createItems: (batch, oldDb) {
+        batch.insertAll(oldDb.mangaTables, [
+          v4.MangaTablesData(
+            createdAt: 1000,
+            updatedAt: 1000,
+            id: 'manga_1',
+            title: 'Manga 1',
+            coverUrl: 'https://example.com/cover_1.jpg',
+            author: 'Author 1',
+            status: 'ongoing',
+            description: 'Description 1',
+            webUrl: 'https://example.com/manga_1',
+            source: 'mangadex',
+          ),
+        ]);
+        batch.insertAll(oldDb.chapterTables, [
+          v4.ChapterTablesData(
+            createdAt: 1000,
+            updatedAt: 1000,
+            id: 'chapter_1',
+            mangaId: 'manga_1',
+            title: 'Chapter 1',
+            volume: '1',
+            chapter: '1',
+            translatedLanguage: 'en',
+            scanlationGroup: null,
+            webUrl: 'https://example.com/chapter_1',
+            readableAt: 1000,
+            publishAt: 1000,
+            lastReadAt: null,
+          ),
+        ]);
+        batch.insertAll(oldDb.jobTables, [
+          v4.JobTablesData(
+            createdAt: 1000,
+            updatedAt: 1000,
+            id: 1,
+            type: 'prefetchImage',
+            source: 'mangadex',
+            chapterId: 'chapter_1',
+            mangaId: 'manga_1',
+            imageUrl: 'https://example.com/image_1.jpg',
+          ),
+        ]);
+      },
+      validateItems: (newDb) async {
+        final mangas = await newDb.select(newDb.mangaTables).get();
+        expect(mangas, hasLength(1));
+        // The column is added nullable: pre-v5 rows have no artist.
+        expect(mangas.single.artist, null);
+        expect(mangas.single.author, 'Author 1');
+
+        expect(await newDb.select(newDb.chapterTables).get(), hasLength(1));
+        expect(await newDb.select(newDb.jobTables).get(), hasLength(1));
+      },
+    );
   });
 }

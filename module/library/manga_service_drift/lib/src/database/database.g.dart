@@ -1542,6 +1542,15 @@ class $MangaTablesTable extends MangaTables
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _artistMeta = const VerificationMeta('artist');
+  @override
+  late final GeneratedColumn<String> artist = GeneratedColumn<String>(
+    'artist',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _statusMeta = const VerificationMeta('status');
   @override
   late final GeneratedColumn<String> status = GeneratedColumn<String>(
@@ -1588,6 +1597,7 @@ class $MangaTablesTable extends MangaTables
     title,
     coverUrl,
     author,
+    artist,
     status,
     description,
     webUrl,
@@ -1636,6 +1646,12 @@ class $MangaTablesTable extends MangaTables
       context.handle(
         _authorMeta,
         author.isAcceptableOrUnknown(data['author']!, _authorMeta),
+      );
+    }
+    if (data.containsKey('artist')) {
+      context.handle(
+        _artistMeta,
+        artist.isAcceptableOrUnknown(data['artist']!, _artistMeta),
       );
     }
     if (data.containsKey('status')) {
@@ -1706,6 +1722,10 @@ class $MangaTablesTable extends MangaTables
         DriftSqlType.string,
         data['${effectivePrefix}author'],
       ),
+      artist: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}artist'],
+      ),
       status: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}status'],
@@ -1738,6 +1758,11 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
   final String? title;
   final String? coverUrl;
   final String? author;
+
+  /// Co-artist credits (MangaDex `artist` relationships), kept separate
+  /// from `author` (issue #131). Nullable for legacy rows and sources
+  /// without the concept.
+  final String? artist;
   final String? status;
   final String? description;
   final String? webUrl;
@@ -1749,6 +1774,7 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
     this.title,
     this.coverUrl,
     this.author,
+    this.artist,
     this.status,
     this.description,
     this.webUrl,
@@ -1768,6 +1794,9 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
     }
     if (!nullToAbsent || author != null) {
       map['author'] = Variable<String>(author);
+    }
+    if (!nullToAbsent || artist != null) {
+      map['artist'] = Variable<String>(artist);
     }
     if (!nullToAbsent || status != null) {
       map['status'] = Variable<String>(status);
@@ -1797,6 +1826,8 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
               : Value(coverUrl),
       author:
           author == null && nullToAbsent ? const Value.absent() : Value(author),
+      artist:
+          artist == null && nullToAbsent ? const Value.absent() : Value(artist),
       status:
           status == null && nullToAbsent ? const Value.absent() : Value(status),
       description:
@@ -1822,6 +1853,7 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
       title: serializer.fromJson<String?>(json['title']),
       coverUrl: serializer.fromJson<String?>(json['coverUrl']),
       author: serializer.fromJson<String?>(json['author']),
+      artist: serializer.fromJson<String?>(json['artist']),
       status: serializer.fromJson<String?>(json['status']),
       description: serializer.fromJson<String?>(json['description']),
       webUrl: serializer.fromJson<String?>(json['webUrl']),
@@ -1838,6 +1870,7 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
       'title': serializer.toJson<String?>(title),
       'coverUrl': serializer.toJson<String?>(coverUrl),
       'author': serializer.toJson<String?>(author),
+      'artist': serializer.toJson<String?>(artist),
       'status': serializer.toJson<String?>(status),
       'description': serializer.toJson<String?>(description),
       'webUrl': serializer.toJson<String?>(webUrl),
@@ -1852,6 +1885,7 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
     Value<String?> title = const Value.absent(),
     Value<String?> coverUrl = const Value.absent(),
     Value<String?> author = const Value.absent(),
+    Value<String?> artist = const Value.absent(),
     Value<String?> status = const Value.absent(),
     Value<String?> description = const Value.absent(),
     Value<String?> webUrl = const Value.absent(),
@@ -1863,6 +1897,7 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
     title: title.present ? title.value : this.title,
     coverUrl: coverUrl.present ? coverUrl.value : this.coverUrl,
     author: author.present ? author.value : this.author,
+    artist: artist.present ? artist.value : this.artist,
     status: status.present ? status.value : this.status,
     description: description.present ? description.value : this.description,
     webUrl: webUrl.present ? webUrl.value : this.webUrl,
@@ -1876,6 +1911,7 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
       title: data.title.present ? data.title.value : this.title,
       coverUrl: data.coverUrl.present ? data.coverUrl.value : this.coverUrl,
       author: data.author.present ? data.author.value : this.author,
+      artist: data.artist.present ? data.artist.value : this.artist,
       status: data.status.present ? data.status.value : this.status,
       description:
           data.description.present ? data.description.value : this.description,
@@ -1893,6 +1929,7 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
           ..write('title: $title, ')
           ..write('coverUrl: $coverUrl, ')
           ..write('author: $author, ')
+          ..write('artist: $artist, ')
           ..write('status: $status, ')
           ..write('description: $description, ')
           ..write('webUrl: $webUrl, ')
@@ -1909,6 +1946,7 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
     title,
     coverUrl,
     author,
+    artist,
     status,
     description,
     webUrl,
@@ -1924,6 +1962,7 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
           other.title == this.title &&
           other.coverUrl == this.coverUrl &&
           other.author == this.author &&
+          other.artist == this.artist &&
           other.status == this.status &&
           other.description == this.description &&
           other.webUrl == this.webUrl &&
@@ -1937,6 +1976,7 @@ class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
   final Value<String?> title;
   final Value<String?> coverUrl;
   final Value<String?> author;
+  final Value<String?> artist;
   final Value<String?> status;
   final Value<String?> description;
   final Value<String?> webUrl;
@@ -1949,6 +1989,7 @@ class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
     this.title = const Value.absent(),
     this.coverUrl = const Value.absent(),
     this.author = const Value.absent(),
+    this.artist = const Value.absent(),
     this.status = const Value.absent(),
     this.description = const Value.absent(),
     this.webUrl = const Value.absent(),
@@ -1962,6 +2003,7 @@ class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
     this.title = const Value.absent(),
     this.coverUrl = const Value.absent(),
     this.author = const Value.absent(),
+    this.artist = const Value.absent(),
     this.status = const Value.absent(),
     this.description = const Value.absent(),
     this.webUrl = const Value.absent(),
@@ -1975,6 +2017,7 @@ class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
     Expression<String>? title,
     Expression<String>? coverUrl,
     Expression<String>? author,
+    Expression<String>? artist,
     Expression<String>? status,
     Expression<String>? description,
     Expression<String>? webUrl,
@@ -1988,6 +2031,7 @@ class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
       if (title != null) 'title': title,
       if (coverUrl != null) 'cover_url': coverUrl,
       if (author != null) 'author': author,
+      if (artist != null) 'artist': artist,
       if (status != null) 'status': status,
       if (description != null) 'description': description,
       if (webUrl != null) 'web_url': webUrl,
@@ -2003,6 +2047,7 @@ class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
     Value<String?>? title,
     Value<String?>? coverUrl,
     Value<String?>? author,
+    Value<String?>? artist,
     Value<String?>? status,
     Value<String?>? description,
     Value<String?>? webUrl,
@@ -2016,6 +2061,7 @@ class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
       title: title ?? this.title,
       coverUrl: coverUrl ?? this.coverUrl,
       author: author ?? this.author,
+      artist: artist ?? this.artist,
       status: status ?? this.status,
       description: description ?? this.description,
       webUrl: webUrl ?? this.webUrl,
@@ -2045,6 +2091,9 @@ class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
     if (author.present) {
       map['author'] = Variable<String>(author.value);
     }
+    if (artist.present) {
+      map['artist'] = Variable<String>(artist.value);
+    }
     if (status.present) {
       map['status'] = Variable<String>(status.value);
     }
@@ -2072,6 +2121,7 @@ class MangaTablesCompanion extends UpdateCompanion<MangaDrift> {
           ..write('title: $title, ')
           ..write('coverUrl: $coverUrl, ')
           ..write('author: $author, ')
+          ..write('artist: $artist, ')
           ..write('status: $status, ')
           ..write('description: $description, ')
           ..write('webUrl: $webUrl, ')
@@ -3691,6 +3741,18 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $RelationshipTablesTable(this);
   late final $JobTablesTable jobTables = $JobTablesTable(this);
   late final $FileTablesTable fileTables = $FileTablesTable(this);
+  late final Index idxRelationshipMangaId = Index(
+    'idx_relationship_manga_id',
+    'CREATE INDEX idx_relationship_manga_id ON relationship_tables (manga_id)',
+  );
+  late final Index idxJobChapterId = Index(
+    'idx_job_chapter_id',
+    'CREATE INDEX idx_job_chapter_id ON job_tables (chapter_id)',
+  );
+  late final Index idxJobMangaId = Index(
+    'idx_job_manga_id',
+    'CREATE INDEX idx_job_manga_id ON job_tables (manga_id)',
+  );
   late final MangaDao mangaDao = MangaDao(this as AppDatabase);
   late final ChapterDao chapterDao = ChapterDao(this as AppDatabase);
   late final LibraryDao libraryDao = LibraryDao(this as AppDatabase);
@@ -3712,6 +3774,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     relationshipTables,
     jobTables,
     fileTables,
+    idxRelationshipMangaId,
+    idxJobChapterId,
+    idxJobMangaId,
   ];
 }
 
@@ -4494,6 +4559,7 @@ typedef $$MangaTablesTableCreateCompanionBuilder =
       Value<String?> title,
       Value<String?> coverUrl,
       Value<String?> author,
+      Value<String?> artist,
       Value<String?> status,
       Value<String?> description,
       Value<String?> webUrl,
@@ -4508,6 +4574,7 @@ typedef $$MangaTablesTableUpdateCompanionBuilder =
       Value<String?> title,
       Value<String?> coverUrl,
       Value<String?> author,
+      Value<String?> artist,
       Value<String?> status,
       Value<String?> description,
       Value<String?> webUrl,
@@ -4551,6 +4618,11 @@ class $$MangaTablesTableFilterComposer
 
   ColumnFilters<String> get author => $composableBuilder(
     column: $table.author,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get artist => $composableBuilder(
+    column: $table.artist,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4614,6 +4686,11 @@ class $$MangaTablesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get artist => $composableBuilder(
+    column: $table.artist,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get status => $composableBuilder(
     column: $table.status,
     builder: (column) => ColumnOrderings(column),
@@ -4661,6 +4738,9 @@ class $$MangaTablesTableAnnotationComposer
 
   GeneratedColumn<String> get author =>
       $composableBuilder(column: $table.author, builder: (column) => column);
+
+  GeneratedColumn<String> get artist =>
+      $composableBuilder(column: $table.artist, builder: (column) => column);
 
   GeneratedColumn<String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
@@ -4715,6 +4795,7 @@ class $$MangaTablesTableTableManager
                 Value<String?> title = const Value.absent(),
                 Value<String?> coverUrl = const Value.absent(),
                 Value<String?> author = const Value.absent(),
+                Value<String?> artist = const Value.absent(),
                 Value<String?> status = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<String?> webUrl = const Value.absent(),
@@ -4727,6 +4808,7 @@ class $$MangaTablesTableTableManager
                 title: title,
                 coverUrl: coverUrl,
                 author: author,
+                artist: artist,
                 status: status,
                 description: description,
                 webUrl: webUrl,
@@ -4741,6 +4823,7 @@ class $$MangaTablesTableTableManager
                 Value<String?> title = const Value.absent(),
                 Value<String?> coverUrl = const Value.absent(),
                 Value<String?> author = const Value.absent(),
+                Value<String?> artist = const Value.absent(),
                 Value<String?> status = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<String?> webUrl = const Value.absent(),
@@ -4753,6 +4836,7 @@ class $$MangaTablesTableTableManager
                 title: title,
                 coverUrl: coverUrl,
                 author: author,
+                artist: artist,
                 status: status,
                 description: description,
                 webUrl: webUrl,

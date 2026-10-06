@@ -22,6 +22,10 @@ class Manga extends Equatable {
 
   final String? author;
 
+  /// Co-artist credits (MangaDex `artist` relationships), separate from
+  /// [author] (issue #131).
+  final String? artist;
+
   final String? status;
 
   final String? description;
@@ -41,6 +45,7 @@ class Manga extends Equatable {
     this.title,
     this.coverUrl,
     this.author,
+    this.artist,
     this.status,
     this.description,
     this.tags,
@@ -57,6 +62,7 @@ class Manga extends Equatable {
       title,
       coverUrl,
       author,
+      artist,
       status,
       description,
       tags,
@@ -79,6 +85,7 @@ class Manga extends Equatable {
       title: manga.title,
       coverUrl: manga.coverUrl,
       author: manga.author,
+      artist: manga.artist,
       status: manga.status,
       description: manga.description,
       webUrl: manga.webUrl,
@@ -95,6 +102,7 @@ class Manga extends Equatable {
       title: Value.absentIfNull(title),
       coverUrl: Value.absentIfNull(coverUrl),
       author: Value.absentIfNull(author),
+      artist: Value.absentIfNull(artist),
       status: Value.absentIfNull(status),
       description: Value.absentIfNull(description),
       webUrl: Value.absentIfNull(webUrl),
@@ -115,6 +123,7 @@ class Manga extends Equatable {
     String? title,
     String? coverUrl,
     String? author,
+    String? artist,
     String? status,
     String? description,
     List<Tag>? tags,
@@ -128,6 +137,7 @@ class Manga extends Equatable {
       title: title ?? this.title,
       coverUrl: coverUrl ?? this.coverUrl,
       author: author ?? this.author,
+      artist: artist ?? this.artist,
       status: status ?? this.status,
       description: description ?? this.description,
       tags: tags ?? this.tags,
@@ -160,8 +170,18 @@ class Manga extends Equatable {
       ),
       status: data.attributes?.status,
       tags: data.attributes?.tags?.map((e) => Tag.from(data: e)).toList(),
+      // Author and artist relationships share the same attribute shape and
+      // both parse as Relationship<AuthorDataAttributes>; the `type` field
+      // tells them apart (issue #131).
       author: data.relationships
           ?.whereType<Relationship<AuthorDataAttributes>>()
+          .where((e) => e.type == Include.author.rawValue)
+          .map((e) => e.attributes?.name)
+          .nonNulls
+          .join(' | '),
+      artist: data.relationships
+          ?.whereType<Relationship<AuthorDataAttributes>>()
+          .where((e) => e.type == Include.artist.rawValue)
           .map((e) => e.attributes?.name)
           .nonNulls
           .join(' | '),
@@ -175,6 +195,7 @@ class Manga extends Equatable {
       title: title ?? other?.title,
       coverUrl: coverUrl ?? other?.coverUrl,
       author: author ?? other?.author,
+      artist: artist ?? other?.artist,
       status: status ?? other?.status,
       description: description ?? other?.description,
       tags: tags?.isNotEmpty == true ? tags : other?.tags,
