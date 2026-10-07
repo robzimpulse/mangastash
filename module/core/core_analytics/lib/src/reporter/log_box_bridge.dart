@@ -213,8 +213,10 @@ class LogBoxBridge {
 
   /// Identity shared by [markFatal]'s arguments and a LogBox entry's stored
   /// strings — LogBox persists `error.toString()`/`stackTrace.toString()`.
+  /// An absent stack normalizes to the empty string so a hook logging a null
+  /// stack dedupes against the same fatal marked with [StackTrace.empty].
   String _fatalIdentity(String error, String? stackTrace) {
-    return '$error\u0000$stackTrace';
+    return '$error\u0000${stackTrace ?? ''}';
   }
 
   /// Resolves [contextKeys] without ever throwing: context keys are

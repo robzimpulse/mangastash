@@ -55,6 +55,10 @@ void main() async {
                 error: details.exception,
                 stackTrace: details.stack,
               );
+              locator.getOrNull<LogBoxBridge>()?.markFatal(
+                details.exception,
+                details.stack ?? StackTrace.empty,
+              );
               locator<CrashReporter>().reportFatal(
                 details.exception,
                 details.stack ?? StackTrace.empty,
@@ -68,6 +72,7 @@ void main() async {
                 error: error,
                 stackTrace: stack,
               );
+              locator.getOrNull<LogBoxBridge>()?.markFatal(error, stack);
               locator<CrashReporter>().reportFatal(error, stack);
               return true;
             };
@@ -78,18 +83,23 @@ void main() async {
                   if (pair is! List) return;
                   final Object? error = pair.firstOrNull.castOrNull();
                   final String? trace = pair.lastOrNull.castOrNull();
+                  final StackTrace stack =
+                      trace?.let((e) => StackTrace.fromString(e)) ??
+                      StackTrace.empty;
+                  final Object fatalError =
+                      error ?? Exception('Unknown isolate error');
 
                   logbox.log(
                     error.toString(),
                     name: 'Isolate',
                     error: error,
-                    stackTrace: trace?.let((e) => StackTrace.fromString(e)),
+                    stackTrace: stack,
                   );
-                  locator<CrashReporter>().reportFatal(
-                    error ?? Exception('Unknown isolate error'),
-                    trace?.let((e) => StackTrace.fromString(e)) ??
-                        StackTrace.empty,
+                  locator.getOrNull<LogBoxBridge>()?.markFatal(
+                    fatalError,
+                    stack,
                   );
+                  locator<CrashReporter>().reportFatal(fatalError, stack);
                 }).sendPort,
               );
             }

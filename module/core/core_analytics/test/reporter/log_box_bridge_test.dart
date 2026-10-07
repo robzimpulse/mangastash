@@ -104,7 +104,12 @@ void main() {
       final stack = StackTrace.current;
       // What the fatal path in main.dart calls before logging the same error.
       bridge.markFatal(error, stack);
-      logBox.log('uncaught exception', name: 'FlutterError', error: error, stackTrace: stack);
+      logBox.log(
+        'uncaught exception',
+        name: 'FlutterError',
+        error: error,
+        stackTrace: stack,
+      );
       await Future<void>.delayed(Duration.zero);
 
       expect(reporter.nonFatals, isEmpty);
@@ -120,6 +125,28 @@ void main() {
 
       expect(reporter.nonFatals, hasLength(1));
       expect(reporter.nonFatals.single.error.toString(), 'Bad state: other');
+      await bridge.close();
+    });
+
+    test('fatal with empty or absent stack dedupes like any other fatal',
+        () async {
+      final bridge = await startBridge();
+
+      final error = StateError('isolate boom');
+      // The isolate hook passes StackTrace.empty to markFatal AND logs it.
+      bridge.markFatal(error, StackTrace.empty);
+      logBox.log(
+        'isolate boom',
+        name: 'Isolate',
+        error: error,
+        stackTrace: StackTrace.empty,
+      );
+      // A hook variant logging a null stack while reporting StackTrace.empty
+      // must dedupe too: absent and empty stacks are the same "no stack".
+      logBox.log('isolate boom without trace', name: 'Isolate', error: error);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(reporter.nonFatals, isEmpty);
       await bridge.close();
     });
 
