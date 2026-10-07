@@ -55,6 +55,10 @@ void main() async {
                 error: details.exception,
                 stackTrace: details.stack,
               );
+              locator<CrashReporter>().reportFatal(
+                details.exception,
+                details.stack ?? StackTrace.empty,
+              );
             };
 
             PlatformDispatcher.instance.onError = (error, stack) {
@@ -64,6 +68,7 @@ void main() async {
                 error: error,
                 stackTrace: stack,
               );
+              locator<CrashReporter>().reportFatal(error, stack);
               return true;
             };
 
@@ -79,6 +84,11 @@ void main() async {
                     name: 'Isolate',
                     error: error,
                     stackTrace: trace?.let((e) => StackTrace.fromString(e)),
+                  );
+                  locator<CrashReporter>().reportFatal(
+                    error ?? Exception('Unknown isolate error'),
+                    trace?.let((e) => StackTrace.fromString(e)) ??
+                        StackTrace.empty,
                   );
                 }).sendPort,
               );
