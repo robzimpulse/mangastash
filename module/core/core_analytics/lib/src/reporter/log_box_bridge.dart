@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
@@ -20,7 +21,9 @@ import 'crash_reporter.dart';
 /// The subscription rides `LogBox.storage.liveStorage`, a [ChangeNotifier]
 /// that notifies on every write; new entries are detected by diffing entry
 /// identities, so merged updates with new content are forwarded while pure
-/// re-notifications are not.
+/// re-notifications are not. The diff itself is deferred by one microtask so
+/// a caller that logs an error and then marks it fatal in the same
+/// synchronous callback does not double-report.
 class LogBoxBridge {
   /// Creates a bridge over [logBox] forwarding to [reporter].
   ///
@@ -77,6 +80,10 @@ class LogBoxBridge {
   bool _started = false;
   bool _closed = false;
 
+  /// Whether a deferred diff is already scheduled, coalescing bursts of
+  /// writes into a single diff.
+  bool _diffScheduled = false;
+
   /// Marks [error] and [stack] as already reported through the fatal path so
   /// the matching LogBox entry is skipped instead of double-reported as a
   /// non-fatal. Call it wherever `reportFatal` is invoked.
@@ -108,7 +115,8 @@ class LogBoxBridge {
   }
 
   /// Stops forwarding entries and releases the subscription. Safe to call
-  /// more than once and after the storage has been disposed.
+  /// more than once and after the storage has been disposed. A diff deferred
+  /// by a write that raced the close is dropped, not forwarded.
   Future<void> close() async {
     if (_closed) {
       return;
@@ -122,14 +130,34 @@ class LogBoxBridge {
     }
     _forwardedKeys = {};
     _fatalIdentities.clear();
+    _diffScheduled = false;
   }
 
-  /// Diff `data` against the forwarded identities and forward what is new.
+  /// Schedules a diff of `data` against the forwarded identities, forwarding
+  /// what is new.
   ///
-  /// Runs synchronously inside LogBox's write path, so any failure is
-  /// swallowed after printing: forwarding must never break logging. LogBox is
-  /// not used for these failures to avoid re-entering this listener.
+  /// The diff runs one event-loop turn later, in a scheduled microtask: the
+  /// listener fires synchronously inside LogBox's write path, so processing
+  /// inline would race any caller that logs an error and THEN marks it fatal
+  /// in the same synchronous callback — the exact order of the fatal hooks in
+  /// `main.dart`. Deferring lets [markFatal] register the identity before the
+  /// diff sees the entry, and coalesces bursts of writes into one diff.
   void _onStorageChanged() {
+    if (_closed || _diffScheduled) {
+      return;
+    }
+    _diffScheduled = true;
+    scheduleMicrotask(_runDiff);
+  }
+
+  /// Runs the deferred diff. A diff still pending when [close] ran is dropped
+  /// by the closed guard instead of forwarding after close.
+  ///
+  /// Failures are swallowed after printing: forwarding must never break
+  /// logging. LogBox is not used for these failures to avoid re-entering the
+  /// listener that scheduled this diff.
+  void _runDiff() {
+    _diffScheduled = false;
     if (_closed) {
       return;
     }

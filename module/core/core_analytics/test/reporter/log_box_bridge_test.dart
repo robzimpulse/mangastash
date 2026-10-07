@@ -194,10 +194,67 @@ void main() {
       await bridge.close();
     });
 
+    test('production order (log, then markFatal) does not double-report',
+        () async {
+      final bridge = await startBridge();
+
+      final error = StateError('fatal');
+      final stack = StackTrace.current;
+      // The exact shape of the fatal hooks in main.dart: the error is logged
+      // first and marked fatal afterwards, in one synchronous callback.
+      logBox.log(
+        'Bad state: fatal',
+        name: 'FlutterError',
+        error: error,
+        stackTrace: stack,
+      );
+      bridge.markFatal(error, stack);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(reporter.nonFatals, isEmpty);
+      expect(reporter.fatals, isEmpty);
+      await bridge.close();
+    });
+
+    test('entries logged before start() are not replayed', () async {
+      logBox.log('history 1', name: 'Info');
+      logBox.log('opened reader', name: 'Navigation');
+      logBox.log(
+        'history 2',
+        name: 'Sync',
+        error: StateError('old'),
+        stackTrace: StackTrace.current,
+      );
+
+      final bridge = await startBridge();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(reporter.breadcrumbs, isEmpty);
+      expect(reporter.nonFatals, isEmpty);
+
+      // Entries arriving after start still forward.
+      logBox.log(
+        'fresh',
+        name: 'Sync',
+        error: StateError('new'),
+        stackTrace: StackTrace.current,
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(reporter.nonFatals, hasLength(1));
+      expect(reporter.nonFatals.single.error.toString(), 'Bad state: new');
+      await bridge.close();
+    });
+
     test('close() stops forwarding new entries', () async {
       final bridge = await startBridge();
 
       logBox.log('before', name: 'Info');
+      await Future<void>.delayed(Duration.zero);
+      expect(reporter.breadcrumbs, ['Info: before']);
+
+      // A diff pending at close time is dropped, not forwarded afterwards.
+      logBox.log('pending at close', name: 'Info');
       await bridge.close();
       logBox.log(
         'after',
