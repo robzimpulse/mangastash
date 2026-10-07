@@ -25,7 +25,9 @@ plugins {
     // stack traces (issue #190). 3.0.4 = latest stable 3.0.x, needs Gradle 7.5+ / AGP 7+.
     id "com.google.firebase.crashlytics" version "3.0.4" apply false
     // END: FlutterFire Configuration
-    id "org.jetbrains.kotlin.android" version "1.8.10" apply false
+    // Kotlin 2.x required by firebase_core 4.15.0's compilerOptions() KGP API (#190);
+    // 2.1.0 = Flutter 3.32-era template default, compatible with AGP 8.10.1 / Gradle 8.12.
+    id "org.jetbrains.kotlin.android" version "2.1.0" apply false
 }
 
 include ':app'
