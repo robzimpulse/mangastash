@@ -15,14 +15,16 @@ import 'reporter/noop_crash_reporter.dart';
 /// non-fatals, the rest as breadcrumbs).
 ///
 /// The crash reporter prefers Firebase Crashlytics. Platforms that cannot run
-/// it (web, Windows, Linux) and any Firebase initialization failure fall back
-/// to [NoOpCrashReporter] instead of blocking startup.
+/// it (web and every desktop target: macOS, Windows, Linux) and any Firebase
+/// initialization failure fall back to [NoOpCrashReporter] instead of blocking
+/// startup.
 class CoreAnalyticsRegistrar extends Registrar {
   /// Creates a registrar with overridable seams for tests.
   ///
   /// - [isSupportedPlatform] decides whether Firebase Crashlytics can run on
-  ///   the current platform. Defaults to the real check: not web and not
-  ///   Windows/Linux.
+  ///   the current platform. Defaults to the real check: Crashlytics runs on
+  ///   Android and iOS only — web and desktop (macOS, Windows, Linux) degrade
+  ///   to [NoOpCrashReporter].
   /// - [firebaseInit] initializes the default [FirebaseApp]. Defaults to
   ///   [Firebase.initializeApp].
   /// - [enableCollectionInDebug] keeps crash collection enabled in debug/test
@@ -46,15 +48,26 @@ class CoreAnalyticsRegistrar extends Registrar {
   /// Whether crash collection stays enabled in debug/test builds.
   final bool _enableCollectionInDebug;
 
-  /// Whether the current platform can run Firebase Crashlytics: everywhere
-  /// except web, Windows, and Linux.
+  /// Whether the current platform can run Firebase Crashlytics.
   static bool _defaultIsSupportedPlatform() {
-    if (kIsWeb) {
+    return supportsPlatform(isWeb: kIsWeb, platform: defaultTargetPlatform);
+  }
+
+  /// Decides whether [platform] running in web ([isWeb]) can use Firebase
+  /// Crashlytics. Pinned per spec: Crashlytics is Android + iOS only; web and
+  /// desktop (macOS, Windows, Linux) degrade to the [NoOpCrashReporter],
+  /// because no desktop/web Crashlytics method channel exists.
+  @visibleForTesting
+  static bool supportsPlatform({
+    required bool isWeb,
+    required TargetPlatform platform,
+  }) {
+    if (isWeb) {
       return false;
     }
-    return switch (defaultTargetPlatform) {
-      TargetPlatform.windows || TargetPlatform.linux => false,
-      _ => true,
+    return switch (platform) {
+      TargetPlatform.android || TargetPlatform.iOS => true,
+      _ => false,
     };
   }
 

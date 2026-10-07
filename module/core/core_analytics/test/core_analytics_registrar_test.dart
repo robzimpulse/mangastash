@@ -1,4 +1,5 @@
 import 'package:core_analytics/core_analytics.dart';
+import 'package:flutter/foundation.dart' show TargetPlatform;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:service_locator/service_locator.dart';
 
@@ -139,6 +140,34 @@ void main() {
         ),
         isEmpty,
       );
+    });
+
+    test('default platform seam supports Android and iOS only', () {
+      const supported = {TargetPlatform.android, TargetPlatform.iOS};
+      for (final platform in TargetPlatform.values) {
+        expect(
+          CoreAnalyticsRegistrar.supportsPlatform(
+            isWeb: false,
+            platform: platform,
+          ),
+          supported.contains(platform),
+          reason: '$platform must stay pinned per spec: Crashlytics is '
+              'Android + iOS only; desktop degrades to NoOpCrashReporter.',
+        );
+      }
+    });
+
+    test('default platform seam never supports web', () {
+      for (final platform in TargetPlatform.values) {
+        expect(
+          CoreAnalyticsRegistrar.supportsPlatform(
+            isWeb: true,
+            platform: platform,
+          ),
+          isFalse,
+          reason: 'web always degrades to NoOpCrashReporter ($platform).',
+        );
+      }
     });
   });
 }
