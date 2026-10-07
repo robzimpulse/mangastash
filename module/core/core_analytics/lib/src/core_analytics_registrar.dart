@@ -7,9 +7,12 @@ import 'package:service_locator/service_locator.dart';
 
 import 'reporter/crash_reporter.dart';
 import 'reporter/firebase_crash_reporter.dart';
+import 'reporter/log_box_bridge.dart';
 import 'reporter/noop_crash_reporter.dart';
 
-/// Registers the analytics services: [LogBox] and a [CrashReporter].
+/// Registers the analytics services: [LogBox], a [CrashReporter], and the
+/// [LogBoxBridge] forwarding LogBox entries to that reporter (errors as
+/// non-fatals, the rest as breadcrumbs).
 ///
 /// The crash reporter prefers Firebase Crashlytics. Platforms that cannot run
 /// it (web, Windows, Linux) and any Firebase initialization failure fall back
@@ -73,6 +76,15 @@ class CoreAnalyticsRegistrar extends Registrar {
     if (kDebugMode && !_enableCollectionInDebug) {
       await locator<CrashReporter>().setCollectionEnabled(false);
     }
+    final bridge = LogBoxBridge(
+      logBox: locator<LogBox>(),
+      reporter: locator<CrashReporter>(),
+    );
+    await bridge.start();
+    locator.registerSingleton<LogBoxBridge>(
+      bridge,
+      dispose: (bridge) => bridge.close(),
+    );
     final end = DateTime.timestamp();
     locator<LogBox>().log(
       'Register ${runtimeType.toString()}',
