@@ -10,17 +10,6 @@ class CoreAnalyticsRegistrar extends Registrar {
       LogBox(
         storage: Storage(
           liveDataStorage: MemoryStorage(capacity: 10000),
-          // TODO: Disable persistent storage
-          // persistentDataStorage: DriftPersistentStorage(
-          //   executor: await Executor.adaptive(),
-          //   decoder: {
-          //     (LogEntryModel).toString(): LogEntryModel.fromJson,
-          //     (WebviewEntryModel).toString(): WebviewEntryModel.fromJson,
-          //     (NavigationEntryModel).toString(): NavigationEntryModel.fromJson,
-          //     (TraceLogEntryModel).toString(): TraceLogEntryModel.fromJson,
-          //     (NetworkEntryModel).toString(): NetworkEntryModel.fromJson,
-          //   },
-          // ),
         ),
       ),
       dispose: (e) => e.dispose(),
