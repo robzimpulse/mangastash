@@ -10,6 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  firebase_core: ^4.15.0
+  firebase_crashlytics: ^5.4.0
   package_info_plus: ^8.3.0
   universal_io: ^2.2.2
   log_box:
@@ -46,3 +48,4 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  mocktail: ^1.0.5
