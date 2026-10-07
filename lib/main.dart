@@ -59,7 +59,7 @@ void main() async {
                 details.exception,
                 details.stack ?? StackTrace.empty,
               );
-              locator<CrashReporter>().reportFatal(
+              locator.getOrNull<CrashReporter>()?.reportFatal(
                 details.exception,
                 details.stack ?? StackTrace.empty,
               );
@@ -73,7 +73,7 @@ void main() async {
                 stackTrace: stack,
               );
               locator.getOrNull<LogBoxBridge>()?.markFatal(error, stack);
-              locator<CrashReporter>().reportFatal(error, stack);
+              locator.getOrNull<CrashReporter>()?.reportFatal(error, stack);
               return true;
             };
 
@@ -99,7 +99,10 @@ void main() async {
                     fatalError,
                     stack,
                   );
-                  locator<CrashReporter>().reportFatal(fatalError, stack);
+                  locator.getOrNull<CrashReporter>()?.reportFatal(
+                    fatalError,
+                    stack,
+                  );
                 }).sendPort,
               );
             }
