@@ -26,17 +26,25 @@ class CoreAnalyticsRegistrar extends Registrar {
   ///   Android and iOS only — web and desktop (macOS, Windows, Linux) degrade
   ///   to [NoOpCrashReporter].
   /// - [firebaseInit] initializes the default [FirebaseApp]. Defaults to
-  ///   [Firebase.initializeApp].
+  ///   [Firebase.initializeApp] with [firebaseOptions]; the app passes its
+  ///   generated options (`DefaultFirebaseOptions.currentPlatform`) here so
+  ///   the module itself stays app-agnostic.
+  /// - [firebaseOptions] the options used by the default [firebaseInit].
+  ///   `null` falls back to the native configs (`google-services.json` /
+  ///   `GoogleService-Info.plist`).
   /// - [enableCollectionInDebug] keeps crash collection enabled in debug/test
   ///   builds, where it is disabled by default so local crashes never reach
   ///   the dashboard.
   CoreAnalyticsRegistrar({
     bool Function()? isSupportedPlatform,
     Future<FirebaseApp> Function()? firebaseInit,
+    FirebaseOptions? firebaseOptions,
     bool enableCollectionInDebug = false,
   }) : _isSupportedPlatform =
            isSupportedPlatform ?? _defaultIsSupportedPlatform,
-       _firebaseInit = firebaseInit ?? Firebase.initializeApp,
+       _firebaseInit =
+           firebaseInit ??
+           (() => Firebase.initializeApp(options: firebaseOptions)),
        _enableCollectionInDebug = enableCollectionInDebug;
 
   /// Seam for the platform support check, replaceable in tests.
@@ -55,8 +63,9 @@ class CoreAnalyticsRegistrar extends Registrar {
 
   /// Decides whether [platform] running in web ([isWeb]) can use Firebase
   /// Crashlytics. Pinned per spec: Crashlytics is Android + iOS only; web and
-  /// desktop (macOS, Windows, Linux) degrade to the [NoOpCrashReporter],
-  /// because no desktop/web Crashlytics method channel exists.
+  /// desktop (macOS, Windows, Linux) degrade to the [NoOpCrashReporter] by
+  /// product decision (#190), not for lack of a plugin — the committed macOS
+  /// registrant still registers `FirebaseCrashlyticsPlugin`.
   @visibleForTesting
   static bool supportsPlatform({
     required bool isWeb,

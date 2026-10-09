@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
+import 'firebase_options.dart';
 import 'screen/apps_screen.dart';
 import 'screen/error_screen.dart';
 import 'screen/splash_screen.dart';
@@ -32,7 +33,11 @@ void main() async {
           await locator.reset();
 
           // TODO: register module registrar here
-          await locator.registerRegistrar(CoreAnalyticsRegistrar());
+          await locator.registerRegistrar(
+            CoreAnalyticsRegistrar(
+              firebaseOptions: DefaultFirebaseOptions.currentPlatform,
+            ),
+          );
           await locator.registerRegistrar(CoreStorageRegistrar());
           await locator.registerRegistrar(CoreNetworkRegistrar());
           await locator.registerRegistrar(CoreEnvironmentRegistrar());
