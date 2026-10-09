@@ -1,4 +1,5 @@
 import 'package:core_analytics/core_analytics.dart';
+import 'package:flutter/foundation.dart' show TargetPlatform;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:service_locator/service_locator.dart';
 
@@ -82,6 +83,91 @@ void main() {
       );
 
       await registrar.register(locator);
+    });
+
+    test('register() registers NoOpCrashReporter when Firebase init throws',
+        () async {
+      final registrar = CoreAnalyticsRegistrar(
+        firebaseInit: () async {
+          throw StateError('Firebase init failed');
+        },
+      );
+      await registrar.register(locator);
+
+      expect(locator<CrashReporter>(), isA<NoOpCrashReporter>());
+    });
+
+    test('register() registers NoOpCrashReporter on unsupported platforms',
+        () async {
+      final registrar = CoreAnalyticsRegistrar(
+        isSupportedPlatform: () => false,
+      );
+      await registrar.register(locator);
+
+      expect(locator<CrashReporter>(), isA<NoOpCrashReporter>());
+    });
+
+    test('register() disables crash collection in debug/test wiring',
+        () async {
+      final registrar = CoreAnalyticsRegistrar(
+        isSupportedPlatform: () => false,
+      );
+      await registrar.register(locator);
+
+      final reporter = locator<CrashReporter>() as NoOpCrashReporter;
+      expect(
+        reporter.calls,
+        contains(
+          isA<CrashReporterCall>()
+              .having((call) => call.method, 'method', 'setCollectionEnabled')
+              .having((call) => call.arguments, 'arguments', [false]),
+        ),
+      );
+    });
+
+    test('register() keeps collection enabled when explicitly enabled in debug',
+        () async {
+      final registrar = CoreAnalyticsRegistrar(
+        isSupportedPlatform: () => false,
+        enableCollectionInDebug: true,
+      );
+      await registrar.register(locator);
+
+      final reporter = locator<CrashReporter>() as NoOpCrashReporter;
+      expect(
+        reporter.calls.where(
+          (call) => call.method == 'setCollectionEnabled',
+        ),
+        isEmpty,
+      );
+    });
+
+    test('default platform seam supports Android and iOS only', () {
+      const supported = {TargetPlatform.android, TargetPlatform.iOS};
+      for (final platform in TargetPlatform.values) {
+        expect(
+          CoreAnalyticsRegistrar.supportsPlatform(
+            isWeb: false,
+            platform: platform,
+          ),
+          supported.contains(platform),
+          reason: '$platform must stay pinned per spec: Crashlytics is '
+              'Android + iOS only; desktop degrades to NoOpCrashReporter.',
+        );
+      }
+    });
+
+    test('default platform seam never supports web', () {
+      for (final platform in TargetPlatform.values) {
+        expect(
+          CoreAnalyticsRegistrar.supportsPlatform(
+            isWeb: true,
+            platform: platform,
+          ),
+          isFalse,
+          reason: 'web always degrades to NoOpCrashReporter ($platform).',
+        );
+      }
     });
   });
 }

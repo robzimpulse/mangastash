@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
 
+import 'firebase_options.dart';
 import 'screen/apps_screen.dart';
 import 'screen/error_screen.dart';
 import 'screen/splash_screen.dart';
@@ -32,7 +33,11 @@ void main() async {
           await locator.reset();
 
           // TODO: register module registrar here
-          await locator.registerRegistrar(CoreAnalyticsRegistrar());
+          await locator.registerRegistrar(
+            CoreAnalyticsRegistrar(
+              firebaseOptions: DefaultFirebaseOptions.currentPlatform,
+            ),
+          );
           await locator.registerRegistrar(CoreStorageRegistrar());
           await locator.registerRegistrar(CoreNetworkRegistrar());
           await locator.registerRegistrar(CoreEnvironmentRegistrar());
@@ -55,6 +60,14 @@ void main() async {
                 error: details.exception,
                 stackTrace: details.stack,
               );
+              locator.getOrNull<LogBoxBridge>()?.markFatal(
+                details.exception,
+                details.stack ?? StackTrace.empty,
+              );
+              locator.getOrNull<CrashReporter>()?.reportFatal(
+                details.exception,
+                details.stack ?? StackTrace.empty,
+              );
             };
 
             PlatformDispatcher.instance.onError = (error, stack) {
@@ -64,6 +77,8 @@ void main() async {
                 error: error,
                 stackTrace: stack,
               );
+              locator.getOrNull<LogBoxBridge>()?.markFatal(error, stack);
+              locator.getOrNull<CrashReporter>()?.reportFatal(error, stack);
               return true;
             };
 
@@ -73,12 +88,25 @@ void main() async {
                   if (pair is! List) return;
                   final Object? error = pair.firstOrNull.castOrNull();
                   final String? trace = pair.lastOrNull.castOrNull();
+                  final StackTrace stack =
+                      trace?.let((e) => StackTrace.fromString(e)) ??
+                      StackTrace.empty;
+                  final Object fatalError =
+                      error ?? Exception('Unknown isolate error');
 
                   logbox.log(
                     error.toString(),
                     name: 'Isolate',
                     error: error,
-                    stackTrace: trace?.let((e) => StackTrace.fromString(e)),
+                    stackTrace: stack,
+                  );
+                  locator.getOrNull<LogBoxBridge>()?.markFatal(
+                    fatalError,
+                    stack,
+                  );
+                  locator.getOrNull<CrashReporter>()?.reportFatal(
+                    fatalError,
+                    stack,
                   );
                 }).sendPort,
               );
