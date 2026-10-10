@@ -1,3 +1,10 @@
+// The app's Drift database (schema v7): declares every table and DAO, the
+// stepByStep migrations, and backup/restore/clear helpers.
+//
+// Usage: construct with an `Executor`; after changing a table, DAO or
+// `schemaVersion`, run build_runner and `drift_dev make-migrations` (see
+// CLAUDE.md "Adding a Drift Schema Version") and hand-write the new
+// `fromNToN+1` step below. v7 (issue #115) adds `SourceScriptTables`.
 import 'dart:async';
 
 import 'package:drift/drift.dart';
@@ -11,6 +18,7 @@ import '../dao/image_dao.dart';
 import '../dao/job_dao.dart';
 import '../dao/library_dao.dart';
 import '../dao/manga_dao.dart';
+import '../dao/source_script_dao.dart';
 import '../dao/tag_dao.dart';
 import '../tables/chapter_tables.dart';
 import '../tables/file_tables.dart';
@@ -19,8 +27,10 @@ import '../tables/job_tables.dart';
 import '../tables/library_tables.dart';
 import '../tables/manga_tables.dart';
 import '../tables/relationship_tables.dart';
+import '../tables/source_script_tables.dart';
 import '../tables/tag_tables.dart';
 import '../util/job_type_enum.dart';
+import '../util/source_script_origin.dart';
 import 'adapter/backup_database/backup_database_adapter.dart'
     if (dart.library.js_interop) 'adapter/backup_database/backup_database_web.dart'
     if (dart.library.io) 'adapter/backup_database/backup_database_io.dart';
@@ -42,6 +52,7 @@ part 'database.g.dart';
     RelationshipTables,
     JobTables,
     FileTables,
+    SourceScriptTables,
   ],
   daos: [
     MangaDao,
@@ -52,6 +63,7 @@ part 'database.g.dart';
     TagDao,
     HistoryDao,
     FileDao,
+    SourceScriptDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -65,7 +77,7 @@ class AppDatabase extends _$AppDatabase {
       super(executor.build());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration {
@@ -248,6 +260,11 @@ class AppDatabase extends _$AppDatabase {
           await customStatement(
             'UPDATE tag_tables SET tag_id = NULL WHERE $scraped',
           );
+        },
+        from6To7: (m, schema) async {
+          // v7 (issue #115): editable JavaScript source scripts. A new
+          // table only — no existing data is touched.
+          await m.createTable(schema.sourceScriptTables);
         },
       ),
     );

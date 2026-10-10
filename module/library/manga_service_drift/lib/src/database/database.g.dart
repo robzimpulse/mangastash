@@ -3729,6 +3729,533 @@ class FileTablesCompanion extends UpdateCompanion<FileDrift> {
   }
 }
 
+class $SourceScriptTablesTable extends SourceScriptTables
+    with TableInfo<$SourceScriptTablesTable, SourceScriptDrift> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SourceScriptTablesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.timestamp(),
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<SourceScriptOrigin, String>
+  origin = GeneratedColumn<String>(
+    'origin',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  ).withConverter<SourceScriptOrigin>(
+    $SourceScriptTablesTable.$converterorigin,
+  );
+  static const VerificationMeta _baseVersionMeta = const VerificationMeta(
+    'baseVersion',
+  );
+  @override
+  late final GeneratedColumn<int> baseVersion = GeneratedColumn<int>(
+    'base_version',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    createdAt,
+    updatedAt,
+    id,
+    name,
+    code,
+    version,
+    origin,
+    baseVersion,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'source_script_tables';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SourceScriptDrift> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_versionMeta);
+    }
+    if (data.containsKey('base_version')) {
+      context.handle(
+        _baseVersionMeta,
+        baseVersion.isAcceptableOrUnknown(
+          data['base_version']!,
+          _baseVersionMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SourceScriptDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SourceScriptDrift(
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      name:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}name'],
+          )!,
+      code:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}code'],
+          )!,
+      version:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}version'],
+          )!,
+      origin: $SourceScriptTablesTable.$converterorigin.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}origin'],
+        )!,
+      ),
+      baseVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}base_version'],
+      ),
+    );
+  }
+
+  @override
+  $SourceScriptTablesTable createAlias(String alias) {
+    return $SourceScriptTablesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<SourceScriptOrigin, String, String>
+  $converterorigin = const EnumNameConverter<SourceScriptOrigin>(
+    SourceScriptOrigin.values,
+  );
+}
+
+class SourceScriptDrift extends DataClass
+    implements Insertable<SourceScriptDrift> {
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String id;
+  final String name;
+  final String code;
+  final int version;
+  final SourceScriptOrigin origin;
+  final int? baseVersion;
+  const SourceScriptDrift({
+    required this.createdAt,
+    required this.updatedAt,
+    required this.id,
+    required this.name,
+    required this.code,
+    required this.version,
+    required this.origin,
+    this.baseVersion,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['code'] = Variable<String>(code);
+    map['version'] = Variable<int>(version);
+    {
+      map['origin'] = Variable<String>(
+        $SourceScriptTablesTable.$converterorigin.toSql(origin),
+      );
+    }
+    if (!nullToAbsent || baseVersion != null) {
+      map['base_version'] = Variable<int>(baseVersion);
+    }
+    return map;
+  }
+
+  SourceScriptTablesCompanion toCompanion(bool nullToAbsent) {
+    return SourceScriptTablesCompanion(
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      id: Value(id),
+      name: Value(name),
+      code: Value(code),
+      version: Value(version),
+      origin: Value(origin),
+      baseVersion:
+          baseVersion == null && nullToAbsent
+              ? const Value.absent()
+              : Value(baseVersion),
+    );
+  }
+
+  factory SourceScriptDrift.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SourceScriptDrift(
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      code: serializer.fromJson<String>(json['code']),
+      version: serializer.fromJson<int>(json['version']),
+      origin: $SourceScriptTablesTable.$converterorigin.fromJson(
+        serializer.fromJson<String>(json['origin']),
+      ),
+      baseVersion: serializer.fromJson<int?>(json['baseVersion']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'code': serializer.toJson<String>(code),
+      'version': serializer.toJson<int>(version),
+      'origin': serializer.toJson<String>(
+        $SourceScriptTablesTable.$converterorigin.toJson(origin),
+      ),
+      'baseVersion': serializer.toJson<int?>(baseVersion),
+    };
+  }
+
+  SourceScriptDrift copyWith({
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? id,
+    String? name,
+    String? code,
+    int? version,
+    SourceScriptOrigin? origin,
+    Value<int?> baseVersion = const Value.absent(),
+  }) => SourceScriptDrift(
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    id: id ?? this.id,
+    name: name ?? this.name,
+    code: code ?? this.code,
+    version: version ?? this.version,
+    origin: origin ?? this.origin,
+    baseVersion: baseVersion.present ? baseVersion.value : this.baseVersion,
+  );
+  SourceScriptDrift copyWithCompanion(SourceScriptTablesCompanion data) {
+    return SourceScriptDrift(
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      code: data.code.present ? data.code.value : this.code,
+      version: data.version.present ? data.version.value : this.version,
+      origin: data.origin.present ? data.origin.value : this.origin,
+      baseVersion:
+          data.baseVersion.present ? data.baseVersion.value : this.baseVersion,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SourceScriptDrift(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('code: $code, ')
+          ..write('version: $version, ')
+          ..write('origin: $origin, ')
+          ..write('baseVersion: $baseVersion')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    createdAt,
+    updatedAt,
+    id,
+    name,
+    code,
+    version,
+    origin,
+    baseVersion,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SourceScriptDrift &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.code == this.code &&
+          other.version == this.version &&
+          other.origin == this.origin &&
+          other.baseVersion == this.baseVersion);
+}
+
+class SourceScriptTablesCompanion extends UpdateCompanion<SourceScriptDrift> {
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String> code;
+  final Value<int> version;
+  final Value<SourceScriptOrigin> origin;
+  final Value<int?> baseVersion;
+  final Value<int> rowid;
+  const SourceScriptTablesCompanion({
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.code = const Value.absent(),
+    this.version = const Value.absent(),
+    this.origin = const Value.absent(),
+    this.baseVersion = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SourceScriptTablesCompanion.insert({
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    required String id,
+    required String name,
+    required String code,
+    required int version,
+    required SourceScriptOrigin origin,
+    this.baseVersion = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       code = Value(code),
+       version = Value(version),
+       origin = Value(origin);
+  static Insertable<SourceScriptDrift> custom({
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? code,
+    Expression<int>? version,
+    Expression<String>? origin,
+    Expression<int>? baseVersion,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (code != null) 'code': code,
+      if (version != null) 'version': version,
+      if (origin != null) 'origin': origin,
+      if (baseVersion != null) 'base_version': baseVersion,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SourceScriptTablesCompanion copyWith({
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<String>? id,
+    Value<String>? name,
+    Value<String>? code,
+    Value<int>? version,
+    Value<SourceScriptOrigin>? origin,
+    Value<int?>? baseVersion,
+    Value<int>? rowid,
+  }) {
+    return SourceScriptTablesCompanion(
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      id: id ?? this.id,
+      name: name ?? this.name,
+      code: code ?? this.code,
+      version: version ?? this.version,
+      origin: origin ?? this.origin,
+      baseVersion: baseVersion ?? this.baseVersion,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (origin.present) {
+      map['origin'] = Variable<String>(
+        $SourceScriptTablesTable.$converterorigin.toSql(origin.value),
+      );
+    }
+    if (baseVersion.present) {
+      map['base_version'] = Variable<int>(baseVersion.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SourceScriptTablesCompanion(')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('code: $code, ')
+          ..write('version: $version, ')
+          ..write('origin: $origin, ')
+          ..write('baseVersion: $baseVersion, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3741,6 +4268,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $RelationshipTablesTable(this);
   late final $JobTablesTable jobTables = $JobTablesTable(this);
   late final $FileTablesTable fileTables = $FileTablesTable(this);
+  late final $SourceScriptTablesTable sourceScriptTables =
+      $SourceScriptTablesTable(this);
   late final Index idxRelationshipMangaId = Index(
     'idx_relationship_manga_id',
     'CREATE INDEX idx_relationship_manga_id ON relationship_tables (manga_id)',
@@ -3761,6 +4290,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final TagDao tagDao = TagDao(this as AppDatabase);
   late final HistoryDao historyDao = HistoryDao(this as AppDatabase);
   late final FileDao fileDao = FileDao(this as AppDatabase);
+  late final SourceScriptDao sourceScriptDao = SourceScriptDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3774,6 +4306,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     relationshipTables,
     jobTables,
     fileTables,
+    sourceScriptTables,
     idxRelationshipMangaId,
     idxJobChapterId,
     idxJobMangaId,
@@ -5755,6 +6288,292 @@ typedef $$FileTablesTableProcessedTableManager =
       FileDrift,
       PrefetchHooks Function()
     >;
+typedef $$SourceScriptTablesTableCreateCompanionBuilder =
+    SourceScriptTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      required String id,
+      required String name,
+      required String code,
+      required int version,
+      required SourceScriptOrigin origin,
+      Value<int?> baseVersion,
+      Value<int> rowid,
+    });
+typedef $$SourceScriptTablesTableUpdateCompanionBuilder =
+    SourceScriptTablesCompanion Function({
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<String> id,
+      Value<String> name,
+      Value<String> code,
+      Value<int> version,
+      Value<SourceScriptOrigin> origin,
+      Value<int?> baseVersion,
+      Value<int> rowid,
+    });
+
+class $$SourceScriptTablesTableFilterComposer
+    extends Composer<_$AppDatabase, $SourceScriptTablesTable> {
+  $$SourceScriptTablesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<SourceScriptOrigin, SourceScriptOrigin, String>
+  get origin => $composableBuilder(
+    column: $table.origin,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<int> get baseVersion => $composableBuilder(
+    column: $table.baseVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$SourceScriptTablesTableOrderingComposer
+    extends Composer<_$AppDatabase, $SourceScriptTablesTable> {
+  $$SourceScriptTablesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get origin => $composableBuilder(
+    column: $table.origin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get baseVersion => $composableBuilder(
+    column: $table.baseVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$SourceScriptTablesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SourceScriptTablesTable> {
+  $$SourceScriptTablesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<SourceScriptOrigin, String> get origin =>
+      $composableBuilder(column: $table.origin, builder: (column) => column);
+
+  GeneratedColumn<int> get baseVersion => $composableBuilder(
+    column: $table.baseVersion,
+    builder: (column) => column,
+  );
+}
+
+class $$SourceScriptTablesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SourceScriptTablesTable,
+          SourceScriptDrift,
+          $$SourceScriptTablesTableFilterComposer,
+          $$SourceScriptTablesTableOrderingComposer,
+          $$SourceScriptTablesTableAnnotationComposer,
+          $$SourceScriptTablesTableCreateCompanionBuilder,
+          $$SourceScriptTablesTableUpdateCompanionBuilder,
+          (
+            SourceScriptDrift,
+            BaseReferences<
+              _$AppDatabase,
+              $SourceScriptTablesTable,
+              SourceScriptDrift
+            >,
+          ),
+          SourceScriptDrift,
+          PrefetchHooks Function()
+        > {
+  $$SourceScriptTablesTableTableManager(
+    _$AppDatabase db,
+    $SourceScriptTablesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$SourceScriptTablesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$SourceScriptTablesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$SourceScriptTablesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> code = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<SourceScriptOrigin> origin = const Value.absent(),
+                Value<int?> baseVersion = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SourceScriptTablesCompanion(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                name: name,
+                code: code,
+                version: version,
+                origin: origin,
+                baseVersion: baseVersion,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                required String id,
+                required String name,
+                required String code,
+                required int version,
+                required SourceScriptOrigin origin,
+                Value<int?> baseVersion = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SourceScriptTablesCompanion.insert(
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                id: id,
+                name: name,
+                code: code,
+                version: version,
+                origin: origin,
+                baseVersion: baseVersion,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$SourceScriptTablesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $SourceScriptTablesTable,
+      SourceScriptDrift,
+      $$SourceScriptTablesTableFilterComposer,
+      $$SourceScriptTablesTableOrderingComposer,
+      $$SourceScriptTablesTableAnnotationComposer,
+      $$SourceScriptTablesTableCreateCompanionBuilder,
+      $$SourceScriptTablesTableUpdateCompanionBuilder,
+      (
+        SourceScriptDrift,
+        BaseReferences<
+          _$AppDatabase,
+          $SourceScriptTablesTable,
+          SourceScriptDrift
+        >,
+      ),
+      SourceScriptDrift,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5775,4 +6594,6 @@ class $AppDatabaseManager {
       $$JobTablesTableTableManager(_db, _db.jobTables);
   $$FileTablesTableTableManager get fileTables =>
       $$FileTablesTableTableManager(_db, _db.fileTables);
+  $$SourceScriptTablesTableTableManager get sourceScriptTables =>
+      $$SourceScriptTablesTableTableManager(_db, _db.sourceScriptTables);
 }
