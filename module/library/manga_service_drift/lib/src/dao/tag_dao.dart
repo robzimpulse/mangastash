@@ -114,8 +114,12 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
           }
         }
 
+        // A matched row keeps its id: the upsert then conflicts on the
+        // primary key and updates in place. Taking the entry's id would
+        // insert a duplicate whenever source is NULL (NULLs never collide
+        // on the per-source unique keys) and renumber a referenced id.
         final value = entry.copyWith(
-          id: Value.absentIfNull(entry.id.valueOrNull ?? tag?.id),
+          id: Value.absentIfNull(tag?.id ?? entry.id.valueOrNull),
           tagId: Value.absentIfNull(entry.tagId.valueOrNull ?? tag?.tagId),
           name: Value.absentIfNull(entry.name.valueOrNull ?? tag?.name),
         );

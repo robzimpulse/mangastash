@@ -12,6 +12,7 @@ import 'generated/schema_v2.dart' as v2;
 import 'generated/schema_v3.dart' as v3;
 import 'generated/schema_v4.dart' as v4;
 import 'generated/schema_v5.dart' as v5;
+import 'generated/schema_v6.dart' as v6;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -404,6 +405,128 @@ void main() {
 
         expect(await newDb.select(newDb.chapterTables).get(), hasLength(1));
         expect(await newDb.select(newDb.jobTables).get(), hasLength(1));
+      },
+    );
+  });
+
+  // v6 scopes tag uniqueness per source. Under v5's global (tag_id, name)
+  // key, a second source upserting ('action', 'Action') rewrote the first
+  // source's row to its own source ("stolen" row) — so v6 also repairs
+  // links and invalidates scraped tag caches, without losing a genre link.
+  test('v5 to v6 rebuilds tag keys per source and repairs stolen tags', () async {
+    const katana = 'Manga Katana';
+    const asura = 'Asura Scans';
+    const dex = 'Manga Dex';
+    const uuidAction = '391b0423-d847-456f-aff0-8b0cfc03066b';
+    const uuidDrama = 'b9af3a63-f058-46de-a9a0-e0c13906197a';
+
+    await verifier.testWithDataIntegrity(
+      oldVersion: 5,
+      newVersion: 6,
+      createOld: v5.DatabaseAtV5.new,
+      createNew: v6.DatabaseAtV6.new,
+      openTestedDatabase: (executor) {
+        return AppDatabase(executor: MemoryExecutor(executor: executor));
+      },
+      createItems: (batch, oldDb) {
+        v5.MangaTablesData manga(String id, String source) {
+          return v5.MangaTablesData(
+            createdAt: 1000,
+            updatedAt: 1000,
+            id: id,
+            webUrl: 'https://example.com/$id',
+            source: source,
+          );
+        }
+
+        v5.TagTablesData tag(int id, String? tagId, String name, String src) {
+          return v5.TagTablesData(
+            createdAt: 1000,
+            updatedAt: 1000,
+            id: id,
+            tagId: tagId,
+            name: name,
+            source: src,
+          );
+        }
+
+        v5.RelationshipTablesData link(int tagId, String mangaId) {
+          return v5.RelationshipTablesData(
+            createdAt: 1000,
+            updatedAt: 1000,
+            tagId: tagId,
+            mangaId: mangaId,
+          );
+        }
+
+        batch.insertAll(oldDb.mangaTables, [
+          manga('mk1', katana),
+          manga('as1', asura),
+          manga('md1', dex),
+        ]);
+        batch.insertAll(oldDb.tagTables, [
+          // Katana's row, rewritten to Asura by the v5 upsert.
+          tag(1, 'action', 'Action', asura),
+          tag(2, null, 'Romance', katana),
+          // Unreferenced genre-list cache row.
+          tag(3, 'comedy', 'Comedy', katana),
+          tag(4, uuidAction, 'Action', dex),
+          tag(5, uuidDrama, 'Drama', dex),
+          // NULL tag_id escaped v5's key: duplicate of 2 by (source, name).
+          tag(6, null, 'Romance', katana),
+          // Different names escaped v5's key: duplicates by (source, tag_id).
+          tag(7, 'drama', 'Drama', asura),
+          tag(8, 'drama', 'Dramas', asura),
+        ]);
+        batch.insertAll(oldDb.relationshipTables, [
+          link(1, 'mk1'),
+          link(1, 'as1'),
+          link(2, 'mk1'),
+          link(4, 'md1'),
+          link(6, 'mk1'),
+          link(8, 'as1'),
+        ]);
+      },
+      validateItems: (newDb) async {
+        final tags = await newDb.select(newDb.tagTables).get();
+        final byId = {for (final t in tags) t.id: t};
+
+        // Duplicates merged into the lowest id; the unreferenced scraped
+        // row is dropped; a fresh Katana 'Action' row replaces the stolen one.
+        expect(
+          tags.map((e) => (e.name, e.source)),
+          unorderedEquals([
+            ('Action', asura),
+            ('Romance', katana),
+            ('Action', dex),
+            ('Drama', dex),
+            ('Drama', asura),
+            ('Action', katana),
+          ]),
+        );
+        expect(byId.keys, containsAll([1, 2, 4, 5, 7]));
+
+        // Scraped tag ids are cleared so GetTagsUseCase re-scrapes the
+        // genre lists (one may be missing rows lost to the old upsert).
+        final scraped = tags.where((e) => e.source != dex);
+        expect(scraped.map((e) => e.tagId).toSet(), {null});
+        expect(byId[4]?.tagId, uuidAction);
+        expect(byId[5]?.tagId, uuidDrama);
+
+        final katanaAction = tags.singleWhere(
+          (e) => e.name == 'Action' && e.source == katana,
+        );
+        final links = await newDb.select(newDb.relationshipTables).get();
+        expect(
+          links.map((e) => (e.tagId, e.mangaId)),
+          unorderedEquals([
+            (katanaAction.id, 'mk1'),
+            (1, 'as1'),
+            (2, 'mk1'),
+            (4, 'md1'),
+            (7, 'as1'),
+          ]),
+        );
       },
     );
   });

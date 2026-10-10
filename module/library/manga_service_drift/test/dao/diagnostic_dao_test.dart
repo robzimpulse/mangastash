@@ -79,11 +79,12 @@ void main() {
     });
 
     test('duplicateTag', () async {
+      // v6 enforces (source, name) per source; NULL-source rows are the
+      // duplicates the diagnostic can still find (NULLs never collide).
       final t1 = TagTablesCompanion(
         id: const Value(1),
         tagId: const Value('dup_tag_1'),
         name: const Value('Name'),
-        source: const Value('src'),
         createdAt: Value(DateTime.now()),
         updatedAt: Value(DateTime.now()),
       );
@@ -91,7 +92,6 @@ void main() {
         id: const Value(2),
         tagId: const Value('dup_tag_2'),
         name: const Value('Name'),
-        source: const Value('src'),
         createdAt: Value(DateTime.now()),
         updatedAt: Value(DateTime.now()),
       );

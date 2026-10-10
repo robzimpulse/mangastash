@@ -109,4 +109,71 @@ void main() {
       ]);
     },
   );
+
+  group('cache', () {
+    TagDrift row({String? tagId}) {
+      return TagDrift(
+        createdAt: DateTime.utc(2026),
+        updatedAt: DateTime.utc(2026),
+        id: 1,
+        tagId: tagId,
+        name: 'Action',
+        source: AsuraScanSourceExternal().name,
+      );
+    }
+
+    void stubOpen() {
+      when(
+        () => webview.open(
+          any(),
+          scripts: any(named: 'scripts'),
+          readyWhenSelectors: any(named: 'readyWhenSelectors'),
+          useCache: any(named: 'useCache'),
+          timeout: any(named: 'timeout'),
+        ),
+      ).thenAnswer((_) async => html_parser.parse('<html></html>'));
+    }
+
+    test('returns cached genre list without scraping', () async {
+      stubOpen();
+      when(
+        () => tagDao.search(sources: any(named: 'sources')),
+      ).thenAnswer((_) async => [row(tagId: 'action')]);
+
+      final result = await useCase.execute(source: AsuraScanSourceExternal());
+
+      expect((result as Success<List<Tag>>).data.single.id, 'action');
+      verifyNever(
+        () => webview.open(
+          any(),
+          scripts: any(named: 'scripts'),
+          readyWhenSelectors: any(named: 'readyWhenSelectors'),
+          useCache: any(named: 'useCache'),
+          timeout: any(named: 'timeout'),
+        ),
+      );
+    });
+
+    // Name-only rows come from manga detail syncs (TagDao.reattach) or the
+    // schema v6 repair — they are not a genre list, so scrape one.
+    test('scrapes when cached tags have no tag ids', () async {
+      stubOpen();
+      when(
+        () => tagDao.search(sources: any(named: 'sources')),
+      ).thenAnswer((_) async => [row()]);
+
+      final result = await useCase.execute(source: AsuraScanSourceExternal());
+
+      expect(result, isA<Success<List<Tag>>>());
+      verify(
+        () => webview.open(
+          any(),
+          scripts: any(named: 'scripts'),
+          readyWhenSelectors: any(named: 'readyWhenSelectors'),
+          useCache: any(named: 'useCache'),
+          timeout: any(named: 'timeout'),
+        ),
+      ).called(1);
+    });
+  });
 }

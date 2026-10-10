@@ -70,7 +70,10 @@ class GetTagsUseCase with SyncTagsMixin {
     try {
       final cache = await _tagDao.search(sources: [source.name]);
       final tags = [...cache.map(Tag.fromDrift)];
-      if (tags.isNotEmpty && useCache) return Success(tags);
+      // Name-only rows (manga detail syncs, the schema v6 repair) are not
+      // a genre list: without any tag id the cache is a miss.
+      final isGenreList = tags.any((e) => e.id != null);
+      if (isGenreList && useCache) return Success(tags);
 
       final data =
           source.builtIn

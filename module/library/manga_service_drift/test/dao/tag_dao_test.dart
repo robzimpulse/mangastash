@@ -207,5 +207,47 @@ void main() {
         );
       });
     });
+
+    // Scraped sources derive tag ids from genre slugs, so different sources
+    // emit the same (tagId, name) pair — uniqueness must be per source.
+    group('Same Tag Across Sources', () {
+      TagTablesCompanion action(String source, {String? tagId}) {
+        return TagTablesCompanion(
+          tagId: Value.absentIfNull(tagId),
+          name: const Value('Action'),
+          source: Value(source),
+        );
+      }
+
+      test('Keeps One Row Per Source', () async {
+        await dao.adds(values: [action('Manga Katana', tagId: 'action')]);
+        await dao.adds(values: [action('Asura Scans', tagId: 'action')]);
+
+        final rows = await dao.search(names: ['Action']);
+        expect(
+          rows.map((e) => (e.tagId, e.source)),
+          unorderedEquals([
+            ('action', 'Manga Katana'),
+            ('action', 'Asura Scans'),
+          ]),
+        );
+      });
+
+      test('Upgrades Name-Only Row When Another Source Has The Pair', () async {
+        await dao.adds(values: [action('Manga Katana', tagId: 'action')]);
+        final nameOnly = await dao.adds(values: [action('Asura Scans')]);
+
+        final upgraded = await dao.adds(
+          values: [action('Asura Scans', tagId: 'action')],
+        );
+
+        expect(upgraded.single.id, equals(nameOnly.single.id));
+        expect(upgraded.single.tagId, equals('action'));
+        expect(
+          (await dao.search(sources: ['Manga Katana'])).single.tagId,
+          equals('action'),
+        );
+      });
+    });
   });
 }

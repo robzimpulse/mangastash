@@ -65,7 +65,7 @@ class AppDatabase extends _$AppDatabase {
       super(executor.build());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration {
@@ -164,6 +164,89 @@ class AppDatabase extends _$AppDatabase {
               'idx_job_manga_id',
               'CREATE INDEX idx_job_manga_id ON job_tables (manga_id)',
             ),
+          );
+        },
+        from5To6: (m, schema) async {
+          // v6: tag uniqueness is per source. v5's global (tag_id, name)
+          // key collided across scraped sources sharing genre slugs, and
+          // TagDao's DO UPDATE upsert then rewrote the other source's row
+          // to its own source ("stolen" rows). Steps run in this order:
+          // dedupe (so the rebuild's new keys hold), rebuild, repair the
+          // stolen rows' links, then invalidate scraped tag caches.
+
+          // 1. Merge rows that v5 allowed but v6 keys reject (NULL tag_id
+          // escaped v5's key; same slug with different names too) into the
+          // lowest id of each group, moving their manga links first.
+          for (final key in const ['name', 'tag_id']) {
+            const dup = 'd.id > (SELECT MIN(k.id) FROM tag_tables k '
+                'WHERE k.source = d.source AND k.{key} = d.{key})';
+            await customStatement(
+              'INSERT OR IGNORE INTO relationship_tables '
+              '(created_at, updated_at, tag_id, manga_id) '
+              'SELECT r.created_at, r.updated_at, '
+              '(SELECT MIN(k.id) FROM tag_tables k WHERE '
+              'k.source = d.source AND k.$key = d.$key), r.manga_id '
+              'FROM relationship_tables r '
+              'JOIN tag_tables d ON d.id = r.tag_id '
+              'WHERE ${dup.replaceAll('{key}', key)}',
+            );
+            await customStatement(
+              'DELETE FROM tag_tables AS d '
+              'WHERE ${dup.replaceAll('{key}', key)}',
+            );
+          }
+          // FK enforcement may be off during migration (no cascade).
+          await customStatement(
+            'DELETE FROM relationship_tables WHERE tag_id NOT IN '
+            '(SELECT id FROM tag_tables)',
+          );
+
+          // 2. SQLite cannot drop a table-level UNIQUE: rebuild the table.
+          // Row ids are copied, so relationship_tables stays valid.
+          await m.alterTable(TableMigration(tagTables));
+
+          // 3. A stolen row is linked to manga of a different source than
+          // its own. Recreate the tag under the manga's source and move
+          // those links onto it. Tag and manga source are always equal
+          // for honest links (MangaDao.reattach passes the manga source).
+          const links = 'FROM relationship_tables r '
+              'JOIN tag_tables t ON t.id = r.tag_id '
+              'JOIN manga_tables m ON m.id = r.manga_id';
+          const mismatch = '$links '
+              'WHERE m.source IS NOT NULL AND t.source IS NOT NULL '
+              'AND m.source <> t.source';
+          await customStatement(
+            'INSERT OR IGNORE INTO tag_tables '
+            '(created_at, updated_at, name, source) '
+            'SELECT MIN(t.created_at), MAX(t.updated_at), t.name, m.source '
+            '$mismatch GROUP BY t.name, m.source',
+          );
+          await customStatement(
+            'INSERT OR IGNORE INTO relationship_tables '
+            '(created_at, updated_at, tag_id, manga_id) '
+            'SELECT r.created_at, r.updated_at, n.id, r.manga_id $links '
+            'JOIN tag_tables n ON n.source = m.source AND n.name = t.name '
+            'WHERE m.source <> t.source',
+          );
+          await customStatement(
+            'DELETE FROM relationship_tables WHERE rowid IN '
+            '(SELECT r.rowid $mismatch)',
+          );
+
+          // 4. A source whose row was stolen has an incomplete cached genre
+          // list, and which source lost rows is unknowable. Drop unlinked
+          // scraped tags and clear scraped tag ids: GetTagsUseCase treats a
+          // cache without tag ids as a miss and re-scrapes, and TagDao.adds
+          // re-attaches the slugs by name, keeping every manga link.
+          // 'Manga Dex' (MangaDexSourceExternal.name) is skipped: its ids
+          // are API UUIDs that never collided.
+          const scraped = "source IS NOT NULL AND source <> 'Manga Dex'";
+          await customStatement(
+            'DELETE FROM tag_tables WHERE $scraped AND id NOT IN '
+            '(SELECT tag_id FROM relationship_tables)',
+          );
+          await customStatement(
+            'UPDATE tag_tables SET tag_id = NULL WHERE $scraped',
           );
         },
       ),

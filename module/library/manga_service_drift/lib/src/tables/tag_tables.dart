@@ -11,9 +11,12 @@ class TagTables extends Table with AutoTimestampTable, AutoIntegerIdTable {
 
   TextColumn get source => text().named('source').nullable()();
 
+  // Per-source keys (schema v6): scraped sources derive tag ids from genre
+  // slugs, so different sources share (tagId, name) pairs like
+  // ('action', 'Action'). A global key made them collide.
   @override
   List<Set<Column<Object>>>? get uniqueKeys => [
-    {tagId, name},
-    {tagId, name, source},
+    {source, tagId},
+    {source, name},
   ];
 }
