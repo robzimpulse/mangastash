@@ -1,0 +1,25 @@
+<html><body>
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4"
+         x-show="show_filter" x-transition>
+  <fieldset class="fieldset text-base mt-2">
+    <label class="fieldset-label">
+      <input type="radio" class="radio" name="sort" value="Best Match" checked>
+      <span class="ml-2 cursor-pointer">Best Match</span>
+    </label>
+  </fieldset>
+  <fieldset class="fieldset text-base mt-2">
+    <label class="fieldset-label">
+      <input type="checkbox" class="checkbox " form="advanced-search-form"
+             id="tag-Action" value="0">
+      <span class="ml-2 cursor-pointer">Action</span>
+    </label>
+  </fieldset>
+  <fieldset class="fieldset text-base mt-2">
+    <label class="fieldset-label">
+      <input type="checkbox" class="checkbox " form="advanced-search-form"
+             id="tag-Adventure" value="0">
+      <span class="ml-2 cursor-pointer">Adventure</span>
+    </label>
+  </fieldset>
+</section>
+</body></html>
