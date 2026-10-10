@@ -6,7 +6,8 @@
 // from SourceScriptDao (CoreStorageRegistrar) and RunSourceScriptUseCase
 // (CoreNetworkRegistrar) — both registrars must run before this one. It is
 // bound to the static `Sources` facade for widgets without locator access.
-// GlobalOptionsManager awaits it; [allReady] awaits both.
+// GlobalOptionsManager awaits it; [allReady] awaits both. FixPromptBuilder
+// (the copy-fix prompt, §10.1) is a plain factory over rootBundle.loadString.
 //
 // Usage: `await locator.registerRegistrar(DomainMangaRegistrar())` after the
 // core registrars (see WrapperScreen in lib/main.dart), then
@@ -21,6 +22,7 @@ import 'manager/history_manager.dart';
 import 'manager/job_manager.dart';
 import 'manager/library_manager.dart';
 import 'manager/source_registry.dart';
+import 'prompt/fix_prompt_builder.dart';
 import 'sources/sources.dart';
 import 'use_case/cancel_job_use_case.dart';
 import 'use_case/chapter/get_all_chapter_use_case.dart';
@@ -117,6 +119,11 @@ class DomainMangaRegistrar extends Registrar {
     );
     locator.alias<ListenReadHistoryUseCase, HistoryManager>();
     locator.alias<ListenUnreadHistoryUseCase, HistoryManager>();
+
+    // fix-source prompt builder (issue #115): template read from the bundle
+    locator.registerFactory(
+      () => FixPromptBuilder(loadAsset: rootBundle.loadString),
+    );
 
     // manga dex services
     locator.registerFactory(() => MangaService(locator()));

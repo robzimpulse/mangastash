@@ -1,6 +1,8 @@
 /// Public API of domain_manga: use cases, managers' use-case interfaces, the
 /// SourceRegistry of scripted sources (issue #115) with its SourceEntry model,
-/// the SourceExternal implementations and the static `Sources` facade.
+/// the SourceExternal implementations, the static `Sources` facade and the
+/// fix-source prompt helpers (FixPromptBuilder, trimPageHtml,
+/// extractScriptFromReply).
 ///
 /// Usage: `import 'package:domain_manga/domain_manga.dart';` and resolve
 /// services from the locator after `DomainMangaRegistrar` has run.
@@ -14,6 +16,7 @@ export 'src/extension/uri_source_extension.dart';
 export 'src/manager/source_registry.dart';
 export 'src/mixin/sort_chapters_mixin.dart';
 export 'src/model/source_entry.dart';
+export 'src/prompt/fix_prompt_builder.dart';
 export 'src/sources/manga_dex_source_external.dart';
 export 'src/sources/script_source_external.dart';
 export 'src/sources/sources.dart';
