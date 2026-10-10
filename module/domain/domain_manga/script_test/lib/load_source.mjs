@@ -16,7 +16,8 @@
  * Exports:
  *   loadSource(path)                       -> { meta, source }
  *   runPage(path, fn, html, { searchTerm, waitTimeoutMs }) -> Promise<result>
- *       calls source[fn](doc, ctx) with doc = linkedom parseHTML(html).document
+ *       calls source[fn](doc, ctx) with doc = linkedom parseHTML(html).document;
+ *       waitTimeoutMs, when given, replaces EVERY ctx.waitFor timeout
  *   runBlank(path, fn, ...args)            -> Promise<result>
  *       calls source[fn](...args, ctx) on an empty document (URL functions)
  * `path` may be a bare file name (resolved under assets/sources) or a path.
@@ -124,7 +125,9 @@ export async function runPage(path, fn, html, { searchTerm, waitTimeoutMs } = {}
   const ctx = createSourceCtx({ doc, baseUrl: meta.baseUrl, searchTerm });
   if (waitTimeoutMs !== undefined) {
     const waitFor = ctx.waitFor;
-    ctx.waitFor = (selector, timeoutMs = waitTimeoutMs) => waitFor(selector, timeoutMs);
+    // waitTimeoutMs wins over an explicit per-call timeout too (scripts pass
+    // the production timeouts, e.g. 30000, which would make timeout tests crawl).
+    ctx.waitFor = (selector) => waitFor(selector, waitTimeoutMs);
   }
   return bridge(await callFunction(source, fn, [doc, ctx]));
 }
