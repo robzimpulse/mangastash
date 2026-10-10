@@ -1,4 +1,18 @@
+// DomainMangaRegistrar: registers domain_manga's managers, MangaDex
+// services/repositories and use cases into the ServiceLocator.
+//
+// Issue #115: SourceRegistry (the scripted sources, from bundled assets plus
+// the user's `source_script_tables` rows) is an async lazy singleton built
+// from SourceScriptDao (CoreStorageRegistrar) and RunSourceScriptUseCase
+// (CoreNetworkRegistrar) — both registrars must run before this one. It is
+// bound to the static `Sources` facade for widgets without locator access.
+// GlobalOptionsManager awaits it; [allReady] awaits both.
+//
+// Usage: `await locator.registerRegistrar(DomainMangaRegistrar())` after the
+// core registrars (see WrapperScreen in lib/main.dart), then
+// `await locator.allReady()`.
 import 'package:core_analytics/core_analytics.dart';
+import 'package:flutter/services.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:service_locator/service_locator.dart';
 
@@ -6,6 +20,8 @@ import 'manager/global_options_manager.dart';
 import 'manager/history_manager.dart';
 import 'manager/job_manager.dart';
 import 'manager/library_manager.dart';
+import 'manager/source_registry.dart';
+import 'sources/sources.dart';
 import 'use_case/cancel_job_use_case.dart';
 import 'use_case/chapter/get_all_chapter_use_case.dart';
 import 'use_case/chapter/get_chapter_use_case.dart';
@@ -43,7 +59,26 @@ class DomainMangaRegistrar extends Registrar {
     final start = DateTime.timestamp();
 
     locator.registerLazySingletonAsync(
-      () => GlobalOptionsManager.create(storage: locator()),
+      () async {
+        final registry = await SourceRegistry.create(
+          dao: locator(),
+          runner: locator(),
+          loadAsset: rootBundle.loadString,
+        );
+        Sources.bind(registry);
+        return registry;
+      },
+      dispose: (registry) async {
+        Sources.unbind(registry);
+        await registry.close();
+      },
+    );
+    locator.registerLazySingletonAsync(
+      () async => GlobalOptionsManager.create(
+        storage: locator(),
+        registry: await locator.getAsync<SourceRegistry>(),
+      ),
+      dispose: (e) => e.dispose(),
     );
     locator.alias<ListenSearchParameterUseCase, GlobalOptionsManager>();
     locator.alias<UpdateSearchParameterUseCase, GlobalOptionsManager>();
@@ -64,6 +99,7 @@ class DomainMangaRegistrar extends Registrar {
         getMangaUseCase: () => locator(),
         getAllChapterUseCase: () => locator(),
         listenSearchParameterUseCase: locator(),
+        registry: locator(),
       ),
       dispose: (e) => e.dispose(),
     );
@@ -104,10 +140,10 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => SearchMangaUseCase(
         logBox: locator(),
-        webview: locator(),
+        runner: locator(),
+        registry: locator(),
         mangaDao: locator(),
         mangaRepository: locator(),
-        htmlCacheManager: locator(),
         searchMangaCacheManager: locator(),
         converterCacheManager: locator(),
       ),
@@ -115,13 +151,13 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => SearchChapterUseCase(
         logBox: locator(),
-        webview: locator(),
+        runner: locator(),
+        registry: locator(),
         mangaDao: locator(),
         chapterDao: locator(),
         chapterRepository: locator(),
         searchChapterCacheManager: locator(),
         converterCacheManager: locator(),
-        htmlCacheManager: locator(),
       ),
     );
     locator.registerFactory(
@@ -136,7 +172,7 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => GetMangaUseCase(
         logBox: locator(),
-        webview: locator(),
+        runner: locator(),
         mangaDao: locator(),
         mangaService: locator(),
         converterCacheManager: locator(),
@@ -144,7 +180,7 @@ class DomainMangaRegistrar extends Registrar {
     );
     locator.registerFactory(
       () => GetMangaFromUrlUseCase(
-        webview: locator(),
+        runner: locator(),
         mangaDao: locator(),
         logBox: locator(),
         converterCacheManager: locator(),
@@ -153,7 +189,7 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => GetChapterUseCase(
         logBox: locator(),
-        webview: locator(),
+        runner: locator(),
         chapterDao: locator(),
         atHomeRepository: locator(),
         chapterRepository: locator(),
@@ -180,14 +216,13 @@ class DomainMangaRegistrar extends Registrar {
     );
     locator.registerFactory(
       () => GetTagsUseCase(
-        webview: locator(),
         tagDao: locator(),
         logBox: locator(),
         mangaService: locator(),
       ),
     );
     locator.registerFactory(
-      () => RecrawlUseCase(logBox: locator(), htmlCacheManager: locator()),
+      () => RecrawlUseCase(logBox: locator(), runner: locator()),
     );
 
     locator.registerFactory(
@@ -218,6 +253,7 @@ class DomainMangaRegistrar extends Registrar {
 
   @override
   Future<void> allReady(ServiceLocator locator) async {
+    await locator.isReady<SourceRegistry>();
     await locator.isReady<GlobalOptionsManager>();
   }
 }

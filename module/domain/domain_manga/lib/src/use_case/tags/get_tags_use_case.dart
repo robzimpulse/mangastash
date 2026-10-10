@@ -1,3 +1,8 @@
+// GetTagsUseCase: a source's genre list, served from TagDao when it holds a
+// genre list (rows with tag ids), else fetched — MangaDex via MangaService,
+// scripted sources via `SourceExternal.tagsUrl()` + `tags(url:)` (issue #115).
+//
+// Usage: `await useCase.execute(source: s, useCache: false)`.
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
@@ -10,19 +15,16 @@ import '../../extension/map_network_error.dart';
 import '../../mixin/sync_tags_mixin.dart';
 
 class GetTagsUseCase with SyncTagsMixin {
-  final HeadlessWebviewUseCase _webview;
   final MangaService _mangaService;
   final TagDao _tagDao;
   final LogBox _logBox;
 
   const GetTagsUseCase({
-    required HeadlessWebviewUseCase webview,
     required MangaService mangaService,
     required TagDao tagDao,
     required LogBox logBox,
   }) : _mangaService = mangaService,
        _tagDao = tagDao,
-       _webview = webview,
        _logBox = logBox;
 
   Future<List<Tag>> _mangadex() async {
@@ -41,24 +43,12 @@ class GetTagsUseCase with SyncTagsMixin {
     required SourceExternal source,
     bool useCache = true,
   }) async {
-    // Most sources list their genres on the search page; sources whose tag
-    // list lives elsewhere declare it via listTagUseCase.url (WeebCentral:
-    // the checkboxes are only on /search, not the /search/data fragment).
-    final url =
-        source.listTagUseCase.url ??
-        source.searchMangaUseCase.url(
-          parameter: const SearchMangaParameter(page: 1),
-        );
-
-    final document = await _webview.open(
-      url,
-      scripts: source.listTagUseCase.scripts,
-      readyWhenSelectors: source.listTagUseCase.readyWhenSelectors,
-      useCache: useCache,
-      timeout: source.listTagUseCase.timeout,
-    );
-
-    final tags = await source.listTagUseCase.parse(root: document);
+    // Most sources list their genres on the search page (tagsUrl falls back
+    // to searchUrl(page: 1)); sources whose tag list lives elsewhere define
+    // tagsUrl (WeebCentral: the checkboxes are only on /search, not the
+    // /search/data fragment).
+    final url = await source.tagsUrl();
+    final tags = await source.tags(url: url, useCache: useCache);
 
     return [...tags.map((e) => e.convert())];
   }

@@ -1,3 +1,15 @@
+// testScreen: the shared patrol harness for root-app widget tests. It sets up
+// a GetIt locator (reassignment allowed), fake platform channels, in-memory
+// shared preferences, an in-memory database executor and mocked caches, and
+// registers the same registrars as main.dart before pumping WrapperScreen.
+//
+// SourceRegistry (issue #115) is re-registered with a loadAsset that never
+// touches the file system: the real one reads the bundled source scripts via
+// rootBundle, which flutter_test serves from disk — and every dart:io File
+// here is the FakeFile of FakeIOOverride. No source scripts are loaded, so
+// only the built-in MangaDex source exists in these tests.
+//
+// Usage: `testScreen('description', onRunTest: (locator, $) async { ... });`
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
@@ -133,6 +145,21 @@ void testScreen(
         );
         locator.registerSingleton<SearchMangaCacheManager>(
           MockSearchMangaCacheManager(),
+        );
+        locator.registerLazySingletonAsync<SourceRegistry>(
+          () async {
+            final registry = await SourceRegistry.create(
+              dao: locator(),
+              runner: locator(),
+              loadAsset: (path) => Future.error(StateError('no asset $path')),
+            );
+            Sources.bind(registry);
+            return registry;
+          },
+          dispose: (registry) async {
+            Sources.unbind(registry);
+            await registry.close();
+          },
         );
 
         await onSetupTest?.call(locator);

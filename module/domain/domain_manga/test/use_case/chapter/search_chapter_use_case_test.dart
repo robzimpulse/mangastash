@@ -1,7 +1,10 @@
 // Tests for SearchChapterUseCase.execute on scraped sources: the whole
 // chapter document is parsed on the first fetch, so the pagination must hand
 // the complete list back with hasNextPage: false instead of faking paging
-// over an already-complete dataset (issue #116).
+// over an already-complete dataset (issue #116). Sources are mocked
+// SourceExternals resolved through a mocked SourceRegistry (issue #115): the
+// use case reads rows from `chapters(url: await chaptersUrl(webUrl))`, and a
+// failed validation or clear() evicts the runner's cached script results.
 //
 // Run with: fvm flutter test test/use_case/chapter/search_chapter_use_case_test.dart
 import 'dart:convert';
@@ -11,24 +14,20 @@ import 'package:core_analytics/core_analytics.dart';
 import 'package:core_analytics/core_analytics.dart' as analytics;
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
-import 'package:domain_manga/src/sources/mangakatana_source_external.dart';
-import 'package:domain_manga/src/sources/weeb_central_source_external.dart';
 import 'package:domain_manga/src/use_case/chapter/search_chapter_use_case.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:file/file.dart';
 import 'package:file/memory.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:html/parser.dart' as html_parser;
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:mocktail/mocktail.dart';
 
+import '../../mock/mock_sources.dart';
+
 class MockChapterRepository extends Mock implements ChapterRepository {}
 
-class MockHeadlessWebviewUseCase extends Mock implements HeadlessWebviewUseCase {}
-
 class MockConverterCacheManager extends Mock implements ConverterCacheManager {}
-
-class MockHtmlCacheManager extends Mock implements HtmlCacheManager {}
 
 class MockSearchChapterCacheManager extends Mock
     implements SearchChapterCacheManager {}
@@ -45,29 +44,56 @@ class MockCacheFile extends Mock implements File {}
 
 const _mangaId = 'm-1';
 const _mangaUrl = 'https://mangakatana.com/manga/one-piece.49';
+const _seriesUrl = 'https://weebcentral.com/series/01J76XY7E3JVY2XJGG8VGP46NN';
 
-/// Detail page with [count] chapter rows (desc), mirroring the MangaKatana
-/// chapter table the listChapterUseCase parses.
-String chapterListHtml(int count) {
-  final buffer = StringBuffer('<html><body><table>');
-  for (var i = count; i >= 1; i--) {
-    buffer.write(
-      '<tr><td><div class="chapter">'
-      '<a href="$_mangaUrl/c$i">Chapter $i</a></div></td>'
-      '<td><div class="update_time">2026-08-0${(i % 9) + 1}</div></td></tr>',
-    );
-  }
-  buffer.write('</table></body></html>');
-  return buffer.toString();
+/// [count] chapter rows (desc), as a chapters() script result.
+List<ChapterScrapped> chapterRows(int count) {
+  return [
+    for (var i = count; i >= 1; i--)
+      ChapterScrapped(
+        webUrl: '$_mangaUrl/c$i',
+        title: 'Chapter $i',
+        chapter: '$i',
+      ),
+  ];
 }
 
 void main() {
   late MockSearchChapterCacheManager cacheManager;
-  late MockHtmlCacheManager htmlCacheManager;
   late MockChapterDao chapterDao;
   late MockMangaDao mangaDao;
-  late MockHeadlessWebviewUseCase webview;
+  late MockRunSourceScriptUseCase runner;
+  late MockSourceExternal katana;
+  late MockSourceExternal weebCentral;
+  late MockSourceRegistry registry;
   late SearchChapterUseCase useCase;
+
+  void stubChapters(
+    MockSourceExternal source,
+    Future<List<ChapterScrapped>> Function(Invocation) answer,
+  ) {
+    when(
+      () => source.chapters(
+        url: any(named: 'url'),
+        useCache: any(named: 'useCache'),
+      ),
+    ).thenAnswer(answer);
+  }
+
+  void stubSeriesUrl(String url) {
+    when(() => mangaDao.search(ids: any(named: 'ids'))).thenAnswer(
+      (_) async => [
+        MangaModel(
+          manga: MangaDrift(
+            id: _mangaId,
+            webUrl: url,
+            createdAt: DateTime(2026),
+            updatedAt: DateTime(2026),
+          ),
+        ),
+      ],
+    );
+  }
 
   setUpAll(() {
     registerFallbackValue(const Duration(seconds: 1));
@@ -80,10 +106,20 @@ void main() {
 
   setUp(() {
     cacheManager = MockSearchChapterCacheManager();
-    htmlCacheManager = MockHtmlCacheManager();
     chapterDao = MockChapterDao();
     mangaDao = MockMangaDao();
-    webview = MockHeadlessWebviewUseCase();
+    runner = mockRunner();
+    katana = mockScrapedSource(name: 'Manga Katana');
+    when(
+      () => katana.chaptersUrl(webUrl: any(named: 'webUrl')),
+    ).thenAnswer((i) async => i.namedArguments[#webUrl] as String);
+    weebCentral = mockScrapedSource(name: 'Weeb Central');
+    when(
+      () => weebCentral.chaptersUrl(webUrl: any(named: 'webUrl')),
+    ).thenAnswer(
+      (i) async => '${i.namedArguments[#webUrl]}/full-chapter-list',
+    );
+    registry = mockRegistry([katana, weebCentral]);
     // LogBox.log is an extension method, so mocktail cannot intercept it —
     // the real body runs and needs a real Storage behind the mock's field.
     final logBox = MockLogBox();
@@ -92,9 +128,9 @@ void main() {
     ).thenReturn(analytics.Storage(liveDataStorage: analytics.MemoryStorage()));
     useCase = SearchChapterUseCase(
       chapterRepository: MockChapterRepository(),
-      webview: webview,
+      runner: runner,
+      registry: registry,
       converterCacheManager: MockConverterCacheManager(),
-      htmlCacheManager: htmlCacheManager,
       searchChapterCacheManager: cacheManager,
       chapterDao: chapterDao,
       mangaDao: mangaDao,
@@ -111,30 +147,11 @@ void main() {
         maxAge: any(named: 'maxAge'),
       ),
     ).thenAnswer((_) async => MemoryFileSystem().file('stub'));
-    when(() => mangaDao.search(ids: any(named: 'ids'))).thenAnswer(
-      (_) async => [
-        MangaModel(
-          manga: MangaDrift(
-            id: _mangaId,
-            webUrl: _mangaUrl,
-            createdAt: DateTime(2026),
-            updatedAt: DateTime(2026),
-          ),
-        ),
-      ],
-    );
+    stubSeriesUrl(_mangaUrl);
   });
 
   test('returns the whole chapter list with no next page on first fetch', () async {
-    when(
-      () => webview.open(
-        _mangaUrl,
-        scripts: any(named: 'scripts'),
-        readyWhenSelectors: any(named: 'readyWhenSelectors'),
-        useCache: any(named: 'useCache'),
-        timeout: any(named: 'timeout'),
-      ),
-    ).thenAnswer((_) async => html_parser.parse(chapterListHtml(25)));
+    stubChapters(katana, (_) async => chapterRows(25));
 
     Map<ChapterTablesCompanion, List<String>>? syncedValues;
     when(
@@ -147,7 +164,7 @@ void main() {
 
     final result = await useCase.execute(
       parameter: SourceSearchChapterParameter(
-        source: MangakatanaSourceExternal().name,
+        source: 'Manga Katana',
         parameter: const SearchChapterParameter(page: 1, limit: 20),
         mangaId: _mangaId,
       ),
@@ -173,9 +190,9 @@ void main() {
       );
       final useCase = SearchChapterUseCase(
         chapterRepository: repository,
-        webview: MockHeadlessWebviewUseCase(),
+        runner: runner,
+        registry: registry,
         converterCacheManager: MockConverterCacheManager(),
-        htmlCacheManager: MockHtmlCacheManager(),
         searchChapterCacheManager: cacheManager,
         chapterDao: chapterDao,
         mangaDao: mangaDao,
@@ -223,38 +240,15 @@ void main() {
   test(
     'fetches the source chapter-list URL (WeebCentral full-chapter-list, #161)',
     () async {
-      const seriesUrl =
-          'https://weebcentral.com/series/01J76XY7E3JVY2XJGG8VGP46NN';
-      when(() => mangaDao.search(ids: any(named: 'ids'))).thenAnswer(
-        (_) async => [
-          MangaModel(
-            manga: MangaDrift(
-              id: _mangaId,
-              webUrl: seriesUrl,
-              createdAt: DateTime(2026),
-              updatedAt: DateTime(2026),
-            ),
-          ),
-        ],
-      );
+      stubSeriesUrl(_seriesUrl);
 
       final openedUrls = <String>[];
-      when(
-        () => webview.open(
-          any(),
-          scripts: any(named: 'scripts'),
-          readyWhenSelectors: any(named: 'readyWhenSelectors'),
-          useCache: any(named: 'useCache'),
-          timeout: any(named: 'timeout'),
-        ),
-      ).thenAnswer((invocation) async {
-        openedUrls.add(invocation.positionalArguments.first as String);
-        return html_parser.parse('''
-          <div>
-            <a href="/chapters/c1"><span class="grow"><span>Chapter 3</span></span><time>2026-01-03T00:00:00Z</time></a>
-            <a href="/chapters/c2"><span class="grow"><span>Chapter 2</span></span><time>2026-01-02T00:00:00Z</time></a>
-          </div>
-        ''');
+      stubChapters(weebCentral, (invocation) async {
+        openedUrls.add(invocation.namedArguments[#url] as String);
+        return const [
+          ChapterScrapped(webUrl: 'https://weebcentral.com/chapters/c1'),
+          ChapterScrapped(webUrl: 'https://weebcentral.com/chapters/c2'),
+        ];
       });
       when(
         () => chapterDao.adds(values: any(named: 'values')),
@@ -262,7 +256,7 @@ void main() {
 
       final result = await useCase.execute(
         parameter: SourceSearchChapterParameter(
-          source: WeebCentralSourceExternal().name,
+          source: 'Weeb Central',
           parameter: const SearchChapterParameter(page: 1, limit: 20),
           mangaId: _mangaId,
         ),
@@ -271,7 +265,7 @@ void main() {
       expect(result, isA<Success<Pagination<Chapter>>>());
       // The series page itself only carries ~9 latest rows — the use case
       // must fetch the dedicated full-chapter-list endpoint.
-      expect(openedUrls, ['$seriesUrl/full-chapter-list']);
+      expect(openedUrls, ['$_seriesUrl/full-chapter-list']);
       expect((result as Success<Pagination<Chapter>>).data.total, 2);
     },
   );
@@ -283,19 +277,11 @@ void main() {
       // rows means the row anchors drifted. The old behavior returned an
       // empty list that synced into the DB, got cached for 30 minutes,
       // and rendered as "no chapters" with no trace of the real cause.
-      when(
-        () => webview.open(
-          any(),
-          scripts: any(named: 'scripts'),
-          readyWhenSelectors: any(named: 'readyWhenSelectors'),
-          useCache: any(named: 'useCache'),
-          timeout: any(named: 'timeout'),
-        ),
-      ).thenAnswer((_) async => html_parser.parse('<html><body></body></html>'));
+      stubChapters(katana, (_) async => []);
 
       final result = await useCase.execute(
         parameter: SourceSearchChapterParameter(
-          source: MangakatanaSourceExternal().name,
+          source: 'Manga Katana',
           parameter: const SearchChapterParameter(page: 1, limit: 20),
           mangaId: _mangaId,
         ),
@@ -305,10 +291,12 @@ void main() {
       final error = (result as Error<Pagination<Chapter>>).error;
       expect(error, isA<FailedParsingHtmlException>());
       expect((error as FailedParsingHtmlException).source, 'Manga Katana');
-      expect(error.parser, 'listChapter');
+      expect(error.parser, 'chapters');
       expect(error.missingFields, ['chapter rows']);
-      // The garbage never reaches the DB sync or the 30-minute cache.
+      // The garbage never reaches the DB sync or the 30-minute cache, and
+      // the runner's cached script result for the fetched URL is dropped.
       verifyNever(() => chapterDao.adds(values: any(named: 'values')));
+      verify(() => runner.evict(url: _mangaUrl)).called(1);
       verifyNever(
         () => cacheManager.putFile(
           any(),
@@ -327,33 +315,12 @@ void main() {
       // WeebCentral serves the chapter list from a dedicated
       // full-chapter-list endpoint, not the series page — the parse error
       // must carry that endpoint or recrawling reopens the wrong page.
-      const seriesUrl =
-          'https://weebcentral.com/series/01J76XY7E3JVY2XJGG8VGP46NN';
-      when(() => mangaDao.search(ids: any(named: 'ids'))).thenAnswer(
-        (_) async => [
-          MangaModel(
-            manga: MangaDrift(
-              id: _mangaId,
-              webUrl: seriesUrl,
-              createdAt: DateTime(2026),
-              updatedAt: DateTime(2026),
-            ),
-          ),
-        ],
-      );
-      when(
-        () => webview.open(
-          any(),
-          scripts: any(named: 'scripts'),
-          readyWhenSelectors: any(named: 'readyWhenSelectors'),
-          useCache: any(named: 'useCache'),
-          timeout: any(named: 'timeout'),
-        ),
-      ).thenAnswer((_) async => html_parser.parse('<html><body></body></html>'));
+      stubSeriesUrl(_seriesUrl);
+      stubChapters(weebCentral, (_) async => []);
 
       final result = await useCase.execute(
         parameter: SourceSearchChapterParameter(
-          source: WeebCentralSourceExternal().name,
+          source: 'Weeb Central',
           parameter: const SearchChapterParameter(page: 1, limit: 20),
           mangaId: _mangaId,
         ),
@@ -362,64 +329,54 @@ void main() {
       expect(result, isA<Error<Pagination<Chapter>>>());
       final error = (result as Error<Pagination<Chapter>>).error
           as FailedParsingHtmlException;
-      expect(error.url, '$seriesUrl/full-chapter-list');
+      expect(error.url, '$_seriesUrl/full-chapter-list');
       expect(error.source, 'Weeb Central');
+      verify(
+        () => runner.evict(url: '$_seriesUrl/full-chapter-list'),
+      ).called(1);
     },
   );
 
   test(
-    'clear evicts the html entry the fetch actually uses (review on #167)',
+    'clear evicts the script results the fetch actually uses (review on #167)',
     () async {
-      // WeebCentral's chapter fetch (and therefore its html cache entry)
-      // uses the derived full-chapter-list URL, not the series page —
-      // evicting the series page would leave the stale entry alive.
-      const seriesUrl =
-          'https://weebcentral.com/series/01J76XY7E3JVY2XJGG8VGP46NN';
-      when(() => mangaDao.search(ids: any(named: 'ids'))).thenAnswer(
-        (_) async => [
-          MangaModel(
-            manga: MangaDrift(
-              id: _mangaId,
-              webUrl: seriesUrl,
-              createdAt: DateTime(2026),
-              updatedAt: DateTime(2026),
-            ),
-          ),
-        ],
-      );
+      // WeebCentral's chapter fetch (and therefore its cached script
+      // result) uses the derived full-chapter-list URL, not the series page
+      // — evicting the series page would leave the stale entry alive.
+      stubSeriesUrl(_seriesUrl);
       when(() => cacheManager.keys).thenAnswer((_) async => {});
 
       final evicted = <String>[];
-      when(
-        () => htmlCacheManager.removeFile(captureAny()),
-      ).thenAnswer((invocation) async {
-        evicted.add(invocation.positionalArguments.first as String);
+      when(() => runner.evict(url: any(named: 'url'))).thenAnswer((
+        invocation,
+      ) async {
+        evicted.add(invocation.namedArguments[#url] as String);
       });
 
       await useCase.clear(
         parameter: SourceSearchChapterParameter(
-          source: WeebCentralSourceExternal().name,
+          source: 'Weeb Central',
           parameter: const SearchChapterParameter(page: 1, limit: 20),
           mangaId: _mangaId,
         ),
       );
 
-      expect(evicted, ['$seriesUrl/full-chapter-list']);
+      expect(evicted, ['$_seriesUrl/full-chapter-list']);
     },
   );
 
   test(
     'clear with the built-in MangaDex source evicts the plain webUrl (review on #167)',
     () async {
-      // MangaDexSourceExternal.listChapterUseCase throws UnimplementedError
-      // by design — clear() must not touch the hook for built-in sources.
+      // MangaDexSourceExternal.chaptersUrl throws UnimplementedError by
+      // design — clear() must not touch the hook for built-in sources.
       when(() => cacheManager.keys).thenAnswer((_) async => {});
 
       final evicted = <String>[];
-      when(
-        () => htmlCacheManager.removeFile(captureAny()),
-      ).thenAnswer((invocation) async {
-        evicted.add(invocation.positionalArguments.first as String);
+      when(() => runner.evict(url: any(named: 'url'))).thenAnswer((
+        invocation,
+      ) async {
+        evicted.add(invocation.namedArguments[#url] as String);
       });
 
       await useCase.clear(
@@ -448,9 +405,9 @@ void main() {
       );
       final useCase = SearchChapterUseCase(
         chapterRepository: repository,
-        webview: MockHeadlessWebviewUseCase(),
+        runner: runner,
+        registry: registry,
         converterCacheManager: MockConverterCacheManager(),
-        htmlCacheManager: MockHtmlCacheManager(),
         searchChapterCacheManager: cacheManager,
         chapterDao: chapterDao,
         mangaDao: mangaDao,

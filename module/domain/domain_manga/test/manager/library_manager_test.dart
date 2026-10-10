@@ -12,7 +12,10 @@ import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_drift/src/database/memory_executor.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../mock/mock_sources.dart';
+
 void main() {
+  final testSources = shippedSources();
   late AppDatabase db;
   late LibraryDao libraryDao;
   late MangaDao mangaDao;
@@ -38,7 +41,7 @@ void main() {
     db = AppDatabase(executor: MemoryExecutor());
     libraryDao = LibraryDao(db);
     mangaDao = MangaDao(db);
-    enabledSources = BehaviorSubject.seeded(Sources.values);
+    enabledSources = BehaviorSubject.seeded(testSources);
   });
 
   tearDown(() async {
@@ -59,7 +62,7 @@ void main() {
 
   test('libraryStateStream filters out disabled-source manga', () async {
     enabledSources.add(
-      Sources.values.where((e) => e.name != 'Asura Scans').toList(),
+      testSources.where((e) => e.name != 'Asura Scans').toList(),
     );
 
     final manager = await makeManager();
@@ -71,7 +74,7 @@ void main() {
 
   test('libraryMangaIds excludes disabled-source manga ids', () async {
     enabledSources.add(
-      Sources.values.where((e) => e.name != 'Asura Scans').toList(),
+      testSources.where((e) => e.name != 'Asura Scans').toList(),
     );
 
     final manager = await makeManager();
@@ -120,13 +123,13 @@ void main() {
 
       // Disable AsuraScan; its row drops from the stream.
       enabledSources.add(
-        Sources.values.where((e) => e.name != 'Asura Scans').toList(),
+        testSources.where((e) => e.name != 'Asura Scans').toList(),
       );
       final hidden = await controller.stream.first;
       expect(hidden.map((e) => e.id).toList(), ['manga_0', 'manga_2']);
 
       // Re-enable AsuraScan with no DB write; the row reappears.
-      enabledSources.add(Sources.values);
+      enabledSources.add(testSources);
       final restored = await controller.stream.first;
       expect(
         restored.map((e) => e.id).toList(),

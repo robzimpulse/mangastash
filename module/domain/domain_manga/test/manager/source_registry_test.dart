@@ -1,14 +1,23 @@
 // Tests for SourceRegistry (issue #115, spec §8): resolution of shipped assets
 // vs DB rows, status computation, ordering, save validation, reset/delete and
-// stream emissions. Uses a real in-memory AppDatabase (MemoryExecutor) with the
-// real SourceScriptDao, and a map-backed loadAsset standing in for rootBundle.
+// stream emissions, plus the SourceExternal adapters it exposes (values,
+// fromName, fromHost; issue #115 Task 10). Uses a real in-memory AppDatabase
+// (MemoryExecutor) with the real SourceScriptDao, a map-backed loadAsset
+// standing in for rootBundle, and a mocktail RunSourceScriptUseCase.
 // Run: fvm flutter test test/manager/source_registry_test.dart
+import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/src/manager/source_registry.dart';
 import 'package:domain_manga/src/model/source_entry.dart';
+import 'package:domain_manga/src/sources/manga_dex_source_external.dart';
+import 'package:domain_manga/src/sources/script_source_external.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manga_service_drift/src/database/memory_executor.dart';
+import 'package:mocktail/mocktail.dart';
+
+class MockRunSourceScriptUseCase extends Mock
+    implements RunSourceScriptUseCase {}
 
 String script({
   required String id,
@@ -52,6 +61,7 @@ void main() {
   Future<SourceRegistry> create() async {
     final registry = await SourceRegistry.create(
       dao: dao,
+      runner: MockRunSourceScriptUseCase(),
       loadAsset: (path) async {
         final asset = assetMap[path];
         if (asset == null) throw StateError('missing asset $path');
@@ -86,18 +96,21 @@ void main() {
       expect(entries.map((e) => e.script.name), names.values);
     });
 
-    test('skips a shipped asset with a broken header without throwing', () async {
-      assetMap['packages/domain_manga/assets/sources/weeb-central.js'] =
-          'not a header';
+    test(
+      'skips a shipped asset with a broken header without throwing',
+      () async {
+        assetMap['packages/domain_manga/assets/sources/weeb-central.js'] =
+            'not a header';
 
-      final registry = await create();
+        final registry = await create();
 
-      expect(registry.entries.value.map((e) => e.script.id), [
-        'asura-scans',
-        'manga-katana',
-        'manhua-plus',
-      ]);
-    });
+        expect(registry.entries.value.map((e) => e.script.id), [
+          'asura-scans',
+          'manga-katana',
+          'manhua-plus',
+        ]);
+      },
+    );
 
     test('skips a shipped asset that cannot be loaded', () async {
       assetMap.remove('packages/domain_manga/assets/sources/manhua-plus.js');
@@ -137,63 +150,75 @@ void main() {
       expect(registry.entries.value.first, saved);
     });
 
-    test('shipped edit with lower or equal version is still modified', () async {
-      final registry = await create();
+    test(
+      'shipped edit with lower or equal version is still modified',
+      () async {
+        final registry = await create();
 
-      final lower = await registry.save(
-        script(id: 'asura-scans', name: 'Asura Scans', version: 1),
-      );
-      expect(lower.status, SourceStatus.modified);
-      expect((await dao.get('asura-scans'))?.baseVersion, 2);
+        final lower = await registry.save(
+          script(id: 'asura-scans', name: 'Asura Scans', version: 1),
+        );
+        expect(lower.status, SourceStatus.modified);
+        expect((await dao.get('asura-scans'))?.baseVersion, 2);
 
-      final equal = await registry.save(
-        script(id: 'asura-scans', name: 'Asura Scans', version: 2, body: '//x'),
-      );
-      expect(equal.status, SourceStatus.modified);
-    });
-
-    test('shipped bump after an edit gives updateAvailable; reset restores',
-        () async {
-      var registry = await create();
-      await registry.save(
-        script(id: 'asura-scans', name: 'Asura Scans', version: 5),
-      );
-
-      assetMap = assets(asuraVersion: 3);
-      registry = await create();
-
-      expect(
-        registry.entries.value.first.status,
-        SourceStatus.updateAvailable,
-      );
-
-      await registry.reset('asura-scans');
-
-      final first = registry.entries.value.first;
-      expect(first.status, SourceStatus.shipped);
-      expect(
-        first.script.code,
-        assetMap['packages/domain_manga/assets/sources/asura-scans.js'],
-      );
-      expect(await dao.get('asura-scans'), null);
-    });
-
-    test('rejects a renamed existing id and leaves the DAO untouched',
-        () async {
-      final registry = await create();
-
-      await expectLater(
-        registry.save(script(id: 'asura-scans', name: 'Asura', version: 5)),
-        throwsA(
-          isA<SourceScriptRejected>().having(
-            (e) => e.message,
-            'message',
-            'Name is locked: expected "Asura Scans"',
+        final equal = await registry.save(
+          script(
+            id: 'asura-scans',
+            name: 'Asura Scans',
+            version: 2,
+            body: '//x',
           ),
-        ),
-      );
-      expect(await dao.getAll(), isEmpty);
-    });
+        );
+        expect(equal.status, SourceStatus.modified);
+      },
+    );
+
+    test(
+      'shipped bump after an edit gives updateAvailable; reset restores',
+      () async {
+        var registry = await create();
+        await registry.save(
+          script(id: 'asura-scans', name: 'Asura Scans', version: 5),
+        );
+
+        assetMap = assets(asuraVersion: 3);
+        registry = await create();
+
+        expect(
+          registry.entries.value.first.status,
+          SourceStatus.updateAvailable,
+        );
+
+        await registry.reset('asura-scans');
+
+        final first = registry.entries.value.first;
+        expect(first.status, SourceStatus.shipped);
+        expect(
+          first.script.code,
+          assetMap['packages/domain_manga/assets/sources/asura-scans.js'],
+        );
+        expect(await dao.get('asura-scans'), null);
+      },
+    );
+
+    test(
+      'rejects a renamed existing id and leaves the DAO untouched',
+      () async {
+        final registry = await create();
+
+        await expectLater(
+          registry.save(script(id: 'asura-scans', name: 'Asura', version: 5)),
+          throwsA(
+            isA<SourceScriptRejected>().having(
+              (e) => e.message,
+              'message',
+              'Name is locked: expected "Asura Scans"',
+            ),
+          ),
+        );
+        expect(await dao.getAll(), isEmpty);
+      },
+    );
 
     test('rejects a new id reusing a shipped name or Manga Dex', () async {
       final registry = await create();
@@ -250,18 +275,20 @@ void main() {
       expect(again.status, SourceStatus.custom);
     });
 
-    test('overwriting a custom id keeps origin custom and baseVersion null',
-        () async {
-      final registry = await create();
-      await registry.save(script(id: 'one', name: 'One'));
+    test(
+      'overwriting a custom id keeps origin custom and baseVersion null',
+      () async {
+        final registry = await create();
+        await registry.save(script(id: 'one', name: 'One'));
 
-      await registry.save(script(id: 'one', name: 'One', version: 3));
+        await registry.save(script(id: 'one', name: 'One', version: 3));
 
-      final row = await dao.get('one');
-      expect(row?.origin, SourceScriptOrigin.custom);
-      expect(row?.baseVersion, null);
-      expect(row?.version, 3);
-    });
+        final row = await dao.get('one');
+        expect(row?.origin, SourceScriptOrigin.custom);
+        expect(row?.baseVersion, null);
+        expect(row?.version, 3);
+      },
+    );
 
     test('name of a deleted source may be reused', () async {
       final registry = await create();
@@ -289,16 +316,18 @@ void main() {
       expect(await dao.getAll(), isEmpty);
     });
 
-    test('rethrows a malformed header as SourceScriptFormatException',
-        () async {
-      final registry = await create();
+    test(
+      'rethrows a malformed header as SourceScriptFormatException',
+      () async {
+        final registry = await create();
 
-      await expectLater(
-        registry.save('// nothing here'),
-        throwsA(isA<SourceScriptFormatException>()),
-      );
-      expect(await dao.getAll(), isEmpty);
-    });
+        await expectLater(
+          registry.save('// nothing here'),
+          throwsA(isA<SourceScriptFormatException>()),
+        );
+        expect(await dao.getAll(), isEmpty);
+      },
+    );
 
     test('concurrent saves with the same new name: exactly one wins', () async {
       final registry = await create();
@@ -321,18 +350,21 @@ void main() {
   });
 
   group('classify', () {
-    test('ReplacesSource for an existing id, NewSource for a new one', () async {
-      final registry = await create();
+    test(
+      'ReplacesSource for an existing id, NewSource for a new one',
+      () async {
+        final registry = await create();
 
-      final existing = registry.classify(
-        script(id: 'asura-scans', name: 'Whatever'),
-      );
-      final fresh = registry.classify(script(id: 'my-site', name: 'My Site'));
+        final existing = registry.classify(
+          script(id: 'asura-scans', name: 'Whatever'),
+        );
+        final fresh = registry.classify(script(id: 'my-site', name: 'My Site'));
 
-      expect(existing, isA<ReplacesSource>());
-      expect((existing as ReplacesSource).entry.script.id, 'asura-scans');
-      expect(fresh, isA<NewSource>());
-    });
+        expect(existing, isA<ReplacesSource>());
+        expect((existing as ReplacesSource).entry.script.id, 'asura-scans');
+        expect(fresh, isA<NewSource>());
+      },
+    );
 
     test('throws SourceScriptFormatException on unparseable code', () async {
       final registry = await create();
@@ -417,6 +449,77 @@ void main() {
         registry.entries.value.map((e) => e.script.id),
         contains('outside'),
       );
+    });
+  });
+
+  group('adapters', () {
+    test('values lists Manga Dex first, then one adapter per entry', () async {
+      final registry = await create();
+
+      expect(registry.values.first, isA<MangaDexSourceExternal>());
+      expect(
+        registry.values.skip(1),
+        everyElement(isA<ScriptSourceExternal>()),
+      );
+      expect(registry.values.map((e) => e.name), [
+        'Manga Dex',
+        ...names.values,
+      ]);
+    });
+
+    test(
+      'fromName returns the adapter; after save it has the edited code',
+      () async {
+        final registry = await create();
+
+        final before = registry.fromName('Asura Scans');
+        expect(before, isA<ScriptSourceExternal>());
+        expect(
+          (before as ScriptSourceExternal).script.code,
+          contains('shipped'),
+        );
+
+        final edited = script(
+          id: 'asura-scans',
+          name: 'Asura Scans',
+          body: '// edited',
+        );
+        await registry.save(edited);
+
+        final after = registry.fromName('Asura Scans') as ScriptSourceExternal?;
+        expect(after?.script.code, edited);
+        expect(registry.fromName('Manga Dex'), isA<MangaDexSourceExternal>());
+        expect(registry.fromName('Gone Source'), isNull);
+      },
+    );
+
+    test('fromHost matches the base url host', () async {
+      final registry = await create();
+
+      expect(registry.fromHost('asura-scans.com')?.name, 'Asura Scans');
+      expect(registry.fromHost('www.mangadex.org')?.name, 'Manga Dex');
+      expect(registry.fromHost('unknown.com'), isNull);
+    });
+
+    test('values are fresh before entries emits', () async {
+      final registry = await create();
+      final seen = <String?>[];
+      final sub = registry.entries.listen((_) {
+        final asura = registry.fromName('Asura Scans') as ScriptSourceExternal?;
+        seen.add(asura?.script.code);
+      });
+      await pumpEventQueue();
+
+      final edited = script(
+        id: 'asura-scans',
+        name: 'Asura Scans',
+        body: '//e',
+      );
+      await registry.save(edited);
+      await pumpEventQueue();
+
+      expect(seen.last, edited);
+      await sub.cancel();
     });
   });
 }

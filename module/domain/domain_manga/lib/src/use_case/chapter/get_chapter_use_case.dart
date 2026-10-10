@@ -1,3 +1,10 @@
+// GetChapterUseCase: a chapter with its image URLs, served from ChapterDao
+// when images are stored, else fetched — MangaDex via the chapter/at-home
+// repositories, scripted sources via `SourceExternal.images(url: webUrl)`
+// (issue #115) validated by requireChapterImages (a failure evicts the
+// runner's cached result).
+//
+// Usage: `await useCase.execute(source: s, mangaId: m, chapterId: c)`.
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
@@ -13,21 +20,21 @@ import '../../mixin/sync_chapters_mixin.dart';
 class GetChapterUseCase with SyncChaptersMixin {
   final ChapterRepository _chapterRepository;
   final AtHomeRepository _atHomeRepository;
-  final HeadlessWebviewUseCase _webview;
+  final RunSourceScriptUseCase _runner;
   final ChapterDao _chapterDao;
   final LogBox _logBox;
 
   GetChapterUseCase({
     required ChapterRepository chapterRepository,
     required AtHomeRepository atHomeRepository,
-    required HeadlessWebviewUseCase webview,
+    required RunSourceScriptUseCase runner,
     required ChapterDao chapterDao,
     required LogBox logBox,
   }) : _chapterRepository = chapterRepository,
        _atHomeRepository = atHomeRepository,
        _chapterDao = chapterDao,
        _logBox = logBox,
-       _webview = webview;
+       _runner = runner;
 
   Future<Chapter> _mangadex({
     required String mangaId,
@@ -61,19 +68,17 @@ class GetChapterUseCase with SyncChaptersMixin {
       throw DataNotFoundException();
     }
 
-    final document = await _webview.open(
-      url,
-      scripts: source.getChapterImageUseCase.scripts,
-      readyWhenSelectors: source.getChapterImageUseCase.readyWhenSelectors,
-      useCache: useCache,
-      timeout: source.getChapterImageUseCase.timeout,
-    );
+    final images = await source.images(url: url, useCache: useCache);
 
     // Zero images is selector drift, not an empty reader — fail here with
     // context instead of syncing an image-less chapter that explodes as a
     // DataNotFoundException on the next open (issue #114).
-    return source.getChapterImageUseCase.parse(root: document).then(
-      (images) => requireChapterImages(images, source: source.name, url: url),
+    return validateOrEvict(
+      _runner,
+      url: url,
+      validate: () {
+        return requireChapterImages(images, source: source.name, url: url);
+      },
     );
   }
 

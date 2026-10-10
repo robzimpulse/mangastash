@@ -51,7 +51,7 @@ void main() {
           isA<FailedParsingHtmlException>()
               .having((e) => e.url, 'url', _url)
               .having((e) => e.source, 'source', _source)
-              .having((e) => e.parser, 'parser', 'getManga')
+              .having((e) => e.parser, 'parser', 'manga')
               .having((e) => e.missingFields, 'missingFields', ['title']),
         ),
       );
@@ -110,7 +110,7 @@ void main() {
         throwsA(
           isA<FailedParsingHtmlException>()
               .having((e) => e.source, 'source', _source)
-              .having((e) => e.parser, 'parser', 'searchManga')
+              .having((e) => e.parser, 'parser', 'search')
               .having(
                 (e) => e.missingFields,
                 'missingFields',
@@ -135,7 +135,7 @@ void main() {
         throwsA(
           isA<FailedParsingHtmlException>()
               .having((e) => e.url, 'url', _url)
-              .having((e) => e.parser, 'parser', 'listChapter')
+              .having((e) => e.parser, 'parser', 'chapters')
               .having((e) => e.missingFields, 'missingFields', [
                 'chapter rows',
               ]),
@@ -177,7 +177,7 @@ void main() {
         throwsA(
           isA<FailedParsingHtmlException>()
               .having((e) => e.url, 'url', _url)
-              .having((e) => e.parser, 'parser', 'getChapterImage')
+              .having((e) => e.parser, 'parser', 'images')
               .having((e) => e.missingFields, 'missingFields', [
                 'image urls',
               ]),

@@ -1,3 +1,14 @@
+// Domain validators for scraped results (issue #114): use cases run them
+// between the source call and the DB sync/cache write, failing with a
+// FailedParsingHtmlException that names the source, the script function that
+// produced the data (`parser`: 'search', 'manga', 'chapters' or 'images' —
+// issue #115) and the missing fields.
+//
+// Usage: `cards.requireCardFields(source: s.name, url: url, logBox: log)`,
+// `detail.requireDetailFields(...)`, `rows.requireChapterFields(...)`,
+// `requireChapterImages(images, source: s.name, url: url)`; wrap them in
+// `validateOrEvict(runner, url: url, validate: ...)` so a failure also drops
+// the runner's cached script result.
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
@@ -21,7 +32,7 @@ extension MangaScrappedDetailValidation on MangaScrapped {
       throw FailedParsingHtmlException(
         url,
         source: source,
-        parser: 'getManga',
+        parser: 'manga',
         missingFields: const ['title'],
       );
     }
@@ -42,16 +53,15 @@ extension MangaScrappedCardsValidation on List<MangaScrapped> {
     required String url,
     LogBox? logBox,
   }) {
-    final valid = where(
-      (card) => _filled(card.title) && _filled(card.webUrl),
-    ).toList();
+    final valid =
+        where((card) => _filled(card.title) && _filled(card.webUrl)).toList();
 
     if (isEmpty) return valid;
     if (valid.isEmpty) {
       throw FailedParsingHtmlException(
         url,
         source: source,
-        parser: 'searchManga',
+        parser: 'search',
         missingFields: const ['title', 'webUrl'],
       );
     }
@@ -85,7 +95,7 @@ extension ChapterScrappedRowsValidation on List<ChapterScrapped> {
         throw FailedParsingHtmlException(
           url,
           source: source,
-          parser: 'listChapter',
+          parser: 'chapters',
           missingFields: const ['chapter rows'],
         );
       }
@@ -101,7 +111,7 @@ extension ChapterScrappedRowsValidation on List<ChapterScrapped> {
     throw FailedParsingHtmlException(
       url,
       source: source,
-      parser: 'listChapter',
+      parser: 'chapters',
       missingFields: const ['chapter rows'],
     );
   }
@@ -119,9 +129,27 @@ List<String> requireChapterImages(
     throw FailedParsingHtmlException(
       url,
       source: source,
-      parser: 'getChapterImage',
+      parser: 'images',
       missingFields: const ['image urls'],
     );
   }
   return images;
+}
+
+/// Runs [validate] on a scripted source's result fetched from [url]; when it
+/// throws [FailedParsingHtmlException], first evicts [runner]'s cached results
+/// for [url] (issue #115). The runner caches a script's JSON before domain
+/// validation sees it, so without the eviction a broken result would be
+/// served again for the cache's 30 minutes.
+Future<T> validateOrEvict<T>(
+  RunSourceScriptUseCase runner, {
+  required String url,
+  required T Function() validate,
+}) async {
+  try {
+    return validate();
+  } on FailedParsingHtmlException {
+    await runner.evict(url: url);
+    rethrow;
+  }
 }

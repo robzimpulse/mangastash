@@ -1,4 +1,9 @@
-import 'package:domain_manga/domain_manga.dart';
+// BrowseScreen: the "Browse" settings page — the global search-manga filter
+// and a "Sources" entry. The entry calls [BrowseScreen.onTapSources]; the
+// per-source enable checkboxes moved to the source list screen it opens
+// (issue #115). Until a route is wired the tile is disabled.
+//
+// Usage: `BrowseScreen.create(locator: locator, onTapSources: () => ...)`.
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_common/ui_common.dart';
@@ -9,10 +14,15 @@ import 'browse_screen_state.dart';
 class BrowseScreen extends StatelessWidget {
   const BrowseScreen({
     super.key,
+    this.onTapSources,
   });
+
+  /// Opens the list of sources; null disables the "Sources" tile.
+  final VoidCallback? onTapSources;
 
   static Widget create({
     required ServiceLocator locator,
+    VoidCallback? onTapSources,
   }) {
     return BlocProvider(
       create: (context) => BrowseScreenCubit(
@@ -21,7 +31,7 @@ class BrowseScreen extends StatelessWidget {
         updateSourcesUseCase: locator(),
         listenSourcesUseCase: locator(),
       ),
-      child: const BrowseScreen(),
+      child: BrowseScreen(onTapSources: onTapSources),
     );
   }
 
@@ -59,27 +69,12 @@ class BrowseScreen extends StatelessWidget {
   }
 
   Widget _buildSourceOption({required BuildContext context}) {
-    return _builder(
-      buildWhen: (prev, curr) => prev.sources != curr.sources,
-      builder: (context, state) => ExpansionTile(
-        title: const Text('Source Options'),
-        subtitle: const Text('Available Sources for Manga'),
-        leading: const Icon(Icons.source),
-        children: [
-          ...Sources.values.map(
-            (source) => CheckboxListTile(
-              title: Text(source.name),
-              value: state.sources.contains(source) == true,
-              onChanged: (value) {
-                if (value == null) return;
-                final values = [...state.sources];
-                value ? values.add(source) : values.remove(source);
-                _cubit(context)?.update(sources: values);
-              },
-            ),
-          ),
-        ],
-      ),
+    return ListTile(
+      title: const Text('Sources'),
+      subtitle: const Text('Enable, edit and add manga sources'),
+      leading: const Icon(Icons.source),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: onTapSources,
     );
   }
 

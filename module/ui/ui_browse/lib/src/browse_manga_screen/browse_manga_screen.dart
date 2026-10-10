@@ -1,7 +1,15 @@
+// BrowseMangaScreen: browse/search screen of one source — a paged manga
+// grid with filter, search and library/prefetch actions, plus an
+// "open in browser" action that re-crawls the source's search page
+// (resolved through the source's searchUrl script, issue #115).
+//
+// Usage: `BrowseMangaScreen.create(locator: locator, source: name,
+// onTapManga: ..., onTapFilter: ..., onTapMangaMenu: ...)`.
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:feature_common/feature_common.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -139,6 +147,24 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     _cubit(context)?.recrawl(context: context, url: url);
   }
 
+  /// Resolves the source's search URL (a script call, issue #115) and
+  /// opens it for a re-crawl; a failing searchUrl script leaves the screen
+  /// as it is — the search itself already reports that error.
+  void _onTapOpenSource({
+    required BuildContext context,
+    required SourceExternal source,
+    required SearchMangaParameter parameter,
+  }) async {
+    final String url;
+    try {
+      url = await source.searchUrl(parameter: parameter);
+    } catch (_) {
+      return;
+    }
+    if (!context.mounted) return;
+    _onTapRecrawl(context: context, url: url);
+  }
+
   Widget _menuSource({required BuildContext context}) {
     return _builder(
       buildWhen: (prev, curr) {
@@ -148,18 +174,16 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         ].contains(true);
       },
       builder: (context, state) {
-        final url = state.source?.let((e) {
-          if (e.builtIn) return null;
-          return e.searchMangaUseCase.url(
-            parameter: state.parameter.copyWith(page: 1),
-          );
-        });
-
-        if (url == null) return const SizedBox.shrink();
+        final source = state.source;
+        if (source == null || source.builtIn) return const SizedBox.shrink();
 
         return IconButton(
           icon: const Icon(Icons.open_in_browser),
-          onPressed: () => _onTapRecrawl(context: context, url: url),
+          onPressed: () => _onTapOpenSource(
+            context: context,
+            source: source,
+            parameter: state.parameter.copyWith(page: 1),
+          ),
         );
       },
     );

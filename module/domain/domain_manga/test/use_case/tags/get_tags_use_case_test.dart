@@ -1,32 +1,33 @@
-// Tests for GetTagsUseCase on scraped sources: the page it opens must be
-// the one the genre list actually lives on — WeebCentral's checkboxes are
-// only on /search, while its searchMangaUseCase.url() points at the
-// /search/data htmx fragment with zero checkboxes (issue #163). Sources
-// that leave the url hook null fall back to their search page.
+// Tests for GetTagsUseCase on scraped sources: the tag list is fetched from
+// the page the source's tagsUrl() resolves to (WeebCentral's checkboxes live
+// only on /search, issue #163; the searchUrl(page: 1) fallback for scripts
+// without tagsUrl is pinned in script_source_external_test.dart), and a
+// cached genre list (rows with tag ids) is served without scraping. The
+// source is a mocked SourceExternal (issue #115).
 //
 // Run with: fvm flutter test test/use_case/tags/get_tags_use_case_test.dart
 import 'package:core_analytics/core_analytics.dart' as analytics;
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
-import 'package:domain_manga/src/sources/asura_scan_source_external.dart';
-import 'package:domain_manga/src/sources/weeb_central_source_external.dart';
 import 'package:domain_manga/src/use_case/tags/get_tags_use_case.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:html/parser.dart' as html_parser;
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockMangaService extends Mock implements MangaService {}
+import '../../mock/mock_sources.dart';
 
-class MockHeadlessWebviewUseCase extends Mock implements HeadlessWebviewUseCase {}
+class MockMangaService extends Mock implements MangaService {}
 
 class MockTagDao extends Mock implements TagDao {}
 
 class MockLogBox extends Mock implements analytics.LogBox {}
 
+const _tagsUrl = 'https://weebcentral.com/search';
+
 void main() {
-  late MockHeadlessWebviewUseCase webview;
+  late MockSourceExternal source;
   late MockTagDao tagDao;
   late GetTagsUseCase useCase;
 
@@ -35,7 +36,7 @@ void main() {
   });
 
   setUp(() {
-    webview = MockHeadlessWebviewUseCase();
+    source = mockScrapedSource(name: 'Weeb Central');
     tagDao = MockTagDao();
     // LogBox.log is an extension method, so mocktail cannot intercept it —
     // the real body runs and needs a real Storage behind the mock's field.
@@ -44,12 +45,18 @@ void main() {
       () => logBox.storage,
     ).thenReturn(analytics.Storage(liveDataStorage: analytics.MemoryStorage()));
     useCase = GetTagsUseCase(
-      webview: webview,
       mangaService: MockMangaService(),
       tagDao: tagDao,
       logBox: logBox,
     );
 
+    when(() => source.tagsUrl()).thenAnswer((_) async => _tagsUrl);
+    when(
+      () => source.tags(
+        url: any(named: 'url'),
+        useCache: any(named: 'useCache'),
+      ),
+    ).thenAnswer((_) async => const [TagScrapped(id: 'action', name: 'Action')]);
     when(
       () => tagDao.search(sources: any(named: 'sources')),
     ).thenAnswer((_) async => []);
@@ -58,57 +65,13 @@ void main() {
     ).thenAnswer((_) async => []);
   });
 
-  test('fetches the dedicated tags page for WeebCentral (#163)', () async {
-    final openedUrls = <String>[];
-    when(
-      () => webview.open(
-        any(),
-        scripts: any(named: 'scripts'),
-        readyWhenSelectors: any(named: 'readyWhenSelectors'),
-        useCache: any(named: 'useCache'),
-        timeout: any(named: 'timeout'),
-      ),
-    ).thenAnswer((invocation) async {
-      openedUrls.add(invocation.positionalArguments.first as String);
-      return html_parser.parse('<html></html>');
-    });
-
-    final result = await useCase.execute(source: WeebCentralSourceExternal());
+  test('fetches the tags from the page tagsUrl resolves to (#163)', () async {
+    final result = await useCase.execute(source: source, useCache: false);
 
     expect(result, isA<Success<List<Tag>>>());
-    expect(openedUrls, ['https://weebcentral.com/search']);
+    verify(() => source.tags(url: _tagsUrl, useCache: false)).called(1);
+    verify(() => tagDao.adds(values: any(named: 'values'))).called(1);
   });
-
-  test(
-    'a null url hook falls back to the source search page (review on #169)',
-    () async {
-      // Asura leaves listTagUseCase.url null — the tags fetch must open
-      // its search URL, pinning the null-fallback branch five sources now
-      // document with `url => null`.
-      final openedUrls = <String>[];
-      when(
-        () => webview.open(
-          any(),
-          scripts: any(named: 'scripts'),
-          readyWhenSelectors: any(named: 'readyWhenSelectors'),
-          useCache: any(named: 'useCache'),
-          timeout: any(named: 'timeout'),
-        ),
-      ).thenAnswer((invocation) async {
-        openedUrls.add(invocation.positionalArguments.first as String);
-        return html_parser.parse('<html></html>');
-      });
-
-      final result = await useCase.execute(source: AsuraScanSourceExternal());
-
-      expect(result, isA<Success<List<Tag>>>());
-      expect(openedUrls, [
-        AsuraScanSourceExternal()
-            .searchMangaUseCase
-            .url(parameter: const SearchMangaParameter(page: 1)),
-      ]);
-    },
-  );
 
   group('cache', () {
     TagDrift row({String? tagId}) {
@@ -118,38 +81,23 @@ void main() {
         id: 1,
         tagId: tagId,
         name: 'Action',
-        source: AsuraScanSourceExternal().name,
+        source: 'Weeb Central',
       );
     }
 
-    void stubOpen() {
-      when(
-        () => webview.open(
-          any(),
-          scripts: any(named: 'scripts'),
-          readyWhenSelectors: any(named: 'readyWhenSelectors'),
-          useCache: any(named: 'useCache'),
-          timeout: any(named: 'timeout'),
-        ),
-      ).thenAnswer((_) async => html_parser.parse('<html></html>'));
-    }
-
     test('returns cached genre list without scraping', () async {
-      stubOpen();
       when(
         () => tagDao.search(sources: any(named: 'sources')),
       ).thenAnswer((_) async => [row(tagId: 'action')]);
 
-      final result = await useCase.execute(source: AsuraScanSourceExternal());
+      final result = await useCase.execute(source: source);
 
       expect((result as Success<List<Tag>>).data.single.id, 'action');
+      verifyNever(() => source.tagsUrl());
       verifyNever(
-        () => webview.open(
-          any(),
-          scripts: any(named: 'scripts'),
-          readyWhenSelectors: any(named: 'readyWhenSelectors'),
+        () => source.tags(
+          url: any(named: 'url'),
           useCache: any(named: 'useCache'),
-          timeout: any(named: 'timeout'),
         ),
       );
     });
@@ -157,23 +105,14 @@ void main() {
     // Name-only rows come from manga detail syncs (TagDao.reattach) or the
     // schema v6 repair — they are not a genre list, so scrape one.
     test('scrapes when cached tags have no tag ids', () async {
-      stubOpen();
       when(
         () => tagDao.search(sources: any(named: 'sources')),
       ).thenAnswer((_) async => [row()]);
 
-      final result = await useCase.execute(source: AsuraScanSourceExternal());
+      final result = await useCase.execute(source: source);
 
       expect(result, isA<Success<List<Tag>>>());
-      verify(
-        () => webview.open(
-          any(),
-          scripts: any(named: 'scripts'),
-          readyWhenSelectors: any(named: 'readyWhenSelectors'),
-          useCache: any(named: 'useCache'),
-          timeout: any(named: 'timeout'),
-        ),
-      ).called(1);
+      verify(() => source.tags(url: _tagsUrl, useCache: true)).called(1);
     });
   });
 }

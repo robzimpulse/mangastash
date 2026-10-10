@@ -1,3 +1,9 @@
+// GetMangaFromUrlUseCase: series details for a pasted series URL of a
+// scripted source, served from MangaDao when complete, else fetched via
+// `SourceExternal.manga(url:)` (issue #115) and validated by
+// requireDetailFields (a failure evicts the runner's cached result).
+//
+// Usage: `await useCase.execute(source: s, url: link)`.
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
@@ -11,19 +17,19 @@ import '../../extension/scrapped_validation_extension.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 
 class GetMangaFromUrlUseCase with SyncMangasMixin {
-  final HeadlessWebviewUseCase _webview;
+  final RunSourceScriptUseCase _runner;
   final MangaDao _mangaDao;
   final LogBox _logBox;
   final ConverterCacheManager _converterCacheManager;
 
   GetMangaFromUrlUseCase({
-    required HeadlessWebviewUseCase webview,
+    required RunSourceScriptUseCase runner,
     required MangaDao mangaDao,
     required LogBox logBox,
     required ConverterCacheManager converterCacheManager,
   }) : _mangaDao = mangaDao,
        _logBox = logBox,
-       _webview = webview,
+       _runner = runner,
        _converterCacheManager = converterCacheManager;
 
   Future<Manga> _scrapping({
@@ -31,20 +37,18 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
     required String url,
     bool useCache = true,
   }) async {
-    final document = await _webview.open(
-      url,
-      scripts: source.getMangaUseCase.scripts,
-      readyWhenSelectors: source.getMangaUseCase.readyWhenSelectors,
-      useCache: useCache,
-      timeout: source.getMangaUseCase.timeout,
-    );
-
-    final scrapped = await source.getMangaUseCase.parse(root: document);
+    final scrapped = await source.manga(url: url, useCache: useCache);
 
     // A detail page always names its series — a missing title means the
     // detail selectors drifted. Fail before the sync writes a null-title
     // manga into the DB (issue #114).
-    final valid = scrapped.requireDetailFields(source: source.name, url: url);
+    final valid = await validateOrEvict(
+      _runner,
+      url: url,
+      validate: () {
+        return scrapped.requireDetailFields(source: source.name, url: url);
+      },
+    );
 
     final manga = await valid.convert(
       logbox: _logBox,

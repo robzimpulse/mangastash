@@ -3,8 +3,9 @@
 ///
 /// Purpose: [HeadlessWebviewManager] loads pages in `HeadlessInAppWebView`s
 /// with the platform UA, Cloudflare retry and diagnostics observer plumbing.
-/// It implements [HeadlessWebviewUseCase] (`open` → parsed post-JS DOM,
-/// `image` → data url) and [RunSourceScriptUseCase] (spec §6): `runOnPage`
+/// It implements [HeadlessWebviewUseCase] (`image` → data url; the old
+/// `open` → parsed DOM entry point was removed with the Dart scrapers in
+/// issue #115) and [RunSourceScriptUseCase] (spec §6): `runOnPage`
 /// runs a source function inside a freshly loaded page and caches its JSON
 /// result for 30 minutes (cache read/write failures are logged, never fatal);
 /// `runOnBlank` runs URL builders in one warm, reused blank webview
@@ -33,8 +34,6 @@ import 'package:core_storage/core_storage.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:html/dom.dart';
-import 'package:html/parser.dart';
 import 'package:mutex/mutex.dart';
 
 import '../exception/failed_parsing_html_exception.dart';
@@ -49,30 +48,19 @@ import 'user_agent_manager.dart';
 
 class _Key extends Equatable {
   final String url;
-  final List<String> scripts;
-  final List<String> readyWhenSelectors;
   final bool useCache;
   final Map<String, String> headers;
   final Duration? timeout;
 
   const _Key({
     required this.url,
-    this.scripts = const [],
-    this.readyWhenSelectors = const [],
     required this.useCache,
     this.headers = const {},
     this.timeout,
   });
 
   @override
-  List<Object?> get props => [
-    url,
-    scripts,
-    readyWhenSelectors,
-    useCache,
-    headers,
-    timeout,
-  ];
+  List<Object?> get props => [url, useCache, headers, timeout];
 }
 
 const List<String> _imgExt = [
@@ -159,23 +147,9 @@ void handleRejectedImage(
 /// injected scripts produce different DOMs, so the scripts are part of the
 /// key. Both the cache read and write in [_fetch] must go through this —
 /// diverging keys mean scripted pages never hit the cache.
-///
-/// [readyWhenSelectors] also feeds the key: a page whose source declared
-/// readiness must never match an entry written by a build that didn't gate
-/// on it — such a stale entry is exactly the broken snapshot the gate
-/// exists to reject. An empty list keeps the key identical to older builds
-/// (nothing was declared, so nothing can be stale about it).
-String htmlCacheKey(
-  String url, {
-  List<String> scripts = const [],
-  List<String> readyWhenSelectors = const [],
-}) {
-  if (scripts.isEmpty && readyWhenSelectors.isEmpty) return url;
-  return [
-    url,
-    ...scripts,
-    if (readyWhenSelectors.isNotEmpty) ...['ready', ...readyWhenSelectors],
-  ].join('|');
+String htmlCacheKey(String url, {List<String> scripts = const []}) {
+  if (scripts.isEmpty) return url;
+  return [url, ...scripts].join('|');
 }
 
 /// Whether this [_fetch] caller may be served from (and written to) the
@@ -306,7 +280,6 @@ class HeadlessWebviewManager
 
   bool _uaDiscoveryStarted = false;
 
-  final Map<_Key, Future<Document>> _cDocument = {};
   final Map<_Key, Future<String>> _cImage = {};
   final Map<int, HeadlessInAppWebView> _instances = {};
 
@@ -339,35 +312,6 @@ class HeadlessWebviewManager
     await Future.wait([
       for (final instance in _instances.values) instance.dispose(),
     ]);
-  }
-
-  @override
-  Future<Document> open(
-    String url, {
-    List<String> scripts = const [],
-    List<String> readyWhenSelectors = const [],
-    bool useCache = true,
-    Duration? timeout,
-  }) {
-    final key = _Key(
-      url: url,
-      useCache: useCache,
-      scripts: scripts,
-      readyWhenSelectors: readyWhenSelectors,
-      timeout: timeout,
-    );
-    return _cDocument.putIfAbsent(
-      key,
-      () => _open(
-        url,
-        scripts: scripts,
-        readyWhenSelectors: readyWhenSelectors,
-        useCache: useCache,
-        timeout: timeout,
-      ).whenComplete(() {
-        _cDocument.remove(key);
-      }),
-    );
   }
 
   @override
@@ -601,26 +545,6 @@ class HeadlessWebviewManager
     ]);
   }
 
-  Future<Document> _open(
-    String url, {
-    List<String> scripts = const [],
-    List<String> readyWhenSelectors = const [],
-    bool useCache = true,
-    Duration? timeout,
-  }) async {
-    return parse(
-      await _fetch(
-        uri: WebUri(url),
-        scripts: scripts,
-        readyWhenSelectors: readyWhenSelectors,
-        delegate: _log.inAppWebviewObserver,
-        useCache: useCache,
-        timeout: timeout,
-      ),
-      sourceUrl: url,
-    );
-  }
-
   Future<String> _image(
     String url, {
     bool useCache = true,
@@ -685,18 +609,13 @@ class HeadlessWebviewManager
     UnmodifiableListView<UserScript>? initialUserScripts,
     Map<String, JavaScriptHandlerCallback>? javascriptHandlers,
     List<String> scripts = const [],
-    List<String> readyWhenSelectors = const [],
     bool useCache = true,
     Future? signalComplete,
     Duration? timeout,
   }) async {
     delegate.set(uri: uri, loading: true);
     final effectiveTimeout = timeout ?? defaultTimeout;
-    final key = htmlCacheKey(
-      uri.toString(),
-      scripts: scripts,
-      readyWhenSelectors: readyWhenSelectors,
-    );
+    final key = htmlCacheKey(uri.toString(), scripts: scripts);
     final cacheAllowed = shouldUseHtmlCache(
       useCache: useCache,
       signalComplete: signalComplete,
@@ -717,7 +636,7 @@ class HeadlessWebviewManager
     // challenge-shaped snapshot is retried once in a fresh webview; anything
     // else (null html, timeouts) propagates as before.
     Future<(String, String?)> attempt() async {
-      // Script errors and readiness reports arrive over the bridge —
+      // Script errors arrive over the bridge —
       // evaluateJavascript neither awaits JS Promises nor reliably surfaces
       // uncaught JS errors. The bridge message can land shortly AFTER
       // evaluateJavascript resolves, so error checks race a short grace
@@ -725,7 +644,6 @@ class HeadlessWebviewManager
       // Cloudflare retry re-runs the scripts with clean state.
       ScriptEvaluationException? scriptError;
       final scriptErrorCompleter = Completer<void>();
-      final scriptReadyCompleter = Completer<void>();
 
       final handlers = {
         ...?javascriptHandlers,
@@ -744,13 +662,6 @@ class HeadlessWebviewManager
             url: uri.toString(),
           );
           scriptErrorCompleter.safeComplete();
-        },
-        'scriptReady': (_) {
-          // The beacon's reported boolean is deliberately ignored: the
-          // readinessSatisfied() gate over the snapshotted html is the
-          // authority on whether the page may be cached — don't "fix" this
-          // into an early pass/fail branch.
-          scriptReadyCompleter.safeComplete();
         },
       };
 
@@ -785,15 +696,6 @@ class HeadlessWebviewManager
           if (scriptError != null) {
             throw scriptError!;
           }
-        }
-
-        if (readyWhenSelectors.isNotEmpty) {
-          await webview.webViewController?.evaluateJavascript(
-            source: readinessBeaconScript(readyWhenSelectors),
-          );
-          // Beacons report over the bridge; the snapshot timeout bounds this
-          // wait if the beacon never fires.
-          await scriptReadyCompleter.future;
         }
 
         await signalComplete;
@@ -834,18 +736,6 @@ class HeadlessWebviewManager
       onExhausted: (error) => delegate.set(error: error, loading: false),
       attempt: attempt,
     );
-
-    // A page whose declared readiness selectors never matched is broken for
-    // the caller's purposes — fail instead of caching it for 30 minutes.
-    if (!readinessSatisfied(html, readyWhenSelectors)) {
-      delegate.set(
-        error: Exception(
-          'Readiness selectors never matched: $readyWhenSelectors',
-        ),
-        loading: false,
-      );
-      throw FailedParsingHtmlException(uri.toString());
-    }
 
     if (cacheAllowed) {
       await _htmlCacheManager.putFile(

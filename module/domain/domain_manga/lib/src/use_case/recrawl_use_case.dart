@@ -1,47 +1,32 @@
-import 'dart:convert';
-
+// RecrawlUseCase: opens [url] in the visible in-app webview so the user can
+// pass a Cloudflare challenge (or just look at the page), then — once the
+// webview is closed — evicts every cached script result for [url] (issue #115)
+// so the next headless run re-fetches the page with the cookies the visible
+// webview obtained. Nothing is written into any cache.
+//
+// Usage: `await recrawlUseCase.execute(context: context, url: url);` then
+// refresh the screen (callers re-run their use case with `useCache: false`).
 import 'package:core_analytics/core_analytics.dart';
-import 'package:core_storage/core_storage.dart';
+import 'package:core_network/core_network.dart';
 import 'package:flutter/material.dart';
 
 class RecrawlUseCase {
   final LogBox _logBox;
-  final HtmlCacheManager _htmlCacheManager;
+  final RunSourceScriptUseCase _runner;
 
   RecrawlUseCase({
     required LogBox logBox,
-    required HtmlCacheManager htmlCacheManager,
-  }) : _htmlCacheManager = htmlCacheManager,
+    required RunSourceScriptUseCase runner,
+  }) : _runner = runner,
        _logBox = logBox;
 
   Future<void> execute({
     required BuildContext context,
     required String url,
-    List<String> scripts = const [],
   }) async {
     final uri = Uri.tryParse(url);
     if (uri == null) return;
-    await _logBox.webview(
-      context: context,
-      uri: uri,
-      scripts: scripts,
-      onTapSnapshot: (url, html) => _snapshot(url, html, uri),
-    );
-  }
-
-  void _snapshot(String? url, String? html, Uri uri) async {
-    if (url == null || html == null) return;
-
-    await _htmlCacheManager.putFile(
-      url,
-      utf8.encode(html),
-      fileExtension: 'html',
-      maxAge: const Duration(minutes: 30),
-    );
-
-    _logBox.log(
-      name: runtimeType.toString(),
-      'Finish caching html for url [$uri]',
-    );
+    await _logBox.webview(context: context, uri: uri);
+    await _runner.evict(url: url);
   }
 }

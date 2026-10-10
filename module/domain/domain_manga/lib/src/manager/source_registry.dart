@@ -7,12 +7,20 @@
 // remaining entries sorted by name. A bundled asset that fails to load or parse
 // is logged and skipped; it never makes `create` throw.
 //
+// It also exposes the sources as `SourceExternal`s (issue #115 Task 10):
+// [SourceRegistry.values] is the built-in MangaDex source followed by one
+// `ScriptSourceExternal` per entry, rebuilt before `entries` emits, so a
+// listener of `entries` always reads fresh adapters.
+//
 // Usage:
 //   final registry = await SourceRegistry.create(
 //     dao: locator<SourceScriptDao>(),
+//     runner: locator<RunSourceScriptUseCase>(),
 //     loadAsset: rootBundle.loadString,
 //   );
 //   registry.entries            // ValueStream<List<SourceEntry>>
+//   registry.values             // [MangaDex, ...one adapter per entry]
+//   registry.fromName('Asura Scans') / registry.fromHost('asurascans.com')
 //   registry.classify(code)     // NewSource | ReplacesSource, for the editor UI
 //   await registry.save(code);  // throws SourceScriptFormatException or
 //                               // SourceScriptRejected, before any write
@@ -27,11 +35,14 @@ import 'dart:async';
 import 'dart:developer' as developer;
 
 import 'package:collection/collection.dart';
+import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../model/source_entry.dart';
+import '../sources/manga_dex_source_external.dart';
+import '../sources/script_source_external.dart';
 
 /// Ids of the scripts bundled with the app, in display order.
 const shippedSourceIds = [
@@ -56,20 +67,34 @@ class SourceScriptRejected implements Exception {
 }
 
 class SourceRegistry {
+  /// The native MangaDex source, always first in [values].
+  static final SourceExternal _mangaDex = MangaDexSourceExternal();
+
   final SourceScriptDao _dao;
+  final RunSourceScriptUseCase _runner;
   final Map<String, SourceScript> _shipped;
   final BehaviorSubject<List<SourceEntry>> _entries;
+  List<SourceExternal> _values;
   StreamSubscription<List<SourceScriptDrift>>? _subscription;
   Future<void> _tail = Future<void>.value();
 
-  SourceRegistry._(this._dao, this._shipped, List<SourceEntry> initial)
-    : _entries = BehaviorSubject.seeded(initial);
+  SourceRegistry._(
+    this._dao,
+    this._runner,
+    this._shipped,
+    List<SourceEntry> initial,
+  ) : _entries = BehaviorSubject.seeded(initial),
+      _values = const [] {
+    _values = _adapters(initial);
+  }
 
   /// Loads the bundled scripts through [loadAsset] (path
   /// `packages/domain_manga/assets/sources/<id>.js`) and the stored rows from
-  /// [dao], and keeps [entries] in sync with later [dao] changes.
+  /// [dao], and keeps [entries] in sync with later [dao] changes. [runner]
+  /// executes the scripts behind [values].
   static Future<SourceRegistry> create({
     required SourceScriptDao dao,
+    required RunSourceScriptUseCase runner,
     required Future<String> Function(String assetPath) loadAsset,
   }) async {
     final shipped = <String, SourceScript>{};
@@ -87,13 +112,34 @@ class SourceRegistry {
       }
     }
     final rows = await dao.getAll();
-    final registry = SourceRegistry._(dao, shipped, _resolve(shipped, rows));
+    final registry = SourceRegistry._(
+      dao,
+      runner,
+      shipped,
+      _resolve(shipped, rows),
+    );
     registry._subscription = dao.watchAll().listen(registry._publish);
     return registry;
   }
 
   /// Current resolved sources; replays the latest list to new listeners.
   ValueStream<List<SourceEntry>> get entries => _entries.stream;
+
+  /// MangaDex followed by one adapter per entry, in [entries] order. Updated
+  /// before [entries] emits.
+  List<SourceExternal> get values => _values;
+
+  /// The source named [name], or null (e.g. a removed or deleted source).
+  SourceExternal? fromName(String name) {
+    return _values.firstWhereOrNull((e) => e.name == name);
+  }
+
+  /// The source whose `baseUrl` host is [host], or null.
+  SourceExternal? fromHost(String host) {
+    return _values.firstWhereOrNull(
+      (e) => Uri.tryParse(e.baseUrl)?.host == host,
+    );
+  }
 
   /// Whether saving [code] would create a source or replace an existing one.
   /// Throws [SourceScriptFormatException] when the header does not parse.
@@ -140,8 +186,7 @@ class SourceRegistry {
       }
 
       final shipped = _shipped[script.id];
-      final edited =
-          shipped != null && existing?.status != SourceStatus.custom;
+      final edited = shipped != null && existing?.status != SourceStatus.custom;
       await _dao.upsert(
         SourceScriptTablesCompanion(
           id: Value(script.id),
@@ -149,7 +194,9 @@ class SourceRegistry {
           code: Value(code),
           version: Value(script.version),
           origin: Value(
-            edited ? SourceScriptOrigin.shippedEdited : SourceScriptOrigin.custom,
+            edited
+                ? SourceScriptOrigin.shippedEdited
+                : SourceScriptOrigin.custom,
           ),
           // Explicit null: an absent value would keep the old base on replace.
           baseVersion: Value<int?>(edited ? shipped.version : null),
@@ -203,7 +250,16 @@ class SourceRegistry {
     if (_entries.isClosed) return;
     final next = _resolve(_shipped, rows);
     if (const ListEquality<SourceEntry>().equals(_entries.value, next)) return;
+    _values = _adapters(next);
     _entries.add(next);
+  }
+
+  List<SourceExternal> _adapters(List<SourceEntry> entries) {
+    return List.unmodifiable([
+      _mangaDex,
+      for (final entry in entries)
+        ScriptSourceExternal(script: entry.script, runner: _runner),
+    ]);
   }
 
   static List<SourceEntry> _resolve(
@@ -218,10 +274,10 @@ class SourceRegistry {
         return bundled == null
             ? null
             : SourceEntry(
-                script: bundled,
-                status: SourceStatus.shipped,
-                shipped: bundled,
-              );
+              script: bundled,
+              status: SourceStatus.shipped,
+              shipped: bundled,
+            );
       }
       final SourceScript script;
       try {
@@ -235,16 +291,18 @@ class SourceRegistry {
         );
         return null;
       }
-      final status = row.origin == SourceScriptOrigin.custom
-          ? SourceStatus.custom
-          : bundled != null && bundled.version > (row.baseVersion ?? 0)
-          ? SourceStatus.updateAvailable
-          : SourceStatus.modified;
+      final status =
+          row.origin == SourceScriptOrigin.custom
+              ? SourceStatus.custom
+              : bundled != null && bundled.version > (row.baseVersion ?? 0)
+              ? SourceStatus.updateAvailable
+              : SourceStatus.modified;
       return SourceEntry(script: script, status: status, shipped: bundled);
     }
 
-    final others = rows.where((r) => !shippedSourceIds.contains(r.id)).toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
+    final others =
+        rows.where((r) => !shippedSourceIds.contains(r.id)).toList()
+          ..sort((a, b) => a.name.compareTo(b.name));
     return [
       for (final id in [...shippedSourceIds, ...others.map((r) => r.id)])
         if (entry(id) case final resolved?) resolved,
