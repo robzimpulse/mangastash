@@ -103,10 +103,11 @@ const source = {
       );
       // No labeled section: degrade to the last text-link section WITHOUT a
       // cover image (order-proof), else plain last.
+      const noCover = textLinkSections.filter((section) => section.querySelector('img') === null);
       const metadata =
         labeled ??
-        textLinkSections.filter((section) => section.querySelector('img') === null).at(-1) ??
-        textLinkSections.at(-1);
+        noCover[noCover.length - 1] ??
+        textLinkSections[textLinkSections.length - 1];
 
       const link = metadata
         ? [...metadata.querySelectorAll('a[href*="/series/"]')].find(
