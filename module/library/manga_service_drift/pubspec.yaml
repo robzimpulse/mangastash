@@ -32,14 +32,12 @@ dependencies:
   log_box:
     git:
       url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box
+      ref: v0.1.0
 
   log_box_persistent_storage_drift:
     git:
-      url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box_persistent_storage_drift
+      url: https://github.com/robzimpulse/log_box_persistent_storage_drift.git
+      ref: v0.0.1
 
 dev_dependencies:
   flutter_test:
