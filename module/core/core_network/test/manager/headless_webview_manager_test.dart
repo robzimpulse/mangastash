@@ -1,3 +1,10 @@
+// Tests for HeadlessWebviewManager's pure helpers and image path:
+// handleResolvedImage/handleRejectedImage, htmlCacheKey,
+// shouldUseHtmlCache, publishDiscoveredUserAgent, plus
+// HeadlessWebviewManager.image and its constructor with a fake LogBox and
+// HtmlCacheManager. The script runner has its own suite
+// (source_script_runner_test.dart).
+// Run: fvm flutter test test/manager/headless_webview_manager_test.dart
 import 'dart:async';
 
 import 'package:core_analytics/core_analytics.dart';

@@ -28,8 +28,6 @@ class BrowseScreen extends StatelessWidget {
       create: (context) => BrowseScreenCubit(
         updateSearchParameterUseCase: locator(),
         listenSearchParameterUseCase: locator(),
-        updateSourcesUseCase: locator(),
-        listenSourcesUseCase: locator(),
       ),
       child: BrowseScreen(onTapSources: onTapSources),
     );

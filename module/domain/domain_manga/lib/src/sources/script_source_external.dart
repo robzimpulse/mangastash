@@ -9,7 +9,10 @@
 // Errors: a runner `SourceScriptException` is rethrown with `source` set to the
 // script's name; a result of the wrong shape (fromJson `FormatException`, a
 // non-object/non-list/non-string value) becomes
-// `SourceScriptException(function: <fn>, message: 'Invalid result: <why>')`.
+// `SourceScriptException(function: <fn>, message: 'Invalid result: <why>')`;
+// for page functions it also carries the page `url` and the runner's cached
+// result for that url is evicted first (the runner caches before this check,
+// so a half-loaded page's bad JSON would otherwise be served for 30 minutes).
 // Domain validation (missing titles, zero chapters/images) stays in the use
 // cases, which evict the runner's cached result when it fails.
 //
@@ -71,7 +74,9 @@ class ScriptSourceExternal extends Equatable implements SourceExternal {
       searchTerm: searchTerm,
       useCache: useCache,
     );
-    return _map(function, () => SearchResultScrapped.fromJson(_object(value)));
+    return _mapPage(function, url, () {
+      return SearchResultScrapped.fromJson(_object(value));
+    });
   }
 
   @override
@@ -81,7 +86,11 @@ class ScriptSourceExternal extends Equatable implements SourceExternal {
   }) async {
     const function = 'manga';
     final value = await _page(function, url: url, useCache: useCache);
-    return _map(function, () => MangaScrapped.fromJson(_object(value)));
+    return _mapPage(
+      function,
+      url,
+      () => MangaScrapped.fromJson(_object(value)),
+    );
   }
 
   @override
@@ -99,7 +108,7 @@ class ScriptSourceExternal extends Equatable implements SourceExternal {
   }) async {
     const function = 'chapters';
     final value = await _page(function, url: url, useCache: useCache);
-    return _map(function, () {
+    return _mapPage(function, url, () {
       return [
         for (final row in _list(value)) ChapterScrapped.fromJson(_object(row)),
       ];
@@ -113,7 +122,9 @@ class ScriptSourceExternal extends Equatable implements SourceExternal {
   }) async {
     const function = 'images';
     final value = await _page(function, url: url, useCache: useCache);
-    return _map(function, () => [for (final e in _list(value)) _string(e)]);
+    return _mapPage(function, url, () {
+      return [for (final e in _list(value)) _string(e)];
+    });
   }
 
   @override
@@ -133,7 +144,7 @@ class ScriptSourceExternal extends Equatable implements SourceExternal {
   }) async {
     const function = 'tags';
     final value = await _page(function, url: url, useCache: useCache);
-    return _map(function, () {
+    return _mapPage(function, url, () {
       return [
         for (final tag in _list(value)) TagScrapped.fromJson(_object(tag)),
       ];
@@ -202,6 +213,27 @@ class ScriptSourceExternal extends Equatable implements SourceExternal {
       throw SourceScriptException(
         function: function,
         message: 'Invalid result: ${e.message}',
+        source: name,
+      );
+    }
+  }
+
+  /// [_map] for a page function's result fetched from [url]: a malformed
+  /// result first evicts the runner's cached results for [url], and the
+  /// exception carries [url] (the page to recrawl or fix against).
+  Future<T> _mapPage<T>(
+    String function,
+    String url,
+    T Function() convert,
+  ) async {
+    try {
+      return convert();
+    } on FormatException catch (e) {
+      await _runner.evict(url: url);
+      throw SourceScriptException(
+        function: function,
+        message: 'Invalid result: ${e.message}',
+        url: url,
         source: name,
       );
     }

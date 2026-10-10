@@ -3,7 +3,9 @@
 // its JSON results to the *Scrapped models. The runner is a mocktail mock, so
 // these tests pin the call shapes (function, args, searchTerm, timeout) and the
 // error mapping (runner errors gain the source name; malformed results become
-// SourceScriptException 'Invalid result: ...').
+// SourceScriptException 'Invalid result: ...'; for page functions that
+// exception carries the page url and the runner's cached result for it is
+// evicted first).
 // Run: fvm flutter test test/sources/script_source_external_test.dart
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/src/sources/script_source_external.dart';
@@ -72,6 +74,7 @@ void main() {
 
   setUp(() {
     runner = MockRunSourceScriptUseCase();
+    when(() => runner.evict(url: any(named: 'url'))).thenAnswer((_) async {});
     script = SourceScript.parse(code());
     source = ScriptSourceExternal(script: script, runner: runner);
   });
@@ -132,23 +135,30 @@ void main() {
       expect(script.timeoutFor('search'), const Duration(seconds: 20));
     });
 
-    test('a malformed result throws SourceScriptException Invalid result', () {
-      stubPage('search', {'items': 'nope'});
+    test(
+      'a malformed result throws Invalid result and evicts the cache',
+      () async {
+        stubPage('search', {'items': 'nope'});
 
-      expect(
-        source.search(url: 'https://p'),
-        throwsA(
-          isA<SourceScriptException>()
-              .having((e) => e.function, 'function', 'search')
-              .having((e) => e.source, 'source', 'My Site')
-              .having(
-                (e) => e.message,
-                'message',
-                startsWith('Invalid result'),
-              ),
-        ),
-      );
-    });
+        await expectLater(
+          source.search(url: 'https://p'),
+          throwsA(
+            isA<SourceScriptException>()
+                .having((e) => e.function, 'function', 'search')
+                .having((e) => e.source, 'source', 'My Site')
+                .having((e) => e.url, 'url', 'https://p')
+                .having(
+                  (e) => e.message,
+                  'message',
+                  startsWith('Invalid result'),
+                ),
+          ),
+        );
+        // The runner cached the bad JSON before the shape check; it must not
+        // be served again for 30 minutes.
+        verify(() => runner.evict(url: 'https://p')).called(1);
+      },
+    );
 
     test('a non-object result throws Invalid result', () {
       stubPage('search', ['not', 'a', 'map']);
@@ -233,6 +243,41 @@ void main() {
     );
   });
 
+  test('every page function evicts its url on a malformed result', () async {
+    final calls = <String, Future<Object?> Function()>{
+      'manga': () => source.manga(url: 'https://p/manga'),
+      'chapters': () => source.chapters(url: 'https://p/chapters'),
+      'images': () => source.images(url: 'https://p/images'),
+      'tags': () => source.tags(url: 'https://p/tags'),
+    };
+    for (final entry in calls.entries) {
+      stubPage(entry.key, 42);
+
+      await expectLater(
+        entry.value(),
+        throwsA(
+          isA<SourceScriptException>()
+              .having((e) => e.function, 'function', entry.key)
+              .having((e) => e.url, 'url', 'https://p/${entry.key}')
+              .having(
+                (e) => e.message,
+                'message',
+                startsWith('Invalid result'),
+              ),
+        ),
+      );
+      verify(() => runner.evict(url: 'https://p/${entry.key}')).called(1);
+    }
+  });
+
+  test('a well-formed result evicts nothing', () async {
+    stubPage('images', ['i1']);
+
+    await source.images(url: 'https://p');
+
+    verifyNever(() => runner.evict(url: any(named: 'url')));
+  });
+
   test('images maps a list of strings and rejects other shapes', () async {
     stubPage('images', ['i1', 'i2']);
     expect(await source.images(url: 'https://p'), ['i1', 'i2']);
@@ -279,19 +324,19 @@ void main() {
       ).called(1);
     });
 
-    test('a non-string result throws Invalid result', () {
+    test('a non-string result throws Invalid result', () async {
       stubBlank('searchUrl', 42);
 
-      expect(
+      await expectLater(
         source.searchUrl(parameter: const SearchMangaParameter()),
         throwsA(
-          isA<SourceScriptException>().having(
-            (e) => e.message,
-            'message',
-            startsWith('Invalid result'),
-          ),
+          isA<SourceScriptException>()
+              .having((e) => e.message, 'message', startsWith('Invalid result'))
+              .having((e) => e.url, 'url', isNull),
         ),
       );
+      // URL builders run on the blank page: nothing is cached to evict.
+      verifyNever(() => runner.evict(url: any(named: 'url')));
     });
   });
 
