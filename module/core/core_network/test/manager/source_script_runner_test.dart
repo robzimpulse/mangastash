@@ -41,10 +41,28 @@ typedef FakeReply = ({String handler, Map<String, Object?> payload});
 /// page "loads" on `run()`. Scripts never answer unless [reply] is set; then
 /// each evaluated harness gets [reply]'s message (with its `callId`) posted
 /// to the registered JS handler, as the real bridge would.
+///
+/// Knobs: [replyEarly] posts the reply synchronously *before* the
+/// `evaluateJavascript` future completes (a device can deliver the bridge
+/// message ahead of the evaluate reply); [currentUrl] is what `getUrl()`
+/// reports; [disposeHangs] makes `dispose()` never complete; [loadHangs]
+/// makes the page never finish loading. Every `shouldOverrideUrlLoading`
+/// callback handed to the factory is kept in [policies].
 class FakeWebviewFactory {
   int calls = 0;
   final List<MockHeadlessWebview> created = [];
+  final List<
+    Future<NavigationActionPolicy?> Function(
+      InAppWebViewController controller,
+      NavigationAction navigationAction,
+    )?
+  >
+  policies = [];
   FakeReply Function()? reply;
+  bool replyEarly = false;
+  WebUri? currentUrl = WebUri('about:blank');
+  bool disposeHangs = false;
+  bool loadHangs = false;
 
   HeadlessInAppWebView call({
     URLRequest? initialUrlRequest,
@@ -90,6 +108,7 @@ class FakeWebviewFactory {
     shouldOverrideUrlLoading,
   }) {
     calls++;
+    policies.add(shouldOverrideUrlLoading);
     final controller = MockWebviewController();
     final handlers = <String, Function>{};
     when(
@@ -108,11 +127,18 @@ class FakeWebviewFactory {
       final callId = RegExp(r'var callId = "([^"]+)"').firstMatch(source);
       final message = reply?.call();
       if (callId != null && message != null) {
-        scheduleMicrotask(() {
+        void post() {
           handlers[message.handler]!([
             {'callId': callId.group(1), ...message.payload},
           ]);
-        });
+        }
+
+        if (replyEarly) {
+          post();
+          await Future<void>.delayed(const Duration(milliseconds: 20));
+        } else {
+          scheduleMicrotask(post);
+        }
       }
       return null;
     });
@@ -120,10 +146,14 @@ class FakeWebviewFactory {
     when(() => webview.webViewController).thenReturn(controller);
     when(() => webview.run()).thenAnswer((_) async {
       onWebViewCreated?.call(controller);
+      if (loadHangs) return;
       onLoadStart?.call(controller, null);
       onLoadStop?.call(controller, null);
     });
-    when(() => webview.dispose()).thenAnswer((_) async {});
+    when(() => webview.dispose()).thenAnswer(
+      (_) => disposeHangs ? Completer<void>().future : Future<void>.value(),
+    );
+    when(() => controller.getUrl()).thenAnswer((_) async => currentUrl);
     when(() => controller.getTitle()).thenAnswer((_) async => 'Page');
     when(() => controller.getHtml()).thenAnswer((_) async => '<html></html>');
     created.add(webview);
@@ -530,6 +560,277 @@ void main() {
         );
       }
       expect(loads, 1);
+    });
+  });
+
+  group('bridge reply before evaluateJavascript returns', () {
+    setUp(() {
+      factory.replyEarly = true;
+      when(() => cache.getFileFromCache(any())).thenAnswer((_) async => null);
+      when(
+        () => cache.putFile(
+          any(),
+          any(),
+          fileExtension: any(named: 'fileExtension'),
+          maxAge: any(named: 'maxAge'),
+        ),
+      ).thenAnswer((_) async => MemoryCacheSystem().createFile('put.json'));
+    });
+
+    // Without a listener on the call's completer, an early sourceError is an
+    // uncaught async error (fatal in the app); flutter_test fails the test.
+    test('an early sourceError on a blank run is a normal failure', () async {
+      factory.reply =
+          () => (
+            handler: 'sourceError',
+            payload: {'message': 'early', 'stack': ''},
+          );
+      await expectLater(
+        manager.runOnBlank(
+          code: 'const source = {};',
+          function: 'searchUrl',
+          baseUrl: 'https://x',
+        ),
+        throwsA(
+          isA<SourceScriptException>().having(
+            (e) => e.message,
+            'message',
+            'early',
+          ),
+        ),
+      );
+    });
+
+    test('an early sourceError on a page run is a normal failure', () async {
+      factory.reply =
+          () => (
+            handler: 'sourceError',
+            payload: {'message': 'early', 'stack': ''},
+          );
+      await expectLater(
+        manager.runOnPage(
+          url: 'https://x/p',
+          code: 'const source = {};',
+          function: 'search',
+          baseUrl: 'https://x',
+        ),
+        throwsA(isA<SourceScriptException>()),
+      );
+    });
+
+    test('an early sourceResult is still returned', () async {
+      factory.reply =
+          () => (handler: 'sourceResult', payload: {'value': '"https://x/a"'});
+      expect(
+        await manager.runOnBlank(
+          code: 'const source = {};',
+          function: 'searchUrl',
+          baseUrl: 'https://x',
+        ),
+        'https://x/a',
+      );
+    });
+  });
+
+  group('warm blank navigation', () {
+    Future<Object?> run() => manager.runOnBlank(
+      code: 'const source = {};',
+      function: 'searchUrl',
+      baseUrl: 'https://x',
+    );
+
+    setUp(() {
+      factory.reply =
+          () => (handler: 'sourceResult', payload: {'value': '"https://x/a"'});
+    });
+
+    test('cancels every navigation except the initial blank load', () async {
+      await run();
+
+      final policy = factory.policies.single;
+      expect(policy, isNotNull);
+      Future<NavigationActionPolicy?> decide(String url) => policy!(
+        MockWebviewController(),
+        NavigationAction(
+          request: URLRequest(url: WebUri(url)),
+          isForMainFrame: true,
+        ),
+      );
+      expect(await decide('about:blank'), NavigationActionPolicy.ALLOW);
+      expect(await decide('https://elsewhere/'), NavigationActionPolicy.CANCEL);
+      expect(await decide('https://x/a'), NavigationActionPolicy.CANCEL);
+    });
+
+    test('a webview that left the blank page is replaced', () async {
+      factory.currentUrl = WebUri('https://elsewhere/');
+      expect(await run(), 'https://x/a');
+      verify(() => factory.created.first.dispose()).called(1);
+
+      factory.currentUrl = WebUri('about:blank');
+      expect(await run(), 'https://x/a');
+      expect(factory.calls, 2);
+      verifyNever(() => factory.created.last.dispose());
+    });
+
+    test('a page load timeout is a timed-out SourceScriptException', () async {
+      factory.loadHangs = true;
+      await expectLater(
+        manager.runOnBlank(
+          code: 'const source = {};',
+          function: 'searchUrl',
+          baseUrl: 'https://x',
+          timeout: const Duration(milliseconds: 50),
+        ),
+        throwsA(
+          isA<SourceScriptException>()
+              .having((e) => e.timedOut, 'timedOut', isTrue)
+              .having((e) => e.function, 'function', 'searchUrl'),
+        ),
+      );
+      verify(() => factory.created.single.dispose()).called(1);
+    });
+  });
+
+  group('robustness', () {
+    setUp(() {
+      factory.reply =
+          () => (handler: 'sourceResult', payload: {'value': '{"items":[]}'});
+    });
+
+    Future<ScriptRunResult> runPage() => manager.runOnPage(
+      url: 'https://x/p',
+      code: 'const source = {};',
+      function: 'search',
+      baseUrl: 'https://x',
+    );
+
+    test('a failing cache read is a miss', () async {
+      when(() => cache.getFileFromCache(any())).thenThrow(Exception('io'));
+      when(
+        () => cache.putFile(
+          any(),
+          any(),
+          fileExtension: any(named: 'fileExtension'),
+          maxAge: any(named: 'maxAge'),
+        ),
+      ).thenAnswer((_) async => MemoryCacheSystem().createFile('put.json'));
+
+      final result = await runPage();
+      expect(result.value, {'items': []});
+      expect(result.fromCache, isFalse);
+    });
+
+    test('a corrupt cached value is a miss', () async {
+      final file = await MemoryCacheSystem().createFile('bad.json');
+      await file.writeAsString('{not json');
+      when(() => cache.getFileFromCache(any())).thenAnswer(
+        (_) async => FileInfo(
+          file,
+          FileSource.Cache,
+          DateTime.now().add(const Duration(minutes: 30)),
+          'k',
+        ),
+      );
+      when(
+        () => cache.putFile(
+          any(),
+          any(),
+          fileExtension: any(named: 'fileExtension'),
+          maxAge: any(named: 'maxAge'),
+        ),
+      ).thenAnswer((_) async => MemoryCacheSystem().createFile('put.json'));
+
+      final result = await runPage();
+      expect(result.value, {'items': []});
+      expect(result.fromCache, isFalse);
+      expect(factory.calls, 1);
+    });
+
+    test('a failing cache write does not fail the run', () async {
+      when(() => cache.getFileFromCache(any())).thenAnswer((_) async => null);
+      when(
+        () => cache.putFile(
+          any(),
+          any(),
+          fileExtension: any(named: 'fileExtension'),
+          maxAge: any(named: 'maxAge'),
+        ),
+      ).thenThrow(Exception('disk full'));
+
+      final result = await runPage();
+      expect(result.value, {'items': []});
+    });
+
+    test('non-JSON args fail as a SourceScriptException future', () async {
+      await expectLater(
+        manager.runOnBlank(
+          code: 'const source = {};',
+          function: 'searchUrl',
+          baseUrl: 'https://x',
+          args: [Object()],
+        ),
+        throwsA(
+          isA<SourceScriptException>().having(
+            (e) => e.function,
+            'function',
+            'searchUrl',
+          ),
+        ),
+      );
+      expect(factory.calls, 0);
+    });
+
+    test('a hung dispose cannot wedge the warm blank mutex', () async {
+      factory.reply = null;
+      factory.disposeHangs = true;
+      Future<Object?> run() => manager.runOnBlank(
+        code: 'const source = {};',
+        function: 'searchUrl',
+        baseUrl: 'https://x',
+        timeout: const Duration(milliseconds: 50),
+      );
+
+      await expectLater(run(), throwsA(isA<SourceScriptException>()));
+      await expectLater(run(), throwsA(isA<SourceScriptException>()));
+      expect(factory.calls, 2);
+    });
+
+    test('a hung dispose cannot wedge a page run', () async {
+      factory.disposeHangs = true;
+      when(() => cache.getFileFromCache(any())).thenAnswer((_) async => null);
+      when(
+        () => cache.putFile(
+          any(),
+          any(),
+          fileExtension: any(named: 'fileExtension'),
+          maxAge: any(named: 'maxAge'),
+        ),
+      ).thenAnswer((_) async => MemoryCacheSystem().createFile('put.json'));
+
+      expect((await runPage()).value, {'items': []});
+    });
+
+    test('a failed source ctx load is retried on the next call', () async {
+      var loads = 0;
+      final retrying = HeadlessWebviewManager(
+        log: log,
+        htmlCacheManager: cache,
+        webviewFactory: factory.call,
+        loadSourceCtx: () async {
+          loads++;
+          if (loads == 1) throw Exception('asset missing');
+          return '/*ctx*/';
+        },
+      );
+      Future<Object?> run() => retrying.runOnBlank(
+        code: 'const source = {};',
+        function: 'searchUrl',
+        baseUrl: 'https://x',
+      );
+
+      await expectLater(run(), throwsA(isA<Exception>()));
+      expect(await run(), {'items': []});
+      expect(loads, 2);
     });
   });
 

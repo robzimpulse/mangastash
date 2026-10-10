@@ -6,8 +6,11 @@
 /// It implements [HeadlessWebviewUseCase] (`open` → parsed post-JS DOM,
 /// `image` → data url) and [RunSourceScriptUseCase] (spec §6): `runOnPage`
 /// runs a source function inside a freshly loaded page and caches its JSON
-/// result for 30 minutes; `runOnBlank` runs URL builders in one warm, reused
-/// blank webview (serialized, rebuilt after a timeout/platform error);
+/// result for 30 minutes (cache read/write failures are logged, never fatal);
+/// `runOnBlank` runs URL builders in one warm, reused blank webview
+/// (serialized; navigations off the blank page are cancelled; rebuilt after
+/// a timeout, a platform error, or when found off the blank page). Script-run
+/// disposes are bounded by `disposeTimeout`;
 /// `evict` drops a URL's cached script results. Every webview — page fetch,
 /// script page, warm blank — is built by [HeadlessWebviewManager._createWebview],
 /// the single choke point for settings and (later) `hosts` enforcement.
@@ -285,6 +288,10 @@ class HeadlessWebviewManager
     implements HeadlessWebviewUseCase, RunSourceScriptUseCase {
   static const Duration defaultTimeout = Duration(seconds: 15);
 
+  /// Upper bound on a script-run webview dispose (and on the warm blank
+  /// page's URL check); a hung native call is logged and abandoned.
+  static const Duration disposeTimeout = Duration(seconds: 2);
+
   /// How long a successful script result stays in the JSON result cache.
   static const Duration scriptCacheMaxAge = Duration(minutes: 30);
 
@@ -412,13 +419,22 @@ class HeadlessWebviewManager
     final cacheAllowed = useCache && !captureHtml;
 
     if (cacheAllowed) {
-      final cached = await _htmlCacheManager.getFileFromCache(key);
-      final data = await cached?.file.readAsString(encoding: utf8);
-      if (data != null) {
-        return ScriptRunResult(
-          value: jsonDecode(data),
-          elapsed: stopwatch.elapsed,
-          fromCache: true,
+      // The cache is an optimisation: an unreadable or corrupt entry is a
+      // miss, never a failure of a run that could otherwise succeed.
+      try {
+        final cached = await _htmlCacheManager.getFileFromCache(key);
+        final data = await cached?.file.readAsString(encoding: utf8);
+        if (data != null) {
+          return ScriptRunResult(
+            value: jsonDecode(data),
+            elapsed: stopwatch.elapsed,
+            fromCache: true,
+          );
+        }
+      } catch (e) {
+        _log.log(
+          'Ignoring unreadable script cache entry [$key]: $e',
+          name: 'HeadlessWebviewManager',
         );
       }
     }
@@ -439,7 +455,7 @@ class HeadlessWebviewManager
         delay: _cloudflareRetryDelay,
         onExhausted: (error) => delegate.set(error: error, loading: false),
         attempt: () async {
-          await _disposeWebview(webview);
+          await _disposeBounded(webview);
           webview = null;
           final loaded = await _loadPage(
             uri: uri,
@@ -481,12 +497,19 @@ class HeadlessWebviewManager
           : null;
 
       if (cacheAllowed) {
-        await _htmlCacheManager.putFile(
-          key,
-          utf8.encode(jsonEncode(value)),
-          fileExtension: 'json',
-          maxAge: scriptCacheMaxAge,
-        );
+        try {
+          await _htmlCacheManager.putFile(
+            key,
+            utf8.encode(jsonEncode(value)),
+            fileExtension: 'json',
+            maxAge: scriptCacheMaxAge,
+          );
+        } catch (e) {
+          _log.log(
+            'Failed to cache script result [$key]: $e',
+            name: 'HeadlessWebviewManager',
+          );
+        }
       }
 
       delegate.set(loading: false);
@@ -499,7 +522,7 @@ class HeadlessWebviewManager
       delegate.set(error: e, stackTrace: st, loading: false);
       rethrow;
     } finally {
-      await _disposeWebview(webview);
+      await _disposeBounded(webview);
     }
   }
 
@@ -510,25 +533,56 @@ class HeadlessWebviewManager
     required String baseUrl,
     List<Object?> args = const [],
     Duration? timeout,
-  }) {
-    final argsJson = jsonEncode(args);
+  }) async {
+    final String argsJson;
+    try {
+      argsJson = jsonEncode(args);
+    } catch (e) {
+      throw SourceScriptException(
+        function: function,
+        message: 'Arguments are not JSON-encodable: $e',
+      );
+    }
+    final effectiveTimeout = timeout ?? defaultTimeout;
+
     return _blankMutex.protect(() async {
-      final webview = _blankWebview ?? await _warmBlankWebview();
-      _blankWebview = webview;
+      var webview = _blankWebview;
+      if (webview == null) {
+        try {
+          webview = await _warmBlankWebview(effectiveTimeout);
+        } on TimeoutException {
+          throw SourceScriptException(
+            function: function,
+            message:
+                '$function timed out after ${_seconds(effectiveTimeout)}s '
+                'waiting for the blank page to load',
+            timedOut: true,
+          );
+        }
+        _blankWebview = webview;
+      }
+
       try {
-        return await _invoke(
+        final value = await _invoke(
           webview: webview,
           code: code,
           function: function,
           baseUrl: baseUrl,
           argsJson: argsJson,
           pageFunction: false,
-          timeout: timeout ?? defaultTimeout,
+          timeout: effectiveTimeout,
         );
+        await _discardBlankWebviewIfNavigated(webview);
+        return value;
       } on SourceScriptException catch (e) {
-        // A script that merely threw leaves the page healthy; one that never
-        // answered may still be spinning, so the next call gets a fresh page.
-        if (e.timedOut) await _discardBlankWebview();
+        // A script that merely threw leaves the page healthy (unless it
+        // navigated away); one that never answered may still be spinning,
+        // so the next call gets a fresh page.
+        if (e.timedOut) {
+          await _discardBlankWebview();
+        } else {
+          await _discardBlankWebviewIfNavigated(webview);
+        }
         rethrow;
       } catch (_) {
         await _discardBlankWebview();
@@ -965,7 +1019,14 @@ class HeadlessWebviewManager
       },
       shouldOverrideUrlLoading:
           origin == null
-              ? null
+              // Blank page: only its own about:blank/data load may proceed.
+              // A URL builder that navigates must not turn the warm webview
+              // into a remote page that later calls (and the bridge) run on.
+              ? (_, action) async {
+                return _isBlankUrl(action.request.url)
+                    ? NavigationActionPolicy.ALLOW
+                    : NavigationActionPolicy.CANCEL;
+              }
               : (_, action) async {
                 final destination = action.request.url;
                 final isCloudFlare = action.isCloudFlare(origin);
@@ -997,11 +1058,31 @@ class HeadlessWebviewManager
     return webview;
   }
 
+  /// Whether [url] is still the warm blank page (`about:`/`data:`).
+  static bool _isBlankUrl(Uri? url) {
+    final scheme = url?.scheme;
+    return scheme == 'about' || scheme == 'data';
+  }
+
+  /// [_disposeWebview] for script runs: bounded by [disposeTimeout] and
+  /// never throwing (logged), so a hung or failing native dispose can
+  /// neither hold the warm-blank mutex nor mask the call's real outcome.
+  Future<void> _disposeBounded(HeadlessInAppWebView? webview) async {
+    try {
+      await _disposeWebview(webview)?.timeout(disposeTimeout);
+    } catch (e) {
+      _log.log(
+        'Failed to dispose headless webview: $e',
+        name: 'HeadlessWebviewManager',
+      );
+    }
+  }
+
   /// Untracks and disposes [webview]; null is a no-op.
-  Future<void> _disposeWebview(HeadlessInAppWebView? webview) async {
-    if (webview == null) return;
+  Future<void>? _disposeWebview(HeadlessInAppWebView? webview) {
+    if (webview == null) return null;
     _instances.remove(webview.hashCode);
-    await webview.dispose();
+    return webview.dispose();
   }
 
   /// JS handlers for script runs — the only channel a source script has to
@@ -1076,9 +1157,14 @@ class HeadlessWebviewManager
     required Duration timeout,
     String? url,
   }) async {
-    final ctxJs = await (_sourceCtx ??= _loadSourceCtx());
+    final ctxJs = await _sourceCtxOnce();
     final callId = 'call-${_callSequence++}';
     final completer = Completer<Object?>();
+    // The bridge reply can land before evaluateJavascript's own reply; a
+    // listener must exist from the start or an early sourceError completes
+    // a listener-less future and surfaces as an uncaught (fatal) error. The
+    // awaits below still observe the outcome.
+    completer.future.ignore();
     _pendingScripts[callId] = (
       completer: completer,
       function: function,
@@ -1130,14 +1216,30 @@ class HeadlessWebviewManager
     }
   }
 
+  /// `source_ctx.js`, loaded once and memoized; a failed load is forgotten
+  /// so the next script run retries it.
+  Future<String> _sourceCtxOnce() {
+    return _sourceCtx ??= Future.sync(_loadSourceCtx).catchError((
+      Object e,
+      StackTrace st,
+    ) {
+      _sourceCtx = null;
+      Error.throwWithStackTrace(e, st);
+    });
+  }
+
   /// Builds the warm blank webview for [runOnBlank] and waits (bounded by
-  /// [defaultTimeout]) for its page to load; disposed on failure.
-  Future<HeadlessInAppWebView> _warmBlankWebview() async {
+  /// [timeout], the calling script's budget) for its page to load; disposed
+  /// on failure, rethrowing (a [TimeoutException] on a stuck load).
+  Future<HeadlessInAppWebView> _warmBlankWebview(Duration timeout) async {
     final onLoadStopCompleter = Completer();
     final onLoadErrorCompleter = Completer();
 
     final webview = _createWebview(
-      initialData: InAppWebViewInitialData(data: _blankPage),
+      initialData: InAppWebViewInitialData(
+        data: _blankPage,
+        baseUrl: WebUri('about:blank'),
+      ),
       handlers: _scriptHandlers(),
       onLoadStart: () {},
       onLoadStop: () => onLoadStopCompleter.safeComplete(),
@@ -1148,9 +1250,9 @@ class HeadlessWebviewManager
       await Future.wait([
         webview.run(),
         Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
-      ]).timeout(defaultTimeout);
+      ]).timeout(timeout);
     } catch (_) {
-      await _disposeWebview(webview);
+      await _disposeBounded(webview);
       rethrow;
     }
     return webview;
@@ -1161,6 +1263,31 @@ class HeadlessWebviewManager
   Future<void> _discardBlankWebview() async {
     final webview = _blankWebview;
     _blankWebview = null;
-    await _disposeWebview(webview);
+    await _disposeBounded(webview);
+  }
+
+  /// Discards the warm blank webview when [webview] (the one a call just
+  /// used) is no longer on the blank page — e.g. a script navigated
+  /// somewhere the navigation policy did not catch — or its URL cannot be
+  /// read. Keeps it otherwise.
+  Future<void> _discardBlankWebviewIfNavigated(
+    HeadlessInAppWebView webview,
+  ) async {
+    bool blank;
+    try {
+      final url = await webview.webViewController?.getUrl().timeout(
+        disposeTimeout,
+      );
+      blank = url == null || _isBlankUrl(url);
+    } catch (_) {
+      blank = false;
+    }
+    if (!blank) {
+      _log.log(
+        'Warm blank webview left the blank page; replacing it',
+        name: 'HeadlessWebviewManager',
+      );
+      await _discardBlankWebview();
+    }
   }
 }
