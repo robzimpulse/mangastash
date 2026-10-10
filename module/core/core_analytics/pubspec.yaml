@@ -17,28 +17,23 @@ dependencies:
   log_box:
     git:
       url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box
+      ref: v0.1.0
   log_box_navigation_logger:
     git:
-      url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box_navigation_logger
+      url: https://github.com/robzimpulse/log_box_navigation_logger.git
+      ref: v0.0.1
   log_box_dio_logger:
     git:
-      url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box_dio_logger
+      url: https://github.com/robzimpulse/log_box_dio_logger.git
+      ref: v0.0.1
   log_box_in_app_webview_logger:
     git:
-      url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box_in_app_webview_logger
+      url: https://github.com/robzimpulse/log_box_in_app_webview_logger.git
+      ref: v0.0.1
   log_box_persistent_storage_drift:
     git:
-      url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box_persistent_storage_drift
+      url: https://github.com/robzimpulse/log_box_persistent_storage_drift.git
+      ref: v0.0.1
 
   # library
   service_locator:
