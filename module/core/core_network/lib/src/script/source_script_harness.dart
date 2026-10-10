@@ -12,7 +12,11 @@
 ///      with `Error('source.<function> is not a function')`),
 ///   4. posts the outcome back through the inappwebview bridge:
 ///      `sourceResult {callId, value: <JSON string>}` or
-///      `sourceError {callId, message, stack}`.
+///      `sourceError {callId, message, stack}`. Serialising the result and
+///      posting it happen inside the promise chain, ahead of a final `.catch`,
+///      so a throw there (circular structure, BigInt, a failing post) is also
+///      reported as `sourceError`; a result that stringifies to `undefined`
+///      (undefined, function, symbol) is posted as `"null"`.
 /// [parseScriptLocation] extracts `line:column` of the first script frame from
 /// a WebKit (`fn@mangastash-source.js:12:9`) or Chromium
 /// (`at fn (mangastash-source.js:7:15)`) stack.
@@ -27,7 +31,7 @@ import 'dart:convert';
 String _literal(Object? value) {
   return jsonEncode(
     value,
-  ).replaceAll(' ', r' ').replaceAll(' ', r' ');
+  ).replaceAll('\u2028', r'\u2028').replaceAll('\u2029', r'\u2029');
 }
 
 String buildSourceHarness({
@@ -71,11 +75,17 @@ String buildSourceHarness({
     }
     return $call;
   }).then(function (result) {
+    // Inside the chain on purpose: JSON.stringify can throw (circular
+    // structure, BigInt) and so can the post itself; both must reach the
+    // .catch below as a sourceError instead of an unhandled rejection that
+    // leaves the runner waiting for its timeout. undefined, functions and
+    // symbols stringify to undefined, which is reported as JSON "null".
+    var json = JSON.stringify(result);
     post('sourceResult', {
       callId: callId,
-      value: JSON.stringify(result === undefined ? null : result),
+      value: json === undefined ? 'null' : json,
     });
-  }, function (e) {
+  }).catch(function (e) {
     post('sourceError', {
       callId: callId,
       message: String(e && e.message || e),

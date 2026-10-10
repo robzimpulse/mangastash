@@ -3,17 +3,163 @@
 ///
 /// Purpose: pins the exact JS contract the headless runner relies on (indirect
 /// eval of the JSON-encoded script, sourceURL, result/error handler names,
-/// missing-function error) and the WebKit/Chromium stack parsing.
+/// missing-function error) and the WebKit/Chromium stack parsing. The
+/// "harness under Node" group executes the generated JS with a stubbed
+/// `window.flutter_inappwebview` bridge, so success-path failures
+/// (JSON.stringify of circular/BigInt values, a throwing post) are proven to
+/// surface as `sourceError` rather than a silent timeout. That group is
+/// skipped when `node` is not on PATH (CI installs Node 22 before tests).
 /// Usage: `fvm flutter test test/script/source_script_harness_test.dart`
 /// from module/core/core_network.
 library;
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:core_network/core_network.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+/// Whether a `node` binary is runnable; the Node-backed group is skipped
+/// otherwise.
+bool _hasNode() {
+  try {
+    return Process.runSync('node', ['--version']).exitCode == 0;
+  } on ProcessException {
+    return false;
+  }
+}
+
+/// Runs the harness for [code] (calling `source.run()`) under Node with a
+/// stubbed bridge and returns every `{name, payload}` the harness posted.
+/// When [throwOn] names a handler, the stubbed `callHandler` throws for it.
+Future<List<dynamic>> _runHarness(String code, {String? throwOn}) async {
+  final harness = buildSourceHarness(
+    ctxJs: File('assets/source_ctx.js').readAsStringSync(),
+    code: code,
+    function: 'run',
+    argsJson: '[]',
+    callId: 'c1',
+    baseUrl: 'https://x.y',
+    pageFunction: false,
+  );
+  final dir = await Directory.systemTemp.createTemp('harness_test');
+  try {
+    final file = File('${dir.path}/run.js');
+    await file.writeAsString('''
+var posts = [];
+var throwOn = ${jsonEncode(throwOn)};
+globalThis.window = {
+  flutter_inappwebview: {
+    callHandler: function (name, payload) {
+      if (name === throwOn) throw new Error('post failed');
+      posts.push({ name: name, payload: payload });
+    },
+  },
+};
+globalThis.document = {};
+$harness
+setTimeout(function () { console.log(JSON.stringify(posts)); }, 50);
+''');
+    final result = await Process.run('node', [file.path]);
+    expect(result.exitCode, 0, reason: '${result.stderr}');
+    return jsonDecode((result.stdout as String).trim()) as List<dynamic>;
+  } finally {
+    await dir.delete(recursive: true);
+  }
+}
+
 void main() {
+  group(
+    'harness under Node',
+    skip: _hasNode() ? false : 'node not on PATH',
+    () {
+      test('posts the JSON-encoded value on success', () async {
+        final posts = await _runHarness(
+          'const source = { run: function () { return { a: 1 }; } };',
+        );
+        expect(posts, [
+          {
+            'name': 'sourceResult',
+            'payload': {'callId': 'c1', 'value': '{"a":1}'},
+          },
+        ]);
+      });
+
+      test('undefined, function and symbol results post "null"', () async {
+        for (final value in ['undefined', 'function () {}', 'Symbol("s")']) {
+          final posts = await _runHarness(
+            'const source = { run: function () { return $value; } };',
+          );
+          expect(posts, [
+            {
+              'name': 'sourceResult',
+              'payload': {'callId': 'c1', 'value': 'null'},
+            },
+          ], reason: value);
+        }
+      });
+
+      test('a circular result posts sourceError, not silence', () async {
+        final posts = await _runHarness(
+          'const source = { run: function () '
+          '{ var a = {}; a.self = a; return a; } };',
+        );
+        expect(posts, hasLength(1));
+        expect(posts.single['name'], 'sourceError');
+        expect(posts.single['payload']['callId'], 'c1');
+        expect(posts.single['payload']['message'], contains('circular'));
+      });
+
+      test('a BigInt result posts sourceError', () async {
+        final posts = await _runHarness(
+          'const source = { run: function () { return BigInt(1); } };',
+        );
+        expect(posts.single['name'], 'sourceError');
+        expect(posts.single['payload']['message'], contains('BigInt'));
+      });
+
+      test('a throwing sourceResult post is reported as sourceError', () async {
+        final posts = await _runHarness(
+          'const source = { run: function () { return 1; } };',
+          throwOn: 'sourceResult',
+        );
+        expect(posts, [
+          {
+            'name': 'sourceError',
+            'payload': {
+              'callId': 'c1',
+              'message': 'post failed',
+              'stack': isA<String>(),
+            },
+          },
+        ]);
+      });
+
+      test('a throwing function reports its message and script line', () async {
+        final posts = await _runHarness(
+          'const source = {\n  run: function () {\n'
+          "    throw new Error('boom');\n  },\n};",
+        );
+        expect(posts.single['name'], 'sourceError');
+        expect(posts.single['payload']['message'], 'boom');
+        expect(
+          parseScriptLocation(posts.single['payload']['stack'] as String)?.line,
+          3,
+        );
+      });
+
+      test('U+2028/U+2029 in the script survive as escapes', () async {
+        final posts = await _runHarness(
+          "const source = { run: function () { return 'a\u2028b\u2029c'; } };",
+        );
+        expect(
+          jsonDecode(posts.single['payload']['value'] as String),
+          'a\u2028b\u2029c',
+        );
+      });
+    },
+  );
+
   group('parseScriptLocation', () {
     test('WebKit stack', () {
       expect(
@@ -78,6 +224,21 @@ void main() {
 
     test('reports a missing function', () {
       expect(build(), contains("'source.' + fn + ' is not a function'"));
+    });
+
+    test('escapes U+2028/U+2029 so literals stay valid on pre-ES2019 JS', () {
+      final js = buildSourceHarness(
+        ctxJs: '',
+        code: 'a\u2028b\u2029c',
+        function: 'f',
+        argsJson: '[]',
+        callId: 'c',
+        baseUrl: 'https://x.y',
+        pageFunction: false,
+      );
+      expect(js, isNot(contains('\u2028')));
+      expect(js, isNot(contains('\u2029')));
+      expect(js, contains(r'"a\u2028b\u2029c"'));
     });
 
     test('embeds search term, base url and call id as JSON literals', () {
