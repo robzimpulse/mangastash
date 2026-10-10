@@ -1,3 +1,13 @@
+/// Registers core_network's services into the shared [ServiceLocator].
+///
+/// Purpose: wires the headless webview runtime (`HeadlessWebviewManager`,
+/// exposed as both `HeadlessWebviewUseCase` and `RunSourceScriptUseCase`),
+/// the `UserAgentManager` and the shared Dio client.
+/// Usage: `await CoreNetworkRegistrar().register(locator)` during bootstrap,
+/// after `CoreAnalyticsRegistrar` (LogBox) and `CoreStorageRegistrar`
+/// (`HtmlCacheManager`) — see `WrapperScreen` in `lib/main.dart`.
+library;
+
 import 'package:core_analytics/core_analytics.dart';
 import 'package:service_locator/service_locator.dart';
 
@@ -5,6 +15,7 @@ import 'manager/dio_manager.dart';
 import 'manager/headless_webview_manager.dart';
 import 'manager/user_agent_manager.dart';
 import 'usecase/headless_webview_use_case.dart';
+import 'usecase/run_source_script_use_case.dart';
 
 class CoreNetworkRegistrar extends Registrar {
   @override
@@ -20,6 +31,7 @@ class CoreNetworkRegistrar extends Registrar {
       dispose: (e) => e.dispose(),
     );
     locator.alias<HeadlessWebviewUseCase, HeadlessWebviewManager>();
+    locator.alias<RunSourceScriptUseCase, HeadlessWebviewManager>();
     locator.registerLazySingleton(
       () => UserAgentManager(log: locator()),
     );

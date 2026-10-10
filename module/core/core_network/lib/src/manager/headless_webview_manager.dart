@@ -1,18 +1,45 @@
+/// Headless-webview runtime of core_network: page fetches, image fetches and
+/// the JS source script runner.
+///
+/// Purpose: [HeadlessWebviewManager] loads pages in `HeadlessInAppWebView`s
+/// with the platform UA, Cloudflare retry and diagnostics observer plumbing.
+/// It implements [HeadlessWebviewUseCase] (`open` → parsed post-JS DOM,
+/// `image` → data url) and [RunSourceScriptUseCase] (spec §6): `runOnPage`
+/// runs a source function inside a freshly loaded page and caches its JSON
+/// result for 30 minutes; `runOnBlank` runs URL builders in one warm, reused
+/// blank webview (serialized, rebuilt after a timeout/platform error);
+/// `evict` drops a URL's cached script results. Every webview — page fetch,
+/// script page, warm blank — is built by [HeadlessWebviewManager._createWebview],
+/// the single choke point for settings and (later) `hosts` enforcement.
+/// Script runs register only the `sourceResult`/`sourceError` JS handlers.
+/// Usage: resolve via the locator (`HeadlessWebviewUseCase` /
+/// `RunSourceScriptUseCase`, both aliased by `CoreNetworkRegistrar`). Tests
+/// may inject `webviewFactory` (defaults to the real `HeadlessInAppWebView`
+/// constructor) and `loadSourceCtx` (defaults to the bundled
+/// `source_ctx.js` asset).
+library;
+
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:ui' show Size;
 
-import 'package:core_analytics/core_analytics.dart';
+import 'package:core_analytics/core_analytics.dart' hide NavigationAction;
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
+import 'package:mutex/mutex.dart';
 
 import '../exception/failed_parsing_html_exception.dart';
 import '../exception/script_evaluation_exception.dart';
+import '../script/source_script_exception.dart';
+import '../script/source_script_harness.dart';
 import '../usecase/headless_webview_use_case.dart';
+import '../usecase/run_source_script_use_case.dart';
 import 'cloudflare_detector.dart';
 import 'script_wrapper.dart';
 import 'user_agent_manager.dart';
@@ -185,12 +212,90 @@ Future<bool> publishDiscoveredUserAgent({
   }
 }
 
-class HeadlessWebviewManager implements HeadlessWebviewUseCase {
+
+/// Builds a [HeadlessInAppWebView]; the parameters are the subset of the
+/// real constructor this manager uses, so `HeadlessInAppWebView.new` is a
+/// valid value. Tests inject fakes through it.
+typedef HeadlessWebviewFactory =
+    HeadlessInAppWebView Function({
+      URLRequest? initialUrlRequest,
+      InAppWebViewInitialData? initialData,
+      UnmodifiableListView<UserScript>? initialUserScripts,
+      InAppWebViewSettings? initialSettings,
+      void Function(InAppWebViewController controller)? onWebViewCreated,
+      void Function(InAppWebViewController controller, String? title)?
+      onTitleChanged,
+      void Function(InAppWebViewController controller, WebUri? url)?
+      onLoadStart,
+      void Function(InAppWebViewController controller, WebUri? url)? onLoadStop,
+      void Function(InAppWebViewController controller, int progress)?
+      onProgressChanged,
+      void Function(
+        InAppWebViewController controller,
+        WebResourceRequest request,
+        WebResourceError error,
+      )?
+      onReceivedError,
+      void Function(
+        InAppWebViewController controller,
+        Size oldContentSize,
+        Size newContentSize,
+      )?
+      onContentSizeChanged,
+      void Function(
+        InAppWebViewController controller,
+        WebResourceRequest request,
+        WebResourceResponse errorResponse,
+      )?
+      onReceivedHttpError,
+      void Function(InAppWebViewController controller, LoadedResource resource)?
+      onLoadResource,
+      void Function(
+        InAppWebViewController controller,
+        ConsoleMessage consoleMessage,
+      )?
+      onConsoleMessage,
+      Future<NavigationActionPolicy?> Function(
+        InAppWebViewController controller,
+        NavigationAction navigationAction,
+      )?
+      shouldOverrideUrlLoading,
+    });
+
+/// Bundled `ctx` helpers evaluated ahead of every source script.
+Future<String> _loadBundledSourceCtx() {
+  return rootBundle.loadString('packages/core_network/assets/source_ctx.js');
+}
+
+/// A script call waiting for its `sourceResult`/`sourceError` bridge message.
+typedef _PendingScript = ({
+  Completer<Object?> completer,
+  String function,
+  String? url,
+});
+
+/// Formats [duration] as seconds for timeout messages: `15` for whole
+/// seconds, `0.05` otherwise.
+String _seconds(Duration duration) {
+  if (duration.inMilliseconds % 1000 == 0) return '${duration.inSeconds}';
+  return '${duration.inMilliseconds / 1000}';
+}
+
+class HeadlessWebviewManager
+    implements HeadlessWebviewUseCase, RunSourceScriptUseCase {
   static const Duration defaultTimeout = Duration(seconds: 15);
+
+  /// How long a successful script result stays in the JSON result cache.
+  static const Duration scriptCacheMaxAge = Duration(minutes: 30);
+
+  /// Document loaded into the warm blank webview used by [runOnBlank].
+  static const String _blankPage = '<html><head></head><body></body></html>';
 
   final LogBox _log;
   final HtmlCacheManager _htmlCacheManager;
   final UserAgentManager? _userAgentManager;
+  final HeadlessWebviewFactory _webviewFactory;
+  final Future<String> Function() _loadSourceCtx;
 
   bool _uaDiscoveryStarted = false;
 
@@ -198,15 +303,32 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
   final Map<_Key, Future<String>> _cImage = {};
   final Map<int, HeadlessInAppWebView> _instances = {};
 
+  /// Script calls awaiting their bridge message, keyed by call id.
+  final Map<String, _PendingScript> _pendingScripts = {};
+  int _callSequence = 0;
+
+  /// Memoized `source_ctx.js` contents (loaded on the first script run).
+  Future<String>? _sourceCtx;
+
+  /// Warm blank webview shared by [runOnBlank]; null until first use and
+  /// after a timeout/platform error discarded it.
+  HeadlessInAppWebView? _blankWebview;
+  final Mutex _blankMutex = Mutex();
+
   HeadlessWebviewManager({
     required LogBox log,
     required HtmlCacheManager htmlCacheManager,
     UserAgentManager? userAgentManager,
+    HeadlessWebviewFactory webviewFactory = HeadlessInAppWebView.new,
+    Future<String> Function() loadSourceCtx = _loadBundledSourceCtx,
   }) : _log = log,
        _htmlCacheManager = htmlCacheManager,
-       _userAgentManager = userAgentManager;
+       _userAgentManager = userAgentManager,
+       _webviewFactory = webviewFactory,
+       _loadSourceCtx = loadSourceCtx;
 
   Future<void> dispose() async {
+    _blankWebview = null;
     await Future.wait([
       for (final instance in _instances.values) instance.dispose(),
     ]);
@@ -267,6 +389,164 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     );
   }
 
+  @override
+  Future<ScriptRunResult> runOnPage({
+    required String url,
+    required String code,
+    required String function,
+    required String baseUrl,
+    String? searchTerm,
+    Duration? timeout,
+    bool useCache = true,
+    bool captureHtml = false,
+  }) async {
+    final stopwatch = Stopwatch()..start();
+    final key = sourceScriptCacheKey(
+      url: url,
+      function: function,
+      code: code,
+      searchTerm: searchTerm,
+    );
+    // A caller asking for the page HTML needs a real run; a cached value has
+    // no page behind it.
+    final cacheAllowed = useCache && !captureHtml;
+
+    if (cacheAllowed) {
+      final cached = await _htmlCacheManager.getFileFromCache(key);
+      final data = await cached?.file.readAsString(encoding: utf8);
+      if (data != null) {
+        return ScriptRunResult(
+          value: jsonDecode(data),
+          elapsed: stopwatch.elapsed,
+          fromCache: true,
+        );
+      }
+    }
+
+    final uri = WebUri(url);
+    final delegate = _log.inAppWebviewObserver;
+    final effectiveTimeout = timeout ?? defaultTimeout;
+    delegate.set(uri: uri, loading: true);
+
+    HeadlessInAppWebView? webview;
+    try {
+      // Same load stage and Cloudflare retry as page fetches; only the title
+      // decides whether the page is a challenge. A challenged page is
+      // disposed before the retry loads a fresh one.
+      await fetchWithCloudflareRetry(
+        url: url,
+        attemptCount: 2,
+        delay: _cloudflareRetryDelay,
+        onExhausted: (error) => delegate.set(error: error, loading: false),
+        attempt: () async {
+          await _disposeWebview(webview);
+          webview = null;
+          final loaded = await _loadPage(
+            uri: uri,
+            delegate: delegate,
+            handlers: _scriptHandlers(),
+            timeout: effectiveTimeout,
+          );
+          webview = loaded;
+          final title = await loaded.webViewController?.getTitle().timeout(
+            effectiveTimeout,
+          );
+          return ('', title);
+        },
+      );
+
+      final page = webview!;
+      delegate.onRunJavascript(script: code);
+
+      final Object? value;
+      try {
+        value = await _invoke(
+          webview: page,
+          code: code,
+          function: function,
+          baseUrl: baseUrl,
+          searchTerm: searchTerm,
+          argsJson: '[]',
+          pageFunction: true,
+          timeout: effectiveTimeout,
+          url: url,
+        );
+      } on SourceScriptException catch (e) {
+        if (!captureHtml) rethrow;
+        throw e.copyWith(html: await _snapshotHtml(page, effectiveTimeout));
+      }
+
+      final html = captureHtml
+          ? await _snapshotHtml(page, effectiveTimeout)
+          : null;
+
+      if (cacheAllowed) {
+        await _htmlCacheManager.putFile(
+          key,
+          utf8.encode(jsonEncode(value)),
+          fileExtension: 'json',
+          maxAge: scriptCacheMaxAge,
+        );
+      }
+
+      delegate.set(loading: false);
+      return ScriptRunResult(
+        value: value,
+        html: html,
+        elapsed: stopwatch.elapsed,
+      );
+    } catch (e, st) {
+      delegate.set(error: e, stackTrace: st, loading: false);
+      rethrow;
+    } finally {
+      await _disposeWebview(webview);
+    }
+  }
+
+  @override
+  Future<Object?> runOnBlank({
+    required String code,
+    required String function,
+    required String baseUrl,
+    List<Object?> args = const [],
+    Duration? timeout,
+  }) {
+    final argsJson = jsonEncode(args);
+    return _blankMutex.protect(() async {
+      final webview = _blankWebview ?? await _warmBlankWebview();
+      _blankWebview = webview;
+      try {
+        return await _invoke(
+          webview: webview,
+          code: code,
+          function: function,
+          baseUrl: baseUrl,
+          argsJson: argsJson,
+          pageFunction: false,
+          timeout: timeout ?? defaultTimeout,
+        );
+      } on SourceScriptException catch (e) {
+        // A script that merely threw leaves the page healthy; one that never
+        // answered may still be spinning, so the next call gets a fresh page.
+        if (e.timedOut) await _discardBlankWebview();
+        rethrow;
+      } catch (_) {
+        await _discardBlankWebview();
+        rethrow;
+      }
+    });
+  }
+
+  @override
+  Future<void> evict({required String url}) async {
+    final prefix = 'script|$url|';
+    final keys = await _htmlCacheManager.keys;
+    await Future.wait([
+      for (final key in keys)
+        if (key.startsWith(prefix)) _htmlCacheManager.removeFile(key),
+    ]);
+  }
+
   Future<Document> _open(
     String url, {
     List<String> scripts = const [],
@@ -316,7 +596,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
             reader.onerror = reject;
             reader.readAsDataURL(blob);
           }));
-        
+
         toDataURL('$url').then(
           e => window.flutter_inappwebview.callHandler('resolved', e),
           e => window.flutter_inappwebview.callHandler('reject', e),
@@ -383,10 +663,6 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     // challenge-shaped snapshot is retried once in a fresh webview; anything
     // else (null html, timeouts) propagates as before.
     Future<(String, String?)> attempt() async {
-      final onLoadStartCompleter = Completer();
-      final onLoadStopCompleter = Completer();
-      final onLoadErrorCompleter = Completer();
-
       // Script errors and readiness reports arrive over the bridge —
       // evaluateJavascript neither awaits JS Promises nor reliably surfaces
       // uncaught JS errors. The bridge message can land shortly AFTER
@@ -424,125 +700,14 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
         },
       };
 
-      final webview = HeadlessInAppWebView(
+      final webview = await _loadPage(
+        uri: uri,
+        delegate: delegate,
+        handlers: handlers,
+        timeout: effectiveTimeout,
         initialUserScripts: initialUserScripts,
-        initialUrlRequest: URLRequest(url: uri),
-        initialSettings: InAppWebViewSettings(
-          isInspectable: true,
-          javaScriptEnabled: true,
-          supportZoom: false,
-        ),
-        onWebViewCreated: (controller) {
-          delegate.onWebViewCreated(uri: uri, scripts: scripts);
-          for (final handler in handlers.entries) {
-            controller.addJavaScriptHandler(
-              handlerName: handler.key,
-              callback: handler.value,
-            );
-          }
-          // The headers override is gone so the webview sends its real
-          // platform UA; publish it once per manager for Dio to reuse.
-          // Fire-and-forget: discovery must never block or fail a fetch.
-          // A failed discovery (null/empty/throw) resets the once-guard so
-          // the next spawn retries instead of pinning the static fallback.
-          final userAgentManager = _userAgentManager;
-          if (userAgentManager != null && !_uaDiscoveryStarted) {
-            _uaDiscoveryStarted = true;
-            unawaited(
-              publishDiscoveredUserAgent(
-                manager: userAgentManager,
-                getUA: () async {
-                  final userAgent = await controller.evaluateJavascript(
-                    source: 'navigator.userAgent',
-                  );
-                  return userAgent?.toString();
-                },
-                log: _log,
-              ).then((published) {
-                if (!published) {
-                  _uaDiscoveryStarted = false;
-                }
-              }),
-            );
-          }
-        },
-        onTitleChanged: (_, name) {
-          delegate.onTitleChanged(title: name);
-        },
-        onLoadStart: (_, uri) {
-          delegate.onLoadStart(uri: uri?.uriValue);
-          onLoadStartCompleter.safeComplete();
-        },
-        onLoadStop: (_, uri) {
-          delegate.onLoadStop(uri: uri?.uriValue);
-          onLoadStopCompleter.safeComplete();
-        },
-        onProgressChanged: (controller, progress) {
-          delegate.onProgressChanged(progress: progress);
-        },
-        onReceivedError: (_, request, error) {
-          delegate.onReceivedError(
-            request: request.toMap(),
-            error: error.toMap(),
-          );
-          onLoadErrorCompleter.safeComplete();
-        },
-        onContentSizeChanged: (_, prev, curr) {
-          delegate.onContentSizeChanged(previous: prev, current: curr);
-        },
-        onReceivedHttpError: (_, request, response) {
-          delegate.onReceivedHttpError(
-            request: request.toMap(),
-            response: response.toMap(),
-          );
-        },
-        onLoadResource: (_, resource) {
-          delegate.onLoadResource(resource: resource.toMap());
-        },
-        onConsoleMessage: (controller, message) {
-          delegate.onConsoleMessage(message: message.toMap());
-        },
-        shouldOverrideUrlLoading: (_, action) async {
-          final destination = action.request.url;
-          final isCloudFlare = action.isCloudFlare(uri);
-          delegate.shouldOverrideUrlLoading(
-            action: action.toMap(),
-            extra: {'is_cloudflare': isCloudFlare},
-          );
-
-          if (destination == null) {
-            return NavigationActionPolicy.CANCEL;
-          }
-
-          final isSame = [
-            destination.scheme == uri.scheme,
-            destination.host == uri.host,
-          ].every((e) => e);
-
-          if (isCloudFlare) {
-            return NavigationActionPolicy.ALLOW;
-          }
-
-          return isSame
-              ? NavigationActionPolicy.ALLOW
-              : NavigationActionPolicy.CANCEL;
-        },
+        scripts: scripts,
       );
-
-      _instances[webview.hashCode] = webview;
-
-      try {
-        await Future.wait([
-          webview.run(),
-          onLoadStartCompleter.future,
-          Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
-        ]).timeout(effectiveTimeout);
-      } catch (e, st) {
-        delegate.set(error: e, stackTrace: st, loading: false);
-        _instances.remove(webview.hashCode);
-        await webview.dispose();
-        rethrow;
-      }
 
       // Everything after the load stage runs under one bounded wait: a wedged
       // renderer that never answers evaluateJavascript/getHtml/getTitle would
@@ -591,14 +756,11 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
         (html, title) = await snapshot().timeout(effectiveTimeout);
       } catch (e, st) {
         delegate.set(error: e, stackTrace: st, loading: false);
-        _instances.remove(webview.hashCode);
-        await webview.dispose();
+        await _disposeWebview(webview);
         rethrow;
       }
 
-      await webview.dispose();
-
-      _instances.remove(webview.hashCode);
+      await _disposeWebview(webview);
 
       if (html == null) {
         delegate.set(error: Exception('Null Html'), loading: false);
@@ -611,13 +773,7 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
     final (html, _) = await fetchWithCloudflareRetry(
       url: uri.toString(),
       attemptCount: 2,
-      delay: (duration) async {
-        _log.log(
-          'Cloudflare challenge page detected, retrying in $duration',
-          name: 'HeadlessWebviewManager',
-        );
-        await Future.delayed(duration);
-      },
+      delay: _cloudflareRetryDelay,
       // Parity with the other failure paths: the observer (diagnostics
       // screen) must see the terminal error state when attempts run out,
       // not only the per-attempt ones.
@@ -648,5 +804,363 @@ class HeadlessWebviewManager implements HeadlessWebviewUseCase {
 
     delegate.set(html: html, loading: false);
     return html;
+  }
+
+  /// Logged pause between Cloudflare retry attempts (shared by [_fetch] and
+  /// [runOnPage]).
+  Future<void> _cloudflareRetryDelay(Duration duration) async {
+    _log.log(
+      'Cloudflare challenge page detected, retrying in $duration',
+      name: 'HeadlessWebviewManager',
+    );
+    await Future.delayed(duration);
+  }
+
+  /// Shared load stage of page fetches and page script runs: builds a
+  /// webview for [uri] with [handlers], runs it and waits (bounded by
+  /// [timeout]) for load start plus load stop or a load error. Returns the
+  /// live webview — the caller owns it and must dispose it via
+  /// [_disposeWebview]. On failure the webview is disposed, the observer
+  /// gets the error, and the error is rethrown.
+  Future<HeadlessInAppWebView> _loadPage({
+    required WebUri uri,
+    required InAppWebviewObserver delegate,
+    required Map<String, JavaScriptHandlerCallback> handlers,
+    required Duration timeout,
+    UnmodifiableListView<UserScript>? initialUserScripts,
+    List<String> scripts = const [],
+  }) async {
+    final onLoadStartCompleter = Completer();
+    final onLoadStopCompleter = Completer();
+    final onLoadErrorCompleter = Completer();
+
+    final webview = _createWebview(
+      initialUrlRequest: URLRequest(url: uri),
+      initialUserScripts: initialUserScripts,
+      handlers: handlers,
+      delegate: delegate,
+      scripts: scripts,
+      onLoadStart: () => onLoadStartCompleter.safeComplete(),
+      onLoadStop: () => onLoadStopCompleter.safeComplete(),
+      onLoadError: () => onLoadErrorCompleter.safeComplete(),
+    );
+
+    try {
+      await Future.wait([
+        webview.run(),
+        onLoadStartCompleter.future,
+        Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
+      ]).timeout(timeout);
+    } catch (e, st) {
+      delegate.set(error: e, stackTrace: st, loading: false);
+      await _disposeWebview(webview);
+      rethrow;
+    }
+
+    return webview;
+  }
+
+  /// The single construction path for every headless webview (page fetches,
+  /// script pages, the warm blank page) and therefore the choke point where
+  /// webview settings — and, in a later phase, a script's declared `hosts` —
+  /// are enforced. Registers exactly [handlers] on the controller, reports
+  /// lifecycle events to [delegate] when given, kicks off platform UA
+  /// discovery, and tracks the instance for [dispose]. Pages loaded from
+  /// [initialUrlRequest] may only navigate within its scheme+host (Cloudflare
+  /// challenge hops excepted); the blank page ([initialData]) installs no
+  /// navigation policy so its own load is never cancelled.
+  HeadlessInAppWebView _createWebview({
+    URLRequest? initialUrlRequest,
+    InAppWebViewInitialData? initialData,
+    UnmodifiableListView<UserScript>? initialUserScripts,
+    required Map<String, JavaScriptHandlerCallback> handlers,
+    InAppWebviewObserver? delegate,
+    List<String> scripts = const [],
+    required void Function() onLoadStart,
+    required void Function() onLoadStop,
+    required void Function() onLoadError,
+  }) {
+    final origin = initialUrlRequest?.url;
+
+    final webview = _webviewFactory(
+      initialUserScripts: initialUserScripts,
+      initialUrlRequest: initialUrlRequest,
+      initialData: initialData,
+      initialSettings: InAppWebViewSettings(
+        isInspectable: true,
+        javaScriptEnabled: true,
+        supportZoom: false,
+      ),
+      onWebViewCreated: (controller) {
+        if (origin != null) {
+          delegate?.onWebViewCreated(uri: origin, scripts: scripts);
+        }
+        for (final handler in handlers.entries) {
+          controller.addJavaScriptHandler(
+            handlerName: handler.key,
+            callback: handler.value,
+          );
+        }
+        // The headers override is gone so the webview sends its real
+        // platform UA; publish it once per manager for Dio to reuse.
+        // Fire-and-forget: discovery must never block or fail a fetch.
+        // A failed discovery (null/empty/throw) resets the once-guard so
+        // the next spawn retries instead of pinning the static fallback.
+        final userAgentManager = _userAgentManager;
+        if (userAgentManager != null && !_uaDiscoveryStarted) {
+          _uaDiscoveryStarted = true;
+          unawaited(
+            publishDiscoveredUserAgent(
+              manager: userAgentManager,
+              getUA: () async {
+                final userAgent = await controller.evaluateJavascript(
+                  source: 'navigator.userAgent',
+                );
+                return userAgent?.toString();
+              },
+              log: _log,
+            ).then((published) {
+              if (!published) {
+                _uaDiscoveryStarted = false;
+              }
+            }),
+          );
+        }
+      },
+      onTitleChanged: (_, name) {
+        delegate?.onTitleChanged(title: name);
+      },
+      onLoadStart: (_, uri) {
+        delegate?.onLoadStart(uri: uri?.uriValue);
+        onLoadStart();
+      },
+      onLoadStop: (_, uri) {
+        delegate?.onLoadStop(uri: uri?.uriValue);
+        onLoadStop();
+      },
+      onProgressChanged: (controller, progress) {
+        delegate?.onProgressChanged(progress: progress);
+      },
+      onReceivedError: (_, request, error) {
+        delegate?.onReceivedError(
+          request: request.toMap(),
+          error: error.toMap(),
+        );
+        onLoadError();
+      },
+      onContentSizeChanged: (_, prev, curr) {
+        delegate?.onContentSizeChanged(previous: prev, current: curr);
+      },
+      onReceivedHttpError: (_, request, response) {
+        delegate?.onReceivedHttpError(
+          request: request.toMap(),
+          response: response.toMap(),
+        );
+      },
+      onLoadResource: (_, resource) {
+        delegate?.onLoadResource(resource: resource.toMap());
+      },
+      onConsoleMessage: (controller, message) {
+        delegate?.onConsoleMessage(message: message.toMap());
+      },
+      shouldOverrideUrlLoading:
+          origin == null
+              ? null
+              : (_, action) async {
+                final destination = action.request.url;
+                final isCloudFlare = action.isCloudFlare(origin);
+                delegate?.shouldOverrideUrlLoading(
+                  action: action.toMap(),
+                  extra: {'is_cloudflare': isCloudFlare},
+                );
+
+                if (destination == null) {
+                  return NavigationActionPolicy.CANCEL;
+                }
+
+                final isSame = [
+                  destination.scheme == origin.scheme,
+                  destination.host == origin.host,
+                ].every((e) => e);
+
+                if (isCloudFlare) {
+                  return NavigationActionPolicy.ALLOW;
+                }
+
+                return isSame
+                    ? NavigationActionPolicy.ALLOW
+                    : NavigationActionPolicy.CANCEL;
+              },
+    );
+
+    _instances[webview.hashCode] = webview;
+    return webview;
+  }
+
+  /// Untracks and disposes [webview]; null is a no-op.
+  Future<void> _disposeWebview(HeadlessInAppWebView? webview) async {
+    if (webview == null) return;
+    _instances.remove(webview.hashCode);
+    await webview.dispose();
+  }
+
+  /// JS handlers for script runs — the only channel a source script has to
+  /// the app. Both accept data only and settle the pending call whose
+  /// `callId` they carry; unknown/late ids are ignored.
+  Map<String, JavaScriptHandlerCallback> _scriptHandlers() {
+    return {
+      'sourceResult': (List<dynamic> args) {
+        _settleScript(args, isError: false);
+        return null;
+      },
+      'sourceError': (List<dynamic> args) {
+        _settleScript(args, isError: true);
+        return null;
+      },
+    };
+  }
+
+  /// Completes the pending script call addressed by a bridge message.
+  void _settleScript(List<dynamic> args, {required bool isError}) {
+    final payload = args.firstOrNull;
+    if (payload is! Map) return;
+    final pending = _pendingScripts[payload['callId']];
+    if (pending == null) return;
+
+    if (isError) {
+      final message = payload['message']?.toString() ?? 'Unknown error';
+      final stack = payload['stack']?.toString() ?? '';
+      final location = parseScriptLocation(stack);
+      _log.log(
+        'Source script ${pending.function} threw: $message',
+        name: 'HeadlessWebviewManager',
+        extra: {'url': pending.url, 'function': pending.function, 'stack': stack},
+      );
+      pending.completer.safeCompleteError(
+        SourceScriptException(
+          function: pending.function,
+          message: message,
+          line: location?.line,
+          column: location?.column,
+          url: pending.url,
+        ),
+      );
+      return;
+    }
+
+    try {
+      pending.completer.safeComplete(jsonDecode('${payload['value']}'));
+    } on FormatException catch (e) {
+      pending.completer.safeCompleteError(
+        SourceScriptException(
+          function: pending.function,
+          message: 'Invalid result JSON: ${e.message}',
+          url: pending.url,
+        ),
+      );
+    }
+  }
+
+  /// Evaluates the source harness for [function] in [webview] and awaits its
+  /// bridge reply, bounded by [timeout] (evaluation included). A timeout
+  /// becomes a [SourceScriptException] with `timedOut: true`; platform errors
+  /// propagate unchanged.
+  Future<Object?> _invoke({
+    required HeadlessInAppWebView webview,
+    required String code,
+    required String function,
+    required String baseUrl,
+    String? searchTerm,
+    required String argsJson,
+    required bool pageFunction,
+    required Duration timeout,
+    String? url,
+  }) async {
+    final ctxJs = await (_sourceCtx ??= _loadSourceCtx());
+    final callId = 'call-${_callSequence++}';
+    final completer = Completer<Object?>();
+    _pendingScripts[callId] = (
+      completer: completer,
+      function: function,
+      url: url,
+    );
+
+    try {
+      return await Future(() async {
+        await webview.webViewController?.evaluateJavascript(
+          source: buildSourceHarness(
+            ctxJs: ctxJs,
+            code: code,
+            function: function,
+            argsJson: argsJson,
+            callId: callId,
+            baseUrl: baseUrl,
+            searchTerm: searchTerm,
+            pageFunction: pageFunction,
+          ),
+        );
+        return completer.future;
+      }).timeout(timeout);
+    } on TimeoutException {
+      throw SourceScriptException(
+        function: function,
+        message: '$function timed out after ${_seconds(timeout)}s',
+        url: url,
+        timedOut: true,
+      );
+    } finally {
+      _pendingScripts.remove(callId);
+    }
+  }
+
+  /// Raw page HTML for diagnostics; null when the renderer cannot answer in
+  /// [timeout] (never masks the error being reported).
+  Future<String?> _snapshotHtml(
+    HeadlessInAppWebView webview,
+    Duration timeout,
+  ) async {
+    try {
+      return await webview.webViewController?.getHtml().timeout(timeout);
+    } catch (e) {
+      _log.log(
+        'Failed to capture page html: $e',
+        name: 'HeadlessWebviewManager',
+      );
+      return null;
+    }
+  }
+
+  /// Builds the warm blank webview for [runOnBlank] and waits (bounded by
+  /// [defaultTimeout]) for its page to load; disposed on failure.
+  Future<HeadlessInAppWebView> _warmBlankWebview() async {
+    final onLoadStopCompleter = Completer();
+    final onLoadErrorCompleter = Completer();
+
+    final webview = _createWebview(
+      initialData: InAppWebViewInitialData(data: _blankPage),
+      handlers: _scriptHandlers(),
+      onLoadStart: () {},
+      onLoadStop: () => onLoadStopCompleter.safeComplete(),
+      onLoadError: () => onLoadErrorCompleter.safeComplete(),
+    );
+
+    try {
+      await Future.wait([
+        webview.run(),
+        Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
+      ]).timeout(defaultTimeout);
+    } catch (_) {
+      await _disposeWebview(webview);
+      rethrow;
+    }
+    return webview;
+  }
+
+  /// Disposes and forgets the warm blank webview so the next [runOnBlank]
+  /// builds a fresh one.
+  Future<void> _discardBlankWebview() async {
+    final webview = _blankWebview;
+    _blankWebview = null;
+    await _disposeWebview(webview);
   }
 }

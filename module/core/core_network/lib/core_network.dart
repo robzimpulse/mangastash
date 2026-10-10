@@ -1,3 +1,9 @@
+/// Public API of core_network: Dio/webview networking, typed network
+/// exceptions, `Result` wrappers, the JS source script harness and the
+/// `RunSourceScriptUseCase` runner contract.
+///
+/// Usage: `import 'package:core_network/core_network.dart';` and resolve
+/// services from the locator after `CoreNetworkRegistrar` has run.
 library;
 
 export 'package:dio/dio.dart';
@@ -23,3 +29,4 @@ export 'src/response/success.dart';
 export 'src/script/source_script_exception.dart';
 export 'src/script/source_script_harness.dart';
 export 'src/usecase/headless_webview_use_case.dart';
+export 'src/usecase/run_source_script_use_case.dart';
