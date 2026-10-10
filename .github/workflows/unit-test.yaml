@@ -122,6 +122,15 @@ jobs:
       - name: 'Install Lcov'
         run: sudo apt-get update && sudo apt-get install -y lcov
 
+      - name: 'Setup Node (JS source script tests)'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 'Test JS Source Scripts'
+        working-directory: module/domain/domain_manga/script_test
+        run: npm ci && npm test
+
       - name: 'Generate Code Coverage'
         run: melos coverage:merged
 

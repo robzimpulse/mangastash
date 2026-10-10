@@ -37,3 +37,10 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
   mocktail: ^1.0.4
+
+flutter:
+  # Shared JS `ctx` helpers injected next to every source script
+  # (assets/source_ctx.js); loaded via rootBundle as
+  # 'packages/core_network/assets/source_ctx.js'.
+  assets:
+    - assets/

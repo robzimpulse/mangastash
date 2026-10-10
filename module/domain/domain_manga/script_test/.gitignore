@@ -1,0 +1,2 @@
+# Dependencies installed by `npm ci` (see package.json / package-lock.json).
+node_modules/

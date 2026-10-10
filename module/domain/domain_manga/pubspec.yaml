@@ -46,3 +46,9 @@ dev_dependencies:
   mocktail: ^1.0.5
   manga_service_drift:
     path: ../../library/manga_service_drift
+
+flutter:
+  # Shipped JS source scripts (assets/sources/*.js) and the AI-prompt assets.
+  assets:
+    - assets/sources/
+    - assets/prompt/
