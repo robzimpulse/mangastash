@@ -20,4 +20,6 @@ export 'src/provider/dio_image_provider.dart';
 export 'src/response/error.dart';
 export 'src/response/result.dart';
 export 'src/response/success.dart';
+export 'src/script/source_script_exception.dart';
+export 'src/script/source_script_harness.dart';
 export 'src/usecase/headless_webview_use_case.dart';
