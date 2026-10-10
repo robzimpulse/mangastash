@@ -272,8 +272,10 @@ void main() {
     testWidgets('Duplicated Tag: shows data and custom builder', (
       tester,
     ) async {
-      await insertTag(tagId: 't1', name: 'Tag', source: 'S');
-      await insertTag(tagId: 't2', name: 'Tag', source: 'S');
+      // v6 enforces (source, name) per source; NULL-source rows are the
+      // duplicates the diagnostic can still find (NULLs never collide).
+      await insertTag(tagId: 't1', name: 'Tag');
+      await insertTag(tagId: 't2', name: 'Tag');
 
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
@@ -387,8 +389,10 @@ void main() {
       final mid = await insertManga(id: 'm3', title: 'X', source: 'S');
       await insertChapter(id: 'c1', mangaId: mid, chapter: '1');
       await insertChapter(id: 'c2', mangaId: mid, chapter: '1');
-      await insertTag(tagId: 't1', name: 'T', source: 'S');
-      await insertTag(tagId: 't2', name: 'T', source: 'S');
+      // v6 enforces (source, name) per source; NULL-source rows are the
+      // duplicates the diagnostic can still find (NULLs never collide).
+      await insertTag(tagId: 't1', name: 'T');
+      await insertTag(tagId: 't2', name: 'T');
       // v3 FKs block orphan inserts; the delete action targets them, so
       // seed with the pragma off (see Orphaned Chapter above).
       await db.customStatement('PRAGMA foreign_keys = OFF');

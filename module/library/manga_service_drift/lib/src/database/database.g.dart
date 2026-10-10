@@ -2265,8 +2265,8 @@ class $TagTablesTable extends TagTables
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   List<Set<GeneratedColumn>> get uniqueKeys => [
-    {tagId, name},
-    {tagId, name, source},
+    {source, tagId},
+    {source, name},
   ];
   @override
   TagDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
