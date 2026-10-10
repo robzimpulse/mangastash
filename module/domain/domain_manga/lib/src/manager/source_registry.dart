@@ -1,0 +1,253 @@
+// SourceRegistry (issue #115, spec §8): resolves the JavaScript sources the app
+// uses by combining the scripts bundled as assets (`assets/sources/<id>.js`,
+// ids in [shippedSourceIds]) with the user's rows in `source_script_tables`.
+//
+// Resolution per id: a DB row wins over the bundled asset ("last edit wins").
+// Entries are ordered shipped ids first (in [shippedSourceIds] order) then the
+// remaining entries sorted by name. A bundled asset that fails to load or parse
+// is logged and skipped; it never makes `create` throw.
+//
+// Usage:
+//   final registry = await SourceRegistry.create(
+//     dao: locator<SourceScriptDao>(),
+//     loadAsset: rootBundle.loadString,
+//   );
+//   registry.entries            // ValueStream<List<SourceEntry>>
+//   registry.classify(code)     // NewSource | ReplacesSource, for the editor UI
+//   await registry.save(code);  // throws SourceScriptFormatException or
+//                               // SourceScriptRejected, before any write
+//   await registry.reset(id);   // shipped id: drop the user's edit
+//   await registry.delete(id);  // custom id: remove the source
+//   await registry.close();     // when the owner is disposed
+//
+// Writes are serialized, so two concurrent saves cannot race on name
+// uniqueness. `save`/`reset`/`delete` return only after `entries` reflects the
+// change.
+import 'dart:async';
+import 'dart:developer' as developer;
+
+import 'package:collection/collection.dart';
+import 'package:core_storage/core_storage.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
+import 'package:rxdart/rxdart.dart';
+
+import '../model/source_entry.dart';
+
+/// Ids of the scripts bundled with the app, in display order.
+const shippedSourceIds = [
+  'asura-scans',
+  'weeb-central',
+  'manga-katana',
+  'manhua-plus',
+];
+
+/// Name of the built-in MangaDex source; no script may take it.
+const _mangaDexName = 'Manga Dex';
+
+/// Thrown by [SourceRegistry.save] when a well-formed script is not allowed
+/// (unsupported contract, locked or duplicate name). [message] is user facing.
+class SourceScriptRejected implements Exception {
+  final String message;
+
+  const SourceScriptRejected(this.message);
+
+  @override
+  String toString() => 'SourceScriptRejected: $message';
+}
+
+class SourceRegistry {
+  final SourceScriptDao _dao;
+  final Map<String, SourceScript> _shipped;
+  final BehaviorSubject<List<SourceEntry>> _entries;
+  StreamSubscription<List<SourceScriptDrift>>? _subscription;
+  Future<void> _tail = Future<void>.value();
+
+  SourceRegistry._(this._dao, this._shipped, List<SourceEntry> initial)
+    : _entries = BehaviorSubject.seeded(initial);
+
+  /// Loads the bundled scripts through [loadAsset] (path
+  /// `packages/domain_manga/assets/sources/<id>.js`) and the stored rows from
+  /// [dao], and keeps [entries] in sync with later [dao] changes.
+  static Future<SourceRegistry> create({
+    required SourceScriptDao dao,
+    required Future<String> Function(String assetPath) loadAsset,
+  }) async {
+    final shipped = <String, SourceScript>{};
+    for (final id in shippedSourceIds) {
+      final path = 'packages/domain_manga/assets/sources/$id.js';
+      try {
+        shipped[id] = SourceScript.parse(await loadAsset(path));
+      } catch (error, stackTrace) {
+        developer.log(
+          'Skipping shipped source "$id"',
+          name: 'SourceRegistry',
+          error: error,
+          stackTrace: stackTrace,
+        );
+      }
+    }
+    final rows = await dao.getAll();
+    final registry = SourceRegistry._(dao, shipped, _resolve(shipped, rows));
+    registry._subscription = dao.watchAll().listen(registry._publish);
+    return registry;
+  }
+
+  /// Current resolved sources; replays the latest list to new listeners.
+  ValueStream<List<SourceEntry>> get entries => _entries.stream;
+
+  /// Whether saving [code] would create a source or replace an existing one.
+  /// Throws [SourceScriptFormatException] when the header does not parse.
+  SaveTarget classify(String code) {
+    final script = SourceScript.parse(code);
+    final existing = _entries.value.firstWhereOrNull(
+      (e) => e.script.id == script.id,
+    );
+    return existing == null ? const NewSource() : ReplacesSource(existing);
+  }
+
+  /// Validates and stores [code], returning the resulting entry.
+  ///
+  /// Throws [SourceScriptFormatException] for a bad header and
+  /// [SourceScriptRejected] for a contract mismatch, a changed name on an
+  /// existing id, or a new id whose name is already taken. Nothing is written
+  /// when it throws.
+  Future<SourceEntry> save(String code) {
+    return _synchronized(() async {
+      final script = SourceScript.parse(code);
+      if (script.contract != kSupportedSourceContract) {
+        throw SourceScriptRejected(
+          'Unsupported contract ${script.contract}; '
+          'this app supports $kSupportedSourceContract',
+        );
+      }
+
+      await _refresh();
+      final entries = _entries.value;
+      final existing = entries.firstWhereOrNull(
+        (e) => e.script.id == script.id,
+      );
+      if (existing != null) {
+        if (script.name != existing.script.name) {
+          throw SourceScriptRejected(
+            'Name is locked: expected "${existing.script.name}"',
+          );
+        }
+      } else if (script.name == _mangaDexName ||
+          entries.any((e) => e.script.name == script.name)) {
+        throw SourceScriptRejected(
+          'Name "${script.name}" is already used by another source',
+        );
+      }
+
+      final shipped = _shipped[script.id];
+      final edited =
+          shipped != null && existing?.status != SourceStatus.custom;
+      await _dao.upsert(
+        SourceScriptTablesCompanion(
+          id: Value(script.id),
+          name: Value(script.name),
+          code: Value(code),
+          version: Value(script.version),
+          origin: Value(
+            edited ? SourceScriptOrigin.shippedEdited : SourceScriptOrigin.custom,
+          ),
+          // Explicit null: an absent value would keep the old base on replace.
+          baseVersion: Value<int?>(edited ? shipped.version : null),
+        ),
+      );
+      await _refresh();
+      return _entries.value.firstWhere((e) => e.script.id == script.id);
+    });
+  }
+
+  /// Drops the user's edit of the shipped source [id], restoring the bundled
+  /// script. Throws [StateError] when [id] is not a shipped id.
+  Future<void> reset(String id) {
+    return _synchronized(() async {
+      if (!shippedSourceIds.contains(id)) {
+        throw StateError('"$id" is not a shipped source; use delete');
+      }
+      await _dao.remove(id);
+      await _refresh();
+    });
+  }
+
+  /// Removes the custom source [id]. Throws [StateError] for a shipped id.
+  Future<void> delete(String id) {
+    return _synchronized(() async {
+      if (shippedSourceIds.contains(id)) {
+        throw StateError('"$id" is a shipped source; use reset');
+      }
+      await _dao.remove(id);
+      await _refresh();
+    });
+  }
+
+  /// Stops listening to the DAO and closes [entries].
+  Future<void> close() async {
+    await _subscription?.cancel();
+    await _entries.close();
+  }
+
+  Future<T> _synchronized<T>(Future<T> Function() action) {
+    // Not a plain whenComplete: a failed earlier action must not poison the
+    // queue, and the caller still sees its own action's error.
+    final result = _tail.then((_) => action());
+    _tail = result.then<void>((_) {}, onError: (Object _) {});
+    return result;
+  }
+
+  Future<void> _refresh() async => _publish(await _dao.getAll());
+
+  void _publish(List<SourceScriptDrift> rows) {
+    if (_entries.isClosed) return;
+    final next = _resolve(_shipped, rows);
+    if (const ListEquality<SourceEntry>().equals(_entries.value, next)) return;
+    _entries.add(next);
+  }
+
+  static List<SourceEntry> _resolve(
+    Map<String, SourceScript> shipped,
+    List<SourceScriptDrift> rows,
+  ) {
+    final byId = {for (final row in rows) row.id: row};
+    SourceEntry? entry(String id) {
+      final row = byId[id];
+      final bundled = shipped[id];
+      if (row == null) {
+        return bundled == null
+            ? null
+            : SourceEntry(
+                script: bundled,
+                status: SourceStatus.shipped,
+                shipped: bundled,
+              );
+      }
+      final SourceScript script;
+      try {
+        script = SourceScript.parse(row.code);
+      } on SourceScriptFormatException catch (error) {
+        // A stored row can only be invalid through outside tampering.
+        developer.log(
+          'Skipping stored source "$id"',
+          name: 'SourceRegistry',
+          error: error,
+        );
+        return null;
+      }
+      final status = row.origin == SourceScriptOrigin.custom
+          ? SourceStatus.custom
+          : bundled != null && bundled.version > (row.baseVersion ?? 0)
+          ? SourceStatus.updateAvailable
+          : SourceStatus.modified;
+      return SourceEntry(script: script, status: status, shipped: bundled);
+    }
+
+    final others = rows.where((r) => !shippedSourceIds.contains(r.id)).toList()
+      ..sort((a, b) => a.name.compareTo(b.name));
+    return [
+      for (final id in [...shippedSourceIds, ...others.map((r) => r.id)])
+        if (entry(id) case final resolved?) resolved,
+    ];
+  }
+}
