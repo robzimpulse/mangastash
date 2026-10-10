@@ -1,6 +1,7 @@
 // MoreRouteBuilder: GoRoutes of the More tab and the Settings pages. Aggregated
 // in lib/main_route.dart; Browse opens the source list (issue #115) through
-// `onTapSources`.
+// `onTapSources`, and the source list opens the source editor
+// (MoreRoutePath.sourceEditor, query params `id`, `function`, `url`).
 import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
 import 'package:feature_common/feature_common.dart';
@@ -126,9 +127,28 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         builder: (context, state) {
           return SourceListScreen.create(
             locator: locator,
-            // The editor route (MoreRoutePath.sourceEditor) is registered by
-            // the editor task (#115 Task 13), which owns this navigation.
-            onTapEdit: (id) => context.showOnProgressSnackBar(),
+            onTapEdit: (id) {
+              context.push(
+                Uri(
+                  path: MoreRoutePath.sourceEditor,
+                  queryParameters: {'id': id},
+                ).toString(),
+              );
+            },
+          );
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MoreRoutePath.sourceEditor,
+        name: MoreRoutePath.sourceEditor,
+        builder: (context, state) {
+          final params = state.uri.queryParameters;
+          return SourceEditorScreen.create(
+            locator: locator,
+            id: params['id'] ?? '',
+            function: params['function'],
+            url: params['url'],
           );
         },
       ),

@@ -2,7 +2,8 @@
 /// SourceRegistry of scripted sources (issue #115) with its SourceEntry model,
 /// the SourceExternal implementations, the static `Sources` facade and the
 /// fix-source prompt helpers (FixPromptBuilder, trimPageHtml,
-/// extractScriptFromReply).
+/// extractScriptFromReply) and the scraped-result validators the use cases run
+/// (also run by the source editor's Test, issue #115).
 ///
 /// Usage: `import 'package:domain_manga/domain_manga.dart';` and resolve
 /// services from the locator after `DomainMangaRegistrar` has run.
@@ -12,6 +13,12 @@ export 'package:manga_dex_api/manga_dex_api.dart';
 
 export 'src/domain_manga_registrar.dart';
 export 'src/extension/language_code_converter.dart';
+export 'src/extension/scrapped_validation_extension.dart'
+    show
+        ChapterScrappedRowsValidation,
+        MangaScrappedCardsValidation,
+        MangaScrappedDetailValidation,
+        requireChapterImages;
 export 'src/extension/uri_source_extension.dart';
 export 'src/manager/source_registry.dart';
 export 'src/mixin/sort_chapters_mixin.dart';

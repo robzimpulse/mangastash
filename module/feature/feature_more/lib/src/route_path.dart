@@ -9,9 +9,8 @@ class MoreRoutePath {
   static const dataStorage = '$setting/data_storage';
   static const browse = '$setting/browse';
   static const sources = '$setting/sources';
-  // Query params: `id` (required), `function` and `url` (optional). The
-  // editor screen and its GoRoute are added by the editor task (#115 Task 13);
-  // nothing pushes this path yet.
+  // Source editor. Query params: `id` (required), `function` and `url`
+  // (optional, prefill the editor's Test).
   static const sourceEditor = '$setting/sources/editor';
   static const queue = '$setting/queue';
   static const general = '$setting/general';
