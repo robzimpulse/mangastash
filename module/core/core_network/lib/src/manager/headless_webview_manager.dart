@@ -991,6 +991,14 @@ class HeadlessWebviewManager
     };
   }
 
+  /// The `line`/`column` the harness posted with a `sourceError`, if any.
+  static ({int line, int? column})? _postedLocation(Map<dynamic, dynamic> p) {
+    final line = p['line'];
+    if (line is! num) return null;
+    final column = p['column'];
+    return (line: line.toInt(), column: column is num ? column.toInt() : null);
+  }
+
   /// Completes the pending script call addressed by a bridge message.
   void _settleScript(List<dynamic> args, {required bool isError}) {
     final payload = args.firstOrNull;
@@ -1001,7 +1009,9 @@ class HeadlessWebviewManager
     if (isError) {
       final message = payload['message']?.toString() ?? 'Unknown error';
       final stack = payload['stack']?.toString() ?? '';
-      final location = parseScriptLocation(stack);
+      // WebKit's stack for eval'd code has no file/line: fall back to the
+      // numeric line/column the harness reads off the thrown Error.
+      final location = parseScriptLocation(stack) ?? _postedLocation(payload);
       _log.log(
         'Source script ${pending.function} threw: $message',
         name: 'HeadlessWebviewManager',

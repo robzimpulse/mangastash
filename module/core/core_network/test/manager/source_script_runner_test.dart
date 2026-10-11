@@ -401,6 +401,64 @@ void main() {
     });
   });
 
+  group('sourceError line fallback (WebKit, issue #115)', () {
+    Future<SourceScriptException> failWith(Map<String, Object?> payload) async {
+      factory.reply = () => (handler: 'sourceError', payload: payload);
+      final error = await manager
+          .runOnPage(
+            url: 'https://x/p',
+            code: 'const source = {};',
+            function: 'search',
+            baseUrl: 'https://x',
+          )
+          .then<Object?>((_) => null, onError: (Object e) => e);
+      return error as SourceScriptException;
+    }
+
+    test('a stack without a location falls back to the posted line', () async {
+      final error = await failWith({
+        'message': "Can't find variable: notDefinedFn",
+        'stack': 'search@\nglobal code@',
+        'line': 61,
+        'column': 17,
+      });
+
+      expect(error.line, 61);
+      expect(error.column, 17);
+    });
+
+    test('a numeric double from the bridge is accepted', () async {
+      final error = await failWith({
+        'message': 'boom',
+        'stack': '',
+        'line': 4.0,
+        'column': 9.0,
+      });
+
+      expect(error.line, 4);
+      expect(error.column, 9);
+    });
+
+    test('the stack location wins over the posted line', () async {
+      final error = await failWith({
+        'message': 'boom',
+        'stack': 'search@mangastash-source.js:3:7',
+        'line': 99,
+        'column': 99,
+      });
+
+      expect(error.line, 3);
+      expect(error.column, 7);
+    });
+
+    test('no location anywhere leaves the line empty', () async {
+      final error = await failWith({'message': 'boom', 'stack': ''});
+
+      expect(error.line, isNull);
+      expect(error.column, isNull);
+    });
+  });
+
   group('runOnPage timeout', () {
     test('throws a timed-out SourceScriptException and disposes', () async {
       when(() => cache.getFileFromCache(any())).thenAnswer((_) async => null);

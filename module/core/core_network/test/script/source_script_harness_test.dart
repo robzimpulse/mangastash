@@ -31,8 +31,13 @@ bool _hasNode() {
 
 /// Runs the harness for [code] (calling `source.run()`) under Node with a
 /// stubbed bridge and returns every `{name, payload}` the harness posted.
-/// When [throwOn] names a handler, the stubbed `callHandler` throws for it.
-Future<List<dynamic>> _runHarness(String code, {String? throwOn}) async {
+/// When [throwOn] names a handler, the stubbed `callHandler` throws for it;
+/// [prelude] is JS run before the harness (e.g. to stub Error properties).
+Future<List<dynamic>> _runHarness(
+  String code, {
+  String? throwOn,
+  String prelude = '',
+}) async {
   final harness = buildSourceHarness(
     ctxJs: File('assets/source_ctx.js').readAsStringSync(),
     code: code,
@@ -57,6 +62,7 @@ globalThis.window = {
   },
 };
 globalThis.document = {};
+$prelude
 $harness
 setTimeout(function () { console.log(JSON.stringify(posts)); }, 50);
 ''');
@@ -146,6 +152,68 @@ void main() {
           parseScriptLocation(posts.single['payload']['stack'] as String)?.line,
           3,
         );
+      });
+
+      test('posts the error line and column JavaScriptCore exposes', () async {
+        // JavaScriptCore (iOS) leaves no file/line in the stack of eval'd
+        // code but sets numeric `line`/`column` on the thrown Error, counted
+        // from the eval'd text, i.e. the script's own line 1.
+        final posts = await _runHarness(
+          'const source = {\n  run: function () {\n'
+          "    throw Object.assign(new Error('boom'), { line: 3, column: 11 });\n"
+          '  },\n};',
+        );
+        expect(posts.single['name'], 'sourceError');
+        expect(posts.single['payload']['line'], 3);
+        expect(posts.single['payload']['column'], 11);
+      });
+
+      test('an error without line and column posts neither key', () async {
+        final posts = await _runHarness(
+          "const source = { run: function () { throw new Error('boom'); } };",
+        );
+        final payload = posts.single['payload'] as Map<String, dynamic>;
+        expect(payload.containsKey('line'), isFalse);
+        expect(payload.containsKey('column'), isFalse);
+      });
+
+      test('a line beyond the script is not posted', () async {
+        // Errors raised by the harness or ctx helpers carry positions of the
+        // harness text, never of the script.
+        final posts = await _runHarness(
+          'const source = { run: function () '
+          "{ throw Object.assign(new Error('x'), { line: 900, column: 2 }); } };",
+        );
+        final payload = posts.single['payload'] as Map<String, dynamic>;
+        expect(payload.containsKey('line'), isFalse);
+        expect(payload.containsKey('column'), isFalse);
+      });
+
+      test('a script SyntaxError never carries a line', () async {
+        // JavaScriptCore offsets a SyntaxError of eval'd code by the line of
+        // the eval call (a harness line), so it must not be reported.
+        final posts = await _runHarness(
+          'const source = { run: function () { return 1 +; } };',
+          prelude:
+              'Object.defineProperty(SyntaxError.prototype, "line", '
+              '{ value: 3 });',
+        );
+        final payload = posts.single['payload'] as Map<String, dynamic>;
+        expect(payload['message'], isNotEmpty);
+        expect(payload.containsKey('line'), isFalse);
+      });
+
+      test('the missing-function rejection never carries a line', () async {
+        // ScriptSourceExternal tells "function not defined" from a script bug
+        // by the absence of a line; the harness throws it at a harness line.
+        final posts = await _runHarness(
+          'Error.prototype.line = 2; Error.prototype.column = 1;\n'
+          'const source = {};',
+        );
+        final payload = posts.single['payload'] as Map<String, dynamic>;
+        expect(payload['message'], 'source.run is not a function');
+        expect(payload.containsKey('line'), isFalse);
+        expect(payload.containsKey('column'), isFalse);
       });
 
       test('U+2028/U+2029 in the script survive as escapes', () async {
