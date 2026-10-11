@@ -13,16 +13,19 @@
 /// a timeout, a platform error, or when found off the blank page). Script-run
 /// disposes are bounded by `disposeTimeout`;
 /// `evict` drops a URL's cached script results. On Android all webviews share
-/// one renderer process, so a script run that times out (or a page/blank load
-/// that never finishes) first terminates that renderer through
+/// one renderer process, so a script run that times out (or a warm blank page
+/// that never loads) first terminates that renderer through
 /// `MainActivity`'s `webview_renderer` channel (`_terminateRenderer`; skipped
 /// while a `VisibleWebviewGuard` session is open, because the visible
 /// log_box webview screens would take the whole app down with the renderer),
-/// and every webview built here handles `onRenderProcessGone` (a dead renderer fails its
-/// pending script call at once; the warm blank webview is discarded and its
-/// creation retried once) and `onRenderProcessUnresponsive` (TERMINATE for
-/// script webviews). Every webview — page fetch,
-/// script page, warm blank — is built by [HeadlessWebviewManager._createWebview],
+/// and every webview built here handles `onRenderProcessGone` (a dead renderer
+/// fails every pending script call and every in-flight script-run page load at
+/// once; the warm blank webview is discarded and its creation retried once)
+/// and `onRenderProcessUnresponsive` (TERMINATE for script webviews). Only a
+/// script-run timeout and a blank-page load timeout terminate the renderer: a
+/// heavy page that is merely slow to load never does. Every webview — page
+/// fetch, script page, warm blank — is built by
+/// [HeadlessWebviewManager._createWebview],
 /// the single choke point for settings and (later) `hosts` enforcement.
 /// Script runs register only the `sourceResult`/`sourceError` JS handlers.
 /// Usage: resolve via the locator (`HeadlessWebviewUseCase` /
@@ -320,6 +323,10 @@ class HeadlessWebviewManager
   final Map<_Key, Future<String>> _cImage = {};
   final Map<int, HeadlessInAppWebView> _instances = {};
 
+  /// Script-run page loads in flight, failed together when the shared
+  /// renderer dies (see [_onRendererLost]).
+  final Set<Completer<void>> _loadWaiters = {};
+
   /// Script calls awaiting their bridge message, keyed by call id.
   final Map<String, _PendingScript> _pendingScripts = {};
   int _callSequence = 0;
@@ -434,6 +441,12 @@ class HeadlessWebviewManager
     // to load must not be killed.
     final owner = Object();
     var scriptRunning = false;
+    // Completed with an error when the renderer dies (by termination or
+    // otherwise) while this run's page is still loading, so the load fails
+    // at once instead of waiting out its timeout and then wedging the NEW
+    // renderer other calls already use.
+    final rendererLost = Completer<void>()..future.ignore();
+    _loadWaiters.add(rendererLost);
     try {
       // Same load stage and Cloudflare retry as page fetches; only the title
       // decides whether the page is a challenge. A challenged page is
@@ -453,18 +466,29 @@ class HeadlessWebviewManager
               handlers: _scriptHandlers(),
               timeout: effectiveTimeout,
               terminateWhenUnresponsive: () => scriptRunning,
-              onRendererGone: () => _failPendingScripts(owner),
-              killRendererOnTimeout: true,
+              onRendererGone: _onRendererLost,
+              rendererLost: rendererLost,
             );
             webview = loaded;
             final title = await loaded.webViewController?.getTitle().timeout(
               effectiveTimeout,
             );
             return ('', title);
+          } on _RendererGoneException {
+            throw SourceScriptException(
+              function: function,
+              message:
+                  '$function stopped: the WebView renderer process was '
+                  'terminated while the page loaded',
+              url: url,
+              timedOut: true,
+            );
           } on TimeoutException {
             // A slow or wedged page load is a script-run failure like any
             // other: typed, with the function and URL, so the error UI and
-            // the Fix source / recrawl logic have context.
+            // the Fix source / recrawl logic have context. The renderer is
+            // NOT terminated for it: a heavy page that is merely slow to
+            // load must not be killed.
             throw SourceScriptException(
               function: function,
               message:
@@ -530,6 +554,7 @@ class HeadlessWebviewManager
       delegate.set(error: e, stackTrace: st, loading: false);
       rethrow;
     } finally {
+      _loadWaiters.remove(rendererLost);
       await _disposeBounded(webview);
     }
   }
@@ -830,7 +855,7 @@ class HeadlessWebviewManager
     List<String> scripts = const [],
     bool Function()? terminateWhenUnresponsive,
     void Function()? onRendererGone,
-    bool killRendererOnTimeout = false,
+    Completer<void>? rendererLost,
   }) async {
     final onLoadStartCompleter = Completer();
     final onLoadStopCompleter = Completer();
@@ -850,16 +875,20 @@ class HeadlessWebviewManager
     );
 
     try {
-      await Future.wait([
+      final loaded = Future.wait([
         webview.run(),
         onLoadStartCompleter.future,
         Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
+      ]);
+      await Future.any<Object?>([
+        loaded,
+        if (rendererLost != null)
+          rendererLost.future.then<Object?>(
+            (_) => throw const _RendererGoneException(),
+          ),
       ]).timeout(timeout);
     } catch (e, st) {
       delegate.set(error: e, stackTrace: st, loading: false);
-      if (killRendererOnTimeout && e is TimeoutException) {
-        await _terminateRenderer();
-      }
       await _disposeWebview(webview);
       rethrow;
     }
@@ -1169,9 +1198,10 @@ class HeadlessWebviewManager
         'answered',
         name: 'HeadlessWebviewManager',
       );
-      await _rendererChannel
+      final terminated = await _rendererChannel
           .invokeMethod<bool>('terminate')
           .timeout(disposeTimeout);
+      if (terminated ?? false) _onRendererLost();
     } catch (e) {
       _log.log(
         'Failed to terminate the WebView renderer: $e',
@@ -1180,12 +1210,13 @@ class HeadlessWebviewManager
     }
   }
 
-  /// Fails every pending script call of [owner] right away: its renderer
-  /// process is gone, so no bridge reply will ever arrive. Reported as a
-  /// timeout (the script stopped answering) without waiting for the budget.
-  void _failPendingScripts(Object owner) {
+  /// The shared renderer process died (a platform `onRenderProcessGone`, or
+  /// our own termination): no bridge reply will ever arrive for any pending
+  /// script call and no in-flight script-run page load will finish, so fail
+  /// them all at once instead of letting each wait out its timeout.
+  /// Reported as a timeout (the script stopped answering).
+  void _onRendererLost() {
     for (final pending in _pendingScripts.values) {
-      if (!identical(pending.owner, owner)) continue;
       pending.completer.safeCompleteError(
         SourceScriptException(
           function: pending.function,
@@ -1196,6 +1227,9 @@ class HeadlessWebviewManager
           timedOut: true,
         ),
       );
+    }
+    for (final waiter in _loadWaiters.toList()) {
+      waiter.safeCompleteError(const _RendererGoneException());
     }
   }
 
@@ -1313,7 +1347,7 @@ class HeadlessWebviewManager
       terminateWhenUnresponsive: () => true,
       onRendererGone: () {
         onGoneCompleter.safeComplete();
-        _failPendingScripts(webview);
+        _onRendererLost();
         if (identical(_blankWebview, webview)) {
           _blankWebview = null;
           unawaited(_disposeBounded(webview));

@@ -87,6 +87,9 @@ class FakeWebviewFactory {
   bool disposeHangs = false;
   bool loadHangs = false;
   bool goneOnRun = false;
+
+  /// Indexes of constructions whose page never finishes loading.
+  final Set<int> loadHangsAt = {};
   int goneOnRunCount = 1;
   final List<RenderProcessCallbacks> renderProcess = [];
 
@@ -200,7 +203,7 @@ class FakeWebviewFactory {
         );
         return;
       }
-      if (loadHangs) return;
+      if (loadHangs || loadHangsAt.contains(index)) return;
       onLoadStart?.call(controller, null);
       onLoadStop?.call(controller, null);
     });
@@ -1065,7 +1068,8 @@ void main() {
         expect(factory.events, ['terminate', 'dispose:0']);
       });
 
-      test('a page that never loads terminates the renderer too', () async {
+      test('a slow page load never terminates the renderer (heavy pages)',
+          () async {
         factory.loadHangs = true;
 
         await expectLater(
@@ -1076,10 +1080,52 @@ void main() {
             baseUrl: 'https://x',
             timeout: const Duration(milliseconds: 50),
           ),
-          throwsA(isA<SourceScriptException>()),
+          throwsA(
+            isA<SourceScriptException>().having(
+              (e) => e.message,
+              'message',
+              'search timed out loading the page after 0.05s',
+            ),
+          ),
         );
 
-        expect(factory.events, ['terminate', 'dispose:0']);
+        expect(factory.events, ['dispose:0']);
+      });
+
+      test('a termination fails every in-flight page load at once, and the '
+          'failed load does not terminate the new renderer again', () async {
+        factory.loadHangsAt.add(0);
+        final stopwatch = Stopwatch()..start();
+        final pageRun = manager
+            .runOnPage(
+              url: 'https://x/p',
+              code: 'const source = {};',
+              function: 'search',
+              baseUrl: 'https://x',
+              timeout: const Duration(seconds: 30),
+            )
+            .then<Object?>((_) => null, onError: (Object e) => e);
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+
+        // Another call (index 1) runs away and is terminated.
+        await expectLater(blankRun(), throwsA(isA<SourceScriptException>()));
+        final error = await pageRun.timeout(const Duration(seconds: 2));
+
+        expect(stopwatch.elapsed, lessThan(const Duration(seconds: 5)));
+        expect(error, isA<SourceScriptException>());
+        expect(
+          (error as SourceScriptException).message,
+          contains('renderer'),
+        );
+        expect(error.timedOut, isTrue);
+        expect(error.function, 'search');
+        expect(error.url, 'https://x/p');
+        expect(factory.events.where((e) => e == 'terminate'), hasLength(1));
+        // Both webviews were disposed.
+        expect(
+          factory.events,
+          containsAll(['dispose:0', 'dispose:1']),
+        );
       });
 
       test('a blank page that never loads terminates the renderer too',
