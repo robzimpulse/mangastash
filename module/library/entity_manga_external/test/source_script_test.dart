@@ -137,4 +137,31 @@ void main() {
       withJson(jsonWith({'timeouts': '{"bogus": 1000}'})),
     );
   });
+
+  group('timeout upper bound', () {
+    test('120000 ms is the largest accepted timeout', () {
+      final s = SourceScript.parse(
+        withJson(jsonWith({'timeouts': '{"images": 120000}'})),
+      );
+
+      expect(s.timeoutFor('images'), const Duration(milliseconds: 120000));
+    });
+
+    test('a timeout above 120000 ms is rejected naming the limit', () {
+      // A script cannot hold the shared webview (and, on Android, the
+      // renderer other calls wait on) for longer than two minutes.
+      expect(
+        () => SourceScript.parse(
+          withJson(jsonWith({'timeouts': '{"images": 120001}'})),
+        ),
+        throwsA(
+          isA<SourceScriptFormatException>().having(
+            (e) => e.message,
+            'message',
+            allOf(contains('images'), contains('120000')),
+          ),
+        ),
+      );
+    });
+  });
 }

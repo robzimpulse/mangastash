@@ -34,14 +34,18 @@ class SourceScriptFormatException implements Exception {
 /// Required keys: `id` (slug `^[a-z0-9]+(-[a-z0-9]+)*$`), `name`, `baseUrl`
 /// (absolute http/https), `version` (int >= 1), `contract` (int >= 1), `hosts`
 /// (non-empty list of bare host names). Optional: `iconUrl`, `timeouts`
-/// (map of function name -> positive milliseconds; allowed names are in
-/// [allowedTimeoutKeys]).
+/// (map of function name -> positive milliseconds, at most [maxTimeoutMs];
+/// allowed names are in [allowedTimeoutKeys]).
 ///
 /// Use `SourceScript.parse(code)`; it throws [SourceScriptFormatException] on
 /// any violation. [props] include [code], so editing the body changes equality.
 class SourceScript extends Equatable {
   /// Default per-function timeout when the header does not override it.
   static const Duration defaultTimeout = Duration(milliseconds: 15000);
+
+  /// Largest timeout a header may set, in milliseconds: a script holds the
+  /// shared webview (on Android the shared renderer too) for that long.
+  static const int maxTimeoutMs = 120000;
 
   /// Function names a header may set a timeout for.
   static const Set<String> allowedTimeoutKeys = {
@@ -226,6 +230,11 @@ class SourceScript extends Equatable {
       if (ms is! int || ms <= 0) {
         throw SourceScriptFormatException(
           'Timeout "$key" must be a positive integer (milliseconds)',
+        );
+      }
+      if (ms > maxTimeoutMs) {
+        throw SourceScriptFormatException(
+          'Timeout "$key" is $ms ms; the maximum is $maxTimeoutMs ms',
         );
       }
       result[key as String] = ms;
