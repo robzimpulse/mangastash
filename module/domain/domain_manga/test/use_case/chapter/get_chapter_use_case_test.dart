@@ -33,6 +33,7 @@ void main() {
   late MockChapterDao chapterDao;
   late MockRunSourceScriptUseCase runner;
   late MockSourceExternal source;
+  late MockSourceRegistry registry;
   late GetChapterUseCase useCase;
 
   setUpAll(() {
@@ -44,6 +45,7 @@ void main() {
     chapterDao = MockChapterDao();
     runner = mockRunner();
     source = mockScrapedSource(name: 'Manga Katana');
+    registry = mockRegistry([source]);
     // LogBox.log is an extension method, so mocktail cannot intercept it —
     // the real body runs and needs a real Storage behind the mock's field
     // (see CLAUDE.md's LogBox entry).
@@ -55,6 +57,7 @@ void main() {
       chapterRepository: MockChapterRepository(),
       atHomeRepository: MockAtHomeRepository(),
       runner: runner,
+      registry: registry,
       chapterDao: chapterDao,
       logBox: logBox,
     );
@@ -104,4 +107,28 @@ void main() {
       verify(() => runner.evict(url: _chapterUrl)).called(1);
     },
   );
+
+  test('runs the code saved after the reader captured its source', () async {
+    // The reader resolved `source` before the user saved a fix; the registry
+    // now holds an adapter with the new code under the same name.
+    final edited = mockScrapedSource(name: 'Manga Katana');
+    when(() => registry.fromName('Manga Katana')).thenReturn(edited);
+    when(
+      () => edited.images(url: _chapterUrl, useCache: any(named: 'useCache')),
+    ).thenAnswer((_) async => ['https://img/1.jpg']);
+
+    await useCase.execute(
+      source: source,
+      mangaId: _mangaId,
+      chapterId: _chapterId,
+      useCache: false,
+    );
+
+    verify(
+      () => edited.images(url: _chapterUrl, useCache: any(named: 'useCache')),
+    ).called(1);
+    verifyNever(
+      () => source.images(url: any(named: 'url'), useCache: any(named: 'useCache')),
+    );
+  });
 }

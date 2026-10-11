@@ -34,6 +34,7 @@ void main() {
   late MockMangaDao mangaDao;
   late MockRunSourceScriptUseCase runner;
   late MockSourceExternal source;
+  late MockSourceRegistry registry;
   late GetMangaUseCase useCase;
 
   setUpAll(() {
@@ -44,12 +45,14 @@ void main() {
     mangaDao = MockMangaDao();
     runner = mockRunner();
     source = mockScrapedSource(name: 'Manga Katana');
+    registry = mockRegistry([source]);
     final logBox = MockLogBox();
     when(() => logBox.storage).thenReturn(
       analytics.Storage(liveDataStorage: analytics.MemoryStorage()),
     );
     useCase = GetMangaUseCase(
       runner: runner,
+      registry: registry,
       converterCacheManager: MockConverterCacheManager(),
       mangaService: MockMangaService(),
       mangaDao: mangaDao,
@@ -97,4 +100,36 @@ void main() {
       verify(() => runner.evict(url: _mangaUrl)).called(1);
     },
   );
+
+  test('runs the code saved after the screen captured its source', () async {
+    // The detail screen resolved `source` before the user saved a fix; the
+    // registry now holds an adapter with the new code under the same name.
+    final edited = mockScrapedSource(name: 'Manga Katana');
+    when(() => registry.fromName('Manga Katana')).thenReturn(edited);
+    when(
+      () => edited.manga(url: _mangaUrl, useCache: any(named: 'useCache')),
+    ).thenAnswer((_) async => const MangaScrapped());
+
+    await useCase.execute(source: source, mangaId: _mangaId, useCache: false);
+
+    verify(
+      () => edited.manga(url: _mangaUrl, useCache: any(named: 'useCache')),
+    ).called(1);
+    verifyNever(
+      () => source.manga(url: any(named: 'url'), useCache: any(named: 'useCache')),
+    );
+  });
+
+  test('falls back to the passed source when the registry lost it', () async {
+    when(() => registry.fromName('Manga Katana')).thenReturn(null);
+    when(
+      () => source.manga(url: _mangaUrl, useCache: any(named: 'useCache')),
+    ).thenAnswer((_) async => const MangaScrapped());
+
+    await useCase.execute(source: source, mangaId: _mangaId, useCache: false);
+
+    verify(
+      () => source.manga(url: _mangaUrl, useCache: any(named: 'useCache')),
+    ).called(1);
+  });
 }

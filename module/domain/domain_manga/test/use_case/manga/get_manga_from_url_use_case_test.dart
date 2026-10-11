@@ -29,6 +29,7 @@ void main() {
   late MockMangaDao mangaDao;
   late MockRunSourceScriptUseCase runner;
   late MockSourceExternal source;
+  late MockSourceRegistry registry;
   late GetMangaFromUrlUseCase useCase;
 
   setUpAll(() {
@@ -39,12 +40,14 @@ void main() {
     mangaDao = MockMangaDao();
     runner = mockRunner();
     source = mockScrapedSource(name: 'Manga Katana');
+    registry = mockRegistry([source]);
     final logBox = MockLogBox();
     when(() => logBox.storage).thenReturn(
       analytics.Storage(liveDataStorage: analytics.MemoryStorage()),
     );
     useCase = GetMangaFromUrlUseCase(
       runner: runner,
+      registry: registry,
       mangaDao: mangaDao,
       logBox: logBox,
       converterCacheManager: MockConverterCacheManager(),
@@ -80,4 +83,21 @@ void main() {
       verify(() => runner.evict(url: _mangaUrl)).called(1);
     },
   );
+
+  test('runs the code saved after the caller captured its source', () async {
+    final edited = mockScrapedSource(name: 'Manga Katana');
+    when(() => registry.fromName('Manga Katana')).thenReturn(edited);
+    when(
+      () => edited.manga(url: _mangaUrl, useCache: any(named: 'useCache')),
+    ).thenAnswer((_) async => const MangaScrapped());
+
+    await useCase.execute(source: source, url: _mangaUrl, useCache: false);
+
+    verify(
+      () => edited.manga(url: _mangaUrl, useCache: any(named: 'useCache')),
+    ).called(1);
+    verifyNever(
+      () => source.manga(url: any(named: 'url'), useCache: any(named: 'useCache')),
+    );
+  });
 }

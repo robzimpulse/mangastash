@@ -3,6 +3,10 @@
 // scripted sources via `SourceExternal.tagsUrl()` + `tags(url:)` (issue #115).
 //
 // Usage: `await useCase.execute(source: s, useCache: false)`.
+//
+// `source` only carries the name: `execute` re-resolves it through the
+// SourceRegistry, so a screen that captured the adapter before the user saved
+// an edited script (Fix source) still runs the saved code.
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
@@ -12,19 +16,23 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 
 import '../../extension/data_scrapped_extension.dart';
 import '../../extension/map_network_error.dart';
+import '../../manager/source_registry.dart';
 import '../../mixin/sync_tags_mixin.dart';
 
 class GetTagsUseCase with SyncTagsMixin {
   final MangaService _mangaService;
   final TagDao _tagDao;
   final LogBox _logBox;
+  final SourceRegistry _registry;
 
   const GetTagsUseCase({
     required MangaService mangaService,
     required TagDao tagDao,
     required LogBox logBox,
+    required SourceRegistry registry,
   }) : _mangaService = mangaService,
        _tagDao = tagDao,
+       _registry = registry,
        _logBox = logBox;
 
   Future<List<Tag>> _mangadex() async {
@@ -58,7 +66,8 @@ class GetTagsUseCase with SyncTagsMixin {
     bool useCache = true,
   }) async {
     try {
-      final cache = await _tagDao.search(sources: [source.name]);
+      final resolved = _registry.fromName(source.name) ?? source;
+      final cache = await _tagDao.search(sources: [resolved.name]);
       final tags = [...cache.map(Tag.fromDrift)];
       // Name-only rows (manga detail syncs, the schema v6 repair) are not
       // a genre list: without any tag id the cache is a miss.
@@ -66,13 +75,13 @@ class GetTagsUseCase with SyncTagsMixin {
       if (isGenreList && useCache) return Success(tags);
 
       final data =
-          source.builtIn
+          resolved.builtIn
               ? await _mangadex()
-              : await _scrapping(source: source, useCache: useCache);
+              : await _scrapping(source: resolved, useCache: useCache);
 
       final result = await sync(
         dao: _tagDao,
-        values: [...data.map((e) => e.copyWith(source: source.name))],
+        values: [...data.map((e) => e.copyWith(source: resolved.name))],
         logBox: _logBox,
       );
 

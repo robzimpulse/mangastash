@@ -28,6 +28,7 @@ const _tagsUrl = 'https://weebcentral.com/search';
 
 void main() {
   late MockSourceExternal source;
+  late MockSourceRegistry registry;
   late MockTagDao tagDao;
   late GetTagsUseCase useCase;
 
@@ -37,6 +38,7 @@ void main() {
 
   setUp(() {
     source = mockScrapedSource(name: 'Weeb Central');
+    registry = mockRegistry([source]);
     tagDao = MockTagDao();
     // LogBox.log is an extension method, so mocktail cannot intercept it —
     // the real body runs and needs a real Storage behind the mock's field.
@@ -48,6 +50,7 @@ void main() {
       mangaService: MockMangaService(),
       tagDao: tagDao,
       logBox: logBox,
+      registry: registry,
     );
 
     when(() => source.tagsUrl()).thenAnswer((_) async => _tagsUrl);
@@ -71,6 +74,29 @@ void main() {
     expect(result, isA<Success<List<Tag>>>());
     verify(() => source.tags(url: _tagsUrl, useCache: false)).called(1);
     verify(() => tagDao.adds(values: any(named: 'values'))).called(1);
+  });
+
+  test('fetches with the code saved after the screen captured its source',
+      () async {
+    final edited = mockScrapedSource(name: 'Weeb Central');
+    when(() => registry.fromName('Weeb Central')).thenReturn(edited);
+    when(() => edited.tagsUrl()).thenAnswer((_) async => _tagsUrl);
+    when(
+      () => edited.tags(
+        url: any(named: 'url'),
+        useCache: any(named: 'useCache'),
+      ),
+    ).thenAnswer((_) async => const [TagScrapped(id: 'new', name: 'New')]);
+
+    await useCase.execute(source: source, useCache: false);
+
+    verify(() => edited.tags(url: _tagsUrl, useCache: false)).called(1);
+    verifyNever(
+      () => source.tags(
+        url: any(named: 'url'),
+        useCache: any(named: 'useCache'),
+      ),
+    );
   });
 
   group('cache', () {

@@ -180,6 +180,7 @@ class DomainMangaRegistrar extends Registrar {
       () => GetMangaUseCase(
         logBox: locator(),
         runner: locator(),
+        registry: locator(),
         mangaDao: locator(),
         mangaService: locator(),
         converterCacheManager: locator(),
@@ -188,6 +189,7 @@ class DomainMangaRegistrar extends Registrar {
     locator.registerFactory(
       () => GetMangaFromUrlUseCase(
         runner: locator(),
+        registry: locator(),
         mangaDao: locator(),
         logBox: locator(),
         converterCacheManager: locator(),
@@ -197,6 +199,7 @@ class DomainMangaRegistrar extends Registrar {
       () => GetChapterUseCase(
         logBox: locator(),
         runner: locator(),
+        registry: locator(),
         chapterDao: locator(),
         atHomeRepository: locator(),
         chapterRepository: locator(),
@@ -225,6 +228,7 @@ class DomainMangaRegistrar extends Registrar {
       () => GetTagsUseCase(
         tagDao: locator(),
         logBox: locator(),
+        registry: locator(),
         mangaService: locator(),
       ),
     );
