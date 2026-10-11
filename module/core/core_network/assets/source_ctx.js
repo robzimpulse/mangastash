@@ -13,6 +13,9 @@
  *                                 null/undefined input.
  *   - searchTerm               -> the user's search text (may be undefined).
  *
+ * Errors these helpers raise carry `fromHarness = true`: the harness then posts
+ * no `line`/`column` for them (iOS would report a position inside this file).
+ *
  * How to use: the Dart runtime (core_network) loads this file as an asset and
  * evaluates it before the source script inside the webview; the Node test
  * harness (domain_manga/script_test/lib/load_source.mjs) evaluates the very
@@ -28,7 +31,9 @@ function createSourceCtx({ doc, baseUrl, searchTerm }) {
       const found = doc.querySelector(selector);
       if (found) return found;
       if (Date.now() >= deadline) {
-        throw new Error('waitFor timed out: ' + selector);
+        const timeout = new Error('waitFor timed out: ' + selector);
+        timeout.fromHarness = true;
+        throw timeout;
       }
       await sleep(100);
     }
@@ -36,7 +41,14 @@ function createSourceCtx({ doc, baseUrl, searchTerm }) {
 
   const absUrl = (href) => {
     if (href === null || href === undefined) return null;
-    return new URL(href, baseUrl).href;
+    try {
+      return new URL(href, baseUrl).href;
+    } catch (err) {
+      // Raised here, not in the script: no script line applies (see the
+      // harness, which skips line/column for errors flagged fromHarness).
+      if (err && typeof err === 'object') err.fromHarness = true;
+      throw err;
+    }
   };
 
   return { sleep, waitFor, absUrl, searchTerm };

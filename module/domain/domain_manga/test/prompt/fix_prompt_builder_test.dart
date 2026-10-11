@@ -142,6 +142,15 @@ void main() {
       );
     });
 
+    test('many empty heads stay linear', () {
+      final watch = Stopwatch()..start();
+
+      expect(trimPageHtml('<head></head>' * 100000), '');
+      expect(trimPageHtml('<head></head><p>a</p>' * 3), '<p>a</p>' * 3);
+
+      expect(watch.elapsed, lessThan(const Duration(seconds: 5)));
+    });
+
     test('unterminated blocks and comments drop the rest without hanging', () {
       final watch = Stopwatch()..start();
 

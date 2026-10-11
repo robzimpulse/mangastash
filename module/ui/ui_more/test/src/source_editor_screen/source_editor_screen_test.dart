@@ -26,6 +26,34 @@ class _MockSourceRegistry extends Mock implements SourceRegistry {}
 
 class _MockRunner extends Mock implements RunSourceScriptUseCase {}
 
+/// Counts editor-to-cubit pushes and throws past [limit]: a feedback loop
+/// between the text controller and the cubit (the iOS freeze) then fails the
+/// test with an error instead of spinning the microtask queue forever.
+class _CountingCubit extends SourceEditorScreenCubit {
+  _CountingCubit({
+    required super.id,
+    super.function,
+    super.url,
+    required super.registry,
+    required super.runner,
+    required super.promptBuilder,
+  });
+
+  static const int limit = 500;
+
+  int updateCalls = 0;
+
+  @override
+  void updateCode(String code) {
+    if (++updateCalls > limit) {
+      throw StateError(
+        'updateCode called more than $limit times: feedback loop',
+      );
+    }
+    super.updateCode(code);
+  }
+}
+
 String _code({
   String id = 'asura-scans',
   String name = 'Asura Scans',
@@ -152,7 +180,7 @@ void main() {
     tester.view.physicalSize = const Size(1200, 2400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
-    final created = SourceEditorScreenCubit(
+    final created = _CountingCubit(
       id: id,
       function: function,
       url: url,
@@ -240,6 +268,7 @@ void main() {
 
     expect(controller.text, '${base}abcd');
     expect(cubit!.state.code, '${base}abcd');
+    expect((cubit! as _CountingCubit).updateCalls, lessThan(20));
     expect(
       controller.selection,
       TextSelection.collapsed(offset: base.length + 4),

@@ -130,14 +130,18 @@ int _skipHead(String html, String lower, int start, StringBuffer out) {
   final end = close != -1 ? close : lower.indexOf('<body', afterOpen);
   final headEnd = end == -1 ? html.length : end;
 
-  final titleStart = lower.indexOf('<title', afterOpen);
-  if (titleStart != -1 && titleStart < headEnd) {
-    final textStart = html.indexOf('>', titleStart);
-    final textEnd = lower.indexOf('</title', titleStart);
+  // Searched inside the head slice only: an unbounded indexOf would rescan
+  // the whole document for every empty `<head></head>` (quadratic).
+  final offset = afterOpen > headEnd ? headEnd : afterOpen;
+  final head = lower.substring(offset, headEnd);
+  final titleStart = head.indexOf('<title');
+  if (titleStart != -1) {
+    final textStart = head.indexOf('>', titleStart);
+    final textEnd = head.indexOf('</title', titleStart);
     if (textStart != -1 && textEnd != -1 && textStart < textEnd) {
       out
         ..write('<title>')
-        ..write(html.substring(textStart + 1, textEnd))
+        ..write(html.substring(offset + textStart + 1, offset + textEnd))
         ..write('</title>');
     }
   }
