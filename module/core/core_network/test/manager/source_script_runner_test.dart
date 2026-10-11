@@ -804,7 +804,15 @@ void main() {
         throwsA(
           isA<SourceScriptException>()
               .having((e) => e.timedOut, 'timedOut', isTrue)
-              .having((e) => e.function, 'function', 'searchUrl'),
+              .having((e) => e.function, 'function', 'searchUrl')
+              // Not "searchUrl timed out": the script never ran (offline
+              // devices hit this), so it must not read like a script fault.
+              .having(
+                (e) => e.message,
+                'message',
+                'searchUrl could not start the script runner '
+                    '(blank page did not load after 0.05s)',
+              ),
         ),
       );
       verify(() => factory.created.single.dispose()).called(1);

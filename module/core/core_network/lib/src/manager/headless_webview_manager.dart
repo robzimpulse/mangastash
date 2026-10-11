@@ -511,9 +511,12 @@ class HeadlessWebviewManager
         } on TimeoutException {
           throw SourceScriptException(
             function: function,
+            // The script never ran (typically no network): do not word it
+            // like a script fault.
             message:
-                '$function timed out after ${_seconds(effectiveTimeout)}s '
-                'waiting for the blank page to load',
+                '$function could not start the script runner '
+                '(blank page did not load after '
+                '${_seconds(effectiveTimeout)}s)',
             timedOut: true,
           );
         }
