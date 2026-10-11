@@ -22,6 +22,9 @@ import 'package:core_network/src/script/source_script_exception.dart';
 import 'package:core_network/src/usecase/run_source_script_use_case.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, debugDefaultTargetPlatformOverride;
+import 'package:flutter/services.dart' show MethodChannel, PlatformException;
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -33,6 +36,21 @@ class MockHtmlCacheManager extends Mock implements HtmlCacheManager {}
 class MockHeadlessWebview extends Mock implements HeadlessInAppWebView {}
 
 class MockWebviewController extends Mock implements InAppWebViewController {}
+
+/// Android render-process callbacks a webview was constructed with.
+typedef RenderProcessCallbacks = ({
+  InAppWebViewController controller,
+  Future<WebViewRenderProcessAction?> Function(
+    InAppWebViewController controller,
+    WebUri? url,
+  )?
+  unresponsive,
+  void Function(
+    InAppWebViewController controller,
+    RenderProcessGoneDetail detail,
+  )?
+  gone,
+});
 
 /// Bridge message a fake page posts back for a harness call.
 typedef FakeReply = ({String handler, Map<String, Object?> payload});
@@ -47,7 +65,11 @@ typedef FakeReply = ({String handler, Map<String, Object?> payload});
 /// message ahead of the evaluate reply); [currentUrl] is what `getUrl()`
 /// reports; [disposeHangs] makes `dispose()` never complete; [loadHangs]
 /// makes the page never finish loading. Every `shouldOverrideUrlLoading`
-/// callback handed to the factory is kept in [policies].
+/// callback handed to the factory is kept in [policies]. The Android
+/// render-process callbacks of each construction are kept in [renderProcess]
+/// (same index as [created]); [goneOnRun] makes `run()` report the renderer
+/// as gone instead of finishing the load, for the first [goneOnRunCount]
+/// constructions.
 class FakeWebviewFactory {
   int calls = 0;
   final List<MockHeadlessWebview> created = [];
@@ -63,6 +85,14 @@ class FakeWebviewFactory {
   WebUri? currentUrl = WebUri('about:blank');
   bool disposeHangs = false;
   bool loadHangs = false;
+  bool goneOnRun = false;
+  int goneOnRunCount = 1;
+  final List<RenderProcessCallbacks> renderProcess = [];
+
+  /// `dispose:<index>` for every disposed webview, in order; tests append
+  /// `terminate` for every renderer-terminate platform-channel call, so the
+  /// relative order is observable.
+  final List<String> events = [];
 
   HeadlessInAppWebView call({
     URLRequest? initialUrlRequest,
@@ -106,8 +136,19 @@ class FakeWebviewFactory {
       NavigationAction navigationAction,
     )?
     shouldOverrideUrlLoading,
+    Future<WebViewRenderProcessAction?> Function(
+      InAppWebViewController controller,
+      WebUri? url,
+    )?
+    onRenderProcessUnresponsive,
+    void Function(
+      InAppWebViewController controller,
+      RenderProcessGoneDetail detail,
+    )?
+    onRenderProcessGone,
   }) {
     calls++;
+    final index = calls - 1;
     policies.add(shouldOverrideUrlLoading);
     final controller = MockWebviewController();
     final handlers = <String, Function>{};
@@ -144,15 +185,28 @@ class FakeWebviewFactory {
     });
     final webview = MockHeadlessWebview();
     when(() => webview.webViewController).thenReturn(controller);
+    renderProcess.add((
+      controller: controller,
+      unresponsive: onRenderProcessUnresponsive,
+      gone: onRenderProcessGone,
+    ));
     when(() => webview.run()).thenAnswer((_) async {
       onWebViewCreated?.call(controller);
+      if (goneOnRun && index < goneOnRunCount) {
+        onRenderProcessGone?.call(
+          controller,
+          RenderProcessGoneDetail(didCrash: false),
+        );
+        return;
+      }
       if (loadHangs) return;
       onLoadStart?.call(controller, null);
       onLoadStop?.call(controller, null);
     });
-    when(() => webview.dispose()).thenAnswer(
-      (_) => disposeHangs ? Completer<void>().future : Future<void>.value(),
-    );
+    when(() => webview.dispose()).thenAnswer((_) {
+      events.add('dispose:$index');
+      return disposeHangs ? Completer<void>().future : Future<void>.value();
+    });
     when(() => controller.getUrl()).thenAnswer((_) async => currentUrl);
     when(() => controller.getTitle()).thenAnswer((_) async => 'Page');
     when(() => controller.getHtml()).thenAnswer((_) async => '<html></html>');
@@ -162,6 +216,7 @@ class FakeWebviewFactory {
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   late MockLogBox log;
   late MockHtmlCacheManager cache;
   late FakeWebviewFactory factory;
@@ -816,6 +871,272 @@ void main() {
         ),
       );
       verify(() => factory.created.single.dispose()).called(1);
+    });
+  });
+
+  group('Android render-process recovery (runaway script, issue #115)', () {
+    // On Android every WebView of the app shares one renderer process, so a
+    // `while(true){}` keeps spinning after the webview is disposed and every
+    // later call times out. The platform answer is to terminate the renderer
+    // when it reports itself unresponsive and to handle its death
+    // (onRenderProcessGone) instead of crashing the app.
+    Future<Object?> blankRun({Duration? timeout}) => manager.runOnBlank(
+      code: 'const source = {};',
+      function: 'searchUrl',
+      baseUrl: 'https://x',
+      timeout: timeout ?? const Duration(milliseconds: 100),
+    );
+
+    Future<WebViewRenderProcessAction?> reportUnresponsive(int index) {
+      final callbacks = factory.renderProcess[index];
+      return callbacks.unresponsive!(callbacks.controller, null);
+    }
+
+    setUp(() {
+      when(() => cache.getFileFromCache(any())).thenAnswer((_) async => null);
+    });
+
+    test('the warm blank webview registers both callbacks', () async {
+      await expectLater(blankRun(), throwsA(isA<SourceScriptException>()));
+
+      final callbacks = factory.renderProcess.single;
+      expect(callbacks.unresponsive, isNotNull);
+      expect(callbacks.gone, isNotNull);
+    });
+
+    test('a replacement created after a timeout has the callbacks too', () async {
+      await expectLater(blankRun(), throwsA(isA<SourceScriptException>()));
+      await expectLater(blankRun(), throwsA(isA<SourceScriptException>()));
+
+      expect(factory.renderProcess, hasLength(2));
+      for (final callbacks in factory.renderProcess) {
+        expect(callbacks.unresponsive, isNotNull);
+        expect(callbacks.gone, isNotNull);
+      }
+    });
+
+    test('an unresponsive blank renderer is terminated', () async {
+      final run = blankRun(timeout: const Duration(seconds: 5));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      expect(
+        await reportUnresponsive(0),
+        WebViewRenderProcessAction.TERMINATE,
+      );
+      // Gone arrives next; it must fail the pending call right away.
+      factory.renderProcess[0].gone!(
+        factory.renderProcess[0].controller,
+        RenderProcessGoneDetail(didCrash: false),
+      );
+      await expectLater(
+        run,
+        throwsA(
+          isA<SourceScriptException>()
+              .having((e) => e.timedOut, 'timedOut', isTrue)
+              .having((e) => e.function, 'function', 'searchUrl')
+              .having((e) => e.message, 'message', contains('renderer')),
+        ),
+      );
+    });
+
+    test('a page run is terminated only once its script is running', () async {
+      final run = manager
+          .runOnPage(
+            url: 'https://x/p',
+            code: 'const source = {};',
+            function: 'search',
+            baseUrl: 'https://x',
+            timeout: const Duration(milliseconds: 300),
+          )
+          .then<Object?>((_) => null, onError: (Object e) => e);
+      // The fake page has loaded; the harness is evaluated after getTitle.
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      expect(factory.renderProcess, hasLength(1));
+      expect(
+        await reportUnresponsive(0),
+        WebViewRenderProcessAction.TERMINATE,
+      );
+      expect(await run, isA<SourceScriptException>());
+    });
+
+    test('a page still loading is never terminated (heavy pages)', () async {
+      factory.loadHangs = true;
+      final run = manager
+          .runOnPage(
+            url: 'https://x/p',
+            code: 'const source = {};',
+            function: 'search',
+            baseUrl: 'https://x',
+            timeout: const Duration(milliseconds: 100),
+          )
+          .then<Object?>((_) => null, onError: (Object e) => e);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      expect(await reportUnresponsive(0), isNull);
+      await run;
+    });
+
+    test('a renderer that dies discards the warm blank webview', () async {
+      factory.reply = () => (handler: 'sourceResult', payload: {'value': '1'});
+      expect(await blankRun(), 1);
+      expect(factory.calls, 1);
+
+      factory.renderProcess[0].gone!(
+        factory.renderProcess[0].controller,
+        RenderProcessGoneDetail(didCrash: true),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      expect(await blankRun(), 1);
+      expect(factory.calls, 2);
+      verify(() => factory.created[0].dispose()).called(1);
+    });
+
+    test('a renderer that dies while the blank page loads is retried '
+        'once on a fresh webview', () async {
+      factory.reply = () => (handler: 'sourceResult', payload: {'value': '1'});
+      factory.goneOnRun = true;
+
+      expect(await blankRun(), 1);
+
+      expect(factory.calls, 2);
+      verify(() => factory.created[0].dispose()).called(1);
+    });
+
+    // Chromium's hang monitor needs input events, which a headless webview
+    // never gets, so onRenderProcessUnresponsive is not delivered for a
+    // script spinning in one (observed on WebView 109, API 33: the renderer
+    // kept burning 100% CPU for minutes, and neither input nudges nor
+    // chrome://kill navigations stopped it). The plugin has no terminate
+    // call either, so MainActivity exposes WebView.getWebViewRenderProcess()
+    // .terminate() on a platform channel and the manager calls it whenever a
+    // script run times out.
+    group('explicit renderer termination (Android)', () {
+      const channel = MethodChannel(
+        'com.robzimpulse.mangastash/webview_renderer',
+      );
+      var terminateFails = false;
+
+      setUp(() {
+        terminateFails = false;
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(channel, (call) async {
+              factory.events.add(call.method);
+              if (terminateFails) throw PlatformException(code: 'boom');
+              return true;
+            });
+      });
+      tearDown(() {
+        debugDefaultTargetPlatformOverride = null;
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(channel, null);
+      });
+
+      test('a timed-out blank call terminates the renderer, then disposes',
+          () async {
+        await expectLater(
+          blankRun(),
+          throwsA(
+            isA<SourceScriptException>().having(
+              (e) => e.timedOut,
+              'timedOut',
+              isTrue,
+            ),
+          ),
+        );
+
+        expect(factory.events, ['terminate', 'dispose:0']);
+      });
+
+      test('a timed-out page script terminates the renderer', () async {
+        await expectLater(
+          manager.runOnPage(
+            url: 'https://x/p',
+            code: 'const source = {};',
+            function: 'search',
+            baseUrl: 'https://x',
+            timeout: const Duration(milliseconds: 50),
+          ),
+          throwsA(isA<SourceScriptException>()),
+        );
+
+        expect(factory.events, ['terminate', 'dispose:0']);
+      });
+
+      test('a page that never loads terminates the renderer too', () async {
+        factory.loadHangs = true;
+
+        await expectLater(
+          manager.runOnPage(
+            url: 'https://x/p',
+            code: 'const source = {};',
+            function: 'search',
+            baseUrl: 'https://x',
+            timeout: const Duration(milliseconds: 50),
+          ),
+          throwsA(isA<SourceScriptException>()),
+        );
+
+        expect(factory.events, ['terminate', 'dispose:0']);
+      });
+
+      test('a blank page that never loads terminates the renderer too',
+          () async {
+        factory.loadHangs = true;
+
+        await expectLater(blankRun(), throwsA(isA<SourceScriptException>()));
+
+        expect(factory.events, ['terminate', 'dispose:0']);
+      });
+
+      test('a script that merely threw leaves the renderer alone', () async {
+        factory.reply =
+            () => (handler: 'sourceError', payload: {'message': 'boom'});
+
+        await expectLater(blankRun(), throwsA(isA<SourceScriptException>()));
+
+        expect(factory.events, isNot(contains('terminate')));
+      });
+
+      test('a failing termination never masks the timeout', () async {
+        terminateFails = true;
+
+        await expectLater(
+          blankRun(),
+          throwsA(
+            isA<SourceScriptException>().having(
+              (e) => e.message,
+              'message',
+              'searchUrl timed out after 0.1s',
+            ),
+          ),
+        );
+        expect(factory.events, ['terminate', 'dispose:0']);
+      });
+
+      test('iOS never asks to terminate', () async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+
+        await expectLater(blankRun(), throwsA(isA<SourceScriptException>()));
+
+        expect(factory.events, ['dispose:0']);
+      });
+    });
+
+    test('a renderer that keeps dying fails the call, no endless retry', () async {
+      factory.goneOnRun = true;
+      factory.goneOnRunCount = 10;
+
+      await expectLater(
+        blankRun(),
+        throwsA(
+          isA<SourceScriptException>()
+              .having((e) => e.function, 'function', 'searchUrl')
+              .having((e) => e.message, 'message', contains('renderer')),
+        ),
+      );
+      expect(factory.calls, 2);
     });
   });
 

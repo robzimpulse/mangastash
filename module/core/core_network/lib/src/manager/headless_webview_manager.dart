@@ -12,7 +12,14 @@
 /// (serialized; navigations off the blank page are cancelled; rebuilt after
 /// a timeout, a platform error, or when found off the blank page). Script-run
 /// disposes are bounded by `disposeTimeout`;
-/// `evict` drops a URL's cached script results. Every webview — page fetch,
+/// `evict` drops a URL's cached script results. On Android all webviews share
+/// one renderer process, so a script run that times out (or a page/blank load
+/// that never finishes) first terminates that renderer through
+/// `MainActivity`'s `webview_renderer` channel (`_terminateRenderer`), and
+/// every webview handles `onRenderProcessGone` (a dead renderer fails its
+/// pending script call at once; the warm blank webview is discarded and its
+/// creation retried once) and `onRenderProcessUnresponsive` (TERMINATE for
+/// script webviews). Every webview — page fetch,
 /// script page, warm blank — is built by [HeadlessWebviewManager._createWebview],
 /// the single choke point for settings and (later) `hosts` enforcement.
 /// Script runs register only the `sourceResult`/`sourceError` JS handlers.
@@ -32,7 +39,9 @@ import 'package:core_analytics/core_analytics.dart' hide NavigationAction;
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform;
+import 'package:flutter/services.dart' show MethodChannel, rootBundle;
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:mutex/mutex.dart';
 
@@ -237,6 +246,16 @@ typedef HeadlessWebviewFactory =
         NavigationAction navigationAction,
       )?
       shouldOverrideUrlLoading,
+      Future<WebViewRenderProcessAction?> Function(
+        InAppWebViewController controller,
+        WebUri? url,
+      )?
+      onRenderProcessUnresponsive,
+      void Function(
+        InAppWebViewController controller,
+        RenderProcessGoneDetail detail,
+      )?
+      onRenderProcessGone,
     });
 
 /// Bundled `ctx` helpers evaluated ahead of every source script.
@@ -249,7 +268,15 @@ typedef _PendingScript = ({
   Completer<Object?> completer,
   String function,
   String? url,
+  Object owner,
 });
+
+/// The WebView renderer process died (crash, kill or termination) while a
+/// warm blank page was loading; [HeadlessWebviewManager.runOnBlank] retries
+/// once on a fresh webview.
+class _RendererGoneException implements Exception {
+  const _RendererGoneException();
+}
 
 /// Formats [duration] as seconds for timeout messages: `15` for whole
 /// seconds, `0.05` otherwise.
@@ -268,6 +295,12 @@ class HeadlessWebviewManager
 
   /// How long a successful script result stays in the JSON result cache.
   static const Duration scriptCacheMaxAge = Duration(minutes: 30);
+
+  /// Android channel to `MainActivity`'s renderer termination (see
+  /// [_terminateRenderer]); unregistered on other platforms.
+  static const MethodChannel _rendererChannel = MethodChannel(
+    'com.robzimpulse.mangastash/webview_renderer',
+  );
 
   /// Document loaded into the warm blank webview used by [runOnBlank].
   static const String _blankPage = '<html><head></head><body></body></html>';
@@ -389,6 +422,12 @@ class HeadlessWebviewManager
     delegate.set(uri: uri, loading: true);
 
     HeadlessInAppWebView? webview;
+    // Identifies this run's pending script call, so a dead renderer fails
+    // exactly its call. Termination of an unresponsive renderer is only
+    // allowed once the script itself runs: a heavy page that is merely slow
+    // to load must not be killed.
+    final owner = Object();
+    var scriptRunning = false;
     try {
       // Same load stage and Cloudflare retry as page fetches; only the title
       // decides whether the page is a challenge. A challenged page is
@@ -407,6 +446,9 @@ class HeadlessWebviewManager
               delegate: delegate,
               handlers: _scriptHandlers(),
               timeout: effectiveTimeout,
+              terminateWhenUnresponsive: () => scriptRunning,
+              onRendererGone: () => _failPendingScripts(owner),
+              killRendererOnTimeout: true,
             );
             webview = loaded;
             final title = await loaded.webViewController?.getTitle().timeout(
@@ -434,8 +476,10 @@ class HeadlessWebviewManager
 
       final Object? value;
       try {
+        scriptRunning = true;
         value = await _invoke(
           webview: page,
+          owner: owner,
           code: code,
           function: function,
           baseUrl: baseUrl,
@@ -506,26 +550,14 @@ class HeadlessWebviewManager
     return _blankMutex.protect(() async {
       var webview = _blankWebview;
       if (webview == null) {
-        try {
-          webview = await _warmBlankWebview(effectiveTimeout);
-        } on TimeoutException {
-          throw SourceScriptException(
-            function: function,
-            // The script never ran (typically no network): do not word it
-            // like a script fault.
-            message:
-                '$function could not start the script runner '
-                '(blank page did not load after '
-                '${_seconds(effectiveTimeout)}s)',
-            timedOut: true,
-          );
-        }
+        webview = await _startBlankWebview(function, effectiveTimeout);
         _blankWebview = webview;
       }
 
       try {
         final value = await _invoke(
           webview: webview,
+          owner: webview,
           code: code,
           function: function,
           baseUrl: baseUrl,
@@ -790,6 +822,9 @@ class HeadlessWebviewManager
     required Duration timeout,
     UnmodifiableListView<UserScript>? initialUserScripts,
     List<String> scripts = const [],
+    bool Function()? terminateWhenUnresponsive,
+    void Function()? onRendererGone,
+    bool killRendererOnTimeout = false,
   }) async {
     final onLoadStartCompleter = Completer();
     final onLoadStopCompleter = Completer();
@@ -804,6 +839,8 @@ class HeadlessWebviewManager
       onLoadStart: () => onLoadStartCompleter.safeComplete(),
       onLoadStop: () => onLoadStopCompleter.safeComplete(),
       onLoadError: () => onLoadErrorCompleter.safeComplete(),
+      terminateWhenUnresponsive: terminateWhenUnresponsive,
+      onRendererGone: onRendererGone,
     );
 
     try {
@@ -814,6 +851,9 @@ class HeadlessWebviewManager
       ]).timeout(timeout);
     } catch (e, st) {
       delegate.set(error: e, stackTrace: st, loading: false);
+      if (killRendererOnTimeout && e is TimeoutException) {
+        await _terminateRenderer();
+      }
       await _disposeWebview(webview);
       rethrow;
     }
@@ -840,6 +880,8 @@ class HeadlessWebviewManager
     required void Function() onLoadStart,
     required void Function() onLoadStop,
     required void Function() onLoadError,
+    bool Function()? terminateWhenUnresponsive,
+    void Function()? onRendererGone,
   }) {
     final origin = initialUrlRequest?.url;
 
@@ -908,6 +950,30 @@ class HeadlessWebviewManager
           error: error.toMap(),
         );
         onLoadError();
+      },
+      // Android (API 29+): every WebView of the app shares ONE renderer
+      // process, so a script that spins (`while(true){}`) outlives the
+      // webview that started it and wedges every later call. Terminating
+      // the unresponsive renderer is the only way out; the plugin then
+      // requires onRenderProcessGone to be handled (it also enables the
+      // plugin's useOnRenderProcessGone), otherwise the app itself dies with
+      // the renderer. Not delivered on other platforms.
+      onRenderProcessUnresponsive: (_, url) async {
+        final terminate = terminateWhenUnresponsive?.call() ?? false;
+        _log.log(
+          'WebView renderer unresponsive '
+          '(${terminate ? 'terminating' : 'left running'})',
+          name: 'HeadlessWebviewManager',
+          extra: {'url': url?.toString()},
+        );
+        return terminate ? WebViewRenderProcessAction.TERMINATE : null;
+      },
+      onRenderProcessGone: (_, detail) {
+        _log.log(
+          'WebView renderer process gone (crashed: ${detail.didCrash})',
+          name: 'HeadlessWebviewManager',
+        );
+        onRendererGone?.call();
       },
       onContentSizeChanged: (_, prev, curr) {
         delegate?.onContentSizeChanged(previous: prev, current: curr);
@@ -1064,12 +1130,65 @@ class HeadlessWebviewManager
     }
   }
 
+  /// Kills the shared WebView renderer process (Android only).
+  ///
+  /// All WebViews of an Android app share one renderer, so a script that
+  /// never returns (`while(true){}`) keeps burning CPU after its webview is
+  /// disposed and every later webview hangs on it. Chromium's hang monitor
+  /// (`onRenderProcessUnresponsive`) needs input events and never fires for
+  /// a headless webview, and neither the plugin nor `chrome://kill` navigation
+  /// offers a way out (both verified on WebView 109), so `MainActivity`
+  /// exposes `WebView.getWebViewRenderProcess().terminate()` on
+  /// [_rendererChannel]. The next webview then gets a fresh process;
+  /// webviews still attached see `onRenderProcessGone`. Bounded by
+  /// [disposeTimeout] and never throwing: it must not mask the timeout being
+  /// reported. iOS gives every WKWebView its own process, so disposing is
+  /// enough there.
+  Future<void> _terminateRenderer() async {
+    if (defaultTargetPlatform != TargetPlatform.android) return;
+    try {
+      _log.log(
+        'Terminating the WebView renderer process of a script that never '
+        'answered',
+        name: 'HeadlessWebviewManager',
+      );
+      await _rendererChannel
+          .invokeMethod<bool>('terminate')
+          .timeout(disposeTimeout);
+    } catch (e) {
+      _log.log(
+        'Failed to terminate the WebView renderer: $e',
+        name: 'HeadlessWebviewManager',
+      );
+    }
+  }
+
+  /// Fails every pending script call of [owner] right away: its renderer
+  /// process is gone, so no bridge reply will ever arrive. Reported as a
+  /// timeout (the script stopped answering) without waiting for the budget.
+  void _failPendingScripts(Object owner) {
+    for (final pending in _pendingScripts.values) {
+      if (!identical(pending.owner, owner)) continue;
+      pending.completer.safeCompleteError(
+        SourceScriptException(
+          function: pending.function,
+          message:
+              '${pending.function} stopped responding: the WebView renderer '
+              'process was terminated',
+          url: pending.url,
+          timedOut: true,
+        ),
+      );
+    }
+  }
+
   /// Evaluates the source harness for [function] in [webview] and awaits its
   /// bridge reply, bounded by [timeout] (evaluation included). A timeout
   /// becomes a [SourceScriptException] with `timedOut: true`; platform errors
   /// propagate unchanged.
   Future<Object?> _invoke({
     required HeadlessInAppWebView webview,
+    required Object owner,
     required String code,
     required String function,
     required String baseUrl,
@@ -1091,6 +1210,7 @@ class HeadlessWebviewManager
       completer: completer,
       function: function,
       url: url,
+      owner: owner,
     );
 
     try {
@@ -1110,6 +1230,9 @@ class HeadlessWebviewManager
         return completer.future;
       }).timeout(timeout);
     } on TimeoutException {
+      // The script never answered and may still be spinning (Android keeps
+      // it running in the shared renderer after the webview is disposed).
+      await _terminateRenderer();
       throw SourceScriptException(
         function: function,
         message: '$function timed out after ${_seconds(timeout)}s',
@@ -1156,8 +1279,10 @@ class HeadlessWebviewManager
   Future<HeadlessInAppWebView> _warmBlankWebview(Duration timeout) async {
     final onLoadStopCompleter = Completer();
     final onLoadErrorCompleter = Completer();
+    final onGoneCompleter = Completer<void>();
 
-    final webview = _createWebview(
+    late final HeadlessInAppWebView webview;
+    webview = _createWebview(
       initialData: InAppWebViewInitialData(
         data: _blankPage,
         baseUrl: WebUri('about:blank'),
@@ -1166,18 +1291,71 @@ class HeadlessWebviewManager
       onLoadStart: () {},
       onLoadStop: () => onLoadStopCompleter.safeComplete(),
       onLoadError: () => onLoadErrorCompleter.safeComplete(),
+      // Nothing legitimate runs on the blank page for long: an unresponsive
+      // renderer here is a leftover runaway script's.
+      terminateWhenUnresponsive: () => true,
+      onRendererGone: () {
+        onGoneCompleter.safeComplete();
+        _failPendingScripts(webview);
+        if (identical(_blankWebview, webview)) {
+          _blankWebview = null;
+          unawaited(_disposeBounded(webview));
+        }
+      },
     );
 
     try {
       await Future.wait([
         webview.run(),
-        Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
+        Future.any([
+          onLoadStopCompleter.future,
+          onLoadErrorCompleter.future,
+          onGoneCompleter.future.then<void>(
+            (_) => throw const _RendererGoneException(),
+          ),
+        ]),
       ]).timeout(timeout);
-    } catch (_) {
+    } catch (e) {
+      // A blank page that never loads is typically a renderer wedged by an
+      // earlier runaway script: kill it so the next call gets a fresh one.
+      if (e is TimeoutException) await _terminateRenderer();
       await _disposeBounded(webview);
       rethrow;
     }
     return webview;
+  }
+
+  /// [_warmBlankWebview] for [runOnBlank]: failures become
+  /// [SourceScriptException]s for [function], and a renderer that dies while
+  /// the page loads (e.g. terminated because a previous runaway script left
+  /// it wedged) is retried once, on a fresh renderer.
+  Future<HeadlessInAppWebView> _startBlankWebview(
+    String function,
+    Duration timeout,
+  ) async {
+    for (var attempt = 0; ; attempt++) {
+      try {
+        return await _warmBlankWebview(timeout);
+      } on _RendererGoneException {
+        if (attempt == 0) continue;
+        throw SourceScriptException(
+          function: function,
+          message:
+              '$function could not start the script runner (the WebView '
+              'renderer process was terminated)',
+        );
+      } on TimeoutException {
+        throw SourceScriptException(
+          function: function,
+          // The script never ran (typically no network): do not word it
+          // like a script fault.
+          message:
+              '$function could not start the script runner '
+              '(blank page did not load after ${_seconds(timeout)}s)',
+          timedOut: true,
+        );
+      }
+    }
   }
 
   /// Disposes and forgets the warm blank webview so the next [runOnBlank]
