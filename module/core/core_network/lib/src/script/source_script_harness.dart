@@ -34,7 +34,10 @@
 /// Usage: the runner evaluates `buildSourceHarness(...)` in the page, awaits the
 /// handler call, and on `sourceError` feeds `stack` to [parseScriptLocation]
 /// and falls back to the posted `line`/`column`.
-/// Generated JS sticks to ES2017 plus spread (iOS 13 WebKit).
+/// The generated JS sticks to ES2017 plus spread. User scripts may (and the
+/// shipped ones do) use optional chaining and `??` (ES2020), which sets the
+/// real minimum WebView: iOS 13.4 WebKit / Chromium 80. (The app itself
+/// already needs iOS 15 for Firebase, so this is not a practical limit.)
 library;
 
 import 'dart:convert';

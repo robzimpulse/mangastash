@@ -70,7 +70,7 @@ Return at least a `title` and an absolute `webUrl` for every manga and chapter; 
 2. Keep `id` and `name` exactly unchanged.
 3. Increment `version` by 1.
 4. Plain DOM APIs only (`querySelector`, `querySelectorAll`, `closest`, `textContent`, `getAttribute`, ...). No external libraries, no `import`, no `require`, no network calls of your own unless the original already did one.
-5. Keep the script working in older WebViews (iOS 13 / Safari 13): avoid JavaScript features newer than 2019 (no `Array.prototype.at`, `replaceAll`, `structuredClone`, top-level `await`, logical assignment `||=` or `??=`, private class fields).
+5. Keep the script working in older WebViews (iOS 13.4+ WebKit / Chromium 80+): optional chaining `?.` and `??` are fine, but avoid anything newer than ES2020 (no `Array.prototype.at`, `replaceAll`, `structuredClone`, top-level `await`, logical assignment `||=`, `&&=` or `??=`, private class fields).
 6. Prefer stable selectors (ids, `data-*` attributes, `aria-label`, href shapes, structure) over generated or utility CSS class names, so the script survives the next redesign.
 7. Change only what is needed to fix the failure; keep the behaviour and return shapes of the other functions.
 

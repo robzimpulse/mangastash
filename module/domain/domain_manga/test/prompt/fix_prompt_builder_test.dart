@@ -327,7 +327,7 @@ void main() {
         'ctx.absUrl',
         'ctx.searchTerm',
         'version',
-        'iOS 13',
+        'iOS 13.4',
         '{{script}}',
         '{{function}}',
         '{{url}}',
