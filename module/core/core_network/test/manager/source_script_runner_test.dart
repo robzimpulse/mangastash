@@ -18,6 +18,7 @@ import 'dart:ui';
 
 import 'package:core_analytics/core_analytics.dart' as analytics;
 import 'package:core_network/src/manager/headless_webview_manager.dart';
+import 'package:core_network/src/manager/visible_webview_guard.dart';
 import 'package:core_network/src/script/source_script_exception.dart';
 import 'package:core_network/src/usecase/run_source_script_use_case.dart';
 import 'package:core_storage/core_storage.dart';
@@ -1113,6 +1114,42 @@ void main() {
           ),
         );
         expect(factory.events, ['terminate', 'dispose:0']);
+      });
+
+      test('an open visible webview suppresses it; the failed call still '
+          'disposes and the next call terminates once it is closed',
+          () async {
+        // The log_box visible screens share the renderer but handle no
+        // onRenderProcessGone: terminating under them kills the whole app.
+        final guard = VisibleWebviewGuard();
+        manager = HeadlessWebviewManager(
+          log: log,
+          htmlCacheManager: cache,
+          webviewFactory: factory.call,
+          loadSourceCtx: () async => '/*ctx*/',
+          visibleWebviewGuard: guard,
+        );
+        final session = Completer<void>();
+        final visible = guard.track(() => session.future);
+
+        await expectLater(
+          blankRun(),
+          throwsA(
+            isA<SourceScriptException>().having(
+              (e) => e.message,
+              'message',
+              'searchUrl timed out after 0.1s',
+            ),
+          ),
+        );
+        expect(factory.events, ['dispose:0']);
+
+        session.complete();
+        await visible;
+        await expectLater(blankRun(), throwsA(isA<SourceScriptException>()));
+
+        expect(factory.calls, 2);
+        expect(factory.events, ['dispose:0', 'terminate', 'dispose:1']);
       });
 
       test('iOS never asks to terminate', () async {

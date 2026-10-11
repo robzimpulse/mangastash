@@ -12,6 +12,12 @@
  * `WebView.getWebViewRenderProcess().terminate()` (API 29+) on the live
  * headless webviews; the next webview gets a fresh renderer.
  *
+ * The renderer is NOT terminated while a visible (non-headless) WebView is
+ * attached to the window: the visible log_box webview screens register no
+ * `onRenderProcessGone`, so Android would kill the whole app with the renderer.
+ * (core_network's `VisibleWebviewGuard` covers the sessions the app opens
+ * itself; this scan also covers the log inspector's own webview entries.)
+ *
  * Usage: core_network's `HeadlessWebviewManager` invokes `terminate` (returns
  * true when a renderer was terminated, false when none was running or the
  * platform is older than API 29) right after a script run times out, before
@@ -21,6 +27,9 @@
 package com.robzimpulse.mangastash
 
 import android.os.Build
+import android.view.View
+import android.view.ViewGroup
+import android.webkit.WebView
 import com.pichillilorenzo.flutter_inappwebview_android.InAppWebViewFlutterPlugin
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -48,10 +57,23 @@ class MainActivity : FlutterActivity() {
         var terminated = false
         val headlessWebViews = plugin.headlessInAppWebViewManager?.webViews?.values?.toList()
             ?: return false
+        val headlessViews = headlessWebViews.mapNotNull { it.flutterWebView?.webView }
+        if (hasVisibleWebView(window.decorView, headlessViews)) return false
         for (headless in headlessWebViews) {
             val renderer = headless.flutterWebView?.webView?.webViewRenderProcess ?: continue
             if (renderer.terminate()) terminated = true
         }
         return terminated
+    }
+
+    /** Whether [view] contains a WebView that is not one of the [headless] ones. */
+    private fun hasVisibleWebView(view: View?, headless: List<View>): Boolean {
+        if (view is WebView) return headless.none { it === view }
+        if (view is ViewGroup) {
+            for (i in 0 until view.childCount) {
+                if (hasVisibleWebView(view.getChildAt(i), headless)) return true
+            }
+        }
+        return false
     }
 }

@@ -2,7 +2,8 @@
 ///
 /// Purpose: wires the headless webview runtime (`HeadlessWebviewManager`,
 /// exposed as both `HeadlessWebviewUseCase` and `RunSourceScriptUseCase`),
-/// the `UserAgentManager` and the shared Dio client.
+/// the `VisibleWebviewGuard` it consults before terminating the Android
+/// renderer, the `UserAgentManager` and the shared Dio client.
 /// Usage: `await CoreNetworkRegistrar().register(locator)` during bootstrap,
 /// after `CoreAnalyticsRegistrar` (LogBox) and `CoreStorageRegistrar`
 /// (`HtmlCacheManager`) — see `WrapperScreen` in `lib/main.dart`.
@@ -14,6 +15,7 @@ import 'package:service_locator/service_locator.dart';
 import 'manager/dio_manager.dart';
 import 'manager/headless_webview_manager.dart';
 import 'manager/user_agent_manager.dart';
+import 'manager/visible_webview_guard.dart';
 import 'usecase/headless_webview_use_case.dart';
 import 'usecase/run_source_script_use_case.dart';
 
@@ -22,11 +24,13 @@ class CoreNetworkRegistrar extends Registrar {
   Future<void> register(ServiceLocator locator) async {
     final start = DateTime.timestamp();
 
+    locator.registerLazySingleton(() => VisibleWebviewGuard());
     locator.registerLazySingleton(
       () => HeadlessWebviewManager(
         log: locator(),
         htmlCacheManager: locator(),
         userAgentManager: locator(),
+        visibleWebviewGuard: locator(),
       ),
       dispose: (e) => e.dispose(),
     );

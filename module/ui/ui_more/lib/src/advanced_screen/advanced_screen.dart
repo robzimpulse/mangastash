@@ -1,3 +1,8 @@
+// Advanced settings screen: log inspector, database inspector/diagnostics and
+// the browser tester. Usage: `AdvancedScreen.create(locator: locator)`. The
+// browser tester opens the visible in-app webview through the shared
+// `VisibleWebviewGuard` (`guard.track`) so the headless runner never terminates
+// the shared Android renderer under it.
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
@@ -9,6 +14,7 @@ class AdvancedScreen extends StatelessWidget {
   final DatabaseViewer viewer;
   final AppDatabase database;
   final HeadlessWebviewUseCase webview;
+  final VisibleWebviewGuard guard;
 
   const AdvancedScreen({
     super.key,
@@ -16,6 +22,7 @@ class AdvancedScreen extends StatelessWidget {
     required this.viewer,
     required this.database,
     required this.webview,
+    required this.guard,
   });
 
   static Widget create({required ServiceLocator locator}) {
@@ -24,6 +31,7 @@ class AdvancedScreen extends StatelessWidget {
       database: locator(),
       viewer: locator(),
       webview: locator(),
+      guard: locator(),
     );
   }
 
@@ -74,7 +82,9 @@ class AdvancedScreen extends StatelessWidget {
                   onSubmitted: (text) async {
                     final uri = Uri.tryParse(text);
                     if (uri == null) return;
-                    await logBox.webview(context: context, uri: uri);
+                    await guard.track(
+                      () => logBox.webview(context: context, uri: uri),
+                    );
                   },
                 ),
                 leading: const Icon(Icons.web_asset),
@@ -88,7 +98,9 @@ class AdvancedScreen extends StatelessWidget {
                     'https://www.scrapingcourse.com/cloudflare-challenge',
                   );
                   if (uri == null) return;
-                  await logBox.webview(context: context, uri: uri);
+                  await guard.track(
+                    () => logBox.webview(context: context, uri: uri),
+                  );
                 },
               ),
             ],

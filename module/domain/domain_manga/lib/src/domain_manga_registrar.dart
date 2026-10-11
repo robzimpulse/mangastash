@@ -229,7 +229,11 @@ class DomainMangaRegistrar extends Registrar {
       ),
     );
     locator.registerFactory(
-      () => RecrawlUseCase(logBox: locator(), runner: locator()),
+      () => RecrawlUseCase(
+        logBox: locator(),
+        runner: locator(),
+        guard: locator(),
+      ),
     );
 
     locator.registerFactory(

@@ -15,8 +15,10 @@
 /// `evict` drops a URL's cached script results. On Android all webviews share
 /// one renderer process, so a script run that times out (or a page/blank load
 /// that never finishes) first terminates that renderer through
-/// `MainActivity`'s `webview_renderer` channel (`_terminateRenderer`), and
-/// every webview handles `onRenderProcessGone` (a dead renderer fails its
+/// `MainActivity`'s `webview_renderer` channel (`_terminateRenderer`; skipped
+/// while a `VisibleWebviewGuard` session is open, because the visible
+/// log_box webview screens would take the whole app down with the renderer),
+/// and every webview built here handles `onRenderProcessGone` (a dead renderer fails its
 /// pending script call at once; the warm blank webview is discarded and its
 /// creation retried once) and `onRenderProcessUnresponsive` (TERMINATE for
 /// script webviews). Every webview — page fetch,
@@ -54,6 +56,7 @@ import '../usecase/run_source_script_use_case.dart';
 import 'cloudflare_detector.dart';
 import 'script_wrapper.dart';
 import 'user_agent_manager.dart';
+import 'visible_webview_guard.dart';
 
 class _Key extends Equatable {
   final String url;
@@ -310,6 +313,7 @@ class HeadlessWebviewManager
   final UserAgentManager? _userAgentManager;
   final HeadlessWebviewFactory _webviewFactory;
   final Future<String> Function() _loadSourceCtx;
+  final VisibleWebviewGuard _visibleWebviewGuard;
 
   bool _uaDiscoveryStarted = false;
 
@@ -334,11 +338,13 @@ class HeadlessWebviewManager
     UserAgentManager? userAgentManager,
     HeadlessWebviewFactory webviewFactory = HeadlessInAppWebView.new,
     Future<String> Function() loadSourceCtx = _loadBundledSourceCtx,
+    VisibleWebviewGuard? visibleWebviewGuard,
   }) : _log = log,
        _htmlCacheManager = htmlCacheManager,
        _userAgentManager = userAgentManager,
        _webviewFactory = webviewFactory,
-       _loadSourceCtx = loadSourceCtx;
+       _loadSourceCtx = loadSourceCtx,
+       _visibleWebviewGuard = visibleWebviewGuard ?? VisibleWebviewGuard();
 
   Future<void> dispose() async {
     _blankWebview = null;
@@ -1146,6 +1152,17 @@ class HeadlessWebviewManager
   /// enough there.
   Future<void> _terminateRenderer() async {
     if (defaultTargetPlatform != TargetPlatform.android) return;
+    // A visible webview (debug browser, Cloudflare tester) shares the
+    // renderer but registers no onRenderProcessGone, so terminating it would
+    // kill the whole app. The runaway script may keep spinning until that
+    // webview is closed; the failed call still disposes its own webview.
+    if (_visibleWebviewGuard.isOpen) {
+      _log.log(
+        'Not terminating the WebView renderer: a visible webview is open',
+        name: 'HeadlessWebviewManager',
+      );
+      return;
+    }
     try {
       _log.log(
         'Terminating the WebView renderer process of a script that never '
