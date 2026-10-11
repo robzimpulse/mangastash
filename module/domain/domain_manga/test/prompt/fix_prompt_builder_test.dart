@@ -52,6 +52,108 @@ void main() {
 
       expect(trimmed, '${'a' * 60000}\n<!-- truncated 5 chars -->');
     });
+
+    test('keeps the cards of a real-shaped page inside the cap (bug H)', () {
+      // The head (meta/link/scripts) and a huge astro-island props attribute
+      // used to eat the whole budget so the cards were cut off.
+      final head = StringBuffer('<!DOCTYPE html><html><head>')
+        ..write('<title>Browse - Asura</title>');
+      for (var i = 0; i < 400; i++) {
+        head.write('<meta property="og:x$i" content="${'m' * 150}">');
+        head.write('<link rel="preload" href="/a$i.js" as="script">');
+      }
+      head.write('<script>var big = "${'s' * 80000}";</script></head>');
+      final body =
+          StringBuffer('<body>')
+            ..write('<astro-island props="${'{&quot;k&quot;:1}' * 20000}">')
+            ..write('<div class="grid">');
+      for (var i = 0; i < 50; i++) {
+        body.write(
+          '<div class="series-card rounded-md"><a href="/comics/s$i">'
+          '<img src="/c$i.jpg"><h3>Series $i</h3></a></div>',
+        );
+      }
+      body.write('</div></astro-island></body></html>');
+
+      final trimmed = trimPageHtml('$head$body');
+
+      expect('series-card'.allMatches(trimmed), hasLength(50));
+      expect(trimmed, contains('<title>Browse - Asura</title>'));
+      expect(trimmed, isNot(contains('og:x')));
+      expect(trimmed, isNot(contains('<link')));
+      expect(trimmed, isNot(contains('truncated')));
+      expect(trimmed.length, lessThan(60000));
+    });
+
+    test('drops the head except the title', () {
+      expect(
+        trimPageHtml(
+          '<html><head><meta charset="utf-8"><TITLE>My Page</TITLE>'
+          '<link rel="x"></head><body><p>a</p></body></html>',
+        ),
+        '<html><title>My Page</title><body><p>a</p></body></html>',
+      );
+      expect(
+        trimPageHtml('<head><meta charset="utf-8"></head><p>a</p>'),
+        '<p>a</p>',
+      );
+    });
+
+    test('does not mistake header for head', () {
+      expect(
+        trimPageHtml('<header><p>a</p></header>'),
+        '<header><p>a</p></header>',
+      );
+    });
+
+    test('removes comments and noscript blocks', () {
+      expect(
+        trimPageHtml(
+          '<p>a</p><!-- hidden <p>x</p> --><noscript><img src="t.gif">'
+          '</noscript><p>b</p>',
+        ),
+        '<p>a</p><p>b</p>',
+      );
+    });
+
+    test('truncates attribute values longer than 200 characters', () {
+      final long = 'x' * 201;
+      expect(
+        trimPageHtml('<div data-a="$long" data-b=\'$long\' class="ok">t</div>'),
+        '<div data-a="${'x' * 200}…" data-b=\'${'x' * 200}…\' class="ok">'
+        't</div>',
+      );
+      // Exactly 200 stays untouched.
+      final edge = '<a href="${'y' * 200}">t</a>';
+      expect(trimPageHtml(edge), edge);
+    });
+
+    test('a > or < inside an attribute value does not end the tag', () {
+      expect(
+        trimPageHtml('<a title="1 > 0 <b>" href="/x">t</a>'),
+        '<a title="1 > 0 <b>" href="/x">t</a>',
+      );
+    });
+
+    test('stray less-than signs in text are kept', () {
+      expect(
+        trimPageHtml('<p>1 < 2 and 3 <= 4</p>'),
+        '<p>1 < 2 and 3 <= 4</p>',
+      );
+    });
+
+    test('unterminated blocks and comments drop the rest without hanging', () {
+      final watch = Stopwatch()..start();
+
+      expect(trimPageHtml('<p>a</p><script>never closed'), '<p>a</p>');
+      expect(trimPageHtml('<p>a</p><!-- never closed'), '<p>a</p>');
+      // Many unterminated openers must stay linear, not quadratic.
+      expect(trimPageHtml('<svg ' * 200000), '');
+      expect(trimPageHtml('<!-- ' * 200000), '');
+      expect(trimPageHtml('<a href="' * 100000), isNotEmpty);
+
+      expect(watch.elapsed, lessThan(const Duration(seconds: 5)));
+    });
   });
 
   group('extractScriptFromReply', () {
