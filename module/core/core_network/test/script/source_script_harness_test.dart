@@ -229,6 +229,31 @@ void main() {
           });
         }
 
+        for (final (name, body) in [
+          ('a waitFor timeout', "await ctx.waitFor('.never', 0);"),
+          ('an absUrl failure', "ctx.absUrl('http://');"),
+        ]) {
+          // Chromium keeps the awaiting script frame in the stack, so the
+          // runner needs the flag itself to skip stack parsing (issue #115).
+          test('$name posts fromHarness: true', () async {
+            final posts = await _runHarness(
+              'const source = {\n  run: async function (ctx) {\n'
+              '    $body\n  },\n};',
+              prelude: prelude,
+            );
+            final payload = posts.single['payload'] as Map<String, dynamic>;
+            expect(payload['fromHarness'], isTrue);
+          });
+        }
+
+        test('a throw in user code never posts fromHarness', () async {
+          final posts = await _runHarness(
+            "const source = { run: function () { throw new Error('mine'); } };",
+          );
+          final payload = posts.single['payload'] as Map<String, dynamic>;
+          expect(payload.containsKey('fromHarness'), isFalse);
+        });
+
         test('a throw in user code on line 3 still posts line 3', () async {
           final posts = await _runHarness(
             'const source = {\n  run: async function (ctx) {\n'
@@ -251,6 +276,7 @@ void main() {
         );
         final payload = posts.single['payload'] as Map<String, dynamic>;
         expect(payload['message'], 'source.run is not a function');
+        expect(payload['fromHarness'], isTrue);
         expect(payload.containsKey('line'), isFalse);
         expect(payload.containsKey('column'), isFalse);
       });

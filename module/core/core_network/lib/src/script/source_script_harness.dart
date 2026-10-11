@@ -12,7 +12,10 @@
 ///      with `Error('source.<function> is not a function')`),
 ///   4. posts the outcome back through the inappwebview bridge:
 ///      `sourceResult {callId, value: <JSON string>}` or
-///      `sourceError {callId, message, stack[, line, column]}`. `line`/`column`
+///      `sourceError {callId, message, stack[, line, column][, fromHarness]}`.
+///      `fromHarness: true` marks an error raised by the harness or a ctx helper
+///      (waitFor timeout, absUrl failure, script SyntaxError, missing function):
+///      the runner reports no script line for it on any platform. `line`/`column`
 ///      are the numeric position JavaScriptCore (iOS) puts on the thrown Error
 ///      because its stack for eval'd code has no file/line; they count from the
 ///      eval'd text, i.e. the script's own line 1, so they equal editor lines.
@@ -110,6 +113,10 @@ String buildSourceHarness({
       message: String(e && e.message || e),
       stack: String(e && e.stack || ''),
     };
+    // Raised by the harness or a ctx helper, not by the script: the runner
+    // must report no script line for it on any platform (Chromium keeps the
+    // awaiting script frame in the stack of such errors).
+    if (e && e.fromHarness) payload.fromHarness = true;
     // JavaScriptCore: no file/line in the stack of eval'd code, but numeric
     // line/column on the Error (relative to the eval'd text = script line 1).
     if (e && !e.fromHarness && typeof e.line === 'number' &&

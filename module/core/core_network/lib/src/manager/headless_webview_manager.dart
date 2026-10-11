@@ -1009,9 +1009,14 @@ class HeadlessWebviewManager
     if (isError) {
       final message = payload['message']?.toString() ?? 'Unknown error';
       final stack = payload['stack']?.toString() ?? '';
+      // Errors the harness or a ctx helper raised carry no script line on any
+      // platform (Chromium would otherwise report the awaiting script frame).
       // WebKit's stack for eval'd code has no file/line: fall back to the
       // numeric line/column the harness reads off the thrown Error.
-      final location = parseScriptLocation(stack) ?? _postedLocation(payload);
+      final location =
+          payload['fromHarness'] == true
+              ? null
+              : parseScriptLocation(stack) ?? _postedLocation(payload);
       _log.log(
         'Source script ${pending.function} threw: $message',
         name: 'HeadlessWebviewManager',

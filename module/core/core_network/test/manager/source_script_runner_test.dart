@@ -451,6 +451,36 @@ void main() {
       expect(error.column, 7);
     });
 
+    test('a fromHarness error reports no line, even with a stack frame', () async {
+      // Chromium keeps the async awaiting script frame in the stack of a
+      // ctx-helper error (waitFor timeout); iOS has none. The flag makes
+      // both platforms agree: no script line for harness-raised errors.
+      final error = await failWith({
+        'message': 'waitFor timed out: .x',
+        'stack':
+            'Error: waitFor timed out\n    at async Object.images '
+            '(mangastash-source.js:167:7)',
+        'line': 167,
+        'column': 7,
+        'fromHarness': true,
+      });
+
+      expect(error.message, 'waitFor timed out: .x');
+      expect(error.line, isNull);
+      expect(error.column, isNull);
+    });
+
+    test('fromHarness: false keeps the stack location', () async {
+      final error = await failWith({
+        'message': 'boom',
+        'stack': 'search@mangastash-source.js:3:7',
+        'fromHarness': false,
+      });
+
+      expect(error.line, 3);
+      expect(error.column, 7);
+    });
+
     test('no location anywhere leaves the line empty', () async {
       final error = await failWith({'message': 'boom', 'stack': ''});
 
