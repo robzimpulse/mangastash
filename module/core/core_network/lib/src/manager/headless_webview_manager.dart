@@ -38,6 +38,7 @@ library;
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:math' show Random;
 import 'dart:ui' show Size;
 
 import 'package:core_analytics/core_analytics.dart' hide NavigationAction;
@@ -204,7 +205,6 @@ Future<bool> publishDiscoveredUserAgent({
   }
 }
 
-
 /// Builds a [HeadlessInAppWebView]; the parameters are the subset of the
 /// real constructor this manager uses, so `HeadlessInAppWebView.new` is a
 /// valid value. Tests inject fakes through it.
@@ -329,7 +329,11 @@ class HeadlessWebviewManager
 
   /// Script calls awaiting their bridge message, keyed by call id.
   final Map<String, _PendingScript> _pendingScripts = {};
-  int _callSequence = 0;
+  final Random _random = Random.secure();
+
+  /// Owner token of each warm blank webview: the only handlers that may
+  /// settle a call run on it are the ones bound to this token.
+  final Expando<Object> _blankOwners = Expando<Object>('blankOwner');
 
   /// Memoized `source_ctx.js` contents (loaded on the first script run).
   Future<String>? _sourceCtx;
@@ -463,7 +467,7 @@ class HeadlessWebviewManager
             final loaded = await _loadPage(
               uri: uri,
               delegate: delegate,
-              handlers: _scriptHandlers(),
+              handlers: _scriptHandlers(owner),
               timeout: effectiveTimeout,
               terminateWhenUnresponsive: () => scriptRunning,
               onRendererGone: _onRendererLost,
@@ -520,7 +524,9 @@ class HeadlessWebviewManager
           url: url,
         );
       } on SourceScriptException catch (e) {
-        if (!captureHtml) rethrow;
+        // A timed-out script may still be spinning (iOS keeps the page
+        // alive): a snapshot would just wait out another full budget.
+        if (!captureHtml || e.timedOut) rethrow;
         throw e.copyWith(html: await _snapshotHtml(page, effectiveTimeout));
       }
 
@@ -588,7 +594,7 @@ class HeadlessWebviewManager
       try {
         final value = await _invoke(
           webview: webview,
-          owner: webview,
+          owner: _blankOwners[webview]!,
           code: code,
           function: function,
           baseUrl: baseUrl,
@@ -1093,17 +1099,27 @@ class HeadlessWebviewManager
     return webview.dispose();
   }
 
+  /// A fresh unguessable call id (128 random bits): a page's own script can
+  /// read nothing about calls running in other webviews, and cannot guess
+  /// their ids either.
+  String _newCallId() {
+    final bytes = List<int>.generate(16, (_) => _random.nextInt(256));
+    return 'call-${bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join()}';
+  }
+
   /// JS handlers for script runs — the only channel a source script has to
   /// the app. Both accept data only and settle the pending call whose
-  /// `callId` they carry; unknown/late ids are ignored.
-  Map<String, JavaScriptHandlerCallback> _scriptHandlers() {
+  /// `callId` they carry, and only when that call belongs to [owner] (the
+  /// webview the handlers are registered on): a page loaded in another
+  /// webview cannot settle it. Unknown/late ids are ignored.
+  Map<String, JavaScriptHandlerCallback> _scriptHandlers(Object owner) {
     return {
       'sourceResult': (List<dynamic> args) {
-        _settleScript(args, isError: false);
+        _settleScript(args, isError: false, owner: owner);
         return null;
       },
       'sourceError': (List<dynamic> args) {
-        _settleScript(args, isError: true);
+        _settleScript(args, isError: true, owner: owner);
         return null;
       },
     };
@@ -1118,11 +1134,15 @@ class HeadlessWebviewManager
   }
 
   /// Completes the pending script call addressed by a bridge message.
-  void _settleScript(List<dynamic> args, {required bool isError}) {
+  void _settleScript(
+    List<dynamic> args, {
+    required bool isError,
+    required Object owner,
+  }) {
     final payload = args.firstOrNull;
     if (payload is! Map) return;
     final pending = _pendingScripts[payload['callId']];
-    if (pending == null) return;
+    if (pending == null || !identical(pending.owner, owner)) return;
 
     if (isError) {
       final message = payload['message']?.toString() ?? 'Unknown error';
@@ -1250,7 +1270,7 @@ class HeadlessWebviewManager
     String? url,
   }) async {
     final ctxJs = await _sourceCtxOnce();
-    final callId = 'call-${_callSequence++}';
+    final callId = _newCallId();
     final completer = Completer<Object?>();
     // The bridge reply can land before evaluateJavascript's own reply; a
     // listener must exist from the start or an early sourceError completes
@@ -1332,13 +1352,14 @@ class HeadlessWebviewManager
     final onLoadErrorCompleter = Completer();
     final onGoneCompleter = Completer<void>();
 
+    final owner = Object();
     late final HeadlessInAppWebView webview;
     webview = _createWebview(
       initialData: InAppWebViewInitialData(
         data: _blankPage,
         baseUrl: WebUri('about:blank'),
       ),
-      handlers: _scriptHandlers(),
+      handlers: _scriptHandlers(owner),
       onLoadStart: () {},
       onLoadStop: () => onLoadStopCompleter.safeComplete(),
       onLoadError: () => onLoadErrorCompleter.safeComplete(),
@@ -1355,6 +1376,7 @@ class HeadlessWebviewManager
       },
     );
 
+    _blankOwners[webview] = owner;
     try {
       await Future.wait([
         webview.run(),

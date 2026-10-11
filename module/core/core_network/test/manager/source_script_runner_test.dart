@@ -88,6 +88,12 @@ class FakeWebviewFactory {
   bool loadHangs = false;
   bool goneOnRun = false;
 
+  /// Registered JS handlers per construction (same index as [created]).
+  final List<Map<String, Function>> handlerMaps = [];
+
+  /// Every call id the harness was evaluated with, in order.
+  final List<String> callIds = [];
+
   /// Indexes of constructions whose page never finishes loading.
   final Set<int> loadHangsAt = {};
   int goneOnRunCount = 1;
@@ -156,6 +162,7 @@ class FakeWebviewFactory {
     policies.add(shouldOverrideUrlLoading);
     final controller = MockWebviewController();
     final handlers = <String, Function>{};
+    handlerMaps.add(handlers);
     when(
       () => controller.addJavaScriptHandler(
         handlerName: any(named: 'handlerName'),
@@ -171,6 +178,7 @@ class FakeWebviewFactory {
       final source = invocation.namedArguments[#source] as String;
       final callId = RegExp(r'var callId = "([^"]+)"').firstMatch(source);
       final message = reply?.call();
+      if (callId != null) callIds.add(callId.group(1)!);
       if (callId != null && message != null) {
         void post() {
           handlers[message.handler]!([
@@ -348,7 +356,9 @@ void main() {
         throwsA(
           isA<SourceScriptException>()
               .having((e) => e.timedOut, 'timedOut', isTrue)
-              .having((e) => e.html, 'html', '<html></html>'),
+              // No snapshot of a page that never answered: it may still be
+              // spinning and would cost another full budget.
+              .having((e) => e.html, 'html', isNull),
         ),
       );
 
@@ -609,6 +619,88 @@ void main() {
         'images timed out loading the page after 0.05s',
       );
       verify(() => factory.created.single.dispose()).called(1);
+    });
+  });
+
+  group('script call bridge', () {
+    setUp(() {
+      when(() => cache.getFileFromCache(any())).thenAnswer((_) async => null);
+    });
+
+    test('call ids are unguessable (secure random, not a counter)', () async {
+      for (var i = 0; i < 2; i++) {
+        await expectLater(
+          manager.runOnBlank(
+            code: 'const source = {};',
+            function: 'searchUrl',
+            baseUrl: 'https://x',
+            timeout: const Duration(milliseconds: 30),
+          ),
+          throwsA(isA<SourceScriptException>()),
+        );
+      }
+
+      expect(factory.callIds, hasLength(2));
+      expect(factory.callIds.toSet(), hasLength(2));
+      for (final id in factory.callIds) {
+        expect(id, matches(RegExp(r'^call-[0-9a-f]{32}$')));
+      }
+    });
+
+    test('a webview cannot settle a call another webview owns', () async {
+      final blank = manager
+          .runOnBlank(
+            code: 'const source = {};',
+            function: 'searchUrl',
+            baseUrl: 'https://x',
+            timeout: const Duration(milliseconds: 300),
+          )
+          .then<Object?>((v) => v, onError: (Object e) => e);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      final page = manager
+          .runOnPage(
+            url: 'https://evil/p',
+            code: 'const source = {};',
+            function: 'search',
+            baseUrl: 'https://evil',
+            timeout: const Duration(milliseconds: 300),
+          )
+          .then<Object?>((v) => v, onError: (Object e) => e);
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      expect(factory.callIds, isNotEmpty);
+
+      // The page webview (index 1) forges a result for the blank call.
+      factory.handlerMaps[1]['sourceResult']!([
+        {'callId': factory.callIds.first, 'value': '"forged"'},
+      ]);
+
+      final blankResult = await blank;
+      expect(blankResult, isA<SourceScriptException>());
+      expect((blankResult as SourceScriptException).timedOut, isTrue);
+      await page;
+    });
+  });
+
+  group('runOnPage captureHtml after a timeout', () {
+    test('does not wait for a second budget to snapshot a spinning page',
+        () async {
+      when(() => cache.getFileFromCache(any())).thenAnswer((_) async => null);
+
+      final error = await manager
+          .runOnPage(
+            url: 'https://x/p',
+            code: 'const source = {};',
+            function: 'search',
+            baseUrl: 'https://x',
+            timeout: const Duration(milliseconds: 50),
+            captureHtml: true,
+          )
+          .then<Object?>((_) => null, onError: (Object e) => e);
+
+      expect(error, isA<SourceScriptException>());
+      expect((error as SourceScriptException).timedOut, isTrue);
+      expect(error.html, isNull);
+      verifyNever(() => factory.renderProcess[0].controller.getHtml());
     });
   });
 
