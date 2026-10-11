@@ -1,7 +1,8 @@
 // TestResultPanel: shows one source-editor Test outcome (issue #115, spec
 // §10) — the function, URL and elapsed time, then either the error (with its
-// script `line N`) or the validation result, and the result JSON in a
-// height-capped, scrollable monospace box.
+// script `line N`, and the failing function when it is not the tested one,
+// e.g. `Error in searchUrl at line 3`) or the validation result, and the
+// result JSON in a height-capped, scrollable monospace box.
 //
 // Usage: `TestResultPanel(run: state.lastRun!)` inside the editor screen.
 import 'package:flutter/material.dart';
@@ -23,6 +24,11 @@ class TestResultPanel extends StatelessWidget {
     final summary = run.summary;
     final json = run.json;
     final url = run.url;
+    final failed = run.failedFunction;
+    final where = [
+      if (failed != null) 'in $failed',
+      if (line != null) 'at line $line',
+    ].join(' ');
     return Card(
       margin: EdgeInsets.zero,
       child: Padding(
@@ -38,7 +44,7 @@ class TestResultPanel extends StatelessWidget {
             const SizedBox(height: 8),
             if (error != null) ...[
               Text(
-                line == null ? 'Error' : 'Error at line $line',
+                where.isEmpty ? 'Error' : 'Error $where',
                 style: TextStyle(color: colors.error),
               ),
               Text(error, style: TextStyle(color: colors.error)),

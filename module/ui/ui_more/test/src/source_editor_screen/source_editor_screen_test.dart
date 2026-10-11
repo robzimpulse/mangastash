@@ -8,6 +8,8 @@
 /// Run: `cd module/ui/ui_more && fvm flutter test test/src/source_editor_screen`.
 /// ScaffoldScreen shimmers forever, so interactions are followed by
 /// [pumpFrames] instead of pumpAndSettle (see CLAUDE.md).
+import 'dart:async';
+
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
@@ -25,11 +27,12 @@ class _MockSourceRegistry extends Mock implements SourceRegistry {}
 class _MockRunner extends Mock implements RunSourceScriptUseCase {}
 
 String _code({
+  String id = 'asura-scans',
   String name = 'Asura Scans',
   String body = 'const source = {};',
 }) {
   return '// ==MangaStashSource==\n'
-      '// {"id": "asura-scans", "name": "$name", '
+      '// {"id": "$id", "name": "$name", '
       '"baseUrl": "https://asurascans.com", "version": 1, "contract": 1, '
       '"hosts": ["asurascans.com"]}\n'
       '// ==/MangaStashSource==\n'
@@ -43,6 +46,13 @@ SourceEntry _entry(SourceStatus status, {String? code, String? shippedCode}) {
     shipped: SourceScript.parse(shippedCode ?? _code()),
   );
 }
+
+/// A search result with one valid card.
+const Map<String, Object> _oneCard = {
+  'items': [
+    {'title': 'Solo', 'webUrl': 'https://asurascans.com/comics/solo'},
+  ],
+};
 
 void main() {
   late _MockSourceRegistry registry;
@@ -96,8 +106,14 @@ void main() {
     await entries.close();
   });
 
-  /// Stubs runOnPage to return [value] with [html], or to throw [error].
-  void stubPage({Object? value, String? html, Object? error}) {
+  /// Stubs runOnPage to return [value] with [html], or to throw [error];
+  /// when [gate] is given the run waits for it to complete.
+  void stubPage({
+    Object? value,
+    String? html,
+    Object? error,
+    Completer<void>? gate,
+  }) {
     when(
       () => runner.runOnPage(
         url: any(named: 'url'),
@@ -111,6 +127,7 @@ void main() {
       ),
     ).thenAnswer((_) async {
       calls.add('runOnPage');
+      await gate?.future;
       if (error != null) throw error;
       return ScriptRunResult(
         value: value,
@@ -197,7 +214,9 @@ void main() {
 
     await tapText(tester, 'Paste answer');
 
-    expect(editorField(tester).controller!.text, pasted.trim());
+    final controller = editorField(tester).controller!;
+    expect(controller.text, pasted.trim());
+    expect(controller.selection, const TextSelection.collapsed(offset: 0));
     expect(find.text('Run Test before saving'), findsOneWidget);
   });
 
@@ -338,7 +357,7 @@ void main() {
   testWidgets('copy fix prompt without a run tests first, then copies', (
     tester,
   ) async {
-    stubPage(value: {'items': <Object>[]}, html: '<html>page</html>');
+    stubPage(value: _oneCard, html: '<html>page</html>');
     await pumpScreen(tester);
 
     await tapText(tester, 'Copy fix prompt');
@@ -362,6 +381,137 @@ void main() {
       'URL=https://asurascans.com/browse',
     );
     expect(find.text('Prompt copied — paste it into any chatbot'), findsOne);
+  });
+
+  testWidgets('a search with 0 items fails and feeds the prompt', (
+    tester,
+  ) async {
+    stubPage(value: {'items': <Object>[]}, html: '<html>empty</html>');
+    await pumpScreen(tester);
+
+    await tapText(tester, 'Test');
+    expect(
+      find.text('Validation failed: search returned 0 items'),
+      findsOneWidget,
+    );
+
+    await tapText(tester, 'Copy fix prompt');
+    expect(
+      copiedText,
+      'FN=search ERR=search returned 0 items '
+      'URL=https://asurascans.com/browse',
+    );
+  });
+
+  testWidgets('copy fix prompt re-runs Test after the code changed', (
+    tester,
+  ) async {
+    stubPage(value: _oneCard, html: '<html>page</html>');
+    await pumpScreen(tester);
+    await tapText(tester, 'Test');
+
+    final edited = _code(body: 'const source = { v: 2 };');
+    await tester.enterText(find.byKey(SourceEditorScreen.editorKey), edited);
+    await pumpFrames(tester);
+    calls.clear();
+    await tapText(tester, 'Copy fix prompt');
+
+    expect(calls, ['runOnBlank', 'runOnPage', 'setData']);
+    verify(
+      () => runner.runOnPage(
+        url: any(named: 'url'),
+        code: edited,
+        function: any(named: 'function'),
+        baseUrl: any(named: 'baseUrl'),
+        searchTerm: any(named: 'searchTerm'),
+        timeout: any(named: 'timeout'),
+        useCache: false,
+        captureHtml: true,
+      ),
+    ).called(1);
+  });
+
+  testWidgets('copy fix prompt re-runs Test after the input changed', (
+    tester,
+  ) async {
+    stubPage(value: _oneCard, html: '<html>page</html>');
+    await pumpScreen(tester);
+    await tapText(tester, 'Test');
+
+    await tester.enterText(find.byKey(SourceEditorScreen.inputKey), 'solo');
+    await pumpFrames(tester);
+    calls.clear();
+    await tapText(tester, 'Copy fix prompt');
+
+    expect(calls, ['runOnBlank', 'runOnPage', 'setData']);
+  });
+
+  testWidgets('copy fix prompt re-runs Test after the function changed', (
+    tester,
+  ) async {
+    stubPage(value: {'title': 'Solo'}, html: '<html>page</html>');
+    await pumpScreen(
+      tester,
+      function: 'manga',
+      url: 'https://asurascans.com/comics/a',
+    );
+    await tapText(tester, 'Test');
+
+    await tester.tap(find.byType(DropdownButton<String>));
+    await pumpFrames(tester);
+    await tapText(tester, 'chapters');
+    calls.clear();
+    await tapText(tester, 'Copy fix prompt');
+
+    expect(calls, ['runOnPage', 'setData']);
+    expect(copiedText, startsWith('FN=chapters '));
+  });
+
+  testWidgets('a failing URL builder is named and no page URL is sent', (
+    tester,
+  ) async {
+    when(
+      () => runner.runOnBlank(
+        code: any(named: 'code'),
+        function: any(named: 'function'),
+        baseUrl: any(named: 'baseUrl'),
+        args: any(named: 'args'),
+        timeout: any(named: 'timeout'),
+      ),
+    ).thenAnswer(
+      (_) async =>
+          throw const SourceScriptException(
+            function: 'searchUrl',
+            message: 'params is undefined',
+            line: 3,
+          ),
+    );
+    await pumpScreen(tester);
+    await tester.enterText(find.byKey(SourceEditorScreen.inputKey), 'solo');
+    await pumpFrames(tester);
+
+    await tapText(tester, 'Copy fix prompt');
+
+    expect(find.text('Error in searchUrl at line 3'), findsOneWidget);
+    expect(
+      copiedText,
+      'FN=searchUrl ERR=line 3: params is undefined URL=(no page loaded)',
+    );
+  });
+
+  testWidgets('test runs never evict the production cache', (tester) async {
+    // A list where an object is expected makes the adapter evict the URL.
+    stubPage(value: <Object>[1, 2]);
+    await pumpScreen(
+      tester,
+      function: 'manga',
+      url: 'https://asurascans.com/comics/a',
+    );
+
+    await tapText(tester, 'Test');
+
+    expect(find.textContaining('Invalid result'), findsOneWidget);
+    verifyNever(() => runner.evict(url: any(named: 'url')));
   });
 
   testWidgets('copy fix prompt reuses the last run and its error', (
@@ -412,6 +562,72 @@ void main() {
     verify(() => registry.save(renamed)).called(1);
     expect(find.textContaining('Name is locked'), findsOneWidget);
     expect(editorField(tester).controller!.text, renamed);
+  });
+
+  testWidgets('save rejects a changed id and keeps the text', (tester) async {
+    final forked = _code(id: 'asura-scans-fixed');
+    await pumpScreen(tester);
+
+    await tester.enterText(find.byKey(SourceEditorScreen.editorKey), forked);
+    await pumpFrames(tester);
+    await tester.tap(find.byTooltip('Save'));
+    await pumpFrames(tester);
+
+    expect(find.text('Id is locked: expected "asura-scans"'), findsOneWidget);
+    verifyNever(() => registry.save(any()));
+    expect(editorField(tester).controller!.text, forked);
+  });
+
+  testWidgets('a stale failing run does not ask before saving', (tester) async {
+    stubPage(
+      error: const SourceScriptException(function: 'manga', message: 'boom'),
+    );
+    final edited = _code(body: 'const source = { v: 2 };');
+    when(
+      () => registry.save(any()),
+    ).thenAnswer((_) async => _entry(SourceStatus.modified, code: edited));
+    await pumpScreen(
+      tester,
+      function: 'manga',
+      url: 'https://asurascans.com/comics/a',
+    );
+    await tapText(tester, 'Test');
+
+    await tester.enterText(find.byKey(SourceEditorScreen.editorKey), edited);
+    await pumpFrames(tester);
+    await tester.tap(find.byTooltip('Save'));
+    await pumpFrames(tester);
+
+    expect(find.text('Test is failing. Save anyway?'), findsNothing);
+    verify(() => registry.save(edited)).called(1);
+  });
+
+  testWidgets('save is disabled while a test runs', (tester) async {
+    final gate = Completer<void>();
+    stubPage(value: {'title': 'Solo'}, gate: gate);
+    await pumpScreen(
+      tester,
+      function: 'manga',
+      url: 'https://asurascans.com/comics/a',
+    );
+    await tester.enterText(
+      find.byKey(SourceEditorScreen.editorKey),
+      _code(body: 'const source = { v: 2 };'),
+    );
+    await pumpFrames(tester);
+
+    await tapText(tester, 'Test');
+    IconButton save() => tester.widget<IconButton>(
+      find.ancestor(
+        of: find.byIcon(Icons.save),
+        matching: find.byType(IconButton),
+      ),
+    );
+    expect(save().onPressed, isNull);
+
+    gate.complete();
+    await pumpFrames(tester);
+    expect(save().onPressed, isNotNull);
   });
 
   testWidgets('saving after a failing test asks for confirmation', (

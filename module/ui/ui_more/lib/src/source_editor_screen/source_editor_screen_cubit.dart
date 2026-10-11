@@ -7,12 +7,16 @@
 //     captureHtml: true)`, runs the selected function (search: a search term
 //     goes through `searchUrl` first; a URL input is loaded as-is), applies
 //     the same validators as the use cases and stores a [SourceTestRun].
-//   - [copyFixPrompt] builds the FixPromptBuilder prompt from the last run,
-//     running Test first when there is no page HTML yet, and copies it.
+//     A search with 0 items is flagged here as `search returned 0 items`
+//     (editor only; the domain validator lets it pass).
+//   - [copyFixPrompt] builds the FixPromptBuilder prompt from the current
+//     run, running Test first when the last run is stale (other code,
+//     function or input) or has no page HTML, and copies it.
 //   - [pasteAnswer] replaces the code with the script extracted from the
 //     clipboard (extractScriptFromReply).
 //   - [save] / [reset] go through SourceRegistry; errors land in
-//     `saveError` (banner) and `message` (snackbar).
+//     `saveError` (banner) and `message` (snackbar). [save] rejects a header
+//     id other than [id] (`Id is locked`) before touching the registry.
 //
 // Usage: `SourceEditorScreenCubit(id: id, function: fn, url: url,
 // registry: ..., runner: ..., promptBuilder: ...)`; see SourceEditorScreen.
@@ -44,6 +48,9 @@ class SourceEditorScreenCubit extends Cubit<SourceEditorScreenState>
 
   /// Error message passed to the fix prompt when the last run passed.
   static const String noErrorMessage = 'no error — improve or verify';
+
+  /// URL passed to the fix prompt when the run never loaded a page.
+  static const String noPageUrl = '(no page loaded)';
 
   final SourceRegistry _registry;
   final RunSourceScriptUseCase _runner;
@@ -143,18 +150,18 @@ class SourceEditorScreenCubit extends Cubit<SourceEditorScreenState>
     emit(state.copyWith(isRunning: false, lastRun: run));
   }
 
-  /// Copies the fix prompt for the last run (running Test first when there is
-  /// no page HTML yet) to the clipboard.
+  /// Copies the fix prompt for the current run (running Test first when the
+  /// last run is stale or has no page HTML) to the clipboard.
   Future<void> copyFixPrompt() async {
     if (state.isRunning) return;
-    if (state.lastRun?.html == null) await test();
+    if (state.currentRun?.html == null) await test();
     final run = state.lastRun;
     if (run == null) return;
     try {
       final prompt = await _promptBuilder.build(
-        code: state.code,
-        function: run.function,
-        url: run.url ?? state.input.trim(),
+        code: run.code,
+        function: run.failedFunction ?? run.function,
+        url: run.url ?? noPageUrl,
         errorMessage: run.problem ?? noErrorMessage,
         html: run.html ?? '',
       );
@@ -184,6 +191,11 @@ class SourceEditorScreenCubit extends Cubit<SourceEditorScreenState>
     final code = state.code;
     emit(state.copyWith(clearSaveError: true));
     try {
+      final id = SourceScript.parse(code).id;
+      if (id != state.id) {
+        emit(state.copyWith(saveError: 'Id is locked: expected "${state.id}"'));
+        return false;
+      }
       final entry = await _registry.save(code);
       emit(state.copyWith(entry: entry, savedCode: code, message: 'Saved'));
       return true;
@@ -222,6 +234,7 @@ class SourceEditorScreenCubit extends Cubit<SourceEditorScreenState>
     final watch = Stopwatch()..start();
     final runner = _CapturingRunner(_runner);
     String? url;
+    String? failedFunction;
     SourceTestRun result({
       String? error,
       int? line,
@@ -231,6 +244,9 @@ class SourceEditorScreenCubit extends Cubit<SourceEditorScreenState>
     }) {
       return SourceTestRun(
         function: function,
+        failedFunction: failedFunction,
+        code: code,
+        input: input,
         url: url,
         json: _json(runner.last),
         error: error,
@@ -265,6 +281,9 @@ class SourceEditorScreenCubit extends Cubit<SourceEditorScreenState>
             useCache: false,
           );
           final cards = page.items.requireCardFields(source: name, url: url);
+          if (cards.isEmpty) {
+            return result(validation: 'search returned 0 items');
+          }
           return result(summary: _count(cards.length, 'item'));
         case 'manga':
           url = input;
@@ -290,6 +309,7 @@ class SourceEditorScreenCubit extends Cubit<SourceEditorScreenState>
       return result(error: e.message);
     } on SourceScriptException catch (e) {
       url = e.url ?? url;
+      if (e.function != function) failedFunction = e.function;
       final message = e.timedOut ? 'Timed out: ${e.message}' : e.message;
       return result(error: message, line: e.line, html: e.html);
     } on FailedParsingHtmlException catch (e) {
@@ -332,7 +352,8 @@ class SourceEditorScreenCubit extends Cubit<SourceEditorScreenState>
 }
 
 /// Runner for Test: page runs never use the cache and always capture the
-/// page HTML; the last page result is kept for the JSON view and the prompt.
+/// page HTML, and [evict] does nothing; the last page result is kept for the
+/// JSON view and the prompt.
 class _CapturingRunner implements RunSourceScriptUseCase {
   final RunSourceScriptUseCase _inner;
 
@@ -382,6 +403,8 @@ class _CapturingRunner implements RunSourceScriptUseCase {
     );
   }
 
+  /// No-op: Test runs never read the cache, so they must not drop the
+  /// production cache entries of the same URL either.
   @override
-  Future<void> evict({required String url}) => _inner.evict(url: url);
+  Future<void> evict({required String url}) async {}
 }

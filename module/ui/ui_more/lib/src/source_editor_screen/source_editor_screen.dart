@@ -10,7 +10,11 @@
 //
 // The editor's TextEditingController lives in this State, so unsaved text
 // survives rebuilds; it only follows the cubit when the code is replaced from
-// outside (Paste answer, Reset).
+// outside (Paste answer, Reset), with the caret moved to the start.
+//
+// Save is disabled while a Test runs and cannot be re-entered while a save
+// (or its confirmation) is pending; only a current failing run (same code,
+// function and input) asks for confirmation — a stale run counts as untested.
 //
 // Usage: `SourceEditorScreen.create(locator: locator, id: id,
 // function: fn, url: url)`; `function`/`url` prefill Test (e.g. from a
@@ -63,6 +67,9 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
   late final TextEditingController _code;
   late final TextEditingController _input;
 
+  /// True while a save (or its confirmation dialog) is in progress.
+  bool _saving = false;
+
   SourceEditorScreenCubit get _cubit => context.read();
 
   @override
@@ -99,7 +106,10 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
           listener: (context, state) {
             // Only external replacements differ from the field's own text.
             if (_code.text == state.code) return;
-            _code.value = TextEditingValue(text: state.code);
+            _code.value = TextEditingValue(
+              text: state.code,
+              selection: const TextSelection.collapsed(offset: 0),
+            );
           },
         ),
       ],
@@ -114,7 +124,10 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
                   IconButton(
                     tooltip: 'Save',
                     icon: const Icon(Icons.save),
-                    onPressed: state.hasChanges ? () => _onSave(state) : null,
+                    onPressed:
+                        state.hasChanges && !state.isRunning && !_saving
+                            ? () => _onSave(state)
+                            : null,
                   ),
                 if (entry != null) ..._buildMenu(entry),
               ],
@@ -298,14 +311,20 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
   }
 
   Future<void> _onSave(SourceEditorScreenState state) async {
-    if (state.lastRun?.failed ?? false) {
-      final confirmed = await _confirm(
-        title: 'Test is failing. Save anyway?',
-        confirmText: 'Save',
-      );
-      if (!confirmed || !mounted) return;
+    if (_saving) return;
+    setState(() => _saving = true);
+    try {
+      if (state.currentRun?.failed ?? false) {
+        final confirmed = await _confirm(
+          title: 'Test is failing. Save anyway?',
+          confirmText: 'Save',
+        );
+        if (!confirmed || !mounted) return;
+      }
+      await _cubit.save();
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
-    await _cubit.save();
   }
 
   Future<void> _onReset(SourceEntry entry) async {

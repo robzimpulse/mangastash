@@ -5,15 +5,27 @@
 // [message], the persistent [hint] and the Save error [saveError].
 //
 // Usage: `state.copyWith(code: ...)`; nullable fields are cleared with the
-// matching `clearX: true` flag. [SourceTestRun.failed] tells whether Save
-// must ask for confirmation.
+// matching `clearX: true` flag. A run only describes the editor while it is
+// current ([SourceEditorScreenState.currentRun]: same code, function and
+// input); Save asks for confirmation only after a current failing run, and
+// Copy fix prompt re-runs Test when the last run is not current.
 import 'package:domain_manga/domain_manga.dart';
 import 'package:equatable/equatable.dart';
 
 /// Outcome of one Test run against the unsaved script.
 class SourceTestRun extends Equatable {
-  /// The script function that was tested.
+  /// The script function that was tested (the Test dropdown value).
   final String function;
+
+  /// The function that actually failed when it differs from the tested one,
+  /// e.g. `searchUrl` while testing `search`; null otherwise.
+  final String? failedFunction;
+
+  /// The editor code the run used.
+  final String code;
+
+  /// The trimmed Test input the run used.
+  final String input;
 
   /// The page URL the function ran on; null when the run stopped before.
   final String? url;
@@ -41,7 +53,10 @@ class SourceTestRun extends Equatable {
 
   const SourceTestRun({
     required this.function,
+    required this.code,
+    required this.input,
     required this.elapsed,
+    this.failedFunction,
     this.url,
     this.json,
     this.error,
@@ -64,6 +79,9 @@ class SourceTestRun extends Equatable {
   @override
   List<Object?> get props => [
     function,
+    failedFunction,
+    code,
+    input,
     url,
     json,
     error,
@@ -125,6 +143,18 @@ class SourceEditorScreenState extends Equatable {
 
   /// Whether [code] differs from [savedCode].
   bool get hasChanges => code != savedCode;
+
+  /// [lastRun] when it ran this exact code, function and input; null when
+  /// there is no run or the editor changed since (a stale run).
+  SourceTestRun? get currentRun {
+    final run = lastRun;
+    if (run == null) return null;
+    final current =
+        run.code == code &&
+        run.function == function &&
+        run.input == input.trim();
+    return current ? run : null;
+  }
 
   @override
   List<Object?> get props => [
