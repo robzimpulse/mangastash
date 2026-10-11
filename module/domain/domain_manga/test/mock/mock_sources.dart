@@ -9,10 +9,12 @@
 //   final runner = mockRunner();   // verify(() => runner.evict(url: url))
 //   final registry = mockRegistry([source]);  // fromName by source.name
 //   final sources = shippedSources();  // MangaDex + 4 named scraped doubles
+//   final real = scriptSource(name: 'X', body: 'v1', runner: runner);
 import 'package:collection/collection.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/src/manager/source_registry.dart';
 import 'package:domain_manga/src/sources/manga_dex_source_external.dart';
+import 'package:domain_manga/src/sources/script_source_external.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -68,4 +70,22 @@ List<SourceExternal> shippedSources() {
     ])
       mockScrapedSource(name: name),
   ];
+}
+
+/// A real ScriptSourceExternal named [name] whose script body is [body], run
+/// by [runner]. Two sources with different [body]s model a script before and
+/// after a user edit (different code, same name).
+ScriptSourceExternal scriptSource({
+  required String name,
+  required String body,
+  required RunSourceScriptUseCase runner,
+}) {
+  final id = name.toLowerCase().replaceAll(' ', '-');
+  final code =
+      '// ==MangaStashSource==\n'
+      '// {"id": "$id", "name": "$name", "baseUrl": "https://$id.example", '
+      '"version": 1, "contract": 1, "hosts": ["$id.example"]}\n'
+      '// ==/MangaStashSource==\n'
+      'const source = {}; // $body\n';
+  return ScriptSourceExternal(script: SourceScript.parse(code), runner: runner);
 }

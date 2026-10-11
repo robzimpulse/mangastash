@@ -13,6 +13,7 @@ import 'package:core_analytics/core_analytics.dart';
 import 'package:core_analytics/core_analytics.dart' as analytics;
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
+import 'package:domain_manga/src/sources/script_source_external.dart';
 import 'package:domain_manga/src/use_case/manga/search_manga_use_case.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
@@ -38,6 +39,23 @@ class MockLogBox extends Mock implements LogBox {}
 class MockFileInfo extends Mock implements FileInfo {}
 
 class MockCacheFile extends Mock implements File {}
+
+/// In-memory cache entry: only the file read the use case performs.
+class _StoredFile extends Fake implements File {
+  _StoredFile(this.text);
+
+  final String text;
+
+  @override
+  Future<String> readAsString({Encoding encoding = utf8}) async => text;
+}
+
+class _StoredInfo extends Fake implements FileInfo {
+  _StoredInfo(String text) : file = _StoredFile(text);
+
+  @override
+  final File file;
+}
 
 void main() {
   const browseUrl = 'https://asurascans.com/browse?q=&page=1';
@@ -300,6 +318,107 @@ void main() {
 
       expect(result, isA<Success<Pagination<Manga>>>());
       expect((result as Success<Pagination<Manga>>).data.data, isEmpty);
+    });
+  });
+
+  group('SearchMangaUseCase.execute script identity (issue #115)', () {
+    const parameter = SourceSearchMangaParameter(
+      source: 'Asura Scans',
+      parameter: SearchMangaParameter(page: 1),
+    );
+
+    late Map<String, String> store;
+    late List<String> ranCodes;
+    late ScriptSourceExternal current;
+
+    setUp(() {
+      store = {};
+      ranCodes = [];
+      when(() => cacheManager.getFileFromCache(any())).thenAnswer((i) async {
+        final text = store[i.positionalArguments.first as String];
+        return text == null ? null : _StoredInfo(text);
+      });
+      when(
+        () => cacheManager.putFile(
+          any(),
+          any(),
+          key: any(named: 'key'),
+          fileExtension: any(named: 'fileExtension'),
+          maxAge: any(named: 'maxAge'),
+        ),
+      ).thenAnswer((i) async {
+        store[i.namedArguments[#key] as String] = utf8.decode(
+          i.positionalArguments[1] as List<int>,
+        );
+        return MemoryFileSystem().file('stub');
+      });
+      when(
+        () => runner.runOnBlank(
+          code: any(named: 'code'),
+          function: any(named: 'function'),
+          baseUrl: any(named: 'baseUrl'),
+          args: any(named: 'args'),
+          timeout: any(named: 'timeout'),
+        ),
+      ).thenAnswer((_) async => browseUrl);
+      when(
+        () => runner.runOnPage(
+          url: any(named: 'url'),
+          code: any(named: 'code'),
+          function: any(named: 'function'),
+          baseUrl: any(named: 'baseUrl'),
+          searchTerm: any(named: 'searchTerm'),
+          timeout: any(named: 'timeout'),
+          useCache: any(named: 'useCache'),
+          captureHtml: any(named: 'captureHtml'),
+        ),
+      ).thenAnswer((i) async {
+        ranCodes.add(i.namedArguments[#code] as String);
+        return const ScriptRunResult(
+          value: {
+            'items': [
+              {'title': 'Solo', 'webUrl': 'https://asurascans.com/comics/solo'},
+            ],
+          },
+          elapsed: Duration.zero,
+        );
+      });
+      current = scriptSource(name: 'Asura Scans', body: 'v1', runner: runner);
+      when(() => registry.fromName('Asura Scans')).thenAnswer((_) => current);
+    });
+
+    test('the same script is served from the cache', () async {
+      await useCase.execute(parameter: parameter);
+      await useCase.execute(parameter: parameter);
+
+      expect(ranCodes, hasLength(1));
+    });
+
+    test('an edited script re-runs instead of serving the old cards', () async {
+      await useCase.execute(parameter: parameter);
+      // The user edits the script and saves: the registry now resolves the
+      // same source name to an adapter holding the new code.
+      current = scriptSource(name: 'Asura Scans', body: 'v2', runner: runner);
+
+      await useCase.execute(parameter: parameter);
+
+      expect(ranCodes, hasLength(2));
+      expect(ranCodes.first, isNot(ranCodes.last));
+      expect(store, hasLength(2));
+    });
+
+    test('clear removes the entries of every script version', () async {
+      await useCase.execute(parameter: parameter);
+      current = scriptSource(name: 'Asura Scans', body: 'v2', runner: runner);
+      await useCase.execute(parameter: parameter);
+      when(() => cacheManager.keys).thenAnswer((_) async => store.keys.toSet());
+      when(() => cacheManager.removeFile(any())).thenAnswer((_) async {});
+
+      await useCase.clear(parameter: parameter);
+
+      for (final key in store.keys) {
+        verify(() => cacheManager.removeFile(key)).called(1);
+      }
     });
   });
 }

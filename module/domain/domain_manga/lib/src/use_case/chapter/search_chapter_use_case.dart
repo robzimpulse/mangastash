@@ -1,5 +1,7 @@
 // SearchChapterUseCase: the chapter list of a manga, cached for 30 minutes
-// per SourceSearchChapterParameter and synced into ChapterDao. MangaDex pages
+// per SourceSearchChapterParameter and script version
+// (`SourceCacheVersion.cacheVersion`, so a saved script edit never serves the
+// old script's rows) and synced into ChapterDao. MangaDex pages
 // through ChapterRepository.feed; scripted sources (issue #115) resolve the
 // list page with `SourceExternal.chaptersUrl` and read every row in one
 // `chapters` call, validated by requireChapterFields (a failure evicts the
@@ -22,6 +24,7 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import '../../extension/data_scrapped_extension.dart';
 import '../../extension/map_network_error.dart';
 import '../../extension/scrapped_validation_extension.dart';
+import '../../extension/source_cache_version_extension.dart';
 import '../../manager/source_registry.dart';
 import '../../mixin/sort_chapters_mixin.dart';
 import '../../mixin/sync_chapters_mixin.dart';
@@ -158,7 +161,9 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
     final data = await _searchChapterCacheManager.keys;
     final List<Future<void>> promises = [];
     for (final value in data) {
-      final key = SourceSearchChapterParameter.fromJsonString(value);
+      final key = SourceSearchChapterParameter.fromJsonString(
+        stripCacheVersion(value),
+      );
       if (key == null) continue;
       if (key.source != parameter.source) continue;
       final paramIgnorePagination = parameter.parameter.copyWith(
@@ -207,7 +212,10 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
     required SourceSearchChapterParameter parameter,
     bool useCache = true,
   }) async {
-    final key = parameter.toJsonString();
+    // The script version is part of the key: after the user saves an edited
+    // script the old entry is never read again (issue #115, Review Focus 5).
+    final source = _registry.fromName(parameter.source);
+    final key = '${parameter.toJsonString()}${source?.cacheVersion ?? ''}';
 
     // A corrupt or partially-written cache file must be treated as a miss
     // (issue #122 sibling, review on #160): this read happens before the
@@ -235,7 +243,6 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
     if (cached != null && useCache) return Success(cached);
 
     try {
-      final source = _registry.fromName(parameter.source);
       if (source == null) {
         throw DataNotFoundException();
       }

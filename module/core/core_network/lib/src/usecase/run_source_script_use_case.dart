@@ -63,6 +63,13 @@ String sourceScriptCacheKey({
   return 'script|$url|$function|$digest';
 }
 
+/// Stable SHA-1 hex digest of a script's [code]: its identity for caches that
+/// outlive one run (a persisted result keyed with it stops matching as soon as
+/// the script is edited, see `SearchMangaUseCase` in domain_manga).
+String sourceScriptCodeHash(String code) {
+  return sha1.convert(utf8.encode(code)).toString();
+}
+
 abstract class RunSourceScriptUseCase {
   /// Loads [url] in a fresh headless webview (same UA, Cloudflare retry and
   /// diagnostics plumbing as page fetches), runs `source[function](document,

@@ -1,5 +1,7 @@
 // SearchMangaUseCase: one page of search/browse results for a source, cached
-// for 30 minutes per SourceSearchMangaParameter and synced into MangaDao.
+// for 30 minutes per SourceSearchMangaParameter and the script version
+// (`SourceCacheVersion.cacheVersion`, so a saved script edit never serves the
+// old script's cards) and synced into MangaDao.
 // MangaDex goes through MangaRepository; scripted sources resolve their search
 // URL and cards through SourceExternal (issue #115), validated by
 // requireCardFields — a failed validation evicts the runner's cached script
@@ -21,6 +23,7 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import '../../extension/data_scrapped_extension.dart';
 import '../../extension/map_network_error.dart';
 import '../../extension/scrapped_validation_extension.dart';
+import '../../extension/source_cache_version_extension.dart';
 import '../../manager/source_registry.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 
@@ -120,7 +123,9 @@ class SearchMangaUseCase with SyncMangasMixin {
     final List<Future<void>> promises = [];
 
     for (final value in data) {
-      final key = SourceSearchMangaParameter.fromJsonString(value);
+      final key = SourceSearchMangaParameter.fromJsonString(
+        stripCacheVersion(value),
+      );
       if (key == null) continue;
       if (key.source != parameter.source) continue;
       final paramIgnorePagination = parameter.parameter.copyWith(
@@ -162,7 +167,10 @@ class SearchMangaUseCase with SyncMangasMixin {
     required SourceSearchMangaParameter parameter,
     bool useCache = true,
   }) async {
-    final key = parameter.toJsonString();
+    // The script version is part of the key: after the user saves an edited
+    // script the old entry is never read again (issue #115, Review Focus 5).
+    final source = _registry.fromName(parameter.source);
+    final key = '${parameter.toJsonString()}${source?.cacheVersion ?? ''}';
 
     // A corrupt or partially-written cache file must be treated as a miss
     // (issue #122): this read happens before the fetch try below and used
@@ -193,7 +201,6 @@ class SearchMangaUseCase with SyncMangasMixin {
     if (cached != null && useCache) return Success(cached);
 
     try {
-      final source = _registry.fromName(parameter.source);
       if (source == null) {
         throw DataNotFoundException();
       }
