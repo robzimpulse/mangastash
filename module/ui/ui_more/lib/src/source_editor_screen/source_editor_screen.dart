@@ -9,8 +9,14 @@
 // shipped code) for update-available ones. An unknown id shows an error state.
 //
 // The editor's TextEditingController lives in this State, so unsaved text
-// survives rebuilds; it only follows the cubit when the code is replaced from
-// outside (Paste answer, Reset), with the caret moved to the start.
+// survives rebuilds. While typing the controller is the source of truth: every
+// controller change is pushed to the cubit, and the cubit's code is written
+// back only when it differs from the controller's CURRENT text, judged against
+// `cubit.state` (never the possibly stale state the listener was handed).
+// Writing a stale emission back used to ping-pong with the controller listener
+// forever on fast input (UI freeze). An external replacement (Paste answer,
+// Reset, View new version, entries refresh) moves the caret to the start, and
+// the push-back is suppressed while it is applied (`_syncing`).
 //
 // Save is disabled while a Test runs and cannot be re-entered while a save
 // (or its confirmation) is pending; only a current failing run (same code,
@@ -70,6 +76,10 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
   /// True while a save (or its confirmation dialog) is in progress.
   bool _saving = false;
 
+  /// True while the cubit's code is being written into the controller, so the
+  /// controller listener does not echo it back to the cubit.
+  bool _syncing = false;
+
   SourceEditorScreenCubit get _cubit => context.read();
 
   @override
@@ -78,7 +88,28 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
     final state = _cubit.state;
     _code = TextEditingController(text: state.code);
     _input = TextEditingController(text: state.input);
-    _code.addListener(() => _cubit.updateCode(_code.text));
+    _code.addListener(_onCodeChanged);
+  }
+
+  void _onCodeChanged() {
+    if (_syncing) return;
+    _cubit.updateCode(_code.text);
+  }
+
+  /// Writes the cubit's current code into the controller when an external
+  /// replacement made them differ; a no-op while the controller is ahead.
+  void _applyCubitCode() {
+    final code = _cubit.state.code;
+    if (_code.text == code) return;
+    _syncing = true;
+    try {
+      _code.value = TextEditingValue(
+        text: code,
+        selection: const TextSelection.collapsed(offset: 0),
+      );
+    } finally {
+      _syncing = false;
+    }
   }
 
   @override
@@ -103,14 +134,9 @@ class _SourceEditorScreenState extends State<SourceEditorScreen> {
         ),
         BlocListener<SourceEditorScreenCubit, SourceEditorScreenState>(
           listenWhen: (prev, curr) => prev.code != curr.code,
-          listener: (context, state) {
-            // Only external replacements differ from the field's own text.
-            if (_code.text == state.code) return;
-            _code.value = TextEditingValue(
-              text: state.code,
-              selection: const TextSelection.collapsed(offset: 0),
-            );
-          },
+          // The handed state may be older than the controller; the latest
+          // cubit code is what counts (see the file header).
+          listener: (context, state) => _applyCubitCode(),
         ),
       ],
       child: BlocBuilder<SourceEditorScreenCubit, SourceEditorScreenState>(

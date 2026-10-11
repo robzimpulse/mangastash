@@ -220,6 +220,67 @@ void main() {
     expect(find.text('Run Test before saving'), findsOneWidget);
   });
 
+  testWidgets('rapid typing is not overwritten by older emitted code', (
+    tester,
+  ) async {
+    await pumpScreen(tester);
+    final controller = editorField(tester).controller!;
+    final base = controller.text;
+
+    // Several edits in a row without letting the cubit's stream deliver the
+    // earlier emissions (what a fast IME burst does): the listener sees stale
+    // states and must not write them back (that ping-pong froze the UI).
+    for (final tail in ['a', 'ab', 'abc', 'abcd']) {
+      controller.value = TextEditingValue(
+        text: '$base$tail',
+        selection: TextSelection.collapsed(offset: base.length + tail.length),
+      );
+    }
+    await pumpFrames(tester);
+
+    expect(controller.text, '${base}abcd');
+    expect(cubit!.state.code, '${base}abcd');
+    expect(
+      controller.selection,
+      TextSelection.collapsed(offset: base.length + 4),
+    );
+  });
+
+  testWidgets('entering text several times in a row keeps the last text', (
+    tester,
+  ) async {
+    await pumpScreen(tester);
+    final controller = editorField(tester).controller!;
+    final base = controller.text;
+    final field = find.byKey(SourceEditorScreen.editorKey);
+
+    await tester.enterText(field, '${base}x');
+    await tester.enterText(field, '${base}xy');
+    await tester.enterText(field, '${base}xyz');
+    await pumpFrames(tester);
+
+    expect(controller.text, '${base}xyz');
+    expect(cubit!.state.code, '${base}xyz');
+  });
+
+  testWidgets('paste after typing still replaces the text', (tester) async {
+    final pasted = _code(body: 'const source = { fixed: true };');
+    clipboardText = '```js\n$pasted```';
+    await pumpScreen(tester);
+    final controller = editorField(tester).controller!;
+    controller.text = '${controller.text}typed';
+    await pumpFrames(tester);
+
+    await tapText(tester, 'Paste answer');
+
+    expect(controller.text, pasted.trim());
+    expect(controller.selection.isValid, isTrue);
+    expect(
+      controller.selection.baseOffset,
+      inInclusiveRange(0, controller.text.length),
+    );
+  });
+
   testWidgets('paste answer without a script shows a snackbar', (tester) async {
     clipboardText = 'I could not fix it, sorry.';
     await pumpScreen(tester);
