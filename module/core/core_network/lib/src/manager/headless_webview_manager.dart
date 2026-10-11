@@ -401,17 +401,31 @@ class HeadlessWebviewManager
         attempt: () async {
           await _disposeBounded(webview);
           webview = null;
-          final loaded = await _loadPage(
-            uri: uri,
-            delegate: delegate,
-            handlers: _scriptHandlers(),
-            timeout: effectiveTimeout,
-          );
-          webview = loaded;
-          final title = await loaded.webViewController?.getTitle().timeout(
-            effectiveTimeout,
-          );
-          return ('', title);
+          try {
+            final loaded = await _loadPage(
+              uri: uri,
+              delegate: delegate,
+              handlers: _scriptHandlers(),
+              timeout: effectiveTimeout,
+            );
+            webview = loaded;
+            final title = await loaded.webViewController?.getTitle().timeout(
+              effectiveTimeout,
+            );
+            return ('', title);
+          } on TimeoutException {
+            // A slow or wedged page load is a script-run failure like any
+            // other: typed, with the function and URL, so the error UI and
+            // the Fix source / recrawl logic have context.
+            throw SourceScriptException(
+              function: function,
+              message:
+                  '$function timed out loading the page after '
+                  '${_seconds(effectiveTimeout)}s',
+              url: url,
+              timedOut: true,
+            );
+          }
         },
       );
 

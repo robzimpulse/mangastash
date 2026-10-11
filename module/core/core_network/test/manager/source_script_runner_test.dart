@@ -521,6 +521,38 @@ void main() {
     });
   });
 
+  group('runOnPage page-load timeout (Android, issue #115)', () {
+    // A slow first load used to surface as a raw TimeoutException without the
+    // function or URL, so the Fix source / recrawl logic and the error UI had
+    // nothing to work with.
+    test('a page that never finishes loading is a timed-out '
+        'SourceScriptException naming function and url', () async {
+      when(() => cache.getFileFromCache(any())).thenAnswer((_) async => null);
+      factory.loadHangs = true;
+
+      final error = await manager
+          .runOnPage(
+            url: 'https://x/chapter',
+            code: 'const source = {};',
+            function: 'images',
+            baseUrl: 'https://x',
+            timeout: const Duration(milliseconds: 50),
+          )
+          .then<Object?>((_) => null, onError: (Object e) => e);
+
+      expect(error, isA<SourceScriptException>());
+      final exception = error as SourceScriptException;
+      expect(exception.timedOut, isTrue);
+      expect(exception.function, 'images');
+      expect(exception.url, 'https://x/chapter');
+      expect(
+        exception.message,
+        'images timed out loading the page after 0.05s',
+      );
+      verify(() => factory.created.single.dispose()).called(1);
+    });
+  });
+
   group('evict', () {
     test('removes only the keys for the given url', () async {
       when(() => cache.keys).thenAnswer(
