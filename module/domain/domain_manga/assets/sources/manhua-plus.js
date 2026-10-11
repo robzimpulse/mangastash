@@ -3,7 +3,7 @@
 //   "id": "manhua-plus",
 //   "name": "Manhua Plus",
 //   "baseUrl": "https://manhuaplus.com",
-//   "iconUrl": "https://manhuaplus.com/favicon.ico",
+//   "iconUrl": "https://manhuaplus.com/wp-content/uploads/2020/07/cropped-manhua-vuong-den-1-192x192.jpg",
 //   "version": 1,
 //   "contract": 1,
 //   "hosts": ["manhuaplus.com", "cdn.mhpcdn.com"],

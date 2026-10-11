@@ -29,7 +29,12 @@ describe('identity', () => {
     assert.equal(meta.id, 'manhua-plus');
     assert.equal(meta.name, 'Manhua Plus');
     assert.equal(meta.baseUrl, 'https://manhuaplus.com');
-    assert.equal(meta.iconUrl, 'https://manhuaplus.com/favicon.ico');
+    // /favicon.ico answers a 404 HTML page (repeated Crashlytics non-fatals);
+    // this is the site's own <link rel="icon"> (live 2026-10: 200 image/jpeg).
+    assert.equal(
+      meta.iconUrl,
+      'https://manhuaplus.com/wp-content/uploads/2020/07/cropped-manhua-vuong-den-1-192x192.jpg',
+    );
     assert.equal(meta.version, 1);
     assert.equal(meta.contract, 1);
     assert.deepEqual(meta.hosts, ['manhuaplus.com', 'cdn.mhpcdn.com']);
