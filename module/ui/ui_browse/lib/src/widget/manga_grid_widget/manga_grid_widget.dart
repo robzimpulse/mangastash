@@ -1,3 +1,10 @@
+// MangaGridWidget: one source's manga grid inside the search screen, driven by
+// MangaGridWidgetCubit. A scripted-source parse failure also offers "Fix
+// source" (issue #115), reported through `onTapFixSource`.
+//
+// Usage: `MangaGridWidget.create(locator: locator, parent: cubit,
+// source: source, onTapManga: ..., onTapMangaMenu: ...,
+// onTapFixSource: ...)`.
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -18,6 +25,7 @@ class MangaGridWidget extends StatefulWidget {
     SourceExternal? source,
     void Function(Manga, SearchMangaParameter)? onTapManga,
     Future<MangaMenu?> Function(bool)? onTapMangaMenu,
+    ValueSetter<FixSourceTarget>? onTapFixSource,
   }) {
     return BlocProvider(
       create: (context) {
@@ -40,6 +48,7 @@ class MangaGridWidget extends StatefulWidget {
         imagesCacheManager: locator(),
         onTapManga: onTapManga,
         onTapMangaMenu: onTapMangaMenu,
+        onTapFixSource: onTapFixSource,
       ),
     );
   }
@@ -50,11 +59,14 @@ class MangaGridWidget extends StatefulWidget {
 
   final Future<MangaMenu?> Function(bool)? onTapMangaMenu;
 
+  final ValueSetter<FixSourceTarget>? onTapFixSource;
+
   const MangaGridWidget._({
     super.key,
     required this.imagesCacheManager,
     this.onTapManga,
     this.onTapMangaMenu,
+    this.onTapFixSource,
   });
 
   @override
@@ -133,6 +145,7 @@ class _MangaGridWidgetState extends State<MangaGridWidget> {
           onTapRecrawl: (url) {
             _cubit(context)?.recrawl(context: context, url: url);
           },
+          onTapFixSource: widget.onTapFixSource,
           error: state.error,
           isLoading: state.isLoading,
           hasNext: state.hasNextPage,

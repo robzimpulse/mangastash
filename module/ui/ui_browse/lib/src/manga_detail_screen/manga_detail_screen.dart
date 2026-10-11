@@ -1,3 +1,9 @@
+// MangaDetailScreen: manga header, chapter list and similar manga. A
+// scripted-source parse failure in the chapter list or the similar-manga grid
+// also offers "Fix source" (issue #115), reported through `onTapFixSource`.
+//
+// Usage: `MangaDetailScreen.create(locator: locator, source: name,
+// mangaId: id, onTapChapter: ..., onTapFixSource: ...)`.
 import 'dart:ui';
 
 import 'package:core_analytics/core_analytics.dart';
@@ -22,11 +28,14 @@ class MangaDetailScreen extends StatefulWidget {
     this.onMangaMenu,
     this.onTapSort,
     this.onTapTag,
+    this.onTapFixSource,
     required this.imagesCacheManager,
     required this.logBox,
   });
 
   final ValueSetter<Tag>? onTapTag;
+
+  final ValueSetter<FixSourceTarget>? onTapFixSource;
 
   final ValueSetter<Chapter>? onTapChapter;
 
@@ -45,6 +54,7 @@ class MangaDetailScreen extends StatefulWidget {
     String? source,
     String? mangaId,
     ValueSetter<Tag>? onTapTag,
+    ValueSetter<FixSourceTarget>? onTapFixSource,
     ValueSetter<Chapter>? onTapChapter,
     ValueSetter<Manga>? onTapManga,
     Future<MangaMenu?>? Function(Manga, bool)? onMangaMenu,
@@ -83,6 +93,7 @@ class MangaDetailScreen extends StatefulWidget {
         onMangaMenu: onMangaMenu,
         onTapSort: onTapSort,
         onTapTag: onTapTag,
+        onTapFixSource: onTapFixSource,
         logBox: locator(),
       ),
     );
@@ -591,6 +602,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 await _cubit(context)?.initChapter(refresh: true);
               },
               onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
+              onTapFixSource: widget.onTapFixSource,
               onTapDownload: (option) {
                 _onTapDownload(context: context, option: option);
               },
@@ -666,6 +678,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               },
               onLoadNextPage: () => _cubit(context)?.nextSimilarManga(),
               onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
+              onTapFixSource: widget.onTapFixSource,
               error: state.errorSimilarManga,
               isLoading: state.isLoadingSimilarManga || state.isLoadingManga,
               hasNext: state.hasNextPageSimilarManga,

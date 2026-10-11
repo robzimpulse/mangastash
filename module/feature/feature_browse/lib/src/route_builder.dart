@@ -1,3 +1,8 @@
+// BrowseRouteBuilder: GoRoutes of the Browse tab (source list, browse, manga
+// detail, reader, search) and their sheets. Aggregated in lib/main_route.dart.
+// Each screen's `onTapFixSource` ("Fix source" on a scripted-source failure,
+// issue #115) is answered by [_openSourceEditor], which resolves the source
+// to its script id and pushes the editor route owned by feature_more.
 import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
 import 'package:domain_manga/domain_manga.dart';
@@ -7,9 +12,17 @@ import 'package:service_locator/service_locator.dart';
 import 'package:ui_browse/ui_browse.dart';
 
 import 'chapter_config_query.dart';
+import 'fix_source_location.dart';
 import 'route_path.dart';
 
 class BrowseRouteBuilder extends BaseRouteBuilder {
+  /// Opens the source editor for [target]; does nothing when the source has
+  /// no editable script (see [fixSourceLocation]).
+  void _openSourceEditor(BuildContext context, FixSourceTarget target) {
+    final location = fixSourceLocation(target);
+    if (location != null) context.push(location);
+  }
+
   @override
   GoRoute root({
     required ServiceLocator locator,
@@ -82,6 +95,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
                 extra: SearchParameterExtra(tags: tags, parameter: param),
               );
             },
+            onTapFixSource: (target) => _openSourceEditor(context, target),
           );
         },
       ),
@@ -151,6 +165,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
                 },
               );
             },
+            onTapFixSource: (target) => _openSourceEditor(context, target),
           );
         },
       ),
@@ -180,6 +195,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
               );
             },
             onTapImageMenu: () => context.push(CommonRoutePath.imageMenu),
+            onTapFixSource: (target) => _openSourceEditor(context, target),
           );
         },
       ),
@@ -255,6 +271,7 @@ class BrowseRouteBuilder extends BaseRouteBuilder {
                 },
               );
             },
+            onTapFixSource: (target) => _openSourceEditor(context, target),
           );
         },
       ),

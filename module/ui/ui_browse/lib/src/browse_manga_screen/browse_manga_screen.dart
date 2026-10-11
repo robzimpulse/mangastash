@@ -3,8 +3,12 @@
 // "open in browser" action that re-crawls the source's search page
 // (resolved through the source's searchUrl script, issue #115).
 //
+// A scripted-source parse failure also offers "Fix source" (issue #115),
+// reported through `onTapFixSource`.
+//
 // Usage: `BrowseMangaScreen.create(locator: locator, source: name,
-// onTapManga: ..., onTapFilter: ..., onTapMangaMenu: ...)`.
+// onTapManga: ..., onTapFilter: ..., onTapMangaMenu: ...,
+// onTapFixSource: ...)`.
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
@@ -24,6 +28,7 @@ class BrowseMangaScreen extends StatefulWidget {
     this.onTapManga,
     this.onTapFilter,
     this.onTapMangaMenu,
+    this.onTapFixSource,
   });
 
   final Function(Manga, SearchMangaParameter)? onTapManga;
@@ -36,6 +41,8 @@ class BrowseMangaScreen extends StatefulWidget {
 
   final Future<MangaMenu?> Function(bool)? onTapMangaMenu;
 
+  final ValueSetter<FixSourceTarget>? onTapFixSource;
+
   final ImagesCacheManager imagesCacheManager;
 
   static Widget create({
@@ -47,6 +54,7 @@ class BrowseMangaScreen extends StatefulWidget {
     )?
     onTapFilter,
     Future<MangaMenu?> Function(bool)? onTapMangaMenu,
+    ValueSetter<FixSourceTarget>? onTapFixSource,
     String? source,
     String? tagId,
   }) {
@@ -76,6 +84,7 @@ class BrowseMangaScreen extends StatefulWidget {
         onTapManga: onTapManga,
         onTapFilter: onTapFilter,
         onTapMangaMenu: onTapMangaMenu,
+        onTapFixSource: onTapFixSource,
       ),
     );
   }
@@ -436,6 +445,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
           onLoadNextPage: () async => await _cubit(context)?.next(),
           onRefresh: () async => await _cubit(context)?.init(refresh: true),
           onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
+          onTapFixSource: widget.onTapFixSource,
           error: state.error,
           isLoading: state.isLoading,
           hasNext: state.hasNextPage,
