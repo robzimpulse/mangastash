@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { describe, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { loadSource, recordWaitFor, runBlank, runPage } from './lib/load_source.mjs';
+import { headerTimeoutMs, loadSource, recordWaitFor, runBlank, runPage } from './lib/load_source.mjs';
 
 const SCRIPT = 'asura-scans.js';
 const fixture = (name) =>
@@ -228,17 +228,22 @@ describe('searchUrl', () => {
 describe('readiness budgets', () => {
   // Master waited for the readiness selector within the hook timeout; the 10 s
   // ctx default would fail slow chapter/genre pages earlier than before.
-  test('images waits up to the header timeouts.images', async () => {
+  // The wait must end BEFORE the runner's own timeout (header timeout), or a
+  // stale selector yields the generic runner timeout with no page HTML instead
+  // of the clean `waitFor timed out: <selector>` error.
+  test('images waits 3000 ms less than the header timeouts.images', async () => {
     const { meta } = loadSource(SCRIPT);
     const calls = await recordWaitFor(SCRIPT, 'images');
-    assert.deepEqual(calls, [['div.select-none img[data-page-index]', meta.timeouts.images]]);
+    assert.deepEqual(calls, [['div.select-none img[data-page-index]', 27000]]);
+    assert.ok(calls[0][1] < headerTimeoutMs(meta, 'images'));
     assert.equal(meta.timeouts.images, 30000);
   });
 
-  test('tags waits up to the header timeouts.tags', async () => {
+  test('tags waits 3000 ms less than the header timeouts.tags', async () => {
     const { meta } = loadSource(SCRIPT);
     const calls = await recordWaitFor(SCRIPT, 'tags');
-    assert.deepEqual(calls, [['astro-island[props*="availableGenres"]', meta.timeouts.tags]]);
+    assert.deepEqual(calls, [['astro-island[props*="availableGenres"]', 17000]]);
+    assert.ok(calls[0][1] < headerTimeoutMs(meta, 'tags'));
     assert.equal(meta.timeouts.tags, 20000);
   });
 });

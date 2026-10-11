@@ -164,9 +164,12 @@ const source = {
   // Lazy `src` values are populated by scrolling each image into view.
   async images(doc, ctx) {
     const query = 'div.select-none img[data-page-index]';
-    // 30000 = header timeouts.images: master waited for the readiness
-    // selector within the hook timeout, not the 10 s ctx default.
-    await ctx.waitFor(query, 30000);
+    // Header timeouts.images is 30000 (master waited within the hook timeout,
+    // not the 10 s ctx default).
+    // Stay 3000 ms below the header timeout so a stale selector fails with the
+    // clean `waitFor timed out: <selector>` error + page HTML instead of the
+    // runner's generic timeout (which captures no HTML).
+    await ctx.waitFor(query, 27000);
     for (const img of doc.querySelectorAll(query)) {
       img.scrollIntoView?.(); // linkedom (tests) has no scrollIntoView
       await ctx.sleep(60);
@@ -189,8 +192,11 @@ const source = {
   // JSON.parse walks it: no dropdown click, no client-rendered DOM. A
   // truncated or reshaped payload degrades to "no tags", never a throw.
   async tags(doc, ctx) {
-    // 20000 = header timeouts.tags (not the 10 s ctx default).
-    await ctx.waitFor('astro-island[props*="availableGenres"]', 20000);
+    // Header timeouts.tags is 20000 (not the 10 s ctx default).
+    // Stay 3000 ms below the header timeout so a stale selector fails with the
+    // clean `waitFor timed out: <selector>` error + page HTML instead of the
+    // runner's generic timeout (which captures no HTML).
+    await ctx.waitFor('astro-island[props*="availableGenres"]', 17000);
     let props = null;
     for (const island of doc.querySelectorAll('astro-island')) {
       const value = island.getAttribute('props');

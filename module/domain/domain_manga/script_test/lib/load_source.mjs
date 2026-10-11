@@ -132,6 +132,11 @@ export async function runPage(path, fn, html, { searchTerm, waitTimeoutMs } = {}
   return bridge(await callFunction(source, fn, [doc, ctx]));
 }
 
+/** The runner's timeout for [fn]: the header override, else the 15000 ms default. */
+export function headerTimeoutMs(meta, fn) {
+  return meta.timeouts?.[fn] ?? 15000;
+}
+
 /**
  * Runs a page function with a ctx whose `waitFor` records its arguments and
  * resolves immediately, and returns the recorded `[selector, timeoutMs]`

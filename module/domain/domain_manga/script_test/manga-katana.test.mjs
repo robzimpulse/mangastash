@@ -14,7 +14,7 @@ import { readFileSync } from 'node:fs';
 import { describe, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { loadSource, runBlank, runPage } from './lib/load_source.mjs';
+import { headerTimeoutMs, loadSource, recordWaitFor, runBlank, runPage } from './lib/load_source.mjs';
 
 const SCRIPT = 'manga-katana.js';
 const fixture = (name) =>
@@ -278,5 +278,18 @@ describe('tags', () => {
 
   test('tagsUrl is null: genres come from the page searchUrl already opens', async () => {
     assert.equal(await runBlank(SCRIPT, 'tagsUrl'), null);
+  });
+});
+
+describe('readiness budgets', () => {
+  // The wait must end BEFORE the runner's own timeout (header timeout), or a
+  // stale selector yields the generic runner timeout with no page HTML instead
+  // of the clean `waitFor timed out: <selector>` error.
+  test('images waits 3000 ms less than the header timeouts.images', async () => {
+    const { meta } = loadSource(SCRIPT);
+    const calls = await recordWaitFor(SCRIPT, 'images');
+    assert.deepEqual(calls, [['#imgs .wrap_img img', 27000]]);
+    assert.ok(calls[0][1] < headerTimeoutMs(meta, 'images'));
+    assert.equal(meta.timeouts.images, 30000);
   });
 });

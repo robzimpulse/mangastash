@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 import { parseHTML } from 'linkedom';
 
-import { loadSource, recordWaitFor, runBlank, runPage } from './lib/load_source.mjs';
+import { headerTimeoutMs, loadSource, recordWaitFor, runBlank, runPage } from './lib/load_source.mjs';
 
 const SCRIPT = 'weeb-central.js';
 const fixture = (name) =>
@@ -412,15 +412,21 @@ describe('tags', () => {
 describe('readiness budgets', () => {
   // Master waited for the readiness selector within the hook timeout; the 10 s
   // ctx default would fail slow chapter/genre pages earlier than before.
-  test('images waits up to the header timeouts.images', async () => {
+  // The wait must end BEFORE the runner's own timeout (header timeout), or a
+  // stale selector yields the generic runner timeout with no page HTML instead
+  // of the clean `waitFor timed out: <selector>` error.
+  test('images waits 3000 ms less than the header timeouts.images', async () => {
     const { meta } = loadSource(SCRIPT);
     const calls = await recordWaitFor(SCRIPT, 'images');
-    assert.deepEqual(calls, [['section#chapter-images img', meta.timeouts.images]]);
+    assert.deepEqual(calls, [['section#chapter-images img', 27000]]);
+    assert.ok(calls[0][1] < headerTimeoutMs(meta, 'images'));
     assert.equal(meta.timeouts.images, 30000);
   });
 
-  test('tags waits the default 15 s hook budget (no header override)', async () => {
+  test('tags waits 3000 ms less than the default 15 s budget (no header override)', async () => {
+    const { meta } = loadSource(SCRIPT);
     const calls = await recordWaitFor(SCRIPT, 'tags');
-    assert.deepEqual(calls, [['input[type="checkbox"][id^="tag-"]', 15000]]);
+    assert.deepEqual(calls, [['input[type="checkbox"][id^="tag-"]', 12000]]);
+    assert.ok(calls[0][1] < headerTimeoutMs(meta, 'tags'));
   });
 });

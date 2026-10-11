@@ -127,7 +127,11 @@ const source = {
   // placeholder, then drop any that remain "#".
   async images(doc, ctx) {
     const query = '#imgs .wrap_img img';
-    await ctx.waitFor(query, 30000);
+    // Header timeouts.images is 30000.
+    // Stay 3000 ms below the header timeout so a stale selector fails with the
+    // clean `waitFor timed out: <selector>` error + page HTML instead of the
+    // runner's generic timeout (which captures no HTML).
+    await ctx.waitFor(query, 27000);
     if (typeof thzq !== 'undefined') {
       doc.querySelectorAll(query).forEach((img, i) => {
         if (thzq[i]) img.setAttribute('data-src', thzq[i]);

@@ -266,8 +266,11 @@ const source = {
         );
       }
     }
-    // 30000 = header timeouts.images (not the 10 s ctx default).
-    await ctx.waitFor('section#chapter-images img', 30000);
+    // Header timeouts.images is 30000 (not the 10 s ctx default).
+    // Stay 3000 ms below the header timeout so a stale selector fails with the
+    // clean `waitFor timed out: <selector>` error + page HTML instead of the
+    // runner's generic timeout (which captures no HTML).
+    await ctx.waitFor('section#chapter-images img', 27000);
     return [...doc.querySelectorAll('section#chapter-images img')]
       .map((img) => img.getAttribute('src'))
       .filter((src) => src !== null)
@@ -287,8 +290,11 @@ const source = {
     for (const panel of doc.querySelectorAll('section[x-show="show_filter"]')) {
       panel.style.display = 'block';
     }
-    // 15000 = the default hook budget master gave tags (no header override).
-    await ctx.waitFor('input[type="checkbox"][id^="tag-"]', 15000);
+    // No header override: tags gets the default 15000 budget, as on master.
+    // Stay 3000 ms below the header timeout so a stale selector fails with the
+    // clean `waitFor timed out: <selector>` error + page HTML instead of the
+    // runner's generic timeout (which captures no HTML).
+    await ctx.waitFor('input[type="checkbox"][id^="tag-"]', 12000);
 
     const names = new Set();
     for (const input of doc.querySelectorAll('input[type="checkbox"][id^="tag-"]')) {
