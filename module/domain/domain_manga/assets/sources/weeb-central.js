@@ -4,7 +4,7 @@
 //   "name": "Weeb Central",
 //   "baseUrl": "https://weebcentral.com",
 //   "iconUrl": "https://weebcentral.com/favicon.ico",
-//   "version": 1,
+//   "version": 2,
 //   "contract": 1,
 //   "hosts": ["weebcentral.com", "temp.compsci88.com"],
 //   "timeouts": { "images": 30000 }
@@ -209,9 +209,13 @@ const source = {
 
   // The series page's #chapter-list only carries ~9 latest chapters; the
   // complete list is served by the endpoint the "Show All Chapters" htmx button
-  // targets (#161). Stored webUrls may carry a trailing slash.
+  // targets (#161). Stored webUrls may carry a trailing slash, and the ones
+  // taken from search/browse cards carry the slug segment
+  // (/series/<id>/Berserk): the endpoint only exists at /series/<id>/
+  // full-chapter-list - with the slug it redirects to /404 (live 2026-10).
   chaptersUrl(webUrl, ctx) {
-    const base = webUrl.endsWith('/') ? webUrl.slice(0, -1) : webUrl;
+    const series = webUrl.match(/^(.*?\/series\/[^/?#]+)/);
+    const base = series ? series[1] : webUrl.replace(/\/$/, '');
     return base + '/full-chapter-list';
   },
 

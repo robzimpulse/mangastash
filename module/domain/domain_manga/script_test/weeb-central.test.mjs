@@ -32,7 +32,9 @@ describe('identity', () => {
     assert.equal(meta.name, 'Weeb Central');
     assert.equal(meta.baseUrl, 'https://weebcentral.com');
     assert.equal(meta.iconUrl, 'https://weebcentral.com/favicon.ico');
-    assert.equal(meta.version, 1);
+    // 2: chaptersUrl drops the slug segment (A2 of the Android verification of
+    // #115); the version drives the registry's 'update available'.
+    assert.equal(meta.version, 2);
     assert.equal(meta.contract, 1);
     assert.deepEqual(meta.hosts, ['weebcentral.com', 'temp.compsci88.com']);
     assert.deepEqual(meta.timeouts, { images: 30000 });
@@ -222,6 +224,25 @@ describe('chapters', () => {
       await runBlank(SCRIPT, 'chaptersUrl', seriesUrl),
       `${seriesUrl}/full-chapter-list`,
     );
+  });
+
+  // Site change (live 2026-10, Android verification of #115): cards from
+  // search/browse store webUrls WITH the slug segment, and weebcentral.com now
+  // answers /series/<id>/<slug>/full-chapter-list with a 307 to /404; only
+  // /series/<id>/full-chapter-list returns the rows. This deliberately differs
+  // from the former Dart url() (webUrl + '/full-chapter-list'), which the
+  // pinned value above equalled for slug-less webUrls only.
+  test('chaptersUrl drops the slug segment of a stored webUrl', async () => {
+    const id = '01J76XY7EF75DJNQCV04HTPDZK';
+    const expected = `https://weebcentral.com/series/${id}/full-chapter-list`;
+    for (const webUrl of [
+      `https://weebcentral.com/series/${id}/Berserk`,
+      `https://weebcentral.com/series/${id}/Berserk/`,
+      `https://weebcentral.com/series/${id}/`,
+      `https://weebcentral.com/series/${id}`,
+    ]) {
+      assert.equal(await runBlank(SCRIPT, 'chaptersUrl', webUrl), expected, webUrl);
+    }
   });
 
   test('chaptersUrl tolerates a trailing slash on the stored webUrl (review on #167)', async () => {
