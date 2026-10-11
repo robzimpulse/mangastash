@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { describe, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { loadSource, runBlank, runPage } from './lib/load_source.mjs';
+import { loadSource, recordWaitFor, runBlank, runPage } from './lib/load_source.mjs';
 
 const SCRIPT = 'asura-scans.js';
 const fixture = (name) =>
@@ -222,5 +222,23 @@ describe('searchUrl', () => {
       }),
       'https://asurascans.com/browse?q=&page=3&status=ongoing,completed',
     );
+  });
+});
+
+describe('readiness budgets', () => {
+  // Master waited for the readiness selector within the hook timeout; the 10 s
+  // ctx default would fail slow chapter/genre pages earlier than before.
+  test('images waits up to the header timeouts.images', async () => {
+    const { meta } = loadSource(SCRIPT);
+    const calls = await recordWaitFor(SCRIPT, 'images');
+    assert.deepEqual(calls, [['div.select-none img[data-page-index]', meta.timeouts.images]]);
+    assert.equal(meta.timeouts.images, 30000);
+  });
+
+  test('tags waits up to the header timeouts.tags', async () => {
+    const { meta } = loadSource(SCRIPT);
+    const calls = await recordWaitFor(SCRIPT, 'tags');
+    assert.deepEqual(calls, [['astro-island[props*="availableGenres"]', meta.timeouts.tags]]);
+    assert.equal(meta.timeouts.tags, 20000);
   });
 });

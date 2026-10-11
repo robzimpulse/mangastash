@@ -266,7 +266,8 @@ const source = {
         );
       }
     }
-    await ctx.waitFor('section#chapter-images img');
+    // 30000 = header timeouts.images (not the 10 s ctx default).
+    await ctx.waitFor('section#chapter-images img', 30000);
     return [...doc.querySelectorAll('section#chapter-images img')]
       .map((img) => img.getAttribute('src'))
       .filter((src) => src !== null)
@@ -286,7 +287,8 @@ const source = {
     for (const panel of doc.querySelectorAll('section[x-show="show_filter"]')) {
       panel.style.display = 'block';
     }
-    await ctx.waitFor('input[type="checkbox"][id^="tag-"]');
+    // 15000 = the default hook budget master gave tags (no header override).
+    await ctx.waitFor('input[type="checkbox"][id^="tag-"]', 15000);
 
     const names = new Set();
     for (const input of doc.querySelectorAll('input[type="checkbox"][id^="tag-"]')) {

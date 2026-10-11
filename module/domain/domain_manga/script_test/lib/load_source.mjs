@@ -132,6 +132,30 @@ export async function runPage(path, fn, html, { searchTerm, waitTimeoutMs } = {}
   return bridge(await callFunction(source, fn, [doc, ctx]));
 }
 
+/**
+ * Runs a page function with a ctx whose `waitFor` records its arguments and
+ * resolves immediately, and returns the recorded `[selector, timeoutMs]`
+ * pairs. Pins the readiness budgets a script passes (master waited within the
+ * hook timeouts, not the 10 s ctx default). A throw after the wait (nothing
+ * to parse in the given HTML) is ignored.
+ */
+export async function recordWaitFor(path, fn, html = '<html><body></body></html>') {
+  const { meta, source, createSourceCtx } = loadSource(path);
+  const doc = parseHTML(html).document;
+  const ctx = createSourceCtx({ doc, baseUrl: meta.baseUrl });
+  const calls = [];
+  ctx.waitFor = async (selector, timeoutMs) => {
+    calls.push([selector, timeoutMs]);
+    return null;
+  };
+  try {
+    await callFunction(source, fn, [doc, ctx]);
+  } catch {
+    // only the recorded waits matter
+  }
+  return calls;
+}
+
 /** Runs a blank-page (URL) function: `source[fn](...args, ctx)`. */
 export async function runBlank(path, fn, ...args) {
   const { meta, source, createSourceCtx } = loadSource(path);

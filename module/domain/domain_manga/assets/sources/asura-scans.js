@@ -164,7 +164,9 @@ const source = {
   // Lazy `src` values are populated by scrolling each image into view.
   async images(doc, ctx) {
     const query = 'div.select-none img[data-page-index]';
-    await ctx.waitFor(query);
+    // 30000 = header timeouts.images: master waited for the readiness
+    // selector within the hook timeout, not the 10 s ctx default.
+    await ctx.waitFor(query, 30000);
     for (const img of doc.querySelectorAll(query)) {
       img.scrollIntoView?.(); // linkedom (tests) has no scrollIntoView
       await ctx.sleep(60);
@@ -187,7 +189,8 @@ const source = {
   // JSON.parse walks it: no dropdown click, no client-rendered DOM. A
   // truncated or reshaped payload degrades to "no tags", never a throw.
   async tags(doc, ctx) {
-    await ctx.waitFor('astro-island[props*="availableGenres"]');
+    // 20000 = header timeouts.tags (not the 10 s ctx default).
+    await ctx.waitFor('astro-island[props*="availableGenres"]', 20000);
     let props = null;
     for (const island of doc.querySelectorAll('astro-island')) {
       const value = island.getAttribute('props');

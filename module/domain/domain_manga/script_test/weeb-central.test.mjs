@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 import { parseHTML } from 'linkedom';
 
-import { loadSource, runBlank, runPage } from './lib/load_source.mjs';
+import { loadSource, recordWaitFor, runBlank, runPage } from './lib/load_source.mjs';
 
 const SCRIPT = 'weeb-central.js';
 const fixture = (name) =>
@@ -406,5 +406,21 @@ describe('tags', () => {
     // The genre checkboxes live ONLY on /search; searchUrl points at the
     // /search/data htmx fragment, which ships zero checkboxes.
     assert.equal(await runBlank(SCRIPT, 'tagsUrl'), 'https://weebcentral.com/search');
+  });
+});
+
+describe('readiness budgets', () => {
+  // Master waited for the readiness selector within the hook timeout; the 10 s
+  // ctx default would fail slow chapter/genre pages earlier than before.
+  test('images waits up to the header timeouts.images', async () => {
+    const { meta } = loadSource(SCRIPT);
+    const calls = await recordWaitFor(SCRIPT, 'images');
+    assert.deepEqual(calls, [['section#chapter-images img', meta.timeouts.images]]);
+    assert.equal(meta.timeouts.images, 30000);
+  });
+
+  test('tags waits the default 15 s hook budget (no header override)', async () => {
+    const calls = await recordWaitFor(SCRIPT, 'tags');
+    assert.deepEqual(calls, [['input[type="checkbox"][id^="tag-"]', 15000]]);
   });
 });
