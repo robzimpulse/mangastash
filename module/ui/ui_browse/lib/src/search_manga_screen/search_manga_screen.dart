@@ -1,3 +1,8 @@
+// SearchMangaScreen: multi-source search screen hosting one MangaGridWidget per
+// enabled source. `onTapFixSource` is forwarded to each grid (issue #115).
+//
+// Usage: `SearchMangaScreen.create(locator: locator, onTapManga: ...,
+// onTapMangaMenu: ..., onTapFilter: ..., onTapFixSource: ...)`.
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
@@ -35,6 +40,7 @@ class SearchMangaScreen extends StatefulWidget {
     Future<SearchMangaParameter?>? Function(SearchMangaParameter? value)?
     onTapFilter,
     VoidCallback? onTapBrowseSources,
+    ValueSetter<FixSourceTarget>? onTapFixSource,
   }) {
     return BlocProvider(
       create: (context) {
@@ -54,6 +60,7 @@ class SearchMangaScreen extends StatefulWidget {
             parent: cubit,
             onTapManga: onTapManga,
             onTapMangaMenu: onTapMangaMenu,
+            onTapFixSource: onTapFixSource,
           );
         },
       ),

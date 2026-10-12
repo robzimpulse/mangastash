@@ -1,3 +1,11 @@
+// JobManager: drains the persistent prefetch job queue (JobDao) one job at a
+// time — manga details, a chapter's images, a manga's full chapter list, or a
+// single image — resolving each job's source by name through SourceRegistry
+// (issue #115; a job whose source no longer exists fails and is dropped).
+//
+// Usage: resolved from the locator as PrefetchMangaUseCase,
+// PrefetchChapterUseCase, ListenPrefetchUseCase, ListenJobUseCase and
+// CancelJobUseCase; `dispose()` on teardown.
 import 'dart:async';
 
 import 'package:core_analytics/core_analytics.dart';
@@ -11,7 +19,6 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
 
-import '../sources/sources.dart';
 import '../use_case/cancel_job_use_case.dart';
 import '../use_case/chapter/get_all_chapter_use_case.dart';
 import '../use_case/chapter/get_chapter_use_case.dart';
@@ -21,6 +28,7 @@ import '../use_case/prefetch/listen_job_use_case.dart';
 import '../use_case/prefetch/listen_prefetch_use_case.dart';
 import '../use_case/prefetch/prefetch_chapter_use_case.dart';
 import '../use_case/prefetch/prefetch_manga_use_case.dart';
+import 'source_registry.dart';
 
 class JobManager
     with UserAgentMixin, WidgetsBindingObserver
@@ -36,6 +44,7 @@ class JobManager
   final ValueGetter<GetMangaUseCase> _getMangaUseCase;
   final ValueGetter<GetAllChapterUseCase> _getAllChapterUseCase;
   final ListenSearchParameterUseCase _listenSearchParameterUseCase;
+  final SourceRegistry _registry;
   final ImagesCacheManager _manager;
   final JobDao _jobDao;
   final LogBox _log;
@@ -48,19 +57,19 @@ class JobManager
     required JobDao jobDao,
     required ImagesCacheManager manager,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
+    required SourceRegistry registry,
     required ValueGetter<GetChapterUseCase> getChapterUseCase,
     required ValueGetter<GetMangaUseCase> getMangaUseCase,
     required ValueGetter<GetAllChapterUseCase> getAllChapterUseCase,
   }) : _log = log,
        _jobDao = jobDao,
        _manager = manager,
+       _registry = registry,
        _getMangaUseCase = getMangaUseCase,
        _getChapterUseCase = getChapterUseCase,
        _getAllChapterUseCase = getAllChapterUseCase,
        _listenSearchParameterUseCase = listenSearchParameterUseCase {
-    _subscriptions.addAll([
-      _ongoingJob.listen(_onData),
-    ]);
+    _subscriptions.addAll([_ongoingJob.listen(_onData)]);
     _ongoingJob.addStream(_jobDao.single.distinct());
     WidgetsBinding.instance.addObserver(this);
   }
@@ -120,7 +129,7 @@ class JobManager
 
   Future<void> _fetchManga(JobModel job) async {
     final mangaId = job.manga?.id;
-    final source = job.manga?.source?.let(Sources.fromName);
+    final source = job.manga?.source?.let(_registry.fromName);
 
     if (mangaId == null || source == null) {
       throw Exception('No Manga ID or Source Url');
@@ -140,7 +149,7 @@ class JobManager
   Future<void> _fetchChapter(JobModel job) async {
     final mangaId = job.manga?.id;
     final chapterId = job.chapter?.id;
-    final source = job.manga?.source?.let(Sources.fromName);
+    final source = job.manga?.source?.let(_registry.fromName);
 
     if (mangaId == null || chapterId == null || source == null) {
       throw Exception('No Manga ID or Chapter ID or Source');
@@ -173,7 +182,7 @@ class JobManager
 
   Future<void> _fetchAllChapter(JobModel job) async {
     final mangaId = job.manga?.id;
-    final source = job.manga?.source?.let(Sources.fromName);
+    final source = job.manga?.source?.let(_registry.fromName);
 
     if (mangaId == null || source == null) {
       throw Exception('No Manga ID or Source');

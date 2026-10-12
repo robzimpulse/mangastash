@@ -1,3 +1,6 @@
+// MoreRoutePath: path constants of the More/Settings routes. Use them with
+// `context.push(MoreRoutePath.x)`; the matching GoRoutes live in
+// MoreRouteBuilder (route_builder.dart).
 class MoreRoutePath {
 
   static const aboutUs = '$setting/about_us';
@@ -5,6 +8,10 @@ class MoreRoutePath {
   static const appearance = '$setting/appearance';
   static const dataStorage = '$setting/data_storage';
   static const browse = '$setting/browse';
+  static const sources = '$setting/sources';
+  // Source editor. Query params: `id` (required), `function` and `url`
+  // (optional, prefill the editor's Test).
+  static const sourceEditor = '$setting/sources/editor';
   static const queue = '$setting/queue';
   static const general = '$setting/general';
   static const library = '$setting/library';

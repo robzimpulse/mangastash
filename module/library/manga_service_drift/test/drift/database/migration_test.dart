@@ -1,4 +1,8 @@
 // dart format width=80
+// Drift migration tests for every schema step (generated scaffold plus
+// hand-written data-integrity tests; v6 to v7 added for issue #115).
+// Usage: `fvm flutter test test/drift/database/migration_test.dart` from the
+// manga_service_drift module directory.
 // ignore_for_file: unused_local_variable, unused_import
 import 'package:drift/drift.dart';
 import 'package:drift_dev/api/migrations_native.dart';
@@ -13,6 +17,7 @@ import 'generated/schema_v3.dart' as v3;
 import 'generated/schema_v4.dart' as v4;
 import 'generated/schema_v5.dart' as v5;
 import 'generated/schema_v6.dart' as v6;
+import 'generated/schema_v7.dart' as v7;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -527,6 +532,46 @@ void main() {
             (7, 'as1'),
           ]),
         );
+      },
+    );
+  });
+
+  // v7 (issue #115) only adds source_script_tables: rows of existing tables
+  // must survive untouched and the new table must start empty and writable.
+  test('v6 to v7 keeps manga rows and creates source_script_tables', () async {
+    await verifier.testWithDataIntegrity(
+      oldVersion: 6,
+      newVersion: 7,
+      createOld: v6.DatabaseAtV6.new,
+      createNew: v7.DatabaseAtV7.new,
+      openTestedDatabase: (executor) {
+        return AppDatabase(executor: MemoryExecutor(executor: executor));
+      },
+      createItems: (batch, oldDb) {
+        batch.insertAll(oldDb.mangaTables, [
+          v6.MangaTablesData(
+            createdAt: 1000,
+            updatedAt: 1000,
+            id: 'manga_1',
+            title: 'Manga 1',
+            coverUrl: 'https://example.com/cover_1.jpg',
+            author: 'Author 1',
+            artist: 'Artist 1',
+            status: 'ongoing',
+            description: 'Description 1',
+            webUrl: 'https://example.com/manga_1',
+            source: 'Asura Scans',
+          ),
+        ]);
+      },
+      validateItems: (newDb) async {
+        final mangas = await newDb.select(newDb.mangaTables).get();
+        expect(mangas, hasLength(1));
+        expect(mangas.single.id, 'manga_1');
+        expect(mangas.single.title, 'Manga 1');
+        expect(mangas.single.artist, 'Artist 1');
+
+        expect(await newDb.select(newDb.sourceScriptTables).get(), isEmpty);
       },
     );
   });

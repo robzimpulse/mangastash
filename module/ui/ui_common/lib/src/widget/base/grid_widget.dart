@@ -1,9 +1,17 @@
+// GridWidget: paged sliver grid with shimmer loading, an error state and an
+// empty state. A recrawlable error offers "Open Debug Browser"
+// (`onTapRecrawl`), and a script failure naming its source also offers
+// "Fix source" (`onTapFixSource`, issue #115).
+//
+// Usage: `GridWidget<T>(itemBuilder: ..., data: ..., error: ...,
+// onTapRecrawl: ..., onTapFixSource: ...)`.
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
+import '../../util/fix_source_target.dart';
 import 'next_page_notification_widget.dart';
 import 'shimmer_loading_widget.dart';
 
@@ -15,6 +23,7 @@ class GridWidget<T> extends StatefulWidget {
     this.onLoadNextPage,
     this.onRefresh,
     this.onTapRecrawl,
+    this.onTapFixSource,
     this.absorber,
     this.error,
     this.isLoading = false,
@@ -31,6 +40,8 @@ class GridWidget<T> extends StatefulWidget {
   final Widget Function(BuildContext context, T data) itemBuilder;
 
   final ValueSetter<String>? onTapRecrawl;
+
+  final ValueSetter<FixSourceTarget>? onTapFixSource;
 
   final SliverOverlapAbsorberHandle? absorber;
 
@@ -140,6 +151,16 @@ class _GridWidgetState<T> extends State<GridWidget<T>> {
                               child: const Text('Open Debug Browser'),
                             ),
                           ],
+                          if (fixSourceTargetOf(error) case final target?)
+                            if (widget.onTapFixSource != null) ...[
+                              const SizedBox(height: 8),
+                              OutlinedButton(
+                                onPressed: () {
+                                  widget.onTapFixSource?.call(target);
+                                },
+                                child: const Text('Fix source'),
+                              ),
+                            ],
                         ],
                       ),
                     ),

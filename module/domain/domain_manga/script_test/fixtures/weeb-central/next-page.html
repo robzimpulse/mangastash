@@ -1,0 +1,18 @@
+<div>
+  <article class="bg-base-300 flex gap-4 p-4">
+    <section class="w-full lg:w-[25%] xl:w-[20%]">
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece">
+        <img src="https://temp.compsci88.com/cover/fallback/01J76XY7E9FNDZ1DBBM6PBJPFK.jpg" alt="cover">
+      </a>
+    </section>
+    <section class="hidden lg:block lg:w-[75%] xl:w-[80%]">
+      <a href="https://weebcentral.com/series/01J76XY7E9FNDZ1DBBM6PBJPFK/One-Piece"
+         class="line-clamp-1 link link-hover">One Piece</a>
+      <div class="opacity-70"><strong>Status:</strong><span>Ongoing</span></div>
+    </section>
+  </article>
+  <button hx-get="/search/data?limit=32&offset=32&text=One+Piece"
+          hx-swap="innerHTML" hx-target="#search_results" class="btn btn-primary btn-wide btn-lg">
+    View More Results…
+  </button>
+</div>

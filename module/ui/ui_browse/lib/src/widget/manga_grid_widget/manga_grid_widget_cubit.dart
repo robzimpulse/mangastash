@@ -1,3 +1,10 @@
+// MangaGridWidgetCubit: state of a source's paged manga grid (search,
+// paging, library/prefetch markers) on top of SearchMangaUseCase.
+// `recrawl` opens a URL in the visible webview; once it closes the
+// cached script results for that URL are evicted (issue #115) and the
+// grid refreshes.
+//
+// Usage: provided by MangaGridWidget; call `init`, `next`, `recrawl`.
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
@@ -195,17 +202,7 @@ class MangaGridWidgetCubit extends Cubit<MangaGridWidgetState>
   }
 
   void recrawl({required BuildContext context, required String url}) async {
-    await _recrawlUseCase.execute(
-      context: context,
-      url: url,
-      // Built-in sources (MangaDex) have no scraping use cases — their
-      // getters throw UnimplementedError — so pass no scripts for them.
-      scripts:
-          state.source?.let(
-            (e) => e.builtIn ? null : e.searchMangaUseCase.scripts,
-          ) ??
-          [],
-    );
+    await _recrawlUseCase.execute(context: context, url: url);
     await init(refresh: true);
   }
 

@@ -1391,12 +1391,287 @@ final class Schema6 extends i0.VersionedSchema {
   );
 }
 
+final class Schema7 extends i0.VersionedSchema {
+  Schema7({required super.database}) : super(version: 7);
+  @override
+  late final List<i1.DatabaseSchemaEntity> entities = [
+    imageTables,
+    chapterTables,
+    mangaTables,
+    libraryTables,
+    tagTables,
+    relationshipTables,
+    jobTables,
+    fileTables,
+    sourceScriptTables,
+    idxRelationshipMangaId,
+    idxJobChapterId,
+    idxJobMangaId,
+  ];
+  late final Shape0 imageTables = Shape0(
+    source: i0.VersionedTable(
+      entityName: 'image_tables',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'UNIQUE(chapter_id, web_url, "order")',
+        'UNIQUE(chapter_id, web_url)',
+        'UNIQUE(web_url, "order")',
+        'UNIQUE(chapter_id, "order")',
+        'FOREIGN KEY(chapter_id)REFERENCES chapter_tables(id)ON DELETE CASCADE',
+      ],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape1 chapterTables = Shape1(
+    source: i0.VersionedTable(
+      entityName: 'chapter_tables',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'UNIQUE(manga_id, webUrl, title)',
+        'UNIQUE(manga_id, title)',
+        'UNIQUE(manga_id, webUrl)',
+        'UNIQUE(webUrl, title)',
+        'UNIQUE(webUrl)',
+        'FOREIGN KEY(manga_id)REFERENCES manga_tables(id)ON DELETE CASCADE',
+      ],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_6,
+        _column_7,
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_11,
+        _column_12,
+        _column_13,
+        _column_14,
+        _column_15,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape9 mangaTables = Shape9(
+    source: i0.VersionedTable(
+      entityName: 'manga_tables',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'UNIQUE(web_url, source)',
+        'UNIQUE(web_url)',
+      ],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_7,
+        _column_17,
+        _column_18,
+        _column_32,
+        _column_19,
+        _column_20,
+        _column_21,
+        _column_22,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape2 libraryTables = Shape2(
+    source: i0.VersionedTable(
+      entityName: 'library_tables',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(manga_id)',
+        'FOREIGN KEY(manga_id)REFERENCES manga_tables(id)ON DELETE CASCADE',
+      ],
+      columns: [_column_0, _column_1, _column_16],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape4 tagTables = Shape4(
+    source: i0.VersionedTable(
+      entityName: 'tag_tables',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['UNIQUE(source, tag_id)', 'UNIQUE(source, name)'],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_23,
+        _column_24,
+        _column_25,
+        _column_22,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape5 relationshipTables = Shape5(
+    source: i0.VersionedTable(
+      entityName: 'relationship_tables',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'UNIQUE(tag_id, manga_id)',
+        'FOREIGN KEY(tag_id)REFERENCES tag_tables(id)ON DELETE CASCADE',
+        'FOREIGN KEY(manga_id)REFERENCES manga_tables(id)ON DELETE CASCADE',
+      ],
+      columns: [_column_0, _column_1, _column_26, _column_16],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape8 jobTables = Shape8(
+    source: i0.VersionedTable(
+      entityName: 'job_tables',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_23,
+        _column_27,
+        _column_22,
+        _column_28,
+        _column_6,
+        _column_29,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape7 fileTables = Shape7(
+    source: i0.VersionedTable(
+      entityName: 'file_tables',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)', 'UNIQUE(web_url)'],
+      columns: [_column_0, _column_1, _column_2, _column_5, _column_31],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape10 sourceScriptTables = Shape10(
+    source: i0.VersionedTable(
+      entityName: 'source_script_tables',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_33,
+        _column_34,
+        _column_35,
+        _column_36,
+        _column_37,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Index idxRelationshipMangaId = i1.Index(
+    'idx_relationship_manga_id',
+    'CREATE INDEX idx_relationship_manga_id ON relationship_tables (manga_id)',
+  );
+  final i1.Index idxJobChapterId = i1.Index(
+    'idx_job_chapter_id',
+    'CREATE INDEX idx_job_chapter_id ON job_tables (chapter_id)',
+  );
+  final i1.Index idxJobMangaId = i1.Index(
+    'idx_job_manga_id',
+    'CREATE INDEX idx_job_manga_id ON job_tables (manga_id)',
+  );
+}
+
+class Shape10 extends i0.VersionedTable {
+  Shape10({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<int> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get name =>
+      columnsByName['name']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get code =>
+      columnsByName['code']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get version =>
+      columnsByName['version']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get origin =>
+      columnsByName['origin']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get baseVersion =>
+      columnsByName['base_version']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<String> _column_33(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'name',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL UNIQUE',
+    );
+i1.GeneratedColumn<String> _column_34(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'code',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<int> _column_35(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'version',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<String> _column_36(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'origin',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<int> _column_37(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'base_version',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NULL',
+    );
 i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
   required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
   required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,
   required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
   required Future<void> Function(i1.Migrator m, Schema6 schema) from5To6,
+  required Future<void> Function(i1.Migrator m, Schema7 schema) from6To7,
 }) {
   return (currentVersion, database) async {
     switch (currentVersion) {
@@ -1425,6 +1700,11 @@ i0.MigrationStepWithVersion migrationSteps({
         final migrator = i1.Migrator(database, schema);
         await from5To6(migrator, schema);
         return 6;
+      case 6:
+        final schema = Schema7(database: database);
+        final migrator = i1.Migrator(database, schema);
+        await from6To7(migrator, schema);
+        return 7;
       default:
         throw ArgumentError.value('Unknown migration from $currentVersion');
     }
@@ -1437,6 +1717,7 @@ i1.OnUpgrade stepByStep({
   required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,
   required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
   required Future<void> Function(i1.Migrator m, Schema6 schema) from5To6,
+  required Future<void> Function(i1.Migrator m, Schema7 schema) from6To7,
 }) => i0.VersionedSchema.stepByStepHelper(
   step: migrationSteps(
     from1To2: from1To2,
@@ -1444,5 +1725,6 @@ i1.OnUpgrade stepByStep({
     from3To4: from3To4,
     from4To5: from4To5,
     from5To6: from5To6,
+    from6To7: from6To7,
   ),
 );

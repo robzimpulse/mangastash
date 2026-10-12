@@ -1,8 +1,16 @@
+// ListWidget: chapter-list sliver with a header (count, download, prefetch,
+// filter), shimmer loading, an error state and an empty state. A recrawlable
+// error offers "Open Debug Browser" (`onTapRecrawl`), and a script failure
+// naming its source also offers "Fix source" (`onTapFixSource`, issue #115).
+//
+// Usage: `ListWidget<T>(itemBuilder: ..., data: ..., error: ...,
+// onTapRecrawl: ..., onTapFixSource: ...)`.
 import 'package:core_network/core_network.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
+import '../../util/fix_source_target.dart';
 import '../base/next_page_notification_widget.dart';
 import '../base/shimmer_loading_widget.dart';
 
@@ -19,6 +27,7 @@ class ListWidget<T> extends StatefulWidget {
     this.hasNext = false,
     this.data = const [],
     this.onTapRecrawl,
+    this.onTapFixSource,
     this.total = 0,
     this.onTapDownload,
     this.onTapFilter,
@@ -45,6 +54,8 @@ class ListWidget<T> extends StatefulWidget {
   final RefreshCallback? onRefresh;
 
   final ValueSetter<String>? onTapRecrawl;
+
+  final ValueSetter<FixSourceTarget>? onTapFixSource;
 
   final SliverOverlapAbsorberHandle? absorber;
 
@@ -204,6 +215,16 @@ class _ListWidgetState<T> extends State<ListWidget<T>> {
                               child: const Text('Open Debug Browser'),
                             ),
                           ],
+                          if (fixSourceTargetOf(error) case final target?)
+                            if (widget.onTapFixSource != null) ...[
+                              const SizedBox(height: 8),
+                              OutlinedButton(
+                                onPressed: () {
+                                  widget.onTapFixSource?.call(target);
+                                },
+                                child: const Text('Fix source'),
+                              ),
+                            ],
                         ],
                       ),
                     ),

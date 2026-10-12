@@ -24,6 +24,7 @@ export 'src/route_bottom_sheet/manga_menu_route_bottom_sheet.dart';
 export 'src/route_popup_dialog/text_field_dialog.dart';
 export 'src/scaffold_screen.dart';
 export 'src/util/debounce.dart';
+export 'src/util/fix_source_target.dart';
 export 'src/widget/base/adaptive_physic_list_view.dart';
 export 'src/widget/base/decorated_preferred_size_widget.dart';
 export 'src/widget/base/flexible_app_bar_builder.dart';

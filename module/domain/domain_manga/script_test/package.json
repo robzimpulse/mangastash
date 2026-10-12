@@ -1,0 +1,12 @@
+{
+  "name": "mangastash-source-scripts-test",
+  "private": true,
+  "type": "module",
+  "description": "Node test harness for the MangaStash JS source scripts (../assets/sources/*.js). Run: npm ci && npm test",
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "linkedom": "0.18.12"
+  }
+}

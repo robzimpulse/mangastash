@@ -1,10 +1,10 @@
 // Tests for MangaDetailScreenCubit, grouped by the fix that introduced each
 // case:
 //
-//   - recrawl — the built-in MangaDex source has no scraping use cases (getters
-//     throw UnimplementedError by design), so recrawl must pass an empty scripts
-//     list instead of crashing; plus #130, recrawl must await the re-crawl
-//     before the refetches that read the html cache it writes.
+//   - recrawl — the built-in MangaDex source has no scraping hooks (they
+//     throw UnimplementedError by design), so recrawl must just open the url;
+//     plus #130, recrawl must await the re-crawl (which evicts the cached
+//     script results once the webview closes, issue #115) before refetching.
 //   - init (#122) — loading/paging flags must never be stranded by a throw.
 //   - in-flight guards (#127) — repeat taps on addToLibrary and prefetch are
 //     no-ops, and chapters already in the job queue are not re-enqueued.
@@ -17,8 +17,6 @@ import 'dart:async';
 
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
-import 'package:domain_manga/src/sources/asura_scan_source_external.dart';
-import 'package:domain_manga/src/sources/manga_dex_source_external.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -48,14 +46,13 @@ void main() {
     );
   });
 
-  test('recrawl passes no scripts for the built-in MangaDex source', () async {
+  test('recrawl opens the url for the built-in MangaDex source', () async {
     final recrawlUseCase = MockRecrawlUseCase();
     final searchMangaUseCase = MockSearchMangaUseCase();
     when(
       () => recrawlUseCase.execute(
         context: any(named: 'context'),
         url: any(named: 'url'),
-        scripts: any(named: 'scripts'),
       ),
     ).thenAnswer((_) async {});
 
@@ -84,22 +81,20 @@ void main() {
       () => recrawlUseCase.execute(
         context: captureAny(named: 'context'),
         url: captureAny(named: 'url'),
-        scripts: captureAny(named: 'scripts'),
       ),
     );
     verification.called(1);
-    expect(verification.captured[2] as List<String>, isEmpty);
+    expect(verification.captured[1], 'https://www.mangadex.org/');
   });
 
-  test('recrawl passes the source scripts through for a scraped source', () async {
-    final source = AsuraScanSourceExternal();
+  test('recrawl opens the url for a scraped source', () async {
+    final source = FakeScrapedSourceExternal();
     final recrawlUseCase = MockRecrawlUseCase();
     final searchMangaUseCase = MockSearchMangaUseCase();
     when(
       () => recrawlUseCase.execute(
         context: any(named: 'context'),
         url: any(named: 'url'),
-        scripts: any(named: 'scripts'),
       ),
     ).thenAnswer((_) async {});
 
@@ -128,14 +123,10 @@ void main() {
       () => recrawlUseCase.execute(
         context: captureAny(named: 'context'),
         url: captureAny(named: 'url'),
-        scripts: captureAny(named: 'scripts'),
       ),
     );
     verification.called(1);
-    expect(
-      verification.captured[2] as List<String>,
-      source.getMangaUseCase.scripts,
-    );
+    expect(verification.captured[1], 'https://asurascans.com/comics/solo-swordmaster-3ec3b16f');
   });
 
   group('MangaDetailScreenCubit.init (issue #122 hardening)', () {
@@ -462,7 +453,6 @@ void main() {
         () => recrawlUseCase.execute(
           context: any(named: 'context'),
           url: any(named: 'url'),
-          scripts: any(named: 'scripts'),
         ),
       ).thenAnswer((_) => gate.future);
       when(

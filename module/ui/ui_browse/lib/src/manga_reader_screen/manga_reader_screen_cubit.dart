@@ -1,3 +1,9 @@
+// MangaReaderScreenCubit: state of the chapter reader (images,
+// neighbours, prefetch) on top of GetChapterUseCase. `recrawl` opens a
+// URL in the visible webview; once it closes the cached script results
+// for that URL are evicted (issue #115) and the chapter reloads.
+//
+// Usage: provided by MangaReaderScreen.create; call `init`, `recrawl`.
 import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
@@ -150,17 +156,7 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
   }
 
   void recrawl({required BuildContext context, required String url}) async {
-    await _recrawlUseCase.execute(
-      context: context,
-      url: url,
-      // Built-in sources (MangaDex) have no scraping use cases — their
-      // getters throw UnimplementedError — so pass no scripts for them.
-      scripts:
-          state.source?.let(
-            (e) => e.builtIn ? null : e.getChapterImageUseCase.scripts,
-          ) ??
-          [],
-    );
+    await _recrawlUseCase.execute(context: context, url: url);
     await init(useCache: false);
   }
 

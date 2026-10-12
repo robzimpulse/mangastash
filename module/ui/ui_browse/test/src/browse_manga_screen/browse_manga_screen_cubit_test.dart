@@ -1,13 +1,14 @@
 // Tests for BrowseMangaScreenCubit.recrawl: the built-in MangaDex source has
-// no scraping use cases (getters throw UnimplementedError by design), so
-// recrawl must pass an empty scripts list instead of crashing.
+// no scraping hooks (they throw UnimplementedError by design), so recrawl
+// must open the url without touching the source; scraped sources likewise
+// just open the url (cached script results are evicted by RecrawlUseCase,
+// issue #115).
 //
 // Run with: fvm flutter test test/src/browse_manga_screen/browse_manga_screen_cubit_test.dart
 import 'dart:async';
 
 import 'package:core_network/core_network.dart';
 import 'package:domain_manga/domain_manga.dart';
-import 'package:domain_manga/src/sources/manga_dex_source_external.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -30,7 +31,7 @@ void main() {
     registerFallbackValue(MangaDexSourceExternal());
   });
 
-  test('recrawl passes no scripts for the built-in MangaDex source', () async {
+  test('recrawl opens the url for the built-in MangaDex source', () async {
     final recrawlUseCase = MockRecrawlUseCase();
     final searchMangaUseCase = MockSearchMangaUseCase();
     final getTagsUseCase = MockGetTagsUseCase();
@@ -54,7 +55,6 @@ void main() {
       () => recrawlUseCase.execute(
         context: any(named: 'context'),
         url: any(named: 'url'),
-        scripts: any(named: 'scripts'),
       ),
     ).thenAnswer((_) async {});
 
@@ -82,14 +82,13 @@ void main() {
       () => recrawlUseCase.execute(
         context: captureAny(named: 'context'),
         url: captureAny(named: 'url'),
-        scripts: captureAny(named: 'scripts'),
       ),
     );
     verification.called(1);
-    expect(verification.captured[2] as List<String>, isEmpty);
+    expect(verification.captured[1], 'https://www.mangadex.org/');
   });
 
-  test('recrawl passes the source scripts through for a scraped source', () async {
+  test('recrawl opens the url for a scraped source', () async {
     final recrawlUseCase = MockRecrawlUseCase();
     final searchMangaUseCase = MockSearchMangaUseCase();
     final getTagsUseCase = MockGetTagsUseCase();
@@ -116,7 +115,6 @@ void main() {
       () => recrawlUseCase.execute(
         context: any(named: 'context'),
         url: any(named: 'url'),
-        scripts: any(named: 'scripts'),
       ),
     ).thenAnswer((_) async {});
 
@@ -144,14 +142,10 @@ void main() {
       () => recrawlUseCase.execute(
         context: captureAny(named: 'context'),
         url: captureAny(named: 'url'),
-        scripts: captureAny(named: 'scripts'),
       ),
     );
     verification.called(1);
-    expect(
-      verification.captured[2] as List<String>,
-      FakeScrapedSourceExternal.searchScripts,
-    );
+    expect(verification.captured[1], 'https://scraped.example.com/browse');
   });
 
   group('BrowseMangaScreenCubit.init/next (issues #122 & #123)', () {

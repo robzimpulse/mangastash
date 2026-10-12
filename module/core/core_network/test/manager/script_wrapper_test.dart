@@ -1,3 +1,7 @@
+// Tests for wrapScript (the error-reporting wrapper of injected page
+// scripts) and ScriptEvaluationException. The readiness beacon helpers
+// were removed with the Dart scrapers (issue #115).
+// Run: fvm flutter test test/manager/script_wrapper_test.dart
 import 'package:core_network/src/exception/script_evaluation_exception.dart';
 import 'package:core_network/src/manager/script_wrapper.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,51 +28,6 @@ void main() {
 
       expect(wrapped.startsWith('(async function(){'), isTrue);
       expect(wrapped.endsWith('})()'), isTrue);
-    });
-  });
-
-  group('readinessBeaconScript', () {
-    test('waits for all selectors then reports over the bridge', () {
-      final script = readinessBeaconScript(const ['img[data-page-index]']);
-
-      expect(script, contains('img[data-page-index]'));
-      expect(script, contains('document.querySelectorAll'));
-      expect(script, contains('selectors.every'));
-      expect(script, contains("callHandler('scriptReady', ready)"));
-    });
-
-    test('reports failure after a bounded number of tries', () {
-      final script = readinessBeaconScript(const ['img']);
-
-      // The timeout path reports the same call with ready === false; the
-      // bound is what stops it from polling forever.
-      expect(script, contains('++tries >= maxTries'));
-      expect(script, contains('maxTries = 40'));
-    });
-
-    test('escapes single quotes in selectors', () {
-      final script = readinessBeaconScript(const ["img[alt='page']"]);
-
-      expect(script, contains(r"img[alt=\'page\']"));
-    });
-  });
-
-  group('readinessSatisfied', () {
-    test('empty selectors are always satisfied', () {
-      expect(readinessSatisfied('<html></html>', const []), isTrue);
-    });
-
-    test('all selectors must match at least one element', () {
-      final html = '<div><img data-page-index="0"></div>';
-
-      expect(readinessSatisfied(html, const ['img[data-page-index]']), isTrue);
-      expect(
-        readinessSatisfied(html, const [
-          'img[data-page-index]',
-          'section#chapter-images',
-        ]),
-        isFalse,
-      );
     });
   });
 

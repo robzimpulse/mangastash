@@ -1,3 +1,15 @@
+// SearchChapterUseCase: the chapter list of a manga, cached for 30 minutes
+// per SourceSearchChapterParameter and script version
+// (`SourceCacheVersion.cacheVersion`, so a saved script edit never serves the
+// old script's rows) and synced into ChapterDao. MangaDex pages
+// through ChapterRepository.feed; scripted sources (issue #115) resolve the
+// list page with `SourceExternal.chaptersUrl` and read every row in one
+// `chapters` call, validated by requireChapterFields (a failure evicts the
+// runner's cached result).
+//
+// Usage: `await useCase.execute(parameter: p)` → Result<Pagination<Chapter>>;
+// `await useCase.clear(parameter: p)` drops the cached pages and the script
+// results of the chapter-list URL before a refresh.
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
@@ -12,37 +24,38 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import '../../extension/data_scrapped_extension.dart';
 import '../../extension/map_network_error.dart';
 import '../../extension/scrapped_validation_extension.dart';
+import '../../extension/source_cache_version_extension.dart';
+import '../../manager/source_registry.dart';
 import '../../mixin/sort_chapters_mixin.dart';
 import '../../mixin/sync_chapters_mixin.dart';
-import '../../sources/sources.dart';
 
 class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
   final ChapterRepository _chapterRepository;
-  final HeadlessWebviewUseCase _webview;
+  final RunSourceScriptUseCase _runner;
+  final SourceRegistry _registry;
   final ConverterCacheManager _converterCacheManager;
   final SearchChapterCacheManager _searchChapterCacheManager;
-  final HtmlCacheManager _htmlCacheManager;
   final ChapterDao _chapterDao;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   const SearchChapterUseCase({
     required ChapterRepository chapterRepository,
-    required HeadlessWebviewUseCase webview,
+    required RunSourceScriptUseCase runner,
+    required SourceRegistry registry,
     required ConverterCacheManager converterCacheManager,
-    required HtmlCacheManager htmlCacheManager,
     required SearchChapterCacheManager searchChapterCacheManager,
     required ChapterDao chapterDao,
     required MangaDao mangaDao,
     required LogBox logBox,
   }) : _chapterRepository = chapterRepository,
        _converterCacheManager = converterCacheManager,
-       _htmlCacheManager = htmlCacheManager,
        _searchChapterCacheManager = searchChapterCacheManager,
        _chapterDao = chapterDao,
        _mangaDao = mangaDao,
        _logBox = logBox,
-       _webview = webview;
+       _runner = runner,
+       _registry = registry;
 
   Future<Pagination<Chapter>> _mangadex({
     required SearchChapterParameter parameter,
@@ -101,24 +114,21 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
     // fetch URL once and use it for both the open and the parse-error
     // context, or recrawling reopens the series page instead of the
     // endpoint that actually failed to parse (review on #178).
-    final fetchUrl = source.listChapterUseCase.url(webUrl: url);
-    final document = await _webview.open(
-      fetchUrl,
-      scripts: source.listChapterUseCase.scripts,
-      readyWhenSelectors: source.listChapterUseCase.readyWhenSelectors,
-      useCache: useCache,
-      timeout: source.listChapterUseCase.timeout,
-    );
-
-    final scraps = await source.listChapterUseCase.parse(root: document);
+    final fetchUrl = await source.chaptersUrl(webUrl: url);
+    final scraps = await source.chapters(url: fetchUrl, useCache: useCache);
 
     // A series page always carries chapter rows when parsed correctly —
     // zero (or all-invalid) rows is selector drift, not an empty library
     // (issue #114). Fail before the sync/cache writes persist it.
-    final valid = scraps.requireChapterFields(
-      source: source.name,
+    final valid = await validateOrEvict(
+      _runner,
       url: fetchUrl,
-      logBox: _logBox,
+      validate:
+          () => scraps.requireChapterFields(
+            source: source.name,
+            url: fetchUrl,
+            logBox: _logBox,
+          ),
     );
 
     final chapters = await Future.wait(
@@ -151,7 +161,9 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
     final data = await _searchChapterCacheManager.keys;
     final List<Future<void>> promises = [];
     for (final value in data) {
-      final key = SourceSearchChapterParameter.fromJsonString(value);
+      final key = SourceSearchChapterParameter.fromJsonString(
+        stripCacheVersion(value),
+      );
       if (key == null) continue;
       if (key.source != parameter.source) continue;
       final paramIgnorePagination = parameter.parameter.copyWith(
@@ -163,27 +175,47 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
       promises.add(_searchChapterCacheManager.removeFile(value));
     }
     if (url != null) {
-      // The fetch (and therefore the html cache entry) uses the
+      // The fetch (and therefore the cached script result) uses the
       // source-derived URL — for WeebCentral that is the full-chapter-list
       // endpoint, not the series page; evicting the series page would
       // leave the stale derived entry alive (review on #167). Built-in
-      // sources have no scraping use cases (their getters throw
-      // UnimplementedError by design), so they always use the plain URL.
-      final source = Sources.fromName(parameter.source);
-      final evictUrl =
-          (source == null || source.builtIn)
-              ? url
-              : source.listChapterUseCase.url(webUrl: url);
-      promises.add(_htmlCacheManager.removeFile(evictUrl));
+      // sources have no scraping hooks (they throw UnimplementedError by
+      // design), so they always use the plain URL.
+      promises.add(_evictChapterList(source: parameter.source, url: url));
     }
     await Future.wait(promises);
+  }
+
+  Future<void> _evictChapterList({
+    required String source,
+    required String url,
+  }) async {
+    final resolved = _registry.fromName(source);
+    var evictUrl = url;
+    if (resolved != null && !resolved.builtIn) {
+      try {
+        evictUrl = await resolved.chaptersUrl(webUrl: url);
+      } catch (e) {
+        // A failing chaptersUrl script must not break the refresh that
+        // follows; the fetch reports that error itself.
+        _logBox.log(
+          'Failed to resolve the chapter list url to evict',
+          extra: {'source': source, 'url': url, 'error': e.toString()},
+          name: runtimeType.toString(),
+        );
+      }
+    }
+    await _runner.evict(url: evictUrl);
   }
 
   Future<Result<Pagination<Chapter>>> execute({
     required SourceSearchChapterParameter parameter,
     bool useCache = true,
   }) async {
-    final key = parameter.toJsonString();
+    // The script version is part of the key: after the user saves an edited
+    // script the old entry is never read again (issue #115, Review Focus 5).
+    final source = _registry.fromName(parameter.source);
+    final key = '${parameter.toJsonString()}${source?.cacheVersion ?? ''}';
 
     // A corrupt or partially-written cache file must be treated as a miss
     // (issue #122 sibling, review on #160): this read happens before the
@@ -202,11 +234,7 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
     } catch (e, st) {
       _logBox.log(
         'Corrupt chapter cache treated as a miss',
-        extra: {
-          'key': key,
-          'error': e.toString(),
-          'stack': st.toString(),
-        },
+        extra: {'key': key, 'error': e.toString(), 'stack': st.toString()},
         name: runtimeType.toString(),
       );
       cached = null;
@@ -215,7 +243,6 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
     if (cached != null && useCache) return Success(cached);
 
     try {
-      final source = Sources.fromName(parameter.source);
       if (source == null) {
         throw DataNotFoundException();
       }

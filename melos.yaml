@@ -84,6 +84,10 @@ scripts:
     packageFilters:
       dirExists: "test"
 
+  test:scripts:
+    description: Test the JS source scripts (Node, linkedom fixtures). Needs Node 22+.
+    run: cd module/domain/domain_manga/script_test && npm ci && npm test
+
   coverage:
     description: Generate code coverage for specified package.
     run: |

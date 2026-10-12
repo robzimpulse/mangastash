@@ -1,3 +1,15 @@
+// SearchMangaUseCase: one page of search/browse results for a source, cached
+// for 30 minutes per SourceSearchMangaParameter and the script version
+// (`SourceCacheVersion.cacheVersion`, so a saved script edit never serves the
+// old script's cards) and synced into MangaDao.
+// MangaDex goes through MangaRepository; scripted sources resolve their search
+// URL and cards through SourceExternal (issue #115), validated by
+// requireCardFields — a failed validation evicts the runner's cached script
+// result for that URL.
+//
+// Usage: `await useCase.execute(parameter: p)` → Result<Pagination<Manga>>;
+// `await useCase.clear(parameter: p)` drops the cached pages (and the script
+// results behind them) before a refresh.
 import 'dart:convert';
 
 import 'package:core_analytics/core_analytics.dart';
@@ -11,32 +23,33 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import '../../extension/data_scrapped_extension.dart';
 import '../../extension/map_network_error.dart';
 import '../../extension/scrapped_validation_extension.dart';
+import '../../extension/source_cache_version_extension.dart';
+import '../../manager/source_registry.dart';
 import '../../mixin/sync_mangas_mixin.dart';
-import '../../sources/sources.dart';
 
 class SearchMangaUseCase with SyncMangasMixin {
   final MangaRepository _mangaRepository;
-  final HeadlessWebviewUseCase _webview;
+  final RunSourceScriptUseCase _runner;
+  final SourceRegistry _registry;
   final ConverterCacheManager _converterCacheManager;
-  final HtmlCacheManager _htmlCacheManager;
   final SearchMangaCacheManager _searchMangaCacheManager;
   final MangaDao _mangaDao;
   final LogBox _logBox;
 
   const SearchMangaUseCase({
     required MangaRepository mangaRepository,
-    required HeadlessWebviewUseCase webview,
+    required RunSourceScriptUseCase runner,
+    required SourceRegistry registry,
     required ConverterCacheManager converterCacheManager,
-    required HtmlCacheManager htmlCacheManager,
     required SearchMangaCacheManager searchMangaCacheManager,
     required MangaDao mangaDao,
     required LogBox logBox,
   }) : _mangaRepository = mangaRepository,
        _converterCacheManager = converterCacheManager,
-       _htmlCacheManager = htmlCacheManager,
        _searchMangaCacheManager = searchMangaCacheManager,
        _mangaDao = mangaDao,
-       _webview = webview,
+       _runner = runner,
+       _registry = registry,
        _logBox = logBox;
 
   Future<Pagination<Manga>> _mangadex({
@@ -66,27 +79,25 @@ class SearchMangaUseCase with SyncMangasMixin {
     required SearchMangaParameter parameter,
     bool useCache = true,
   }) async {
-    final url = source.searchMangaUseCase.url(parameter: parameter);
+    final url = await source.searchUrl(parameter: parameter);
 
-    final document = await _webview.open(
-      url,
-      scripts: source.searchMangaUseCase.scripts,
-      readyWhenSelectors: source.searchMangaUseCase.readyWhenSelectors,
-      useCache: useCache,
-      timeout: source.searchMangaUseCase.timeout,
-    );
-
-    final data = await source.searchMangaUseCase.parse(
-      root: document,
+    final data = await source.search(
+      url: url,
       searchTerm: parameter.title,
+      useCache: useCache,
     );
     // Drop cards the extraction came back half-empty for, and fail fast
     // when a page full of cards yields nothing usable — rendering "no
     // results" for a broken parse would hide the breakage (issue #114).
-    final cards = data.requireCardFields(
-      source: source.name,
+    final cards = await validateOrEvict(
+      _runner,
       url: url,
-      logBox: _logBox,
+      validate:
+          () => data.items.requireCardFields(
+            source: source.name,
+            url: url,
+            logBox: _logBox,
+          ),
     );
     final mangas = await Future.wait(
       cards.map(
@@ -99,22 +110,21 @@ class SearchMangaUseCase with SyncMangasMixin {
       page: parameter.page,
       limit: mangas.length,
       total: mangas.length,
-      hasNextPage: await source.searchMangaUseCase.haveNextPage(root: document),
+      hasNextPage: data.hasNextPage,
       sourceUrl: url,
     );
   }
 
   Future<void> clear({required SourceSearchMangaParameter parameter}) async {
     final data = await _searchMangaCacheManager.keys;
-    final source = Sources.fromName(parameter.source);
-    if (source == null) return;
+    final source = _registry.fromName(parameter.source);
 
-    final List<Future<void>> promises = [
-      _htmlCacheManager.removeFile(source.iconUrl),
-    ];
+    final List<Future<void>> promises = [];
 
     for (final value in data) {
-      final key = SourceSearchMangaParameter.fromJsonString(value);
+      final key = SourceSearchMangaParameter.fromJsonString(
+        stripCacheVersion(value),
+      );
       if (key == null) continue;
       if (key.source != parameter.source) continue;
       final paramIgnorePagination = parameter.parameter.copyWith(
@@ -123,23 +133,47 @@ class SearchMangaUseCase with SyncMangasMixin {
         page: key.parameter.page,
       );
       if (paramIgnorePagination != key.parameter) continue;
+      // The file removal must not depend on the registry lookup below: a
+      // source deleted from the registry (custom source removed) still owns
+      // cached files here, and they must not be orphaned (review on #194;
+      // SearchChapterUseCase.clear is the sibling shape).
       promises.add(_searchMangaCacheManager.removeFile(value));
-      // Built-in sources have no scraping use cases (their getters throw
-      // UnimplementedError by design) and never cache scraped html pages, so
-      // only scraped sources resolve a URL to evict from the html cache.
-      if (!source.builtIn) {
-        final url = source.searchMangaUseCase.url(parameter: key.parameter);
-        promises.add(_htmlCacheManager.removeFile(url));
+      // Built-in sources have no scraping hooks (they throw
+      // UnimplementedError by design) and never cache script results, so
+      // only scraped sources resolve a URL to evict from the runner cache.
+      if (source != null && !source.builtIn) {
+        // A failing searchUrl script must not break the refresh that
+        // follows; the fetch reports that error itself.
+        promises.add(_evictSearch(source: source, parameter: key.parameter));
       }
     }
     await Future.wait(promises);
+  }
+
+  Future<void> _evictSearch({
+    required SourceExternal source,
+    required SearchMangaParameter parameter,
+  }) async {
+    try {
+      final url = await source.searchUrl(parameter: parameter);
+      await _runner.evict(url: url);
+    } catch (e) {
+      _logBox.log(
+        'Failed to evict search results',
+        extra: {'source': source.name, 'error': e.toString()},
+        name: runtimeType.toString(),
+      );
+    }
   }
 
   Future<Result<Pagination<Manga>>> execute({
     required SourceSearchMangaParameter parameter,
     bool useCache = true,
   }) async {
-    final key = parameter.toJsonString();
+    // The script version is part of the key: after the user saves an edited
+    // script the old entry is never read again (issue #115, Review Focus 5).
+    final source = _registry.fromName(parameter.source);
+    final key = '${parameter.toJsonString()}${source?.cacheVersion ?? ''}';
 
     // A corrupt or partially-written cache file must be treated as a miss
     // (issue #122): this read happens before the fetch try below and used
@@ -161,11 +195,7 @@ class SearchMangaUseCase with SyncMangasMixin {
       // the field (review on #160).
       _logBox.log(
         'Corrupt search cache treated as a miss',
-        extra: {
-          'key': key,
-          'error': e.toString(),
-          'stack': st.toString(),
-        },
+        extra: {'key': key, 'error': e.toString(), 'stack': st.toString()},
         name: runtimeType.toString(),
       );
       cached = null;
@@ -174,7 +204,6 @@ class SearchMangaUseCase with SyncMangasMixin {
     if (cached != null && useCache) return Success(cached);
 
     try {
-      final source = Sources.fromName(parameter.source);
       if (source == null) {
         throw DataNotFoundException();
       }

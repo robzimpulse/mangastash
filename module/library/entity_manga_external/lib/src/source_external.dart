@@ -1,83 +1,67 @@
-import 'package:html/dom.dart';
+// The SourceExternal contract (issue #115, spec §7): one manga source as the
+// domain layer sees it — metadata plus document-free scraping hooks that return
+// the *Scrapped models. Scripted sources implement it with a JS script run in a
+// headless webview (`ScriptSourceExternal` in domain_manga); the built-in
+// MangaDex source sets [builtIn] and its scraping hooks throw
+// `UnimplementedError` (MangaDex goes through manga_dex_api instead).
+//
+// Usage (scraped sources only, i.e. `!source.builtIn`):
+//   final url = await source.searchUrl(parameter: parameter);
+//   final page = await source.search(url: url, searchTerm: parameter.title);
+//   final detail = await source.manga(url: manga.webUrl!);
+//   final rows = await source.chapters(
+//     url: await source.chaptersUrl(webUrl: manga.webUrl!),
+//   );
+//   final images = await source.images(url: chapter.webUrl!);
+//   final tags = await source.tags(url: await source.tagsUrl());
+// `useCache: false` bypasses the 30-minute result cache of page functions.
 import 'package:manga_dex_api/manga_dex_api.dart';
 
 import 'chapter_scrapped.dart';
 import 'manga_scrapped.dart';
+import 'search_result_scrapped.dart';
 import 'tag_scrapped.dart';
 
 abstract class SourceExternal {
+  /// Display name and the database key of every row from this source.
   String get name;
   String get iconUrl;
   String get baseUrl;
+
+  /// Whether the source is native (MangaDex) rather than scraped.
   bool get builtIn => false;
 
-  GetMangaSourceExternalUseCase get getMangaUseCase;
-  GetChapterImageSourceExternalUseCase get getChapterImageUseCase;
-  SearchMangaSourceExternalUseCase get searchMangaUseCase;
-  ListChapterSourceExternalUseCase get listChapterUseCase;
-  ListTagSourceExternalUseCase get listTagUseCase;
-}
+  /// URL of the search/browse page for [parameter] (empty title = browse).
+  Future<String> searchUrl({required SearchMangaParameter parameter});
 
-abstract class GetMangaSourceExternalUseCase {
-  Duration? get timeout;
-  List<String> get scripts;
+  /// Cards (and whether a next page exists) on the search page at [url].
+  /// [searchTerm] is the title searched for, for sources that filter
+  /// client-side.
+  Future<SearchResultScrapped> search({
+    required String url,
+    String? searchTerm,
+    bool useCache = true,
+  });
 
-  /// CSS selectors that must each match at least one element before the
-  /// HTML snapshot is cached; the fetch fails instead of caching a broken
-  /// page. Empty (default) means no readiness requirement.
-  List<String> get readyWhenSelectors => [];
-  Future<MangaScrapped> parse({required Document root});
-}
+  /// Series details on the series page at [url].
+  Future<MangaScrapped> manga({required String url, bool useCache = true});
 
-abstract class GetChapterImageSourceExternalUseCase {
-  Duration? get timeout;
-  List<String> get scripts;
+  /// The page holding the chapter list of the series at [webUrl]; usually
+  /// [webUrl] itself.
+  Future<String> chaptersUrl({required String webUrl});
 
-  /// See [GetMangaSourceExternalUseCase.readyWhenSelectors].
-  List<String> get readyWhenSelectors => [];
-  Future<List<String>> parse({required Document root});
-}
+  /// Chapter rows on the chapter-list page at [url].
+  Future<List<ChapterScrapped>> chapters({
+    required String url,
+    bool useCache = true,
+  });
 
-abstract class SearchMangaSourceExternalUseCase {
-  Duration? get timeout;
-  List<String> get scripts;
+  /// Image URLs, in reading order, on the reader page at [url].
+  Future<List<String>> images({required String url, bool useCache = true});
 
-  /// See [GetMangaSourceExternalUseCase.readyWhenSelectors].
-  List<String> get readyWhenSelectors => [];
-  String url({required SearchMangaParameter parameter});
-  Future<List<MangaScrapped>> parse({required Document root, String? searchTerm});
-  Future<bool?> haveNextPage({required Document root});
-}
+  /// The page listing the source's genres.
+  Future<String> tagsUrl();
 
-abstract class ListChapterSourceExternalUseCase {
-  Duration? get timeout;
-  List<String> get scripts;
-
-  /// See [GetMangaSourceExternalUseCase.readyWhenSelectors].
-  List<String> get readyWhenSelectors => [];
-  Future<List<ChapterScrapped>> parse({required Document root});
-
-  /// The page to open for the chapter list. Defaults to the series
-  /// [webUrl]; sources whose full list lives elsewhere (e.g. WeebCentral
-  /// serves it from a dedicated fragment endpoint) override this.
-  String url({required String webUrl}) => webUrl;
-}
-
-abstract class ListTagSourceExternalUseCase {
-  Duration? get timeout;
-  List<String> get scripts;
-
-  /// See [GetMangaSourceExternalUseCase.readyWhenSelectors].
-  List<String> get readyWhenSelectors => [];
-  Future<List<TagScrapped>> parse({required Document root});
-
-  /// The page to open for the tag list, when it differs from the search
-  /// page — null falls back to `searchMangaUseCase.url(page: 1)`, which is
-  /// where most sources list their genres. Override when the tag list
-  /// lives elsewhere: that fallback is whatever the search URL resolves
-  /// to — for WeebCentral a `/search/data` fragment with zero checkboxes,
-  /// so it points at `/search` (issue #163). Note the deliberate shape
-  /// difference from the chapter-list hook: tags are one global page
-  /// (`url` getter), chapters are per-manga (`url({webUrl})` method).
-  String? get url => null;
+  /// Genres on the tag page at [url].
+  Future<List<TagScrapped>> tags({required String url, bool useCache = true});
 }
