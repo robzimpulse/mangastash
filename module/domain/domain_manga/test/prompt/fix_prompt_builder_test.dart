@@ -43,6 +43,16 @@ void main() {
       expect(trimmed, '${'a' * 100000}\n<!-- truncated 1 chars -->');
     });
 
+    test('the over-budget cut snaps back to the last complete tag', () {
+      // A raw offset cut can split a tag or entity; the fixer must never see
+      // one (review on #194). 100 chars in, the offset lands inside
+      // `<div class="grid">`; the cut snaps back to the `>` of `</p>`.
+      final html = '<p>${'a' * 90}</p><div class="grid">${'b' * 40}';
+      final trimmed = trimPageHtml(html, maxChars: 100);
+
+      expect(trimmed, '<p>${'a' * 90}</p>\n<!-- truncated 58 chars -->');
+    });
+
     test('leaves input at exactly maxChars untouched', () {
       expect(trimPageHtml('a' * 10, maxChars: 10), 'a' * 10);
     });
@@ -202,10 +212,16 @@ void main() {
       );
     });
 
-    test('no fence but the header: the trimmed whole reply', () {
+    test('no fence but the header: the reply from the marker on', () {
       expect(
         extractScriptFromReply('\n  $_header\nconst source = {};\n\n'),
         '$_header\nconst source = {};',
+      );
+      // Leading prose would make SourceScript.parse reject the paste ("must
+      // start with header"), so it is cut off (review on #194).
+      expect(
+        extractScriptFromReply('Here is the fixed script:\n$_header\nx\n'),
+        '$_header\nx',
       );
     });
 
@@ -233,9 +249,25 @@ void main() {
       expect(extractScriptFromReply(''), isNull);
     });
 
-    test('an empty js fence yields an empty string', () {
-      expect(extractScriptFromReply('```js\n```'), '');
-      expect(extractScriptFromReply('```js\n\n```'), '');
+    test('an empty js fence does not shadow a later valid block', () {
+      // ```js\n``` used to win the first pass and return '', hiding a later
+      // valid block (review on #194).
+      expect(
+        extractScriptFromReply('```js\n```\n```js\n$_header\n```'),
+        _header,
+      );
+      // A lone empty js fence yields null, not ''.
+      expect(extractScriptFromReply('```js\n```'), isNull);
+      expect(extractScriptFromReply('```js\n\n```'), isNull);
+    });
+
+    test('info string variants name JavaScript', () {
+      expect(extractScriptFromReply('```js run\nA\n```'), 'A');
+      expect(extractScriptFromReply('```javascript:file\nA\n```'), 'A');
+      expect(extractScriptFromReply('~~~js\nA\n~~~'), 'A');
+      // jsx/ts do not name our script; the header pass still finds them.
+      expect(extractScriptFromReply('```jsx\n$_header\n```'), _header);
+      expect(extractScriptFromReply('```ts\nA\n```'), isNull);
     });
 
     test('an unterminated js fence yields null', () {
@@ -303,10 +335,14 @@ void main() {
         '{{function}}',
         '{{url}}',
         '{{error}}',
+        '{{stack}}',
         '{{html}}',
       ]) {
         expect(prompt, isNot(contains(placeholder)));
       }
+      // No stack in this run: the section stays empty instead of naming a
+      // frame that does not exist.
+      expect(prompt, contains('<stack>\n\n</stack>'));
     });
 
     test('real template states the contract and the rules', () {
@@ -332,10 +368,28 @@ void main() {
         '{{function}}',
         '{{url}}',
         '{{error}}',
+        '{{stack}}',
         '{{html}}',
       ]) {
         expect(template, contains(needle), reason: needle);
       }
+    });
+
+    test('the stack lands in its own section', () async {
+      final builder = FixPromptBuilder(
+        loadAsset: (_) async => '<stack>\n{{stack}}\n</stack>',
+      );
+
+      final prompt = await builder.build(
+        code: 'c',
+        function: 'search',
+        url: 'u',
+        errorMessage: 'e',
+        html: 'h',
+        stack: 'search@source.js:3:7',
+      );
+
+      expect(prompt, '<stack>\nsearch@source.js:3:7\n</stack>');
     });
 
     test(

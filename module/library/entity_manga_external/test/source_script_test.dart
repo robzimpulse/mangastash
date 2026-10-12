@@ -147,6 +147,26 @@ void main() {
       expect(s.timeoutFor('images'), const Duration(milliseconds: 120000));
     });
 
+    test('timeoutFor clamps a directly-constructed script to the cap', () {
+      // parse rejects an over-cap timeout; the clamp in timeoutFor keeps a
+      // SourceScript built without parse (e.g. in a test or future producer)
+      // from holding the shared webview past the budget anyway.
+      const s = SourceScript(
+        id: 'asura-scans',
+        name: 'Asura Scans',
+        baseUrl: 'https://asurascans.com',
+        iconUrl: '',
+        version: 3,
+        contract: 1,
+        hosts: ['asurascans.com'],
+        timeouts: {'images': 99999999, 'search': 0},
+        code: 'const source = {};',
+      );
+
+      expect(s.timeoutFor('images'), const Duration(milliseconds: 120000));
+      expect(s.timeoutFor('search'), const Duration(milliseconds: 1));
+    });
+
     test('a timeout above 120000 ms is rejected naming the limit', () {
       // A script cannot hold the shared webview (and, on Android, the
       // renderer other calls wait on) for longer than two minutes.

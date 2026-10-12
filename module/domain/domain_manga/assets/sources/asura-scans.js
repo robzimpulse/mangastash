@@ -123,6 +123,11 @@ const source = {
   // sub-pages). The page also holds same-shaped hero and related-row links, so
   // scope to the astro-island with the most such anchors and dedupe by URL.
   // There is no per-row lock marker, so rows are never filtered.
+  // Verified live 2026-10-12: the ChapterListReact island's SSR fallback ships
+  // the FULL list (a 134-chapter series carried all 134 anchors in the raw
+  // HTML) inside a plain max-h scroll box, so no row is lazily injected. The
+  // page's only "Show more" buttons belong to the description expander —
+  // there is no chapter expander to click (review on #194).
   chapters(doc, ctx) {
     const chapterHref = /\/chapter\/[\w.-]+\/?$/;
     const candidates = [...doc.querySelectorAll('a')].filter((a) =>

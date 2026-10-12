@@ -23,10 +23,18 @@
  * platform is older than API 29) right after a script run times out, before
  * disposing the webview. Webviews still attached receive
  * `onRenderProcessGone`, which the manager always handles.
+ *
+ * Compat: `terminateRenderers` reaches into flutter_inappwebview_android
+ * 1.1.3 internals (`headlessInAppWebViewManager.webViews`); the Dart side
+ * pins `flutter_inappwebview: ^6.1.0` (core_network/pubspec.yaml). A plugin
+ * bump that moves that field makes this channel log a warning and return
+ * false — runaway scripts then can no longer be terminated, so re-verify
+ * this channel on every plugin upgrade.
  */
 package com.robzimpulse.mangastash
 
 import android.os.Build
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
@@ -54,13 +62,32 @@ class MainActivity : FlutterActivity() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return false
         val plugin = flutterEngine.plugins.get(InAppWebViewFlutterPlugin::class.java)
             as? InAppWebViewFlutterPlugin ?: return false
-        var terminated = false
+        // Reach-in contract (see the class doc): when the plugin object exists
+        // but its headless map does not, the plugin changed under us — log it
+        // loudly instead of silently returning false, which would let a
+        // runaway script wedge the shared renderer until the app is
+        // force-stopped (review on #194).
         val headlessWebViews = plugin.headlessInAppWebViewManager?.webViews?.values?.toList()
-            ?: return false
-        val headlessViews = headlessWebViews.mapNotNull { it.flutterWebView?.webView }
-        if (hasVisibleWebView(window.decorView, headlessViews)) return false
+        if (headlessWebViews == null) {
+            Log.w(
+                "mangastash/WebviewRenderer",
+                "flutter_inappwebview internals changed: headlessInAppWebViewManager" +
+                    ".webViews is unavailable; runaway source scripts can no longer " +
+                    "be terminated",
+            )
+            return false
+        }
+        var terminated = false
         for (headless in headlessWebViews) {
-            val renderer = headless.flutterWebView?.webView?.webViewRenderProcess ?: continue
+            val webView = headless.flutterWebView?.webView ?: continue
+            // Re-checked per webview, as late as possible: the scan is not
+            // atomic with the kill below, and a visible webview can attach in
+            // between (e.g. the user opening the log inspector while a script
+            // times out). Terminating the shared renderer under a visible
+            // webview whose screen registers no onRenderProcessGone would
+            // make Android kill the whole app (review on #194).
+            if (hasVisibleWebView(window.decorView, listOf(webView))) continue
+            val renderer = webView.webViewRenderProcess ?: continue
             if (renderer.terminate()) terminated = true
         }
         return terminated

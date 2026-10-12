@@ -92,6 +92,12 @@ Error or validation message:
 {{error}}
 </error>
 
+Stack trace of the script error (as the WebView reported it; empty when the failure raised outside the script, e.g. in a ctx helper or a validation):
+
+<stack>
+{{stack}}
+</stack>
+
 # Page HTML
 
 This is the page as the WebView saw it after its JavaScript ran, with `<script>`, `<style>` and `<svg>` removed, whitespace collapsed, and truncated if very long. Inspect it to find the selectors the script should use.

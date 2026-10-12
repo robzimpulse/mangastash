@@ -187,7 +187,9 @@ void main() {
       registry: registry,
       runner: runner,
       promptBuilder: FixPromptBuilder(
-        loadAsset: (_) async => 'FN={{function}} ERR={{error}} URL={{url}}',
+        loadAsset:
+            (_) async =>
+                'FN={{function}} ERR={{error}} STACK={{stack}} URL={{url}}',
       ),
     );
     cubit = created;
@@ -310,8 +312,41 @@ void main() {
     );
   });
 
-  testWidgets('paste answer without a script shows a snackbar', (tester) async {
+  testWidgets('paste answer with a bare unfenced script inserts it raw', (
+    tester,
+  ) async {
+    // A chatbot sometimes replies without any fence; the raw fallback lets
+    // the script land (and SourceScript.parse report precisely on Test/Save)
+    // like the list flow (review on #194).
+    final pasted = _code(body: 'const source = { fixed: true };');
+    clipboardText = pasted;
+    await pumpScreen(tester);
+
+    await tapText(tester, 'Paste answer');
+
+    expect(editorField(tester).controller!.text, pasted.trim());
+    expect(find.text('Run Test before saving'), findsOneWidget);
+  });
+
+  testWidgets('paste answer with unrelated prose keeps it for cleanup', (
+    tester,
+  ) async {
+    // No fence and no header marker: there is nothing to extract, but the
+    // raw text still lands so the user sees WHY nothing was recognized
+    // (review on #194) — same fallback as the list flow.
     clipboardText = 'I could not fix it, sorry.';
+    await pumpScreen(tester);
+
+    await tapText(tester, 'Paste answer');
+
+    expect(editorField(tester).controller!.text, 'I could not fix it, sorry.');
+    expect(find.text('Run Test before saving'), findsOneWidget);
+  });
+
+  testWidgets('paste answer with an empty clipboard shows a snackbar', (
+    tester,
+  ) async {
+    clipboardText = null;
     await pumpScreen(tester);
 
     await tapText(tester, 'Paste answer');
@@ -468,7 +503,7 @@ void main() {
     expect(
       copiedText,
       'FN=search ERR=no error — improve or verify '
-      'URL=https://asurascans.com/browse',
+      'STACK= URL=https://asurascans.com/browse',
     );
     expect(find.text('Prompt copied — paste it into any chatbot'), findsOne);
   });
@@ -489,7 +524,7 @@ void main() {
     expect(
       copiedText,
       'FN=search ERR=search returned 0 items '
-      'URL=https://asurascans.com/browse',
+      'STACK= URL=https://asurascans.com/browse',
     );
   });
 
@@ -585,7 +620,8 @@ void main() {
     expect(find.text('Error in searchUrl at line 3'), findsOneWidget);
     expect(
       copiedText,
-      'FN=searchUrl ERR=line 3: params is undefined URL=(no page loaded)',
+      'FN=searchUrl ERR=line 3: params is undefined '
+      'STACK= URL=(no page loaded)',
     );
   });
 
@@ -628,7 +664,37 @@ void main() {
     expect(calls, ['setData']);
     expect(
       copiedText,
-      'FN=manga ERR=line 12: x is null URL=https://asurascans.com/comics/a',
+      'FN=manga ERR=line 12: x is null STACK= '
+      'URL=https://asurascans.com/comics/a',
+    );
+  });
+
+  testWidgets('copy fix prompt includes the stack of the script error', (
+    tester,
+  ) async {
+    stubPage(
+      error: const SourceScriptException(
+        function: 'manga',
+        message: 'x is null',
+        line: 12,
+        stack: 'manga@source.js:12:5\nglobal code@about:blank',
+        html: '<html>broken</html>',
+      ),
+    );
+    await pumpScreen(
+      tester,
+      function: 'manga',
+      url: 'https://asurascans.com/comics/a',
+    );
+    await tapText(tester, 'Test');
+
+    await tapText(tester, 'Copy fix prompt');
+
+    // The stack names the failing frame inside the script, so the fixer does
+    // not have to rediscover it (review on #194).
+    expect(
+      copiedText,
+      contains('STACK=manga@source.js:12:5\nglobal code@about:blank'),
     );
   });
 

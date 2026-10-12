@@ -461,6 +461,12 @@ void main() {
               .having((e) => e.message, 'message', 'boom')
               .having((e) => e.line, 'line', 3)
               .having((e) => e.column, 'column', 7)
+              // The raw stack rides along for the fix prompt.
+              .having(
+                (e) => e.stack,
+                'stack',
+                'search@mangastash-source.js:3:7\nglobal code@about:blank',
+              )
               .having((e) => e.url, 'url', 'https://x/p')
               .having((e) => e.timedOut, 'timedOut', isFalse)
               .having((e) => e.html, 'html', isNull),
@@ -506,6 +512,9 @@ void main() {
 
       expect(error.line, 4);
       expect(error.column, 9);
+      // An empty stack (a harness-raised error) is stored as absent, so the
+      // fix prompt does not render an empty stack section.
+      expect(error.stack, isNull);
     });
 
     test('the stack location wins over the posted line', () async {
@@ -746,7 +755,7 @@ void main() {
       expect(factory.calls, 2);
     });
 
-    test('reuses one warm webview across calls, even after a throw', () async {
+    test('rebuilds the blank webview after every call, throw or not', () async {
       Future<Object?> run() => manager.runOnBlank(
         code: 'const source = {};',
         function: 'searchUrl',
@@ -781,8 +790,15 @@ void main() {
           () => (handler: 'sourceResult', payload: {'value': 'null'});
       expect(await run(), isNull);
 
-      expect(factory.calls, 1);
-      verifyNever(() => factory.created.single.dispose());
+      // No page survives a script call: a user script can poison shared
+      // globals (Object.prototype, JSON, Promise) or navigate/data:-persist
+      // markup, and the NEXT call's harness must never run against it
+      // (review on #194). Three calls, three webviews, every one of them
+      // disposed before its call returned.
+      expect(factory.calls, 3);
+      verify(() => factory.created[0].dispose()).called(1);
+      verify(() => factory.created[1].dispose()).called(1);
+      verify(() => factory.created[2].dispose()).called(1);
     });
 
     test('registers only the sourceResult/sourceError handlers', () async {
@@ -928,11 +944,21 @@ void main() {
         ),
       );
       expect(await decide('about:blank'), NavigationActionPolicy.ALLOW);
+      // A data: URL is markup a script chose, not the blank page — it must
+      // not be able to persist attacker content in the warm webview (review
+      // on #194).
+      expect(
+        await decide('data:text/html,<h1>hi</h1>'),
+        NavigationActionPolicy.CANCEL,
+      );
       expect(await decide('https://elsewhere/'), NavigationActionPolicy.CANCEL);
       expect(await decide('https://x/a'), NavigationActionPolicy.CANCEL);
     });
 
-    test('a webview that left the blank page is replaced', () async {
+    test('a webview that left the blank page is still discarded', () async {
+      // Discarding is now unconditional (no page survives a script call, see
+      // runOnBlank), so a navigated-away webview is disposed like any other;
+      // this pins the navigated case end-to-end.
       factory.currentUrl = WebUri('https://elsewhere/');
       expect(await run(), 'https://x/a');
       verify(() => factory.created.first.dispose()).called(1);
@@ -940,7 +966,7 @@ void main() {
       factory.currentUrl = WebUri('about:blank');
       expect(await run(), 'https://x/a');
       expect(factory.calls, 2);
-      verifyNever(() => factory.created.last.dispose());
+      verify(() => factory.created.last.dispose()).called(1);
     });
 
     test('a page load timeout is a timed-out SourceScriptException', () async {

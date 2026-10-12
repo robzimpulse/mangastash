@@ -30,4 +30,11 @@ void main() {
     expect(stripCacheVersion('{"a":{"b":1}}@abc123'), '{"a":{"b":1}}');
     expect(stripCacheVersion('{"a":{"b":1}}'), '{"a":{"b":1}}');
   });
+
+  test('stripCacheVersion returns a key without any } unchanged', () {
+    // A key that is not a versioned parameter JSON is passed through so the
+    // caller's parse fails visibly instead of receiving '' (review on #194).
+    expect(stripCacheVersion('not-json'), 'not-json');
+    expect(stripCacheVersion(''), '');
+  });
 }

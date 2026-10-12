@@ -120,6 +120,41 @@ void main() {
       expect(registry.entries.value, hasLength(3));
     });
 
+    test('skips a shipped asset with an unsupported contract', () async {
+      assetMap['packages/domain_manga/assets/sources/weeb-central.js'] =
+          script(id: 'weeb-central', name: 'Weeb Central', contract: 2);
+
+      final registry = await create();
+
+      expect(registry.entries.value.map((e) => e.script.id), [
+        'asura-scans',
+        'manga-katana',
+        'manhua-plus',
+      ]);
+    });
+
+    test('quarantines a stored row with an unsupported contract', () async {
+      // A row written by a NEWER app version after a contract bump must not
+      // execute against an incompatible runtime (review on #194): it is
+      // skipped at load, like a row that fails to parse.
+      await dao.upsert(
+        SourceScriptTablesCompanion.insert(
+          id: 'future',
+          name: 'Future',
+          code: script(id: 'future', name: 'Future', contract: 2),
+          version: 1,
+          origin: SourceScriptOrigin.custom,
+        ),
+      );
+
+      final registry = await create();
+
+      expect(
+        registry.entries.value.map((e) => e.script.id),
+        isNot(contains('future')),
+      );
+    });
+
     test('custom entries come after shipped ones, sorted by name', () async {
       final registry = await create();
       await registry.save(script(id: 'zeta', name: 'Zeta'));

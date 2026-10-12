@@ -93,9 +93,13 @@ class SourceScript extends Equatable {
   });
 
   /// Timeout for [function]: its override in [timeouts], else 15000 ms.
+  /// The override is clamped to `[1, maxTimeoutMs]` here and not only at
+  /// parse time, so a directly-constructed [SourceScript] (bypassing
+  /// [parse]) cannot hold the shared webview past the cap either.
   Duration timeoutFor(String function) {
     final ms = timeouts[function];
-    return ms == null ? defaultTimeout : Duration(milliseconds: ms);
+    if (ms == null) return defaultTimeout;
+    return Duration(milliseconds: ms.clamp(1, maxTimeoutMs).toInt());
   }
 
   /// Parses and validates the header of [code]; see the class docs.

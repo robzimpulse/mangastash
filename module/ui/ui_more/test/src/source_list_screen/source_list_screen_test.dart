@@ -325,17 +325,26 @@ void main() {
     expect(find.text('New Site'), findsOneWidget);
     expect(find.text('new-site.com'), findsOneWidget);
     expect(find.text('cdn.new-site.net'), findsOneWidget);
+    // Declared, not enforced: hosts is self-declared header text the runtime
+    // does not police (review on #194).
+    expect(find.text('Declared hosts (not enforced):'), findsOneWidget);
+    expect(
+      find.textContaining('can contact any website'),
+      findsOneWidget,
+    );
+    expect(find.textContaining("site's cookies"), findsOneWidget);
     expect(
       find.text(
-        "Scripts run inside the site's page and can contact any website. "
-        'Only add scripts you trust.',
+        "Scripts run inside the site's page and can contact any website — "
+        "they run with this app's network identity and the site's cookies, so "
+        'they can send data anywhere. Only add scripts you trust.',
       ),
       findsOneWidget,
     );
     expect(find.textContaining('Replace'), findsNothing);
     verifyNever(() => registry.save(any()));
 
-    await tester.tap(find.text('Add'));
+    await tester.tap(find.text('Add and enable'));
     await pumpFrames(tester);
 
     verify(() => registry.save(code.trim())).called(1);
@@ -398,7 +407,7 @@ void main() {
 
     await tester.tap(find.byTooltip('Add source'));
     await pumpFrames(tester);
-    await tester.tap(find.text('Add'));
+    await tester.tap(find.text('Add and enable'));
     await pumpFrames(tester);
 
     expect(

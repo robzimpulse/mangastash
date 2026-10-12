@@ -32,7 +32,10 @@ extension SourceCacheVersion on SourceExternal {
 
 /// The parameter JSON inside a cache [key] built as `<json><cacheVersion>`
 /// (a key without a version is returned unchanged). The JSON always ends with
-/// `}`, so everything after its last `}` is the version.
+/// `}`, so everything after its last `}` is the version; a key without any
+/// `}` is not a versioned key and is returned unchanged too, so callers can
+/// at least try to parse it (and skip it) instead of receiving `''`.
 String stripCacheVersion(String key) {
-  return key.substring(0, key.lastIndexOf('}') + 1);
+  final i = key.lastIndexOf('}');
+  return i < 0 ? key : key.substring(0, i + 1);
 }

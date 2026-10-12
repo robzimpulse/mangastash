@@ -118,7 +118,6 @@ class SearchMangaUseCase with SyncMangasMixin {
   Future<void> clear({required SourceSearchMangaParameter parameter}) async {
     final data = await _searchMangaCacheManager.keys;
     final source = _registry.fromName(parameter.source);
-    if (source == null) return;
 
     final List<Future<void>> promises = [];
 
@@ -134,11 +133,15 @@ class SearchMangaUseCase with SyncMangasMixin {
         page: key.parameter.page,
       );
       if (paramIgnorePagination != key.parameter) continue;
+      // The file removal must not depend on the registry lookup below: a
+      // source deleted from the registry (custom source removed) still owns
+      // cached files here, and they must not be orphaned (review on #194;
+      // SearchChapterUseCase.clear is the sibling shape).
       promises.add(_searchMangaCacheManager.removeFile(value));
       // Built-in sources have no scraping hooks (they throw
       // UnimplementedError by design) and never cache script results, so
       // only scraped sources resolve a URL to evict from the runner cache.
-      if (!source.builtIn) {
+      if (source != null && !source.builtIn) {
         // A failing searchUrl script must not break the refresh that
         // follows; the fetch reports that error itself.
         promises.add(_evictSearch(source: source, parameter: key.parameter));

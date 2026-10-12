@@ -22,9 +22,13 @@ class SourceListScreen extends StatelessWidget {
   /// Opens the editor for the source with the given id.
   final ValueSetter<String> onTapEdit;
 
+  // `hosts` is self-declared header text: the runtime gates top-level
+  // navigation only, not fetch()/XHR from inside the page, so the list must
+  // never read like an enforced boundary (review on #194).
   static const String trustCopy =
-      "Scripts run inside the site's page and can contact any website. "
-      'Only add scripts you trust.';
+      "Scripts run inside the site's page and can contact any website — "
+      "they run with this app's network identity and the site's cookies, so "
+      'they can send data anywhere. Only add scripts you trust.';
 
   static Widget create({
     required ServiceLocator locator,
@@ -253,12 +257,14 @@ class SourceListScreen extends StatelessWidget {
       content: [
         Text(script.name, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
-        const Text('Can contact:'),
+        // Declared, not enforced: the header's `hosts` is self-declared text
+        // and the page's own fetch() calls are not policed (see trustCopy).
+        const Text('Declared hosts (not enforced):'),
         for (final host in script.hosts) Text(host),
         const SizedBox(height: 12),
         const Text(trustCopy),
       ],
-      confirmText: replaces == null ? 'Add' : 'Replace',
+      confirmText: replaces == null ? 'Add and enable' : 'Replace',
     );
     if (!confirmed || !context.mounted) return;
     await _cubit(context)?.add(pending);

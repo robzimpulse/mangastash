@@ -101,7 +101,19 @@ class SourceRegistry {
     for (final id in shippedSourceIds) {
       final path = 'packages/domain_manga/assets/sources/$id.js';
       try {
-        shipped[id] = SourceScript.parse(await loadAsset(path));
+        final script = SourceScript.parse(await loadAsset(path));
+        // A bundled asset always matches the compiled-in constant; the gate
+        // keeps a mismatched asset from executing if they ever drift (same
+        // gate as [save], review on #194).
+        if (script.contract != kSupportedSourceContract) {
+          developer.log(
+            'Skipping shipped source "$id": unsupported contract '
+            '${script.contract} (this app supports $kSupportedSourceContract)',
+            name: 'SourceRegistry',
+          );
+        } else {
+          shipped[id] = script;
+        }
       } catch (error, stackTrace) {
         developer.log(
           'Skipping shipped source "$id"',
@@ -288,6 +300,18 @@ class SourceRegistry {
           'Skipping stored source "$id"',
           name: 'SourceRegistry',
           error: error,
+        );
+        return null;
+      }
+      // [save] rejects unsupported contracts; the gate is repeated at load so
+      // a row written by a NEWER app version (after a contract bump) is
+      // quarantined here instead of executing against an incompatible runtime
+      // and failing later as per-function errors (review on #194).
+      if (script.contract != kSupportedSourceContract) {
+        developer.log(
+          'Skipping stored source "$id": unsupported contract '
+          '${script.contract} (this app supports $kSupportedSourceContract)',
+          name: 'SourceRegistry',
         );
         return null;
       }

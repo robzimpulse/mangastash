@@ -592,7 +592,7 @@ class HeadlessWebviewManager
       }
 
       try {
-        final value = await _invoke(
+        return await _invoke(
           webview: webview,
           owner: _blankOwners[webview]!,
           code: code,
@@ -602,21 +602,17 @@ class HeadlessWebviewManager
           pageFunction: false,
           timeout: effectiveTimeout,
         );
-        await _discardBlankWebviewIfNavigated(webview);
-        return value;
-      } on SourceScriptException catch (e) {
-        // A script that merely threw leaves the page healthy (unless it
-        // navigated away); one that never answered may still be spinning,
-        // so the next call gets a fresh page.
-        if (e.timedOut) {
-          await _discardBlankWebview();
-        } else {
-          await _discardBlankWebviewIfNavigated(webview);
-        }
-        rethrow;
-      } catch (_) {
+      } finally {
+        // No page survives a script call. A user script runs with the page's
+        // full authority: it can navigate away (racing the navigation
+        // policy's CANCEL), persist data:-page markup, or poison shared
+        // globals (Object.prototype, JSON, Promise — all reachable through
+        // the harness's indirect eval) that the NEXT call's harness would
+        // run against. Discarding the webview per call is the only reliable
+        // reset; the warm webview only saves one webview creation per call,
+        // which is cheap next to the fetch a built URL leads to (review on
+        // #194).
         await _discardBlankWebview();
-        rethrow;
       }
     });
   }
@@ -1033,9 +1029,10 @@ class HeadlessWebviewManager
       },
       shouldOverrideUrlLoading:
           origin == null
-              // Blank page: only its own about:blank/data load may proceed.
-              // A URL builder that navigates must not turn the warm webview
-              // into a remote page that later calls (and the bridge) run on.
+              // Blank page: only its own about:blank load may proceed. A URL
+              // builder that navigates must not turn the warm webview into a
+              // remote page — or an attacker-chosen data: page — that later
+              // calls (and the bridge) run on.
               ? (_, action) async {
                 return _isBlankUrl(action.request.url)
                     ? NavigationActionPolicy.ALLOW
@@ -1072,11 +1069,11 @@ class HeadlessWebviewManager
     return webview;
   }
 
-  /// Whether [url] is still the warm blank page (`about:`/`data:`).
-  static bool _isBlankUrl(Uri? url) {
-    final scheme = url?.scheme;
-    return scheme == 'about' || scheme == 'data';
-  }
+  /// Whether [url] is still the warm blank page (`about:blank`). A `data:`
+  /// URL is deliberately NOT blank: it is markup a script navigated to, so
+  /// the navigation policy cancels it, and treating it as blank here would
+  /// keep the attacker page alive (review on #194).
+  static bool _isBlankUrl(Uri? url) => url?.scheme == 'about';
 
   /// [_disposeWebview] for script runs: bounded by [disposeTimeout] and
   /// never throwing (logged), so a hung or failing native dispose can
@@ -1166,6 +1163,9 @@ class HeadlessWebviewManager
           message: message,
           line: location?.line,
           column: location?.column,
+          // The raw stack names the failing helper/frame inside the script;
+          // the fix prompt includes it (empty means the harness raised).
+          stack: stack.isEmpty ? null : stack,
           url: pending.url,
         ),
       );
@@ -1437,30 +1437,5 @@ class HeadlessWebviewManager
     final webview = _blankWebview;
     _blankWebview = null;
     await _disposeBounded(webview);
-  }
-
-  /// Discards the warm blank webview when [webview] (the one a call just
-  /// used) is no longer on the blank page — e.g. a script navigated
-  /// somewhere the navigation policy did not catch — or its URL cannot be
-  /// read. Keeps it otherwise.
-  Future<void> _discardBlankWebviewIfNavigated(
-    HeadlessInAppWebView webview,
-  ) async {
-    bool blank;
-    try {
-      final url = await webview.webViewController?.getUrl().timeout(
-        disposeTimeout,
-      );
-      blank = url == null || _isBlankUrl(url);
-    } catch (_) {
-      blank = false;
-    }
-    if (!blank) {
-      _log.log(
-        'Warm blank webview left the blank page; replacing it',
-        name: 'HeadlessWebviewManager',
-      );
-      await _discardBlankWebview();
-    }
   }
 }

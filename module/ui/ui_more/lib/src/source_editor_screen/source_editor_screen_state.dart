@@ -39,6 +39,10 @@ class SourceTestRun extends Equatable {
   /// 1-based script line of [error], when the runtime knows it.
   final int? line;
 
+  /// Raw stack of the script error, when the runtime posted one; for the fix
+  /// prompt (it names the failing helper/frame inside the script).
+  final String? stack;
+
   /// Domain validation failure (e.g. `missing title`); null when it passed.
   final String? validation;
 
@@ -61,6 +65,7 @@ class SourceTestRun extends Equatable {
     this.json,
     this.error,
     this.line,
+    this.stack,
     this.validation,
     this.summary,
     this.html,
@@ -86,6 +91,7 @@ class SourceTestRun extends Equatable {
     json,
     error,
     line,
+    stack,
     validation,
     summary,
     elapsed,

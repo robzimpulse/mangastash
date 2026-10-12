@@ -164,6 +164,7 @@ class SourceEditorScreenCubit extends Cubit<SourceEditorScreenState>
         url: run.url ?? noPageUrl,
         errorMessage: run.problem ?? noErrorMessage,
         html: run.html ?? '',
+        stack: run.stack ?? '',
       );
       await Clipboard.setData(ClipboardData(text: prompt));
       emit(
@@ -174,14 +175,18 @@ class SourceEditorScreenCubit extends Cubit<SourceEditorScreenState>
     }
   }
 
-  /// Replaces the code with the script found in the clipboard.
+  /// Replaces the code with the script found in the clipboard. When no fenced
+  /// script block is found, the raw clipboard text is used — a bare (unfenced)
+  /// script still lands in the editor and `SourceScript.parse` surfaces the
+  /// precise header error on Test/Save, like the list flow's fallback.
   Future<void> pasteAnswer() async {
     final raw = (await Clipboard.getData(Clipboard.kTextPlain))?.text;
-    final code = raw == null ? null : extractScriptFromReply(raw);
-    if (code == null || code.isEmpty) {
+    if (raw == null || raw.trim().isEmpty) {
       emit(state.copyWith(message: 'No script found in the clipboard'));
       return;
     }
+    final extracted = extractScriptFromReply(raw);
+    final code = (extracted == null || extracted.isEmpty) ? raw : extracted;
     emit(state.copyWith(code: code, hint: 'Run Test before saving'));
   }
 
@@ -238,6 +243,7 @@ class SourceEditorScreenCubit extends Cubit<SourceEditorScreenState>
     SourceTestRun result({
       String? error,
       int? line,
+      String? stack,
       String? validation,
       String? summary,
       String? html,
@@ -251,6 +257,7 @@ class SourceEditorScreenCubit extends Cubit<SourceEditorScreenState>
         json: _json(runner.last),
         error: error,
         line: line,
+        stack: stack,
         validation: validation,
         summary: summary,
         elapsed: watch.elapsed,
@@ -311,7 +318,7 @@ class SourceEditorScreenCubit extends Cubit<SourceEditorScreenState>
       url = e.url ?? url;
       if (e.function != function) failedFunction = e.function;
       final message = e.timedOut ? 'Timed out: ${e.message}' : e.message;
-      return result(error: message, line: e.line, html: e.html);
+      return result(error: message, line: e.line, stack: e.stack, html: e.html);
     } on FailedParsingHtmlException catch (e) {
       // No missing fields = the page itself failed to load, not validation.
       if (e.missingFields.isEmpty) return result(error: e.toString());

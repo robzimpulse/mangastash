@@ -174,6 +174,25 @@ void main() {
       await expectLater(useCase.clear(parameter: parameter), completes);
       verify(() => cacheManager.removeFile(any())).called(1);
     });
+
+    test('removes files for a source that is no longer in the registry', () async {
+      // A custom source deleted from the registry still owns cache files;
+      // clear must remove them instead of silently doing nothing — only the
+      // script-result eviction depends on the registry (review on #194).
+      final parameter = SourceSearchMangaParameter(
+        source: 'Ghost',
+        parameter: const SearchMangaParameter(page: 1),
+      );
+      when(
+        () => cacheManager.keys,
+      ).thenAnswer((_) async => {parameter.toJsonString()});
+      when(() => registry.fromName('Ghost')).thenAnswer((_) => null);
+
+      await useCase.clear(parameter: parameter);
+
+      verify(() => cacheManager.removeFile(any())).called(1);
+      verifyNever(() => runner.evict(url: any(named: 'url')));
+    });
   });
 
   group('SearchMangaUseCase.execute (issue #122)', () {

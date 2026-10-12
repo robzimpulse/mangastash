@@ -7,6 +7,9 @@ import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+// context.showSnackBar (via feature_common's ui_common re-export) answers the
+// "Fix source" fallback below (review on #194): the source can disappear
+// between the error and the tap.
 import 'package:feature_common/feature_common.dart';
 import 'package:service_locator/service_locator.dart';
 import 'package:ui_browse/ui_browse.dart';
@@ -16,11 +19,16 @@ import 'fix_source_location.dart';
 import 'route_path.dart';
 
 class BrowseRouteBuilder extends BaseRouteBuilder {
-  /// Opens the source editor for [target]; does nothing when the source has
-  /// no editable script (see [fixSourceLocation]).
+  /// Opens the source editor for [target]; explains itself when the source
+  /// has no editable script anymore (deleted or renamed between the error
+  /// and the tap — [fixSourceLocation] returns null for unknown names).
   void _openSourceEditor(BuildContext context, FixSourceTarget target) {
     final location = fixSourceLocation(target);
-    if (location != null) context.push(location);
+    if (location != null) {
+      context.push(location);
+    } else {
+      context.showSnackBar(message: 'Source no longer available');
+    }
   }
 
   @override

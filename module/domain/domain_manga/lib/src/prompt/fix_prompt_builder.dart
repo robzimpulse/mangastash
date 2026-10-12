@@ -39,8 +39,13 @@ final RegExp _whitespace = RegExp(r'\s+');
 String trimPageHtml(String html, {int maxChars = 60000}) {
   final collapsed = _strip(html).replaceAll(_whitespace, ' ');
   if (collapsed.length <= maxChars) return collapsed;
-  final dropped = collapsed.length - maxChars;
-  return '${collapsed.substring(0, maxChars)}\n<!-- truncated $dropped chars -->';
+  // Snap the cut back to the end of the last complete tag so the fixer never
+  // sees a split tag, quoted attribute or entity (review on #194); fall back
+  // to the raw cut when no '>' precedes the budget.
+  final cut = collapsed.lastIndexOf('>', maxChars - 1);
+  final end = cut == -1 ? maxChars : cut + 1;
+  final dropped = collapsed.length - end;
+  return '${collapsed.substring(0, end)}\n<!-- truncated $dropped chars -->';
 }
 
 /// Lowercases ASCII letters only, so the result has the same length as the
@@ -194,39 +199,61 @@ int _copyTag(String html, int start, StringBuffer out) {
 
 const String _headerMarker = '==MangaStashSource==';
 
-final RegExp _fence = RegExp(r'```([^\n`]*)\n([\s\S]*?)```');
+/// A fenced block: ``` or ~~~ delimiters, an info string without newlines or
+/// fence characters, then the content (~~~ is the alternative chatbots use
+/// when the reply itself contains ```).
+final RegExp _fence = RegExp(
+  r'(?:```|~~~)([^\n`~]*)\n([\s\S]*?)(?:```|~~~)',
+);
+
+/// Whether a fence's info string names JavaScript: the first token must be
+/// `js` or start with `javascript` (covers `js run`, `javascript:file`,
+/// `JAVASCRIPT`); `jsx`, `ts` and friends do not.
+bool _isJavaScriptInfo(String info) {
+  final token = info.trim().toLowerCase().split(RegExp(r'\s')).first;
+  return token == 'js' || token.startsWith('javascript');
+}
 
 /// Extracts the script from a chatbot [reply] (CRLF is normalized to LF).
 ///
-/// Order of preference: the content of the first fenced block whose info
-/// string is `js` or `javascript` (case-insensitive); else the content of the
-/// first fenced block of any info string containing `==MangaStashSource==`;
-/// else the trimmed whole reply when it contains that marker; else `null`.
+/// Order of preference: the content of the first non-empty fenced block whose
+/// info string names JavaScript (an empty one never shadows a later valid
+/// block); else the content of the first fenced block of any info string
+/// containing `==MangaStashSource==`; else, when a fenceless reply contains
+/// that marker, the reply from the marker on (leading prose would make
+/// [SourceScript.parse] reject a well-meant paste); else `null`.
 /// Returned content is trimmed.
 String? extractScriptFromReply(String reply) {
   final text = reply.replaceAll('\r\n', '\n');
   final fences = _fence.allMatches(text).toList();
 
   for (final fence in fences) {
-    final info = fence.group(1)!.trim().toLowerCase();
-    if (info == 'js' || info == 'javascript') return fence.group(2)!.trim();
+    if (!_isJavaScriptInfo(fence.group(1)!)) continue;
+    final content = fence.group(2)!.trim();
+    if (content.isNotEmpty) return content;
   }
   for (final fence in fences) {
     final content = fence.group(2)!;
     if (content.contains(_headerMarker)) return content.trim();
   }
-  return text.contains(_headerMarker) ? text.trim() : null;
+  final marker = text.indexOf(_headerMarker);
+  if (marker == -1) return null;
+  // Back up to the start of the marker's line so the `// ` prefix of the
+  // header comment survives (SourceScript.parse requires it).
+  final lineStart = text.lastIndexOf('\n', marker) + 1;
+  return text.substring(lineStart).trim();
 }
 
 /// Builds the fix prompt from the template shipped at
 /// `packages/domain_manga/assets/prompt/fix_source_prompt.md`.
 ///
-/// The template holds five placeholders, replaced in a single pass (so
+/// The template holds six placeholders, replaced in a single pass (so
 /// placeholder-like text inside a value is never expanded again):
 /// `{{script}}` the current script, `{{function}}` the failing function name,
 /// `{{url}}` the URL that was loaded, `{{error}}` the error or validation
-/// message and `{{html}}` the page HTML as the webview saw it, passed through
-/// [trimPageHtml]. Unknown `{{...}}` text is left untouched.
+/// message, `{{stack}}` the raw stack of the script error (empty when the
+/// runtime has none) and `{{html}}` the page HTML as the webview saw it,
+/// passed through [trimPageHtml]. Unknown `{{...}}` text is left untouched.
 class FixPromptBuilder {
   static const String templateAsset =
       'packages/domain_manga/assets/prompt/fix_source_prompt.md';
@@ -241,6 +268,7 @@ class FixPromptBuilder {
     required String url,
     required String errorMessage,
     required String html,
+    String stack = '',
   }) async {
     final template = await loadAsset(templateAsset);
     final values = <String, String>{
@@ -248,10 +276,11 @@ class FixPromptBuilder {
       'function': function,
       'url': url,
       'error': errorMessage,
+      'stack': stack,
       'html': trimPageHtml(html),
     };
     return template.replaceAllMapped(
-      RegExp(r'\{\{(script|function|url|error|html)\}\}'),
+      RegExp(r'\{\{(script|function|url|error|stack|html)\}\}'),
       (match) => values[match.group(1)]!,
     );
   }
