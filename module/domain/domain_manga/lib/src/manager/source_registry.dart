@@ -279,41 +279,51 @@ class SourceRegistry {
     List<SourceScriptDrift> rows,
   ) {
     final byId = {for (final row in rows) row.id: row};
+
+    // The entry for a shipped id with no usable stored row: the bundled
+    // script keeps the source visible, usable and resettable instead of
+    // letting it vanish from the registry because its stored edit is
+    // unreadable or from a newer contract (review on #194).
+    SourceEntry? shippedEntry(SourceScript? bundled) {
+      return bundled == null
+          ? null
+          : SourceEntry(
+            script: bundled,
+            status: SourceStatus.shipped,
+            shipped: bundled,
+          );
+    }
+
     SourceEntry? entry(String id) {
       final row = byId[id];
       final bundled = shipped[id];
-      if (row == null) {
-        return bundled == null
-            ? null
-            : SourceEntry(
-              script: bundled,
-              status: SourceStatus.shipped,
-              shipped: bundled,
-            );
-      }
+      if (row == null) return shippedEntry(bundled);
       final SourceScript script;
       try {
         script = SourceScript.parse(row.code);
       } on SourceScriptFormatException catch (error) {
         // A stored row can only be invalid through outside tampering.
         developer.log(
-          'Skipping stored source "$id"',
+          'Skipping stored source "$id" '
+          '(the shipped script stays active)',
           name: 'SourceRegistry',
           error: error,
         );
-        return null;
+        return shippedEntry(bundled);
       }
       // [save] rejects unsupported contracts; the gate is repeated at load so
       // a row written by a NEWER app version (after a contract bump) is
       // quarantined here instead of executing against an incompatible runtime
-      // and failing later as per-function errors (review on #194).
+      // and failing later as per-function errors (review on #194). A bundled
+      // script keeps the source alive.
       if (script.contract != kSupportedSourceContract) {
         developer.log(
           'Skipping stored source "$id": unsupported contract '
-          '${script.contract} (this app supports $kSupportedSourceContract)',
+          '${script.contract} (this app supports $kSupportedSourceContract; '
+          'the shipped script stays active)',
           name: 'SourceRegistry',
         );
-        return null;
+        return shippedEntry(bundled);
       }
       final status =
           row.origin == SourceScriptOrigin.custom

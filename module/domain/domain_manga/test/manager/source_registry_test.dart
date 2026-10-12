@@ -155,6 +155,56 @@ void main() {
       );
     });
 
+    test('a broken row of a shipped id falls back to the bundled script', () async {
+      // Quarantining must not make the source vanish: without the bundled
+      // fallback it would disappear from the Sources screen (no Reset) and
+      // every library manga of that source would fail (review on #194).
+      await dao.upsert(
+        SourceScriptTablesCompanion.insert(
+          id: 'asura-scans',
+          name: 'Asura Scans',
+          code: 'not a header',
+          version: 2,
+          origin: SourceScriptOrigin.shippedEdited,
+        ),
+      );
+
+      final registry = await create();
+
+      final entry = registry.entries.value.firstWhere(
+        (e) => e.script.id == 'asura-scans',
+      );
+      expect(entry.status, SourceStatus.shipped);
+      expect(
+        entry.script.code,
+        assetMap['packages/domain_manga/assets/sources/asura-scans.js'],
+      );
+      expect(entry.shipped, isNotNull);
+    });
+
+    test(
+      'a newer-contract row of a shipped id falls back to the bundled script',
+      () async {
+        await dao.upsert(
+          SourceScriptTablesCompanion.insert(
+            id: 'weeb-central',
+            name: 'Weeb Central',
+            code: script(id: 'weeb-central', name: 'Weeb Central', contract: 2),
+            version: 1,
+            origin: SourceScriptOrigin.shippedEdited,
+          ),
+        );
+
+        final registry = await create();
+
+        final entry = registry.entries.value.firstWhere(
+          (e) => e.script.id == 'weeb-central',
+        );
+        expect(entry.status, SourceStatus.shipped);
+        expect(entry.script.contract, kSupportedSourceContract);
+      },
+    );
+
     test('custom entries come after shipped ones, sorted by name', () async {
       final registry = await create();
       await registry.save(script(id: 'zeta', name: 'Zeta'));

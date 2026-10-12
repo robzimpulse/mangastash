@@ -78,6 +78,13 @@ class MainActivity : FlutterActivity() {
             return false
         }
         var terminated = false
+        // Every headless webview is attached to the window hierarchy by the
+        // plugin (HeadlessInAppWebView.prepare adds its view to the content
+        // view), so the scan below must exempt ALL of them: exempting only
+        // the current iteration's webview makes any second live headless
+        // webview look "visible" and skips every termination (review on
+        // #194).
+        val headlessViews = headlessWebViews.mapNotNull { it.flutterWebView?.webView }
         for (headless in headlessWebViews) {
             val webView = headless.flutterWebView?.webView ?: continue
             // Re-checked per webview, as late as possible: the scan is not
@@ -86,7 +93,7 @@ class MainActivity : FlutterActivity() {
             // times out). Terminating the shared renderer under a visible
             // webview whose screen registers no onRenderProcessGone would
             // make Android kill the whole app (review on #194).
-            if (hasVisibleWebView(window.decorView, listOf(webView))) continue
+            if (hasVisibleWebView(window.decorView, headlessViews)) continue
             val renderer = webView.webViewRenderProcess ?: continue
             if (renderer.terminate()) terminated = true
         }

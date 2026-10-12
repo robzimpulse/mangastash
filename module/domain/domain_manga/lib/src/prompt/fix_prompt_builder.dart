@@ -200,10 +200,13 @@ int _copyTag(String html, int start, StringBuffer out) {
 const String _headerMarker = '==MangaStashSource==';
 
 /// A fenced block: ``` or ~~~ delimiters, an info string without newlines or
-/// fence characters, then the content (~~~ is the alternative chatbots use
-/// when the reply itself contains ```).
+/// fence characters, then the content. The captured delimiter plus the `\1`
+/// backreference require the SAME delimiter to close the block: a `~~~` fence
+/// must survive ``` inside it (the reason ~~~ exists — replies containing
+/// ```), and a ``` fence must survive `~~~` in a template literal (review on
+/// #194).
 final RegExp _fence = RegExp(
-  r'(?:```|~~~)([^\n`~]*)\n([\s\S]*?)(?:```|~~~)',
+  r'(```|~~~)([^\n`~]*)\n([\s\S]*?)\1',
 );
 
 /// Whether a fence's info string names JavaScript: the first token must be
@@ -228,12 +231,12 @@ String? extractScriptFromReply(String reply) {
   final fences = _fence.allMatches(text).toList();
 
   for (final fence in fences) {
-    if (!_isJavaScriptInfo(fence.group(1)!)) continue;
-    final content = fence.group(2)!.trim();
+    if (!_isJavaScriptInfo(fence.group(2)!)) continue;
+    final content = fence.group(3)!.trim();
     if (content.isNotEmpty) return content;
   }
   for (final fence in fences) {
-    final content = fence.group(2)!;
+    final content = fence.group(3)!;
     if (content.contains(_headerMarker)) return content.trim();
   }
   final marker = text.indexOf(_headerMarker);

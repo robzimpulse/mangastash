@@ -280,6 +280,30 @@ void main() {
         'const a = `x`;',
       );
     });
+
+    test('a ~~~ fence survives ``` inside it (why ~~~ exists)', () {
+      // ~~~ is the alternative for replies CONTAINING ``` — the independent
+      // delimiters used to truncate such a block at the inner ``` (review on
+      // #194).
+      expect(
+        extractScriptFromReply('~~~js\nA\n// see ```\nB\n~~~'),
+        'A\n// see ```\nB',
+      );
+    });
+
+    test('a ``` fence survives ~~~ inside it', () {
+      expect(
+        extractScriptFromReply('```js\nconst t = `~~~`;\n```'),
+        'const t = `~~~`;',
+      );
+    });
+
+    test('a fence closes only on its own delimiter', () {
+      // An unterminated block with a stray opposite delimiter no longer
+      // matches (it used to be truncated at the stray delimiter).
+      expect(extractScriptFromReply('~~~js\nA\n```'), isNull);
+      expect(extractScriptFromReply('```js\nA\n~~~'), isNull);
+    });
   });
 
   group('FixPromptBuilder', () {
