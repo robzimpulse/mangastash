@@ -1,7 +1,9 @@
 // GridWidget: paged sliver grid with shimmer loading, an error state and an
 // empty state. A recrawlable error offers "Open Debug Browser"
 // (`onTapRecrawl`), and a script failure naming its source also offers
-// "Fix source" (`onTapFixSource`, issue #115).
+// "Fix source" (`onTapFixSource`, issue #115). A page that never loaded
+// (`isTransientLoadError`: the script never ran) offers "Retry"
+// (`onRefresh`) instead of "Fix source".
 //
 // Usage: `GridWidget<T>(itemBuilder: ..., data: ..., error: ...,
 // onTapRecrawl: ..., onTapFixSource: ...)`.
@@ -149,6 +151,17 @@ class _GridWidgetState<T> extends State<GridWidget<T>> {
                                 );
                               },
                               child: const Text('Open Debug Browser'),
+                            ),
+                          ],
+                          // A page that never loaded is transient (issue
+                          // #115): the script never ran, so offer Retry, not
+                          // Fix source.
+                          if (isTransientLoadError(error) &&
+                              onRefresh != null) ...[
+                            const SizedBox(height: 8),
+                            OutlinedButton(
+                              onPressed: onRefresh,
+                              child: const Text('Retry'),
                             ),
                           ],
                           if (fixSourceTargetOf(error) case final target?)

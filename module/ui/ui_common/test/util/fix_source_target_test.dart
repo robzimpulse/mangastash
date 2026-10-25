@@ -37,6 +37,22 @@ void main() {
       expect(target?.url, 'u');
     });
 
+    test('is null for a page-load failure (the script never ran)', () {
+      expect(
+        fixSourceTargetOf(
+          const SourceScriptException(
+            function: 'chapters',
+            message: 'chapters timed out loading the page after 15s',
+            source: 'Weeb Central',
+            url: 'u',
+            timedOut: true,
+            loadFailed: true,
+          ),
+        ),
+        null,
+      );
+    });
+
     test('is null for a SourceScriptException without a source', () {
       expect(
         fixSourceTargetOf(

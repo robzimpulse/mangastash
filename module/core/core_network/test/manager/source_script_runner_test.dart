@@ -88,6 +88,16 @@ class FakeWebviewFactory {
   bool loadHangs = false;
   bool goneOnRun = false;
 
+  /// The page starts loading but its `load` event (`onLoadStop`) never
+  /// fires, as on a page with hundreds of eager images.
+  bool loadStopNever = false;
+
+  /// What the DOM-ready probe ([scriptPageReadyProbe]) evaluates to.
+  bool domReady = false;
+
+  /// How many times the DOM-ready probe was evaluated.
+  int domProbes = 0;
+
   /// Registered JS handlers per construction (same index as [created]).
   final List<Map<String, Function>> handlerMaps = [];
 
@@ -176,6 +186,10 @@ class FakeWebviewFactory {
       () => controller.evaluateJavascript(source: any(named: 'source')),
     ).thenAnswer((invocation) async {
       final source = invocation.namedArguments[#source] as String;
+      if (source == scriptPageReadyProbe) {
+        domProbes++;
+        return domReady;
+      }
       final callId = RegExp(r'var callId = "([^"]+)"').firstMatch(source);
       final message = reply?.call();
       if (callId != null) callIds.add(callId.group(1)!);
@@ -213,6 +227,7 @@ class FakeWebviewFactory {
       }
       if (loadHangs || loadHangsAt.contains(index)) return;
       onLoadStart?.call(controller, null);
+      if (loadStopNever) return;
       onLoadStop?.call(controller, null);
     });
     when(() => webview.dispose()).thenAnswer((_) {
@@ -587,6 +602,8 @@ void main() {
       expect(exception.function, 'search');
       expect(exception.url, 'https://x/p');
       expect(exception.message, 'search timed out after 0.05s');
+      // The page loaded and the script itself hung: a script fault.
+      expect(exception.loadFailed, isFalse);
       verify(() => factory.created.single.dispose()).called(1);
       verifyNever(
         () => cache.putFile(
@@ -627,7 +644,88 @@ void main() {
         exception.message,
         'images timed out loading the page after 0.05s',
       );
+      // The script never ran: not a script fault (no "Fix source").
+      expect(exception.loadFailed, isTrue);
       verify(() => factory.created.single.dispose()).called(1);
+    });
+  });
+
+  group('runOnPage DOM-ready gate (iOS reliability, issue #115)', () {
+    // The browser `load` event waits for every image and script; a Weeb
+    // Central chapter list (806 eager images) took 27s on an iOS simulator,
+    // so script pages must not wait for it.
+    setUp(() {
+      when(() => cache.getFileFromCache(any())).thenAnswer((_) async => null);
+      when(
+        () => cache.putFile(
+          any(),
+          any(),
+          fileExtension: any(named: 'fileExtension'),
+          maxAge: any(named: 'maxAge'),
+        ),
+      ).thenAnswer((_) async => MemoryCacheSystem().createFile('put.json'));
+      factory.reply =
+          () => (handler: 'sourceResult', payload: {'value': '[1]'});
+    });
+
+    test('runs the script once the DOM is ready, without the load '
+        'event', () async {
+      factory.loadStopNever = true;
+      factory.domReady = true;
+
+      final result = await manager.runOnPage(
+        url: 'https://x/full-chapter-list',
+        code: 'const source = {};',
+        function: 'chapters',
+        baseUrl: 'https://x',
+        timeout: const Duration(seconds: 5),
+      );
+
+      expect(result.value, [1]);
+      expect(factory.domProbes, greaterThan(0));
+    });
+
+    test('a DOM that never becomes ready times out as a load '
+        'failure', () async {
+      factory.loadStopNever = true;
+      factory.domReady = false;
+
+      final error = await manager
+          .runOnPage(
+            url: 'https://x/full-chapter-list',
+            code: 'const source = {};',
+            function: 'chapters',
+            baseUrl: 'https://x',
+            timeout: const Duration(milliseconds: 500),
+          )
+          .then<Object?>((_) => null, onError: (Object e) => e);
+
+      expect(
+        error,
+        isA<SourceScriptException>()
+            .having((e) => e.loadFailed, 'loadFailed', isTrue)
+            .having((e) => e.timedOut, 'timedOut', isTrue)
+            .having(
+              (e) => e.message,
+              'message',
+              'chapters timed out loading the page after 0.5s',
+            ),
+      );
+      expect(factory.domProbes, greaterThan(0));
+    });
+
+    test('the load event still releases the gate', () async {
+      factory.domReady = false;
+
+      final result = await manager.runOnPage(
+        url: 'https://x/p',
+        code: 'const source = {};',
+        function: 'search',
+        baseUrl: 'https://x',
+        timeout: const Duration(seconds: 5),
+      );
+
+      expect(result.value, [1]);
     });
   });
 
@@ -989,7 +1087,8 @@ void main() {
                 'message',
                 'searchUrl could not start the script runner '
                     '(blank page did not load after 0.05s)',
-              ),
+              )
+              .having((e) => e.loadFailed, 'loadFailed', isTrue),
         ),
       );
       verify(() => factory.created.single.dispose()).called(1);

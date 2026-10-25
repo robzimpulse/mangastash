@@ -1,6 +1,7 @@
 // MangaReaderScreen: chapter reader. A failed chapter load offers "Open Debug
 // Browser" and, for a scripted-source parse failure, "Fix source" (issue
-// #115, reported through `onTapFixSource`).
+// #115, reported through `onTapFixSource`); a page that never loaded (the
+// script never ran) offers "Retry" instead of "Fix source".
 //
 // Usage: `MangaReaderScreen.create(locator: locator, source: name,
 // mangaId: id, chapterId: id, onTapShortcut: ..., onTapFixSource: ...)`.
@@ -143,6 +144,15 @@ class MangaReaderScreen extends StatelessWidget {
             },
             child: const Text('Open Debug Browser'),
           ),
+          // A page that never loaded is transient (issue #115): the script
+          // never ran, so offer Retry, not Fix source.
+          if (isTransientLoadError(error)) ...[
+            const SizedBox(height: 8),
+            OutlinedButton(
+              onPressed: () => _cubit(context)?.init(useCache: false),
+              child: const Text('Retry'),
+            ),
+          ],
           if (fixSourceTargetOf(error) case final target?)
             if (onTapFixSource != null) ...[
               const SizedBox(height: 8),

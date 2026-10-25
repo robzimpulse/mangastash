@@ -5,8 +5,10 @@
 // Only errors raised by a source *script* qualify: a SourceScriptException
 // carrying the source name, or a FailedParsingHtmlException that names both
 // its source and the parser (script function: search | manga | chapters |
-// images). MangaDex is a native built-in with no script and never raises
-// these, so it never gets the action; the feature layer additionally resolves
+// images). A page-load failure (`SourceScriptException.loadFailed`: the page
+// or script runner never loaded, so the script never ran) does not qualify:
+// it is transient and the UI offers Retry instead. MangaDex is a native
+// built-in with no script and never raises these, so it never gets the action; the feature layer additionally resolves
 // the name to a script id and does nothing when the source has none.
 //
 // Usage:
@@ -50,6 +52,7 @@ class FixSourceTarget {
 /// failure that names its source.
 FixSourceTarget? fixSourceTargetOf(Object? error) {
   if (error is SourceScriptException) {
+    if (error.loadFailed) return null;
     final source = error.source;
     if (source == null) return null;
     return FixSourceTarget(

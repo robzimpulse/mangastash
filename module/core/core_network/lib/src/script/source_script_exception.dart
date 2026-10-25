@@ -5,12 +5,23 @@
 /// inside the script (null when the stack had no script frame), the raw [stack]
 /// text the page posted (null for harness-raised errors and timeouts), the
 /// page [url] it ran against, the id of the [source], a snapshot of the page
-/// [html] and whether the call [timedOut].
+/// [html], whether the call [timedOut], and whether the page or script
+/// runner never loaded ([loadFailed]: the script did not run, so the failure
+/// is transient and not a script fault; the UI offers Retry, not Fix source).
 /// Usage: thrown by the source script runner; catch it and read the fields, or
 /// print it: "SourceScriptException: {source} {function} failed at line {line}:
 /// {message}" (missing parts are omitted). Use [copyWith] to attach the
 /// [source] id and [html] snapshot once they are known.
+/// [isTransientLoadError] tells the UI whether an error is such a load
+/// failure (offer Retry) rather than a script fault (offer Fix source).
 library;
+
+/// Whether [error] is a [SourceScriptException] whose page or script runner
+/// never loaded ([SourceScriptException.loadFailed]): the script did not
+/// run, so retrying can help and editing the script cannot.
+bool isTransientLoadError(Object? error) {
+  return error is SourceScriptException && error.loadFailed;
+}
 
 class SourceScriptException implements Exception {
   const SourceScriptException({
@@ -23,6 +34,7 @@ class SourceScriptException implements Exception {
     this.source,
     this.html,
     this.timedOut = false,
+    this.loadFailed = false,
   });
 
   final String function;
@@ -39,6 +51,11 @@ class SourceScriptException implements Exception {
   final String? html;
   final bool timedOut;
 
+  /// The page (or the blank script runner) failed to load in time, or its
+  /// renderer died while loading, so the script never ran. Such failures are
+  /// transient: retrying can succeed, and editing the script cannot help.
+  final bool loadFailed;
+
   SourceScriptException copyWith({String? source, String? html}) {
     return SourceScriptException(
       function: function,
@@ -50,6 +67,7 @@ class SourceScriptException implements Exception {
       source: source ?? this.source,
       html: html ?? this.html,
       timedOut: timedOut,
+      loadFailed: loadFailed,
     );
   }
 

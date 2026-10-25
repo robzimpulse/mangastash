@@ -227,6 +227,36 @@ void main() {
       expect(find.text('Fix source'), findsOneWidget);
     });
 
+    testWidgets('a page-load failure offers Retry instead, which '
+        'refetches', (tester) async {
+      stubSearchError(
+        const SourceScriptException(
+          function: 'search',
+          message: 'search timed out loading the page after 15s',
+          source: 'Manhua Plus',
+          url: 'https://example.com/',
+          timedOut: true,
+          loadFailed: true,
+        ),
+      );
+      await pumpScreen(tester, onTapFixSource: (_) {});
+      unawaited(cubit.init());
+      await pumpFrames(tester);
+
+      expect(find.text('Fix source'), findsNothing);
+      expect(find.text('Retry'), findsOneWidget);
+      clearInteractions(searchMangaUseCase);
+      await tester.tap(find.text('Retry'));
+      await pumpFrames(tester);
+
+      verify(
+        () => searchMangaUseCase.execute(
+          parameter: any(named: 'parameter'),
+          useCache: any(named: 'useCache'),
+        ),
+      ).called(greaterThanOrEqualTo(1));
+    });
+
     testWidgets('an unrelated error does not offer it', (tester) async {
       await pumpScreen(tester, onTapFixSource: (_) {});
       unawaited(cubit.init());

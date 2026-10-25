@@ -264,6 +264,20 @@ typedef HeadlessWebviewFactory =
       onRenderProcessGone,
     });
 
+/// JavaScript probe for the DOM-ready gate of script pages: true once the
+/// requested document (not the initial `about:blank`) has been parsed, i.e.
+/// from `DOMContentLoaded` on. Script pages start on this instead of the
+/// `load` event, which waits for every image and script on the page — a Weeb
+/// Central chapter list (806 eager images) took 27s to fire it on an iOS
+/// simulator (issue #115). Scripts wait for anything else they need with
+/// `ctx.waitFor`.
+const String scriptPageReadyProbe =
+    "document.readyState !== 'loading' && location.href !== 'about:blank'";
+
+/// Interval between [scriptPageReadyProbe] evaluations while a script page
+/// loads.
+const Duration _domReadyPollInterval = Duration(milliseconds: 200);
+
 /// Bundled `ctx` helpers evaluated ahead of every source script.
 Future<String> _loadBundledSourceCtx() {
   return rootBundle.loadString('packages/core_network/assets/source_ctx.js');
@@ -469,6 +483,7 @@ class HeadlessWebviewManager
               delegate: delegate,
               handlers: _scriptHandlers(owner),
               timeout: effectiveTimeout,
+              readyOnDom: true,
               terminateWhenUnresponsive: () => scriptRunning,
               onRendererGone: _onRendererLost,
               rendererLost: rendererLost,
@@ -486,6 +501,7 @@ class HeadlessWebviewManager
                   'terminated while the page loaded',
               url: url,
               timedOut: true,
+              loadFailed: true,
             );
           } on TimeoutException {
             // A slow or wedged page load is a script-run failure like any
@@ -500,6 +516,7 @@ class HeadlessWebviewManager
                   '${_seconds(effectiveTimeout)}s',
               url: url,
               timedOut: true,
+              loadFailed: true,
             );
           }
         },
@@ -855,6 +872,7 @@ class HeadlessWebviewManager
     required Duration timeout,
     UnmodifiableListView<UserScript>? initialUserScripts,
     List<String> scripts = const [],
+    bool readyOnDom = false,
     bool Function()? terminateWhenUnresponsive,
     void Function()? onRendererGone,
     Completer<void>? rendererLost,
@@ -876,11 +894,20 @@ class HeadlessWebviewManager
       onRendererGone: onRendererGone,
     );
 
+    // Stops the DOM-ready poll once the load settles either way.
+    var settled = false;
     try {
       final loaded = Future.wait([
         webview.run(),
         onLoadStartCompleter.future,
-        Future.any([onLoadStopCompleter.future, onLoadErrorCompleter.future]),
+        Future.any([
+          onLoadStopCompleter.future,
+          onLoadErrorCompleter.future,
+          if (readyOnDom)
+            onLoadStartCompleter.future.then(
+              (_) => _waitDomReady(webview, isSettled: () => settled),
+            ),
+        ]),
       ]);
       await Future.any<Object?>([
         loaded,
@@ -893,9 +920,34 @@ class HeadlessWebviewManager
       delegate.set(error: e, stackTrace: st, loading: false);
       await _disposeWebview(webview);
       rethrow;
+    } finally {
+      settled = true;
     }
 
     return webview;
+  }
+
+  /// Completes once [webview]'s requested document is parsed
+  /// ([scriptPageReadyProbe]), polling every [_domReadyPollInterval] until
+  /// [isSettled] reports that the load already ended (load event, error or
+  /// timeout). A probe that throws (no document yet) is retried.
+  Future<void> _waitDomReady(
+    HeadlessInAppWebView webview, {
+    required bool Function() isSettled,
+  }) async {
+    while (!isSettled()) {
+      try {
+        final ready = await webview.webViewController?.evaluateJavascript(
+          source: scriptPageReadyProbe,
+        );
+        if (ready == true) return;
+      } catch (_) {
+        // The document is not available yet; poll again.
+      }
+      await Future<void>.delayed(_domReadyPollInterval);
+    }
+    // The load settled first and already decided the outcome.
+    await Completer<void>().future;
   }
 
   /// The single construction path for every headless webview (page fetches,
@@ -1416,6 +1468,7 @@ class HeadlessWebviewManager
           message:
               '$function could not start the script runner (the WebView '
               'renderer process was terminated)',
+          loadFailed: true,
         );
       } on TimeoutException {
         throw SourceScriptException(
@@ -1426,6 +1479,7 @@ class HeadlessWebviewManager
               '$function could not start the script runner '
               '(blank page did not load after ${_seconds(timeout)}s)',
           timedOut: true,
+          loadFailed: true,
         );
       }
     }
