@@ -14,10 +14,9 @@ class GetAllChapterUseCase {
   final LogBox _logBox;
 
   GetAllChapterUseCase({
-    required SearchChapterUseCase searchChapterUseCase,
-    required LogBox logBox,
-  }) : _searchChapterUseCase = searchChapterUseCase,
-       _logBox = logBox;
+    required this._searchChapterUseCase,
+    required this._logBox,
+  });
 
   Future<List<Chapter>> execute({
     required SourceExternal source,

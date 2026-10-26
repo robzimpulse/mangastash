@@ -8,7 +8,7 @@ Manga Reader Apps built with Flutter, focusing on modularity and high performanc
 
 ## 🚀 Tech Stack
 
-- **Framework**: [Flutter](https://flutter.dev/) (v3.32.8)
+- **Framework**: [Flutter](https://flutter.dev/) (v3.47.8)
 - **Monorepo**: [Melos](https://melos.invertase.dev/) for multi-package management.
 - **State Management**: BLoC (via internal `safe_bloc`), Provider, and RxDart.
 - **Persistence**: [Drift](https://drift.simonbinder.eu/) (SQLite) for high-performance local storage.

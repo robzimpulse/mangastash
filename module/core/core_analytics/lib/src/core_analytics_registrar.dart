@@ -32,20 +32,19 @@ class CoreAnalyticsRegistrar extends Registrar {
   /// - [firebaseOptions] the options used by the default [firebaseInit].
   ///   `null` falls back to the native configs (`google-services.json` /
   ///   `GoogleService-Info.plist`).
-  /// - [enableCollectionInDebug] keeps crash collection enabled in debug/test
+  /// - [_enableCollectionInDebug] keeps crash collection enabled in debug/test
   ///   builds, where it is disabled by default so local crashes never reach
   ///   the dashboard.
   CoreAnalyticsRegistrar({
     bool Function()? isSupportedPlatform,
     Future<FirebaseApp> Function()? firebaseInit,
     FirebaseOptions? firebaseOptions,
-    bool enableCollectionInDebug = false,
+    this._enableCollectionInDebug = false,
   }) : _isSupportedPlatform =
            isSupportedPlatform ?? _defaultIsSupportedPlatform,
        _firebaseInit =
            firebaseInit ??
-           (() => Firebase.initializeApp(options: firebaseOptions)),
-       _enableCollectionInDebug = enableCollectionInDebug;
+           (() => Firebase.initializeApp(options: firebaseOptions));
 
   /// Seam for the platform support check, replaceable in tests.
   final bool Function() _isSupportedPlatform;

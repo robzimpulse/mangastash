@@ -13,9 +13,8 @@ class MangaUpdatesScreenCubit extends Cubit<MangaUpdatesScreenState>
     MangaUpdatesScreenState initialState = const MangaUpdatesScreenState(),
     required ListenUnreadHistoryUseCase listenUnreadHistoryUseCase,
     required ListenPrefetchUseCase listenPrefetchUseCase,
-    required PrefetchChapterUseCase prefetchChapterUseCase,
-  }) : _prefetchChapterUseCase = prefetchChapterUseCase,
-       // Initial states go through the same completeness filter as stream
+    required this._prefetchChapterUseCase,
+  }) : // Initial states go through the same completeness filter as stream
        // emissions — an all-malformed initialState must land empty so the
        // screen shows its Empty Data state, not blank rows (review on #158).
        super(

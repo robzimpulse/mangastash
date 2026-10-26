@@ -14,10 +14,9 @@ class AddToLibraryUseCase {
   final ListenSourcesUseCase _listenSourcesUseCase;
 
   AddToLibraryUseCase({
-    required LibraryDao libraryDao,
-    required ListenSourcesUseCase listenSourcesUseCase,
-  }) : _libraryDao = libraryDao,
-       _listenSourcesUseCase = listenSourcesUseCase;
+    required this._libraryDao,
+    required this._listenSourcesUseCase,
+  });
 
   Future<Result<bool>> execute({required Manga manga}) async {
     final mangaId = manga.id;

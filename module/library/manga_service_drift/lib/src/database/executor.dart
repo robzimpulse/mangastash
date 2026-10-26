@@ -28,10 +28,9 @@ class Executor {
   }
 
   const Executor({
-    DriftQueryInterceptor? interceptor,
-    String name = 'mangastash-local',
-  }) : _interceptor = interceptor,
-       _name = name;
+    this._interceptor,
+    this._name = 'mangastash-local',
+  });
 
   QueryExecutor build() {
     final executor = queryExecutor(

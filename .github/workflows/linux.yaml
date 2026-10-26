@@ -24,7 +24,7 @@ jobs:
       - name: 'Install Flutter'
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.8'
+          flutter-version: '3.47.8'
           # ref: https://github.com/subosito/flutter-action/issues/350
           cache: true
       - name: 'Install Melos'

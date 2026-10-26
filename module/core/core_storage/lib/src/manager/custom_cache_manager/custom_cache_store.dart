@@ -52,9 +52,8 @@ class CustomCacheStore implements CacheStore {
 
   CustomCacheStore(
     Config config, {
-    RescueEvictedFile? rescueEvictedFile,
+    this._rescueEvictedFile,
   }) : _config = config,
-       _rescueEvictedFile = rescueEvictedFile,
        fileSystem = config.fileSystem,
        _cacheInfoRepository = config.repo.open().then((value) => config.repo);
 

@@ -13,12 +13,10 @@ class UpdateChapterUseCase with SyncChaptersMixin {
   final LogBox _logBox;
 
   UpdateChapterUseCase({
-    required ChapterDao chapterDao,
-    required LogBox logBox,
-    required ListenSettingIncognitoUseCase listenSettingIncognitoUseCase,
-  }) : _chapterDao = chapterDao,
-       _logBox = logBox,
-       _listenSettingIncognitoUseCase = listenSettingIncognitoUseCase;
+    required this._chapterDao,
+    required this._logBox,
+    required this._listenSettingIncognitoUseCase,
+  });
 
   Future<void> removeImage({
     required String chapterId,

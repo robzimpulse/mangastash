@@ -10,10 +10,9 @@ class ChapterRepository {
   final MangaService _mangaService;
 
   const ChapterRepository({
-    required MangaService mangaService,
-    required ChapterService chapterService,
-  })  : _chapterService = chapterService,
-        _mangaService = mangaService;
+    required this._mangaService,
+    required this._chapterService,
+  });
 
   Future<ChapterResponse> detail(String id, {List<Include>? includes}) {
     return _chapterService.detail(

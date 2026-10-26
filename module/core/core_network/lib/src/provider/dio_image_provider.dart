@@ -126,7 +126,7 @@ class DioImageProvider extends ImageProvider<DioImageProvider> {
       }
 
       final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
-      return decode(buffer);
+      return await decode(buffer);
     } catch (e) {
       // Depending on where the exception was thrown, the image cache may not
       // have had a chance to track the key in the cache at all.

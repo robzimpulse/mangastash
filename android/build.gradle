@@ -1,14 +1,14 @@
 buildscript {
-    // Keep aligned with the Kotlin plugin version in settings.gradle (2.1.0, #190):
+    // Keep aligned with the Kotlin plugin version in settings.gradle (2.3.21):
     // feeds kotlin-gradle-plugin classpath and the app's kotlin-stdlib dependency.
-    ext.kotlin_version = '2.1.0'
+    ext.kotlin_version = '2.3.21'
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.12.0'
+        classpath 'com.android.tools.build:gradle:8.13.2'
         // START: FlutterFire Configuration
         classpath 'com.google.gms:google-services:4.3.14'
         // END: FlutterFire Configuration

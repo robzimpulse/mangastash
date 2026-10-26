@@ -98,7 +98,7 @@ class GlobalOptionsManager
   }
 
   GlobalOptionsManager._({
-    required SharedPreferencesAsync storage,
+    required this._storage,
     required SourceRegistry registry,
     required Set<String>? enabledSources,
     required SearchMangaParameter initialParameter,
@@ -106,8 +106,7 @@ class GlobalOptionsManager
     int numOfPrefetchedNextChapter = 0,
     bool downloadedOnlyChapter = false,
     bool incognito = false,
-  }) : _storage = storage,
-       _registry = registry,
+  }) : _registry = registry,
        _enabledSources = enabledSources,
        _sources = BehaviorSubject.seeded(
          _resolveSources(registry, enabledSources),

@@ -25,7 +25,7 @@ import 'crash_reporter.dart';
 /// a caller that logs an error and then marks it fatal in the same
 /// synchronous callback does not double-report.
 class LogBoxBridge {
-  /// Creates a bridge over [logBox] forwarding to [reporter].
+  /// Creates a bridge over [_logBox] forwarding to [_reporter].
   ///
   /// [contextKeys] resolves the session-wide context keys attached to every
   /// report, e.g. app version/build. It defaults to a `package_info_plus`-
@@ -33,12 +33,10 @@ class LogBoxBridge {
   /// unavailable (tests, broken configs) — inject a stub for deterministic
   /// tests.
   LogBoxBridge({
-    required LogBox logBox,
-    required CrashReporter reporter,
+    required this._logBox,
+    required this._reporter,
     Future<Map<String, String>> Function()? contextKeys,
-  }) : _logBox = logBox,
-       _reporter = reporter,
-       _contextKeys = contextKeys ?? _packageInfoContextKeys;
+  }) : _contextKeys = contextKeys ?? _packageInfoContextKeys;
 
   /// The LogBox whose new entries are forwarded.
   final LogBox _logBox;

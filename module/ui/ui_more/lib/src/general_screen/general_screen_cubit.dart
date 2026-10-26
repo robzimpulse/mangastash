@@ -11,10 +11,9 @@ class GeneralScreenCubit extends Cubit<GeneralScreenState>
 
   GeneralScreenCubit({
     GeneralScreenState initialState = const GeneralScreenState(),
-    required UpdateLocaleUseCase updateLocaleUseCase,
+    required this._updateLocaleUseCase,
     required ListenLocaleUseCase listenLocaleUseCase,
-  })  : _updateLocaleUseCase = updateLocaleUseCase,
-        super(initialState) {
+  })  : super(initialState) {
     addSubscription(
       listenLocaleUseCase.localeDataStream.distinct().listen(_updateLocaleData),
     );

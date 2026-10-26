@@ -29,28 +29,20 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
 
   MangaDetailScreenCubit({
     required MangaDetailScreenState initialState,
-    required GetMangaUseCase getMangaUseCase,
-    required SearchMangaUseCase searchMangaUseCase,
-    required SearchChapterUseCase searchChapterUseCase,
-    required AddToLibraryUseCase addToLibraryUseCase,
-    required RemoveFromLibraryUseCase removeFromLibraryUseCase,
+    required this._getMangaUseCase,
+    required this._searchMangaUseCase,
+    required this._searchChapterUseCase,
+    required this._addToLibraryUseCase,
+    required this._removeFromLibraryUseCase,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
     required ListenPrefetchUseCase listenPrefetchUseCase,
-    required PrefetchChapterUseCase prefetchChapterUseCase,
+    required this._prefetchChapterUseCase,
     required ListenReadHistoryUseCase listenReadHistoryUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
-    required GetAllChapterUseCase getAllChapterUseCase,
-    required RecrawlUseCase recrawlUseCase,
+    required this._getAllChapterUseCase,
+    required this._recrawlUseCase,
     required ListenDownloadedChapterUseCase listenDownloadedChapterUseCase,
-  }) : _getMangaUseCase = getMangaUseCase,
-       _searchMangaUseCase = searchMangaUseCase,
-       _searchChapterUseCase = searchChapterUseCase,
-       _addToLibraryUseCase = addToLibraryUseCase,
-       _removeFromLibraryUseCase = removeFromLibraryUseCase,
-       _prefetchChapterUseCase = prefetchChapterUseCase,
-       _getAllChapterUseCase = getAllChapterUseCase,
-       _recrawlUseCase = recrawlUseCase,
-       super(
+  }) : super(
          initialState.copyWith(
            chapterParameter: listenSearchParameterUseCase
                .searchParameterState

@@ -19,10 +19,9 @@ class HistoryManager
   final ListenSourcesUseCase _listenSourcesUseCase;
 
   HistoryManager({
-    required HistoryDao historyDao,
-    required ListenSourcesUseCase listenSourcesUseCase,
-  }) : _historyDao = historyDao,
-       _listenSourcesUseCase = listenSourcesUseCase;
+    required this._historyDao,
+    required this._listenSourcesUseCase,
+  });
 
   Stream<List<MangaChapter>> _filter(Stream<List<HistoryModel>> source) {
     return Rx.combineLatest2<List<HistoryModel>, List<SourceExternal>, List<MangaChapter>>(

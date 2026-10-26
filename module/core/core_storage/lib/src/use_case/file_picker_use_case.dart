@@ -8,8 +8,7 @@ import 'get_root_path_use_case.dart';
 class FilePickerUseCase {
   final GetRootPathUseCase _getRootPathUseCase;
 
-  const FilePickerUseCase({required GetRootPathUseCase getRootPathUseCase})
-    : _getRootPathUseCase = getRootPathUseCase;
+  const FilePickerUseCase({required this._getRootPathUseCase});
 
   Future<Uint8List?> execute({required List<String> allowedExtensions}) async {
     String initialDirectory = _getRootPathUseCase.rootPath.path;

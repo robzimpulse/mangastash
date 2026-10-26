@@ -43,11 +43,10 @@ class SourceListScreenCubit extends Cubit<SourceListScreenState>
   SourceListScreenCubit({
     required SourceRegistry registry,
     required ListenSourcesUseCase listenSourcesUseCase,
-    required UpdateSourcesUseCase updateSourcesUseCase,
+    required this._updateSourcesUseCase,
     SourceListScreenState initialState = const SourceListScreenState(),
   }) : _registry = registry,
        _listenSourcesUseCase = listenSourcesUseCase,
-       _updateSourcesUseCase = updateSourcesUseCase,
        super(
          initialState.copyWith(
            entries: registry.entries.valueOrNull,

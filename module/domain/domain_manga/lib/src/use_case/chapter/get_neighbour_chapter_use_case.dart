@@ -4,8 +4,7 @@ import 'package:entity_manga/entity_manga.dart';
 class GetNeighbourChapterUseCase {
   final ChapterDao _chapterDao;
 
-  GetNeighbourChapterUseCase({required ChapterDao chapterDao})
-    : _chapterDao = chapterDao;
+  GetNeighbourChapterUseCase({required this._chapterDao});
 
   Future<List<Chapter>> execute({
     required String chapterId,

@@ -31,18 +31,13 @@ class GetChapterUseCase with SyncChaptersMixin {
   final SourceRegistry _registry;
 
   GetChapterUseCase({
-    required ChapterRepository chapterRepository,
-    required AtHomeRepository atHomeRepository,
-    required RunSourceScriptUseCase runner,
-    required ChapterDao chapterDao,
-    required LogBox logBox,
-    required SourceRegistry registry,
-  }) : _chapterRepository = chapterRepository,
-       _atHomeRepository = atHomeRepository,
-       _chapterDao = chapterDao,
-       _logBox = logBox,
-       _registry = registry,
-       _runner = runner;
+    required this._chapterRepository,
+    required this._atHomeRepository,
+    required this._runner,
+    required this._chapterDao,
+    required this._logBox,
+    required this._registry,
+  });
 
   Future<Chapter> _mangadex({
     required String mangaId,

@@ -31,10 +31,9 @@ class LocaleManager implements ListenLocaleUseCase, UpdateLocaleUseCase {
   }
 
   LocaleManager._({
-    required SharedPreferencesAsync storage,
+    required this._storage,
     required Locale initialLocale,
-  }) : _storage = storage,
-       _localeDataStream = BehaviorSubject.seeded(initialLocale);
+  }) : _localeDataStream = BehaviorSubject.seeded(initialLocale);
 
   @override
   ValueStream<Locale?> get localeDataStream => _localeDataStream.stream;

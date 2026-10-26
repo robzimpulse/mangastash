@@ -40,22 +40,15 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
   final LogBox _logBox;
 
   const SearchChapterUseCase({
-    required ChapterRepository chapterRepository,
-    required RunSourceScriptUseCase runner,
-    required SourceRegistry registry,
-    required ConverterCacheManager converterCacheManager,
-    required SearchChapterCacheManager searchChapterCacheManager,
-    required ChapterDao chapterDao,
-    required MangaDao mangaDao,
-    required LogBox logBox,
-  }) : _chapterRepository = chapterRepository,
-       _converterCacheManager = converterCacheManager,
-       _searchChapterCacheManager = searchChapterCacheManager,
-       _chapterDao = chapterDao,
-       _mangaDao = mangaDao,
-       _logBox = logBox,
-       _runner = runner,
-       _registry = registry;
+    required this._chapterRepository,
+    required this._runner,
+    required this._registry,
+    required this._converterCacheManager,
+    required this._searchChapterCacheManager,
+    required this._chapterDao,
+    required this._mangaDao,
+    required this._logBox,
+  });
 
   Future<Pagination<Chapter>> _mangadex({
     required SearchChapterParameter parameter,

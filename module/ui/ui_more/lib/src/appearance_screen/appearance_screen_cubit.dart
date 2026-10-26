@@ -10,10 +10,9 @@ class AppearanceScreenCubit extends Cubit<AppearanceScreenState>
 
   AppearanceScreenCubit({
     AppearanceScreenState initialState = const AppearanceScreenState(),
-    required UpdateThemeUseCase updateThemeUseCase,
+    required this._updateThemeUseCase,
     required ListenThemeUseCase listenThemeUseCase,
-  })  : _updateThemeUseCase = updateThemeUseCase,
-        super(initialState) {
+  })  : super(initialState) {
     addSubscription(
       listenThemeUseCase.themeDataStream.distinct().listen(_updateThemeData),
     );

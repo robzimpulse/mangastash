@@ -53,22 +53,15 @@ class JobManager
   final List<StreamSubscription> _subscriptions = [];
 
   JobManager({
-    required LogBox log,
-    required JobDao jobDao,
-    required ImagesCacheManager manager,
-    required ListenSearchParameterUseCase listenSearchParameterUseCase,
-    required SourceRegistry registry,
-    required ValueGetter<GetChapterUseCase> getChapterUseCase,
-    required ValueGetter<GetMangaUseCase> getMangaUseCase,
-    required ValueGetter<GetAllChapterUseCase> getAllChapterUseCase,
-  }) : _log = log,
-       _jobDao = jobDao,
-       _manager = manager,
-       _registry = registry,
-       _getMangaUseCase = getMangaUseCase,
-       _getChapterUseCase = getChapterUseCase,
-       _getAllChapterUseCase = getAllChapterUseCase,
-       _listenSearchParameterUseCase = listenSearchParameterUseCase {
+    required this._log,
+    required this._jobDao,
+    required this._manager,
+    required this._listenSearchParameterUseCase,
+    required this._registry,
+    required this._getChapterUseCase,
+    required this._getMangaUseCase,
+    required this._getAllChapterUseCase,
+  }) {
     _subscriptions.addAll([_ongoingJob.listen(_onData)]);
     _ongoingJob.addStream(_jobDao.single.distinct());
     WidgetsBinding.instance.addObserver(this);

@@ -61,11 +61,9 @@ class SourceEditorScreenCubit extends Cubit<SourceEditorScreenState>
     String? function,
     String? url,
     required SourceRegistry registry,
-    required RunSourceScriptUseCase runner,
-    required FixPromptBuilder promptBuilder,
+    required this._runner,
+    required this._promptBuilder,
   }) : _registry = registry,
-       _runner = runner,
-       _promptBuilder = promptBuilder,
        super(_initial(id, function, url, registry)) {
     addSubscription(registry.entries.listen(_onEntries));
   }

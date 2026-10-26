@@ -10,12 +10,9 @@ class FakeMethodChannel {
   final Future<void> Function(MethodChannel, MethodCall) _onChannelTriggered;
 
   FakeMethodChannel({
-    required ValueSetter<Channels> onChannelsChanged,
-    required Future<void> Function(MethodChannel, MethodCall)
-    onChannelTriggered,
-  }) : _channels = const {},
-       _onChannelsChanged = onChannelsChanged,
-       _onChannelTriggered = onChannelTriggered;
+    required this._onChannelsChanged,
+    required this._onChannelTriggered,
+  }) : _channels = const {};
 
   void addChannel({
     required MethodChannel channel,

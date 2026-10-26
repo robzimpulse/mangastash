@@ -125,9 +125,16 @@ class AppDatabase extends _$AppDatabase {
           // SQLite cannot ALTER-add FK constraints: recreate each child
           // table from the v3 definitions (alterTable with an empty
           // TableMigration copies rows into the rebuilt table).
+          // TableMigration is drift's @experimental API; shipped migrations
+          // depend on it, so the analyzer's experimental_member_use is
+          // acknowledged here.
+          // ignore: experimental_member_use
           await m.alterTable(TableMigration(chapterTables));
+          // ignore: experimental_member_use
           await m.alterTable(TableMigration(imageTables));
+          // ignore: experimental_member_use
           await m.alterTable(TableMigration(libraryTables));
+          // ignore: experimental_member_use
           await m.alterTable(TableMigration(relationshipTables));
         },
         from3To4: (m, schema) async {
@@ -215,6 +222,7 @@ class AppDatabase extends _$AppDatabase {
 
           // 2. SQLite cannot drop a table-level UNIQUE: rebuild the table.
           // Row ids are copied, so relationship_tables stays valid.
+          // ignore: experimental_member_use (see from2To3)
           await m.alterTable(TableMigration(tagTables));
 
           // 3. A stolen row is linked to manga of a different source than

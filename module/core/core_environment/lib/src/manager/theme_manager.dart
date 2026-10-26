@@ -13,10 +13,9 @@ class ThemeManager implements UpdateThemeUseCase, ListenThemeUseCase {
   static const _key = 'is_dark_mode';
 
   ThemeManager._({
-    required SharedPreferencesAsync storage,
+    required this._storage,
     required ThemeData initialThemeData,
-  }) : _storage = storage,
-       _themeDataStream = BehaviorSubject.seeded(initialThemeData);
+  }) : _themeDataStream = BehaviorSubject.seeded(initialThemeData);
 
   static Future<ThemeManager> create({
     required SharedPreferencesAsync storage,

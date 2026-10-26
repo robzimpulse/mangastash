@@ -18,19 +18,14 @@ class LibraryMangaScreenCubit extends Cubit<LibraryMangaScreenState>
   LibraryMangaScreenCubit({
     LibraryMangaScreenState initialState = const LibraryMangaScreenState(),
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
-    required PrefetchMangaUseCase prefetchMangaUseCase,
-    required RemoveFromLibraryUseCase removeFromLibraryUseCase,
+    required this._prefetchMangaUseCase,
+    required this._removeFromLibraryUseCase,
     required ListenPrefetchUseCase listenPrefetchMangaUseCase,
-    required PrefetchChapterUseCase prefetchChapterUseCase,
-    required GetMangaFromUrlUseCase getMangaFromUrlUseCase,
-    required AddToLibraryUseCase addToLibraryUseCase,
+    required this._prefetchChapterUseCase,
+    required this._getMangaFromUrlUseCase,
+    required this._addToLibraryUseCase,
     required ListenSourcesUseCase listenSourcesUseCase,
-  })  : _prefetchMangaUseCase = prefetchMangaUseCase,
-        _addToLibraryUseCase = addToLibraryUseCase,
-        _removeFromLibraryUseCase = removeFromLibraryUseCase,
-        _prefetchChapterUseCase = prefetchChapterUseCase,
-        _getMangaFromUrlUseCase = getMangaFromUrlUseCase,
-        super(
+  })  : super(
           initialState.copyWith(
             sources: listenSourcesUseCase.sourceStateStream.valueOrNull ?? const [],
           ),

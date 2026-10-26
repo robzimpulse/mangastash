@@ -18,16 +18,18 @@ pluginManagement {
 
 plugins {
     id "dev.flutter.flutter-plugin-loader" version "1.0.0"
-    id "com.android.application" version '8.10.1' apply false
+    // Flutter 3.47 refuses to build below AGP 8.11.1 / KGP 2.2.20 / Gradle 8.14.
+    // Held on AGP 8.x: AGP 9 rejects flutter_inappwebview_android 1.1.3's
+    // getDefaultProguardFile('proguard-android.txt') (fixed only in 1.2.0 betas).
+    id "com.android.application" version '8.13.2' apply false
     // START: FlutterFire Configuration
     id "com.google.gms.google-services" version "4.4.4" apply false
     // Crashlytics Gradle plugin: uploads release mapping files for deobfuscated
     // stack traces (issue #190). 3.0.4 = latest stable 3.0.x, needs Gradle 7.5+ / AGP 7+.
     id "com.google.firebase.crashlytics" version "3.0.4" apply false
     // END: FlutterFire Configuration
-    // Kotlin 2.x required by firebase_core 4.15.0's compilerOptions() KGP API (#190);
-    // 2.1.0 = Flutter 3.32-era template default, compatible with AGP 8.10.1 / Gradle 8.12.
-    id "org.jetbrains.kotlin.android" version "2.1.0" apply false
+    // Kotlin 2.x required by firebase_core 4.15.0's compilerOptions() KGP API (#190).
+    id "org.jetbrains.kotlin.android" version "2.3.21" apply false
 }
 
 include ':app'

@@ -17,8 +17,7 @@ import 'crash_reporter.dart';
 /// injected so unit tests never touch the Firebase singleton, platform
 /// channels, or the service locator.
 class FirebaseCrashReporter implements CrashReporter {
-  FirebaseCrashReporter(this._crashlytics, {required LogBox logBox})
-    : _logBox = logBox;
+  FirebaseCrashReporter(this._crashlytics, {required this._logBox});
 
   /// The Firebase Crashlytics instance every call delegates to.
   final FirebaseCrashlytics _crashlytics;

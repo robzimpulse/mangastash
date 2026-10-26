@@ -29,7 +29,7 @@ jobs:
       - name: 'Install Flutter'
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.8'
+          flutter-version: '3.47.8'
           # ref: https://github.com/subosito/flutter-action/issues/350
           cache: true
 
@@ -55,10 +55,17 @@ jobs:
           ref: master
           clean: true
 
+      # The workflow file comes from the PR, but this job builds master's code:
+      # install the Flutter version master pins in its own .fvmrc, not the PR's
+      # pin, or an SDK-bump PR compiles master on an SDK it never ran on (#199).
+      - name: 'Read Baseline Flutter Version'
+        id: fvm
+        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+
       - name: 'Install Flutter'
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.8'
+          flutter-version: ${{ steps.fvm.outputs.version }}
           # ref: https://github.com/subosito/flutter-action/issues/350
           cache: true
 
@@ -87,7 +94,7 @@ jobs:
             echo "pct=$VAL" >> $GITHUB_OUTPUT
             echo "Successfully extracted Baseline: $VAL%"
           else
-            echo "pct=0.00" >> $GITHUB_OUTPUT
+            # No pct output: the report shows the baseline as n/a, not 0.00%.
             echo "Warning: LCOV file not found at $FILE"
           fi
 
@@ -106,7 +113,7 @@ jobs:
       - name: 'Install Flutter'
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.8'
+          flutter-version: '3.47.8'
           # ref: https://github.com/subosito/flutter-action/issues/350
           cache: true
 
@@ -160,10 +167,22 @@ jobs:
     steps:
       - name: 'Compare Results'
         id: compare
+        env:
+          # Empty when the baseline job failed or produced no lcov file (#199).
+          BASE: ${{ needs.baseline-coverage.result == 'success' && needs.baseline-coverage.outputs.pct || '' }}
+          PR: ${{ needs.unit-test.outputs.pct || '0.00' }}
         run: |
-          # Fallback to 0.00 if outputs are missing or null
-          BASE=${{ needs.baseline-coverage.outputs.pct || '0.00' }}
-          PR=${{ needs.unit-test.outputs.pct || '0.00' }}
+          # A missing baseline is reported as n/a: a 0.00% fallback would show
+          # the whole PR coverage as a gain.
+          if [ -z "$BASE" ]; then
+            {
+              echo "base_val=n/a"
+              echo "pr_val=$PR"
+              echo "diff=n/a (baseline unavailable)"
+              echo "icon=⚠️"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
           # Floating point math via awk
           DIFF=$(awk "BEGIN {print $PR - $BASE}")
@@ -177,10 +196,12 @@ jobs:
             ICON="➖"
           fi
 
-          echo "base_val=$BASE" >> $GITHUB_OUTPUT
-          echo "pr_val=$PR" >> $GITHUB_OUTPUT
-          echo "diff=$DIFF" >> $GITHUB_OUTPUT
-          echo "icon=$ICON" >> $GITHUB_OUTPUT
+          {
+            echo "base_val=$BASE%"
+            echo "pr_val=$PR"
+            echo "diff=$DIFF%"
+            echo "icon=$ICON"
+          } >> "$GITHUB_OUTPUT"
 
       - name: 'Find Previous Results'
         uses: peter-evans/find-comment@v3
@@ -201,7 +222,7 @@ jobs:
 
             | Metric | Master (Base) | PR (Current) | Diff |
             |:---:|:---:|:---:|:---|
-            | **Total Coverage** | ${{ steps.compare.outputs.base_val }}% | ${{ steps.compare.outputs.pr_val }}% | ${{ steps.compare.outputs.icon }} **${{ steps.compare.outputs.diff }}%** |
+            | **Total Coverage** | ${{ steps.compare.outputs.base_val }} | ${{ steps.compare.outputs.pr_val }}% | ${{ steps.compare.outputs.icon }} **${{ steps.compare.outputs.diff }}** |
 
             ### Status Summary
             * **Static Analysis**: ${{ needs.pr-check.result == 'success' && '✅ Clean' || '❌ Issues Found' }}

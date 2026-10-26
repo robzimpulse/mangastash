@@ -99,7 +99,7 @@ class FileDao extends DatabaseAccessor<AppDatabase> with _$FileDaoMixin {
       );
 
       try {
-        return into(fileTables).insertReturning(
+        return await into(fileTables).insertReturning(
           value,
           mode: InsertMode.insertOrReplace,
         );
