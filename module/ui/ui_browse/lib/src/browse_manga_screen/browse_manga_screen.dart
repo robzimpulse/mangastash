@@ -1,7 +1,19 @@
+// BrowseMangaScreen: browse/search screen of one source — a paged manga
+// grid with filter, search and library/prefetch actions, plus an
+// "open in browser" action that re-crawls the source's search page
+// (resolved through the source's searchUrl script, issue #115).
+//
+// A scripted-source parse failure also offers "Fix source" (issue #115),
+// reported through `onTapFixSource`.
+//
+// Usage: `BrowseMangaScreen.create(locator: locator, source: name,
+// onTapManga: ..., onTapFilter: ..., onTapMangaMenu: ...,
+// onTapFixSource: ...)`.
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
+import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:feature_common/feature_common.dart';
 import 'package:safe_bloc/safe_bloc.dart';
 import 'package:service_locator/service_locator.dart';
@@ -16,6 +28,7 @@ class BrowseMangaScreen extends StatefulWidget {
     this.onTapManga,
     this.onTapFilter,
     this.onTapMangaMenu,
+    this.onTapFixSource,
   });
 
   final Function(Manga, SearchMangaParameter)? onTapManga;
@@ -28,6 +41,8 @@ class BrowseMangaScreen extends StatefulWidget {
 
   final Future<MangaMenu?> Function(bool)? onTapMangaMenu;
 
+  final ValueSetter<FixSourceTarget>? onTapFixSource;
+
   final ImagesCacheManager imagesCacheManager;
 
   static Widget create({
@@ -39,6 +54,7 @@ class BrowseMangaScreen extends StatefulWidget {
     )?
     onTapFilter,
     Future<MangaMenu?> Function(bool)? onTapMangaMenu,
+    ValueSetter<FixSourceTarget>? onTapFixSource,
     String? source,
     String? tagId,
   }) {
@@ -68,6 +84,7 @@ class BrowseMangaScreen extends StatefulWidget {
         onTapManga: onTapManga,
         onTapFilter: onTapFilter,
         onTapMangaMenu: onTapMangaMenu,
+        onTapFixSource: onTapFixSource,
       ),
     );
   }
@@ -139,6 +156,24 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
     _cubit(context)?.recrawl(context: context, url: url);
   }
 
+  /// Resolves the source's search URL (a script call, issue #115) and
+  /// opens it for a re-crawl; a failing searchUrl script leaves the screen
+  /// as it is — the search itself already reports that error.
+  void _onTapOpenSource({
+    required BuildContext context,
+    required SourceExternal source,
+    required SearchMangaParameter parameter,
+  }) async {
+    final String url;
+    try {
+      url = await source.searchUrl(parameter: parameter);
+    } catch (_) {
+      return;
+    }
+    if (!context.mounted) return;
+    _onTapRecrawl(context: context, url: url);
+  }
+
   Widget _menuSource({required BuildContext context}) {
     return _builder(
       buildWhen: (prev, curr) {
@@ -148,18 +183,16 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
         ].contains(true);
       },
       builder: (context, state) {
-        final url = state.source?.let((e) {
-          if (e.builtIn) return null;
-          return e.searchMangaUseCase.url(
-            parameter: state.parameter.copyWith(page: 1),
-          );
-        });
-
-        if (url == null) return const SizedBox.shrink();
+        final source = state.source;
+        if (source == null || source.builtIn) return const SizedBox.shrink();
 
         return IconButton(
           icon: const Icon(Icons.open_in_browser),
-          onPressed: () => _onTapRecrawl(context: context, url: url),
+          onPressed: () => _onTapOpenSource(
+            context: context,
+            source: source,
+            parameter: state.parameter.copyWith(page: 1),
+          ),
         );
       },
     );
@@ -412,6 +445,7 @@ class _BrowseMangaScreenState extends State<BrowseMangaScreen> {
           onLoadNextPage: () async => await _cubit(context)?.next(),
           onRefresh: () async => await _cubit(context)?.init(refresh: true),
           onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
+          onTapFixSource: widget.onTapFixSource,
           error: state.error,
           isLoading: state.isLoading,
           hasNext: state.hasNextPage,

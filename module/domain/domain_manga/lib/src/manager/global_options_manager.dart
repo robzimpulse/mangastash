@@ -1,10 +1,25 @@
+// GlobalOptionsManager: app-wide options persisted in SharedPreferencesAsync —
+// search parameter, enabled sources, prefetch counts, downloaded-only and
+// incognito — each exposed as a ValueStream plus an update method.
+//
+// Enabled sources (issue #115): the enabled source NAMES are stored under
+// 'sources' (absent key = every source). [sourceStateStream] resolves them
+// against [SourceRegistry.values] in registry order and re-resolves whenever
+// the registry's entries change, so editing a script swaps in its new adapter
+// without touching the stored names; names of sources that no longer exist
+// resolve to nothing.
+//
+// Usage: `await GlobalOptionsManager.create(storage: prefs, registry: reg)`;
+// call [GlobalOptionsManager.dispose] when its owner is torn down.
+import 'dart:async';
+
+import 'package:collection/collection.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_storage/core_storage.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../sources/sources.dart';
 import '../use_case/parameter/listen_search_parameter_use_case.dart';
 import '../use_case/parameter/listen_setting_downloaded_only_use_case.dart';
 import '../use_case/parameter/listen_setting_incognito_use_case.dart';
@@ -14,6 +29,7 @@ import '../use_case/parameter/update_setting_incognito_use_case.dart';
 import '../use_case/prefetch/listen_prefetch_chapter_config.dart';
 import '../use_case/source/listen_sources_use_case.dart';
 import '../use_case/source/update_sources_use_case.dart';
+import 'source_registry.dart';
 
 class GlobalOptionsManager
     implements
@@ -34,6 +50,11 @@ class GlobalOptionsManager
   final BehaviorSubject<bool> _isIncognito;
 
   final SharedPreferencesAsync _storage;
+  final SourceRegistry _registry;
+
+  /// Enabled source names; null means every source.
+  Set<String>? _enabledSources;
+  late final StreamSubscription<void> _registrySubscription;
 
   static const String _mangaParameterKey = 'manga_parameter';
   static const String _sourcesKey = 'sources';
@@ -44,6 +65,7 @@ class GlobalOptionsManager
 
   static Future<GlobalOptionsManager> create({
     required SharedPreferencesAsync storage,
+    required SourceRegistry registry,
   }) async {
     final incognito = await storage.getBool(_incognitoKey);
     final downloadedOnly = await storage.getBool(_downloadedOnlyChapterKey);
@@ -58,6 +80,8 @@ class GlobalOptionsManager
 
     return GlobalOptionsManager._(
       storage: storage,
+      registry: registry,
+      enabledSources: sources?.toSet(),
       initialParameter: parameter
           .let(SearchMangaParameter.fromJsonString)
           .or(
@@ -66,9 +90,6 @@ class GlobalOptionsManager
               availableTranslatedLanguage: [LanguageCodes.english],
             ),
           ),
-      initialSources: sources
-          .let((e) => [...e.map(Sources.fromName).nonNulls])
-          .or(Sources.values),
       numOfPrefetchedPrevChapter: numOfPrefetchedPrevChapter ?? 0,
       numOfPrefetchedNextChapter: numOfPrefetchedNextChapter ?? 0,
       downloadedOnlyChapter: downloadedOnly ?? false,
@@ -78,14 +99,19 @@ class GlobalOptionsManager
 
   GlobalOptionsManager._({
     required SharedPreferencesAsync storage,
+    required SourceRegistry registry,
+    required Set<String>? enabledSources,
     required SearchMangaParameter initialParameter,
-    required List<SourceExternal> initialSources,
     int numOfPrefetchedPrevChapter = 0,
     int numOfPrefetchedNextChapter = 0,
     bool downloadedOnlyChapter = false,
     bool incognito = false,
   }) : _storage = storage,
-       _sources = BehaviorSubject.seeded(initialSources),
+       _registry = registry,
+       _enabledSources = enabledSources,
+       _sources = BehaviorSubject.seeded(
+         _resolveSources(registry, enabledSources),
+       ),
        _searchMangaParameter = BehaviorSubject.seeded(initialParameter),
        _numOfPrefetchedNextChapter = BehaviorSubject.seeded(
          numOfPrefetchedNextChapter,
@@ -94,7 +120,38 @@ class GlobalOptionsManager
          numOfPrefetchedPrevChapter,
        ),
        _downloadedOnlyChapter = BehaviorSubject.seeded(downloadedOnlyChapter),
-       _isIncognito = BehaviorSubject.seeded(incognito);
+       _isIncognito = BehaviorSubject.seeded(incognito) {
+    _registrySubscription = registry.entries.listen((_) => _publishSources());
+  }
+
+  /// Stops following the registry and closes the option streams.
+  Future<void> dispose() async {
+    await _registrySubscription.cancel();
+    await Future.wait([
+      _searchMangaParameter.close(),
+      _sources.close(),
+      _numOfPrefetchedPrevChapter.close(),
+      _numOfPrefetchedNextChapter.close(),
+      _downloadedOnlyChapter.close(),
+      _isIncognito.close(),
+    ]);
+  }
+
+  static List<SourceExternal> _resolveSources(
+    SourceRegistry registry,
+    Set<String>? enabled,
+  ) {
+    return [...registry.values.where((e) => enabled?.contains(e.name) ?? true)];
+  }
+
+  void _publishSources() {
+    if (_sources.isClosed) return;
+    final next = _resolveSources(_registry, _enabledSources);
+    if (const ListEquality<SourceExternal>().equals(_sources.value, next)) {
+      return;
+    }
+    _sources.add(next);
+  }
 
   @override
   ValueStream<SearchMangaParameter> get searchParameterState =>
@@ -113,8 +170,10 @@ class GlobalOptionsManager
 
   @override
   Future<void> updateSources({required List<SourceExternal> sources}) async {
-    await _storage.setStringList(_sourcesKey, [...sources.map((e) => e.name)]);
-    _sources.add(sources);
+    final names = [...sources.map((e) => e.name)];
+    await _storage.setStringList(_sourcesKey, names);
+    _enabledSources = names.toSet();
+    _publishSources();
   }
 
   @override

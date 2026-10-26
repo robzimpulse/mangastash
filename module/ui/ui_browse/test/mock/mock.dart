@@ -6,78 +6,90 @@
 // helpers below; use them from tests via the `mock*()` factories.
 //
 // Keep this file free of test logic — it only declares types and default
-// stubs (empty streams, sealed BehaviorSubjects).
+// stubs (empty streams, sealed BehaviorSubjects). FakeScrapedSourceExternal
+// implements the document-free SourceExternal contract (issue #115).
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
-import 'package:html/dom.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'package:ui_browse/src/search_manga_screen/search_manga_screen_cubit.dart';
 import 'package:ui_browse/src/search_manga_screen/search_manga_screen_state.dart';
 
-/// Scraped-source double whose search scripts are non-empty. No real source
-/// ships non-empty `searchMangaUseCase.scripts` yet (all `[]`), so recrawl
-/// tests use this to prove scripts are passed through — an always-empty
-/// regression would fail against [searchScripts].
+/// Scraped (non built-in) source double: metadata only (name and base URL
+/// are configurable), URL builders return fixed URLs and every page hook
+/// throws UnimplementedError. Cubit tests use it where a non-MangaDex source
+/// is needed; no test here may reach a page hook.
 class FakeScrapedSourceExternal implements SourceExternal {
-  static const List<String> searchScripts = ['__stub_scraped_script__'];
+  FakeScrapedSourceExternal({
+    this.name = 'Scraped Example',
+    this.baseUrl = 'https://scraped.example.com',
+  });
 
   @override
-  String get baseUrl => 'https://scraped.example.com';
+  final String baseUrl;
 
   @override
   String get iconUrl => '$baseUrl/favicon.ico';
 
   @override
-  String get name => 'Scraped Example';
+  final String name;
 
   @override
   bool get builtIn => false;
 
   @override
-  GetChapterImageSourceExternalUseCase get getChapterImageUseCase =>
+  Future<String> searchUrl({required SearchMangaParameter parameter}) async {
+    return '$baseUrl/browse';
+  }
+
+  @override
+  Future<SearchResultScrapped> search({
+    required String url,
+    String? searchTerm,
+    bool useCache = true,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<MangaScrapped> manga({required String url, bool useCache = true}) =>
       throw UnimplementedError();
 
   @override
-  GetMangaSourceExternalUseCase get getMangaUseCase =>
+  Future<String> chaptersUrl({required String webUrl}) async => webUrl;
+
+  @override
+  Future<List<ChapterScrapped>> chapters({
+    required String url,
+    bool useCache = true,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<List<String>> images({required String url, bool useCache = true}) =>
       throw UnimplementedError();
 
   @override
-  ListChapterSourceExternalUseCase get listChapterUseCase =>
-      throw UnimplementedError();
+  Future<String> tagsUrl() async => '$baseUrl/browse';
 
   @override
-  ListTagSourceExternalUseCase get listTagUseCase =>
-      throw UnimplementedError();
-
-  @override
-  SearchMangaSourceExternalUseCase get searchMangaUseCase =>
-      _StubSearchMangaUseCase();
+  Future<List<TagScrapped>> tags({
+    required String url,
+    bool useCache = true,
+  }) => throw UnimplementedError();
 }
 
-class _StubSearchMangaUseCase implements SearchMangaSourceExternalUseCase {
-  @override
-  Duration? get timeout => null;
+class MockSourceRegistry extends Mock implements SourceRegistry {}
 
-  @override
-  List<String> get readyWhenSelectors => [];
-
-  @override
-  List<String> get scripts => FakeScrapedSourceExternal.searchScripts;
-
-  @override
-  String url({required SearchMangaParameter parameter}) =>
-      '${FakeScrapedSourceExternal().baseUrl}/browse';
-
-  @override
-  Future<List<MangaScrapped>> parse({
-    required Document root,
-    String? searchTerm,
-  }) async => [];
-
-  @override
-  Future<bool?> haveNextPage({required Document root}) async => false;
+/// Binds a registry double resolving MangaDex plus [sources] to the static
+/// `Sources` facade (what `Uri.source` and `Sources.fromName` read), and
+/// unbinds it when the current test ends.
+void bindSources(List<SourceExternal> sources) {
+  final registry = MockSourceRegistry();
+  when(
+    () => registry.values,
+  ).thenReturn([MangaDexSourceExternal(), ...sources]);
+  Sources.bind(registry);
+  addTearDown(() => Sources.unbind(registry));
 }
 
 class MockSearchMangaUseCase extends Mock implements SearchMangaUseCase {}

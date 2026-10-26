@@ -13,7 +13,10 @@ import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_drift/src/database/memory_executor.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../mock/mock_sources.dart';
+
 void main() {
+  final testSources = shippedSources();
   late AppDatabase db;
   late HistoryDao historyDao;
   late MangaDao mangaDao;
@@ -56,7 +59,7 @@ void main() {
     historyDao = HistoryDao(db);
     mangaDao = MangaDao(db);
     chapterDao = ChapterDao(db);
-    enabledSources = BehaviorSubject.seeded(Sources.values);
+    enabledSources = BehaviorSubject.seeded(testSources);
   });
 
   tearDown(() async {
@@ -76,7 +79,7 @@ void main() {
   test('readHistoryStream filters disabled-source history', () async {
     await seedHistory();
     enabledSources.add(
-      Sources.values.where((e) => e.name != 'Asura Scans').toList(),
+      testSources.where((e) => e.name != 'Asura Scans').toList(),
     );
 
     final manager = HistoryManager(
@@ -143,12 +146,12 @@ void main() {
       final subscription = manager.readHistoryStream.listen(controller.add);
 
       enabledSources.add(
-        Sources.values.where((e) => e.name != 'Asura Scans').toList(),
+        testSources.where((e) => e.name != 'Asura Scans').toList(),
       );
       final hidden = await controller.stream.first;
       expect(hidden.map((e) => e.manga?.title), ['title_0']);
 
-      enabledSources.add(Sources.values);
+      enabledSources.add(testSources);
       final restored = await controller.stream.first;
       expect(restored.map((e) => e.manga?.title), ['title_0', 'title_1']);
 

@@ -1,3 +1,13 @@
+// GetMangaUseCase: series details for a manga id, served from MangaDao when
+// complete, else fetched — MangaDex via MangaService, scripted sources via
+// `SourceExternal.manga(url: webUrl)` (issue #115) validated by
+// requireDetailFields (a failure evicts the runner's cached result).
+//
+// Usage: `await useCase.execute(source: s, mangaId: id, useCache: false)`.
+//
+// `source` only carries the name: `execute` re-resolves it through the
+// SourceRegistry, so a screen that captured the adapter before the user saved
+// an edited script (Fix source) still runs the saved code.
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
@@ -8,17 +18,20 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import '../../extension/data_scrapped_extension.dart';
 import '../../extension/map_network_error.dart';
 import '../../extension/scrapped_validation_extension.dart';
+import '../../manager/source_registry.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 
 class GetMangaUseCase with SyncMangasMixin {
-  final HeadlessWebviewUseCase _webview;
+  final RunSourceScriptUseCase _runner;
   final MangaService _mangaService;
   final MangaDao _mangaDao;
   final LogBox _logBox;
   final ConverterCacheManager _converterCacheManager;
+  final SourceRegistry _registry;
 
   GetMangaUseCase({
-    required HeadlessWebviewUseCase webview,
+    required RunSourceScriptUseCase runner,
+    required SourceRegistry registry,
     required ConverterCacheManager converterCacheManager,
     required MangaService mangaService,
     required MangaDao mangaDao,
@@ -26,7 +39,8 @@ class GetMangaUseCase with SyncMangasMixin {
   }) : _mangaService = mangaService,
        _mangaDao = mangaDao,
        _logBox = logBox,
-       _webview = webview,
+       _runner = runner,
+       _registry = registry,
        _converterCacheManager = converterCacheManager;
 
   Future<Manga> _mangadex({required String mangaId}) async {
@@ -57,20 +71,16 @@ class GetMangaUseCase with SyncMangasMixin {
       throw DataNotFoundException();
     }
 
-    final document = await _webview.open(
-      url,
-      scripts: source.getMangaUseCase.scripts,
-      readyWhenSelectors: source.getMangaUseCase.readyWhenSelectors,
-      useCache: useCache,
-      timeout: source.getMangaUseCase.timeout,
-    );
-
-    final data = await source.getMangaUseCase.parse(root: document);
+    final data = await source.manga(url: url, useCache: useCache);
 
     // A detail page always names its series — a missing title means the
     // detail selectors drifted. Fail before the sync writes a null-title
     // manga into the DB (issue #114).
-    final valid = data.requireDetailFields(source: source.name, url: url);
+    final valid = await validateOrEvict(
+      _runner,
+      url: url,
+      validate: () => data.requireDetailFields(source: source.name, url: url),
+    );
 
     final manga = await valid.convert(
       logbox: _logBox,
@@ -86,6 +96,7 @@ class GetMangaUseCase with SyncMangasMixin {
     bool useCache = true,
   }) async {
     try {
+      final resolved = _registry.fromName(source.name) ?? source;
       final raw = await _mangaDao.search(ids: [mangaId]);
       final manga = Manga.fromDatabase(raw.firstOrNull);
 
@@ -94,17 +105,17 @@ class GetMangaUseCase with SyncMangasMixin {
       }
 
       final data =
-          source.builtIn
+          resolved.builtIn
               ? await _mangadex(mangaId: mangaId)
               : await _scrapping(
                 url: manga?.webUrl,
-                source: source,
+                source: resolved,
                 useCache: useCache,
               );
 
       final results = await sync(
         dao: _mangaDao,
-        values: [data.copyWith(source: source.name)],
+        values: [data.copyWith(source: resolved.name)],
         logBox: _logBox,
       );
 

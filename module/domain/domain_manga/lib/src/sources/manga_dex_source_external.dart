@@ -1,4 +1,11 @@
+// The built-in MangaDex source. It is native: use cases branch on [builtIn]
+// and talk to manga_dex_api, so every scraping hook throws
+// UnimplementedError by design.
+//
+// Usage: obtain it from `SourceRegistry.values` / `fromName('Manga Dex')`;
+// never call its scraping hooks.
 import 'package:entity_manga_external/entity_manga_external.dart';
+import 'package:manga_dex_api/manga_dex_api.dart';
 
 class MangaDexSourceExternal extends SourceExternal {
   @override
@@ -14,26 +21,49 @@ class MangaDexSourceExternal extends SourceExternal {
   bool get builtIn => true;
 
   @override
-  // TODO: implement getChapterImageUseCase
-  GetChapterImageSourceExternalUseCase get getChapterImageUseCase =>
-      throw UnimplementedError();
+  Future<String> searchUrl({required SearchMangaParameter parameter}) {
+    throw UnimplementedError();
+  }
 
   @override
-  // TODO: implement getMangaUseCase
-  GetMangaSourceExternalUseCase get getMangaUseCase =>
-      throw UnimplementedError();
+  Future<SearchResultScrapped> search({
+    required String url,
+    String? searchTerm,
+    bool useCache = true,
+  }) {
+    throw UnimplementedError();
+  }
 
   @override
-  // TODO: implement searchChapterUseCase
-  ListChapterSourceExternalUseCase get listChapterUseCase =>
-      throw UnimplementedError();
+  Future<MangaScrapped> manga({required String url, bool useCache = true}) {
+    throw UnimplementedError();
+  }
 
   @override
-  // TODO: implement searchMangaUseCase
-  SearchMangaSourceExternalUseCase get searchMangaUseCase =>
-      throw UnimplementedError();
+  Future<String> chaptersUrl({required String webUrl}) {
+    throw UnimplementedError();
+  }
 
   @override
-  // TODO: implement listTagUseCase
-  ListTagSourceExternalUseCase get listTagUseCase => throw UnimplementedError();
+  Future<List<ChapterScrapped>> chapters({
+    required String url,
+    bool useCache = true,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<String>> images({required String url, bool useCache = true}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> tagsUrl() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<TagScrapped>> tags({required String url, bool useCache = true}) {
+    throw UnimplementedError();
+  }
 }

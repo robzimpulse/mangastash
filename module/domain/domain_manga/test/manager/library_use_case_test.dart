@@ -13,7 +13,10 @@ import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:manga_service_drift/src/database/memory_executor.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../mock/mock_sources.dart';
+
 void main() {
+  final testSources = shippedSources();
   late AppDatabase db;
   late LibraryDao libraryDao;
   late MangaDao mangaDao;
@@ -23,7 +26,7 @@ void main() {
     db = AppDatabase(executor: MemoryExecutor());
     libraryDao = LibraryDao(db);
     mangaDao = MangaDao(db);
-    enabledSources = BehaviorSubject.seeded(Sources.values);
+    enabledSources = BehaviorSubject.seeded(testSources);
   });
 
   tearDown(() async {
@@ -44,7 +47,7 @@ void main() {
 
     // Disable Asura Scans.
     enabledSources.add(
-      Sources.values.where((e) => e.name != 'Asura Scans').toList(),
+      testSources.where((e) => e.name != 'Asura Scans').toList(),
     );
 
     final useCase = RemoveFromLibraryUseCase(
@@ -66,7 +69,7 @@ void main() {
     await seedManga(manga);
 
     enabledSources.add(
-      Sources.values.where((e) => e.name != 'Asura Scans').toList(),
+      testSources.where((e) => e.name != 'Asura Scans').toList(),
     );
 
     final useCase = AddToLibraryUseCase(

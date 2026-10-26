@@ -1,9 +1,10 @@
 // Tests for MangaReaderScreenCubit.recrawl: the built-in MangaDex source has
-// no scraping use cases (getters throw UnimplementedError by design), so
-// recrawl must pass an empty scripts list instead of crashing.
+// no scraping hooks (they throw UnimplementedError by design), so recrawl
+// must open the url without touching the source; scraped sources likewise
+// just open the url (cached script results are evicted by RecrawlUseCase,
+// issue #115).
 //
 // Run with: fvm flutter test test/src/manga_reader_screen/manga_reader_screen_cubit_test.dart
-import 'package:domain_manga/src/sources/asura_scan_source_external.dart';
 import 'package:domain_manga/src/sources/manga_dex_source_external.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -21,13 +22,12 @@ void main() {
     registerFallbackValue(_FakeBuildContext());
   });
 
-  test('recrawl passes no scripts for the built-in MangaDex source', () async {
+  test('recrawl opens the url for the built-in MangaDex source', () async {
     final recrawlUseCase = MockRecrawlUseCase();
     when(
       () => recrawlUseCase.execute(
         context: any(named: 'context'),
         url: any(named: 'url'),
-        scripts: any(named: 'scripts'),
       ),
     ).thenAnswer((_) async {});
 
@@ -50,21 +50,19 @@ void main() {
       () => recrawlUseCase.execute(
         context: captureAny(named: 'context'),
         url: captureAny(named: 'url'),
-        scripts: captureAny(named: 'scripts'),
       ),
     );
     verification.called(1);
-    expect(verification.captured[2] as List<String>, isEmpty);
+    expect(verification.captured[1], 'https://www.mangadex.org/');
   });
 
-  test('recrawl passes the source scripts through for a scraped source', () async {
-    final source = AsuraScanSourceExternal();
+  test('recrawl opens the url for a scraped source', () async {
+    final source = FakeScrapedSourceExternal();
     final recrawlUseCase = MockRecrawlUseCase();
     when(
       () => recrawlUseCase.execute(
         context: any(named: 'context'),
         url: any(named: 'url'),
-        scripts: any(named: 'scripts'),
       ),
     ).thenAnswer((_) async {});
 
@@ -87,13 +85,9 @@ void main() {
       () => recrawlUseCase.execute(
         context: captureAny(named: 'context'),
         url: captureAny(named: 'url'),
-        scripts: captureAny(named: 'scripts'),
       ),
     );
     verification.called(1);
-    expect(
-      verification.captured[2] as List<String>,
-      source.getChapterImageUseCase.scripts,
-    );
+    expect(verification.captured[1], 'https://asurascans.com/comics/solo-swordmaster-3ec3b16f');
   });
 }

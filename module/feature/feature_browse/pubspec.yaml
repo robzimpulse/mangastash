@@ -36,6 +36,10 @@ dependencies:
   # feature
   feature_common:
     path: ../../feature/feature_common
+  # Navigates to MoreRoutePath.sourceEditor from the "Fix source" action
+  # (issue #115); feature_more depends only on feature_common, so no cycle.
+  feature_more:
+    path: ../../feature/feature_more
 
   # ui
   ui_browse:

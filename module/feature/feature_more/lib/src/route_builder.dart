@@ -1,3 +1,7 @@
+// MoreRouteBuilder: GoRoutes of the More tab and the Settings pages. Aggregated
+// in lib/main_route.dart; Browse opens the source list (issue #115) through
+// `onTapSources`, and the source list opens the source editor
+// (MoreRoutePath.sourceEditor, query params `id`, `function`, `url`).
 import 'package:core_environment/core_environment.dart';
 import 'package:core_route/core_route.dart';
 import 'package:feature_common/feature_common.dart';
@@ -109,7 +113,44 @@ class MoreRouteBuilder extends BaseRouteBuilder {
         parentNavigatorKey: rootNavigatorKey,
         path: MoreRoutePath.browse,
         name: MoreRoutePath.browse,
-        builder: (context, state) => BrowseScreen.create(locator: locator),
+        builder: (context, state) {
+          return BrowseScreen.create(
+            locator: locator,
+            onTapSources: () => context.push(MoreRoutePath.sources),
+          );
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MoreRoutePath.sources,
+        name: MoreRoutePath.sources,
+        builder: (context, state) {
+          return SourceListScreen.create(
+            locator: locator,
+            onTapEdit: (id) {
+              context.push(
+                Uri(
+                  path: MoreRoutePath.sourceEditor,
+                  queryParameters: {'id': id},
+                ).toString(),
+              );
+            },
+          );
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: MoreRoutePath.sourceEditor,
+        name: MoreRoutePath.sourceEditor,
+        builder: (context, state) {
+          final params = state.uri.queryParameters;
+          return SourceEditorScreen.create(
+            locator: locator,
+            id: params['id'] ?? '',
+            function: params['function'],
+            url: params['url'],
+          );
+        },
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,

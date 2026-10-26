@@ -1,3 +1,10 @@
+// Tests for HeadlessWebviewManager's pure helpers and image path:
+// handleResolvedImage/handleRejectedImage, htmlCacheKey,
+// shouldUseHtmlCache, publishDiscoveredUserAgent, plus
+// HeadlessWebviewManager.image and its constructor with a fake LogBox and
+// HtmlCacheManager. The script runner has its own suite
+// (source_script_runner_test.dart).
+// Run: fvm flutter test test/manager/headless_webview_manager_test.dart
 import 'dart:async';
 
 import 'package:core_analytics/core_analytics.dart';
@@ -145,39 +152,6 @@ void main() {
       final b = htmlCacheKey('https://example.com/page', scripts: const [
         'b();',
       ]);
-
-      expect(a, isNot(equals(b)));
-    });
-
-    test('distinguishes readiness-declared pages from older cache entries',
-        () {
-      final legacy = htmlCacheKey('https://example.com/page', scripts: const [
-        'a();',
-      ]);
-      final gated = htmlCacheKey(
-        'https://example.com/page',
-        scripts: const ['a();'],
-        readyWhenSelectors: const ['div[data-page]'],
-      );
-      final ungated = htmlCacheKey(
-        'https://example.com/page',
-        scripts: const ['a();'],
-        readyWhenSelectors: const [],
-      );
-
-      expect(gated, isNot(equals(legacy)));
-      expect(ungated, equals(legacy));
-    });
-
-    test('distinguishes different readiness selectors on the same url', () {
-      final a = htmlCacheKey(
-        'https://example.com/page',
-        readyWhenSelectors: const ['div.a'],
-      );
-      final b = htmlCacheKey(
-        'https://example.com/page',
-        readyWhenSelectors: const ['div.b'],
-      );
 
       expect(a, isNot(equals(b)));
     });

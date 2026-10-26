@@ -11,8 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
   collection: ^1.16.0
+  equatable: ^2.0.5
   rxdart: ^0.28.0
-  html: ^0.15.5
   universal_io: ^2.2.2
   file: ^7.0.0
   uuid: ^4.5.1
@@ -46,3 +46,9 @@ dev_dependencies:
   mocktail: ^1.0.5
   manga_service_drift:
     path: ../../library/manga_service_drift
+
+flutter:
+  # Shipped JS source scripts (assets/sources/*.js) and the AI-prompt assets.
+  assets:
+    - assets/sources/
+    - assets/prompt/

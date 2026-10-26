@@ -1,3 +1,6 @@
+// Registers core_storage services (database, DAOs incl. SourceScriptDao for
+// issue #115, path/cache managers, file use cases) into the ServiceLocator.
+// Usage: add `CoreStorageRegistrar()` to the registrar list in `main.dart`.
 import 'package:core_analytics/core_analytics.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 import 'package:service_locator/service_locator.dart';
@@ -32,6 +35,7 @@ class CoreStorageRegistrar extends Registrar {
     locator.registerFactory(() => HistoryDao(locator()));
     locator.registerFactory(() => TagDao(locator()));
     locator.registerFactory(() => DiagnosticDao(locator()));
+    locator.registerFactory(() => SourceScriptDao(locator()));
 
     locator.registerLazySingleton(() => SharedPreferencesAsync());
     locator.registerLazySingletonAsync(() => PathManager.create());

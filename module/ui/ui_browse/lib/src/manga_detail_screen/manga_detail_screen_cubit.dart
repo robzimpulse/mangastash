@@ -1,3 +1,10 @@
+// MangaDetailScreenCubit: state of the manga detail screen (details,
+// chapters, similar manga, library/prefetch) on top of the domain use
+// cases. `recrawl` opens a URL in the visible webview; once it closes the
+// cached script results for that URL are evicted (issue #115) and the
+// screen reloads without cache.
+//
+// Usage: provided by MangaDetailScreen.create; call `init`, `recrawl`.
 import 'dart:async';
 
 import 'package:core_environment/core_environment.dart';
@@ -598,20 +605,10 @@ class MangaDetailScreenCubit extends Cubit<MangaDetailScreenState>
   }
 
   void recrawl({required BuildContext context, required String url}) async {
-    // Await the re-crawl before refreshing: the fetches below read the
-    // html cache the re-crawl writes, so starting them early serves the
-    // stale page (#130).
-    await _recrawlUseCase.execute(
-      context: context,
-      url: url,
-      // Built-in sources (MangaDex) have no scraping use cases — their
-      // getters throw UnimplementedError — so pass no scripts for them.
-      scripts:
-          state.source?.let(
-            (e) => e.builtIn ? null : e.getMangaUseCase.scripts,
-          ) ??
-          [],
-    );
+    // Await the re-crawl before refreshing: it evicts the cached script
+    // results only after the webview closes, so starting the fetches early
+    // serves the stale result (#130).
+    await _recrawlUseCase.execute(context: context, url: url);
     await init(useCache: false);
   }
 }

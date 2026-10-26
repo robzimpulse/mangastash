@@ -25,6 +25,14 @@ void main() {
   late LibraryMangaScreenCubit cubit;
 
   setUp(() {
+    // Uri.source resolves through the registry bound to the Sources facade
+    // (issue #115); bind one that knows the Asura host.
+    bindSources([
+      FakeScrapedSourceExternal(
+        name: 'Asura Scans',
+        baseUrl: 'https://asurascans.com',
+      ),
+    ]);
     getMangaFromUrlUseCase = MockGetMangaFromUrlUseCase();
     addToLibraryUseCase = MockAddToLibraryUseCase();
     when(

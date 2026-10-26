@@ -1,3 +1,10 @@
+// MangaReaderScreen: chapter reader. A failed chapter load offers "Open Debug
+// Browser" and, for a scripted-source parse failure, "Fix source" (issue
+// #115, reported through `onTapFixSource`); a page that never loaded (the
+// script never ran) offers "Retry" instead of "Fix source".
+//
+// Usage: `MangaReaderScreen.create(locator: locator, source: name,
+// mangaId: id, chapterId: id, onTapShortcut: ..., onTapFixSource: ...)`.
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
@@ -20,6 +27,7 @@ class MangaReaderScreen extends StatelessWidget {
     required this.logBox,
     this.onTapShortcut,
     this.onTapImageMenu,
+    this.onTapFixSource,
   });
 
   final ImagesCacheManager imagesCacheManager;
@@ -30,6 +38,8 @@ class MangaReaderScreen extends StatelessWidget {
 
   final AsyncValueGetter<ImageMenu?>? onTapImageMenu;
 
+  final ValueSetter<FixSourceTarget>? onTapFixSource;
+
   static Widget create({
     required ServiceLocator locator,
     required String? source,
@@ -37,6 +47,7 @@ class MangaReaderScreen extends StatelessWidget {
     required String? chapterId,
     ValueSetter<String>? onTapShortcut,
     AsyncValueGetter<ImageMenu?>? onTapImageMenu,
+    ValueSetter<FixSourceTarget>? onTapFixSource,
   }) {
     return BlocProvider(
       create: (context) {
@@ -59,6 +70,7 @@ class MangaReaderScreen extends StatelessWidget {
         imagesCacheManager: locator(),
         onTapShortcut: onTapShortcut,
         onTapImageMenu: onTapImageMenu,
+        onTapFixSource: onTapFixSource,
         logBox: locator(),
       ),
     );
@@ -132,6 +144,23 @@ class MangaReaderScreen extends StatelessWidget {
             },
             child: const Text('Open Debug Browser'),
           ),
+          // A page that never loaded is transient (issue #115): the script
+          // never ran, so offer Retry, not Fix source.
+          if (isTransientLoadError(error)) ...[
+            const SizedBox(height: 8),
+            OutlinedButton(
+              onPressed: () => _cubit(context)?.init(useCache: false),
+              child: const Text('Retry'),
+            ),
+          ],
+          if (fixSourceTargetOf(error) case final target?)
+            if (onTapFixSource != null) ...[
+              const SizedBox(height: 8),
+              OutlinedButton(
+                onPressed: () => onTapFixSource?.call(target),
+                child: const Text('Fix source'),
+              ),
+            ],
         ],
       ),
     );
