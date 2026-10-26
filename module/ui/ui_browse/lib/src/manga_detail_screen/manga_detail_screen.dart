@@ -587,6 +587,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                     _cubit(context)?.downloadChapter(chapterId: chapterId);
                   },
                   chapter: data,
+                  display: state.config.display,
                   opacity: data.lastReadAt != null ? 0.5 : 1,
                   isPrefetching: state.prefetchedChapterIds.contains(data.id),
                   isDownloaded: state.downloadedChapterIds.contains(data.id),
