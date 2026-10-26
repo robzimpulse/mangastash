@@ -148,36 +148,30 @@ class $ImageTablesTable extends ImageTables
   ImageDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ImageDrift(
-      createdAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}created_at'],
-          )!,
-      updatedAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}updated_at'],
-          )!,
-      id:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}id'],
-          )!,
-      order:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.int,
-            data['${effectivePrefix}order'],
-          )!,
-      chapterId:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}chapter_id'],
-          )!,
-      webUrl:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}web_url'],
-          )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      order: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}order'],
+      )!,
+      chapterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}chapter_id'],
+      )!,
+      webUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}web_url'],
+      )!,
     );
   }
 
@@ -689,21 +683,18 @@ class $ChapterTablesTable extends ChapterTables
   ChapterDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ChapterDrift(
-      createdAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}created_at'],
-          )!,
-      updatedAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}updated_at'],
-          )!,
-      id:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}id'],
-          )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
       mangaId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}manga_id'],
@@ -826,40 +817,36 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       id: Value(id),
-      mangaId:
-          mangaId == null && nullToAbsent
-              ? const Value.absent()
-              : Value(mangaId),
-      title:
-          title == null && nullToAbsent ? const Value.absent() : Value(title),
-      volume:
-          volume == null && nullToAbsent ? const Value.absent() : Value(volume),
-      chapter:
-          chapter == null && nullToAbsent
-              ? const Value.absent()
-              : Value(chapter),
-      translatedLanguage:
-          translatedLanguage == null && nullToAbsent
-              ? const Value.absent()
-              : Value(translatedLanguage),
-      scanlationGroup:
-          scanlationGroup == null && nullToAbsent
-              ? const Value.absent()
-              : Value(scanlationGroup),
-      webUrl:
-          webUrl == null && nullToAbsent ? const Value.absent() : Value(webUrl),
-      readableAt:
-          readableAt == null && nullToAbsent
-              ? const Value.absent()
-              : Value(readableAt),
-      publishAt:
-          publishAt == null && nullToAbsent
-              ? const Value.absent()
-              : Value(publishAt),
-      lastReadAt:
-          lastReadAt == null && nullToAbsent
-              ? const Value.absent()
-              : Value(lastReadAt),
+      mangaId: mangaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mangaId),
+      title: title == null && nullToAbsent
+          ? const Value.absent()
+          : Value(title),
+      volume: volume == null && nullToAbsent
+          ? const Value.absent()
+          : Value(volume),
+      chapter: chapter == null && nullToAbsent
+          ? const Value.absent()
+          : Value(chapter),
+      translatedLanguage: translatedLanguage == null && nullToAbsent
+          ? const Value.absent()
+          : Value(translatedLanguage),
+      scanlationGroup: scanlationGroup == null && nullToAbsent
+          ? const Value.absent()
+          : Value(scanlationGroup),
+      webUrl: webUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(webUrl),
+      readableAt: readableAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(readableAt),
+      publishAt: publishAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(publishAt),
+      lastReadAt: lastReadAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastReadAt),
     );
   }
 
@@ -928,12 +915,12 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
     title: title.present ? title.value : this.title,
     volume: volume.present ? volume.value : this.volume,
     chapter: chapter.present ? chapter.value : this.chapter,
-    translatedLanguage:
-        translatedLanguage.present
-            ? translatedLanguage.value
-            : this.translatedLanguage,
-    scanlationGroup:
-        scanlationGroup.present ? scanlationGroup.value : this.scanlationGroup,
+    translatedLanguage: translatedLanguage.present
+        ? translatedLanguage.value
+        : this.translatedLanguage,
+    scanlationGroup: scanlationGroup.present
+        ? scanlationGroup.value
+        : this.scanlationGroup,
     webUrl: webUrl.present ? webUrl.value : this.webUrl,
     readableAt: readableAt.present ? readableAt.value : this.readableAt,
     publishAt: publishAt.present ? publishAt.value : this.publishAt,
@@ -948,20 +935,20 @@ class ChapterDrift extends DataClass implements Insertable<ChapterDrift> {
       title: data.title.present ? data.title.value : this.title,
       volume: data.volume.present ? data.volume.value : this.volume,
       chapter: data.chapter.present ? data.chapter.value : this.chapter,
-      translatedLanguage:
-          data.translatedLanguage.present
-              ? data.translatedLanguage.value
-              : this.translatedLanguage,
-      scanlationGroup:
-          data.scanlationGroup.present
-              ? data.scanlationGroup.value
-              : this.scanlationGroup,
+      translatedLanguage: data.translatedLanguage.present
+          ? data.translatedLanguage.value
+          : this.translatedLanguage,
+      scanlationGroup: data.scanlationGroup.present
+          ? data.scanlationGroup.value
+          : this.scanlationGroup,
       webUrl: data.webUrl.present ? data.webUrl.value : this.webUrl,
-      readableAt:
-          data.readableAt.present ? data.readableAt.value : this.readableAt,
+      readableAt: data.readableAt.present
+          ? data.readableAt.value
+          : this.readableAt,
       publishAt: data.publishAt.present ? data.publishAt.value : this.publishAt,
-      lastReadAt:
-          data.lastReadAt.present ? data.lastReadAt.value : this.lastReadAt,
+      lastReadAt: data.lastReadAt.present
+          ? data.lastReadAt.value
+          : this.lastReadAt,
     );
   }
 
@@ -1289,21 +1276,18 @@ class $LibraryTablesTable extends LibraryTables
   LibraryDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return LibraryDrift(
-      createdAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}created_at'],
-          )!,
-      updatedAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}updated_at'],
-          )!,
-      mangaId:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}manga_id'],
-          )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      mangaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}manga_id'],
+      )!,
     );
   }
 
@@ -1695,21 +1679,18 @@ class $MangaTablesTable extends MangaTables
   MangaDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return MangaDrift(
-      createdAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}created_at'],
-          )!,
-      updatedAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}updated_at'],
-          )!,
-      id:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}id'],
-          )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
       title: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}title'],
@@ -1818,26 +1799,30 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       id: Value(id),
-      title:
-          title == null && nullToAbsent ? const Value.absent() : Value(title),
-      coverUrl:
-          coverUrl == null && nullToAbsent
-              ? const Value.absent()
-              : Value(coverUrl),
-      author:
-          author == null && nullToAbsent ? const Value.absent() : Value(author),
-      artist:
-          artist == null && nullToAbsent ? const Value.absent() : Value(artist),
-      status:
-          status == null && nullToAbsent ? const Value.absent() : Value(status),
-      description:
-          description == null && nullToAbsent
-              ? const Value.absent()
-              : Value(description),
-      webUrl:
-          webUrl == null && nullToAbsent ? const Value.absent() : Value(webUrl),
-      source:
-          source == null && nullToAbsent ? const Value.absent() : Value(source),
+      title: title == null && nullToAbsent
+          ? const Value.absent()
+          : Value(title),
+      coverUrl: coverUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(coverUrl),
+      author: author == null && nullToAbsent
+          ? const Value.absent()
+          : Value(author),
+      artist: artist == null && nullToAbsent
+          ? const Value.absent()
+          : Value(artist),
+      status: status == null && nullToAbsent
+          ? const Value.absent()
+          : Value(status),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      webUrl: webUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(webUrl),
+      source: source == null && nullToAbsent
+          ? const Value.absent()
+          : Value(source),
     );
   }
 
@@ -1913,8 +1898,9 @@ class MangaDrift extends DataClass implements Insertable<MangaDrift> {
       author: data.author.present ? data.author.value : this.author,
       artist: data.artist.present ? data.artist.value : this.artist,
       status: data.status.present ? data.status.value : this.status,
-      description:
-          data.description.present ? data.description.value : this.description,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
       webUrl: data.webUrl.present ? data.webUrl.value : this.webUrl,
       source: data.source.present ? data.source.value : this.source,
     );
@@ -2272,30 +2258,26 @@ class $TagTablesTable extends TagTables
   TagDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TagDrift(
-      createdAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}created_at'],
-          )!,
-      updatedAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}updated_at'],
-          )!,
-      id:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.int,
-            data['${effectivePrefix}id'],
-          )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
       tagId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}tag_id'],
       ),
-      name:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}name'],
-          )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
       source: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}source'],
@@ -2345,11 +2327,13 @@ class TagDrift extends DataClass implements Insertable<TagDrift> {
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       id: Value(id),
-      tagId:
-          tagId == null && nullToAbsent ? const Value.absent() : Value(tagId),
+      tagId: tagId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(tagId),
       name: Value(name),
-      source:
-          source == null && nullToAbsent ? const Value.absent() : Value(source),
+      source: source == null && nullToAbsent
+          ? const Value.absent()
+          : Value(source),
     );
   }
 
@@ -2636,26 +2620,22 @@ class $RelationshipTablesTable extends RelationshipTables
   RelationshipTable map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return RelationshipTable(
-      createdAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}created_at'],
-          )!,
-      updatedAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}updated_at'],
-          )!,
-      tagId:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.int,
-            data['${effectivePrefix}tag_id'],
-          )!,
-      mangaId:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}manga_id'],
-          )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      tagId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}tag_id'],
+      )!,
+      mangaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}manga_id'],
+      )!,
     );
   }
 
@@ -3014,21 +2994,18 @@ class $JobTablesTable extends JobTables
   JobDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return JobDrift(
-      createdAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}created_at'],
-          )!,
-      updatedAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}updated_at'],
-          )!,
-      id:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.int,
-            data['${effectivePrefix}id'],
-          )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
       type: $JobTablesTable.$convertertype.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
@@ -3114,20 +3091,18 @@ class JobDrift extends DataClass implements Insertable<JobDrift> {
       updatedAt: Value(updatedAt),
       id: Value(id),
       type: Value(type),
-      source:
-          source == null && nullToAbsent ? const Value.absent() : Value(source),
-      chapterId:
-          chapterId == null && nullToAbsent
-              ? const Value.absent()
-              : Value(chapterId),
-      mangaId:
-          mangaId == null && nullToAbsent
-              ? const Value.absent()
-              : Value(mangaId),
-      imageUrl:
-          imageUrl == null && nullToAbsent
-              ? const Value.absent()
-              : Value(imageUrl),
+      source: source == null && nullToAbsent
+          ? const Value.absent()
+          : Value(source),
+      chapterId: chapterId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(chapterId),
+      mangaId: mangaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mangaId),
+      imageUrl: imageUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(imageUrl),
     );
   }
 
@@ -3486,31 +3461,26 @@ class $FileTablesTable extends FileTables
   FileDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return FileDrift(
-      createdAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}created_at'],
-          )!,
-      updatedAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}updated_at'],
-          )!,
-      id:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}id'],
-          )!,
-      webUrl:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}web_url'],
-          )!,
-      relativePath:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}relative_path'],
-          )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      webUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}web_url'],
+      )!,
+      relativePath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}relative_path'],
+      )!,
     );
   }
 
@@ -3598,10 +3568,9 @@ class FileDrift extends DataClass implements Insertable<FileDrift> {
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       id: data.id.present ? data.id.value : this.id,
       webUrl: data.webUrl.present ? data.webUrl.value : this.webUrl,
-      relativePath:
-          data.relativePath.present
-              ? data.relativePath.value
-              : this.relativePath,
+      relativePath: data.relativePath.present
+          ? data.relativePath.value
+          : this.relativePath,
     );
   }
 
@@ -3800,15 +3769,16 @@ class $SourceScriptTablesTable extends SourceScriptTables
   );
   @override
   late final GeneratedColumnWithTypeConverter<SourceScriptOrigin, String>
-  origin = GeneratedColumn<String>(
-    'origin',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  ).withConverter<SourceScriptOrigin>(
-    $SourceScriptTablesTable.$converterorigin,
-  );
+  origin =
+      GeneratedColumn<String>(
+        'origin',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<SourceScriptOrigin>(
+        $SourceScriptTablesTable.$converterorigin,
+      );
   static const VerificationMeta _baseVersionMeta = const VerificationMeta(
     'baseVersion',
   );
@@ -3902,36 +3872,30 @@ class $SourceScriptTablesTable extends SourceScriptTables
   SourceScriptDrift map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return SourceScriptDrift(
-      createdAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}created_at'],
-          )!,
-      updatedAt:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
-            data['${effectivePrefix}updated_at'],
-          )!,
-      id:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}id'],
-          )!,
-      name:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}name'],
-          )!,
-      code:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.string,
-            data['${effectivePrefix}code'],
-          )!,
-      version:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.int,
-            data['${effectivePrefix}version'],
-          )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
       origin: $SourceScriptTablesTable.$converterorigin.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
@@ -4005,10 +3969,9 @@ class SourceScriptDrift extends DataClass
       code: Value(code),
       version: Value(version),
       origin: Value(origin),
-      baseVersion:
-          baseVersion == null && nullToAbsent
-              ? const Value.absent()
-              : Value(baseVersion),
+      baseVersion: baseVersion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(baseVersion),
     );
   }
 
@@ -4075,8 +4038,9 @@ class SourceScriptDrift extends DataClass
       code: data.code.present ? data.code.value : this.code,
       version: data.version.present ? data.version.value : this.version,
       origin: data.origin.present ? data.origin.value : this.origin,
-      baseVersion:
-          data.baseVersion.present ? data.baseVersion.value : this.baseVersion,
+      baseVersion: data.baseVersion.present
+          ? data.baseVersion.value
+          : this.baseVersion,
     );
   }
 
@@ -4465,13 +4429,12 @@ class $$ImageTablesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer:
-              () => $$ImageTablesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer:
-              () => $$ImageTablesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer:
-              () =>
-                  $$ImageTablesTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$ImageTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ImageTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ImageTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<DateTime> createdAt = const Value.absent(),
@@ -4508,16 +4471,9 @@ class $$ImageTablesTableTableManager
                 webUrl: webUrl,
                 rowid: rowid,
               ),
-          withReferenceMapper:
-              (p0) =>
-                  p0
-                      .map(
-                        (e) => (
-                          e.readTable(table),
-                          BaseReferences(db, table, e),
-                        ),
-                      )
-                      .toList(),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -4805,16 +4761,12 @@ class $$ChapterTablesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer:
-              () => $$ChapterTablesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer:
-              () =>
-                  $$ChapterTablesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer:
-              () => $$ChapterTablesTableAnnotationComposer(
-                $db: db,
-                $table: table,
-              ),
+          createFilteringComposer: () =>
+              $$ChapterTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ChapterTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ChapterTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<DateTime> createdAt = const Value.absent(),
@@ -4879,16 +4831,9 @@ class $$ChapterTablesTableTableManager
                 lastReadAt: lastReadAt,
                 rowid: rowid,
               ),
-          withReferenceMapper:
-              (p0) =>
-                  p0
-                      .map(
-                        (e) => (
-                          e.readTable(table),
-                          BaseReferences(db, table, e),
-                        ),
-                      )
-                      .toList(),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -5018,16 +4963,12 @@ class $$LibraryTablesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer:
-              () => $$LibraryTablesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer:
-              () =>
-                  $$LibraryTablesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer:
-              () => $$LibraryTablesTableAnnotationComposer(
-                $db: db,
-                $table: table,
-              ),
+          createFilteringComposer: () =>
+              $$LibraryTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LibraryTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LibraryTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<DateTime> createdAt = const Value.absent(),
@@ -5052,16 +4993,9 @@ class $$LibraryTablesTableTableManager
                 mangaId: mangaId,
                 rowid: rowid,
               ),
-          withReferenceMapper:
-              (p0) =>
-                  p0
-                      .map(
-                        (e) => (
-                          e.readTable(table),
-                          BaseReferences(db, table, e),
-                        ),
-                      )
-                      .toList(),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -5313,13 +5247,12 @@ class $$MangaTablesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer:
-              () => $$MangaTablesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer:
-              () => $$MangaTablesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer:
-              () =>
-                  $$MangaTablesTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$MangaTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MangaTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MangaTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<DateTime> createdAt = const Value.absent(),
@@ -5376,16 +5309,9 @@ class $$MangaTablesTableTableManager
                 source: source,
                 rowid: rowid,
               ),
-          withReferenceMapper:
-              (p0) =>
-                  p0
-                      .map(
-                        (e) => (
-                          e.readTable(table),
-                          BaseReferences(db, table, e),
-                        ),
-                      )
-                      .toList(),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -5555,12 +5481,12 @@ class $$TagTablesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer:
-              () => $$TagTablesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer:
-              () => $$TagTablesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer:
-              () => $$TagTablesTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$TagTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TagTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TagTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<DateTime> createdAt = const Value.absent(),
@@ -5593,16 +5519,9 @@ class $$TagTablesTableTableManager
                 name: name,
                 source: source,
               ),
-          withReferenceMapper:
-              (p0) =>
-                  p0
-                      .map(
-                        (e) => (
-                          e.readTable(table),
-                          BaseReferences(db, table, e),
-                        ),
-                      )
-                      .toList(),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -5750,18 +5669,12 @@ class $$RelationshipTablesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer:
-              () => $$RelationshipTablesTableFilterComposer(
-                $db: db,
-                $table: table,
-              ),
-          createOrderingComposer:
-              () => $$RelationshipTablesTableOrderingComposer(
-                $db: db,
-                $table: table,
-              ),
-          createComputedFieldComposer:
-              () => $$RelationshipTablesTableAnnotationComposer(
+          createFilteringComposer: () =>
+              $$RelationshipTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RelationshipTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RelationshipTablesTableAnnotationComposer(
                 $db: db,
                 $table: table,
               ),
@@ -5793,16 +5706,9 @@ class $$RelationshipTablesTableTableManager
                 mangaId: mangaId,
                 rowid: rowid,
               ),
-          withReferenceMapper:
-              (p0) =>
-                  p0
-                      .map(
-                        (e) => (
-                          e.readTable(table),
-                          BaseReferences(db, table, e),
-                        ),
-                      )
-                      .toList(),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -6007,12 +5913,12 @@ class $$JobTablesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer:
-              () => $$JobTablesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer:
-              () => $$JobTablesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer:
-              () => $$JobTablesTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$JobTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$JobTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$JobTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<DateTime> createdAt = const Value.absent(),
@@ -6053,16 +5959,9 @@ class $$JobTablesTableTableManager
                 mangaId: mangaId,
                 imageUrl: imageUrl,
               ),
-          withReferenceMapper:
-              (p0) =>
-                  p0
-                      .map(
-                        (e) => (
-                          e.readTable(table),
-                          BaseReferences(db, table, e),
-                        ),
-                      )
-                      .toList(),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -6221,12 +6120,12 @@ class $$FileTablesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer:
-              () => $$FileTablesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer:
-              () => $$FileTablesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer:
-              () => $$FileTablesTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$FileTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FileTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FileTablesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<DateTime> createdAt = const Value.absent(),
@@ -6259,16 +6158,9 @@ class $$FileTablesTableTableManager
                 relativePath: relativePath,
                 rowid: rowid,
               ),
-          withReferenceMapper:
-              (p0) =>
-                  p0
-                      .map(
-                        (e) => (
-                          e.readTable(table),
-                          BaseReferences(db, table, e),
-                        ),
-                      )
-                      .toList(),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -6479,18 +6371,12 @@ class $$SourceScriptTablesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer:
-              () => $$SourceScriptTablesTableFilterComposer(
-                $db: db,
-                $table: table,
-              ),
-          createOrderingComposer:
-              () => $$SourceScriptTablesTableOrderingComposer(
-                $db: db,
-                $table: table,
-              ),
-          createComputedFieldComposer:
-              () => $$SourceScriptTablesTableAnnotationComposer(
+          createFilteringComposer: () =>
+              $$SourceScriptTablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SourceScriptTablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SourceScriptTablesTableAnnotationComposer(
                 $db: db,
                 $table: table,
               ),
@@ -6538,16 +6424,9 @@ class $$SourceScriptTablesTableTableManager
                 baseVersion: baseVersion,
                 rowid: rowid,
               ),
-          withReferenceMapper:
-              (p0) =>
-                  p0
-                      .map(
-                        (e) => (
-                          e.readTable(table),
-                          BaseReferences(db, table, e),
-                        ),
-                      )
-                      .toList(),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
           prefetchHooksCallback: null,
         ),
       );

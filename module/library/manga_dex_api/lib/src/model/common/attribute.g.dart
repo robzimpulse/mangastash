@@ -7,13 +7,13 @@ part of 'attribute.dart';
 // **************************************************************************
 
 Attribute _$AttributeFromJson(Map<String, dynamic> json) => Attribute(
-      json['createdAt'] as String?,
-      json['updatedAt'] as String?,
-      json['version'] as num?,
-    );
+  json['createdAt'] as String?,
+  json['updatedAt'] as String?,
+  json['version'] as num?,
+);
 
 Map<String, dynamic> _$AttributeToJson(Attribute instance) => <String, dynamic>{
-      'createdAt': instance.createdAt,
-      'updatedAt': instance.updatedAt,
-      'version': instance.version,
-    };
+  'createdAt': instance.createdAt,
+  'updatedAt': instance.updatedAt,
+  'version': instance.version,
+};

@@ -7,14 +7,15 @@ part of 'author_data.dart';
 // **************************************************************************
 
 AuthorData _$AuthorDataFromJson(Map<String, dynamic> json) => AuthorData(
-      json['id'] as String?,
-      json['type'] as String?,
-      json['attributes'] == null
-          ? null
-          : AuthorDataAttributes.fromJson(
-              json['attributes'] as Map<String, dynamic>),
-      Relationship.from(json['relationships'] as List),
-    );
+  json['id'] as String?,
+  json['type'] as String?,
+  json['attributes'] == null
+      ? null
+      : AuthorDataAttributes.fromJson(
+          json['attributes'] as Map<String, dynamic>,
+        ),
+  Relationship.from(json['relationships'] as List),
+);
 
 Map<String, dynamic> _$AuthorDataToJson(AuthorData instance) =>
     <String, dynamic>{
@@ -22,8 +23,6 @@ Map<String, dynamic> _$AuthorDataToJson(AuthorData instance) =>
       'type': instance.type,
       'attributes': instance.attributes,
       'relationships': instance.relationships
-          ?.map((e) => e.toJson(
-                (value) => value,
-              ))
+          ?.map((e) => e.toJson((value) => value))
           .toList(),
     };

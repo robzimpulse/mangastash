@@ -7,15 +7,15 @@ part of 'tag_response.dart';
 // **************************************************************************
 
 TagResponse _$TagResponseFromJson(Map<String, dynamic> json) => TagResponse(
-      json['result'] as String?,
-      json['response'] as String?,
-      (json['data'] as List<dynamic>?)
-          ?.map((e) => TagData.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      json['limit'] as num?,
-      json['offset'] as num?,
-      json['total'] as num?,
-    );
+  json['result'] as String?,
+  json['response'] as String?,
+  (json['data'] as List<dynamic>?)
+      ?.map((e) => TagData.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  json['limit'] as num?,
+  json['offset'] as num?,
+  json['total'] as num?,
+);
 
 Map<String, dynamic> _$TagResponseToJson(TagResponse instance) =>
     <String, dynamic>{

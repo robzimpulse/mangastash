@@ -19,12 +19,12 @@ SearchMangaResponse _$SearchMangaResponseFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$SearchMangaResponseToJson(
-        SearchMangaResponse instance) =>
-    <String, dynamic>{
-      'result': instance.result,
-      'response': instance.response,
-      'data': instance.data,
-      'limit': instance.limit,
-      'offset': instance.offset,
-      'total': instance.total,
-    };
+  SearchMangaResponse instance,
+) => <String, dynamic>{
+  'result': instance.result,
+  'response': instance.response,
+  'data': instance.data,
+  'limit': instance.limit,
+  'offset': instance.offset,
+  'total': instance.total,
+};

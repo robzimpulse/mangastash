@@ -15,21 +15,18 @@ ServerException _$ServerExceptionFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$ServerExceptionToJson(ServerException instance) =>
-    <String, dynamic>{
-      'result': instance.result,
-      'errors': instance.errors,
-    };
+    <String, dynamic>{'result': instance.result, 'errors': instance.errors};
 
 Error _$ErrorFromJson(Map<String, dynamic> json) => Error(
-      json['id'] as String?,
-      json['status'] as num?,
-      json['title'] as String?,
-      json['detail'] as String?,
-    );
+  json['id'] as String?,
+  json['status'] as num?,
+  json['title'] as String?,
+  json['detail'] as String?,
+);
 
 Map<String, dynamic> _$ErrorToJson(Error instance) => <String, dynamic>{
-      'id': instance.id,
-      'status': instance.status,
-      'title': instance.title,
-      'detail': instance.detail,
-    };
+  'id': instance.id,
+  'status': instance.status,
+  'title': instance.title,
+  'detail': instance.detail,
+};
