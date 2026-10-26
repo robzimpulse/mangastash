@@ -7,14 +7,15 @@ part of 'chapter_data.dart';
 // **************************************************************************
 
 ChapterData _$ChapterDataFromJson(Map<String, dynamic> json) => ChapterData(
-      json['id'] as String?,
-      json['type'] as String?,
-      json['attributes'] == null
-          ? null
-          : ChapterDataAttributes.fromJson(
-              json['attributes'] as Map<String, dynamic>),
-      Relationship.from(json['relationships'] as List),
-    );
+  json['id'] as String?,
+  json['type'] as String?,
+  json['attributes'] == null
+      ? null
+      : ChapterDataAttributes.fromJson(
+          json['attributes'] as Map<String, dynamic>,
+        ),
+  Relationship.from(json['relationships'] as List),
+);
 
 Map<String, dynamic> _$ChapterDataToJson(ChapterData instance) =>
     <String, dynamic>{
@@ -22,8 +23,6 @@ Map<String, dynamic> _$ChapterDataToJson(ChapterData instance) =>
       'type': instance.type,
       'attributes': instance.attributes,
       'relationships': instance.relationships
-          ?.map((e) => e.toJson(
-                (value) => value,
-              ))
+          ?.map((e) => e.toJson((value) => value))
           .toList(),
     };

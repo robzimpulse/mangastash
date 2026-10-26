@@ -40,25 +40,25 @@ MangaDataAttributes _$MangaDataAttributesFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$MangaDataAttributesToJson(
-        MangaDataAttributes instance) =>
-    <String, dynamic>{
-      'createdAt': instance.createdAt,
-      'updatedAt': instance.updatedAt,
-      'version': instance.version,
-      'title': instance.title,
-      'altTitles': instance.altTitles,
-      'description': instance.description,
-      'isLocked': instance.isLocked,
-      'originalLanguage': instance.originalLanguage,
-      'lastVolume': instance.lastVolume,
-      'lastChapter': instance.lastChapter,
-      'publicationDemographic': instance.publicationDemographic,
-      'status': instance.status,
-      'year': instance.year,
-      'contentRating': instance.contentRating,
-      'state': instance.state,
-      'chapterNumbersResetOnNewVolume': instance.chapterNumbersResetOnNewVolume,
-      'latestUploadedChapter': instance.latestUploadedChapter,
-      'availableTranslatedLanguages': instance.availableTranslatedLanguages,
-      'tags': instance.tags,
-    };
+  MangaDataAttributes instance,
+) => <String, dynamic>{
+  'createdAt': instance.createdAt,
+  'updatedAt': instance.updatedAt,
+  'version': instance.version,
+  'title': instance.title,
+  'altTitles': instance.altTitles,
+  'description': instance.description,
+  'isLocked': instance.isLocked,
+  'originalLanguage': instance.originalLanguage,
+  'lastVolume': instance.lastVolume,
+  'lastChapter': instance.lastChapter,
+  'publicationDemographic': instance.publicationDemographic,
+  'status': instance.status,
+  'year': instance.year,
+  'contentRating': instance.contentRating,
+  'state': instance.state,
+  'chapterNumbersResetOnNewVolume': instance.chapterNumbersResetOnNewVolume,
+  'latestUploadedChapter': instance.latestUploadedChapter,
+  'availableTranslatedLanguages': instance.availableTranslatedLanguages,
+  'tags': instance.tags,
+};
