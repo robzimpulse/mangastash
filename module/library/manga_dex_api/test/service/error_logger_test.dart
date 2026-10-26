@@ -79,6 +79,7 @@ void main() {
       expect(logger.errors, hasLength(1));
       expect(logger.errors.single, isA<TypeError>());
       expect(logger.options.single.path, '/at-home/server/c1');
+      expect(logger.responses.single, isNotNull);
     },
   );
 }
