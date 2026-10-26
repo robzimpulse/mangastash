@@ -7,8 +7,7 @@ import 'get_root_path_use_case.dart';
 class FileSaverUseCase {
   final GetRootPathUseCase _getRootPathUseCase;
 
-  const FileSaverUseCase({required GetRootPathUseCase getRootPathUseCase})
-    : _getRootPathUseCase = getRootPathUseCase;
+  const FileSaverUseCase({required this._getRootPathUseCase});
 
   Future<void> execute({String? filename, required Uint8List data}) async {
     if (!kIsWeb) {

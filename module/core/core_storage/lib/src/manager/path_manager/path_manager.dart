@@ -17,12 +17,10 @@ class PathManager
   final Directory _downloadDirectory;
 
   PathManager._({
-    required Directory rootDirectory,
-    required Directory backupDirectory,
-    required Directory downloadDirectory,
-  }) : _rootDirectory = rootDirectory,
-       _backupDirectory = backupDirectory,
-       _downloadDirectory = downloadDirectory;
+    required this._rootDirectory,
+    required this._backupDirectory,
+    required this._downloadDirectory,
+  });
 
   static Future<PathManager> create() async {
     final root = await rootDirectory();

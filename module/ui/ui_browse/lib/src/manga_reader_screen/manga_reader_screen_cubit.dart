@@ -25,21 +25,15 @@ class MangaReaderScreenCubit extends Cubit<MangaReaderScreenState>
   final ListenPrefetchChapterConfig _listenPrefetchChapterConfig;
 
   MangaReaderScreenCubit({
-    required GetChapterUseCase getChapterUseCase,
+    required this._getChapterUseCase,
     required MangaReaderScreenState initialState,
-    required UpdateChapterUseCase updateChapterUseCase,
+    required this._updateChapterUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
-    required RecrawlUseCase recrawlUseCase,
-    required PrefetchChapterUseCase prefetchChapterUseCase,
-    required GetNeighbourChapterUseCase getNeighbourChapterUseCase,
-    required ListenPrefetchChapterConfig listenPrefetchChapterConfig,
-  }) : _getChapterUseCase = getChapterUseCase,
-       _updateChapterUseCase = updateChapterUseCase,
-       _recrawlUseCase = recrawlUseCase,
-       _prefetchChapterUseCase = prefetchChapterUseCase,
-       _getNeighbourChapterUseCase = getNeighbourChapterUseCase,
-       _listenPrefetchChapterConfig = listenPrefetchChapterConfig,
-       super(
+    required this._recrawlUseCase,
+    required this._prefetchChapterUseCase,
+    required this._getNeighbourChapterUseCase,
+    required this._listenPrefetchChapterConfig,
+  }) : super(
          initialState.copyWith(
            parameter: listenSearchParameterUseCase
                .searchParameterState

@@ -4,8 +4,7 @@ import 'package:entity_manga/entity_manga.dart';
 class ListenDownloadedChapterUseCase {
   final ChapterDao _chapterDao;
 
-  ListenDownloadedChapterUseCase({required ChapterDao chapterDao})
-    : _chapterDao = chapterDao;
+  ListenDownloadedChapterUseCase({required this._chapterDao});
 
   Stream<List<Chapter>> execute({required mangaId}) {
     return _chapterDao

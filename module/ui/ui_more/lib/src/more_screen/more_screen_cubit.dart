@@ -13,13 +13,10 @@ class MoreScreenCubit extends Cubit<MoreScreenState>
     required ListenJobUseCase listenJobUseCase,
     required ListenSettingDownloadedOnlyUseCase
     listenSettingDownloadedOnlyUseCase,
-    required UpdateSettingDownloadedOnlyUseCase
-    updateSettingDownloadedOnlyUseCase,
+    required this._updateSettingDownloadedOnlyUseCase,
     required ListenSettingIncognitoUseCase listenSettingIncognitoUseCase,
-    required UpdateSettingIncognitoUseCase updateSettingIncognitoUseCase,
-  }) : _updateSettingDownloadedOnlyUseCase = updateSettingDownloadedOnlyUseCase,
-       _updateSettingIncognitoUseCase = updateSettingIncognitoUseCase,
-       super(initialState) {
+    required this._updateSettingIncognitoUseCase,
+  }) : super(initialState) {
     addSubscription(
       CombineLatestStream.combine2(
         listenJobUseCase.jobLength,

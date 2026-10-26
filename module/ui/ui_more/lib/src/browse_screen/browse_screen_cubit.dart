@@ -15,11 +15,10 @@ class BrowseScreenCubit extends Cubit<BrowseScreenState> {
   final UpdateSearchParameterUseCase _updateSearchParameterUseCase;
 
   BrowseScreenCubit({
-    required UpdateSearchParameterUseCase updateSearchParameterUseCase,
+    required this._updateSearchParameterUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
     BrowseScreenState initialState = const BrowseScreenState(),
-  })  : _updateSearchParameterUseCase = updateSearchParameterUseCase,
-        super(
+  })  : super(
           initialState.copyWith(
             parameter:
                 listenSearchParameterUseCase.searchParameterState.valueOrNull,

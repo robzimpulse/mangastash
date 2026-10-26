@@ -6,8 +6,8 @@ class AuthorRepository {
   final AuthorService _service;
 
   const AuthorRepository({
-    required AuthorService service,
-  }) : _service = service;
+    required this._service,
+  });
 
   Future<AuthorResponse> detail(String id, {List<Include>? includes}) async {
     return _service.detail(

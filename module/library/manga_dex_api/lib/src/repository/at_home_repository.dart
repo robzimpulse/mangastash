@@ -5,8 +5,8 @@ class AtHomeRepository {
   final AtHomeService _service;
 
   const AtHomeRepository({
-    required AtHomeService service,
-  }) : _service = service;
+    required this._service,
+  });
 
   Future<AtHomeResponse> url(String id) {
     return _service.url(id);

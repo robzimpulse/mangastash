@@ -20,14 +20,11 @@ class RecrawlUseCase {
   final Future<void> Function(BuildContext context, Uri uri)? _openWebview;
 
   RecrawlUseCase({
-    required LogBox logBox,
-    required RunSourceScriptUseCase runner,
-    required VisibleWebviewGuard guard,
-    Future<void> Function(BuildContext context, Uri uri)? openWebview,
-  }) : _runner = runner,
-       _logBox = logBox,
-       _guard = guard,
-       _openWebview = openWebview;
+    required this._logBox,
+    required this._runner,
+    required this._guard,
+    this._openWebview,
+  });
 
   Future<void> execute({
     required BuildContext context,

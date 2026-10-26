@@ -10,10 +10,9 @@ class CustomFileService extends FileService {
   final ValueGetter<HeadlessWebviewUseCase> _headlessWebviewUseCase;
 
   CustomFileService({
-    required ValueGetter<Dio> dio,
-    required ValueGetter<HeadlessWebviewUseCase> headlessWebviewUseCase,
-  }) : _dio = dio,
-       _headlessWebviewUseCase = headlessWebviewUseCase;
+    required this._dio,
+    required this._headlessWebviewUseCase,
+  });
 
   @override
   Future<FileServiceResponse> get(

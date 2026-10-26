@@ -6,7 +6,7 @@ import 'executor.dart';
 class MemoryExecutor extends Executor {
   final QueryExecutor? _executor;
 
-  const MemoryExecutor({QueryExecutor? executor}) : _executor = executor;
+  const MemoryExecutor({this._executor});
 
   @override
   QueryExecutor build() {

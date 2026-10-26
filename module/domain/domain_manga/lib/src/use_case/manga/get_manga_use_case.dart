@@ -30,18 +30,13 @@ class GetMangaUseCase with SyncMangasMixin {
   final SourceRegistry _registry;
 
   GetMangaUseCase({
-    required RunSourceScriptUseCase runner,
-    required SourceRegistry registry,
-    required ConverterCacheManager converterCacheManager,
-    required MangaService mangaService,
-    required MangaDao mangaDao,
-    required LogBox logBox,
-  }) : _mangaService = mangaService,
-       _mangaDao = mangaDao,
-       _logBox = logBox,
-       _runner = runner,
-       _registry = registry,
-       _converterCacheManager = converterCacheManager;
+    required this._runner,
+    required this._registry,
+    required this._converterCacheManager,
+    required this._mangaService,
+    required this._mangaDao,
+    required this._logBox,
+  });
 
   Future<Manga> _mangadex({required String mangaId}) async {
     final result = await _mangaService.detail(

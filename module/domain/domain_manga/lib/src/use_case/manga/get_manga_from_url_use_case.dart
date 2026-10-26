@@ -29,16 +29,12 @@ class GetMangaFromUrlUseCase with SyncMangasMixin {
   final SourceRegistry _registry;
 
   GetMangaFromUrlUseCase({
-    required RunSourceScriptUseCase runner,
-    required SourceRegistry registry,
-    required MangaDao mangaDao,
-    required LogBox logBox,
-    required ConverterCacheManager converterCacheManager,
-  }) : _mangaDao = mangaDao,
-       _logBox = logBox,
-       _runner = runner,
-       _registry = registry,
-       _converterCacheManager = converterCacheManager;
+    required this._runner,
+    required this._registry,
+    required this._mangaDao,
+    required this._logBox,
+    required this._converterCacheManager,
+  });
 
   Future<Manga> _scrapping({
     required SourceExternal source,

@@ -9,8 +9,8 @@ class MangaRepository {
   final MangaService _service;
 
   const MangaRepository({
-    required MangaService service,
-  }) : _service = service;
+    required this._service,
+  });
 
   Future<SearchMangaResponse> search({
     required SearchMangaParameter parameter,

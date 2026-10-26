@@ -6,8 +6,8 @@ class CoverRepository {
   final CoverArtService _service;
 
   const CoverRepository({
-    required CoverArtService service,
-  }) : _service = service;
+    required this._service,
+  });
 
   Future<CoverArtResponse> detail(String id, {List<Include>? includes}) {
     return _service.detail(

@@ -33,24 +33,17 @@ class BrowseMangaScreenCubit extends Cubit<BrowseMangaScreenState>
 
   BrowseMangaScreenCubit({
     required BrowseMangaScreenState initialState,
-    required SearchMangaUseCase searchMangaUseCase,
-    required AddToLibraryUseCase addToLibraryUseCase,
-    required RemoveFromLibraryUseCase removeFromLibraryUseCase,
+    required this._searchMangaUseCase,
+    required this._addToLibraryUseCase,
+    required this._removeFromLibraryUseCase,
     required ListenMangaFromLibraryUseCase listenMangaFromLibraryUseCase,
-    required PrefetchMangaUseCase prefetchMangaUseCase,
+    required this._prefetchMangaUseCase,
     required ListenPrefetchUseCase listenPrefetchMangaUseCase,
-    required PrefetchChapterUseCase prefetchChapterUseCase,
+    required this._prefetchChapterUseCase,
     required ListenSearchParameterUseCase listenSearchParameterUseCase,
-    required GetTagsUseCase getTagsUseCase,
-    required RecrawlUseCase recrawlUseCase,
-  }) : _searchMangaUseCase = searchMangaUseCase,
-       _addToLibraryUseCase = addToLibraryUseCase,
-       _removeFromLibraryUseCase = removeFromLibraryUseCase,
-       _prefetchMangaUseCase = prefetchMangaUseCase,
-       _prefetchChapterUseCase = prefetchChapterUseCase,
-       _getTagsUseCase = getTagsUseCase,
-       _recrawlUseCase = recrawlUseCase,
-       super(
+    required this._getTagsUseCase,
+    required this._recrawlUseCase,
+  }) : super(
          initialState.copyWith(
            parameter: initialState.parameter.merge(
              listenSearchParameterUseCase.searchParameterState.valueOrNull,

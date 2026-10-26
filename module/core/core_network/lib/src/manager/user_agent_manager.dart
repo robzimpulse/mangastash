@@ -5,7 +5,7 @@ import 'package:universal_io/io.dart';
 import '../mixin/user_agent_mixin.dart';
 
 class UserAgentManager {
-  UserAgentManager({required LogBox log}) : _log = log;
+  UserAgentManager({required this._log});
 
   final LogBox _log;
 

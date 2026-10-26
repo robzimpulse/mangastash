@@ -37,20 +37,14 @@ class SearchMangaUseCase with SyncMangasMixin {
   final LogBox _logBox;
 
   const SearchMangaUseCase({
-    required MangaRepository mangaRepository,
-    required RunSourceScriptUseCase runner,
-    required SourceRegistry registry,
-    required ConverterCacheManager converterCacheManager,
-    required SearchMangaCacheManager searchMangaCacheManager,
-    required MangaDao mangaDao,
-    required LogBox logBox,
-  }) : _mangaRepository = mangaRepository,
-       _converterCacheManager = converterCacheManager,
-       _searchMangaCacheManager = searchMangaCacheManager,
-       _mangaDao = mangaDao,
-       _runner = runner,
-       _registry = registry,
-       _logBox = logBox;
+    required this._mangaRepository,
+    required this._runner,
+    required this._registry,
+    required this._converterCacheManager,
+    required this._searchMangaCacheManager,
+    required this._mangaDao,
+    required this._logBox,
+  });
 
   Future<Pagination<Manga>> _mangadex({
     required SearchMangaParameter parameter,

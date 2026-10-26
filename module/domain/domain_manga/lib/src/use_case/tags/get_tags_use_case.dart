@@ -26,14 +26,11 @@ class GetTagsUseCase with SyncTagsMixin {
   final SourceRegistry _registry;
 
   const GetTagsUseCase({
-    required MangaService mangaService,
-    required TagDao tagDao,
-    required LogBox logBox,
-    required SourceRegistry registry,
-  }) : _mangaService = mangaService,
-       _tagDao = tagDao,
-       _registry = registry,
-       _logBox = logBox;
+    required this._mangaService,
+    required this._tagDao,
+    required this._logBox,
+    required this._registry,
+  });
 
   Future<List<Tag>> _mangadex() async {
     final result = await _mangaService.tags();

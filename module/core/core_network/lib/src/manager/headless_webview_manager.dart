@@ -358,18 +358,13 @@ class HeadlessWebviewManager
   final Mutex _blankMutex = Mutex();
 
   HeadlessWebviewManager({
-    required LogBox log,
-    required HtmlCacheManager htmlCacheManager,
-    UserAgentManager? userAgentManager,
-    HeadlessWebviewFactory webviewFactory = HeadlessInAppWebView.new,
-    Future<String> Function() loadSourceCtx = _loadBundledSourceCtx,
+    required this._log,
+    required this._htmlCacheManager,
+    this._userAgentManager,
+    this._webviewFactory = HeadlessInAppWebView.new,
+    this._loadSourceCtx = _loadBundledSourceCtx,
     VisibleWebviewGuard? visibleWebviewGuard,
-  }) : _log = log,
-       _htmlCacheManager = htmlCacheManager,
-       _userAgentManager = userAgentManager,
-       _webviewFactory = webviewFactory,
-       _loadSourceCtx = loadSourceCtx,
-       _visibleWebviewGuard = visibleWebviewGuard ?? VisibleWebviewGuard();
+  }) : _visibleWebviewGuard = visibleWebviewGuard ?? VisibleWebviewGuard();
 
   Future<void> dispose() async {
     _blankWebview = null;

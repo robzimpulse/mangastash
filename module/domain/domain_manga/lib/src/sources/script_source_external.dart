@@ -36,8 +36,8 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 class ScriptSourceExternal extends Equatable implements SourceExternal {
   const ScriptSourceExternal({
     required this.script,
-    required RunSourceScriptUseCase runner,
-  }) : _runner = runner;
+    required this._runner,
+  });
 
   final SourceScript script;
   final RunSourceScriptUseCase _runner;

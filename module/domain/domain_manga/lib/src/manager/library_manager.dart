@@ -15,10 +15,9 @@ class LibraryManager implements ListenMangaFromLibraryUseCase {
   final ListenSourcesUseCase _listenSourcesUseCase;
 
   LibraryManager({
-    required LibraryDao libraryDao,
-    required ListenSourcesUseCase listenSourcesUseCase,
-  }) : _libraryDao = libraryDao,
-       _listenSourcesUseCase = listenSourcesUseCase;
+    required this._libraryDao,
+    required this._listenSourcesUseCase,
+  });
 
   Stream<List<Manga>> get _stateSubject {
     return Rx.combineLatest2<List<MangaModel>, List<SourceExternal>, List<Manga>>(

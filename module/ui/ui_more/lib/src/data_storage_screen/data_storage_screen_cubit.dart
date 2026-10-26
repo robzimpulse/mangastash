@@ -15,11 +15,9 @@ class DataStorageScreenCubit extends Cubit<DataStorageScreenState>
 
   DataStorageScreenCubit({
     DataStorageScreenState initialState = const DataStorageScreenState(),
-    required GetBackupPathUseCase getBackupPathUseCase,
-    required AppDatabase database,
-  }) : _getBackupPathUseCase = getBackupPathUseCase,
-       _database = database,
-       super(initialState);
+    required this._getBackupPathUseCase,
+    required this._database,
+  }) : super(initialState);
 
   Future<void> addBackupFromDatabase() async {
     await addBackupFromData(data: await _database.backup());

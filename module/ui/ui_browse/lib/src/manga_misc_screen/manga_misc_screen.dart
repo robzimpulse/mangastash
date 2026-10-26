@@ -185,25 +185,30 @@ class _MangaMiscScreenState extends State<MangaMiscScreen> {
     );
   }
 
+  /// Display tab: one [RadioGroup] owns the selected [ChapterDisplayEnum]
+  /// (Flutter 3.32+ replaced per-tile `groupValue`/`onChanged`), rebuilt
+  /// only when the configured display changes.
   Widget _display(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (final display in ChapterDisplayEnum.values)
-          _builder(
-            buildWhen: (prev, curr) {
-              return prev.config?.display != curr.config?.display;
-            },
-            builder: (context, state) {
-              return RadioListTile<ChapterDisplayEnum>(
-                title: Text(display.value),
-                value: display,
-                groupValue: state.config?.display,
-                onChanged: (value) => _cubit(context)?.update(display: value),
-              );
-            },
+    return _builder(
+      buildWhen: (prev, curr) {
+        return prev.config?.display != curr.config?.display;
+      },
+      builder: (context, state) {
+        return RadioGroup<ChapterDisplayEnum>(
+          groupValue: state.config?.display,
+          onChanged: (value) => _cubit(context)?.update(display: value),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final display in ChapterDisplayEnum.values)
+                RadioListTile<ChapterDisplayEnum>(
+                  title: Text(display.value),
+                  value: display,
+                ),
+            ],
           ),
-      ],
+        );
+      },
     );
   }
 }
