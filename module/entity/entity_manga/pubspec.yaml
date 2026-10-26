@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
   equatable: ^2.0.5
   collection: ^1.16.0
-  json_annotation: ^4.9.0
+  json_annotation: ^4.11.0
 
   # core
   core_environment:
@@ -30,5 +30,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-  build_runner: ^2.3.3
-  json_serializable: ^6.6.1
+  build_runner: 2.15.1
+  json_serializable: 6.13.0
+  # source_helper 1.4.0 adds `DartTypeExtension.toStringNonNullable`, which
+  # collides with json_serializable 6.13.0's own extension of the same name
+  # and breaks the builder compile; 1.3.13 is the last version without it.
+  source_helper: 1.3.13
