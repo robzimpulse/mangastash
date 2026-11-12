@@ -457,4 +457,61 @@ void main() {
 
     expect(find.textContaining('Artist One'), findsOneWidget);
   });
+
+  // Issue #206: a manga whose source moved to another domain is frozen — the
+  // chapter tab shows the moved-source banner above the chapter list; a
+  // current-host manga shows none.
+  group('moved source mark (#206)', () {
+    testWidgets('a moved manga shows the banner on the chapter tab', (
+      tester,
+    ) async {
+      final fake = FakeScrapedSourceExternal(name: 'Scraped Example');
+      bindSources([fake]);
+      cubit = buildCubit(
+        initialState: MangaDetailScreenState(
+          mangaId: 'm-1',
+          manga: const Manga(
+            id: 'm-1',
+            source: 'Scraped Example',
+            title: 'Solo Leveling',
+            webUrl: 'https://old.example/t',
+          ),
+          source: fake,
+          chapters: chapters,
+          totalChapter: 2,
+        ),
+      );
+      await pumpScreen(tester);
+
+      expect(
+        find.text(
+          'Source moved — Scraped Example no longer serves old.example. '
+          "Showing your saved copy; this manga can't be updated.",
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('a manga on a current host shows no banner', (tester) async {
+      final fake = FakeScrapedSourceExternal(name: 'Scraped Example');
+      bindSources([fake]);
+      cubit = buildCubit(
+        initialState: MangaDetailScreenState(
+          mangaId: 'm-1',
+          manga: const Manga(
+            id: 'm-1',
+            source: 'Scraped Example',
+            title: 'Solo Leveling',
+            webUrl: 'https://scraped.example.com/t',
+          ),
+          source: fake,
+          chapters: chapters,
+          totalChapter: 2,
+        ),
+      );
+      await pumpScreen(tester);
+
+      expect(find.textContaining('Source moved'), findsNothing);
+    });
+  });
 }

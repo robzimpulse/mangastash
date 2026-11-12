@@ -573,49 +573,67 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               prev.downloadedChapterIds != curr.downloadedChapterIds,
               prev.config != curr.config,
               prev.isPrefetchingAll != curr.isPrefetchingAll,
+              // Issue #206: movedHost derives from manga, so the chapter tab
+              // must rebuild (and show/hide the banner) when it loads.
+              prev.manga != curr.manga,
             ].contains(true);
           },
           builder: (context, state) {
-            return ListWidget(
-              itemBuilder: (context, data) {
-                return ChapterTileWidget.chapter(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  onTap: () => widget.onTapChapter?.call(data),
-                  onTapLongPress: () {
-                    final chapterId = data.id;
-                    if (chapterId == null) return;
-                    _cubit(context)?.downloadChapter(chapterId: chapterId);
-                  },
-                  chapter: data,
-                  opacity: data.lastReadAt != null ? 0.5 : 1,
-                  isPrefetching: state.prefetchedChapterIds.contains(data.id),
-                  isDownloaded: state.downloadedChapterIds.contains(data.id),
-                  lastReadAt: data.lastReadAt,
-                );
-              },
-              pageStorageKey: PageStorageKey('chapter-list-${state.mangaId}'),
-              absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                context,
-              ),
-              onLoadNextPage: () => _cubit(context)?.nextChapter(),
-              onRefresh: () async {
-                await _cubit(context)?.initChapter(refresh: true);
-              },
-              onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
-              onTapFixSource: widget.onTapFixSource,
-              onTapDownload: (option) {
-                _onTapDownload(context: context, option: option);
-              },
-              onTapFilter: () {
-                _onTapFilter(context: context, config: state.config);
-              },
-              onTapPrefetch: () => _cubit(context)?.prefetch(),
-              isPrefetchingAll: state.isPrefetchingAll,
-              error: state.errorChapters,
-              isLoading: state.isLoadingChapters || state.isLoadingManga,
-              hasNext: state.hasNextPageChapter,
-              data: state.filtered,
-              total: state.totalChapter ?? 0,
+            // Issue #206: a moved manga is frozen — the banner above the
+            // stored chapter list explains it. Refresh stays wired: the
+            // gated use cases make it a no-op.
+            final movedHost = state.movedHost;
+            return Column(
+              children: [
+                if (movedHost != null)
+                  SourceMovedBannerWidget(
+                    sourceName: state.source?.name ?? '',
+                    host: movedHost,
+                  ),
+                Expanded(
+                  child: ListWidget(
+                    itemBuilder: (context, data) {
+                      return ChapterTileWidget.chapter(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        onTap: () => widget.onTapChapter?.call(data),
+                        onTapLongPress: () {
+                          final chapterId = data.id;
+                          if (chapterId == null) return;
+                          _cubit(context)?.downloadChapter(chapterId: chapterId);
+                        },
+                        chapter: data,
+                        opacity: data.lastReadAt != null ? 0.5 : 1,
+                        isPrefetching: state.prefetchedChapterIds.contains(data.id),
+                        isDownloaded: state.downloadedChapterIds.contains(data.id),
+                        lastReadAt: data.lastReadAt,
+                      );
+                    },
+                    pageStorageKey: PageStorageKey('chapter-list-${state.mangaId}'),
+                    absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                      context,
+                    ),
+                    onLoadNextPage: () => _cubit(context)?.nextChapter(),
+                    onRefresh: () async {
+                      await _cubit(context)?.initChapter(refresh: true);
+                    },
+                    onTapRecrawl: (url) => _onTapRecrawl(context: context, url: url),
+                    onTapFixSource: widget.onTapFixSource,
+                    onTapDownload: (option) {
+                      _onTapDownload(context: context, option: option);
+                    },
+                    onTapFilter: () {
+                      _onTapFilter(context: context, config: state.config);
+                    },
+                    onTapPrefetch: () => _cubit(context)?.prefetch(),
+                    isPrefetchingAll: state.isPrefetchingAll,
+                    error: state.errorChapters,
+                    isLoading: state.isLoadingChapters || state.isLoadingManga,
+                    hasNext: state.hasNextPageChapter,
+                    data: state.filtered,
+                    total: state.totalChapter ?? 0,
+                  ),
+                ),
+              ],
             );
           },
         ),

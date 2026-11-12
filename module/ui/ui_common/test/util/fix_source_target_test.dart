@@ -3,6 +3,7 @@
 //
 // Run with: fvm flutter test test/util/fix_source_target_test.dart
 import 'package:core_network/core_network.dart';
+import 'package:domain_manga/domain_manga.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ui_common/src/util/fix_source_target.dart';
 
@@ -77,6 +78,14 @@ void main() {
     test('is null for any other error', () {
       expect(fixSourceTargetOf(Exception()), null);
       expect(fixSourceTargetOf(null), null);
+    });
+
+    test('is null for a SourceMovedException, which is never transient (#206)', () {
+      // A moved source cannot be fixed by editing the script nor by
+      // retrying: neither action may be offered.
+      const error = SourceMovedException(sourceName: 'A', host: 'h');
+      expect(fixSourceTargetOf(error), null);
+      expect(isTransientLoadError(error), isFalse);
     });
   });
 }
