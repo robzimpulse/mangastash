@@ -3,9 +3,23 @@
 // by `results.first` — the old exception-as-control-flow pattern logged a
 // full error + stack trace on every cache miss before falling to network.
 //
+// Also pins issue #207: the image cache's own config guards its file service
+// against HTML bodies (bot challenge / Cloudflare pages), whatever service
+// the registrar hands it.
+//
 // Run with: fvm flutter test test/manager/storage_manager/images_cache_manager_test.dart
+import 'dart:typed_data';
+
 import 'package:core_analytics/core_analytics.dart';
+import 'package:core_network/core_network.dart'
+    show
+        Dio,
+        HeadlessWebviewUseCase,
+        HttpClientAdapter,
+        RequestOptions,
+        ResponseBody;
 import 'package:core_storage/src/manager/storage_manager/file_service/custom_file_service.dart';
+import 'package:core_storage/src/manager/storage_manager/file_service/image_base64_get_response.dart';
 import 'package:core_storage/src/manager/storage_manager/images_cache_manager.dart';
 import 'package:file/file.dart' show File;
 import 'package:file/memory.dart';
@@ -23,6 +37,30 @@ class _MockLogBox extends Mock implements LogBox {}
 class _MockFile extends Mock implements File {}
 
 class _MockCacheInfoRepository extends Mock implements CacheInfoRepository {}
+
+class _MockHeadlessWebviewUseCase extends Mock
+    implements HeadlessWebviewUseCase {}
+
+/// Serves every request as a `200 text/html` page, like a bot challenge.
+class _HtmlAdapter implements HttpClientAdapter {
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    return ResponseBody(
+      Stream.value(Uint8List.fromList('<html></html>'.codeUnits)),
+      200,
+      headers: {
+        'content-type': ['text/html; charset=UTF-8'],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
 
 /// Delegates flutter_cache_manager's [FileSystem] to an in-memory
 /// implementation so the manager never touches the platform temp
@@ -48,8 +86,10 @@ void main() {
     repo = _MockCacheInfoRepository();
     when(() => repo.open()).thenAnswer((_) async => true);
     when(() => repo.close()).thenAnswer((_) async => true);
+    final fileService = _MockFileService();
+    when(() => fileService.withRejectHtml()).thenReturn(fileService);
     manager = ImagesCacheManager(
-      fileService: _MockFileService(),
+      fileService: fileService,
       fileDao: fileDao,
       logBox: _MockLogBox(),
       fileSystem: _MemoryFileSystem(),
@@ -83,6 +123,36 @@ void main() {
       final result = await manager.getFromDatabase(url: url);
 
       expect(result, same(file));
+    });
+  });
+
+  group('HTML guard (#207)', () {
+    test('config falls back to webview for text/html even when the '
+        'given file service does not reject HTML', () async {
+      final dio = Dio()..httpClientAdapter = _HtmlAdapter();
+      final webview = _MockHeadlessWebviewUseCase();
+      when(
+        () => webview.image(any(), headers: any(named: 'headers')),
+      ).thenAnswer(
+        (_) async =>
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      );
+
+      final config = ImagesCacheManager.buildConfig(
+        fileService: CustomFileService(
+          dio: () => dio,
+          headlessWebviewUseCase: () => webview,
+        ),
+        fileSystem: _MemoryFileSystem(),
+        repo: repo,
+      );
+
+      final response = await config.fileService.get(url);
+
+      expect(response, isA<ImageBase64GetResponse>());
+      verify(
+        () => webview.image(url, headers: any(named: 'headers')),
+      ).called(1);
     });
   });
 }

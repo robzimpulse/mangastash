@@ -1,3 +1,13 @@
+/// Factory for configuring and creating shared [Dio] HTTP client instances.
+///
+/// Sets timeouts, attaches [UserAgentManager], registers [MangaDexEdgeInterceptor]
+/// to bypass MangaDex POWBlock challenges and detect challenge redirects, throttles requests,
+/// validates URI paths, logs traffic, and configures smart retries.
+///
+/// Usage:
+/// Call [DioManager.create] with a [LogBox] instance to get a configured [Dio] client.
+library;
+
 import 'package:core_analytics/core_analytics.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
@@ -5,9 +15,13 @@ import 'package:universal_io/io.dart';
 
 import '../interceptor/dio_reject_interceptor.dart';
 import '../interceptor/dio_throttler_interceptor.dart';
+import '../interceptor/mangadex_edge_interceptor.dart';
 import '../mixin/user_agent_mixin.dart';
 import 'user_agent_manager.dart';
 
+/// Requests to MangaDex edge hosts (`mangadex.org` and `*.mangadex.org`) have
+/// their User-Agent stripped by [MangaDexEdgeInterceptor] to avoid POWBlock
+/// challenges, and any redirected challenge page response is rejected.
 class DioManager {
   /// In dio 5.11.1, receiveTimeout bounds the wait for the response HEADERS
   /// (time-to-first-byte, `request.close()` in `io_adapter.dart`) and then
@@ -32,6 +46,7 @@ class DioManager {
     }
 
     dio.interceptors.addAll([
+      MangaDexEdgeInterceptor(),
       DioThrottlerInterceptor(
         const Duration(milliseconds: 200),
         onThrottled: (req, scheduled) {

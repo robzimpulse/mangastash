@@ -1,8 +1,53 @@
+/// Tests for [mapDioError] mapping DioException to domain-appropriate exceptions.
+///
+/// Verifies status code mappings, rate limiting, and bot challenge redirection detection.
+///
+/// Usage:
+/// Run via `fvm flutter test test/exception/map_dio_error_test.dart`.
 import 'package:core_network/core_network.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('mapDioError', () {
+    test('challenge redirect → BotChallengeException', () {
+      final requestOptions = RequestOptions(
+        path: 'https://api.mangadex.org/manga',
+      );
+      final dio = DioException(
+        requestOptions: requestOptions,
+        response: Response(
+          requestOptions: requestOptions,
+          statusCode: 200,
+          redirects: [
+            RedirectRecord(
+              302,
+              'GET',
+              Uri.parse('https://mangadex.org/edge/challenge?src=x'),
+            ),
+          ],
+        ),
+      );
+      final result = mapDioError(dio);
+      expect(result, isA<BotChallengeException>());
+      final challenge = result as BotChallengeException;
+      expect(challenge.url, equals('https://api.mangadex.org/manga'));
+    });
+
+    test('200 without challenge redirect → HttpStatusException(200)', () {
+      final requestOptions = RequestOptions(
+        path: 'https://api.mangadex.org/manga',
+      );
+      final dio = DioException(
+        requestOptions: requestOptions,
+        response: Response(
+          requestOptions: requestOptions,
+          statusCode: 200,
+        ),
+      );
+      final result = mapDioError(dio);
+      expect(result, isA<HttpStatusException>());
+      expect((result as HttpStatusException).statusCode, equals(200));
+    });
     test('429 + integer Retry-After → RateLimitException', () {
       final dio = DioException(
         requestOptions: RequestOptions(),
