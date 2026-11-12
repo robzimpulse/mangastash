@@ -201,6 +201,7 @@ class DomainMangaRegistrar extends Registrar {
         runner: locator(),
         registry: locator(),
         chapterDao: locator(),
+        mangaDao: locator(),
         atHomeRepository: locator(),
         chapterRepository: locator(),
       ),

@@ -9,6 +9,12 @@
 // `source` only carries the name: `execute` re-resolves it through the
 // SourceRegistry, so a screen that captured the adapter before the user saved
 // an edited script (Fix source) still runs the saved code.
+//
+// Moved-source gate (issue #206): when the stored manga's webUrl host or the
+// chapter's own webUrl host is not served by the resolved source any more
+// (`movedHostOf` != null — the second check covers half-merged rows whose
+// manga was relinked by title), nothing scrapes: a saved chapter (stored
+// images) is served as-is, an unsaved one throws `SourceMovedException`.
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_environment/core_environment.dart';
 import 'package:core_network/core_network.dart';
@@ -17,8 +23,10 @@ import 'package:entity_manga/entity_manga.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
 import 'package:manga_dex_api/manga_dex_api.dart';
 
+import '../../exception/source_moved_exception.dart';
 import '../../extension/map_network_error.dart';
 import '../../extension/scrapped_validation_extension.dart';
+import '../../extension/source_moved_extension.dart';
 import '../../manager/source_registry.dart';
 import '../../mixin/sync_chapters_mixin.dart';
 
@@ -27,6 +35,7 @@ class GetChapterUseCase with SyncChaptersMixin {
   final AtHomeRepository _atHomeRepository;
   final RunSourceScriptUseCase _runner;
   final ChapterDao _chapterDao;
+  final MangaDao _mangaDao;
   final LogBox _logBox;
   final SourceRegistry _registry;
 
@@ -35,6 +44,7 @@ class GetChapterUseCase with SyncChaptersMixin {
     required this._atHomeRepository,
     required this._runner,
     required this._chapterDao,
+    required this._mangaDao,
     required this._logBox,
     required this._registry,
   });
@@ -97,6 +107,23 @@ class GetChapterUseCase with SyncChaptersMixin {
       final chapter = raw.firstOrNull.let(
         (e) => e.chapter?.let((d) => Chapter.fromDrift(d, images: e.images)),
       );
+
+      // Issue #206: the manga's stored host decides first; the chapter's own
+      // webUrl host second (half-merged rows carry an old-host chapter under
+      // a current-host manga, which is not marked at manga level).
+      final storedRaw = await _mangaDao.search(ids: [mangaId]);
+      final storedManga = Manga.fromDatabase(storedRaw.firstOrNull);
+      final movedHost =
+          resolved.movedHostOf(storedManga?.webUrl) ??
+          resolved.movedHostOf(chapter?.webUrl);
+
+      if (movedHost != null) {
+        if (chapter != null && chapter.images.or([]).isNotEmpty) {
+          return Success(chapter);
+        }
+
+        throw SourceMovedException(sourceName: resolved.name, host: movedHost);
+      }
 
       if (chapter != null && chapter.images.or([]).isNotEmpty && useCache) {
         return Success(chapter);
