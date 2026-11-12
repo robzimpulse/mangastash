@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:core_analytics/core_analytics.dart';
 import 'package:file/file.dart' show File;
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:manga_service_drift/manga_service_drift.dart';
 
@@ -26,7 +27,7 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
     FileSystem? fileSystem,
     CacheInfoRepository? repo,
   }) : this._(
-         config: _buildConfig(
+         config: buildConfig(
            fileService: fileService,
            fileSystem: fileSystem,
            repo: repo,
@@ -48,28 +49,35 @@ class ImagesCacheManager extends CustomCacheManager with ImageCacheManager {
          },
        );
 
+  /// Builds the image cache's [Config]. The given [fileService] is always
+  /// wrapped with [CustomFileService.withRejectHtml], so an HTML body (a bot
+  /// challenge or Cloudflare page) falls back to the webview instead of being
+  /// cached as an image, whatever service the caller hands in (issue #207).
+  ///
   /// Config's named params are non-nullable in its factory signature, so a
   /// nullable override must be forwarded by omission, not by passing null.
-  static Config _buildConfig({
+  @visibleForTesting
+  static Config buildConfig({
     required CustomFileService fileService,
     FileSystem? fileSystem,
     CacheInfoRepository? repo,
   }) {
+    final guarded = fileService.withRejectHtml();
     if (fileSystem != null && repo != null) {
       return Config(
         'image',
-        fileService: fileService,
+        fileService: guarded,
         fileSystem: fileSystem,
         repo: repo,
       );
     }
     if (fileSystem != null) {
-      return Config('image', fileService: fileService, fileSystem: fileSystem);
+      return Config('image', fileService: guarded, fileSystem: fileSystem);
     }
     if (repo != null) {
-      return Config('image', fileService: fileService, repo: repo);
+      return Config('image', fileService: guarded, repo: repo);
     }
-    return Config('image', fileService: fileService);
+    return Config('image', fileService: guarded);
   }
 
   /// Resolves [url] against the app database. An empty result is a clean

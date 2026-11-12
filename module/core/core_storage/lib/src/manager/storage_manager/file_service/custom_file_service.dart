@@ -29,6 +29,19 @@ class CustomFileService extends FileService {
     this._rejectHtml = false,
   });
 
+  /// A copy of this service that rejects `text/html` bodies (falling back to
+  /// the headless webview), or this service itself when it already does.
+  /// `ImagesCacheManager` applies it to whatever service it is given, so the
+  /// image cache can never store an HTML page as an image (issue #207).
+  CustomFileService withRejectHtml() {
+    if (_rejectHtml) return this;
+    return CustomFileService(
+      dio: _dio,
+      headlessWebviewUseCase: _headlessWebviewUseCase,
+      rejectHtml: true,
+    );
+  }
+
   @override
   Future<FileServiceResponse> get(
     String url, {

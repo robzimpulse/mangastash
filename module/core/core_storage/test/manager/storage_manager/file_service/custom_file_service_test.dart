@@ -113,6 +113,27 @@ void main() {
     verifyNever(() => webview.image(any(), headers: any(named: 'headers')));
   });
 
+  test('withRejectHtml: guarded copy falls back for text/html', () async {
+    final dio = Dio();
+    dio.httpClientAdapter = _StubAdapter(
+      headers: {
+        'content-type': ['text/html; charset=UTF-8'],
+      },
+    );
+
+    final service = CustomFileService(
+      dio: () => dio,
+      headlessWebviewUseCase: () => webview,
+    ).withRejectHtml();
+
+    final response = await service.get(testUrl);
+
+    expect(response, isA<ImageBase64GetResponse>());
+    verify(
+      () => webview.image(testUrl, headers: any(named: 'headers')),
+    ).called(1);
+  });
+
   test('default (rejectHtml false): text/html uses Dio', () async {
     final dio = Dio();
     dio.httpClientAdapter = _StubAdapter(
