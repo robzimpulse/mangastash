@@ -25,6 +25,7 @@ class FakeScrapedSourceExternal implements SourceExternal {
   FakeScrapedSourceExternal({
     this.name = 'Scraped Example',
     this.baseUrl = 'https://scraped.example.com',
+    this.hosts = const [],
   });
 
   @override
@@ -35,6 +36,11 @@ class FakeScrapedSourceExternal implements SourceExternal {
 
   @override
   final String name;
+
+  /// Hosts the source still serves (issue #206); a moved-host URL makes the
+  /// moved predicate fire for manga whose webUrl is stored on it.
+  @override
+  final List<String> hosts;
 
   @override
   bool get builtIn => false;

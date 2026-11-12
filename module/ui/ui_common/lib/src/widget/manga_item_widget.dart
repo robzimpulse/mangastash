@@ -33,6 +33,11 @@ class MangaItemWidget extends StatelessWidget {
     final source = manga.source?.let(Sources.fromName);
     final sourceIconUrl = source?.iconUrl;
     final title = manga.title;
+    // Issue #206: the source moved away from the host this manga was saved
+    // on — mark the tile (the manga is frozen; new-domain results never
+    // attach to it). Resolved through the Sources facade like the icon, so
+    // the badge follows a saved script edit at once.
+    final movedHost = source?.movedHostOf(manga.webUrl);
 
     return Material(
       color: theme.scaffoldBackgroundColor,
@@ -93,6 +98,29 @@ class MangaItemWidget extends StatelessWidget {
                   ),
                 ),
               ],
+              // Issue #206: sits below the In-Library chip (top: 4) so the
+              // two never overlap, and away from the source icon (top-right).
+              if (movedHost != null)
+                Positioned(
+                  top: 28,
+                  left: 4,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                    ),
+                    child: Tooltip(
+                      message: 'Source moved',
+                      child: Icon(
+                        Icons.link_off,
+                        key: const Key('source-moved-badge'),
+                        size: 14,
+                        color: theme.colorScheme.error,
+                      ),
+                    ),
+                  ),
+                ),
               if (title != null)
                 Positioned(
                   bottom: 0,

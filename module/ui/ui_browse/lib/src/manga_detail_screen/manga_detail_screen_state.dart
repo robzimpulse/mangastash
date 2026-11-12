@@ -1,3 +1,4 @@
+import 'package:core_environment/core_environment.dart';
 import 'package:domain_manga/domain_manga.dart';
 import 'package:entity_manga/entity_manga.dart';
 import 'package:entity_manga_external/entity_manga_external.dart';
@@ -50,6 +51,14 @@ class MangaDetailScreenState extends Equatable {
   final bool isPrefetchingAll;
 
   bool get isOnLibrary => libraryMangaIds.contains(mangaId);
+
+  /// Issue #206: the host this manga's source moved away from, or null when
+  /// the manga is not frozen. Re-resolved through the `Sources` facade (like
+  /// tile icons), so a saved source edit answers immediately and putting the
+  /// old host back into the script's `hosts` clears the mark without a
+  /// restart.
+  String? get movedHost =>
+      source?.name.let(Sources.fromName)?.movedHostOf(manga?.webUrl);
 
   List<Chapter> get filtered {
     final List<Chapter> result = [];

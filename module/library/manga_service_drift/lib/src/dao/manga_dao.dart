@@ -11,6 +11,7 @@ import '../model/manga_model.dart';
 import '../tables/manga_tables.dart';
 import '../tables/relationship_tables.dart';
 import '../tables/tag_tables.dart';
+import '../util/normalized_host.dart';
 import 'chapter_dao.dart';
 import 'file_dao.dart';
 import 'tag_dao.dart';
@@ -176,10 +177,18 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
         final byWebUrl = entry.key.webUrl.valueOrNull?.let(
           (webUrl) => mangas.firstWhereOrNull((e) => e.manga?.webUrl == webUrl),
         );
+        // Issue #206: the title+source fallback must not relink a user's
+        // saved manga to a result scraped from another host (a moved
+        // source). Match only when one side has no host (legacy rows) or
+        // both normalise to the same host; cross-host results insert a
+        // separate manga row instead.
         final byTitleAndSource = entry.key.title.valueOrNull?.let(
           (title) => entry.key.source.valueOrNull.let(
             (source) => mangas.firstWhereOrNull(
-              (e) => e.manga?.title == title && e.manga?.source == source,
+              (e) =>
+                  e.manga?.title == title &&
+                  e.manga?.source == source &&
+                  _sameHost(e.manga?.webUrl, entry.key.webUrl.valueOrNull),
             ),
           ),
         );
@@ -276,4 +285,17 @@ class MangaDao extends DatabaseAccessor<AppDatabase> with _$MangaDaoMixin {
       return data;
     });
   }
+}
+
+/// Issue #206: whether [stored] and [incoming] may be treated as the same
+/// manga by MangaDao's title+source fallback. True when either side has no
+/// normalisable host (legacy rows, null webUrl) or both hosts are equal
+/// after `normalizedHostOf` — never true across different hosts.
+bool _sameHost(String? stored, String? incoming) {
+  final storedHost = normalizedHostOf(stored);
+  final incomingHost = normalizedHostOf(incoming);
+
+  return storedHost == null ||
+      incomingHost == null ||
+      storedHost == incomingHost;
 }

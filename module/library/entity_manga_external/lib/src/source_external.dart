@@ -31,6 +31,12 @@ abstract class SourceExternal {
   /// Whether the source is native (MangaDex) rather than scraped.
   bool get builtIn => false;
 
+  /// Every host the source currently serves its content on: the [baseUrl]
+  /// host plus the script header's `hosts` (issue #206). Scraped sources
+  /// override this from their script; when a stored manga's webUrl host is
+  /// not listed here any more, the source has moved and the manga is frozen.
+  List<String> get hosts => const [];
+
   /// URL of the search/browse page for [parameter] (empty title = browse).
   Future<String> searchUrl({required SearchMangaParameter parameter});
 

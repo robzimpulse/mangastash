@@ -55,6 +55,9 @@ class ScriptSourceExternal extends Equatable implements SourceExternal {
   bool get builtIn => false;
 
   @override
+  List<String> get hosts => script.hosts;
+
+  @override
   Future<String> searchUrl({required SearchMangaParameter parameter}) async {
     const function = 'searchUrl';
     final value = await _blank(function, args: [parameter.toJson()]);

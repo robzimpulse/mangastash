@@ -10,6 +10,12 @@
 // Usage: `await useCase.execute(parameter: p)` → Result<Pagination<Chapter>>;
 // `await useCase.clear(parameter: p)` drops the cached pages and the script
 // results of the chapter-list URL before a refresh.
+//
+// Moved-source gate (issue #206): when the source no longer serves the
+// stored manga's webUrl host (`movedHostOf` != null), execute() never
+// scrapes — it returns the stored chapters of `parameter.mangaId` as a
+// single page (empty when none are stored, `hasNextPage: false`) before the
+// cache read, with no DB sync and no cache write.
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
@@ -25,6 +31,7 @@ import '../../extension/data_scrapped_extension.dart';
 import '../../extension/map_network_error.dart';
 import '../../extension/scrapped_validation_extension.dart';
 import '../../extension/source_cache_version_extension.dart';
+import '../../extension/source_moved_extension.dart';
 import '../../manager/source_registry.dart';
 import '../../mixin/sort_chapters_mixin.dart';
 import '../../mixin/sync_chapters_mixin.dart';
@@ -209,6 +216,40 @@ class SearchChapterUseCase with SyncChaptersMixin, SortChaptersMixin {
     // script the old entry is never read again (issue #115, Review Focus 5).
     final source = _registry.fromName(parameter.source);
     final key = '${parameter.toJsonString()}${source?.cacheVersion ?? ''}';
+
+    // Issue #206: a source that no longer serves the stored manga's host is
+    // never scraped — the stored chapters are the one page the caller gets
+    // (an empty page when none are stored), with no sync and no cache write.
+    // This runs before the cache read: the banner in the UI explains the
+    // empty list, so no stale cache entry may answer instead.
+    if (source != null) {
+      final storedRaw = await _mangaDao.search(ids: [parameter.mangaId]);
+      final storedManga = Manga.fromDatabase(storedRaw.firstOrNull);
+      final movedHost = source.movedHostOf(storedManga?.webUrl);
+
+      if (movedHost != null) {
+        final rows = await _chapterDao.search(mangaIds: [parameter.mangaId]);
+        final data = sortChapters(
+          chapters: [
+            for (final row in rows)
+              if (row.chapter case final chapter?)
+                Chapter.fromDrift(chapter, images: row.images),
+          ],
+          parameter: parameter.parameter,
+        );
+
+        return Success(
+          Pagination(
+            data: data,
+            page: parameter.parameter.page,
+            limit: parameter.parameter.limit,
+            total: data.length,
+            hasNextPage: false,
+            sourceUrl: storedManga?.webUrl,
+          ),
+        );
+      }
+    }
 
     // A corrupt or partially-written cache file must be treated as a miss
     // (issue #122 sibling, review on #160): this read happens before the

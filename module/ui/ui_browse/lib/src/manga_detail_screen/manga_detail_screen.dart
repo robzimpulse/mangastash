@@ -573,9 +573,19 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               prev.downloadedChapterIds != curr.downloadedChapterIds,
               prev.config != curr.config,
               prev.isPrefetchingAll != curr.isPrefetchingAll,
+              // Issue #206: movedHost derives from manga, so the chapter tab
+              // must rebuild (and show/hide the banner) when it loads.
+              prev.manga != curr.manga,
             ].contains(true);
           },
           builder: (context, state) {
+            // Issue #206: a moved manga is frozen — the banner above the
+            // stored chapter list explains it. It must be the list's `header`
+            // (not a Column sibling): the chapter tab sits at the top of a
+            // NestedScrollView body, so a widget outside the list's scroll
+            // view is painted behind the collapsing app bar and never seen.
+            // Refresh stays wired: the gated use cases make it a no-op.
+            final movedHost = state.movedHost;
             return ListWidget(
               itemBuilder: (context, data) {
                 return ChapterTileWidget.chapter(
@@ -594,9 +604,13 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 );
               },
               pageStorageKey: PageStorageKey('chapter-list-${state.mangaId}'),
-              absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                context,
-              ),
+              absorber: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+              header: movedHost == null
+                  ? null
+                  : SourceMovedBannerWidget(
+                      sourceName: state.source?.name ?? '',
+                      host: movedHost,
+                    ),
               onLoadNextPage: () => _cubit(context)?.nextChapter(),
               onRefresh: () async {
                 await _cubit(context)?.initChapter(refresh: true);

@@ -24,6 +24,7 @@ class ListWidget<T> extends StatefulWidget {
     this.onLoadNextPage,
     this.onRefresh,
     this.absorber,
+    this.header,
     this.error,
     this.isLoading = true,
     this.hasNext = false,
@@ -60,6 +61,13 @@ class ListWidget<T> extends StatefulWidget {
   final ValueSetter<FixSourceTarget>? onTapFixSource;
 
   final SliverOverlapAbsorberHandle? absorber;
+
+  /// Optional widget pinned to the top of the list content, rendered below the
+  /// overlap spacer so it starts under a NestedScrollView's pinned header and
+  /// scrolls with the list. Used for the moved-source banner (issue #206): a
+  /// widget placed outside this scroll view would be painted behind the
+  /// collapsing app bar and be invisible.
+  final Widget? header;
 
   final Exception? error;
 
@@ -114,6 +122,8 @@ class _ListWidgetState<T> extends State<ListWidget<T>> {
             builder: (context, value, _) => SizedBox(height: value),
           ),
         ),
+        if (widget.header != null)
+          SliverToBoxAdapter(child: widget.header),
         SliverPadding(
           padding: const EdgeInsets.all(16),
           sliver: MultiSliver(
