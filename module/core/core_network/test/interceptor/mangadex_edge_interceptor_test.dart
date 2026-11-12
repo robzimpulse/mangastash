@@ -94,11 +94,29 @@ void main() {
     expect(adapter.lastOptions!.headers['x-after-strip'], '1');
   });
 
+  test('strips UA for mangadex.org and www.mangadex.org', () async {
+    // The site and its favicon (the Manga Dex source icon) sit behind the
+    // same challenge as the API.
+    const urls = [
+      'https://www.mangadex.org/favicon.ico',
+      'https://mangadex.org/title/123',
+    ];
+    for (final url in urls) {
+      await dio.get<Object>(url);
+      expect(
+        hasUserAgent(adapter.lastOptions!.headers),
+        isFalse,
+        reason: 'UA should be stripped for $url',
+      );
+    }
+  });
+
   test('keeps UA for other hosts', () async {
     const hosts = [
       'https://cmdx.mangadex.network/data/1.jpg',
-      'https://mangadex.org/title/123',
       'https://asurascans.com/manga',
+      'https://notmangadex.org/a',
+      'https://mangadex.org.example.com/a',
     ];
     for (final url in hosts) {
       await dio.get<Object>(url);

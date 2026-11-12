@@ -19,7 +19,7 @@ import '../interceptor/mangadex_edge_interceptor.dart';
 import '../mixin/user_agent_mixin.dart';
 import 'user_agent_manager.dart';
 
-/// Requests to MangaDex hosts (api.mangadex.org, uploads.mangadex.org) have
+/// Requests to MangaDex edge hosts (`mangadex.org` and `*.mangadex.org`) have
 /// their User-Agent stripped by [MangaDexEdgeInterceptor] to avoid POWBlock
 /// challenges, and any redirected challenge page response is rejected.
 class DioManager {

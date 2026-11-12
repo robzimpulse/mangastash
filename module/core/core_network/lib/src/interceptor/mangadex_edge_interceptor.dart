@@ -1,8 +1,10 @@
 /// Dio interceptor for MangaDex edge requests.
 ///
-/// Strips User-Agent headers for MangaDex edge hosts (api.mangadex.org and
-/// uploads.mangadex.org) so dart:io's default Dart User-Agent is used instead of
-/// a browser-like User-Agent, preventing MangaDex's POWBlock bot challenge redirect.
+/// Strips User-Agent headers for MangaDex edge hosts (`mangadex.org` and every
+/// `*.mangadex.org` subdomain: api, uploads, www) so dart:io's default Dart
+/// User-Agent is used instead of a browser-like User-Agent, preventing
+/// MangaDex's POWBlock bot challenge redirect. `*.mangadex.network` (MD@Home
+/// chapter pages) is not challenged and keeps the published UA.
 /// Also rejects responses whose final URL is the POWBlock challenge page
 /// (https://mangadex.org/edge/challenge) with a [DioException.badResponse].
 ///
@@ -17,15 +19,16 @@ import '../exception/bot_challenge_exception.dart';
 
 /// Interceptor that strips User-Agent on MangaDex edge hosts and catches challenge redirects.
 class MangaDexEdgeInterceptor extends Interceptor {
-  /// The MangaDex edge hosts that challenge browser-like User-Agents.
-  static const Set<String> hosts = {
-    'api.mangadex.org',
-    'uploads.mangadex.org',
-  };
+  /// Whether [host] sits behind MangaDex's edge challenge: `mangadex.org`
+  /// itself or any `*.mangadex.org` subdomain (api, uploads, www — the latter
+  /// serves the Manga Dex source icon).
+  static bool isEdgeHost(String host) {
+    return host == 'mangadex.org' || host.endsWith('.mangadex.org');
+  }
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    if (hosts.contains(options.uri.host)) {
+    if (isEdgeHost(options.uri.host)) {
       // `headers` is dio's case-insensitive map, so `remove` drops any
       // casing. Never use `removeWhere` here: on a LinkedHashMap with custom
       // equality it leaves a deleted slot that makes the next insert throw a
