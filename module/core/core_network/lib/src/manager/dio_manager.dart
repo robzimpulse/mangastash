@@ -1,3 +1,13 @@
+/// Factory for configuring and creating shared [Dio] HTTP client instances.
+///
+/// Sets timeouts, attaches [UserAgentManager], registers [MangaDexEdgeInterceptor]
+/// to bypass MangaDex POWBlock challenges and detect challenge redirects, throttles requests,
+/// validates URI paths, logs traffic, and configures smart retries.
+///
+/// Usage:
+/// Call [DioManager.create] with a [LogBox] instance to get a configured [Dio] client.
+library;
+
 import 'package:core_analytics/core_analytics.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
@@ -5,6 +15,7 @@ import 'package:universal_io/io.dart';
 
 import '../interceptor/dio_reject_interceptor.dart';
 import '../interceptor/dio_throttler_interceptor.dart';
+import '../interceptor/mangadex_edge_interceptor.dart';
 import '../mixin/user_agent_mixin.dart';
 import 'user_agent_manager.dart';
 
@@ -14,6 +25,10 @@ class DioManager {
   /// each gap between body chunks. A server that takes >30s to first byte —
   /// or stalls >30s mid-body — fails with `DioException.receiveTimeout` and
   /// `CustomFileService` falls back to the heavyweight headless-webview path.
+  ///
+  /// Requests to MangaDex hosts (api.mangadex.org, uploads.mangadex.org) have
+  /// their User-Agent stripped by [MangaDexEdgeInterceptor] to avoid POWBlock challenges,
+  /// and any redirected challenge page response is rejected.
   static const Duration connectTimeout = Duration(seconds: 15);
   static const Duration receiveTimeout = Duration(seconds: 30);
 
@@ -32,6 +47,7 @@ class DioManager {
     }
 
     dio.interceptors.addAll([
+      MangaDexEdgeInterceptor(),
       DioThrottlerInterceptor(
         const Duration(milliseconds: 200),
         onThrottled: (req, scheduled) {

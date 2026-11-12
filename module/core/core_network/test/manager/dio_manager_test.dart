@@ -1,6 +1,15 @@
+/// Unit tests for [DioManager].
+///
+/// Verifies HTTP client creation, timeouts, retry policies, UserAgentManager
+/// attachment, MangaDex edge User-Agent stripping, and bot challenge handling.
+///
+/// Usage:
+/// Run via `fvm flutter test test/manager/dio_manager_test.dart`.
 import 'dart:typed_data';
 
 import 'package:core_analytics/core_analytics.dart';
+import 'package:core_network/src/exception/bot_challenge_exception.dart';
+import 'package:core_network/src/exception/map_dio_error.dart';
 import 'package:core_network/src/manager/dio_manager.dart';
 import 'package:core_network/src/manager/user_agent_manager.dart';
 import 'package:core_network/src/mixin/user_agent_mixin.dart';
@@ -16,10 +25,12 @@ class FakeStorage extends Mock implements Storage {}
 /// Serves the queued status codes in order (the last one repeats) and counts
 /// how many HTTP requests actually hit the adapter.
 class _CountingAdapter implements HttpClientAdapter {
-  _CountingAdapter(this.statuses);
+  _CountingAdapter(this.statuses, {this.redirects = const []});
 
   final List<int> statuses;
+  final List<RedirectRecord> redirects;
   int calls = 0;
+  RequestOptions? lastOptions;
 
   @override
   Future<ResponseBody> fetch(
@@ -27,11 +38,14 @@ class _CountingAdapter implements HttpClientAdapter {
     Stream<Uint8List>? requestStream,
     Future<void>? cancelFuture,
   ) async {
+    lastOptions = options;
     final status = statuses[calls.clamp(0, statuses.length - 1)];
     calls++;
     return ResponseBody(
       Stream.value(Uint8List.fromList([123, 125])),
       status,
+      isRedirect: redirects.isNotEmpty,
+      redirects: redirects,
     );
   }
 
@@ -128,5 +142,77 @@ void main() {
       dio.options.headers[HttpHeaders.userAgentHeader],
       UserAgentMixin.staticUserAgent,
     );
+  });
+
+  test('MangaDex request carries no UA after publish', () async {
+    final manager = UserAgentManager(log: log);
+    final dio = DioManager.create(log: log, userAgentManager: manager);
+    final adapter = _CountingAdapter([200]);
+    dio.httpClientAdapter = adapter;
+
+    manager.publish('WebView/1');
+
+    await dio.get<Object>('https://api.mangadex.org/ping');
+    final mangadexHeaders = adapter.lastOptions?.headers ?? {};
+    expect(
+      mangadexHeaders.keys.any((k) => k.toLowerCase() == 'user-agent'),
+      isFalse,
+    );
+
+    await dio.get<Object>('https://example.com/a');
+    final otherHeaders = adapter.lastOptions?.headers ?? {};
+    expect(
+      otherHeaders[HttpHeaders.userAgentHeader],
+      'WebView/1',
+    );
+  });
+
+  test('challenge response is not retried', () async {
+    final dio = DioManager.create(
+      log: log,
+      retryDelays: const [Duration(milliseconds: 1)],
+    );
+    final adapter = _CountingAdapter(
+      [200],
+      redirects: [
+        RedirectRecord(
+          302,
+          'GET',
+          Uri.parse('https://mangadex.org/edge/challenge?src=x'),
+        ),
+      ],
+    );
+    dio.httpClientAdapter = adapter;
+
+    await expectLater(
+      dio.get<Object>('https://api.mangadex.org/ping'),
+      throwsA(isA<DioException>()),
+    );
+    expect(adapter.calls, 1);
+  });
+
+  test('challenge maps to BotChallengeException', () async {
+    final dio = DioManager.create(log: log);
+    final adapter = _CountingAdapter(
+      [200],
+      redirects: [
+        RedirectRecord(
+          302,
+          'GET',
+          Uri.parse('https://mangadex.org/edge/challenge?src=x'),
+        ),
+      ],
+    );
+    dio.httpClientAdapter = adapter;
+
+    DioException? caught;
+    try {
+      await dio.get<Object>('https://api.mangadex.org/ping');
+    } on DioException catch (e) {
+      caught = e;
+    }
+    expect(caught, isNotNull);
+    final mapped = mapDioError(caught!);
+    expect(mapped, isA<BotChallengeException>());
   });
 }
