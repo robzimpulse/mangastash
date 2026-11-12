@@ -492,6 +492,38 @@ void main() {
       );
     });
 
+    testWidgets('the banner scrolls inside the chapter list', (tester) async {
+      final fake = FakeScrapedSourceExternal(name: 'Scraped Example');
+      bindSources([fake]);
+      cubit = buildCubit(
+        initialState: MangaDetailScreenState(
+          mangaId: 'm-1',
+          manga: const Manga(
+            id: 'm-1',
+            source: 'Scraped Example',
+            title: 'Solo Leveling',
+            webUrl: 'https://old.example/t',
+          ),
+          source: fake,
+          chapters: chapters,
+          totalChapter: 2,
+        ),
+      );
+      await pumpScreen(tester);
+
+      // Regression (#206): the chapter tab is the top of a NestedScrollView
+      // body, so a banner placed outside the chapter list's scroll view is
+      // painted behind the collapsing app bar and never seen. It must be the
+      // ListWidget header, i.e. a child of the chapter list's CustomScrollView.
+      expect(
+        find.descendant(
+          of: find.byType(CustomScrollView),
+          matching: find.byType(SourceMovedBannerWidget),
+        ),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('a manga on a current host shows no banner', (tester) async {
       final fake = FakeScrapedSourceExternal(name: 'Scraped Example');
       bindSources([fake]);
