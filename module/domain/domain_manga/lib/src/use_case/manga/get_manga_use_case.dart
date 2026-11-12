@@ -8,6 +8,11 @@
 // `source` only carries the name: `execute` re-resolves it through the
 // SourceRegistry, so a screen that captured the adapter before the user saved
 // an edited script (Fix source) still runs the saved code.
+//
+// Moved-source gate (issue #206): when the stored manga's webUrl host is not
+// served by the resolved source any more (`movedHostOf` != null), the stored
+// copy is returned as-is — `useCache` and `propertiesFilled` are ignored and
+// no scrape runs, so a new-domain result can never attach to it.
 import 'package:core_analytics/core_analytics.dart';
 import 'package:core_network/core_network.dart';
 import 'package:core_storage/core_storage.dart';
@@ -18,6 +23,7 @@ import 'package:manga_dex_api/manga_dex_api.dart';
 import '../../extension/data_scrapped_extension.dart';
 import '../../extension/map_network_error.dart';
 import '../../extension/scrapped_validation_extension.dart';
+import '../../extension/source_moved_extension.dart';
 import '../../manager/source_registry.dart';
 import '../../mixin/sync_mangas_mixin.dart';
 
@@ -94,6 +100,14 @@ class GetMangaUseCase with SyncMangasMixin {
       final resolved = _registry.fromName(source.name) ?? source;
       final raw = await _mangaDao.search(ids: [mangaId]);
       final manga = Manga.fromDatabase(raw.firstOrNull);
+
+      // Issue #206: a stored manga whose webUrl lives on a host the resolved
+      // source no longer serves is frozen — the stored copy is served
+      // regardless of `useCache`/`propertiesFilled`, and no scrape happens
+      // (a new-domain result must never attach to it).
+      if (manga != null && resolved.movedHostOf(manga.webUrl) != null) {
+        return Success(manga);
+      }
 
       if (manga != null && manga.propertiesFilled && useCache) {
         return Success(manga);

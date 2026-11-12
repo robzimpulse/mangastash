@@ -28,7 +28,9 @@ class MockMangaDao extends Mock implements MangaDao {}
 class MockLogBox extends Mock implements LogBox {}
 
 const _mangaId = 'm-1';
-const _mangaUrl = 'https://mangakatana.com/manga/one-piece.49';
+// The stored webUrl must live on the mocked source's own host (issue #206):
+// a URL on any other host now counts as "moved" and would freeze the manga.
+const _mangaUrl = 'https://scraped.example.com/manga/one-piece.49';
 
 void main() {
   late MockMangaDao mangaDao;
@@ -131,5 +133,99 @@ void main() {
     verify(
       () => source.manga(url: _mangaUrl, useCache: any(named: 'useCache')),
     ).called(1);
+  });
+
+  // Issue #206: a manga whose stored webUrl lives on a host the source no
+  // longer serves is frozen — only stored data is served and nothing scrapes.
+  group('moved source', () {
+    late MockSourceExternal newSource;
+
+    setUp(() {
+      // The user edited the script: the source now serves another domain,
+      // while the stored manga still points at the dead old host.
+      newSource = mockScrapedSource(
+        name: 'Manga Katana',
+        baseUrl: 'https://new.example',
+      );
+      when(() => registry.fromName('Manga Katana')).thenReturn(newSource);
+      when(() => mangaDao.search(ids: any(named: 'ids'))).thenAnswer(
+        (_) async => [
+          MangaModel(
+            manga: MangaDrift(
+              id: _mangaId,
+              webUrl: 'https://old.example/t',
+              createdAt: DateTime(2026),
+              updatedAt: DateTime(2026),
+            ),
+          ),
+        ],
+      );
+    });
+
+    test(
+      'returns the stored manga even with useCache: false and unfilled properties',
+      () async {
+        final result = await useCase.execute(
+          source: source,
+          mangaId: _mangaId,
+          useCache: false,
+        );
+
+        expect(result, isA<Success<Manga>>());
+        expect((result as Success<Manga>).data.webUrl, 'https://old.example/t');
+        verifyNever(
+          () => newSource.manga(
+            url: any(named: 'url'),
+            useCache: any(named: 'useCache'),
+          ),
+        );
+      },
+    );
+
+    test('no stored row keeps the existing not-found path', () async {
+      // Nothing stored ⇒ no stored webUrl ⇒ never moved; the unreachable
+      // "nothing stored → SourceMovedException" row of the spec stays out.
+      when(
+        () => mangaDao.search(ids: any(named: 'ids')),
+      ).thenAnswer((_) async => []);
+
+      final result = await useCase.execute(
+        source: source,
+        mangaId: _mangaId,
+        useCache: false,
+      );
+
+      expect(result, isA<Error<Manga>>());
+      expect((result as Error<Manga>).error, isA<DataNotFoundException>());
+    });
+
+    test('unresolved source falls back to the passed source', () async {
+      // A deleted script (fromName → null) behaves exactly as before the
+      // feature: the passed source serves the stored host, so it scrapes.
+      final passedSource = mockScrapedSource(
+        name: 'Manga Katana',
+        baseUrl: 'https://old.example',
+      );
+      when(() => registry.fromName('Manga Katana')).thenReturn(null);
+      when(
+        () => passedSource.manga(
+          url: 'https://old.example/t',
+          useCache: any(named: 'useCache'),
+        ),
+      ).thenAnswer((_) async => const MangaScrapped());
+
+      await useCase.execute(
+        source: passedSource,
+        mangaId: _mangaId,
+        useCache: false,
+      );
+
+      verify(
+        () => passedSource.manga(
+          url: 'https://old.example/t',
+          useCache: any(named: 'useCache'),
+        ),
+      ).called(1);
+    });
   });
 }
