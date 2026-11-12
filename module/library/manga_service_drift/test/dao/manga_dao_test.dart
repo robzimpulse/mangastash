@@ -150,6 +150,74 @@ void main() {
     );
   });
 
+  // Issue #206: the title+source fallback in adds() must only match rows
+  // whose stored webUrl lives on the same host as the incoming one, so a
+  // moved source's new-domain results insert a fresh manga instead of
+  // silently relinking the user's saved copy.
+  group('adds title+source fallback', () {
+    test('same title+source on a different host inserts a new row', () async {
+      const stored = MangaTablesCompanion(
+        title: Value('T'),
+        source: Value('S'),
+        webUrl: Value('https://old.com/t'),
+      );
+      const incoming = MangaTablesCompanion(
+        title: Value('T'),
+        source: Value('S'),
+        webUrl: Value('https://new.com/t'),
+      );
+
+      await dao.adds(values: {stored: const []});
+      await dao.adds(values: {incoming: const []});
+
+      final rows = await dao.all;
+      expect(rows, hasLength(2));
+      expect(
+        rows.map((e) => e.manga?.webUrl),
+        containsAll(<String>['https://old.com/t', 'https://new.com/t']),
+      );
+    });
+
+    test('same host, different path still updates the existing row', () async {
+      const stored = MangaTablesCompanion(
+        title: Value('T'),
+        source: Value('S'),
+        webUrl: Value('https://old.com/series/t'),
+      );
+      const incoming = MangaTablesCompanion(
+        title: Value('T'),
+        source: Value('S'),
+        webUrl: Value('https://www.old.com/comics/t'),
+      );
+
+      await dao.adds(values: {stored: const []});
+      await dao.adds(values: {incoming: const []});
+
+      final rows = await dao.all;
+      expect(rows, hasLength(1));
+      expect(rows.single.manga?.webUrl, equals('https://www.old.com/comics/t'));
+    });
+
+    test('stored null webUrl still matches by title+source', () async {
+      const stored = MangaTablesCompanion(
+        title: Value('T'),
+        source: Value('S'),
+      );
+      const incoming = MangaTablesCompanion(
+        title: Value('T'),
+        source: Value('S'),
+        webUrl: Value('https://new.com/t'),
+      );
+
+      await dao.adds(values: {stored: const []});
+      await dao.adds(values: {incoming: const []});
+
+      final rows = await dao.all;
+      expect(rows, hasLength(1));
+      expect(rows.single.manga?.webUrl, equals('https://new.com/t'));
+    });
+  });
+
   group('Manga Dao Test', () {
     setUp(() async {
       await dao.adds(values: {for (final (manga, tags) in mangas) manga: tags});

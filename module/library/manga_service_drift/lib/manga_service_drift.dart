@@ -25,5 +25,6 @@ export 'src/model/manga_model.dart';
 export 'src/util/database_viewer.dart';
 export 'src/util/job_type_enum.dart';
 export 'src/util/next_chapter_direction_enum.dart';
+export 'src/util/normalized_host.dart';
 export 'src/util/source_script_origin.dart';
 export 'src/util/typedef.dart';
