@@ -12,6 +12,7 @@ library;
 export 'package:manga_dex_api/manga_dex_api.dart';
 
 export 'src/domain_manga_registrar.dart';
+export 'src/exception/source_moved_exception.dart';
 export 'src/extension/language_code_converter.dart';
 export 'src/extension/scrapped_validation_extension.dart'
     show
@@ -19,6 +20,7 @@ export 'src/extension/scrapped_validation_extension.dart'
         MangaScrappedCardsValidation,
         MangaScrappedDetailValidation,
         requireChapterImages;
+export 'src/extension/source_moved_extension.dart';
 export 'src/extension/uri_source_extension.dart';
 export 'src/manager/source_registry.dart';
 export 'src/mixin/sort_chapters_mixin.dart';

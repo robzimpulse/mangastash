@@ -35,6 +35,8 @@ MockSourceExternal mockScrapedSource({
   when(() => source.baseUrl).thenReturn(baseUrl);
   when(() => source.iconUrl).thenReturn('$baseUrl/favicon.ico');
   when(() => source.builtIn).thenReturn(false);
+  // Issue #206: movedHostOf reads hosts; unstubbed mocks would return null.
+  when(() => source.hosts).thenReturn(const []);
   return source;
 }
 
