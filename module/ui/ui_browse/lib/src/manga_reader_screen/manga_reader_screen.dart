@@ -1,7 +1,9 @@
 // MangaReaderScreen: chapter reader. A failed chapter load offers "Open Debug
 // Browser" and, for a scripted-source parse failure, "Fix source" (issue
 // #115, reported through `onTapFixSource`); a page that never loaded (the
-// script never ran) offers "Retry" instead of "Fix source".
+// script never ran) offers "Retry" instead of "Fix source". A chapter whose
+// source moved away from its host (SourceMovedException, issue #206) shows
+// only the message: no debug browser, Retry or Fix source.
 //
 // Usage: `MangaReaderScreen.create(locator: locator, source: name,
 // mangaId: id, chapterId: id, onTapShortcut: ..., onTapFixSource: ...)`.
@@ -132,18 +134,22 @@ class MangaReaderScreen extends StatelessWidget {
       child: Column(
         children: [
           Text(error.toString(), textAlign: TextAlign.center),
-          const SizedBox(height: 16),
-          OutlinedButton(
-            onPressed: () {
-              final recrawlUrl = recrawlUrlOf(error);
-              if (recrawlUrl != null) {
-                _onTapRecrawl(context: context, url: recrawlUrl);
-              } else {
-                _cubit(context)?.init();
-              }
-            },
-            child: const Text('Open Debug Browser'),
-          ),
+          // Issue #206: the source moved away from this chapter's host, so
+          // there is nothing to open or reload — no debug browser for it.
+          if (error is! SourceMovedException) ...[
+            const SizedBox(height: 16),
+            OutlinedButton(
+              onPressed: () {
+                final recrawlUrl = recrawlUrlOf(error);
+                if (recrawlUrl != null) {
+                  _onTapRecrawl(context: context, url: recrawlUrl);
+                } else {
+                  _cubit(context)?.init();
+                }
+              },
+              child: const Text('Open Debug Browser'),
+            ),
+          ],
           // A page that never loaded is transient (issue #115): the script
           // never ran, so offer Retry, not Fix source.
           if (isTransientLoadError(error)) ...[
