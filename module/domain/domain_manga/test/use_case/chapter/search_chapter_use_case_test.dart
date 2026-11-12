@@ -127,11 +127,17 @@ void main() {
     chapterDao = MockChapterDao();
     mangaDao = MockMangaDao();
     runner = mockRunner();
-    katana = mockScrapedSource(name: 'Manga Katana');
+    katana = mockScrapedSource(
+      name: 'Manga Katana',
+      baseUrl: 'https://mangakatana.com',
+    );
     when(
       () => katana.chaptersUrl(webUrl: any(named: 'webUrl')),
     ).thenAnswer((i) async => i.namedArguments[#webUrl] as String);
-    weebCentral = mockScrapedSource(name: 'Weeb Central');
+    weebCentral = mockScrapedSource(
+      name: 'Weeb Central',
+      baseUrl: 'https://weebcentral.com',
+    );
     when(
       () => weebCentral.chaptersUrl(webUrl: any(named: 'webUrl')),
     ).thenAnswer(
@@ -463,6 +469,107 @@ void main() {
     },
   );
 
+  // Issue #206: a moved source never scrapes — the stored chapters are the
+  // single page the caller gets (empty when none are stored), with no DB
+  // sync and no cache write.
+  group('moved source', () {
+    late MockSourceExternal newSource;
+
+    setUp(() {
+      // The user edited the script: the source now serves another domain,
+      // while the stored manga still points at the dead old host.
+      newSource = mockScrapedSource(
+        name: 'Manga Katana',
+        baseUrl: 'https://new.example',
+      );
+      when(() => registry.fromName('Manga Katana')).thenReturn(newSource);
+      stubSeriesUrl('https://old.example/t');
+      when(
+        () => chapterDao.search(mangaIds: any(named: 'mangaIds')),
+      ).thenAnswer(
+        (_) async => [
+          for (var i = 25; i >= 1; i--)
+            ChapterModel(
+              chapter: ChapterDrift(
+                id: 'stored-$i',
+                mangaId: _mangaId,
+                title: 'Chapter $i',
+                chapter: '$i',
+                webUrl: 'https://old.example/t/c$i',
+                readableAt: DateTime(2026, 1, 1).add(Duration(days: i)),
+                createdAt: DateTime(2026),
+                updatedAt: DateTime(2026),
+              ),
+            ),
+        ],
+      );
+    });
+
+    SourceSearchChapterParameter parameter({
+      Map<ChapterOrders, OrderDirections>? orders,
+    }) {
+      return SourceSearchChapterParameter(
+        source: 'Manga Katana',
+        parameter: SearchChapterParameter(page: 1, limit: 20, orders: orders),
+        mangaId: _mangaId,
+      );
+    }
+
+    test('returns all stored chapters as one page', () async {
+      final result = await useCase.execute(
+        parameter: parameter(
+          orders: {ChapterOrders.chapter: OrderDirections.descending},
+        ),
+      );
+
+      expect(result, isA<Success<Pagination<Chapter>>>());
+      final pagination = (result as Success<Pagination<Chapter>>).data;
+      // More stored chapters than one 20-chapter page: everything comes
+      // back, sorted by sortChapters(parameter), with load-more closed.
+      expect(pagination.data, hasLength(25));
+      expect(
+        pagination.data?.map((e) => e.chapter),
+        equals([for (var i = 25; i >= 1; i--) '$i']),
+      );
+      expect(pagination.hasNextPage, isFalse);
+      expect(pagination.total, 25);
+    });
+
+    test('never calls chaptersUrl/chapters and writes no cache', () async {
+      await useCase.execute(parameter: parameter());
+
+      verifyNever(() => newSource.chaptersUrl(webUrl: any(named: 'webUrl')));
+      verifyNever(
+        () => newSource.chapters(
+          url: any(named: 'url'),
+          useCache: any(named: 'useCache'),
+        ),
+      );
+      verifyNever(
+        () => cacheManager.putFile(
+          any(),
+          any(),
+          key: any(named: 'key'),
+          fileExtension: any(named: 'fileExtension'),
+          maxAge: any(named: 'maxAge'),
+        ),
+      );
+    });
+
+    test('no stored chapters → empty page', () async {
+      when(
+        () => chapterDao.search(mangaIds: any(named: 'mangaIds')),
+      ).thenAnswer((_) async => []);
+
+      final result = await useCase.execute(parameter: parameter());
+
+      expect(result, isA<Success<Pagination<Chapter>>>());
+      final pagination = (result as Success<Pagination<Chapter>>).data;
+      expect(pagination.data, isEmpty);
+      expect(pagination.hasNextPage, isFalse);
+    });
+  });
+
   group('script identity (issue #115)', () {
     final parameter = SourceSearchChapterParameter(
       source: 'Manga Katana',
@@ -530,6 +637,10 @@ void main() {
       });
       current = scriptSource(name: 'Manga Katana', body: 'v1', runner: runner);
       when(() => registry.fromName('Manga Katana')).thenAnswer((_) => current);
+      // Issue #206: the stored manga must live on the resolved script's own
+      // host (scriptSource derives `https://manga-katana.example`), or the
+      // moved-source gate would freeze it and skip the script entirely.
+      stubSeriesUrl('https://manga-katana.example/manga/one-piece');
     });
 
     test('the same script is served from the cache', () async {
