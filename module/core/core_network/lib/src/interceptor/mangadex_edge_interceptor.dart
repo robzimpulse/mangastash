@@ -26,9 +26,11 @@ class MangaDexEdgeInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     if (hosts.contains(options.uri.host)) {
-      options.headers.removeWhere(
-        (key, _) => key.toLowerCase() == 'user-agent',
-      );
+      // `headers` is dio's case-insensitive map, so `remove` drops any
+      // casing. Never use `removeWhere` here: on a LinkedHashMap with custom
+      // equality it leaves a deleted slot that makes the next insert throw a
+      // TypeError (`List<dynamic>` is not a subtype of `String` of 'key1').
+      options.headers.remove('user-agent');
     }
     handler.next(options);
   }

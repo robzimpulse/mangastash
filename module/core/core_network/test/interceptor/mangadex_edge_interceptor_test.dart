@@ -74,6 +74,26 @@ void main() {
     expect(hasUserAgent(adapter.lastOptions!.headers), isFalse);
   });
 
+  test('headers stay writable after the UA is stripped', () async {
+    // `removeWhere` on Dio's case-insensitive LinkedHashMap leaves a deleted
+    // slot that makes the next insert throw a TypeError; a later interceptor
+    // (or dio setting content-length for a body) must still be able to
+    // write headers.
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          options.headers['user-agent'] = 'Later/1.0';
+          options.headers['x-after-strip'] = '1';
+          handler.next(options);
+        },
+      ),
+    );
+
+    await dio.get<Object>('https://api.mangadex.org/ping');
+
+    expect(adapter.lastOptions!.headers['x-after-strip'], '1');
+  });
+
   test('keeps UA for other hosts', () async {
     const hosts = [
       'https://cmdx.mangadex.network/data/1.jpg',
