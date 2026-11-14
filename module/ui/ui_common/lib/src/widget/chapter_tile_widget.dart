@@ -29,6 +29,24 @@ class ChapterTileWidget extends StatelessWidget {
     this.coverUrl,
   });
 
+  /// Resolves the tile title for [chapter] under the reader's saved display
+  /// mode (issue #200): `title` shows the source title (falling back to the
+  /// number when it is missing), `chapter` shows the number only. A null
+  /// [display] keeps the legacy combined format so callers that do not carry
+  /// a [ChapterConfig] (updates, history) render exactly as before.
+  static String displayTitle(Chapter chapter, ChapterDisplayEnum? display) {
+    final number = chapter.chapter;
+    final title = chapter.title;
+    switch (display) {
+      case ChapterDisplayEnum.title:
+        return title ?? (number == null ? '' : 'Chapter $number');
+      case ChapterDisplayEnum.chapter:
+        return number == null ? (title ?? '') : 'Chapter $number';
+      case null:
+        return ['Chapter $number', title].nonNulls.join(' - ');
+    }
+  }
+
   factory ChapterTileWidget.chapter({
     Manga? manga,
     required Chapter chapter,
@@ -41,13 +59,14 @@ class ChapterTileWidget extends StatelessWidget {
     bool isDownloaded = false,
     DateTime? lastReadAt,
     BaseCacheManager? cacheManager,
+    ChapterDisplayEnum? display,
   }) {
     return ChapterTileWidget(
       key: key,
       mangaTitle: manga?.title,
       coverUrl: manga?.coverUrl,
       sourceIconUrl: manga?.source?.let(Sources.fromName)?.iconUrl,
-      title: ['Chapter ${chapter.chapter}', chapter.title].nonNulls.join(' - '),
+      title: displayTitle(chapter, display),
       language: Language.fromCode(chapter.translatedLanguage),
       uploadedAt: chapter.readableAt,
       groups: chapter.scanlationGroup,
